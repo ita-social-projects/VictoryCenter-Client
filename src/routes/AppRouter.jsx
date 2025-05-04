@@ -15,7 +15,7 @@ import { routes } from '../const/routes';
 
 const { adminRoute, userPageRoutes: { page1Route, page2Route } } = routes;
 
-const AppRouter = () => (
+export const AppRouter = () => (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<MainLayout />}>
@@ -28,5 +28,3 @@ const AppRouter = () => (
       </Routes>
     </BrowserRouter>
   );
-
-export default AppRouter;

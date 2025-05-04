@@ -1,6 +1,45 @@
-# Getting Started with Create React App
+# Victory center
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This repo contains front end part of the Victory center
+
+Main structure of this project
+
+my-app/
+├── public/
+│   └── index.html
+├── src/
+│   ├── assets/                             # Images, icons, fonts, etc.
+│   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
+│   │   └── navigation
+│   ├── const                               # Constans that will be used across the project
+│   │   └── routes
+│   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
+│   │   └──main-layout              
+│   ├── pages/                              # Pages
+│   │   ├── admin
+│   │   ├── not-found
+│   │   └── usesr-pages
+│   │       ├── home-page
+│   │       ├── page-1
+│   │       └── page-2
+│   ├── routes/                             # Route configuration
+│   │   └── app-router
+│   ├── hooks/                              # Custom React hooks
+│   ├── context/                            # React context providers
+│   │   └── admin-contex-provider
+│   ├── services/                           # API calls, data services
+│   │   └── data-fetch
+│   │       ├── admin-page-data-fetch
+│   │       └── user-pages-data-fetch
+│   │           ├── home-page-data-fetch
+│   │           ├── page-1-data-fetch
+│   │           └── page-2-data-fetch
+│   ├── utils/                              # Utility functions
+│   │   └── mock-data
+│   ├── main.jsx                            # Entry point (ReactDOM.createRoot)
+│   └── index.css                           # Global styles (normalizer)
+├── .gitignore
+└── package.json
 
 ## Available Scripts
 
@@ -32,15 +71,3 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 ### `npm run eject`
 
 **Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).

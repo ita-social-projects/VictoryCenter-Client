@@ -1,33 +1,27 @@
-dev
-## JIRA
+## JIRA or Github ticker
 
-* [Main JIRA ticket](https://jira.softserve.academy/secure/RapidBoard.jspa?rapidView=id)
+* [JIRA or Github ticket](https://jira.softserve.academy/secure/RapidBoard.jspa?rapidView=id)
 
+## Description
 
-## Code reviewers
+<!--- Please decripe the main goal of this PR and why it was created --->
 
-- [ ] @github_username
+## How it looks
 
-### Second Level Review
-
-- [ ] @github_username
-
-## Summary of issue
-
-ToDo
+<!--- Please provide iamges(screenshots or screen recording) of changes --->
 
 ## Summary of change
 
-ToDo
+<!--- Please specify what was changed --->
 
-## Testing approach
+## How to recreate changes
 
-ToDo
+<!--- Please provide short instruction step-by-step how to see changes that was implemented by this PR --->
+
 
 ## CHECK LIST
-- [ ]  СI passed
-- [ ]  Сode coverage >=95%
-- [ ]  PR is reviewed manually again (to make sure you have 100% ready code)
-- [ ]  All reviewers agreed to merge the PR
-- [ ]  I've checked new feature as logged in and logged out user if needed
+- [ ]  New tests was added or existing was modified
+- [ ]  Changes has severe impact on users
+- [ ]  Changes has medium impact on users
+- [ ]  Changes has light impact on users
 - [ ]  PR meets all conventions

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './page2.scss';
 
-import { page2DataFetch } from '../../../utils/data-fetch/user-pages-data-fetch/page-2-data-fetch/page2DataFetch';
+import { page2DataFetch } from '../../../services/data-fetch/user-pages-data-fetch/page-2-data-fetch/page2DataFetch';
 
 export const Page2 = () => {
     const [headerInfo, setHeaderInfo] = useState('');

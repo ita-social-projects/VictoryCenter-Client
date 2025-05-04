@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAdminContext } from "../../../context/admin-context-provider/AdminContextProvider";
-import { adminPageDataFetch } from "../../../utils/data-fetch/admin-page-data-fetch/adminPageDataFetch";
+import { adminPageDataFetch } from "../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch";
 
 export const AdminPageContent = () => {
   const { token } = useAdminContext();

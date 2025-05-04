@@ -1,9 +1,11 @@
 import React from 'react';
+import { AdminContextProvider } from '../../context/admin-context-provider/AdminContextProvider';
+import { AdminPageContent } from './admin-page-content/AdminPageContent';
 
 export const AdminPage = () => {
     return(
-        <div className='admin-page-container'>
-            <h1>Admin page</h1>
-        </div>
+        <AdminContextProvider>
+            <AdminPageContent />
+        </AdminContextProvider>
     )
 };

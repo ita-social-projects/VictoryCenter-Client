@@ -1,5 +1,8 @@
 import React, { createContext, useContext, ReactNode } from "react";
 
+// DEV NOTE: This is a exaple how we can implement log in procces using React Context
+// if you are more comfortable with AutLayout for React Router then go for it
+
 type Props = {
     children: ReactNode;
 };

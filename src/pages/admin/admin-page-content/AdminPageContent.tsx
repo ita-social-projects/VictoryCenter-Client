@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import './admin-page-content.scss';
+
 import { useAdminContext } from "../../../context/admin-context-provider/AdminContextProvider";
 import { adminPageDataFetch } from "../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch";
 

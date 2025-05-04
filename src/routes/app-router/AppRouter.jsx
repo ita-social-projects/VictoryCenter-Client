@@ -11,7 +11,7 @@ import { Page2 } from '../../pages/user-pages/page2/Page2';
 
 import { NotFound } from '../../pages/not-found/NotFound';
 
-import { routes } from '../../const/routes';
+import { routes } from '../../const/routers/routes';
 
 const { adminRoute, userPageRoutes: { page1Route, page2Route } } = routes;
 

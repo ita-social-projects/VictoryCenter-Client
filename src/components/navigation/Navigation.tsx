@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { routes } from '../../const/routes';
+import { routes } from '../../const/routers/routes';
 
 // DEV NOTE: this is test component creqated to simulate navigation
 // modify or delete it if necessary

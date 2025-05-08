@@ -6,6 +6,8 @@ import { adminPageDataFetch } from "../../../services/data-fetch/admin-page-data
 
 export const AdminPageContent = () => {
   const { token } = useAdminContext();
+  
+  // eslint-disable-next-line no-console
   console.log("Here is our token", token);
 
   const [headerInfo, setHeaderInfo] = useState("");

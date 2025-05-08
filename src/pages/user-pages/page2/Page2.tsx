@@ -26,8 +26,8 @@ export const Page2 = () => {
 
     return (
       <div className="page2-container">
-        <h1>{headerInfo}</h1>
-        <p>{contentInfo}</p>
+        <h1 className='header'>{headerInfo}</h1>
+        <p className='content'>{contentInfo}</p>
       </div>
     );
 };

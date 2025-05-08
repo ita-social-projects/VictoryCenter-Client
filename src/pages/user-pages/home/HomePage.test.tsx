@@ -1,5 +1,4 @@
-import { act } from 'react';
-import { render } from '@testing-library/react';
+import { render,  waitFor } from '@testing-library/react';
 import { HomePage } from './HomePage';
 import * as HomePageDataFetchModule from '../../../services/data-fetch/user-pages-data-fetch/home-page-data-fetch/homePageDataFetch';
 
@@ -22,19 +21,17 @@ describe('Page1', () => {
 
   it('renders the component', async () => {
     const { container } = render(<HomePage />);
-    
-    await act(() => {
-        container
-    });
 
     const header = container.querySelector('.header');
     const content = container.querySelector('.content');
 
     expect(header).toBeInTheDocument();
-    expect(header?.textContent).toEqual(mockHeader);
-
     expect(content).toBeInTheDocument();
-    expect(content?.textContent).toEqual(mockContent);
+
+    await waitFor(() => {
+      expect(header?.textContent).toEqual(mockHeader);
+      expect(content?.textContent).toEqual(mockContent);
+    });
 
     expect(spyHomePageDataFetch).toHaveBeenCalledTimes(1);
   });

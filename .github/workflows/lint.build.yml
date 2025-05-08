@@ -1,0 +1,25 @@
+name: PR-lint-check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    types: [opened, synchronize, reopended]
+
+jobs:
+  sonard_cloud:
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Install modules
+      run: npm i
+    
+    - name: Build project
+      run: npm run build
+
+    - name: Run lint check
+      run: npm run lint

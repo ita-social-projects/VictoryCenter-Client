@@ -1,0 +1,6 @@
+# This is an example of a CODEOWNERS file for a GitHub repository.
+
+# Owners for the entire repository
+
+# temp solution to include this person in order to esure that PRs will be following conventions
+* @Rominos7

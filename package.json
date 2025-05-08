@@ -33,7 +33,14 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "no-console": 1,
+      "no-unused-vars": 2,
+      "testing-library/no-wait-for-multiple-assertions": 0,
+      "testing-library/no-container": 0,
+      "testing-library/no-node-access": 0
+    }
   },
   "browserslist": {
     "production": [

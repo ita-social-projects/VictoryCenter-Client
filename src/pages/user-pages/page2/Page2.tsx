@@ -3,10 +3,13 @@ import './page2.scss';
 
 import { page2DataFetch } from '../../../services/data-fetch/user-pages-data-fetch/page-2-data-fetch/page2DataFetch';
 
+const unusedVar1 = 1;
+
 export const Page2 = () => {
     const [headerInfo, setHeaderInfo] = useState('');
     const [contentInfo, setContentInfo] = useState('');
 
+    const unusedVar2 = 2;
 
     useEffect(() => {
       (async () => {

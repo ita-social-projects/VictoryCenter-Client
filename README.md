@@ -7,6 +7,14 @@ This repo contains front end part of the Victory center
 Main structure of this project
 <pre><code>
 victory-center-client/
+├── .github/
+│   ├── ISSUE_TEMPLATE
+│   ├── PULL_REQUEST_TEMPLATE
+│   ├── workflows
+│   │   ├── lint.build.yml
+│   │   └── test.build.yml
+│   ├── CODEOWNERS
+│   └── pull_request_template.md
 ├── public/
 │   └── index.html
 ├── src/

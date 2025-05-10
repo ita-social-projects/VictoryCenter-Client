@@ -83,7 +83,7 @@ See the section about [running tests](https://facebook.github.io/create-react-ap
 ### `npm run test:cover`
 
 Launches the test runnner that will collect coverage info\
-and present it in a form of a table in terminal.\
+and present it in a form of a table in terminal.
 
 ### `npm run lint`
 

@@ -27,7 +27,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "test:cover": "npm test -- --coverage --watchAll=false",
-    "lint": "eslint . --ignore-path .gitignore --max-warnings 10"
+    "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --max-warnings 10"
   },
   "eslintConfig": {
     "extends": [

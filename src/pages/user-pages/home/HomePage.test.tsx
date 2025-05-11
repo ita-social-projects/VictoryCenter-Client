@@ -4,7 +4,7 @@ import * as HomePageDataFetchModule from '../../../services/data-fetch/user-page
 
 const spyHomePageDataFetch = jest.spyOn(HomePageDataFetchModule, 'homePageDataFetch');
 
-describe('Page1', () => {
+describe('HomePage', () => {
   const mockHeader = 'Test Header';
   const mockContent = 'Test Content';
 

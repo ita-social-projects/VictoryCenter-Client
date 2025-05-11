@@ -1,11 +1,11 @@
-import React, { createContext, useContext, ReactNode } from "react";
-import { getIsLoginSuccessfulMock } from '../../utils/mock-data/admin-page/loginMethod';
+import React, { createContext, useContext, useMemo, ReactNode } from "react";
+import { getIsLoginSuccessfulMock } from "../../utils/mock-data/admin-page/loginMethod";
 
 // DEV NOTE: This is a exaple how we can implement log in procces using React Context
 // if you are more comfortable with AutLayout for React Router then go for it
 
 type Props = {
-    children: ReactNode;
+  children: ReactNode;
 };
 
 type ContextType = {
@@ -28,12 +28,17 @@ export const AdminContextProvider = ({ children }: Props) => {
 
   const isLoginSuccessful = getIsLoginSuccessfulMock(); // <-- true
 
+  const token = "fake-token"; // <-- in a future provide real token here
+
+  const contextValue = useMemo(
+    () => ({
+      token,
+    }),
+    [token]
+  );
+
   return isLoginSuccessful ? (
-    <AdminContext.Provider
-      value={{
-        token: "fake-token", // token value goes here
-      }}
-    >
+    <AdminContext.Provider value={contextValue}>
       {children}
     </AdminContext.Provider>
   ) : (

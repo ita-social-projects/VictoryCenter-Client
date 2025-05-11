@@ -24,4 +24,5 @@
 - [ ]  Changes has severe impact on users
 - [ ]  Changes has medium impact on users
 - [ ]  Changes has light impact on users
+- [ ]  Test covetage was updated
 - [ ]  PR meets all conventions

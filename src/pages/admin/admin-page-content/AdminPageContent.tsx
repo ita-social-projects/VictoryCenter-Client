@@ -31,8 +31,8 @@ export const AdminPageContent = () => {
 
   return (
     <div className="admin-page-content">
-      <h1>{headerInfo}</h1>
-      <p>{contentInfo}</p>
+      <h1 className='header'>{headerInfo}</h1>
+      <p className='content'>{contentInfo}</p>
     </div>
   );
 };

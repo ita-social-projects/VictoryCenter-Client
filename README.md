@@ -46,10 +46,17 @@ victory-center-client/
 │   │           └── page-2-data-fetch
 │   ├── utils/                              # Utility functions
 │   │   └── mock-data
-│   ├── main.jsx                            # Entry point (ReactDOM.createRoot)
-│   └── index.css                           # Global styles (normalizer)
+│   ├── index.jsx                           # Entry point (ReactDOM.createRoot)
+│   ├── index.css                           # Global styles (normalizer)
+│   ├── react-app-env.d.ts
+│   ├── reportWebVitals.ts
+│   └── setupTests.ts
 ├── .gitignore
-└── package.json
+├── LICENSE
+├── package-lock.json
+├── package.json
+├── README
+└── tsconfig.json
 </code></pre>
 
 [![Build Status](https://img.shields.io/travis/ita-social-projects/VictoryCenter-Back/master?style=flat-square)](https://travis-ci.org/github/ita-social-projects/VictoryCenter-Back)
@@ -83,7 +90,7 @@ See the section about [running tests](https://facebook.github.io/create-react-ap
 ### `npm run test:cover`
 
 Launches the test runnner that will collect coverage info\
-and present it in a form of a table in terminal.\
+and present it in a form of a table in terminal.
 
 ### `npm run lint`
 

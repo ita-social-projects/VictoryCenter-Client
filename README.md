@@ -59,10 +59,10 @@ victory-center-client/
 └── tsconfig.json
 </code></pre>
 
-[![Build Status](https://img.shields.io/travis/ita-social-projects/VictoryCenter-Back/master?style=flat-square)](https://travis-ci.org/github/ita-social-projects/VictoryCenter-Back)
-[![Coverage Status](https://img.shields.io/gitlab/coverage/ita-social-projects/VictoryCenter-Back/master?style=flat-square)](https://coveralls.io)
-[![Github Issues](https://img.shields.io/github/issues/ita-social-projects/VictoryCenter-Back?style=flat-square)](https://github.com/ita-social-projects/VictoryCenter-Back/issues)
-[![Pending Pull-Requests](https://img.shields.io/github/issues-pr/ita-social-projects/VictoryCenter-Back?style=flat-square)](https://github.com/ita-social-projects/VictoryCenter-Back/pulls)
+[![Build Status](https://img.shields.io/travis/ita-social-projects/VictoryCenter-Client/main?style=flat-square)](https://travis-ci.org/github/ita-social-projects/VictoryCenter-Client)
+[![Coverage Status](https://img.shields.io/gitlab/coverage/ita-social-projects/VictoryCenter-Client/main?style=flat-square)](https://coveralls.io)
+[![Github Issues](https://img.shields.io/github/issues/ita-social-projects/VictoryCenter-Client?style=flat-square)](https://github.com/ita-social-projects/VictoryCenter-Client/issues)
+[![Pending Pull-Requests](https://img.shields.io/github/issues-pr/ita-social-projects/VictoryCenter-Client?style=flat-square)](https://github.com/ita-social-projects/VictoryCenter-Client/pulls)
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=alert_status)](https://sonarcloud.io/project/overview?id=ita-social-projects_VictoryCenter-Client) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=coverage)](https://sonarcloud.io/dashboard?id=ita-social-projects_VictoryCenter-Client) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=bugs)](https://sonarcloud.io/dashboard?id=ita-social-projects_VictoryCenter-Client) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=code_smells)](https://sonarcloud.io/dashboard?id=ita-social-projects_VictoryCenter-Client) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=security_rating)](https://sonarcloud.io/dashboard?id=ita-social-projects_VictoryCenter-Client)
 

@@ -7,7 +7,6 @@ export const Page2 = () => {
     const [headerInfo, setHeaderInfo] = useState('');
     const [contentInfo, setContentInfo] = useState('');
 
-
     useEffect(() => {
       (async () => {
         const responce = await page2DataFetch();

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, ReactNode } from "react";
+import { getIsLoginSuccessfulMock } from '../../utils/mock-data/admin-page/loginMethod';
 
 // DEV NOTE: This is a exaple how we can implement log in procces using React Context
 // if you are more comfortable with AutLayout for React Router then go for it
@@ -25,7 +26,7 @@ export const AdminContextProvider = ({ children }: Props) => {
   // if isLoginSuccessful = true then we will "leed" user to admin page
   // if isLoginSuccessful = false then we will show user error message
 
-  const isLoginSuccessful = true;
+  const isLoginSuccessful = getIsLoginSuccessfulMock(); // <-- true
 
   return isLoginSuccessful ? (
     <AdminContext.Provider

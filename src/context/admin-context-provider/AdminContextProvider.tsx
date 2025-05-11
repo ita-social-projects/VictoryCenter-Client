@@ -18,11 +18,10 @@ export const AdminContextProvider = ({ children }: Props) => {
   // DEV NOTE:
   // here you need to call login method to init login proccess
   // for example
-  /* 
-        const isLoginSuccessful =  initLogin();
-        // additional logic to show log in page if needed
 
-    */
+  // const isLoginSuccessful =  initLogin();
+  // additional logic to show log in page if needed
+
   // if isLoginSuccessful = true then we will "leed" user to admin page
   // if isLoginSuccessful = false then we will show user error message
 

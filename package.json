@@ -60,14 +60,17 @@
     ],
     "coveragePathIgnorePatterns": [
       "src/utils/mock-data",
-      "src/const"
+      "src/const",
+      "index.tsx",
+      "react-app-env.d.ts",
+      "reportWebVitals.ts"
     ],
     "coverageThreshold": {
       "global": {
-        "statements": 44.3,
+        "statements": 58.8,
         "branches": 0,
-        "functions": 40,
-        "lines": 47.2
+        "functions": 60.8,
+        "lines": 57.1
       }
     }
   },

@@ -174,7 +174,7 @@ api.secret=${API_SECRET}
 
 Reach out to us at one of the following places!
 
-- Telegram at <a href="https://t.me/ira_zavushchak" target="_blank">`Iryna Zavushchak`</a>
+- Discord at <a href="https://discord.com/">`ira_zavushchak`</a>
 
 ---
 

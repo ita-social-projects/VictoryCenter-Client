@@ -2,16 +2,19 @@ import React from 'react';
 import {Link} from 'react-router';
 import {routes} from '../../const/routers/routes';
 import {ReactComponent as VictoryCenterLogo} from '../../assets/images/header/VictoryCenterLogo.svg'
+import {ABOUT_US, PROGRAMS, REPORTING, HOW_TO_SUPPORT, CONTACT_US, DONATE} from "../../const/header/header";
 import './Header.scss'
 
 const {userPageRoutes: {page1Route, page2Route}} = routes;
 
 export const Header = () => {
     const onContactUsClick = () => {
+        //TODO: remove this log after implementing an actual logic
         console.log('CONTACT USED!');
     }
 
     const onDonateClick = () => {
+        //TODO: remove this log after implementing an actual logic
         console.log('DONATE!');
     }
 
@@ -25,16 +28,16 @@ export const Header = () => {
 
             <div className="middleContainer">
                 <nav>
-                    <Link to={page1Route}>Про нас</Link>
-                    <Link to={page2Route}>Програми</Link>
-                    <Link to={page2Route}>Звітність</Link>
-                    <Link to={page2Route}>Як підтримати?</Link>
+                    <Link to={page1Route}>{ABOUT_US}</Link>
+                    <Link to={page2Route}>{PROGRAMS}</Link>
+                    <Link to={page2Route}>{REPORTING}</Link>
+                    <Link to={page2Route}>{HOW_TO_SUPPORT}</Link>
                 </nav>
             </div>
 
             <div className="rightContainer">
-                <button className="contactUsButton" onClick={onContactUsClick}>Зв' язатись</button>
-                <button className="donateButton" onClick={onDonateClick}>Донатити</button>
+                <button className="contactUsButton" onClick={onContactUsClick}>{CONTACT_US}</button>
+                <button className="donateButton" onClick={onDonateClick}>{DONATE}</button>
             </div>
         </div>
     )

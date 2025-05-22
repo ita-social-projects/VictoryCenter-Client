@@ -10,11 +10,13 @@ const {userPageRoutes: {page1Route, page2Route}} = routes;
 export const Header = () => {
     const onContactUsClick = () => {
         //TODO: remove this log after implementing an actual logic
+        //eslint-disable-next-line no-console
         console.log('CONTACT USED!');
     }
 
     const onDonateClick = () => {
         //TODO: remove this log after implementing an actual logic
+        //eslint-disable-next-line no-console
         console.log('DONATE!');
     }
 

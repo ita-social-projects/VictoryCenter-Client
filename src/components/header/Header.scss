@@ -1,0 +1,50 @@
+.headerBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  padding-top: 1rem;
+  padding-left: 3rem;
+  padding-right: 3rem;
+
+  .leftContainer {
+    .logo {
+      user-select: none;
+      cursor: pointer;
+    }
+  }
+
+  .middleContainer {
+    nav {
+      display: flex;
+      gap: 3rem;
+
+      a {
+        color: black;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .rightContainer {
+    display: flex;
+    gap: 0.5rem;
+
+    .contactUsButton {
+      background-color: white;
+      width: 10em;
+      height: 2.5rem;
+      cursor: pointer;
+    }
+    .donateButton {
+      background-color: #061125;
+      color: white;
+      width: 7.5rem;
+      height: 2.5rem;
+      cursor: pointer;
+    }
+  }
+}

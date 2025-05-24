@@ -1,0 +1,12 @@
+@use '../variables/variables.fonts' as ft;
+
+@mixin font-face($font-family, $file-name, $font-weight: normal, $font-style: normal) {
+  @font-face {
+    font-family: #{$font-family};
+    src: url('../../fonts/#{$file-name}.woff2') format('woff2'),
+         url('../../fonts/#{$file-name}.woff') format('woff');
+    font-weight: $font-weight;
+    font-style: $font-style;
+    font-display: swap;
+  }
+}

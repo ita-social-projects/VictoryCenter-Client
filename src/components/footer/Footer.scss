@@ -132,9 +132,6 @@
     animation: scroll-left 30s linear infinite, color-change 15s ease-in-out infinite;
     padding: 0;
   }
-
-  .scrolling-text span {}
-
   @keyframes scroll-left {
     0% {
       transform: translateX(0%);

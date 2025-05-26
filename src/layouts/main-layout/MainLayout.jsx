@@ -4,7 +4,7 @@ import { Header } from '../../components/header/Header';
 
 export const MainLayout = () => (
   <div>
-    <div className="navigation-container">
+    <div className="header-container">
       <Header />
     </div>
     <div className="page-container">

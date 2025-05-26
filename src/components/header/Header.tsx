@@ -22,13 +22,13 @@ export const Header = () => {
 
     return (
         <div className="headerBlock">
-            <div className="leftContainer">
+            <div className="logoContainer">
                 <Link to="/">
                     <VictoryCenterLogo className="logo"/>
                 </Link>
             </div>
 
-            <div className="middleContainer">
+            <div className="linkContainer">
                 <nav>
                     <Link to={page1Route}>{ABOUT_US}</Link>
                     <Link to={page2Route}>{PROGRAMS}</Link>
@@ -37,7 +37,7 @@ export const Header = () => {
                 </nav>
             </div>
 
-            <div className="rightContainer">
+            <div className="buttonContainer">
                 <button className="contactUsButton" onClick={onContactUsClick}>{CONTACT_US}</button>
                 <button className="donateButton" onClick={onDonateClick}>{DONATE}</button>
             </div>

@@ -7,14 +7,14 @@
   padding-left: 3rem;
   padding-right: 3rem;
 
-  .leftContainer {
+  .logoContainer {
     .logo {
       user-select: none;
       cursor: pointer;
     }
   }
 
-  .middleContainer {
+  .linkContainer {
     nav {
       display: flex;
       gap: 3rem;
@@ -29,7 +29,7 @@
     }
   }
 
-  .rightContainer {
+  .buttonContainer {
     display: flex;
     gap: 0.5rem;
 

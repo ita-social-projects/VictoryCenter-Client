@@ -2,6 +2,7 @@
 @use "../../assets/sass/variables/variables.colors" as c;
 
 .content {
+  margin-top: 3.75rem;
   font-family: ft.$mulish-regular-font;
   display: flex;
   flex-direction: column;
@@ -21,6 +22,7 @@
     display: flex;
     gap: 3rem;
     justify-content: center;
+    width: 68.5rem;
 
     a {
 

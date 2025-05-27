@@ -6,8 +6,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+      - name: Get current date and time
+        id: datetime
+        run: echo "datetime=$(date -u)" >> $GITHUB_OUTPUT
+
       - name: send custom message
         uses: appleboy/discord-action@v1.2.0
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
-          message: The ${{ github.event_name }} event triggered first step.
+          message: |
+              The ${{ github.event_name }} event triggered first step
+            - **Time (UTC)**: ${{ steps.datetime.outputs.datetime }}
+            - The Repository: {{ github.repository }}
+             

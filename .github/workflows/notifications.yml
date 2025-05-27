@@ -16,6 +16,6 @@ jobs:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
           message: |
               The ${{ github.event_name }} event triggered first step
-            - **Time (UTC)**: ${{ steps.datetime.outputs.datetime }}
-            - The Repository: {{ github.repository }}
+              Time (UTC): ${{ steps.datetime.outputs.datetime }}
+              The Repository: {{ github.repository }}
              

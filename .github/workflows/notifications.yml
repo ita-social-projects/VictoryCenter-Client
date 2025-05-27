@@ -3,7 +3,7 @@ on: [push]
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: runner-stage-front
     steps:
       - uses: actions/checkout@master
       - name: Get current date and time
@@ -18,7 +18,7 @@ jobs:
               The "${{ github.event_name }}" event triggered first step
               Time (UTC): ${{ steps.datetime.outputs.datetime }}
               The Repository: ${{ github.repository }}
-              Runner: ${{ github.runner }}
+              Runner: ${{ runner.name }} / OS: ${{ runner.os }} / Arch: ${{ runner.arch }}
               Branch: ${{ github.ref_name }}
               Job: ${{ github.job }}
               Actor: ${{ github.actor }}

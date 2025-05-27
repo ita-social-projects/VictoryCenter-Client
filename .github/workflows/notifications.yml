@@ -15,7 +15,13 @@ jobs:
         with:
           webhook_url: ${{ secrets.WEBHOOK_URL }}
           message: |
-              The ${{ github.event_name }} event triggered first step
+              The "${{ github.event_name }}" event triggered first step
               Time (UTC): ${{ steps.datetime.outputs.datetime }}
-              The Repository: {{ github.repository }}
+              The Repository: ${{ github.repository }}
+              Runner: ${{ github.runner }}
+              Branch: ${{ github.ref_name }}
+              Job: ${{ github.job }}
+              Actor: ${{ github.actor }}
+              Status: 
+
              

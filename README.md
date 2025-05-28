@@ -52,6 +52,7 @@ victory-center-client/
 │   ├── reportWebVitals.ts
 │   └── setupTests.ts
 ├── .gitignore
+├── Dockerfile
 ├── LICENSE
 ├── package-lock.json
 ├── package.json

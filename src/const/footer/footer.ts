@@ -22,3 +22,7 @@ export const FINANCIALLY = 'Фінансово';
 export const NON_FINANCIALLY = 'Нефінансово';
 
 export const VICTORY_STARTS_WITH_YOU = 'ПЕРЕМОГА ПОЧИНАЄТЬСЯ З ТЕБЕ';
+
+export const STAY_UP_TO_DATE_WUTH_THE_NEWS ='Будьте в курсі новин та можливостей';
+export const ENTER_YOUR_EMAIL = 'Вкажіть ваш Email';
+export const SIGN_UP = 'Підписатися';

@@ -2,9 +2,32 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { routes } from "../../const/routers/routes";
 import "./Footer.scss";
-import "../../const/footer/footer"
 import arrowIcon from "../../assets/images/footer/arrow-up-right.svg";
-import { ABOUT_US, ABOUT_VC, ARCHIVE, EVENTS, FINANCIALLY, FOR_CHILDREN, FOR_VETERAN, HISTORY_OF_CREATION, HOW_TO_SUPPORT, NON_FINANCIALLY, PARTNERS, PRESS_ABOUT_US, PROGRAMS, REPORTING, REPORTS, REVIEWS, SUCCES_STORIES, TEAM, VICTORY_STARTS_WITH_YOU, WHAT_IS_HIPPOTHERAPY } from "../../const/footer/footer";
+import {
+  ABOUT_US,
+  STAY_UP_TO_DATE_WUTH_THE_NEWS,
+  ENTER_YOUR_EMAIL,
+  SIGN_UP,
+  ABOUT_VC,
+  ARCHIVE,
+  EVENTS,
+  FINANCIALLY,
+  FOR_CHILDREN,
+  FOR_VETERAN,
+  HISTORY_OF_CREATION,
+  HOW_TO_SUPPORT,
+  NON_FINANCIALLY,
+  PARTNERS,
+  PRESS_ABOUT_US,
+  PROGRAMS,
+  REPORTING,
+  REPORTS,
+  REVIEWS,
+  SUCCES_STORIES,
+  TEAM,
+  VICTORY_STARTS_WITH_YOU,
+  WHAT_IS_HIPPOTHERAPY,
+} from "../../const/footer/footer";
 
 const {
   userPageRoutes: { page1Route, page2Route },
@@ -17,18 +40,18 @@ export const Footer = () => {
     setEmail("");
   };
 
-   const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
   };
   return (
     <div className="content">
       <div className="main_block">
         <div className="email_field">
-          <span className="title">Будьте в курсі новин та можливостей</span>
+          <span className="title">{STAY_UP_TO_DATE_WUTH_THE_NEWS}</span>
           <div className="input_block">
             <input
               type="email"
-              placeholder="Вкажіть ваш Email"
+              placeholder={ENTER_YOUR_EMAIL}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -36,9 +59,9 @@ export const Footer = () => {
             <button
               onClick={handleClick}
               className="subscribe-btn"
-              aria-label="Підписатися"
+              aria-label={SIGN_UP}
             >
-              <img src={arrowIcon} alt="Підписатися" />
+              <img src={arrowIcon} alt={SIGN_UP} />
             </button>
           </div>
         </div>
@@ -78,30 +101,47 @@ export const Footer = () => {
 
       <div className="contact_block">
         <div className="main_contacts">
-          <p className="contact-item" onClick={() => copyToClipboard('+380 50 334 4448')}>
+          <button
+            className="contact-item"
+            onClick={() => copyToClipboard("+380 50 334 4448")}
+          >
             +380 50 334 4448
-          </p>
-          <p className="contact-item" onClick={() => copyToClipboard('victorycenter@gmail.com')}>
+          </button>
+
+          <button
+            className="contact-item"
+            onClick={() => copyToClipboard("victorycenter@gmail.com")}
+          >
             victorycenter@gmail.com
-          </p>
+          </button>
         </div>
-        <div className="social_media"></div>
-          <p className="contact-item" onClick={() => copyToClipboard('some_inst')}>
-           Instagram
-          </p>
-          <p className="contact-item" onClick={() => copyToClipboard('some_facebook')}>
-           Facebook
-          </p>
-          <p className="contact-item" onClick={() => copyToClipboard('some_telegram')}>
-           Telegram
-          </p>
+        <div className="social_media">
+          <button
+            className="contact-item"
+            onClick={() => copyToClipboard("some_inst")}
+          >
+            Instagram
+          </button>
+          <button
+            className="contact-item"
+            onClick={() => copyToClipboard("some_facebook")}
+          >
+            Facebook
+          </button>
+          <button
+            className="contact-item"
+            onClick={() => copyToClipboard("some_telegram")}
+          >
+            Telegram
+          </button>
+        </div>
       </div>
       <div className="scrolling-text-wrapper">
-      <p className="scrolling-text">
-        <span>{VICTORY_STARTS_WITH_YOU}</span>
-        <span>{VICTORY_STARTS_WITH_YOU}</span>
-      </p>
-    </div>
+        <p className="scrolling-text">
+          <span>{VICTORY_STARTS_WITH_YOU} </span>
+          <span> {VICTORY_STARTS_WITH_YOU}</span>
+        </p>
+      </div>
     </div>
   );
 };

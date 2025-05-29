@@ -2,31 +2,44 @@ import React, { useState, useEffect } from 'react';
 import './page1.scss';
 
 import { page1DataFetch } from '../../../services/data-fetch/user-pages-data-fetch/page-1-data-fetch/page1DataFetch';
+import { TeamMember } from './TeamMemberCard/TeamMemberCard';
 
-export const Page1 = () => {
-    const [headerInfo, setHeaderInfo] = useState('');
-    const [contentInfo, setContentInfo] = useState('');
+interface Member {
+  name: string;
+  role: string;
+  photo: string;
+}
 
-    useEffect(() => {
-      (async () => {
-        const responce = await page1DataFetch();
+interface TeamItem {
+  title: string;
+  description: string;
+  members: Member[];
+}
 
-        const { header, content } = responce;
+export const Page1: React.FC = () => {
+  const [teamData, setTeamData] = useState<TeamItem[]>([]);
 
-        // DEV NOTE: in React 18 and higher there is a term "Automatic Batching"
-        // https://react.dev/blog/2022/03/08/react-18-upgrade-guide#automatic-batching
-        // that means if you are calling setState one after another it will set data in ONE render cycle
-        // please follow the pattern
+  useEffect(() => {
+    (async () => {
+      const response = await page1DataFetch();
+      const {teamData } = response;
+      setTeamData(teamData);
+    })();
+  }, []);
 
-        setHeaderInfo(header);
-        setContentInfo(content);
-      })();
-    }, []);
-
-    return (
-      <div className="page1-container">
-        <h1 className='header'>{headerInfo}</h1>
-        <p className='content'>{contentInfo}</p>
-      </div>
-    );
+  return (
+    <div className="page1-container">
+      {teamData.map((team, index) => (
+        <div key={index} className="team-section">
+          <h2>{team.title}</h2>
+          <p>{team.description}</p>
+          <ul className="team-members-list">
+            {team.members.map((member) => (
+              <TeamMember key={member.name} member={member} />
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
 };

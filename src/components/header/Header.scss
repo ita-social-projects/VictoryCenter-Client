@@ -3,9 +3,9 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
-  padding-top: 1rem;
-  padding-left: 3rem;
-  padding-right: 3rem;
+  padding-top: 0.85rem;
+  padding-left: 3.5rem;
+  padding-right: 3.5rem;
 
   .logoContainer {
     .logo {
@@ -21,6 +21,9 @@
 
       a {
         color: black;
+        font-family: 'Mulish', sans-serif;
+        font-size: 1rem;
+        font-weight: 600;
         text-decoration: none;
       }
       a:hover {
@@ -35,13 +38,18 @@
 
     .contactUsButton {
       background-color: white;
-      width: 10em;
+      width: 8.2em;
       height: 2.5rem;
-      cursor: pointer;
+      font-family: 'Mulish', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer
     }
     .donateButton {
       background-color: #061125;
       color: white;
+      font-family: 'Mulish', sans-serif;
+      font-size: 1rem;
       width: 7.5rem;
       height: 2.5rem;
       cursor: pointer;

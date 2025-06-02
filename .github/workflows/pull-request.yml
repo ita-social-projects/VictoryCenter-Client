@@ -26,7 +26,6 @@ jobs:
         with:
           images: |
             victorycenterua/test
-            ghcr.io/${{ github.repository }}
 
       - name: Build and push Docker images
         id: push

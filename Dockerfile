@@ -3,9 +3,11 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 RUN npm install --global serve
-COPY ./ ./
+COPY tsconfig.json ./
+COPY public ./public
+COPY src ./src
 RUN npm run build
-User nonroot
+
 
 FROM nginx:alpine
 COPY --from=build /app/build /usr/share/nginx/html

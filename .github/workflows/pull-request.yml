@@ -1,13 +1,10 @@
 name: Publish Docker image
 
-on:
-  push:
-    branches: [ release/* ]
-
+on: [push]
 jobs:
-  push_to_registries:
-    name: Push Docker image to multiple registries
-    runs-on: ubuntu-latest
+  build:
+    name: Build
+    runs-on: runner-stage-front
     permissions:
       packages: write
       contents: read

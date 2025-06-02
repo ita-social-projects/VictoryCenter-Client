@@ -22,6 +22,6 @@ jobs:
               Branch: ${{ github.ref_name }}
               Job: ${{ github.job }}
               Actor: ${{ github.actor }}
-              Status: 
+              
 
              

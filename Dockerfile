@@ -2,7 +2,6 @@ FROM node:alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm install --ignore-scripts
-RUN npm install --global serve --ignore-scripts
 COPY tsconfig.json ./
 COPY public ./public
 COPY src ./src

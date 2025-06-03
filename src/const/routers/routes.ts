@@ -1,11 +1,11 @@
 export const adminRoute = '/admin-page';
 
 // user pages routes
-export const page1Route = '/page-1';
+export const TeamPageRoute = '/team-page';
 export const page2Route = '/page-2';
 
 export const userPageRoutes = {
-    page1Route,
+    TeamPageRoute,
     page2Route
 };
 

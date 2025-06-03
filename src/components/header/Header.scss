@@ -1,3 +1,5 @@
+$mulish-font-family: 'Mulish', sans-serif;
+
 .headerBlock {
   display: flex;
   justify-content: space-between;
@@ -21,12 +23,15 @@
 
       a {
         color: black;
-        font-family: 'Mulish', sans-serif;
+        font-family: $mulish-font-family;
         font-size: 1rem;
         font-weight: 600;
         text-decoration: none;
       }
       a:hover {
+        text-decoration: underline;
+      }
+      a:focus {
         text-decoration: underline;
       }
     }
@@ -40,15 +45,15 @@
       background-color: white;
       width: 8.2em;
       height: 2.5rem;
-      font-family: 'Mulish', sans-serif;
+      font-family: $mulish-font-family;
       font-size: 1rem;
       font-weight: 500;
-      cursor: pointer
+      cursor: pointer;
     }
     .donateButton {
       background-color: #061125;
       color: white;
-      font-family: 'Mulish', sans-serif;
+      font-family: $mulish-font-family;
       font-size: 1rem;
       width: 7.5rem;
       height: 2.5rem;

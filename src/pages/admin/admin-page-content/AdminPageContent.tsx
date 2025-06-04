@@ -3,6 +3,7 @@ import './admin-page-content.scss';
 
 import { useAdminContext } from "../../../context/admin-context-provider/AdminContextProvider";
 import { adminPageDataFetch } from "../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch";
+import {Link} from "react-router-dom";
 
 export const AdminPageContent = () => {
   const { token } = useAdminContext();
@@ -33,6 +34,7 @@ export const AdminPageContent = () => {
     <div className="admin-page-content">
       <h1 className='header'>{headerInfo}</h1>
       <p className='content'>{contentInfo}</p>
+      <Link to='/admin-page/team'>teams</Link>
     </div>
   );
 };

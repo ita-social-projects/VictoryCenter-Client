@@ -1,0 +1,43 @@
+.admin {
+  &__logo {
+    height: 110px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 36px;
+  }
+
+  &__pages {
+    font-size: 24px;
+
+    &-selected {
+      background-color: #b5bdcb;
+
+      &:before {
+        position: absolute;
+        content: '';
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 3%;
+        background-color: #081124;
+      }
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+
+      a {
+        color: black;
+        text-decoration: none;
+      }
+
+      li {
+        position: relative;
+        padding: 10px 10px 10px 40px;
+
+      }
+    }
+  }
+}

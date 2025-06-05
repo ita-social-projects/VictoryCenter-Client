@@ -4,7 +4,7 @@ import {MemberDragPreviewModel} from "../members-list/MembersList";
 import {MemberComponent} from "../member-component/MemberComponent";
 import "./member-drag-preview.scss";
 
-type MemberDragPreviewProps = {
+export type MemberDragPreviewProps = {
     dragPreview: MemberDragPreviewModel
 };
 export const MemberDragPreview = ({dragPreview}: MemberDragPreviewProps) => {

@@ -3,7 +3,7 @@ import "./modal.scss";
 import CloseIcon from "../../../assets/icons/close-icon.svg";
 
 interface ModalProps {
-    children: ReactNode;
+    children?: ReactNode;
     isOpen: boolean;
     onClose: () => void;
     // Changed from widthInPx to more flexible width options
@@ -50,8 +50,8 @@ export const Modal = ({
 
     return (
         <>
-            <div className="modal-overlay" onClick={onClose}>
-                <div
+            <div data-testid="modal-overlay" className="modal-overlay" onClick={onClose}>
+                <div role={'dialog'}
                     className="modal-container"
                     style={modalStyle}
                     onClick={(e) => e.stopPropagation()}

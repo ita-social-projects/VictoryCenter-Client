@@ -24,7 +24,7 @@ export const Select = <TValue,>({children, onValueChange, selectContainerRef, cl
         onValueChange(value);
     };
 
-    return (<div ref={selectContainerRef} onClick={handleOpenSelect} className={`${className} select ${isOpen ? 'select-opened' : 'select-closed'}`}>
+    return (<div ref={selectContainerRef} onClick={handleOpenSelect} className={`${className || ''} select ${isOpen ? 'select-opened' : 'select-closed'}`}>
         <span style={selectedValue !== null ? {color: "#061125"} : {color: "#61615C"}}>{selectedValue ? selectedValue.toString() : 'Статус'}</span>
         <img src={isOpen ? ArrowUp : ArrowDown} alt="arrow-down"/>
         <div className={`select-options ${isOpen ? 'select-options-visible' : ''}`}>
@@ -39,4 +39,4 @@ export const Select = <TValue,>({children, onValueChange, selectContainerRef, cl
     </div>);
 }
 
-Select.Option = ({children, value, name}: { children?: React.ReactNode, value: string, name: string }) => <>{children}</>
+Select.Option = <TValue,>({children, value, name}: { children?: React.ReactNode, value: TValue, name: string }) => <>{children}</>

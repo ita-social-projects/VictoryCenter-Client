@@ -2,12 +2,13 @@ import React from "react";
 import "./button.scss";
 type ButtonProps = {
     children: React.ReactNode,
-    style: 'primary' | 'secondary',
+    style?: 'primary' | 'secondary',
     onClick?: () => void;
     type?: "submit" | "reset" | "button"
     form?: string | undefined;
+    className?: string;
 };
-export const Button = ({children, onClick, style, type = "button", form}: ButtonProps) => {
+export const Button = ({children, onClick, style, type = "button", form, className}: ButtonProps) => {
     const getClassName = () => {
         switch (style) {
             case "primary":
@@ -19,7 +20,7 @@ export const Button = ({children, onClick, style, type = "button", form}: Button
         }
     }
 
-    return (<button form={form} type={type} className={getClassName()} onClick={onClick}>
+    return (<button form={form} type={type} className={`${getClassName()} ${className}`} onClick={onClick}>
         {children}
     </button>);
 }

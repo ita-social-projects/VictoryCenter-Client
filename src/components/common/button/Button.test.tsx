@@ -17,6 +17,12 @@ describe('Button Component', () => {
         expect(button).toHaveClass('btn-primary');
     });
 
+    it('applies none class when style is not chosen', () => {
+        render(<Button>Primary Button</Button>);
+        const button = screen.getByRole('button');
+        expect(button).toHaveClass('');
+    });
+
     it('applies secondary class when style is secondary', () => {
         render(<Button style="secondary">Secondary Button</Button>);
         const button = screen.getByRole('button');

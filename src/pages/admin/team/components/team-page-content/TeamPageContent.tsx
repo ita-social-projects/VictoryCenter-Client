@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useCallback, useState} from "react";
 import {StatusFilter, TeamPageToolbar} from "../team-page-toolbar/TeamPageToolbar";
 import {MembersList} from "../members-list/MembersList";
 
@@ -6,23 +6,31 @@ export const TeamPageContent = () => {
     const [searchByNameQuery, setSearchByNameQuery] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("Усі");
     const [autocompleteValues, setAutocompleteValues] = useState<string[]>([]);
-    const handleSearchQueryByName = (query: string) => {
-        console.log(query)
+
+    const handleSearchQueryByName = useCallback((query: string) => {
         setSearchByNameQuery(query);
-    };
+    }, []);
 
-    const onCategoryFilterChange = (category: StatusFilter) => {
+    const onCategoryFilterChange = useCallback((category: StatusFilter) => {
         setStatusFilter(category);
-    };
+    }, []);
 
-    const handleAutocompleteValuesChange = (autocompleteValues: string[]) => {
-        setAutocompleteValues(autocompleteValues);
-    }
+    const handleAutocompleteValuesChange = useCallback((values: string[]) => {
+        setAutocompleteValues(values);
+    }, []);
 
     return (
         <div className='wrapper'>
-            <TeamPageToolbar autocompleteValues={autocompleteValues} onSearchQueryChange={handleSearchQueryByName} onStatusFilterChange={onCategoryFilterChange}></TeamPageToolbar>
-            <MembersList searchByNameQuery={searchByNameQuery} statusFilter={statusFilter} onAutocompleteValuesChange={handleAutocompleteValuesChange}></MembersList>
+            <TeamPageToolbar
+                autocompleteValues={autocompleteValues}
+                onSearchQueryChange={handleSearchQueryByName}
+                onStatusFilterChange={onCategoryFilterChange}
+            />
+            <MembersList
+                searchByNameQuery={searchByNameQuery}
+                statusFilter={statusFilter}
+                onAutocompleteValuesChange={handleAutocompleteValuesChange}
+            />
         </div>
     );
 }

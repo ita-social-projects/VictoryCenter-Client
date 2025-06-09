@@ -28,7 +28,6 @@ export const TeamPage: React.FC = () => {
         setTeamData(teamData);
         setError(null);
       } catch {
-        // Просто встановлюємо повідомлення про помилку без console.error
         setError("Не вдалося завантажити дані команди. Будь ласка, спробуйте пізніше.");
         setTeamData([]);
       }

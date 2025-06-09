@@ -62,7 +62,7 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
         }
     }
 
-    return (<form id={id} onSubmit={handleOnSubmit}>
+    return (<form id={id} onSubmit={handleOnSubmit} data-testid="test-form">
         <div className='members-add-modal-body'>
             <div className='form-group'>
                 <label htmlFor="category">Категорія</label>
@@ -100,7 +100,7 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
                             <span>Перетягніть файл сюди або натисніть для завантаження</span>
                         </div>
                     </label>
-                    <input onChange={handleMemberFormValuesChange} name='img' type="file" id='image'/>
+                    <input data-testid="image" onChange={handleMemberFormValuesChange} name='img' type="file" id='image'/>
                     <div className='form-group-image-loaded'>
                         {(memberFormValues && memberFormValues.img) ? (
                             Array.from(memberFormValues.img).map(f => (<div key={f.name}>{f.name}</div>))

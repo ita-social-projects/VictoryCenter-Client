@@ -15,6 +15,8 @@ victory-center-client/
 │   │   └── test.build.yml
 │   ├── CODEOWNERS
 │   └── pull_request_template.md
+├── nginx/
+│   └── nginx.conf
 ├── public/
 │   └── index.html
 ├── src/
@@ -52,6 +54,7 @@ victory-center-client/
 │   ├── reportWebVitals.ts
 │   └── setupTests.ts
 ├── .gitignore
+├── Dockerfile
 ├── LICENSE
 ├── package-lock.json
 ├── package.json
@@ -73,6 +76,11 @@ victory-center-client/
 ## Available Scripts
 
 In the project directory, you can run:
+
+# Setup
+To setup this project use this command in project folder:
+
+### `npm install`
 
 ### `npm start`
 

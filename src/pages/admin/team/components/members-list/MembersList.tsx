@@ -19,7 +19,7 @@ export type Member = {
     category: TeamCategory;
 };
 
-type MembersListProps = {
+export type MembersListProps = {
     searchByNameQuery: string | null;
     statusFilter: StatusFilter;
     onAutocompleteValuesChange: (autocompleteValue: string[]) => void;
@@ -357,8 +357,6 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
     const handleEditMemberOnClose = () => {
         const existingMember = members.filter(m => m.id === memberIdToEdit)[0];
-        console.log(existingMember)
-        console.log(memberToEdit)
         //check photos as well
         if (existingMember && memberToEdit) {
             if (memberToEdit.description !== existingMember.description

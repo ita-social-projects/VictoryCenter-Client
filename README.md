@@ -24,13 +24,13 @@ victory-center-client/
 │   ├── const                               # Constans that will be used across the project
 │   │   └── routes
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
-│   │   └──main-layout              
+│   │   └──main-layout
 │   ├── pages/                              # Pages
 │   │   ├── admin
 │   │   ├── not-found
 │   │   └── usesr-pages
 │   │       ├── home-page
-│   │       ├── page-1
+│   │       ├── TeamPage
 │   │       └── page-2
 │   ├── routes/                             # Route configuration
 │   │   └── app-router
@@ -42,7 +42,7 @@ victory-center-client/
 │   │       ├── admin-page-data-fetch
 │   │       └── user-pages-data-fetch
 │   │           ├── home-page-data-fetch
-│   │           ├── page-1-data-fetch
+│   │           ├── team-page-data-fetch
 │   │           └── page-2-data-fetch
 │   ├── utils/                              # Utility functions
 │   │   └── mock-data
@@ -160,8 +160,8 @@ api.secret=${API_SECRET}
 > Or Contributors/People
 
 [![@IrynaZavushchak](https://avatars.githubusercontent.com/u/45690640?s=100&v=4)](https://github.com/IrynaZavushchak)
-[![@LanchevychMaxym](https://avatars.githubusercontent.com/u/47561209?s=100&v=4)](https://github.com/LanchevychMaxym) 
- 
+[![@LanchevychMaxym](https://avatars.githubusercontent.com/u/47561209?s=100&v=4)](https://github.com/LanchevychMaxym)
+
 
 - You can just grab their GitHub profile image URL
 - You should probably resize their picture using `?s=200` at the end of the image URL.

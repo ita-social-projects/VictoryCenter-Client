@@ -1,6 +1,6 @@
 import React from "react";
 import {Member} from "../members-list/MembersList";
-
+import "./member-component.scss"
 export const MemberComponent = ({member, handleOnDeleteMember, handleOnEditMember}: {member: Member, handleOnDeleteMember: (fullName: string) => void, handleOnEditMember: (id: number) => void }) => {
     return (<div className='members-item'>
         <div className='members-profile'>

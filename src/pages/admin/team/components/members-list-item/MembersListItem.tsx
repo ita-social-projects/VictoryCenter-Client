@@ -2,6 +2,7 @@ import {Member} from "../members-list/MembersList";
 import DragIcon from "../../../../../assets/icons/dragger.svg";
 import React from "react";
 import {MemberComponent} from "../member-component/MemberComponent";
+import "./members-list-item.scss"
 
 type MembersListItemProps = {
     member: Member,

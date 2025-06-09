@@ -9,6 +9,7 @@ import LoaderIcon from "../../../../../assets/icons/load.svg";
 import ArrowUpIcon from "../../../../../assets/icons/arrow-up.svg"
 import {StatusFilter} from "../team-page-toolbar/TeamPageToolbar";
 import {MemberForm, MemberFormValues} from "../member-form/MemberForm";
+import "./members-list.scss"
 
 export type Member = {
     id: number;

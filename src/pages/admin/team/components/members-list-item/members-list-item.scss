@@ -1,0 +1,26 @@
+.members-wrapper {
+  min-width: fit-content;
+  justify-content: space-between;
+  display: flex;
+  height: 120px;
+  border-bottom-width: 0.3px;
+  align-items: center;
+  box-sizing: border-box;
+  background-color: white;
+  box-shadow: 0 0 4px rgba(128, 128, 128, 0.45);
+  margin-bottom: 10px;
+}
+
+.members-dragger {
+  height: 100%;
+  width: 60px;
+  box-shadow: 0 0 4px rgba(128, 128, 128, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    cursor: grab;
+    background-color: #E7EAEE;
+  }
+}

@@ -21,10 +21,13 @@ victory-center-client/
 │   └── index.html
 ├── src/
 │   ├── assets/                             # Images, icons, fonts, etc.
+|   |   └── images
+|   |       └── header
 │   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
-│   │   └── navigation
+│   │   └── header
 │   ├── const                               # Constans that will be used across the project
-│   │   └── routes
+│   │   ├── routes
+|   |   └── header
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
 │   │   └──main-layout              
 │   ├── pages/                              # Pages

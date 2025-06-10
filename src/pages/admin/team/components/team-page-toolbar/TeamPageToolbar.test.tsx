@@ -1,12 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { TeamPageToolbar, TeamPageToolbarProps } from './TeamPageToolbar';
-import userEvent from "@testing-library/user-event";
+import {render, screen, fireEvent} from '@testing-library/react';
+import {TeamPageToolbar, TeamPageToolbarProps} from './TeamPageToolbar';
 
 // Mock the imported components and assets
 jest.mock('../../../../../assets/icons/plus.svg', () => 'plus-icon.svg');
 jest.mock('../../../../../components/common/modal/Modal', () => ({
-    Modal: ({ children, isOpen, onClose }: any) => (
+    Modal: ({children, isOpen, onClose}: any) => (
         isOpen ? (
             <div data-testid="modal" onClick={onClose}>
                 {children}
@@ -17,7 +16,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => ({
 }));
 
 jest.mock('../../../../../components/common/button/Button', () => ({
-    Button: ({ children, onClick, style, form, type, ...props }: any) => (
+    Button: ({children, onClick, style, form, type, ...props}: any) => (
         <button
             onClick={onClick}
             data-style={style}
@@ -32,7 +31,7 @@ jest.mock('../../../../../components/common/button/Button', () => ({
 }));
 
 jest.mock('../../../../../components/common/select/Select', () => ({
-    Select: ({ children, onValueChange }: any) => (
+    Select: ({children, onValueChange}: any) => (
         <select data-testid="select" onChange={(e) => onValueChange(e.target.value)}>
             {children}
         </select>
@@ -42,12 +41,12 @@ jest.mock('../../../../../components/common/select/Select', () => ({
 
 // Add Select.Option to the Select mock
 const SelectMock = jest.requireMock('../../../../../components/common/select/Select').Select;
-SelectMock.Option = ({ name, value }: any) => (
+SelectMock.Option = ({name, value}: any) => (
     <option value={value}>{name}</option>
 );
 
 jest.mock('../../../../../components/common/input/Input', () => ({
-    Input: ({ onChange, autocompleteValues, ...props }: any) => (
+    Input: ({onChange, autocompleteValues, ...props}: any) => (
         <input
             data-testid="search-input"
             onChange={(e) => onChange(e.target.value)}
@@ -58,7 +57,7 @@ jest.mock('../../../../../components/common/input/Input', () => ({
 }));
 
 jest.mock('../member-form/MemberForm', () => ({
-    MemberForm: ({ id, onSubmit, onChange }: any) => (
+    MemberForm: ({id, onSubmit, onChange}: any) => (
         <form
             id={id}
             data-testid="member-form"
@@ -88,9 +87,9 @@ jest.mock('../member-form/MemberForm', () => ({
 
 // Mock Modal sub-components
 const MockModal = jest.requireMock('../../../../../components/common/modal/Modal').Modal;
-MockModal.Title = ({ children }: any) => <h2 data-testid="modal-title">{children}</h2>;
-MockModal.Content = ({ children }: any) => <div data-testid="modal-content">{children}</div>;
-MockModal.Actions = ({ children }: any) => <div data-testid="modal-actions">{children}</div>;
+MockModal.Title = ({children}: any) => <h2 data-testid="modal-title">{children}</h2>;
+MockModal.Content = ({children}: any) => <div data-testid="modal-content">{children}</div>;
+MockModal.Actions = ({children}: any) => <div data-testid="modal-actions">{children}</div>;
 
 describe('TeamPageToolbar', () => {
     const defaultProps: TeamPageToolbarProps = {
@@ -134,7 +133,7 @@ describe('TeamPageToolbar', () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
             const searchInput = screen.getByTestId('search-input');
-            fireEvent.change(searchInput, { target: { value: 'test query' } });
+            fireEvent.change(searchInput, {target: {value: 'test query'}});
 
             expect(defaultProps.onSearchQueryChange).toHaveBeenCalledWith('test query');
         });
@@ -145,7 +144,7 @@ describe('TeamPageToolbar', () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
             const select = screen.getByTestId('select');
-            fireEvent.change(select, { target: { value: 'Опубліковано' } });
+            fireEvent.change(select, {target: {value: 'Опубліковано'}});
 
             expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith('Опубліковано');
         });
@@ -159,7 +158,7 @@ describe('TeamPageToolbar', () => {
             fireEvent.click(addButton);
 
             expect(screen.getByTestId('modal')).toBeInTheDocument();
-            expect(screen.getByText('Додати в команду')).toBeInTheDocument();
+            expect(screen.getByTestId('modal-title')).toHaveTextContent("Додати в команду");
             expect(screen.getByTestId('member-form')).toBeInTheDocument();
         });
 
@@ -319,7 +318,7 @@ describe('TeamPageToolbar', () => {
                 );
             };
 
-            render(<TestComponent />);
+            render(<TestComponent/>);
 
             // Open modal and trigger close with changes
             fireEvent.click(screen.getByText('Open Modal'));
@@ -383,7 +382,7 @@ describe('TeamPageToolbar', () => {
                 );
             };
 
-            render(<TestComponent />);
+            render(<TestComponent/>);
 
             // Open modal, trigger close, then confirm
             fireEvent.click(screen.getByText('Open Modal'));
@@ -439,7 +438,7 @@ describe('TeamPageToolbar', () => {
                 );
             };
 
-            render(<TestComponent />);
+            render(<TestComponent/>);
 
             fireEvent.click(screen.getByText('Open Modal'));
             fireEvent.click(screen.getByText('Show Confirm'));
@@ -463,7 +462,7 @@ describe('TeamPageToolbar', () => {
                 );
             };
 
-            render(<TestComponent />);
+            render(<TestComponent/>);
 
             fireEvent.click(screen.getByTestId('cancel-close'));
             expect(screen.getByTestId('modal-state')).toHaveTextContent('Closed');

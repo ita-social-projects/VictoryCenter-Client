@@ -8,7 +8,7 @@ type ButtonProps = {
     form?: string | undefined;
     className?: string;
 };
-export const Button = ({children, onClick, style, type = "button", form, className}: ButtonProps) => {
+export const Button = ({children, onClick, style, type = "button", form, className = ''}: ButtonProps) => {
     const getClassName = () => {
         switch (style) {
             case "primary":

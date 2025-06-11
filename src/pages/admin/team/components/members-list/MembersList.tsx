@@ -117,12 +117,11 @@ export let mockMembers: Member[] = [
 ];
 
 const currentTabKey = "currentTab";
-
-const fetchMembers = async (category: string, pageSize: number, pageNumber: number): Promise<{
+export const fetchMembers = async (category: string, pageSize: number, pageNumber: number): Promise<{
     newMembers: Member[],
     totalCountOfPages: number
 }> => {
-    await new Promise((res) => setTimeout(res, 1000));
+    // await new Promise((res) => setTimeout(res, 1000));
     const some = (pageNumber - 1) * pageSize;
     const filteredAndSortedMembers = mockMembers.filter(m => m.category === category).sort((a, b) => a.id - b.id);
 
@@ -267,9 +266,14 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
             document.addEventListener('mousemove', handleMouseMove);
         }
 
-        return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-        };
+        if (dragPreview.visible) {
+            document.addEventListener('mousemove', handleMouseMove);
+            return () => {
+                document.removeEventListener('mousemove', handleMouseMove);
+            };
+        }
+
+        return () => {};
     }, [dragPreview.visible]);
 
     useEffect(() => {
@@ -431,7 +435,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
             ) : <></>}
 
             <div className='members'>
-                <div className='members-categories' style={{"pointerEvents": isMembersLoading ? "none" : "all"}}>
+                <div data-testid="members-categories" className='members-categories' style={{"pointerEvents": isMembersLoading ? "none" : "all"}}>
                     <div onClick={() => setCategory("Основна команда")}
                          className={category === "Основна команда" ? 'members-categories-selected' : ''}>Основна
                         команда
@@ -443,7 +447,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
                          className={category === "Радники" ? 'members-categories-selected' : ''}>Радники
                     </div>
                 </div>
-                <div ref={memberListRef} onScroll={handleOnScroll} className="members-list">
+                <div ref={memberListRef} onScroll={handleOnScroll} data-testid="members-list" className="members-list">
                     {members.length > 0 ? members.filter(m => {
                         if (statusFilter === "Усі") return true;
                         return m.status === statusFilter;
@@ -459,18 +463,18 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
                             handleDrop={handleDrop}
                             handleOnDeleteMember={handleOnDeleteMember}
                             index={index} handleOnEditMember={handleOnEditMember}></MembersListItem>
-                    )) : (!isMembersLoading ? (<div className='members-not-found'>
-                        <img src={NotFoundIcon} alt="members-not-found"/>
+                    )) : (!isMembersLoading ? (<div className='members-not-found' data-testid='members-not-found'>
+                        <img src={NotFoundIcon} alt="members-not-found" data-testid='members-not-found-icon'/>
                         <p>Нічого не знайдено</p>
                     </div>) : (<></>))}
                     {isMembersLoading
-                        ? (<div className='members-list-loader'>
-                            <img src={LoaderIcon} alt="loader-icon"/>
+                        ? (<div className='members-list-loader' data-testid='members-list-loader'>
+                            <img src={LoaderIcon} alt="loader-icon" data-testid='members-list-loader-icon'/>
                         </div>)
                         : (<></>)}
                     {isMoveToTopVisible ?
-                        <div onClick={moveToTop} className='members-list-list-to-top'>
-                            <img src={ArrowUpIcon} alt="arrow-up-icon"/>
+                        <div onClick={moveToTop} className='members-list-list-to-top' >
+                            <img src={ArrowUpIcon} alt="arrow-up-icon" data-testid="members-list-list-to-top"/>
                         </div> : <></>}
                 </div>
             </div>

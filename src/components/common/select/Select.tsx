@@ -29,7 +29,7 @@ export const Select = <TValue,>({children, onValueChange, selectContainerRef, cl
         <img src={isOpen ? ArrowUp : ArrowDown} alt="arrow-down"/>
         <div className={`select-options ${isOpen ? 'select-options-visible' : ''}`}>
             {options.map((opt, index) => {
-                if (!React.isValidElement(opt)) return;
+                if (!React.isValidElement(opt)) return <></>;
                 const {name, value} = opt.props as { children: React.ReactNode, value: TValue, name: string };
                 return (<div key={index} className={(!isAutocomplete && selectedValue === value) ? 'select-options-selected' : ''} onClick={() => handleSelect(value)}>
                     <span>{name}</span>

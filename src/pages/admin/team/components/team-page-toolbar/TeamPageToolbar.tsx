@@ -94,7 +94,7 @@ export const TeamPageToolbar = ({
                     <Select.Option name='Опубліковано' value='Опубліковано'></Select.Option>
                     <Select.Option name='Чернетка' value='Чернетка'></Select.Option>
                 </Select>
-                <Button onClick={() => setIsAddTeamMemberModalOpen(true)} style={"primary"}>
+                <Button onClick={() => setIsAddTeamMemberModalOpen(true)} buttonStyle={"primary"}>
                     Додати в команду
                     <img src={PlusIcon} alt="plus"/>
                 </Button>
@@ -108,8 +108,8 @@ export const TeamPageToolbar = ({
                 <MemberForm id='add-member-modal' onSubmit={handlePublish} />
             </Modal.Content>
             <Modal.Actions>
-                <Button onClick={handleSaveAsDraft} style={'secondary'}>Зберегти як чернетку</Button>
-                <Button form='add-member-modal' type={"submit"} style={"primary"}>Опублікувати</Button>
+                <Button onClick={handleSaveAsDraft} buttonStyle={'secondary'}>Зберегти як чернетку</Button>
+                <Button form='add-member-modal' type={"submit"} buttonStyle={"primary"}>Опублікувати</Button>
             </Modal.Actions>
         </Modal>
         <Modal isOpen={isConfirmPublishNewMemberModalOpen} onClose={() => setIsConfirmPublishNewMemberModalOpen(false)}>
@@ -120,8 +120,8 @@ export const TeamPageToolbar = ({
 
             </Modal.Content>
             <Modal.Actions>
-                <Button onClick={handleCancelPublish} style={"secondary"}>Ні</Button>
-                <Button onClick={handleConfirmPublish} style={"primary"}>Так</Button>
+                <Button onClick={handleCancelPublish} buttonStyle={"secondary"}>Ні</Button>
+                <Button onClick={handleConfirmPublish} buttonStyle={"primary"}>Так</Button>
             </Modal.Actions>
         </Modal>
 
@@ -133,8 +133,8 @@ export const TeamPageToolbar = ({
 
             </Modal.Content>
             <Modal.Actions>
-                <Button onClick={() => setIsConfirmCloseModalOpen(false)} style={'secondary'}>Ні</Button>
-                <Button style={'primary'} onClick={handleConfirmClose}>Так</Button>
+                <Button onClick={() => setIsConfirmCloseModalOpen(false)} buttonStyle={'secondary'}>Ні</Button>
+                <Button buttonStyle={'primary'} onClick={handleConfirmClose}>Так</Button>
             </Modal.Actions>
         </Modal>
     </>);

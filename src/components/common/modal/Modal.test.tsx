@@ -124,7 +124,7 @@ describe('Modal Component', () => {
         expect(mockOnClose).not.toHaveBeenCalled();
     });
 
-    test('sets and unsets body overflow style when modal opens and closes', () => {
+    test('sets and unsets body overflow buttonStyle when modal opens and closes', () => {
         const {rerender} = render(
             <Modal {...defaultProps}>
                 <Modal.Title>Title</Modal.Title>

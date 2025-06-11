@@ -489,8 +489,8 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
                 </Modal.Content>
                 <Modal.Actions>
                     <div className='members-delete-modal-actions'>
-                        <Button style={"secondary"} onClick={() => setIsDeleteTeamMemberModalOpen(false)}>Ні</Button>
-                        <Button style={"primary"} onClick={handleDeleteMember}>Так</Button>
+                        <Button buttonStyle={"secondary"} onClick={() => setIsDeleteTeamMemberModalOpen(false)}>Ні</Button>
+                        <Button buttonStyle={"primary"} onClick={handleDeleteMember}>Так</Button>
                     </div>
                 </Modal.Actions>
             </Modal>
@@ -505,8 +505,8 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
                                 onSubmit={handleMemberEdit}/>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button onClick={handleSaveAsDraft} style={'secondary'}>Зберегти як чернетку</Button>
-                    <Button form='edit-member-modal' type={"submit"} style={"primary"}>Опублікувати</Button>
+                    <Button onClick={handleSaveAsDraft} buttonStyle={'secondary'}>Зберегти як чернетку</Button>
+                    <Button form='edit-member-modal' type={"submit"} buttonStyle={"primary"}>Опублікувати</Button>
                 </Modal.Actions>
             </Modal>}
             <Modal isOpen={isConfirmPublishNewMemberModalOpen}
@@ -518,8 +518,8 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button onClick={handleCancelPublish} style={"secondary"}>Ні</Button>
-                    <Button onClick={handleConfirmPublish} style={"primary"}>Так</Button>
+                    <Button onClick={handleCancelPublish} buttonStyle={"secondary"}>Ні</Button>
+                    <Button onClick={handleConfirmPublish} buttonStyle={"primary"}>Так</Button>
                 </Modal.Actions>
             </Modal>
 
@@ -531,8 +531,8 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button onClick={() => setIsConfirmCloseModalOpen(false)} style={'secondary'}>Ні</Button>
-                    <Button style={'primary'} onClick={handleConfirmClose}>Так</Button>
+                    <Button onClick={() => setIsConfirmCloseModalOpen(false)} buttonStyle={'secondary'}>Ні</Button>
+                    <Button buttonStyle={'primary'} onClick={handleConfirmClose}>Так</Button>
                 </Modal.Actions>
             </Modal>
         </>

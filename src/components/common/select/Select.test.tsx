@@ -311,13 +311,13 @@ describe('Select Component', () => {
     });
 
     it('renders Select.Option component correctly', () => {
-        const option = render(
+        const {container} = render(
             <Select.Option value="test" name="Test Option">
                 Child content
             </Select.Option>
         );
 
-        expect(option.container.textContent).toBe('Child content');
+        expect(container.textContent).toBe('Child content');
     });
 
     it('Select.Option handles props correctly', () => {

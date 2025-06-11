@@ -16,18 +16,15 @@ export const Input = ({onChange, autocompleteValues}: InputProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
 
     const handleOnChange = (value: string) => {
-        console.log('yues')
         setValue(value);
         onChange(value);
 
         if(selectContainerRef.current && !isAutocompleteOpen.current && value){
-            console.log('here 1')
             isAutocompleteOpen.current = true;
             selectContainerRef.current.click();
         }
 
         if(selectContainerRef.current && isAutocompleteOpen.current && !value){
-            console.log('here 2')
             isAutocompleteOpen.current = false;
             selectContainerRef.current.click();
         }

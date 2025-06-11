@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import {MemberDragPreview, MemberDragPreviewProps} from './MemberDragPreview';
+import {MemberDragPreview} from './MemberDragPreview';
 import {Member, MemberDragPreviewModel} from "../members-list/MembersList";
 
 jest.mock('../../../../../assets/icons/dragger.svg', () => 'mock-dragger-icon');

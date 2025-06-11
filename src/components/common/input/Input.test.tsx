@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { Input, InputProps } from './Input';
+import { Input } from './Input';
 
 jest.mock("../../../assets/icons/la_search.svg", () => "search-icon.svg");
 jest.mock("../../../assets/icons/remove-query.svg", () => "remove-icon.svg");
@@ -42,16 +42,18 @@ describe('Input component', () => {
 
     beforeEach(() => {
         onChangeMock = jest.fn();
-        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
     });
 
     it('renders input field and icons', () => {
+        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
         expect(screen.getByPlaceholderText("Пошук за ім'ям")).toBeInTheDocument();
         expect(screen.getByAltText('input-icon')).toBeInTheDocument();
         expect(screen.getByAltText('remove-query-icon')).toBeInTheDocument();
     });
 
     it('updates input value and calls onChange when typing', () => {
+        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
+
         const input = screen.getByPlaceholderText("Пошук за ім'ям");
         fireEvent.change(input, { target: { value: 'A' } });
         expect(input).toHaveValue('A');
@@ -59,6 +61,8 @@ describe('Input component', () => {
     });
 
     it('clears the input and triggers onChange when remove icon is clicked', () => {
+        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
+
         const input = screen.getByPlaceholderText("Пошук за ім'ям");
         fireEvent.change(input, { target: { value: 'Bob' } });
         fireEvent.click(screen.getByAltText('remove-query-icon'));
@@ -67,6 +71,8 @@ describe('Input component', () => {
     });
 
     it('focuses the input when search icon is clicked', () => {
+        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
+
         const input = screen.getByPlaceholderText("Пошук за ім'ям") as HTMLInputElement;
         jest.spyOn(input, 'focus');
         fireEvent.click(screen.getByAltText('input-icon'));

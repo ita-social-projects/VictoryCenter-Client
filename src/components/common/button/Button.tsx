@@ -2,15 +2,15 @@ import React from "react";
 import "./button.scss";
 type ButtonProps = {
     children: React.ReactNode,
-    style?: 'primary' | 'secondary',
+    buttonStyle?: 'primary' | 'secondary',
     onClick?: () => void;
     type?: "submit" | "reset" | "button"
     form?: string | undefined;
     className?: string;
 };
-export const Button = ({children, onClick, style, type = "button", form, className = ''}: ButtonProps) => {
+export const Button = ({children, onClick, buttonStyle, type = "button", form, className = ''}: ButtonProps) => {
     const getClassName = () => {
-        switch (style) {
+        switch (buttonStyle) {
             case "primary":
                 return "btn-primary";
             case "secondary":

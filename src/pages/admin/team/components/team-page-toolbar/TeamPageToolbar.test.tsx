@@ -539,7 +539,7 @@ describe('TeamPageToolbar', () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
             const addButton = screen.getByText('Додати в команду');
-            expect(addButton).toHaveAttribute('data-style', 'primary');
+            expect(addButton).toHaveAttribute('data-buttonStyle', 'primary');
         });
 
         it('has proper form attributes for modal form', async () => {
@@ -572,7 +572,7 @@ describe('TeamPageToolbar', () => {
             expect(searchInput).toHaveAttribute('data-autocomplete', JSON.stringify(defaultProps.autocompleteValues));
 
             const addButton = screen.getByText('Додати в команду');
-            expect(addButton).toHaveAttribute('data-style', 'primary');
+            expect(addButton).toHaveAttribute('data-buttonStyle', 'primary');
         });
     });
 

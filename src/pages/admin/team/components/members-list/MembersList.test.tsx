@@ -10,7 +10,6 @@ const mockDataTransfer = {
     types: [],
 };
 
-// Mock dependencies
 jest.mock('../../../../../components/common/modal/Modal', () => ({
     Modal: ({children, isOpen, onClose}: any) => (
         isOpen ? (
@@ -94,12 +93,10 @@ jest.mock('../../../../../components/common/button/Button', () => ({
     ),
 }));
 
-// Mock icons
 jest.mock('../../../../../assets/icons/not-found.svg', () => 'not-found-icon');
 jest.mock('../../../../../assets/icons/load.svg', () => 'loader-icon');
 jest.mock('../../../../../assets/icons/arrow-up.svg', () => 'arrow-up-icon');
 
-// Mock localStorage
 const localStorageMock = (() => {
     let store: { [key: string]: string } = {};
     return {
@@ -226,142 +223,6 @@ describe('MembersList', () => {
             expect(screen.getByTestId('member-item-1')).toHaveTextContent('First First');
         });
     });
-
-    // it('triggers load more members when scrolling to bottom', async () => {
-    //     mockFetchMembers.mockImplementation(async (category, pageSize, pageNumber) => ({
-    //         newMembers: [{...mockMember, id: pageNumber + 1, fullName: `Member ${pageNumber + 1}`}],
-    //         totalCountOfPages: 3,
-    //     }));
-    //     render(<MembersList {...defaultProps} />);
-    //     const list = screen.getByTestId('members-list');
-    //     Object.defineProperty(list, 'scrollHeight', {value: 1000});
-    //     Object.defineProperty(list, 'clientHeight', {value: 500});
-    //     Object.defineProperty(list, 'scrollTop', {value: 500});
-    //
-    //     fireEvent.scroll(list);
-    //     await waitFor(() => {
-    //         expect(mockFetchMembers).toHaveBeenCalledTimes(2);
-    //         expect(screen.getByTestId('member-item-1')).toHaveTextContent('Member 2');
-    //     });
-    // });
-    //
-    // it('opens delete modal and handles deletion', async () => {
-    //     render(<MembersList {...defaultProps} />);
-    //
-    //     await waitFor(() => {
-    //         expect(screen.getByTestId('member-item-0')).toHaveTextContent('First First');
-    //     }, {timeout: 3000});
-    //
-    //     fireEvent.click(screen.getByTestId('delete-button-0'));
-    //     expect(screen.getByTestId('modal')).toBeInTheDocument();
-    //     expect(screen.getByTestId('modal-title')).toHaveTextContent('Видалити члена команди?');
-    //
-    //     fireEvent.click(screen.getByTestId('button-primary'));
-    //     await waitFor(() => {
-    //         expect(screen.queryByTestId('member-item-0')).not.toBeInTheDocument();
-    //         expect(mockMembers).toHaveLength(0);
-    //     });
-    // });
-    //
-    // it('closes delete modal without deletion', async () => {
-    //     render(<MembersList {...defaultProps} />);
-    //     fireEvent.click(screen.getByTestId('delete-button-0'));
-    //     fireEvent.click(screen.getByTestId('button-secondary'));
-    //     await waitFor(() => {
-    //         expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
-    //         expect(screen.getByTestId('member-item-0')).toBeInTheDocument();
-    //     });
-    // });
-    //
-    // it('opens edit modal and handles form changes', async () => {
-    //     render(<MembersList {...defaultProps} />);
-    //     fireEvent.click(screen.getByTestId('edit-button-0'));
-    //     await waitFor(() => {
-    //         expect(screen.getByTestId('modal')).toBeInTheDocument();
-    //         expect(screen.getByTestId('modal-title')).toHaveTextContent('Редагування учасника команди');
-    //         expect(screen.getByTestId('form-fullName')).toHaveValue('First First');
-    //     });
-    //
-    //     fireEvent.change(screen.getByTestId('form-fullName'), {target: {value: 'Updated Name'}});
-    //     expect(screen.getByTestId('form-fullName')).toHaveValue('Updated Name');
-    // });
-    //
-    // it('saves member as draft', async () => {
-    //     render(<MembersList {...defaultProps} />);
-    //     fireEvent.click(screen.getByTestId('edit-button-0'));
-    //     fireEvent.change(screen.getByTestId('form-fullName'), {target: {value: 'Updated Name'}});
-    //     fireEvent.click(screen.getByTestId('button-secondary'));
-    //     await waitFor(() => {
-    //         expect(mockMembers[0].fullName).toBe('Updated Name');
-    //         expect(mockMembers[0].status).toBe('Чернетка');
-    //     });
-    // });
-    //
-    // it('publishes edited member', async () => {
-    //     render(<MembersList {...defaultProps} />);
-    //     fireEvent.click(screen.getByTestId('edit-button-0'));
-    //     fireEvent.change(screen.getByTestId('form-fullName'), {target: {value: 'Updated Name'}});
-    //     fireEvent.submit(screen.getByTestId('member-form'));
-    //     await waitFor(() => {
-    //         expect(screen.getByTestId('modal-title')).toHaveTextContent('Опублікувати нового члена команди?');
-    //     });
-    //     fireEvent.click(screen.getByTestId('button-primary'));
-    //     await waitFor(() => {
-    //         expect(mockMembers[0].fullName).toBe('Updated Name');
-    //         expect(mockMembers[0].status).toBe('Опубліковано');
-    //         expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
-    //     });
-    // });
-    //
-    // it('cancels publish modal', async () => {
-    //     render(<MembersList {...defaultProps} />);
-    //     fireEvent.click(screen.getByTestId('edit-button-0'));
-    //     fireEvent.submit(screen.getByTestId('member-form'));
-    //     fireEvent.click(screen.getByTestId('button-secondary'));
-    //     await waitFor(() => {
-    //         expect(screen.getByTestId('modal')).toBeInTheDocument();
-    //         expect(screen.getByTestId('modal-title')).toHaveTextContent('Редагування учасника команди');
-    //     });
-    // });
-    //
-    // it('shows confirm close modal when changes are made and handles close', async () => {
-    //     render(<MembersList {...defaultProps} />);
-    //     await new Promise((res) => setTimeout(res, 1500));
-    //
-    //     fireEvent.click(screen.getByTestId('edit-button-0'));
-    //     fireEvent.change(screen.getByTestId('form-fullName'), {target: {value: 'Updated Name'}});
-    //     fireEvent.click(screen.getByTestId('modal'));
-    //     await waitFor(() => {
-    //         expect(screen.getByTestId('modal-title')).toHaveTextContent('Зміни буде втрачено. Бажаєте продовжити?');
-    //     });
-    //     fireEvent.click(screen.getByTestId('button-primary'));
-    //     await waitFor(() => {
-    //         expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
-    //         expect(mockMembers[0].fullName).toBe('First First'); // Changes not saved
-    //     });
-    // });
-    //
-    // it('closes edit modal without confirm when no changes', async () => {
-    //     render(<MembersList {...defaultProps} />);
-    //
-    //     await waitFor(() => {
-    //         expect(screen.getByTestId('edit-button-0')).toBeInTheDocument();
-    //     }, {timeout: 1500});
-    //
-    //     fireEvent.click(screen.getByTestId('edit-button-0'));
-    //
-    //     await waitFor(() => {
-    //         expect(screen.getByTestId('modal')).toBeInTheDocument();
-    //         expect(screen.getByTestId('modal-title')).toHaveTextContent('Редагування учасника команди');
-    //     });
-    //
-    //     fireEvent.click(screen.getByTestId('modal'));
-    //
-    //     await waitFor(() => {
-    //         expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
-    //         expect(screen.queryByTestId('modal-title')).not.toBeInTheDocument();
-    //     });
-    // });
 
     it('updates autocomplete values based on search query', async () => {
         mockMembers.push({

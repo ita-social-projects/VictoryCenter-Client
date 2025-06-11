@@ -204,7 +204,7 @@ describe('MemberComponent', () => {
                 description: '',
                 img: '',
                 status: 'Чернетка',
-                category: 'Радники' // Advisors
+                category: 'Радники'
             };
 
             render(

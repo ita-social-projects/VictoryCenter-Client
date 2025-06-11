@@ -2,7 +2,6 @@ import React from 'react';
 import {render, screen, fireEvent} from '@testing-library/react';
 import {TeamPageToolbar, TeamPageToolbarProps} from './TeamPageToolbar';
 
-// Mock the imported components and assets
 jest.mock('../../../../../assets/icons/plus.svg', () => 'plus-icon.svg');
 jest.mock('../../../../../components/common/modal/Modal', () => ({
     Modal: ({children, isOpen, onClose}: any) => (
@@ -39,7 +38,6 @@ jest.mock('../../../../../components/common/select/Select', () => ({
     __esModule: true,
 }));
 
-// Add Select.Option to the Select mock
 const SelectMock = jest.requireMock('../../../../../components/common/select/Select').Select;
 SelectMock.Option = ({name, value}: any) => (
     <option value={value}>{name}</option>
@@ -85,7 +83,6 @@ jest.mock('../member-form/MemberForm', () => ({
     ),
 }));
 
-// Mock Modal sub-components
 const MockModal = jest.requireMock('../../../../../components/common/modal/Modal').Modal;
 MockModal.Title = ({children}: any) => <h2 data-testid="modal-title">{children}</h2>;
 MockModal.Content = ({children}: any) => <div data-testid="modal-content">{children}</div>;
@@ -175,11 +172,9 @@ describe('TeamPageToolbar', () => {
         it('closes modal when save as draft is clicked', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            // Open modal
             const addButton = screen.getByText('Додати в команду');
             fireEvent.click(addButton);
 
-            // Click save as draft
             const saveAsDraftButton = screen.getByText('Зберегти як чернетку');
             fireEvent.click(saveAsDraftButton);
 
@@ -191,11 +186,9 @@ describe('TeamPageToolbar', () => {
         it('opens publish confirmation modal when form is submitted', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            // Open add member modal
             const addButton = screen.getByText('Додати в команду');
             fireEvent.click(addButton);
 
-            // Submit form
             const publishButton = screen.getByText('Опублікувати');
             fireEvent.click(publishButton);
 
@@ -205,13 +198,11 @@ describe('TeamPageToolbar', () => {
         it('cancels publish when "Ні" is clicked', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            // Open add member modal and submit
             const addButton = screen.getByText('Додати в команду');
             fireEvent.click(addButton);
             const publishButton = screen.getByText('Опублікувати');
             fireEvent.click(publishButton);
 
-            // Cancel publish
             const cancelButtons = screen.getAllByText('Ні');
             fireEvent.click(cancelButtons[0]);
 
@@ -221,17 +212,14 @@ describe('TeamPageToolbar', () => {
         it('confirms publish when "Так" is clicked', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            // Open add member modal and submit
             const addButton = screen.getByText('Додати в команду');
             fireEvent.click(addButton);
             const publishButton = screen.getByText('Опублікувати');
             fireEvent.click(publishButton);
 
-            // Confirm publish
             const confirmButtons = screen.getAllByText('Так');
             fireEvent.click(confirmButtons[0]);
 
-            // Both modals should be closed
             expect(screen.queryByText('Опублікувати нового члена команди?')).not.toBeInTheDocument();
             expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
         });
@@ -241,27 +229,21 @@ describe('TeamPageToolbar', () => {
         it('shows close confirmation modal when trying to close with unsaved changes', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            // Open add member modal
             const addButton = screen.getByText('Додати в команду');
             fireEvent.click(addButton);
 
-            // Simulate having unsaved changes by setting newTeamMemberInfo
-            // This is tested indirectly through the modal close behavior
             const modal = screen.getByTestId('modal');
             fireEvent.click(modal);
 
-            // Since we don't have changes, modal should close without confirmation
             expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
         });
 
         it('closes without confirmation when no changes are made', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            // Open add member modal
             const addButton = screen.getByText('Додати в команду');
             fireEvent.click(addButton);
 
-            // Close modal (no changes made)
             const modal = screen.getByTestId('modal');
             fireEvent.click(modal);
 
@@ -269,7 +251,6 @@ describe('TeamPageToolbar', () => {
         });
 
         it('shows close confirmation modal when there are unsaved changes', async () => {
-            // Mock the component to simulate having changes
             const TestComponent = () => {
                 const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = React.useState(false);
                 const [isAddTeamMemberModalOpen, setIsAddTeamMemberModalOpen] = React.useState(false);
@@ -320,17 +301,14 @@ describe('TeamPageToolbar', () => {
 
             render(<TestComponent/>);
 
-            // Open modal and trigger close with changes
             fireEvent.click(screen.getByText('Open Modal'));
             fireEvent.click(screen.getByTestId('modal'));
 
-            // Confirmation modal should appear
             expect(screen.getByTestId('confirm-close-modal')).toBeInTheDocument();
             expect(screen.getByText('Зміни буде втрачено. Бажаєте продовжити?')).toBeInTheDocument();
         });
 
         it('handles confirm close with unsaved changes', async () => {
-            // Mock the component to simulate the full flow
             const TestComponent = () => {
                 const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = React.useState(false);
                 const [isAddTeamMemberModalOpen, setIsAddTeamMemberModalOpen] = React.useState(false);
@@ -384,18 +362,15 @@ describe('TeamPageToolbar', () => {
 
             render(<TestComponent/>);
 
-            // Open modal, trigger close, then confirm
             fireEvent.click(screen.getByText('Open Modal'));
             fireEvent.click(screen.getByTestId('modal'));
             fireEvent.click(screen.getByTestId('confirm-yes'));
 
-            // Modal should be closed
             expect(screen.getByTestId('state-display')).toHaveTextContent('Modal Closed');
             expect(screen.queryByTestId('confirm-close-modal')).not.toBeInTheDocument();
         });
 
         it('handles confirm close with empty form data', async () => {
-            // Test the second condition in handleConfirmClose
             const TestComponent = () => {
                 const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = React.useState(false);
                 const [isAddTeamMemberModalOpen, setIsAddTeamMemberModalOpen] = React.useState(false);
@@ -473,15 +448,12 @@ describe('TeamPageToolbar', () => {
         it('handles multiple modal states correctly', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            // Open add member modal
             const addButton = screen.getByText('Додати в команду');
             fireEvent.click(addButton);
 
-            // Submit form to open publish confirmation
             const publishButton = screen.getByText('Опублікувати');
             fireEvent.click(publishButton);
 
-            // Both modal contents should be present
             expect(screen.getByText('Додати в команду')).toBeInTheDocument();
             expect(screen.getByText('Опублікувати нового члена команди?')).toBeInTheDocument();
         });
@@ -489,14 +461,12 @@ describe('TeamPageToolbar', () => {
         it('resets state when modals are closed', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            // Open and close add member modal
             const addButton = screen.getByText('Додати в команду');
             fireEvent.click(addButton);
 
             const saveAsDraftButton = screen.getByText('Зберегти як чернетку');
             fireEvent.click(saveAsDraftButton);
 
-            // Open modal again - it should be in clean state
             fireEvent.click(addButton);
             expect(screen.getByTestId('member-form')).toBeInTheDocument();
         });
@@ -508,7 +478,6 @@ describe('TeamPageToolbar', () => {
 
             const addButton = screen.getByText('Додати в команду');
 
-            // Rapidly open and close modal
             fireEvent.click(addButton);
             expect(screen.getByTestId('modal')).toBeInTheDocument();
 
@@ -526,7 +495,6 @@ describe('TeamPageToolbar', () => {
             const addButton = screen.getByText('Додати в команду');
             fireEvent.click(addButton);
 
-            // Submit form (this calls handlePublish with mock data)
             const form = screen.getByTestId('member-form');
             fireEvent.submit(form);
 

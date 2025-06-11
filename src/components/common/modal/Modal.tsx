@@ -6,8 +6,7 @@ interface ModalProps {
     children?: ReactNode;
     isOpen: boolean;
     onClose: () => void;
-    // Changed from widthInPx to more flexible width options
-    width?: string | number; // Can accept "400px", "80%", "50rem", etc.
+    width?: string | number;
     maxWidth?: string;
 }
 

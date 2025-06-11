@@ -3,10 +3,8 @@ import { render, fireEvent } from "@testing-library/react";
 import { MembersListItem } from "./MembersListItem";
 import { Member } from "../members-list/MembersList";
 
-// Mock the drag icon
 jest.mock("../../../../../assets/icons/dragger.svg", () => "drag-icon.svg");
 
-// Test data
 const mockMember: Member = {
     id: 1,
     img: "avatar.png",
@@ -74,7 +72,7 @@ describe("MembersListItem", () => {
         expect(props.handleDrag).toHaveBeenCalled();
 
         fireEvent.dragEnd(dragger);
-        expect(props.handleDragEnd).toHaveBeenCalledTimes(2); // One from wrapper and one from dragger
+        expect(props.handleDragEnd).toHaveBeenCalledTimes(2);
     });
 
     it("calls handleOnEditMember on edit icon click", () => {

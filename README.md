@@ -15,22 +15,26 @@ victory-center-client/
 │   │   └── test.build.yml
 │   ├── CODEOWNERS
 │   └── pull_request_template.md
+├── nginx/
+│   └── nginx.conf
 ├── public/
 │   └── index.html
 ├── src/
 │   ├── assets/                             # Images, icons, fonts, etc.
         ├── images/
-        │  └── footer
+        │  ├── footer
+        |  └── header
         ├── fonts
         └── sass/
             ├── mixins
-             └── variables
+            └── variables
 │   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
-        ├── footer
-│   │   └── navigation
+|   |   ├── footer
+|   |   └── header
 │   ├── const                               # Constans that will be used across the project
-        ├── footer
-│   │   └── routes
+|   |   ├── footer
+│   │   ├── routes
+|   |   └── header
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
 │   │   └──main-layout
 │   ├── pages/                              # Pages
@@ -60,6 +64,7 @@ victory-center-client/
 │   ├── reportWebVitals.ts
 │   └── setupTests.ts
 ├── .gitignore
+├── Dockerfile
 ├── LICENSE
 ├── package-lock.json
 ├── package.json
@@ -81,6 +86,11 @@ victory-center-client/
 ## Available Scripts
 
 In the project directory, you can run:
+
+# Setup
+To setup this project use this command in project folder:
+
+### `npm install`
 
 ### `npm start`
 
@@ -168,7 +178,7 @@ api.secret=${API_SECRET}
 > Or Contributors/People
 
 [![@IrynaZavushchak](https://avatars.githubusercontent.com/u/45690640?s=100&v=4)](https://github.com/IrynaZavushchak)
-[![@LanchevychMaxym](https://avatars.githubusercontent.com/u/47561209?s=100&v=4)](https://github.com/LanchevychMaxym) 
+[![@LanchevychMaxym](https://avatars.githubusercontent.com/u/47561209?s=100&v=4)](https://github.com/LanchevychMaxym)
 
 
 - You can just grab their GitHub profile image URL

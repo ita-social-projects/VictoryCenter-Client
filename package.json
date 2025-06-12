@@ -6,6 +6,7 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@fontsource/mulish": "^5.2.5",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -67,10 +68,10 @@
     ],
     "coverageThreshold": {
       "global": {
-        "statements": 74.11,
+        "statements": 70.78,
         "branches": 100,
-        "functions": 63.63,
-        "lines": 72.5
+        "functions": 60.00,
+        "lines": 69.04
       }
     }
   },

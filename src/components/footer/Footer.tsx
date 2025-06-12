@@ -3,29 +3,26 @@ import { Link } from "react-router-dom";
 import { routes } from "../../const/routers/routes";
 import "./Footer.scss";
 import arrowIcon from "../../assets/images/footer/arrow-up-right.svg";
+import phoneIcon from "../../assets/images/footer/phone.svg";
+import mailIcon from "../../assets/images/footer/mail.svg";
 import {
   ABOUT_US,
+  HIPPOTHERAPY,
+  MENU,
+  REPORTING,
+  STORE,
+  HOW_TO_SUPPORT,
+  STORIES_OF_VICTORIES,
+  OUR_HISTORY,
+  OUR_TEAM,
+  PARTNERS,
+  EVENTS_AND_NEWS,
+  PROGRAMS,
+  PROGRAMS_SESSIONS,
+  VICTORY_STARTS_WITH_YOU,
   STAY_UP_TO_DATE_WUTH_THE_NEWS,
   ENTER_YOUR_EMAIL,
   SIGN_UP,
-  ABOUT_VC,
-  ARCHIVE,
-  EVENTS,
-  FINANCIALLY,
-  FOR_CHILDREN,
-  FOR_VETERAN,
-  HISTORY_OF_CREATION,
-  HOW_TO_SUPPORT,
-  NON_FINANCIALLY,
-  PARTNERS,
-  PRESS_ABOUT_US,
-  PROGRAMS,
-  REPORTING,
-  REPORTS,
-  REVIEWS,
-  SUCCES_STORIES,
-  TEAM,
-  VICTORY_STARTS_WITH_YOU,
   WHAT_IS_HIPPOTHERAPY,
 } from "../../const/footer/footer";
 
@@ -66,62 +63,49 @@ export const Footer = () => {
           </div>
         </div>
 
+        <div className="programs">
+          <span className="title">{MENU}</span>
+          <Link to={page1Route}>{REPORTING}</Link>
+          <Link to={page2Route}>{STORE}</Link>
+          <Link to={page2Route}>{HOW_TO_SUPPORT}</Link>
+          <Link to={page2Route}>{STORIES_OF_VICTORIES}</Link>
+        </div>
+
         <div className="about_us">
           <span className="title">{ABOUT_US}</span>
-          <Link to={page1Route}>{ABOUT_VC}</Link>
-          <Link to={page2Route}>{TEAM}</Link>
-          <Link to={page2Route}>{HISTORY_OF_CREATION}</Link>
+          <Link to={page1Route}>{ABOUT_US}</Link>
+          <Link to={page2Route}>{OUR_HISTORY}</Link>
+          <Link to={page2Route}>{OUR_TEAM}</Link>
           <Link to={page2Route}>{PARTNERS}</Link>
-          <Link to={page2Route}>{EVENTS}</Link>
-          <Link to={page2Route}>{PRESS_ABOUT_US}</Link>
+          <Link to={page2Route}>{EVENTS_AND_NEWS}</Link>
         </div>
 
-        <div className="programs">
-          <span className="title">{PROGRAMS}</span>
-          <Link to={page1Route}>{WHAT_IS_HIPPOTHERAPY}</Link>
-          <Link to={page2Route}>{FOR_VETERAN}</Link>
-          <Link to={page2Route}>{FOR_CHILDREN}</Link>
-          <Link to={page2Route}>{ARCHIVE}</Link>
-          <Link to={page2Route}>{REVIEWS}</Link>
-          <Link to={page2Route}>{SUCCES_STORIES}</Link>
-        </div>
-
-        <div className="reports_title_block">
-          <div className="reports">
-            <span className="title">{REPORTING}</span>
-            <Link to={page1Route}>{REPORTS}</Link>
+          <div className="about_us">
+            <span className="title">{HIPPOTHERAPY}</span>
+            <Link to={page1Route}>{WHAT_IS_HIPPOTHERAPY}</Link>
+            <Link to={page1Route}>{PROGRAMS}</Link>
+            <Link to={page1Route}>{PROGRAMS_SESSIONS}</Link>
           </div>
-          <div className="help">
-            <span className="title">{HOW_TO_SUPPORT}</span>
-            <Link to={page1Route}>{FINANCIALLY}</Link>
-            <Link to={page1Route}>{NON_FINANCIALLY}</Link>
-          </div>
-        </div>
       </div>
 
       <div className="contact_block">
         <div className="main_contacts">
+           <button
+            className="contact-item"
+            onClick={() => copyToClipboard("victorycenter@gmail.com")}
+          >
+            <img src={mailIcon} alt="mail" />
+            victorycenter@gmail.com
+          </button>
           <button
             className="contact-item"
             onClick={() => copyToClipboard("+380 50 334 4448")}
           >
+            <img src={phoneIcon} alt="phone" />
             +380 50 334 4448
-          </button>
-
-          <button
-            className="contact-item"
-            onClick={() => copyToClipboard("victorycenter@gmail.com")}
-          >
-            victorycenter@gmail.com
           </button>
         </div>
         <div className="social_media">
-          <button
-            className="contact-item"
-            onClick={() => copyToClipboard("some_inst")}
-          >
-            Instagram
-          </button>
           <button
             className="contact-item"
             onClick={() => copyToClipboard("some_facebook")}
@@ -133,6 +117,12 @@ export const Footer = () => {
             onClick={() => copyToClipboard("some_telegram")}
           >
             Telegram
+          </button>
+          <button
+            className="contact-item"
+            onClick={() => copyToClipboard("some_inst")}
+          >
+            Instagram
           </button>
         </div>
       </div>

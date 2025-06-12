@@ -80,29 +80,27 @@ export const Footer = () => {
           <Link to={page2Route}>{EVENTS_AND_NEWS}</Link>
         </div>
 
-          <div className="about_us">
-            <span className="title">{HIPPOTHERAPY}</span>
-            <Link to={page1Route}>{WHAT_IS_HIPPOTHERAPY}</Link>
-            <Link to={page1Route}>{PROGRAMS}</Link>
-            <Link to={page1Route}>{PROGRAMS_SESSIONS}</Link>
-          </div>
+        <div className="about_us">
+          <span className="title">{HIPPOTHERAPY}</span>
+          <Link to={page1Route}>{WHAT_IS_HIPPOTHERAPY}</Link>
+          <Link to={page1Route}>{PROGRAMS}</Link>
+          <Link to={page1Route}>{PROGRAMS_SESSIONS}</Link>
+        </div>
       </div>
 
       <div className="contact_block">
         <div className="main_contacts">
-           <button
+          <button
             className="contact-item"
             onClick={() => copyToClipboard("victorycenter@gmail.com")}
           >
-            <img src={mailIcon} alt="mail" />
-            victorycenter@gmail.com
+            <img src={mailIcon} alt="mail" /> victorycenter@gmail.com
           </button>
           <button
             className="contact-item"
             onClick={() => copyToClipboard("+380 50 334 4448")}
           >
-            <img src={phoneIcon} alt="phone" />
-            +380 50 334 4448
+            <img src={phoneIcon} alt="phone" /> +380 50 334 4448
           </button>
         </div>
         <div className="social_media">

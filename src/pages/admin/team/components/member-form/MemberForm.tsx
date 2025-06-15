@@ -19,10 +19,15 @@ export type MemberFormProps = {
 const MAX_FULLNAME_LENGTH = 50;
 const MAX_DESCRIPTION_LENGTH = 200;
 export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onValuesChange}: MemberFormProps) => {
-    const [memberFormValues, setMemberFormValues] = useState<MemberFormValues | null>(existingMemberFormValues);
+    const [memberFormValues, setMemberFormValues] = useState<MemberFormValues>(existingMemberFormValues || {
+        fullName: '',
+        img: null,
+        description: '',
+        category: '' as TeamCategory
+    });
     const handleOnSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if(memberFormValues) {
+        if(memberFormValues && memberFormValues.category && memberFormValues.description && memberFormValues.fullName) {
             onSubmit(memberFormValues);
         }
     }
@@ -33,12 +38,12 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
         if (inputTarget.files && inputTarget.files.length > 0) {
             const file = inputTarget.files;
             setMemberFormValues((prev) => ({
-                ...prev!,
+                ...prev,
                 img: file
             }));
         } else {
             setMemberFormValues((prev) => ({
-                ...prev!,
+                ...prev,
                 [name]: value
             }));
         }
@@ -48,7 +53,7 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
         if (onValuesChange && memberFormValues) {
             onValuesChange(memberFormValues)
         }
-    }, [memberFormValues]);
+    }, [memberFormValues, onValuesChange]);
 
     const handleFileDrop = (e: React.DragEvent<HTMLLabelElement>) => {
         e.preventDefault();
@@ -78,14 +83,14 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
                 <input value={memberFormValues ? memberFormValues.fullName : ''} maxLength={MAX_FULLNAME_LENGTH} onChange={handleMemberFormValuesChange} name='fullName'
                        type="text" id='fullName'/>
                 <div
-                    className='form-group-fullname-lenght-limit'>{memberFormValues?.fullName ? memberFormValues.fullName.length : 0}/{MAX_FULLNAME_LENGTH}</div>
+                    className='form-group-fullname-length-limit'>{memberFormValues?.fullName ? memberFormValues.fullName.length : 0}/{MAX_FULLNAME_LENGTH}</div>
             </div>
             <div className='form-group'>
                 <label htmlFor="description">Опис</label>
                 <textarea value={memberFormValues ? memberFormValues.description : ''} maxLength={MAX_DESCRIPTION_LENGTH} onChange={handleMemberFormValuesChange}
                           name='description' className='form-group-description' id='description'/>
                 <div
-                    className='form-group-description-lenght-limit'>{memberFormValues?.description ? memberFormValues.description.length : 0}/{MAX_DESCRIPTION_LENGTH}</div>
+                    className='form-group-description-length-limit'>{memberFormValues?.description ? memberFormValues.description.length : 0}/{MAX_DESCRIPTION_LENGTH}</div>
             </div>
             <div className='form-group form-group-image'>
                 <span><span className='form-group-image-required'>*</span>Фото</span>
@@ -95,7 +100,7 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
                         onDragLeave={e => e.preventDefault()}
                         onDrop={handleFileDrop}
                         htmlFor="image" className='form-group-image-choose-file'>
-                        <div className='form-group-image-choose-file-inner'>
+                        <div className='form-group-image-choose-file-inner' data-testid='drop-area'>
                             <img src={CloudDownload} alt="cloud-download"/>
                             <span>Перетягніть файл сюди або натисніть для завантаження</span>
                         </div>

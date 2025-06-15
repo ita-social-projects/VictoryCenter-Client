@@ -8,7 +8,7 @@ export type MemberDragPreviewProps = {
     dragPreview: MemberDragPreviewModel
 };
 export const MemberDragPreview = ({dragPreview}: MemberDragPreviewProps) => {
-    if (!dragPreview.member) return <></>;
+    if (!dragPreview.visible || !dragPreview.member) return <></>;
 
     return (
         <div

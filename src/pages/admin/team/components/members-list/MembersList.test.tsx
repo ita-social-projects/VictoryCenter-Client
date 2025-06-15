@@ -10,18 +10,22 @@ const mockDataTransfer = {
     types: [],
 };
 
-jest.mock('../../../../../components/common/modal/Modal', () => ({
-    Modal: ({children, isOpen, onClose}: any) => (
+jest.mock('../../../../../components/common/modal/Modal', () => {
+    const Modal = ({ children, isOpen, onClose }: any) =>
         isOpen ? (
             <div data-testid="modal" onClick={onClose}>
                 {children}
             </div>
-        ) : null
-    ),
-    'Modal.Title': ({children}: any) => <div data-testid="modal-title">{children}</div>,
-    'Modal.Content': ({children}: any) => <div data-testid="modal-content">{children}</div>,
-    'Modal.Actions': ({children}: any) => <div data-testid="modal-actions">{children}</div>
-}));
+        ) : null;
+
+    Modal.Title = ({ children }: any) => <div data-testid="modal-title">{children}</div>;
+    Modal.Content = ({ children }: any) => <div data-testid="modal-content">{children}</div>;
+    Modal.Actions = ({ children }: any) => <div data-testid="modal-actions">{children}</div>;
+
+    return {
+        Modal,
+    };
+});
 
 jest.mock('../member-drag-preview/MemberDragPreview', () => ({
     MemberDragPreview: ({dragPreview}: any) => (
@@ -51,7 +55,8 @@ jest.mock('../members-list-item/MembersListItem', () => ({
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(index)}
         >
-            {member.fullName}
+            <span>{member.fullName}</span>
+            <span>{member.status}</span>
             <button data-testid={`delete-button-${index}`} onClick={() => handleOnDeleteMember(member.fullName)}>
                 Delete
             </button>
@@ -123,13 +128,16 @@ describe('MembersList', () => {
         category: 'Основна команда',
     };
 
-    let mockFetchMembers: jest.Mock;
+    let mockFetchMembers: jest.SpyInstance;
 
     beforeEach(() => {
         jest.clearAllMocks();
         localStorageMock.clear();
-        mockMembers.splice(0, mockMembers.length, ...[mockMember]);
-        // @ts-ignore
+        const resetMockMembers = () => {
+            mockMembers.length = 0;
+            mockMembers.push(...[mockMember]);
+        };
+        resetMockMembers();
         mockFetchMembers = jest.spyOn(require('./MembersList'), 'fetchMembers');
         mockFetchMembers.mockImplementation(async (category: string, pageSize: number, pageNumber: number) => {
             const filtered = mockMembers.filter((m) => m.category === category);
@@ -249,4 +257,506 @@ describe('MembersList', () => {
             expect(screen.getByTestId('members-categories')).toHaveStyle({pointerEvents: 'all'});
         });
     });
+
+    it('should reset dragPreview and draggedIndex state', async () => {
+        render(<MembersList {...defaultProps} />);
+
+        const dragItem = await screen.findByTestId('member-item-0');
+
+        fireEvent.dragStart(dragItem, { dataTransfer: mockDataTransfer });
+        fireEvent.dragEnd(dragItem);
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('drag-preview')).not.toBeInTheDocument();
+        });
+    });
+
+    // Additional tests to cover uncovered code paths
+
+    describe('MembersList - Category Switching', () => {
+        const defaultProps: MembersListProps = {
+            searchByNameQuery: null,
+            statusFilter: 'Усі',
+            onAutocompleteValuesChange: jest.fn(),
+        };
+
+        beforeEach(() => {
+            jest.clearAllMocks();
+            localStorageMock.clear();
+            mockMembers.length = 0;
+            mockMembers.push(
+                {
+                    id: 1,
+                    img: 'https://randomuser.me/api/portraits/men/1.jpg',
+                    fullName: 'Main Team Member',
+                    description: 'Software Engineer',
+                    status: 'Опубліковано',
+                    category: 'Основна команда',
+                },
+                {
+                    id: 2,
+                    img: 'https://randomuser.me/api/portraits/women/1.jpg',
+                    fullName: 'Board Member',
+                    description: 'Director',
+                    status: 'Опубліковано',
+                    category: 'Наглядова рада',
+                },
+                {
+                    id: 3,
+                    img: 'https://randomuser.me/api/portraits/men/2.jpg',
+                    fullName: 'Advisor Member',
+                    description: 'Consultant',
+                    status: 'Опубліковано',
+                    category: 'Радники',
+                }
+            );
+        });
+
+        it('switches to "Наглядова рада" category and loads corresponding members', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Main Team Member')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByText('Наглядова рада'));
+
+            await waitFor(() => {
+                expect(screen.getByText('Board Member')).toBeInTheDocument();
+                expect(screen.queryByText('Main Team Member')).not.toBeInTheDocument();
+            });
+        });
+
+        it('switches to "Радники" category and loads corresponding members', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Main Team Member')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByText('Радники'));
+
+            await waitFor(() => {
+                expect(screen.getByText('Advisor Member')).toBeInTheDocument();
+                expect(screen.queryByText('Main Team Member')).not.toBeInTheDocument();
+            });
+        });
+
+        it('saves selected category to localStorage', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            fireEvent.click(screen.getByText('Наглядова рада'));
+
+            expect(localStorageMock.getItem('currentTab')).toBe('Наглядова рада');
+        });
+    });
+
+    describe('MembersList - Scroll and Pagination', () => {
+        const defaultProps: MembersListProps = {
+            searchByNameQuery: null,
+            statusFilter: 'Усі',
+            onAutocompleteValuesChange: jest.fn(),
+        };
+
+        beforeEach(() => {
+            jest.clearAllMocks();
+            localStorageMock.clear();
+            mockMembers.length = 0;
+            // Add 10 members to test pagination
+            for (let i = 1; i <= 10; i++) {
+                mockMembers.push({
+                    id: i,
+                    img: `https://randomuser.me/api/portraits/men/${i}.jpg`,
+                    fullName: `Member ${i}`,
+                    description: `Description ${i}`,
+                    status: 'Опубліковано',
+                    category: 'Основна команда',
+                });
+            }
+        });
+
+        it('shows "move to top" button when scrolled down', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Member 1')).toBeInTheDocument();
+            });
+
+            const membersList = screen.getByTestId('members-list');
+
+            // Mock scrollTop to simulate scrolling
+            Object.defineProperty(membersList, 'scrollTop', {
+                writable: true,
+                value: 100,
+            });
+
+            fireEvent.scroll(membersList);
+
+            expect(screen.getByTestId('members-list-list-to-top')).toBeInTheDocument();
+        });
+
+        it('hides "move to top" button when at top', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Member 1')).toBeInTheDocument();
+            });
+
+            const membersList = screen.getByTestId('members-list');
+
+            // First scroll down
+            Object.defineProperty(membersList, 'scrollTop', {
+                writable: true,
+                value: 100,
+            });
+            fireEvent.scroll(membersList);
+
+            // Then scroll back to top
+            Object.defineProperty(membersList, 'scrollTop', {
+                writable: true,
+                value: 0,
+            });
+            fireEvent.scroll(membersList);
+
+            expect(screen.queryByTestId('members-list-list-to-top')).not.toBeInTheDocument();
+        });
+
+        it('scrolls to top when "move to top" button is clicked', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Member 1')).toBeInTheDocument();
+            });
+
+            const membersList = screen.getByTestId('members-list');
+
+            Object.defineProperty(membersList, 'scrollTop', {
+                writable: true,
+                value: 100,
+            });
+
+            fireEvent.scroll(membersList);
+
+            const moveToTopButton = screen.getByTestId('members-list-list-to-top');
+            fireEvent.click(moveToTopButton);
+
+            expect(membersList.scrollTop).toBe(0);
+        });
+    });
+
+    describe('MembersList - Edit Member Modal', () => {
+        const defaultProps: MembersListProps = {
+            searchByNameQuery: null,
+            statusFilter: 'Усі',
+            onAutocompleteValuesChange: jest.fn(),
+        };
+
+        const mockMember: Member = {
+            id: 1,
+            img: 'https://randomuser.me/api/portraits/men/1.jpg',
+            fullName: 'Test Member',
+            description: 'Test Description',
+            status: 'Опубліковано',
+            category: 'Основна команда',
+        };
+
+        beforeEach(() => {
+            jest.clearAllMocks();
+            localStorageMock.clear();
+            mockMembers.length = 0;
+            mockMembers.push(mockMember);
+        });
+
+        it('opens edit modal when edit button is clicked', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Test Member')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('edit-button-0'));
+
+            expect(screen.getByText('Редагування учасника команди')).toBeInTheDocument();
+            expect(screen.getByTestId('member-form')).toBeInTheDocument();
+        });
+
+        it('opens publish confirmation modal when form is submitted', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Test Member')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('edit-button-0'));
+
+            const form = screen.getByTestId('member-form');
+            fireEvent.submit(form);
+
+            expect(screen.getByText('Опублікувати нового члена команди?')).toBeInTheDocument();
+        });
+
+        it('publishes member when confirmation is accepted', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Test Member')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('edit-button-0'));
+
+            // Modify form
+            const nameInput = screen.getByTestId('form-fullName');
+            fireEvent.change(nameInput, { target: { value: 'Published Name' } });
+
+            const form = screen.getByTestId('member-form');
+            fireEvent.submit(form);
+
+            const confirmButton = screen.getByRole('button', { name: /Так/i });
+            fireEvent.click(confirmButton);
+
+            await waitFor(() => {
+                expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
+            });
+        });
+
+        it('cancels publish when confirmation is rejected', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Test Member')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('edit-button-0'));
+
+            const form = screen.getByTestId('member-form');
+            fireEvent.submit(form);
+
+            const cancelButton = screen.getByText('Ні');
+            fireEvent.click(cancelButton);
+
+            expect(screen.getByText('Редагування учасника команди')).toBeInTheDocument();
+        });
+
+        it('shows close confirmation when closing modal with unsaved changes', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Test Member')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('edit-button-0'));
+
+            // Make changes
+            const nameInput = screen.getByTestId('form-fullName');
+            fireEvent.change(nameInput, { target: { value: 'Changed Name' } });
+
+            // Try to close modal (simulate onClose)
+            const modal = screen.getByTestId('modal');
+            fireEvent.click(modal);
+
+            expect(screen.getByText('Зміни буде втрачено. Бажаєте продовжити?')).toBeInTheDocument();
+        });
+
+        it('closes modal directly when no changes are made', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Test Member')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('edit-button-0'));
+
+            // Close modal without changes
+            const modal = screen.getByTestId('modal');
+            fireEvent.click(modal);
+
+            await waitFor(() => {
+                expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
+            });
+        });
+
+        it('confirms close when user accepts losing changes', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Test Member')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('edit-button-0'));
+
+            // Make changes
+            const nameInput = screen.getByTestId('form-fullName');
+            fireEvent.change(nameInput, { target: { value: 'Changed Name' } });
+
+            // Try to close modal
+            const modal = screen.getByTestId('modal');
+            fireEvent.click(modal);
+
+            // Confirm close
+            const confirmCloseButton = screen.getByRole('button', { name: /Так/i });
+            fireEvent.click(confirmCloseButton);
+
+            await waitFor(() => {
+                expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
+            });
+        });
+    });
+
+    describe('MembersList - Search Functionality', () => {
+        const defaultProps: MembersListProps = {
+            searchByNameQuery: null,
+            statusFilter: 'Усі',
+            onAutocompleteValuesChange: jest.fn(),
+        };
+
+        beforeEach(() => {
+            jest.clearAllMocks();
+            localStorageMock.clear();
+            mockMembers.length = 0;
+            mockMembers.push(
+                {
+                    id: 1,
+                    img: 'https://randomuser.me/api/portraits/men/1.jpg',
+                    fullName: 'John Doe',
+                    description: 'Engineer',
+                    status: 'Опубліковано',
+                    category: 'Основна команда',
+                },
+                {
+                    id: 2,
+                    img: 'https://randomuser.me/api/portraits/women/1.jpg',
+                    fullName: 'Jane Smith',
+                    description: 'Designer',
+                    status: 'Опубліковано',
+                    category: 'Основна команда',
+                }
+            );
+        });
+
+        it('filters members by search query', async () => {
+            const { rerender } = render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('John Doe')).toBeInTheDocument();
+                expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+            });
+
+            rerender(<MembersList {...defaultProps} searchByNameQuery="John" />);
+
+            await waitFor(() => {
+                expect(screen.getByText('John Doe')).toBeInTheDocument();
+                expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument();
+            });
+        });
+
+        it('reloads all members when search query is cleared', async () => {
+            const { rerender } = render(<MembersList {...defaultProps} searchByNameQuery="John" />);
+
+            await waitFor(() => {
+                expect(screen.getByText('John Doe')).toBeInTheDocument();
+                expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument();
+            }, {timeout: 3000});
+
+            rerender(<MembersList {...defaultProps} searchByNameQuery={''} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('John Doe')).toBeInTheDocument();
+                expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+            });
+        });
+
+        it('calls onAutocompleteValuesChange with empty array when no search query', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(defaultProps.onAutocompleteValuesChange).toHaveBeenCalledWith([]);
+            });
+        });
+    });
+
+    describe('MembersList - Drag Events', () => {
+        const defaultProps: MembersListProps = {
+            searchByNameQuery: null,
+            statusFilter: 'Усі',
+            onAutocompleteValuesChange: jest.fn(),
+        };
+
+        beforeEach(() => {
+            jest.clearAllMocks();
+            localStorageMock.clear();
+            mockMembers.length = 0;
+            mockMembers.push({
+                id: 1,
+                img: 'https://randomuser.me/api/portraits/men/1.jpg',
+                fullName: 'Test Member',
+                description: 'Test Description',
+                status: 'Опубліковано',
+                category: 'Основна команда',
+            });
+        });
+
+        it('handles drag with zero coordinates', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Test Member')).toBeInTheDocument();
+            });
+
+            const dragItem = screen.getByTestId('member-item-0');
+
+            fireEvent.dragStart(dragItem, { clientX: 100, clientY: 100, dataTransfer: mockDataTransfer });
+
+            // Drag with zero coordinates (should not update preview position)
+            fireEvent.drag(dragItem, { clientX: 0, clientY: 0, dataTransfer: mockDataTransfer });
+
+            expect(screen.getByTestId('drag-preview')).toBeInTheDocument();
+        });
+
+        it('does not reorder when dropping on same index', async () => {
+            mockMembers.push({
+                id: 2,
+                img: 'https://randomuser.me/api/portraits/men/2.jpg',
+                fullName: 'Second Member',
+                description: 'Second Description',
+                status: 'Опубліковано',
+                category: 'Основна команда',
+            });
+
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Test Member')).toBeInTheDocument();
+                expect(screen.getByText('Second Member')).toBeInTheDocument();
+            });
+
+            const dragItem = screen.getByTestId('member-item-0');
+
+            fireEvent.dragStart(dragItem, { clientX: 100, clientY: 100, dataTransfer: mockDataTransfer });
+            fireEvent.drop(dragItem, { dataTransfer: mockDataTransfer });
+
+            // Order should remain the same
+            expect(screen.getByTestId('member-item-0')).toHaveTextContent('Test Member');
+            expect(screen.getByTestId('member-item-1')).toHaveTextContent('Second Member');
+        });
+
+        it('tracks mouse movement during drag', async () => {
+            render(<MembersList {...defaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Test Member')).toBeInTheDocument();
+            });
+
+            const dragItem = screen.getByTestId('member-item-0');
+
+            fireEvent.dragStart(dragItem, { clientX: 100, clientY: 100, dataTransfer: mockDataTransfer });
+
+            // Simulate mouse move
+            fireEvent.mouseMove(document, { clientX: 200, clientY: 200 });
+
+            expect(screen.getByTestId('drag-preview')).toBeInTheDocument();
+        });
+    });
+
 });
+
+

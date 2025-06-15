@@ -23,6 +23,7 @@ export const Modal = ({
     const actions = React.Children.toArray(children).find(child => React.isValidElement(child) && child.type === Modal.Actions);
 
     useEffect(() => {
+        const prevOverflow = document.body.style.overflow;
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape' && isOpen) {
                 onClose();
@@ -36,7 +37,7 @@ export const Modal = ({
 
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = prevOverflow;
         };
     }, [isOpen, onClose]);
 

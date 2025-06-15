@@ -3,7 +3,7 @@ import {StatusFilter, TeamPageToolbar} from "../team-page-toolbar/TeamPageToolba
 import {MembersList} from "../members-list/MembersList";
 
 export const TeamPageContent = () => {
-    const [searchByNameQuery, setSearchByNameQuery] = useState<string | null>(null);
+    const [searchByNameQuery, setSearchByNameQuery] = useState<string>('');
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("Усі");
     const [autocompleteValues, setAutocompleteValues] = useState<string[]>([]);
 

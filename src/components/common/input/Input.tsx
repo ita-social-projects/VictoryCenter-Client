@@ -10,7 +10,7 @@ export type InputProps = {
 };
 
 export const Input = ({onChange, autocompleteValues}: InputProps) => {
-    const [value, setValue] = useState<string>();
+    const [value, setValue] = useState<string>('');
     const selectContainerRef = useRef<HTMLDivElement>(null);
     const isAutocompleteOpen = useRef(false);
     const inputRef = useRef<HTMLInputElement>(null);

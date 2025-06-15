@@ -20,8 +20,8 @@ export const MemberComponent = ({member, handleOnDeleteMember, handleOnEditMembe
                 </span>
             </div>
             <div className='members-actions'>
-                <div onClick={() => handleOnEditMember(member.id)} className='members-actions-edit'/>
-                <div onClick={() => handleOnDeleteMember(member.fullName)} className='members-actions-delete'/>
+                <button type="button" onClick={() => handleOnEditMember(member.id)} className='members-actions-edit' />
+                <button type="button" onClick={() => handleOnDeleteMember(member.fullName)} className='members-actions-delete' />
             </div>
         </div>
     </div>);

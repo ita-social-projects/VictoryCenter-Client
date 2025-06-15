@@ -175,7 +175,7 @@ describe('MemberDragPreview', () => {
     describe('Props validation', () => {
         test('component receives dragPreview prop correctly', () => {
             const customDragPreview = {
-                visible: false,
+                visible: true,
                 x: 500,
                 y: 600,
                 member: mockMember
@@ -194,7 +194,7 @@ describe('MemberDragPreview', () => {
             const dragPreview = { ...mockDragPreview, visible: false };
             render(<MemberDragPreview dragPreview={dragPreview} />);
 
-            expect(screen.getByTestId('member-component')).toBeInTheDocument();
+            expect(screen.getByTestId('member-component')).not.toBeInTheDocument();
         });
     });
 

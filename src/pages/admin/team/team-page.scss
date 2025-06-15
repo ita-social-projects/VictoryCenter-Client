@@ -33,16 +33,7 @@
 }
 
 
-@keyframes rotate {
-  from {
-    transform: rotate(0)
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (width <= 1400px) {
+@media (max-width <= 1400px) {
   .toolbar {
     flex-wrap: wrap;
     gap: 15px;

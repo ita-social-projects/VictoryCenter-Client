@@ -1,29 +1,37 @@
-import "./admin-navigation.scss"
+import "./admin-navigation.scss";
 import React from "react";
-import {Link, useLocation} from "react-router-dom";
-import {adminRoutes} from "../../../const/routers/routes";
+import { NavLink } from "react-router-dom";
+import { adminRoutes } from "../../../const/routers/routes";
 
 export const AdminNavigation = () => {
-    const location = useLocation();
-
-    return (<>
-        <div className='admin__logo'>
-            LOGO
-        </div>
-        <div className='admin__pages'>
-            <ul>
-                <Link to={adminRoutes.teamPageRoute}>
-                    <li className={location.pathname === adminRoutes.teamPageRoute ? "admin__pages-selected" : ''}>
+    return (
+        <>
+            <div className='admin-logo'>
+                LOGO
+            </div>
+            <div className='admin-pages'>
+                <nav>
+                    <NavLink
+                        to={adminRoutes.teamPageRoute}
+                        end
+                        className={({ isActive }) =>
+                            isActive ? "admin-pages-selected admin-page-link" : "admin-page-link"
+                        }
+                    >
                         Команда
-                    </li>
-                </Link>
+                    </NavLink>
 
-                <Link to={adminRoutes.testAdminRoute}>
-                    <li className={location.pathname === adminRoutes.testAdminRoute ? "admin__pages-selected" : ''}>
+                    <NavLink
+                        to={adminRoutes.testAdminRoute}
+                        end
+                        className={({ isActive }) =>
+                            isActive ? "admin-pages-selected admin-page-link" : "admin-page-link"
+                        }
+                    >
                         Test
-                    </li>
-                </Link>
-            </ul>
-        </div>
-    </>);
+                    </NavLink>
+                </nav>
+            </div>
+        </>
+    );
 }

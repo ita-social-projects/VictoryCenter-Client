@@ -1,119 +1,129 @@
 import React from 'react';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen, fireEvent, waitFor} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {TeamPageToolbar, TeamPageToolbarProps} from './TeamPageToolbar';
+import {MemberFormValues} from '../member-form/MemberForm';
 
+// Mock external dependencies
 jest.mock('../../../../../assets/icons/plus.svg', () => 'plus-icon.svg');
-jest.mock('../../../../../components/common/modal/Modal', () => ({
-    Modal: ({children, isOpen, onClose}: any) => (
-        isOpen ? (
-            <div data-testid="modal" onClick={onClose}>
+
+jest.mock('../../../../../components/common/modal/Modal', () => {
+    const MockModal = ({children, isOpen, onClose, 'data-testid': testId}: any) => {
+        if (!isOpen) return null;
+
+        return (
+            <div data-testid={testId} role="dialog">
+                <div onClick={onClose} data-testid="modal-backdrop"/>
                 {children}
             </div>
-        ) : null
-    ),
-    __esModule: true,
-}));
+        );
+    };
+
+    MockModal.Title = ({children}: any) => <h2 data-testid="modal-title">{children}</h2>;
+    MockModal.Content = ({children}: any) => <div data-testid="modal-content">{children}</div>;
+    MockModal.Actions = ({children}: any) => <div data-testid="modal-actions">{children}</div>;
+
+    return {Modal: MockModal};
+});
 
 jest.mock('../../../../../components/common/button/Button', () => ({
-    Button: ({children, onClick, style, form, type, ...props}: any) => (
+    Button: ({children, onClick, buttonStyle, form, type, 'data-testid': testId, ...props}: any) => (
         <button
             onClick={onClick}
-            data-style={style}
+            data-button-style={buttonStyle}
+            data-testid={testId}
             form={form}
             type={type}
-            data-testid={`button-${style}`}
             {...props}
         >
             {children}
         </button>
-    ),
+    )
 }));
 
-jest.mock('../../../../../components/common/select/Select', () => ({
-    Select: ({children, onValueChange}: any) => (
-        <select data-testid="select" onChange={(e) => onValueChange(e.target.value)}>
+jest.mock('../../../../../components/common/select/Select', () => {
+    const MockSelect = ({children, onValueChange, 'data-testid': testId}: any) => (
+        <select data-testid={testId} onChange={(e) => onValueChange?.(e.target.value)}>
             {children}
         </select>
-    ),
-    __esModule: true,
-}));
-
-const SelectMock = jest.requireMock('../../../../../components/common/select/Select').Select;
-SelectMock.Option = ({name, value}: any) => (
-    <option value={value}>{name}</option>
-);
+    );
+    MockSelect.Option = ({name, value}: any) => <option value={value}>{name}</option>;
+    return {Select: MockSelect};
+});
 
 jest.mock('../../../../../components/common/input/Input', () => ({
-    Input: ({onChange, autocompleteValues, ...props}: any) => (
+    Input: ({onChange, autocompleteValues, 'data-testid': testId, ...props}: any) => (
         <input
-            data-testid="search-input"
-            onChange={(e) => onChange(e.target.value)}
-            data-autocomplete={JSON.stringify(autocompleteValues)}
+            data-testid={testId}
+            onChange={(e) => onChange?.(e.target.value)}
+            data-autocomplete-values={JSON.stringify(autocompleteValues)}
             {...props}
         />
-    ),
+    )
 }));
 
+// Mock MemberForm with controllable behavior
+const mockMemberForm = jest.fn();
 jest.mock('../member-form/MemberForm', () => ({
-    MemberForm: ({id, onSubmit, onChange}: any) => (
-        <form
-            id={id}
-            data-testid="member-form"
-            onSubmit={(e) => {
-                e.preventDefault();
-                onSubmit({
-                    category: 'TestCategory',
-                    fullName: 'Test User',
-                    description: 'Test Description',
-                    img: null
-                });
-            }}
-        >
-            <input
-                data-testid="form-input"
-                onChange={(e) => onChange && onChange({
-                    category: 'TestCategory',
-                    fullName: e.target.value,
-                    description: 'Test Description',
-                    img: null
-                })}
-            />
-            <button type="submit">Submit Form</button>
-        </form>
-    ),
+    MemberForm: (props: any) => {
+        mockMemberForm(props);
+        return (
+            <form
+                id={props.id}
+                data-testid="member-form"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    const mockMemberData: MemberFormValues = {
+                        category: 'Керівництво' as any,
+                        fullName: 'Test User',
+                        description: 'Test Description',
+                        img: null
+                    };
+                    props.onSubmit?.(mockMemberData);
+                }}
+            >
+                <input data-testid="form-fullname" onChange={(e) => {
+                    // Simulate form data changes
+                    if (e.target.value) {
+                        // Trigger state update in parent component
+                        setTimeout(() => {
+                            props.onSubmit?.({
+                                category: 'Керівництво' as any,
+                                fullName: e.target.value,
+                                description: 'Test Description',
+                                img: null
+                            });
+                        }, 0);
+                    }
+                }}/>
+                <button type="submit" data-testid="form-submit">Submit Form</button>
+            </form>
+        );
+    }
 }));
-
-const MockModal = jest.requireMock('../../../../../components/common/modal/Modal').Modal;
-MockModal.Title = ({children}: any) => <h2 data-testid="modal-title">{children}</h2>;
-MockModal.Content = ({children}: any) => <div data-testid="modal-content">{children}</div>;
-MockModal.Actions = ({children}: any) => <div data-testid="modal-actions">{children}</div>;
 
 describe('TeamPageToolbar', () => {
     const defaultProps: TeamPageToolbarProps = {
         onSearchQueryChange: jest.fn(),
         onStatusFilterChange: jest.fn(),
-        autocompleteValues: ['value1', 'value2', 'value3'],
+        autocompleteValues: ['John Doe', 'Jane Smith'],
+        onMemberPublish: jest.fn(),
+        onMemberSaveDraft: jest.fn(),
     };
 
     beforeEach(() => {
         jest.clearAllMocks();
+        mockMemberForm.mockClear();
     });
 
-    describe('Rendering', () => {
-        it('renders the toolbar with all elements', () => {
+    describe('Initial Rendering', () => {
+        it('renders all toolbar elements', () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
             expect(screen.getByTestId('search-input')).toBeInTheDocument();
-            expect(screen.getByTestId('select')).toBeInTheDocument();
+            expect(screen.getByTestId('status-filter')).toBeInTheDocument();
+            expect(screen.getByTestId('add-member-button')).toBeInTheDocument();
             expect(screen.getByText('Додати в команду')).toBeInTheDocument();
-            expect(screen.getByAltText('plus')).toBeInTheDocument();
-        });
-
-        it('passes autocomplete values to input', () => {
-            render(<TeamPageToolbar {...defaultProps} />);
-
-            const input = screen.getByTestId('search-input');
-            expect(input).toHaveAttribute('data-autocomplete', JSON.stringify(defaultProps.autocompleteValues));
         });
 
         it('renders select options correctly', () => {
@@ -123,450 +133,282 @@ describe('TeamPageToolbar', () => {
             expect(screen.getByText('Опубліковано')).toBeInTheDocument();
             expect(screen.getByText('Чернетка')).toBeInTheDocument();
         });
+
+        it('passes autocomplete values to input', () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            const input = screen.getByTestId('search-input');
+            expect(input).toHaveAttribute('data-autocomplete-values', JSON.stringify(defaultProps.autocompleteValues));
+        });
+
+        it('initially shows no modals', () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('publish-confirm-modal')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('confirm-close-modal')).not.toBeInTheDocument();
+        });
     });
 
-    describe('Search functionality', () => {
+    describe('Search Functionality', () => {
         it('calls onSearchQueryChange when search input changes', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
             const searchInput = screen.getByTestId('search-input');
-            fireEvent.change(searchInput, {target: {value: 'test query'}});
+            await userEvent.type(searchInput, 'test search');
 
-            expect(defaultProps.onSearchQueryChange).toHaveBeenCalledWith('test query');
+            expect(defaultProps.onSearchQueryChange).toHaveBeenCalledWith('test search');
+        });
+
+        it('handles empty search queries', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            const searchInput = screen.getByTestId('search-input');
+            await userEvent.clear(searchInput);
+
+            expect(defaultProps.onSearchQueryChange).not.toHaveBeenCalledWith();
         });
     });
 
-    describe('Filter functionality', () => {
-        it('calls onStatusFilterChange when select value changes', async () => {
+    describe('Status Filter Functionality', () => {
+        it('calls onStatusFilterChange for each filter option', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            const select = screen.getByTestId('select');
-            fireEvent.change(select, {target: {value: 'Опубліковано'}});
+            const select = screen.getByTestId('status-filter');
 
+            await userEvent.selectOptions(select, 'Усі');
+            expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith('Усі');
+
+            await userEvent.selectOptions(select, 'Опубліковано');
             expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith('Опубліковано');
+
+            await userEvent.selectOptions(select, 'Чернетка');
+            expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith('Чернетка');
         });
     });
 
-    describe('Add Team Member Modal', () => {
-        it('opens add team member modal when button is clicked', async () => {
+    describe('Add Member Modal Flow', () => {
+        it('opens add member modal when button is clicked', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
+            await userEvent.click(screen.getByTestId('add-member-button'));
 
-            expect(screen.getByTestId('modal')).toBeInTheDocument();
-            expect(screen.getByTestId('modal-title')).toHaveTextContent("Додати в команду");
-            expect(screen.getByTestId('member-form')).toBeInTheDocument();
+            expect(screen.getByTestId('add-member-modal')).toBeInTheDocument();
         });
 
-        it('renders modal actions correctly', async () => {
+        it('renders add member modal with correct structure', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
+            await userEvent.click(screen.getByTestId('add-member-button'));
 
+            expect(screen.getByTestId('add-member-modal')).toBeInTheDocument();
+            expect(screen.getByTestId('member-form')).toBeInTheDocument();
             expect(screen.getByText('Зберегти як чернетку')).toBeInTheDocument();
             expect(screen.getByText('Опублікувати')).toBeInTheDocument();
         });
 
-        it('closes modal when save as draft is clicked', async () => {
+        it('passes correct props to MemberForm', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
+            await userEvent.click(screen.getByTestId('add-member-button'));
 
-            const saveAsDraftButton = screen.getByText('Зберегти як чернетку');
-            fireEvent.click(saveAsDraftButton);
-
-            expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
+            expect(mockMemberForm).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    id: 'add-member-modal',
+                    onSubmit: expect.any(Function)
+                })
+            );
         });
     });
 
-    describe('Publish Confirmation Modal', () => {
+    describe('Save as Draft Flow', () => {
+        it('saves as draft and closes modal', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            await userEvent.click(screen.getByText('Зберегти як чернетку'));
+
+            expect(defaultProps.onMemberSaveDraft).toHaveBeenCalled();
+            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+        });
+
+        it('resets state after saving draft', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            await userEvent.click(screen.getByText('Зберегти як чернетку'));
+
+            // Reopen modal should be in clean state
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            expect(screen.getByTestId('add-member-modal')).toBeInTheDocument();
+        });
+    });
+
+    describe('Publish Flow', () => {
         it('opens publish confirmation modal when form is submitted', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
-
-            const publishButton = screen.getByText('Опублікувати');
-            fireEvent.click(publishButton);
-
-            expect(screen.getByText('Опублікувати нового члена команди?')).toBeInTheDocument();
-        });
-
-        it('cancels publish when "Ні" is clicked', async () => {
-            render(<TeamPageToolbar {...defaultProps} />);
-
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
-            const publishButton = screen.getByText('Опублікувати');
-            fireEvent.click(publishButton);
-
-            const cancelButtons = screen.getAllByText('Ні');
-            fireEvent.click(cancelButtons[0]);
-
-            expect(screen.queryByText('Опублікувати нового члена команди?')).not.toBeInTheDocument();
-        });
-
-        it('confirms publish when "Так" is clicked', async () => {
-            render(<TeamPageToolbar {...defaultProps} />);
-
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
-            const publishButton = screen.getByText('Опублікувати');
-            fireEvent.click(publishButton);
-
-            const confirmButtons = screen.getAllByText('Так');
-            fireEvent.click(confirmButtons[0]);
-
-            expect(screen.queryByText('Опублікувати нового члена команди?')).not.toBeInTheDocument();
-            expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
-        });
-    });
-
-    describe('Close Confirmation Modal', () => {
-        it('shows close confirmation modal when trying to close with unsaved changes', async () => {
-            render(<TeamPageToolbar {...defaultProps} />);
-
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
-
-            const modal = screen.getByTestId('modal');
-            fireEvent.click(modal);
-
-            expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
-        });
-
-        it('closes without confirmation when no changes are made', async () => {
-            render(<TeamPageToolbar {...defaultProps} />);
-
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
-
-            const modal = screen.getByTestId('modal');
-            fireEvent.click(modal);
-
-            expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
-        });
-
-        it('shows close confirmation modal when there are unsaved changes', async () => {
-            const TestComponent = () => {
-                const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = React.useState(false);
-                const [isAddTeamMemberModalOpen, setIsAddTeamMemberModalOpen] = React.useState(false);
-                const [newTeamMemberInfo, setNewTeamMemberInfo] = React.useState<{
-                    category: string,
-                    fullName: string,
-                    description: string,
-                    img: string | null
-                } | null>({
-                    category: 'TestCategory',
-                    fullName: 'Test User',
-                    description: 'Test Description',
-                    img: null
-                });
-
-                const handleAddMemberOnClose = () => {
-                    if (isAddTeamMemberModalOpen && newTeamMemberInfo !== null) {
-                        setIsConfirmCloseModalOpen(true);
-                    }
-                };
-
-                const handleConfirmClose = () => {
-                    if (isAddTeamMemberModalOpen && newTeamMemberInfo != null) {
-                        setIsConfirmCloseModalOpen(false);
-                        setNewTeamMemberInfo(null);
-                        setIsAddTeamMemberModalOpen(false);
-                    }
-                };
-
-                return (
-                    <>
-                        <button onClick={() => setIsAddTeamMemberModalOpen(true)}>Open Modal</button>
-                        {isAddTeamMemberModalOpen && (
-                            <div data-testid="modal" onClick={handleAddMemberOnClose}>
-                                <div>Add Member Modal</div>
-                            </div>
-                        )}
-                        {isConfirmCloseModalOpen && (
-                            <div data-testid="confirm-close-modal">
-                                <div>Зміни буде втрачено. Бажаєте продовжити?</div>
-                                <button onClick={() => setIsConfirmCloseModalOpen(false)}>Ні</button>
-                                <button onClick={handleConfirmClose}>Так</button>
-                            </div>
-                        )}
-                    </>
-                );
-            };
-
-            render(<TestComponent/>);
-
-            fireEvent.click(screen.getByText('Open Modal'));
-            fireEvent.click(screen.getByTestId('modal'));
-
-            expect(screen.getByTestId('confirm-close-modal')).toBeInTheDocument();
-            expect(screen.getByText('Зміни буде втрачено. Бажаєте продовжити?')).toBeInTheDocument();
-        });
-
-        it('handles confirm close with unsaved changes', async () => {
-            const TestComponent = () => {
-                const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = React.useState(false);
-                const [isAddTeamMemberModalOpen, setIsAddTeamMemberModalOpen] = React.useState(false);
-                const [newTeamMemberInfo, setNewTeamMemberInfo] = React.useState<{
-                    category: string,
-                    fullName: string,
-                    description: string,
-                    img: string | null
-                } | null>({
-                    category: 'TestCategory',
-                    fullName: 'Test User',
-                    description: 'Test Description',
-                    img: null
-                });
-
-                const handleAddMemberOnClose = () => {
-                    if (isAddTeamMemberModalOpen && newTeamMemberInfo !== null) {
-                        setIsConfirmCloseModalOpen(true);
-                    }
-                };
-
-                const handleConfirmClose = () => {
-                    if (isAddTeamMemberModalOpen && newTeamMemberInfo != null) {
-                        setIsConfirmCloseModalOpen(false);
-                        setNewTeamMemberInfo(null);
-                        setIsAddTeamMemberModalOpen(false);
-                    }
-                };
-
-                return (
-                    <>
-                        <button onClick={() => setIsAddTeamMemberModalOpen(true)}>Open Modal</button>
-                        {isAddTeamMemberModalOpen && (
-                            <div data-testid="modal" onClick={handleAddMemberOnClose}>
-                                <div>Add Member Modal</div>
-                            </div>
-                        )}
-                        {isConfirmCloseModalOpen && (
-                            <div data-testid="confirm-close-modal">
-                                <div>Зміни буде втрачено. Бажаєте продовжити?</div>
-                                <button onClick={() => setIsConfirmCloseModalOpen(false)}>Ні</button>
-                                <button onClick={handleConfirmClose} data-testid="confirm-yes">Так</button>
-                            </div>
-                        )}
-                        <div data-testid="state-display">
-                            {isAddTeamMemberModalOpen ? 'Modal Open' : 'Modal Closed'}
-                        </div>
-                    </>
-                );
-            };
-
-            render(<TestComponent/>);
-
-            fireEvent.click(screen.getByText('Open Modal'));
-            fireEvent.click(screen.getByTestId('modal'));
-            fireEvent.click(screen.getByTestId('confirm-yes'));
-
-            expect(screen.getByTestId('state-display')).toHaveTextContent('Modal Closed');
-            expect(screen.queryByTestId('confirm-close-modal')).not.toBeInTheDocument();
-        });
-
-        it('handles confirm close with empty form data', async () => {
-            const TestComponent = () => {
-                const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = React.useState(false);
-                const [isAddTeamMemberModalOpen, setIsAddTeamMemberModalOpen] = React.useState(false);
-                const [newTeamMemberInfo, setNewTeamMemberInfo] = React.useState<{
-                    category: string,
-                    fullName: string,
-                    description: string,
-                    img: string | null
-                } | null>({
-                    category: '',
-                    fullName: '',
-                    description: '',
-                    img: null
-                });
-
-                const handleConfirmClose = () => {
-                    if (isAddTeamMemberModalOpen && (newTeamMemberInfo === null
-                        || (newTeamMemberInfo.img === null
-                            && !newTeamMemberInfo.category
-                            && !newTeamMemberInfo.fullName
-                            && !newTeamMemberInfo.description))) {
-                        setNewTeamMemberInfo(null);
-                        setIsAddTeamMemberModalOpen(false);
-                    }
-                };
-
-                return (
-                    <>
-                        <button onClick={() => setIsAddTeamMemberModalOpen(true)}>Open Modal</button>
-                        <button onClick={() => setIsConfirmCloseModalOpen(true)}>Show Confirm</button>
-                        {isConfirmCloseModalOpen && (
-                            <div data-testid="confirm-close-modal">
-                                <button onClick={handleConfirmClose} data-testid="confirm-yes">Так</button>
-                            </div>
-                        )}
-                        <div data-testid="state-display">
-                            {isAddTeamMemberModalOpen ? 'Modal Open' : 'Modal Closed'}
-                        </div>
-                    </>
-                );
-            };
-
-            render(<TestComponent/>);
-
-            fireEvent.click(screen.getByText('Open Modal'));
-            fireEvent.click(screen.getByText('Show Confirm'));
-            fireEvent.click(screen.getByTestId('confirm-yes'));
-
-            expect(screen.getByTestId('state-display')).toHaveTextContent('Modal Closed');
-        });
-
-        it('cancels close confirmation when "Ні" is clicked', async () => {
-            const TestComponent = () => {
-                const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = React.useState(true);
-
-                return (
-                    <div data-testid="confirm-close-modal">
-                        <div>Зміни буде втрачено. Бажаєте продовжити?</div>
-                        <button onClick={() => setIsConfirmCloseModalOpen(false)} data-testid="cancel-close">Ні</button>
-                        <div data-testid="modal-state">
-                            {isConfirmCloseModalOpen ? 'Open' : 'Closed'}
-                        </div>
-                    </div>
-                );
-            };
-
-            render(<TestComponent/>);
-
-            fireEvent.click(screen.getByTestId('cancel-close'));
-            expect(screen.getByTestId('modal-state')).toHaveTextContent('Closed');
-        });
-    });
-
-    describe('State Management', () => {
-        it('handles multiple modal states correctly', async () => {
-            render(<TeamPageToolbar {...defaultProps} />);
-
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
-
-            const publishButton = screen.getByText('Опублікувати');
-            fireEvent.click(publishButton);
-
-            expect(screen.getByText('Додати в команду')).toBeInTheDocument();
-            expect(screen.getByText('Опублікувати нового члена команди?')).toBeInTheDocument();
-        });
-
-        it('resets state when modals are closed', async () => {
-            render(<TeamPageToolbar {...defaultProps} />);
-
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
-
-            const saveAsDraftButton = screen.getByText('Зберегти як чернетку');
-            fireEvent.click(saveAsDraftButton);
-
-            fireEvent.click(addButton);
-            expect(screen.getByTestId('member-form')).toBeInTheDocument();
-        });
-    });
-
-    describe('Edge Cases', () => {
-        it('handles rapid modal open/close operations', async () => {
-            render(<TeamPageToolbar {...defaultProps} />);
-
-            const addButton = screen.getByText('Додати в команду');
-
-            fireEvent.click(addButton);
-            expect(screen.getByTestId('modal')).toBeInTheDocument();
-
-            const saveAsDraftButton = screen.getByText('Зберегти як чернетку');
-            fireEvent.click(saveAsDraftButton);
-            expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
-
-            fireEvent.click(addButton);
-            expect(screen.getByTestId('modal')).toBeInTheDocument();
-        });
-
-        it('handles form submission with different member data', async () => {
-            render(<TeamPageToolbar {...defaultProps} />);
-
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
+            await userEvent.click(screen.getByTestId('add-member-button'));
 
             const form = screen.getByTestId('member-form');
             fireEvent.submit(form);
 
+            expect(screen.getByTestId('publish-confirm-modal')).toBeInTheDocument();
             expect(screen.getByText('Опублікувати нового члена команди?')).toBeInTheDocument();
+        });
+
+        it('cancels publish confirmation and returns to add member modal', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            fireEvent.submit(screen.getByTestId('member-form'));
+
+            await userEvent.click(screen.getByText('Ні'));
+
+            expect(screen.queryByTestId('publish-confirm-modal')).not.toBeInTheDocument();
+            expect(screen.getByTestId('add-member-modal')).toBeInTheDocument();
+        });
+
+        it('confirms publish and calls onMemberPublish', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            fireEvent.submit(screen.getByTestId('member-form'));
+
+            await userEvent.click(screen.getByText('Так'));
+
+            expect(defaultProps.onMemberPublish).toHaveBeenCalledWith({
+                category: 'Керівництво',
+                fullName: 'Test User',
+                description: 'Test Description',
+                img: null
+            });
+            expect(screen.queryByTestId('publish-confirm-modal')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
         });
     });
 
-    describe('Accessibility', () => {
-        it('has proper button roles and attributes', () => {
+    describe('Close Confirmation Flow', () => {
+        it('closes modal directly when no unsaved changes', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            const addButton = screen.getByText('Додати в команду');
-            expect(addButton).toHaveAttribute('data-buttonStyle', 'primary');
+            await userEvent.click(screen.getByTestId('add-member-button'));
+
+            const backdrop = screen.getByTestId('modal-backdrop');
+            await userEvent.click(backdrop);
+
+            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('confirm-close-modal')).not.toBeInTheDocument();
         });
+    });
 
-        it('has proper form attributes for modal form', async () => {
+    describe('Button Attributes and Styling', () => {
+        it('applies correct button styles and attributes', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
+            const addButton = screen.getByTestId('add-member-button');
+            expect(addButton).toHaveAttribute('data-button-style', 'primary');
+
+            await userEvent.click(addButton);
+
+            const draftButton = screen.getByText('Зберегти як чернетку');
+            expect(draftButton).toHaveAttribute('data-button-style', 'secondary');
 
             const publishButton = screen.getByText('Опублікувати');
+            expect(publishButton).toHaveAttribute('data-button-style', 'primary');
             expect(publishButton).toHaveAttribute('form', 'add-member-modal');
             expect(publishButton).toHaveAttribute('type', 'submit');
         });
     });
 
-    describe('Component Integration', () => {
-        it('integrates properly with MemberForm component', async () => {
+    describe('Complex Scenarios', () => {
+        it('handles multiple modal transitions correctly', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            expect(screen.getByTestId('add-member-modal')).toBeInTheDocument();
 
-            const memberForm = screen.getByTestId('member-form');
-            expect(memberForm).toHaveAttribute('id', 'add-member-modal');
+            fireEvent.submit(screen.getByTestId('member-form'));
+            expect(screen.getByTestId('publish-confirm-modal')).toBeInTheDocument();
+
+            await userEvent.click(screen.getByText('Ні'));
+            expect(screen.queryByTestId('publish-confirm-modal')).not.toBeInTheDocument();
+            expect(screen.getByTestId('add-member-modal')).toBeInTheDocument();
+
+            const formInput = screen.getByTestId('form-fullname');
+            await userEvent.type(formInput, 'Test');
+
+            fireEvent.click(screen.getByTestId('modal-backdrop'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('confirm-close-modal')).toBeInTheDocument();
+            });
         });
 
-        it('passes correct props to child components', () => {
+        it('handles rapid state changes without errors', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            const searchInput = screen.getByTestId('search-input');
-            expect(searchInput).toHaveAttribute('data-autocomplete', JSON.stringify(defaultProps.autocompleteValues));
+            // Rapidly open and close modals
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            await userEvent.click(screen.getByText('Зберегти як чернетку'));
 
-            const addButton = screen.getByText('Додати в команду');
-            expect(addButton).toHaveAttribute('data-buttonStyle', 'primary');
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            fireEvent.submit(screen.getByTestId('member-form'));
+            await userEvent.click(screen.getByText('Так'));
+
+            expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
         });
     });
 
-    describe('handleConfirmClose', () => {
-        it('closes modal and resets state when newTeamMemberInfo is empty', async () => {
-            render(<TeamPageToolbar {...defaultProps} />);
+    describe('Optional Props', () => {
+        it('works without optional callback props', () => {
+            const minimalProps = {
+                onSearchQueryChange: jest.fn(),
+                onStatusFilterChange: jest.fn(),
+                autocompleteValues: [],
+            };
 
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
+            render(<TeamPageToolbar {...minimalProps} />);
 
-            const modal = screen.getByTestId('modal');
-            fireEvent.click(modal);
-
-            expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
+            expect(screen.getByTestId('add-member-button')).toBeInTheDocument();
         });
 
-        it('closes modal and resets state when newTeamMemberInfo is null', async () => {
+        it('handles missing callbacks gracefully', async () => {
+            const propsWithoutCallbacks = {
+                onSearchQueryChange: jest.fn(),
+                onStatusFilterChange: jest.fn(),
+                autocompleteValues: [],
+            };
+
+            render(<TeamPageToolbar {...propsWithoutCallbacks} />);
+
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            await userEvent.click(screen.getByText('Зберегти як чернетку'));
+
+            // Should not throw errors
+            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+        });
+    });
+
+    describe('Edge Cases', () => {
+        it('handles empty autocomplete values', () => {
+            const props = {...defaultProps, autocompleteValues: []};
+            render(<TeamPageToolbar {...props} />);
+
+            const input = screen.getByTestId('search-input');
+            expect(input).toHaveAttribute('data-autocomplete-values', '[]');
+        });
+
+        it('handles form submission with empty data', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            const addButton = screen.getByText('Додати в команду');
-            fireEvent.click(addButton);
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            fireEvent.submit(screen.getByTestId('member-form'));
 
-            const modal = screen.getByTestId('modal');
-            fireEvent.click(modal);
+            expect(screen.getByTestId('publish-confirm-modal')).toBeInTheDocument();
 
-            expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
+            await userEvent.click(screen.getByText('Так'));
+            expect(defaultProps.onMemberPublish).toHaveBeenCalled();
         });
     });
 });

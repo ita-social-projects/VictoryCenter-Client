@@ -38,7 +38,7 @@ describe("MembersListItem", () => {
         expect(getByText("John Doe")).toBeInTheDocument();
         expect(getByText("Senior Developer")).toBeInTheDocument();
         expect(getByText("Чернетка")).toBeInTheDocument();
-        expect(getByAltText("dragger")).toBeInTheDocument();
+        expect(getByAltText("Drag Handle")).toBeInTheDocument();
         expect(getByAltText("John Doe-img")).toBeInTheDocument();
     });
 

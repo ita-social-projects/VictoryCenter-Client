@@ -32,7 +32,7 @@ export const MembersListItem = ({draggedIndex, index, member, handleDragOver, ha
                 onDrag={handleDrag}
                 onDragEnd={handleDragEnd}
             >
-                <img src={DragIcon} alt="dragger"/>
+                <img src={DragIcon} alt="Drag Handle"/>
             </div>
             <MemberComponent member={member} handleOnDeleteMember={handleOnDeleteMember} handleOnEditMember={handleOnEditMember}></MemberComponent>
         </div>

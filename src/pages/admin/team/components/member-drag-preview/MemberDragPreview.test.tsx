@@ -194,7 +194,7 @@ describe('MemberDragPreview', () => {
             const dragPreview = { ...mockDragPreview, visible: false };
             render(<MemberDragPreview dragPreview={dragPreview} />);
 
-            expect(screen.getByTestId('member-component')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('member-component')).not.toBeInTheDocument();
         });
     });
 

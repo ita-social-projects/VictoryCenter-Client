@@ -188,7 +188,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
             isFetchingRef.current = false;
             loadMembers();
         }
-    }, [category]);
+    }, [category, loadMembers]);
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
         setDraggedIndex(index);

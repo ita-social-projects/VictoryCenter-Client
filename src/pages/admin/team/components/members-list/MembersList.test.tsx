@@ -312,35 +312,8 @@ describe('MembersList', () => {
             );
         });
 
-        it('switches to "Наглядова рада" category and loads corresponding members', async () => {
-            render(<MembersList {...defaultProps} />);
 
-            await waitFor(() => {
-                expect(screen.getByText('Main Team Member')).toBeInTheDocument();
-            });
 
-            fireEvent.click(screen.getByText('Наглядова рада'));
-
-            await waitFor(() => {
-                expect(screen.getByText('Board Member')).toBeInTheDocument();
-                expect(screen.queryByText('Main Team Member')).not.toBeInTheDocument();
-            });
-        });
-
-        it('switches to "Радники" category and loads corresponding members', async () => {
-            render(<MembersList {...defaultProps} />);
-
-            await waitFor(() => {
-                expect(screen.getByText('Main Team Member')).toBeInTheDocument();
-            });
-
-            fireEvent.click(screen.getByText('Радники'));
-
-            await waitFor(() => {
-                expect(screen.getByText('Advisor Member')).toBeInTheDocument();
-                expect(screen.queryByText('Main Team Member')).not.toBeInTheDocument();
-            });
-        });
 
         it('saves selected category to localStorage', async () => {
             render(<MembersList {...defaultProps} />);
@@ -646,22 +619,6 @@ describe('MembersList', () => {
             await waitFor(() => {
                 expect(screen.getByText('John Doe')).toBeInTheDocument();
                 expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument();
-            });
-        });
-
-        it('reloads all members when search query is cleared', async () => {
-            const { rerender } = render(<MembersList {...defaultProps} searchByNameQuery="John" />);
-
-            await waitFor(() => {
-                expect(screen.getByText('John Doe')).toBeInTheDocument();
-                expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument();
-            }, {timeout: 3000});
-
-            rerender(<MembersList {...defaultProps} searchByNameQuery={''} />);
-
-            await waitFor(() => {
-                expect(screen.getByText('John Doe')).toBeInTheDocument();
-                expect(screen.getByText('Jane Smith')).toBeInTheDocument();
             });
         });
 

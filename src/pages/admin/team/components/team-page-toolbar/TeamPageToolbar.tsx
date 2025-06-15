@@ -188,7 +188,6 @@ export const TeamPageToolbar = ({
         resetState();
     }, [resetState]);
 
-    // For testing purposes, expose internal state
     const getInternalState = useCallback(() => ({
         modalState,
         pendingMemberData,

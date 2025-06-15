@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {TeamCategory} from "../../TeamPage";
 import {Modal} from "../../../../../components/common/modal/Modal";
 import {MemberDragPreview} from "../member-drag-preview/MemberDragPreview";
@@ -158,9 +158,16 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     const [isConfirmPublishNewMemberModalOpen, setIsConfirmPublishNewMemberModalOpen] = useState(false);
     const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState(false);
 
+    useEffect(() => {
+        if (category) {
+            setMembers([]);
+            setCurrentPage(1);
+            isFetchingRef.current = false;
+            loadMembers();
+        }
+    }, [category]);
 
-
-    const loadMembers = useCallback(async (reset: boolean = false) => {
+    const loadMembers = async (reset: boolean = false) => {
         if (!category || isFetchingRef.current) return;
         if (!reset && totalPages && currentPage > totalPages) return;
 
@@ -179,16 +186,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
         setIsMembersLoading(false);
         isFetchingRef.current = false;
-    }, [category, currentPage, totalPages]);
-
-    useEffect(() => {
-        if (category) {
-            setMembers([]);
-            setCurrentPage(1);
-            isFetchingRef.current = false;
-            loadMembers();
-        }
-    }, [category, loadMembers]);
+    };
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
         setDraggedIndex(index);
@@ -303,7 +301,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
             isFetchingRef.current = false;
             loadMembers(true);
         }
-    }, [searchByNameQuery, loadMembers]);
+    }, [searchByNameQuery]);
 
     useEffect(() => {
         if (isMembersLoading && memberListRef.current) {
@@ -318,7 +316,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         } else {
             onAutocompleteValuesChange([]);
         }
-    }, [members, searchByNameQuery, onAutocompleteValuesChange]);
+    }, [members]);
 
     const handleOnScroll = () => {
         const el = memberListRef.current;

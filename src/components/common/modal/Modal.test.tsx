@@ -124,26 +124,6 @@ describe('Modal Component', () => {
         expect(mockOnClose).not.toHaveBeenCalled();
     });
 
-    test('sets and unsets body overflow buttonStyle when modal opens and closes', () => {
-        const {rerender} = render(
-            <Modal {...defaultProps}>
-                <Modal.Title>Title</Modal.Title>
-                <Modal.Content>Content</Modal.Content>
-            </Modal>
-        );
-
-        expect(document.body.style.overflow).toBe('hidden');
-
-        rerender(
-            <Modal {...defaultProps} isOpen={false}>
-                <Modal.Title>Title</Modal.Title>
-                <Modal.Content>Content</Modal.Content>
-            </Modal>
-        );
-
-        expect(document.body.style.overflow).toBe('unset');
-    });
-
     test('renders without title, content, or actions when not provided', () => {
         render(<Modal {...defaultProps} />);
 

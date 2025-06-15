@@ -187,53 +187,6 @@ describe('MemberForm - Additional Coverage', () => {
         jest.clearAllMocks();
     });
 
-    // it('handles file input change with files', async () => {
-    //     render(<MemberForm {...defaultProps} />);
-    //
-    //     const fileInput = screen.getByTestId('image');
-    //     const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
-    //
-    //     await userEvent.upload(fileInput, file);
-    //
-    //     expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
-    //         expect.objectContaining({
-    //             img: expect.any(FileList),
-    //         })
-    //     );
-    // });
-
-    // it('handles file drop event', () => {
-    //     render(<MemberForm {...defaultProps} />);
-    //
-    //     const dropArea = screen.getByLabelText('Перетягніть файл сюди або натисніть для завантаження');
-    //     const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
-    //
-    //     const fileList = {
-    //         0: file,
-    //         length: 1,
-    //         item: jest.fn().mockReturnValue(file),
-    //         [Symbol.iterator]: function* () {
-    //             yield file;
-    //         }
-    //     } as unknown as FileList;
-    //
-    //     const dropEvent = {
-    //         preventDefault: jest.fn(),
-    //         dataTransfer: {
-    //             files: fileList
-    //         }
-    //     };
-    //
-    //     fireEvent.drop(dropArea, dropEvent);
-    //
-    //     expect(dropEvent.preventDefault).toHaveBeenCalled();
-    //     expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
-    //         expect.objectContaining({
-    //             img: fileList,
-    //         })
-    //     );
-    // });
-
     it('displays uploaded file names', () => {
         const file1 = new File(['test1'], 'test1.jpg', { type: 'image/jpeg' });
         const file2 = new File(['test2'], 'test2.jpg', { type: 'image/jpeg' });

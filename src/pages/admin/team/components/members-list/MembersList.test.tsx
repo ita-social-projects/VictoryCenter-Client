@@ -377,14 +377,12 @@ describe('MembersList', () => {
 
             const membersList = screen.getByTestId('members-list');
 
-            // First scroll down
             Object.defineProperty(membersList, 'scrollTop', {
                 writable: true,
                 value: 100,
             });
             fireEvent.scroll(membersList);
 
-            // Then scroll back to top
             Object.defineProperty(membersList, 'scrollTop', {
                 writable: true,
                 value: 0,
@@ -477,7 +475,6 @@ describe('MembersList', () => {
 
             fireEvent.click(screen.getByTestId('edit-button-0'));
 
-            // Modify form
             const nameInput = screen.getByTestId('form-fullName');
             fireEvent.change(nameInput, { target: { value: 'Published Name' } });
 
@@ -519,11 +516,9 @@ describe('MembersList', () => {
 
             fireEvent.click(screen.getByTestId('edit-button-0'));
 
-            // Make changes
             const nameInput = screen.getByTestId('form-fullName');
             fireEvent.change(nameInput, { target: { value: 'Changed Name' } });
 
-            // Try to close modal (simulate onClose)
             const modal = screen.getByTestId('modal');
             fireEvent.click(modal);
 
@@ -539,7 +534,6 @@ describe('MembersList', () => {
 
             fireEvent.click(screen.getByTestId('edit-button-0'));
 
-            // Close modal without changes
             const modal = screen.getByTestId('modal');
             fireEvent.click(modal);
 
@@ -557,15 +551,12 @@ describe('MembersList', () => {
 
             fireEvent.click(screen.getByTestId('edit-button-0'));
 
-            // Make changes
             const nameInput = screen.getByTestId('form-fullName');
             fireEvent.change(nameInput, { target: { value: 'Changed Name' } });
 
-            // Try to close modal
             const modal = screen.getByTestId('modal');
             fireEvent.click(modal);
 
-            // Confirm close
             const confirmCloseButton = screen.getByRole('button', { name: /Так/i });
             fireEvent.click(confirmCloseButton);
 
@@ -663,7 +654,6 @@ describe('MembersList', () => {
 
             fireEvent.dragStart(dragItem, { clientX: 100, clientY: 100, dataTransfer: mockDataTransfer });
 
-            // Drag with zero coordinates (should not update preview position)
             fireEvent.drag(dragItem, { clientX: 0, clientY: 0, dataTransfer: mockDataTransfer });
 
             expect(screen.getByTestId('drag-preview')).toBeInTheDocument();
@@ -691,7 +681,6 @@ describe('MembersList', () => {
             fireEvent.dragStart(dragItem, { clientX: 100, clientY: 100, dataTransfer: mockDataTransfer });
             fireEvent.drop(dragItem, { dataTransfer: mockDataTransfer });
 
-            // Order should remain the same
             expect(screen.getByTestId('member-item-0')).toHaveTextContent('Test Member');
             expect(screen.getByTestId('member-item-1')).toHaveTextContent('Second Member');
         });
@@ -707,7 +696,6 @@ describe('MembersList', () => {
 
             fireEvent.dragStart(dragItem, { clientX: 100, clientY: 100, dataTransfer: mockDataTransfer });
 
-            // Simulate mouse move
             fireEvent.mouseMove(document, { clientX: 200, clientY: 200 });
 
             expect(screen.getByTestId('drag-preview')).toBeInTheDocument();

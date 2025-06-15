@@ -158,6 +158,47 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     const [isConfirmPublishNewMemberModalOpen, setIsConfirmPublishNewMemberModalOpen] = useState(false);
     const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState(false);
 
+    // Use refs for values that shouldn't trigger re-renders
+    const currentPageRef = useRef<number>(currentPage);
+    const totalPagesRef = useRef<number | null>(totalPages);
+    const categoryRef = useRef<TeamCategory | undefined>(category);
+
+    // Update refs when state changes
+    useEffect(() => {
+        currentPageRef.current = currentPage;
+    }, [currentPage]);
+
+    useEffect(() => {
+        totalPagesRef.current = totalPages;
+    }, [totalPages]);
+
+    useEffect(() => {
+        categoryRef.current = category;
+    }, [category]);
+
+    const loadMembers = async (reset: boolean = false) => {
+        const currentCategory = categoryRef.current;
+        if (!currentCategory || isFetchingRef.current) return;
+        if (!reset && totalPagesRef.current && currentPageRef.current > totalPagesRef.current) return;
+
+        isFetchingRef.current = true;
+        setIsMembersLoading(true);
+
+        const pageToFetch = reset ? 1 : currentPageRef.current;
+
+        const {newMembers, totalCountOfPages} = await fetchMembers(currentCategory, pageSize, pageToFetch);
+
+        setMembers(prev => reset ? [...newMembers] : [...prev, ...newMembers]);
+        setCurrentPage(prev => reset ? 2 : prev + 1);
+        if (totalPagesRef.current === null || reset) {
+            setTotalPages(totalCountOfPages);
+        }
+
+        setIsMembersLoading(false);
+        isFetchingRef.current = false;
+    };
+
+    // Effect for initial load and category change
     useEffect(() => {
         if (category) {
             setMembers([]);
@@ -166,27 +207,6 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
             loadMembers();
         }
     }, [category]);
-
-    const loadMembers = async (reset: boolean = false) => {
-        if (!category || isFetchingRef.current) return;
-        if (!reset && totalPages && currentPage > totalPages) return;
-
-        isFetchingRef.current = true;
-        setIsMembersLoading(true);
-
-        const pageToFetch = reset ? 1 : currentPage;
-
-        const {newMembers, totalCountOfPages} = await fetchMembers(category, pageSize, pageToFetch);
-
-        setMembers(prev => reset ? [...newMembers] : [...prev, ...newMembers]);
-        setCurrentPage(prev => reset ? 2 : prev + 1);
-        if (totalPages === null || reset) {
-            setTotalPages(totalCountOfPages);
-        }
-
-        setIsMembersLoading(false);
-        isFetchingRef.current = false;
-    };
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
         setDraggedIndex(index);
@@ -287,6 +307,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         setCategory(localCategory || "Основна команда");
     }, []);
 
+    // Effect for search query changes
     useEffect(() => {
         if (searchByNameQuery) {
             setMembers(prev =>
@@ -316,7 +337,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         } else {
             onAutocompleteValuesChange([]);
         }
-    }, [members]);
+    }, [members, onAutocompleteValuesChange, searchByNameQuery]);
 
     const handleOnScroll = () => {
         const el = memberListRef.current;

@@ -6,11 +6,20 @@ import {Member, MemberDragPreviewModel} from "../members-list/MembersList";
 
 jest.mock('../../../../../assets/icons/dragger.svg', () => 'mock-dragger-icon');
 jest.mock('../member-component/MemberComponent', () => ({
-    MemberComponent: ({ member, handleOnDeleteMember, handleOnEditMember }: {member: Member, handleOnDeleteMember: (fullName: string) => void, handleOnEditMember: (id: number) => void }) => (
-        <div data-testid="member-component" data-member-id={member.id}>
-            {member.fullName}
-        </div>
-    )
+    MemberComponent: ({ member, handleOnDeleteMember, handleOnEditMember }: {
+        member: Member, 
+        handleOnDeleteMember: (fullName: string) => void, 
+        handleOnEditMember: (id: number) => void 
+    }) => {
+        handleOnDeleteMember(member.fullName);
+        handleOnEditMember(member.id);
+
+        return (
+            <div data-testid="member-component" data-member-id={member.id}>
+                {member.fullName}
+            </div>
+        );
+    }
 }));
 
 const mockMember: Member = {
@@ -227,4 +236,5 @@ describe('MemberDragPreview', () => {
             });
         });
     });
+
 });

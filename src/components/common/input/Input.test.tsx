@@ -78,4 +78,34 @@ describe('Input component', () => {
         fireEvent.click(screen.getByAltText('input-icon'));
         expect(input.focus).toHaveBeenCalled();
     });
+
+    it('does not open autocomplete dropdown if input is empty', () => {
+        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
+        const input = screen.getByPlaceholderText("Пошук за ім'ям");
+        const select = screen.getByTestId('select');
+        const selectContainer = select;
+        const clickSpy = jest.spyOn(selectContainer, 'click');
+        // Try to open dropdown with empty input
+        fireEvent.change(input, { target: { value: '' } });
+        expect(clickSpy).not.toHaveBeenCalled();
+    });
+
+    it('renders no autocomplete options if autocompleteValues is empty', () => {
+        render(<Input onChange={onChangeMock} autocompleteValues={[]} />);
+        expect(screen.queryByTestId('select-option-')).not.toBeInTheDocument();
+    });
+
+    it('calls onChange with empty string when remove icon is clicked after input is already empty', () => {
+        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
+        const input = screen.getByPlaceholderText("Пошук за ім'ям");
+        expect(input).toHaveValue('');
+        fireEvent.click(screen.getByAltText('remove-query-icon'));
+        expect(onChangeMock).toHaveBeenCalledWith('');
+    });
+
+    it('does not crash if autocompleteValues contains duplicate values', () => {
+        const valuesWithDuplicates = ['Alice', 'Alice', 'Bob'];
+        render(<Input onChange={onChangeMock} autocompleteValues={valuesWithDuplicates} />);
+        expect(screen.getAllByText('Alice').length).toBeGreaterThan(1);
+    });
 });

@@ -1,7 +1,7 @@
 import "./input.scss"
 import MagnifyingGlassIcon from "../../../assets/icons/la_search.svg";
-import React, {useRef, useState} from "react";
-import {Select} from "../select/Select";
+import React, { useRef, useState, useCallback } from "react";
+import { Select } from "../select/Select";
 import RemoveQueryIcon from "../../../assets/icons/remove-query.svg";
 
 export type InputProps = {
@@ -9,56 +9,75 @@ export type InputProps = {
     autocompleteValues: string[];
 };
 
-export const Input = ({onChange, autocompleteValues}: InputProps) => {
+export const Input = ({ onChange, autocompleteValues }: InputProps) => {
     const [value, setValue] = useState<string>('');
+    const [isAutocompleteOpen, setIsAutocompleteOpen] = useState(false);
     const selectContainerRef = useRef<HTMLDivElement>(null);
-    const isAutocompleteOpen = useRef(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const handleOnChange = (value: string) => {
-        setValue(value);
-        onChange(value);
-
-        if(selectContainerRef.current && !isAutocompleteOpen.current && value){
-            isAutocompleteOpen.current = true;
-            selectContainerRef.current.click();
+    const handleOnChange = useCallback((newValue: string) => {
+        setValue(newValue);
+        onChange(newValue);
+        if (newValue && !isAutocompleteOpen) {
+            setIsAutocompleteOpen(true);
+            selectContainerRef.current?.click();
+        } else if (!newValue && isAutocompleteOpen) {
+            setIsAutocompleteOpen(false);
+            selectContainerRef.current?.click();
         }
+    }, [onChange, isAutocompleteOpen]);
 
-        if(selectContainerRef.current && isAutocompleteOpen.current && !value){
-            isAutocompleteOpen.current = false;
-            selectContainerRef.current.click();
-        }
-    };
+    const handleChooseAutocompleteValue = useCallback((selectedValue: string) => {
+        setIsAutocompleteOpen(false);
+        selectContainerRef.current?.click();
+        setValue(selectedValue);
+        onChange(selectedValue);
+    }, [onChange]);
 
-    const handleChooseAutocompleteValue = (value: string) => {
-        isAutocompleteOpen.current = false;
-        if(selectContainerRef.current){
-            selectContainerRef.current.click();
-        }
-        setValue(value);
-        onChange(value);
-    };
+    const handleSearchIconClick = useCallback(() => {
+        inputRef.current?.focus();
+    }, []);
 
-    const handleSearchIconClick = () => {
-        if(inputRef.current){
-            inputRef.current.focus();
-        }
-    };
-
-    const handleRemoveQueryIconClick = () => {
+    const handleRemoveQueryIconClick = useCallback(() => {
         setValue('');
         handleOnChange('');
-    };
+    }, [handleOnChange]);
 
     return (
-        <div className="input">
-            <img onClick={handleSearchIconClick} src={MagnifyingGlassIcon} alt="input-icon" className='input-icon input-search-icon'/>
-            <img onClick={handleRemoveQueryIconClick} src={RemoveQueryIcon} alt="remove-query-icon" className='input-icon input-remove-query-icon'/>
-            <input ref={inputRef} value={value} onChange={e => handleOnChange(e.currentTarget.value)} placeholder={"Пошук за ім'ям"} type="text"/>
-            <Select isAutocomplete={true} className='autocomplete' selectContainerRef={selectContainerRef} onValueChange={handleChooseAutocompleteValue}>
+        <div className="input" data-testid="input-root">
+            <img
+                onClick={handleSearchIconClick}
+                src={MagnifyingGlassIcon}
+                alt="input-icon"
+                className='input-icon input-search-icon'
+                data-testid="search-icon"
+            />
+            <img
+                onClick={handleRemoveQueryIconClick}
+                src={RemoveQueryIcon}
+                alt="remove-query-icon"
+                className='input-icon input-remove-query-icon'
+                data-testid="remove-query-icon"
+            />
+            <input
+                ref={inputRef}
+                value={value}
+                onChange={e => handleOnChange(e.currentTarget.value)}
+                placeholder={"Пошук за ім'ям"}
+                type="text"
+                data-testid="input-field"
+            />
+            <Select
+                isAutocomplete={true}
+                className='autocomplete'
+                selectContainerRef={selectContainerRef}
+                onValueChange={handleChooseAutocompleteValue}
+                data-testid="autocomplete-select"
+            >
                 {autocompleteValues.map((av, index) => (
-                    <Select.Option key={index} value={av} name={av}></Select.Option>
+                    <Select.Option key={index} value={av} name={av} data-testid={`select-option-${av}`}></Select.Option>
                 ))}
             </Select>
-        </div>);
+        </div>
+    );
 }

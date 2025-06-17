@@ -27,7 +27,7 @@ describe('test program-card component', () => {
         expect(image).toHaveAttribute('src',  mockProgram.image);
         expect(image).toHaveClass('card-img');
     })
-    test('should contain correct information', () => {
+    test('should contain correct classes', () => {
         render(<ProgramCard program={mockProgram}/>);
         const container = screen.getByAltText(mockProgram.title).closest('.card-block');
         expect(container).toBeInTheDocument();

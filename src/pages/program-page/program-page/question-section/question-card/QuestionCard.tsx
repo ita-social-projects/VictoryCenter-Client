@@ -4,12 +4,12 @@ import closeIcon from '../../../../../assets/program_page_images/icons/Cross.svg
 import openBlue from '../../../../../assets/program_page_images/icons/arrowDownBlue.svg';
 import closeBlue from '../../../../../assets/program_page_images/icons/crossBlue.svg';
 import './QuestionCard.scss'
-export interface  QuestionCard {
+interface  QuestionData {
     question: string;
     answer: string;
 }
 interface QuestionCardProps{
-    questionCard: QuestionCard;
+    questionCard: QuestionData;
 }
 export const  QuestionCard: React.FC<QuestionCardProps> = ({questionCard}) => {
     const [isHovered, setIsHovered] = useState(false);

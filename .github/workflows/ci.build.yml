@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: stageVictoryCenter-Front
+    runs-on: self-hosted-vm
     steps:
     - uses: actions/checkout@v2
     - name: Run a one-line script

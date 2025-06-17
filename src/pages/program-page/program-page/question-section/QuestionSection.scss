@@ -1,0 +1,27 @@
+.qa-section{
+  box-sizing: content-box;
+  padding: 7.5rem 3.5rem;
+  display: flex;
+  justify-content: center;
+  align-items:  center;
+  .question-block{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-top: 1rem;
+    border-top: 1.5px solid #ECECE2;
+    gap: 1rem;
+    h2{
+      width: 544.205078125px;
+      font-family: Mulish, sans-serif;
+      font-weight: 700;
+      font-size: 40px;
+      line-height: 48px;
+      letter-spacing: 0;
+      vertical-align: middle;
+      text-transform: uppercase;
+      color: #061125;
+    }
+  }
+}

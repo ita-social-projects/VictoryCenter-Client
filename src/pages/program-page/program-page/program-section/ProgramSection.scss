@@ -1,0 +1,65 @@
+.program-block{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  .menu-block{
+    width: 100%;
+    padding: 0 3.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    .button-block{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      .white-button{
+        border-radius: 24px;
+        padding: 0.5rem 1rem;
+        border: 1px solid #B5BDCB;
+        background: none;
+        font-family: Mulish, sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: -2%;
+        vertical-align: middle;
+        transition: 0.3s ease;
+        &:hover{
+          background: #E7EAEE;
+          transition: 0.3s ease;
+        ;
+        }
+      }
+      .black-button{
+        background: #061125;
+        padding: 0.5rem 1rem;
+        border-radius: 24px;
+        border: 1px solid #061125;
+        font-family: Mulish, sans-serif;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: -2%;
+        vertical-align: middle;
+        color: #FDFDFB;
+      }
+    }
+    
+  }
+  .menu-block h2{
+    font-family: Mulish, sans-serif;
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 40px;
+    letter-spacing: -2%;
+    vertical-align: middle;
+  }
+  .cards-block{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

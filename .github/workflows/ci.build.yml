@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: runner-stage-front
+    runs-on: stageVictoryCenter-Front
     steps:
     - uses: actions/checkout@v2
     - name: Run a one-line script

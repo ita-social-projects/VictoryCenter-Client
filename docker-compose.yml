@@ -1,0 +1,52 @@
+nginx:
+  restart: always
+  image: nginx:latest
+  ports:
+    - "80:80"
+    - "443:443"
+  volumes:
+    - ./templates:/etc/nginx/templates
+   
+frontend:
+  restart: always
+  image: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_FRONTEND }}:$TAG_DEPLOY_FRONT
+  pull_policy: always
+  expose:
+    - "80"
+  healthcheck:
+    test: curl --fail http://localhost || exit 1
+    interval: 30s
+    timeout: 10s
+    retries: 5
+
+backend:
+  restart: always
+  image: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_BACKEND }}:$TAG_DEPLOY_BACK
+  pull_policy: always
+  expose:
+    - "80"
+  environment:
+    VICTORYCENTER_ConnectionStrings__DefaultConnection: ${DB_CONNECTION_STRING}
+  volumes:
+    - type: bind
+      source: /imagestorage
+      target: /mnt/data
+  healthcheck:
+    test: curl --fail http://localhost/api/partners/getAll || exit 1
+    interval: 30s
+    timeout: 10s
+    retries: 5
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+
+volumes:
+  backend:
+networks:
+  backend:
+    external:
+      name: backend
+  frontend:
+    external:
+      name: frontend
+
+  

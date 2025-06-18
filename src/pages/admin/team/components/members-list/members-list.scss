@@ -26,37 +26,25 @@
     background-color: #F8F8F8;
     box-shadow: 0 0 4px rgba(128, 128, 128, 0.22);
 
-    &-selected {
-      border-bottom: 1px solid #041128;
-    }
-
-    div {
-      border-bottom-width: 1px;
+    button {
+      font-size: 24px;
+      border: none;
+      background: transparent;
       text-align: center;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: background-color 0.2s;
+      padding: 15px;
+
+      &.members-categories-selected {
+        border-bottom: 1px solid #041128;
+      }
 
       &:hover {
         cursor: pointer;
         background-color: rgba(128, 128, 128, 0.15);
       }
-    }
-
-    div:nth-child(1) {
-      width: 254px;
-      height: 59px;
-    }
-
-    div:nth-child(2) {
-      width: 237px;
-      height: 59px;
-    }
-
-    div:nth-child(3) {
-      width: 148px;
-      height: 59px;
     }
   }
 
@@ -90,6 +78,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      border: none;
 
       &:hover {
         cursor: pointer;

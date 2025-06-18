@@ -140,7 +140,8 @@ describe('MemberComponent', () => {
             );
 
             const editButton = container.querySelector('.members-actions-edit');
-            fireEvent.click(editButton!);
+            if(!editButton) throw new Error();
+            fireEvent.click(editButton);
 
             expect(mockHandleOnEditMember).toHaveBeenCalledTimes(1);
             expect(mockHandleOnEditMember).toHaveBeenCalledWith(1);
@@ -156,7 +157,8 @@ describe('MemberComponent', () => {
             );
 
             const deleteButton = container.querySelector('.members-actions-delete');
-            fireEvent.click(deleteButton!);
+            if(!deleteButton) throw new Error();
+            fireEvent.click(deleteButton);
 
             expect(mockHandleOnDeleteMember).toHaveBeenCalledTimes(1);
             expect(mockHandleOnDeleteMember).toHaveBeenCalledWith('Jane Smith');
@@ -294,8 +296,10 @@ describe('MemberComponent', () => {
             const deleteButton = container.querySelector('.members-actions-delete');
             const editButton = container.querySelector('.members-actions-edit');
 
-            fireEvent.click(editButton!);
-            fireEvent.click(deleteButton!);
+            if(!deleteButton || !editButton) throw new Error();
+
+            fireEvent.click(editButton);
+            fireEvent.click(deleteButton);
 
             expect(mockHandleOnEditMember).toHaveBeenCalledWith(6);
             expect(mockHandleOnDeleteMember).toHaveBeenCalledWith('Props Test');

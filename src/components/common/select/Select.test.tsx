@@ -335,7 +335,8 @@ describe('Select Component', () => {
         expect(ref.current).toBeTruthy();
         expect(ref.current?.tagName).toBe('DIV');
 
-        fireEvent.click(ref.current!);
+        // @ts-ignore
+        fireEvent.click(ref.current);
         expect(ref.current).toHaveClass('select-opened');
     });
 });

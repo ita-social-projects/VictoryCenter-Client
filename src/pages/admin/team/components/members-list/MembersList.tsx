@@ -33,7 +33,7 @@ export type MemberDragPreviewModel = {
     member: Member | null;
 };
 
-export let mockMembers: Member[] = [
+export const mockMembers: Member[] = [
     {
         id: 1,
         img: "https://randomuser.me/api/portraits/men/1.jpg",
@@ -121,7 +121,6 @@ export const fetchMembers = async (category: string, pageSize: number, pageNumbe
     newMembers: Member[],
     totalCountOfPages: number
 }> => {
-    // await new Promise((res) => setTimeout(res, 1000));
     const some = (pageNumber - 1) * pageSize;
     const filteredAndSortedMembers = mockMembers.filter(m => m.category === category).sort((a, b) => a.id - b.id);
 
@@ -208,7 +207,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         }
     }, [category]);
 
-    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
+    const handleDragStart = (e: React.DragEvent<HTMLButtonElement>, index: number) => {
         setDraggedIndex(index);
         setDragPreview({
             visible: true,
@@ -222,7 +221,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         e.dataTransfer.setDragImage(dragImage, 0, 0);
     };
 
-    const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
+    const handleDrag = (e: React.DragEvent<HTMLButtonElement>) => {
 
         if (e.clientX !== 0 && e.clientY !== 0) {
             setDragPreview(prev => ({
@@ -243,7 +242,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         setDraggedIndex(null);
     };
 
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    const handleDragOver = (e: React.DragEvent<HTMLButtonElement>) => {
         e.preventDefault();
     };
 
@@ -266,7 +265,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
     const handleDeleteMember = () => {
         setMembers(prev => prev.filter(m => m.fullName !== teamMemberToDelete));
-        mockMembers = mockMembers.filter(m => m.fullName !== teamMemberToDelete);
+        setMembers(prev => prev.filter(m => m.fullName !== teamMemberToDelete));
         setIsDeleteTeamMemberModalOpen(false);
         setTeamMemberToDelete(null);
     };
@@ -449,54 +448,74 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         }
     };
 
+    let content;
+
+    if (members.length > 0) {
+        const filteredMembers = members.filter(m => {
+            if (statusFilter === "Усі") return true;
+            return m.status === statusFilter;
+        });
+
+        content = filteredMembers.map((m, index) => (
+            <MembersListItem
+                key={m.id}
+                draggedIndex={draggedIndex}
+                member={m}
+                handleDragOver={handleDragOver}
+                handleDragStart={handleDragStart}
+                handleDrag={handleDrag}
+                handleDragEnd={handleDragEnd}
+                handleDrop={handleDrop}
+                handleOnDeleteMember={handleOnDeleteMember}
+                handleOnEditMember={handleOnEditMember}
+                index={index}
+            />
+        ));
+    } else if (!isMembersLoading) {
+        content = (
+            <div className="members-not-found" data-testid="members-not-found">
+                <img
+                    src={NotFoundIcon}
+                    alt="members-not-found"
+                    data-testid="members-not-found-icon"
+                />
+                <p>Нічого не знайдено</p>
+            </div>
+        );
+    } else {
+        content = null; // or a loading spinner if you want
+    }
+
     return (
         <>
-            {dragPreview && dragPreview.visible && dragPreview.member ? (
+            {dragPreview?.visible && dragPreview?.member ? (
                 <MemberDragPreview dragPreview={dragPreview}/>
             ) : <></>}
 
             <div className='members'>
                 <div data-testid="members-categories" className='members-categories' style={{"pointerEvents": isMembersLoading ? "none" : "all"}}>
-                    <div onClick={() => setCategory("Основна команда")}
+                    <button onClick={() => setCategory("Основна команда")}
                          className={category === "Основна команда" ? 'members-categories-selected' : ''}>Основна
                         команда
-                    </div>
-                    <div onClick={() => setCategory("Наглядова рада")}
+                    </button>
+                    <button onClick={() => setCategory("Наглядова рада")}
                          className={category === "Наглядова рада" ? 'members-categories-selected' : ''}>Наглядова рада
-                    </div>
-                    <div onClick={() => setCategory("Радники")}
+                    </button>
+                    <button onClick={() => setCategory("Радники")}
                          className={category === "Радники" ? 'members-categories-selected' : ''}>Радники
-                    </div>
+                    </button>
                 </div>
                 <div ref={memberListRef} onScroll={handleOnScroll} data-testid="members-list" className="members-list">
-                    {members.length > 0 ? members.filter(m => {
-                        if (statusFilter === "Усі") return true;
-                        return m.status === statusFilter;
-                    }).map((m, index) => (
-                        <MembersListItem
-                            key={index}
-                            draggedIndex={draggedIndex}
-                            member={m}
-                            handleDragOver={handleDragOver}
-                            handleDragStart={handleDragStart}
-                            handleDrag={handleDrag}
-                            handleDragEnd={handleDragEnd}
-                            handleDrop={handleDrop}
-                            handleOnDeleteMember={handleOnDeleteMember}
-                            index={index} handleOnEditMember={handleOnEditMember}></MembersListItem>
-                    )) : (!isMembersLoading ? (<div className='members-not-found' data-testid='members-not-found'>
-                        <img src={NotFoundIcon} alt="members-not-found" data-testid='members-not-found-icon'/>
-                        <p>Нічого не знайдено</p>
-                    </div>) : (<></>))}
+                    {content}
                     {isMembersLoading
                         ? (<div className='members-list-loader' data-testid='members-list-loader'>
                             <img src={LoaderIcon} alt="loader-icon" data-testid='members-list-loader-icon'/>
                         </div>)
                         : (<></>)}
                     {isMoveToTopVisible ?
-                        <div onClick={moveToTop} className='members-list-list-to-top' >
+                        <button onClick={moveToTop} className='members-list-list-to-top' >
                             <img src={ArrowUpIcon} alt="arrow-up-icon" data-testid="members-list-list-to-top"/>
-                        </div> : <></>}
+                        </button> : <></>}
                 </div>
             </div>
             <Modal onClose={() => setIsDeleteTeamMemberModalOpen(false)}

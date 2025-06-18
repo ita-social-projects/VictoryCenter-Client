@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import {TeamPageToolbar, TeamPageToolbarProps} from './TeamPageToolbar';
 import {MemberFormValues} from '../member-form/MemberForm';
 
-// Mock external dependencies
 jest.mock('../../../../../assets/icons/plus.svg', () => 'plus-icon.svg');
 
 jest.mock('../../../../../components/common/modal/Modal', () => {
@@ -13,7 +12,11 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
 
         return (
             <div data-testid={testId} role="dialog">
-                <div onClick={onClose} data-testid="modal-backdrop"/>
+                <div onClick={onClose} data-testid="modal-backdrop" onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        onClose();
+                    }
+                }}/>
                 {children}
             </div>
         );

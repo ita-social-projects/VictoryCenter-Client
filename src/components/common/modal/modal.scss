@@ -36,11 +36,13 @@
       width: 100%;
       margin-bottom: 0.5rem;
 
-      img {
+      button {
         width: 24px;
         height: 24px;
         cursor: pointer;
         transition: opacity 0.2s ease;
+        border: none;
+        background: url("../../../assets/icons/close-icon.svg") no-repeat;
 
         &:hover {
           opacity: 0.7;

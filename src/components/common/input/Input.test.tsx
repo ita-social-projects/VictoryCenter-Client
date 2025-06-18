@@ -25,7 +25,11 @@ jest.mock('../select/Select', () => {
             );
         },
         SelectOption: ({ value, name, onClick }: any) => (
-            <div data-testid={`select-option-${value}`} onClick={onClick}>
+            <div data-testid={`select-option-${value}`} onClick={onClick} onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    onClick();
+                }
+            }}>
                 {name}
             </div>
         ),
@@ -46,15 +50,15 @@ describe('Input component', () => {
 
     it('renders input field and icons', () => {
         render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
-        expect(screen.getByPlaceholderText("Пошук за ім'ям")).toBeInTheDocument();
-        expect(screen.getByAltText('input-icon')).toBeInTheDocument();
-        expect(screen.getByAltText('remove-query-icon')).toBeInTheDocument();
+        expect(screen.getByTestId('input-field')).toBeInTheDocument();
+        expect(screen.getByTestId('search-icon')).toBeInTheDocument();
+        expect(screen.getByTestId('remove-query-icon')).toBeInTheDocument();
     });
 
     it('updates input value and calls onChange when typing', () => {
         render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
 
-        const input = screen.getByPlaceholderText("Пошук за ім'ям");
+        const input = screen.getByTestId('input-field');
         fireEvent.change(input, { target: { value: 'A' } });
         expect(input).toHaveValue('A');
         expect(onChangeMock).toHaveBeenCalledWith('A');
@@ -63,9 +67,9 @@ describe('Input component', () => {
     it('clears the input and triggers onChange when remove icon is clicked', () => {
         render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
 
-        const input = screen.getByPlaceholderText("Пошук за ім'ям");
+        const input = screen.getByTestId('input-field');
         fireEvent.change(input, { target: { value: 'Bob' } });
-        fireEvent.click(screen.getByAltText('remove-query-icon'));
+        fireEvent.click(screen.getByTestId('remove-query-icon'));
         expect(input).toHaveValue('');
         expect(onChangeMock).toHaveBeenCalledWith('');
     });
@@ -73,9 +77,9 @@ describe('Input component', () => {
     it('focuses the input when search icon is clicked', () => {
         render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
 
-        const input = screen.getByPlaceholderText("Пошук за ім'ям") as HTMLInputElement;
+        const input = screen.getByTestId('input-field') as HTMLInputElement;
         jest.spyOn(input, 'focus');
-        fireEvent.click(screen.getByAltText('input-icon'));
+        fireEvent.click(screen.getByTestId('search-icon'));
         expect(input.focus).toHaveBeenCalled();
     });
 
@@ -97,9 +101,9 @@ describe('Input component', () => {
 
     it('calls onChange with empty string when remove icon is clicked after input is already empty', () => {
         render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
-        const input = screen.getByPlaceholderText("Пошук за ім'ям");
+        const input = screen.getByTestId('input-field');
         expect(input).toHaveValue('');
-        fireEvent.click(screen.getByAltText('remove-query-icon'));
+        fireEvent.click(screen.getByTestId('remove-query-icon'));
         expect(onChangeMock).toHaveBeenCalledWith('');
     });
 

@@ -27,7 +27,7 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
     });
     const handleOnSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if(memberFormValues && memberFormValues.category && memberFormValues.description && memberFormValues.fullName) {
+        if(memberFormValues?.category && memberFormValues?.description && memberFormValues?.fullName) {
             onSubmit(memberFormValues);
         }
     }
@@ -61,7 +61,7 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
         const files = e.dataTransfer.files;
         if (files) {
             setMemberFormValues((prev) => ({
-                ...prev!,
+                ...prev,
                 img: files
             }));
         }
@@ -107,7 +107,7 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
                     </label>
                     <input data-testid="image" onChange={handleMemberFormValuesChange} name='img' type="file" id='image'/>
                     <div className='form-group-image-loaded'>
-                        {(memberFormValues && memberFormValues.img) ? (
+                        {(memberFormValues.img) ? (
                             Array.from(memberFormValues.img).map(f => (<div key={f.name}>{f.name}</div>))
                         ) : (<div></div>)}
                     </div>

@@ -28,7 +28,7 @@
     background-color: white;
     z-index: 10;
 
-    div {
+    button {
       color: black;
       background-color: white;
       display: flex;
@@ -37,8 +37,10 @@
       padding-right: 16px;
       height: 40px;
       cursor: pointer;
-
-
+      border: none;
+      width: 100%;
+      text-align: start;
+      font-size: 16px;
 
       &:hover {
         background-color: #E7EAEE;

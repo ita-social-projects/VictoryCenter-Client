@@ -3,30 +3,6 @@ import {render, screen, fireEvent} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemberForm, MemberFormProps, MemberFormValues } from './MemberForm';
 
-class MockDataTransfer implements DataTransfer {
-    dropEffect: DataTransfer['dropEffect'] = 'none';
-    effectAllowed: DataTransfer['effectAllowed'] = 'all';
-    files: FileList = {} as FileList;
-    items: DataTransferItemList = {
-        length: 0,
-        add: () => null,
-        remove: () => {},
-        clear: () => {},
-        [Symbol.iterator]: function* () {},
-    };
-    types: string[] = [];
-
-    getData(format: string): string {
-        return '';
-    }
-
-    setData(format: string, data: string): void {}
-
-    clearData(format?: string): void {}
-
-    setDragImage(image: Element, x: number, y: number): void {}
-}
-(global as any).DataTransfer = MockDataTransfer;
 
 jest.mock('../../../../../assets/icons/cloud-download.svg', () => 'cloud-download.svg');
 

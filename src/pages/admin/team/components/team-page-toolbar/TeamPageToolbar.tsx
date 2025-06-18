@@ -54,6 +54,8 @@ const AddMemberModal = ({
                 Опублікувати
             </Button>
         </Modal.Actions>
+        {123}
+        {'hello'}
     </Modal>
 );
 
@@ -220,7 +222,7 @@ export const TeamPageToolbar = ({
                         buttonStyle="primary"
                         data-testid="add-member-button"
                     >
-                        Додати в команду
+                        Додати в команду{' '}
                         <img src={PlusIcon} alt="plus" />
                     </Button>
                 </div>

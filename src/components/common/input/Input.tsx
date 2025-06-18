@@ -1,8 +1,6 @@
 import "./input.scss"
-import MagnifyingGlassIcon from "../../../assets/icons/la_search.svg";
 import React, { useRef, useState, useCallback } from "react";
 import { Select } from "../select/Select";
-import RemoveQueryIcon from "../../../assets/icons/remove-query.svg";
 
 export type InputProps = {
     onChange: (query: string) => void;
@@ -45,17 +43,13 @@ export const Input = ({ onChange, autocompleteValues }: InputProps) => {
 
     return (
         <div className="input" data-testid="input-root">
-            <img
+            <button
                 onClick={handleSearchIconClick}
-                src={MagnifyingGlassIcon}
-                alt="input-icon"
                 className='input-icon input-search-icon'
                 data-testid="search-icon"
             />
-            <img
+            <button
                 onClick={handleRemoveQueryIconClick}
-                src={RemoveQueryIcon}
-                alt="remove-query-icon"
                 className='input-icon input-remove-query-icon'
                 data-testid="remove-query-icon"
             />
@@ -74,8 +68,8 @@ export const Input = ({ onChange, autocompleteValues }: InputProps) => {
                 onValueChange={handleChooseAutocompleteValue}
                 data-testid="autocomplete-select"
             >
-                {autocompleteValues.map((av, index) => (
-                    <Select.Option key={index} value={av} name={av} data-testid={`select-option-${av}`}></Select.Option>
+                {autocompleteValues.map((av) => (
+                    <Select.Option key={av} value={av} name={av} data-testid={`select-option-${av}`}></Select.Option>
                 ))}
             </Select>
         </div>

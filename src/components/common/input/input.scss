@@ -4,7 +4,8 @@
   &-icon {
     position: absolute;
     z-index: 10000;
-    
+    border: none;
+
     &:hover {
       cursor: pointer;
     }
@@ -15,6 +16,7 @@
     height: 25px;
     top: 10px;
     left: 10px;
+    background: url("../../../assets/icons/la_search.svg");
   }
 
   &-remove-query-icon {
@@ -22,6 +24,7 @@
     height: 25px;
     right: 10px;
     top: 10px;
+    background: url("../../../assets/icons/remove-query.svg");
   }
 
   input {

@@ -1,6 +1,5 @@
 import React, {ReactNode, useEffect} from "react";
 import "./modal.scss";
-import CloseIcon from "../../../assets/icons/close-icon.svg";
 
 interface ModalProps {
     children?: ReactNode;
@@ -49,30 +48,38 @@ export const Modal = ({
     };
 
     return (
-        <>
-            <div data-testid="modal-overlay" className="modal-overlay" onClick={onClose}>
-                <div role={'dialog'}
-                    className="modal-container"
-                    style={modalStyle}
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <div className="modal-header">
-                        <div className='close-icon'>
-                            <img src={CloseIcon} onClick={onClose} alt="close-icon"/>
-                        </div>
-                        <div className="modal-title-wrapper">
+        <div role={"toolbar"} data-testid="modal-overlay" className="modal-overlay" onClick={onClose} onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                onClose();
+            }
+        }}>
+            <div
+                role={"toolbar"}
+                className="modal-container"
+                style={modalStyle}
+                onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.stopPropagation();
+                    }
+                }}
+            >
+                <div className="modal-header">
+                    <div className='close-icon'>
+                        <button onClick={onClose}/>
+                    </div>
+                    <div className="modal-title-wrapper">
                         <span className='modal-header-text'>
                             {title}
                         </span>
-                        </div>
-                    </div>
-                    <div className="modal-body">{content}</div>
-                    <div className="modal-footer">
-                        {actions}
                     </div>
                 </div>
+                <div className="modal-body">{content}</div>
+                <div className="modal-footer">
+                    {actions}
+                </div>
             </div>
-        </>
+        </div>
     );
 }
 

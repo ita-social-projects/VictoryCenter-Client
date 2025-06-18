@@ -5,7 +5,7 @@ type ButtonProps = {
     buttonStyle?: 'primary' | 'secondary',
     onClick?: () => void;
     type?: "submit" | "reset" | "button"
-    form?: string | undefined;
+    form?: string;
     className?: string;
 };
 export const Button = ({children, onClick, buttonStyle, type = "button", form, className = ''}: ButtonProps) => {

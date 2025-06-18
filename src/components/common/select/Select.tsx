@@ -11,7 +11,13 @@ export type SelectProps<TValue> = {
     isAutocomplete?: boolean;
 };
 
-export const Select = <TValue,>({children, onValueChange, selectContainerRef, className, isAutocomplete = false}: SelectProps<TValue>) => {
+export const Select = <TValue, >({
+                                     children,
+                                     onValueChange,
+                                     selectContainerRef,
+                                     className,
+                                     isAutocomplete = false
+                                 }: SelectProps<TValue>) => {
     const options = React.Children.toArray(children).filter(x => React.isValidElement(x) && x.type === Select.Option);
     const [isOpen, setIsOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState<TValue | null>(null);
@@ -24,19 +30,33 @@ export const Select = <TValue,>({children, onValueChange, selectContainerRef, cl
         onValueChange(value);
     };
 
-    return (<div ref={selectContainerRef} onClick={handleOpenSelect} className={`${className || ''} select ${isOpen ? 'select-opened' : 'select-closed'}`}>
-        <span style={selectedValue !== null && selectedValue !== undefined ? {color: "#061125"} : {color: "#61615C"}}> {selectedValue !== null && selectedValue !== undefined ? selectedValue.toString() : 'Статус'}</span>
+    return (<div role={"toolbar"} ref={selectContainerRef}
+                 onClick={handleOpenSelect}
+                 className={`${className ?? ''} select ${isOpen ? 'select-opened' : 'select-closed'}`}
+                 onKeyDown={(e) => {
+                     if (e.key === 'Enter' || e.key === ' ') {
+                         handleOpenSelect();
+                     }
+                 }}>
+        <span
+            style={selectedValue !== null && selectedValue !== undefined ? {color: "#061125"} : {color: "#61615C"}}> {selectedValue !== null && selectedValue !== undefined ? selectedValue.toString() : 'Статус'}</span>
         <img src={isOpen ? ArrowUp : ArrowDown} alt="arrow-down"/>
         <div className={`select-options ${isOpen ? 'select-options-visible' : ''}`}>
             {options.map((opt, index) => {
                 if (!React.isValidElement(opt)) return <></>;
                 const {name, value} = opt.props as { children: React.ReactNode, value: TValue, name: string };
-                return (<div key={index} className={(!isAutocomplete && selectedValue === value) ? 'select-options-selected' : ''} onClick={() => handleSelect(value)}>
+                return (<button key={name}
+                             className={(!isAutocomplete && selectedValue === value) ? 'select-options-selected' : ''}
+                             onClick={() => handleSelect(value)}>
                     <span>{name}</span>
-                </div>)
+                </button>)
             })}
         </div>
     </div>);
 }
 
-Select.Option = <TValue,>({children, value, name}: { children?: React.ReactNode, value: TValue, name: string }) => <>{children}</>
+Select.Option = <TValue, >({children, value, name}: {
+    children?: React.ReactNode,
+    value: TValue,
+    name: string
+}) => <>{children}</>

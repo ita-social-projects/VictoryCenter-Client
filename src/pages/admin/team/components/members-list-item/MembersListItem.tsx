@@ -6,9 +6,9 @@ import "./members-list-item.scss"
 
 type MembersListItemProps = {
     member: Member,
-    handleDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
-    handleDragStart: (e: React.DragEvent<HTMLDivElement>, index: number) => void;
-    handleDrag: (e: React.DragEvent<HTMLDivElement>) => void;
+    handleDragOver: (e: React.DragEvent<HTMLButtonElement>) => void;
+    handleDragStart: (e: React.DragEvent<HTMLButtonElement>, index: number) => void;
+    handleDrag: (e: React.DragEvent<HTMLButtonElement>) => void;
     handleDragEnd: () => void;
     handleDrop: (index: number) => void;
     handleOnDeleteMember: (fullName: string) => void;
@@ -19,13 +19,14 @@ type MembersListItemProps = {
 
 export const MembersListItem = ({draggedIndex, index, member, handleDragOver, handleDragEnd, handleDragStart, handleDrop, handleDrag, handleOnDeleteMember, handleOnEditMember}: MembersListItemProps) => {
     return (
-        <div
+        <button
             className={`members-wrapper ${draggedIndex === index ? "dragging" : ""}`}
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(index)}
             onDragEnd={handleDragEnd}
         >
-            <div
+            <button
+                disabled
                 className='members-dragger'
                 draggable
                 onDragStart={(e) => handleDragStart(e, index)}
@@ -33,8 +34,8 @@ export const MembersListItem = ({draggedIndex, index, member, handleDragOver, ha
                 onDragEnd={handleDragEnd}
             >
                 <img src={DragIcon} alt="Drag Handle"/>
-            </div>
+            </button>
             <MemberComponent member={member} handleOnDeleteMember={handleOnDeleteMember} handleOnEditMember={handleOnEditMember}></MemberComponent>
-        </div>
+        </button>
     );
 }

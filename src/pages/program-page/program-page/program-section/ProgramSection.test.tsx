@@ -70,7 +70,7 @@ describe('test program section', () => {
 
         await waitFor(() => {
             const cards = document.querySelectorAll(".test-card-content");
-            expect(cards.length).toBe(0);
+            expect(cards.length).toEqual(0);
         });
     })
     test('should render without crashing', async () => {
@@ -80,7 +80,7 @@ describe('test program section', () => {
 
         await waitFor(() => {
             const cards = document.querySelectorAll(".test-card-content");
-            expect(cards.length).toBe(0);
+            expect(cards.length).toEqual(0);
             const errorMessage = document.querySelector('.error-message');
             expect(errorMessage).toBeInTheDocument();
         });

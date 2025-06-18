@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
 .faq-item{
   width: 48rem;
   display: flex;
@@ -27,9 +26,9 @@
     p{
       font-family: Mulish, sans-serif;
       font-weight: 500;
-      font-size: 20px;
-      line-height: 28px;
-      letter-spacing: -2%;
+      font-size: 1.25rem;
+      line-height: 1.75rem;
+      letter-spacing: -0.02em;
       vertical-align: middle;
       color: #061125;
     }
@@ -37,9 +36,9 @@
   .faq-answer{
     font-family: Mulish, sans-serif;
     font-weight: 400;
-    font-size: 18px;
-    line-height: 28px;
-    letter-spacing: -2%;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    letter-spacing: -0.02em;
     vertical-align: middle;
   }
   &[open]{
@@ -55,9 +54,6 @@
   &:hover{
     p{
       color: #50A1C6;
-    }
-    .faq-open, .faq-close{
-      stroke: #50A1C6 !important;
     }
   }
 }

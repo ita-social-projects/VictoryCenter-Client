@@ -20,8 +20,8 @@ export const  QuestionCard: React.FC<QuestionCardProps> = ({questionCard}) => {
             <summary className="faq-question">
                 <p>{questionCard.question}</p>
                 <div className="button-icons">
-                    <img src={isHovered ? openBlue : openIcon} alt="open-arrow" className="faq-open"/>
-                    <img src={isHovered ? closeBlue : closeIcon} alt="close-cross" className="faq-close"/>
+                    <img src={isHovered ? openBlue : openIcon} alt="" aria-hidden="true" className="faq-open"/>
+                    <img src={isHovered ? closeBlue : closeIcon} alt="" aria-hidden="true" className="faq-close"/>
                 </div>
             </summary>
             <div className="faq-answer">{questionCard.answer}</div>

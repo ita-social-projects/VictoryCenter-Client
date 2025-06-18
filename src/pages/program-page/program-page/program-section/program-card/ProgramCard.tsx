@@ -24,12 +24,12 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({program}) => {
                             <h2 className="program-title">{program.title}</h2>
                         </div>
                         <div className="arrow-container">
-                            <img src={arrowYellow} alt="" className="hoover-img"/>
+                            <img src={arrowYellow} alt="" className="hover-img"/>
                             <img src={arrowBlack} alt="" className="default-img"/>
                         </div>
                     </div>
                 </div>
-                <div className="subtitle-info-hoover">
+                <div className="subtitle-info-hover">
                     <p className="program-description">{program.description}</p>
                 </div>
             </div>

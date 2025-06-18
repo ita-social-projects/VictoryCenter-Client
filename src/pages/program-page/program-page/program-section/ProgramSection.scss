@@ -17,45 +17,43 @@
       align-items: center;
       gap: 0.5rem;
       .white-button{
-        border-radius: 24px;
+        border-radius: 1.5rem;
         padding: 0.5rem 1rem;
         border: 1px solid #B5BDCB;
         background: none;
         font-family: Mulish, sans-serif;
         font-weight: 400;
-        font-size: 16px;
-        line-height: 24px;
-        letter-spacing: -2%;
+        font-size: 1rem;
+        line-height: 1.5rem;
+        letter-spacing: -0.02em;
         vertical-align: middle;
         transition: 0.3s ease;
         &:hover{
           background: #E7EAEE;
           transition: 0.3s ease;
-        ;
         }
       }
       .black-button{
         background: #061125;
         padding: 0.5rem 1rem;
-        border-radius: 24px;
+        border-radius: 1.5rem;
         border: 1px solid #061125;
         font-family: Mulish, sans-serif;
         font-weight: 400;
-        font-size: 16px;
-        line-height: 24px;
-        letter-spacing: -2%;
+        font-size: 1rem;
+        line-height: 1.5rem;
+        letter-spacing: -0.02rem;
         vertical-align: middle;
         color: #FDFDFB;
       }
     }
-    
   }
   .menu-block h2{
     font-family: Mulish, sans-serif;
     font-weight: 600;
-    font-size: 32px;
-    line-height: 40px;
-    letter-spacing: -2%;
+    font-size: 2rem;
+    line-height: 2.5rem;
+    letter-spacing: -0.02em;
     vertical-align: middle;
   }
   .cards-block{

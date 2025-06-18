@@ -13,8 +13,7 @@ export const QuestionSection: React.FC = () => {
         (async() => {
             try{
                 const response = await questionDataFetch();
-                const {questions} = response;
-                setQuestions(questions);
+                setQuestions(response.questions);
                 setError(null);
             }
             catch{

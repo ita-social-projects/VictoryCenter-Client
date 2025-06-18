@@ -1,6 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
 .card-block{
-  height: 520px;
+  height: 32.5rem;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -45,18 +44,17 @@
             font-weight: 400;
             font-size: 1.125rem;
             line-height: 1.75rem;
-            letter-spacing: -2%;
+            letter-spacing: -0.02em;
             vertical-align: middle;
           }
           .program-title{
             margin: 0;
             font-family: Mulish, sans-serif;
             font-weight: 500;
-            font-size: 18px;
-            line-height: 28px;
-            letter-spacing: -2%;
+            font-size: 1.125rem;
+            line-height: 1.75rem;
+            letter-spacing: -0.02em;
             vertical-align: middle;
-
           }
         }
         .arrow-container{
@@ -72,29 +70,26 @@
             left: 25%;
             transition: opacity 0.3s ease;
           }
-          .hoover-img{
+          .hover-img{
             position: absolute;
             top: 0;
             right: 0;
             transition: opacity 0.3s ease;
             opacity: 0;
           }
-          
         }
-        
       }
     }
     .program-description{
       font-family: Mulish, sans-serif;
       font-weight: 400;
       font-size: 1rem;
-      line-height: 24px;
-      letter-spacing: -2%;
+      line-height: 1.5rem;
       vertical-align: middle;
     }
   }
   &:hover{
-    .hoover-img{
+    .hover-img{
       opacity: 1 !important;
     }
     .card-img{

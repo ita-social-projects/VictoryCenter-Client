@@ -15,13 +15,11 @@ describe('test question card component', () => {
         const answer = screen.getByText(mockQuestion.answer);
         expect(answer).toBeInTheDocument();
         
-        const openIcon = screen.getByAltText('open-arrow');
+        const openIcon = document.querySelector('.faq-open');
         expect(openIcon).toBeInTheDocument();
-        expect(openIcon).toHaveClass('faq-open');
         
-        const closeIcon = screen.getByAltText('close-cross');
+        const closeIcon = document.querySelector('.faq-close');
         expect(closeIcon).toBeInTheDocument();
-        expect(closeIcon).toHaveClass('faq-close');
     })
     test('should have correct classes', () => {
         const {container} = render(<QuestionCard questionCard={mockQuestion}/>)
@@ -37,8 +35,8 @@ describe('test question card component', () => {
         const detailsElement = screen.getByText(mockQuestion.question).closest('details');
         expect(detailsElement).toBeInTheDocument();
 
-        const openIcon = screen.getByAltText('open-arrow') as HTMLImageElement;
-        const closeIcon = screen.getByAltText('close-cross') as HTMLImageElement;
+        const openIcon = document.querySelector('.faq-open') as HTMLImageElement;
+        const closeIcon = document.querySelector('.faq-close') as HTMLImageElement;
         
         expect(openIcon.src).toContain('arrowDown.svg');
         expect(closeIcon.src).toContain('Cross.svg');

@@ -15,8 +15,7 @@ export const ProgramSection: React.FC = () => {
         (async() => {
             try{
                 const response = await programPageDataFetch();
-                const {programData} = response;
-                setProgramData(programData);
+                setProgramData(response.programData);
                 setError(null);
             }
             catch{

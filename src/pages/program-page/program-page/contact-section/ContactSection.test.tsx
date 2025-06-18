@@ -13,7 +13,7 @@ describe('ContactSection', () => {
                 'що найкраще відповідає вашим потребам або потребам вашої дитини.'});
         expect(subtitle).toBeInTheDocument();
         
-        const button = screen.getByRole('button', {name: 'Звʼязатись'});
+        const button = screen.getByRole('button', {name: 'Звʼязатись з нами'});
         expect(button).toBeInTheDocument();
     })
     test('should render background video correctly', () => {
@@ -22,7 +22,7 @@ describe('ContactSection', () => {
         expect(videoElement).toBeInTheDocument();
         expect(videoElement).toHaveAttribute('autoplay');
         expect(videoElement).toHaveAttribute('loop');
-        expect(videoElement).toHaveAttribute('playsInline');
+        expect(videoElement).toHaveAttribute('playsinline');
     })
     test('should have correct container name', () => {
         const {container} = render(<ContactSection/>);

@@ -18,7 +18,7 @@ describe('IntroSection', () => {
     test('should contain two special spans', () => {
         const {container} = render(<IntroSection/>);
         const spans = container.querySelectorAll('span');
-        expect(spans.length).toBe(2);
+        expect(spans.length).toEqual(2);
         expect(spans[0]).toHaveTextContent('простори,');
         expect(spans[1]).toHaveTextContent('зцілення');
     })

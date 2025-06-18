@@ -39,7 +39,7 @@ describe('test question section', () => {
             expect(screen.getByText("answer2")).toBeInTheDocument();
             
             const allQuestions = document.querySelectorAll('.test-question-block');
-            expect(allQuestions.length).toBe(2);    
+            expect(allQuestions.length).toEqual(2);    
         });
     })
     test('should render with no cards', async () => {
@@ -48,7 +48,7 @@ describe('test question section', () => {
         await waitFor(() => {
             expect(spyQuestionDataFetch).toHaveBeenCalledTimes(1);
             const allQuestions = document.querySelectorAll('.test-question-block');
-            expect(allQuestions.length).toBe(0);
+            expect(allQuestions.length).toEqual(0);
         })
     })
     test('should render without crashing', async () => {
@@ -57,7 +57,7 @@ describe('test question section', () => {
         await waitFor(() => {
             expect(spyQuestionDataFetch).toHaveBeenCalledTimes(1);
             const allQuestions = document.querySelectorAll('.test-question-block');
-            expect(allQuestions.length).toBe(0);
+            expect(allQuestions.length).toEqual(0);
             
             const errorMessage = document.querySelector('.error-message');
             expect(errorMessage).toBeInTheDocument();

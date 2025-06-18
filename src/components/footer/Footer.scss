@@ -1,7 +1,7 @@
 @use "../../assets/sass/variables/variables.fonts.scss" as ft;
 @use "../../assets/sass/variables/variables.colors" as c;
 
-.content {
+.footer-content {
   font-weight: 600;
   margin-top: 3.75rem;
   font-family: ft.$mulish-regular-font;
@@ -16,17 +16,18 @@
     font-weight: 600;
   }
 
-  .main_block {
-
-    padding: 4rem 0;
-    width: 73rem;
+  .main-block {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    max-width: 73rem;
+    width: 95%;
+    box-sizing: border-box;
     border-top: 1px solid c.$light-gray;
     border-bottom: 1px solid c.$light-gray;
     display: flex;
     gap: 5rem;
 
     a {
-
       text-decoration: none;
       color: #000;
     }
@@ -72,7 +73,8 @@
     }
 
     .about_us,
-    .programs {
+    .hippotherapy,
+    .menu {
       .title {
         font-weight: 600;
       }
@@ -84,19 +86,20 @@
     }
   }
 
-  .contact_block {
+  .contact-block {
     display: flex;
     flex-direction: row;
     align-items: flex-end;
     justify-content: flex-start;
     gap: 30rem;
-    width: 73rem;
+    max-width: 73rem;
+    width: 100%;
     margin-bottom: 3rem;
 
     .main_contacts {
       margin-top: 1rem;
       display: flex;
-      gap: 20px;
+      gap: 1.25rem;
       flex-direction: row;
       align-items: flex-start;
       margin-left: 0;
@@ -104,7 +107,7 @@
       button {
         display: flex;
         align-items: center;
-        gap: 3px;
+        gap: 0.188rem;
       }
     }
 
@@ -113,7 +116,6 @@
       align-items: flex-end;
       gap: 2rem;
     }
-
 
     .contact-item {
       font-size: 1rem;

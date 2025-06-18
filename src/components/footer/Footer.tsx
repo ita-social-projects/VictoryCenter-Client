@@ -20,10 +20,15 @@ import {
   PROGRAMS,
   PROGRAMS_SESSIONS,
   VICTORY_STARTS_WITH_YOU,
-  STAY_UP_TO_DATE_WUTH_THE_NEWS,
+  STAY_UP_TO_DATE_WITH_THE_NEWS,
   ENTER_YOUR_EMAIL,
   SIGN_UP,
   WHAT_IS_HIPPOTHERAPY,
+  EMAIL,
+  PHONE,
+  FACEBOOK,
+  INSTAGRAM,
+  TELEGRAM,
 } from "../../const/footer/footer";
 
 const {
@@ -41,10 +46,10 @@ export const Footer = () => {
     navigator.clipboard.writeText(text);
   };
   return (
-    <div className="content">
-      <div className="main_block">
+    <div className="footer-content">
+      <div className="main-block">
         <div className="email_field">
-          <span className="title">{STAY_UP_TO_DATE_WUTH_THE_NEWS}</span>
+          <span className="title">{STAY_UP_TO_DATE_WITH_THE_NEWS}</span>
           <div className="input_block">
             <input
               type="email"
@@ -63,7 +68,7 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="programs">
+        <div className="menu">
           <span className="title">{MENU}</span>
           <Link to={page1Route}>{REPORTING}</Link>
           <Link to={page2Route}>{STORE}</Link>
@@ -80,7 +85,7 @@ export const Footer = () => {
           <Link to={page2Route}>{EVENTS_AND_NEWS}</Link>
         </div>
 
-        <div className="about_us">
+        <div className="hippotherapy">
           <span className="title">{HIPPOTHERAPY}</span>
           <Link to={page1Route}>{WHAT_IS_HIPPOTHERAPY}</Link>
           <Link to={page1Route}>{PROGRAMS}</Link>
@@ -88,37 +93,37 @@ export const Footer = () => {
         </div>
       </div>
 
-      <div className="contact_block">
+      <div className="contact-block">
         <div className="main_contacts">
           <button
             className="contact-item"
-            onClick={() => copyToClipboard("victorycenter@gmail.com")}
+            onClick={() => copyToClipboard(EMAIL)}
           >
-            <img src={mailIcon} alt="mail" /> victorycenter@gmail.com
+            <img src={mailIcon} alt="mail" /> {EMAIL}
           </button>
           <button
             className="contact-item"
-            onClick={() => copyToClipboard("+380 50 334 4448")}
+            onClick={() => copyToClipboard(PHONE)}
           >
-            <img src={phoneIcon} alt="phone" /> +380 50 334 4448
+            <img src={phoneIcon} alt="phone" /> {PHONE}
           </button>
         </div>
         <div className="social_media">
           <button
             className="contact-item"
-            onClick={() => copyToClipboard("some_facebook")}
+            onClick={() => copyToClipboard(FACEBOOK)}
           >
             Facebook
           </button>
           <button
             className="contact-item"
-            onClick={() => copyToClipboard("some_telegram")}
+            onClick={() => copyToClipboard(TELEGRAM)}
           >
             Telegram
           </button>
           <button
             className="contact-item"
-            onClick={() => copyToClipboard("some_inst")}
+            onClick={() => copyToClipboard(INSTAGRAM)}
           >
             Instagram
           </button>

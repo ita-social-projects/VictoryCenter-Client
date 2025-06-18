@@ -21,15 +21,22 @@ victory-center-client/
 │   └── index.html
 ├── src/
 │   ├── assets/                             # Images, icons, fonts, etc.
-|   |   └── images
-|   |       └── header
+        ├── images/
+        │  ├── footer
+        |  └── header
+        ├── fonts
+        └── sass/
+            ├── mixins
+            └── variables
 │   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
-│   │   └── header
+|   |   ├── footer
+|   |   └── header
 │   ├── const                               # Constans that will be used across the project
+|   |   ├── footer
 │   │   ├── routes
 |   |   └── header
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
-│   │   └──main-layout              
+│   │   └──main-layout
 │   ├── pages/                              # Pages
 │   │   ├── admin
 │   │   ├── not-found
@@ -171,8 +178,8 @@ api.secret=${API_SECRET}
 > Or Contributors/People
 
 [![@IrynaZavushchak](https://avatars.githubusercontent.com/u/45690640?s=100&v=4)](https://github.com/IrynaZavushchak)
-[![@LanchevychMaxym](https://avatars.githubusercontent.com/u/47561209?s=100&v=4)](https://github.com/LanchevychMaxym) 
- 
+[![@LanchevychMaxym](https://avatars.githubusercontent.com/u/47561209?s=100&v=4)](https://github.com/LanchevychMaxym)
+
 
 - You can just grab their GitHub profile image URL
 - You should probably resize their picture using `?s=200` at the end of the image URL.

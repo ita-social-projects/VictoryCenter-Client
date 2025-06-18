@@ -603,7 +603,7 @@ describe('MembersList', () => {
                 mockMembers.push(createMockMember({ id: i, fullName: `Member ${i}` }));
             }
             render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             const membersList = screen.getByTestId('members-list');
             // Simulate scroll to bottom
             Object.defineProperty(membersList, 'scrollTop', { writable: true, value: 1000 });
@@ -611,15 +611,15 @@ describe('MembersList', () => {
             Object.defineProperty(membersList, 'clientHeight', { writable: true, value: 1 });
             fireEvent.scroll(membersList);
             // Wait for more members to be loaded
-            await waitFor(() => expect(screen.getByText('Member 6')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Member 6')).toBeInTheDocument());
         });
 
         it('resets members when search query is cleared', async () => {
             render(<MembersList {...sharedDefaultProps} searchByNameQuery={"Alpha"} />);
-            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             // Rerender with no search query
             render(<MembersList {...sharedDefaultProps} searchByNameQuery={null} />);
-            await waitFor(() => expect(screen.getByText('Beta')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Beta')).toBeInTheDocument());
         });
 
         it('persists and restores selected category from localStorage', async () => {
@@ -630,7 +630,7 @@ describe('MembersList', () => {
 
         it('does not reorder members if dropped on same index', async () => {
             render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             const dragItem = screen.getByTestId('member-item-0');
             fireEvent.dragStart(dragItem, { clientX: 100, clientY: 100, dataTransfer: mockDataTransfer });
             fireEvent.drop(dragItem, { dataTransfer: mockDataTransfer });
@@ -639,7 +639,7 @@ describe('MembersList', () => {
 
         it('opens and closes delete modal, and deletes member', async () => {
             render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             fireEvent.click(screen.getByTestId('delete-button-0'));
             expect(screen.getByText('Видалити члена команди?')).toBeInTheDocument();
             // Confirm delete
@@ -650,7 +650,7 @@ describe('MembersList', () => {
 
         it('cancels delete modal', async () => {
             render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             fireEvent.click(screen.getByTestId('delete-button-0'));
             expect(screen.getByText('Видалити члена команди?')).toBeInTheDocument();
             // Cancel delete
@@ -661,7 +661,7 @@ describe('MembersList', () => {
 
         it('saves member as draft from edit modal', async () => {
             render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             fireEvent.click(screen.getByTestId('edit-button-0'));
             const draftButton = screen.getByRole('button', { name: /Зберегти як чернетку/i });
             fireEvent.click(draftButton);
@@ -670,7 +670,7 @@ describe('MembersList', () => {
 
         it('cancels publish confirmation and keeps edit modal open', async () => {
             render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             fireEvent.click(screen.getByTestId('edit-button-0'));
             const form = screen.getByTestId('member-form');
             fireEvent.submit(form);
@@ -682,7 +682,7 @@ describe('MembersList', () => {
 
         it('shows and hides move-to-top button correctly', async () => {
             render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             const membersList = screen.getByTestId('members-list');
             Object.defineProperty(membersList, 'scrollTop', { writable: true, value: 100 });
             fireEvent.scroll(membersList);
@@ -696,25 +696,25 @@ describe('MembersList', () => {
         it('handles empty mockMembers array gracefully', async () => {
             resetMockMembers([]);
             render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(() => expect(screen.getByText('Нічого не знайдено')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Нічого не знайдено')).toBeInTheDocument());
         });
 
         it('handles rapid category switching', async () => {
             render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             fireEvent.click(screen.getByText('Наглядова рада'));
             fireEvent.click(screen.getByText('Радники'));
             fireEvent.click(screen.getByText('Основна команда'));
-            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
         });
 
         it('handles rapid search input changes', async () => {
             const {rerender} = render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             rerender(<MembersList {...sharedDefaultProps} searchByNameQuery={"Bet"} />);
-            await waitFor(() => expect(screen.getByText('Beta')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Beta')).toBeInTheDocument());
             rerender(<MembersList {...sharedDefaultProps} searchByNameQuery={""} />);
-            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
         });
     });
 

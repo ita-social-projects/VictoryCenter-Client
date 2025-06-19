@@ -1,18 +1,14 @@
 import React from 'react';
-import "./ProgramCard.scss"
-import arrowBlack from "../../../../../assets/program_page_images/icons/arrow-up-black.png";
-import arrowYellow from "../../../../../assets/program_page_images/icons/arrow-up-yellow.png"
+import { Program } from '../../../../../types/ProgramPage';
+import arrowBlack from '@assets/program_page_images/icons/arrow-up-black.png';
+import arrowYellow from '@assets/program_page_images/icons/arrow-up-yellow.png';
+import './ProgramCard.scss';
 
-interface Program {
-    image: string;
-    title: string;
-    subtitle: string;
-    description: string;
-}
 interface ProgramCardProps{
     program: Program
 }
 export const ProgramCard: React.FC<ProgramCardProps> = ({program}) => {
+    
     return (
         <div className="card-block">
             <img src={program.image} alt={program.title} className="card-img"/>

@@ -1,6 +1,6 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
-import { ProgramPage } from "./ProgramPage";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { ProgramPage } from './ProgramPage';
 
 jest.mock("./program-page/intro-section/IntroSection", () => ({
     IntroSection: () => <div data-testid="intro-section">IntroSection</div>,
@@ -19,7 +19,7 @@ jest.mock("./program-page/contact-section/ContactSection", () => ({
 }));
 
 describe("ProgramPage", () => {
-    test("рендерить всі основні секції", () => {
+    test("should render all sections", () => {
         render(<ProgramPage />);
 
         expect(screen.getByTestId("intro-section")).toBeInTheDocument();

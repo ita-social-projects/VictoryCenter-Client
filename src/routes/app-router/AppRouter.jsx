@@ -7,7 +7,6 @@ import { AdminPage } from '../../pages/admin/AdminPage';
 
 import { HomePage } from '../../pages/user-pages/home/HomePage';
 import { Page1 } from '../../pages/user-pages/page1/Page1';
-import { Page2 } from '../../pages/user-pages/page2/Page2';
 
 import { NotFound } from '../../pages/not-found/NotFound';
 import {ProgramPage} from "../../pages/program-page/ProgramPage";
@@ -23,7 +22,7 @@ export const AppRouter = () => (
           <Route index element={<HomePage />} />
           <Route path={adminRoute} element={<AdminPage />} />
           <Route path={page1Route} element={<Page1 />} />
-          <Route path={page2Route} element={<Page2 />} />
+          <Route path={page2Route} element={<ProgramPage />} />
           <Route path={programPage} element={<ProgramPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>

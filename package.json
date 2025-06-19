@@ -6,6 +6,7 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@craco/craco": "^7.1.0",
     "@fontsource/mulish": "^5.2.5",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -23,9 +24,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "eject": "react-scripts eject",
     "test:cover": "npm test -- --coverage --watchAll=false",
     "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --max-warnings 10"
@@ -56,6 +57,12 @@
     ]
   },
   "jest": {
+    "moduleNameMapper": {
+      "^@assets/(.*)$": "<rootDir>/src/assets/$1",
+      "^@utils/(.*)$": "<rootDir>/src/utils/$1",
+      "^@components/(.*)$": "<rootDir>/src/components/$1",
+      "\\.(mp4|mp3|jpg|jpeg|png|svg)$": "<rootDir>/__mocks__/fileMock.js"
+    },
     "collectCoverageFrom": [
       "src/**/*.{ts,js,tsx,jsx}"
     ],

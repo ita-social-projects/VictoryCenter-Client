@@ -1,18 +1,18 @@
-import React, {useState} from 'react';
-import openIcon from '../../../../../assets/program_page_images/icons/arrowDown.svg';
-import closeIcon from '../../../../../assets/program_page_images/icons/Cross.svg';
-import openBlue from '../../../../../assets/program_page_images/icons/arrowDownBlue.svg';
-import closeBlue from '../../../../../assets/program_page_images/icons/crossBlue.svg';
-import './QuestionCard.scss'
-interface  QuestionData {
-    question: string;
-    answer: string;
-}
+import React, { useState } from 'react';
+import { Question } from "../../../../../types/ProgramPage";
+import openIcon from '@assets/program_page_images/icons/arrowDown.svg';
+import closeIcon from '@assets/program_page_images/icons/Cross.svg';
+import openBlue from '@assets/program_page_images/icons/arrowDownBlue.svg';
+import closeBlue from '@assets/program_page_images/icons/crossBlue.svg';
+import './QuestionCard.scss';
+
 interface QuestionCardProps{
-    questionCard: QuestionData;
+    questionCard: Question;
 }
 export const  QuestionCard: React.FC<QuestionCardProps> = ({questionCard}) => {
+    
     const [isHovered, setIsHovered] = useState(false);
+    
     return (
         <details className="faq-item"
                  onMouseEnter={() => setIsHovered(true)}
@@ -26,5 +26,5 @@ export const  QuestionCard: React.FC<QuestionCardProps> = ({questionCard}) => {
             </summary>
             <div className="faq-answer">{questionCard.answer}</div>
         </details>
-    )
-}
+    );
+};

@@ -1,7 +1,8 @@
 import React from 'react';
-import {ProgramSection} from "./ProgramSection";
-import {render, screen, waitFor} from "@testing-library/react";
-import * as ProgramPageFetchModule from "../../../../services/data-fetch/program-page-data-fetch/programPageDataFetch";
+import { Program } from '../../../../types/ProgramPage';
+import { ProgramSection } from './ProgramSection';
+import { render, screen, waitFor } from '@testing-library/react';
+import * as ProgramPageFetchModule from '../../../../services/data-fetch/program-page-data-fetch/programPageDataFetch';
 
 const spyProgramPageDataFetch = jest.spyOn(ProgramPageFetchModule, "programPageDataFetch");
 
@@ -26,22 +27,22 @@ const mockPrograms = [
     }
 ];
 jest.mock('./program-card/ProgramCard', () => ({
-    ProgramCard: ({program}: any) => (
-        <div className="test-card-content">
+    ProgramCard: ({program}: {program: Program}) => (
+        <div data-testid="test-card-content">
             <img src={program.image} alt={program.title}/>
             <h2>{program.title}</h2>
             <h4>{program.subtitle}</h4>
             <p>{program.description}</p>
         </div>
     )
-}))
+}));
 describe('test program section', () => {
     afterEach(() => {
         jest.resetAllMocks();
-    })
+    });
     test('should render correctly', async () => {
         spyProgramPageDataFetch.mockResolvedValue({programData: mockPrograms});
-        render(<ProgramSection/>)
+        render(<ProgramSection/>);
         expect(spyProgramPageDataFetch).toHaveBeenCalledTimes(1);
         
         await waitFor(() => {
@@ -59,30 +60,30 @@ describe('test program section', () => {
                 .toHaveAttribute("src", 
                     "https://via.placeholder.com/200x200?text=Ponys");
             
-            const cards = document.querySelectorAll(".test-card-content");
-            expect(cards.length).toBe(3);
+            const cards = screen.queryAllByTestId("test-card-content");
+            expect(cards.length).toEqual(3);
         });
-    })
+    });
     test('should render with no cards', async () => {
         spyProgramPageDataFetch.mockResolvedValue({programData: []});
         render(<ProgramSection/>)
         expect(spyProgramPageDataFetch).toHaveBeenCalledTimes(1);
 
         await waitFor(() => {
-            const cards = document.querySelectorAll(".test-card-content");
+            const cards = screen.queryAllByTestId("test-card-content");
             expect(cards.length).toEqual(0);
         });
-    })
+    });
     test('should render without crashing', async () => {
         spyProgramPageDataFetch.mockRejectedValueOnce(new Error("Fetch failed"));
-        render(<ProgramSection/>)
+        render(<ProgramSection/>);
         expect(spyProgramPageDataFetch).toHaveBeenCalledTimes(1);
 
         await waitFor(() => {
-            const cards = document.querySelectorAll(".test-card-content");
+            const cards = screen.queryAllByTestId("test-card-content");
             expect(cards.length).toEqual(0);
             const errorMessage = document.querySelector('.error-message');
             expect(errorMessage).toBeInTheDocument();
         });
-    })
-})
+    });
+});

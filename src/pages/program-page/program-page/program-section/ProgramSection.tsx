@@ -1,16 +1,14 @@
-import React, {useState, useEffect} from 'react';
-import {programPageDataFetch} from "../../../../services/data-fetch/program-page-data-fetch/programPageDataFetch";
-import {ProgramCard} from "./program-card/ProgramCard";
+import React, { useState, useEffect } from 'react';
+import { Program } from '../../../../types/ProgramPage';
+import { ProgramCard } from './program-card/ProgramCard';
+import { programPageDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/programPageDataFetch';
 import './ProgramSection.scss'
-interface Program{
-    image: string;
-    title: string;
-    subtitle: string;
-    description: string;
-}
+
 export const ProgramSection: React.FC = () => {
+    
     const [programData, setProgramData] = useState<Program[]>([]);
     const [error, setError] = useState<string | null>(null);
+    
     useEffect(() => {
         (async() => {
             try{
@@ -19,11 +17,12 @@ export const ProgramSection: React.FC = () => {
                 setError(null);
             }
             catch{
-                setError("Не вдалося завантажити дані програм. Будь-ласка спробуйте пізніше.");
+                setError('Не вдалося завантажити дані програм. Будь-ласка спробуйте пізніше.');
                 setProgramData([]);
             }
         })();
     }, []);
+    
     return (
         <div className="program-block">
             <div className="menu-block">
@@ -48,5 +47,5 @@ export const ProgramSection: React.FC = () => {
                 ))}
             </div>
         </div>
-    )
-}
+    );
+};

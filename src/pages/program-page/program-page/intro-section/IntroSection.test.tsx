@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import {IntroSection} from "./IntroSection";
+import { render, screen } from '@testing-library/react';
+import { IntroSection } from './IntroSection';
 
 describe('IntroSection', () => {
     test('should contain main title', () => {
@@ -21,10 +21,10 @@ describe('IntroSection', () => {
         expect(spans.length).toEqual(2);
         expect(spans[0]).toHaveTextContent('простори,');
         expect(spans[1]).toHaveTextContent('зцілення');
-    })
+    });
     test('should have correct class names', () => {
         const {container} = render(<IntroSection/>);
         expect(container.querySelector('.intro-section')).toBeInTheDocument();
         expect(container.querySelector('.additional-info')).toBeInTheDocument();
-    })
-})
+    });
+});

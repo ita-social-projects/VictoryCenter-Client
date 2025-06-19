@@ -1,22 +1,22 @@
-.program-block{
+.program-block {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  .menu-block{
+  .menu-block {
     width: 100%;
     padding: 0 3.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
-    .button-block{
+    .button-block {
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 0.5rem;
-      .white-button{
+      .white-button {
         border-radius: 1.5rem;
         padding: 0.5rem 1rem;
         border: 1px solid #B5BDCB;
@@ -28,12 +28,12 @@
         letter-spacing: -0.02em;
         vertical-align: middle;
         transition: 0.3s ease;
-        &:hover{
+        &:hover {
           background: #E7EAEE;
           transition: 0.3s ease;
         }
       }
-      .black-button{
+      .black-button {
         background: #061125;
         padding: 0.5rem 1rem;
         border-radius: 1.5rem;
@@ -48,7 +48,7 @@
       }
     }
   }
-  .menu-block h2{
+  .menu-block h2 {
     font-family: Mulish, sans-serif;
     font-weight: 600;
     font-size: 2rem;
@@ -56,7 +56,7 @@
     letter-spacing: -0.02em;
     vertical-align: middle;
   }
-  .cards-block{
+  .cards-block {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
   }

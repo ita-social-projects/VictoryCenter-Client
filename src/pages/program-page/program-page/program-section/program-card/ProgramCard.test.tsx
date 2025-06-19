@@ -1,5 +1,5 @@
-import {ProgramCard} from './ProgramCard';
-import {render, screen} from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import { ProgramCard } from './ProgramCard';
 
 describe('test program-card component', () => {
     const mockProgram = {
@@ -7,7 +7,7 @@ describe('test program-card component', () => {
         title: "Коні лікують Літо 2025",
         subtitle: "Ветеранська програма",
         description: "Зменшення рівня стресу, тривоги та ПТСР у ветеранів, повернення відчуття контролю, розвиток внутрішньої сили та опори."
-    }
+    };
     test('should contain correct information', () => {
         render(<ProgramCard program={mockProgram}/>);
         const title = screen.getByRole('heading', {name: mockProgram.title});
@@ -26,10 +26,10 @@ describe('test program-card component', () => {
         expect(image).toBeInTheDocument();
         expect(image).toHaveAttribute('src',  mockProgram.image);
         expect(image).toHaveClass('card-img');
-    })
+    });
     test('should contain correct classes', () => {
         render(<ProgramCard program={mockProgram}/>);
         const container = screen.getByAltText(mockProgram.title).closest('.card-block');
         expect(container).toBeInTheDocument();
-    })
-})
+    });
+});

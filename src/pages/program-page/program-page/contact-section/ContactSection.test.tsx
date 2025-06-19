@@ -1,6 +1,6 @@
-import {render, screen} from '@testing-library/react';
 import '@testing-library/jest-dom';
-import {ContactSection} from "./ContactSection";
+import { render, screen } from '@testing-library/react';
+import { ContactSection } from './ContactSection';
 
 describe('ContactSection', () => {
     test('should render correctly', () => {
@@ -15,7 +15,7 @@ describe('ContactSection', () => {
         
         const button = screen.getByRole('button', {name: 'Звʼязатись з нами'});
         expect(button).toBeInTheDocument();
-    })
+    });
     test('should render background video correctly', () => {
         render(<ContactSection/>);
         const videoElement = document.querySelector('video');
@@ -23,11 +23,11 @@ describe('ContactSection', () => {
         expect(videoElement).toHaveAttribute('autoplay');
         expect(videoElement).toHaveAttribute('loop');
         expect(videoElement).toHaveAttribute('playsinline');
-    })
+    });
     test('should have correct container name', () => {
         const {container} = render(<ContactSection/>);
         expect(container.querySelector('.contact-us-block')).toBeInTheDocument();
         const videoElement = document.querySelector('video')?.closest('.contact-us-block');
         expect(videoElement).toBeInTheDocument();
-    })
-})
+    });
+});

@@ -1,14 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {QuestionCard} from "./question-card/QuestionCard";
-import {questionDataFetch} from "../../../../services/data-fetch/program-page-data-fetch/programPageDataFetch";
-import "./QuestionSection.scss"
-interface Question{
-    question: string;
-    answer: string;
-}
+import { Question } from '../../../../types/ProgramPage';
+import { QuestionCard } from './question-card/QuestionCard';
+import { questionDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/programPageDataFetch';
+import './QuestionSection.scss';
+
 export const QuestionSection: React.FC = () => {
+    
     const [questions, setQuestions] = useState<Question[]>([]);
     const [error, setError] = useState<string | null>(null);
+    
     useEffect(() => {
         (async() => {
             try{
@@ -22,6 +22,7 @@ export const QuestionSection: React.FC = () => {
             }
         })();
     }, []);
+    
     return (
         <div className="qa-section">
             <div className="question-block">
@@ -41,5 +42,5 @@ export const QuestionSection: React.FC = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};

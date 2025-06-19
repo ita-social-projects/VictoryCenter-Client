@@ -1,7 +1,9 @@
 import React from 'react';
-import background from "../../../../assets/program_page_images/videos/background.mp4";
-import "./ContactSection.scss"
+import background from '@assets/program_page_images/videos/background.mp4';
+import './ContactSection.scss';
+
 export const ContactSection: React.FC = () => {
+    
     return (
         <div className="contact-us-block">
             <video autoPlay muted loop playsInline aria-hidden="true">
@@ -15,5 +17,5 @@ export const ContactSection: React.FC = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};

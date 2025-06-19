@@ -28,7 +28,9 @@ export const TeamPage: React.FC = () => {
         setTeamData(teamData);
         setError(null);
       } catch {
-        setError("Не вдалося завантажити дані команди. Будь ласка, спробуйте пізніше.");
+        setError(
+          "Не вдалося завантажити дані команди. Будь ласка, спробуйте пізніше."
+        );
         setTeamData([]);
       }
     })();
@@ -37,7 +39,11 @@ export const TeamPage: React.FC = () => {
   return (
     <div className="page1-container">
       {error && (
-        <div className="error-message" role="alert" style={{ color: "red", marginBottom: "1rem" }}>
+        <div
+          className="error-message"
+          role="alert"
+          style={{ color: "red", marginBottom: "1rem" }}
+        >
           {error}
         </div>
       )}
@@ -45,7 +51,9 @@ export const TeamPage: React.FC = () => {
       {teamData.map((team, index) => (
         <div
           key={index}
-          className={`team-section ${index === teamData.length - 1 ? "last-section" : ""}`}
+          className={`team-section ${
+            index === teamData.length - 1 ? "last-section" : ""
+          }`}
         >
           <div className="team_info">
             <div className="team_description">
@@ -65,13 +73,11 @@ export const TeamPage: React.FC = () => {
         </video>
 
         <div className="quote-overlay">
-          <p>
-            Я тут, тому що знаю з власного досвіду - коні нас рятують.
-            <br />
-            Очі учасників після програми – найкраща мотивація.
-            <br />
-            І можливість привідкрити глибину цього світу людям, які до нього не були дотичні, а потім спостерігати цей особливий ефект, вартує дорогого.
-          </p>
+          <p className="video-text">Я тут, тому що знаю з власного досвіду – коні нас рятують.</p>
+          <p className="video-text">Очі учасників після програми – найкраща мотивація.</p>
+          <p className="video-text">І можливість привідкрити глибину цього світу людям,</p>
+          <p className="video-text">які до нього не були дотичні, а потім спостерігати цей</p>
+          <p className="video-text">особливий ефект, вартує дорогого.</p>
           <p className="author">Вікторія Яковенко</p>
         </div>
       </div>

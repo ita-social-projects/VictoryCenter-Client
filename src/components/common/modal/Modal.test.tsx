@@ -15,6 +15,7 @@ const defaultProps = {
 describe('Modal Component', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.restoreAllMocks();
     });
 
     test('does not render when isOpen is false', () => {
@@ -25,7 +26,6 @@ describe('Modal Component', () => {
                 <Modal.Actions>Actions</Modal.Actions>
             </Modal>
         );
-        // Should not find overlay or modal container
         expect(screen.queryByTestId('modal-overlay')).not.toBeInTheDocument();
         expect(document.querySelector('.modal-container')).toBeNull();
     });

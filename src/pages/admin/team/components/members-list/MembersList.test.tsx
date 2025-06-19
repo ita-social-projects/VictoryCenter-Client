@@ -1,6 +1,7 @@
 import {render, screen, fireEvent, waitFor} from '@testing-library/react';
-import {MembersList, MembersListProps, Member, mockMembers} from './MembersList';
+import {MembersList, MembersListProps, Member} from './MembersList';
 import * as React from 'react';
+import {mockMembers} from "../../../../../utils/mock-data/admin-page/teamPage";
 
 const mockDataTransfer = {
     setDragImage: jest.fn(),
@@ -615,10 +616,9 @@ describe('MembersList', () => {
         });
 
         it('resets members when search query is cleared', async () => {
-            render(<MembersList {...sharedDefaultProps} searchByNameQuery={"Alpha"} />);
+            const {rerender} = render(<MembersList {...sharedDefaultProps} searchByNameQuery={"Alpha"} />);
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
-            // Rerender with no search query
-            render(<MembersList {...sharedDefaultProps} searchByNameQuery={null} />);
+            rerender(<MembersList {...sharedDefaultProps} searchByNameQuery={null} />);
             await waitFor(async () => expect(await screen.findByText('Beta')).toBeInTheDocument());
         });
 
@@ -642,7 +642,6 @@ describe('MembersList', () => {
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             fireEvent.click(screen.getByTestId('delete-button-0'));
             expect(screen.getByText('Видалити члена команди?')).toBeInTheDocument();
-            // Confirm delete
             const confirmButton = screen.getByRole('button', { name: /Так/i });
             fireEvent.click(confirmButton);
             await waitFor(() => expect(screen.queryByText('Alpha')).not.toBeInTheDocument());
@@ -653,7 +652,6 @@ describe('MembersList', () => {
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             fireEvent.click(screen.getByTestId('delete-button-0'));
             expect(screen.getByText('Видалити члена команди?')).toBeInTheDocument();
-            // Cancel delete
             const cancelButton = screen.getByRole('button', { name: /Ні/i });
             fireEvent.click(cancelButton);
             expect(screen.getByText('Alpha')).toBeInTheDocument();
@@ -687,7 +685,6 @@ describe('MembersList', () => {
             Object.defineProperty(membersList, 'scrollTop', { writable: true, value: 100 });
             fireEvent.scroll(membersList);
             expect(screen.getByTestId('members-list-list-to-top')).toBeInTheDocument();
-            // Scroll to top
             Object.defineProperty(membersList, 'scrollTop', { writable: true, value: 0 });
             fireEvent.scroll(membersList);
             expect(screen.queryByTestId('members-list-list-to-top')).not.toBeInTheDocument();

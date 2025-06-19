@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {TeamCategory} from "../../TeamPage";
 import {Modal} from "../../../../../components/common/modal/Modal";
 import {MemberDragPreview} from "../member-drag-preview/MemberDragPreview";
@@ -10,6 +10,7 @@ import ArrowUpIcon from "../../../../../assets/icons/arrow-up.svg"
 import {StatusFilter} from "../team-page-toolbar/TeamPageToolbar";
 import {MemberForm, MemberFormValues} from "../member-form/MemberForm";
 import "./members-list.scss"
+import {mockMembers} from "../../../../../utils/mock-data/admin-page/teamPage";
 
 export type Member = {
     id: number;
@@ -33,89 +34,6 @@ export type MemberDragPreviewModel = {
     member: Member | null;
 };
 
-export const mockMembers: Member[] = [
-    {
-        id: 1,
-        img: "https://randomuser.me/api/portraits/men/1.jpg",
-        fullName: "First First",
-        description: "Software EngineerS",
-        status: "Опубліковано",
-        category: "Основна команда",
-    },
-    {
-        id: 2,
-        img: "https://randomuser.me/api/portraits/men/1.jpg",
-        fullName: "Second Second",
-        description: "Software EngineerSoftware Engineer",
-        status: "Опубліковано",
-        category: "Основна команда",
-    },
-    {
-        id: 3,
-        img: "https://randomuser.me/api/portraits/men/1.jpg",
-        fullName: "Sohn Carter",
-        description: "Software EngineerSoftware Engineer",
-        status: "Опубліковано",
-        category: "Основна команда",
-    },
-    {
-        id: 4,
-        img: "https://randomuser.me/api/portraits/women/2.jpg",
-        fullName: "Mmily Rose",
-        description: "UI/UX Designer",
-        status: "Чернетка",
-        category: "Основна команда",
-    },
-    {
-        id: 5,
-        img: "https://randomuser.me/api/portraits/men/3.jpg",
-        fullName: "Michael Blake",
-        description: "DevOps Engineer",
-        status: "Опубліковано",
-        category: "Основна команда",
-    },
-    {
-        id: 6,
-        img: "https://randomuser.me/api/portraits/men/5.jpg",
-        fullName: "Daniel Li",
-        description: "QA Analyst",
-        status: "Чернетка",
-        category: "Основна команда",
-    },
-    {
-        id: 7,
-        img: "https://randomuser.me/api/portraits/women/6.jpg",
-        fullName: "Isabella Garcia",
-        description: "HR Specialist",
-        status: "Опубліковано",
-        category: "Основна команда",
-    },
-    {
-        id: 8,
-        img: "https://randomuser.me/api/portraits/women/8.jpg",
-        fullName: "Olivia Brown",
-        description: "Marketing Manager",
-        status: "Опубліковано",
-        category: "Основна команда",
-    },
-    {
-        id: 9,
-        img: "https://randomuser.me/api/portraits/men/9.jpg",
-        fullName: "William Smith",
-        description: "Backend Developer",
-        status: "Опубліковано",
-        category: "Основна команда",
-    },
-    {
-        id: 10,
-        img: "https://randomuser.me/api/portraits/women/10.jpg",
-        fullName: "Ava Thompson",
-        description: "Business Analyst",
-        status: "Чернетка",
-        category: "Основна команда",
-    },
-];
-
 const currentTabKey = "currentTab";
 export const fetchMembers = async (category: string, pageSize: number, pageNumber: number): Promise<{
     newMembers: Member[],
@@ -136,7 +54,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     const [currentPage, setCurrentPage] = useState(1);
     const [teamMemberToDelete, setTeamMemberToDelete] = useState<string | null>(null);
     const [members, setMembers] = useState<Member[]>(mockMembers);
-    const [category, setCategory] = useState<TeamCategory>();
+    const [category, setCategory] = useState<TeamCategory>(() => (localStorage.getItem(currentTabKey) as TeamCategory) || "Основна команда");
     const [isDeleteTeamMemberModalOpen, setIsDeleteTeamMemberModalOpen] = useState(false);
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [dragPreview, setDragPreview] = useState<MemberDragPreviewModel>({
@@ -157,12 +75,10 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     const [isConfirmPublishNewMemberModalOpen, setIsConfirmPublishNewMemberModalOpen] = useState(false);
     const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState(false);
 
-    // Use refs for values that shouldn't trigger re-renders
     const currentPageRef = useRef<number>(currentPage);
     const totalPagesRef = useRef<number | null>(totalPages);
     const categoryRef = useRef<TeamCategory | undefined>(category);
 
-    // Update refs when state changes
     useEffect(() => {
         currentPageRef.current = currentPage;
     }, [currentPage]);
@@ -175,7 +91,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         categoryRef.current = category;
     }, [category]);
 
-    const loadMembers = async (reset: boolean = false) => {
+    const loadMembers = useCallback(async (reset: boolean = false) => {
         const currentCategory = categoryRef.current;
         if (!currentCategory || isFetchingRef.current) return;
         if (!reset && totalPagesRef.current && currentPageRef.current > totalPagesRef.current) return;
@@ -195,9 +111,8 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
         setIsMembersLoading(false);
         isFetchingRef.current = false;
-    };
+    }, []);
 
-    // Effect for initial load and category change
     useEffect(() => {
         if (category) {
             setMembers([]);
@@ -205,7 +120,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
             isFetchingRef.current = false;
             loadMembers();
         }
-    }, [category]);
+    }, [category, loadMembers]);
 
     const handleDragStart = (e: React.DragEvent<HTMLButtonElement>, index: number) => {
         setDraggedIndex(index);
@@ -265,7 +180,6 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
     const handleDeleteMember = () => {
         setMembers(prev => prev.filter(m => m.fullName !== teamMemberToDelete));
-        setMembers(prev => prev.filter(m => m.fullName !== teamMemberToDelete));
         setIsDeleteTeamMemberModalOpen(false);
         setTeamMemberToDelete(null);
     };
@@ -301,19 +215,10 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         }
     }, [category]);
 
-    useEffect(() => {
-        const localCategory = localStorage.getItem(currentTabKey) as TeamCategory;
-        setCategory(localCategory || "Основна команда");
-    }, []);
 
-    // Effect for search query changes
     useEffect(() => {
         if (searchByNameQuery) {
-            setMembers(prev =>
-                prev.filter(m =>
-                    m.fullName.toLowerCase().includes(searchByNameQuery.toLowerCase())
-                )
-            );
+            setMembers(mockMembers.filter(m => m.fullName.toLowerCase().includes(searchByNameQuery.toLowerCase())));
         } else {
             setMembers([]);
             setCurrentPage(1);
@@ -321,7 +226,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
             isFetchingRef.current = false;
             loadMembers(true);
         }
-    }, [searchByNameQuery]);
+    }, [loadMembers, searchByNameQuery]);
 
     useEffect(() => {
         if (isMembersLoading && memberListRef.current) {

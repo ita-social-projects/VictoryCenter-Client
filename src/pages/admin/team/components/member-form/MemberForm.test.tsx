@@ -1,5 +1,5 @@
 import React from 'react';
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen, fireEvent, createEvent} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemberForm, MemberFormProps, MemberFormValues } from './MemberForm';
 
@@ -242,7 +242,7 @@ describe('MemberForm - Additional Coverage', () => {
         const fileInput = screen.getByTestId('image');
 
         const mockEvent = {
-            target: { name: 'img', value: '' },
+            target: { name: 'img', value: null },
             currentTarget: { files: { length: 0 } }
         };
 
@@ -250,7 +250,7 @@ describe('MemberForm - Additional Coverage', () => {
 
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
             expect.objectContaining({
-                img: '',
+                img: null,
             })
         );
     });
@@ -265,18 +265,21 @@ describe('MemberForm - Additional Coverage', () => {
     it('handles drag events without files in dataTransfer', () => {
         render(<MemberForm {...defaultProps} />);
 
-        const dropArea = screen.getByLabelText('Перетягніть файл сюди або натисніть для завантаження');
+        const dropArea = screen.getByTestId('drop-area');
 
-        const dropEvent = {
-            preventDefault: jest.fn(),
-            dataTransfer: {
-                files: null
+        const dropEvent = createEvent.drop(dropArea);
+
+        Object.defineProperty(dropEvent, 'dataTransfer', {
+            value: {
+                files: []
             }
-        };
+        });
 
-        fireEvent.drop(dropArea, dropEvent);
+        dropEvent.preventDefault = jest.fn();
 
-        expect(dropEvent.preventDefault).not.toHaveBeenCalled();
+        fireEvent(dropArea, dropEvent);
+
+        expect(dropEvent.preventDefault).toHaveBeenCalled();
     });
 
     it('handles drag events with files in dataTransfer', () => {
@@ -362,7 +365,7 @@ describe('MemberForm - Extra Function Coverage', () => {
             dataTransfer: { files: null }
         };
         fireEvent.drop(dropArea, dropEvent);
-        expect(screen.getByText('0/50')).toBeInTheDocument(); // still empty
+        expect(screen.getByText('0/50')).toBeInTheDocument();
     });
 
     it('handles drag-and-drop with multiple files', () => {

@@ -716,5 +716,3 @@ describe('MembersList', () => {
     });
 
 });
-
-

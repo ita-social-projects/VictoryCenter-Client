@@ -24,3 +24,4 @@ export const Button = ({children, onClick, buttonStyle, type = "button", form, c
         {children}
     </button>);
 }
+

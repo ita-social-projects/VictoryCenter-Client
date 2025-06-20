@@ -28,3 +28,4 @@ export const MemberDragPreview = ({dragPreview}: MemberDragPreviewProps) => {
         </div>
     );
 }
+

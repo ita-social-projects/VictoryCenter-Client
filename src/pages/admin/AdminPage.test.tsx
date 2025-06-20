@@ -48,3 +48,4 @@ describe('AdminPageContent', () => {
         expect(spyAdminPageDataFetch).toHaveBeenCalledTimes(1);
     });
 });
+

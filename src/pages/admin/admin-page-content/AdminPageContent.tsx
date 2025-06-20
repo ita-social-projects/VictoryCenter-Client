@@ -38,3 +38,4 @@ export const AdminPageContent = () => {
     </div>
   );
 };
+

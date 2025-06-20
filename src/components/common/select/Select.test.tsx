@@ -340,3 +340,4 @@ describe('Select Component', () => {
         expect(ref.current).toHaveClass('select-opened');
     });
 });
+

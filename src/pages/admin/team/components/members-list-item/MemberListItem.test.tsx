@@ -89,3 +89,4 @@ describe("MembersListItem", () => {
         expect(props.handleOnDeleteMember).toHaveBeenCalledWith("John Doe");
     });
 });
+

@@ -6,3 +6,4 @@ export const AdminPage = () => {
         <AdminPageContent/>
     )
 };
+

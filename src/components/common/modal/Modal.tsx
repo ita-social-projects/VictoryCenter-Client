@@ -86,3 +86,4 @@ export const Modal = ({
 Modal.Title = ({children}: { children: React.ReactNode }) => <>{children}</>;
 Modal.Content = ({children}: { children: React.ReactNode }) => <>{children}</>;
 Modal.Actions = ({children}: { children: React.ReactNode }) => <>{children}</>;
+

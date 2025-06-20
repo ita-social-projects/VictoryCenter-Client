@@ -26,3 +26,4 @@ export const MemberComponent = ({member, handleOnDeleteMember, handleOnEditMembe
         </div>
     </div>);
 }
+

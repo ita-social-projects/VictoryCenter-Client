@@ -242,3 +242,4 @@ describe('Modal Component', () => {
         expect(screen.getByText('Fragment Actions')).toBeInTheDocument();
     });
 });
+

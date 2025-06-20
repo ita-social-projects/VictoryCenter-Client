@@ -56,3 +56,4 @@ describe("TeamPageContent", () => {
         expect(screen.getByText("John,Jane")).toBeInTheDocument();
     });
 });
+

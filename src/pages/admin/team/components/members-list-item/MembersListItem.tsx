@@ -39,3 +39,4 @@ export const MembersListItem = ({draggedIndex, index, member, handleDragOver, ha
         </button>
     );
 }
+

@@ -113,3 +113,4 @@ describe('Input component', () => {
         expect(screen.getAllByText('Alice').length).toBeGreaterThan(1);
     });
 });
+

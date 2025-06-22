@@ -1,11 +1,14 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { TeamPage } from "./TeamPage";
-import * as Page1DataFetchModule from "../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch";
+import * as TeamPageDataFetchModule from "../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch";
 
-jest.mock("../../../assets/team_page_images/horse_video.mp4", () => "mocked-video.mp4");
+jest.mock(
+  "../../../assets/team_page_images/horse_video.mp4",
+  () => "mocked-video.mp4"
+);
 
-const spyPage1DataFetch = jest.spyOn(Page1DataFetchModule, "page1DataFetch");
+const spyTeamPageDataFetch = jest.spyOn(TeamPageDataFetchModule, "teamPageDataFetch");
 
 const mockTeamDataSingle = [
   {
@@ -53,12 +56,12 @@ describe("Page1 component", () => {
   });
 
   it("fetches data and displays single team section correctly", async () => {
-    spyPage1DataFetch.mockResolvedValueOnce({
+    spyTeamPageDataFetch.mockResolvedValueOnce({
       teamData: mockTeamDataSingle,
     });
 
     render(<TeamPage />);
-    expect(spyPage1DataFetch).toHaveBeenCalledTimes(1);
+    expect(spyTeamPageDataFetch).toHaveBeenCalledTimes(1);
 
     await waitFor(() => {
       expect(screen.getByText("Основна команда")).toBeInTheDocument();
@@ -81,7 +84,7 @@ describe("Page1 component", () => {
   });
 
   it("renders multiple team sections and assigns 'last-section' class only to the last", async () => {
-    spyPage1DataFetch.mockResolvedValueOnce({
+    spyTeamPageDataFetch.mockResolvedValueOnce({
       teamData: mockTeamDataMultiple,
     });
 
@@ -98,7 +101,7 @@ describe("Page1 component", () => {
   });
 
   it("renders no team sections if data is empty array", async () => {
-    spyPage1DataFetch.mockResolvedValueOnce({
+    spyTeamPageDataFetch.mockResolvedValueOnce({
       teamData: [],
     });
 
@@ -110,7 +113,7 @@ describe("Page1 component", () => {
   });
 
   it("handles fetch error gracefully without crashing", async () => {
-    spyPage1DataFetch.mockRejectedValueOnce(new Error("Fetch failed"));
+    spyTeamPageDataFetch.mockRejectedValueOnce(new Error("Fetch failed"));
 
     render(<TeamPage />);
     await waitFor(() => {
@@ -119,31 +122,31 @@ describe("Page1 component", () => {
   });
 
   it("displays the static quote and author", async () => {
-    spyPage1DataFetch.mockResolvedValueOnce({ teamData: [] });
+    spyTeamPageDataFetch.mockResolvedValueOnce({ teamData: [] });
 
     render(<TeamPage />);
 
     const quoteText =
-      "Я тут, тому що знаю з власного досвіду - коні нас рятують.";
+      "Я тут, тому що знаю з власного досвіду – коні нас рятують.";
     const author = "Вікторія Яковенко";
 
     await waitFor(() => {
       expect(screen.getByText(author)).toBeInTheDocument();
-      expect(screen.getByText((content) => content.includes(quoteText))).toBeInTheDocument();
+      expect(screen.getByText(quoteText)).toBeInTheDocument();
     });
   });
 
   it("renders the background video element", async () => {
-    spyPage1DataFetch.mockResolvedValueOnce({ teamData: [] });
+    spyTeamPageDataFetch.mockResolvedValueOnce({ teamData: [] });
 
     render(<TeamPage />);
 
-    const videoElement = await waitFor(() =>
-      document.querySelector("video")
-    );
+    const videoElement = await waitFor(() => document.querySelector("video"));
 
     expect(videoElement).toBeInTheDocument();
-    expect(videoElement?.querySelector("source")?.getAttribute("src")).toBe("mocked-video.mp4");
+    expect(videoElement?.querySelector("source")?.getAttribute("src")).toBe(
+      "mocked-video.mp4"
+    );
     expect(videoElement?.hasAttribute("autoplay")).toBe(true);
     expect(videoElement?.hasAttribute("loop")).toBe(true);
     expect(videoElement?.hasAttribute("playsinline")).toBe(true);

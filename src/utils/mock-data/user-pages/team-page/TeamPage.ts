@@ -8,7 +8,7 @@ import natalia_zhurbina_photo from '../../../../assets/team_page_images/natalia_
 import merlin_sokoloff_photo from '../../../../assets/team_page_images/merlin_sokoloff_photo.png';
 import martha_mcniel_photo from '../../../../assets/team_page_images/martha_mcniel_photo.png';
 import denise_redmond_photo from '../../../../assets/team_page_images/denise_redmond_photo.png'
-export const page1Mock = {
+export const TeamPageMock = {
     teamData: [
   {
     title: 'ОСНОВНА КОМАНДА',

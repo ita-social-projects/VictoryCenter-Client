@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./TeamPage.scss";
 import horseVideo from "../../../assets/team_page_images/horse_video.mp4";
-import { page1DataFetch } from "../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch";
+import { teamPageDataFetch } from "../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch";
 import { TeamMember } from "./TeamMemberCard/TeamMemberCard";
 
 interface Member {
@@ -23,7 +23,7 @@ export const TeamPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const response = await page1DataFetch();
+        const response = await teamPageDataFetch();
         const { teamData } = response;
         setTeamData(teamData);
         setError(null);
@@ -37,7 +37,7 @@ export const TeamPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="page1-container">
+    <div className="team-page-container">
       {error && (
         <div
           className="error-message"

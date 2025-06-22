@@ -1,9 +1,9 @@
-import { page1DataFetch } from './TeamPageDataFetch';
-import { page1Mock } from '../../../../utils/mock-data/user-pages/team-page/TeamPage';
+import { teamPageDataFetch } from './TeamPageDataFetch';
+import { TeamPageMock } from '../../../../utils/mock-data/user-pages/team-page/TeamPage';
 
-describe('page1DataFetch', () => {
-  it('should return the page1Mock data', async () => {
-    const data = await page1DataFetch();
-    expect(data).toBe(page1Mock);
+describe('teamPageDataFetch', () => {
+  it('should return the  data', async () => {
+    const data = await teamPageDataFetch();
+    expect(data).toBe(TeamPageMock);
   });
 });

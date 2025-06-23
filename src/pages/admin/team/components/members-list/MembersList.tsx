@@ -83,7 +83,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     const [totalPages, setTotalPages] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [teamMemberToDelete, setTeamMemberToDelete] = useState<string | null>(null);
-    const [members, setMembers] = useState<Member[]>(mockMembers);
+    const [members, setMembers] = useState<Member[]>([]);
     const [category, setCategory] = useState<TeamCategory>(() => (localStorage.getItem(currentTabKey) as TeamCategory) || "Основна команда");
     const [isDeleteTeamMemberModalOpen, setIsDeleteTeamMemberModalOpen] = useState(false);
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);

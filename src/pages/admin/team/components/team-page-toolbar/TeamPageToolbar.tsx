@@ -67,8 +67,6 @@ const AddMemberModal = ({
                 {TEAM_PUBLISH}
             </Button>
         </Modal.Actions>
-        {123}
-        {'hello'}
     </Modal>
 );
 

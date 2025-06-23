@@ -21,11 +21,15 @@ victory-center-client/
 │   └── index.html
 ├── src/
 │   ├── assets/                             # Images, icons, fonts, etc.
-<<<<<<< HEAD
-│   │   ├── icons/                          # Icon assets
+│   │   ├── fonts/                          
+│   │   ├── icons/                          
 │   │   ├── images/                         # Image assets
+│   │   │   ├── footer
 │   │   │   ├── admin/                      
-│   │   │   └── header/                     
+│   │   │   └── header/ 
+│   │   ├── sass/
+│   │   │     ├── mixins
+│   │   │      └── variables                   
 │   │   └── styles/                         # Additional styles
 │   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
 │   │   ├── admin/                          # Admin-specific components
@@ -34,12 +38,13 @@ victory-center-client/
 │   │   │   ├── button/                     
 │   │   │   ├── input/                      
 │   │   │   ├── modal/                      
-│   │   │   └── select/                     
+│   │   │   └── select/  
+|   |   ├── footer                   
 │   │   └── header/                         # Header-related components
 │   ├── const/                              # Constants used across the project
+|   |   ├── footer
 │   │   ├── header/                         
 │   │   ├── routes/                         
-│   │   └── team.ts                         
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
 │   │   ├── admin-layout/                   
 │   │   └── main-layout/                               
@@ -53,31 +58,6 @@ victory-center-client/
 │   │       ├── home/                      
 │   │       ├── page1/                         
 │   │       └── page2/                      
-=======
-        ├── images/
-        │  ├── footer
-        |  └── header
-        ├── fonts
-        └── sass/
-            ├── mixins
-            └── variables
-│   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
-|   |   ├── footer
-|   |   └── header
-│   ├── const                               # Constans that will be used across the project
-|   |   ├── footer
-│   │   ├── routes
-|   |   └── header
-│   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
-│   │   └──main-layout
-│   ├── pages/                              # Pages
-│   │   ├── admin
-│   │   ├── not-found
-│   │   └── usesr-pages
-│   │       ├── home-page
-│   │       ├── page-1
-│   │       └── page-2
->>>>>>> d72e93cd1183cb041a4bfff2f72cbb47d082d9b5
 │   ├── routes/                             # Route configuration
 │   │   └── app-router
 │   ├── hooks/                              # Custom React hooks

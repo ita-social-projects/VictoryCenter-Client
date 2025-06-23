@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import { COMMON_QUESTIONS } from "../../../../const/program-page/ProgramPage";
 import { Question } from '../../../../types/ProgramPage';
 import { QuestionCard } from './question-card/QuestionCard';
 import { questionDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/programPageDataFetch';
@@ -26,7 +27,7 @@ export const QuestionSection: React.FC = () => {
     return (
         <div className="qa-section">
             <div className="question-block">
-                <h2>Часті питання</h2>
+                <h2>{COMMON_QUESTIONS}</h2>
                 <div className="qa-block">
                     {error && (
                         <div className="error-message" role="alert" style={{ color: "red" }}>

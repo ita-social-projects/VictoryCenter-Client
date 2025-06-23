@@ -2,6 +2,7 @@
   position: relative;
   height: 100vh;
   width: 100%;
+  
   video {
     height: 100vh;
     width: 100%;
@@ -10,6 +11,7 @@
     z-index: 1;
     pointer-events: none;
   }
+  
   .contact-us-info {
     margin: 0 auto;
     padding-top: 3.75rem;
@@ -17,6 +19,7 @@
     position: relative;
     z-index: 2;
     text-align: center;
+    
     .contact-title {
       font-family: Mulish, sans-serif;
       font-weight: 700;
@@ -28,6 +31,7 @@
       color: #FFFFFF;
       padding-bottom: 19rem;
     }
+    
     .contact-button {
       margin: 0 auto;
       width: 34rem;
@@ -36,6 +40,7 @@
       align-items: center;
       flex-direction: column;
       gap: 2rem;
+      
       h4 {
         font-family: Mulish, sans-serif;
         font-weight: 500;
@@ -45,6 +50,7 @@
         text-align: center;
         color: #FFFFFF;
       }
+      
       button {
         border: none;
         width: 8.125rem;

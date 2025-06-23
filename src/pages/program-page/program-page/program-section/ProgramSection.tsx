@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { PROGRAMS, PROGRAMS_FOR_KIDS, PROGRAMS_FOR_VETERANS, PROGRAMS_ALL} from "../../../../const/program-page/ProgramPage";
 import { Program } from '../../../../types/ProgramPage';
 import { ProgramCard } from './program-card/ProgramCard';
 import { programPageDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/programPageDataFetch';
@@ -26,11 +27,11 @@ export const ProgramSection: React.FC = () => {
     return (
         <div className="program-block">
             <div className="menu-block">
-                <h2>Програми</h2>
+                <h2>{PROGRAMS}</h2>
                 <div className="button-block">
-                    <button className="white-button">Дитячі</button>
-                    <button className="white-button">Ветеранські</button>
-                    <button className="black-button">Всі</button>
+                    <button className="white-button">{PROGRAMS_FOR_KIDS}</button>
+                    <button className="white-button">{PROGRAMS_FOR_VETERANS}</button>
+                    <button className="black-button">{PROGRAMS_ALL}</button>
                 </div>
             </div>
             <div className="cards-block">
@@ -49,3 +50,4 @@ export const ProgramSection: React.FC = () => {
         </div>
     );
 };
+ 

@@ -1,4 +1,10 @@
-export const adminRoute = '/admin-page';
+export const adminRoutes = {
+    adminRoute:      "/admin-page",
+    teamSubRoute:    "team",
+    testSubRoute:    "test",
+    teamPageRoute:   "/admin-page/team",
+    testAdminRoute:  "/admin-page/test",
+};
 
 // user pages routes
 export const page1Route = '/page-1';
@@ -10,6 +16,6 @@ export const userPageRoutes = {
 };
 
 export const routes = {
-    adminRoute,
+    adminRoutes,
     userPageRoutes
 };

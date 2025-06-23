@@ -2,7 +2,7 @@ import React from 'react';
 import { Program } from '../../../../types/ProgramPage';
 import { ProgramSection } from './ProgramSection';
 import { render, screen, waitFor } from '@testing-library/react';
-import * as ProgramPageFetchModule from '../../../../services/data-fetch/program-page-data-fetch/programPageDataFetch';
+import * as ProgramPageFetchModule from '../../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
 
 const spyProgramPageDataFetch = jest.spyOn(ProgramPageFetchModule, "programPageDataFetch");
 

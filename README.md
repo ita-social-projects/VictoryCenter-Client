@@ -21,19 +21,32 @@ victory-center-client/
 │   └── index.html
 ├── src/
 │   ├── assets/                             # Images, icons, fonts, etc.
-|   |   └── images
-|   |       └── header
+│   │   ├── images
+│   │   │   └── header
+│   │   └── program_page_images
+│   │       ├── icons
+│   │       ├── images
+│   │       └── videos
 │   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
 │   │   └── header
 │   ├── const                               # Constans that will be used across the project
-│   │   ├── routes
-|   |   └── header
+│   │   ├── header
+│   │   ├── program-page
+│   │   └── routes
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
-│   │   └──main-layout              
+│   │   └── main-layout              
 │   ├── pages/                              # Pages
 │   │   ├── admin
 │   │   ├── not-found
-│   │   └── usesr-pages
+│   │   ├── program-page
+│   │   │   └── program-page
+│   │   │       ├── contact-section
+│   │   │       ├── intro-section
+│   │   │       ├── program-section
+│   │   │       │   └── program-card
+│   │   │       └── question-section
+│   │   │           └── question-card
+│   │   └── user-pages
 │   │       ├── home-page
 │   │       ├── page-1
 │   │       └── page-2
@@ -45,12 +58,18 @@ victory-center-client/
 │   ├── services/                           # API calls, data services
 │   │   └── data-fetch
 │   │       ├── admin-page-data-fetch
+│   │       ├── program-page-data-fetch
 │   │       └── user-pages-data-fetch
 │   │           ├── home-page-data-fetch
 │   │           ├── page-1-data-fetch
 │   │           └── page-2-data-fetch
+│   ├── types/
 │   ├── utils/                              # Utility functions
+│   │   ├── jest-mock
 │   │   └── mock-data
+│   │       ├── admin-page
+│   │       ├── program-page
+│   │       └── user-pages
 │   ├── index.jsx                           # Entry point (ReactDOM.createRoot)
 │   ├── index.css                           # Global styles (normalizer)
 │   ├── react-app-env.d.ts

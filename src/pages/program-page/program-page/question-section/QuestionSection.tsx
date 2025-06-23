@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import { COMMON_QUESTIONS } from "../../../../const/program-page/ProgramPage";
+import { COMMON_QUESTIONS } from "../../../../const/program-page/program-page";
 import { Question } from '../../../../types/ProgramPage';
 import { QuestionCard } from './question-card/QuestionCard';
-import { questionDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/programPageDataFetch';
-import './QuestionSection.scss';
+import { questionDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
+import './question-section.scss';
 
 export const QuestionSection: React.FC = () => {
     

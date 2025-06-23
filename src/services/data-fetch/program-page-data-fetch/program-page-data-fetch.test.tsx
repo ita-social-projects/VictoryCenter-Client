@@ -1,6 +1,5 @@
-import {programPageDataFetch, questionDataFetch} from "./programPageDataFetch";
-import {MockCards} from "../../../utils/mock-data/program-page/programPage";
-import {MockQuestions} from "../../../utils/mock-data/program-page/programPage";
+import { programPageDataFetch, questionDataFetch } from "./program-page-data-fetch";
+import { MockCards, MockQuestions } from '@utils/mock-data/program-page/program-page';
 
 describe('programPageDataFetch', () => {
     test(('should return the mockCards'), async () => {

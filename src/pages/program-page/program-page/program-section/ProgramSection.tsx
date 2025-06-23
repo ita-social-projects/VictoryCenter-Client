@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { PROGRAMS, PROGRAMS_FOR_KIDS, PROGRAMS_FOR_VETERANS, PROGRAMS_ALL} from "../../../../const/program-page/ProgramPage";
+import { PROGRAMS, PROGRAMS_FOR_KIDS, PROGRAMS_FOR_VETERANS, PROGRAMS_ALL} from "../../../../const/program-page/program-page";
 import { Program } from '../../../../types/ProgramPage';
 import { ProgramCard } from './program-card/ProgramCard';
-import { programPageDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/programPageDataFetch';
-import './ProgramSection.scss'
+import { programPageDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
+import './program-section.scss'
 
 export const ProgramSection: React.FC = () => {
     

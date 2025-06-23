@@ -50,4 +50,3 @@ export const ProgramSection: React.FC = () => {
         </div>
     );
 };
- 

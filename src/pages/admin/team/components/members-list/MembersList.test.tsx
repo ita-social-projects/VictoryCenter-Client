@@ -131,8 +131,10 @@ const sharedDefaultProps: MembersListProps = {
     onAutocompleteValuesChange: jest.fn(),
 };
 
+
+let idCounter = 0;
 const createMockMember = (overrides = {}): Member => ({
-    id: Math.floor(Math.random() * 10000),
+    id: ++idCounter,
     img: 'https://randomuser.me/api/portraits/men/1.jpg',
     fullName: 'First First',
     description: 'Software Engineer',
@@ -155,6 +157,7 @@ describe('MembersList', () => {
     let mockFetchMembers: jest.SpyInstance;
 
     beforeEach(() => {
+        idCounter = 0;
         jest.clearAllMocks();
         localStorageMock.clear();
         resetMockMembers();

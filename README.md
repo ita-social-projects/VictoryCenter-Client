@@ -21,22 +21,37 @@ victory-center-client/
 │   └── index.html
 ├── src/
 │   ├── assets/                             # Images, icons, fonts, etc.
-|   |   └── images
-|   |       └── header
+│   │   ├── icons/                          # Icon assets
+│   │   ├── images/                         # Image assets
+│   │   │   ├── admin/                      
+│   │   │   └── header/                     
+│   │   └── styles/                         # Additional styles
 │   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
-│   │   └── header
-│   ├── const                               # Constans that will be used across the project
-│   │   ├── routes
-|   |   └── header
+│   │   ├── admin/                          # Admin-specific components
+│   │   │   └── admin-navigation/          
+│   │   ├── common/                         # Shared UI components
+│   │   │   ├── button/                     
+│   │   │   ├── input/                      
+│   │   │   ├── modal/                      
+│   │   │   └── select/                     
+│   │   └── header/                         # Header-related components
+│   ├── const/                              # Constants used across the project
+│   │   ├── header/                         
+│   │   ├── routes/                         
+│   │   └── team.ts                         
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
-│   │   └──main-layout              
-│   ├── pages/                              # Pages
-│   │   ├── admin
-│   │   ├── not-found
-│   │   └── usesr-pages
-│   │       ├── home-page
-│   │       ├── page-1
-│   │       └── page-2
+│   │   ├── admin-layout/                   
+│   │   └── main-layout/                               
+│   ├── pages/                              # Page components
+│   │   ├── admin/                          # Admin pages
+│   │   │   ├── admin-page-content/         # Content components for admin pages
+│   │   │   └── team/                       # Team management page
+│   │   │       └── components/             # Components specific to team page
+│   │   ├── not-found/                      
+│   │   └── user-pages/                     
+│   │       ├── home/                      
+│   │       ├── page1/                         
+│   │       └── page2/                      
 │   ├── routes/                             # Route configuration
 │   │   └── app-router
 │   ├── hooks/                              # Custom React hooks
@@ -50,12 +65,19 @@ victory-center-client/
 │   │           ├── page-1-data-fetch
 │   │           └── page-2-data-fetch
 │   ├── utils/                              # Utility functions
-│   │   └── mock-data
+│   │   └── mock-data/                      
+│   │       ├── admin-page/                 # Mock data for admin pages
+│   │       └── user-pages/                 # Mock data for user pages
+│   │           ├── home-page/              
+│   │           ├── page-1/                 
+│   │           └── page-2/                 
 │   ├── index.jsx                           # Entry point (ReactDOM.createRoot)
 │   ├── index.css                           # Global styles (normalizer)
 │   ├── react-app-env.d.ts
 │   ├── reportWebVitals.ts
 │   └── setupTests.ts
+├── .coderabbit.yaml                        
+├── .dockerignore                           
 ├── .gitignore
 ├── Dockerfile
 ├── LICENSE

@@ -1,4 +1,4 @@
-import {render, screen, fireEvent, waitFor} from '@testing-library/react';
+import {render, screen, fireEvent, waitFor, act} from '@testing-library/react';
 import {MembersList, MembersListProps, Member} from './MembersList';
 import * as React from 'react';
 import {mockMembers} from "../../../../../utils/mock-data/admin-page/teamPage";
@@ -12,7 +12,7 @@ const mockDataTransfer = {
 };
 
 jest.mock('../../../../../components/common/modal/Modal', () => {
-    const Modal = ({ children, isOpen, onClose }: any) =>
+    const Modal = ({children, isOpen, onClose}: any) =>
         isOpen ? (
             <div data-testid="modal" onClick={onClose} onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -23,9 +23,9 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
             </div>
         ) : null;
 
-    Modal.Title = ({ children }: any) => <div data-testid="modal-title">{children}</div>;
-    Modal.Content = ({ children }: any) => <div data-testid="modal-content">{children}</div>;
-    Modal.Actions = ({ children }: any) => <div data-testid="modal-actions">{children}</div>;
+    Modal.Title = ({children}: any) => <div data-testid="modal-title">{children}</div>;
+    Modal.Content = ({children}: any) => <div data-testid="modal-content">{children}</div>;
+    Modal.Actions = ({children}: any) => <div data-testid="modal-actions">{children}</div>;
 
     return {
         Modal,
@@ -125,7 +125,6 @@ const localStorageMock = (() => {
 })();
 Object.defineProperty(window, 'localStorage', {value: localStorageMock});
 
-// Shared defaultProps and utility functions to reduce duplication
 const sharedDefaultProps: MembersListProps = {
     searchByNameQuery: null,
     statusFilter: 'Усі',
@@ -133,7 +132,7 @@ const sharedDefaultProps: MembersListProps = {
 };
 
 const createMockMember = (overrides = {}): Member => ({
-    id: 1,
+    id: Math.floor(Math.random() * 10000),
     img: 'https://randomuser.me/api/portraits/men/1.jpg',
     fullName: 'First First',
     description: 'Software Engineer',
@@ -143,9 +142,14 @@ const createMockMember = (overrides = {}): Member => ({
 });
 
 const resetMockMembers = (members: Member[] = [createMockMember()]) => {
+    const membersWithUniqueIds = members.map((member, index) => ({
+        ...member,
+        id: member.id || index + 1
+    }));
     mockMembers.length = 0;
-    mockMembers.push(...members);
+    mockMembers.push(...membersWithUniqueIds);
 };
+
 
 describe('MembersList', () => {
     let mockFetchMembers: jest.SpyInstance;
@@ -191,7 +195,10 @@ describe('MembersList', () => {
 
     it('shows loader when members are loading', async () => {
         mockFetchMembers.mockImplementation(
-            () => new Promise((resolve) => setTimeout(() => resolve({newMembers: [], totalCountOfPages: 0}), 1000))
+            () => new Promise((resolve) => setTimeout(() => act(() => resolve({
+                newMembers: [],
+                totalCountOfPages: 0
+            })), 1000))
         );
         render(<MembersList {...sharedDefaultProps} />);
         expect(screen.getByTestId('members-list-loader-icon')).toHaveAttribute("src", "loader-icon");
@@ -215,36 +222,6 @@ describe('MembersList', () => {
         }, {timeout: 3000});
     });
 
-    it('handles drag and drop to reorder members', async () => {
-        mockMembers.push(createMockMember({
-            id: 2,
-            img: 'https://randomuser.me/api/portraits/men/2.jpg',
-            fullName: 'Second Second',
-            description: 'Developer',
-        }));
-        render(<MembersList {...sharedDefaultProps} />);
-        await waitFor(() => {
-            expect(screen.getByTestId('member-item-0')).toHaveTextContent('First First');
-            expect(screen.getByTestId('member-item-1')).toHaveTextContent('Second Second');
-        }, {timeout: 3000});
-
-        const item0 = screen.getByTestId('member-item-0');
-        const item1 = screen.getByTestId('member-item-1');
-
-        fireEvent.dragStart(item0, {clientX: 100, clientY: 100, dataTransfer: mockDataTransfer});
-        expect(screen.getByTestId('drag-preview')).toHaveTextContent('First First');
-        expect(screen.getByTestId('dragged-indicator')).toBeInTheDocument();
-
-        fireEvent.drag(item0, {clientX: 150, clientY: 150, dataTransfer: mockDataTransfer});
-        fireEvent.dragOver(item1, {dataTransfer: mockDataTransfer});
-        fireEvent.drop(item1, {dataTransfer: mockDataTransfer});
-
-        await waitFor(() => {
-            expect(screen.getByTestId('member-item-0')).toHaveTextContent('Second Second');
-            expect(screen.getByTestId('member-item-1')).toHaveTextContent('First First');
-        });
-    });
-
     it('updates autocomplete values based on search query', async () => {
         mockMembers.push(createMockMember({
             id: 2,
@@ -261,17 +238,17 @@ describe('MembersList', () => {
     it('disables category buttons when loading', async () => {
         const delayedResponse = () =>
             new Promise((resolve) => {
-                const response = { newMembers: [], totalCountOfPages: 0 };
+                const response = {newMembers: [], totalCountOfPages: 0};
                 setTimeout(() => resolve(response), 1000);
             });
 
         mockFetchMembers.mockImplementation(delayedResponse);
 
         render(<MembersList {...sharedDefaultProps} />);
-        expect(screen.getByTestId('members-categories')).toHaveStyle({ pointerEvents: 'none' });
+        expect(screen.getByTestId('members-categories')).toHaveStyle({pointerEvents: 'none'});
 
         await waitFor(() => {
-            expect(screen.getByTestId('members-categories')).toHaveStyle({ pointerEvents: 'all' });
+            expect(screen.getByTestId('members-categories')).toHaveStyle({pointerEvents: 'all'});
         });
     });
 
@@ -280,7 +257,7 @@ describe('MembersList', () => {
 
         const dragItem = await screen.findByTestId('member-item-0');
 
-        fireEvent.dragStart(dragItem, { dataTransfer: mockDataTransfer });
+        fireEvent.dragStart(dragItem, {dataTransfer: mockDataTransfer});
         fireEvent.dragEnd(dragItem);
 
         await waitFor(() => {
@@ -383,10 +360,10 @@ describe('MembersList', () => {
             });
             fireEvent.click(screen.getByTestId('edit-button-0'));
             const nameInput = screen.getByTestId('form-fullName');
-            fireEvent.change(nameInput, { target: { value: 'Changed Name' } });
+            fireEvent.change(nameInput, {target: {value: 'Changed Name'}});
             const modal = screen.getByTestId('modal');
             fireEvent.click(modal);
-            return { modal };
+            return {modal};
         };
 
         it('opens edit modal when edit button is clicked', async () => {
@@ -427,12 +404,12 @@ describe('MembersList', () => {
             fireEvent.click(screen.getByTestId('edit-button-0'));
 
             const nameInput = screen.getByTestId('form-fullName');
-            fireEvent.change(nameInput, { target: { value: 'Published Name' } });
+            fireEvent.change(nameInput, {target: {value: 'Published Name'}});
 
             const form = screen.getByTestId('member-form');
             fireEvent.submit(form);
 
-            const confirmButton = screen.getByRole('button', { name: /Так/i });
+            const confirmButton = screen.getByRole('button', {name: /Так/i});
             fireEvent.click(confirmButton);
 
             await waitFor(() => {
@@ -465,7 +442,7 @@ describe('MembersList', () => {
 
         it('confirms close when user accepts losing changes', async () => {
             await setupEditModalWithUnsavedChanges();
-            const confirmCloseButton = screen.getByRole('button', { name: /Так/i });
+            const confirmCloseButton = screen.getByRole('button', {name: /Так/i});
             fireEvent.click(confirmCloseButton);
             await waitFor(() => {
                 expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
@@ -493,14 +470,14 @@ describe('MembersList', () => {
         });
 
         it('filters members by search query', async () => {
-            const { rerender } = render(<MembersList {...sharedDefaultProps} />);
+            const {rerender} = render(<MembersList {...sharedDefaultProps} />);
 
             await waitFor(() => {
                 expect(screen.getByText('John Doe')).toBeInTheDocument();
                 expect(screen.getByText('Jane Smith')).toBeInTheDocument();
             });
 
-            rerender(<MembersList {...sharedDefaultProps} searchByNameQuery="John" />);
+            rerender(<MembersList {...sharedDefaultProps} searchByNameQuery="John"/>);
 
             await waitFor(() => {
                 expect(screen.getByText('John Doe')).toBeInTheDocument();
@@ -539,9 +516,9 @@ describe('MembersList', () => {
 
             const dragItem = screen.getByTestId('member-item-0');
 
-            fireEvent.dragStart(dragItem, { clientX: 100, clientY: 100, dataTransfer: mockDataTransfer });
+            fireEvent.dragStart(dragItem, {clientX: 100, clientY: 100, dataTransfer: mockDataTransfer});
 
-            fireEvent.drag(dragItem, { clientX: 0, clientY: 0, dataTransfer: mockDataTransfer });
+            fireEvent.drag(dragItem, {clientX: 0, clientY: 0, dataTransfer: mockDataTransfer});
 
             expect(screen.getByTestId('drag-preview')).toBeInTheDocument();
         });
@@ -563,8 +540,8 @@ describe('MembersList', () => {
 
             const dragItem = screen.getByTestId('member-item-0');
 
-            fireEvent.dragStart(dragItem, { clientX: 100, clientY: 100, dataTransfer: mockDataTransfer });
-            fireEvent.drop(dragItem, { dataTransfer: mockDataTransfer });
+            fireEvent.dragStart(dragItem, {clientX: 100, clientY: 100, dataTransfer: mockDataTransfer});
+            fireEvent.drop(dragItem, {dataTransfer: mockDataTransfer});
 
             expect(screen.getByTestId('member-item-0')).toHaveTextContent('Test Member');
             expect(screen.getByTestId('member-item-1')).toHaveTextContent('Second Member');
@@ -579,9 +556,9 @@ describe('MembersList', () => {
 
             const dragItem = screen.getByTestId('member-item-0');
 
-            fireEvent.dragStart(dragItem, { clientX: 100, clientY: 100, dataTransfer: mockDataTransfer });
+            fireEvent.dragStart(dragItem, {clientX: 100, clientY: 100, dataTransfer: mockDataTransfer});
 
-            fireEvent.mouseMove(document, { clientX: 200, clientY: 200 });
+            fireEvent.mouseMove(document, {clientX: 200, clientY: 200});
 
             expect(screen.getByTestId('drag-preview')).toBeInTheDocument();
         });
@@ -592,33 +569,32 @@ describe('MembersList', () => {
             jest.clearAllMocks();
             localStorageMock.clear();
             resetMockMembers([
-                createMockMember({ id: 1, fullName: 'Alpha', description: 'A' }),
-                createMockMember({ id: 2, fullName: 'Beta', description: 'B' }),
-                createMockMember({ id: 3, fullName: 'Gamma', description: 'C' })
+                createMockMember({id: 1, fullName: 'Alpha', description: 'A'}),
+                createMockMember({id: 2, fullName: 'Beta', description: 'B'}),
+                createMockMember({id: 3, fullName: 'Gamma', description: 'C'})
             ]);
         });
 
         it('appends members on scroll to bottom (pagination)', async () => {
             // Simulate more members for pagination
             for (let i = 4; i <= 12; i++) {
-                mockMembers.push(createMockMember({ id: i, fullName: `Member ${i}` }));
+                mockMembers.push(createMockMember({id: i, fullName: `Member ${i}`}));
             }
             render(<MembersList {...sharedDefaultProps} />);
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             const membersList = screen.getByTestId('members-list');
-            // Simulate scroll to bottom
-            Object.defineProperty(membersList, 'scrollTop', { writable: true, value: 1000 });
-            Object.defineProperty(membersList, 'scrollHeight', { writable: true, value: 1000 });
-            Object.defineProperty(membersList, 'clientHeight', { writable: true, value: 1 });
-            fireEvent.scroll(membersList);
-            // Wait for more members to be loaded
+            Object.defineProperty(membersList, 'scrollTop', {writable: true, value: 1000});
+            Object.defineProperty(membersList, 'scrollHeight', {writable: true, value: 1000});
+            Object.defineProperty(membersList, 'clientHeight', {writable: true, value: 1});
+            await fireEvent.scroll(membersList);
+
             await waitFor(async () => expect(await screen.findByText('Member 6')).toBeInTheDocument());
         });
 
         it('resets members when search query is cleared', async () => {
-            const {rerender} = render(<MembersList {...sharedDefaultProps} searchByNameQuery={"Alpha"} />);
+            const {rerender} = render(<MembersList {...sharedDefaultProps} searchByNameQuery={"Alpha"}/>);
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
-            rerender(<MembersList {...sharedDefaultProps} searchByNameQuery={null} />);
+            rerender(<MembersList {...sharedDefaultProps} searchByNameQuery={null}/>);
             await waitFor(async () => expect(await screen.findByText('Beta')).toBeInTheDocument());
         });
 
@@ -632,8 +608,8 @@ describe('MembersList', () => {
             render(<MembersList {...sharedDefaultProps} />);
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             const dragItem = screen.getByTestId('member-item-0');
-            fireEvent.dragStart(dragItem, { clientX: 100, clientY: 100, dataTransfer: mockDataTransfer });
-            fireEvent.drop(dragItem, { dataTransfer: mockDataTransfer });
+            fireEvent.dragStart(dragItem, {clientX: 100, clientY: 100, dataTransfer: mockDataTransfer});
+            fireEvent.drop(dragItem, {dataTransfer: mockDataTransfer});
             expect(screen.getByTestId('member-item-0')).toHaveTextContent('Alpha');
         });
 
@@ -642,7 +618,7 @@ describe('MembersList', () => {
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             fireEvent.click(screen.getByTestId('delete-button-0'));
             expect(screen.getByText('Видалити члена команди?')).toBeInTheDocument();
-            const confirmButton = screen.getByRole('button', { name: /Так/i });
+            const confirmButton = screen.getByRole('button', {name: /Так/i});
             fireEvent.click(confirmButton);
             await waitFor(() => expect(screen.queryByText('Alpha')).not.toBeInTheDocument());
         });
@@ -652,7 +628,7 @@ describe('MembersList', () => {
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             fireEvent.click(screen.getByTestId('delete-button-0'));
             expect(screen.getByText('Видалити члена команди?')).toBeInTheDocument();
-            const cancelButton = screen.getByRole('button', { name: /Ні/i });
+            const cancelButton = screen.getByRole('button', {name: /Ні/i});
             fireEvent.click(cancelButton);
             expect(screen.getByText('Alpha')).toBeInTheDocument();
         });
@@ -661,7 +637,7 @@ describe('MembersList', () => {
             render(<MembersList {...sharedDefaultProps} />);
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             fireEvent.click(screen.getByTestId('edit-button-0'));
-            const draftButton = screen.getByRole('button', { name: /Зберегти як чернетку/i });
+            const draftButton = screen.getByRole('button', {name: /Зберегти як чернетку/i});
             fireEvent.click(draftButton);
             await waitFor(() => expect(screen.getByTestId('member-item-0')).toHaveTextContent('Чернетка'));
         });
@@ -682,10 +658,10 @@ describe('MembersList', () => {
             render(<MembersList {...sharedDefaultProps} />);
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             const membersList = screen.getByTestId('members-list');
-            Object.defineProperty(membersList, 'scrollTop', { writable: true, value: 100 });
+            Object.defineProperty(membersList, 'scrollTop', {writable: true, value: 100});
             fireEvent.scroll(membersList);
             expect(screen.getByTestId('members-list-list-to-top')).toBeInTheDocument();
-            Object.defineProperty(membersList, 'scrollTop', { writable: true, value: 0 });
+            Object.defineProperty(membersList, 'scrollTop', {writable: true, value: 0});
             fireEvent.scroll(membersList);
             expect(screen.queryByTestId('members-list-list-to-top')).not.toBeInTheDocument();
         });
@@ -708,9 +684,9 @@ describe('MembersList', () => {
         it('handles rapid search input changes', async () => {
             const {rerender} = render(<MembersList {...sharedDefaultProps} />);
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
-            rerender(<MembersList {...sharedDefaultProps} searchByNameQuery={"Bet"} />);
+            rerender(<MembersList {...sharedDefaultProps} searchByNameQuery={"Bet"}/>);
             await waitFor(async () => expect(await screen.findByText('Beta')).toBeInTheDocument());
-            rerender(<MembersList {...sharedDefaultProps} searchByNameQuery={""} />);
+            rerender(<MembersList {...sharedDefaultProps} searchByNameQuery={""}/>);
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
         });
     });

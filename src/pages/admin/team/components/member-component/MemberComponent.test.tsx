@@ -25,6 +25,8 @@ const mockMemberPublished: Member  = {
 const mockHandleOnDeleteMember = jest.fn();
 const mockHandleOnEditMember = jest.fn();
 
+jest.mock('../../../../../assets/images/admin/blank-user.svg', () => 'blank-user.svg');
+
 describe('MemberComponent', () => {
     beforeEach(() => {
         jest.clearAllMocks();
@@ -219,7 +221,7 @@ describe('MemberComponent', () => {
 
             const image = screen.getByRole('img');
             const srcAttribute = image.getAttribute('src');
-            expect(srcAttribute).toBe(null);
+            expect(srcAttribute).toBe('blank-user.svg');
             expect(image).toHaveAttribute('alt', '-img');
         });
 

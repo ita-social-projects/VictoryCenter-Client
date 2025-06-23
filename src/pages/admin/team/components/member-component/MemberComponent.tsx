@@ -1,10 +1,11 @@
 import React from "react";
 import {Member} from "../members-list/MembersList";
 import "./member-component.scss"
+import BlankUserImage from "../../../../../assets/images/admin/blank-user.svg"
 export const MemberComponent = ({member, handleOnDeleteMember, handleOnEditMember}: {member: Member, handleOnDeleteMember: (fullName: string) => void, handleOnEditMember: (id: number) => void }) => {
     return (<div className='members-item'>
         <div className='members-profile'>
-            <img src={member.img} alt={`${member.fullName}-img`}/>
+            <img src={member.img || BlankUserImage} alt={`${member.fullName}-img`}/>
             <p>{member.fullName}</p>
         </div>
         <div className='members-position'>

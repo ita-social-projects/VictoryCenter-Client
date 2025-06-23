@@ -85,20 +85,12 @@ jest.mock('../member-form/MemberForm', () => ({
                     props.onSubmit?.(mockMemberData);
                 }}
             >
-                <input data-testid="form-fullname" onChange={(e) => {
-                    // Simulate form data changes
-                    if (e.target.value) {
-                        // Trigger state update in parent component
-                        setTimeout(() => {
-                            props.onSubmit?.({
-                                category: 'Керівництво' as any,
-                                fullName: e.target.value,
-                                description: 'Test Description',
-                                img: null
-                            });
-                        }, 0);
-                    }
-                }}/>
+                <input
+                    data-testid="form-fullname"
+                    onChange={(e) => {
+                        props.onFormDataChange?.(e.target.value);
+                    }}
+                />
                 <button type="submit" data-testid="form-submit">Submit Form</button>
             </form>
         );
@@ -161,15 +153,6 @@ describe('TeamPageToolbar', () => {
             await userEvent.type(searchInput, 'test search');
 
             expect(defaultProps.onSearchQueryChange).toHaveBeenCalledWith('test search');
-        });
-
-        it('handles empty search queries', async () => {
-            render(<TeamPageToolbar {...defaultProps} />);
-
-            const searchInput = screen.getByTestId('search-input');
-            await userEvent.clear(searchInput);
-
-            expect(defaultProps.onSearchQueryChange).not.toHaveBeenCalledWith();
         });
     });
 

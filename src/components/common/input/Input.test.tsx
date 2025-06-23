@@ -49,14 +49,14 @@ describe('Input component', () => {
     });
 
     it('renders input field and icons', () => {
-        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
+        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues}  placeholder={''}/>);
         expect(screen.getByTestId('input-field')).toBeInTheDocument();
         expect(screen.getByTestId('search-icon')).toBeInTheDocument();
         expect(screen.getByTestId('remove-query-icon')).toBeInTheDocument();
     });
 
     it('updates input value and calls onChange when typing', () => {
-        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
+        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues}  placeholder={''}/>);
 
         const input = screen.getByTestId('input-field');
         fireEvent.change(input, { target: { value: 'A' } });
@@ -65,7 +65,7 @@ describe('Input component', () => {
     });
 
     it('clears the input and triggers onChange when remove icon is clicked', () => {
-        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
+        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues}  placeholder={''}/>);
 
         const input = screen.getByTestId('input-field');
         fireEvent.change(input, { target: { value: 'Bob' } });
@@ -75,7 +75,7 @@ describe('Input component', () => {
     });
 
     it('focuses the input when search icon is clicked', () => {
-        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
+        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues}  placeholder={''}/>);
 
         const input = screen.getByTestId('input-field') as HTMLInputElement;
         jest.spyOn(input, 'focus');
@@ -84,7 +84,7 @@ describe('Input component', () => {
     });
 
     it('does not open autocomplete dropdown if input is empty', () => {
-        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
+        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues}  placeholder={"Пошук за ім'ям"}/>);
         const input = screen.getByPlaceholderText("Пошук за ім'ям");
         const select = screen.getByTestId('select');
         const selectContainer = select;
@@ -95,12 +95,12 @@ describe('Input component', () => {
     });
 
     it('renders no autocomplete options if autocompleteValues is empty', () => {
-        render(<Input onChange={onChangeMock} autocompleteValues={[]} />);
+        render(<Input onChange={onChangeMock} autocompleteValues={[]}  placeholder={''}/>);
         expect(screen.queryByTestId('select-option-')).not.toBeInTheDocument();
     });
 
     it('calls onChange with empty string when remove icon is clicked after input is already empty', () => {
-        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues} />);
+        render(<Input onChange={onChangeMock} autocompleteValues={autocompleteValues}  placeholder={''}/>);
         const input = screen.getByTestId('input-field');
         expect(input).toHaveValue('');
         fireEvent.click(screen.getByTestId('remove-query-icon'));
@@ -109,7 +109,7 @@ describe('Input component', () => {
 
     it('does not crash if autocompleteValues contains duplicate values', () => {
         const valuesWithDuplicates = ['Alice', 'Alice', 'Bob'];
-        render(<Input onChange={onChangeMock} autocompleteValues={valuesWithDuplicates} />);
+        render(<Input onChange={onChangeMock} autocompleteValues={valuesWithDuplicates}  placeholder={''}/>);
         expect(screen.getAllByText('Alice').length).toBeGreaterThan(1);
     });
 });

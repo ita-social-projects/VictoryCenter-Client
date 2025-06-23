@@ -1,6 +1,17 @@
 import CloudDownload from "../../../../../assets/icons/cloud-download.svg";
 import React, {ChangeEvent, FormEvent, useEffect, useState} from "react";
 import {TeamCategory} from "../../TeamPage";
+import {
+  TEAM_CATEGORY_MAIN,
+  TEAM_CATEGORY_SUPERVISORY,
+  TEAM_CATEGORY_ADVISORS,
+  TEAM_LABEL_CATEGORY,
+  TEAM_LABEL_SELECT_CATEGORY,
+  TEAM_LABEL_FULLNAME,
+  TEAM_LABEL_DESCRIPTION,
+  TEAM_LABEL_PHOTO,
+  TEAM_LABEL_DRAG_DROP
+} from '../../../../../const/team';
 
 export type MemberFormValues = {
     category: TeamCategory,
@@ -70,30 +81,30 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
     return (<form id={id} onSubmit={handleOnSubmit} data-testid="test-form">
         <div className='members-add-modal-body'>
             <div className='form-group'>
-                <label htmlFor="category">Категорія</label>
+                <label htmlFor="category">{TEAM_LABEL_CATEGORY}</label>
                 <select value={memberFormValues ? memberFormValues.category : ''} onChange={handleMemberFormValuesChange} name="category" id="category">
-                    <option value="" selected disabled>Виберіть категорію</option>
-                    <option value="Основна команда">Основна команда</option>
-                    <option value="Наглядова рада">Наглядова рада</option>
-                    <option value="Радники">Радники</option>
+                    <option value="" disabled>{TEAM_LABEL_SELECT_CATEGORY}</option>
+                    <option value={TEAM_CATEGORY_MAIN}>{TEAM_CATEGORY_MAIN}</option>
+                    <option value={TEAM_CATEGORY_SUPERVISORY}>{TEAM_CATEGORY_SUPERVISORY}</option>
+                    <option value={TEAM_CATEGORY_ADVISORS}>{TEAM_CATEGORY_ADVISORS}</option>
                 </select>
             </div>
             <div className='form-group'>
-                <label htmlFor="fullName">Ім'я та Прізвище</label>
+                <label htmlFor="fullName">{TEAM_LABEL_FULLNAME}</label>
                 <input value={memberFormValues ? memberFormValues.fullName : ''} maxLength={MAX_FULLNAME_LENGTH} onChange={handleMemberFormValuesChange} name='fullName'
                        type="text" id='fullName'/>
                 <div
                     className='form-group-fullname-length-limit'>{memberFormValues?.fullName ? memberFormValues.fullName.length : 0}/{MAX_FULLNAME_LENGTH}</div>
             </div>
             <div className='form-group'>
-                <label htmlFor="description">Опис</label>
+                <label htmlFor="description">{TEAM_LABEL_DESCRIPTION}</label>
                 <textarea value={memberFormValues ? memberFormValues.description : ''} maxLength={MAX_DESCRIPTION_LENGTH} onChange={handleMemberFormValuesChange}
                           name='description' className='form-group-description' id='description'/>
                 <div
                     className='form-group-description-length-limit'>{memberFormValues?.description ? memberFormValues.description.length : 0}/{MAX_DESCRIPTION_LENGTH}</div>
             </div>
             <div className='form-group form-group-image'>
-                <span><span className='form-group-image-required'>*</span>Фото</span>
+                <span><span className='form-group-image-required'>*</span>{TEAM_LABEL_PHOTO}</span>
                 <div className='form-group-image-details'>
                     <label
                         onDragOver={e => e.preventDefault()}
@@ -102,7 +113,7 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
                         htmlFor="image" className='form-group-image-choose-file'>
                         <div className='form-group-image-choose-file-inner' data-testid='drop-area'>
                             <img src={CloudDownload} alt="cloud-download"/>
-                            <span>Перетягніть файл сюди або натисніть для завантаження</span>
+                            <span>{TEAM_LABEL_DRAG_DROP}</span>
                         </div>
                     </label>
                     <input data-testid="image" onChange={handleMemberFormValuesChange} name='img' type="file" id='image'/>

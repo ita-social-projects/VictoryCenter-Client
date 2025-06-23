@@ -1,11 +1,24 @@
 import PlusIcon from "../../../../../assets/icons/plus.svg";
-import React, { useState, useCallback } from "react";
-import { Modal } from "../../../../../components/common/modal/Modal";
-import { TeamCategory } from "../../TeamPage";
-import { Button } from "../../../../../components/common/button/Button";
-import { Select } from "../../../../../components/common/select/Select";
-import { Input } from "../../../../../components/common/input/Input";
-import { MemberForm, MemberFormValues } from "../member-form/MemberForm";
+import React, {useState, useCallback} from "react";
+import {Modal} from "../../../../../components/common/modal/Modal";
+import {TeamCategory} from "../../TeamPage";
+import {Button} from "../../../../../components/common/button/Button";
+import {Select} from "../../../../../components/common/select/Select";
+import {Input} from "../../../../../components/common/input/Input";
+import {MemberForm, MemberFormValues} from "../member-form/MemberForm";
+import {
+    TEAM_ADD_MEMBER,
+    TEAM_SAVE_AS_DRAFT,
+    TEAM_PUBLISH,
+    TEAM_PUBLISH_NEW_MEMBER,
+    TEAM_CONFIRM,
+    TEAM_CANCEL,
+    TEAM_CHANGES_LOST,
+    TEAM_STATUS_ALL,
+    TEAM_STATUS_PUBLISHED,
+    TEAM_STATUS_DRAFT,
+    SEARCH_BY_NAME
+} from '../../../../../const/team';
 
 export type TeamPageToolbarProps = {
     onSearchQueryChange: (query: string) => void;
@@ -42,16 +55,16 @@ const AddMemberModal = ({
     onSaveDraft: (member: MemberFormValues) => void;
 }) => (
     <Modal onClose={onClose} isOpen={isOpen} data-testid="add-member-modal">
-        <Modal.Title>Додати в команду</Modal.Title>
+        <Modal.Title>{TEAM_ADD_MEMBER}</Modal.Title>
         <Modal.Content>
-            <MemberForm id="add-member-modal" onSubmit={onPublish} />
+            <MemberForm id="add-member-modal" onSubmit={onPublish}/>
         </Modal.Content>
         <Modal.Actions>
             <Button onClick={() => onSaveDraft({} as MemberFormValues)} buttonStyle="secondary">
-                Зберегти як чернетку
+                {TEAM_SAVE_AS_DRAFT}
             </Button>
             <Button form="add-member-modal" type="submit" buttonStyle="primary">
-                Опублікувати
+                {TEAM_PUBLISH}
             </Button>
         </Modal.Actions>
         {123}
@@ -69,15 +82,15 @@ const ConfirmPublishModal = ({
     onConfirm: () => void;
 }) => (
     <Modal isOpen={isOpen} onClose={onCancel} data-testid="publish-confirm-modal">
-        <Modal.Title>Опублікувати нового члена команди?</Modal.Title>
+        <Modal.Title>{TEAM_PUBLISH_NEW_MEMBER}</Modal.Title>
         <Modal.Content>
         </Modal.Content>
         <Modal.Actions>
             <Button onClick={onCancel} buttonStyle="secondary">
-                Ні
+                {TEAM_CANCEL}
             </Button>
             <Button onClick={onConfirm} buttonStyle="primary">
-                Так
+                {TEAM_CONFIRM}
             </Button>
         </Modal.Actions>
     </Modal>
@@ -93,16 +106,16 @@ const ConfirmCloseModal = ({
     onConfirm: () => void;
 }) => (
     <Modal isOpen={isOpen} onClose={onCancel} data-testid="confirm-close-modal">
-        <Modal.Title>Зміни буде втрачено. Бажаєте продовжити?</Modal.Title>
+        <Modal.Title>{TEAM_CHANGES_LOST}</Modal.Title>
         <Modal.Content>
 
         </Modal.Content>
         <Modal.Actions>
             <Button onClick={onCancel} buttonStyle="secondary">
-                Ні
+                {TEAM_CANCEL}
             </Button>
             <Button onClick={onConfirm} buttonStyle="primary">
-                Так
+                {TEAM_CONFIRM}
             </Button>
         </Modal.Actions>
     </Modal>
@@ -125,7 +138,7 @@ export const TeamPageToolbar = ({
     const [formData, setFormData] = useState<MemberFormData>(null);
 
     const updateModalState = useCallback((updates: Partial<ModalState>) => {
-        setModalState(prev => ({ ...prev, ...updates }));
+        setModalState(prev => ({...prev, ...updates}));
     }, []);
 
     const hasUnsavedChanges = useCallback(() => {
@@ -148,13 +161,13 @@ export const TeamPageToolbar = ({
     }, []);
 
     const handleOpenAddMember = useCallback(() => {
-        updateModalState({ addMember: true });
+        updateModalState({addMember: true});
     }, [updateModalState]);
 
     const handleFormSubmit = useCallback((member: MemberFormValues) => {
         setPendingMemberData(member);
         setFormData(member);
-        updateModalState({ confirmPublish: true });
+        updateModalState({confirmPublish: true});
     }, [updateModalState]);
 
     const handleSaveAsDraft = useCallback((member: MemberFormValues) => {
@@ -164,7 +177,7 @@ export const TeamPageToolbar = ({
 
     const handleCancelPublish = useCallback(() => {
         setPendingMemberData(null);
-        updateModalState({ confirmPublish: false });
+        updateModalState({confirmPublish: false});
     }, [updateModalState]);
 
     const handleConfirmPublish = useCallback(() => {
@@ -176,14 +189,14 @@ export const TeamPageToolbar = ({
 
     const handleCloseAddMember = useCallback(() => {
         if (hasUnsavedChanges()) {
-            updateModalState({ confirmClose: true });
+            updateModalState({confirmClose: true});
         } else {
             resetState();
         }
     }, [hasUnsavedChanges, updateModalState, resetState]);
 
     const handleCancelClose = useCallback(() => {
-        updateModalState({ confirmClose: false });
+        updateModalState({confirmClose: false});
     }, [updateModalState]);
 
     const handleConfirmClose = useCallback(() => {
@@ -206,24 +219,26 @@ export const TeamPageToolbar = ({
             <div className="toolbar">
                 <div className="toolbar-search">
                     <Input
-                        onChange={onSearchQueryChange}
+                        onChange={(e) => {
+                            onSearchQueryChange(e);
+                        }}
                         autocompleteValues={autocompleteValues}
                         data-testid="search-input"
-                    />
+                        placeholder={SEARCH_BY_NAME}/>
                 </div>
                 <div className="toolbar-actions">
                     <Select onValueChange={onStatusFilterChange} data-testid="status-filter">
-                        <Select.Option name="Усі" value="Усі" />
-                        <Select.Option name="Опубліковано" value="Опубліковано" />
-                        <Select.Option name="Чернетка" value="Чернетка" />
+                        <Select.Option key={1} name={TEAM_STATUS_ALL} value={TEAM_STATUS_ALL}/>
+                        <Select.Option key={2} name={TEAM_STATUS_PUBLISHED} value={TEAM_STATUS_PUBLISHED}/>
+                        <Select.Option key={3} name={TEAM_STATUS_DRAFT} value={TEAM_STATUS_DRAFT}/>
                     </Select>
                     <Button
                         onClick={handleOpenAddMember}
                         buttonStyle="primary"
                         data-testid="add-member-button"
                     >
-                        Додати в команду{' '}
-                        <img src={PlusIcon} alt="plus" />
+                        {TEAM_ADD_MEMBER}{' '}
+                        <img src={PlusIcon} alt="plus"/>
                     </Button>
                 </div>
             </div>

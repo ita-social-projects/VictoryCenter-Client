@@ -11,6 +11,20 @@ import {StatusFilter} from "../team-page-toolbar/TeamPageToolbar";
 import {MemberForm, MemberFormValues} from "../member-form/MemberForm";
 import "./members-list.scss"
 import {mockMembers} from "../../../../../utils/mock-data/admin-page/teamPage";
+import {
+  TEAM_DELETE_MEMBER,
+  TEAM_EDIT_MEMBER,
+  TEAM_SAVE_AS_DRAFT,
+  TEAM_PUBLISH,
+  TEAM_PUBLISH_NEW_MEMBER,
+  TEAM_CONFIRM,
+  TEAM_CANCEL,
+  TEAM_CHANGES_LOST,
+  TEAM_CATEGORY_MAIN,
+  TEAM_CATEGORY_SUPERVISORY,
+  TEAM_CATEGORY_ADVISORS,
+  TEAM_NOT_FOUND
+} from '../../../../../const/team';
 
 export type Member = {
     id: number;
@@ -35,17 +49,33 @@ export type MemberDragPreviewModel = {
 };
 
 const currentTabKey = "currentTab";
-export const fetchMembers = async (category: string, pageSize: number, pageNumber: number): Promise<{
-    newMembers: Member[],
-    totalCountOfPages: number
+export const fetchMembers = async (
+  category: string,
+  pageSize: number,
+  pageNumber: number,
+  searchQuery: string = '',
+  statusFilter: StatusFilter = 'Усі'
+): Promise<{
+  newMembers: Member[],
+  totalCountOfPages: number
 }> => {
-    const some = (pageNumber - 1) * pageSize;
-    const filteredAndSortedMembers = mockMembers.filter(m => m.category === category).sort((a, b) => a.id - b.id);
-
-    return {
-        newMembers: filteredAndSortedMembers.slice(some, some + pageSize),
-        totalCountOfPages: Math.ceil(filteredAndSortedMembers.length / pageSize)
-    }
+  await new Promise((resolve) => setTimeout(resolve, 200));
+  let filtered = mockMembers;
+  if (category) {
+    filtered = filtered.filter(m => m.category === category);
+  }
+  if (searchQuery) {
+    filtered = filtered.filter(m => m.fullName.toLowerCase().includes(searchQuery.toLowerCase()));
+  }
+  if (statusFilter && statusFilter !== 'Усі') {
+    filtered = filtered.filter(m => m.status === statusFilter);
+  }
+  filtered = filtered.sort((a, b) => a.id - b.id);
+  const some = (pageNumber - 1) * pageSize;
+  return {
+    newMembers: filtered.slice(some, some + pageSize),
+    totalCountOfPages: Math.ceil(filtered.length / pageSize)
+  };
 };
 
 export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValuesChange}: MembersListProps) => {
@@ -93,6 +123,8 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
     const loadMembers = useCallback(async (reset: boolean = false) => {
         const currentCategory = categoryRef.current;
+        const currentSearch = searchByNameQuery || '';
+        const currentStatus = statusFilter;
         if (!currentCategory || isFetchingRef.current) return;
         if (!reset && totalPagesRef.current && currentPageRef.current > totalPagesRef.current) return;
 
@@ -101,7 +133,13 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
         const pageToFetch = reset ? 1 : currentPageRef.current;
 
-        const {newMembers, totalCountOfPages} = await fetchMembers(currentCategory, pageSize, pageToFetch);
+        const { newMembers, totalCountOfPages } = await fetchMembers(
+            currentCategory,
+            pageSize,
+            pageToFetch,
+            currentSearch,
+            currentStatus
+        );
 
         setMembers(prev => reset ? [...newMembers] : [...prev, ...newMembers]);
         setCurrentPage(prev => reset ? 2 : prev + 1);
@@ -111,18 +149,17 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
         setIsMembersLoading(false);
         isFetchingRef.current = false;
-    }, []);
+    }, [searchByNameQuery, statusFilter]);
 
     useEffect(() => {
-        if (category) {
-            setMembers([]);
-            setCurrentPage(1);
-            isFetchingRef.current = false;
-            loadMembers();
-        }
-    }, [category, loadMembers]);
+        setMembers([]);
+        setCurrentPage(1);
+        setTotalPages(null);
+        isFetchingRef.current = false;
+        loadMembers(true);
+    }, [category, searchByNameQuery, statusFilter, loadMembers]);
 
-    const handleDragStart = (e: React.DragEvent<HTMLButtonElement>, index: number) => {
+    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
         setDraggedIndex(index);
         setDragPreview({
             visible: true,
@@ -136,7 +173,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         e.dataTransfer.setDragImage(dragImage, 0, 0);
     };
 
-    const handleDrag = (e: React.DragEvent<HTMLButtonElement>) => {
+    const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
 
         if (e.clientX !== 0 && e.clientY !== 0) {
             setDragPreview(prev => ({
@@ -157,7 +194,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         setDraggedIndex(null);
     };
 
-    const handleDragOver = (e: React.DragEvent<HTMLButtonElement>) => {
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
     };
 
@@ -214,19 +251,6 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
             localStorage.setItem(currentTabKey, category);
         }
     }, [category]);
-
-
-    useEffect(() => {
-        if (searchByNameQuery) {
-            setMembers(mockMembers.filter(m => m.fullName.toLowerCase().includes(searchByNameQuery.toLowerCase())));
-        } else {
-            setMembers([]);
-            setCurrentPage(1);
-            setTotalPages(null);
-            isFetchingRef.current = false;
-            loadMembers(true);
-        }
-    }, [loadMembers, searchByNameQuery]);
 
     useEffect(() => {
         if (isMembersLoading && memberListRef.current) {
@@ -384,7 +408,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
                     alt="members-not-found"
                     data-testid="members-not-found-icon"
                 />
-                <p>Нічого не знайдено</p>
+                <p>{TEAM_NOT_FOUND}</p>
             </div>
         );
     } else {
@@ -399,16 +423,12 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
             <div className='members'>
                 <div data-testid="members-categories" className='members-categories' style={{"pointerEvents": isMembersLoading ? "none" : "all"}}>
-                    <button onClick={() => setCategory("Основна команда")}
-                         className={category === "Основна команда" ? 'members-categories-selected' : ''}>Основна
-                        команда
-                    </button>
-                    <button onClick={() => setCategory("Наглядова рада")}
-                         className={category === "Наглядова рада" ? 'members-categories-selected' : ''}>Наглядова рада
-                    </button>
-                    <button onClick={() => setCategory("Радники")}
-                         className={category === "Радники" ? 'members-categories-selected' : ''}>Радники
-                    </button>
+                    <button onClick={() => setCategory(TEAM_CATEGORY_MAIN)}
+                         className={category === TEAM_CATEGORY_MAIN ? 'members-categories-selected' : ''}>{TEAM_CATEGORY_MAIN}</button>
+                    <button onClick={() => setCategory(TEAM_CATEGORY_SUPERVISORY)}
+                         className={category === TEAM_CATEGORY_SUPERVISORY ? 'members-categories-selected' : ''}>{TEAM_CATEGORY_SUPERVISORY}</button>
+                    <button onClick={() => setCategory(TEAM_CATEGORY_ADVISORS)}
+                         className={category === TEAM_CATEGORY_ADVISORS ? 'members-categories-selected' : ''}>{TEAM_CATEGORY_ADVISORS}</button>
                 </div>
                 <div ref={memberListRef} onScroll={handleOnScroll} data-testid="members-list" className="members-list">
                     {content}
@@ -427,22 +447,22 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
                    isOpen={isDeleteTeamMemberModalOpen}>
                 <Modal.Title>
                     <div className='members-delete-modal-header'>
-                        Видалити члена команди?
+                        {TEAM_DELETE_MEMBER}
                     </div>
                 </Modal.Title>
                 <Modal.Content>
                 </Modal.Content>
                 <Modal.Actions>
                     <div className='members-delete-modal-actions'>
-                        <Button buttonStyle={"secondary"} onClick={() => setIsDeleteTeamMemberModalOpen(false)}>Ні</Button>
-                        <Button buttonStyle={"primary"} onClick={handleDeleteMember}>Так</Button>
+                        <Button buttonStyle={"secondary"} onClick={() => setIsDeleteTeamMemberModalOpen(false)}>{TEAM_CANCEL}</Button>
+                        <Button buttonStyle={"primary"} onClick={handleDeleteMember}>{TEAM_CONFIRM}</Button>
                     </div>
                 </Modal.Actions>
             </Modal>
 
             {isEditMemberModalOpen && <Modal onClose={handleEditMemberOnClose} isOpen={isEditMemberModalOpen}>
                 <Modal.Title>
-                    Редагування учасника команди
+                    {TEAM_EDIT_MEMBER}
                 </Modal.Title>
                 <Modal.Content>
                     <MemberForm onValuesChange={mfv => setMemberToEdit(mfv)} existingMemberFormValues={memberToEdit}
@@ -450,34 +470,34 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
                                 onSubmit={handleMemberEdit}/>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button onClick={handleSaveAsDraft} buttonStyle={'secondary'}>Зберегти як чернетку</Button>
-                    <Button form='edit-member-modal' type={"submit"} buttonStyle={"primary"}>Опублікувати</Button>
+                    <Button onClick={handleSaveAsDraft} buttonStyle={'secondary'}>{TEAM_SAVE_AS_DRAFT}</Button>
+                    <Button form='edit-member-modal' type={"submit"} buttonStyle={"primary"}>{TEAM_PUBLISH}</Button>
                 </Modal.Actions>
             </Modal>}
             <Modal isOpen={isConfirmPublishNewMemberModalOpen}
                    onClose={() => setIsConfirmPublishNewMemberModalOpen(false)}>
                 <Modal.Title>
-                    Опублікувати нового члена команди?
+                    {TEAM_PUBLISH_NEW_MEMBER}
                 </Modal.Title>
                 <Modal.Content>
-
+                    <></>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button onClick={handleCancelPublish} buttonStyle={"secondary"}>Ні</Button>
-                    <Button onClick={handleConfirmPublish} buttonStyle={"primary"}>Так</Button>
+                    <Button onClick={handleCancelPublish} buttonStyle={"secondary"}>{TEAM_CANCEL}</Button>
+                    <Button onClick={handleConfirmPublish} buttonStyle={"primary"}>{TEAM_CONFIRM}</Button>
                 </Modal.Actions>
             </Modal>
 
             <Modal isOpen={isConfirmCloseModalOpen} onClose={() => setIsConfirmCloseModalOpen(false)}>
                 <Modal.Title>
-                    Зміни буде втрачено. Бажаєте продовжити?
+                    {TEAM_CHANGES_LOST}
                 </Modal.Title>
                 <Modal.Content>
-
+                    <></>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button onClick={() => setIsConfirmCloseModalOpen(false)} buttonStyle={'secondary'}>Ні</Button>
-                    <Button buttonStyle={'primary'} onClick={handleConfirmClose}>Так</Button>
+                    <Button onClick={() => setIsConfirmCloseModalOpen(false)} buttonStyle={'secondary'}>{TEAM_CANCEL}</Button>
+                    <Button buttonStyle={'primary'} onClick={handleConfirmClose}>{TEAM_CONFIRM}</Button>
                 </Modal.Actions>
             </Modal>
         </>

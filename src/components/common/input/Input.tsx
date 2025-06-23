@@ -5,9 +5,10 @@ import { Select } from "../select/Select";
 export type InputProps = {
     onChange: (query: string) => void;
     autocompleteValues: string[];
+    placeholder: string;
 };
 
-export const Input = ({ onChange, autocompleteValues }: InputProps) => {
+export const Input = ({ onChange, autocompleteValues, placeholder }: InputProps) => {
     const [value, setValue] = useState<string>('');
     const [isAutocompleteOpen, setIsAutocompleteOpen] = useState(false);
     const selectContainerRef = useRef<HTMLDivElement>(null);
@@ -57,7 +58,7 @@ export const Input = ({ onChange, autocompleteValues }: InputProps) => {
                 ref={inputRef}
                 value={value}
                 onChange={e => handleOnChange(e.currentTarget.value)}
-                placeholder={"Пошук за ім'ям"}
+                placeholder={placeholder}
                 type="text"
                 data-testid="input-field"
             />
@@ -68,8 +69,8 @@ export const Input = ({ onChange, autocompleteValues }: InputProps) => {
                 onValueChange={handleChooseAutocompleteValue}
                 data-testid="autocomplete-select"
             >
-                {autocompleteValues.map((av) => (
-                    <Select.Option key={av} value={av} name={av} data-testid={`select-option-${av}`}></Select.Option>
+                {autocompleteValues.map((av, index) => (
+                    <Select.Option key={`${av}-${index}`} value={av} name={av} data-testid={`select-option-${av}`}></Select.Option>
                 ))}
             </Select>
         </div>

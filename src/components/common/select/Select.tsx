@@ -45,7 +45,7 @@ export const Select = <TValue, >({
             {options.map((opt, index) => {
                 if (!React.isValidElement(opt)) return <></>;
                 const {name, value} = opt.props as { children: React.ReactNode, value: TValue, name: string };
-                return (<button key={name}
+                return (<button key={`${name}-${index}`}
                              className={(!isAutocomplete && selectedValue === value) ? 'select-options-selected' : ''}
                              onClick={() => handleSelect(value)}>
                     <span>{name}</span>

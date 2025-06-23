@@ -15,7 +15,7 @@ import {routes} from '../../const/routers/routes';
 import {AdminLayout} from "../../layouts/admin-layout/AdminLayout";
 import {TeamPage} from "../../pages/admin/team/TeamPage";
 
-const {adminRoutes: {adminRoute, teamPageRoute, testAdminRoute}, userPageRoutes: {page1Route, page2Route}} = routes;
+const {adminRoutes, userPageRoutes: {page1Route, page2Route}} = routes;
 
 export const AppRouter = () => (
     <BrowserRouter>
@@ -27,10 +27,10 @@ export const AppRouter = () => (
                 <Route path="*" element={<NotFound/>}/>
             </Route>
 
-            <Route path={adminRoute} element={<AdminLayout/>}>
+            <Route path={adminRoutes.adminRoute} element={<AdminLayout/>}>
                 <Route index element={<AdminPage/>}/>
-                <Route path={teamPageRoute} element={<TeamPage/>}/>
-                <Route path={testAdminRoute} element={<div>hello</div>}></Route>
+                <Route path={adminRoutes.teamSubRoute} element={<TeamPage/>}/>
+                <Route path={adminRoutes.testSubRoute} element={<div>hello</div>}></Route>
             </Route>
         </Routes>
     </BrowserRouter>

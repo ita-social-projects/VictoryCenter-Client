@@ -21,6 +21,7 @@ victory-center-client/
 │   └── index.html
 ├── src/
 │   ├── assets/                             # Images, icons, fonts, etc.
+<<<<<<< HEAD
 │   │   ├── icons/                          # Icon assets
 │   │   ├── images/                         # Image assets
 │   │   │   ├── admin/                      
@@ -52,6 +53,31 @@ victory-center-client/
 │   │       ├── home/                      
 │   │       ├── page1/                         
 │   │       └── page2/                      
+=======
+        ├── images/
+        │  ├── footer
+        |  └── header
+        ├── fonts
+        └── sass/
+            ├── mixins
+            └── variables
+│   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
+|   |   ├── footer
+|   |   └── header
+│   ├── const                               # Constans that will be used across the project
+|   |   ├── footer
+│   │   ├── routes
+|   |   └── header
+│   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
+│   │   └──main-layout
+│   ├── pages/                              # Pages
+│   │   ├── admin
+│   │   ├── not-found
+│   │   └── usesr-pages
+│   │       ├── home-page
+│   │       ├── page-1
+│   │       └── page-2
+>>>>>>> d72e93cd1183cb041a4bfff2f72cbb47d082d9b5
 │   ├── routes/                             # Route configuration
 │   │   └── app-router
 │   ├── hooks/                              # Custom React hooks
@@ -193,8 +219,8 @@ api.secret=${API_SECRET}
 > Or Contributors/People
 
 [![@IrynaZavushchak](https://avatars.githubusercontent.com/u/45690640?s=100&v=4)](https://github.com/IrynaZavushchak)
-[![@LanchevychMaxym](https://avatars.githubusercontent.com/u/47561209?s=100&v=4)](https://github.com/LanchevychMaxym) 
- 
+[![@LanchevychMaxym](https://avatars.githubusercontent.com/u/47561209?s=100&v=4)](https://github.com/LanchevychMaxym)
+
 
 - You can just grab their GitHub profile image URL
 - You should probably resize their picture using `?s=200` at the end of the image URL.

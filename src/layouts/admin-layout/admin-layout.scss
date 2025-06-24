@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
+
+.admin {
+  color: #041128;
+  display: flex;
+
+  &__navigation {
+    width: 311px;
+    box-shadow: 1px 1px 2px rgba(128, 128, 128, 0.38);
+    height: 100vh;
+    position: sticky;
+  }
+
+  &__page {
+    background-color: #fdfdfb;
+    width: calc(100% - 311px);
+  }
+
+  font-family: "Mulish", sans-serif;
+
+  button, select, input {
+    font-family: "Mulish", sans-serif;
+  }
+}
+

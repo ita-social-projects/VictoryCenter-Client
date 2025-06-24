@@ -1,0 +1,110 @@
+.members {
+  &-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    width: 100%;
+  }
+
+  &-profile {
+    display: flex;
+    gap: 16px;
+    font-size: 18px;
+    width: 33%;
+
+    img {
+      width: 60px;
+      height: 60px;
+      border-radius: 100%;
+    }
+  }
+
+  &-position {
+    text-align: start;
+    width: 33%;
+  }
+
+  &-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 33%;
+  }
+
+  &-status {
+    display: flex;
+    padding: 8px 16px;
+    gap: 8px;
+    border-radius: 30px;
+    font-size: 18px;
+
+    &-draft {
+      color: #61615C;
+      background-color: white;
+      border: 1px solid #61615C
+    }
+
+    &-published {
+      background-color: #E5ECFF;
+      border: 1px solid #0F2957;
+      color: #0F2957;
+    }
+
+    img {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      right: 12px;
+      top: 25%;
+      z-index: 1;
+      pointer-events: none;
+    }
+  }
+
+  &-actions {
+    width: 200px;
+    height: 24px;
+    display: flex;
+    justify-content: end;
+    gap: 2px;
+
+    button {
+      border: none;
+    }
+
+    img {
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    &-edit {
+      width: 24px;
+      height: 24px;
+      background: url("../../../../../assets/icons/edit.svg");
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:active {
+        background: url("../../../../../assets/icons/edit-filled.svg");
+      }
+    }
+
+    &-delete {
+      width: 24px;
+      height: 24px;
+      background: url("../../../../../assets/icons/delete.svg");
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:active {
+        background: url("../../../../../assets/icons/delete-filled.svg");
+      }
+    }
+  }
+}
+

@@ -23,33 +23,56 @@ victory-center-client/
 │   ├── assets/                             # Images, icons, fonts, etc.
 │   │   ├── images
 │   │   │   └── header
-│   │   └── program_page_images
-│   │       ├── icons
-│   │       ├── images
-│   │       └── videos
+│   │   ├── program_page_images
+│   │   │   ├── icons
+│   │   │   ├── images
+│   │   │   └── videos
+│   │   ├── fonts/                          
+│   │   ├── icons/                          
+│   │   ├── images/                         # Image assets
+│   │   │   ├── footer
+│   │   │   ├── admin/                      
+│   │   │   └── header/ 
+│   │   ├── sass/
+│   │   │     ├── mixins
+│   │   │     └── variables                   
+│   │   └── styles/                         # Additional styles
 │   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
-│   │   └── header
-│   ├── const                               # Constans that will be used across the project
-│   │   ├── header
-│   │   ├── program-page
-│   │   └── routes
+│   │   ├── admin/                          # Admin-specific components
+│   │   │   └── admin-navigation/          
+│   │   ├── common/                         # Shared UI components
+│   │   │   ├── button/                     
+│   │   │   ├── input/                      
+│   │   │   ├── modal/                      
+│   │   │   └── select/  
+│   │   ├── footer/                   
+│   │   └── header/                         # Header-related components
+│   ├── const/                              # Constants used across the project
+│   │   ├── footer/
+│   │   ├── header/ 
+│   │   ├── program-page/
+│   │   └── routes/                         
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
-│   │   └── main-layout              
-│   ├── pages/                              # Pages
-│   │   ├── admin
-│   │   ├── not-found
-│   │   ├── program-page
-│   │   │   └── program-page
-│   │   │       ├── contact-section
-│   │   │       ├── intro-section
-│   │   │       ├── program-section
-│   │   │       │   └── program-card
-│   │   │       └── question-section
-│   │   │           └── question-card
-│   │   └── user-pages
-│   │       ├── home-page
-│   │       ├── page-1
-│   │       └── page-2
+│   │   ├── admin-layout/                   
+│   │   └── main-layout/                               
+│   ├── pages/                              # Page components
+│   │   ├── admin/                          # Admin pages
+│   │   │   ├── admin-page-content/         # Content components for admin pages
+│   │   │   └── team/                       # Team management page
+│   │   │       └── components/             # Components specific to team page
+│   │   ├── not-found/ 
+│   │   ├── program-page/
+│   │   │   └── program-page/
+│   │   │       ├── contact-section/
+│   │   │       ├── intro-section/
+│   │   │       ├── program-section/
+│   │   │       │   └── program-card/
+│   │   │       └── question-section/
+│   │   │           └── question-card/
+│   │   └── user-pages/                     
+│   │       ├── home/                      
+│   │       ├── page1/                         
+│   │       └── page2/                      
 │   ├── routes/                             # Route configuration
 │   │   └── app-router
 │   ├── hooks/                              # Custom React hooks
@@ -65,15 +88,20 @@ victory-center-client/
 │   │           └── page-2-data-fetch
 │   ├── types/
 │   ├── utils/                              # Utility functions
-│   │   └── mock-data
-│   │       ├── admin-page
-│   │       ├── program-page
-│   │       └── user-pages
+│   │   └── mock-data/                      
+│   │       ├── admin-page/                 # Mock data for admin pages
+│   │       ├── program-page/
+│   │       └── user-pages/                 # Mock data for user pages
+│   │           ├── home-page/              
+│   │           ├── page-1/                 
+│   │           └── page-2/ 
 │   ├── index.jsx                           # Entry point (ReactDOM.createRoot)
 │   ├── index.css                           # Global styles (normalizer)
 │   ├── react-app-env.d.ts
 │   ├── reportWebVitals.ts
 │   └── setupTests.ts
+├── .coderabbit.yaml                        
+├── .dockerignore                           
 ├── .gitignore
 ├── Dockerfile
 ├── LICENSE

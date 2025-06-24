@@ -6,7 +6,7 @@ import * as ProgramPageFetchModule from '../../../../services/data-fetch/program
 
 const spyProgramPageDataFetch = jest.spyOn(ProgramPageFetchModule, "programPageDataFetch");
 
-const mockPrograms = [
+const mockPrograms: Program[] = [
     {
         image: "https://via.placeholder.com/200x200?text=Ponys",
         title: "titletest1",

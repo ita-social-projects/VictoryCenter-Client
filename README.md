@@ -54,7 +54,7 @@ victory-center-client/
 │   │   └── app-router
 │   ├── hooks/                              # Custom React hooks
 │   ├── context/                            # React context providers
-│   │   └── admin-contex-provider
+│   │   └── admin-context-provider
 │   ├── services/                           # API calls, data services
 │   │   └── data-fetch
 │   │       ├── admin-page-data-fetch
@@ -65,7 +65,6 @@ victory-center-client/
 │   │           └── page-2-data-fetch
 │   ├── types/
 │   ├── utils/                              # Utility functions
-│   │   ├── jest-mock
 │   │   └── mock-data
 │   │       ├── admin-page
 │   │       ├── program-page

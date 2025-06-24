@@ -1,6 +1,6 @@
 import React from 'react';
 import { PROGRAM_PROMPT, TEXT_US, CONTACT } from '../../../../const/program-page/program-page';
-import background from '@assets/program_page_images/videos/background.mp4';
+import background from '../../../../assets/program_page_images/videos/background.mp4';
 import './contact-section.scss';
 
 export const ContactSection: React.FC = () => {

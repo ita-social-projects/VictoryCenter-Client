@@ -1,8 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import { Question } from '../../../../../types/ProgramPage';
 import { QuestionCard } from './QuestionCard';
 
 describe('test question card component', () => {
-    const mockQuestion = {
+    const mockQuestion: Question = {
         question: "Як долучитись до програми?",
         answer: "Потрібно заповнити коротку анкету або написати координатору через форму на сайті." +
             " Після цього ми зв'яжемось для уточнення деталей."

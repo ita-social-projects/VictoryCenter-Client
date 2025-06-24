@@ -52,7 +52,7 @@ jest.mock("./TeamMemberCard/TeamMemberCard", () => ({
   ),
 }));
 
-describe("Page1 component", () => {
+describe("TeamPage component", () => {
   afterEach(() => {
     jest.clearAllMocks();
   });

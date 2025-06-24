@@ -18,20 +18,22 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Install modules
-        run: npm i
-      
+        uses: actions/checkout@v4      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
       - name: Build project
         run: npm run build
-
       - name: Run unit tests
         run: npm run test:cover  
 
   docker:
     name: Build and push docker image
-    needs: init
+    needs: run_tests
     runs-on: ubuntu-latest
     steps:
      - name: "Run docker build and doker push"
@@ -53,4 +55,4 @@ jobs:
        with:
           context: .
           push: true
-          tags: ${GITHUB_REF##*/}.${RUN_NUM}
+          tags: ${{ secrets.DOCKER_REPO_FRONTEND }}:${{ github.ref_name }}.${{ env.RUN_NUM }}

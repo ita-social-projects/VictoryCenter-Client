@@ -35,81 +35,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
      - name: "Run docker build and doker push"
-       run:    echo "Tag for image ${GITHUB_REF##*/}.${RUN_NUM}"    
-   #   - name: Log in to Docker Hub
-   #     uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
-   #     with:
-   #       username: ${{ secrets.DOCKER_USERNAME }}
-   #       password: ${{ secrets.DOCKER_PASSWORD }}
-
-  #   - name: Extract metadata (tags, labels) for Docker
-  #      id: meta
-  #      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-  #      with:
-  #        images: |
-  #          ${{ secrets.DOCKER_REPO_FRONTEND }}
-  #    - name: Build and push Docker images
-  #      id: push
-  #      uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-  #      with:
-  #        context: .
-  #        push: true
-  #        tags: ${{ steps.meta.outputs.tags }}
-  #        labels: ${{ steps.meta.outputs.labels }}
-  manual_approval_deploy:
-    needs: docker 
-    environment: test 
-    runs-on: ansible-runner-VictoryCenter-Client
-    outputs:
-      comment: ${{ steps.set_env.outputs.comment }}
-    steps:
-     - name: "Get approval message for Stage deploy"
-       id: set_env
-       run: |
-          echo "comment=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-               -H "Accept: application/vnd.github+json" \
-                https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/approvals \
-              | jq '.[] | {user: .user.login, comment: .comment, environments: [.environments[].name]}' \
-               | jq -r '.comment')" >> $GITHUB_OUTPUT
-  stage_deploy:
-   needs: manual_approval_deploy
-   if: contains(needs.manual_approval_deploy.outputs.comment, 'approve')
-   runs-on: ansible-runner-VictoryCenter-Client
-   steps:
-    - run: echo ${{ needs.manual_approval_deploy.outputs.comment }}
-    - name: Clone DevOps repo
-      uses: actions/checkout@v4
-      with: 
-        repository: ita-social-projects/VictoryCenter-DevOps
-        path: VictoryCenter-DevOps
-    - name: Deploy Tag
-      run: |
-        TAG_DEPLOY_FRONT=$(docker container inspect $(docker container ls -aq) --format "{{.Config.Image}}" | grep "${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO_FRONTEND }}:" | perl -pe \'($_)=/([0-9]+([.][0-9]+)+)/\'")
-        echo "deploy_tag=$TAG_DEPLOY_FRONT"
-    - name: Docker Compose
-      run: |
-        cd VictoryCenter-DevOps
-        docker-compose up -d
-    - name: Deploy stage
-      run: echo "Deploy stage commands"
-  manual_approval_rollback:
-    needs: stage_deploy
-    environment: test 
-    runs-on: ansible-runner-VictoryCenter-Client
-    outputs:
-      comment: ${{ steps.set_comment_rollback.outputs.comment }}
-    steps:
-     - name: "Get rollback message for Stage deploy"
-       id: set_comment_rollback
-       run: |
-              echo "comment=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                -H "Accept: application/vnd.github+json" \
-                https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/approvals \
-                | jq -r '.[0].comment')" >> $GITHUB_OUTPUT    
-  stage_rollback:
-   needs: [manual_approval_rollback, stage_deploy]
-   if: contains(needs.manual_approval_rollback.outputs.comment, 'approve')
-   runs-on: ansible-runner-VictoryCenter-Client
-   steps:
-    - name: Rollback tag
-      run: echo "roll_back_tag=${GITHUB_REF##*/}.$((RUN_NUM - 1))"
+       run:  echo "Tag for image ${GITHUB_REF##*/}.${RUN_NUM}"    
+     - name: Log in to Docker Hub
+       uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+       with:
+         username: ${{ secrets.DOCKER_USERNAME }}
+         password: ${{ secrets.DOCKER_PASSWORD }}
+     - name: Extract metadata for Docker
+       id: meta
+       uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+       with:
+          images: |
+            ${{ secrets.DOCKER_REPO_FRONTEND }}
+     - name: Build and push Docker images
+       id: push
+       uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+       with:
+          context: .
+          push: true
+          tags: ${GITHUB_REF##*/}.${RUN_NUM}

@@ -3,7 +3,7 @@ name: Main pipline Frontend
 on:
   push:
     branches:
-      - 'release/***'
+      - 'release/**'
 env:
   RUN_NUM: ${{ github.run_number }}
   

@@ -5,7 +5,7 @@ import {ReactComponent as VictoryCenterLogo} from '../../assets/images/header/Vi
 import {ABOUT_US, PROGRAMS, REPORTING, HOW_TO_SUPPORT, CONTACT_US, DONATE} from "../../const/header/header";
 import './Header.scss'
 
-const {userPageRoutes: {page1Route, page2Route}} = routes;
+const {userPageRoutes: {teamPageRoute, page2Route}} = routes;
 
 export const Header = () => {
     const onContactUsClick = () => {
@@ -30,7 +30,7 @@ export const Header = () => {
 
             <div className="linkContainer">
                 <nav>
-                    <Link to={page1Route}>{ABOUT_US}</Link>
+                    <Link to={teamPageRoute}>{ABOUT_US}</Link>
                     <Link to={page2Route}>{PROGRAMS}</Link>
                     <Link to={page2Route}>{REPORTING}</Link>
                     <Link to={page2Route}>{HOW_TO_SUPPORT}</Link>

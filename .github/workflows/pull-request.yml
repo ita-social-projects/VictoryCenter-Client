@@ -57,4 +57,4 @@ jobs:
        with:
           context: .
           push: true
-          tags: ${GITHUB_REF##*/}.${RUN_NUM}
+          tags: ${{ github.run_number }}

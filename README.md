@@ -12,8 +12,7 @@ victory-center-client/
 │   ├── PULL_REQUEST_TEMPLATE
 │   ├── workflows
 │   │   ├── lint.build.yml
-│   │   ├── test.build.yml
-│   │   └── ci.build.yml
+│   │   └── test.build.yml
 │   ├── CODEOWNERS
 │   └── pull_request_template.md
 ├── nginx/
@@ -22,6 +21,12 @@ victory-center-client/
 │   └── index.html
 ├── src/
 │   ├── assets/                             # Images, icons, fonts, etc.
+│   │   ├── images
+│   │   │   └── header
+│   │   ├── program_page_images
+│   │   │   ├── icons
+│   │   │   ├── images
+│   │   │   └── videos
 │   │   ├── fonts/                          
 │   │   ├── icons/                          
 │   │   ├── images/                         # Image assets
@@ -30,7 +35,7 @@ victory-center-client/
 │   │   │   └── header/ 
 │   │   ├── sass/
 │   │   │     ├── mixins
-│   │   │      └── variables                   
+│   │   │     └── variables                   
 │   │   └── styles/                         # Additional styles
 │   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
 │   │   ├── admin/                          # Admin-specific components
@@ -40,12 +45,13 @@ victory-center-client/
 │   │   │   ├── input/                      
 │   │   │   ├── modal/                      
 │   │   │   └── select/  
-|   |   ├── footer                   
+│   │   ├── footer/                   
 │   │   └── header/                         # Header-related components
 │   ├── const/                              # Constants used across the project
-|   |   ├── footer
-│   │   ├── header/                         
-│   │   ├── routes/                         
+│   │   ├── footer/
+│   │   ├── header/ 
+│   │   ├── program-page/
+│   │   └── routes/                         
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
 │   │   ├── admin-layout/                   
 │   │   └── main-layout/                               
@@ -54,7 +60,15 @@ victory-center-client/
 │   │   │   ├── admin-page-content/         # Content components for admin pages
 │   │   │   └── team/                       # Team management page
 │   │   │       └── components/             # Components specific to team page
-│   │   ├── not-found/                      
+│   │   ├── not-found/ 
+│   │   ├── program-page/
+│   │   │   └── program-page/
+│   │   │       ├── contact-section/
+│   │   │       ├── intro-section/
+│   │   │       ├── program-section/
+│   │   │       │   └── program-card/
+│   │   │       └── question-section/
+│   │   │           └── question-card/
 │   │   └── user-pages/                     
 │   │       ├── home/                      
 │   │       ├── page1/                         
@@ -63,21 +77,24 @@ victory-center-client/
 │   │   └── app-router
 │   ├── hooks/                              # Custom React hooks
 │   ├── context/                            # React context providers
-│   │   └── admin-contex-provider
+│   │   └── admin-context-provider
 │   ├── services/                           # API calls, data services
 │   │   └── data-fetch
 │   │       ├── admin-page-data-fetch
+│   │       ├── program-page-data-fetch
 │   │       └── user-pages-data-fetch
 │   │           ├── home-page-data-fetch
 │   │           ├── page-1-data-fetch
 │   │           └── page-2-data-fetch
+│   ├── types/
 │   ├── utils/                              # Utility functions
 │   │   └── mock-data/                      
 │   │       ├── admin-page/                 # Mock data for admin pages
+│   │       ├── program-page/
 │   │       └── user-pages/                 # Mock data for user pages
 │   │           ├── home-page/              
 │   │           ├── page-1/                 
-│   │           └── page-2/                 
+│   │           └── page-2/ 
 │   ├── index.jsx                           # Entry point (ReactDOM.createRoot)
 │   ├── index.css                           # Global styles (normalizer)
 │   ├── react-app-env.d.ts
@@ -200,8 +217,8 @@ api.secret=${API_SECRET}
 > Or Contributors/People
 
 [![@IrynaZavushchak](https://avatars.githubusercontent.com/u/45690640?s=100&v=4)](https://github.com/IrynaZavushchak)
-[![@LanchevychMaxym](https://avatars.githubusercontent.com/u/47561209?s=100&v=4)](https://github.com/LanchevychMaxym)
-
+[![@LanchevychMaxym](https://avatars.githubusercontent.com/u/47561209?s=100&v=4)](https://github.com/LanchevychMaxym) 
+ 
 
 - You can just grab their GitHub profile image URL
 - You should probably resize their picture using `?s=200` at the end of the image URL.

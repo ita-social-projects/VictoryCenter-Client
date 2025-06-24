@@ -9,6 +9,7 @@ export const adminRoutes = {
 // user pages routes
 export const page1Route = '/page-1';
 export const page2Route = '/page-2';
+export const programPage = '/programPage';
 
 export const userPageRoutes = {
     page1Route,
@@ -17,5 +18,6 @@ export const userPageRoutes = {
 
 export const routes = {
     adminRoutes,
+    programPage,
     userPageRoutes
 };

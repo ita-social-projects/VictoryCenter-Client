@@ -4,12 +4,13 @@ import { TeamMember } from "./TeamMemberCard";
 
 describe("TeamMember component", () => {
   const mockMember = {
+    id: 1,
     name: "Іван Іванов",
     role: "учасник",
     photo: "https://via.placeholder.com/200x250?text=Іван",
   };
 
-  it("renders member's name, role and photo correctly", () => {
+  it("should render the member's name, role, and photo correctly", () => {
     render(<TeamMember member={mockMember} />);
     const nameElement = screen.getByText(mockMember.name);
     expect(nameElement).toBeInTheDocument();
@@ -25,7 +26,7 @@ describe("TeamMember component", () => {
     expect(imgElement).toHaveClass("member-photo");
   });
 
-  it("renders container with correct class", () => {
+  it("should render the container with the correct class", () => {
     render(<TeamMember member={mockMember} />);
     const container = screen.getByText(mockMember.name).closest(".team-member");
     expect(container).toBeInTheDocument();

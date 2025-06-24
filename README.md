@@ -34,6 +34,7 @@ victory-center-client/
 │   ├── const                               # Constans that will be used across the project
 |   |   ├── footer
 │   │   ├── routes
+|   |   ├── team-page
 |   |   └── header
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
 │   │   └──main-layout
@@ -42,7 +43,7 @@ victory-center-client/
 │   │   ├── not-found
 │   │   └── usesr-pages
 │   │       ├── home-page
-│   │       ├── TeamPage
+│   │       ├── team-page
 │   │       └── page-2
 │   ├── routes/                             # Route configuration
 │   │   └── app-router

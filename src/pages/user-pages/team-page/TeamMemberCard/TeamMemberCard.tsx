@@ -1,14 +1,5 @@
 import React from "react";
-
-interface Member {
-  name: string;
-  role: string;
-  photo: string;
-}
-
-interface TeamMemberProps {
-  member: Member;
-}
+import { TeamMemberProps } from "../../../../types/TeamPage";
 
 export const TeamMember: React.FC<TeamMemberProps> = ({ member }) => {
   return (

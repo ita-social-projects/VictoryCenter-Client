@@ -17,6 +17,7 @@ const mockTeamDataSingle = [
       "Люди, які щодня координують роботу програм, супроводжують учасників, будують логістику, фасилітують сесії.",
     members: [
       {
+        id: 1,
         name: "Настя Попандопулус",
         role: "виконавча директорка",
         photo: "https://via.placeholder.com/200x250?text=Настя",
@@ -32,6 +33,7 @@ const mockTeamDataMultiple = [
     description: "Інший опис",
     members: [
       {
+        id: 1,
         name: "Іван Іванов",
         role: "учасник",
         photo: "https://via.placeholder.com/200x250?text=Іван",
@@ -55,7 +57,7 @@ describe("Page1 component", () => {
     jest.clearAllMocks();
   });
 
-  it("fetches data and displays single team section correctly", async () => {
+  it("should fetch data and display the single team section correctly", async () => {
     spyTeamPageDataFetch.mockResolvedValueOnce({
       teamData: mockTeamDataSingle,
     });
@@ -83,7 +85,7 @@ describe("Page1 component", () => {
     expect(teamSections[0].classList.contains("last-section")).toBe(true);
   });
 
-  it("renders multiple team sections and assigns 'last-section' class only to the last", async () => {
+  it("should render multiple team sections and assign the 'last-section' class only to the last", async () => {
     spyTeamPageDataFetch.mockResolvedValueOnce({
       teamData: mockTeamDataMultiple,
     });
@@ -100,7 +102,7 @@ describe("Page1 component", () => {
     expect(teamSections[1].classList.contains("last-section")).toBe(true);
   });
 
-  it("renders no team sections if data is empty array", async () => {
+  it("should render no team sections if the data is an empty array", async () => {
     spyTeamPageDataFetch.mockResolvedValueOnce({
       teamData: [],
     });
@@ -112,7 +114,7 @@ describe("Page1 component", () => {
     });
   });
 
-  it("handles fetch error gracefully without crashing", async () => {
+  it("should handle fetch errors gracefully without crashing", async () => {
     spyTeamPageDataFetch.mockRejectedValueOnce(new Error("Fetch failed"));
 
     render(<TeamPage />);
@@ -121,7 +123,7 @@ describe("Page1 component", () => {
     });
   });
 
-  it("displays the static quote and author", async () => {
+  it("should display the static quote and author", async () => {
     spyTeamPageDataFetch.mockResolvedValueOnce({ teamData: [] });
 
     render(<TeamPage />);
@@ -136,7 +138,7 @@ describe("Page1 component", () => {
     });
   });
 
-  it("renders the background video element", async () => {
+  it("should render the background video element", async () => {
     spyTeamPageDataFetch.mockResolvedValueOnce({ teamData: [] });
 
     render(<TeamPage />);

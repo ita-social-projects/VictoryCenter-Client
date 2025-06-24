@@ -32,7 +32,7 @@ import {
 } from "../../const/footer/footer";
 
 const {
-  userPageRoutes: { TeamPageRoute, page2Route },
+  userPageRoutes: { teamPageRoute, page2Route },
 } = routes;
 
 export const Footer = () => {
@@ -70,7 +70,7 @@ export const Footer = () => {
 
         <div className="menu">
           <span className="title">{MENU}</span>
-          <Link to={TeamPageRoute}>{REPORTING}</Link>
+          <Link to={teamPageRoute}>{REPORTING}</Link>
           <Link to={page2Route}>{STORE}</Link>
           <Link to={page2Route}>{HOW_TO_SUPPORT}</Link>
           <Link to={page2Route}>{STORIES_OF_VICTORIES}</Link>
@@ -78,7 +78,7 @@ export const Footer = () => {
 
         <div className="about_us">
           <span className="title">{ABOUT_US}</span>
-          <Link to={TeamPageRoute}>{ABOUT_US}</Link>
+          <Link to={teamPageRoute}>{ABOUT_US}</Link>
           <Link to={page2Route}>{OUR_HISTORY}</Link>
           <Link to={page2Route}>{OUR_TEAM}</Link>
           <Link to={page2Route}>{PARTNERS}</Link>
@@ -87,9 +87,9 @@ export const Footer = () => {
 
         <div className="hippotherapy">
           <span className="title">{HIPPOTHERAPY}</span>
-          <Link to={TeamPageRoute}>{WHAT_IS_HIPPOTHERAPY}</Link>
-          <Link to={TeamPageRoute}>{PROGRAMS}</Link>
-          <Link to={TeamPageRoute}>{PROGRAMS_SESSIONS}</Link>
+          <Link to={teamPageRoute}>{WHAT_IS_HIPPOTHERAPY}</Link>
+          <Link to={teamPageRoute}>{PROGRAMS}</Link>
+          <Link to={teamPageRoute}>{PROGRAMS_SESSIONS}</Link>
         </div>
       </div>
 

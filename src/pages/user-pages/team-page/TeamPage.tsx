@@ -3,37 +3,35 @@ import "./TeamPage.scss";
 import horseVideo from "../../../assets/team_page_images/horse_video.mp4";
 import { teamPageDataFetch } from "../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch";
 import { TeamMember } from "./TeamMemberCard/TeamMemberCard";
-
-interface Member {
-  name: string;
-  role: string;
-  photo: string;
-}
-
-interface TeamItem {
-  title: string;
-  description: string;
-  members: Member[];
-}
+import { TeamItem } from "../../../types/TeamPage";
+import {
+  DOWNLOAD_ERROR,
+  VIDEO_TEXT_STRING1,
+  VIDEO_TEXT_STRING2,
+  VIDEO_TEXT_STRING3,
+  VIDEO_TEXT_STRING4,
+  VIDEO_TEXT_STRING5,
+  VIDEO_TEXT_AUTHOR,
+} from "../../../const/team-page/team-page";
 
 export const TeamPage: React.FC = () => {
   const [teamData, setTeamData] = useState<TeamItem[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
+    const fetchData = async () => {
       try {
         const response = await teamPageDataFetch();
         const { teamData } = response;
         setTeamData(teamData);
         setError(null);
       } catch {
-        setError(
-          "Не вдалося завантажити дані команди. Будь ласка, спробуйте пізніше."
-        );
+        setError(DOWNLOAD_ERROR);
         setTeamData([]);
       }
-    })();
+    };
+
+    fetchData();
   }, []);
 
   return (
@@ -61,7 +59,7 @@ export const TeamPage: React.FC = () => {
               <p>{team.description}</p>
             </div>
             {team.members.map((member) => (
-              <TeamMember key={member.name} member={member} />
+              <TeamMember key={member.id} member={member} />
             ))}
           </div>
         </div>
@@ -73,12 +71,12 @@ export const TeamPage: React.FC = () => {
         </video>
 
         <div className="quote-overlay">
-          <p className="video-text">Я тут, тому що знаю з власного досвіду – коні нас рятують.</p>
-          <p className="video-text">Очі учасників після програми – найкраща мотивація.</p>
-          <p className="video-text">І можливість привідкрити глибину цього світу людям,</p>
-          <p className="video-text">які до нього не були дотичні, а потім спостерігати цей</p>
-          <p className="video-text">особливий ефект, вартує дорогого.</p>
-          <p className="author">Вікторія Яковенко</p>
+          <p className="video-text">{VIDEO_TEXT_STRING1}</p>
+          <p className="video-text">{VIDEO_TEXT_STRING2}</p>
+          <p className="video-text">{VIDEO_TEXT_STRING3}</p>
+          <p className="video-text">{VIDEO_TEXT_STRING4}</p>
+          <p className="video-text">{VIDEO_TEXT_STRING5}</p>
+          <p className="author">{VIDEO_TEXT_AUTHOR}</p>
         </div>
       </div>
     </div>

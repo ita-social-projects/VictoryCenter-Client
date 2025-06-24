@@ -108,7 +108,15 @@
         flex-direction: column;
         gap: 6px;
         margin-bottom: 10px;
-
+        .error{
+          font-family: Inter, sans-serif;
+          font-weight: 400;
+          font-size: 14px;
+          margin: 0;
+          line-height: 20px;
+          letter-spacing: 0;
+          color: #F04438;
+        }
         label {
           color: #414651;
         }

@@ -12,7 +12,8 @@ victory-center-client/
 │   ├── PULL_REQUEST_TEMPLATE
 │   ├── workflows
 │   │   ├── lint.build.yml
-│   │   └── test.build.yml
+│   │   ├── test.build.yml
+│   │   └── ci.build.yml
 │   ├── CODEOWNERS
 │   └── pull_request_template.md
 ├── nginx/

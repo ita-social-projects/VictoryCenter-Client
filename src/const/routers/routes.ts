@@ -7,15 +7,17 @@ export const adminRoutes = {
 };
 
 // user pages routes
-export const page1Route = '/page-1';
+export const teamPageRoute = '/team-page';
 export const page2Route = '/page-2';
+export const programPage = '/programPage';
 
 export const userPageRoutes = {
-    page1Route,
+    teamPageRoute,
     page2Route
 };
 
 export const routes = {
     adminRoutes,
+    programPage,
     userPageRoutes
 };

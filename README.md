@@ -21,69 +21,87 @@ victory-center-client/
 │   └── index.html
 ├── src/
 │   ├── assets/                             # Images, icons, fonts, etc.
-│   │   ├── fonts/                          
-│   │   ├── icons/                          
+│   │   ├── images
+│   │   │   └── header
+│   │   ├── program_page_images
+│   │   │   ├── icons
+│   │   │   ├── images
+│   │   │   └── videos
+│   │   ├── fonts/
+│   │   ├── icons/
 │   │   ├── images/                         # Image assets
 │   │   │   ├── footer
-│   │   │   ├── admin/                      
-│   │   │   └── header/ 
+│   │   │   ├── admin/
+│   │   │   └── header/
 │   │   ├── sass/
 │   │   │     ├── mixins
-│   │   │      └── variables                   
+│   │   │     └── variables
 │   │   └── styles/                         # Additional styles
 │   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
 │   │   ├── admin/                          # Admin-specific components
-│   │   │   └── admin-navigation/          
+│   │   │   └── admin-navigation/
 │   │   ├── common/                         # Shared UI components
-│   │   │   ├── button/                     
-│   │   │   ├── input/                      
-│   │   │   ├── modal/                      
-│   │   │   └── select/  
-|   |   ├── footer                   
+│   │   │   ├── button/
+│   │   │   ├── input/
+│   │   │   ├── modal/
+│   │   │   └── select/
+│   │   ├── footer/
 │   │   └── header/                         # Header-related components
 │   ├── const/                              # Constants used across the project
-|   |   ├── footer
-│   │   ├── header/                         
-│   │   ├── routes/                         
+│   │   ├── footer/
+│   │   ├── header/
+│   │   ├── program-page/
+|   |   ├── team-page/
+│   │   └── routes/
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
-│   │   ├── admin-layout/                   
-│   │   └── main-layout/                               
-│   ├── pages/                              # Page components
+│   │   └──main-layout
+│   ├── pages/                              # Pages
 │   │   ├── admin/                          # Admin pages
 │   │   │   ├── admin-page-content/         # Content components for admin pages
 │   │   │   └── team/                       # Team management page
 │   │   │       └── components/             # Components specific to team page
-│   │   ├── not-found/                      
-│   │   └── user-pages/                     
-│   │       ├── home/                      
-│   │       ├── page1/                         
-│   │       └── page2/                      
+│   │   ├── not-found/
+│   │   ├── program-page/
+│   │   │   └── program-page/
+│   │   │       ├── contact-section/
+│   │   │       ├── intro-section/
+│   │   │       ├── program-section/
+│   │   │       │   └── program-card/
+│   │   │       └── question-section/
+│   │   │           └── question-card/
+│   │   └── user-pages
+│   │       ├── home-page
+│   │       ├── team-page
+│   │       └── page-2
 │   ├── routes/                             # Route configuration
 │   │   └── app-router
 │   ├── hooks/                              # Custom React hooks
 │   ├── context/                            # React context providers
-│   │   └── admin-contex-provider
+│   │   └── admin-context-provider
 │   ├── services/                           # API calls, data services
 │   │   └── data-fetch
 │   │       ├── admin-page-data-fetch
+│   │       ├── program-page-data-fetch
 │   │       └── user-pages-data-fetch
 │   │           ├── home-page-data-fetch
-│   │           ├── page-1-data-fetch
+│   │           ├── team-page-data-fetch
 │   │           └── page-2-data-fetch
+│   ├── types/
 │   ├── utils/                              # Utility functions
-│   │   └── mock-data/                      
+│   │   └── mock-data/
 │   │       ├── admin-page/                 # Mock data for admin pages
+│   │       ├── program-page/
 │   │       └── user-pages/                 # Mock data for user pages
-│   │           ├── home-page/              
-│   │           ├── page-1/                 
-│   │           └── page-2/                 
+│   │           ├── home-page/
+│   │           ├── team-page/
+│   │           └── page-2/
 │   ├── index.jsx                           # Entry point (ReactDOM.createRoot)
 │   ├── index.css                           # Global styles (normalizer)
 │   ├── react-app-env.d.ts
 │   ├── reportWebVitals.ts
 │   └── setupTests.ts
-├── .coderabbit.yaml                        
-├── .dockerignore                           
+├── .coderabbit.yaml
+├── .dockerignore
 ├── .gitignore
 ├── Dockerfile
 ├── LICENSE

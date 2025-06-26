@@ -1,5 +1,5 @@
 import React from 'react';
-import {render, screen, fireEvent, createEvent, waitFor, act } from '@testing-library/react';
+import {render, screen, fireEvent, createEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemberForm, MemberFormProps, MemberFormValues } from './MemberForm';
 
@@ -12,13 +12,6 @@ describe('MemberForm', () => {
         onSubmit: jest.fn(),
         onValuesChange: jest.fn(),
         existingMemberFormValues: null,
-    };
-
-    const file = new File(['dummy content'], 'example.png', { type: 'image/png' });
-    const mockFileList = {
-        0: file,
-        length: 1,
-        item: () => file,
     };
 
     beforeEach(() => {

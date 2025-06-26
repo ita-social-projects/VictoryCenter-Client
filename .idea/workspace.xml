@@ -4,13 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="Changed README, changed file names">
-      <change afterPath="$PROJECT_DIR$/src/validation/admin-create-member-form/сreate-member-schema.test.ts" afterDir="false" />
+    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="fixed tests">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/admin/create-member-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/admin/create-member-form.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.test.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/validation/create-member-schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/validation/admin-create-member-form/create-member-schema.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -190,6 +186,15 @@
       <workItem from="1749032320888" duration="3511000" />
       <workItem from="1749112969506" duration="3675000" />
     </task>
+    <task id="LOCAL-00001" summary="fixed tests">
+      <option name="closed" value="true" />
+      <created>1750953374370</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1750953374370</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -197,4 +202,8 @@
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="false" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fixed tests" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed tests" />
+  </component>
 </project>

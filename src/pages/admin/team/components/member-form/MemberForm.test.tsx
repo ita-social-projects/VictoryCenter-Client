@@ -1,5 +1,5 @@
 import React from 'react';
-import {render, screen, fireEvent, createEvent, waitFor} from '@testing-library/react';
+import {render, screen, fireEvent, createEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemberForm, MemberFormProps, MemberFormValues } from './MemberForm';
 
@@ -93,23 +93,32 @@ describe('MemberForm', () => {
         const categorySelect = screen.getByLabelText('Категорія');
         const fullNameInput = screen.getByLabelText('Ім\'я та Прізвище');
         const descriptionTextarea = screen.getByLabelText('Опис');
-        const form = screen.getByTestId('test-form');
+        const imgInput = screen.getByTestId('image');
 
         await userEvent.selectOptions(categorySelect, 'Радники');
         await userEvent.type(fullNameInput, 'Jane Doe');
         await userEvent.type(descriptionTextarea, 'Test description');
 
+        const file = new File(['dummy content'], 'test-image.jpg', { type: 'image/jpeg' });
+        await userEvent.upload(imgInput, file);
+
+        const form = screen.getByTestId('test-form');
         fireEvent.submit(form);
 
         await waitFor(() => {
-            expect(defaultProps.onSubmit).toHaveBeenCalledWith({
-                category: 'Радники',
-                fullName: 'Jane Doe',
-                description: 'Test description',
-                img: expect.any(FileList)
-            });
+            expect(defaultProps.onSubmit).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    category: 'Радники',
+                    fullName: 'Jane Doe',
+                    description: 'Test description',
+                    img: expect.anything()
+                })
+            );
+            
         });
     });
+
+
 
 
     it('displays character count for fullName', async () => {

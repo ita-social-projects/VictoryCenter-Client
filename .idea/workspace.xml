@@ -5,11 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="Changed README, changed file names">
+      <change afterPath="$PROJECT_DIR$/src/validation/admin-create-member-form/сreate-member-schema.test.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/admin/create-member-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/admin/create-member-form.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.test.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/members-list/members-list.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/members-list/members-list.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/validation/create-member-schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/validation/admin-create-member-form/create-member-schema.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,23 +29,23 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="release/1.0.0" />
+        <entry key="$PROJECT_DIR$" value="feature/issue-52" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "OlyaMraka"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;OlyaMraka&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/ita-social-projects/VictoryCenter-Client.git",
-    "accountId": "835c5d1e-44d0-4360-aa0c-b5f3e2fd2fb5"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ita-social-projects/VictoryCenter-Client.git&quot;,
+    &quot;accountId&quot;: &quot;835c5d1e-44d0-4360-aa0c-b5f3e2fd2fb5&quot;
   }
-}]]></component>
+}</component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -62,6 +63,11 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Jest.MemberDragPreview.executor": "Run",
+    "Jest.MemberForm.submits form with valid data.executor": "Run",
+    "Jest.useCreateMemberSchema.executor": "Run",
+    "Jest.useCreateMemberSchema.should fail validation due to too big file.executor": "Run",
+    "Jest.useCreateMemberSchema.should pass validation.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
@@ -72,7 +78,7 @@
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs.jest.jest_package": "C:/Users/User/Desktop/Folders/projects/__SOFTSERVE/VictoryCenter-Client/node_modules/react-scripts",
+    "nodejs.jest.jest_package": "C:/Users/PC/RiderProjects/VictoryCenter-Client/node_modules/react-scripts",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.editor",
     "ts.external.directory.path": "C:\\Users\\PC\\RiderProjects\\VictoryCenter-Client\\node_modules\\typescript\\lib",
@@ -91,46 +97,7 @@
       <recent name="C:\Users\User\Desktop\Folders\projects\__SOFTSERVE\VictoryCenter-Client\src\layouts\admin-layout" />
     </key>
   </component>
-  <component name="RunManager" selected="Jest.MemberDragPreview">
-    <configuration name="MemberComponent" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
-      <node-interpreter value="project" />
-      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
-      <working-dir value="$PROJECT_DIR$" />
-      <envs />
-      <scope-kind value="SUITE" />
-      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/member-component/MemberComponent.test.tsx" />
-      <test-names>
-        <test-name value="MemberComponent" />
-      </test-names>
-      <method v="2" />
-    </configuration>
-    <configuration name="MemberComponent.Edge cases.handles empty string values gracefully" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
-      <node-interpreter value="project" />
-      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
-      <working-dir value="$PROJECT_DIR$" />
-      <envs />
-      <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/member-component/MemberComponent.test.tsx" />
-      <test-names>
-        <test-name value="MemberComponent" />
-        <test-name value="Edge cases" />
-        <test-name value="handles empty string values gracefully" />
-      </test-names>
-      <method v="2" />
-    </configuration>
-    <configuration name="MemberComponent.Event handlers" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
-      <node-interpreter value="project" />
-      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
-      <working-dir value="$PROJECT_DIR$" />
-      <envs />
-      <scope-kind value="SUITE" />
-      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/member-component/MemberComponent.test.tsx" />
-      <test-names>
-        <test-name value="MemberComponent" />
-        <test-name value="Event handlers" />
-      </test-names>
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Jest.useCreateMemberSchema">
     <configuration name="MemberDragPreview" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
@@ -143,27 +110,65 @@
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="MemberDragPreview.Rendering with member.sets correct key on members wrapper" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="MemberForm.submits form with valid data" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
+      <working-dir value="$PROJECT_DIR$" />
+      <jest-options value="--watch" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.test.tsx" />
+      <test-names>
+        <test-name value="MemberForm" />
+        <test-name value="submits form with valid data" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="useCreateMemberSchema" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/src/validation/admin-create-member-form/сreate-member-schema.test.ts" />
+      <test-names>
+        <test-name value="useCreateMemberSchema" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="useCreateMemberSchema.should fail validation due to too big file" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
       <working-dir value="$PROJECT_DIR$" />
       <envs />
       <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/member-drag-preview/MemberDragPreview.test.tsx" />
+      <test-file value="$PROJECT_DIR$/src/validation/admin-create-member-form/сreate-member-schema.test.ts" />
       <test-names>
-        <test-name value="MemberDragPreview" />
-        <test-name value="Rendering with member" />
-        <test-name value="sets correct key on members wrapper" />
+        <test-name value="useCreateMemberSchema" />
+        <test-name value="should fail validation due to too big file" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="useCreateMemberSchema.should pass validation" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/src/validation/admin-create-member-form/сreate-member-schema.test.ts" />
+      <test-names>
+        <test-name value="useCreateMemberSchema" />
+        <test-name value="should pass validation" />
       </test-names>
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Jest.useCreateMemberSchema" />
+        <item itemvalue="Jest.useCreateMemberSchema.should fail validation due to too big file" />
+        <item itemvalue="Jest.useCreateMemberSchema.should pass validation" />
+        <item itemvalue="Jest.MemberForm.submits form with valid data" />
         <item itemvalue="Jest.MemberDragPreview" />
-        <item itemvalue="Jest.MemberDragPreview.Rendering with member.sets correct key on members wrapper" />
-        <item itemvalue="Jest.MemberComponent" />
-        <item itemvalue="Jest.MemberComponent.Edge cases.handles empty string values gracefully" />
-        <item itemvalue="Jest.MemberComponent.Event handlers" />
       </list>
     </recent_temporary>
   </component>

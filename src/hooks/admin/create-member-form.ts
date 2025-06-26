@@ -1,6 +1,6 @@
 import { useForm, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useCreateMemberSchema } from '../../validation/create-member-schema';
+import { useCreateMemberSchema } from '../../validation/admin-create-member-form/create-member-schema';
 import { MemberFormValues } from '../../pages/admin/team/components/member-form/MemberForm';
 
 export const useCreateMemberForm = () =>

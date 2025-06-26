@@ -80,7 +80,7 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
         <div className='members-add-modal-body'>
             <div className='form-group'>
                 <label htmlFor="category">{TEAM_LABEL_CATEGORY}</label>
-                <select 
+                <select defaultValue={existingMemberFormValues ? existingMemberFormValues.category : ''}
                         id="category"
                         {...register("category")}>
                     <option value="" disabled>{TEAM_LABEL_SELECT_CATEGORY}</option>

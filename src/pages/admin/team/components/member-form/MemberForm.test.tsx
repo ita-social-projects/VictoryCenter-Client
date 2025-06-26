@@ -1,5 +1,5 @@
 import React from 'react';
-import {render, screen, fireEvent, createEvent} from '@testing-library/react';
+import {render, screen, fireEvent, createEvent, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemberForm, MemberFormProps, MemberFormValues } from './MemberForm';
 
@@ -14,6 +14,12 @@ describe('MemberForm', () => {
         existingMemberFormValues: null,
     };
 
+    const file = new File(['dummy content'], 'example.png', { type: 'image/png' });
+    const mockFileList = {
+        0: file,
+        length: 1,
+        item: () => file,
+    };
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -87,21 +93,24 @@ describe('MemberForm', () => {
         const categorySelect = screen.getByLabelText('Категорія');
         const fullNameInput = screen.getByLabelText('Ім\'я та Прізвище');
         const descriptionTextarea = screen.getByLabelText('Опис');
+        const form = screen.getByTestId('test-form');
 
-        fireEvent.change(categorySelect, { target: { value: 'Радники' } });
+        await userEvent.selectOptions(categorySelect, 'Радники');
         await userEvent.type(fullNameInput, 'Jane Doe');
         await userEvent.type(descriptionTextarea, 'Test description');
 
-        const form = screen.getByTestId('test-form');
         fireEvent.submit(form);
 
-        expect(defaultProps.onSubmit).toHaveBeenCalledWith({
-            category: 'Радники',
-            fullName: 'Jane Doe',
-            description: 'Test description',
-            img: null
+        await waitFor(() => {
+            expect(defaultProps.onSubmit).toHaveBeenCalledWith({
+                category: 'Радники',
+                fullName: 'Jane Doe',
+                description: 'Test description',
+                img: expect.any(FileList)
+            });
         });
     });
+
 
     it('displays character count for fullName', async () => {
         render(<MemberForm {...defaultProps} />);
@@ -203,21 +212,46 @@ describe('MemberForm - Additional Coverage', () => {
         expect(fullNameInput).toHaveValue('Jane Doe');
     });
 
-    it('handles form submission when memberFormValues exists', () => {
-        const initialValues: MemberFormValues = {
+    it('handles form submission when memberFormValues exists', async () => {
+        const file = new File(['dummy'], 'avatar.jpg', { type: 'image/jpg' });
+        const mockFileList = {
+            0: file,
+            length: 1,
+            item: () => file,
+        };
+        Object.setPrototypeOf(mockFileList, FileList.prototype);
+
+        const existingValues: MemberFormValues = {
             category: 'Основна команда',
             fullName: 'John Doe',
             description: 'Test description',
-            img: null,
+            img: mockFileList as unknown as FileList,
         };
 
-        render(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
+        render(<MemberForm {...defaultProps} existingMemberFormValues={existingValues} />);
 
         const form = screen.getByTestId('test-form');
+        
+        await waitFor(() => {
+            expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('Test description')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('Основна команда')).toBeInTheDocument();
+        });
+
         fireEvent.submit(form);
 
-        expect(defaultProps.onSubmit).toHaveBeenCalledWith(initialValues);
+        await waitFor(() => {
+            expect(defaultProps.onSubmit).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    category: 'Основна команда',
+                    fullName: 'John Doe',
+                    description: 'Test description',
+                    img: expect.any(FileList),
+                })
+            );
+        });
     });
+
 
     it('handles file input change without files (edge case)', () => {
         render(<MemberForm {...defaultProps} />);
@@ -250,7 +284,7 @@ describe('MemberForm - Additional Coverage', () => {
 
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
             expect.objectContaining({
-                img: null,
+                img: expect.any(FileList)
             })
         );
     });

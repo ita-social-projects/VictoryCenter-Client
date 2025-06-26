@@ -6,5 +6,5 @@ import { MemberFormValues } from '../../pages/admin/team/components/member-form/
 export const useCreateMemberForm = () =>
     useForm<MemberFormValues>({
         resolver: yupResolver(useCreateMemberSchema) as unknown as Resolver<MemberFormValues, any, MemberFormValues>,
-        mode: 'onChange'
+        mode: 'onBlur'
     });

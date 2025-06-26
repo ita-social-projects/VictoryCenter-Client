@@ -1,5 +1,5 @@
 import CloudDownload from "../../../../../assets/icons/cloud-download.svg";
-import React, {ChangeEvent, useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { useCreateMemberForm } from "../../../../../hooks/admin/create-member-form";
 import '../members-list/members-list.scss'
 import {TeamCategory} from "../../TeamPage";
@@ -32,12 +32,8 @@ export type MemberFormProps = {
 const MAX_FULLNAME_LENGTH = 50;
 const MAX_DESCRIPTION_LENGTH = 200;
 export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onValuesChange}: MemberFormProps) => {
-    const [memberFormValues, setMemberFormValues] = useState<MemberFormValues>(existingMemberFormValues || {
-        fullName: '',
-        img: null,
-        description: '',
-        category: '' as TeamCategory
-    });
+
+    const [isInitialized, setIsInitialized] = useState(false);
     
     const {
         register,
@@ -49,46 +45,27 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
     } = useCreateMemberForm();
     
     const watchedImg = watch("img");
-    // const handleOnSubmit = (e: FormEvent<HTMLFormElement>) => {
-    //     e.preventDefault();
-    //     if(memberFormValues?.category && memberFormValues?.description && memberFormValues?.fullName) {
-    //         onSubmit(memberFormValues);
-    //     }
-    // }
+
     const handleOnSubmit = (data: MemberFormValues) => {
-        // data — обʼєкт з даними форми, який передає react-hook-form
         if (data.category && data.description && data.fullName) {
             onSubmit(data);
         }
     };
 
-    const handleMemberFormValuesChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const {name, value} = e.target;
-        const inputTarget = e.currentTarget as (EventTarget & HTMLInputElement);
-        if (inputTarget.files && inputTarget.files.length > 0) {
-            const file = inputTarget.files;
-            setMemberFormValues((prev) => ({
-                ...prev,
-                img: file
-            }));
-        } else {
-            setMemberFormValues((prev) => ({
-                ...prev,
-                [name]: value
-            }));
-        }
-    }
-
-    // useEffect(() => {
-    //     if (onValuesChange && memberFormValues) {
-    //         onValuesChange(memberFormValues)
-    //     }
-    // }, [memberFormValues, onValuesChange]);
     useEffect(() => {
-        if (existingMemberFormValues) {
+        if (existingMemberFormValues && !isInitialized) {
             reset(existingMemberFormValues);
+            setIsInitialized(true);
         }
-    }, [existingMemberFormValues, reset]);
+    }, [existingMemberFormValues, isInitialized, reset]);
+
+    const watchedValues = watch();
+    
+    useEffect(() => {
+        if (onValuesChange) {
+            onValuesChange(watchedValues);
+        }
+    }, [watchedValues, onValuesChange]);
 
     const handleFileDrop = (e: React.DragEvent<HTMLLabelElement>) => {
         e.preventDefault();
@@ -162,5 +139,4 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
             </div>
         </div>
     </form>);
-}
-
+};

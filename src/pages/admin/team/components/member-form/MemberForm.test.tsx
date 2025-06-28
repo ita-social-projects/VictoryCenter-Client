@@ -18,6 +18,24 @@ describe('MemberForm', () => {
         jest.clearAllMocks();
     });
 
+    it('calls preventDefault on dragOver and dragLeave', () => {
+        render(<MemberForm {...defaultProps} />);
+
+        const dropArea = screen.getByTestId('drop-area');
+
+        const dragOverEvent = createEvent.dragOver(dropArea);
+        const dragLeaveEvent = createEvent.dragLeave(dropArea);
+
+        dragOverEvent.preventDefault = jest.fn();
+        dragLeaveEvent.preventDefault = jest.fn();
+
+        fireEvent(dropArea, dragOverEvent);
+        fireEvent(dropArea, dragLeaveEvent);
+
+        expect(dragOverEvent.preventDefault).toHaveBeenCalled();
+        expect(dragLeaveEvent.preventDefault).toHaveBeenCalled();
+    });
+
     it('renders form with all fields', () => {
         render(<MemberForm {...defaultProps} />);
 
@@ -79,21 +97,36 @@ describe('MemberForm', () => {
             })
         );
     });
-
+    
     it('submits form with valid data', async () => {
         render(<MemberForm {...defaultProps} />);
 
         const categorySelect = screen.getByLabelText('Категорія');
-        const fullNameInput = screen.getByLabelText('Ім\'я та Прізвище');
+        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         const descriptionTextarea = screen.getByLabelText('Опис');
         const imgInput = screen.getByTestId('image');
 
         await userEvent.selectOptions(categorySelect, 'Радники');
         await userEvent.type(fullNameInput, 'Jane Doe');
         await userEvent.type(descriptionTextarea, 'Test description');
-
+        
         const file = new File(['dummy content'], 'test-image.jpg', { type: 'image/jpeg' });
-        await userEvent.upload(imgInput, file);
+        Object.defineProperty(file, 'size', { value: 1024 * 1024 });
+        
+        const fileList = {
+            0: file,
+            length: 1,
+            item: (index: number) => file,
+            [Symbol.iterator]: function* () {
+                yield file;
+            },
+        };
+        
+        Object.setPrototypeOf(fileList, FileList.prototype);
+        
+        fireEvent.change(imgInput, {
+            target: { files: fileList },
+        });
 
         const form = screen.getByTestId('test-form');
         fireEvent.submit(form);
@@ -104,16 +137,12 @@ describe('MemberForm', () => {
                     category: 'Радники',
                     fullName: 'Jane Doe',
                     description: 'Test description',
-                    img: expect.anything()
+                    img: expect.any(FileList),
                 })
             );
-            
         });
     });
-
-
-
-
+    
     it('displays character count for fullName', async () => {
         render(<MemberForm {...defaultProps} />);
 
@@ -452,4 +481,3 @@ describe('MemberForm - Extra Function Coverage', () => {
         expect(imageLoadedSection?.children).toHaveLength(1);
     });
 });
-

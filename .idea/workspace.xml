@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="fixed errors found by sonarcube" />
+    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="inserted empty lines">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -54,30 +56,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Jest.MemberDragPreview.executor": "Run",
-    "Jest.MemberForm.submits form with valid data.executor": "Run",
-    "Jest.useCreateMemberSchema.executor": "Run",
-    "Jest.useCreateMemberSchema.should fail validation due to too big file.executor": "Run",
-    "Jest.useCreateMemberSchema.should pass validation.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "feature/issue-12",
-    "last_opened_file_path": "C:/Users/User/Desktop/Folders/projects/__SOFTSERVE/VictoryCenter-Client/src/assets/icons",
-    "list.type.of.created.stylesheet": "SCSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs.jest.jest_package": "C:/Users/PC/RiderProjects/VictoryCenter-Client/node_modules/react-scripts",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.editor",
-    "ts.external.directory.path": "C:\\Users\\PC\\RiderProjects\\VictoryCenter-Client\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Jest.MemberDragPreview.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.MemberForm.submits form with valid data.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.useCreateMemberSchema.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.useCreateMemberSchema.should fail validation due to too big file.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.useCreateMemberSchema.should pass validation.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#16 on feature/issue-12&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/Desktop/Folders/projects/__SOFTSERVE/VictoryCenter-Client/src/assets/icons&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;SCSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs.jest.jest_package&quot;: &quot;C:/Users/PC/RiderProjects/VictoryCenter-Client/node_modules/react-scripts&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\PC\\RiderProjects\\VictoryCenter-Client\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\User\Desktop\Folders\projects\__SOFTSERVE\VictoryCenter-Client\src\assets\icons" />
@@ -182,6 +185,7 @@
       <workItem from="1748940886891" duration="12216000" />
       <workItem from="1749032320888" duration="3511000" />
       <workItem from="1749112969506" duration="3675000" />
+      <workItem from="1751016486533" duration="881000" />
     </task>
     <task id="LOCAL-00001" summary="fixed tests">
       <option name="closed" value="true" />
@@ -199,7 +203,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750954248469</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="inserted empty lines">
+      <option name="closed" value="true" />
+      <created>1750955005879</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1750955005880</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -210,6 +222,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="fixed tests" />
     <MESSAGE value="fixed errors found by sonarcube" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed errors found by sonarcube" />
+    <MESSAGE value="inserted empty lines" />
+    <option name="LAST_COMMIT_MESSAGE" value="inserted empty lines" />
   </component>
 </project>

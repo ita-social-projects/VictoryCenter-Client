@@ -1,39 +1,55 @@
 import * as yup from 'yup';
+import { TEAM_CATEGORY_MAIN, TEAM_CATEGORY_SUPERVISORY, TEAM_CATEGORY_ADVISORS } from '../../const/team';
+import { 
+    CATEGORY_REQUIRED,
+    CHOOSE_CATEGORY,
+    FULLNAME_REQUIRED,
+    FULLNAME_MAX,
+    FULLNAME_MIN,
+    FORBIDDEN_SYMBOLS,
+    DESCRIPTIONS_REQUIRED,
+    DESCRIPTIONS_MAX,
+    DESCRIPTIONS_MIN,
+    FILE_SIZE,
+    FILE_FORMAT,
+    IMG_REQUIRED } from '../../const/admin/data-validation';
 
-const FILE_SIZE_LIMIT = 100 * 1024; 
-const SUPPORTED_FORMATS = ['image/jpeg', 'image/jpg', 'application/pdf'];
+const FILE_SIZE_LIMIT = 3 * 1024 * 1024; 
+const SUPPORTED_FORMATS = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 export const useCreateMemberSchema = yup.object({
     category: yup
         .string()
-        .required("Категорія обовʼязкова")
-        .oneOf(['Основна команда', 'Наглядова рада', 'Радники'], "Виберіть категорію"), 
+        .required(CATEGORY_REQUIRED)
+        .oneOf([TEAM_CATEGORY_MAIN, TEAM_CATEGORY_SUPERVISORY, TEAM_CATEGORY_ADVISORS], CHOOSE_CATEGORY), 
     
     fullName: yup
         .string()
-        .required('Введіть ім\'я та прізвище')
-        .max(50, 'Не більше 50 символів')
-        .min(2, 'Не менше 2 символів')
+        .required(FULLNAME_REQUIRED)
+        .max(50, FULLNAME_MAX)
+        .min(2, FULLNAME_MIN)
         .matches(
             /^[A-Za-zА-Яа-яҐґЄєІіЇї'’\-\s]+$/,
-            "Поле може містити лише літери, пробіли, ’ -. Поле не може містити цифри"),
+            FORBIDDEN_SYMBOLS),
     
     description: yup
         .string()
-        .required('Введіть опис')
-        .max(200, 'Не більше 200 символів')
-        .min(10, 'Не менше 10 символів'),
+        .required(DESCRIPTIONS_REQUIRED)
+        .max(200, DESCRIPTIONS_MAX)
+        .min(10, DESCRIPTIONS_MIN),
 
     img: yup
         .mixed()
         .defined()
-        .notRequired()
-        .test("fileSize", "Файл має бути не більше 100KB", (value) => {
+        .test("required", IMG_REQUIRED, (value) => {
+            return value && value instanceof FileList && value.length > 0;
+        })
+        .test("fileSize", FILE_SIZE, (value) => {
             if (value && value instanceof FileList && value.length > 0) {
                 return value[0].size <= FILE_SIZE_LIMIT;
             }
             return true;
         })
-        .test("fileType", "Допустимі формати: jpg, jpeg, pdf", (value) => {
+        .test("fileType", FILE_FORMAT, (value) => {
             if (value && value instanceof FileList && value.length > 0) {
                 return SUPPORTED_FORMATS.includes(value[0].type);
             }

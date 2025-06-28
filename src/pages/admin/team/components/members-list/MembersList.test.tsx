@@ -172,6 +172,32 @@ describe('MembersList', () => {
         });
     });
 
+    it('reorders members when item is dropped on different index', async () => {
+        resetMockMembers([
+            createMockMember({ id: 1, fullName: 'Alpha' }),
+            createMockMember({ id: 2, fullName: 'Beta' }),
+        ]);
+
+        render(<MembersList {...sharedDefaultProps} />);
+        
+        await waitFor(() => {
+            expect(screen.getByText((_, el) => el?.textContent === 'Alpha')).toBeInTheDocument();
+            expect(screen.getByText((_, el) => el?.textContent === 'Beta')).toBeInTheDocument();
+        });
+
+        const dragItem = screen.getByTestId('member-item-0');
+        const dropTarget = screen.getByTestId('member-item-1');
+
+        fireEvent.dragStart(dragItem, { dataTransfer: mockDataTransfer });
+        fireEvent.drop(dropTarget, { dataTransfer: mockDataTransfer });
+        
+        expect(screen.getByTestId('member-item-0')).toHaveTextContent('Beta');
+        expect(screen.getByTestId('member-item-1')).toHaveTextContent('Alpha');
+    });
+
+
+
+
     it('renders without crashing and sets default category from localStorage', async () => {
         localStorageMock.setItem('currentTab', 'Наглядова рада');
         render(<MembersList {...sharedDefaultProps} />);

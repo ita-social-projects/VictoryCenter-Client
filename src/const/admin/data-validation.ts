@@ -1,0 +1,12 @@
+export const CATEGORY_REQUIRED = 'Категорія є обов`язковим полем';
+export const CHOOSE_CATEGORY = 'Учасник команди може належати лише до однієї категорії';
+export const FULLNAME_REQUIRED = 'Введіть ім\'я';
+export const FULLNAME_MAX = 'Не більше 50 символів';
+export const FULLNAME_MIN = 'Не менше 2 символів';
+export const FORBIDDEN_SYMBOLS = 'Поле може містити лише літери, пробіли, ’ -. Поле не може містити цифри';
+export const DESCRIPTIONS_REQUIRED = 'Опис є обов`язковим полем';
+export const DESCRIPTIONS_MAX = 'Не більше 200 символів';
+export const DESCRIPTIONS_MIN = 'Не менше 10 символів';
+export const IMG_REQUIRED = 'Фото учасника команди є  обов`язковим';
+export const FILE_SIZE = 'Фото не більше 3 Mb';
+export const FILE_FORMAT = 'Невірний формат фото, дозволено jpeg, jpg, png, webp';

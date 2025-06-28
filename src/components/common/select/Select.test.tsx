@@ -146,6 +146,8 @@ describe('Select Component', () => {
         expect(span).toHaveStyle('color: #61615C');
 
         fireEvent.click(selectContainer);
+        expect(span).toHaveStyle('color: #061125');
+        
         const option = screen.getByText('Option 1');
         fireEvent.click(option);
 

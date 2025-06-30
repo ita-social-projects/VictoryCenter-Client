@@ -450,7 +450,8 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
                         {TEAM_DELETE_MEMBER}
                     </div>
                 </Modal.Title>
-                <Modal.Content>
+                <Modal.Content> 
+                    <></>
                 </Modal.Content>
                 <Modal.Actions>
                     <div className='members-delete-modal-actions'>

@@ -1,4 +1,5 @@
 export const adminRoutes = {
+    loginRoute:      "/login",
     adminRoute:      "/admin-page",
     teamSubRoute:    "team",
     testSubRoute:    "test",

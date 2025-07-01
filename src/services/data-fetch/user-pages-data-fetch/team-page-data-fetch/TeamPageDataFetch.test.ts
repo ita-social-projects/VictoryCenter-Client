@@ -17,16 +17,16 @@ describe('fetchTeamPageData', () => {
     it('should return full valid data', async () => {
         const mockData = [
             {
-                name: 'Engineering',
+                categoryName: 'Engineering',
                 description: 'Dev team',
-                members: [
+                teamMembers: [
                     { id: 1, fullName: 'Alice', description: 'Frontend Dev' },
                     { id: 2, fullName: 'Bob', description: null },
                 ],
             },
             {
-                name: 'With no description',
-                members: [
+                categoryName: 'With no description',
+                teamMembers: [
                     { id: 3, fullName: 'John', description: 'Backend Dev' },
                 ],
             },
@@ -64,9 +64,9 @@ describe('fetchTeamPageData', () => {
     it('should filter out invalid members', async () => {
         const mockData = [
             {
-                name: 'Design',
+                categoryName: 'Design',
                 description: 'Design team',
-                members: [
+                teamMembers: [
                     // Invalid
                     { id: 3, fullName: '', description: 'UX' },
                     { id: 4, fullName: null, description: 'UI' },
@@ -102,23 +102,23 @@ describe('fetchTeamPageData', () => {
         const mockData = [
             {
                 // Without name
-                name: '',
+                categoryName: '',
                 description: 'Marketing team',
-                members: [
+                teamMembers: [
                     { id: 6, fullName: 'Anna', description: 'SEO' },
                 ],
             },
             {
                 // Without team members
-                name: 'QA',
+                categoryName: 'QA',
                 description: 'Testers',
-                members: [],
+                teamMembers: [],
             },
             {
                 // Without valid team members
-                name: 'PM',
+                categoryName: 'PM',
                 description: 'Product',
-                members: [
+                teamMembers: [
                     // Without fullName
                     { id: 7, fullName: '', description: 'Product Owner' },
                 ],
@@ -126,7 +126,7 @@ describe('fetchTeamPageData', () => {
             {
                 // Without name
                 description: 'Manager',
-                members: [
+                teamMembers: [
                     { id: 8, fullName: 'John', description: 'Cool manager' },
                 ],
             },

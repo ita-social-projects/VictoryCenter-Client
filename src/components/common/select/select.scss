@@ -16,6 +16,13 @@
 
   &-closed {
     justify-content: space-between;
+    
+    span {
+      color: #61615C;
+      &.not-empty {
+        color: #061125;
+      }
+    }
   }
 
   &-options {

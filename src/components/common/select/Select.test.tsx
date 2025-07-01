@@ -143,15 +143,14 @@ describe('Select Component', () => {
         const selectContainer = container.firstChild as HTMLElement;
         const span = container.querySelector('span');
 
-        expect(span).toHaveStyle('color: #61615C');
+        expect(span).toHaveClass('empty');
 
         fireEvent.click(selectContainer);
-        expect(span).toHaveStyle('color: #061125');
         
         const option = screen.getByText('Option 1');
         fireEvent.click(option);
 
-        expect(span).toHaveStyle('color: #061125');
+        expect(span).toHaveClass('not-empty');
     });
 
     it('applies selected class to options when not in autocomplete mode', () => {

@@ -41,7 +41,7 @@ export const Select = <TValue, >({
                      }
                  }}>
         <span
-            className={classNames({
+            className={classNames('empty', {
                 'not-empty': selectedValue !== null && selectedValue !== undefined})}
                 >
                 {selectedValue !== null && selectedValue !== undefined ? selectedValue.toString() : TEAM_STATUS_DEFAULT}

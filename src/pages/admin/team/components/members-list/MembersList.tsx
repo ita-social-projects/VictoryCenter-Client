@@ -79,7 +79,7 @@ export const fetchMembers = async (
 };
 
 export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValuesChange}: MembersListProps) => {
-    const pageSize = 5;
+    const [pageSize, setPageSize] = useState(0);
     const [totalPages, setTotalPages] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [teamMemberToDelete, setTeamMemberToDelete] = useState<string | null>(null);
@@ -121,6 +121,18 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         categoryRef.current = category;
     }, [category]);
 
+    useEffect(() => {
+        const updatePageSize = () => {
+            if (memberListRef.current) {
+                setPageSize(memberListRef.current.clientHeight / 120 + 1);
+            }
+        };
+
+        updatePageSize();
+        window.addEventListener("resize", updatePageSize);
+        return () => window.removeEventListener("resize", updatePageSize);
+    }, [memberListRef]);
+
     const loadMembers = useCallback(async (reset: boolean = false) => {
         const currentCategory = categoryRef.current;
         const currentSearch = searchByNameQuery || '';
@@ -149,7 +161,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
         setIsMembersLoading(false);
         isFetchingRef.current = false;
-    }, [searchByNameQuery, statusFilter]);
+    }, [searchByNameQuery, statusFilter, pageSize]);
 
     useEffect(() => {
         setMembers([]);
@@ -157,7 +169,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         setTotalPages(null);
         isFetchingRef.current = false;
         loadMembers(true);
-    }, [category, searchByNameQuery, statusFilter, loadMembers]);
+    }, [category, searchByNameQuery, statusFilter, loadMembers, pageSize]);
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
         setDraggedIndex(index);

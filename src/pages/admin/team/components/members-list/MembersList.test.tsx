@@ -155,7 +155,14 @@ const resetMockMembers = (members: Member[] = [createMockMember()]) => {
 
 describe('MembersList', () => {
     let mockFetchMembers: jest.SpyInstance;
-
+    beforeAll(() => {
+        Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
+            configurable: true,
+            get() {
+                return 800;
+            },
+        });
+    });
     beforeEach(() => {
         idCounter = 0;
         jest.clearAllMocks();

@@ -451,6 +451,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
                     </div>
                 </Modal.Title>
                 <Modal.Content>
+                <></>
                 </Modal.Content>
                 <Modal.Actions>
                     <div className='members-delete-modal-actions'>

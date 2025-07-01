@@ -35,6 +35,7 @@ export const Select = <TValue, >({
     return (<div role={"toolbar"} ref={selectContainerRef}
                  onClick={handleOpenSelect}
                  className={`${className ?? ''} select ${isOpen ? 'select-opened' : 'select-closed'}`}
+                 tabIndex={0}
                  onKeyDown={(e) => {
                      if (e.key === 'Enter' || e.key === ' ') {
                          handleOpenSelect();

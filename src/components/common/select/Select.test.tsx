@@ -73,6 +73,40 @@ describe('Select Component', () => {
         expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-down.svg');
     });
 
+    it('opens select when Space or Enter is pressed', () => {
+        const { container } = render(<Select {...defaultProps} />);
+        const selectContainer = container.firstChild as HTMLElement;
+
+        fireEvent.keyDown(selectContainer, { key: ' ', code: 'Space', charCode: 32 });
+        expect(selectContainer).toHaveClass('select-opened');
+        expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-up.svg');
+
+        fireEvent.click(selectContainer);
+
+        fireEvent.keyDown(selectContainer, { key: 'Enter', code: 'Enter', charCode: 13 });
+        expect(selectContainer).toHaveClass('select-opened');
+        expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-up.svg');
+    });
+
+    it('closes select when Space or Enter is pressed again', () => {
+        const { container } = render(<Select {...defaultProps} />);
+        const selectContainer = container.firstChild as HTMLElement;
+
+        fireEvent.keyDown(selectContainer, { key: ' ', code: 'Space', charCode: 32 });
+        expect(selectContainer).toHaveClass('select-opened');
+
+        fireEvent.keyDown(selectContainer, { key: ' ', code: 'Space', charCode: 32 });
+        expect(selectContainer).toHaveClass('select-closed');
+        expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-down.svg');
+
+        fireEvent.keyDown(selectContainer, { key: 'Enter', code: 'Enter', charCode: 13 });
+        expect(selectContainer).toHaveClass('select-opened');
+
+        fireEvent.keyDown(selectContainer, { key: 'Enter', code: 'Enter', charCode: 13 });
+        expect(selectContainer).toHaveClass('select-closed');
+        expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-down.svg');
+    });
+
     it('toggles select state multiple times', () => {
         const { container } = render(<Select {...defaultProps} />);
         const selectContainer = container.firstChild as HTMLElement;

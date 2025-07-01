@@ -45,6 +45,11 @@ export const ScrollableFrame = () => {
     
     return (
         <div className="scroll-block">
+            {error && (
+                <div className="error-message" role="alert" style={{ color: "red" }}>
+                    {error}
+                </div>
+            )}
             <Swiper modules={[Navigation, Pagination, Scrollbar]}
                     onSwiper={(swiper: SwiperClass) => (swiperRef.current = swiper)}
                     slidesPerView={3}

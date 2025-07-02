@@ -476,7 +476,7 @@ describe('MembersList', () => {
             fireEvent.change(catInput, {target: {value: ''}});
 
             fireEvent.click(screen.getByTestId('modal'));
-            await waitFor(() => expect(screen.getByText('Зміни буде втрачено. Бажаєте продовжити?')).toBeInTheDocument());
+            expect(await screen.findByText('Зміни буде втрачено. Бажаєте продовжити?')).toBeInTheDocument();
 
             const confirmCloseButton = screen.getByRole('button', {name: /Так/i});
             fireEvent.click(confirmCloseButton);
@@ -491,7 +491,7 @@ describe('MembersList', () => {
                 createMockMember({id: 1, fullName: 'Alpha', description: 'A'}),
             ]);
             render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+            expect(await screen.findByText('Alpha')).toBeInTheDocument();
             fireEvent.click(screen.getByTestId('edit-button-0'));
 
             fireEvent.change(screen.getByTestId('form-fullName'), {target: {value: ''}});
@@ -499,7 +499,7 @@ describe('MembersList', () => {
             fireEvent.change(screen.getByTestId('form-category'), {target: {value: ''}});
 
             fireEvent.click(screen.getByTestId('modal'));
-            await waitFor(() => expect(screen.getByText('Зміни буде втрачено. Бажаєте продовжити?')).toBeInTheDocument());
+            expect(await screen.findByText('Зміни буде втрачено. Бажаєте продовжити?')).toBeInTheDocument();
 
             const confirmCloseButton = screen.getByRole('button', {name: /Так/i});
             fireEvent.click(confirmCloseButton);

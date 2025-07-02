@@ -4,26 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="Changed some rules, fixed tests">
-      <change afterPath="$PROJECT_DIR$/src/assets/about-us-images/icons/arrow-left-black.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/about-us-images/icons/arrow-left.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/about-us-images/icons/arrow-right-black.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/about-us-images/icons/arrow-right.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/about-us-images/images/background.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/common/scrollable-program-frame/ScrollableFrame.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/components/common/scrollable-program-frame/scrollable-frame.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/about-us-page/AboutUsPage.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/about-us-page/intro-section/IntroSection.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/about-us-page/intro-section/intro-section.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/about-us-page/our-mission/OurMission.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/about-us-page/our-mission/our-mission.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/const/routers/routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/const/routers/routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/program-page/program-page/program-section/program-card/program-card.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/program-page/program-page/program-section/program-card/program-card.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/routes/app-router/AppRouter.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/routes/app-router/AppRouter.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/mock-data/program-page/program-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/mock-data/program-page/program-page.ts" afterDir="false" />
+    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="Created new section">
+      <change afterPath="$PROJECT_DIR$/src/assets/about-us-images/images/our-team.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/about-us-page/company-values/CompanyValues.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/about-us-page/company-values/company-values.scss" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/about-us-page/our-team-section/OurTeam.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/about-us-page/our-team-section/our-team.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/about-us-page/AboutUsPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/about-us-page/AboutUsPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/about-us-page/support-section/SupportSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/about-us-page/support-section/SupportSection.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/about-us-page/support-section/support-section.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/about-us-page/support-section/support-section.scss" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,7 +31,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="release/1.0.0" />
+        <entry key="$PROJECT_DIR$" value="feature/issue-12" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />

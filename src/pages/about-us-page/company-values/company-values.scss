@@ -1,0 +1,88 @@
+* { 
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+.values-block{
+  position: relative;
+  height: 78rem;
+  
+  .values-title{
+    font-family: Mulish, sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 2.5rem;
+    letter-spacing: -0.02rem;
+    text-transform: uppercase;
+    position: absolute;
+    top: 2.75rem;
+    left: 3.5rem;
+  }
+  
+  .value-card {
+    position: absolute;
+    background-color: #EEF7FB;
+    display:  flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 2rem;
+    
+    .value-item{
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+      
+      .value-name{
+        width: 100%;
+        font-family: Mulish, sans-serif;
+        font-weight: 500;
+        font-size: 1.5rem;
+        line-height: 2.25rem;
+        letter-spacing: -0.02em;
+        border-bottom: 2px solid #FFFFFF;
+        padding-bottom: 0.25rem;
+      }
+      
+      .value-description{
+        font-family: Mulish, sans-serif;
+        font-weight: 400;
+        font-size: 1rem;
+        line-height: 1.5rem;
+        letter-spacing: -0.02em;
+        color: #061125;
+      }
+    }
+  }
+  
+  .value-card:nth-of-type(1) {
+    width: 34%;
+    top: 8.75rem;
+    padding: 4rem 3.5rem;
+    
+    .value-item{
+      width: 20rem;
+    }
+  }
+  .value-card:nth-of-type(2) {
+    width: 31%;
+    top: 17rem;
+    left: 34%;
+    padding: 4rem 1rem;
+
+    .value-item{
+      width: 19.75rem;
+    }
+  }
+  .value-card:nth-of-type(3) {
+    width: 35%;
+    top: 21rem;
+    left: 65%;
+    padding: 4rem 1rem;
+
+    .value-item{
+      width: 20rem;
+    }
+  }
+}

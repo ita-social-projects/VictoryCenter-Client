@@ -2,6 +2,7 @@ import supportVeterans from '../../../assets/about-us-images/images/support-vete
 import supportVolunteers from '../../../assets/about-us-images/images/support-volunteers.jpg';
 import supportChildren from '../../../assets/about-us-images/images/support-children.jpg';
 import './support-section.scss'
+
 export const SupportSection = () => {
     
     return (
@@ -24,5 +25,5 @@ export const SupportSection = () => {
                     сформувати довіру маленьких українців/ок до оточуючих та повернути відчуття безпеки.&nbsp;</p>
             </div>
         </div>
-    )
-}
+    );
+};

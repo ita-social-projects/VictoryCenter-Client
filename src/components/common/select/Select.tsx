@@ -32,6 +32,8 @@ export const Select = <TValue, >({
         onValueChange(value);
     };
 
+    const isSelectedValuePresent = !!selectedValue;
+
     return (<div role={"toolbar"} ref={selectContainerRef}
                  onClick={handleOpenSelect}
                  className={`${className ?? ''} select ${isOpen ? 'select-opened' : 'select-closed'}`}
@@ -42,10 +44,11 @@ export const Select = <TValue, >({
                      }
                  }}>
         <span
-            className={classNames('empty', {
-                'not-empty': selectedValue !== null && selectedValue !== undefined})}
+            className={classNames({
+                'empty': !isSelectedValuePresent,
+                'not-empty': isSelectedValuePresent})}
                 >
-                {selectedValue !== null && selectedValue !== undefined ? selectedValue.toString() : TEAM_STATUS_DEFAULT}
+                {isSelectedValuePresent ? selectedValue.toString() : TEAM_STATUS_DEFAULT}
         </span>
         <img src={isOpen ? ArrowUp : ArrowDown} alt="arrow-down"/>
         <div className={`select-options ${isOpen ? 'select-options-visible' : ''}`}>

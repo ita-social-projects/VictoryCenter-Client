@@ -1,13 +1,4 @@
-import React, {
-    createContext,
-    useContext,
-    useMemo,
-    ReactNode,
-    useState,
-    useEffect,
-    useCallback,
-} from 'react';
-import { Credentials } from '../../types/AdminContext';
+import React, { createContext, useContext, useMemo, ReactNode, useState, useCallback } from 'react';
 import {
     loginRequest,
     tokenRefreshRequest,
@@ -15,6 +6,8 @@ import {
 import { AuthService } from '../../services/authService';
 import { CreateAdminClient } from '../../services/apiClients/createAdminClient';
 import { AxiosInstance } from 'axios';
+import { useOnMountUnsafe } from '../../utils/hooks/useOnMountUnsafe';
+import { Credentials } from '../../types/Auth';
 
 type Props = {
     children: ReactNode;
@@ -35,7 +28,7 @@ export const AdminContextProvider = ({ children }: Props) => {
     const [token, setToken] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    const isAuthenticated = AuthService.isAccessTokenValid(token);
+    const isAuthenticated = useMemo(() => AuthService.isAccessTokenValid(token), [token]);
 
     const login = useCallback(async (creds: Credentials) => {
         const data = await loginRequest(creds);
@@ -47,20 +40,15 @@ export const AdminContextProvider = ({ children }: Props) => {
     }, []);
 
     const refreshAccessToken = useCallback(async () => {
-        const data = await tokenRefreshRequest(token);
+        const data = await tokenRefreshRequest();
         setToken(data);
-    }, [token]);
-
-    useEffect(() => {
-          // eslint-disable-next-line no-console
-          console.log('Here is our token', token);
-    }, [token]);
+    }, []);
 
     // silent refresh on mount
-    useEffect(() => {
+    useOnMountUnsafe(() => {
         (async () => {
             try {
-                await refreshAccessToken();
+                if (!token) await refreshAccessToken();
             } catch {
                 logout();
             } finally {

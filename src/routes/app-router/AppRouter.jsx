@@ -19,6 +19,7 @@ import { LoginPage } from '../../pages/login/LoginPage';
 import { AdminContextWrapper } from '../../components/admin/admin-context-wrapper/AdminContextWrapper';
 
 import { PrivateRoute } from '../../components/admin/private-route/PrivateRoute';
+import { PublicRoute } from '../../components/admin/public-route/PublicRoute';
 
 const {
     programPage,
@@ -38,7 +39,9 @@ export const AppRouter = () => (
             </Route>
 
             <Route element={<AdminContextWrapper />}>
-                <Route path={adminRoutes.loginRoute} element={<LoginPage />} />
+                <Route element={<PublicRoute />}>
+                    <Route path={adminRoutes.loginRoute} element={<LoginPage />} />
+                </Route>
 
                 <Route element={<PrivateRoute />}>
                     <Route path={adminRoutes.adminRoute} element={<AdminLayout />}>

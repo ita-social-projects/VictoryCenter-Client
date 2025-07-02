@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { useAdminContext } from '../../../../context/admin-context-provider/AdminContextProvider';
-import { Credentials } from '../../../../types/AdminContext';
 import { Button } from '../../../../components/common/button/Button';
 import {
     EMAIL_FIELD_LABEL,
+    EYE_CLOSED_ALT,
+    EYE_OPENED_ALT,
     FORM_TITLE,
     LOGO_ALT,
     PASSWORD_FIELD_LABEL,
     SUBMIT_BUTTON,
 } from '../../../../const/login-page/login-page';
 import Logo from '../../../../assets/icons/logo.svg';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { adminRoutes } from '../../../../const/routers/routes';
+import EyeOpened from '../../../../assets/icons/eye-opened.svg';
+import EyeClosed from '../../../../assets/icons/eye-closed.svg';
+import { Credentials } from '../../../../types/Auth';
 import './login-form.scss';
 
 type LoginFormProps = {
@@ -21,10 +24,7 @@ type LoginFormProps = {
 export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
     const { login } = useAdminContext();
     const [credentials, setCredentials] = useState<Credentials>({ email: '', password: '' });
-    const navigate = useNavigate();
-    const location = useLocation();
-    
-    const from = location.state?.from?.pathname || adminRoutes.adminRoute;
+    const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
     const handleChange = (field: keyof Credentials) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setCredentials((prev) => ({ ...prev, [field]: e.target.value }));
@@ -34,14 +34,13 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
         e.preventDefault();
         try {
             await login(credentials);
-            navigate(from, { replace: true });
         } catch (error) {
             setShowErrorModal(true);
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="form">
+        <form onSubmit={handleSubmit} className="form" spellCheck={false}>
             <NavLink to="/" className="logo">
                 <img src={Logo} alt={LOGO_ALT} />
             </NavLink>
@@ -61,15 +60,30 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
 
             <div className="form-group">
                 <label htmlFor="password">{PASSWORD_FIELD_LABEL}</label>
-                <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    value={credentials.password}
-                    onChange={handleChange('password')}
-                    autoComplete="current-password"
-                    required
-                />
+                <div className="password-input-container">
+                    <input
+                        id="password"
+                        name="password"
+                        type={isPasswordVisible ? 'text' : 'password'}
+                        value={credentials.password}
+                        onChange={handleChange('password')}
+                        autoComplete="current-password"
+                        required
+                    />
+                    <button
+                        type="button"
+                        className="visibility-toggle"
+                        onClick={() =>
+                            setIsPasswordVisible((isPasswordVisible) => !isPasswordVisible)
+                        }
+                    >
+                        <img
+                            src={isPasswordVisible ? EyeOpened : EyeClosed}
+                            alt={isPasswordVisible ? EYE_OPENED_ALT : EYE_CLOSED_ALT}
+                            className="toggle-icon"
+                        />
+                    </button>
+                </div>
             </div>
             <div className="form-group">
                 <Button type="submit" buttonStyle="primary" className="submit-button">

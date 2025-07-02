@@ -42,6 +42,25 @@
             outline: none;   
         }
 
+        .password-input-container {
+            position: relative;
+
+            .visibility-toggle {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                right: 0.75rem;
+                background: none;
+                border: none;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: inherit;
+            }
+        }
+
         .submit-button {
             margin-top: 0.625rem;
             height: 2.5rem;

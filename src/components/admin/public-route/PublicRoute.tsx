@@ -1,9 +1,9 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAdminContext } from '../../../context/admin-context-provider/AdminContextProvider';
-import { adminRoutes } from '../../../const/routers/routes';
 import { PageLoader } from '../../common/page-loader/PageLoader';
+import { adminRoutes } from '../../../const/routers/routes';
 
-export const PrivateRoute = () => {
+export const PublicRoute = () => {
     const { isLoading, isAuthenticated } = useAdminContext();
     const location = useLocation();
 
@@ -11,8 +11,9 @@ export const PrivateRoute = () => {
         return <PageLoader />;
     }
 
-    if (!isAuthenticated) {
-        return <Navigate to={adminRoutes.loginRoute} state={{ from: location }} replace />;
+    if (isAuthenticated) {
+        const from = location.state?.from?.pathname || adminRoutes.adminRoute;
+        return <Navigate to={from} replace />;
     }
 
     return <Outlet />;

@@ -1,4 +1,9 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, {
+    AxiosError,
+    AxiosInstance,
+    AxiosRequestConfig,
+    InternalAxiosRequestConfig,
+} from 'axios';
 
 export function CreateAdminClient(
     baseURL: string,
@@ -17,18 +22,12 @@ export function CreateAdminClient(
         retryQueue.length = 0;
     };
 
-    client.interceptors.request.use((config) => {
-        if (checkIsAuthenticated()) {
-            config.headers = config.headers || {};
-            config.headers['Authorization'] = `Bearer ${getAccessToken()}`;
-            return config;
-        }
-
-        return new Promise((resolve, reject) => {
+    const resolveWithNewToken = (config: InternalAxiosRequestConfig) => {
+        return new Promise<InternalAxiosRequestConfig>((resolve, reject) => {
             retryQueue.push((newToken: string) => {
                 config.headers = config.headers || {};
                 config.headers['Authorization'] = `Bearer ${newToken}`;
-                resolve(config);
+                resolve(client(config));
             });
 
             if (!isRefreshing) {
@@ -46,6 +45,16 @@ export function CreateAdminClient(
                     });
             }
         });
+    };
+
+    client.interceptors.request.use((config) => {
+        if (checkIsAuthenticated()) {
+            config.headers = config.headers || {};
+            config.headers['Authorization'] = `Bearer ${getAccessToken()}`;
+            return config;
+        }
+
+        return resolveWithNewToken(config);
     });
 
     client.interceptors.response.use(
@@ -54,28 +63,7 @@ export function CreateAdminClient(
             const { response, config } = error;
 
             if (response?.status === 401) {
-                return new Promise((resolve, reject) => {
-                    retryQueue.push((newToken: string) => {
-                        config.headers = config.headers || {};
-                        config.headers['Authorization'] = `Bearer ${newToken}`;
-                        resolve(client(config));
-                    });
-
-                    if (!isRefreshing) {
-                        isRefreshing = true;
-                        refreshAccessToken()
-                            .then(() => {
-                                resolveQueue(getAccessToken());
-                            })
-                            .catch((err) => {
-                                logout();
-                                reject(err);
-                            })
-                            .finally(() => {
-                                isRefreshing = false;
-                            });
-                    }
-                });
+                return resolveWithNewToken(config);
             }
 
             return Promise.reject(error);

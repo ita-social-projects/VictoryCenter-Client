@@ -8,6 +8,7 @@ import { CreateAdminClient } from '../../services/apiClients/createAdminClient';
 import { AxiosInstance } from 'axios';
 import { useOnMountUnsafe } from '../../utils/hooks/useOnMountUnsafe';
 import { Credentials } from '../../types/Auth';
+import { apiBase } from '../../const/urls/main-api';
 
 type Props = {
     children: ReactNode;
@@ -61,7 +62,7 @@ export const AdminContextProvider = ({ children }: Props) => {
     const client = useMemo(
         () =>
             CreateAdminClient(
-                '',
+                apiBase,
                 () => isAuthenticated,
                 () => token,
                 refreshAccessToken,

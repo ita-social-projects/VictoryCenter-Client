@@ -126,16 +126,18 @@ victory-center-client/
 
 In the project directory, you can run:
 
-# Setup
-To setup this project use this command in project folder:
-
-### `npm install`
-
 ### `npm start`
 
 Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Open [https://localhost:3000](https://localhost:3000) to view it in the browser.
 
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
+
+### `npm run start-with-cert`
+
+Runs the app in development mode over HTTPS, generating and trusting a local SSL certificate.\
+Open [https://localhost:3000](https://localhost:3000) to view it in the browser without certificate warnings.\
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
@@ -168,7 +170,48 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 **Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
 ## Installation
- - Modify this section later
+
+First of all, make sure you have installed dependencies for [back-end part of project](https://github.com/ita-social-projects/VictoryCenter-Back) and ones listed below: 
+
+### Required to install
+* NodeJS (20.0.0) or higher
+* npm (11.0.0) or higher
+
+### Clone
+
+Clone this repo to your local machine using: 
+```
+git clone https://github.com/ita-social-projects/VictoryCenter-Client
+```
+### Setup
+To setup this project use this command in project folder:
+```
+npm install
+```
+
+To enable HTTPS locally, you have two options: 
+* Either use this command to handle configuration for you and start project: 
+``` 
+npm run start-with-cert 
+```  
+* Or if you have any troubles, we have a few manual setup steps. Follow these instructions carefully:
+
+#### Prerequisites
+
+Before proceeding, ensure you have [mkcert](https://github.com/FiloSottile/mkcert?tab=readme-ov-file#installation) installed on your system.
+
+#### Installation Steps
+
+1. Create a `certs` folder in the root directory of cloned project.
+2. Navigate to the `certs` folder in your console.
+3. Run the following command to install local certificate authority:
+```
+mkcert -install
+```
+4. Run the following command to configure SSL certificates:
+```
+mkcert -key-file localhost-key.pem -cert-file localhost-cert.pem localhost 127.0.0.1 ::1
+```
 
 ### Required to install
  - Modify this section later

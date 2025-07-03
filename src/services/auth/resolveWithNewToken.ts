@@ -1,20 +1,15 @@
-import axios, {
-    AxiosError,
-    AxiosInstance,
-    AxiosRequestConfig,
-    InternalAxiosRequestConfig,
-} from 'axios';
+import { InternalAxiosRequestConfig } from 'axios';
 
-export function CreateAdminClient(
-    baseURL: string,
-    checkIsAuthenticated: () => boolean,
-    getAccessToken: () => string,
+export interface RefreshHandler {
+    (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig>;
+}
+
+export const resolveWithNewTokenConcurrent = (
     refreshAccessToken: () => Promise<void>,
+    getAccessToken: () => string,
     logout: () => void
-): AxiosInstance {
-    const client = axios.create({ baseURL });
-
-    var isRefreshing = false;
+): RefreshHandler => {
+    let isRefreshing = false;
     const retryQueue: Array<(token: string) => void> = [];
 
     const resolveQueue = (token: string) => {
@@ -22,12 +17,12 @@ export function CreateAdminClient(
         retryQueue.length = 0;
     };
 
-    const resolveWithNewToken = (config: InternalAxiosRequestConfig) => {
+    return function resolveWithNewToken(config: InternalAxiosRequestConfig) {
         return new Promise<InternalAxiosRequestConfig>((resolve, reject) => {
             retryQueue.push((newToken: string) => {
                 config.headers = config.headers || {};
                 config.headers['Authorization'] = `Bearer ${newToken}`;
-                resolve(client(config));
+                resolve(config);
             });
 
             if (!isRefreshing) {
@@ -46,29 +41,22 @@ export function CreateAdminClient(
             }
         });
     };
+};
 
-    client.interceptors.request.use((config) => {
-        if (checkIsAuthenticated()) {
+export const resolveWithNewToken = (
+    refreshAccessToken: () => Promise<void>,
+    getAccessToken: () => string,
+    logout: () => void
+): RefreshHandler => {
+    return async function (config: InternalAxiosRequestConfig) {
+        try {
+            await refreshAccessToken();
             config.headers = config.headers || {};
             config.headers['Authorization'] = `Bearer ${getAccessToken()}`;
             return config;
+        } catch (err) {
+            logout();
+            throw err;
         }
-
-        return resolveWithNewToken(config);
-    });
-
-    client.interceptors.response.use(
-        (response) => response,
-        (error: AxiosError & { config: AxiosRequestConfig }) => {
-            const { response, config } = error;
-
-            if (response?.status === 401) {
-                return resolveWithNewToken(config);
-            }
-
-            return Promise.reject(error);
-        }
-    );
-
-    return client;
-}
+    };
+};

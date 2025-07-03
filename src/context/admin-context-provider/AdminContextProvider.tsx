@@ -1,10 +1,18 @@
-import React, { createContext, useContext, useMemo, ReactNode, useState, useCallback } from 'react';
+import React, {
+    createContext,
+    useContext,
+    useMemo,
+    ReactNode,
+    useState,
+    useCallback,
+    useRef,
+} from 'react';
 import {
     loginRequest,
     tokenRefreshRequest,
 } from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
-import { AuthService } from '../../services/authService';
-import { CreateAdminClient } from '../../services/apiClients/createAdminClient';
+import { AuthService } from '../../services/auth/AuthService';
+import { CreateAdminClient } from '../../services/auth/createAdminClient';
 import { AxiosInstance } from 'axios';
 import { useOnMountUnsafe } from '../../utils/hooks/useOnMountUnsafe';
 import { Credentials } from '../../types/Auth';
@@ -29,27 +37,37 @@ export const AdminContextProvider = ({ children }: Props) => {
     const [token, setToken] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    const isAuthenticated = useMemo(() => AuthService.isAccessTokenValid(token), [token]);
+    const isAuthenticated = AuthService.isAccessTokenValid(token);
 
-    const login = useCallback(async (creds: Credentials) => {
-        const data = await loginRequest(creds);
-        setToken(data);
+    const tokenRef = useRef<string>(token);
+
+    const updateToken = useCallback((newToken: string) => {
+        tokenRef.current = newToken;
+        setToken(newToken);
     }, []);
+
+    const login = useCallback(
+        async (creds: Credentials) => {
+            const newToken = await loginRequest(creds);
+            updateToken(newToken);
+        },
+        [updateToken]
+    );
 
     const logout = useCallback(() => {
-        setToken('');
-    }, []);
+        updateToken('');
+    }, [updateToken]);
 
     const refreshAccessToken = useCallback(async () => {
-        const data = await tokenRefreshRequest();
-        setToken(data);
-    }, []);
+        const newToken = await tokenRefreshRequest();
+        updateToken(newToken);
+    }, [updateToken]);
 
     // silent refresh on mount
     useOnMountUnsafe(() => {
         (async () => {
             try {
-                if (!token) await refreshAccessToken();
+                if (!tokenRef.current) await refreshAccessToken();
             } catch {
                 logout();
             } finally {
@@ -63,12 +81,12 @@ export const AdminContextProvider = ({ children }: Props) => {
         () =>
             CreateAdminClient(
                 apiBase,
-                () => isAuthenticated,
-                () => token,
+                () => AuthService.isAccessTokenValid(tokenRef.current),
+                () => tokenRef.current,
                 refreshAccessToken,
                 logout
             ),
-        [isAuthenticated, token, refreshAccessToken, logout]
+        [logout, refreshAccessToken]
     );
 
     const contextValue = useMemo(

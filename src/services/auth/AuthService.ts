@@ -1,4 +1,4 @@
-import { JwtPayload } from "../types/Auth";
+import { JwtPayload } from "../../types/Auth";
 
 export class AuthService {
     public static isAccessTokenValid(token: string): boolean {

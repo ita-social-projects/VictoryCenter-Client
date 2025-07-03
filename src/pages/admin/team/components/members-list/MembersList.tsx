@@ -25,6 +25,7 @@ import {
   TEAM_CATEGORY_ADVISORS,
   TEAM_NOT_FOUND
 } from '../../../../../const/team';
+import classNames from "classnames";
 
 export type Member = {
     id: number;
@@ -424,11 +425,11 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
             <div className='members'>
                 <div data-testid="members-categories" className='members-categories' style={{"pointerEvents": isMembersLoading ? "none" : "all"}}>
                     <button onClick={() => setCategory(TEAM_CATEGORY_MAIN)}
-                         className={category === TEAM_CATEGORY_MAIN ? 'members-categories-selected' : ''}>{TEAM_CATEGORY_MAIN}</button>
+                         className={classNames({'members-categories-selected' : category === TEAM_CATEGORY_MAIN})}>{TEAM_CATEGORY_MAIN}</button>
                     <button onClick={() => setCategory(TEAM_CATEGORY_SUPERVISORY)}
-                         className={category === TEAM_CATEGORY_SUPERVISORY ? 'members-categories-selected' : ''}>{TEAM_CATEGORY_SUPERVISORY}</button>
+                         className={classNames({'members-categories-selected' : category === TEAM_CATEGORY_SUPERVISORY})}>{TEAM_CATEGORY_SUPERVISORY}</button>
                     <button onClick={() => setCategory(TEAM_CATEGORY_ADVISORS)}
-                         className={category === TEAM_CATEGORY_ADVISORS ? 'members-categories-selected' : ''}>{TEAM_CATEGORY_ADVISORS}</button>
+                         className={classNames({'members-categories-selected' : category === TEAM_CATEGORY_ADVISORS})}>{TEAM_CATEGORY_ADVISORS}</button>
                 </div>
                 <div ref={memberListRef} onScroll={handleOnScroll} data-testid="members-list" className="members-list">
                     {content}

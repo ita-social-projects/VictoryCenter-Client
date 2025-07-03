@@ -34,7 +34,11 @@ export const Select = <TValue, >({
 
     return (<div role={"toolbar"} ref={selectContainerRef}
                  onClick={handleOpenSelect}
-                 className={`${className ?? ''} select ${isOpen ? 'select-opened' : 'select-closed'}`}
+                 className={classNames("select", {
+                    [className!]: className!!,
+                    "select-opened": isOpen,
+                    "select-closed": !isOpen,
+                 })}
                  tabIndex={0}
                  onKeyDown={(e) => {
                      if (e.key === 'Enter' || e.key === ' ') {
@@ -48,12 +52,12 @@ export const Select = <TValue, >({
                 {selectedValue !== null && selectedValue !== undefined ? selectedValue.toString() : TEAM_STATUS_DEFAULT}
         </span>
         <img src={isOpen ? ArrowUp : ArrowDown} alt="arrow-down"/>
-        <div className={`select-options ${isOpen ? 'select-options-visible' : ''}`}>
+        <div className={classNames("select-options", {"select-options-visible": isOpen})}>
             {options.map((opt, index) => {
                 if (!React.isValidElement(opt)) return <></>;
                 const {name, value} = opt.props as { children: React.ReactNode, value: TValue, name: string };
                 return (<button key={`${name}-${index}`}
-                             className={(!isAutocomplete && selectedValue === value) ? 'select-options-selected' : ''}
+                             className={classNames({'select-options-selected': !isAutocomplete && selectedValue === value})}
                              onClick={() => handleSelect(value)}>
                     <span>{name}</span>
                 </button>)

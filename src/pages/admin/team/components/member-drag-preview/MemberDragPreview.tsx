@@ -19,7 +19,7 @@ export const MemberDragPreview = ({dragPreview}: MemberDragPreviewProps) => {
             }}>
             <div
                 key={dragPreview.member.fullName}
-                className={`members-wrapper`}>
+                className="members-wrapper">
                 <div className='members-dragger'>
                     <img src={DragIcon} alt="dragger"/>
                 </div>

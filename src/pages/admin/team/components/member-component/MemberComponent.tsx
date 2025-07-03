@@ -2,6 +2,7 @@ import React from "react";
 import {Member} from "../members-list/MembersList";
 import "./member-component.scss"
 import BlankUserImage from "../../../../../assets/images/admin/blank-user.svg"
+import classNames from "classnames";
 export const MemberComponent = ({member, handleOnDeleteMember, handleOnEditMember}: {member: Member, handleOnDeleteMember: (fullName: string) => void, handleOnEditMember: (id: number) => void }) => {
     return (<div className='members-item'>
         <div className='members-profile'>
@@ -12,7 +13,10 @@ export const MemberComponent = ({member, handleOnDeleteMember, handleOnEditMembe
             <p>{member.description}</p>
         </div>
         <div className='members-controls'>
-            <div className={`members-status ${member.status === "Чернетка" ? "members-status-draft" : "members-status-published"}`}>
+            <div className={classNames("members-status", {
+                "members-status-draft": member.status === "Чернетка",
+                "members-status-published": member.status !== "Чернетка",
+            })}>
                 <span>
                     •
                 </span>

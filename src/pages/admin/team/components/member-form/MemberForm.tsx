@@ -4,15 +4,15 @@ import { useCreateMemberForm } from "../../../../../hooks/admin/create-member-fo
 import '../members-list/members-list.scss'
 import {TeamCategory} from "../../TeamPage";
 import {
-  TEAM_CATEGORY_MAIN,
-  TEAM_CATEGORY_SUPERVISORY,
-  TEAM_CATEGORY_ADVISORS,
-  TEAM_LABEL_CATEGORY,
-  TEAM_LABEL_SELECT_CATEGORY,
-  TEAM_LABEL_FULLNAME,
-  TEAM_LABEL_DESCRIPTION,
-  TEAM_LABEL_PHOTO,
-  TEAM_LABEL_DRAG_DROP
+    TEAM_CATEGORY_MAIN,
+    TEAM_CATEGORY_SUPERVISORY,
+    TEAM_CATEGORY_ADVISORS,
+    TEAM_LABEL_CATEGORY,
+    TEAM_LABEL_SELECT_CATEGORY,
+    TEAM_LABEL_FULLNAME,
+    TEAM_LABEL_DESCRIPTION,
+    TEAM_LABEL_PHOTO,
+    TEAM_LABEL_DRAG_DROP
 } from '../../../../../const/team';
 
 export type MemberFormValues = {
@@ -25,16 +25,25 @@ export type MemberFormValues = {
 export type MemberFormProps = {
     id: string;
     onSubmit: (memberFormValues: MemberFormValues) => void;
+    onDraftSubmit?: (data: MemberFormValues) => void;
     existingMemberFormValues?: MemberFormValues | null;
     onValuesChange?: (memberFormValues: MemberFormValues) => void;
+    isDraft: boolean;
+    previewImgUrl?: string;
 };
 
 const MAX_FULLNAME_LENGTH = 50;
 const MAX_DESCRIPTION_LENGTH = 200;
-export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onValuesChange}: MemberFormProps) => {
+export const MemberForm = ({onSubmit,
+                               onDraftSubmit,
+                               id,
+                               existingMemberFormValues = null,
+                               onValuesChange,
+                               isDraft,
+                               previewImgUrl}: MemberFormProps) => {
 
     const [isInitialized, setIsInitialized] = useState(false);
-    
+
     const {
         register,
         watch,
@@ -42,13 +51,17 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
         reset,
         setValue,
         formState: { errors }
-    } = useCreateMemberForm();
-    
+    } = useCreateMemberForm(isDraft);
+
     const watchedImg = watch("img");
 
     const handleOnSubmit = (data: MemberFormValues) => {
         if (data.category && data.description && data.fullName) {
-            onSubmit(data);
+            if (isDraft && onDraftSubmit) {
+                onDraftSubmit(data);
+            } else {
+                onSubmit(data);
+            }
         }
     };
 
@@ -60,7 +73,7 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
     }, [existingMemberFormValues, isInitialized, reset]);
 
     const watchedValues = watch();
-    
+
     useEffect(() => {
         if (onValuesChange) {
             onValuesChange(watchedValues);
@@ -72,7 +85,7 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
 
         const files = e.dataTransfer.files;
         if (files && files.length > 0) {
-            setValue("img", files, { shouldValidate: true }); // <- передаємо файли в форму
+            setValue("img", files, { shouldValidate: true });
         }
     }
 
@@ -90,20 +103,20 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
                 </select>
                 {errors.category && <p className="error">{errors.category.message}</p>}
             </div>
-            
+
             <div className='form-group'>
                 <label htmlFor="fullName">{TEAM_LABEL_FULLNAME}</label>
-                <input maxLength={MAX_FULLNAME_LENGTH} 
+                <input maxLength={MAX_FULLNAME_LENGTH}
                        type="text" id='fullName'
                        {...register("fullName")}/>
                 <div
                     className='form-group-fullname-length-limit'>{watch("fullName")?.length || 0}/{MAX_FULLNAME_LENGTH}</div>
                 {errors.fullName && <p className="error">{errors.fullName.message}</p>}
             </div>
-            
+
             <div className='form-group'>
                 <label htmlFor="description">{TEAM_LABEL_DESCRIPTION}</label>
-                <textarea maxLength={MAX_DESCRIPTION_LENGTH} 
+                <textarea maxLength={MAX_DESCRIPTION_LENGTH}
                           className='form-group-description'
                           id='description'
                           {...register("description")}/>
@@ -111,7 +124,7 @@ export const MemberForm = ({onSubmit, id, existingMemberFormValues = null, onVal
                     className='form-group-description-length-limit'>{watch("description")?.length || 0}/{MAX_DESCRIPTION_LENGTH}</div>
                 {errors.description && <p className="error">{errors.description.message}</p>}
             </div>
-            
+
             <div className='form-group form-group-image'>
                 <span><span className='form-group-image-required'>*</span>{TEAM_LABEL_PHOTO}</span>
                 <div className='form-group-image-details'>

@@ -109,6 +109,8 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     const totalPagesRef = useRef<number | null>(totalPages);
     const categoryRef = useRef<TeamCategory | undefined>(category);
 
+    const [isDraftMode, setIsDraftMode] = useState(false);
+
     useEffect(() => {
         currentPageRef.current = currentPage;
     }, [currentPage]);
@@ -291,12 +293,11 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     };
 
     const handleOnEditMember = (id: number) => {
-        const memberToEdit = members.filter(m => m.id === id)[0];
+        const memberToEdit = members.find(m => m.id === id);
         if (memberToEdit) {
             setMemberToEdit({
                 category: memberToEdit.category,
-                //TODO: handle with photos
-                img: null,
+                img: null,  
                 fullName: memberToEdit.fullName,
                 description: memberToEdit.description
             });
@@ -304,6 +305,8 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
             setIsEditMemberModalOpen(true);
         }
     };
+
+
 
     const handleMemberEdit = () => {
         setIsConfirmPublishNewMemberModalOpen(true);
@@ -325,27 +328,12 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         setIsEditMemberModalOpen(false);
     };
 
-    const handleSaveAsDraft = () => {
-        if (memberToEdit) {
-            setMembers(prev => [...prev.filter(m => m.id !== memberIdToEdit),
-                {
-                    id: memberIdToEdit!,
-                    status: "Чернетка",
-                    category: memberToEdit.category,
-                    fullName: memberToEdit.fullName,
-                    description: memberToEdit.description,
-                    img: ""
-                }].sort((a, b) => a.id - b.id))
-        }
-    }
-
     const handleCancelPublish = () => {
         setIsConfirmPublishNewMemberModalOpen(false);
     };
 
     const handleConfirmPublish = () => {
         if (memberToEdit) {
-            //todo: handle photo
             setMembers(prev => [...prev.filter(m => m.id !== memberIdToEdit),
                 {
                     id: memberIdToEdit!,
@@ -357,7 +345,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
                 }].sort((a, b) => a.id - b.id))
             setIsConfirmPublishNewMemberModalOpen(false);
             setIsEditMemberModalOpen(false);
-            setMemberToEdit(null)
+            setMemberToEdit(null);
         }
     };
     const handleConfirmClose = () => {
@@ -376,6 +364,29 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
             setIsEditMemberModalOpen(false)
         }
     };
+
+    const handleSaveAsDraftFromForm = (data: MemberFormValues) => {
+        if (memberIdToEdit !== null) {
+            const imgValue = data.img && data.img.length > 0 ? data.img[0].name :
+                members.find(m => m.id === memberIdToEdit)?.img || "";
+
+            setMembers(prev => [...prev.filter(m => m.id !== memberIdToEdit),
+                {
+                    id: memberIdToEdit,
+                    status: "Чернетка",
+                    category: data.category,
+                    fullName: data.fullName,
+                    description: data.description,
+                    img: imgValue
+                }].sort((a, b) => a.id - b.id));
+            setIsEditMemberModalOpen(false);
+            setMemberToEdit(null);
+            setIsDraftMode(false);
+        }
+    };
+
+
+
 
     let content;
 
@@ -465,13 +476,24 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
                     {TEAM_EDIT_MEMBER}
                 </Modal.Title>
                 <Modal.Content>
-                    <MemberForm onValuesChange={mfv => setMemberToEdit(mfv)} existingMemberFormValues={memberToEdit}
+                    <MemberForm onValuesChange={mfv => setMemberToEdit(mfv)}
+                                existingMemberFormValues={memberToEdit}
                                 id='edit-member-modal'
-                                onSubmit={handleMemberEdit}/>
+                                onSubmit={handleMemberEdit}
+                                onDraftSubmit={handleSaveAsDraftFromForm}
+                                isDraft={isDraftMode}
+                                previewImgUrl={members.find(m => m.id === memberIdToEdit)?.img || ''}/>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button onClick={handleSaveAsDraft} buttonStyle={'secondary'}>{TEAM_SAVE_AS_DRAFT}</Button>
-                    <Button form='edit-member-modal' type={"submit"} buttonStyle={"primary"}>{TEAM_PUBLISH}</Button>
+                    <Button buttonStyle={'secondary'}
+                            form='edit-member-modal'
+                            type='submit'
+                            onClick={() => setIsDraftMode(true)}
+                    >{TEAM_SAVE_AS_DRAFT}</Button>
+                    <Button form='edit-member-modal'
+                            type="submit"
+                            onClick={() => setIsDraftMode(false)}
+                            buttonStyle={"primary"}>{TEAM_PUBLISH}</Button>
                 </Modal.Actions>
             </Modal>}
             <Modal isOpen={isConfirmPublishNewMemberModalOpen}

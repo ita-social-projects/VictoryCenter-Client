@@ -67,7 +67,36 @@ jest.mock('../../../../../components/common/input/Input', () => ({
 
 // Mock MemberForm with controllable behavior
 const mockMemberForm = jest.fn();
-jest.mock('../member-form/MemberForm', () => ({
+// jest.mock('../member-form/MemberForm', () => ({
+//     MemberForm: (props: any) => {
+//         mockMemberForm(props);
+//         return (
+//             <form
+//                 id={props.id}
+//                 data-testid="member-form"
+//                 onSubmit={(e) => {
+//                     e.preventDefault();
+//                     const mockMemberData: MemberFormValues = {
+//                         category: 'Керівництво' as any,
+//                         fullName: 'Test User',
+//                         description: 'Test Description',
+//                         img: null
+//                     };
+//                     props.onSubmit?.(mockMemberData);
+//                 }}
+//             >
+//                 <input
+//                     data-testid="form-fullname"
+//                     onChange={(e) => {
+//                         props.onFormDataChange?.(e.target.value);
+//                     }}
+//                 />
+//                 <button type="submit" data-testid="form-submit">Submit Form</button>
+//             </form>
+//         );
+//     }
+// }));
+jest.mock("../member-form/MemberForm", () => ({
     MemberForm: (props: any) => {
         mockMemberForm(props);
         return (
@@ -76,11 +105,12 @@ jest.mock('../member-form/MemberForm', () => ({
                 data-testid="member-form"
                 onSubmit={(e) => {
                     e.preventDefault();
-                    const mockMemberData: MemberFormValues = {
-                        category: 'Керівництво' as any,
-                        fullName: 'Test User',
-                        description: 'Test Description',
-                        img: null
+                    const mockMemberData = {
+                        category: "Керівництво",
+                        fullName: "Test User",
+                        description: "Test Description",
+                        img: null,
+                        isDraft: props.isDraft,  // прокидаємо сюди isDraft з пропсів
                     };
                     props.onSubmit?.(mockMemberData);
                 }}
@@ -91,11 +121,14 @@ jest.mock('../member-form/MemberForm', () => ({
                         props.onFormDataChange?.(e.target.value);
                     }}
                 />
-                <button type="submit" data-testid="form-submit">Submit Form</button>
+                <button type="submit" data-testid="form-submit">
+                    Submit Form
+                </button>
             </form>
         );
-    }
+    },
 }));
+
 
 describe('TeamPageToolbar', () => {
     const defaultProps: TeamPageToolbarProps = {
@@ -207,26 +240,51 @@ describe('TeamPageToolbar', () => {
         });
     });
 
-    describe('Save as Draft Flow', () => {
-        it('saves as draft and closes modal', async () => {
-            render(<TeamPageToolbar {...defaultProps} />);
+    describe("Save as Draft Flow", () => {
+        const defaultProps = {
+            onSearchQueryChange: jest.fn(),
+            onStatusFilterChange: jest.fn(),
+            autocompleteValues: [],
+            onMemberSaveDraft: jest.fn(),
+            onMemberPublish: jest.fn(),
+        };
 
-            await userEvent.click(screen.getByTestId('add-member-button'));
-            await userEvent.click(screen.getByText('Зберегти як чернетку'));
-
-            expect(defaultProps.onMemberSaveDraft).toHaveBeenCalled();
-            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+        beforeEach(() => {
+            jest.clearAllMocks();
         });
 
-        it('resets state after saving draft', async () => {
+        it("saves as draft and closes modal", async () => {
             render(<TeamPageToolbar {...defaultProps} />);
+            await userEvent.click(screen.getByTestId("add-member-button"));
+            await userEvent.click(screen.getByText("Зберегти як чернетку"));
+            await userEvent.click(screen.getByTestId("form-submit"));
+            await waitFor(() => {
+                expect(defaultProps.onMemberSaveDraft).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        fullName: "Test User",
+                        isDraft: true,
+                    })
+                );
+            });
+            await waitFor(() => {
+                expect(screen.queryByTestId("add-member-modal")).not.toBeInTheDocument();
+            });
+        });
 
-            await userEvent.click(screen.getByTestId('add-member-button'));
-            await userEvent.click(screen.getByText('Зберегти як чернетку'));
-
-            // Reopen modal should be in clean state
-            await userEvent.click(screen.getByTestId('add-member-button'));
-            expect(screen.getByTestId('add-member-modal')).toBeInTheDocument();
+        it("reopens modal with clean state after saving draft", async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+            
+            await userEvent.click(screen.getByTestId("add-member-button"));
+            await userEvent.click(screen.getByText("Зберегти як чернетку"));
+            await userEvent.click(screen.getByTestId("form-submit"));
+            await waitFor(() => {
+                expect(defaultProps.onMemberSaveDraft).toHaveBeenCalled();
+            });
+            await waitFor(() => {
+                expect(screen.queryByTestId("add-member-modal")).not.toBeInTheDocument();
+            });
+            await userEvent.click(screen.getByTestId("add-member-button"));
+            expect(screen.getByTestId("add-member-modal")).toBeInTheDocument();
         });
     });
 
@@ -267,8 +325,10 @@ describe('TeamPageToolbar', () => {
                 category: 'Керівництво',
                 fullName: 'Test User',
                 description: 'Test Description',
-                img: null
+                img: null,
+                isDraft: false,
             });
+
             expect(screen.queryByTestId('publish-confirm-modal')).not.toBeInTheDocument();
             expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
         });
@@ -369,11 +429,16 @@ describe('TeamPageToolbar', () => {
             render(<TeamPageToolbar {...propsWithoutCallbacks} />);
 
             await userEvent.click(screen.getByTestId('add-member-button'));
+
             await userEvent.click(screen.getByText('Зберегти як чернетку'));
 
-            // Should not throw errors
-            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+            fireEvent.submit(screen.getByTestId('member-form'));
+            
+            await waitFor(() => {
+                expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+            });
         });
+
     });
 
     describe('Edge Cases', () => {

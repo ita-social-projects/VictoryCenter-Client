@@ -12,7 +12,7 @@ export const MemberComponent = ({member, handleOnDeleteMember, handleOnEditMembe
             <p>{member.description}</p>
         </div>
         <div className='members-controls'>
-            <div className={`members-status ${member.status === "Чернетка" ? "members-status-draft" : "members-status-published"}`}>
+            <div data-testid={`member-status-${member.id}`} className={`members-status ${member.status === "Чернетка" ? "members-status-draft" : "members-status-published"}`}>
                 <span>
                     •
                 </span>

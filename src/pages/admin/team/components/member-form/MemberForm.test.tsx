@@ -12,6 +12,7 @@ describe('MemberForm', () => {
         onSubmit: jest.fn(),
         onValuesChange: jest.fn(),
         existingMemberFormValues: null,
+        isDraft: false,
     };
 
     beforeEach(() => {
@@ -197,6 +198,7 @@ describe('MemberForm - Additional Coverage', () => {
         onSubmit: jest.fn(),
         onValuesChange: jest.fn(),
         existingMemberFormValues: null,
+        isDraft: false,
     };
 
     beforeEach(() => {
@@ -372,6 +374,7 @@ describe('MemberForm - Extra Function Coverage', () => {
         onSubmit: jest.fn(),
         onValuesChange: jest.fn(),
         existingMemberFormValues: null,
+        isDraft: false,
     };
 
     beforeEach(() => {

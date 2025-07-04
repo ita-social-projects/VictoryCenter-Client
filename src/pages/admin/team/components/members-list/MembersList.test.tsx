@@ -81,27 +81,72 @@ jest.mock('../members-list-item/MembersListItem', () => ({
     ),
 }));
 
+// jest.mock('../member-form/MemberForm', () => ({
+//     MemberForm: ({onValuesChange, existingMemberFormValues, id, onSubmit}: any) => (
+//         <form data-testid="member-form" id={id} onSubmit={onSubmit}>
+//             <input
+//                 data-testid="form-fullName"
+//                 value={existingMemberFormValues?.fullName ?? ''}
+//                 onChange={(e) => onValuesChange({...existingMemberFormValues, fullName: e.target.value})}
+//             />
+//             <input
+//                 data-testid="form-description"
+//                 value={existingMemberFormValues?.description ?? ''}
+//                 onChange={(e) => onValuesChange({...existingMemberFormValues, description: e.target.value})}
+//             />
+//             <input
+//                 data-testid="form-category"
+//                 value={existingMemberFormValues?.category ?? ''}
+//                 onChange={(e) => onValuesChange({...existingMemberFormValues, category: e.target.value})}
+//             />
+//         </form>
+//     ),
+// }));
 jest.mock('../member-form/MemberForm', () => ({
-    MemberForm: ({onValuesChange, existingMemberFormValues, id, onSubmit}: any) => (
-        <form data-testid="member-form" id={id} onSubmit={onSubmit}>
-            <input
-                data-testid="form-fullName"
-                value={existingMemberFormValues?.fullName ?? ''}
-                onChange={(e) => onValuesChange({...existingMemberFormValues, fullName: e.target.value})}
-            />
-            <input
-                data-testid="form-description"
-                value={existingMemberFormValues?.description ?? ''}
-                onChange={(e) => onValuesChange({...existingMemberFormValues, description: e.target.value})}
-            />
-            <input
-                data-testid="form-category"
-                value={existingMemberFormValues?.category ?? ''}
-                onChange={(e) => onValuesChange({...existingMemberFormValues, category: e.target.value})}
-            />
-        </form>
-    ),
+    MemberForm: ({ onValuesChange, existingMemberFormValues, id, onSubmit, onDraftSubmit, isDraft }: any) => {
+        const handleSubmit = (e: React.FormEvent) => {
+            e.preventDefault();
+            if (isDraft && onDraftSubmit) {
+                onDraftSubmit(existingMemberFormValues);
+            } else {
+                onSubmit(existingMemberFormValues);
+            }
+        };
+
+        return (
+            <form data-testid="member-form" id={id} onSubmit={handleSubmit}>
+                <input
+                    data-testid="form-fullName"
+                    value={existingMemberFormValues?.fullName ?? 'test-form-fullname'}
+                    onChange={(e) => onValuesChange({ ...existingMemberFormValues, fullName: e.target.value })}
+                />
+                <input
+                    data-testid="form-description"
+                    value={existingMemberFormValues?.description ?? 'test-form-description'}
+                    onChange={(e) => onValuesChange({ ...existingMemberFormValues, description: e.target.value })}
+                />
+                <input
+                    data-testid="form-category"
+                    value={existingMemberFormValues?.category ?? 'Радники'}
+                    onChange={(e) => onValuesChange({ ...existingMemberFormValues, category: e.target.value })}
+                />
+                {/* Кнопка Зберегти як чернетку */}
+                <button
+                    type="button"
+                    data-testid="save-as-draft-button"
+                    onClick={() => {
+                        if (onDraftSubmit) onDraftSubmit(existingMemberFormValues);
+                    }}
+                >
+                    Зберегти як чернетку
+                </button>
+
+                <button type="submit">Submit</button>
+            </form>
+        );
+    },
 }));
+
 
 jest.mock('../../../../../components/common/button/Button', () => ({
     Button: ({children, onClick, style, form, type}: any) => (
@@ -664,12 +709,17 @@ describe('MembersList', () => {
 
         it('saves member as draft from edit modal', async () => {
             render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
+            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+
             fireEvent.click(screen.getByTestId('edit-button-0'));
-            const draftButton = screen.getByRole('button', {name: /Зберегти як чернетку/i});
+            const draftButton = screen.getByTestId('save-as-draft-button');
             fireEvent.click(draftButton);
-            await waitFor(() => expect(screen.getByTestId('member-item-0')).toHaveTextContent('Чернетка'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('member-item-0')).toHaveTextContent('Чернетка');
+            });
         });
+
 
         it('cancels publish confirmation and keeps edit modal open', async () => {
             render(<MembersList {...sharedDefaultProps} />);

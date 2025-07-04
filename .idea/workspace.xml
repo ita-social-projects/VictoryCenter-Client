@@ -4,8 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="inserted empty lines">
+    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="Created new section">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/admin/create-member-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/admin/create-member-form.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/member-component/MemberComponent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/member-component/MemberComponent.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/members-list/MembersList.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/members-list/MembersList.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/members-list/MembersList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/members-list/MembersList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/validation/admin-create-member-form/create-member-schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/validation/admin-create-member-form/create-member-schema.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,7 +33,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="feature/issue-52" />
+        <entry key="$PROJECT_DIR$" value="feature/issue-207" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -60,6 +69,13 @@
   &quot;keyToString&quot;: {
     &quot;Jest.MemberDragPreview.executor&quot;: &quot;Run&quot;,
     &quot;Jest.MemberForm.submits form with valid data.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.MembersList.MembersList - Internal Functions and Edge Cases.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.MembersList.MembersList - Internal Functions and Edge Cases.saves member as draft from edit modal.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.TeamPageToolbar.Add Member Modal Flow.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.TeamPageToolbar.Optional Props.handles missing callbacks gracefully.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.TeamPageToolbar.Publish Flow.confirms publish and calls onMemberPublish.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.TeamPageToolbar.Save as Draft Flow.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.TeamPageToolbar.Save as Draft Flow.reopens modal with clean state after saving draft.executor&quot;: &quot;Run&quot;,
     &quot;Jest.useCreateMemberSchema.executor&quot;: &quot;Run&quot;,
     &quot;Jest.useCreateMemberSchema.should fail validation due to too big file.executor&quot;: &quot;Run&quot;,
     &quot;Jest.useCreateMemberSchema.should pass validation.executor&quot;: &quot;Run&quot;,
@@ -93,78 +109,82 @@
       <recent name="C:\Users\User\Desktop\Folders\projects\__SOFTSERVE\VictoryCenter-Client\src\layouts\admin-layout" />
     </key>
   </component>
-  <component name="RunManager" selected="Jest.useCreateMemberSchema">
-    <configuration name="MemberDragPreview" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Jest.MembersList.MembersList - Internal Functions and Edge Cases.saves member as draft from edit modal">
+    <configuration name="MembersList.MembersList - Internal Functions and Edge Cases" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
       <working-dir value="$PROJECT_DIR$" />
       <envs />
       <scope-kind value="SUITE" />
-      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/member-drag-preview/MemberDragPreview.test.tsx" />
+      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/members-list/MembersList.test.tsx" />
       <test-names>
-        <test-name value="MemberDragPreview" />
+        <test-name value="MembersList" />
+        <test-name value="MembersList - Internal Functions and Edge Cases" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="MemberForm.submits form with valid data" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="MembersList.MembersList - Internal Functions and Edge Cases.saves member as draft from edit modal" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
       <working-dir value="$PROJECT_DIR$" />
-      <jest-options value="--watch" />
       <envs />
       <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.test.tsx" />
+      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/members-list/MembersList.test.tsx" />
       <test-names>
-        <test-name value="MemberForm" />
-        <test-name value="submits form with valid data" />
+        <test-name value="MembersList" />
+        <test-name value="MembersList - Internal Functions and Edge Cases" />
+        <test-name value="saves member as draft from edit modal" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="useCreateMemberSchema" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="TeamPageToolbar.Add Member Modal Flow" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
       <working-dir value="$PROJECT_DIR$" />
       <envs />
       <scope-kind value="SUITE" />
-      <test-file value="$PROJECT_DIR$/src/validation/admin-create-member-form/сreate-member-schema.test.ts" />
+      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" />
       <test-names>
-        <test-name value="useCreateMemberSchema" />
+        <test-name value="TeamPageToolbar" />
+        <test-name value="Add Member Modal Flow" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="useCreateMemberSchema.should fail validation due to too big file" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="TeamPageToolbar.Optional Props.handles missing callbacks gracefully" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
       <working-dir value="$PROJECT_DIR$" />
       <envs />
       <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/src/validation/admin-create-member-form/сreate-member-schema.test.ts" />
+      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" />
       <test-names>
-        <test-name value="useCreateMemberSchema" />
-        <test-name value="should fail validation due to too big file" />
+        <test-name value="TeamPageToolbar" />
+        <test-name value="Optional Props" />
+        <test-name value="handles missing callbacks gracefully" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="useCreateMemberSchema.should pass validation" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="TeamPageToolbar.Publish Flow.confirms publish and calls onMemberPublish" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
       <working-dir value="$PROJECT_DIR$" />
       <envs />
       <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/src/validation/admin-create-member-form/сreate-member-schema.test.ts" />
+      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" />
       <test-names>
-        <test-name value="useCreateMemberSchema" />
-        <test-name value="should pass validation" />
+        <test-name value="TeamPageToolbar" />
+        <test-name value="Publish Flow" />
+        <test-name value="confirms publish and calls onMemberPublish" />
       </test-names>
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Jest.useCreateMemberSchema" />
-        <item itemvalue="Jest.useCreateMemberSchema.should fail validation due to too big file" />
-        <item itemvalue="Jest.useCreateMemberSchema.should pass validation" />
-        <item itemvalue="Jest.MemberForm.submits form with valid data" />
-        <item itemvalue="Jest.MemberDragPreview" />
+        <item itemvalue="Jest.MembersList.MembersList - Internal Functions and Edge Cases.saves member as draft from edit modal" />
+        <item itemvalue="Jest.MembersList.MembersList - Internal Functions and Edge Cases" />
+        <item itemvalue="Jest.TeamPageToolbar.Optional Props.handles missing callbacks gracefully" />
+        <item itemvalue="Jest.TeamPageToolbar.Publish Flow.confirms publish and calls onMemberPublish" />
+        <item itemvalue="Jest.TeamPageToolbar.Add Member Modal Flow" />
       </list>
     </recent_temporary>
   </component>
@@ -186,6 +206,9 @@
       <workItem from="1749032320888" duration="3511000" />
       <workItem from="1749112969506" duration="3675000" />
       <workItem from="1751016486533" duration="881000" />
+      <workItem from="1751486239613" duration="6378000" />
+      <workItem from="1751526053694" duration="4020000" />
+      <workItem from="1751543634414" duration="2430000" />
     </task>
     <task id="LOCAL-00001" summary="fixed tests">
       <option name="closed" value="true" />

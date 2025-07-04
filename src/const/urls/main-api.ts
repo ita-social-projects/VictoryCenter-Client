@@ -1,6 +1,9 @@
-export const apiBase = process.env.REACT_APP_BACKEND_URL ?? '/api';
+import { getEnvVariable } from '../../utils/functions/getEnvVariable';
 
-export const authEndpoints = {
-    login: '/auth/login',
-    refresh: '/auth/refresh-token',
+export const API_ROUTES = {
+    BASE: getEnvVariable('REACT_APP_BACKEND_URL'),
+    AUTH: {
+        LOGIN: 'auth/login',
+        REFRESH_TOKEN: 'auth/refresh-token',
+    },
 };

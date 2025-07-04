@@ -190,7 +190,7 @@ npm install
 ```
 
 To enable HTTPS locally, you have two options: 
-* Either use this command to handle configuration for you and start project: 
+* Either install OpenSSL, add it to your PATH and use this command to handle configuration for you and start the project: 
 ``` 
 npm run start-with-cert 
 ```  

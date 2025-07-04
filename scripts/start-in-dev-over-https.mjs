@@ -10,9 +10,10 @@ import { getCerts } from 'https-localhost/certs.js';
         await fs.rm(certDir, { recursive: true, force: true });
         await fs.mkdir(certDir, { recursive: true });
 
-        // Trusting CAs on Linux OS often requires distro-specific manual commands.
+        // Generate or retrieve the SSL certificates
         const { key, cert } = await getCerts();
 
+        // Write the key and cert files to the certs directory
         const keyPath = path.join(certDir, 'localhost-key.pem');
         const certPath = path.join(certDir, 'localhost-cert.pem');
         await fs.writeFile(keyPath, key, { mode: 0o600 });

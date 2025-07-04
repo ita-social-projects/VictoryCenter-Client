@@ -11,12 +11,12 @@ import {
     loginRequest,
     tokenRefreshRequest,
 } from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
-import { AuthService } from '../../services/auth/AuthService';
+import { AuthService } from '../../services/auth/AuthService/AuthService';
 import { CreateAdminClient } from '../../services/auth/createAdminClient';
 import { AxiosInstance } from 'axios';
-import { useOnMountUnsafe } from '../../utils/hooks/useOnMountUnsafe';
+import { useOnMountUnsafe } from '../../utils/hooks/useOnMountUnsafe/useOnMountUnsafe';
 import { Credentials } from '../../types/Auth';
-import { apiBase } from '../../const/urls/main-api';
+import { API_ROUTES } from '../../const/urls/main-api';
 
 type Props = {
     children: ReactNode;
@@ -80,7 +80,7 @@ export const AdminContextProvider = ({ children }: Props) => {
     const client = useMemo(
         () =>
             CreateAdminClient(
-                apiBase,
+                API_ROUTES.BASE,
                 () => AuthService.isAccessTokenValid(tokenRef.current),
                 () => tokenRef.current,
                 refreshAccessToken,

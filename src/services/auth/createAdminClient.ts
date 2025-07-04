@@ -4,7 +4,7 @@ import axios, {
     AxiosRequestConfig,
     InternalAxiosRequestConfig,
 } from 'axios';
-import { resolveWithNewTokenConcurrent } from './resolveWithNewToken';
+import { resolveWithNewTokenConcurrent } from './resolveWithNewToken/resolveWithNewToken';
 
 export function CreateAdminClient(
     baseURL: string,

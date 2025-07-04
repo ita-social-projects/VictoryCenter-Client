@@ -1,0 +1,40 @@
+# Node modules
+/node_modules/
+
+# Build output
+/build/
+/dist/
+/out/
+/.next/
+/.vite/
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Configuration files Prettier shouldn't touch (e.g., if you prefer manual formatting)
+.eslintignore
+.prettierignore
+.stylelintrc*
+.babelrc*
+.gitattributes
+.editorconfig
+
+# Markdown files that might contain code blocks that prettier shouldn't format
+# (e.g., if you use code blocks for different languages or specific tools)
+# If you want Prettier to format markdown, remove this line or specify other patterns
+# *.md
+
+# Log files and misc
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.env.*
+.DS_Store
+*.seed
+*.patch
+.coverage/
+.cache/

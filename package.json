@@ -37,7 +37,7 @@
     "extends": [
       "react-app",
       "react-app/jest",
-      "prettier"
+      "plugin:prettier/recommended"
     ],
     "rules": {
       "no-console": 1,

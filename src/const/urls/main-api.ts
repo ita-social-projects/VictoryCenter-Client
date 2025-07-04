@@ -1,4 +1,4 @@
-export const apiBase = process.env.REACT_APP_API_URL || 'https://localhost:5001/api';
+export const apiBase = process.env.REACT_APP_BACKEND_URL ?? '/api';
 
 export const authEndpoints = {
     login: '/auth/login',

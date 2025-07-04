@@ -5,7 +5,7 @@ import {
     TeamItem,
     TeamPageData
 } from '../../../../types/TeamPage';
-import default_team_member_photo from '../../../../assets/team_page_images/nastia_popandopulus_photo.png';
+import default_team_member_photo from '../../../../assets/team_page_images/team_member_not_found_photo.svg';
 import { axiosInstance } from '../../../api/axios';
 
 const isValidCategory = (category: PublicCategoryWithTeamMembersDto): boolean => {

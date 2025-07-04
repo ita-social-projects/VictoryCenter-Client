@@ -61,6 +61,9 @@
         ]
     },
     "jest": {
+        "transformIgnorePatterns": [
+          "node_modules/(?!(axios)/)"
+        ],
         "collectCoverageFrom": [
             "src/**/*.{ts,js,tsx,jsx}"
         ],

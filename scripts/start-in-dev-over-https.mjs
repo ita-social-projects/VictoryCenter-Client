@@ -1,22 +1,20 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import spawn from 'cross-spawn';
-import { certificateFor } from 'devcert';
+import { getCerts } from 'https-localhost/certs.js';
 
 (async () => {
     try {
-        const certDir = path.resolve(process.cwd(), 'certs');
-        const keyPath = path.join(certDir, 'localhost-key.pem');
-        const certPath = path.join(certDir, 'localhost-cert.pem');
-
         // Ensure the certs directory exists and is clean
+        const certDir = path.resolve(process.cwd(), 'certs');
         await fs.rm(certDir, { recursive: true, force: true });
         await fs.mkdir(certDir, { recursive: true });
 
         // Trusting CAs on Linux OS often requires distro-specific manual commands.
-        const installCert = process.platform !== 'linux';
-        const { key, cert } = await certificateFor('localhost', { installCert });
+        const { key, cert } = await getCerts();
 
+        const keyPath = path.join(certDir, 'localhost-key.pem');
+        const certPath = path.join(certDir, 'localhost-cert.pem');
         await fs.writeFile(keyPath, key, { mode: 0o600 });
         await fs.writeFile(certPath, cert, { mode: 0o600 });
 

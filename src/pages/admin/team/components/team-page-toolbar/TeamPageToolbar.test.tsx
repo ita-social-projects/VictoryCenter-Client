@@ -2,7 +2,6 @@ import React from 'react';
 import {render, screen, fireEvent, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {TeamPageToolbar, TeamPageToolbarProps} from './TeamPageToolbar';
-import {MemberFormValues} from '../member-form/MemberForm';
 
 jest.mock('../../../../../assets/icons/plus.svg', () => 'plus-icon.svg');
 

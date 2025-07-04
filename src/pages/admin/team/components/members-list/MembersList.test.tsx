@@ -709,7 +709,8 @@ describe('MembersList', () => {
 
         it('saves member as draft from edit modal', async () => {
             render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(() => expect(screen.getByText('Alpha')).toBeInTheDocument());
+
+            await screen.findByText('Alpha');
 
             fireEvent.click(screen.getByTestId('edit-button-0'));
             const draftButton = screen.getByTestId('save-as-draft-button');
@@ -719,6 +720,7 @@ describe('MembersList', () => {
                 expect(screen.getByTestId('member-item-0')).toHaveTextContent('Чернетка');
             });
         });
+
 
 
         it('cancels publish confirmation and keeps edit modal open', async () => {

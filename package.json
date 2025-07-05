@@ -76,7 +76,10 @@
         "functions": 85.2,
         "lines": 88.9
       }
-    }
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!axios)/"
+    ]
   },
   "devDependencies": {
     "@types/react": "^19.1.3",

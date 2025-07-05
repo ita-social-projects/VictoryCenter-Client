@@ -12,7 +12,7 @@ import {
     tokenRefreshRequest,
 } from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
 import { AuthService } from '../../services/auth/AuthService/AuthService';
-import { CreateAdminClient } from '../../services/auth/createAdminClient';
+import { CreateAdminClient } from '../../services/auth/createAdminClient/createAdminClient';
 import { AxiosInstance } from 'axios';
 import { useOnMountUnsafe } from '../../utils/hooks/useOnMountUnsafe/useOnMountUnsafe';
 import { Credentials } from '../../types/Auth';

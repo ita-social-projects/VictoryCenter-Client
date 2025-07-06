@@ -1,12 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import { AboutUsPage } from './AboutUsPage';
-import * as Intro from './intro-section/IntroSection';
-import * as Mission from './our-mission/OurMission';
-import * as Support from './support-section/SupportSection';
-import * as Values from './company-values/CompanyValues';
-import * as Team from './our-team-section/OurTeam';
-import * as Main from './main-value/MainValue';
-import * as Donate from './donate-section/DonateSection';
 
 jest.mock('./intro-section/IntroSection', () => ({
     AboutUsIntro: () => <div data-testid="intro-section">Intro Section</div>

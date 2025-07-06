@@ -11,8 +11,14 @@ export const  DonateSection = () => {
                 <div className="donate-details">
                     <h3>{DONATE_DETAILS}</h3>
                     <div className="donate-buttons">
-                        <button className="donate-button">{DONATE}</button>
-                        <button className="partner-button">{BECOME_PARTNER}</button>
+                        <button
+                            className="donate-button"
+                            onClick={() => {/* Handle donate action */}}
+                            aria-label="Make a donation">{DONATE}</button>
+                        <button
+                            className="partner-button"
+                            onClick={() => {/* Handle partnership action */}}
+                            aria-label="Become a partner">{BECOME_PARTNER}</button>
                     </div>
                 </div>
             </div>

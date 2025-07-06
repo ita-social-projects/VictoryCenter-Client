@@ -3,11 +3,11 @@
   margin: 0;
   box-sizing: border-box;
 }
-.values-block{
+.values-block {
   position: relative;
   height: 78rem;
   
-  .values-title{
+  .values-title {
     font-family: Mulish, sans-serif;
     font-weight: 700;
     font-size: 2rem;
@@ -28,13 +28,13 @@
     justify-content: flex-start;
     gap: 2rem;
     
-    .value-item{
+    .value-item {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       gap: 0.75rem;
       
-      .value-name{
+      .value-name {
         width: 100%;
         font-family: Mulish, sans-serif;
         font-weight: 500;
@@ -45,7 +45,7 @@
         padding-bottom: 0.25rem;
       }
       
-      .value-description{
+      .value-description {
         font-family: Mulish, sans-serif;
         font-weight: 400;
         font-size: 1rem;
@@ -65,6 +65,7 @@
       width: 20rem;
     }
   }
+  
   .value-card:nth-of-type(2) {
     width: 31%;
     top: 17rem;
@@ -75,13 +76,14 @@
       width: 19.75rem;
     }
   }
+  
   .value-card:nth-of-type(3) {
     width: 35%;
     top: 21rem;
     left: 65%;
     padding: 4rem 1rem;
 
-    .value-item{
+    .value-item {
       width: 20rem;
     }
   }

@@ -1,0 +1,90 @@
+.donate-block {
+  position: relative;
+  height: 49.5625rem;
+  
+  .donate-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 49.5625rem;
+    object-fit:  cover;
+  }
+  
+  .donate-info-block {
+    height: 41.375rem;
+    position: absolute;
+    top: 3.75rem;
+    left: 14%;
+    z-index: 1;
+    width: 72%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    
+    .donate-title {
+      font-family: Mulish, sans-serif;
+      font-weight: 600;
+      font-size: 64px;
+      line-height: 72px;
+      letter-spacing: 0;
+      text-align: center;
+      text-transform: uppercase;
+      color: #FFFFFF;
+    }
+    
+    .donate-details{
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 1rem;
+      
+      h3{
+        font-family: Mulish, sans-serif;
+        font-weight: 400;
+        font-size: 18px;
+        line-height: 28px;
+        letter-spacing: -0.02em;
+        text-align: center;
+        color: #FFFFFF;
+      }
+      
+      .donate-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        
+        .donate-button {
+          height: 2.5rem;
+          opacity: 1;
+          padding: 0.5rem 1.5rem;
+          background-color: #FFEF43;
+          font-family: Mulish, sans-serif;
+          font-weight: 400;
+          font-size: 16px;
+          line-height: 24px;
+          letter-spacing: -0.02em;
+          vertical-align: middle;
+          border: none;
+        }
+        
+        .partner-button {
+          height: 2.5rem;
+          padding: 0.5rem 1.5rem;
+          border: 1px solid #FDFDFB;
+          font-family: Mulish, sans-serif;
+          font-weight: 400;
+          font-size: 16px;
+          line-height: 24px;
+          letter-spacing: -2%;
+          vertical-align: middle;
+          background: none;
+          color: #FDFDFB;
+        }
+      }
+    }
+  }
+}

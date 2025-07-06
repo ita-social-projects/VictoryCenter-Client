@@ -1,0 +1,149 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.main-values-block{
+  height: 117.75rem;
+  color: #061125;
+  font-family: Mulish, sans-serif;
+  
+  .main-values-title{
+    height: 29rem;
+    width: 100%;
+    display:  flex;
+    justify-content: center;
+    align-items: center;
+    
+    h2 {
+      width: 51.35rem;
+      font-weight: 400; 
+      font-style: normal;
+      font-size: 4rem;
+      line-height: 4.5rem;
+      letter-spacing: 0;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    span {
+      font-weight: 800;
+      font-style: Italic;
+      font-size: 4rem;
+      line-height: 4.5rem;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    span:nth-child(3) {
+      background: #B2DBEE;
+      position: relative;
+    }
+
+    span:nth-child(3):before {
+      content: '';
+      width: 100vw;
+      height: 5rem;
+      background: #B2DBEE;
+      position: absolute;
+      top: 0;
+      transform: translateX(-100%);
+    }
+
+    span:nth-child(1) {
+      background: #FFF481 ;
+      position: relative;
+    }
+
+    span:nth-child(1):before {
+      content: '';
+      width: 48.65vw;
+      height: 5rem;
+      background: #FFF481 ;
+      position: absolute;
+      top: 0;
+      z-index: -1;
+    }
+  }
+  .people-block {
+    position: relative;
+    height: 65rem;
+    
+    .people-card {
+      p {
+        font-weight: 500;
+        font-style: normal;
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+        letter-spacing: -0.02em;
+        padding: 1rem 0.5rem;
+      }
+    }
+    
+    .aside-card {
+      position: absolute;
+      width: 26%;
+      img {
+        width: 100%;
+        height: 26.875rem;
+        object-fit: cover;
+      }
+    }
+    div:nth-child(1) {
+      top: 10rem;
+      
+      .people-info{
+        text-align: center;
+      }
+    }
+    div:nth-child(4) {
+      left: 74%;
+      top: 26rem;
+    }
+    
+    .middle-card {
+      position: absolute;
+      width: 24%;
+      img {
+        width: 100%;
+        height: 26.875rem;
+        object-fit: cover;
+      }
+    }
+
+    div:nth-child(2) {
+      left: 26%;
+      top: 25rem;
+    }
+    
+    div:nth-child(3) {
+      left: 50%;
+      top: 2.5rem;
+      
+      img{
+        object-position: top right;
+      }
+    }
+  }
+  .summary-block {
+    padding-top: 1rem;
+    height: 23.25rem;
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    
+    .summary-text {
+      padding-top: 2rem;
+      width: 41rem;
+      height: 6.75rem;
+      border-top: 2px solid #A8DAFF;
+      font-weight: 500;
+      font-size: 1.5rem;
+      line-height: 2.25rem;
+      letter-spacing: -0.02em;
+      text-align: center;
+    }
+  }
+}

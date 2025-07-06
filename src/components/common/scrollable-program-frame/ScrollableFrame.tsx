@@ -1,6 +1,8 @@
 import {ProgramCard} from '../../../pages/program-page/program-page/program-section/program-card/ProgramCard';
-import {Navigation, Pagination, Scrollbar} from 'swiper/modules';
-import {Swiper, SwiperSlide} from 'swiper/react';
+// import {Swiper, SwiperSlide} from 'swiper/react';
+// import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
+import * as SwiperReact from 'swiper/react';
+import * as SwiperModules from 'swiper/modules';
 import {programPageDataFetch} from '../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
 import React, {useState, useEffect, useRef} from 'react';
 import {SwiperClass} from 'swiper/react';
@@ -16,6 +18,8 @@ import 'swiper/css/scrollbar';
 import './scrollable-frame.scss'
 
 export const ScrollableFrame = () => {
+    const { Swiper, SwiperSlide } = SwiperReact as any;
+    const { Navigation, Pagination, Scrollbar } = SwiperModules as any;
 
     const [programData, setProgramData] = useState<Program[]>([]);
     const [error, setError] = useState<string | null>(null);

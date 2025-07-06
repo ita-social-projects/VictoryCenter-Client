@@ -171,11 +171,11 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 
 ## Installation
 
-First of all, make sure you have installed dependencies for [back-end part of project](https://github.com/ita-social-projects/VictoryCenter-Back) and ones listed below: 
+Ensure you have installed the [back-end project](https://github.com/ita-social-projects/VictoryCenter-Back) and the following prerequisites:
 
 ### Required to install
-* Node.js (24.0.0) or higher
-* npm (11.4.2) or higher
+- Node.js (24.0.0) or higher
+- npm (11.4.2) or higher
 
 ### Clone
 
@@ -189,12 +189,15 @@ To setup this project use this command in project folder:
 npm install
 ```
 
-To enable HTTPS locally, you have two options: 
-* Either install OpenSSL, add it to your PATH and use this command to handle configuration for you and start the project: 
-``` 
-npm run start-with-cert 
-```  
-* Or if you have any troubles, we have a few manual setup steps. Follow these instructions carefully:
+To enable HTTPS locally, you have two options:
+
+-   Either install OpenSSL, add it to your PATH and use this command to handle configuration for you and start the project:
+
+```
+npm run start-with-cert
+```
+
+-   Or if you have any troubles, we have a few manual setup steps. Follow these instructions carefully:
 
 #### Prerequisites
 

@@ -38,7 +38,7 @@ export function CreateAdminClient(
             const { response, config } = error;
 
             if (response?.status === 401) {
-                return refreshHandler(config).then((newConfig) => client(newConfig));
+                return refreshHandler(config).then((newConfig) => client.request(newConfig));
             }
 
             return Promise.reject(error);

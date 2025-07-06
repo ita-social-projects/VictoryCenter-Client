@@ -1,11 +1,9 @@
 import {render, waitFor} from '@testing-library/react';
 import {AdminPage} from './AdminPage';
 import * as AdminPageDataFetchModule from '../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch';
-// import * as AdminContextProviderModule from '../../context/admin-context-provider/AdminContextProvider';
 import {MemoryRouter} from "react-router";
 
 const spyAdminPageDataFetch = jest.spyOn(AdminPageDataFetchModule, 'adminPageDataFetch');
-// const spyUseAdminContext = jest.spyOn(AdminContextProviderModule, 'useAdminContext');
 
 // DEV NOTE: This test would be very similar to AdminPageContent
 // since this component will render AdminPageContent.tsx
@@ -21,10 +19,6 @@ describe('AdminPageContent', () => {
             header: mockHeader,
             content: mockContent,
         });
-
-        // spyUseAdminContext.mockReturnValue({
-        //     token: 'fake-token'
-        // })
     });
 
     afterEach(() => {

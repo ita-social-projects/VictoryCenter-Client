@@ -10,19 +10,27 @@ export const resolveWithNewTokenConcurrent = (
     logout: () => void
 ): RefreshHandler => {
     let isRefreshing = false;
-    const retryQueue: Array<(token: string) => void> = [];
+    const retryQueue: Array<{ resolve: (token: string) => void; reject: (error: any) => void }> = [];
 
     const resolveQueue = (token: string) => {
-        retryQueue.forEach((callback) => callback(token));
+        retryQueue.forEach(({ resolve }) => resolve(token));
+        retryQueue.length = 0;
+    };
+
+    const rejectQueue = (error: any) => {
+        retryQueue.forEach(({ reject }) => reject(error));
         retryQueue.length = 0;
     };
 
     return function resolveWithNewToken(config: InternalAxiosRequestConfig) {
         return new Promise<InternalAxiosRequestConfig>((resolve, reject) => {
-            retryQueue.push((newToken: string) => {
-                config.headers = config.headers || {};
-                config.headers['Authorization'] = `Bearer ${newToken}`;
-                resolve(config);
+            retryQueue.push({
+                resolve: (newToken: string) => {
+                    config.headers = config.headers || {};
+                    config.headers['Authorization'] = `Bearer ${newToken}`;
+                    resolve(config);
+                },
+                reject,
             });
 
             if (!isRefreshing) {
@@ -33,7 +41,7 @@ export const resolveWithNewTokenConcurrent = (
                     })
                     .catch((error) => {
                         logout();
-                        reject(error);
+                        rejectQueue(error);
                     })
                     .finally(() => {
                         isRefreshing = false;

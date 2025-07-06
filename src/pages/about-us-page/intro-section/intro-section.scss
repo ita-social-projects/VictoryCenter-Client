@@ -54,6 +54,13 @@
     line-height: 28px;
     letter-spacing: -2%;
     color: #fff;
+
+    .title-details p {
+      margin-bottom: 0.5rem;
+    }
+    .paragraph-break {
+      margin-top: 1rem;
+    }
   }
 }
 @keyframes revealColor {

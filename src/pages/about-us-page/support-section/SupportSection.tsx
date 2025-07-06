@@ -4,12 +4,12 @@ import { SUPPORT_TITLE, SUPPORT_DATA } from '../../../const/about-us-page/about-
 export const SupportSection = () => {
     return (
         <div className="support-block">
-            <h2 className="support-title">{SUPPORT_TITLE}&nbsp;</h2>
+            <h2 className="support-title">{SUPPORT_TITLE}</h2>
             {SUPPORT_DATA.map(({ img, alt, description }, index) => (
                 <div key={index} className="support-card">
                     <img src={img} alt={alt} />
                     <p className="support-description">
-                        {description}&nbsp;
+                        {description}
                     </p>
                 </div>
             ))}

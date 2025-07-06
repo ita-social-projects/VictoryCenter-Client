@@ -17,11 +17,12 @@ export const AboutUsIntro = () => {
                     {INTRO_TITLE.SECOND_HIGHLIGHT}
                 </span></h1>
             <div className="title-details">
-                {INTRO_DETAILS.FIRST_LINE}<br/>
-                {INTRO_DETAILS.SECOND_LINE}<br/>
-                {INTRO_DETAILS.THIRD_LINE}<br/><br/>
-                {INTRO_DETAILS.FOURTH_LINE}<br/>
-                {INTRO_DETAILS.FIFTH_LINE}</div>
+                <p>{INTRO_DETAILS.FIRST_LINE}</p>
+                <p>{INTRO_DETAILS.SECOND_LINE}</p>
+                <p>{INTRO_DETAILS.THIRD_LINE}</p>
+                <p className="paragraph-break">{INTRO_DETAILS.FOURTH_LINE}</p>
+                <p>{INTRO_DETAILS.FIFTH_LINE}</p>
+            </div>
         </div>
     );
 };

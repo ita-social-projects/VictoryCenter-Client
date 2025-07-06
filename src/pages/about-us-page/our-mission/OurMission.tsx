@@ -1,7 +1,9 @@
 import {Link} from 'react-router-dom';
+import {ScrollableFrame} from '../../../components/common/scrollable-program-frame/ScrollableFrame';
 import ArrowIcon from '../../../assets/program_page_images/icons/arrow-up-black.png';
-import {ScrollableFrame} from "../../../components/common/scrollable-program-frame/ScrollableFrame";
+import {programPage} from '../../../const/routers/routes';
 import './our-mission.scss';
+
 export const OurMission = () => {
     
     return (
@@ -15,7 +17,7 @@ export const OurMission = () => {
                         супровід, спільноту підтримки. Кожна програма адаптується під
                         індивідуальні запити учасників/ць групи.
                     </p>
-                    <Link to="/" className="link-to-programs">
+                    <Link to={programPage} className="link-to-programs">
                         <div className="link-block">
                             <span className="link-title">Перейти до програм</span>
                             <img src={ArrowIcon} alt=""/>

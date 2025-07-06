@@ -1,4 +1,5 @@
 import ourTeam from '../../../assets/about-us-images/images/our-team.jpg';
+import {teamPageRoute} from '../../../const/routers/routes';
 import {Link} from 'react-router-dom';
 import './our-team.scss';
 
@@ -12,7 +13,7 @@ export const OurTeam = () => {
                     прагненням створити безпечне середовище для відновлення.<br/><br/>
                     Наша команда працює з військовими/ветеранами, дітьми та їхніми родинами,
                     проходить регулярне навчання, дотримується етичного кодексу, не знецінює, а цінує та підтримує</p>
-                <Link to="/" className="link-ro-team">Переглянути команду</Link>
+                <Link to={teamPageRoute} className="link-ro-team">Переглянути команду</Link>
             </div>
         </div>
     );

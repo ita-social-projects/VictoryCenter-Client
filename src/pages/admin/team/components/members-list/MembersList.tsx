@@ -30,7 +30,7 @@ export type Member = {
     id: number;
     img: string;
     fullName: string;
-    description: string;
+    description?: string;
     status: string;
     category: TeamCategory;
 };
@@ -297,7 +297,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         if (memberToEdit) {
             setMemberToEdit({
                 category: memberToEdit.category,
-                img: null,  
+                img: undefined,  
                 fullName: memberToEdit.fullName,
                 description: memberToEdit.description
             });

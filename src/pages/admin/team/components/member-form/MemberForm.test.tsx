@@ -51,7 +51,7 @@ describe('MemberForm', () => {
             category: 'Основна команда',
             fullName: 'John Doe',
             description: 'Test description',
-            img: null,
+            img: undefined,
         };
         render(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
 

@@ -15,12 +15,29 @@ import {
     TEAM_LABEL_DRAG_DROP
 } from '../../../../../const/team';
 
-export type MemberFormValues = {
-    category: TeamCategory,
-    fullName: string,
-    description: string,
-    img: FileList | null
+// export type MemberFormValues = {
+//     category: TeamCategory,
+//     fullName: string,
+//     description: string,
+//     img: FileList | null
+// };
+export type FullMemberFormValues = {
+    category: TeamCategory;
+    fullName: string;
+    description: string;   // обов’язкове
+    img: FileList;         // обов’язкове
 };
+
+export type DraftMemberFormValues = {
+    category: TeamCategory;
+    fullName: string;
+    description?: string;  // опційне
+    img?: FileList;        // опційне
+};
+
+// Юніон тип для значень форми
+export type MemberFormValues = FullMemberFormValues | DraftMemberFormValues;
+
 
 export type MemberFormProps = {
     id: string;
@@ -54,16 +71,21 @@ export const MemberForm = ({onSubmit,
     } = useCreateMemberForm(isDraft);
 
     const watchedImg = watch("img");
-
+    
     const handleOnSubmit = (data: MemberFormValues) => {
-        if (data.category && data.description && data.fullName) {
-            if (isDraft && onDraftSubmit) {
-                onDraftSubmit(data);
-            } else {
-                onSubmit(data);
-            }
+        const { category, description, fullName } = data;
+
+        if (!category || !description || !fullName) {
+            return;
+        }
+
+        if (isDraft && onDraftSubmit) {
+            onDraftSubmit(data);
+        } else {
+            onSubmit(data);
         }
     };
+
 
     useEffect(() => {
         if (existingMemberFormValues && !isInitialized) {

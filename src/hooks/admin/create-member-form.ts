@@ -1,11 +1,14 @@
 import { useForm, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useCreateMemberSchema } from '../../validation/admin-create-member-form/create-member-schema';
-import { MemberFormValues } from '../../pages/admin/team/components/member-form/MemberForm';
+import { FullMemberFormValues, DraftMemberFormValues } from '../../pages/admin/team/components/member-form/MemberForm';
 
+export const useCreateMemberForm = (isDraft: boolean) => {
+    
+    type FormValues = typeof isDraft extends true ? DraftMemberFormValues : FullMemberFormValues;
 
-export const useCreateMemberForm = (isDraft: boolean) =>
-    useForm<MemberFormValues>({
-        resolver: yupResolver(useCreateMemberSchema(isDraft)) as Resolver<MemberFormValues, any, MemberFormValues>,
-        mode: 'onBlur'
+    return useForm<FormValues>({
+        resolver: yupResolver(useCreateMemberSchema(isDraft)) as Resolver<FormValues>,
+        mode: 'onBlur',
     });
+};

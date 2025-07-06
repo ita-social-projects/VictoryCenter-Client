@@ -39,8 +39,8 @@ type ModalState = {
 type MemberFormData = {
     category: TeamCategory;
     fullName: string;
-    description: string;
-    img: FileList | null;
+    description?: string;
+    img?: FileList | undefined;
 } | null;
 
 const AddMemberModal = ({

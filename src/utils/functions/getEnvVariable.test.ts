@@ -23,14 +23,14 @@ describe('getEnvVariable', () => {
     });
 
     it('throws if neither env var nor fallback is provided', () => {
-        delete process.env.TEST_VAR;
+        process.env.TEST_VAR = undefined;
         expect(() => getEnvVariable('TEST_VAR')).toThrowError(
             'Missing environment variable: TEST_VAR'
         );
     });
     
     it('throws if fallback is empty string', () => {
-        delete process.env.TEST_VAR;
+        process.env.TEST_VAR = undefined;
         expect(() => getEnvVariable('TEST_VAR', '')).toThrowError(
             'Missing environment variable: TEST_VAR'
         );

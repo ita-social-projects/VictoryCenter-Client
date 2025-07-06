@@ -36,8 +36,12 @@ import { getCerts } from 'https-localhost/certs.js';
             'SIGTERM', // kill or docker stop
             'SIGQUIT', // Ctrl+\
             'SIGHUP', // hangup
-            'SIGBREAK', // Ctrl+Break
         ];
+        // Add Windows-specific signals conditionally
+        if (process.platform === 'win32') {
+            SIGNALS_TO_FORWARD.push('SIGBREAK'); // Ctrl+Break
+        }
+        
         SIGNALS_TO_FORWARD.forEach((sig) => process.on(sig, () => child.kill(sig)));
 
         // Exit the parent process with the same exit code as the child

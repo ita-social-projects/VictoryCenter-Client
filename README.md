@@ -174,8 +174,8 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 First of all, make sure you have installed dependencies for [back-end part of project](https://github.com/ita-social-projects/VictoryCenter-Back) and ones listed below: 
 
 ### Required to install
-* NodeJS (20.0.0) or higher
-* npm (11.0.0) or higher
+* Node.js (24.0.0) or higher
+* npm (11.4.2) or higher
 
 ### Clone
 

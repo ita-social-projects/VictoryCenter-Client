@@ -1,10 +1,14 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const { getEnvVariable } = require('./src/utils/functions/getEnvVariable');
 
 module.exports = (app) => {
+    const backendUrl = getEnvVariable('REACT_APP_BACKEND_URL');
+    const targetUrl = getEnvVariable('REACT_APP_PROXY_TARGET');
+
     app.use(
-        process.env.REACT_APP_BACKEND_URL,
+        backendUrl,
         createProxyMiddleware({
-            target: 'https://staging-api.victorycenter.com',
+            target: targetUrl,
             changeOrigin: true,
             secure: false,
         })

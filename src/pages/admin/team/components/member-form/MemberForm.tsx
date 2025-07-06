@@ -2,6 +2,7 @@ import CloudDownload from "../../../../../assets/icons/cloud-download.svg";
 import React, { useEffect, useState } from "react";
 import { useCreateMemberForm } from "../../../../../hooks/admin/create-member-form";
 import '../members-list/members-list.scss'
+import {MAX_FULLNAME_LENGTH, MAX_DESCRIPTION_LENGTH} from "../../../../../const/admin/data-validation";
 import {TeamCategory} from "../../TeamPage";
 import {
     TEAM_CATEGORY_MAIN,
@@ -15,29 +16,21 @@ import {
     TEAM_LABEL_DRAG_DROP
 } from '../../../../../const/team';
 
-// export type MemberFormValues = {
-//     category: TeamCategory,
-//     fullName: string,
-//     description: string,
-//     img: FileList | null
-// };
 export type FullMemberFormValues = {
     category: TeamCategory;
     fullName: string;
-    description: string;   // обов’язкове
-    img: FileList;         // обов’язкове
+    description: string;   
+    img: FileList | string;   
 };
 
 export type DraftMemberFormValues = {
     category: TeamCategory;
     fullName: string;
-    description?: string;  // опційне
-    img?: FileList;        // опційне
+    description?: string; 
+    img?: FileList | string; 
 };
 
-// Юніон тип для значень форми
 export type MemberFormValues = FullMemberFormValues | DraftMemberFormValues;
-
 
 export type MemberFormProps = {
     id: string;
@@ -49,8 +42,6 @@ export type MemberFormProps = {
     previewImgUrl?: string;
 };
 
-const MAX_FULLNAME_LENGTH = 50;
-const MAX_DESCRIPTION_LENGTH = 200;
 export const MemberForm = ({onSubmit,
                                onDraftSubmit,
                                id,
@@ -86,10 +77,12 @@ export const MemberForm = ({onSubmit,
         }
     };
 
-
     useEffect(() => {
         if (existingMemberFormValues && !isInitialized) {
-            reset(existingMemberFormValues);
+            reset({
+                ...existingMemberFormValues,
+                img: existingMemberFormValues.img || '', 
+            });
             setIsInitialized(true);
         }
     }, [existingMemberFormValues, isInitialized, reset]);
@@ -165,9 +158,18 @@ export const MemberForm = ({onSubmit,
                            id='image'
                            {...register("img")}/>
                     <div className='form-group-image-loaded'>
-                        {(watchedImg && watchedImg.length > 0) ? (
-                            Array.from(watchedImg).map(f => (<div key={f.name}>{f.name}</div>))
-                        ) : (<div></div>)}
+                        {/*{(watchedImg instanceof FileList && watchedImg.length > 0) ? (*/}
+                        {/*    Array.from(watchedImg).map(f => (<div key={f.name}>{f.name}</div>))*/}
+                        {/*) : previewImgUrl ? (*/}
+                        {/*    <div>{previewImgUrl}</div>*/}
+                        {/*) : null}*/}
+                        {(watchedImg instanceof FileList && watchedImg.length > 0) ? (
+                            Array.from(watchedImg).map(f => (
+                                <div key={f.name} data-testid="uploaded-file">{f.name}</div>
+                            ))
+                        ) : previewImgUrl ? (
+                            <div data-testid="uploaded-file">{previewImgUrl}</div>
+                        ) : null}
                     </div>
                     {errors.img && <p className="error">{errors.img.message}</p>}
                 </div>

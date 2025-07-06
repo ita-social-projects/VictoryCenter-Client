@@ -205,31 +205,50 @@ describe('MemberForm - Additional Coverage', () => {
         jest.clearAllMocks();
     });
 
-    it('displays uploaded file names', () => {
+    it('displays uploaded file names', async () => {
         const file1 = new File(['test1'], 'test1.jpg', { type: 'image/jpeg' });
         const file2 = new File(['test2'], 'test2.jpg', { type: 'image/jpeg' });
-        const fileList = [file1, file2] as any as FileList;
+
+        const mockFileList = {
+            0: file1,
+            1: file2,
+            length: 2,
+            item: (index: number) => {
+                if (index === 0) return file1;
+                if (index === 1) return file2;
+                return null;
+            },
+            [Symbol.iterator]: function* () {
+                yield file1;
+                yield file2;
+            },
+        };
+        Object.setPrototypeOf(mockFileList, FileList.prototype);
 
         const initialValues: MemberFormValues = {
             category: 'Основна команда',
             fullName: 'John Doe',
             description: 'Test description',
-            img: fileList,
+            img: mockFileList as FileList,
         };
 
         render(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
 
-        expect(screen.getByText('test1.jpg')).toBeInTheDocument();
-        expect(screen.getByText('test2.jpg')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText('test1.jpg')).toBeInTheDocument();
+            expect(screen.getByText('test2.jpg')).toBeInTheDocument();
+        });
     });
+
 
     it('renders empty div when no files are uploaded', () => {
         render(<MemberForm {...defaultProps} />);
 
         const imageLoadedSection = document.querySelector('.form-group-image-loaded');
         expect(imageLoadedSection).toBeInTheDocument();
-        expect(imageLoadedSection?.children).toHaveLength(1);
+        expect(imageLoadedSection?.textContent?.trim()).toBe('');
     });
+
 
     it('does not call onValuesChange when onValuesChange prop is not provided', () => {
         const propsWithoutOnValuesChange = {
@@ -348,23 +367,36 @@ describe('MemberForm - Additional Coverage', () => {
 
         expect(dropEvent.preventDefault).toHaveBeenCalled();
     });
-
-    it('handles drag events with files in dataTransfer', () => {
+    
+    it('handles drag events with files in dataTransfer', async () => {
         render(<MemberForm {...defaultProps} />);
 
         const dropArea = screen.getByTestId('drop-area');
         const file = new File(['hello'], 'hello.png', { type: 'image/png' });
-
-        const data = {
-            files: [file],
-            types: ['Files'],
+        
+        const mockFileList = {
+            0: file,
+            length: 1,
+            item: (index: number) => (index === 0 ? file : null),
+            [Symbol.iterator]: function* () {
+                yield file;
+            },
         };
-
-        fireEvent.drop(dropArea, {
-            dataTransfer: data,
+        Object.setPrototypeOf(mockFileList, FileList.prototype);
+        
+        const dropEvent = new Event('drop', { bubbles: true });
+        Object.defineProperty(dropEvent, 'dataTransfer', {
+            value: {
+                files: mockFileList,
+                types: ['Files'],
+            },
         });
 
-        expect(screen.getByText('hello.png')).toBeInTheDocument();
+        fireEvent(dropArea, dropEvent);
+        
+        await waitFor(() => {
+            expect(screen.getByText('hello.png')).toBeInTheDocument();
+        });
     });
 });
 
@@ -381,16 +413,48 @@ describe('MemberForm - Extra Function Coverage', () => {
         jest.clearAllMocks();
     });
 
-    it('updates file input after already set', () => {
+    it('updates file input after already set', async () => {
         render(<MemberForm {...defaultProps} />);
+
         const fileInput = screen.getByTestId('image');
+
         const file1 = new File(['a'], 'a.png', { type: 'image/png' });
-        fireEvent.change(fileInput, { target: { files: [file1], name: 'img' }, currentTarget: { files: [file1] } });
-        expect(screen.getByText('a.png')).toBeInTheDocument();
+        const fileList1 = {
+            0: file1,
+            length: 1,
+            item: (index: number) => file1,
+            [Symbol.iterator]: function* () {
+                yield file1;
+            },
+        };
+        Object.setPrototypeOf(fileList1, FileList.prototype);
+
+        fireEvent.change(fileInput, { target: { files: fileList1 } });
+
+        await waitFor(() => {
+            expect(screen.getByText('a.png')).toBeInTheDocument();
+        });
+
         const file2 = new File(['b'], 'b.png', { type: 'image/png' });
-        fireEvent.change(fileInput, { target: { files: [file2], name: 'img' }, currentTarget: { files: [file2] } });
-        expect(screen.getByText('b.png')).toBeInTheDocument();
+        const fileList2 = {
+            0: file2,
+            length: 1,
+            item: (index: number) => file2,
+            [Symbol.iterator]: function* () {
+                yield file2;
+            },
+        };
+        Object.setPrototypeOf(fileList2, FileList.prototype);
+
+        fireEvent.change(fileInput, { target: { files: fileList2 } });
+
+        await waitFor(() => {
+            expect(screen.queryByText('a.png')).not.toBeInTheDocument();
+            expect(screen.getByText('b.png')).toBeInTheDocument();
+        });
     });
+
+
 
     it('does not submit if category is empty', () => {
         render(<MemberForm {...defaultProps} />);
@@ -436,15 +500,41 @@ describe('MemberForm - Extra Function Coverage', () => {
         expect(screen.getByText('0/50')).toBeInTheDocument();
     });
 
-    it('handles drag-and-drop with multiple files', () => {
+    it('handles drag-and-drop with multiple files', async () => {
         render(<MemberForm {...defaultProps} />);
+
         const dropArea = screen.getByTestId('drop-area');
+
         const file1 = new File(['a'], 'a.png', { type: 'image/png' });
         const file2 = new File(['b'], 'b.png', { type: 'image/png' });
-        const data = { files: [file1, file2], types: ['Files'] };
-        fireEvent.drop(dropArea, { dataTransfer: data, preventDefault: jest.fn() });
-        expect(screen.getByText('a.png')).toBeInTheDocument();
-        expect(screen.getByText('b.png')).toBeInTheDocument();
+        
+        const fileListMock = {
+            0: file1,
+            1: file2,
+            length: 2,
+            item: (index: number) => [file1, file2][index],
+            [Symbol.iterator]: function* () {
+                yield file1;
+                yield file2;
+            },
+        };
+        Object.setPrototypeOf(fileListMock, FileList.prototype);
+
+        const dropEvent = createEvent.drop(dropArea);
+        Object.defineProperty(dropEvent, 'dataTransfer', {
+            value: {
+                files: fileListMock,
+                types: ['Files'],
+            },
+        });
+        dropEvent.preventDefault = jest.fn();
+
+        fireEvent(dropArea, dropEvent);
+
+        await waitFor(() => {
+            expect(screen.getByText('a.png')).toBeInTheDocument();
+            expect(screen.getByText('b.png')).toBeInTheDocument();
+        });
     });
 
     it('does not call onValuesChange if memberFormValues is falsy (defensive)', () => {
@@ -471,16 +561,45 @@ describe('MemberForm - Extra Function Coverage', () => {
         expect(screen.getByText('200/200')).toBeInTheDocument();
     });
 
-    it('removes file input (sets to null) after file was set', () => {
+    it('removes file input (sets to empty FileList) after file was set', async () => {
         render(<MemberForm {...defaultProps} />);
         const fileInput = screen.getByTestId('image');
         const file1 = new File(['a'], 'a.png', { type: 'image/png' });
-        fireEvent.change(fileInput, { target: { files: [file1], name: 'img' }, currentTarget: { files: [file1] } });
-        expect(screen.getByText('a.png')).toBeInTheDocument();
-        // Now remove file
-        fireEvent.change(fileInput, { target: { files: null, name: 'img' }, currentTarget: { files: null } });
-        // Should render empty div
-        const imageLoadedSection = document.querySelector('.form-group-image-loaded');
-        expect(imageLoadedSection?.children).toHaveLength(1);
+
+        const fileListWithFile = {
+            0: file1,
+            length: 1,
+            item: (index: number) => (index === 0 ? file1 : null),
+            [Symbol.iterator]: function* () {
+                yield file1;
+            },
+        };
+        Object.setPrototypeOf(fileListWithFile, FileList.prototype);
+
+        fireEvent.change(fileInput, {
+            target: { files: fileListWithFile, name: 'img' },
+            currentTarget: { files: fileListWithFile },
+        });
+
+        await waitFor(() => {
+            expect(screen.getByText('a.png')).toBeInTheDocument();
+        });
+
+        const emptyFileList = {
+            length: 0,
+            item: () => null,
+            [Symbol.iterator]: function* () {},
+        };
+        Object.setPrototypeOf(emptyFileList, FileList.prototype);
+        
+        fireEvent.change(fileInput, {
+            target: { files: emptyFileList, name: 'img' },
+            currentTarget: { files: emptyFileList },
+        });
+        
+        await waitFor(() => {
+            const imageLoadedSection = document.querySelector('.form-group-image-loaded');
+            expect(imageLoadedSection?.textContent?.trim()).toBe('');
+        });
     });
 });

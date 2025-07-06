@@ -367,8 +367,12 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
     const handleSaveAsDraftFromForm = (data: MemberFormValues) => {
         if (memberIdToEdit !== null) {
-            const imgValue = data.img && data.img.length > 0 ? data.img[0].name :
-                members.find(m => m.id === memberIdToEdit)?.img || "";
+            // const imgValue = data.img && data.img.length > 0 ? data.img[0].name :
+            //     members.find(m => m.id === memberIdToEdit)?.img || "";
+            const imgValue = data.img instanceof FileList && data.img.length > 0
+                ? data.img[0].name
+                : members.find(m => m.id === memberIdToEdit)?.img || "";
+
 
             setMembers(prev => [...prev.filter(m => m.id !== memberIdToEdit),
                 {

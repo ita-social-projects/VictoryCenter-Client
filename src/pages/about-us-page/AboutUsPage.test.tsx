@@ -24,35 +24,15 @@ jest.mock('./donate-section/DonateSection', () => ({
 }));
 
 describe('AboutUsPage', () => {
-    beforeEach(() => {
-        render(<AboutUsPage />);
-    });
 
     test('should render IntroSection', () => {
+        render(<AboutUsPage />);
         expect(screen.getByTestId('intro-section')).toBeInTheDocument();
-    });
-
-    test('should render OurMission section', () => {
         expect(screen.getByTestId('mission-section')).toBeInTheDocument();
-    });
-
-    test('should render SupportSection', () => {
         expect(screen.getByTestId('support-section')).toBeInTheDocument();
-    });
-
-    test('should render CompanyValues section', () => {
         expect(screen.getByTestId('values-section')).toBeInTheDocument();
-    });
-
-    test('should render OurTeam section', () => {
         expect(screen.getByTestId('team-section')).toBeInTheDocument();
-    });
-
-    test('should render MainValues section', () => {
         expect(screen.getByTestId('main-values-section')).toBeInTheDocument();
-    });
-
-    test('should render DonateSection', () => {
         expect(screen.getByTestId('donate-section')).toBeInTheDocument();
     });
 });

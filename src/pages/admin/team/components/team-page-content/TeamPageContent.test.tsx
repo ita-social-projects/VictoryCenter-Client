@@ -11,7 +11,7 @@ jest.mock("../team-page-toolbar/TeamPageToolbar", () => ({
                 <div>{autocompleteValues.join(",")}</div>
             </div>
         );
-    }
+    },
 }));
 
 jest.mock("../members-list/MembersList", () => {
@@ -28,7 +28,7 @@ jest.mock("../members-list/MembersList", () => {
                     <div>Status: {statusFilter}</div>
                 </div>
             );
-        }
+        },
     };
 });
 
@@ -56,4 +56,3 @@ describe("TeamPageContent", () => {
         expect(screen.getByText("John,Jane")).toBeInTheDocument();
     });
 });
-

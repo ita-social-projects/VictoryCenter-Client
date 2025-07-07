@@ -11,7 +11,7 @@ const mockMember: Member = {
     fullName: "John Doe",
     description: "Senior Developer",
     status: "Чернетка",
-    category: "Основна команда"
+    category: "Основна команда",
 };
 
 describe("MembersListItem", () => {
@@ -89,4 +89,3 @@ describe("MembersListItem", () => {
         expect(props.handleOnDeleteMember).toHaveBeenCalledWith("John Doe");
     });
 });
-

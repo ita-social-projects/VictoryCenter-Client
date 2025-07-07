@@ -1,9 +1,9 @@
-import React, {useCallback, useState} from "react";
-import {StatusFilter, TeamPageToolbar} from "../team-page-toolbar/TeamPageToolbar";
-import {MembersList} from "../members-list/MembersList";
+import React, { useCallback, useState } from "react";
+import { StatusFilter, TeamPageToolbar } from "../team-page-toolbar/TeamPageToolbar";
+import { MembersList } from "../members-list/MembersList";
 
 export const TeamPageContent = () => {
-    const [searchByNameQuery, setSearchByNameQuery] = useState<string>('');
+    const [searchByNameQuery, setSearchByNameQuery] = useState<string>("");
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("Усі");
     const [autocompleteValues, setAutocompleteValues] = useState<string[]>([]);
 
@@ -20,7 +20,7 @@ export const TeamPageContent = () => {
     }, []);
 
     return (
-        <div className='wrapper'>
+        <div className="wrapper">
             <TeamPageToolbar
                 autocompleteValues={autocompleteValues}
                 onSearchQueryChange={handleSearchQueryByName}
@@ -33,5 +33,4 @@ export const TeamPageContent = () => {
             />
         </div>
     );
-}
-
+};

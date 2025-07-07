@@ -1,11 +1,11 @@
-import {Member} from "../members-list/MembersList";
+import { Member } from "../members-list/MembersList";
 import DragIcon from "../../../../../assets/icons/dragger.svg";
 import React from "react";
-import {MemberComponent} from "../member-component/MemberComponent";
-import "./members-list-item.scss"
+import { MemberComponent } from "../member-component/MemberComponent";
+import "./members-list-item.scss";
 
 type MembersListItemProps = {
-    member: Member,
+    member: Member;
     handleDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
     handleDragStart: (e: React.DragEvent<HTMLDivElement>, index: number) => void;
     handleDrag: (e: React.DragEvent<HTMLDivElement>) => void;
@@ -18,17 +18,17 @@ type MembersListItemProps = {
 };
 
 export const MembersListItem = ({
-                                    draggedIndex,
-                                    index,
-                                    member,
-                                    handleDragOver,
-                                    handleDragEnd,
-                                    handleDragStart,
-                                    handleDrop,
-                                    handleDrag,
-                                    handleOnDeleteMember,
-                                    handleOnEditMember
-                                }: MembersListItemProps) => {
+    draggedIndex,
+    index,
+    member,
+    handleDragOver,
+    handleDragEnd,
+    handleDragStart,
+    handleDrop,
+    handleDrag,
+    handleOnDeleteMember,
+    handleOnEditMember,
+}: MembersListItemProps) => {
     return (
         <div
             className={`members-wrapper ${draggedIndex === index ? "dragging" : ""}`}
@@ -56,4 +56,4 @@ export const MembersListItem = ({
             />
         </div>
     );
-}
+};

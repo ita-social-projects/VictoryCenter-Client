@@ -67,7 +67,7 @@ export const AdminContextProvider = ({ children }: Props) => {
     useOnMountUnsafe(() => {
         (async () => {
             try {
-                if (!tokenRef.current) await refreshAccessToken();
+                await refreshAccessToken();
             } catch {
                 logout();
             } finally {

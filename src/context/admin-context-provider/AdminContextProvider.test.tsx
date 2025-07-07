@@ -1,66 +1,149 @@
-// import { render, screen } from '@testing-library/react';
-// import { AdminContextProvider, useAdminContext } from './AdminContextProvider';
-// import * as loginMethodModule from '../../utils/mock-data/admin-page/loginMethod';
+import React from 'react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { AdminContextProvider, useAdminContext } from './AdminContextProvider';
+import {
+    loginRequest,
+    tokenRefreshRequest,
+} from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
+import { AuthService } from '../../services/auth/AuthService/AuthService';
+import { CreateAdminClient } from '../../services/auth/createAdminClient/createAdminClient';
+import { API_ROUTES } from '../../const/urls/main-api';
 
-// const speGetIsLoginSuccessfulMock = jest.spyOn(loginMethodModule, 'getIsLoginSuccessfulMock');
+jest.mock('../../services/data-fetch/login-page-data-fetch/login-page-data-fetch', () => ({
+    loginRequest: jest.fn(),
+    tokenRefreshRequest: jest.fn(),
+}));
+jest.mock('../../services/auth/AuthService/AuthService', () => ({
+    AuthService: { isAccessTokenValid: jest.fn() },
+}));
+jest.mock('../../services/auth/createAdminClient/createAdminClient', () => ({
+    CreateAdminClient: jest.fn(),
+}));
+jest.mock('../../const/urls/main-api', () => ({
+    API_ROUTES: { BASE: '/base' },
+}));
 
-// const ChildComponent = () => {
-//   const HEADER = 'header'
+const loginRequestMock = loginRequest as jest.Mock<Promise<string>, [any]>;
+const tokenRefreshMock = tokenRefreshRequest as jest.Mock<Promise<string>, []>;
+const isValidMock = AuthService.isAccessTokenValid as jest.Mock<boolean, [string]>;
+const CreateAdminClientMock = CreateAdminClient as jest.Mock<any, any>;
 
-//   const { token } = useAdminContext();
+const Consumer = () => {
+    const { isLoading, isAuthenticated, client, login, logout, refreshAccessToken } =
+        useAdminContext();
 
-//   return (
-//     <div className='child-component-container'>
-//       <h1 className='header'>{HEADER}</h1>
-//       <div className='token'>{token}</div>
-//     </div>
-//   )
-// }
+    return (
+        <div>
+            <span data-testid="loading">{String(isLoading)}</span>
+            <span data-testid="auth">{String(isAuthenticated)}</span>
+            <span data-testid="client-marker">{(client as any)?.marker}</span>
 
-// describe('AdminPageContent', () => {
-//   beforeEach(() => {
-//     speGetIsLoginSuccessfulMock.mockReturnValue(true);
-//   });
+            <button data-testid="login-btn" onClick={() => login({ email: 'e', password: 'p' })}>
+                login
+            </button>
+            <button data-testid="logout-btn" onClick={logout}>
+                logout
+            </button>
+            <button data-testid="refresh-btn" onClick={refreshAccessToken}>
+                refresh
+            </button>
+        </div>
+    );
+};
 
-//   afterEach(() => {
-//     jest.clearAllMocks();
-//   });
+describe('<AdminContextProvider />', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        isValidMock.mockReturnValue(false);
+    });
 
-//   it('provides context and renders children when login is successful', async () => {
-//     const { container } = render(
-//       <AdminContextProvider>
-//         <ChildComponent />
-//       </AdminContextProvider>
-//     );
+    beforeEach(() => {
+        jest.clearAllMocks();
 
-//     const header = container.querySelector('.header');
-//     const token = container.querySelector('.token');
+        loginRequestMock.mockResolvedValue('login_token');
+        isValidMock.mockImplementation((t: string) => t === 'initial_token' || t === 'login_token');
+        CreateAdminClientMock.mockReturnValue({ marker: 'FAKE_CLIENT' });
+        (API_ROUTES as any).BASE = '/base';
+    });
 
-//     expect(header).toBeInTheDocument();
-//     expect(token).toBeInTheDocument();
+    it('on silent-refresh on mount: loading toggles, auth=true, client.marker set', async () => {
+        tokenRefreshMock.mockResolvedValueOnce('initial_token');
 
-//     expect(header?.textContent).toEqual('header');
-//     expect(token?.textContent).toEqual('fake-token');
-//   });
+        render(
+            <AdminContextProvider>
+                <Consumer />
+            </AdminContextProvider>
+        );
 
-//   it('provides context and renders children when login is failed', async () => {
-//     speGetIsLoginSuccessfulMock.mockReturnValue(false); // <-- emulate situation when login is failed
+        expect(screen.getByTestId('loading')).toHaveTextContent('true');
+        expect(tokenRefreshMock).toHaveBeenCalledTimes(1);
 
-//     const { container } = render(
-//       <AdminContextProvider>
-//         <ChildComponent />
-//       </AdminContextProvider>
-//     );
+        await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
 
-//     const header = container.querySelector('.header');
-//     const token = container.querySelector('.token');
+        expect(screen.getByTestId('auth')).toHaveTextContent('true');
+        expect(screen.getByTestId('client-marker')).toHaveTextContent('FAKE_CLIENT');
 
-//     expect(header).not.toBeInTheDocument();
-//     expect(token).not.toBeInTheDocument();
+        const [, isAuthChecker, getTokenFn] = CreateAdminClientMock.mock.calls[0];
 
-//     expect(screen.getByText(/YOU SHALL NOT PASS/i)).toBeInTheDocument();
-//     expect(screen.getByAltText(/you shall not pass/i)).toBeInTheDocument();
-//   });
-// });
+        expect(getTokenFn()).toBe('initial_token');
+        expect(isAuthChecker()).toBe(true);
 
-export {};
+        expect(CreateAdminClientMock).toHaveBeenCalledWith(
+            '/base',
+            expect.any(Function),
+            expect.any(Function),
+            expect.any(Function),
+            expect.any(Function)
+        );
+    });
+
+    it('on mount failure: loading=false and auth=false', async () => {
+        tokenRefreshMock.mockRejectedValueOnce(new Error('fail'));
+        isValidMock.mockReturnValue(false);
+
+        render(
+            <AdminContextProvider>
+                <Consumer />
+            </AdminContextProvider>
+        );
+
+        await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
+        expect(screen.getByTestId('auth')).toHaveTextContent('false');
+    });
+
+    it('login() calls loginRequest and flips auth to true', async () => {
+        tokenRefreshMock.mockResolvedValueOnce('initial_token');
+        render(
+            <AdminContextProvider>
+                <Consumer />
+            </AdminContextProvider>
+        );
+        await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
+
+        fireEvent.click(screen.getByTestId('login-btn'));
+        await waitFor(() =>
+            expect(loginRequestMock).toHaveBeenCalledWith({
+                email: 'e',
+                password: 'p',
+            })
+        );
+        expect(screen.getByTestId('auth')).toHaveTextContent('true');
+    });
+
+    it('logout() resets auth to false', async () => {
+        tokenRefreshMock.mockResolvedValueOnce('initial_token');
+        render(
+            <AdminContextProvider>
+                <Consumer />
+            </AdminContextProvider>
+        );
+        await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('true'));
+        fireEvent.click(screen.getByTestId('logout-btn'));
+        expect(screen.getByTestId('auth')).toHaveTextContent('false');
+
+        const [, isAuthCheckerFail, getTokenFnFail] = CreateAdminClientMock.mock.calls[0];
+        expect(getTokenFnFail()).toBe('');
+        expect(isAuthCheckerFail()).toBe(false);
+    });
+});

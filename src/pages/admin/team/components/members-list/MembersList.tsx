@@ -121,17 +121,20 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         categoryRef.current = category;
     }, [category]);
 
-    useEffect(() => {
-        const updatePageSize = () => {
+    const updatePageSize = () => {
             if (memberListRef.current) {
                 setPageSize(memberListRef.current.clientHeight / 120 + 1);
             }
         };
 
-        updatePageSize();
+    useEffect(() => {
         window.addEventListener("resize", updatePageSize);
         return () => window.removeEventListener("resize", updatePageSize);
-    }, [memberListRef]);
+    }, []);
+
+    useEffect(() => {
+        updatePageSize();
+    }, [memberListRef])
 
     const loadMembers = useCallback(async (reset: boolean = false) => {
         const currentCategory = categoryRef.current;

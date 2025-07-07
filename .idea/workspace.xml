@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="added tests for scrollbar">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.test.tsx" afterDir="false" />
+    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="added tests for higher coverage">
       <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/validation/admin-create-member-form/create-member-schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/validation/admin-create-member-form/create-member-schema.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -218,7 +215,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751886155066</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="added tests for higher coverage">
+      <option name="closed" value="true" />
+      <created>1751889730670</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1751889730670</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -228,6 +233,7 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added tests for scrollbar" />
-    <option name="LAST_COMMIT_MESSAGE" value="added tests for scrollbar" />
+    <MESSAGE value="added tests for higher coverage" />
+    <option name="LAST_COMMIT_MESSAGE" value="added tests for higher coverage" />
   </component>
 </project>

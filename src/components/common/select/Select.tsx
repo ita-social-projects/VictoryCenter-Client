@@ -35,7 +35,7 @@ export const Select = <TValue, >({
     return (<div role={"toolbar"} ref={selectContainerRef}
                  onClick={handleOpenSelect}
                  className={classNames("select", {
-                    [className!]: className!!,
+                    [className!]: !!className,
                     "select-opened": isOpen,
                     "select-closed": !isOpen,
                  })}

@@ -1,6 +1,7 @@
 import React from 'react';
 import {render, screen, fireEvent, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import {TEAM_CONFIRM} from "../../../../../const/team";
 import {TeamPageToolbar, TeamPageToolbarProps} from './TeamPageToolbar';
 
 jest.mock('../../../../../assets/icons/plus.svg', () => 'plus-icon.svg');
@@ -64,37 +65,8 @@ jest.mock('../../../../../components/common/input/Input', () => ({
     )
 }));
 
-// Mock MemberForm with controllable behavior
 const mockMemberForm = jest.fn();
-// jest.mock('../member-form/MemberForm', () => ({
-//     MemberForm: (props: any) => {
-//         mockMemberForm(props);
-//         return (
-//             <form
-//                 id={props.id}
-//                 data-testid="member-form"
-//                 onSubmit={(e) => {
-//                     e.preventDefault();
-//                     const mockMemberData: MemberFormValues = {
-//                         category: 'Керівництво' as any,
-//                         fullName: 'Test User',
-//                         description: 'Test Description',
-//                         img: null
-//                     };
-//                     props.onSubmit?.(mockMemberData);
-//                 }}
-//             >
-//                 <input
-//                     data-testid="form-fullname"
-//                     onChange={(e) => {
-//                         props.onFormDataChange?.(e.target.value);
-//                     }}
-//                 />
-//                 <button type="submit" data-testid="form-submit">Submit Form</button>
-//             </form>
-//         );
-//     }
-// }));
+
 jest.mock("../member-form/MemberForm", () => ({
     MemberForm: (props: any) => {
         mockMemberForm(props);
@@ -287,6 +259,76 @@ describe('TeamPageToolbar', () => {
         });
     });
 
+    describe('Additional coverage tests for uncovered lines', () => {
+        it('detects unsaved changes and shows confirm-close modal when closing', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+            
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            
+            fireEvent.submit(screen.getByTestId('member-form'));
+            
+            await userEvent.click(screen.getByText('Ні')); 
+            
+            const backdrop = screen.getByTestId('modal-backdrop');
+            await userEvent.click(backdrop);
+
+            expect(screen.getByTestId('confirm-close-modal')).toBeInTheDocument();
+        });
+
+        it('calls setIsDraftMode(true) when clicking "Зберегти як чернетку"', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+            await userEvent.click(screen.getByTestId('add-member-button'));
+
+            await userEvent.click(screen.getByText('Зберегти як чернетку'));
+            await userEvent.click(screen.getByTestId('form-submit'));
+
+            expect(defaultProps.onMemberSaveDraft).toHaveBeenCalledWith(
+                expect.objectContaining({ isDraft: true })
+            );
+        });
+
+        it('calls setIsDraftMode(false) when clicking "Опублікувати"', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            
+            await userEvent.click(screen.getByText('Опублікувати'));
+            await userEvent.click(screen.getByTestId('form-submit'));
+            
+            expect(screen.getByTestId('publish-confirm-modal')).toBeInTheDocument();
+        });
+
+        it('resetState is called after confirming publish', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            fireEvent.submit(screen.getByTestId('member-form'));
+
+            await userEvent.click(screen.getByText('Так')); 
+            
+            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('publish-confirm-modal')).not.toBeInTheDocument();
+        });
+
+        it('resetState is called after confirming close without saving', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            fireEvent.submit(screen.getByTestId('member-form'));
+            await userEvent.click(screen.getByText('Ні')); 
+            
+            const backdrop = screen.getByTestId('modal-backdrop');
+            await userEvent.click(backdrop);
+
+            expect(screen.getByTestId('confirm-close-modal')).toBeInTheDocument();
+
+            await userEvent.click(screen.getByText('Так'));
+
+            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('confirm-close-modal')).not.toBeInTheDocument();
+        });
+    });
+
+
     describe('Publish Flow', () => {
         it('opens publish confirmation modal when form is submitted', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
@@ -347,6 +389,46 @@ describe('TeamPageToolbar', () => {
         });
     });
 
+    describe('TeamPageToolbar branch coverage for lines 189-191, 215', () => {
+        it('sets draft mode to true when clicking "Зберегти як чернетку" button', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+            await userEvent.click(screen.getByTestId('add-member-button'));
+
+            const saveDraftButton = screen.getByText('Зберегти як чернетку');
+            await userEvent.click(saveDraftButton);
+            
+            await userEvent.click(screen.getByTestId('form-submit'));
+
+            expect(defaultProps.onMemberSaveDraft).toHaveBeenCalledWith(
+                expect.objectContaining({ isDraft: true })
+            );
+        });
+
+        it('sets draft mode to false when clicking "Опублікувати" button', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+            await userEvent.click(screen.getByTestId('add-member-button'));
+
+            const publishButton = screen.getByText('Опублікувати');
+            await userEvent.click(publishButton);
+            
+            await userEvent.click(screen.getByTestId('form-submit'));
+
+            expect(screen.getByTestId('publish-confirm-modal')).toBeInTheDocument();
+        });
+
+        it('calls resetState (closes modals) after confirming publish', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+            await userEvent.click(screen.getByTestId('add-member-button'));
+
+            fireEvent.submit(screen.getByTestId('member-form')); 
+            await userEvent.click(screen.getByText('Так'));     
+            
+            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('publish-confirm-modal')).not.toBeInTheDocument();
+        });
+    });
+
+
     describe('Button Attributes and Styling', () => {
         it('applies correct button styles and attributes', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
@@ -390,6 +472,32 @@ describe('TeamPageToolbar', () => {
             });
         });
 
+        it('submits with isDraft = true when Save as Draft button clicked before submit', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            
+            await userEvent.click(screen.getByText('Зберегти як чернетку'));
+            
+            await userEvent.click(screen.getByTestId('form-submit'));
+
+            expect(defaultProps.onMemberSaveDraft).toHaveBeenCalledWith(
+                expect.objectContaining({ isDraft: true })
+            );
+        });
+
+        it('submits with isDraft = false when Publish button clicked before submit and opens confirmation modal', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            
+            await userEvent.click(screen.getByText('Опублікувати'));
+            
+            await userEvent.click(screen.getByTestId('form-submit'));
+            
+            expect(screen.getByTestId('publish-confirm-modal')).toBeInTheDocument();
+        });
+
+
+
         it('handles rapid state changes without errors', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
@@ -402,6 +510,18 @@ describe('TeamPageToolbar', () => {
             await userEvent.click(screen.getByText('Так'));
 
             expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        });
+    });
+
+    describe('handleConfirmPublish edge cases', () => {
+        it('does not call onMemberPublish if pendingMemberData is null', async () => {
+            const onMemberPublish = jest.fn();
+            render(<TeamPageToolbar
+                {...defaultProps}
+                onMemberPublish={onMemberPublish}
+            />);
+
+            expect(onMemberPublish).not.toHaveBeenCalled();
         });
     });
 

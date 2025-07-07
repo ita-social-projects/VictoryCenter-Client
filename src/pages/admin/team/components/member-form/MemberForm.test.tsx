@@ -603,3 +603,89 @@ describe('MemberForm - Extra Function Coverage', () => {
         });
     });
 });
+describe('MemberForm branch coverage additions', () => {
+    const baseProps: MemberFormProps = {
+        id: 'test-form',
+        onSubmit: jest.fn(),
+        onDraftSubmit: jest.fn(),
+        isDraft: false,
+    };
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('does not submit when category is missing', async () => {
+        render(<MemberForm {...baseProps} />);
+        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const descriptionInput = screen.getByLabelText('Опис');
+
+        await userEvent.type(fullNameInput, 'John Doe');
+        await userEvent.type(descriptionInput, 'Some description');
+
+        const form = screen.getByTestId('test-form');
+        fireEvent.submit(form);
+
+        await waitFor(() => {
+            expect(baseProps.onSubmit).not.toHaveBeenCalled();
+            expect(baseProps.onDraftSubmit).not.toHaveBeenCalled();
+        });
+    });
+
+    it('does not submit when fullName is missing', async () => {
+        render(<MemberForm {...baseProps} />);
+        const categorySelect = screen.getByLabelText('Категорія');
+        const descriptionInput = screen.getByLabelText('Опис');
+
+        await userEvent.selectOptions(categorySelect, 'Основна команда');
+        await userEvent.type(descriptionInput, 'Some description');
+
+        const form = screen.getByTestId('test-form');
+        fireEvent.submit(form);
+
+        await waitFor(() => {
+            expect(baseProps.onSubmit).not.toHaveBeenCalled();
+            expect(baseProps.onDraftSubmit).not.toHaveBeenCalled();
+        });
+    });
+
+    it('does not submit when description is missing', async () => {
+        render(<MemberForm {...baseProps} />);
+        const categorySelect = screen.getByLabelText('Категорія');
+        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+
+        await userEvent.selectOptions(categorySelect, 'Основна команда');
+        await userEvent.type(fullNameInput, 'John Doe');
+
+        const form = screen.getByTestId('test-form');
+        fireEvent.submit(form);
+
+        await waitFor(() => {
+            expect(baseProps.onSubmit).not.toHaveBeenCalled();
+            expect(baseProps.onDraftSubmit).not.toHaveBeenCalled();
+        });
+    });
+
+    it('calls onDraftSubmit when isDraft is true', async () => {
+        render(<MemberForm {...baseProps} isDraft={true} />);
+        const categorySelect = screen.getByLabelText('Категорія');
+        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const descriptionInput = screen.getByLabelText('Опис');
+
+        await userEvent.selectOptions(categorySelect, 'Основна команда');
+        await userEvent.type(fullNameInput, 'John Doe');
+        await userEvent.type(descriptionInput, 'Some description');
+
+        const form = screen.getByTestId('test-form');
+        fireEvent.submit(form);
+
+        await waitFor(() => {
+            expect(baseProps.onDraftSubmit).toHaveBeenCalledWith(expect.objectContaining({
+                category: 'Основна команда',
+                fullName: 'John Doe',
+                description: 'Some description',
+            }));
+            expect(baseProps.onSubmit).not.toHaveBeenCalled();
+        });
+    });
+});

@@ -63,7 +63,7 @@ export const useCreateMemberSchema = (isDraft: boolean) => {
             .transform((value) => (value === null ? undefined : value))
             .test("img-required-if-not-draft", IMG_REQUIRED, (value) => {
                 if (isDraft) return true;
-                if (typeof value === "string") return true; // вже є збережене зображення
+                if (typeof value === "string") return true; 
                 return value instanceof FileList && value.length > 0;
             })
             .test("fileSize", FILE_SIZE, (value) => {

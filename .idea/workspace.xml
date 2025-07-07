@@ -4,16 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="Created new section">
+    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="added tests for scrollbar">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/hooks/admin/create-member-form.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/admin/create-member-form.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/member-component/MemberComponent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/member-component/MemberComponent.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.test.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/members-list/MembersList.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/members-list/MembersList.test.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/members-list/MembersList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/members-list/MembersList.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/validation/admin-create-member-form/create-member-schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/validation/admin-create-member-form/create-member-schema.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -24,8 +18,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="SCSS File" />
         <option value="TypeScript JSX File" />
+        <option value="SCSS File" />
+        <option value="JavaScript File" />
         <option value="TypeScript File" />
       </list>
     </option>
@@ -65,38 +60,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Jest.MemberDragPreview.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.MemberForm.submits form with valid data.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.MembersList.MembersList - Internal Functions and Edge Cases.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.MembersList.MembersList - Internal Functions and Edge Cases.saves member as draft from edit modal.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.TeamPageToolbar.Add Member Modal Flow.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.TeamPageToolbar.Optional Props.handles missing callbacks gracefully.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.TeamPageToolbar.Publish Flow.confirms publish and calls onMemberPublish.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.TeamPageToolbar.Save as Draft Flow.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.TeamPageToolbar.Save as Draft Flow.reopens modal with clean state after saving draft.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.useCreateMemberSchema.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.useCreateMemberSchema.should fail validation due to too big file.executor&quot;: &quot;Run&quot;,
-    &quot;Jest.useCreateMemberSchema.should pass validation.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;#16 on feature/issue-12&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/Desktop/Folders/projects/__SOFTSERVE/VictoryCenter-Client/src/assets/icons&quot;,
-    &quot;list.type.of.created.stylesheet&quot;: &quot;SCSS&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs.jest.jest_package&quot;: &quot;C:/Users/PC/RiderProjects/VictoryCenter-Client/node_modules/react-scripts&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\PC\\RiderProjects\\VictoryCenter-Client\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Jest.Create Member Schema.executor": "Run",
+    "Jest.Create Member Schema.fails if description is too short (not draft).executor": "Run",
+    "Jest.Create Member Schema.fails on too short fullName.executor": "Run",
+    "Jest.Create Member Schema.validates correctly for published entry.executor": "Run",
+    "Jest.MemberForm branch coverage additions.executor": "Run",
+    "Jest.ScrollableFrame.executor": "Run",
+    "Jest.ScrollableFrame.показує повідомлення про помилку, якщо fetch не вдалось.executor": "Run",
+    "Jest.ScrollableFrame.рендерить програми з мокових даних.executor": "Run",
+    "Jest.TeamPageToolbar.Additional coverage tests for uncovered lines.executor": "Run",
+    "Jest.TeamPageToolbar.Complex Scenarios.submits with isDraft = false when Publish button clicked before submit and opens confirmation modal.executor": "Run",
+    "Jest.TeamPageToolbar.Complex Scenarios.submits with isDraft = true when Save as Draft button clicked before submit.executor": "Run",
+    "Jest.TeamPageToolbar.TeamPageToolbar branch coverage for lines 189-191, 215.executor": "Run",
+    "Jest.TeamPageToolbar.handleConfirmClose.executor": "Run",
+    "Jest.TeamPageToolbar.handleConfirmPublish edge cases.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "#16 on feature/issue-12",
+    "last_opened_file_path": "C:/Users/User/Desktop/Folders/projects/__SOFTSERVE/VictoryCenter-Client/src/assets/icons",
+    "list.type.of.created.stylesheet": "SCSS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs.jest.jest_package": "C:/Users/PC/RiderProjects/VictoryCenter-Client/node_modules/react-scripts",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.editor",
+    "ts.external.directory.path": "C:\\Users\\PC\\RiderProjects\\VictoryCenter-Client\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\User\Desktop\Folders\projects\__SOFTSERVE\VictoryCenter-Client\src\assets\icons" />
@@ -109,35 +106,48 @@
       <recent name="C:\Users\User\Desktop\Folders\projects\__SOFTSERVE\VictoryCenter-Client\src\layouts\admin-layout" />
     </key>
   </component>
-  <component name="RunManager" selected="Jest.MembersList.MembersList - Internal Functions and Edge Cases.saves member as draft from edit modal">
-    <configuration name="MembersList.MembersList - Internal Functions and Edge Cases" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Jest.MemberForm branch coverage additions">
+    <configuration name="MemberForm branch coverage additions" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
       <working-dir value="$PROJECT_DIR$" />
       <envs />
       <scope-kind value="SUITE" />
-      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/members-list/MembersList.test.tsx" />
+      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/member-form/MemberForm.test.tsx" />
       <test-names>
-        <test-name value="MembersList" />
-        <test-name value="MembersList - Internal Functions and Edge Cases" />
+        <test-name value="MemberForm branch coverage additions" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="MembersList.MembersList - Internal Functions and Edge Cases.saves member as draft from edit modal" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="TeamPageToolbar.Complex Scenarios.submits with isDraft = false when Publish button clicked before submit and opens confirmation modal" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
       <working-dir value="$PROJECT_DIR$" />
       <envs />
       <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/members-list/MembersList.test.tsx" />
+      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" />
       <test-names>
-        <test-name value="MembersList" />
-        <test-name value="MembersList - Internal Functions and Edge Cases" />
-        <test-name value="saves member as draft from edit modal" />
+        <test-name value="TeamPageToolbar" />
+        <test-name value="Complex Scenarios" />
+        <test-name value="submits with isDraft = false when Publish button clicked before submit and opens confirmation modal" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="TeamPageToolbar.Add Member Modal Flow" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="TeamPageToolbar.Complex Scenarios.submits with isDraft = true when Save as Draft button clicked before submit" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" />
+      <test-names>
+        <test-name value="TeamPageToolbar" />
+        <test-name value="Complex Scenarios" />
+        <test-name value="submits with isDraft = true when Save as Draft button clicked before submit" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="TeamPageToolbar.handleConfirmClose" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
       <working-dir value="$PROJECT_DIR$" />
@@ -146,45 +156,30 @@
       <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" />
       <test-names>
         <test-name value="TeamPageToolbar" />
-        <test-name value="Add Member Modal Flow" />
+        <test-name value="handleConfirmClose" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="TeamPageToolbar.Optional Props.handles missing callbacks gracefully" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="TeamPageToolbar.handleConfirmPublish edge cases" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
       <working-dir value="$PROJECT_DIR$" />
       <envs />
-      <scope-kind value="TEST" />
+      <scope-kind value="SUITE" />
       <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" />
       <test-names>
         <test-name value="TeamPageToolbar" />
-        <test-name value="Optional Props" />
-        <test-name value="handles missing callbacks gracefully" />
-      </test-names>
-      <method v="2" />
-    </configuration>
-    <configuration name="TeamPageToolbar.Publish Flow.confirms publish and calls onMemberPublish" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
-      <node-interpreter value="project" />
-      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
-      <working-dir value="$PROJECT_DIR$" />
-      <envs />
-      <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" />
-      <test-names>
-        <test-name value="TeamPageToolbar" />
-        <test-name value="Publish Flow" />
-        <test-name value="confirms publish and calls onMemberPublish" />
+        <test-name value="handleConfirmPublish edge cases" />
       </test-names>
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Jest.MembersList.MembersList - Internal Functions and Edge Cases.saves member as draft from edit modal" />
-        <item itemvalue="Jest.MembersList.MembersList - Internal Functions and Edge Cases" />
-        <item itemvalue="Jest.TeamPageToolbar.Optional Props.handles missing callbacks gracefully" />
-        <item itemvalue="Jest.TeamPageToolbar.Publish Flow.confirms publish and calls onMemberPublish" />
-        <item itemvalue="Jest.TeamPageToolbar.Add Member Modal Flow" />
+        <item itemvalue="Jest.MemberForm branch coverage additions" />
+        <item itemvalue="Jest.TeamPageToolbar.handleConfirmClose" />
+        <item itemvalue="Jest.TeamPageToolbar.handleConfirmPublish edge cases" />
+        <item itemvalue="Jest.TeamPageToolbar.Complex Scenarios.submits with isDraft = false when Publish button clicked before submit and opens confirmation modal" />
+        <item itemvalue="Jest.TeamPageToolbar.Complex Scenarios.submits with isDraft = true when Save as Draft button clicked before submit" />
       </list>
     </recent_temporary>
   </component>
@@ -205,36 +200,25 @@
       <workItem from="1748940886891" duration="12216000" />
       <workItem from="1749032320888" duration="3511000" />
       <workItem from="1749112969506" duration="3675000" />
-      <workItem from="1751016486533" duration="881000" />
-      <workItem from="1751486239613" duration="6378000" />
-      <workItem from="1751526053694" duration="4020000" />
-      <workItem from="1751543634414" duration="2430000" />
+      <workItem from="1751276329599" duration="13151000" />
     </task>
-    <task id="LOCAL-00001" summary="fixed tests">
+    <task id="LOCAL-00001" summary="Merge branch 'release/1.0.0' into feature/issue-52&#10;&#10;# Conflicts:&#10;#&#9;README.md&#10;#&#9;src/const/routers/routes.ts&#10;#&#9;src/routes/app-router/AppRouter.jsx">
       <option name="closed" value="true" />
-      <created>1750953374370</created>
+      <created>1750786186812</created>
       <option name="number" value="00001" />
       <option name="presentableId" value="LOCAL-00001" />
       <option name="project" value="LOCAL" />
-      <updated>1750953374370</updated>
+      <updated>1750786186812</updated>
     </task>
-    <task id="LOCAL-00002" summary="fixed errors found by sonarcube">
+    <task id="LOCAL-00002" summary="added tests for scrollbar">
       <option name="closed" value="true" />
-      <created>1750954248469</created>
+      <created>1751886155066</created>
       <option name="number" value="00002" />
       <option name="presentableId" value="LOCAL-00002" />
       <option name="project" value="LOCAL" />
-      <updated>1750954248469</updated>
+      <updated>1751886155066</updated>
     </task>
-    <task id="LOCAL-00003" summary="inserted empty lines">
-      <option name="closed" value="true" />
-      <created>1750955005879</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1750955005880</updated>
-    </task>
-    <option name="localTasksCounter" value="4" />
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -243,9 +227,7 @@
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="false" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed tests" />
-    <MESSAGE value="fixed errors found by sonarcube" />
-    <MESSAGE value="inserted empty lines" />
-    <option name="LAST_COMMIT_MESSAGE" value="inserted empty lines" />
+    <MESSAGE value="added tests for scrollbar" />
+    <option name="LAST_COMMIT_MESSAGE" value="added tests for scrollbar" />
   </component>
 </project>

@@ -46,7 +46,7 @@ export const ScrollableFrame = () => {
             }
         })();
     }, []);
-    
+
     return (
         <div className="scroll-block">
             {error && (
@@ -76,7 +76,7 @@ export const ScrollableFrame = () => {
                     <img src={arrowRightBlack} alt="" className="arrow-hover-state"/>
                 </button>
             </div>
-            
+
             <div className="custom-scrollbar" />
         </div>
     );

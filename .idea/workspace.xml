@@ -5,14 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="Created new section">
-      <change afterPath="$PROJECT_DIR$/src/assets/about-us-images/images/our-team.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/about-us-page/company-values/CompanyValues.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/about-us-page/company-values/company-values.scss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/about-us-page/our-team-section/OurTeam.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/about-us-page/our-team-section/our-team.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/about-us-page/AboutUsPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/about-us-page/AboutUsPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/about-us-page/support-section/SupportSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/about-us-page/support-section/SupportSection.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/about-us-page/support-section/support-section.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/about-us-page/support-section/support-section.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/common/scrollable-program-frame/ScrollableFrame.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/common/scrollable-program-frame/ScrollableFrame.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/common/scrollable-program-frame/scrollable-frame.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/common/scrollable-program-frame/scrollable-frame.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/mock-data/program-page/program-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/mock-data/program-page/program-page.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,6 +22,7 @@
         <option value="TypeScript File" />
         <option value="TypeScript JSX File" />
         <option value="SCSS File" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -63,26 +61,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/issue-207&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/Desktop/Folders/projects/__SOFTSERVE/VictoryCenter-Client/src/assets/icons&quot;,
-    &quot;list.type.of.created.stylesheet&quot;: &quot;SCSS&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs.jest.jest_package&quot;: &quot;C:/Users/User/Desktop/Folders/projects/__SOFTSERVE/VictoryCenter-Client/node_modules/react-scripts&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\PC\\RiderProjects\\VictoryCenter-Client\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Jest.ScrollableFrame.executor": "Run",
+    "Jest.ScrollableFrame.показує повідомлення про помилку, якщо fetch не вдалось.executor": "Run",
+    "Jest.ScrollableFrame.рендерить програми з мокових даних.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "#22 on feature/issue-207",
+    "last_opened_file_path": "C:/Users/User/Desktop/Folders/projects/__SOFTSERVE/VictoryCenter-Client/src/assets/icons",
+    "list.type.of.created.stylesheet": "SCSS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs.jest.jest_package": "C:/Users/PC/RiderProjects/VictoryCenter-Client/node_modules/react-scripts",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.editor",
+    "ts.external.directory.path": "C:\\Users\\PC\\RiderProjects\\VictoryCenter-Client\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\User\Desktop\Folders\projects\__SOFTSERVE\VictoryCenter-Client\src\assets\icons" />
@@ -95,58 +96,7 @@
       <recent name="C:\Users\User\Desktop\Folders\projects\__SOFTSERVE\VictoryCenter-Client\src\layouts\admin-layout" />
     </key>
   </component>
-  <component name="RunManager" selected="Jest.MemberDragPreview">
-    <configuration name="MemberComponent" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
-      <node-interpreter value="project" />
-      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
-      <working-dir value="$PROJECT_DIR$" />
-      <envs />
-      <scope-kind value="SUITE" />
-      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/member-component/MemberComponent.test.tsx" />
-      <test-names>
-        <test-name value="MemberComponent" />
-      </test-names>
-      <method v="2" />
-    </configuration>
-    <configuration name="MemberComponent.Edge cases.handles empty string values gracefully" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
-      <node-interpreter value="project" />
-      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
-      <working-dir value="$PROJECT_DIR$" />
-      <envs />
-      <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/member-component/MemberComponent.test.tsx" />
-      <test-names>
-        <test-name value="MemberComponent" />
-        <test-name value="Edge cases" />
-        <test-name value="handles empty string values gracefully" />
-      </test-names>
-      <method v="2" />
-    </configuration>
-    <configuration name="MemberComponent.Event handlers" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
-      <node-interpreter value="project" />
-      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
-      <working-dir value="$PROJECT_DIR$" />
-      <envs />
-      <scope-kind value="SUITE" />
-      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/member-component/MemberComponent.test.tsx" />
-      <test-names>
-        <test-name value="MemberComponent" />
-        <test-name value="Event handlers" />
-      </test-names>
-      <method v="2" />
-    </configuration>
-    <configuration name="MemberDragPreview" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
-      <node-interpreter value="project" />
-      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
-      <working-dir value="$PROJECT_DIR$" />
-      <envs />
-      <scope-kind value="SUITE" />
-      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/member-drag-preview/MemberDragPreview.test.tsx" />
-      <test-names>
-        <test-name value="MemberDragPreview" />
-      </test-names>
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Jest.ScrollableFrame">
     <configuration name="MemberDragPreview.Rendering with member.sets correct key on members wrapper" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
@@ -161,13 +111,64 @@
       </test-names>
       <method v="2" />
     </configuration>
+    <configuration name="ScrollableFrame" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/src/components/common/scrollable-program-frame/ScrollableFrame.test.tsx" />
+      <test-names>
+        <test-name value="ScrollableFrame" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="ScrollableFrame.показує повідомлення про помилку, якщо fetch не вдалось" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/src/components/common/scrollable-program-frame/ScrollableFrame.test.tsx" />
+      <test-names>
+        <test-name value="ScrollableFrame" />
+        <test-name value="показує повідомлення про помилку, якщо fetch не вдалось" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="ScrollableFrame.рендерить програми з мокових даних" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/src/components/common/scrollable-program-frame/ScrollableFrame.test.tsx" />
+      <test-names>
+        <test-name value="ScrollableFrame" />
+        <test-name value="рендерить програми з мокових даних" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="SupportSection component.renders all descriptions" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/src/pages/about-us-page/support-section/SupportSection.test.tsx" />
+      <test-names>
+        <test-name value="SupportSection component" />
+        <test-name value="renders all descriptions" />
+      </test-names>
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Jest.ScrollableFrame" />
+        <item itemvalue="Jest.ScrollableFrame.рендерить програми з мокових даних" />
+        <item itemvalue="Jest.ScrollableFrame.показує повідомлення про помилку, якщо fetch не вдалось" />
+        <item itemvalue="Jest.SupportSection component.renders all descriptions" />
         <item itemvalue="Jest.MemberDragPreview.Rendering with member.sets correct key on members wrapper" />
-        <item itemvalue="Jest.MemberDragPreview" />
-        <item itemvalue="Jest.MemberComponent.Event handlers" />
-        <item itemvalue="Jest.MemberComponent.Edge cases.handles empty string values gracefully" />
-        <item itemvalue="Jest.MemberComponent" />
       </list>
     </recent_temporary>
   </component>

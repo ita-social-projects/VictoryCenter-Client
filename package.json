@@ -58,9 +58,13 @@
   },
   "jest": {
     "moduleNameMapper": {
-      "^swiper/react$": "swiper",
-      "^swiper/modules$": "swiper",
-      "\\.(css|scss|sass)$": "identity-obj-proxy"
+      "^swiper/react$": "<rootDir>/src/__mocks__/swiperReactMock.js",
+      "^swiper/modules$": "<rootDir>/src/__mocks__/swiperModulesMock.js",
+      "\\.(css|scss)$": "<rootDir>/src/__mocks__/styleMock.js",
+      "^swiper/css$": "<rootDir>/src/__mocks__/styleMock.js",
+      "^swiper/css/navigation$": "<rootDir>/src/__mocks__/styleMock.js",
+      "^swiper/css/pagination$": "<rootDir>/src/__mocks__/styleMock.js",
+      "^swiper/css/scrollbar$": "<rootDir>/src/__mocks__/styleMock.js"
     },
     "transformIgnorePatterns": [
       "/node_modules/(?!swiper).+\\.js$"

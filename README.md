@@ -112,6 +112,7 @@ victory-center-client/
 └── tsconfig.json
 </code></pre>
 
+<div>
 [![Build Status](https://img.shields.io/travis/ita-social-projects/VictoryCenter-Client/main?style=flat-square)](https://travis-ci.org/github/ita-social-projects/VictoryCenter-Client)
 [![Coverage Status](https://img.shields.io/gitlab/coverage/ita-social-projects/VictoryCenter-Client/main?style=flat-square)](https://coveralls.io)
 [![Github Issues](https://img.shields.io/github/issues/ita-social-projects/VictoryCenter-Client?style=flat-square)](https://github.com/ita-social-projects/VictoryCenter-Client/issues)
@@ -154,6 +155,10 @@ and present it in a form of a table in terminal.
 ### `npm run lint`
 
 Launches the lint check that will allow to debug lint errors locally.
+
+### `npm run format`
+
+Lunches code formating process
 
 ### `npm run build`
 

@@ -2,10 +2,10 @@ import type { InternalAxiosRequestConfig } from 'axios';
 import { resolveWithNewTokenConcurrent, resolveWithNewToken } from './resolveWithNewToken';
 
 describe('resolveWithNewTokenConcurrent', () => {
-    var refreshAccessToken: jest.Mock<Promise<void>, []>;
-    var getAccessToken: jest.Mock<string, []>;
-    var logout: jest.Mock<void, []>;
-    var handler: ReturnType<typeof resolveWithNewTokenConcurrent>;
+    let refreshAccessToken: jest.Mock<Promise<void>, []>;
+    let getAccessToken: jest.Mock<string, []>;
+    let logout: jest.Mock<void, []>;
+    let handler: ReturnType<typeof resolveWithNewTokenConcurrent>;
 
     beforeEach(() => {
         refreshAccessToken = jest.fn();
@@ -15,7 +15,7 @@ describe('resolveWithNewTokenConcurrent', () => {
     });
 
     it('calls refreshAccessToken only once for multiple requests and resolves all with Authorization header', async () => {
-        var resolveRefresh: () => void;
+        let resolveRefresh: () => void;
         const refreshPromise = new Promise<void>((res) => {
             resolveRefresh = res;
         });
@@ -70,10 +70,10 @@ describe('resolveWithNewTokenConcurrent', () => {
 });
 
 describe('resolveWithNewToken', () => {
-    var refreshAccessToken: jest.Mock<Promise<void>, []>;
-    var getAccessToken: jest.Mock<string, []>;
-    var logout: jest.Mock<void, []>;
-    var handler: ReturnType<typeof resolveWithNewToken>;
+    let refreshAccessToken: jest.Mock<Promise<void>, []>;
+    let getAccessToken: jest.Mock<string, []>;
+    let logout: jest.Mock<void, []>;
+    let handler: ReturnType<typeof resolveWithNewToken>;
 
     beforeEach(() => {
         refreshAccessToken = jest.fn();

@@ -26,15 +26,10 @@
             color: #414651;
         }
         
-        input:-webkit-autofill {
-            box-shadow: inset 0 0 0 62.5rem #fff !important;
-            -webkit-text-fill-color: #061125 !important;
-        }
-
-        input:-moz-autofill,
-        input:autofill {
-            background-color: #fff !important;
-            color: #061125 !important;
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 62.5rem #fff inset;     
         }
     
         input {

@@ -59,7 +59,6 @@ describe('CreateAdminClient', () => {
         expect(mockedAxios.create).toHaveBeenCalledWith({
             baseURL,
             headers: { 'Content-Type': 'application/json' },
-            withCredentials: true,
         });
     });
 

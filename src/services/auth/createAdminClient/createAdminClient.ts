@@ -19,12 +19,11 @@ export function CreateAdminClient(
         headers: {
             'Content-Type': 'application/json',
         },
-        withCredentials: true,
     });
 
     client.interceptors.request.use((config: InternalAxiosRequestConfig) => {
         if (checkIsAuthenticated()) {
-            config.headers = config.headers || {};
+            config.headers = config.headers ?? {};
             config.headers['Authorization'] = `Bearer ${getAccessToken()}`;
             return config;
         }

@@ -1,8 +1,6 @@
 import { InternalAxiosRequestConfig } from 'axios';
 
-export interface RefreshHandler {
-    (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig>;
-}
+export type RefreshHandler = (config: InternalAxiosRequestConfig) => Promise<InternalAxiosRequestConfig>;
 
 export const resolveWithNewTokenConcurrent = (
     refreshAccessToken: () => Promise<void>,
@@ -26,7 +24,7 @@ export const resolveWithNewTokenConcurrent = (
         return new Promise<InternalAxiosRequestConfig>((resolve, reject) => {
             retryQueue.push({
                 resolve: (newToken: string) => {
-                    config.headers = config.headers || {};
+                    config.headers = config.headers ?? {};
                     config.headers['Authorization'] = `Bearer ${newToken}`;
                     resolve(config);
                 },
@@ -59,7 +57,7 @@ export const resolveWithNewToken = (
     return async function (config: InternalAxiosRequestConfig) {
         try {
             await refreshAccessToken();
-            config.headers = config.headers || {};
+            config.headers = config.headers ?? {};
             config.headers['Authorization'] = `Bearer ${getAccessToken()}`;
             return config;
         } catch (err) {

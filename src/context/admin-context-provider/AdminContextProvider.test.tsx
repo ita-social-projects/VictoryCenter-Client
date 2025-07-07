@@ -55,11 +55,6 @@ const Consumer = () => {
 describe('<AdminContextProvider />', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-        isValidMock.mockReturnValue(false);
-    });
-
-    beforeEach(() => {
-        jest.clearAllMocks();
 
         loginRequestMock.mockResolvedValue('login_token');
         isValidMock.mockImplementation((t: string) => t === 'initial_token' || t === 'login_token');

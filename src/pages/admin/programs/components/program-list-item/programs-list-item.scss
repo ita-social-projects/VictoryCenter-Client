@@ -1,0 +1,280 @@
+.programs {
+  &-wrapper {
+    border: none;
+    gap: 12px;
+    padding: 12px;
+    width: 100%;
+    min-width: fit-content;
+    justify-content: space-between;
+    display: flex;
+    height: 120px;
+    align-items: center;
+    box-sizing: border-box;
+    background-color: white;
+    box-shadow: 0 0 4px rgba(128, 128, 128, 0.45);
+    margin-bottom: 8px;
+  }
+
+  &-identity {
+    display: flex;
+    gap: 16px;
+    font-size: 18px;
+    width: 33%;
+
+    img {
+      width: 60px;
+      height: 60px;
+      border-radius: 100%;
+    }
+  }
+
+  &-description {
+    text-align: start;
+    width: 33%;
+  }
+
+  &-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 33%;
+  }
+
+  // Додаємо контейнер для статусу з фіксованою шириною
+  &-status-container {
+    width: 200px;
+    display: flex;
+    justify-content: flex-start; // Вирівнюємо статус по лівому краю
+  }
+
+  &-status {
+    display: flex;
+    padding: 8px 16px;
+    gap: 8px;
+    border-radius: 30px;
+    font-size: 18px;
+    width: fit-content; // Статус займає лише необхідну ширину
+
+    &-draft {
+      color: #61615C;
+      background-color: white;
+      border: 1px solid #61615C
+    }
+
+    &-published {
+      background-color: #E5ECFF;
+      border: 1px solid #0F2957;
+      color: #0F2957;
+    }
+
+    img {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      right: 12px;
+      top: 25%;
+      z-index: 1;
+      pointer-events: none;
+    }
+  }
+
+  &-actions {
+    height: 24px;
+    display: flex;
+    flex-grow: 1;
+    justify-content: end;
+    align-items: center;
+    gap: 2px;
+
+    &-tooltip-container{
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    button {
+      border: none;
+    }
+
+    &-info {
+      width: 24px;
+      height: 24px;
+    }
+
+    &-spacer {
+      flex-grow: 1;
+    }
+
+    &-edit {
+      width: 24px;
+      height: 24px;
+      background: url("../../../../../assets/icons/edit.svg");
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:active {
+        background: url("../../../../../assets/icons/edit-filled.svg");
+      }
+    }
+
+    &-delete {
+      width: 24px;
+      height: 24px;
+      background: url("../../../../../assets/icons/delete.svg");
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:active {
+        background: url("../../../../../assets/icons/delete-filled.svg");
+      }
+    }
+  }
+}
+
+
+/*
+.programs {
+  &-wrapper {
+    padding: 0;
+    border: none;
+    width: 100%;
+    min-width: fit-content;
+    justify-content: space-between;
+    display: flex;
+    height: 120px;
+    align-items: center;
+    box-sizing: border-box;
+    background-color: white;
+    box-shadow: 0 0 4px rgba(128, 128, 128, 0.45);
+    margin-bottom: 8px;
+  }
+
+  &-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    width: 100%;
+  }
+
+  &-profile {
+    display: flex;
+    gap: 16px;
+    font-size: 18px;
+    width: 33%;
+
+    img {
+      width: 60px;
+      height: 60px;
+      border-radius: 100%;
+    }
+  }
+
+  &-description {
+    text-align: start;
+    width: 33%;
+  }
+
+  &-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 33%;
+  }
+
+  &-status {
+    max-width: 200px;
+    width: 200px;
+    display: flex;
+    padding: 8px 16px;
+    gap: 8px;
+    border-radius: 30px;
+    font-size: 18px;
+
+    &-draft {
+      color: #61615C;
+      width: auto;
+      background-color: white;
+      border: 1px solid #61615C
+    }
+
+    &-published {
+      background-color: #E5ECFF;
+      border: 1px solid #0F2957;
+      color: #0F2957;
+      width: auto;
+    }
+
+    img {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      right: 12px;
+      top: 25%;
+      z-index: 1;
+      pointer-events: none;
+    }
+  }
+
+  &-actions {
+    height: 24px;
+    display: flex;
+    flex-grow: 1;
+    justify-content: end;
+    align-items: center;
+    gap: 2px;
+
+    &-tooltip-container{
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    button {
+      border: none;
+    }
+
+    &-info {
+      width: 24px;
+      height: 24px;
+    }
+
+    &-spacer {
+      flex-grow: 1;
+    }
+
+    &-edit {
+      width: 24px;
+      height: 24px;
+      background: url("../../../../../assets/icons/edit.svg");
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:active {
+        background: url("../../../../../assets/icons/edit-filled.svg");
+      }
+    }
+
+    &-delete {
+      width: 24px;
+      height: 24px;
+      background: url("../../../../../assets/icons/delete.svg");
+
+      &:hover {
+        cursor: pointer;
+      }
+
+      &:active {
+        background: url("../../../../../assets/icons/delete-filled.svg");
+      }
+    }
+  }
+}
+
+*/

@@ -1,6 +1,6 @@
 .support-block{
   position: relative;
-  height: 64rem;
+  min-height: 64rem;
   
   .support-title{
     position: absolute;
@@ -10,9 +10,9 @@
 
     font-family: Mulish, sans-serif;
     font-weight: 700;
-    font-size: 32px;
-    line-height: 40px;
-    letter-spacing: -2%;
+    font-size: 2rem;
+    line-height: 2.5rem;
+    letter-spacing: -0.02em;
     text-transform: uppercase;
   }
   
@@ -20,9 +20,9 @@
     font-family: Mulish, sans-serif;
     padding: 0 1rem;
     font-weight: 400;
-    font-size: 18px;
-    line-height: 28px;
-    letter-spacing: -2%;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    letter-spacing: -0.02em;
   }
 
   .support-card{

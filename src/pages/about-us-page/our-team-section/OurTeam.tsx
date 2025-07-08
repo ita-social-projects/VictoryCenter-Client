@@ -1,6 +1,7 @@
 import ourTeam from '../../../assets/about-us-images/images/our-team.jpg';
-import {teamPageRoute} from '../../../const/routers/routes';
-import {Link} from 'react-router-dom';
+import { teamPageRoute } from '../../../const/routers/routes';
+import { GO_TO_TEAM, TEAM_DETAILS } from '../../../const/about-us-page/about-us-page';
+import { Link } from 'react-router-dom';
 import './our-team.scss';
 
 export const OurTeam = () => {
@@ -8,12 +9,8 @@ export const OurTeam = () => {
         <div className="our-team-block">
             <img src={ourTeam} alt="Our Team" className="our-team-image" />
             <div className="team-info">
-                <p className="team-description">Victory Center — це спільна робота психологів, фасилітаторів,
-                    координаторів, волонтерів, а також партнерських локацій (ранчо), об’єднаних
-                    прагненням створити безпечне середовище для відновлення.<br/><br/>
-                    Наша команда працює з військовими/ветеранами, дітьми та їхніми родинами,
-                    проходить регулярне навчання, дотримується етичного кодексу, не знецінює, а цінує та підтримує</p>
-                <Link to={teamPageRoute} className="link-ro-team">Переглянути команду</Link>
+                <p className="team-description">{TEAM_DETAILS.FIRST_PART}<br/><br/>{TEAM_DETAILS.SECOND_PART}</p>
+                <Link to={teamPageRoute} className="link-ro-team">{GO_TO_TEAM}</Link>
             </div>
         </div>
     );

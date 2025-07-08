@@ -18,3 +18,4 @@ export const MAIN_TITLE = {
     MIDDLE: ' де можливе ',
     SECOND_HIGHLIGHT: 'зцілення',
 };
+export const FAILED_TO_LOAD_THE_PROGRAMS = 'Не вдалося завантажити дані програм. Будь-ласка спробуйте пізніше.';

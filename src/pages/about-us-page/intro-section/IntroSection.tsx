@@ -1,5 +1,5 @@
 import background from '../../../assets/about-us-images/images/background.jpg';
-import {INTRO_TITLE, INTRO_DETAILS} from '../../../const/about-us-page/about-us-page';
+import { INTRO_TITLE, INTRO_DETAILS } from '../../../const/about-us-page/about-us-page';
 import './intro-section.scss';
 
 export const AboutUsIntro = () => {

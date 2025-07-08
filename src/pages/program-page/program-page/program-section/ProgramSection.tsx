@@ -3,7 +3,8 @@ import { PROGRAMS, PROGRAMS_FOR_KIDS, PROGRAMS_FOR_VETERANS, PROGRAMS_ALL} from 
 import { Program } from '../../../../types/ProgramPage';
 import { ProgramCard } from './program-card/ProgramCard';
 import { programPageDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
-import './program-section.scss'
+import './program-section.scss';
+import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/program-page/program-page';
 
 export const ProgramSection: React.FC = () => {
     
@@ -18,7 +19,7 @@ export const ProgramSection: React.FC = () => {
                 setError(null);
             }
             catch{
-                setError('Не вдалося завантажити дані програм. Будь-ласка спробуйте пізніше.');
+                setError(FAILED_TO_LOAD_THE_PROGRAMS);
                 setProgramData([]);
             }
         })();

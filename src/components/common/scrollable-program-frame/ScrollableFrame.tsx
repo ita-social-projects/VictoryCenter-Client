@@ -1,8 +1,6 @@
 import {ProgramCard} from '../../../pages/program-page/program-page/program-section/program-card/ProgramCard';
-// import {Swiper, SwiperSlide} from 'swiper/react';
-// import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
-import * as SwiperReact from 'swiper/react';
-import * as SwiperModules from 'swiper/modules';
+import {Swiper, SwiperSlide} from 'swiper/react';
+import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
 import {programPageDataFetch} from '../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
 import React, {useState, useEffect, useRef} from 'react';
 import {SwiperClass} from 'swiper/react';
@@ -16,14 +14,13 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import './scrollable-frame.scss'
+import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../const/program-page/program-page';
 
 export const ScrollableFrame = () => {
-    const { Swiper, SwiperSlide } = SwiperReact as any;
-    const { Navigation, Pagination, Scrollbar } = SwiperModules as any;
 
     const [programData, setProgramData] = useState<Program[]>([]);
     const [error, setError] = useState<string | null>(null);
-    const swiperRef = useRef<any>(null);
+    const swiperRef = useRef<SwiperClass | null>(null);
 
     const handlePrev = () => {
         swiperRef.current?.slidePrev();
@@ -41,7 +38,7 @@ export const ScrollableFrame = () => {
                 setError(null);
             }
             catch{
-                setError('Не вдалося завантажити дані програм. Будь-ласка спробуйте пізніше.');
+                setError(FAILED_TO_LOAD_THE_PROGRAMS);
                 setProgramData([]);
             }
         })();
@@ -61,7 +58,7 @@ export const ScrollableFrame = () => {
                     scrollbar={{draggable: true, el: '.custom-scrollbar',}}>
                 {programData.map((item, index) => (
                     <SwiperSlide key={index}>
-                        <ProgramCard key={index} program={item}/>
+                        <ProgramCard program={item}/>
                     </SwiperSlide>
                 ))}
             </Swiper>

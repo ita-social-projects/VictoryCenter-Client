@@ -1,6 +1,6 @@
 import './donate-section.scss';
 import background from '../../../assets/about-us-images/images/donate-background.jpg';
-import {DONATE_TITLE, DONATE_DETAILS, DONATE, BECOME_PARTNER} from '../../../const/about-us-page/about-us-page';
+import { DONATE_TITLE, DONATE_DETAILS, DONATE, BECOME_PARTNER } from '../../../const/about-us-page/about-us-page';
 
 export const  DonateSection = () => {
     return (

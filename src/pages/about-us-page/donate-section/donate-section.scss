@@ -1,6 +1,6 @@
 .donate-block {
   position: relative;
-  height: 49.5625rem;
+  min-height: 49.5625rem;
   
   .donate-background {
     position: absolute;
@@ -8,11 +8,11 @@
     left: 0;
     width: 100%;
     height: 49.5625rem;
-    object-fit:  cover;
+    object-fit: cover;
   }
   
   .donate-info-block {
-    height: 41.375rem;
+    min-height: 41.375rem;
     position: absolute;
     top: 3.75rem;
     left: 14%;
@@ -26,26 +26,26 @@
     .donate-title {
       font-family: Mulish, sans-serif;
       font-weight: 600;
-      font-size: 64px;
-      line-height: 72px;
+      font-size: 4rem;
+      line-height: 4.5rem;
       letter-spacing: 0;
       text-align: center;
       text-transform: uppercase;
       color: #FFFFFF;
     }
     
-    .donate-details{
+    .donate-details {
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
       align-items: center;
       gap: 1rem;
       
-      h3{
+      h3 {
         font-family: Mulish, sans-serif;
         font-weight: 400;
-        font-size: 18px;
-        line-height: 28px;
+        font-size: 1.125rem;
+        line-height: 1.75rem;
         letter-spacing: -0.02em;
         text-align: center;
         color: #FFFFFF;
@@ -64,8 +64,8 @@
           background-color: #FFEF43;
           font-family: Mulish, sans-serif;
           font-weight: 400;
-          font-size: 16px;
-          line-height: 24px;
+          font-size: 1rem;
+          line-height: 1.5rem;
           letter-spacing: -0.02em;
           vertical-align: middle;
           border: none;
@@ -77,9 +77,9 @@
           border: 1px solid #FDFDFB;
           font-family: Mulish, sans-serif;
           font-weight: 400;
-          font-size: 16px;
-          line-height: 24px;
-          letter-spacing: -2%;
+          font-size: 1rem;
+          line-height: 1.5rem;
+          letter-spacing: -0.02em;
           vertical-align: middle;
           background: none;
           color: #FDFDFB;

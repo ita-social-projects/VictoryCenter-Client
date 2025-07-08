@@ -13,3 +13,14 @@ export interface TeamItem {
 export interface TeamMemberProps {
   member: Member;
 }
+
+export interface TeamMemberDto {
+  id: number;
+  fullName: string,
+  categoryId: number;
+  priority: number;
+  status: number;
+  description: string;
+  photo: string;
+  email: string;
+}

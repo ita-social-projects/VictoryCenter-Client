@@ -94,7 +94,6 @@ describe('TeamMembersApi', () => {
             categoryId: 1,
             status: 1,
             description: 'description',
-            photo: '',
             email: ''
         });
     });
@@ -116,7 +115,6 @@ describe('TeamMembersApi', () => {
             categoryId: 1,
             status: 0,
             description: 'description',
-            photo: '',
             email: ''
         });
     });

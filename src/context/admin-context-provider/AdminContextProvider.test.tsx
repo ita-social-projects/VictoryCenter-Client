@@ -6,16 +6,16 @@ import {
     loginRequest,
     tokenRefreshRequest,
 } from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
-import { AuthService } from '../../services/auth/AuthService/AuthService';
 import { CreateAdminClient } from '../../services/auth/createAdminClient/createAdminClient';
 import { API_ROUTES } from '../../const/urls/main-api';
+import { isAccessTokenValid } from '../../services/auth/AuthService/AuthService';
 
 jest.mock('../../services/data-fetch/login-page-data-fetch/login-page-data-fetch', () => ({
     loginRequest: jest.fn(),
     tokenRefreshRequest: jest.fn(),
 }));
 jest.mock('../../services/auth/AuthService/AuthService', () => ({
-    AuthService: { isAccessTokenValid: jest.fn() },
+    isAccessTokenValid: jest.fn(),
 }));
 jest.mock('../../services/auth/createAdminClient/createAdminClient', () => ({
     CreateAdminClient: jest.fn(),
@@ -26,7 +26,7 @@ jest.mock('../../const/urls/main-api', () => ({
 
 const loginRequestMock = loginRequest as jest.Mock<Promise<string>, [any]>;
 const tokenRefreshMock = tokenRefreshRequest as jest.Mock<Promise<string>, []>;
-const isValidMock = AuthService.isAccessTokenValid as jest.Mock<boolean, [string]>;
+const isValidMock = isAccessTokenValid as jest.Mock<boolean, [string]>;
 const CreateAdminClientMock = CreateAdminClient as jest.Mock<any, any>;
 
 const Consumer = () => {

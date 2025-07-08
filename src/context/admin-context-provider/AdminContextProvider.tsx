@@ -11,12 +11,12 @@ import {
     loginRequest,
     tokenRefreshRequest,
 } from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
-import { AuthService } from '../../services/auth/AuthService/AuthService';
 import { CreateAdminClient } from '../../services/auth/createAdminClient/createAdminClient';
 import { AxiosInstance } from 'axios';
 import { useOnMountUnsafe } from '../../utils/hooks/useOnMountUnsafe/useOnMountUnsafe';
 import { Credentials } from '../../types/Auth';
 import { API_ROUTES } from '../../const/urls/main-api';
+import { isAccessTokenValid } from '../../services/auth/AuthService/AuthService';
 
 type Props = {
     children: ReactNode;
@@ -37,7 +37,7 @@ export const AdminContextProvider = ({ children }: Props) => {
     const [token, setToken] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    const isAuthenticated = AuthService.isAccessTokenValid(token);
+    const isAuthenticated = isAccessTokenValid(token);
 
     const tokenRef = useRef<string>(token);
 
@@ -81,7 +81,7 @@ export const AdminContextProvider = ({ children }: Props) => {
         () =>
             CreateAdminClient(
                 API_ROUTES.BASE,
-                () => AuthService.isAccessTokenValid(tokenRef.current),
+                () => isAccessTokenValid(tokenRef.current),
                 () => tokenRef.current,
                 refreshAccessToken,
                 logout

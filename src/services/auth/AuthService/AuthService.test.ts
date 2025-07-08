@@ -1,14 +1,19 @@
-import { AuthService } from './AuthService';
+import {
+    isAccessTokenValid,
+    isTokenExpired,
+    hasValidStructure,
+    getTokenPayload,
+    decodeToken,
+} from './AuthService';
 import { JwtPayload } from '../../../types/Auth';
 
-describe('AuthService', () => {
-    const validPayload: JwtPayload = {
-        exp: Math.floor(Date.now() / 1000) + 60,
-    };
-    const expiredPayload: JwtPayload = {
-        exp: Math.floor(Date.now() / 1000) - 60,
-    };
-    function createToken(payload: object) {
+describe('AuthService functions', () => {
+    const nowSec = Math.floor(Date.now() / 1000);
+    const validPayload: JwtPayload = { exp: nowSec + 60 };
+    const expiredPayload: JwtPayload = { exp: nowSec - 60 };
+    const malformedExpPayload: JwtPayload = {};
+
+    function createToken(payload: object): string {
         const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString(
             'base64url'
         );
@@ -16,61 +21,71 @@ describe('AuthService', () => {
         return `${header}.${body}.signature`;
     }
 
-    it('should validate a valid access token', () => {
-        const token = createToken(validPayload);
-        expect(AuthService.isAccessTokenValid(token)).toBe(true);
+    describe('isAccessTokenValid', () => {
+        it('returns true when structure is valid and not expired', () => {
+            const token = createToken(validPayload);
+            expect(isAccessTokenValid(token)).toBe(true);
+        });
+
+        it('returns false when token is expired or malformed', () => {
+            const expired = createToken(expiredPayload);
+            expect(isAccessTokenValid(expired)).toBe(false);
+
+            const malformed = createToken(malformedExpPayload);
+            expect(isAccessTokenValid(malformed)).toBe(false);
+        });
     });
 
-    it('should invalidate an expired token', () => {
-        const token = createToken(expiredPayload);
-        expect(AuthService.isAccessTokenValid(token)).toBe(false);
+    describe('isTokenExpired', () => {
+        it('returns false for non-expired token', () => {
+            const token = createToken(validPayload);
+            expect(isTokenExpired(token)).toBe(false);
+        });
+
+        it('returns true for expired token', () => {
+            const token = createToken(expiredPayload);
+            expect(isTokenExpired(token)).toBe(true);
+        });
+
+        it('returns true if payload.exp is missing or not a number', () => {
+            const token = createToken(malformedExpPayload);
+            expect(isTokenExpired(token)).toBe(true);
+        });
     });
 
-    it('should detect token expiration', () => {
-        const token = createToken(expiredPayload);
-        expect(AuthService.isTokenExpired(token)).toBe(true);
+    describe('hasValidStructure', () => {
+        it('returns true for a valid JWT format', () => {
+            const token = createToken(validPayload);
+            expect(hasValidStructure(token)).toBe(true);
+        });
+
+        it('returns false if token is empty or malformed', () => {
+            expect(hasValidStructure('')).toBe(false);
+
+            const token = createToken(malformedExpPayload);
+            expect(isAccessTokenValid(token)).toBe(false);
+        });
     });
 
-    it('should detect token with malformed expiration time', () => {
-        const expiredPayload: JwtPayload = {};
-        const token = createToken(expiredPayload);
-        expect(AuthService.isTokenExpired(token)).toBe(true);
+    describe('getTokenPayload', () => {
+        it('returns the payload for valid token', () => {
+            const token = createToken(validPayload);
+            expect(getTokenPayload(token)).toEqual(validPayload);
+        });
+
+        it('returns null for invalid token', () => {
+            expect(getTokenPayload('very.bad.token')).toBeNull();
+        });
     });
 
-    it('should detect non-expired token', () => {
-        const token = createToken(validPayload);
-        expect(AuthService.isTokenExpired(token)).toBe(false);
-    });
+    describe('decodeToken', () => {
+        it('decodes a correct token', () => {
+            const token = createToken(validPayload);
+            expect(decodeToken(token)).toEqual(validPayload);
+        });
 
-    it('should detect valid structure of token', () => {
-        const token = createToken(validPayload);
-        expect(AuthService.hasValidStructure(token)).toBe(true);
-    });
-
-    it('should detect invalid structure (missing parts)', () => {
-        expect(AuthService.hasValidStructure('invalidtoken')).toBe(false);
-    });
-
-    it('should return payload for valid token', () => {
-        const token = createToken(validPayload);
-        expect(AuthService.getTokenPayload(token)).toEqual(validPayload);
-    });
-
-    it('should return null for invalid token in getTokenPayload', () => {
-        expect(AuthService.getTokenPayload('invalidtoken')).toBeNull();
-    });
-
-    it('should decode valid token', () => {
-        const token = createToken(validPayload);
-        expect(AuthService.decodeToken(token)).toEqual(validPayload);
-    });
-
-    it('should return null for invalid token in decodeToken', () => {
-        expect(AuthService.decodeToken('invalidtoken')).toBeNull();
-    });
-
-    it('should handle malformed base64 in decodeToken', () => {
-        const token = 'very.bad.signature';
-        expect(AuthService.decodeToken(token)).toBeNull();
+        it('returns null for invalid token', () => {
+            expect(decodeToken('bad.token')).toBeNull();
+        });
     });
 });

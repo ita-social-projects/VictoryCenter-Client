@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="added tests for higher coverage">
-      <change beforePath="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/admin/team/components/team-page-toolbar/TeamPageToolbar.test.tsx" afterDir="false" />
+    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="removed never-used import">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,40 +57,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Jest.Create Member Schema.executor": "Run",
-    "Jest.Create Member Schema.fails if description is too short (not draft).executor": "Run",
-    "Jest.Create Member Schema.fails on too short fullName.executor": "Run",
-    "Jest.Create Member Schema.validates correctly for published entry.executor": "Run",
-    "Jest.MemberForm branch coverage additions.executor": "Run",
-    "Jest.ScrollableFrame.executor": "Run",
-    "Jest.ScrollableFrame.показує повідомлення про помилку, якщо fetch не вдалось.executor": "Run",
-    "Jest.ScrollableFrame.рендерить програми з мокових даних.executor": "Run",
-    "Jest.TeamPageToolbar.Additional coverage tests for uncovered lines.executor": "Run",
-    "Jest.TeamPageToolbar.Complex Scenarios.submits with isDraft = false when Publish button clicked before submit and opens confirmation modal.executor": "Run",
-    "Jest.TeamPageToolbar.Complex Scenarios.submits with isDraft = true when Save as Draft button clicked before submit.executor": "Run",
-    "Jest.TeamPageToolbar.TeamPageToolbar branch coverage for lines 189-191, 215.executor": "Run",
-    "Jest.TeamPageToolbar.handleConfirmClose.executor": "Run",
-    "Jest.TeamPageToolbar.handleConfirmPublish edge cases.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "#16 on feature/issue-12",
-    "last_opened_file_path": "C:/Users/User/Desktop/Folders/projects/__SOFTSERVE/VictoryCenter-Client/src/assets/icons",
-    "list.type.of.created.stylesheet": "SCSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs.jest.jest_package": "C:/Users/PC/RiderProjects/VictoryCenter-Client/node_modules/react-scripts",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.editor",
-    "ts.external.directory.path": "C:\\Users\\PC\\RiderProjects\\VictoryCenter-Client\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Jest.Create Member Schema.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.Create Member Schema.fails if description is too short (not draft).executor&quot;: &quot;Run&quot;,
+    &quot;Jest.Create Member Schema.fails on too short fullName.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.Create Member Schema.validates correctly for published entry.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.MemberForm branch coverage additions.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.ScrollableFrame.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.ScrollableFrame.показує повідомлення про помилку, якщо fetch не вдалось.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.ScrollableFrame.рендерить програми з мокових даних.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.TeamPageToolbar.Additional coverage tests for uncovered lines.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.TeamPageToolbar.Complex Scenarios.submits with isDraft = false when Publish button clicked before submit and opens confirmation modal.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.TeamPageToolbar.Complex Scenarios.submits with isDraft = true when Save as Draft button clicked before submit.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.TeamPageToolbar.TeamPageToolbar branch coverage for lines 189-191, 215.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.TeamPageToolbar.handleConfirmClose.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.TeamPageToolbar.handleConfirmPublish edge cases.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#16 on feature/issue-12&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/Desktop/Folders/projects/__SOFTSERVE/VictoryCenter-Client/src/assets/icons&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;SCSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs.jest.jest_package&quot;: &quot;C:/Users/PC/RiderProjects/VictoryCenter-Client/node_modules/react-scripts&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\PC\\RiderProjects\\VictoryCenter-Client\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\User\Desktop\Folders\projects\__SOFTSERVE\VictoryCenter-Client\src\assets\icons" />
@@ -198,6 +198,7 @@
       <workItem from="1749032320888" duration="3511000" />
       <workItem from="1749112969506" duration="3675000" />
       <workItem from="1751276329599" duration="13151000" />
+      <workItem from="1751903417538" duration="616000" />
     </task>
     <task id="LOCAL-00001" summary="Merge branch 'release/1.0.0' into feature/issue-52&#10;&#10;# Conflicts:&#10;#&#9;README.md&#10;#&#9;src/const/routers/routes.ts&#10;#&#9;src/routes/app-router/AppRouter.jsx">
       <option name="closed" value="true" />
@@ -223,7 +224,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751889730670</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="removed some duplicated tests">
+      <option name="closed" value="true" />
+      <created>1751890260186</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1751890260186</updated>
+    </task>
+    <task id="LOCAL-00005" summary="removed never-used import">
+      <option name="closed" value="true" />
+      <created>1751890373695</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1751890373695</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -234,6 +251,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added tests for scrollbar" />
     <MESSAGE value="added tests for higher coverage" />
-    <option name="LAST_COMMIT_MESSAGE" value="added tests for higher coverage" />
+    <MESSAGE value="removed some duplicated tests" />
+    <MESSAGE value="removed never-used import" />
+    <option name="LAST_COMMIT_MESSAGE" value="removed never-used import" />
   </component>
 </project>

@@ -71,7 +71,7 @@ const AddMemberModal = ({
         <Modal.Actions>
             <Button
                 onClick={() => {
-                    if (formData) {
+                    if (formData?.description && formData?.fullName) {
                         const safeFormData = {
                             ...formData,
                             category: formData.category || 'Основна команда',

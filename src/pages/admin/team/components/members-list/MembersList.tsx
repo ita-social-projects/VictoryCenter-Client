@@ -11,6 +11,8 @@ import {StatusFilter} from "../team-page-toolbar/TeamPageToolbar";
 import {MemberForm, MemberFormValues} from "../member-form/MemberForm";
 import "./members-list.scss";
 import {TeamMembersApi} from "../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi";
+import { useAdminClient } from "../../../../../utils/hooks/useAdminClient/useAdminClient";
+import { AxiosInstance } from "axios";
 import {
   TEAM_DELETE_MEMBER,
   TEAM_EDIT_MEMBER,
@@ -55,13 +57,15 @@ export const fetchMembers = async (
   pageSize: number,
   pageNumber: number,
   searchQuery: string = '',
-  statusFilter: StatusFilter = 'Усі'
+  statusFilter: StatusFilter = 'Усі',
+  client: AxiosInstance
 ): Promise<{
   newMembers: Member[],
   totalCountOfPages: number
 }> => {
   await new Promise((resolve) => setTimeout(resolve, 200));
-  let filtered = await TeamMembersApi.getAll();
+
+  let filtered = await TeamMembersApi.getAll(client);
   if (category) {
     filtered = filtered.filter(m => m.category === category);
   }
@@ -109,6 +113,8 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     const totalPagesRef = useRef<number | null>(totalPages);
     const categoryRef = useRef<TeamCategory | undefined>(category);
 
+    const client = useAdminClient();
+
     useEffect(() => {
         currentPageRef.current = currentPage;
     }, [currentPage]);
@@ -138,7 +144,8 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
             pageSize,
             pageToFetch,
             currentSearch,
-            currentStatus
+            currentStatus,
+            client
         );
 
         setMembers(prev => reset ? [...newMembers] : [...prev, ...newMembers]);
@@ -212,7 +219,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         const orderedIds = updatedMembers.map(m => m.id);
         const categoryId = categoryMap[category];
 
-        await TeamMembersApi.reorder(categoryId, orderedIds);
+        await TeamMembersApi.reorder(client, categoryId, orderedIds);
     };
 
     const handleOnDeleteMember = (fullName: string) => {
@@ -226,7 +233,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
             if (!member){
                 return;
             }
-            await TeamMembersApi.delete(member.id);
+            await TeamMembersApi.delete(client, member.id);
             setMembers(prev => prev.filter(m => m.id !== member.id));
         } finally {
             setIsDeleteTeamMemberModalOpen(false);
@@ -340,7 +347,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
     const handleSaveAsDraft = async () => {
         if (memberToEdit && memberIdToEdit != null) {
-            await TeamMembersApi.updateDraft(memberIdToEdit, memberToEdit);
+            await TeamMembersApi.updateDraft(client, memberIdToEdit, memberToEdit);
             await loadMembers(true);
         }
     }
@@ -352,7 +359,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     const handleConfirmPublish = async () => {
         if (memberToEdit && memberIdToEdit != null) {
             try {
-                await TeamMembersApi.updatePublish(memberIdToEdit, memberToEdit)
+                await TeamMembersApi.updatePublish(client, memberIdToEdit, memberToEdit)
                 await loadMembers(true);
             } finally {
                 setIsConfirmPublishNewMemberModalOpen(false);

@@ -12,6 +12,17 @@ const mockDataTransfer = {
     types: [],
 };
 
+jest.mock('../../../../../context/admin-context-provider/AdminContextProvider', () => ({
+  useAdminContext: () => ({
+    client: {
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      delete: jest.fn(),
+    },
+  }),
+}));
+
 jest.mock('../../../../../components/common/modal/Modal', () => {
     const Modal = ({children, isOpen, onClose}: any) =>
         isOpen ? (

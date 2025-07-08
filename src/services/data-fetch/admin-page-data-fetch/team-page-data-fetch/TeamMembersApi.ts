@@ -1,17 +1,17 @@
-import {apiClient} from '../../../api-client/apiClient';
 import { Member } from '../../../../pages/admin/team/components/members-list/MembersList';
 import { categoryMap, reverseCategoryMap, TeamCategory } from '../../../../pages/admin/team/TeamPage';
 import { TeamMemberDto } from '../../../../types/TeamPage';
 import { MemberFormValues } from '../../../../pages/admin/team/components/member-form/MemberForm';
+import { AxiosInstance } from 'axios';
 
 export const TeamMembersApi = {
-  getAll: async (): Promise<Member[]> => {
-    const response = await apiClient.get<TeamMemberDto[]>('/TeamMembers');
+  getAll: async (client: AxiosInstance): Promise<Member[]> => {
+    const response = await client.get<TeamMemberDto[]>('/TeamMembers');
     return response.data.map(mapTeamMemberDtoToTeamMember);
   },
 
-  updateDraft: async (id: number, member: MemberFormValues) => {
-    await apiClient.put(`/TeamMembers/${id}`, {
+  updateDraft: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
+    await client.put(`/TeamMembers/${id}`, {
         fullName: member.fullName,
         categoryId: categoryMap[member.category],
         status: 1,
@@ -20,8 +20,8 @@ export const TeamMembersApi = {
     });
   },
 
-  updatePublish: async (id: number, member: MemberFormValues) => {
-    await apiClient.put(`/TeamMembers/${id}`, {
+  updatePublish: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
+    await client.put(`/TeamMembers/${id}`, {
         fullName: member.fullName,
         categoryId: categoryMap[member.category],
         status: 0,
@@ -30,8 +30,8 @@ export const TeamMembersApi = {
     });
   },
 
-  postDraft: async (member: MemberFormValues) => {
-    await apiClient.post(`/TeamMembers`, {
+  postDraft: async (client: AxiosInstance, member: MemberFormValues) => {
+    await client.post(`/TeamMembers`, {
       fullName: member.fullName,
       categoryId: categoryMap[member.category],
       status: 1,
@@ -40,8 +40,8 @@ export const TeamMembersApi = {
     });
   },
 
-  postPublished: async (member: MemberFormValues) => {
-    await apiClient.post(`/TeamMembers`, {
+  postPublished: async (client: AxiosInstance, member: MemberFormValues) => {
+    await client.post(`/TeamMembers`, {
       fullName: member.fullName,
       categoryId: categoryMap[member.category],
       status: 0,
@@ -50,12 +50,12 @@ export const TeamMembersApi = {
     });
   },
 
-  delete: async (id: number) => {
-    await apiClient.delete(`/TeamMembers/${id}`);
+  delete: async (client: AxiosInstance, id: number) => {
+    await client.delete(`/TeamMembers/${id}`);
   },
 
-  reorder: async (categoryId: number, orderedIds: number[]) => {
-    await apiClient.put(`/TeamMembers/reorder`, {
+  reorder: async (client: AxiosInstance, categoryId: number, orderedIds: number[]) => {
+    await client.put(`/TeamMembers/reorder`, {
       categoryId,
       orderedIds,
     });

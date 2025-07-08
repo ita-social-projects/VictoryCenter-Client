@@ -2,6 +2,7 @@ import {render, screen, fireEvent, waitFor, act} from '@testing-library/react';
 import {MembersList, MembersListProps, Member} from './MembersList';
 import * as React from 'react';
 import {mockMembers} from "../../../../../utils/mock-data/admin-page/teamPage";
+import {TeamMembersApi} from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
 
 const mockDataTransfer = {
     setDragImage: jest.fn(),
@@ -161,6 +162,15 @@ describe('MembersList', () => {
         jest.clearAllMocks();
         localStorageMock.clear();
         resetMockMembers();
+        
+        jest.spyOn(TeamMembersApi, 'getAll').mockResolvedValue(mockMembers);
+        jest.spyOn(TeamMembersApi, 'updateDraft').mockResolvedValue(undefined);
+        jest.spyOn(TeamMembersApi, 'updatePublish').mockResolvedValue(undefined);
+        jest.spyOn(TeamMembersApi, 'delete').mockResolvedValue(undefined);
+        jest.spyOn(TeamMembersApi, 'postDraft').mockResolvedValue(undefined);
+        jest.spyOn(TeamMembersApi, 'postPublished').mockResolvedValue(undefined);
+        jest.spyOn(TeamMembersApi, 'reorder').mockResolvedValue(undefined);
+        
         mockFetchMembers = jest.spyOn(require('./MembersList'), 'fetchMembers');
         mockFetchMembers.mockImplementation(async (category: string, pageSize: number, pageNumber: number) => {
             const filtered = mockMembers.filter((m) => m.category === category);
@@ -637,11 +647,24 @@ describe('MembersList', () => {
         });
 
         it('saves member as draft from edit modal', async () => {
+            jest.spyOn(TeamMembersApi, 'updateDraft').mockImplementation(async () => {
+                jest.spyOn(TeamMembersApi, 'getAll').mockResolvedValueOnce([
+                    {
+                        id: 1,
+                        fullName: 'Alpha',
+                        category: 'Основна команда',
+                        description: '',
+                        status: 'Чернетка',
+                        img: '',
+                    },
+                ]);
+            });
             render(<MembersList {...sharedDefaultProps} />);
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             fireEvent.click(screen.getByTestId('edit-button-0'));
             const draftButton = screen.getByRole('button', {name: /Зберегти як чернетку/i});
             fireEvent.click(draftButton);
+            await waitFor(() => expect(TeamMembersApi.updateDraft).toHaveBeenCalled());
             await waitFor(() => expect(screen.getByTestId('member-item-0')).toHaveTextContent('Чернетка'));
         });
 

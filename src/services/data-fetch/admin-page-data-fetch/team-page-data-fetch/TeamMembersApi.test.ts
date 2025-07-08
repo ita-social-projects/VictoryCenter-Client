@@ -1,28 +1,36 @@
+import { AxiosInstance, AxiosResponse } from "axios";
 import { MemberFormValues } from "../../../../pages/admin/team/components/member-form/MemberForm";
 import { TeamMemberDto } from "../../../../types/TeamPage";
-import { apiClient } from "../../../api-client/apiClient";
 import { mapTeamMemberDtoToTeamMember, TeamMembersApi } from "./TeamMembersApi";
+
+const mockClient = {
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn(),
+} as unknown as jest.Mocked<AxiosInstance>;
+
 
 describe('TeamMembersApi', () => {
     it('should fetch and map team members', async () => {
         const mockDto = [
             {
-            id: 1,
-            fullName: 'Test Member',
-            categoryId: 1,
-            priority: 1,
-            status: 0,
-            description: 'Test description',
-            photo: 'photo.png',
-            email: 'test@example.com'
+                id: 1,
+                fullName: 'Test Member',
+                categoryId: 1,
+                priority: 1,
+                status: 0,
+                description: 'Test description',
+                photo: 'photo.png',
+                email: 'test@example.com'
             }
         ];
 
-        jest.spyOn(apiClient, 'get').mockResolvedValue({ data: mockDto });
+        mockClient.get.mockResolvedValue({ data: mockDto });
 
-        const members = await TeamMembersApi.getAll();
+        const members = await TeamMembersApi.getAll(mockClient);
 
-        expect(apiClient.get).toHaveBeenCalledWith('/TeamMembers');
+        expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers');
         expect(members).toEqual([
             {
             id: 1,
@@ -43,9 +51,9 @@ describe('TeamMembersApi', () => {
             img: null,
         };
 
-        const putMock = jest.spyOn(apiClient, 'put').mockResolvedValue({});
+        const putMock = jest.spyOn(mockClient, 'put').mockResolvedValue({});
 
-        await TeamMembersApi.updateDraft(5, member);
+        await TeamMembersApi.updateDraft(mockClient, 5, member);
 
         expect(putMock).toHaveBeenCalledWith('/TeamMembers/5', {
             fullName: 'Member',
@@ -64,9 +72,9 @@ describe('TeamMembersApi', () => {
             img: null,
         };
 
-        const putMock = jest.spyOn(apiClient, 'put').mockResolvedValue({});
+        const putMock = jest.spyOn(mockClient, 'put').mockResolvedValue({});
 
-        await TeamMembersApi.updatePublish(5, member);
+        await TeamMembersApi.updatePublish(mockClient, 5, member);
 
         expect(putMock).toHaveBeenCalledWith('/TeamMembers/5', {
             fullName: 'Member',
@@ -85,9 +93,9 @@ describe('TeamMembersApi', () => {
             img: null
         };
 
-        const postMock = jest.spyOn(apiClient, 'post').mockResolvedValue({});
+        const postMock = jest.spyOn(mockClient, 'post').mockResolvedValue({});
 
-        await TeamMembersApi.postDraft(member);
+        await TeamMembersApi.postDraft(mockClient, member);
 
         expect(postMock).toHaveBeenCalledWith('/TeamMembers', {
             fullName: 'Draft Member',
@@ -106,9 +114,9 @@ describe('TeamMembersApi', () => {
             img: null
         };
 
-        const postMock = jest.spyOn(apiClient, 'post').mockResolvedValue({});
+        const postMock = jest.spyOn(mockClient, 'post').mockResolvedValue({});
 
-        await TeamMembersApi.postPublished(member);
+        await TeamMembersApi.postPublished(mockClient, member);
 
         expect(postMock).toHaveBeenCalledWith('/TeamMembers', {
             fullName: 'Draft Member',
@@ -120,14 +128,14 @@ describe('TeamMembersApi', () => {
     });
 
     it('should delete member by id', async () => {
-        const deleteMock = jest.spyOn(apiClient, 'delete').mockResolvedValue({});
-        await TeamMembersApi.delete(42);
+        const deleteMock = jest.spyOn(mockClient, 'delete').mockResolvedValue({});
+        await TeamMembersApi.delete(mockClient, 42);
         expect(deleteMock).toHaveBeenCalledWith('/TeamMembers/42');
     });
 
     it('should reorder team members', async () => {
-        const putMock = jest.spyOn(apiClient, 'put').mockResolvedValue({});
-        await TeamMembersApi.reorder(1, [3, 2, 1]);
+        const putMock = jest.spyOn(mockClient, 'put').mockResolvedValue({});
+        await TeamMembersApi.reorder(mockClient, 1, [3, 2, 1]);
 
         expect(putMock).toHaveBeenCalledWith('/TeamMembers/reorder', {
             categoryId: 1,

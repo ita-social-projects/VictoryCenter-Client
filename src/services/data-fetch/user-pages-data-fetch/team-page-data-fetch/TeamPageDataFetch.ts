@@ -7,6 +7,7 @@ import {
 } from '../../../../types/TeamPage';
 import default_team_member_photo from '../../../../assets/team_page_images/team_member_not_found_photo.svg';
 import { axiosInstance } from '../../../api/axios';
+import {API_ROUTES} from '../../../../const/api-routes-constants'
 
 const isValidCategory = (category: PublicCategoryWithTeamMembersDto): boolean => {
     return Boolean(
@@ -40,7 +41,8 @@ const mapCategoryDtoToTeamCategory = (dto: PublicCategoryWithTeamMembersDto): Te
 };
 
 export const teamPageDataFetch = async (): Promise<TeamPageData> => {
-    const response = await axiosInstance.get<PublicCategoryWithTeamMembersDto[]>('/TeamMembers/public');
+    const response =
+        await axiosInstance.get<PublicCategoryWithTeamMembersDto[]>(API_ROUTES.TEAM.PUBLISHED);
 
     const teamCategories = response.data
         .filter(isValidCategory)

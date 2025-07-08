@@ -82,6 +82,7 @@ const ConfirmPublishModal = ({
     <Modal isOpen={isOpen} onClose={onCancel} data-testid="publish-confirm-modal">
         <Modal.Title>{TEAM_PUBLISH_NEW_MEMBER}</Modal.Title>
         <Modal.Content>
+            <></>
         </Modal.Content>
         <Modal.Actions>
             <Button onClick={onCancel} buttonStyle="secondary">
@@ -106,7 +107,7 @@ const ConfirmCloseModal = ({
     <Modal isOpen={isOpen} onClose={onCancel} data-testid="confirm-close-modal">
         <Modal.Title>{TEAM_CHANGES_LOST}</Modal.Title>
         <Modal.Content>
-
+            <></>
         </Modal.Content>
         <Modal.Actions>
             <Button onClick={onCancel} buttonStyle="secondary">

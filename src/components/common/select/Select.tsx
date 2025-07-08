@@ -1,7 +1,9 @@
 import React, {RefObject, useState} from "react";
+import classNames from "classnames";
 import "./select.scss"
 import ArrowDown from "../../../assets/icons/chevron-down.svg"
 import ArrowUp from "../../../assets/icons/chevron-up.svg";
+import { TEAM_STATUS_DEFAULT } from "../../../const/admin/team-page";
 
 export type SelectProps<TValue> = {
     children: React.ReactNode;
@@ -33,13 +35,18 @@ export const Select = <TValue, >({
     return (<div role={"toolbar"} ref={selectContainerRef}
                  onClick={handleOpenSelect}
                  className={`${className ?? ''} select ${isOpen ? 'select-opened' : 'select-closed'}`}
+                 tabIndex={0}
                  onKeyDown={(e) => {
                      if (e.key === 'Enter' || e.key === ' ') {
                          handleOpenSelect();
                      }
                  }}>
         <span
-            style={selectedValue !== null && selectedValue !== undefined ? {color: "#061125"} : {color: "#61615C"}}> {selectedValue !== null && selectedValue !== undefined ? selectedValue.toString() : 'Статус'}</span>
+            className={classNames('empty', {
+                'not-empty': selectedValue !== null && selectedValue !== undefined})}
+                >
+                {selectedValue !== null && selectedValue !== undefined ? selectedValue.toString() : TEAM_STATUS_DEFAULT}
+        </span>
         <img src={isOpen ? ArrowUp : ArrowDown} alt="arrow-down"/>
         <div className={`select-options ${isOpen ? 'select-options-visible' : ''}`}>
             {options.map((opt, index) => {

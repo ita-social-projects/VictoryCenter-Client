@@ -15,7 +15,17 @@
   }
 
   &-closed {
-    justify-content: center;
+    justify-content: space-between;
+    
+    span {
+      &.empty {
+        color: #61615C;
+      }
+
+      &.not-empty {
+        color: #061125;
+      }
+    }
   }
 
   &-options {
@@ -50,7 +60,6 @@
     &-selected {
       span {
         color: #061125;
-        width: 100%;
         border-bottom: 1px solid black;
       }
     }

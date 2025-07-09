@@ -11,12 +11,12 @@ import {
     loginRequest,
     tokenRefreshRequest,
 } from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
-import { CreateAdminClient } from '../../services/auth/createAdminClient/createAdminClient';
+import { CreateAdminClient } from '../../services/auth/create-admin-client/createAdminClient';
 import { AxiosInstance } from 'axios';
-import { useOnMountUnsafe } from '../../utils/hooks/useOnMountUnsafe/useOnMountUnsafe';
+import { useOnMountUnsafe } from '../../utils/hooks/use-on-mount-unsafe/useOnMountUnsafe';
 import { Credentials } from '../../types/Auth';
 import { API_ROUTES } from '../../const/urls/main-api';
-import { isAccessTokenValid } from '../../services/auth/AuthService/AuthService';
+import { isAccessTokenValid } from '../../services/auth/auth-service/AuthService';
 
 type Props = {
     children: ReactNode;

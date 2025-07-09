@@ -19,6 +19,8 @@ victory-center-client/
 │   └── nginx.conf
 ├── public/
 │   └── index.html
+├── scripts/
+│   └── start-in-dev-over-https.mjs
 ├── src/
 │   ├── assets/                             # Images, icons, fonts, etc.
 │   │   ├── images
@@ -39,27 +41,41 @@ victory-center-client/
 │   │   └── styles/                         # Additional styles
 │   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
 │   │   ├── admin/                          # Admin-specific components
-│   │   │   └── admin-navigation/
+│   │   │   ├── admin-context-wrapper/
+│   │   │   ├── admin-navigation/
+│   │   │   ├── private-route/
+│   │   │   └── public-route/
 │   │   ├── common/                         # Shared UI components
 │   │   │   ├── button/
+│   │   │   ├── inline-loader/
 │   │   │   ├── input/
 │   │   │   ├── modal/
+│   │   │   ├── page-loader/
 │   │   │   └── select/
 │   │   ├── footer/
 │   │   └── header/                         # Header-related components
 │   ├── const/                              # Constants used across the project
+│   │   ├── admin/
 │   │   ├── footer/
 │   │   ├── header/
+│   │   ├── loader/
+│   │   ├── login-page/
 │   │   ├── program-page/
+│   │   ├── routers/
 |   |   ├── team-page/
-│   │   └── routes/
+│   │   └── urls/
+│   ├── context/                            # React context providers
+│   │   └── admin-context-provider
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
-│   │   └──main-layout
+│   │   ├── admin-layout/
+│   │   └── main-layout/
 │   ├── pages/                              # Pages
 │   │   ├── admin/                          # Admin pages
 │   │   │   ├── admin-page-content/         # Content components for admin pages
 │   │   │   └── team/                       # Team management page
 │   │   │       └── components/             # Components specific to team page
+│   │   ├── login/
+│   │   │   └── components/
 │   │   ├── not-found/
 │   │   ├── program-page/
 │   │   │   └── program-page/
@@ -76,11 +92,14 @@ victory-center-client/
 │   ├── routes/                             # Route configuration
 │   │   └── app-router
 │   ├── hooks/                              # Custom React hooks
-│   ├── context/                            # React context providers
-│   │   └── admin-context-provider
 │   ├── services/                           # API calls, data services
+│   │   ├── auth/
+│   │   │   ├── auth-service/
+│   │   │   ├── create-admin-client/
+│   │   │   └── resolve-with-new-token/
 │   │   └── data-fetch
 │   │       ├── admin-page-data-fetch
+│   │       ├── login-page-data-fetch
 │   │       ├── program-page-data-fetch
 │   │       └── user-pages-data-fetch
 │   │           ├── home-page-data-fetch
@@ -88,6 +107,10 @@ victory-center-client/
 │   │           └── page-2-data-fetch
 │   ├── types/
 │   ├── utils/                              # Utility functions
+│   │   ├── functions/
+│   │   ├── hooks/
+│   │   │   ├── use-admin-client/
+│   │   │   └── use-on-mount-unsafe/
 │   │   └── mock-data/
 │   │       ├── admin-page/                 # Mock data for admin pages
 │   │       ├── program-page/
@@ -99,9 +122,11 @@ victory-center-client/
 │   ├── index.css                           # Global styles (normalizer)
 │   ├── react-app-env.d.ts
 │   ├── reportWebVitals.ts
+│   ├── setupProxy.ts
 │   └── setupTests.ts
 ├── .coderabbit.yaml
 ├── .dockerignore
+├── .env.development
 ├── .gitignore
 ├── Dockerfile
 ├── LICENSE

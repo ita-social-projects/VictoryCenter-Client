@@ -6,18 +6,18 @@ import {
     loginRequest,
     tokenRefreshRequest,
 } from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
-import { CreateAdminClient } from '../../services/auth/createAdminClient/createAdminClient';
+import { CreateAdminClient } from '../../services/auth/create-admin-client/createAdminClient';
 import { API_ROUTES } from '../../const/urls/main-api';
-import { isAccessTokenValid } from '../../services/auth/AuthService/AuthService';
+import { isAccessTokenValid } from '../../services/auth/auth-service/AuthService';
 
 jest.mock('../../services/data-fetch/login-page-data-fetch/login-page-data-fetch', () => ({
     loginRequest: jest.fn(),
     tokenRefreshRequest: jest.fn(),
 }));
-jest.mock('../../services/auth/AuthService/AuthService', () => ({
+jest.mock('../../services/auth/auth-service/AuthService', () => ({
     isAccessTokenValid: jest.fn(),
 }));
-jest.mock('../../services/auth/createAdminClient/createAdminClient', () => ({
+jest.mock('../../services/auth/create-admin-client/createAdminClient', () => ({
     CreateAdminClient: jest.fn(),
 }));
 jest.mock('../../const/urls/main-api', () => ({

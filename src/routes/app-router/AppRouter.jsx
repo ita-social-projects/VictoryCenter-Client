@@ -47,7 +47,6 @@ export const AppRouter = () => (
                     <Route path={adminRoutes.adminRoute} element={<AdminLayout />}>
                         <Route index element={<AdminPage />} />
                         <Route path={adminRoutes.teamSubRoute} element={<TeamPageAdmin />} />
-                        <Route path={adminRoutes.testSubRoute} element={<div>hello</div>} />
                     </Route>
                 </Route>
             </Route>

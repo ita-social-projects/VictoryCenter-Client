@@ -61,9 +61,8 @@ describe('AuthService functions', () => {
 
         it('returns false if token is empty or malformed', () => {
             expect(hasValidStructure('')).toBe(false);
-
-            const token = createToken(malformedExpPayload);
-            expect(isAccessTokenValid(token)).toBe(false);
+            expect(hasValidStructure('invalid')).toBe(false);
+            expect(hasValidStructure('invalid.token')).toBe(false);
         });
     });
 

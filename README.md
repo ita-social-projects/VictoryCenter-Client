@@ -44,10 +44,12 @@ victory-center-client/
 │   │   │   ├── button/
 │   │   │   ├── input/
 │   │   │   ├── modal/
+│   │   │   ├── scrollable-program-frame/
 │   │   │   └── select/
 │   │   ├── footer/
 │   │   └── header/                         # Header-related components
 │   ├── const/                              # Constants used across the project
+│   │   ├── about-us-page/
 │   │   ├── footer/
 │   │   ├── header/
 │   │   ├── program-page/
@@ -56,6 +58,14 @@ victory-center-client/
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
 │   │   └──main-layout
 │   ├── pages/                              # Pages
+│   │   ├── about-as-page/
+│   │   │   ├── company-values/
+│   │   │   ├── donate-section/
+│   │   │   ├── intro-section/
+│   │   │   ├── main-value/
+│   │   │   ├── our-mission/
+│   │   │   ├── our-team-section/
+│   │   │   └── support-section/
 │   │   ├── admin/                          # Admin pages
 │   │   │   ├── admin-page-content/         # Content components for admin pages
 │   │   │   └── team/                       # Team management page

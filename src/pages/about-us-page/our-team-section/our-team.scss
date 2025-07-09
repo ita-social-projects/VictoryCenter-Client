@@ -1,3 +1,4 @@
+@import '../../../assets/sass/variables/_variables.colors.scss';
 .our-team-block{
   display:  flex;
   align-items: center;
@@ -30,8 +31,8 @@
       line-height: 1.5rem;
       letter-spacing: -0.02em;
       vertical-align: middle;
-      border-bottom: 1px solid #000000;
-      color: #000000;
+      border-bottom: 1px solid $main-black;
+      color: $main-black;
       padding: 0.5rem 0;
     }
   }

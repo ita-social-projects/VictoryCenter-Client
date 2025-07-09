@@ -1,3 +1,4 @@
+@import '../../../assets/sass/variables/_variables.colors.scss';
 .our-mission-block * {
   margin: 0;
   padding: 0;
@@ -18,7 +19,7 @@
       line-height: 2.5rem;
       letter-spacing: -0.02em;
       text-transform: uppercase;
-      color: #061125;
+      color: $blue-900;
     }
     
     .details-block {
@@ -35,7 +36,7 @@
         font-size: 1.125rem;
         line-height: 1.75rem;
         letter-spacing: -0.02em;
-        color: #061125;
+        color: $blue-900;
       }
       
       .link-to-programs{
@@ -52,7 +53,7 @@
           justify-content: center;
           align-items: center;
           gap: 0.5rem;
-          border-bottom: 1px solid #061125;
+          border-bottom: 1px solid $blue-900;
           
           .link-title{
             font-family: Mulish, sans-serif;
@@ -61,7 +62,7 @@
             line-height: 1.5rem;
             letter-spacing: -0.02em;
             vertical-align: middle;
-            color: #061125;
+            color: $blue-900;
           }
         }
       }

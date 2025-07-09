@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="some little fixes">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="fixed bug">
+      <change beforePath="$PROJECT_DIR$/src/pages/about-us-page/company-values/company-values.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/about-us-page/company-values/company-values.scss" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,9 +59,19 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Jest.AboutUsIntro.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.AboutUsPage.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.Company Values Section.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.DonateSection.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.DonateSection.should call donate handler when donate button is clicked.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.DonateSection.should call partner handler when partner button is clicked.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.MainValues component.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.OurMission component.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.OurTeam component.executor&quot;: &quot;Run&quot;,
     &quot;Jest.ScrollableFrame.executor&quot;: &quot;Run&quot;,
     &quot;Jest.ScrollableFrame.показує повідомлення про помилку, якщо fetch не вдалось.executor&quot;: &quot;Run&quot;,
     &quot;Jest.ScrollableFrame.рендерить програми з мокових даних.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.SupportSection component.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
@@ -92,79 +102,75 @@
       <recent name="C:\Users\User\Desktop\Folders\projects\__SOFTSERVE\VictoryCenter-Client\src\layouts\admin-layout" />
     </key>
   </component>
-  <component name="RunManager" selected="Jest.ScrollableFrame">
-    <configuration name="MemberDragPreview.Rendering with member.sets correct key on members wrapper" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
-      <node-interpreter value="project" />
-      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
-      <working-dir value="$PROJECT_DIR$" />
-      <envs />
-      <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/src/pages/admin/team/components/member-drag-preview/MemberDragPreview.test.tsx" />
-      <test-names>
-        <test-name value="MemberDragPreview" />
-        <test-name value="Rendering with member" />
-        <test-name value="sets correct key on members wrapper" />
-      </test-names>
-      <method v="2" />
-    </configuration>
-    <configuration name="ScrollableFrame" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Jest.DonateSection">
+    <configuration name="AboutUsPage" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
       <working-dir value="$PROJECT_DIR$" />
       <envs />
       <scope-kind value="SUITE" />
-      <test-file value="$PROJECT_DIR$/src/components/common/scrollable-program-frame/ScrollableFrame.test.tsx" />
+      <test-file value="$PROJECT_DIR$/src/pages/about-us-page/AboutUsPage.test.tsx" />
       <test-names>
-        <test-name value="ScrollableFrame" />
+        <test-name value="AboutUsPage" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="ScrollableFrame.показує повідомлення про помилку, якщо fetch не вдалось" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="DonateSection" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/src/pages/about-us-page/donate-section/DonateSection.test.tsx" />
+      <test-names>
+        <test-name value="DonateSection" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="DonateSection.should call donate handler when donate button is clicked" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
       <working-dir value="$PROJECT_DIR$" />
       <envs />
       <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/src/components/common/scrollable-program-frame/ScrollableFrame.test.tsx" />
+      <test-file value="$PROJECT_DIR$/src/pages/about-us-page/donate-section/DonateSection.test.tsx" />
       <test-names>
-        <test-name value="ScrollableFrame" />
-        <test-name value="показує повідомлення про помилку, якщо fetch не вдалось" />
+        <test-name value="DonateSection" />
+        <test-name value="should call donate handler when donate button is clicked" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="ScrollableFrame.рендерить програми з мокових даних" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="MainValues component" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
       <working-dir value="$PROJECT_DIR$" />
       <envs />
-      <scope-kind value="TEST" />
-      <test-file value="$PROJECT_DIR$/src/components/common/scrollable-program-frame/ScrollableFrame.test.tsx" />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/src/pages/about-us-page/main-value/MainValue.test.tsx" />
       <test-names>
-        <test-name value="ScrollableFrame" />
-        <test-name value="рендерить програми з мокових даних" />
+        <test-name value="MainValues component" />
       </test-names>
       <method v="2" />
     </configuration>
-    <configuration name="SupportSection component.renders all descriptions" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+    <configuration name="SupportSection component" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
       <node-interpreter value="project" />
       <jest-package value="$PROJECT_DIR$/node_modules/react-scripts" />
       <working-dir value="$PROJECT_DIR$" />
       <envs />
-      <scope-kind value="TEST" />
+      <scope-kind value="SUITE" />
       <test-file value="$PROJECT_DIR$/src/pages/about-us-page/support-section/SupportSection.test.tsx" />
       <test-names>
         <test-name value="SupportSection component" />
-        <test-name value="renders all descriptions" />
       </test-names>
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Jest.SupportSection component.renders all descriptions" />
-        <item itemvalue="Jest.ScrollableFrame.рендерить програми з мокових даних" />
-        <item itemvalue="Jest.ScrollableFrame.показує повідомлення про помилку, якщо fetch не вдалось" />
-        <item itemvalue="Jest.ScrollableFrame" />
-        <item itemvalue="Jest.MemberDragPreview.Rendering with member.sets correct key on members wrapper" />
+        <item itemvalue="Jest.DonateSection" />
+        <item itemvalue="Jest.DonateSection.should call donate handler when donate button is clicked" />
+        <item itemvalue="Jest.AboutUsPage" />
+        <item itemvalue="Jest.SupportSection component" />
+        <item itemvalue="Jest.MainValues component" />
       </list>
     </recent_temporary>
   </component>
@@ -187,6 +193,7 @@
       <workItem from="1749112969506" duration="3675000" />
       <workItem from="1751276329599" duration="13151000" />
       <workItem from="1751968133163" duration="2502000" />
+      <workItem from="1752041174232" duration="4379000" />
     </task>
     <task id="LOCAL-00001" summary="Merge branch 'release/1.0.0' into feature/issue-52&#10;&#10;# Conflicts:&#10;#&#9;README.md&#10;#&#9;src/const/routers/routes.ts&#10;#&#9;src/routes/app-router/AppRouter.jsx">
       <option name="closed" value="true" />
@@ -204,7 +211,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751957319867</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="added some new tests">
+      <option name="closed" value="true" />
+      <created>1752042745685</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1752042745685</updated>
+    </task>
+    <task id="LOCAL-00004" summary="fixed bug">
+      <option name="closed" value="true" />
+      <created>1752043072202</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1752043072202</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -214,7 +237,9 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <MESSAGE value="some little fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="some little fixes" />
+    <MESSAGE value="added some new tests" />
+    <MESSAGE value="fixed bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed bug" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

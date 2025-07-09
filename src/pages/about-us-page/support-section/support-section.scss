@@ -1,6 +1,8 @@
+@import '../../../assets/sass/variables/_variables.colors.scss';
 .support-block{
   position: relative;
   min-height: 64rem;
+  color: $blue-900;
   
   .support-title{
     position: absolute;

@@ -1,3 +1,4 @@
+@import '../../../assets/sass/variables/_variables.colors.scss';
 .about-us-block {
   position: relative;
 
@@ -34,7 +35,7 @@
     line-height: 5rem;
     letter-spacing: 0;
     text-transform: uppercase;
-    color: #fff;
+    color: $main-white;
     
     .highlighted {
       font-weight: 800;
@@ -53,7 +54,7 @@
     font-size: 1.125rem;
     line-height: 1.75rem;
     letter-spacing: -0.02em;
-    color: #fff;
+    color: $main-white;
 
     .title-details p {
       margin-bottom: 0.5rem;

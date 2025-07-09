@@ -1,4 +1,5 @@
-* { 
+@import '../../../assets/sass/variables/_variables.colors.scss';
+.values-block * { 
   padding: 0;
   margin: 0;
   box-sizing: border-box;
@@ -21,7 +22,7 @@
   
   .value-card {
     position: absolute;
-    background-color: #EEF7FB;
+    background-color: $light-blue-50;
     display:  flex;
     flex-direction: column;
     align-items: flex-start;
@@ -41,7 +42,7 @@
         font-size: 1.5rem;
         line-height: 2.25rem;
         letter-spacing: -0.02em;
-        border-bottom: 2px solid #FFFFFF;
+        border-bottom: 2px solid $main-white;
         padding-bottom: 0.25rem;
       }
       
@@ -51,7 +52,7 @@
         font-size: 1rem;
         line-height: 1.5rem;
         letter-spacing: -0.02em;
-        color: #061125;
+        color: $blue-900;
       }
     }
   }

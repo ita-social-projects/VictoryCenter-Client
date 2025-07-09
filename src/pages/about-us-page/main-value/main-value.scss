@@ -1,3 +1,4 @@
+@import '../../../assets/sass/variables/_variables.colors.scss';
 .main-values-block * {
   margin: 0;
   padding: 0;
@@ -5,7 +6,7 @@
 }
 .main-values-block{
   height: 117.75rem;
-  color: #061125;
+  color: $blue-900;
   font-family: Mulish, sans-serif;
   
   .main-values-title{
@@ -36,7 +37,7 @@
     }
 
     span:nth-child(3) {
-      background: #B2DBEE;
+      background: $light-blue-200;
       position: relative;
     }
 
@@ -44,14 +45,14 @@
       content: '';
       width: 100vw;
       height: 5rem;
-      background: #B2DBEE;
+      background: $light-blue-200;
       position: absolute;
       top: 0;
       transform: translateX(-100%);
     }
 
     span:nth-child(1) {
-      background: #FFF481 ;
+      background: $yellow-300;
       position: relative;
     }
 
@@ -59,7 +60,7 @@
       content: '';
       width: 48.65vw;
       height: 5rem;
-      background: #FFF481 ;
+      background: $yellow-300;
       position: absolute;
       top: 0;
       z-index: -1;
@@ -138,7 +139,7 @@
       padding-top: 2rem;
       width: 41rem;
       height: 6.75rem;
-      border-top: 2px solid #A8DAFF;
+      border-top: 2px solid $border-blue;
       font-weight: 500;
       font-size: 1.5rem;
       line-height: 2.25rem;

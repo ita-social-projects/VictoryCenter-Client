@@ -28,7 +28,6 @@ export const AppRouter = () => (
                 <Route path={teamPageRoute} element={<TeamPage />} />
                 <Route path={page2Route} element={<ProgramPage/>}/>
                 <Route path={programPage} element={<ProgramPage />} />
-                <Route path={aboutUsRoute} element={<AboutUsPage />} />
                 <Route path="*" element={<NotFound/>}/>
             </Route>
 

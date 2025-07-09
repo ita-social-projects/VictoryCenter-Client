@@ -81,6 +81,7 @@ victory-center-client/
 │   ├── services/                           # API calls, data services
 │   │   └── data-fetch
 │   │       ├── admin-page-data-fetch
+|   |           └── team-page-data-fetch
 │   │       ├── program-page-data-fetch
 │   │       └── user-pages-data-fetch
 │   │           ├── home-page-data-fetch

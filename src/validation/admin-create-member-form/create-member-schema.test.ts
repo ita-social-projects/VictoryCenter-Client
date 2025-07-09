@@ -37,7 +37,7 @@ describe('Create Member Schema', () => {
         img: createMockFileList(validFile),
     };
 
-    test('validates correctly for published entry', async () => {
+    it('validates correctly for published entry', async () => {
         const schema = useCreateMemberSchema(false);
         const validFile = new File(['dummy content'], 'avatar.png', {
             type: SUPPORTED_FORMATS[0],
@@ -54,49 +54,49 @@ describe('Create Member Schema', () => {
         await expect(schema.validate(validData)).resolves.toBeTruthy();
     });
 
-    test('fails on too short fullName', async () => {
+    it('fails on too short fullName', async () => {
         const schema = useCreateMemberSchema(false);
         await expect(
             schema.validate({ ...requiredBase, fullName: 'J' })
         ).rejects.toThrow(FULLNAME_MIN);
     });
 
-    test('fails on forbidden symbols in fullName', async () => {
+    it('fails on forbidden symbols in fullName', async () => {
         const schema = useCreateMemberSchema(false);
         await expect(
             schema.validate({ ...requiredBase, fullName: 'John@Doe!' })
         ).rejects.toThrow(FORBIDDEN_SYMBOLS);
     });
 
-    test('description is optional for draft', async () => {
+    it('description is optional for draft', async () => {
         const schema = useCreateMemberSchema(true);
         await expect(
             schema.validate({ ...requiredBase, description: '' })
         ).resolves.toBeTruthy();
     });
 
-    test('fails if description is too short (not draft)', async () => {
+    it('fails if description is too short (not draft)', async () => {
         const schema = useCreateMemberSchema(false);
         await expect(
             schema.validate({ ...requiredBase, description: 'short' })
         ).rejects.toThrow(DESCRIPTIONS_MIN);
     });
 
-    test('fails if img not provided and not draft', async () => {
+    it('fails if img not provided and not draft', async () => {
         const schema = useCreateMemberSchema(false);
         await expect(
             schema.validate({ ...requiredBase, img: undefined })
         ).rejects.toThrow(IMG_REQUIRED);
     });
 
-    test('passes if img is string (already uploaded)', async () => {
+    it('passes if img is string (already uploaded)', async () => {
         const schema = useCreateMemberSchema(false);
         await expect(
             schema.validate({ ...requiredBase, img: 'https://some-url.com/image.png' })
         ).resolves.toBeTruthy();
     });
 
-    test('fails if file is too large', async () => {
+    it('fails if file is too large', async () => {
         const schema = useCreateMemberSchema(false);
         const bigFile = new File(['a'.repeat(FILE_SIZE_LIMIT + 1)], 'big.png', {
             type: SUPPORTED_FORMATS[0],
@@ -108,7 +108,7 @@ describe('Create Member Schema', () => {
         ).rejects.toThrow(FILE_SIZE);
     });
 
-    test('fails if file has unsupported format', async () => {
+    it('fails if file has unsupported format', async () => {
         const schema = useCreateMemberSchema(false);
         const badFile = new File([''], 'file.txt', { type: 'text/plain' });
         const fileList = createMockFileList(badFile);
@@ -118,7 +118,7 @@ describe('Create Member Schema', () => {
         ).rejects.toThrow(FILE_FORMAT);
     });
 
-    test('passes if img is not required and draft is true', async () => {
+    it('passes if img is not required and draft is true', async () => {
         const schema = useCreateMemberSchema(true);
         await expect(
             schema.validate({ ...requiredBase, img: undefined })

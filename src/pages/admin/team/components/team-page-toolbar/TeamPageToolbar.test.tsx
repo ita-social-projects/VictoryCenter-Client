@@ -80,7 +80,7 @@ jest.mock("../member-form/MemberForm", () => ({
                         fullName: "Test User",
                         description: "Test Description",
                         img: null,
-                        isDraft: props.isDraft,  // прокидаємо сюди isDraft з пропсів
+                        isDraft: props.isDraft, 
                     };
                     props.onSubmit?.(mockMemberData);
                 }}
@@ -354,7 +354,7 @@ describe('TeamPageToolbar', () => {
         });
     });
 
-    describe('TeamPageToolbar branch coverage for lines 189-191, 215', () => {
+    describe('Save as draft tests', () => {
         it('sets draft mode to true when clicking "Зберегти як чернетку" button', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
             await userEvent.click(screen.getByTestId('add-member-button'));

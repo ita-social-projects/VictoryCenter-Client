@@ -158,11 +158,6 @@ export const MemberForm = ({onSubmit,
                            id='image'
                            {...register("img")}/>
                     <div className='form-group-image-loaded'>
-                        {/*{(watchedImg instanceof FileList && watchedImg.length > 0) ? (*/}
-                        {/*    Array.from(watchedImg).map(f => (<div key={f.name}>{f.name}</div>))*/}
-                        {/*) : previewImgUrl ? (*/}
-                        {/*    <div>{previewImgUrl}</div>*/}
-                        {/*) : null}*/}
                         {(watchedImg instanceof FileList && watchedImg.length > 0) ? (
                             Array.from(watchedImg).map(f => (
                                 <div key={f.name} data-testid="uploaded-file">{f.name}</div>

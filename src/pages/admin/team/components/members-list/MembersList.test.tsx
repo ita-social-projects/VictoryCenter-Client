@@ -80,28 +80,6 @@ jest.mock('../members-list-item/MembersListItem', () => ({
         </div>
     ),
 }));
-
-// jest.mock('../member-form/MemberForm', () => ({
-//     MemberForm: ({onValuesChange, existingMemberFormValues, id, onSubmit}: any) => (
-//         <form data-testid="member-form" id={id} onSubmit={onSubmit}>
-//             <input
-//                 data-testid="form-fullName"
-//                 value={existingMemberFormValues?.fullName ?? ''}
-//                 onChange={(e) => onValuesChange({...existingMemberFormValues, fullName: e.target.value})}
-//             />
-//             <input
-//                 data-testid="form-description"
-//                 value={existingMemberFormValues?.description ?? ''}
-//                 onChange={(e) => onValuesChange({...existingMemberFormValues, description: e.target.value})}
-//             />
-//             <input
-//                 data-testid="form-category"
-//                 value={existingMemberFormValues?.category ?? ''}
-//                 onChange={(e) => onValuesChange({...existingMemberFormValues, category: e.target.value})}
-//             />
-//         </form>
-//     ),
-// }));
 jest.mock('../member-form/MemberForm', () => ({
     MemberForm: ({ onValuesChange, existingMemberFormValues, id, onSubmit, onDraftSubmit, isDraft }: any) => {
         const handleSubmit = (e: React.FormEvent) => {

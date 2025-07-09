@@ -5,11 +5,11 @@ import { DONATE_TITLE, DONATE_DETAILS, DONATE, BECOME_PARTNER } from '../../../c
 export const  DonateSection = () => {
 
     const handleDonate = () => {
-        console.log('Donate clicked');
+        // TODO: implementation of making donats
     };
 
     const handlePartner = () => {
-        console.log('Partner clicked');
+        // TODO: implementation of becoming a partner
     };
     
     return (

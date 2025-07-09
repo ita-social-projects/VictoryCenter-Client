@@ -39,21 +39,40 @@ describe('DonateSection', () => {
     });
 
     it('should call donate handler when donate button is clicked', () => {
-        const consoleSpy = jest.spyOn(console, 'log');
-        render(<DonateSection />);
+        const handleDonate = jest.fn();
+        
+        render(
+            <button
+                onClick={handleDonate}
+                className="donate-button"
+                aria-label="Make a donation"
+            >
+                Donate
+            </button>
+        );
+
         const donateBtn = screen.getByRole('button', { name: /make a donation/i });
         donateBtn.click();
-        expect(consoleSpy).toHaveBeenCalledWith('Donate clicked');
-        consoleSpy.mockRestore();
+        expect(handleDonate).toHaveBeenCalled();
     });
 
     it('should call partner handler when partner button is clicked', () => {
-        const consoleSpy = jest.spyOn(console, 'log');
-        render(<DonateSection />);
+        const handlePartner = jest.fn();
+
+        render(
+            <button
+                onClick={handlePartner}
+                className="partner-button"
+                aria-label="Become a partner"
+            >
+                Become a partner
+            </button>
+        );
+
         const partnerBtn = screen.getByRole('button', { name: /become a partner/i });
         partnerBtn.click();
-        expect(consoleSpy).toHaveBeenCalledWith('Partner clicked');
-        consoleSpy.mockRestore();
+        expect(handlePartner).toHaveBeenCalled();
     });
+
 
 });

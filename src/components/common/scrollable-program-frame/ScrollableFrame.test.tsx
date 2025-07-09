@@ -53,7 +53,7 @@ describe('ScrollableFrame', () => {
         jest.clearAllMocks();
     });
 
-    test('should render programs correctly', async () => {
+    it('should render programs correctly', async () => {
         jest.spyOn(dataFetch, 'programPageDataFetch').mockResolvedValue({
             programData: MockProgramData,
         });
@@ -70,7 +70,7 @@ describe('ScrollableFrame', () => {
     });
 
 
-    test('should show message about fetch error', async () => {
+    it('should show message about fetch error', async () => {
         jest.spyOn(dataFetch, 'programPageDataFetch').mockRejectedValue(new Error('Fetch error'));
 
         render(<ScrollableFrame />);

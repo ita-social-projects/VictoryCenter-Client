@@ -1,9 +1,8 @@
 import {ProgramCard} from '../../../pages/program-page/program-page/program-section/program-card/ProgramCard';
-import {Swiper, SwiperSlide} from 'swiper/react';
+import {Swiper, SwiperSlide, SwiperClass} from 'swiper/react';
 import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
 import {programPageDataFetch} from '../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
 import React, {useState, useEffect, useRef} from 'react';
-import {SwiperClass} from 'swiper/react';
 import {Program} from '../../../types/ProgramPage';
 import arrowRight from '../../../assets/about-us-images/icons/arrow-right.png';
 import arrowLeft from '../../../assets/about-us-images/icons/arrow-left.png';
@@ -57,7 +56,7 @@ export const ScrollableFrame = () => {
                     navigation={false}
                     scrollbar={{draggable: true, el: '.custom-scrollbar',}}>
                 {programData.map((item, index) => (
-                    <SwiperSlide key={index}>
+                    <SwiperSlide key={item.title}>
                         <ProgramCard program={item}/>
                     </SwiperSlide>
                 ))}

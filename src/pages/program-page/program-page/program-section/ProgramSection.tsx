@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { PROGRAMS, PROGRAMS_FOR_KIDS, PROGRAMS_FOR_VETERANS, PROGRAMS_ALL} from "../../../../const/program-page/program-page";
+import { PROGRAMS,
+    PROGRAMS_FOR_KIDS,
+    PROGRAMS_FOR_VETERANS,
+    PROGRAMS_ALL,
+    FAILED_TO_LOAD_THE_PROGRAMS} from "../../../../const/program-page/program-page";
 import { Program } from '../../../../types/ProgramPage';
 import { ProgramCard } from './program-card/ProgramCard';
 import { programPageDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
 import './program-section.scss';
-import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/program-page/program-page';
 
 export const ProgramSection: React.FC = () => {
     

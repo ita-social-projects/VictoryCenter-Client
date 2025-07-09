@@ -1,1 +1,1 @@
-export const TEAM_STATUS_DEFAULT = "Статус";
+export const TEAM_STATUS_DEFAULT = 'Статус';

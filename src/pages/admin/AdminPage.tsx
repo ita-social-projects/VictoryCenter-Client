@@ -1,5 +1,5 @@
-import React from "react";
-import { AdminPageContent } from "./admin-page-content/AdminPageContent";
+import React from 'react';
+import { AdminPageContent } from './admin-page-content/AdminPageContent';
 
 export const AdminPage = () => {
     return <AdminPageContent />;

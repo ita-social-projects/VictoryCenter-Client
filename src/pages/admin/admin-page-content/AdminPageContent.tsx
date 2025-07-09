@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
-import "./admin-page-content.scss";
+import React, { useState, useEffect } from 'react';
+import './admin-page-content.scss';
 
-import { useAdminContext } from "../../../context/admin-context-provider/AdminContextProvider";
-import { adminPageDataFetch } from "../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch";
-import { NavLink } from "react-router";
+import { useAdminContext } from '../../../context/admin-context-provider/AdminContextProvider';
+import { adminPageDataFetch } from '../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch';
+import { NavLink } from 'react-router';
 
 export const AdminPageContent = () => {
     const { token } = useAdminContext();
 
     // eslint-disable-next-line no-console
-    console.log("Here is our token", token);
+    console.log('Here is our token', token);
 
-    const [headerInfo, setHeaderInfo] = useState("");
-    const [contentInfo, setContentInfo] = useState("");
+    const [headerInfo, setHeaderInfo] = useState('');
+    const [contentInfo, setContentInfo] = useState('');
 
     useEffect(() => {
         (async () => {

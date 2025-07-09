@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { COMMON_QUESTIONS } from "../../../../const/program-page/program-page";
-import { Question } from "../../../../types/ProgramPage";
-import { QuestionCard } from "./question-card/QuestionCard";
-import { questionDataFetch } from "../../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch";
-import "./question-section.scss";
+import React, { useEffect, useState } from 'react';
+import { COMMON_QUESTIONS } from '../../../../const/program-page/program-page';
+import { Question } from '../../../../types/ProgramPage';
+import { QuestionCard } from './question-card/QuestionCard';
+import { questionDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
+import './question-section.scss';
 
 export const QuestionSection: React.FC = () => {
     const [questions, setQuestions] = useState<Question[]>([]);
@@ -16,7 +16,7 @@ export const QuestionSection: React.FC = () => {
                 setQuestions(response.questions);
                 setError(null);
             } catch {
-                setError("Не вдалося завантажити дані програм. Будь-ласка спробуйте пізніше.");
+                setError('Не вдалося завантажити дані програм. Будь-ласка спробуйте пізніше.');
                 setQuestions([]);
             }
         })();
@@ -28,7 +28,7 @@ export const QuestionSection: React.FC = () => {
                 <h2>{COMMON_QUESTIONS}</h2>
                 <div className="qa-block">
                     {error && (
-                        <div className="error-message" role="alert" style={{ color: "red" }}>
+                        <div className="error-message" role="alert" style={{ color: 'red' }}>
                             {error}
                         </div>
                     )}

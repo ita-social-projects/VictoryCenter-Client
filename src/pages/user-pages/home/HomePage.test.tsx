@@ -1,12 +1,12 @@
-import { render, waitFor } from "@testing-library/react";
-import { HomePage } from "./HomePage";
-import * as HomePageDataFetchModule from "../../../services/data-fetch/user-pages-data-fetch/home-page-data-fetch/homePageDataFetch";
+import { render, waitFor } from '@testing-library/react';
+import { HomePage } from './HomePage';
+import * as HomePageDataFetchModule from '../../../services/data-fetch/user-pages-data-fetch/home-page-data-fetch/homePageDataFetch';
 
-const spyHomePageDataFetch = jest.spyOn(HomePageDataFetchModule, "homePageDataFetch");
+const spyHomePageDataFetch = jest.spyOn(HomePageDataFetchModule, 'homePageDataFetch');
 
-describe("HomePage", () => {
-    const mockHeader = "Test Header";
-    const mockContent = "Test Content";
+describe('HomePage', () => {
+    const mockHeader = 'Test Header';
+    const mockContent = 'Test Content';
 
     beforeEach(() => {
         spyHomePageDataFetch.mockResolvedValue({
@@ -19,11 +19,11 @@ describe("HomePage", () => {
         jest.clearAllMocks();
     });
 
-    it("renders the component", async () => {
+    it('renders the component', async () => {
         const { container } = render(<HomePage />);
 
-        const header = container.querySelector(".header");
-        const content = container.querySelector(".content");
+        const header = container.querySelector('.header');
+        const content = container.querySelector('.content');
 
         expect(header).toBeInTheDocument();
         expect(content).toBeInTheDocument();

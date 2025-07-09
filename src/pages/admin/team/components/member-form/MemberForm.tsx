@@ -1,6 +1,6 @@
-import CloudDownload from "../../../../../assets/icons/cloud-download.svg";
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { TeamCategory } from "../../TeamPage";
+import CloudDownload from '../../../../../assets/icons/cloud-download.svg';
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { TeamCategory } from '../../TeamPage';
 import {
     TEAM_CATEGORY_MAIN,
     TEAM_CATEGORY_SUPERVISORY,
@@ -11,7 +11,7 @@ import {
     TEAM_LABEL_DESCRIPTION,
     TEAM_LABEL_PHOTO,
     TEAM_LABEL_DRAG_DROP,
-} from "../../../../../const/team";
+} from '../../../../../const/team';
 
 export type MemberFormValues = {
     category: TeamCategory;
@@ -32,10 +32,10 @@ const MAX_DESCRIPTION_LENGTH = 200;
 export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onValuesChange }: MemberFormProps) => {
     const [memberFormValues, setMemberFormValues] = useState<MemberFormValues>(
         existingMemberFormValues || {
-            fullName: "",
+            fullName: '',
             img: null,
-            description: "",
-            category: "" as TeamCategory,
+            description: '',
+            category: '' as TeamCategory,
         },
     );
     const handleOnSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -88,7 +88,7 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
                 <div className="form-group">
                     <label htmlFor="category">{TEAM_LABEL_CATEGORY}</label>
                     <select
-                        value={memberFormValues ? memberFormValues.category : ""}
+                        value={memberFormValues ? memberFormValues.category : ''}
                         onChange={handleMemberFormValuesChange}
                         name="category"
                         id="category"
@@ -104,7 +104,7 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
                 <div className="form-group">
                     <label htmlFor="fullName">{TEAM_LABEL_FULLNAME}</label>
                     <input
-                        value={memberFormValues ? memberFormValues.fullName : ""}
+                        value={memberFormValues ? memberFormValues.fullName : ''}
                         maxLength={MAX_FULLNAME_LENGTH}
                         onChange={handleMemberFormValuesChange}
                         name="fullName"
@@ -118,7 +118,7 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
                 <div className="form-group">
                     <label htmlFor="description">{TEAM_LABEL_DESCRIPTION}</label>
                     <textarea
-                        value={memberFormValues ? memberFormValues.description : ""}
+                        value={memberFormValues ? memberFormValues.description : ''}
                         maxLength={MAX_DESCRIPTION_LENGTH}
                         onChange={handleMemberFormValuesChange}
                         name="description"

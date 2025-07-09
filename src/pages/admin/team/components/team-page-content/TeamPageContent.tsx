@@ -1,10 +1,10 @@
-import React, { useCallback, useState } from "react";
-import { StatusFilter, TeamPageToolbar } from "../team-page-toolbar/TeamPageToolbar";
-import { MembersList } from "../members-list/MembersList";
+import React, { useCallback, useState } from 'react';
+import { StatusFilter, TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
+import { MembersList } from '../members-list/MembersList';
 
 export const TeamPageContent = () => {
-    const [searchByNameQuery, setSearchByNameQuery] = useState<string>("");
-    const [statusFilter, setStatusFilter] = useState<StatusFilter>("Усі");
+    const [searchByNameQuery, setSearchByNameQuery] = useState<string>('');
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>('Усі');
     const [autocompleteValues, setAutocompleteValues] = useState<string[]>([]);
 
     const handleSearchQueryByName = useCallback((query: string) => {

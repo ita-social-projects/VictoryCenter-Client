@@ -1,11 +1,11 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import "./index.css";
-import { AppRouter } from "./routes/app-router/AppRouter";
-import reportWebVitals from "./reportWebVitals";
-import "./assets/fonts/fonts.styles.scss";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import { AppRouter } from './routes/app-router/AppRouter';
+import reportWebVitals from './reportWebVitals';
+import './assets/fonts/fonts.styles.scss';
 
-const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
     <React.StrictMode>
         <AppRouter />

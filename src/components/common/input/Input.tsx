@@ -1,6 +1,6 @@
-import "./input.scss";
-import React, { useRef, useState, useCallback } from "react";
-import { Select } from "../select/Select";
+import './input.scss';
+import React, { useRef, useState, useCallback } from 'react';
+import { Select } from '../select/Select';
 
 export type InputProps = {
     onChange: (query: string) => void;
@@ -9,7 +9,7 @@ export type InputProps = {
 };
 
 export const Input = ({ onChange, autocompleteValues, placeholder }: InputProps) => {
-    const [value, setValue] = useState<string>("");
+    const [value, setValue] = useState<string>('');
     const [isAutocompleteOpen, setIsAutocompleteOpen] = useState(false);
     const selectContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -44,8 +44,8 @@ export const Input = ({ onChange, autocompleteValues, placeholder }: InputProps)
     }, []);
 
     const handleRemoveQueryIconClick = useCallback(() => {
-        setValue("");
-        handleOnChange("");
+        setValue('');
+        handleOnChange('');
     }, [handleOnChange]);
 
     return (

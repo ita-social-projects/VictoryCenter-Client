@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import "./TeamPage.scss";
-import horseVideo from "../../../assets/team_page_images/horse_video.mp4";
-import { teamPageDataFetch } from "../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch";
-import { TeamMember } from "./TeamMemberCard/TeamMemberCard";
-import { TeamItem } from "../../../types/TeamPage";
+import React, { useState, useEffect } from 'react';
+import './TeamPage.scss';
+import horseVideo from '../../../assets/team_page_images/horse_video.mp4';
+import { teamPageDataFetch } from '../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch';
+import { TeamMember } from './TeamMemberCard/TeamMemberCard';
+import { TeamItem } from '../../../types/TeamPage';
 import {
     DOWNLOAD_ERROR,
     VIDEO_TEXT_STRING1,
@@ -12,7 +12,7 @@ import {
     VIDEO_TEXT_STRING4,
     VIDEO_TEXT_STRING5,
     VIDEO_TEXT_AUTHOR,
-} from "../../../const/team-page/team-page";
+} from '../../../const/team-page/team-page';
 
 export const TeamPage: React.FC = () => {
     const [teamData, setTeamData] = useState<TeamItem[]>([]);
@@ -37,13 +37,13 @@ export const TeamPage: React.FC = () => {
     return (
         <div className="team-page-container">
             {error && (
-                <div className="error-message" role="alert" style={{ color: "red", marginBottom: "1rem" }}>
+                <div className="error-message" role="alert" style={{ color: 'red', marginBottom: '1rem' }}>
                     {error}
                 </div>
             )}
 
             {teamData.map((team, index) => (
-                <div key={index} className={`team-section ${index === teamData.length - 1 ? "last-section" : ""}`}>
+                <div key={index} className={`team-section ${index === teamData.length - 1 ? 'last-section' : ''}`}>
                     <div className="team_info">
                         <div className="team_description">
                             <h2>{team.title}</h2>

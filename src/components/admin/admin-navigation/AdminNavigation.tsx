@@ -1,8 +1,8 @@
-import "./admin-navigation.scss";
-import React from "react";
-import { NavLink } from "react-router-dom";
-import { adminRoutes } from "../../../const/routers/routes";
-import Logo from "../../../assets/icons/logo.svg";
+import './admin-navigation.scss';
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import { adminRoutes } from '../../../const/routers/routes';
+import Logo from '../../../assets/icons/logo.svg';
 
 export const AdminNavigation = () => {
     return (
@@ -16,7 +16,7 @@ export const AdminNavigation = () => {
                         to={adminRoutes.teamPageRoute}
                         end
                         className={({ isActive }) =>
-                            isActive ? "admin-pages-selected admin-page-link" : "admin-page-link"
+                            isActive ? 'admin-pages-selected admin-page-link' : 'admin-page-link'
                         }
                     >
                         Команда
@@ -26,7 +26,7 @@ export const AdminNavigation = () => {
                         to={adminRoutes.testAdminRoute}
                         end
                         className={({ isActive }) =>
-                            isActive ? "admin-pages-selected admin-page-link" : "admin-page-link"
+                            isActive ? 'admin-pages-selected admin-page-link' : 'admin-page-link'
                         }
                     >
                         Test

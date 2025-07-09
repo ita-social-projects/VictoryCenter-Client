@@ -1,11 +1,11 @@
-import { render, screen } from "@testing-library/react";
-import { AdminContextProvider, useAdminContext } from "./AdminContextProvider";
-import * as loginMethodModule from "../../utils/mock-data/admin-page/loginMethod";
+import { render, screen } from '@testing-library/react';
+import { AdminContextProvider, useAdminContext } from './AdminContextProvider';
+import * as loginMethodModule from '../../utils/mock-data/admin-page/loginMethod';
 
-const speGetIsLoginSuccessfulMock = jest.spyOn(loginMethodModule, "getIsLoginSuccessfulMock");
+const speGetIsLoginSuccessfulMock = jest.spyOn(loginMethodModule, 'getIsLoginSuccessfulMock');
 
 const ChildComponent = () => {
-    const HEADER = "header";
+    const HEADER = 'header';
 
     const { token } = useAdminContext();
 
@@ -17,7 +17,7 @@ const ChildComponent = () => {
     );
 };
 
-describe("AdminPageContent", () => {
+describe('AdminPageContent', () => {
     beforeEach(() => {
         speGetIsLoginSuccessfulMock.mockReturnValue(true);
     });
@@ -26,24 +26,24 @@ describe("AdminPageContent", () => {
         jest.clearAllMocks();
     });
 
-    it("provides context and renders children when login is successful", async () => {
+    it('provides context and renders children when login is successful', async () => {
         const { container } = render(
             <AdminContextProvider>
                 <ChildComponent />
             </AdminContextProvider>,
         );
 
-        const header = container.querySelector(".header");
-        const token = container.querySelector(".token");
+        const header = container.querySelector('.header');
+        const token = container.querySelector('.token');
 
         expect(header).toBeInTheDocument();
         expect(token).toBeInTheDocument();
 
-        expect(header?.textContent).toEqual("header");
-        expect(token?.textContent).toEqual("fake-token");
+        expect(header?.textContent).toEqual('header');
+        expect(token?.textContent).toEqual('fake-token');
     });
 
-    it("provides context and renders children when login is failed", async () => {
+    it('provides context and renders children when login is failed', async () => {
         speGetIsLoginSuccessfulMock.mockReturnValue(false); // <-- emulate situation when login is failed
 
         const { container } = render(
@@ -52,8 +52,8 @@ describe("AdminPageContent", () => {
             </AdminContextProvider>,
         );
 
-        const header = container.querySelector(".header");
-        const token = container.querySelector(".token");
+        const header = container.querySelector('.header');
+        const token = container.querySelector('.token');
 
         expect(header).not.toBeInTheDocument();
         expect(token).not.toBeInTheDocument();

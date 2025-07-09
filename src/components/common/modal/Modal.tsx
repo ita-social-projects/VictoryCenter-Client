@@ -1,5 +1,5 @@
-import React, { ReactNode, useEffect } from "react";
-import "./modal.scss";
+import React, { ReactNode, useEffect } from 'react';
+import './modal.scss';
 
 interface ModalProps {
     children?: ReactNode;
@@ -9,7 +9,7 @@ interface ModalProps {
     maxWidth?: string;
 }
 
-export const Modal = ({ children, isOpen, onClose, width = "80%", maxWidth = "600px" }: ModalProps) => {
+export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '600px' }: ModalProps) => {
     const title = React.Children.toArray(children).find(
         (child) => React.isValidElement(child) && child.type === Modal.Title,
     );
@@ -23,18 +23,18 @@ export const Modal = ({ children, isOpen, onClose, width = "80%", maxWidth = "60
     useEffect(() => {
         const prevOverflow = document.body.style.overflow;
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Escape" && isOpen) {
+            if (e.key === 'Escape' && isOpen) {
                 onClose();
             }
         };
 
         if (isOpen) {
-            document.addEventListener("keydown", handleKeyDown);
-            document.body.style.overflow = "hidden";
+            document.addEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = 'hidden';
         }
 
         return () => {
-            document.removeEventListener("keydown", handleKeyDown);
+            document.removeEventListener('keydown', handleKeyDown);
             document.body.style.overflow = prevOverflow;
         };
     }, [isOpen, onClose]);
@@ -42,29 +42,29 @@ export const Modal = ({ children, isOpen, onClose, width = "80%", maxWidth = "60
     if (!isOpen) return null;
 
     const modalStyle = {
-        width: typeof width === "number" ? `${width}px` : width,
+        width: typeof width === 'number' ? `${width}px` : width,
         maxWidth: maxWidth,
     };
 
     return (
         <div
-            role={"toolbar"}
+            role={'toolbar'}
             data-testid="modal-overlay"
             className="modal-overlay"
             onClick={onClose}
             onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
+                if (e.key === 'Enter' || e.key === ' ') {
                     onClose();
                 }
             }}
         >
             <div
-                role={"toolbar"}
+                role={'toolbar'}
                 className="modal-container"
                 style={modalStyle}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
+                    if (e.key === 'Enter' || e.key === ' ') {
                         e.stopPropagation();
                     }
                 }}

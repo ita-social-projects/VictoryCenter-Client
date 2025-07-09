@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { TeamCategory } from "../../TeamPage";
-import { Modal } from "../../../../../components/common/modal/Modal";
-import { MemberDragPreview } from "../member-drag-preview/MemberDragPreview";
-import { MembersListItem } from "../members-list-item/MembersListItem";
-import NotFoundIcon from "../../../../../assets/icons/not-found.svg";
-import { Button } from "../../../../../components/common/button/Button";
-import LoaderIcon from "../../../../../assets/icons/load.svg";
-import ArrowUpIcon from "../../../../../assets/icons/arrow-up.svg";
-import { StatusFilter } from "../team-page-toolbar/TeamPageToolbar";
-import { MemberForm, MemberFormValues } from "../member-form/MemberForm";
-import "./members-list.scss";
-import { mockMembers } from "../../../../../utils/mock-data/admin-page/teamPage";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { TeamCategory } from '../../TeamPage';
+import { Modal } from '../../../../../components/common/modal/Modal';
+import { MemberDragPreview } from '../member-drag-preview/MemberDragPreview';
+import { MembersListItem } from '../members-list-item/MembersListItem';
+import NotFoundIcon from '../../../../../assets/icons/not-found.svg';
+import { Button } from '../../../../../components/common/button/Button';
+import LoaderIcon from '../../../../../assets/icons/load.svg';
+import ArrowUpIcon from '../../../../../assets/icons/arrow-up.svg';
+import { StatusFilter } from '../team-page-toolbar/TeamPageToolbar';
+import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
+import './members-list.scss';
+import { mockMembers } from '../../../../../utils/mock-data/admin-page/teamPage';
 import {
     TEAM_DELETE_MEMBER,
     TEAM_EDIT_MEMBER,
@@ -24,7 +24,7 @@ import {
     TEAM_CATEGORY_SUPERVISORY,
     TEAM_CATEGORY_ADVISORS,
     TEAM_NOT_FOUND,
-} from "../../../../../const/team";
+} from '../../../../../const/team';
 
 export type Member = {
     id: number;
@@ -48,13 +48,13 @@ export type MemberDragPreviewModel = {
     member: Member | null;
 };
 
-const currentTabKey = "currentTab";
+const currentTabKey = 'currentTab';
 export const fetchMembers = async (
     category: string,
     pageSize: number,
     pageNumber: number,
-    searchQuery: string = "",
-    statusFilter: StatusFilter = "Усі",
+    searchQuery: string = '',
+    statusFilter: StatusFilter = 'Усі',
 ): Promise<{
     newMembers: Member[];
     totalCountOfPages: number;
@@ -67,7 +67,7 @@ export const fetchMembers = async (
     if (searchQuery) {
         filtered = filtered.filter((m) => m.fullName.toLowerCase().includes(searchQuery.toLowerCase()));
     }
-    if (statusFilter && statusFilter !== "Усі") {
+    if (statusFilter && statusFilter !== 'Усі') {
         filtered = filtered.filter((m) => m.status === statusFilter);
     }
     filtered = filtered.sort((a, b) => a.id - b.id);
@@ -85,7 +85,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
     const [teamMemberToDelete, setTeamMemberToDelete] = useState<string | null>(null);
     const [members, setMembers] = useState<Member[]>([]);
     const [category, setCategory] = useState<TeamCategory>(
-        () => (localStorage.getItem(currentTabKey) as TeamCategory) || "Основна команда",
+        () => (localStorage.getItem(currentTabKey) as TeamCategory) || 'Основна команда',
     );
     const [isDeleteTeamMemberModalOpen, setIsDeleteTeamMemberModalOpen] = useState(false);
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -126,7 +126,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
     const loadMembers = useCallback(
         async (reset: boolean = false) => {
             const currentCategory = categoryRef.current;
-            const currentSearch = searchByNameQuery || "";
+            const currentSearch = searchByNameQuery || '';
             const currentStatus = statusFilter;
             if (!currentCategory || isFetchingRef.current) return;
             if (!reset && totalPagesRef.current && currentPageRef.current > totalPagesRef.current) return;
@@ -174,7 +174,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
         });
 
         const dragImage = new Image();
-        dragImage.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=";
+        dragImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
         e.dataTransfer.setDragImage(dragImage, 0, 0);
     };
 
@@ -237,13 +237,13 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
         };
 
         if (dragPreview.visible) {
-            document.addEventListener("mousemove", handleMouseMove);
+            document.addEventListener('mousemove', handleMouseMove);
         }
 
         if (dragPreview.visible) {
-            document.addEventListener("mousemove", handleMouseMove);
+            document.addEventListener('mousemove', handleMouseMove);
             return () => {
-                document.removeEventListener("mousemove", handleMouseMove);
+                document.removeEventListener('mousemove', handleMouseMove);
             };
         }
 
@@ -342,11 +342,11 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
                     ...prev.filter((m) => m.id !== memberIdToEdit),
                     {
                         id: memberIdToEdit!,
-                        status: "Чернетка",
+                        status: 'Чернетка',
                         category: memberToEdit.category,
                         fullName: memberToEdit.fullName,
                         description: memberToEdit.description,
-                        img: "",
+                        img: '',
                     },
                 ].sort((a, b) => a.id - b.id),
             );
@@ -365,11 +365,11 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
                     ...prev.filter((m) => m.id !== memberIdToEdit),
                     {
                         id: memberIdToEdit!,
-                        status: "Опубліковано",
+                        status: 'Опубліковано',
                         category: memberToEdit.category,
                         fullName: memberToEdit.fullName,
                         description: memberToEdit.description,
-                        img: "",
+                        img: '',
                     },
                 ].sort((a, b) => a.id - b.id),
             );
@@ -402,7 +402,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
 
     if (members.length > 0) {
         const filteredMembers = members.filter((m) => {
-            if (statusFilter === "Усі") return true;
+            if (statusFilter === 'Усі') return true;
             return m.status === statusFilter;
         });
 
@@ -440,23 +440,23 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
                 <div
                     data-testid="members-categories"
                     className="members-categories"
-                    style={{ pointerEvents: isMembersLoading ? "none" : "all" }}
+                    style={{ pointerEvents: isMembersLoading ? 'none' : 'all' }}
                 >
                     <button
                         onClick={() => setCategory(TEAM_CATEGORY_MAIN)}
-                        className={category === TEAM_CATEGORY_MAIN ? "members-categories-selected" : ""}
+                        className={category === TEAM_CATEGORY_MAIN ? 'members-categories-selected' : ''}
                     >
                         {TEAM_CATEGORY_MAIN}
                     </button>
                     <button
                         onClick={() => setCategory(TEAM_CATEGORY_SUPERVISORY)}
-                        className={category === TEAM_CATEGORY_SUPERVISORY ? "members-categories-selected" : ""}
+                        className={category === TEAM_CATEGORY_SUPERVISORY ? 'members-categories-selected' : ''}
                     >
                         {TEAM_CATEGORY_SUPERVISORY}
                     </button>
                     <button
                         onClick={() => setCategory(TEAM_CATEGORY_ADVISORS)}
-                        className={category === TEAM_CATEGORY_ADVISORS ? "members-categories-selected" : ""}
+                        className={category === TEAM_CATEGORY_ADVISORS ? 'members-categories-selected' : ''}
                     >
                         {TEAM_CATEGORY_ADVISORS}
                     </button>
@@ -488,10 +488,10 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
                 </Modal.Content>
                 <Modal.Actions>
                     <div className="members-delete-modal-actions">
-                        <Button buttonStyle={"secondary"} onClick={() => setIsDeleteTeamMemberModalOpen(false)}>
+                        <Button buttonStyle={'secondary'} onClick={() => setIsDeleteTeamMemberModalOpen(false)}>
                             {TEAM_CANCEL}
                         </Button>
-                        <Button buttonStyle={"primary"} onClick={handleDeleteMember}>
+                        <Button buttonStyle={'primary'} onClick={handleDeleteMember}>
                             {TEAM_CONFIRM}
                         </Button>
                     </div>
@@ -510,10 +510,10 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
                         />
                     </Modal.Content>
                     <Modal.Actions>
-                        <Button onClick={handleSaveAsDraft} buttonStyle={"secondary"}>
+                        <Button onClick={handleSaveAsDraft} buttonStyle={'secondary'}>
                             {TEAM_SAVE_AS_DRAFT}
                         </Button>
-                        <Button form="edit-member-modal" type={"submit"} buttonStyle={"primary"}>
+                        <Button form="edit-member-modal" type={'submit'} buttonStyle={'primary'}>
                             {TEAM_PUBLISH}
                         </Button>
                     </Modal.Actions>
@@ -528,10 +528,10 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
                     <></>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button onClick={handleCancelPublish} buttonStyle={"secondary"}>
+                    <Button onClick={handleCancelPublish} buttonStyle={'secondary'}>
                         {TEAM_CANCEL}
                     </Button>
-                    <Button onClick={handleConfirmPublish} buttonStyle={"primary"}>
+                    <Button onClick={handleConfirmPublish} buttonStyle={'primary'}>
                         {TEAM_CONFIRM}
                     </Button>
                 </Modal.Actions>
@@ -543,10 +543,10 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
                     <></>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button onClick={() => setIsConfirmCloseModalOpen(false)} buttonStyle={"secondary"}>
+                    <Button onClick={() => setIsConfirmCloseModalOpen(false)} buttonStyle={'secondary'}>
                         {TEAM_CANCEL}
                     </Button>
-                    <Button buttonStyle={"primary"} onClick={handleConfirmClose}>
+                    <Button buttonStyle={'primary'} onClick={handleConfirmClose}>
                         {TEAM_CONFIRM}
                     </Button>
                 </Modal.Actions>

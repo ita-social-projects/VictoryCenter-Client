@@ -81,28 +81,28 @@
         &-edit {
             width: 24px;
             height: 24px;
-            background: url("../../../../../assets/icons/edit.svg");
+            background: url('../../../../../assets/icons/edit.svg');
 
             &:hover {
                 cursor: pointer;
             }
 
             &:active {
-                background: url("../../../../../assets/icons/edit-filled.svg");
+                background: url('../../../../../assets/icons/edit-filled.svg');
             }
         }
 
         &-delete {
             width: 24px;
             height: 24px;
-            background: url("../../../../../assets/icons/delete.svg");
+            background: url('../../../../../assets/icons/delete.svg');
 
             &:hover {
                 cursor: pointer;
             }
 
             &:active {
-                background: url("../../../../../assets/icons/delete-filled.svg");
+                background: url('../../../../../assets/icons/delete-filled.svg');
             }
         }
     }

@@ -1,9 +1,9 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { routes } from "../../const/routers/routes";
-import { ReactComponent as VictoryCenterLogo } from "../../assets/images/header/VictoryCenterLogo.svg";
-import { ABOUT_US, PROGRAMS, REPORTING, HOW_TO_SUPPORT, CONTACT_US, DONATE } from "../../const/header/header";
-import "./Header.scss";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { routes } from '../../const/routers/routes';
+import { ReactComponent as VictoryCenterLogo } from '../../assets/images/header/VictoryCenterLogo.svg';
+import { ABOUT_US, PROGRAMS, REPORTING, HOW_TO_SUPPORT, CONTACT_US, DONATE } from '../../const/header/header';
+import './Header.scss';
 
 const {
     userPageRoutes: { teamPageRoute, page2Route },
@@ -13,13 +13,13 @@ export const Header = () => {
     const onContactUsClick = () => {
         //TODO: remove this log after implementing an actual logic
         //eslint-disable-next-line no-console
-        console.log("CONTACT USED!");
+        console.log('CONTACT USED!');
     };
 
     const onDonateClick = () => {
         //TODO: remove this log after implementing an actual logic
         //eslint-disable-next-line no-console
-        console.log("DONATE!");
+        console.log('DONATE!');
     };
 
     return (

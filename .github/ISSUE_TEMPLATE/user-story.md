@@ -1,9 +1,9 @@
 ---
 name: User story
 about: Describe story goal
-title: ""
+title: ''
 labels: User story
-assignees: ""
+assignees: ''
 ---
 
 **As a** <role> **I want to** <....> **so that** <...>

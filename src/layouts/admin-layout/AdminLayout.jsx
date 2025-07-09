@@ -1,7 +1,7 @@
-import { Outlet } from "react-router-dom";
-import { AdminContextProvider } from "../../context/admin-context-provider/AdminContextProvider";
-import "./admin-layout.scss";
-import { AdminNavigation } from "../../components/admin/admin-navigation/AdminNavigation";
+import { Outlet } from 'react-router-dom';
+import { AdminContextProvider } from '../../context/admin-context-provider/AdminContextProvider';
+import './admin-layout.scss';
+import { AdminNavigation } from '../../components/admin/admin-navigation/AdminNavigation';
 
 export const AdminLayout = () => (
     <AdminContextProvider>

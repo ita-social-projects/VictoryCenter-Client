@@ -1,8 +1,8 @@
-import React from "react";
-import { Program } from "../../../../../types/ProgramPage";
-import arrowBlack from "../../../../../assets/program_page_images/icons/arrow-up-black.png";
-import arrowYellow from "../../../../../assets/program_page_images/icons/arrow-up-yellow.png";
-import "./program-card.scss";
+import React from 'react';
+import { Program } from '../../../../../types/ProgramPage';
+import arrowBlack from '../../../../../assets/program_page_images/icons/arrow-up-black.png';
+import arrowYellow from '../../../../../assets/program_page_images/icons/arrow-up-yellow.png';
+import './program-card.scss';
 
 interface ProgramCardProps {
     program: Program;

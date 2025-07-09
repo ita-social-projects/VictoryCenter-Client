@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import "./home-page.scss";
+import React, { useState, useEffect } from 'react';
+import './home-page.scss';
 
-import { homePageDataFetch } from "../../../services/data-fetch/user-pages-data-fetch/home-page-data-fetch/homePageDataFetch";
+import { homePageDataFetch } from '../../../services/data-fetch/user-pages-data-fetch/home-page-data-fetch/homePageDataFetch';
 
 export const HomePage = () => {
-    const [headerInfo, setHeaderInfo] = useState("");
-    const [contentInfo, setContentInfo] = useState("");
+    const [headerInfo, setHeaderInfo] = useState('');
+    const [contentInfo, setContentInfo] = useState('');
 
     useEffect(() => {
         (async () => {

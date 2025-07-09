@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { routes } from "../../const/routers/routes";
-import "./Footer.scss";
-import arrowIcon from "../../assets/images/footer/arrow-up-right.svg";
-import phoneIcon from "../../assets/images/footer/phone.svg";
-import mailIcon from "../../assets/images/footer/mail.svg";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { routes } from '../../const/routers/routes';
+import './Footer.scss';
+import arrowIcon from '../../assets/images/footer/arrow-up-right.svg';
+import phoneIcon from '../../assets/images/footer/phone.svg';
+import mailIcon from '../../assets/images/footer/mail.svg';
 import {
     ABOUT_US,
     HIPPOTHERAPY,
@@ -29,17 +29,17 @@ import {
     FACEBOOK,
     INSTAGRAM,
     TELEGRAM,
-} from "../../const/footer/footer";
+} from '../../const/footer/footer';
 
 const {
     userPageRoutes: { teamPageRoute, page2Route },
 } = routes;
 
 export const Footer = () => {
-    const [email, setEmail] = useState("");
+    const [email, setEmail] = useState('');
 
     const handleClick = () => {
-        setEmail("");
+        setEmail('');
     };
 
     const copyToClipboard = (text: string) => {

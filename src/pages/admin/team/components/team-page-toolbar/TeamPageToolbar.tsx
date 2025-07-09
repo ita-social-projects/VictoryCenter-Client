@@ -1,11 +1,11 @@
-import PlusIcon from "../../../../../assets/icons/plus.svg";
-import React, { useState, useCallback } from "react";
-import { Modal } from "../../../../../components/common/modal/Modal";
-import { TeamCategory } from "../../TeamPage";
-import { Button } from "../../../../../components/common/button/Button";
-import { Select } from "../../../../../components/common/select/Select";
-import { Input } from "../../../../../components/common/input/Input";
-import { MemberForm, MemberFormValues } from "../member-form/MemberForm";
+import PlusIcon from '../../../../../assets/icons/plus.svg';
+import React, { useState, useCallback } from 'react';
+import { Modal } from '../../../../../components/common/modal/Modal';
+import { TeamCategory } from '../../TeamPage';
+import { Button } from '../../../../../components/common/button/Button';
+import { Select } from '../../../../../components/common/select/Select';
+import { Input } from '../../../../../components/common/input/Input';
+import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
 import {
     TEAM_ADD_MEMBER,
     TEAM_SAVE_AS_DRAFT,
@@ -18,7 +18,7 @@ import {
     TEAM_STATUS_PUBLISHED,
     TEAM_STATUS_DRAFT,
     SEARCH_BY_NAME,
-} from "../../../../../const/team";
+} from '../../../../../const/team';
 
 export type TeamPageToolbarProps = {
     onSearchQueryChange: (query: string) => void;
@@ -28,7 +28,7 @@ export type TeamPageToolbarProps = {
     onMemberSaveDraft?: (member: MemberFormValues) => void;
 };
 
-export type StatusFilter = "Усі" | "Опубліковано" | "Чернетка";
+export type StatusFilter = 'Усі' | 'Опубліковано' | 'Чернетка';
 
 type ModalState = {
     addMember: boolean;
@@ -216,7 +216,7 @@ export const TeamPageToolbar = ({
         [modalState, pendingMemberData, formData, hasUnsavedChanges],
     );
 
-    if (process.env.NODE_ENV === "test") {
+    if (process.env.NODE_ENV === 'test') {
         (TeamPageToolbar as any).getInternalState = getInternalState;
     }
 

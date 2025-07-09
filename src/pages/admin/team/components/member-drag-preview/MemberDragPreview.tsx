@@ -1,8 +1,8 @@
-import DragIcon from "../../../../../assets/icons/dragger.svg";
-import React from "react";
-import { MemberDragPreviewModel } from "../members-list/MembersList";
-import { MemberComponent } from "../member-component/MemberComponent";
-import "./member-drag-preview.scss";
+import DragIcon from '../../../../../assets/icons/dragger.svg';
+import React from 'react';
+import { MemberDragPreviewModel } from '../members-list/MembersList';
+import { MemberComponent } from '../member-component/MemberComponent';
+import './member-drag-preview.scss';
 
 export type MemberDragPreviewProps = {
     dragPreview: MemberDragPreviewModel;

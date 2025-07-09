@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import { ScrollableFrame } from '../../../components/common/scrollable-program-frame/ScrollableFrame';
 import ArrowIcon from '../../../assets/program_page_images/icons/arrow-up-black.png';
 import { WHAT_WE_DO, WHAT_WE_DO_DETAILS, GO_TO_PROGRAMS } from '../../../const/about-us-page/about-us-page';
@@ -15,12 +15,12 @@ export const OurMission = () => {
                     <p className="mission-details">
                         {WHAT_WE_DO_DETAILS}
                     </p>
-                    <Link to={programPage} className="link-to-programs">
+                    <NavLink to={programPage} className="link-to-programs">
                         <div className="link-block">
                             <span className="link-title">{GO_TO_PROGRAMS}</span>
                             <img src={ArrowIcon} alt=""/>
                         </div>
-                    </Link>
+                    </NavLink>
                 </div>
             </div>
             <ScrollableFrame/>

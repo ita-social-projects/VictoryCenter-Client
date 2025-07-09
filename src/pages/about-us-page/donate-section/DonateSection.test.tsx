@@ -9,32 +9,51 @@ import {
 
 describe('DonateSection', () => {
 
-    test('should render section with correct title', () => {
+    it('should render section with correct title', () => {
         render(<DonateSection />);
         expect(screen.getByText(DONATE_TITLE)).toBeInTheDocument();
     });
 
-    test('should render subtitle correctly', () => {
+    it('should render subtitle correctly', () => {
         render(<DonateSection />);
         expect(screen.getByText(DONATE_DETAILS)).toBeInTheDocument();
     });
 
-    test('should render donate button', () => {
+    it('should render donate button', () => {
         render(<DonateSection />);
         expect(screen.getByText(DONATE)).toBeInTheDocument();
         expect(screen.getByText(DONATE)).toHaveClass('donate-button');
     });
 
-    test('should render "become-a-partner" button correctly', () => {
+    it('should render "become-a-partner" button correctly', () => {
         render(<DonateSection />);
         expect(screen.getByText(BECOME_PARTNER)).toBeInTheDocument();
         expect(screen.getByText(BECOME_PARTNER)).toHaveClass('partner-button');
     });
 
-    test('should render background image with correct className', () => {
+    it('should render background image with correct className', () => {
         render(<DonateSection />);
         const image = screen.getByAltText('Background horses');
         expect(image).toHaveClass('donate-background');
         expect(image).toHaveAttribute('src', expect.stringContaining('donate-background'));
     });
+
+    it('should call donate handler when donate button is clicked', () => {
+        const consoleSpy = jest.spyOn(console, 'log');
+        render(<DonateSection />);
+        const donateBtn = screen.getByRole('button', { name: /make a donation/i });
+        donateBtn.click();
+        expect(consoleSpy).toHaveBeenCalledWith('Donate clicked');
+        consoleSpy.mockRestore();
+    });
+
+    it('should call partner handler when partner button is clicked', () => {
+        const consoleSpy = jest.spyOn(console, 'log');
+        render(<DonateSection />);
+        const partnerBtn = screen.getByRole('button', { name: /become a partner/i });
+        partnerBtn.click();
+        expect(consoleSpy).toHaveBeenCalledWith('Partner clicked');
+        consoleSpy.mockRestore();
+    });
+
 });

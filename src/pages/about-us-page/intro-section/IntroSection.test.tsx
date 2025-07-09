@@ -4,7 +4,7 @@ import { INTRO_TITLE, INTRO_DETAILS } from '../../../const/about-us-page/about-u
 
 describe('AboutUsIntro', () => {
 
-    test('should render images correctly', () => {
+    it('should render images correctly', () => {
         render(<AboutUsIntro />);
         const images = screen.getAllByAltText('Men and Horse');
         expect(images).toHaveLength(2);
@@ -12,7 +12,7 @@ describe('AboutUsIntro', () => {
         expect(images[1]).toHaveClass('color-overlay');
     });
 
-    test('should render highlighted text correctly', () => {
+    it('should render highlighted text correctly', () => {
         render(<AboutUsIntro />);
         const title = screen.getByRole('heading', { level: 1 });
         expect(title).toBeInTheDocument();
@@ -24,7 +24,7 @@ describe('AboutUsIntro', () => {
         expect(highlightedSpans).toHaveLength(2);
     });
 
-    test('should render title details correctly', () => {
+    it('should render title details correctly', () => {
         render(<AboutUsIntro />);
         Object.values(INTRO_DETAILS).forEach((line) => {
             const paragraph = screen.queryByText((text) =>

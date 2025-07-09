@@ -25,7 +25,7 @@ jest.mock('./donate-section/DonateSection', () => ({
 
 describe('AboutUsPage', () => {
 
-    test('should render IntroSection', () => {
+    it('should render IntroSection', () => {
         render(<AboutUsPage />);
         expect(screen.getByTestId('intro-section')).toBeInTheDocument();
         expect(screen.getByTestId('mission-section')).toBeInTheDocument();

@@ -4,12 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="Created new section">
+    <list default="true" id="20f37bb3-6f12-4494-aaac-e63260ccd910" name="Changes" comment="some little fixes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/common/scrollable-program-frame/ScrollableFrame.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/common/scrollable-program-frame/ScrollableFrame.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/common/scrollable-program-frame/scrollable-frame.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/common/scrollable-program-frame/scrollable-frame.scss" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/mock-data/program-page/program-page.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/mock-data/program-page/program-page.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,29 +57,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Jest.ScrollableFrame.executor": "Run",
-    "Jest.ScrollableFrame.показує повідомлення про помилку, якщо fetch не вдалось.executor": "Run",
-    "Jest.ScrollableFrame.рендерить програми з мокових даних.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "#22 on feature/issue-207",
-    "last_opened_file_path": "C:/Users/User/Desktop/Folders/projects/__SOFTSERVE/VictoryCenter-Client/src/assets/icons",
-    "list.type.of.created.stylesheet": "SCSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs.jest.jest_package": "C:/Users/PC/RiderProjects/VictoryCenter-Client/node_modules/react-scripts",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.editor",
-    "ts.external.directory.path": "C:\\Users\\PC\\RiderProjects\\VictoryCenter-Client\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Jest.ScrollableFrame.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.ScrollableFrame.показує повідомлення про помилку, якщо fetch не вдалось.executor&quot;: &quot;Run&quot;,
+    &quot;Jest.ScrollableFrame.рендерить програми з мокових даних.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#22 on feature/issue-207&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/User/Desktop/Folders/projects/__SOFTSERVE/VictoryCenter-Client/src/assets/icons&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;SCSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs.jest.jest_package&quot;: &quot;C:/Users/PC/RiderProjects/VictoryCenter-Client/node_modules/react-scripts&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\PC\\RiderProjects\\VictoryCenter-Client\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\User\Desktop\Folders\projects\__SOFTSERVE\VictoryCenter-Client\src\assets\icons" />
@@ -164,10 +160,10 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Jest.ScrollableFrame" />
+        <item itemvalue="Jest.SupportSection component.renders all descriptions" />
         <item itemvalue="Jest.ScrollableFrame.рендерить програми з мокових даних" />
         <item itemvalue="Jest.ScrollableFrame.показує повідомлення про помилку, якщо fetch не вдалось" />
-        <item itemvalue="Jest.SupportSection component.renders all descriptions" />
+        <item itemvalue="Jest.ScrollableFrame" />
         <item itemvalue="Jest.MemberDragPreview.Rendering with member.sets correct key on members wrapper" />
       </list>
     </recent_temporary>
@@ -190,6 +186,7 @@
       <workItem from="1749032320888" duration="3511000" />
       <workItem from="1749112969506" duration="3675000" />
       <workItem from="1751276329599" duration="13151000" />
+      <workItem from="1751968133163" duration="2502000" />
     </task>
     <task id="LOCAL-00001" summary="Merge branch 'release/1.0.0' into feature/issue-52&#10;&#10;# Conflicts:&#10;#&#9;README.md&#10;#&#9;src/const/routers/routes.ts&#10;#&#9;src/routes/app-router/AppRouter.jsx">
       <option name="closed" value="true" />
@@ -199,7 +196,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750786186812</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="some little fixes">
+      <option name="closed" value="true" />
+      <created>1751957319867</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1751957319867</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -207,6 +212,10 @@
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="false" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="some little fixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="some little fixes" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>

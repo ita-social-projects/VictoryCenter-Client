@@ -3,6 +3,15 @@ import background from '../../../assets/about-us-images/images/donate-background
 import { DONATE_TITLE, DONATE_DETAILS, DONATE, BECOME_PARTNER } from '../../../const/about-us-page/about-us-page';
 
 export const  DonateSection = () => {
+
+    const handleDonate = () => {
+        console.log('Donate clicked');
+    };
+
+    const handlePartner = () => {
+        console.log('Partner clicked');
+    };
+    
     return (
         <div className="donate-block">
             <img src={background} alt="Background horses" className="donate-background"/>
@@ -13,11 +22,11 @@ export const  DonateSection = () => {
                     <div className="donate-buttons">
                         <button
                             className="donate-button"
-                            onClick={() => {/* Handle donate action */}}
+                            onClick={handleDonate}
                             aria-label="Make a donation">{DONATE}</button>
                         <button
                             className="partner-button"
-                            onClick={() => {/* Handle partnership action */}}
+                            onClick={handlePartner}
                             aria-label="Become a partner">{BECOME_PARTNER}</button>
                     </div>
                 </div>

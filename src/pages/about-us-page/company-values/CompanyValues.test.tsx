@@ -4,14 +4,14 @@ import {CompanyValues} from './CompanyValues';
 
 describe('Company Values Section', () => {
     
-    test('should contain main title', () => {
+    it('should contain main title', () => {
         render(<CompanyValues/>);
         const title = screen.getByRole('heading', {name: 'Наші Цінності'});
         expect(title).toBeInTheDocument();
         expect(title).toHaveClass('values-title');
     });
     
-    test('should contain value cards', () => {
+    it('should contain value cards', () => {
         render(<CompanyValues/>);
         const cards = document.querySelectorAll('.value-card');
         expect(cards.length).toEqual(3);
@@ -23,7 +23,7 @@ describe('Company Values Section', () => {
         expect(values.length).toEqual(9);
     });
     
-    test('should contain correct text', () => {
+    it('should contain correct text', () => {
         render(<CompanyValues/>);
 
         expect(screen.getByRole('heading', {name: 'Емпатія'})).toBeInTheDocument();
@@ -57,7 +57,7 @@ describe('Company Values Section', () => {
         ).toBeInTheDocument();
     });
 
-    test('should render in correct container', () => {
+    it('should render in correct container', () => {
         const {container} = render(<CompanyValues/>);
         expect(container.querySelector('.values-block')).toBeInTheDocument();
         const title = document.querySelector('.values-title')

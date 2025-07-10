@@ -4,7 +4,6 @@ import background from '../../../../assets/program_page_images/videos/background
 import './contact-section.scss';
 
 export const ContactSection: React.FC = () => {
-    
     return (
         <div className="contact-us-block">
             <video autoPlay muted loop playsInline aria-hidden="true">
@@ -14,7 +13,9 @@ export const ContactSection: React.FC = () => {
                 <h2 className="contact-title">{PROGRAM_PROMPT}</h2>
                 <div className="contact-button">
                     <h4>{TEXT_US}</h4>
-                    <button type="button" aria-label="Звʼязатись з нами">{CONTACT}</button>
+                    <button type="button" aria-label="Звʼязатись з нами">
+                        {CONTACT}
+                    </button>
                 </div>
             </div>
         </div>

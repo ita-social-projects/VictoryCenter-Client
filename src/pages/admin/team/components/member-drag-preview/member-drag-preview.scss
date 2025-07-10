@@ -1,25 +1,24 @@
 .drag-preview {
-  position: fixed;
-  z-index: 1000;
-  pointer-events: none;
-  background-color: white;
-  border: 2px solid #007bff;
-  border-radius: 8px;
-  padding: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  opacity: 0.9;
-  transition: none;
+    position: fixed;
+    z-index: 1000;
+    pointer-events: none;
+    background-color: white;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0.9;
+    transition: none;
 
-  &:focus-within {
-    cursor: grabbing;
-  }
+    &:focus-within {
+        cursor: grabbing;
+    }
 
-  &:hover {
-    cursor: grabbing;
-  }
+    &:hover {
+        cursor: grabbing;
+    }
 
-  .members-dragger {
-    background-color: #E7EAEE;
-  }
+    .members-dragger {
+        background-color: #e7eaee;
+    }
 }
-

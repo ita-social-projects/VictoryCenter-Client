@@ -1,6 +1,6 @@
 ## JIRA or Github ticker
 
-* [JIRA or Github ticket](https://jira.softserve.academy/secure/RapidBoard.jspa?rapidView=id)
+- [JIRA or Github ticket](https://jira.softserve.academy/secure/RapidBoard.jspa?rapidView=id)
 
 ## Description
 
@@ -18,11 +18,11 @@
 
 <!--- Please provide short instruction step-by-step how to see changes that was implemented by this PR --->
 
-
 ## CHECK LIST
-- [ ]  New tests was added or existing was modified
-- [ ]  Changes has severe impact on users
-- [ ]  Changes has medium impact on users
-- [ ]  Changes has light impact on users
-- [ ]  Test covetage was updated
-- [ ]  PR meets all conventions
+
+- [ ] New tests was added or existing was modified
+- [ ] Changes has severe impact on users
+- [ ] Changes has medium impact on users
+- [ ] Changes has light impact on users
+- [ ] Test covetage was updated
+- [ ] PR meets all conventions

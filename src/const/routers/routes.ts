@@ -12,11 +12,11 @@ export const programPage = '/programPage';
 
 export const userPageRoutes = {
     teamPageRoute,
-    page2Route
+    page2Route,
 };
 
 export const routes = {
     adminRoutes,
     programPage,
-    userPageRoutes
+    userPageRoutes,
 };

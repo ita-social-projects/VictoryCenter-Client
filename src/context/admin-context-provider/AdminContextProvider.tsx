@@ -1,12 +1,4 @@
-import React, {
-    createContext,
-    useContext,
-    useMemo,
-    ReactNode,
-    useState,
-    useCallback,
-    useRef,
-} from 'react';
+import React, { createContext, useContext, useMemo, ReactNode, useState, useCallback, useRef } from 'react';
 import {
     loginRequest,
     tokenRefreshRequest,
@@ -51,7 +43,7 @@ export const AdminContextProvider = ({ children }: Props) => {
             const newToken = await loginRequest(creds);
             updateToken(newToken);
         },
-        [updateToken]
+        [updateToken],
     );
 
     const logout = useCallback(() => {
@@ -84,14 +76,14 @@ export const AdminContextProvider = ({ children }: Props) => {
                 () => isAccessTokenValid(tokenRef.current),
                 () => tokenRef.current,
                 refreshAccessToken,
-                logout
+                logout,
             ),
-        [logout, refreshAccessToken]
+        [logout, refreshAccessToken],
     );
 
     const contextValue = useMemo(
         () => ({ client, isAuthenticated, isLoading, login, logout, refreshAccessToken }),
-        [client, isAuthenticated, isLoading, login, logout, refreshAccessToken]
+        [client, isAuthenticated, isLoading, login, logout, refreshAccessToken],
     );
 
     return <AdminContext.Provider value={contextValue}>{children}</AdminContext.Provider>;

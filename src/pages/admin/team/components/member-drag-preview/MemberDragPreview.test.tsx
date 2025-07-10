@@ -1,15 +1,19 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import {MemberDragPreview} from './MemberDragPreview';
-import {Member, MemberDragPreviewModel} from "../members-list/MembersList";
+import { MemberDragPreview } from './MemberDragPreview';
+import { Member, MemberDragPreviewModel } from '../members-list/MembersList';
 
 jest.mock('../../../../../assets/icons/dragger.svg', () => 'mock-dragger-icon');
 jest.mock('../member-component/MemberComponent', () => ({
-    MemberComponent: ({ member, handleOnDeleteMember, handleOnEditMember }: {
-        member: Member, 
-        handleOnDeleteMember: (fullName: string) => void, 
-        handleOnEditMember: (id: number) => void 
+    MemberComponent: ({
+        member,
+        handleOnDeleteMember,
+        handleOnEditMember,
+    }: {
+        member: Member;
+        handleOnDeleteMember: (fullName: string) => void;
+        handleOnEditMember: (id: number) => void;
     }) => {
         handleOnDeleteMember(member.fullName);
         handleOnEditMember(member.id);
@@ -19,7 +23,7 @@ jest.mock('../member-component/MemberComponent', () => ({
                 {member.fullName}
             </div>
         );
-    }
+    },
 }));
 
 const mockMember: Member = {
@@ -28,21 +32,21 @@ const mockMember: Member = {
     description: 'Software Engineer',
     img: 'https://example.com/john.jpg',
     status: 'Чернетка',
-    category: 'Основна команда'
+    category: 'Основна команда',
 };
 
 const mockDragPreview: MemberDragPreviewModel = {
     visible: true,
     x: 100,
     y: 150,
-    member: mockMember
+    member: mockMember,
 };
 
 const mockDragPreviewWithoutMember: MemberDragPreviewModel = {
     visible: true,
     x: 100,
     y: 150,
-    member: null
+    member: null,
 };
 
 describe('MemberDragPreview', () => {
@@ -61,7 +65,7 @@ describe('MemberDragPreview', () => {
             expect(dragPreviewElement).toBeInTheDocument();
             expect(dragPreviewElement).toHaveStyle({
                 left: '55px',
-                top: '95px'
+                top: '95px',
             });
         });
 
@@ -110,7 +114,7 @@ describe('MemberDragPreview', () => {
             const dragPreviewElement = container.querySelector('.drag-preview');
             expect(dragPreviewElement).toHaveStyle({
                 left: '-45px',
-                top: '-55px'
+                top: '-55px',
             });
         });
 
@@ -121,7 +125,7 @@ describe('MemberDragPreview', () => {
             const dragPreviewElement = container.querySelector('.drag-preview');
             expect(dragPreviewElement).toHaveStyle({
                 left: '-55px',
-                top: '-75px'
+                top: '-75px',
             });
         });
     });
@@ -147,7 +151,7 @@ describe('MemberDragPreview', () => {
                 description: 'Product Manager',
                 img: 'https://example.com/jane.jpg',
                 status: 'Опубліковано',
-                category: 'Наглядова рада'
+                category: 'Наглядова рада',
             };
 
             const dragPreview: MemberDragPreviewModel = { ...mockDragPreview, member: differentMember };
@@ -187,7 +191,7 @@ describe('MemberDragPreview', () => {
                 visible: true,
                 x: 500,
                 y: 600,
-                member: mockMember
+                member: mockMember,
             };
 
             const { container } = render(<MemberDragPreview dragPreview={customDragPreview} />);
@@ -195,7 +199,7 @@ describe('MemberDragPreview', () => {
             const dragPreviewElement = container.querySelector('.drag-preview');
             expect(dragPreviewElement).toHaveStyle({
                 left: '455px',
-                top: '545px'
+                top: '545px',
             });
         });
 
@@ -232,10 +236,8 @@ describe('MemberDragPreview', () => {
             const dragPreviewElement = container.querySelector('.drag-preview');
             expect(dragPreviewElement).toHaveStyle({
                 left: '99954px',
-                top: '88833px'
+                top: '88833px',
             });
         });
     });
-
 });
-

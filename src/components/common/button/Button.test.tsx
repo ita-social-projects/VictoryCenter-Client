@@ -7,7 +7,7 @@ jest.mock('./button.scss', () => ({}));
 
 describe('Button Component', () => {
     it('renders children correctly', () => {
-        render(<Button buttonStyle={"primary"}>Click me</Button>);
+        render(<Button buttonStyle={'primary'}>Click me</Button>);
         expect(screen.getByText('Click me')).toBeInTheDocument();
     });
 
@@ -36,32 +36,52 @@ describe('Button Component', () => {
     });
 
     it('applies custom type when provided', () => {
-        render(<Button buttonStyle="primary" type="submit">Submit Button</Button>);
+        render(
+            <Button buttonStyle="primary" type="submit">
+                Submit Button
+            </Button>,
+        );
         const button = screen.getByRole('button');
         expect(button).toHaveAttribute('type', 'submit');
     });
 
     it('applies reset type when provided', () => {
-        render(<Button buttonStyle="primary" type="reset">Reset Button</Button>);
+        render(
+            <Button buttonStyle="primary" type="reset">
+                Reset Button
+            </Button>,
+        );
         const button = screen.getByRole('button');
         expect(button).toHaveAttribute('type', 'reset');
     });
 
     it('applies form attribute when provided', () => {
-        render(<Button buttonStyle="primary" form="test-form">Form Button</Button>);
+        render(
+            <Button buttonStyle="primary" form="test-form">
+                Form Button
+            </Button>,
+        );
         const button = screen.getByRole('button');
         expect(button).toHaveAttribute('form', 'test-form');
     });
 
     it('does not apply form attribute when undefined', () => {
-        render(<Button buttonStyle="primary" form={undefined}>No Form Button</Button>);
+        render(
+            <Button buttonStyle="primary" form={undefined}>
+                No Form Button
+            </Button>,
+        );
         const button = screen.getByRole('button');
         expect(button).not.toHaveAttribute('form');
     });
 
     it('calls onClick handler when clicked', () => {
         const mockOnClick = jest.fn();
-        render(<Button buttonStyle="primary" onClick={mockOnClick}>Clickable Button</Button>);
+        render(
+            <Button buttonStyle="primary" onClick={mockOnClick}>
+                Clickable Button
+            </Button>,
+        );
 
         const button = screen.getByRole('button');
         fireEvent.click(button);
@@ -78,7 +98,11 @@ describe('Button Component', () => {
 
     it('calls onClick handler multiple times when clicked multiple times', () => {
         const mockOnClick = jest.fn();
-        render(<Button buttonStyle="primary" onClick={mockOnClick}>Multi Click Button</Button>);
+        render(
+            <Button buttonStyle="primary" onClick={mockOnClick}>
+                Multi Click Button
+            </Button>,
+        );
 
         const button = screen.getByRole('button');
         fireEvent.click(button);
@@ -93,7 +117,7 @@ describe('Button Component', () => {
             <Button buttonStyle="primary">
                 <span>Icon</span>
                 <span>Text</span>
-                </Button>
+            </Button>,
         );
 
         expect(screen.getByText('Icon')).toBeInTheDocument();
@@ -103,15 +127,10 @@ describe('Button Component', () => {
     it('applies all props correctly when provided together', () => {
         const mockOnClick = jest.fn();
         render(
-            <Button
-                buttonStyle="secondary"
-        type="submit"
-        form="test-form"
-        onClick={mockOnClick}
-            >
-            Complete Button
-        </Button>
-    );
+            <Button buttonStyle="secondary" type="submit" form="test-form" onClick={mockOnClick}>
+                Complete Button
+            </Button>,
+        );
 
         const button = screen.getByRole('button');
         expect(button).toHaveClass('btn-secondary');
@@ -137,4 +156,3 @@ describe('Button Component', () => {
         expect(button.tagName).toBe('BUTTON');
     });
 });
-

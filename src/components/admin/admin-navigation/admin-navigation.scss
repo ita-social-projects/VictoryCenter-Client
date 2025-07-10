@@ -1,40 +1,39 @@
 .admin {
-  &-logo {
-    height: 150px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 0.625rem;
-  }
-
-  &-pages {
-    font-size: 24px;
-
-    nav {
-      display: flex;
-      flex-direction: column;
+    &-logo {
+        height: 150px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 0.625rem;
     }
 
-    .admin-page-link {
-      color: black;
-      text-decoration: none;
-      position: relative;
-      padding: 15px 10px 15px 40px;
-    }
+    &-pages {
+        font-size: 24px;
 
-    &-selected {
-      background-color: #b5bdcb;
+        nav {
+            display: flex;
+            flex-direction: column;
+        }
 
-      &:before {
-        position: absolute;
-        content: '';
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 8px;
-        background-color: #081124;
-      }
+        .admin-page-link {
+            color: black;
+            text-decoration: none;
+            position: relative;
+            padding: 15px 10px 15px 40px;
+        }
+
+        &-selected {
+            background-color: #b5bdcb;
+
+            &:before {
+                position: absolute;
+                content: '';
+                left: 0;
+                top: 0;
+                height: 100%;
+                width: 8px;
+                background-color: #081124;
+            }
+        }
     }
-  }
 }
-

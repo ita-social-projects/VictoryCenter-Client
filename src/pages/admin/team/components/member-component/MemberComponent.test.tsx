@@ -2,24 +2,24 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemberComponent } from './MemberComponent';
-import {Member} from "../members-list/MembersList";
+import { Member } from '../members-list/MembersList';
 
-const mockMemberDraft: Member  = {
+const mockMemberDraft: Member = {
     id: 1,
     fullName: 'John Doe',
     description: 'Software Engineer',
     img: 'https://example.com/john.jpg',
     status: 'Чернетка',
-    category: 'Основна команда'
+    category: 'Основна команда',
 };
 
-const mockMemberPublished: Member  = {
+const mockMemberPublished: Member = {
     id: 2,
     fullName: 'Jane Smith',
     description: 'Product Manager',
     img: 'https://example.com/jane.jpg',
     status: 'Опубліковано',
-    category: 'Наглядова рада'
+    category: 'Наглядова рада',
 };
 
 const mockHandleOnDeleteMember = jest.fn();
@@ -39,7 +39,7 @@ describe('MemberComponent', () => {
                     member={mockMemberDraft}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             expect(screen.getByRole('img')).toBeInTheDocument();
@@ -54,7 +54,7 @@ describe('MemberComponent', () => {
                     member={mockMemberDraft}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             const image = screen.getByRole('img');
@@ -68,7 +68,7 @@ describe('MemberComponent', () => {
                     member={mockMemberPublished}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             expect(screen.getByText('Jane Smith')).toBeInTheDocument();
@@ -80,7 +80,7 @@ describe('MemberComponent', () => {
                     member={mockMemberPublished}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             expect(screen.getByText('Product Manager')).toBeInTheDocument();
@@ -94,7 +94,7 @@ describe('MemberComponent', () => {
                     member={mockMemberDraft}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             const statusElement = screen.getByText('Чернетка').closest('div');
@@ -109,7 +109,7 @@ describe('MemberComponent', () => {
                     member={mockMemberPublished}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             const statusElement = screen.getByText('Опубліковано').closest('div');
@@ -124,7 +124,7 @@ describe('MemberComponent', () => {
                     member={mockMemberDraft}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             expect(screen.getByText('•')).toBeInTheDocument();
@@ -133,16 +133,16 @@ describe('MemberComponent', () => {
 
     describe('Event handlers', () => {
         test('calls handleOnEditMember with correct id when edit button is clicked', () => {
-            const {container } = render(
+            const { container } = render(
                 <MemberComponent
                     member={mockMemberDraft}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             const editButton = container.querySelector('.members-actions-edit');
-            if(!editButton) throw new Error();
+            if (!editButton) throw new Error();
             fireEvent.click(editButton);
 
             expect(mockHandleOnEditMember).toHaveBeenCalledTimes(1);
@@ -155,11 +155,11 @@ describe('MemberComponent', () => {
                     member={mockMemberPublished}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             const deleteButton = container.querySelector('.members-actions-delete');
-            if(!deleteButton) throw new Error();
+            if (!deleteButton) throw new Error();
             fireEvent.click(deleteButton);
 
             expect(mockHandleOnDeleteMember).toHaveBeenCalledTimes(1);
@@ -172,7 +172,7 @@ describe('MemberComponent', () => {
                     member={mockMemberDraft}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             expect(mockHandleOnEditMember).not.toHaveBeenCalled();
@@ -187,7 +187,7 @@ describe('MemberComponent', () => {
                     member={mockMemberDraft}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             expect(container.querySelector('.members-item')).toBeInTheDocument();
@@ -208,7 +208,7 @@ describe('MemberComponent', () => {
                 description: '',
                 img: '',
                 status: 'Чернетка',
-                category: 'Радники'
+                category: 'Радники',
             };
 
             render(
@@ -216,7 +216,7 @@ describe('MemberComponent', () => {
                     member={emptyMember}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             const image = screen.getByRole('img');
@@ -232,7 +232,7 @@ describe('MemberComponent', () => {
                 description: 'Designer & Developer',
                 img: 'https://example.com/josé.jpg',
                 status: 'Чернетка',
-                category: 'Основна команда'
+                category: 'Основна команда',
             };
 
             render(
@@ -240,7 +240,7 @@ describe('MemberComponent', () => {
                     member={specialMember}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             expect(screen.getByText('José María Ñoño')).toBeInTheDocument();
@@ -248,13 +248,13 @@ describe('MemberComponent', () => {
         });
 
         test('handles different status values correctly', () => {
-            const customStatusMember: Member  = {
+            const customStatusMember: Member = {
                 id: 5,
                 fullName: 'Test User',
                 description: 'Tester',
                 img: 'test.jpg',
                 status: 'Custom Status',
-                category: 'Наглядова рада'
+                category: 'Наглядова рада',
             };
 
             render(
@@ -262,7 +262,7 @@ describe('MemberComponent', () => {
                     member={customStatusMember}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             const statusElement = screen.getByText('Custom Status').closest('div');
@@ -273,21 +273,21 @@ describe('MemberComponent', () => {
 
     describe('Props validation', () => {
         test('component receives and uses all required props', () => {
-            const testMember: Member  = {
+            const testMember: Member = {
                 id: 6,
                 fullName: 'Props Test',
                 description: 'Testing props',
                 img: 'props.jpg',
                 status: 'Чернетка',
-                category: 'Радники'
+                category: 'Радники',
             };
 
-            const {container} = render(
+            const { container } = render(
                 <MemberComponent
                     member={testMember}
                     handleOnDeleteMember={mockHandleOnDeleteMember}
                     handleOnEditMember={mockHandleOnEditMember}
-                />
+                />,
             );
 
             expect(screen.getByText('Props Test')).toBeInTheDocument();
@@ -298,7 +298,7 @@ describe('MemberComponent', () => {
             const deleteButton = container.querySelector('.members-actions-delete');
             const editButton = container.querySelector('.members-actions-edit');
 
-            if(!deleteButton || !editButton) throw new Error();
+            if (!deleteButton || !editButton) throw new Error();
 
             fireEvent.click(editButton);
             fireEvent.click(deleteButton);
@@ -308,4 +308,3 @@ describe('MemberComponent', () => {
         });
     });
 });
-

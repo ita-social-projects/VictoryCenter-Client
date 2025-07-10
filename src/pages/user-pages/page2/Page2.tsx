@@ -7,27 +7,26 @@ export const Page2 = () => {
     const [headerInfo, setHeaderInfo] = useState('');
     const [contentInfo, setContentInfo] = useState('');
 
-
     useEffect(() => {
-      (async () => {
-        const responce = await page2DataFetch();
+        (async () => {
+            const responce = await page2DataFetch();
 
-        const { header, content } = responce;
+            const { header, content } = responce;
 
-        // DEV NOTE: in React 18 and higher there is a term "Automatic Batching"
-        // https://react.dev/blog/2022/03/08/react-18-upgrade-guide#automatic-batching
-        // that means if you are calling setState one after another it will set data in ONE render cycle
-        // please follow the pattern
+            // DEV NOTE: in React 18 and higher there is a term "Automatic Batching"
+            // https://react.dev/blog/2022/03/08/react-18-upgrade-guide#automatic-batching
+            // that means if you are calling setState one after another it will set data in ONE render cycle
+            // please follow the pattern
 
-        setHeaderInfo(header);
-        setContentInfo(content);
-      })();
+            setHeaderInfo(header);
+            setContentInfo(content);
+        })();
     }, []);
 
     return (
-      <div className="page2-container">
-        <h1 className='header'>{headerInfo}</h1>
-        <p className='content'>{contentInfo}</p>
-      </div>
+        <div className="page2-container">
+            <h1 className="header">{headerInfo}</h1>
+            <p className="content">{contentInfo}</p>
+        </div>
     );
 };

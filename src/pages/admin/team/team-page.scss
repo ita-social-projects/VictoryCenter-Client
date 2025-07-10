@@ -1,40 +1,38 @@
 .wrapper {
-  width: 100%;
+    width: 100%;
 
-  .toolbar {
-    display: flex;
-    justify-content: space-between;
-    padding: 54px;
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        padding: 54px;
 
-    &-actions {
-      display: flex;
-      justify-content: space-between;
-      gap: 20px;
+        &-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
 
-      select {
-        width: 131px;
-        height: 40px;
-        top: 52px;
-        left: 1523px;
-        text-align: center;
-        gap: 8px;
-        outline: none;
-        border: 2px solid #061125;
+            select {
+                width: 131px;
+                height: 40px;
+                top: 52px;
+                left: 1523px;
+                text-align: center;
+                gap: 8px;
+                outline: none;
+                border: 2px solid #061125;
 
-        option {
-          outline: none;
-          border-radius: 0;
+                option {
+                    outline: none;
+                    border-radius: 0;
+                }
+            }
         }
-      }
     }
-  }
 }
-
 
 @media (max-width <= 1400px) {
-  .toolbar {
-    flex-wrap: wrap;
-    gap: 15px;
-  }
+    .toolbar {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
 }
-

@@ -18,7 +18,7 @@ export const PROGRAMS_SESSIONS = 'Сесії програм';
 
 export const VICTORY_STARTS_WITH_YOU = 'ПЕРЕМОГА ПОЧИНАЄТЬСЯ З ТЕБЕ';
 
-export const STAY_UP_TO_DATE_WITH_THE_NEWS ='Будьте в курсі новин та можливостей';
+export const STAY_UP_TO_DATE_WITH_THE_NEWS = 'Будьте в курсі новин та можливостей';
 export const ENTER_YOUR_EMAIL = 'Вкажіть ваш Email';
 export const SIGN_UP = 'Підписатися';
 

@@ -5,7 +5,7 @@ export type RefreshHandler = (config: InternalAxiosRequestConfig) => Promise<Int
 export const resolveWithNewTokenConcurrent = (
     refreshAccessToken: () => Promise<void>,
     getAccessToken: () => string,
-    logout: () => void
+    logout: () => void,
 ): RefreshHandler => {
     let isRefreshing = false;
     const retryQueue: Array<{ resolve: (token: string) => void; reject: (error: any) => void }> = [];
@@ -52,7 +52,7 @@ export const resolveWithNewTokenConcurrent = (
 export const resolveWithNewToken = (
     refreshAccessToken: () => Promise<void>,
     getAccessToken: () => string,
-    logout: () => void
+    logout: () => void,
 ): RefreshHandler => {
     return async function (config: InternalAxiosRequestConfig) {
         try {

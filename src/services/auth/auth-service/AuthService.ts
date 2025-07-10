@@ -39,6 +39,6 @@ function base64UrlDecode(str: string): string {
         atob(base64 + pad)
             .split('')
             .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-            .join('')
+            .join(''),
     );
 }

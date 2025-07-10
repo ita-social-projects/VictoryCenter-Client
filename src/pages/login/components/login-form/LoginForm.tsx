@@ -73,9 +73,7 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
                     <button
                         type="button"
                         className="visibility-toggle"
-                        onClick={() =>
-                            setIsPasswordVisible((isPasswordVisible) => !isPasswordVisible)
-                        }
+                        onClick={() => setIsPasswordVisible((isPasswordVisible) => !isPasswordVisible)}
                     >
                         <img
                             src={isPasswordVisible ? EyeOpened : EyeClosed}

@@ -12,6 +12,6 @@ module.exports = (app: Application) => {
             target: targetUrl,
             changeOrigin: true,
             secure: false,
-        })
+        }),
     );
 };

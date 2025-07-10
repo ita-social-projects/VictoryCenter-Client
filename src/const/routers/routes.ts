@@ -1,8 +1,8 @@
 export const adminRoutes = {
-    loginRoute:      "/login",
-    adminRoute:      "/admin-page",
-    teamSubRoute:    "team",
-    teamPageRoute:   "/admin-page/team",
+    loginRoute: '/login',
+    adminRoute: '/admin-page',
+    teamSubRoute: 'team',
+    teamPageRoute: '/admin-page/team',
 };
 
 // user pages routes

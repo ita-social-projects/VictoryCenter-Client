@@ -9,6 +9,6 @@ export function useOnMountUnsafe(effect: EffectCallback) {
             initialized.current = true;
             effect();
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 }

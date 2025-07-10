@@ -9,12 +9,7 @@ const mockUseLocation = useLocation as jest.MockedFunction<typeof useLocation>;
 
 jest.mock('react-router', () => ({
     Navigate: ({ to, state, replace }: any) => (
-        <div
-            data-testid="navigate"
-            data-to={to}
-            data-from={state.from.pathname}
-            data-replace={String(replace)}
-        />
+        <div data-testid="navigate" data-to={to} data-from={state.from.pathname} data-replace={String(replace)} />
     ),
     Outlet: () => <div data-testid="outlet" />,
     useLocation: jest.fn(),

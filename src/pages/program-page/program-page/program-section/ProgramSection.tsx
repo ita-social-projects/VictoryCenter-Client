@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { PROGRAMS,
+import {
+    PROGRAMS,
     PROGRAMS_FOR_KIDS,
     PROGRAMS_FOR_VETERANS,
     PROGRAMS_ALL,
-    FAILED_TO_LOAD_THE_PROGRAMS} from "../../../../const/program-page/program-page";
+    FAILED_TO_LOAD_THE_PROGRAMS
+} from '../../../../const/program-page/program-page';
 import { Program } from '../../../../types/ProgramPage';
 import { ProgramCard } from './program-card/ProgramCard';
 import { programPageDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
 import './program-section.scss';
 
 export const ProgramSection: React.FC = () => {
-    
     const [programData, setProgramData] = useState<Program[]>([]);
     const [error, setError] = useState<string | null>(null);
-    
+
     useEffect(() => {
-        (async() => {
-            try{
+        (async () => {
+            try {
                 const response = await programPageDataFetch();
                 setProgramData(response.programData);
                 setError(null);
-            }
-            catch{
+            } catch {
                 setError(FAILED_TO_LOAD_THE_PROGRAMS);
                 setProgramData([]);
             }
@@ -40,15 +40,12 @@ export const ProgramSection: React.FC = () => {
             </div>
             <div className="cards-block">
                 {error && (
-                    <div className="error-message" role="alert" style={{ color: "red" }}>
+                    <div className="error-message" role="alert" style={{ color: 'red' }}>
                         {error}
                     </div>
                 )}
                 {programData.map((item, index) => (
-                    <ProgramCard
-                        key={index}
-                        program={item}
-                    />
+                    <ProgramCard key={index} program={item} />
                 ))}
             </div>
         </div>

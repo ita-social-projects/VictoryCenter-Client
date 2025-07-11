@@ -4,14 +4,13 @@ import arrowBlack from '../../../../../assets/program_page_images/icons/arrow-up
 import arrowYellow from '../../../../../assets/program_page_images/icons/arrow-up-yellow.png';
 import './program-card.scss';
 
-interface ProgramCardProps{
-    program: Program
+interface ProgramCardProps {
+    program: Program;
 }
-export const ProgramCard: React.FC<ProgramCardProps> = ({program}) => {
-    
+export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
     return (
         <div className="card-block">
-            <img src={program.image} alt={program.title} className="card-img"/>
+            <img src={program.image} alt={program.title} className="card-img" />
             <div className="card-content">
                 <div className="subtitle-info">
                     <div className="subtitle-content">
@@ -20,8 +19,8 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({program}) => {
                             <h2 className="program-title">{program.title}</h2>
                         </div>
                         <div className="arrow-container">
-                            <img src={arrowYellow} alt="" className="hover-img"/>
-                            <img src={arrowBlack} alt="" className="default-img"/>
+                            <img src={arrowYellow} alt="" className="hover-img" />
+                            <img src={arrowBlack} alt="" className="default-img" />
                         </div>
                     </div>
                 </div>

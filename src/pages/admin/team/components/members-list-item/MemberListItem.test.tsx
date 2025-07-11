@@ -1,20 +1,20 @@
-import React from "react";
-import { render, fireEvent } from "@testing-library/react";
-import { MembersListItem } from "./MembersListItem";
-import { Member } from "../members-list/MembersList";
+import React from 'react';
+import { render, fireEvent } from '@testing-library/react';
+import { MembersListItem } from './MembersListItem';
+import { Member } from '../members-list/MembersList';
 
-jest.mock("../../../../../assets/icons/dragger.svg", () => "drag-icon.svg");
+jest.mock('../../../../../assets/icons/dragger.svg', () => 'drag-icon.svg');
 
 const mockMember: Member = {
     id: 1,
-    img: "avatar.png",
-    fullName: "John Doe",
-    description: "Senior Developer",
-    status: "Чернетка",
-    category: "Основна команда"
+    img: 'avatar.png',
+    fullName: 'John Doe',
+    description: 'Senior Developer',
+    status: 'Чернетка',
+    category: 'Основна команда',
 };
 
-describe("MembersListItem", () => {
+describe('MembersListItem', () => {
     const setup = (draggedIndex: number | null = null) => {
         const props = {
             member: mockMember,
@@ -33,31 +33,31 @@ describe("MembersListItem", () => {
         return { ...utils, props };
     };
 
-    it("renders member details correctly", () => {
+    it('renders member details correctly', () => {
         const { getByText, getByAltText } = setup();
-        expect(getByText("John Doe")).toBeInTheDocument();
-        expect(getByText("Senior Developer")).toBeInTheDocument();
-        expect(getByText("Чернетка")).toBeInTheDocument();
-        expect(getByAltText("Drag Handle")).toBeInTheDocument();
-        expect(getByAltText("John Doe-img")).toBeInTheDocument();
+        expect(getByText('John Doe')).toBeInTheDocument();
+        expect(getByText('Senior Developer')).toBeInTheDocument();
+        expect(getByText('Чернетка')).toBeInTheDocument();
+        expect(getByAltText('Drag Handle')).toBeInTheDocument();
+        expect(getByAltText('John Doe-img')).toBeInTheDocument();
     });
 
-    it("adds dragging class when draggedIndex equals index", () => {
+    it('adds dragging class when draggedIndex equals index', () => {
         const { container } = setup(1);
-        const wrapper = container.querySelector(".members-wrapper");
-        expect(wrapper?.className).toContain("dragging");
+        const wrapper = container.querySelector('.members-wrapper');
+        expect(wrapper?.className).toContain('dragging');
     });
 
-    it("does not add dragging class when draggedIndex is different", () => {
+    it('does not add dragging class when draggedIndex is different', () => {
         const { container } = setup(2);
-        const wrapper = container.querySelector(".members-wrapper");
-        expect(wrapper?.className).not.toContain("dragging");
+        const wrapper = container.querySelector('.members-wrapper');
+        expect(wrapper?.className).not.toContain('dragging');
     });
 
-    it("calls drag event handlers correctly", () => {
+    it('calls drag event handlers correctly', () => {
         const { container, props } = setup();
-        const wrapper = container.querySelector(".members-wrapper")!;
-        const dragger = container.querySelector(".members-dragger")!;
+        const wrapper = container.querySelector('.members-wrapper')!;
+        const dragger = container.querySelector('.members-dragger')!;
 
         fireEvent.dragOver(wrapper);
         expect(props.handleDragOver).toHaveBeenCalled();
@@ -75,18 +75,17 @@ describe("MembersListItem", () => {
         expect(props.handleDragEnd).toHaveBeenCalledTimes(2);
     });
 
-    it("calls handleOnEditMember on edit icon click", () => {
+    it('calls handleOnEditMember on edit icon click', () => {
         const { container, props } = setup();
-        const editIcon = container.querySelector(".members-actions-edit")!;
+        const editIcon = container.querySelector('.members-actions-edit')!;
         fireEvent.click(editIcon);
         expect(props.handleOnEditMember).toHaveBeenCalledWith(1);
     });
 
-    it("calls handleOnDeleteMember on delete icon click", () => {
+    it('calls handleOnDeleteMember on delete icon click', () => {
         const { container, props } = setup();
-        const deleteIcon = container.querySelector(".members-actions-delete")!;
+        const deleteIcon = container.querySelector('.members-actions-delete')!;
         fireEvent.click(deleteIcon);
-        expect(props.handleOnDeleteMember).toHaveBeenCalledWith("John Doe");
+        expect(props.handleOnDeleteMember).toHaveBeenCalledWith('John Doe');
     });
 });
-

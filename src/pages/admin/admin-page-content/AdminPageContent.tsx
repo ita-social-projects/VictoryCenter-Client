@@ -1,41 +1,40 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import './admin-page-content.scss';
 
-import { useAdminContext } from "../../../context/admin-context-provider/AdminContextProvider";
-import { adminPageDataFetch } from "../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch";
-import {NavLink} from "react-router";
+import { useAdminContext } from '../../../context/admin-context-provider/AdminContextProvider';
+import { adminPageDataFetch } from '../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch';
+import { NavLink } from 'react-router';
 
 export const AdminPageContent = () => {
-  const { token } = useAdminContext();
-  
-  // eslint-disable-next-line no-console
-  console.log("Here is our token", token);
+    const { token } = useAdminContext();
 
-  const [headerInfo, setHeaderInfo] = useState("");
-  const [contentInfo, setContentInfo] = useState("");
+    // eslint-disable-next-line no-console
+    console.log('Here is our token', token);
 
-  useEffect(() => {
-    (async () => {
-      const responce = await adminPageDataFetch();
+    const [headerInfo, setHeaderInfo] = useState('');
+    const [contentInfo, setContentInfo] = useState('');
 
-      const { header, content } = responce;
+    useEffect(() => {
+        (async () => {
+            const responce = await adminPageDataFetch();
 
-      // DEV NOTE: in React 18 and higher there is a term "Automatic Batching"
-      // https://react.dev/blog/2022/03/08/react-18-upgrade-guide#automatic-batching
-      // that means if you are calling setState one after another it will set data in ONE render cycle
-      // please follow the pattern
+            const { header, content } = responce;
 
-      setHeaderInfo(header);
-      setContentInfo(content);
-    })();
-  }, []);
+            // DEV NOTE: in React 18 and higher there is a term "Automatic Batching"
+            // https://react.dev/blog/2022/03/08/react-18-upgrade-guide#automatic-batching
+            // that means if you are calling setState one after another it will set data in ONE render cycle
+            // please follow the pattern
 
-  return (
-    <div className="admin-page-content">
-      <h1 className='header'>{headerInfo}</h1>
-      <p className='content'>{contentInfo}</p>
-      <NavLink to='/admin-page/team'>teams</NavLink>
-    </div>
-  );
+            setHeaderInfo(header);
+            setContentInfo(content);
+        })();
+    }, []);
+
+    return (
+        <div className="admin-page-content">
+            <h1 className="header">{headerInfo}</h1>
+            <p className="content">{contentInfo}</p>
+            <NavLink to="/admin-page/team">teams</NavLink>
+        </div>
+    );
 };
-

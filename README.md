@@ -5,6 +5,7 @@
 This repo contains front end part of the Victory center
 
 Main structure of this project
+
 <pre><code>
 victory-center-client/
 ├── .github/
@@ -121,6 +122,7 @@ victory-center-client/
 └── tsconfig.json
 </code></pre>
 
+<div>
 [![Build Status](https://img.shields.io/travis/ita-social-projects/VictoryCenter-Client/main?style=flat-square)](https://travis-ci.org/github/ita-social-projects/VictoryCenter-Client)
 [![Coverage Status](https://img.shields.io/gitlab/coverage/ita-social-projects/VictoryCenter-Client/main?style=flat-square)](https://coveralls.io)
 [![Github Issues](https://img.shields.io/github/issues/ita-social-projects/VictoryCenter-Client?style=flat-square)](https://github.com/ita-social-projects/VictoryCenter-Client/issues)
@@ -128,7 +130,7 @@ victory-center-client/
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=alert_status)](https://sonarcloud.io/project/overview?id=ita-social-projects_VictoryCenter-Client) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=coverage)](https://sonarcloud.io/dashboard?id=ita-social-projects_VictoryCenter-Client) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=bugs)](https://sonarcloud.io/dashboard?id=ita-social-projects_VictoryCenter-Client) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=code_smells)](https://sonarcloud.io/dashboard?id=ita-social-projects_VictoryCenter-Client) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=security_rating)](https://sonarcloud.io/dashboard?id=ita-social-projects_VictoryCenter-Client)
 
-- For more on these wonderful  badges, refer to <a href="https://shields.io/" target="_blank">shields.io</a>.
+- For more on these wonderful badges, refer to <a href="https://shields.io/" target="_blank">shields.io</a>.
 
 ---
 
@@ -137,6 +139,7 @@ victory-center-client/
 In the project directory, you can run:
 
 # Setup
+
 To setup this project use this command in project folder:
 
 ### `npm install`
@@ -163,6 +166,10 @@ and present it in a form of a table in terminal.
 
 Launches the lint check that will allow to debug lint errors locally.
 
+### `npm run format`
+
+Lunches code formating process
+
 ### `npm run build`
 
 Builds the app for production to the `build` folder.\
@@ -178,15 +185,19 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 **Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
 ## Installation
- - Modify this section later
+
+- Modify this section later
 
 ### Required to install
- - Modify this section later
+
+- Modify this section later
 
 ### Environment
+
 - Modify this section later
 
 environmental variables
+
 ```properties
 spring.datasource.url=${DATASOURCE_URL}
 spring.datasource.username=${DATASOURCE_USER}
@@ -201,7 +212,9 @@ api.secret=${API_SECRET}
 ## Contributing
 
 ### Git flow
+
 > To get started...
+
 #### Step 1
 
 - **Option 1**
@@ -229,7 +242,6 @@ api.secret=${API_SECRET}
 [![@IrynaZavushchak](https://avatars.githubusercontent.com/u/45690640?s=100&v=4)](https://github.com/IrynaZavushchak)
 [![@LanchevychMaxym](https://avatars.githubusercontent.com/u/47561209?s=100&v=4)](https://github.com/LanchevychMaxym)
 
-
 - You can just grab their GitHub profile image URL
 - You should probably resize their picture using `?s=200` at the end of the image URL.
 
@@ -246,5 +258,6 @@ Reach out to us at one of the following places!
 ---
 
 ## License
+
 - **[MIT license](http://opensource.org/licenses/mit-license.php)**
 - Copyright 2025 © <a href="https://softserve.academy/" target="_blank"> SoftServe Academy</a>.

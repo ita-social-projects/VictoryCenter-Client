@@ -1,63 +1,63 @@
 $mulish-font-family: 'Mulish', sans-serif;
 
 .headerBlock {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  padding-top: 0.85rem;
-  padding-left: 3.5rem;
-  padding-right: 3.5rem;
-
-  .logoContainer {
-    .logo {
-      user-select: none;
-      cursor: pointer;
-    }
-  }
-
-  .linkContainer {
-    nav {
-      display: flex;
-      gap: 3rem;
-
-      a {
-        color: black;
-        font-family: $mulish-font-family;
-        font-size: 1rem;
-        font-weight: 600;
-        text-decoration: none;
-      }
-      a:hover {
-        text-decoration: underline;
-      }
-      a:focus {
-        text-decoration: underline;
-      }
-    }
-  }
-
-  .buttonContainer {
     display: flex;
-    gap: 0.5rem;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding-top: 0.85rem;
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
 
-    .contactUsButton {
-      background-color: white;
-      width: 8.2em;
-      height: 2.5rem;
-      font-family: $mulish-font-family;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
+    .logoContainer {
+        .logo {
+            user-select: none;
+            cursor: pointer;
+        }
     }
-    .donateButton {
-      background-color: #061125;
-      color: white;
-      font-family: $mulish-font-family;
-      font-size: 1rem;
-      width: 7.5rem;
-      height: 2.5rem;
-      cursor: pointer;
+
+    .linkContainer {
+        nav {
+            display: flex;
+            gap: 3rem;
+
+            a {
+                color: black;
+                font-family: $mulish-font-family;
+                font-size: 1rem;
+                font-weight: 600;
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+            a:focus {
+                text-decoration: underline;
+            }
+        }
     }
-  }
+
+    .buttonContainer {
+        display: flex;
+        gap: 0.5rem;
+
+        .contactUsButton {
+            background-color: white;
+            width: 8.2em;
+            height: 2.5rem;
+            font-family: $mulish-font-family;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .donateButton {
+            background-color: #061125;
+            color: white;
+            font-family: $mulish-font-family;
+            font-size: 1rem;
+            width: 7.5rem;
+            height: 2.5rem;
+            cursor: pointer;
+        }
+    }
 }

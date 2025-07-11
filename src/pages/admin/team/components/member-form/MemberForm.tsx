@@ -19,8 +19,8 @@ import {
 export type FullMemberFormValues = {
     category: TeamCategory;
     fullName: string;
-    description: string;   
-    img: FileList | string;   
+    description: string;
+    img: FileList | string;
 };
 
 export type DraftMemberFormValues = {

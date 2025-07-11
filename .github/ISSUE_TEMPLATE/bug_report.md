@@ -20,6 +20,7 @@ INSERT INTO table1 (column1, column2)
 VALUES (value1, value2);"
 
 **Steps to reproduce**
+
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'

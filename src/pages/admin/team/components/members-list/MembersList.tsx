@@ -1,29 +1,29 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
-import {TeamCategory} from "../../TeamPage";
-import {Modal} from "../../../../../components/common/modal/Modal";
-import {MemberDragPreview} from "../member-drag-preview/MemberDragPreview";
-import {MembersListItem} from "../members-list-item/MembersListItem";
-import NotFoundIcon from "../../../../../assets/icons/not-found.svg";
-import {Button} from "../../../../../components/common/button/Button";
-import LoaderIcon from "../../../../../assets/icons/load.svg";
-import ArrowUpIcon from "../../../../../assets/icons/arrow-up.svg"
-import {StatusFilter} from "../team-page-toolbar/TeamPageToolbar";
-import {MemberForm, MemberFormValues} from "../member-form/MemberForm";
-import "./members-list.scss"
-import {mockMembers} from "../../../../../utils/mock-data/admin-page/teamPage";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { TeamCategory } from '../../TeamPage';
+import { Modal } from '../../../../../components/common/modal/Modal';
+import { MemberDragPreview } from '../member-drag-preview/MemberDragPreview';
+import { MembersListItem } from '../members-list-item/MembersListItem';
+import NotFoundIcon from '../../../../../assets/icons/not-found.svg';
+import { Button } from '../../../../../components/common/button/Button';
+import LoaderIcon from '../../../../../assets/icons/load.svg';
+import ArrowUpIcon from '../../../../../assets/icons/arrow-up.svg';
+import { StatusFilter } from '../team-page-toolbar/TeamPageToolbar';
+import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
+import './members-list.scss';
+import { mockMembers } from '../../../../../utils/mock-data/admin-page/teamPage';
 import {
-  TEAM_DELETE_MEMBER,
-  TEAM_EDIT_MEMBER,
-  TEAM_SAVE_AS_DRAFT,
-  TEAM_PUBLISH,
-  TEAM_PUBLISH_NEW_MEMBER,
-  TEAM_CONFIRM,
-  TEAM_CANCEL,
-  TEAM_CHANGES_LOST,
-  TEAM_CATEGORY_MAIN,
-  TEAM_CATEGORY_SUPERVISORY,
-  TEAM_CATEGORY_ADVISORS,
-  TEAM_NOT_FOUND
+    TEAM_DELETE_MEMBER,
+    TEAM_EDIT_MEMBER,
+    TEAM_SAVE_AS_DRAFT,
+    TEAM_PUBLISH,
+    TEAM_PUBLISH_NEW_MEMBER,
+    TEAM_CONFIRM,
+    TEAM_CANCEL,
+    TEAM_CHANGES_LOST,
+    TEAM_CATEGORY_MAIN,
+    TEAM_CATEGORY_SUPERVISORY,
+    TEAM_CATEGORY_ADVISORS,
+    TEAM_NOT_FOUND,
 } from '../../../../../const/team';
 
 export type Member = {
@@ -48,50 +48,52 @@ export type MemberDragPreviewModel = {
     member: Member | null;
 };
 
-const currentTabKey = "currentTab";
+const currentTabKey = 'currentTab';
 export const fetchMembers = async (
-  category: string,
-  pageSize: number,
-  pageNumber: number,
-  searchQuery: string = '',
-  statusFilter: StatusFilter = 'Усі'
+    category: string,
+    pageSize: number,
+    pageNumber: number,
+    searchQuery: string = '',
+    statusFilter: StatusFilter = 'Усі',
 ): Promise<{
-  newMembers: Member[],
-  totalCountOfPages: number
+    newMembers: Member[];
+    totalCountOfPages: number;
 }> => {
-  await new Promise((resolve) => setTimeout(resolve, 200));
-  let filtered = mockMembers;
-  if (category) {
-    filtered = filtered.filter(m => m.category === category);
-  }
-  if (searchQuery) {
-    filtered = filtered.filter(m => m.fullName.toLowerCase().includes(searchQuery.toLowerCase()));
-  }
-  if (statusFilter && statusFilter !== 'Усі') {
-    filtered = filtered.filter(m => m.status === statusFilter);
-  }
-  filtered = filtered.sort((a, b) => a.id - b.id);
-  const some = (pageNumber - 1) * pageSize;
-  return {
-    newMembers: filtered.slice(some, some + pageSize),
-    totalCountOfPages: Math.ceil(filtered.length / pageSize)
-  };
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    let filtered = mockMembers;
+    if (category) {
+        filtered = filtered.filter((m) => m.category === category);
+    }
+    if (searchQuery) {
+        filtered = filtered.filter((m) => m.fullName.toLowerCase().includes(searchQuery.toLowerCase()));
+    }
+    if (statusFilter && statusFilter !== 'Усі') {
+        filtered = filtered.filter((m) => m.status === statusFilter);
+    }
+    filtered = filtered.sort((a, b) => a.id - b.id);
+    const some = (pageNumber - 1) * pageSize;
+    return {
+        newMembers: filtered.slice(some, some + pageSize),
+        totalCountOfPages: Math.ceil(filtered.length / pageSize),
+    };
 };
 
-export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValuesChange}: MembersListProps) => {
+export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteValuesChange }: MembersListProps) => {
     const pageSize = 5;
     const [totalPages, setTotalPages] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [teamMemberToDelete, setTeamMemberToDelete] = useState<string | null>(null);
     const [members, setMembers] = useState<Member[]>([]);
-    const [category, setCategory] = useState<TeamCategory>(() => (localStorage.getItem(currentTabKey) as TeamCategory) || "Основна команда");
+    const [category, setCategory] = useState<TeamCategory>(
+        () => (localStorage.getItem(currentTabKey) as TeamCategory) || 'Основна команда',
+    );
     const [isDeleteTeamMemberModalOpen, setIsDeleteTeamMemberModalOpen] = useState(false);
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [dragPreview, setDragPreview] = useState<MemberDragPreviewModel>({
         visible: false,
         x: 0,
         y: 0,
-        member: null
+        member: null,
     });
     const memberListRef = useRef<HTMLDivElement>(null);
     const [isMembersLoading, setIsMembersLoading] = useState(false);
@@ -123,35 +125,38 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         categoryRef.current = category;
     }, [category]);
 
-    const loadMembers = useCallback(async (reset: boolean = false) => {
-        const currentCategory = categoryRef.current;
-        const currentSearch = searchByNameQuery || '';
-        const currentStatus = statusFilter;
-        if (!currentCategory || isFetchingRef.current) return;
-        if (!reset && totalPagesRef.current && currentPageRef.current > totalPagesRef.current) return;
+    const loadMembers = useCallback(
+        async (reset: boolean = false) => {
+            const currentCategory = categoryRef.current;
+            const currentSearch = searchByNameQuery || '';
+            const currentStatus = statusFilter;
+            if (!currentCategory || isFetchingRef.current) return;
+            if (!reset && totalPagesRef.current && currentPageRef.current > totalPagesRef.current) return;
 
-        isFetchingRef.current = true;
-        setIsMembersLoading(true);
+            isFetchingRef.current = true;
+            setIsMembersLoading(true);
 
-        const pageToFetch = reset ? 1 : currentPageRef.current;
+            const pageToFetch = reset ? 1 : currentPageRef.current;
 
-        const { newMembers, totalCountOfPages } = await fetchMembers(
-            currentCategory,
-            pageSize,
-            pageToFetch,
-            currentSearch,
-            currentStatus
-        );
+            const { newMembers, totalCountOfPages } = await fetchMembers(
+                currentCategory,
+                pageSize,
+                pageToFetch,
+                currentSearch,
+                currentStatus,
+            );
 
-        setMembers(prev => reset ? [...newMembers] : [...prev, ...newMembers]);
-        setCurrentPage(prev => reset ? 2 : prev + 1);
-        if (totalPagesRef.current === null || reset) {
-            setTotalPages(totalCountOfPages);
-        }
+            setMembers((prev) => (reset ? [...newMembers] : [...prev, ...newMembers]));
+            setCurrentPage((prev) => (reset ? 2 : prev + 1));
+            if (totalPagesRef.current === null || reset) {
+                setTotalPages(totalCountOfPages);
+            }
 
-        setIsMembersLoading(false);
-        isFetchingRef.current = false;
-    }, [searchByNameQuery, statusFilter]);
+            setIsMembersLoading(false);
+            isFetchingRef.current = false;
+        },
+        [searchByNameQuery, statusFilter],
+    );
 
     useEffect(() => {
         setMembers([]);
@@ -176,9 +181,8 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     };
 
     const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
-
         if (e.clientX !== 0 && e.clientY !== 0) {
-            setDragPreview(prev => ({
+            setDragPreview((prev) => ({
                 ...prev,
                 x: e.clientX,
                 y: e.clientY
@@ -218,7 +222,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     };
 
     const handleDeleteMember = () => {
-        setMembers(prev => prev.filter(m => m.fullName !== teamMemberToDelete));
+        setMembers((prev) => prev.filter((m) => m.fullName !== teamMemberToDelete));
         setIsDeleteTeamMemberModalOpen(false);
         setTeamMemberToDelete(null);
     };
@@ -226,7 +230,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (dragPreview.visible) {
-                setDragPreview(prev => ({
+                setDragPreview((prev) => ({
                     ...prev,
                     x: e.clientX,
                     y: e.clientY
@@ -263,7 +267,11 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
     useEffect(() => {
         if (searchByNameQuery) {
-            onAutocompleteValuesChange(members.filter(m => m.fullName.toLowerCase().startsWith(searchByNameQuery.toLowerCase())).map(m => m.fullName))
+            onAutocompleteValuesChange(
+                members
+                    .filter((m) => m.fullName.toLowerCase().startsWith(searchByNameQuery.toLowerCase()))
+                    .map((m) => m.fullName),
+            );
         } else {
             onAutocompleteValuesChange([]);
         }
@@ -279,7 +287,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
             setIsMoveToTopVisible(false);
         }
 
-        const bottomReached = Math.abs((el.scrollHeight - el.scrollTop) - el.clientHeight) <= 5;
+        const bottomReached = Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight) <= 5;
         if (bottomReached) {
             loadMembers();
         }
@@ -306,19 +314,19 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         }
     };
 
-
-
     const handleMemberEdit = () => {
         setIsConfirmPublishNewMemberModalOpen(true);
     };
 
     const handleEditMemberOnClose = () => {
-        const existingMember = members.filter(m => m.id === memberIdToEdit)[0];
+        const existingMember = members.filter((m) => m.id === memberIdToEdit)[0];
         //check photos as well
         if (existingMember && memberToEdit) {
-            if (memberToEdit.description !== existingMember.description
-                || memberToEdit.fullName !== existingMember.fullName
-                || memberToEdit.category !== existingMember.category) {
+            if (
+                memberToEdit.description !== existingMember.description ||
+                memberToEdit.fullName !== existingMember.fullName ||
+                memberToEdit.category !== existingMember.category
+            ) {
                 setIsConfirmCloseModalOpen(true);
                 return;
             }
@@ -327,6 +335,20 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         setMemberToEdit(null);
         setIsEditMemberModalOpen(false);
     };
+
+    const handleSaveAsDraft = () => {
+        if (memberToEdit) {
+            setMembers(prev => [...prev.filter(m => m.id !== memberIdToEdit),
+                {
+                    id: memberIdToEdit!,
+                    status: "Чернетка",
+                    category: memberToEdit.category,
+                    fullName: memberToEdit.fullName,
+                    description: memberToEdit.description,
+                    img: ""
+                }].sort((a, b) => a.id - b.id))
+        }
+    }
 
     const handleCancelPublish = () => {
         setIsConfirmPublishNewMemberModalOpen(false);
@@ -352,16 +374,19 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         if (isEditMemberModalOpen && memberToEdit != null) {
             setIsConfirmCloseModalOpen(false);
             setMemberToEdit(null);
-            setIsEditMemberModalOpen(false)
+            setIsEditMemberModalOpen(false);
         }
 
-        if (isEditMemberModalOpen && (memberToEdit === null
-            || (memberToEdit.img === null
-                && !memberToEdit.category
-                && !memberToEdit.fullName
-                && !memberToEdit.description))) {
+        if (
+            isEditMemberModalOpen &&
+            (memberToEdit === null ||
+                (memberToEdit.img === null &&
+                    !memberToEdit.category &&
+                    !memberToEdit.fullName &&
+                    !memberToEdit.description))
+        ) {
             setMemberToEdit(null);
-            setIsEditMemberModalOpen(false)
+            setIsEditMemberModalOpen(false);
         }
     };
 
@@ -393,8 +418,8 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     let content;
 
     if (members.length > 0) {
-        const filteredMembers = members.filter(m => {
-            if (statusFilter === "Усі") return true;
+        const filteredMembers = members.filter((m) => {
+            if (statusFilter === 'Усі') return true;
             return m.status === statusFilter;
         });
 
@@ -416,11 +441,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     } else if (!isMembersLoading) {
         content = (
             <div className="members-not-found" data-testid="members-not-found">
-                <img
-                    src={NotFoundIcon}
-                    alt="members-not-found"
-                    data-testid="members-not-found-icon"
-                />
+                <img src={NotFoundIcon} alt="members-not-found" data-testid="members-not-found-icon" />
                 <p>{TEAM_NOT_FOUND}</p>
             </div>
         );
@@ -430,45 +451,66 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
     return (
         <>
-            {dragPreview?.visible && dragPreview?.member ? (
-                <MemberDragPreview dragPreview={dragPreview}/>
-            ) : <></>}
+            {dragPreview?.visible && dragPreview?.member ? <MemberDragPreview dragPreview={dragPreview} /> : <></>}
 
-            <div className='members'>
-                <div data-testid="members-categories" className='members-categories' style={{"pointerEvents": isMembersLoading ? "none" : "all"}}>
-                    <button onClick={() => setCategory(TEAM_CATEGORY_MAIN)}
-                         className={category === TEAM_CATEGORY_MAIN ? 'members-categories-selected' : ''}>{TEAM_CATEGORY_MAIN}</button>
-                    <button onClick={() => setCategory(TEAM_CATEGORY_SUPERVISORY)}
-                         className={category === TEAM_CATEGORY_SUPERVISORY ? 'members-categories-selected' : ''}>{TEAM_CATEGORY_SUPERVISORY}</button>
-                    <button onClick={() => setCategory(TEAM_CATEGORY_ADVISORS)}
-                         className={category === TEAM_CATEGORY_ADVISORS ? 'members-categories-selected' : ''}>{TEAM_CATEGORY_ADVISORS}</button>
+            <div className="members">
+                <div
+                    data-testid="members-categories"
+                    className="members-categories"
+                    style={{ pointerEvents: isMembersLoading ? 'none' : 'all' }}
+                >
+                    <button
+                        onClick={() => setCategory(TEAM_CATEGORY_MAIN)}
+                        className={category === TEAM_CATEGORY_MAIN ? 'members-categories-selected' : ''}
+                    >
+                        {TEAM_CATEGORY_MAIN}
+                    </button>
+                    <button
+                        onClick={() => setCategory(TEAM_CATEGORY_SUPERVISORY)}
+                        className={category === TEAM_CATEGORY_SUPERVISORY ? 'members-categories-selected' : ''}
+                    >
+                        {TEAM_CATEGORY_SUPERVISORY}
+                    </button>
+                    <button
+                        onClick={() => setCategory(TEAM_CATEGORY_ADVISORS)}
+                        className={category === TEAM_CATEGORY_ADVISORS ? 'members-categories-selected' : ''}
+                    >
+                        {TEAM_CATEGORY_ADVISORS}
+                    </button>
                 </div>
                 <div ref={memberListRef} onScroll={handleOnScroll} data-testid="members-list" className="members-list">
                     {content}
-                    {isMembersLoading
-                        ? (<div className='members-list-loader' data-testid='members-list-loader'>
-                            <img src={LoaderIcon} alt="loader-icon" data-testid='members-list-loader-icon'/>
-                        </div>)
-                        : (<></>)}
-                    {isMoveToTopVisible ?
-                        <button onClick={moveToTop} className='members-list-list-to-top' >
-                            <img src={ArrowUpIcon} alt="arrow-up-icon" data-testid="members-list-list-to-top"/>
-                        </button> : <></>}
+                    {isMembersLoading ? (
+                        <div className="members-list-loader" data-testid="members-list-loader">
+                            <img src={LoaderIcon} alt="loader-icon" data-testid="members-list-loader-icon" />
+                        </div>
+                    ) : (
+                        <></>
+                    )}
+                    {isMoveToTopVisible ? (
+                        <button onClick={moveToTop} className="members-list-list-to-top">
+                            <img src={ArrowUpIcon} alt="arrow-up-icon" data-testid="members-list-list-to-top" />
+                        </button>
+                    ) : (
+                        <></>
+                    )}
                 </div>
             </div>
-            <Modal onClose={() => setIsDeleteTeamMemberModalOpen(false)}
-                   isOpen={isDeleteTeamMemberModalOpen}>
+            <Modal onClose={() => setIsDeleteTeamMemberModalOpen(false)} isOpen={isDeleteTeamMemberModalOpen}>
                 <Modal.Title>
-                    <div className='members-delete-modal-header'>
-                        {TEAM_DELETE_MEMBER}
-                    </div>
+                    <div className="members-delete-modal-header">{TEAM_DELETE_MEMBER}</div>
                 </Modal.Title>
                 <Modal.Content>
+                    <></>
                 </Modal.Content>
                 <Modal.Actions>
-                    <div className='members-delete-modal-actions'>
-                        <Button buttonStyle={"secondary"} onClick={() => setIsDeleteTeamMemberModalOpen(false)}>{TEAM_CANCEL}</Button>
-                        <Button buttonStyle={"primary"} onClick={handleDeleteMember}>{TEAM_CONFIRM}</Button>
+                    <div className="members-delete-modal-actions">
+                        <Button buttonStyle={'secondary'} onClick={() => setIsDeleteTeamMemberModalOpen(false)}>
+                            {TEAM_CANCEL}
+                        </Button>
+                        <Button buttonStyle={'primary'} onClick={handleDeleteMember}>
+                            {TEAM_CONFIRM}
+                        </Button>
                     </div>
                 </Modal.Actions>
             </Modal>
@@ -507,24 +549,29 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
                     <></>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button onClick={handleCancelPublish} buttonStyle={"secondary"}>{TEAM_CANCEL}</Button>
-                    <Button onClick={handleConfirmPublish} buttonStyle={"primary"}>{TEAM_CONFIRM}</Button>
+                    <Button onClick={handleCancelPublish} buttonStyle={'secondary'}>
+                        {TEAM_CANCEL}
+                    </Button>
+                    <Button onClick={handleConfirmPublish} buttonStyle={'primary'}>
+                        {TEAM_CONFIRM}
+                    </Button>
                 </Modal.Actions>
             </Modal>
 
             <Modal isOpen={isConfirmCloseModalOpen} onClose={() => setIsConfirmCloseModalOpen(false)}>
-                <Modal.Title>
-                    {TEAM_CHANGES_LOST}
-                </Modal.Title>
+                <Modal.Title>{TEAM_CHANGES_LOST}</Modal.Title>
                 <Modal.Content>
                     <></>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button onClick={() => setIsConfirmCloseModalOpen(false)} buttonStyle={'secondary'}>{TEAM_CANCEL}</Button>
-                    <Button buttonStyle={'primary'} onClick={handleConfirmClose}>{TEAM_CONFIRM}</Button>
+                    <Button onClick={() => setIsConfirmCloseModalOpen(false)} buttonStyle={'secondary'}>
+                        {TEAM_CANCEL}
+                    </Button>
+                    <Button buttonStyle={'primary'} onClick={handleConfirmClose}>
+                        {TEAM_CONFIRM}
+                    </Button>
                 </Modal.Actions>
             </Modal>
         </>
     );
-}
-
+};

@@ -1,7 +1,7 @@
 import { teamPageDataFetch } from './TeamPageDataFetch';
 import { axiosInstance } from '../../../api/axios';
 import default_team_member_photo from '../../../../assets/team_page_images/team_member_not_found_photo.svg';
-import { PublicCategoryWithTeamMembersDto, TeamPageData } from "../../../../types/TeamPage";
+import { PublicCategoryWithTeamMembersDto, TeamPageData } from '../../../../types/TeamPage';
 
 jest.mock('../../../api/axios', () => ({
     axiosInstance: {
@@ -26,9 +26,7 @@ describe('fetchTeamPageData', () => {
             },
             {
                 categoryName: 'With no description',
-                teamMembers: [
-                    { id: 3, fullName: 'John', description: 'Backend Dev' },
-                ],
+                teamMembers: [{ id: 3, fullName: 'John', description: 'Backend Dev' }],
             },
         ];
 
@@ -45,10 +43,8 @@ describe('fetchTeamPageData', () => {
                 {
                     title: 'With no description',
                     description: '',
-                    members: [
-                        { id: 3, name: 'John', role: 'Backend Dev', photo: default_team_member_photo },
-                    ],
-                }
+                    members: [{ id: 3, name: 'John', role: 'Backend Dev', photo: default_team_member_photo }],
+                },
             ],
         };
 
@@ -82,9 +78,7 @@ describe('fetchTeamPageData', () => {
                 {
                     title: 'Design',
                     description: 'Design team',
-                    members: [
-                        { id: 5, name: 'John', role: 'Lead', photo: default_team_member_photo,},
-                    ],
+                    members: [{ id: 5, name: 'John', role: 'Lead', photo: default_team_member_photo }],
                 },
             ],
         };
@@ -104,9 +98,7 @@ describe('fetchTeamPageData', () => {
                 // Without name
                 categoryName: '',
                 description: 'Marketing team',
-                teamMembers: [
-                    { id: 6, fullName: 'Anna', description: 'SEO' },
-                ],
+                teamMembers: [{ id: 6, fullName: 'Anna', description: 'SEO' }],
             },
             {
                 // Without team members
@@ -126,9 +118,7 @@ describe('fetchTeamPageData', () => {
             {
                 // Without name
                 description: 'Manager',
-                teamMembers: [
-                    { id: 8, fullName: 'John', description: 'Cool manager' },
-                ],
+                teamMembers: [{ id: 8, fullName: 'John', description: 'Cool manager' }],
             },
         ];
 

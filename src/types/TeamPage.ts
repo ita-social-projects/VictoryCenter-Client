@@ -25,7 +25,7 @@ export interface PublicTeamMemberDto {
 }
 
 export interface TeamPageData {
-  teamData: TeamItem[];
+    teamData: TeamItem[];
 }
 
 export interface TeamMemberProps {

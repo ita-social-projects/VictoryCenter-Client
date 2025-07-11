@@ -8,22 +8,21 @@ jest.mock('../../../assets/about-us-images/images/our-team.jpg', () => 'our-team
 jest.mock('../../../const/about-us-page/about-us-page', () => ({
     TEAM_DETAILS: {
         FIRST_PART: 'Meet our dedicated team.',
-        SECOND_PART: 'We work hard to bring you the best.'
+        SECOND_PART: 'We work hard to bring you the best.',
     },
-    GO_TO_TEAM: 'Go to team'
+    GO_TO_TEAM: 'Go to team',
 }));
 
 jest.mock('../../../const/routers/routes', () => ({
-    teamPageRoute: '/team'
+    teamPageRoute: '/team',
 }));
 
 describe('OurTeam component', () => {
-
     it('should render the team image', () => {
         render(
             <MemoryRouter>
                 <OurTeam />
-            </MemoryRouter>
+            </MemoryRouter>,
         );
         const img = screen.getByAltText('Our Team');
         expect(img).toBeInTheDocument();
@@ -34,7 +33,7 @@ describe('OurTeam component', () => {
         render(
             <MemoryRouter>
                 <OurTeam />
-            </MemoryRouter>
+            </MemoryRouter>,
         );
         expect(screen.getByText(/meet our dedicated team/i)).toBeInTheDocument();
         expect(screen.getByText(/we work hard to bring you the best/i)).toBeInTheDocument();
@@ -44,7 +43,7 @@ describe('OurTeam component', () => {
         render(
             <MemoryRouter>
                 <OurTeam />
-            </MemoryRouter>
+            </MemoryRouter>,
         );
         const link = screen.getByRole('link', { name: /go to team/i });
         expect(link).toBeInTheDocument();

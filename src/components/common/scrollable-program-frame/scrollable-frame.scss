@@ -1,63 +1,63 @@
 @import '../../../assets/sass/variables/_variables.colors.scss';
 .scroll-block {
-  position: relative;
-  height: 38.5rem;
-  background-color: $scrollbar-grey;
+    position: relative;
+    height: 38.5rem;
+    background-color: $scrollbar-grey;
 
-  .custom-scrollbar {
-    margin: 3rem 10.5rem;
-    height: 0.375rem;
-    background: $scroll-line-grey;
-    border-radius: 0;
+    .custom-scrollbar {
+        margin: 3rem 10.5rem;
+        height: 0.375rem;
+        background: $scroll-line-grey;
+        border-radius: 0;
 
-    .swiper-scrollbar-drag {
-      border-radius: 0;
-      background-color: $blue-900;
-    }
-  }
-  .button-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: absolute;
-    width: 100%;
-    top: 42%;
-    z-index: 2;
-    padding: 0 2rem;
-
-    .arrow-button {
-      background-color: $blue-900;
-      position: relative;
-      width: 2.5rem;
-      height: 2.5rem;
-      border: none;
-      transition: all 0.8s ease;
-
-      .arrow-normal-state {
-        position: absolute;
-        top: 0.5rem;
-        right: 0.5rem;
-      }
-
-      .arrow-hover-state {
-        position: absolute;
-        top: 0.5rem;
-        right: 0.5rem;
-        display: none;
-      }
-
-      &:hover {
-        background-color: $yellow-500;
-
-        .arrow-hover-state {
-          display: block !important;
+        .swiper-scrollbar-drag {
+            border-radius: 0;
+            background-color: $blue-900;
         }
-
-        .arrow-normal-state {
-          display: none;
-        }
-        transition: all 0.8s ease;
-      }
     }
-  }
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: absolute;
+        width: 100%;
+        top: 42%;
+        z-index: 2;
+        padding: 0 2rem;
+
+        .arrow-button {
+            background-color: $blue-900;
+            position: relative;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            transition: all 0.8s ease;
+
+            .arrow-normal-state {
+                position: absolute;
+                top: 0.5rem;
+                right: 0.5rem;
+            }
+
+            .arrow-hover-state {
+                position: absolute;
+                top: 0.5rem;
+                right: 0.5rem;
+                display: none;
+            }
+
+            &:hover {
+                background-color: $yellow-500;
+
+                .arrow-hover-state {
+                    display: block !important;
+                }
+
+                .arrow-normal-state {
+                    display: none;
+                }
+                transition: all 0.8s ease;
+            }
+        }
+    }
 }

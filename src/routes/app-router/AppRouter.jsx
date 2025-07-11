@@ -15,10 +15,14 @@ import { routes } from '../../const/routers/routes';
 import { AdminLayout } from '../../layouts/admin-layout/AdminLayout';
 import { TeamPageAdmin } from '../../pages/admin/team/TeamPage';
 
-import {AboutUsPage} from "../../pages/about-us-page/AboutUsPage";
+import { AboutUsPage } from '../../pages/about-us-page/AboutUsPage';
 
-const { programPage, adminRoutes,aboutUsRoute,
-    userPageRoutes: { teamPageRoute, page2Route } } = routes;
+const {
+    programPage,
+    adminRoutes,
+    aboutUsRoute,
+    userPageRoutes: { teamPageRoute, page2Route },
+} = routes;
 
 export const AppRouter = () => (
     <BrowserRouter>

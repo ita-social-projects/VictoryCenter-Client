@@ -7,13 +7,15 @@ import { MainValues } from './main-value/MainValue';
 import { DonateSection } from './donate-section/DonateSection';
 
 export const AboutUsPage = () => {
-    return (<>
-        <AboutUsIntro/>
-        <OurMission/>
-        <SupportSection/>
-        <CompanyValues/>
-        <OurTeam/>
-        <MainValues/>
-        <DonateSection/>
-    </>);
+    return (
+        <>
+            <AboutUsIntro />
+            <OurMission />
+            <SupportSection />
+            <CompanyValues />
+            <OurTeam />
+            <MainValues />
+            <DonateSection />
+        </>
+    );
 };

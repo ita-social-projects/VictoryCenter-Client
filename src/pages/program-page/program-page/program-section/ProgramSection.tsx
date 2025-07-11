@@ -4,7 +4,7 @@ import {
     PROGRAMS_FOR_KIDS,
     PROGRAMS_FOR_VETERANS,
     PROGRAMS_ALL,
-    FAILED_TO_LOAD_THE_PROGRAMS
+    FAILED_TO_LOAD_THE_PROGRAMS,
 } from '../../../../const/program-page/program-page';
 import { Program } from '../../../../types/ProgramPage';
 import { ProgramCard } from './program-card/ProgramCard';
@@ -27,7 +27,7 @@ export const ProgramSection: React.FC = () => {
             }
         })();
     }, []);
-    
+
     return (
         <div className="program-block">
             <div className="menu-block">

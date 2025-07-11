@@ -9,8 +9,15 @@ export const OurTeam = () => {
         <div className="our-team-block">
             <img src={ourTeam} alt="Our Team" className="our-team-image" />
             <div className="team-info">
-                <p className="team-description">{TEAM_DETAILS.FIRST_PART}<br/><br/>{TEAM_DETAILS.SECOND_PART}</p>
-                <NavLink to={teamPageRoute} className="link-ro-team">{GO_TO_TEAM}</NavLink>
+                <p className="team-description">
+                    {TEAM_DETAILS.FIRST_PART}
+                    <br />
+                    <br />
+                    {TEAM_DETAILS.SECOND_PART}
+                </p>
+                <NavLink to={teamPageRoute} className="link-ro-team">
+                    {GO_TO_TEAM}
+                </NavLink>
             </div>
         </div>
     );

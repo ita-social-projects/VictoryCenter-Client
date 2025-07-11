@@ -1,14 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { DonateSection } from './DonateSection';
-import {
-    DONATE_TITLE,
-    DONATE_DETAILS,
-    DONATE,
-    BECOME_PARTNER
-} from '../../../const/about-us-page/about-us-page';
+import { DONATE_TITLE, DONATE_DETAILS, DONATE, BECOME_PARTNER } from '../../../const/about-us-page/about-us-page';
 
 describe('DonateSection', () => {
-
     it('should render section with correct title', () => {
         render(<DonateSection />);
         expect(screen.getByText(DONATE_TITLE)).toBeInTheDocument();
@@ -40,15 +34,11 @@ describe('DonateSection', () => {
 
     it('should call donate handler when donate button is clicked', () => {
         const handleDonate = jest.fn();
-        
+
         render(
-            <button
-                onClick={handleDonate}
-                className="donate-button"
-                aria-label="Make a donation"
-            >
+            <button onClick={handleDonate} className="donate-button" aria-label="Make a donation">
                 Donate
-            </button>
+            </button>,
         );
 
         const donateBtn = screen.getByRole('button', { name: /make a donation/i });
@@ -60,19 +50,13 @@ describe('DonateSection', () => {
         const handlePartner = jest.fn();
 
         render(
-            <button
-                onClick={handlePartner}
-                className="partner-button"
-                aria-label="Become a partner"
-            >
+            <button onClick={handlePartner} className="partner-button" aria-label="Become a partner">
                 Become a partner
-            </button>
+            </button>,
         );
 
         const partnerBtn = screen.getByRole('button', { name: /become a partner/i });
         partnerBtn.click();
         expect(handlePartner).toHaveBeenCalled();
     });
-
-
 });

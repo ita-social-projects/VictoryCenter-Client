@@ -6,24 +6,21 @@ import { programPage } from '../../../const/routers/routes';
 import './our-mission.scss';
 
 export const OurMission = () => {
-    
     return (
         <div className="our-mission-block">
             <div className="what-we-do">
                 <h2 className="mission-title">{WHAT_WE_DO}</h2>
                 <div className="details-block">
-                    <p className="mission-details">
-                        {WHAT_WE_DO_DETAILS}
-                    </p>
+                    <p className="mission-details">{WHAT_WE_DO_DETAILS}</p>
                     <NavLink to={programPage} className="link-to-programs">
                         <div className="link-block">
                             <span className="link-title">{GO_TO_PROGRAMS}</span>
-                            <img src={ArrowIcon} alt=""/>
+                            <img src={ArrowIcon} alt="" />
                         </div>
                     </NavLink>
                 </div>
             </div>
-            <ScrollableFrame/>
+            <ScrollableFrame />
         </div>
     );
 };

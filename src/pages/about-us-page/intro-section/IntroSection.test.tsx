@@ -3,7 +3,6 @@ import { AboutUsIntro } from './IntroSection';
 import { INTRO_TITLE, INTRO_DETAILS } from '../../../const/about-us-page/about-us-page';
 
 describe('AboutUsIntro', () => {
-
     it('should render images correctly', () => {
         render(<AboutUsIntro />);
         const images = screen.getAllByAltText('Men and Horse');
@@ -27,9 +26,7 @@ describe('AboutUsIntro', () => {
     it('should render title details correctly', () => {
         render(<AboutUsIntro />);
         Object.values(INTRO_DETAILS).forEach((line) => {
-            const paragraph = screen.queryByText((text) =>
-                text.trim().includes(line.trim())
-            );
+            const paragraph = screen.queryByText((text) => text.trim().includes(line.trim()));
             expect(paragraph).toBeInTheDocument();
         });
     });

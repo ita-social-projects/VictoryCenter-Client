@@ -2,7 +2,6 @@ import './main-value.scss';
 import { peopleData, MAIN_VALUE, MAIN_VALUE_DETAILS } from '../../../const/about-us-page/about-us-page';
 
 export const MainValues = () => {
-    
     return (
         <div className="main-values-block">
             <div className="main-values-title">

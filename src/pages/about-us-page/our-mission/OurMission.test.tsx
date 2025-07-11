@@ -6,26 +6,25 @@ import { OurMission } from './OurMission';
 jest.mock('../../../const/about-us-page/about-us-page', () => ({
     WHAT_WE_DO: 'What we do title',
     WHAT_WE_DO_DETAILS: 'These are the details of what we do.',
-    GO_TO_PROGRAMS: 'Go to programs'
+    GO_TO_PROGRAMS: 'Go to programs',
 }));
 
 jest.mock('../../../const/routers/routes', () => ({
-    programPage: '/programs'
+    programPage: '/programs',
 }));
 
 jest.mock('../../../assets/program_page_images/icons/arrow-up-black.png', () => 'arrow-up-black.png');
 
 jest.mock('../../../components/common/scrollable-program-frame/ScrollableFrame', () => ({
-    ScrollableFrame: () => <div data-testid="scrollable-frame">ScrollableFrame</div>
+    ScrollableFrame: () => <div data-testid="scrollable-frame">ScrollableFrame</div>,
 }));
 
 describe('OurMission component', () => {
-
     it('should render the mission title', () => {
         render(
             <MemoryRouter>
                 <OurMission />
-            </MemoryRouter>
+            </MemoryRouter>,
         );
         expect(screen.getByText('What we do title')).toBeInTheDocument();
     });
@@ -34,7 +33,7 @@ describe('OurMission component', () => {
         render(
             <MemoryRouter>
                 <OurMission />
-            </MemoryRouter>
+            </MemoryRouter>,
         );
         expect(screen.getByText('These are the details of what we do.')).toBeInTheDocument();
     });
@@ -43,7 +42,7 @@ describe('OurMission component', () => {
         render(
             <MemoryRouter>
                 <OurMission />
-            </MemoryRouter>
+            </MemoryRouter>,
         );
         const link = screen.getByRole('link', { name: /go to programs/i });
         expect(link).toBeInTheDocument();
@@ -54,7 +53,7 @@ describe('OurMission component', () => {
         render(
             <MemoryRouter>
                 <OurMission />
-            </MemoryRouter>
+            </MemoryRouter>,
         );
         expect(screen.getByTestId('scrollable-frame')).toBeInTheDocument();
     });

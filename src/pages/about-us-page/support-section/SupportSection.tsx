@@ -8,9 +8,7 @@ export const SupportSection = () => {
             {SUPPORT_DATA.map(({ img, alt, description }, index) => (
                 <div key={alt} className="support-card">
                     <img src={img} alt={alt} />
-                    <p className="support-description">
-                        {description}
-                    </p>
+                    <p className="support-description">{description}</p>
                 </div>
             ))}
         </div>

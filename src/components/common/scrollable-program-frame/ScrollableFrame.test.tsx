@@ -30,22 +30,22 @@ jest.mock('swiper/react', () => {
 const MockProgramData = [
     {
         image: 'firstImg',
-        title: "Коні лікують Літо 2025",
-        subtitle: "Ветеранська програма",
-        description: "Зменшення рівня стресу, тривоги та ПТСР у ветеранів..."
+        title: 'Коні лікують Літо 2025',
+        subtitle: 'Ветеранська програма',
+        description: 'Зменшення рівня стресу, тривоги та ПТСР у ветеранів...',
     },
     {
         image: 'secondImg',
-        title: "Програма 2",
-        subtitle: "Ветеранська програма",
-        description: "Опис 2"
+        title: 'Програма 2',
+        subtitle: 'Ветеранська програма',
+        description: 'Опис 2',
     },
     {
         image: 'thirdImg',
-        title: "Програма 3",
-        subtitle: "Ветеранська програма",
-        description: "Опис 3"
-    }
+        title: 'Програма 3',
+        subtitle: 'Ветеранська програма',
+        description: 'Опис 3',
+    },
 ];
 
 describe('ScrollableFrame', () => {
@@ -59,16 +59,15 @@ describe('ScrollableFrame', () => {
         });
 
         render(<ScrollableFrame />);
-        
+
         await waitFor(() => {
             expect(screen.queryByRole('alert')).not.toBeInTheDocument();
         });
-        
+
         const cards = await screen.findAllByTestId('program-card');
         expect(cards.length).toBe(MockProgramData.length);
         expect(cards[0]).toHaveTextContent('Коні лікують Літо 2025');
     });
-
 
     it('should show message about fetch error', async () => {
         jest.spyOn(dataFetch, 'programPageDataFetch').mockRejectedValue(new Error('Fetch error'));
@@ -76,8 +75,9 @@ describe('ScrollableFrame', () => {
         render(<ScrollableFrame />);
 
         await waitFor(() => {
-            expect(screen.getByRole('alert'))
-                .toHaveTextContent('Не вдалося завантажити дані програм. Будь-ласка спробуйте пізніше.');
+            expect(screen.getByRole('alert')).toHaveTextContent(
+                'Не вдалося завантажити дані програм. Будь-ласка спробуйте пізніше.',
+            );
         });
 
         expect(screen.queryAllByTestId('program-card').length).toBe(0);

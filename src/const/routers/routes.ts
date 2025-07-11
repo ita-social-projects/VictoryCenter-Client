@@ -21,5 +21,5 @@ export const routes = {
     adminRoutes,
     programPage,
     aboutUsRoute,
-    userPageRoutes
+    userPageRoutes,
 };

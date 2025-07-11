@@ -1,12 +1,14 @@
-import './company-values.scss'
-import {OUR_VALUES, VALUE_ITEMS} from '../../../const/about-us-page/about-us-page';
+import './company-values.scss';
+import { OUR_VALUES, VALUE_ITEMS } from '../../../const/about-us-page/about-us-page';
 
 export const CompanyValues = () => {
-    
-    const chunkedValues = VALUE_ITEMS.reduce((acc, _, i) => {
-        if (i % 3 === 0) acc.push(VALUE_ITEMS.slice(i, i + 3));
-        return acc;
-    }, [] as typeof VALUE_ITEMS[]);
+    const chunkedValues = VALUE_ITEMS.reduce(
+        (acc, _, i) => {
+            if (i % 3 === 0) acc.push(VALUE_ITEMS.slice(i, i + 3));
+            return acc;
+        },
+        [] as (typeof VALUE_ITEMS)[],
+    );
 
     return (
         <div className="values-block">

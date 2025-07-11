@@ -1,74 +1,74 @@
 @import '../../../assets/sass/variables/_variables.colors.scss';
 .about-us-block {
-  position: relative;
+    position: relative;
 
-  .background-img {
-    width: 100%;
-    height: 56rem;
-    object-fit: cover;
-    filter: grayscale(100%) contrast(120%) brightness(0.8);
-  }
-  
-  .color-overlay {
-    position: absolute;
-    width: 100%;
-    height: 56rem;
-    top: 0;
-    left: 0;
-    clip-path: inset(5rem 34rem 18rem 1.25rem);
-    object-fit: cover;
-    z-index: 2;
-    filter: grayscale(0%) brightness(1) saturate(130%) sepia(0.1);
-    animation: revealColor 4s ease-out forwards;
-  }
-  
-  .about-us-main-title {
-    position: absolute;
-    z-index: 3;
-    width: 39.75rem;
-    top: 10.5rem;
-    left: 5rem;
+    .background-img {
+        width: 100%;
+        height: 56rem;
+        object-fit: cover;
+        filter: grayscale(100%) contrast(120%) brightness(0.8);
+    }
 
-    font-family: Mulish, sans-serif;
-    font-weight: 500;
-    font-size: 4rem;
-    line-height: 5rem;
-    letter-spacing: 0;
-    text-transform: uppercase;
-    color: $main-white;
-    
-    .highlighted {
-      font-weight: 800;
-      font-style: italic;
+    .color-overlay {
+        position: absolute;
+        width: 100%;
+        height: 56rem;
+        top: 0;
+        left: 0;
+        clip-path: inset(5rem 34rem 18rem 1.25rem);
+        object-fit: cover;
+        z-index: 2;
+        filter: grayscale(0%) brightness(1) saturate(130%) sepia(0.1);
+        animation: revealColor 4s ease-out forwards;
     }
-  }
-  
-  .title-details {
-    width: 27rem;
-    position: absolute;
-    z-index: 3;
-    top: 34rem;
-    left: 66.25vw;
-    font-family: Mulish, sans-serif;
-    font-weight: 400;
-    font-size: 1.125rem;
-    line-height: 1.75rem;
-    letter-spacing: -0.02em;
-    color: $main-white;
 
-    .title-details p {
-      margin-bottom: 0.5rem;
+    .about-us-main-title {
+        position: absolute;
+        z-index: 3;
+        width: 39.75rem;
+        top: 10.5rem;
+        left: 5rem;
+
+        font-family: Mulish, sans-serif;
+        font-weight: 500;
+        font-size: 4rem;
+        line-height: 5rem;
+        letter-spacing: 0;
+        text-transform: uppercase;
+        color: $main-white;
+
+        .highlighted {
+            font-weight: 800;
+            font-style: italic;
+        }
     }
-    .paragraph-break {
-      margin-top: 1rem;
+
+    .title-details {
+        width: 27rem;
+        position: absolute;
+        z-index: 3;
+        top: 34rem;
+        left: 66.25vw;
+        font-family: Mulish, sans-serif;
+        font-weight: 400;
+        font-size: 1.125rem;
+        line-height: 1.75rem;
+        letter-spacing: -0.02em;
+        color: $main-white;
+
+        .title-details p {
+            margin-bottom: 0.5rem;
+        }
+        .paragraph-break {
+            margin-top: 1rem;
+        }
     }
-  }
 }
 @keyframes revealColor {
-  0% {
-    clip-path: inset(5rem 34rem 18rem 1.25rem);
-  }
-  100% {
-    clip-path: inset(0 0 0 0);
-  }
+    0% {
+        clip-path: inset(5rem 34rem 18rem 1.25rem);
+    }
+    100% {
+        clip-path: inset(0 0 0 0);
+    }
 }

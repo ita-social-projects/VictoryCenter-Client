@@ -4,7 +4,6 @@ import { MainValues } from './MainValue';
 import { peopleData } from '../../../const/about-us-page/about-us-page';
 
 describe('MainValues component', () => {
-
     it('should render main title with correct parts and highlights', () => {
         render(<MainValues />);
         expect(screen.getByText(/Головна /i)).toBeInTheDocument();

@@ -120,16 +120,7 @@ export const MemberForm = ({
                 <div className="form-group">
                     <label
                         htmlFor="category"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                        }}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                e.stopPropagation();
-                            }
-                        }}
+                        className="no-pointer-events"
                     >
                         <span className="field-required">*</span>
                         {TEAM_LABEL_CATEGORY}

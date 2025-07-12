@@ -40,7 +40,7 @@ type MemberFormData = {
     category: TeamCategory;
     fullName: string;
     description?: string;
-    img?: FileList | undefined | string;
+    img?: FileList | string;
 } | null;
 
 const AddMemberModal = ({

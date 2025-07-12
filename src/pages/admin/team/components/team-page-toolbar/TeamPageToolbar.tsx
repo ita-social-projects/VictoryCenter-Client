@@ -44,13 +44,13 @@ type MemberFormData = {
 } | null;
 
 const AddMemberModal = ({
-                            isOpen,
-                            onClose,
-                            onPublish,
-                            onSaveDraft,
-                            isDraft,
-                            setIsDraftMode,
-                        }: {
+    isOpen,
+    onClose,
+    onPublish,
+    onSaveDraft,
+    isDraft,
+    setIsDraftMode,
+}: {
     isOpen: boolean;
     onClose: () => void;
     onPublish: (member: MemberFormValues) => void;
@@ -61,19 +61,13 @@ const AddMemberModal = ({
     <Modal onClose={onClose} isOpen={isOpen} data-testid="add-member-modal">
         <Modal.Title>{TEAM_ADD_MEMBER}</Modal.Title>
         <Modal.Content>
-            <MemberForm id="add-member-modal" onSubmit={onPublish} isDraft={isDraft}/>
+            <MemberForm id="add-member-modal" onSubmit={onPublish} isDraft={isDraft} />
         </Modal.Content>
         <Modal.Actions>
-            <Button form="add-member-modal"
-                    type="submit"
-                    onClick={() => setIsDraftMode(true)} 
-                    buttonStyle="secondary">
+            <Button form="add-member-modal" type="submit" onClick={() => setIsDraftMode(true)} buttonStyle="secondary">
                 {TEAM_SAVE_AS_DRAFT}
             </Button>
-            <Button form="add-member-modal"
-                    onClick={() => setIsDraftMode(false)}
-                    type="submit"
-                    buttonStyle="primary">
+            <Button form="add-member-modal" onClick={() => setIsDraftMode(false)} type="submit" buttonStyle="primary">
                 {TEAM_PUBLISH}
             </Button>
         </Modal.Actions>
@@ -170,29 +164,35 @@ export const TeamPageToolbar = ({
 
     const handleOpenAddMember = useCallback(() => {
         setIsDraftMode(false);
-        updateModalState({addMember: true});
+        updateModalState({ addMember: true });
     }, [updateModalState]);
 
-    const handleFormSubmit = useCallback((member: MemberFormValues) => {
-        if (isDraftMode) {
+    const handleFormSubmit = useCallback(
+        (member: MemberFormValues) => {
+            if (isDraftMode) {
+                onMemberSaveDraft?.(member);
+                resetState();
+            } else {
+                setPendingMemberData(member);
+                setFormData(member);
+                updateModalState({ confirmPublish: true });
+            }
+        },
+        [isDraftMode, onMemberSaveDraft, resetState, updateModalState],
+    );
+
+    const handleSaveAsDraft = useCallback(
+        (member: MemberFormValues) => {
+            setIsDraftMode(true);
             onMemberSaveDraft?.(member);
             resetState();
-        } else {
-            setPendingMemberData(member);
-            setFormData(member);
-            updateModalState({ confirmPublish: true });
-        }
-    }, [isDraftMode, onMemberSaveDraft, resetState, updateModalState]);
-
-    const handleSaveAsDraft = useCallback((member: MemberFormValues) => {
-        setIsDraftMode(true);
-        onMemberSaveDraft?.(member);
-        resetState();
-    }, [onMemberSaveDraft, resetState]);
+        },
+        [onMemberSaveDraft, resetState],
+    );
 
     const handleCancelPublish = useCallback(() => {
         setPendingMemberData(null);
-        updateModalState({confirmPublish: false});
+        updateModalState({ confirmPublish: false });
     }, [updateModalState]);
 
     const handleConfirmPublish = useCallback(() => {
@@ -204,14 +204,14 @@ export const TeamPageToolbar = ({
 
     const handleCloseAddMember = useCallback(() => {
         if (hasUnsavedChanges()) {
-            updateModalState({confirmClose: true});
+            updateModalState({ confirmClose: true });
         } else {
             resetState();
         }
     }, [hasUnsavedChanges, updateModalState, resetState]);
 
     const handleCancelClose = useCallback(() => {
-        updateModalState({confirmClose: false});
+        updateModalState({ confirmClose: false });
     }, [updateModalState]);
 
     const handleConfirmClose = useCallback(() => {

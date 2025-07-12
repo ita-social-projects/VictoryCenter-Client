@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {TeamPageToolbar, TeamPageToolbarProps} from './TeamPageToolbar';
+import { TeamPageToolbar, TeamPageToolbarProps } from './TeamPageToolbar';
 
 jest.mock('../../../../../assets/icons/plus.svg', () => 'plus-icon.svg');
 
@@ -71,7 +71,7 @@ jest.mock('../../../../../components/common/input/Input', () => ({
 // Mock MemberForm with controllable behavior
 const mockMemberForm = jest.fn();
 
-jest.mock("../member-form/MemberForm", () => ({
+jest.mock('../member-form/MemberForm', () => ({
     MemberForm: (props: any) => {
         mockMemberForm(props);
         return (
@@ -81,11 +81,11 @@ jest.mock("../member-form/MemberForm", () => ({
                 onSubmit={(e) => {
                     e.preventDefault();
                     const mockMemberData = {
-                        category: "Керівництво",
-                        fullName: "Test User",
-                        description: "Test Description",
+                        category: 'Керівництво',
+                        fullName: 'Test User',
+                        description: 'Test Description',
                         img: null,
-                        isDraft: props.isDraft, 
+                        isDraft: props.isDraft,
                     };
                     props.onSubmit?.(mockMemberData);
                 }}
@@ -214,7 +214,7 @@ describe('TeamPageToolbar', () => {
         });
     });
 
-    describe("Save as Draft Flow", () => {
+    describe('Save as Draft Flow', () => {
         const defaultProps = {
             onSearchQueryChange: jest.fn(),
             onStatusFilterChange: jest.fn(),
@@ -227,51 +227,51 @@ describe('TeamPageToolbar', () => {
             jest.clearAllMocks();
         });
 
-        it("saves as draft and closes modal", async () => {
+        it('saves as draft and closes modal', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
-            await userEvent.click(screen.getByTestId("add-member-button"));
-            await userEvent.click(screen.getByText("Зберегти як чернетку"));
-            await userEvent.click(screen.getByTestId("form-submit"));
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            await userEvent.click(screen.getByText('Зберегти як чернетку'));
+            await userEvent.click(screen.getByTestId('form-submit'));
             await waitFor(() => {
                 expect(defaultProps.onMemberSaveDraft).toHaveBeenCalledWith(
                     expect.objectContaining({
-                        fullName: "Test User",
+                        fullName: 'Test User',
                         isDraft: true,
-                    })
+                    }),
                 );
             });
             await waitFor(() => {
-                expect(screen.queryByTestId("add-member-modal")).not.toBeInTheDocument();
+                expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
             });
         });
 
-        it("reopens modal with clean state after saving draft", async () => {
+        it('reopens modal with clean state after saving draft', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
-            
-            await userEvent.click(screen.getByTestId("add-member-button"));
-            await userEvent.click(screen.getByText("Зберегти як чернетку"));
-            await userEvent.click(screen.getByTestId("form-submit"));
+
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            await userEvent.click(screen.getByText('Зберегти як чернетку'));
+            await userEvent.click(screen.getByTestId('form-submit'));
             await waitFor(() => {
                 expect(defaultProps.onMemberSaveDraft).toHaveBeenCalled();
             });
             await waitFor(() => {
-                expect(screen.queryByTestId("add-member-modal")).not.toBeInTheDocument();
+                expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
             });
-            await userEvent.click(screen.getByTestId("add-member-button"));
-            expect(screen.getByTestId("add-member-modal")).toBeInTheDocument();
+            await userEvent.click(screen.getByTestId('add-member-button'));
+            expect(screen.getByTestId('add-member-modal')).toBeInTheDocument();
         });
     });
 
     describe('Additional coverage tests for uncovered lines', () => {
         it('detects unsaved changes and shows confirm-close modal when closing', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
-            
+
             await userEvent.click(screen.getByTestId('add-member-button'));
-            
+
             fireEvent.submit(screen.getByTestId('member-form'));
-            
-            await userEvent.click(screen.getByText('Ні')); 
-            
+
+            await userEvent.click(screen.getByText('Ні'));
+
             const backdrop = screen.getByTestId('modal-backdrop');
             await userEvent.click(backdrop);
 
@@ -283,8 +283,8 @@ describe('TeamPageToolbar', () => {
 
             await userEvent.click(screen.getByTestId('add-member-button'));
             fireEvent.submit(screen.getByTestId('member-form'));
-            await userEvent.click(screen.getByText('Ні')); 
-            
+            await userEvent.click(screen.getByText('Ні'));
+
             const backdrop = screen.getByTestId('modal-backdrop');
             await userEvent.click(backdrop);
 
@@ -296,7 +296,6 @@ describe('TeamPageToolbar', () => {
             expect(screen.queryByTestId('confirm-close-modal')).not.toBeInTheDocument();
         });
     });
-
 
     describe('Publish Flow', () => {
         it('opens publish confirmation modal when form is submitted', async () => {
@@ -365,12 +364,10 @@ describe('TeamPageToolbar', () => {
 
             const saveDraftButton = screen.getByText('Зберегти як чернетку');
             await userEvent.click(saveDraftButton);
-            
+
             await userEvent.click(screen.getByTestId('form-submit'));
 
-            expect(defaultProps.onMemberSaveDraft).toHaveBeenCalledWith(
-                expect.objectContaining({ isDraft: true })
-            );
+            expect(defaultProps.onMemberSaveDraft).toHaveBeenCalledWith(expect.objectContaining({ isDraft: true }));
         });
 
         it('sets draft mode to false when clicking "Опублікувати" button', async () => {
@@ -379,13 +376,12 @@ describe('TeamPageToolbar', () => {
 
             const publishButton = screen.getByText('Опублікувати');
             await userEvent.click(publishButton);
-            
+
             await userEvent.click(screen.getByTestId('form-submit'));
 
             expect(screen.getByTestId('publish-confirm-modal')).toBeInTheDocument();
         });
     });
-
 
     describe('Button Attributes and Styling', () => {
         it('applies correct button styles and attributes', async () => {
@@ -448,10 +444,7 @@ describe('TeamPageToolbar', () => {
     describe('handleConfirmPublish edge cases', () => {
         it('does not call onMemberPublish if pendingMemberData is null', async () => {
             const onMemberPublish = jest.fn();
-            render(<TeamPageToolbar
-                {...defaultProps}
-                onMemberPublish={onMemberPublish}
-            />);
+            render(<TeamPageToolbar {...defaultProps} onMemberPublish={onMemberPublish} />);
 
             expect(onMemberPublish).not.toHaveBeenCalled();
         });
@@ -484,17 +477,16 @@ describe('TeamPageToolbar', () => {
             await userEvent.click(screen.getByText('Зберегти як чернетку'));
 
             fireEvent.submit(screen.getByTestId('member-form'));
-            
+
             await waitFor(() => {
                 expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
             });
         });
-
     });
 
     describe('Edge Cases', () => {
         it('handles empty autocomplete values', () => {
-            const props = {...defaultProps, autocompleteValues: []};
+            const props = { ...defaultProps, autocompleteValues: [] };
             render(<TeamPageToolbar {...props} />);
 
             const input = screen.getByTestId('search-input');
@@ -514,4 +506,3 @@ describe('TeamPageToolbar', () => {
         });
     });
 });
-

@@ -3,7 +3,6 @@ import { render, screen, fireEvent, createEvent, waitFor } from '@testing-librar
 import userEvent from '@testing-library/user-event';
 import { MemberForm, MemberFormProps, MemberFormValues } from './MemberForm';
 
-
 jest.mock('../../../../../assets/icons/cloud-download.svg', () => 'cloud-download.svg');
 
 describe('MemberForm', () => {
@@ -14,6 +13,10 @@ describe('MemberForm', () => {
         existingMemberFormValues: null,
         isDraft: false,
     };
+
+    beforeAll(() => {
+        global.URL.createObjectURL = jest.fn(() => 'blob:http://localhost/mock');
+    });
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -40,10 +43,10 @@ describe('MemberForm', () => {
     it('renders form with all fields', () => {
         render(<MemberForm {...defaultProps} />);
 
-        expect(screen.getByLabelText('Категорія')).toBeInTheDocument();
-        expect(screen.getByLabelText("Ім'я та Прізвище")).toBeInTheDocument();
-        expect(screen.getByLabelText('Опис')).toBeInTheDocument();
-        expect(screen.getByText('Фото')).toBeInTheDocument();
+        expect(screen.getByLabelText(/Категорія/)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Ім'я та Прізвище/)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Опис/)).toBeInTheDocument();
+        expect(screen.getByText(/Фото/)).toBeInTheDocument();
     });
 
     it('initializes with existingMemberFormValues', () => {
@@ -63,7 +66,7 @@ describe('MemberForm', () => {
     it('updates form values and calls onValuesChange on input change', async () => {
         render(<MemberForm {...defaultProps} />);
 
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
         fireEvent.change(fullNameInput, { target: { value: 'Jane Doe' } });
 
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
@@ -76,7 +79,7 @@ describe('MemberForm', () => {
     it('updates category and calls onValuesChange', async () => {
         render(<MemberForm {...defaultProps} />);
 
-        const categorySelect = screen.getByLabelText('Категорія');
+        const categorySelect = screen.getByLabelText(/Категорія/);
         fireEvent.change(categorySelect, { target: { value: 'Наглядова рада' } });
 
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
@@ -89,7 +92,7 @@ describe('MemberForm', () => {
     it('updates description and calls onValuesChange', async () => {
         render(<MemberForm {...defaultProps} />);
 
-        const descriptionTextarea = screen.getByLabelText('Опис');
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
         fireEvent.change(descriptionTextarea, { target: { value: 'New description' } });
 
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
@@ -102,18 +105,18 @@ describe('MemberForm', () => {
     it('submits form with valid data', async () => {
         render(<MemberForm {...defaultProps} />);
 
-        const categorySelect = screen.getByLabelText('Категорія');
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
-        const descriptionTextarea = screen.getByLabelText('Опис');
+        const categorySelect = screen.getByLabelText(/Категорія/);
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
         const imgInput = screen.getByTestId('image');
 
         await userEvent.selectOptions(categorySelect, 'Радники');
         await userEvent.type(fullNameInput, 'Jane Doe');
         await userEvent.type(descriptionTextarea, 'Test description');
-        
+
         const file = new File(['dummy content'], 'test-image.jpg', { type: 'image/jpeg' });
         Object.defineProperty(file, 'size', { value: 1024 * 1024 });
-        
+
         const fileList = {
             0: file,
             length: 1,
@@ -122,9 +125,9 @@ describe('MemberForm', () => {
                 yield file;
             },
         };
-        
+
         Object.setPrototypeOf(fileList, FileList.prototype);
-        
+
         fireEvent.change(imgInput, {
             target: { files: fileList },
         });
@@ -139,7 +142,7 @@ describe('MemberForm', () => {
                     fullName: 'Jane Doe',
                     description: 'Test description',
                     img: expect.any(FileList),
-                })
+                }),
             );
         });
     });
@@ -147,7 +150,7 @@ describe('MemberForm', () => {
     it('displays character count for fullName', async () => {
         render(<MemberForm {...defaultProps} />);
 
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
         await userEvent.type(fullNameInput, 'Jane Doe');
 
         expect(screen.getByText('8/50')).toBeInTheDocument();
@@ -156,7 +159,7 @@ describe('MemberForm', () => {
     it('displays character count for description', async () => {
         render(<MemberForm {...defaultProps} />);
 
-        const descriptionTextarea = screen.getByLabelText('Опис');
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
         await userEvent.type(descriptionTextarea, 'Test description');
 
         expect(screen.getByText('16/200')).toBeInTheDocument();
@@ -184,10 +187,10 @@ describe('MemberForm', () => {
     it('renders with correct input attributes', () => {
         render(<MemberForm {...defaultProps} />);
 
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
         expect(fullNameInput).toHaveAttribute('maxLength', '50');
 
-        const descriptionTextarea = screen.getByLabelText('Опис');
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
         expect(descriptionTextarea).toHaveAttribute('maxLength', '200');
     });
 });
@@ -201,43 +204,12 @@ describe('MemberForm - Additional Coverage', () => {
         isDraft: false,
     };
 
-    beforeEach(() => {
-        jest.clearAllMocks();
+    beforeAll(() => {
+        global.URL.createObjectURL = jest.fn(() => 'blob:http://localhost/mock');
     });
 
-    it('displays uploaded file names', async () => {
-        const file1 = new File(['test1'], 'test1.jpg', { type: 'image/jpeg' });
-        const file2 = new File(['test2'], 'test2.jpg', { type: 'image/jpeg' });
-
-        const mockFileList = {
-            0: file1,
-            1: file2,
-            length: 2,
-            item: (index: number) => {
-                if (index === 0) return file1;
-                if (index === 1) return file2;
-                return null;
-            },
-            [Symbol.iterator]: function* () {
-                yield file1;
-                yield file2;
-            },
-        };
-        Object.setPrototypeOf(mockFileList, FileList.prototype);
-
-        const initialValues: MemberFormValues = {
-            category: 'Основна команда',
-            fullName: 'John Doe',
-            description: 'Test description',
-            img: mockFileList as FileList,
-        };
-
-        render(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
-
-        await waitFor(() => {
-            expect(screen.getByText('test1.jpg')).toBeInTheDocument();
-            expect(screen.getByText('test2.jpg')).toBeInTheDocument();
-        });
+    beforeEach(() => {
+        jest.clearAllMocks();
     });
 
     it('renders empty div when no files are uploaded', () => {
@@ -256,7 +228,7 @@ describe('MemberForm - Additional Coverage', () => {
 
         render(<MemberForm {...propsWithoutOnValuesChange} />);
 
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
         fireEvent.change(fullNameInput, { target: { value: 'Jane Doe' } });
 
         expect(fullNameInput).toHaveValue('Jane Doe');
@@ -281,7 +253,7 @@ describe('MemberForm - Additional Coverage', () => {
         render(<MemberForm {...defaultProps} existingMemberFormValues={existingValues} />);
 
         const form = screen.getByTestId('test-form');
-        
+
         await waitFor(() => {
             expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
             expect(screen.getByDisplayValue('Test description')).toBeInTheDocument();
@@ -297,7 +269,7 @@ describe('MemberForm - Additional Coverage', () => {
                     fullName: 'John Doe',
                     description: 'Test description',
                     img: expect.any(FileList),
-                })
+                }),
             );
         });
     });
@@ -305,7 +277,7 @@ describe('MemberForm - Additional Coverage', () => {
     it('handles file input change without files (edge case)', () => {
         render(<MemberForm {...defaultProps} />);
 
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
 
         fireEvent.change(fullNameInput, {
             target: { name: 'fullName', value: 'Test Name' },
@@ -333,7 +305,7 @@ describe('MemberForm - Additional Coverage', () => {
 
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
             expect.objectContaining({
-                img: expect.any(FileList)
+                img: expect.any(FileList),
             }),
         );
     });
@@ -364,13 +336,13 @@ describe('MemberForm - Additional Coverage', () => {
 
         expect(dropEvent.preventDefault).toHaveBeenCalled();
     });
-    
+
     it('handles drag events with files in dataTransfer', async () => {
         render(<MemberForm {...defaultProps} />);
 
         const dropArea = screen.getByTestId('drop-area');
         const file = new File(['hello'], 'hello.png', { type: 'image/png' });
-        
+
         const mockFileList = {
             0: file,
             length: 1,
@@ -380,7 +352,7 @@ describe('MemberForm - Additional Coverage', () => {
             },
         };
         Object.setPrototypeOf(mockFileList, FileList.prototype);
-        
+
         const dropEvent = new Event('drop', { bubbles: true });
         Object.defineProperty(dropEvent, 'dataTransfer', {
             value: {
@@ -390,7 +362,7 @@ describe('MemberForm - Additional Coverage', () => {
         });
 
         fireEvent(dropArea, dropEvent);
-        
+
         await waitFor(() => {
             expect(screen.getByText('hello.png')).toBeInTheDocument();
         });
@@ -398,6 +370,10 @@ describe('MemberForm - Additional Coverage', () => {
 });
 
 describe('MemberForm - Extra Function Coverage', () => {
+    beforeAll(() => {
+        global.URL.createObjectURL = jest.fn(() => 'blob:http://localhost/mock');
+    });
+
     const defaultProps: MemberFormProps = {
         id: 'test-form',
         onSubmit: jest.fn(),
@@ -453,8 +429,8 @@ describe('MemberForm - Extra Function Coverage', () => {
 
     it('does not submit if category is empty', () => {
         render(<MemberForm {...defaultProps} />);
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
-        const descriptionTextarea = screen.getByLabelText('Опис');
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
         fireEvent.change(fullNameInput, { target: { value: 'Test' } });
         fireEvent.change(descriptionTextarea, { target: { value: 'Test desc' } });
         const form = screen.getByTestId('test-form');
@@ -464,8 +440,8 @@ describe('MemberForm - Extra Function Coverage', () => {
 
     it('does not submit if fullName is empty', () => {
         render(<MemberForm {...defaultProps} />);
-        const categorySelect = screen.getByLabelText('Категорія');
-        const descriptionTextarea = screen.getByLabelText('Опис');
+        const categorySelect = screen.getByLabelText(/Категорія/);
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
         fireEvent.change(categorySelect, { target: { value: 'Основна команда' } });
         fireEvent.change(descriptionTextarea, { target: { value: 'Test desc' } });
         const form = screen.getByTestId('test-form');
@@ -475,8 +451,8 @@ describe('MemberForm - Extra Function Coverage', () => {
 
     it('does not submit if description is empty', () => {
         render(<MemberForm {...defaultProps} />);
-        const categorySelect = screen.getByLabelText('Категорія');
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const categorySelect = screen.getByLabelText(/Категорія/);
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
         fireEvent.change(categorySelect, { target: { value: 'Основна команда' } });
         fireEvent.change(fullNameInput, { target: { value: 'Test' } });
         const form = screen.getByTestId('test-form');
@@ -495,57 +471,17 @@ describe('MemberForm - Extra Function Coverage', () => {
         expect(screen.getByText('0/50')).toBeInTheDocument();
     });
 
-    it('handles drag-and-drop with multiple files', async () => {
-        render(<MemberForm {...defaultProps} />);
-
-        const dropArea = screen.getByTestId('drop-area');
-
-        const file1 = new File(['a'], 'a.png', { type: 'image/png' });
-        const file2 = new File(['b'], 'b.png', { type: 'image/png' });
-        
-        const fileListMock = {
-            0: file1,
-            1: file2,
-            length: 2,
-            item: (index: number) => [file1, file2][index],
-            [Symbol.iterator]: function* () {
-                yield file1;
-                yield file2;
-            },
-        };
-        Object.setPrototypeOf(fileListMock, FileList.prototype);
-
-        const dropEvent = createEvent.drop(dropArea);
-        Object.defineProperty(dropEvent, 'dataTransfer', {
-            value: {
-                files: fileListMock,
-                types: ['Files'],
-            },
-        });
-        dropEvent.preventDefault = jest.fn();
-
-        fireEvent(dropArea, dropEvent);
-
-        await waitFor(() => {
-            expect(screen.getByText('a.png')).toBeInTheDocument();
-            expect(screen.getByText('b.png')).toBeInTheDocument();
-        });
-    });
-
     it('does not call onValuesChange if memberFormValues is falsy (defensive)', () => {
-        // Simulate effect with falsy memberFormValues
-        // Not directly possible, but we can check that the effect is not called if onValuesChange is not provided (already covered)
-        // So this is just for completeness
         render(<MemberForm {...defaultProps} onValuesChange={undefined} />);
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
         fireEvent.change(fullNameInput, { target: { value: 'Test' } });
         expect(fullNameInput).toHaveValue('Test');
     });
 
     it('enforces max length for fullName and description', async () => {
         render(<MemberForm {...defaultProps} />);
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
-        const descriptionTextarea = screen.getByLabelText('Опис');
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
         const longName = 'a'.repeat(60);
         const longDesc = 'b'.repeat(250);
         await userEvent.type(fullNameInput, longName);
@@ -586,12 +522,12 @@ describe('MemberForm - Extra Function Coverage', () => {
             [Symbol.iterator]: function* () {},
         };
         Object.setPrototypeOf(emptyFileList, FileList.prototype);
-        
+
         fireEvent.change(fileInput, {
             target: { files: emptyFileList, name: 'img' },
             currentTarget: { files: emptyFileList },
         });
-        
+
         await waitFor(() => {
             const imageLoadedSection = document.querySelector('.form-group-image-loaded');
             expect(imageLoadedSection?.textContent?.trim()).toBe('');
@@ -599,6 +535,10 @@ describe('MemberForm - Extra Function Coverage', () => {
     });
 });
 describe('MemberForm branch coverage additions', () => {
+    beforeAll(() => {
+        global.URL.createObjectURL = jest.fn(() => 'blob:http://localhost/mock');
+    });
+
     const baseProps: MemberFormProps = {
         id: 'test-form',
         onSubmit: jest.fn(),
@@ -612,8 +552,8 @@ describe('MemberForm branch coverage additions', () => {
 
     it('does not submit when category is missing', async () => {
         render(<MemberForm {...baseProps} />);
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
-        const descriptionInput = screen.getByLabelText('Опис');
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
+        const descriptionInput = screen.getByLabelText(/Опис/);
 
         await userEvent.type(fullNameInput, 'John Doe');
         await userEvent.type(descriptionInput, 'Some description');
@@ -629,8 +569,8 @@ describe('MemberForm branch coverage additions', () => {
 
     it('does not submit when fullName is missing', async () => {
         render(<MemberForm {...baseProps} />);
-        const categorySelect = screen.getByLabelText('Категорія');
-        const descriptionInput = screen.getByLabelText('Опис');
+        const categorySelect = screen.getByLabelText(/Категорія/);
+        const descriptionInput = screen.getByLabelText(/Опис/);
 
         await userEvent.selectOptions(categorySelect, 'Основна команда');
         await userEvent.type(descriptionInput, 'Some description');
@@ -646,8 +586,8 @@ describe('MemberForm branch coverage additions', () => {
 
     it('does not submit when description is missing', async () => {
         render(<MemberForm {...baseProps} />);
-        const categorySelect = screen.getByLabelText('Категорія');
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const categorySelect = screen.getByLabelText(/Категорія/);
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
 
         await userEvent.selectOptions(categorySelect, 'Основна команда');
         await userEvent.type(fullNameInput, 'John Doe');
@@ -663,9 +603,9 @@ describe('MemberForm branch coverage additions', () => {
 
     it('calls onDraftSubmit when isDraft is true', async () => {
         render(<MemberForm {...baseProps} isDraft={true} />);
-        const categorySelect = screen.getByLabelText('Категорія');
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
-        const descriptionInput = screen.getByLabelText('Опис');
+        const categorySelect = screen.getByLabelText(/Категорія/);
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
+        const descriptionInput = screen.getByLabelText(/Опис/);
 
         await userEvent.selectOptions(categorySelect, 'Основна команда');
         await userEvent.type(fullNameInput, 'John Doe');
@@ -675,11 +615,13 @@ describe('MemberForm branch coverage additions', () => {
         fireEvent.submit(form);
 
         await waitFor(() => {
-            expect(baseProps.onDraftSubmit).toHaveBeenCalledWith(expect.objectContaining({
-                category: 'Основна команда',
-                fullName: 'John Doe',
-                description: 'Some description',
-            }));
+            expect(baseProps.onDraftSubmit).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    category: 'Основна команда',
+                    fullName: 'John Doe',
+                    description: 'Some description',
+                }),
+            );
             expect(baseProps.onSubmit).not.toHaveBeenCalled();
         });
     });

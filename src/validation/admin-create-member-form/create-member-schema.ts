@@ -1,10 +1,6 @@
 import * as yup from 'yup';
-import { TeamCategory } from "../../pages/admin/team/TeamPage";
-import {
-    TEAM_CATEGORY_MAIN,
-    TEAM_CATEGORY_SUPERVISORY,
-    TEAM_CATEGORY_ADVISORS
-} from '../../const/team';
+import { TeamCategory } from '../../pages/admin/team/TeamPage';
+import { TEAM_CATEGORY_MAIN, TEAM_CATEGORY_SUPERVISORY, TEAM_CATEGORY_ADVISORS } from '../../const/team';
 
 import {
     CATEGORY_REQUIRED,
@@ -23,21 +19,21 @@ import {
     MIN_FULLNAME_LENGTH,
     MIN_DESCRIPTION_LENGTH,
     FILE_SIZE_LIMIT,
-    SUPPORTED_FORMATS
+    SUPPORTED_FORMATS,
+    DESCRIPTIONS_REQUIRED,
 } from '../../const/admin/data-validation';
 
 export const useCreateMemberSchema = (isDraft: boolean) => {
     return yup.object({
         category: yup
             .mixed<TeamCategory>()
+            .transform((value) => (value === '' ? undefined : value))
             .required(CATEGORY_REQUIRED)
-            .oneOf(
-                [TEAM_CATEGORY_MAIN, TEAM_CATEGORY_SUPERVISORY, TEAM_CATEGORY_ADVISORS],
-                CHOOSE_CATEGORY
-            ),
+            .oneOf([TEAM_CATEGORY_MAIN, TEAM_CATEGORY_SUPERVISORY, TEAM_CATEGORY_ADVISORS], CHOOSE_CATEGORY),
 
         fullName: yup
             .string()
+            .transform((value) => (value === '' ? undefined : value))
             .required(FULLNAME_REQUIRED)
             .max(MAX_FULLNAME_LENGTH, FULLNAME_MAX)
             .min(MIN_FULLNAME_LENGTH, FULLNAME_MIN)
@@ -45,36 +41,34 @@ export const useCreateMemberSchema = (isDraft: boolean) => {
 
         description: yup
             .string()
-            .transform(value => (value === null ? undefined : value))
+            .transform((value) => (typeof value === 'string' && value.trim() === '' ? undefined : value))
             .max(MAX_DESCRIPTION_LENGTH, DESCRIPTIONS_MAX)
-            .test(
-                'min-if-not-draft',
-                `Мінімум ${DESCRIPTIONS_MIN} символів`,
-                value => {
-                    if (isDraft) return true; 
-                    if (typeof value === 'string') return value.length >= MIN_DESCRIPTION_LENGTH;
-                    return false; 
-                }
-            )
-            .notRequired(),
-        
+            .test('description-required-if-not-draft', DESCRIPTIONS_REQUIRED, (value) => {
+                if (isDraft) return true;
+                return typeof value === 'string' && value.trim().length > 0;
+            })
+            .test('description-min-length-if-not-draft', DESCRIPTIONS_MIN, (value) => {
+                if (isDraft) return true;
+                return typeof value === 'string' && value.trim().length >= MIN_DESCRIPTION_LENGTH;
+            }),
+
         img: yup
             .mixed<FileList | string>()
             .transform((value) => (value === null ? undefined : value))
-            .test("img-required-if-not-draft", IMG_REQUIRED, (value) => {
+            .test('img-required-if-not-draft', IMG_REQUIRED, (value) => {
                 if (isDraft) return true;
-                if (typeof value === "string") return true; 
+                if (typeof value === 'string') return true;
                 return value instanceof FileList && value.length > 0;
             })
-            .test("fileSize", FILE_SIZE, (value) => {
-                if (typeof value === "string") return true;
+            .test('fileSize', FILE_SIZE, (value) => {
+                if (typeof value === 'string') return true;
                 if (value && value instanceof FileList && value.length > 0) {
                     return value[0].size <= FILE_SIZE_LIMIT;
                 }
                 return true;
             })
-            .test("fileType", FILE_FORMAT, (value) => {
-                if (typeof value === "string") return true;
+            .test('fileType', FILE_FORMAT, (value) => {
+                if (typeof value === 'string') return true;
                 if (value && value instanceof FileList && value.length > 0) {
                     return SUPPORTED_FORMATS.includes(value[0].type);
                 }

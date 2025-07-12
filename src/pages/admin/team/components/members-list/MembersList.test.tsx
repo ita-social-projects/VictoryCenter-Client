@@ -128,7 +128,6 @@ jest.mock('../member-form/MemberForm', () => ({
     },
 }));
 
-
 jest.mock('../../../../../components/common/button/Button', () => ({
     Button: ({ children, onClick, style, form, type }: any) => (
         <button data-testid={`button-${style}${form ? '-' + form : ''}`} type={type ?? 'button'} onClick={onClick}>
@@ -149,14 +148,13 @@ const localStorageMock = (() => {
         clear: () => (store = {}),
     };
 })();
-Object.defineProperty(window, 'localStorage', {value: localStorageMock});
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 const sharedDefaultProps: MembersListProps = {
     searchByNameQuery: null,
     statusFilter: 'Усі',
     onAutocompleteValuesChange: jest.fn(),
 };
-
 
 let idCounter = 0;
 const createMockMember = (overrides = {}): Member => ({
@@ -177,7 +175,6 @@ const resetMockMembers = (members: Member[] = [createMockMember()]) => {
     mockMembers.length = 0;
     mockMembers.push(...membersWithUniqueIds);
 };
-
 
 describe('MembersList', () => {
     let mockFetchMembers: jest.SpyInstance;
@@ -205,7 +202,7 @@ describe('MembersList', () => {
         ]);
 
         render(<MembersList {...sharedDefaultProps} />);
-        
+
         await waitFor(() => {
             expect(screen.getByText((_, el) => el?.textContent === 'Alpha')).toBeInTheDocument();
             expect(screen.getByText((_, el) => el?.textContent === 'Beta')).toBeInTheDocument();
@@ -216,13 +213,10 @@ describe('MembersList', () => {
 
         fireEvent.dragStart(dragItem, { dataTransfer: mockDataTransfer });
         fireEvent.drop(dropTarget, { dataTransfer: mockDataTransfer });
-        
+
         expect(screen.getByTestId('member-item-0')).toHaveTextContent('Beta');
         expect(screen.getByTestId('member-item-1')).toHaveTextContent('Alpha');
     });
-
-
-
 
     it('renders without crashing and sets default category from localStorage', async () => {
         localStorageMock.setItem('currentTab', 'Наглядова рада');
@@ -377,12 +371,14 @@ describe('MembersList', () => {
         beforeEach(() => {
             jest.clearAllMocks();
             localStorageMock.clear();
-            const members = Array.from({length: 10}, (_, i) => createMockMember({
-                id: i + 1,
-                img: `https://randomuser.me/api/portraits/men/${i + 1}.jpg`,
-                fullName: `Member ${i + 1}`,
-                description: `Description ${i + 1}`,
-            }));
+            const members = Array.from({ length: 10 }, (_, i) =>
+                createMockMember({
+                    id: i + 1,
+                    img: `https://randomuser.me/api/portraits/men/${i + 1}.jpg`,
+                    fullName: `Member ${i + 1}`,
+                    description: `Description ${i + 1}`,
+                }),
+            );
             resetMockMembers(members);
         });
 
@@ -659,9 +655,9 @@ describe('MembersList', () => {
             render(<MembersList {...sharedDefaultProps} />);
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             const membersList = screen.getByTestId('members-list');
-            Object.defineProperty(membersList, 'scrollTop', {writable: true, value: 1000});
-            Object.defineProperty(membersList, 'scrollHeight', {writable: true, value: 1000});
-            Object.defineProperty(membersList, 'clientHeight', {writable: true, value: 1});
+            Object.defineProperty(membersList, 'scrollTop', { writable: true, value: 1000 });
+            Object.defineProperty(membersList, 'scrollHeight', { writable: true, value: 1000 });
+            Object.defineProperty(membersList, 'clientHeight', { writable: true, value: 1 });
             await fireEvent.scroll(membersList);
 
             await waitFor(async () => expect(await screen.findByText('Member 6')).toBeInTheDocument());
@@ -684,8 +680,8 @@ describe('MembersList', () => {
             render(<MembersList {...sharedDefaultProps} />);
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             const dragItem = screen.getByTestId('member-item-0');
-            fireEvent.dragStart(dragItem, {clientX: 100, clientY: 100, dataTransfer: mockDataTransfer});
-            fireEvent.drop(dragItem, {dataTransfer: mockDataTransfer});
+            fireEvent.dragStart(dragItem, { clientX: 100, clientY: 100, dataTransfer: mockDataTransfer });
+            fireEvent.drop(dragItem, { dataTransfer: mockDataTransfer });
             expect(screen.getByTestId('member-item-0')).toHaveTextContent('Alpha');
         });
 
@@ -694,7 +690,7 @@ describe('MembersList', () => {
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             fireEvent.click(screen.getByTestId('delete-button-0'));
             expect(screen.getByText('Видалити члена команди?')).toBeInTheDocument();
-            const confirmButton = screen.getByRole('button', {name: /Так/i});
+            const confirmButton = screen.getByRole('button', { name: /Так/i });
             fireEvent.click(confirmButton);
             await waitFor(() => expect(screen.queryByText('Alpha')).not.toBeInTheDocument());
         });
@@ -704,7 +700,7 @@ describe('MembersList', () => {
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             fireEvent.click(screen.getByTestId('delete-button-0'));
             expect(screen.getByText('Видалити члена команди?')).toBeInTheDocument();
-            const cancelButton = screen.getByRole('button', {name: /Ні/i});
+            const cancelButton = screen.getByRole('button', { name: /Ні/i });
             fireEvent.click(cancelButton);
             expect(screen.getByText('Alpha')).toBeInTheDocument();
         });
@@ -739,10 +735,10 @@ describe('MembersList', () => {
             render(<MembersList {...sharedDefaultProps} />);
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             const membersList = screen.getByTestId('members-list');
-            Object.defineProperty(membersList, 'scrollTop', {writable: true, value: 100});
+            Object.defineProperty(membersList, 'scrollTop', { writable: true, value: 100 });
             fireEvent.scroll(membersList);
             expect(screen.getByTestId('members-list-list-to-top')).toBeInTheDocument();
-            Object.defineProperty(membersList, 'scrollTop', {writable: true, value: 0});
+            Object.defineProperty(membersList, 'scrollTop', { writable: true, value: 0 });
             fireEvent.scroll(membersList);
             expect(screen.queryByTestId('members-list-list-to-top')).not.toBeInTheDocument();
         });

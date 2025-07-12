@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { Member } from '../members-list/MembersList';
 import './member-component.scss';
 import BlankUserImage from '../../../../../assets/images/admin/blank-user.svg';
@@ -21,8 +22,12 @@ export const MemberComponent = ({
                 <p>{member.description}</p>
             </div>
             <div className="members-controls">
-                <div data-testid={`member-status-${member.id}`}
-                    className={`members-status ${member.status === 'Чернетка' ? 'members-status-draft' : 'members-status-published'}`}
+                <div
+                    data-testid={`member-status-${member.id}`}
+                    className={classNames('members-status', {
+                        'members-status-draft': member.status === 'Чернетка',
+                        'members-status-published': member.status !== 'Чернетка',
+                    })}
                 >
                     <span>•</span>
                     <span>{member.status}</span>

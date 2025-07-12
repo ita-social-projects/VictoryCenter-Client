@@ -1,6 +1,6 @@
 export const CATEGORY_REQUIRED = 'Категорія є обов`язковим полем';
 export const CHOOSE_CATEGORY = 'Учасник команди може належати лише до однієї категорії';
-export const FULLNAME_REQUIRED = 'Введіть ім\'я';
+export const FULLNAME_REQUIRED = "Введіть ім'я";
 export const FULLNAME_MAX = 'Не більше 50 символів';
 export const FULLNAME_MIN = 'Не менше 2 символів';
 export const FORBIDDEN_SYMBOLS = 'Поле може містити лише літери, пробіли, ’ -. Поле не може містити цифри';

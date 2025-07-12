@@ -172,7 +172,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
             visible: true,
             x: e.clientX,
             y: e.clientY,
-            member: members[index]
+            member: members[index],
         });
 
         const dragImage = new Image();
@@ -185,7 +185,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
             setDragPreview((prev) => ({
                 ...prev,
                 x: e.clientX,
-                y: e.clientY
+                y: e.clientY,
             }));
         }
     };
@@ -195,7 +195,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
             visible: false,
             x: 0,
             y: 0,
-            member: null
+            member: null,
         });
         setDraggedIndex(null);
     };
@@ -233,7 +233,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
                 setDragPreview((prev) => ({
                     ...prev,
                     x: e.clientX,
-                    y: e.clientY
+                    y: e.clientY,
                 }));
             }
         };
@@ -301,13 +301,13 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
     };
 
     const handleOnEditMember = (id: number) => {
-        const memberToEdit = members.find(m => m.id === id);
+        const memberToEdit = members.find((m) => m.id === id);
         if (memberToEdit) {
             setMemberToEdit({
                 category: memberToEdit.category,
-                img: undefined,  
+                img: undefined,
                 fullName: memberToEdit.fullName,
-                description: memberToEdit.description
+                description: memberToEdit.description,
             });
             setMemberIdToEdit(id);
             setIsEditMemberModalOpen(true);
@@ -320,12 +320,13 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
 
     const handleEditMemberOnClose = () => {
         const existingMember = members.filter((m) => m.id === memberIdToEdit)[0];
-        //check photos as well
+
         if (existingMember && memberToEdit) {
             if (
                 memberToEdit.description !== existingMember.description ||
                 memberToEdit.fullName !== existingMember.fullName ||
-                memberToEdit.category !== existingMember.category
+                memberToEdit.category !== existingMember.category ||
+                memberToEdit.img !== existingMember.img
             ) {
                 setIsConfirmCloseModalOpen(true);
                 return;
@@ -336,35 +337,30 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
         setIsEditMemberModalOpen(false);
     };
 
-    const handleSaveAsDraft = () => {
-        if (memberToEdit) {
-            setMembers(prev => [...prev.filter(m => m.id !== memberIdToEdit),
-                {
-                    id: memberIdToEdit!,
-                    status: "Чернетка",
-                    category: memberToEdit.category,
-                    fullName: memberToEdit.fullName,
-                    description: memberToEdit.description,
-                    img: ""
-                }].sort((a, b) => a.id - b.id))
-        }
-    }
-
     const handleCancelPublish = () => {
         setIsConfirmPublishNewMemberModalOpen(false);
     };
 
     const handleConfirmPublish = () => {
         if (memberToEdit) {
-            setMembers(prev => [...prev.filter(m => m.id !== memberIdToEdit),
-                {
-                    id: memberIdToEdit!,
-                    status: "Опубліковано",
-                    category: memberToEdit.category,
-                    fullName: memberToEdit.fullName,
-                    description: memberToEdit.description,
-                    img: ""
-                }].sort((a, b) => a.id - b.id))
+            const updatedImg =
+                memberToEdit.img instanceof FileList && memberToEdit.img.length > 0
+                    ? URL.createObjectURL(memberToEdit.img[0])
+                    : members.find((m) => m.id === memberIdToEdit)?.img || '';
+
+            setMembers((prev) =>
+                [
+                    ...prev.filter((m) => m.id !== memberIdToEdit),
+                    {
+                        id: memberIdToEdit!,
+                        status: 'Опубліковано',
+                        category: memberToEdit.category,
+                        fullName: memberToEdit.fullName,
+                        description: memberToEdit.description,
+                        img: updatedImg,
+                    },
+                ].sort((a, b) => a.id - b.id),
+            );
             setIsConfirmPublishNewMemberModalOpen(false);
             setIsEditMemberModalOpen(false);
             setMemberToEdit(null);
@@ -392,28 +388,29 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
 
     const handleSaveAsDraftFromForm = (data: MemberFormValues) => {
         if (memberIdToEdit !== null) {
-            const imgValue = data.img instanceof FileList && data.img.length > 0
-                ? data.img[0].name
-                : members.find(m => m.id === memberIdToEdit)?.img || "";
+            const updatedImg =
+                data.img instanceof FileList && data.img.length > 0
+                    ? URL.createObjectURL(data.img[0])
+                    : members.find((m) => m.id === memberIdToEdit)?.img || '';
 
-
-            setMembers(prev => [...prev.filter(m => m.id !== memberIdToEdit),
-                {
-                    id: memberIdToEdit,
-                    status: "Чернетка",
-                    category: data.category,
-                    fullName: data.fullName,
-                    description: data.description,
-                    img: imgValue
-                }].sort((a, b) => a.id - b.id));
+            setMembers((prev) =>
+                [
+                    ...prev.filter((m) => m.id !== memberIdToEdit),
+                    {
+                        id: memberIdToEdit,
+                        status: 'Чернетка',
+                        category: data.category,
+                        fullName: data.fullName,
+                        description: data.description,
+                        img: updatedImg,
+                    },
+                ].sort((a, b) => a.id - b.id),
+            );
             setIsEditMemberModalOpen(false);
             setMemberToEdit(null);
             setIsDraftMode(false);
         }
     };
-
-
-
 
     let content;
 
@@ -515,36 +512,45 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
                 </Modal.Actions>
             </Modal>
 
-            {isEditMemberModalOpen && <Modal onClose={handleEditMemberOnClose} isOpen={isEditMemberModalOpen}>
-                <Modal.Title>
-                    {TEAM_EDIT_MEMBER}
-                </Modal.Title>
-                <Modal.Content>
-                    <MemberForm onValuesChange={mfv => setMemberToEdit(mfv)}
-                                existingMemberFormValues={memberToEdit}
-                                id='edit-member-modal'
-                                onSubmit={handleMemberEdit}
-                                onDraftSubmit={handleSaveAsDraftFromForm}
-                                isDraft={isDraftMode}
-                                previewImgUrl={members.find(m => m.id === memberIdToEdit)?.img || ''}/>
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button buttonStyle={'secondary'}
-                            form='edit-member-modal'
-                            type='submit'
+            {isEditMemberModalOpen && (
+                <Modal onClose={handleEditMemberOnClose} isOpen={isEditMemberModalOpen}>
+                    <Modal.Title>{TEAM_EDIT_MEMBER}</Modal.Title>
+                    <Modal.Content>
+                        <MemberForm
+                            onValuesChange={(mfv) => setMemberToEdit(mfv)}
+                            existingMemberFormValues={memberToEdit}
+                            id="edit-member-modal"
+                            onSubmit={handleMemberEdit}
+                            onDraftSubmit={handleSaveAsDraftFromForm}
+                            isDraft={isDraftMode}
+                            previewImgUrl={members.find((m) => m.id === memberIdToEdit)?.img || ''}
+                        />
+                    </Modal.Content>
+                    <Modal.Actions>
+                        <Button
+                            buttonStyle={'secondary'}
+                            form="edit-member-modal"
+                            type="submit"
                             onClick={() => setIsDraftMode(true)}
-                    >{TEAM_SAVE_AS_DRAFT}</Button>
-                    <Button form='edit-member-modal'
+                        >
+                            {TEAM_SAVE_AS_DRAFT}
+                        </Button>
+                        <Button
+                            form="edit-member-modal"
                             type="submit"
                             onClick={() => setIsDraftMode(false)}
-                            buttonStyle={"primary"}>{TEAM_PUBLISH}</Button>
-                </Modal.Actions>
-            </Modal>}
-            <Modal isOpen={isConfirmPublishNewMemberModalOpen}
-                   onClose={() => setIsConfirmPublishNewMemberModalOpen(false)}>
-                <Modal.Title>
-                    {TEAM_PUBLISH_NEW_MEMBER}
-                </Modal.Title>
+                            buttonStyle={'primary'}
+                        >
+                            {TEAM_PUBLISH}
+                        </Button>
+                    </Modal.Actions>
+                </Modal>
+            )}
+            <Modal
+                isOpen={isConfirmPublishNewMemberModalOpen}
+                onClose={() => setIsConfirmPublishNewMemberModalOpen(false)}
+            >
+                <Modal.Title>{TEAM_PUBLISH_NEW_MEMBER}</Modal.Title>
                 <Modal.Content>
                     <></>
                 </Modal.Content>

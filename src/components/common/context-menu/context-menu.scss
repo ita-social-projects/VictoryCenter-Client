@@ -4,12 +4,11 @@
   align-items: center;
   justify-content: center;
   width: 24px;
-  height: 40px;
   background-color: transparent;
   cursor: pointer;
 
   &-active {
-    border-bottom: 1px solid #041128
+    border-bottom: 1px solid #041128;
   }
 
   &-icon {
@@ -19,7 +18,7 @@
 
   &-options {
     position: absolute;
-    top: 42px;
+    top: calc(100% + 2px);
     left: 0;
     display: none;
     z-index: 99999;
@@ -39,11 +38,9 @@
     height: 40px;
     padding: 8px;
     border: none;
-    border-bottom: 1px solid transparent;
     text-align: left;
     color: #061125;
     background-color: transparent;
-    font-family: 'Mulish', sans-serif;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;

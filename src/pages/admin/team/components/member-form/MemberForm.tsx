@@ -132,7 +132,7 @@ export const MemberForm = ({
                         name={categoryName}
                         ref={categoryRef}
                         defaultValue={existingMemberFormValues?.category || ''}
-                        className="custom-select"
+                        className="custom-select default-select"
                         onClick={handleOpenSelect}
                         onBlur={async (e) => {
                             setIsOpen(false);
@@ -140,12 +140,18 @@ export const MemberForm = ({
                         }}
                         onChange={categoryOnChange}
                     >
-                        <option value="" disabled>
+                        <option value="" disabled className="option-value">
                             {TEAM_LABEL_SELECT_CATEGORY}
                         </option>
-                        <option value={TEAM_CATEGORY_MAIN}>{TEAM_CATEGORY_MAIN}</option>
-                        <option value={TEAM_CATEGORY_SUPERVISORY}>{TEAM_CATEGORY_SUPERVISORY}</option>
-                        <option value={TEAM_CATEGORY_ADVISORS}>{TEAM_CATEGORY_ADVISORS}</option>
+                        <option value={TEAM_CATEGORY_MAIN} className="option-value">
+                            {TEAM_CATEGORY_MAIN}
+                        </option>
+                        <option value={TEAM_CATEGORY_SUPERVISORY} className="option-value">
+                            {TEAM_CATEGORY_SUPERVISORY}
+                        </option>
+                        <option value={TEAM_CATEGORY_ADVISORS} className="option-value">
+                            {TEAM_CATEGORY_ADVISORS}
+                        </option>
                     </select>
                     <img src={isOpen ? ArrowUp : ArrowDown} className="icon-img" alt="arrow-down" />
                     {errors.category && <p className="error">{errors.category.message}</p>}
@@ -164,10 +170,7 @@ export const MemberForm = ({
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="description">
-                        <span className="field-required">*</span>
-                        {TEAM_LABEL_DESCRIPTION}
-                    </label>
+                    <label htmlFor="description">{TEAM_LABEL_DESCRIPTION}</label>
                     <textarea
                         maxLength={MAX_DESCRIPTION_LENGTH}
                         className="form-group-description"
@@ -181,10 +184,7 @@ export const MemberForm = ({
                 </div>
 
                 <div className="form-group form-group-image">
-                    <span>
-                        <span className="field-required">*</span>
-                        {TEAM_LABEL_PHOTO}
-                    </span>
+                    <span>{TEAM_LABEL_PHOTO}</span>
                     <div className="form-group-image-details">
                         <label
                             onDragOver={(e) => e.preventDefault()}

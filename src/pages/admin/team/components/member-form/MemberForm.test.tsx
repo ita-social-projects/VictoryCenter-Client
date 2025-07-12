@@ -193,24 +193,6 @@ describe('MemberForm', () => {
         const descriptionTextarea = screen.getByLabelText(/Опис/);
         expect(descriptionTextarea).toHaveAttribute('maxLength', '200');
     });
-});
-
-describe('MemberForm - Additional Coverage', () => {
-    const defaultProps: MemberFormProps = {
-        id: 'test-form',
-        onSubmit: jest.fn(),
-        onValuesChange: jest.fn(),
-        existingMemberFormValues: null,
-        isDraft: false,
-    };
-
-    beforeAll(() => {
-        global.URL.createObjectURL = jest.fn(() => 'blob:http://localhost/mock');
-    });
-
-    beforeEach(() => {
-        jest.clearAllMocks();
-    });
 
     it('renders empty div when no files are uploaded', () => {
         render(<MemberForm {...defaultProps} />);

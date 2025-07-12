@@ -118,10 +118,7 @@ export const MemberForm = ({
         <form id={id} onSubmit={handleSubmit(handleOnSubmit)} data-testid="test-form">
             <div className="members-add-modal-body">
                 <div className="form-group">
-                    <label
-                        htmlFor="category"
-                        className="no-pointer-events"
-                    >
+                    <label htmlFor="category" className="no-pointer-events">
                         <span className="field-required">*</span>
                         {TEAM_LABEL_CATEGORY}
                     </label>

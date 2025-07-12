@@ -122,6 +122,13 @@ export const MemberForm = ({
                         htmlFor="category"
                         onClick={(e) => {
                             e.preventDefault();
+                            e.stopPropagation();
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }
                         }}
                     >
                         <span className="field-required">*</span>

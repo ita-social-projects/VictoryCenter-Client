@@ -4,6 +4,7 @@ import { Program, ProgramStatus } from '../../../../../types/ProgramAdminPage';
 import { Tooltip } from '../../../../../components/common/tooltip/Tooltip';
 import classNames from 'classnames';
 import './programs-list-item.scss';
+import {PROGRAMS_TEXT} from "../../../../../const/admin/programs";
 
 export interface ProgramListItemProps {
   program: Program;
@@ -50,7 +51,9 @@ export const ProgramListItem = ({
           </Tooltip.Trigger>
           <Tooltip.Content>
             <div className="program-actions-tooltip">
-              <b>Опубліковано в:</b>
+              <b>{program.status == 'Published' ?
+                  PROGRAMS_TEXT.TOOLTIP.PUBLISHED_IN :
+                  PROGRAMS_TEXT.TOOLTIP.DRAFTED_IN}</b>
               {program.categories.map((c) => (
                 <span key={c.id}>{c.name}</span>
               ))}

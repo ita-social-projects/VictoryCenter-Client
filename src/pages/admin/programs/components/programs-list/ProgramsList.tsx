@@ -6,19 +6,25 @@
     forwardRef,
     useImperativeHandle
 } from 'react';
-import {
-    fetchProgramsWithFilterAndPagination,
-    programCategoriesDataFetch
-} from '../../../../../services/data-fetch/admin-page/programs-data-fetch';
+import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
 import { ProgramListItem } from '../program-list-item/ProgramListItem'
 import { ContextMenu } from "../../../../../components/common/context-menu/ContextMenu";
-import { Program, ProgramCategory, ProgramStatus } from '../../../../../types/ProgramAdminPage';
-import { PROGRAMS_TEXT } from "../../../../../const/admin/programs";
+import { Modal } from "../../../../../components/common/modal/Modal";
+import { Button } from "../../../../../components/common/button/Button";
+import {
+    Program,
+    ProgramCategory,
+    ProgramCategoryCreateUpdate,
+    ProgramStatus
+} from '../../../../../types/ProgramAdminPage';
+import { PROGRAMS_TEXT, PROGRAM_CATEGORY_TEXT } from "../../../../../const/admin/programs";
 import classNames from "classnames";
 import LoaderIcon from "../../../../../assets/icons/load.svg";
 import ArrowUpIcon from "../../../../../assets/icons/arrow-up.svg"
 import NotFoundIcon from "../../../../../assets/icons/not-found.svg";
+import InfoIcon from "../../../../../assets/icons/info.svg";
 import './programs-list.scss'
+
 
 export interface ProgramsListProps {
     searchByStatus: ProgramStatus | undefined;
@@ -35,6 +41,380 @@ export type ProgramListRef = {
 
 const PAGE_SIZE = 5;
 const BOTTOM_REACH_THRESHOLD_PIXELS = 5;
+const MAX_CATEGORY_NAME_LENGTH = 20;
+
+const AddCategoryModal = ({
+    isOpen,
+    onClose,
+    onAddCategory,
+    categories,
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    onAddCategory: (category: ProgramCategory) => void;
+    categories: ProgramCategory[];
+}) => {
+    const [categoryNameToAdd, setCategoryNameToAdd] = useState<string>('');
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [error, setError] = useState<string>('');
+    const [isDuplicateName, setIsDuplicateName] = useState<boolean>(false);
+    const isSubmittingRef = useRef(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        console.log("Form submitted");
+
+        if (isSubmittingRef.current  || !categoryNameToAdd.trim() || isDuplicateName) {
+            return;
+        }
+
+        try {
+            isSubmittingRef.current = true;
+            setIsSubmitting(true);
+            setError('');
+
+            const categoryToCreate: ProgramCategoryCreateUpdate = {
+                id: null,
+                name: categoryNameToAdd.trim()
+            };
+
+            console.log(`Creating category with name: ${categoryNameToAdd.trim()}`);
+            const newCategory =  await ProgramsApi.addProgramCategory(categoryToCreate);
+
+            onAddCategory(newCategory);
+            setCategoryNameToAdd('');
+            onClose();
+        } catch (error) {
+            // Or handle in your way
+            setError(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY);
+        } finally {
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
+        }
+    };
+
+    useEffect(() => {
+        if (categoryNameToAdd.trim()) {
+            const isDuplicate = categories.some(category =>
+                category.name.toLowerCase() === categoryNameToAdd.trim().toLowerCase()
+            );
+            setIsDuplicateName(isDuplicate);
+        } else {
+            setIsDuplicateName(false);
+        }
+    }, [categoryNameToAdd, categories]);
+
+    const handleClose = () => {
+        if (isSubmitting) return;
+
+        setCategoryNameToAdd('');
+        setError('');
+        setIsDuplicateName(false);
+        onClose();
+    };
+
+    return (
+        <Modal isOpen={isOpen} onClose={handleClose}>
+            <Modal.Title>
+                <span className={'program-form-header'}>
+                    {PROGRAM_CATEGORY_TEXT.FORM.TITLE.ADD_CATEGORY}
+                </span>
+            </Modal.Title>
+            <Modal.Content>
+                <form onSubmit={handleSubmit} className="program-form-main">
+                    <div className='form-group form-group-name'>
+                        <label htmlFor="add-category-name">
+                            {PROGRAM_CATEGORY_TEXT.FORM.LABEL.NAME}
+                        </label>
+                        <input
+                            value={categoryNameToAdd}
+                            onChange={(e) => setCategoryNameToAdd(e.target.value)}
+                            maxLength={MAX_CATEGORY_NAME_LENGTH}
+                            name='name'
+                            type="text"
+                            id='add-category-name'
+                            required
+                            disabled={isSubmitting}
+                        />
+                        <div className='form-group-name-lenght-limit'>
+                            {categoryNameToAdd.length}/{MAX_CATEGORY_NAME_LENGTH}
+                        </div>
+                        <div className='form-group'>
+                            {isDuplicateName && (
+                                <span className='error'>
+                                    {PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.ALREADY_CONTAIN_CATEGORY_WITH_NAME}
+                                </span>
+                            )}
+                            {error && (<span className='error'>{error}</span>)}
+                        </div>
+                    </div>
+                    <Modal.Actions>
+                        <div className='program-form-buttons-container'>
+                            <Button
+                                type="submit"
+                                buttonStyle="primary"
+                                disabled={isSubmitting || isDuplicateName || !categoryNameToAdd.trim()}
+                            >
+                            {PROGRAMS_TEXT.BUTTONS.SAVE}
+                            </Button>
+                        </div>
+                    </Modal.Actions>
+                </form>
+            </Modal.Content>
+        </Modal>
+    );
+};
+
+const EditCategoryModal: React.FC<{
+    isOpen: boolean;
+    onClose: () => void;
+    onEditCategory: (category: ProgramCategory) => void;
+    categories: ProgramCategory[];
+}> = ({ isOpen, onClose, onEditCategory, categories }) => {
+    const [categoryToEdit, setCategoryToEdit] = useState<ProgramCategory | null>(null);
+    const [editCategoryName, setEditCategoryName] = useState<string>('');
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [error, setError] = useState<string>('');
+    const [isDuplicateName, setIsDuplicateName] = useState<boolean>(false);
+    const isSubmittingRef = useRef(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!categoryToEdit || !editCategoryName.trim() || isDuplicateName) {
+            return;
+        }
+
+        try {
+            isSubmittingRef.current = true;
+            setIsSubmitting(true);
+            setError('');
+
+            const categoryToUpdate = {
+                id: categoryToEdit.id,
+                name: editCategoryName.trim()
+            };
+
+            const updatedCategory = await ProgramsApi.editCategory(categoryToUpdate);
+            onEditCategory(updatedCategory);
+            handleClose();
+        } catch (error) {
+            setError('Не вдалося оновити категорію');
+        } finally {
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleClose = () => {
+        setCategoryToEdit(null);
+        setEditCategoryName('');
+        setError('');
+        setIsDuplicateName(false);
+        onClose();
+    };
+
+    useEffect(() => {
+        if (editCategoryName.trim() && categoryToEdit) {
+            const isDuplicate = categories.some(category =>
+                category.id !== categoryToEdit.id &&
+                category.name.toLowerCase() === editCategoryName.trim().toLowerCase()
+            );
+            setIsDuplicateName(isDuplicate);
+        } else {
+            setIsDuplicateName(false);
+        }
+    }, [editCategoryName, categories, categoryToEdit]);
+
+    useEffect(() => {
+        if (isOpen && categories.length > 0) {
+            setCategoryToEdit(categories[0]);
+            setEditCategoryName(categories[0].name);
+        }
+    }, [isOpen, categories]);
+
+    return (
+        <Modal isOpen={isOpen} onClose={handleClose}>
+            <Modal.Title>
+                <span className={'program-form-header'}>{PROGRAM_CATEGORY_TEXT.FORM.TITLE.EDIT_CATEGORY}</span>
+            </Modal.Title>
+            <Modal.Content>
+                <form onSubmit={handleSubmit} className="program-form-main">
+                    <div className='form-group'>
+                        <label htmlFor="edit-category-select">{PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}</label>
+                        <select
+                            id="edit-category-select"
+                            value={categoryToEdit?.id || ''}
+                            onChange={(e) => {
+                                const selectedId = parseInt(e.target.value);
+                                const selected = categories.find(cat => cat.id === selectedId);
+                                if (selected) {
+                                    setCategoryToEdit(selected);
+                                    setEditCategoryName(selected.name);
+                                }
+                            }}
+                            disabled={isSubmitting}
+                        >
+                            {categories.map(category => (
+                                <option key={category.id} value={category.id}>
+                                    {category.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className='form-group form-group-name'>
+                        <label htmlFor="edit-category-name">{PROGRAM_CATEGORY_TEXT.FORM.LABEL.NAME}</label>
+                        <input
+                            value={editCategoryName}
+                            onChange={(e) => setEditCategoryName(e.target.value)}
+                            maxLength={MAX_CATEGORY_NAME_LENGTH}
+                            name='name'
+                            type="text"
+                            id='edit-category-name'
+                            required
+                            disabled={isSubmitting}
+                        />
+                        <div className='form-group-name-lenght-limit'>
+                            {editCategoryName.length}/{MAX_CATEGORY_NAME_LENGTH}
+                        </div>
+                        {isDuplicateName && (
+                            <span className='error'>
+                                Категорія з такою назвою вже існує
+                            </span>
+                        )}
+                        {error && (<span className='error'>{error}</span>)}
+                    </div>
+                    <Modal.Actions>
+                        <div className={'program-form-buttons-container'}>
+                            <Button
+                                type="submit"
+                                buttonStyle="primary"
+                                disabled={isSubmitting || isDuplicateName || !editCategoryName.trim()}
+                            >
+                                {PROGRAM_CATEGORY_TEXT.FORM.BUTTON.CONFIRM_SAVE}
+                            </Button>
+                        </div>
+                    </Modal.Actions>
+                </form>
+            </Modal.Content>
+        </Modal>
+    );
+};
+
+const DeleteCategoryModal: React.FC<{
+    isOpen: boolean;
+    onClose: () => void;
+    onDeleteCategory: (categoryId: number) => void;
+    categories: ProgramCategory[];
+}> = ({ isOpen, onClose, onDeleteCategory, categories }) => {
+    const [categoryToDelete, setCategoryToDelete] = useState<ProgramCategory | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [error, setError] = useState<string>('');
+    const isSubmittingRef = useRef(false);
+
+    const handleDelete = async () => {
+        if (!categoryToDelete) return;
+
+        try {
+            isSubmittingRef.current = true;
+            setIsSubmitting(true);
+            setError('');
+
+            await ProgramsApi.deleteCategory(categoryToDelete.id);
+            onDeleteCategory(categoryToDelete.id);
+            handleClose();
+        } catch (error) {
+            setError('Не вдалося видалити категорію');
+        } finally {
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleClose = () => {
+        setCategoryToDelete(null);
+        setError('');
+        onClose();
+    };
+
+    useEffect(() => {
+        if (isOpen && categories.length > 0) {
+            setCategoryToDelete(categories[0]);
+        }
+    }, [isOpen, categories]);
+
+    return (
+        <Modal isOpen={isOpen} onClose={handleClose}>
+            <Modal.Title>
+                <span className={'program-form-header'}>Видалити категорію</span>
+            </Modal.Title>
+            <Modal.Content>
+                <div className="program-form-main">
+                    <div className='form-group'>
+                        <label htmlFor="delete-category-select">Категорія</label>
+                        <select
+                            id="delete-category-select"
+                            value={categoryToDelete?.id || ''}
+                            onChange={(e) => {
+                                const selectedId = parseInt(e.target.value);
+                                const selected = categories.find(cat => cat.id === selectedId);
+                                if (selected) {
+                                    setCategoryToDelete(selected);
+                                }
+                            }}
+                            disabled={isSubmitting}
+                        >
+                            {categories.map(category => (
+                                <option key={category.id} value={category.id}>
+                                    {category.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {categoryToDelete && categoryToDelete.programsCount > 0 && (
+                        <div className="delete-category-warning">
+                            <div className="warning-icon-container">
+                                <img src={InfoIcon} alt="info-icon" className="warning-info-icon" />
+                            </div>
+                            <div className="warning-text">
+                                <div className="warning-title">
+                                    Категорія містить {categoryToDelete.programsCount} програм
+                                </div>
+                                <div className="warning-description">
+                                    Перенесіть їх в іншу категорію або видаліть, щоб продовжити
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {error && (<span className='error'>{error}</span>)}
+                </div>
+            </Modal.Content>
+            <Modal.Actions>
+                <div className="program-form-buttons-container">
+                    <button
+                        type='button'
+                        className={'cancel-button'}
+                        onClick={handleClose}
+                        disabled={isSubmitting}
+                    >
+                        Відмінити
+                    </button>
+                    <button
+                        type='button'
+                        disabled={!!(categoryToDelete && categoryToDelete.programsCount > 0) || isSubmitting}
+                        className={'publisher-button'}
+                        onClick={handleDelete}
+                    >
+                        Видалити
+                    </button>
+                </div>
+            </Modal.Actions>
+        </Modal>
+    );
+};
+
 
 export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(({
                                  searchByStatus,
@@ -50,10 +430,6 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(({
     const [isProgramsLoading, setIsProgramsLoading] = useState(false);
     const [isMoveToTopVisible, setIsMoveToTopVisible] = useState<boolean>(false);
 
-    const [categoryNameToAdd, setCategoryNameToAdd] = useState<string>('');
-    const [editCategoryName, setEditCategoryName] = useState<string>('');
-    const [categoryToEdit, setCategoryToEdit] = useState<ProgramCategory | null>(null);
-    const [categoryToDelete, setCategoryToDelete] = useState<ProgramCategory | null>(null);
     const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState<boolean>(false);
     const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState<boolean>(false);
     const [isDeleteCategoryModalOpen, setIsDeleteCategoryModalOpen] = useState<boolean>(false);
@@ -128,6 +504,19 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(({
         isProgramsLoadingRef.current = isProgramsLoading;
     }, [isProgramsLoading]);
 
+    useEffect(() => {
+        const fetchCategories = async () => {
+            console.log('fetchCategories');
+            const categoriesFetch = await ProgramsApi.fetchProgramCategories();
+            setCategories(categoriesFetch);
+
+            if (categoriesFetch.length > 0) {
+                setSelectedCategory(categoriesFetch[0]);
+            }
+        }
+        fetchCategories();
+    }, []);
+
     const loadPrograms = useCallback(async (reset: boolean = false) => {
         if (isProgramsLoadingRef.current || !selectedCategoryRef.current || !hasMoreRef.current) return;
 
@@ -138,7 +527,7 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(({
             const searchCategoryId = selectedCategoryRef.current;
             const searchStatus = searchByStatus;
             const pageToFetch = reset ? 1 : currentPageRef.current;
-            const fetchResult = await fetchProgramsWithFilterAndPagination(
+            const fetchResult = await ProgramsApi.fetchPrograms(
                 searchCategoryId.id,
                 pageToFetch,
                 PAGE_SIZE,
@@ -182,18 +571,6 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(({
         }
     }, [isProgramsLoading]);
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            const categoriesFetch = await programCategoriesDataFetch();
-            setCategories(categoriesFetch);
-
-            if (categoriesFetch.length > 0) {
-                setSelectedCategory(categoriesFetch[0]);
-            }
-        }
-        fetchCategories();
-    }, []);
-
     const handleOnScroll = () => {
         const el = programListRef.current;
         if (!el || isProgramsLoading) return;
@@ -231,6 +608,27 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(({
         }
     }
 
+    const handleAddCategory = (newCategory: ProgramCategory) => {
+        setCategories(prev => [...prev, newCategory]);
+    };
+
+    const handleEditCategory = (updatedCategory: ProgramCategory) => {
+        setCategories(prev => prev.map(cat =>
+            cat.id === updatedCategory.id ? updatedCategory : cat
+        ));
+    };
+
+    const handleDeleteCategory = (categoryId: number) => {
+        setCategories(prev => prev.filter(cat => cat.id !== categoryId));
+        // If deleted category was selected, select first available
+        if (selectedCategory?.id === categoryId) {
+            const remaining = categories.filter(cat => cat.id !== categoryId);
+            if (remaining.length > 0) {
+                setSelectedCategory(remaining[0]);
+            }
+        }
+    };
+
     let content;
 
     if (programs.length > 0) {
@@ -258,6 +656,27 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(({
 
     return (
         <>
+            <AddCategoryModal
+                isOpen={isAddCategoryModalOpen}
+                onClose={() => setIsAddCategoryModalOpen(false)}
+                onAddCategory={handleAddCategory}
+                categories={categories}
+            />
+
+            <EditCategoryModal
+                isOpen={isEditCategoryModalOpen}
+                onClose={() => setIsEditCategoryModalOpen(false)}
+                onEditCategory={handleEditCategory}
+                categories={categories}
+            />
+
+            <DeleteCategoryModal
+                isOpen={isDeleteCategoryModalOpen}
+                onClose={() => setIsDeleteCategoryModalOpen(false)}
+                onDeleteCategory={handleDeleteCategory}
+                categories={categories}
+            />
+
             <div className='programs'>
                 <div data-testid="programs-categories" className='programs-categories'>
                     <ContextMenu onOptionSelected={handleOnOptionSelected} className={'programs-categories-context-menu'}>
@@ -271,9 +690,9 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(({
                             Видалити
                         </ContextMenu.Option>
                     </ContextMenu>
-                    {categories.map(c => (
+                    {categories.map(((c, index) => (
                         <button
-                            key={c.id}
+                            key={index}
                             onClick={() => setSelectedCategory(c)}
                             className={classNames('programs-categories-button', {
                                 'programs-categories-selected': selectedCategory === c
@@ -281,7 +700,7 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(({
                         >
                             {c.name}
                         </button>
-                    ))}
+                    )))}
                 </div>
                 <div ref={programListRef} onScroll={handleOnScroll} data-testid="programs-list" className="programs-list">
                     {content}

@@ -2,9 +2,14 @@
     LIST: {
         NOT_FOUND: 'Нічого не знайдено',
     },
+    TOOLTIP: {
+        PUBLISHED_IN: 'Опубліковано в:',
+        DRAFTED_IN: 'Збережено в:',
+    },
 
     BUTTONS: {
         ADD_PROGRAM: 'Додати програму',
+        SAVE: 'Зберегти',
     },
 
     FILTER: {
@@ -44,6 +49,31 @@
         },
     },
 };
+
+export const PROGRAM_CATEGORY_TEXT = {
+    FORM:{
+        TITLE:{
+            ADD_CATEGORY: 'Додати категорію',
+            EDIT_CATEGORY: 'Редагувати категорію',
+            DELETE_CATEGORY: 'Видалити категорію',
+        },
+        MESSAGE: {
+            ALREADY_CONTAIN_CATEGORY_WITH_NAME: 'Категорія з такою назвою вже існує',
+            FAIL_TO_CREATE_CATEGORY: 'Виникла помилка під час додавання категорії',
+            FAIL_TO_UPDATE_CATEGORY: 'Виникла помилка під час оновлення категорії',
+            FAIL_TO_DELETE_CATEGORY: 'Виникла помилка під час видалення категорії',
+        },
+        BUTTON:{
+            CONFIRM_SAVE: 'Зберегти',
+            CONFIRM_DELETE: 'Видалити',
+            CANCEL_DELETE: 'Відмінити',
+        },
+        LABEL:{
+            NAME: 'Назва',
+            CATEGORY: 'Категорія',
+        },
+    }
+}
 
 export const PROGRAM_VALIDATION = {
     name: {

@@ -14,3 +14,17 @@ export interface Program {
     status: ProgramStatus;
     img: string | null;
 }
+
+export interface ProgramCreateUpdate {
+    id?: number;
+    name: string;
+    description: string;
+    categoryIds: number[];
+    status: ProgramStatus;
+    img: string | null;
+}
+
+export interface ProgramCategoryCreateUpdate {
+    id: number | null;
+    name: string;
+}

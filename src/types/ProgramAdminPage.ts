@@ -4,11 +4,13 @@
     programsCount: number;
 }
 
+export type ProgramStatus = 'Draft' | 'Published';
+
 export interface Program {
     id: number;
     name: string;
     description: string;
     categories: ProgramCategory[];
-    status: string;
-    img: string;
+    status: ProgramStatus;
+    img: string | null;
 }

@@ -1,7 +1,7 @@
 ﻿import { Button } from "../../../../../components/common/button/Button";
 import { Select } from "../../../../../components/common/select/Select";
 import { Input } from "../../../../../components/common/input/Input";
-import { PROGRAMS_TEXT } from '../../../../../const/programs';
+import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { ProgramStatus } from "../../../../../types/ProgramAdminPage";
 import PlusIcon from "../../../../../assets/icons/plus.svg";
 

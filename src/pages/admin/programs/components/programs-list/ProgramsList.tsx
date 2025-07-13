@@ -13,7 +13,7 @@ import {
 import { ProgramListItem } from '../program-list-item/ProgramListItem'
 import { ContextMenu } from "../../../../../components/common/context-menu/ContextMenu";
 import { Program, ProgramCategory, ProgramStatus } from '../../../../../types/ProgramAdminPage';
-import { PROGRAMS_TEXT } from "../../../../../const/programs";
+import { PROGRAMS_TEXT } from "../../../../../const/admin/programs";
 import classNames from "classnames";
 import LoaderIcon from "../../../../../assets/icons/load.svg";
 import ArrowUpIcon from "../../../../../assets/icons/arrow-up.svg"

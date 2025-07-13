@@ -51,6 +51,11 @@
 };
 
 export const PROGRAM_CATEGORY_TEXT = {
+    BUTTON:{
+        ADD_CATEGORY: 'Додати',
+        EDIT_CATEGORY: 'Редагувати',
+        DELETE_CATEGORY: 'Видалити',
+    },
     FORM:{
         TITLE:{
             ADD_CATEGORY: 'Додати категорію',
@@ -100,3 +105,17 @@ export const PROGRAM_VALIDATION = {
         getSizeError: () => `Зображення має бути не більше ${PROGRAM_VALIDATION.img.maxSizeBytes / (1024 * 1024)} МБ`,
     },
 };
+
+export const PROGRAM_CATEGORY_VALIDATION = {
+    name: {
+        min: 2,
+        max: 20,
+        getUniqueNameError: () => 'Категорія з такою назвою вже існує',
+        getMinError: () => `Назва повинна містити щонайменше ${PROGRAM_CATEGORY_VALIDATION.name.min} символи`,
+        getMaxError: () => `Назва не повинна перевищувати ${PROGRAM_CATEGORY_VALIDATION.name.max} символів`,
+    },
+    programsCount:{
+        getRelocationOrRemovalNotice: () => 'Перенесіть їх в іншу категорію або видаліть, щоб продовжити',
+        getProgramsCountWarning: (count: number) => `Категорія містить ${count} програм`,
+    }
+}

@@ -16,7 +16,7 @@ let mockCategoryId = Math.max(...mockCategories.map(c => c.id), 0) + 1;
 const ProgramsApi = {
     fetchProgramCategories: async (): Promise<ProgramCategory[]> => {
         await new Promise((resolve) => setTimeout(resolve, 200));
-        return mockCategories;
+        return [...mockCategories];
     },
 
     fetchProgramById: async (id: number): Promise<Program | null> => {

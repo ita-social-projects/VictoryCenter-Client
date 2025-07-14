@@ -11,7 +11,7 @@ import { TeamPage } from '../../pages/user-pages/team-page/TeamPage';
 import { NotFound } from '../../pages/not-found/NotFound';
 import { ProgramPage } from '../../pages/program-page/ProgramPage';
 
-import {AboutUsPage} from "../../pages/about-us-page/AboutUsPage";
+import { AboutUsPage } from '../../pages/about-us-page/AboutUsPage';
 import { routes } from '../../const/routers/routes';
 import { AdminLayout } from '../../layouts/admin-layout/AdminLayout';
 import { TeamPageAdmin } from '../../pages/admin/team/TeamPage';

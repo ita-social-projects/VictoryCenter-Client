@@ -1,8 +1,8 @@
-import "./team-page.scss";
-import React from "react";
-import {TeamPageContent} from "./components/team-page-content/TeamPageContent";
+import './team-page.scss';
+import React from 'react';
+import { TeamPageContent } from './components/team-page-content/TeamPageContent';
 
-export type TeamCategory = "Основна команда" | "Наглядова рада" | "Радники";
+export type TeamCategory = 'Основна команда' | 'Наглядова рада' | 'Радники';
 
 export const categoryMap: Record<TeamCategory, number> = {
   "Основна команда": 1,
@@ -17,8 +17,5 @@ export const reverseCategoryMap: Record<number, TeamCategory> = Object.entries(c
   }, {} as Record<number, TeamCategory>);
 
 export const TeamPageAdmin = () => {
-    return (
-        <TeamPageContent></TeamPageContent>
-    );
-}
-
+    return <TeamPageContent></TeamPageContent>;
+};

@@ -1,36 +1,40 @@
 import React, { act } from 'react';
 import {render, screen, fireEvent, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {TeamPageToolbar, TeamPageToolbarProps} from './TeamPageToolbar';
-import {MemberFormValues} from '../member-form/MemberForm';
+import { TeamPageToolbar, TeamPageToolbarProps } from './TeamPageToolbar';
+import { MemberFormValues } from '../member-form/MemberForm';
 
 jest.mock('../../../../../assets/icons/plus.svg', () => 'plus-icon.svg');
 
 jest.mock('../../../../../components/common/modal/Modal', () => {
-    const MockModal = ({children, isOpen, onClose, 'data-testid': testId}: any) => {
+    const MockModal = ({ children, isOpen, onClose, 'data-testid': testId }: any) => {
         if (!isOpen) return null;
 
         return (
             <div data-testid={testId} role="dialog">
-                <div onClick={onClose} data-testid="modal-backdrop" onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        onClose();
-                    }
-                }}/>
+                <div
+                    onClick={onClose}
+                    data-testid="modal-backdrop"
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            onClose();
+                        }
+                    }}
+                />
                 {children}
             </div>
         );
     };
 
-    MockModal.Title = ({children}: any) => <h2 data-testid="modal-title">{children}</h2>;
-    MockModal.Content = ({children}: any) => <div data-testid="modal-content">{children}</div>;
-    MockModal.Actions = ({children}: any) => <div data-testid="modal-actions">{children}</div>;
+    MockModal.Title = ({ children }: any) => <h2 data-testid="modal-title">{children}</h2>;
+    MockModal.Content = ({ children }: any) => <div data-testid="modal-content">{children}</div>;
+    MockModal.Actions = ({ children }: any) => <div data-testid="modal-actions">{children}</div>;
 
-    return {Modal: MockModal};
+    return { Modal: MockModal };
 });
 
 jest.mock('../../../../../components/common/button/Button', () => ({
-    Button: ({children, onClick, buttonStyle, form, type, 'data-testid': testId, ...props}: any) => (
+    Button: ({ children, onClick, buttonStyle, form, type, 'data-testid': testId, ...props }: any) => (
         <button
             onClick={onClick}
             data-button-style={buttonStyle}
@@ -41,28 +45,28 @@ jest.mock('../../../../../components/common/button/Button', () => ({
         >
             {children}
         </button>
-    )
+    ),
 }));
 
 jest.mock('../../../../../components/common/select/Select', () => {
-    const MockSelect = ({children, onValueChange, 'data-testid': testId}: any) => (
+    const MockSelect = ({ children, onValueChange, 'data-testid': testId }: any) => (
         <select data-testid={testId} onChange={(e) => onValueChange?.(e.target.value)}>
             {children}
         </select>
     );
-    MockSelect.Option = ({name, value}: any) => <option value={value}>{name}</option>;
-    return {Select: MockSelect};
+    MockSelect.Option = ({ name, value }: any) => <option value={value}>{name}</option>;
+    return { Select: MockSelect };
 });
 
 jest.mock('../../../../../components/common/input/Input', () => ({
-    Input: ({onChange, autocompleteValues, 'data-testid': testId, ...props}: any) => (
+    Input: ({ onChange, autocompleteValues, 'data-testid': testId, ...props }: any) => (
         <input
             data-testid={testId}
             onChange={(e) => onChange?.(e.target.value)}
             data-autocomplete-values={JSON.stringify(autocompleteValues)}
             {...props}
         />
-    )
+    ),
 }));
 
 // Mock MemberForm with controllable behavior
@@ -96,10 +100,12 @@ jest.mock('../member-form/MemberForm', () => ({
                         });
                     }}
                 />
-                <button type="submit" data-testid="form-submit">Submit Form</button>
+                <button type="submit" data-testid="form-submit">
+                    Submit Form
+                </button>
             </form>
         );
-    }
+    },
 }));
 
 describe('TeamPageToolbar', () => {
@@ -206,8 +212,8 @@ describe('TeamPageToolbar', () => {
             expect(mockMemberForm).toHaveBeenCalledWith(
                 expect.objectContaining({
                     id: 'add-member-modal',
-                    onSubmit: expect.any(Function)
-                })
+                    onSubmit: expect.any(Function),
+                }),
             );
         });
     });
@@ -281,7 +287,7 @@ describe('TeamPageToolbar', () => {
                 category: 'Основна команда',
                 fullName: 'Test User',
                 description: 'Test Description',
-                img: null
+                img: null,
             });
             expect(screen.queryByTestId('publish-confirm-modal')).not.toBeInTheDocument();
             expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
@@ -400,7 +406,7 @@ describe('TeamPageToolbar', () => {
 
     describe('Edge Cases', () => {
         it('handles empty autocomplete values', () => {
-            const props = {...defaultProps, autocompleteValues: []};
+            const props = { ...defaultProps, autocompleteValues: [] };
             render(<TeamPageToolbar {...props} />);
 
             const input = screen.getByTestId('search-input');
@@ -420,4 +426,3 @@ describe('TeamPageToolbar', () => {
         });
     });
 });
-

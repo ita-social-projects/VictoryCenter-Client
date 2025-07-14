@@ -8,9 +8,7 @@ const mockUseAdminContext = useAdminContext as jest.MockedFunction<typeof useAdm
 const mockUseLocation = useLocation as jest.MockedFunction<typeof useLocation>;
 
 jest.mock('react-router', () => ({
-    Navigate: ({ to, replace }: any) => (
-        <div data-testid="navigate" data-to={to} data-replace={String(replace)} />
-    ),
+    Navigate: ({ to, replace }: any) => <div data-testid="navigate" data-to={to} data-replace={String(replace)} />,
     Outlet: () => <div data-testid="outlet" />,
     useLocation: jest.fn(),
 }));

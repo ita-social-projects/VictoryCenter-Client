@@ -1,71 +1,71 @@
 .contact-us-block {
-  position: relative;
-  height: 100vh;
-  width: 100%;
-  
-  video {
+    position: relative;
     height: 100vh;
     width: 100%;
-    position: absolute;
-    object-fit: cover;
-    z-index: 1;
-    pointer-events: none;
-  }
-  
-  .contact-us-info {
-    margin: 0 auto;
-    padding-top: 3.75rem;
-    width: 65rem;
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    
-    .contact-title {
-      font-family: Mulish, sans-serif;
-      font-weight: 700;
-      font-size: 4rem;
-      line-height: 4.5rem;
-      letter-spacing: 0;
-      text-align: center;
-      text-transform: uppercase;
-      color: #FFFFFF;
-      padding-bottom: 19rem;
+
+    video {
+        height: 100vh;
+        width: 100%;
+        position: absolute;
+        object-fit: cover;
+        z-index: 1;
+        pointer-events: none;
     }
-    
-    .contact-button {
-      margin: 0 auto;
-      width: 34rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      gap: 2rem;
-      
-      h4 {
-        font-family: Mulish, sans-serif;
-        font-weight: 500;
-        font-size: 1.125rem;
-        line-height: 1.75rem;
-        letter-spacing: -0.02em;
+
+    .contact-us-info {
+        margin: 0 auto;
+        padding-top: 3.75rem;
+        width: 65rem;
+        position: relative;
+        z-index: 2;
         text-align: center;
-        color: #FFFFFF;
-      }
-      
-      button {
-        border: none;
-        width: 8.125rem;
-        height: 2.5rem;
-        gap: 0.5rem;
-        padding: 0.5rem 1.5rem;
-        background: #FFEF43;
-        font-family: Mulish, sans-serif;
-        font-weight: 400;
-        font-size: 1rem;
-        line-height: 1.5rem;
-        letter-spacing: -0.02em;
-        vertical-align: middle;
-        color: #061125;
-      }
+
+        .contact-title {
+            font-family: Mulish, sans-serif;
+            font-weight: 700;
+            font-size: 4rem;
+            line-height: 4.5rem;
+            letter-spacing: 0;
+            text-align: center;
+            text-transform: uppercase;
+            color: #ffffff;
+            padding-bottom: 19rem;
+        }
+
+        .contact-button {
+            margin: 0 auto;
+            width: 34rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 2rem;
+
+            h4 {
+                font-family: Mulish, sans-serif;
+                font-weight: 500;
+                font-size: 1.125rem;
+                line-height: 1.75rem;
+                letter-spacing: -0.02em;
+                text-align: center;
+                color: #ffffff;
+            }
+
+            button {
+                border: none;
+                width: 8.125rem;
+                height: 2.5rem;
+                gap: 0.5rem;
+                padding: 0.5rem 1.5rem;
+                background: #ffef43;
+                font-family: Mulish, sans-serif;
+                font-weight: 400;
+                font-size: 1rem;
+                line-height: 1.5rem;
+                letter-spacing: -0.02em;
+                vertical-align: middle;
+                color: #061125;
+            }
+        }
     }
-  }
 }

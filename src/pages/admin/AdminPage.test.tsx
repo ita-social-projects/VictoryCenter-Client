@@ -1,7 +1,7 @@
-import {render, waitFor} from '@testing-library/react';
-import {AdminPage} from './AdminPage';
+import { render, waitFor } from '@testing-library/react';
+import { AdminPage } from './AdminPage';
 import * as AdminPageDataFetchModule from '../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch';
-import {MemoryRouter} from "react-router";
+import { MemoryRouter } from 'react-router';
 
 const spyAdminPageDataFetch = jest.spyOn(AdminPageDataFetchModule, 'adminPageDataFetch');
 
@@ -26,7 +26,12 @@ describe('AdminPageContent', () => {
     });
 
     it('renders the component', async () => {
-        const {container} = render(<MemoryRouter> <AdminPage/></MemoryRouter>);
+        const { container } = render(
+            <MemoryRouter>
+                {' '}
+                <AdminPage />
+            </MemoryRouter>,
+        );
 
         const header = container.querySelector('.header');
         const content = container.querySelector('.content');

@@ -85,7 +85,7 @@ describe('resolveWithNewToken', () => {
     it('awaits refreshAccessToken, sets header, and returns config', async () => {
         refreshAccessToken.mockResolvedValueOnce();
         const cfg = {} as InternalAxiosRequestConfig;
-        
+
         const result = await handler({ ...cfg });
 
         expect(refreshAccessToken).toHaveBeenCalledTimes(1);
@@ -98,7 +98,7 @@ describe('resolveWithNewToken', () => {
         const cfg = { headers: {} } as InternalAxiosRequestConfig;
 
         await expect(handler({ ...cfg })).rejects.toThrow(error);
-        
+
         expect(logout).toHaveBeenCalledTimes(1);
     });
 });

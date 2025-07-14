@@ -1,10 +1,5 @@
-import axios, {
-    AxiosError,
-    AxiosInstance,
-    AxiosRequestConfig,
-    InternalAxiosRequestConfig,
-} from 'axios';
-import { resolveWithNewTokenConcurrent } from '../resolveWithNewToken/resolveWithNewToken';
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+import { resolveWithNewTokenConcurrent } from '../resolve-with-new-token/resolveWithNewToken';
 
 export function CreateAdminClient(
     baseURL: string,
@@ -12,7 +7,7 @@ export function CreateAdminClient(
     getAccessToken: () => string,
     refreshAccessToken: () => Promise<void>,
     logout: () => void,
-    refreshHandler = resolveWithNewTokenConcurrent(refreshAccessToken, getAccessToken, logout)
+    refreshHandler = resolveWithNewTokenConcurrent(refreshAccessToken, getAccessToken, logout),
 ): AxiosInstance {
     const client = axios.create({
         baseURL: baseURL,
@@ -41,7 +36,7 @@ export function CreateAdminClient(
             }
 
             return Promise.reject(error);
-        }
+        },
     );
 
     return client;

@@ -24,15 +24,11 @@ describe('getEnvVariable', () => {
 
     it('throws if neither env var nor fallback is provided', () => {
         process.env.TEST_VAR = undefined;
-        expect(() => getEnvVariable('TEST_VAR')).toThrowError(
-            'Missing environment variable: TEST_VAR'
-        );
+        expect(() => getEnvVariable('TEST_VAR')).toThrowError('Missing environment variable: TEST_VAR');
     });
-    
+
     it('throws if fallback is empty string', () => {
         process.env.TEST_VAR = undefined;
-        expect(() => getEnvVariable('TEST_VAR', '')).toThrowError(
-            'Missing environment variable: TEST_VAR'
-        );
+        expect(() => getEnvVariable('TEST_VAR', '')).toThrowError('Missing environment variable: TEST_VAR');
     });
 });

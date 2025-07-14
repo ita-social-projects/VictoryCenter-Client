@@ -1,8 +1,7 @@
 import React from 'react';
-import {render, screen, fireEvent, createEvent} from '@testing-library/react';
+import { render, screen, fireEvent, createEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemberForm, MemberFormProps, MemberFormValues } from './MemberForm';
-
 
 jest.mock('../../../../../assets/icons/cloud-download.svg', () => 'cloud-download.svg');
 
@@ -14,7 +13,6 @@ describe('MemberForm', () => {
         existingMemberFormValues: null,
     };
 
-
     beforeEach(() => {
         jest.clearAllMocks();
     });
@@ -23,7 +21,7 @@ describe('MemberForm', () => {
         render(<MemberForm {...defaultProps} />);
 
         expect(screen.getByLabelText('Категорія')).toBeInTheDocument();
-        expect(screen.getByLabelText('Ім\'я та Прізвище')).toBeInTheDocument();
+        expect(screen.getByLabelText("Ім'я та Прізвище")).toBeInTheDocument();
         expect(screen.getByLabelText('Опис')).toBeInTheDocument();
         expect(screen.getByText('Фото')).toBeInTheDocument();
     });
@@ -45,13 +43,13 @@ describe('MemberForm', () => {
     it('updates form values and calls onValuesChange on input change', async () => {
         render(<MemberForm {...defaultProps} />);
 
-        const fullNameInput = screen.getByLabelText('Ім\'я та Прізвище');
+        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         fireEvent.change(fullNameInput, { target: { value: 'Jane Doe' } });
 
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
             expect.objectContaining({
                 fullName: 'Jane Doe',
-            })
+            }),
         );
     });
 
@@ -64,7 +62,7 @@ describe('MemberForm', () => {
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
             expect.objectContaining({
                 category: 'Наглядова рада',
-            })
+            }),
         );
     });
 
@@ -77,7 +75,7 @@ describe('MemberForm', () => {
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
             expect.objectContaining({
                 description: 'New description',
-            })
+            }),
         );
     });
 
@@ -85,7 +83,7 @@ describe('MemberForm', () => {
         render(<MemberForm {...defaultProps} />);
 
         const categorySelect = screen.getByLabelText('Категорія');
-        const fullNameInput = screen.getByLabelText('Ім\'я та Прізвище');
+        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         const descriptionTextarea = screen.getByLabelText('Опис');
 
         fireEvent.change(categorySelect, { target: { value: 'Радники' } });
@@ -99,14 +97,14 @@ describe('MemberForm', () => {
             category: 'Радники',
             fullName: 'Jane Doe',
             description: 'Test description',
-            img: null
+            img: null,
         });
     });
 
     it('displays character count for fullName', async () => {
         render(<MemberForm {...defaultProps} />);
 
-        const fullNameInput = screen.getByLabelText('Ім\'я та Прізвище');
+        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         await userEvent.type(fullNameInput, 'Jane Doe');
 
         expect(screen.getByText('8/50')).toBeInTheDocument();
@@ -143,7 +141,7 @@ describe('MemberForm', () => {
     it('renders with correct input attributes', () => {
         render(<MemberForm {...defaultProps} />);
 
-        const fullNameInput = screen.getByLabelText('Ім\'я та Прізвище');
+        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         expect(fullNameInput).toHaveAttribute('maxLength', '50');
 
         const descriptionTextarea = screen.getByLabelText('Опис');
@@ -197,7 +195,7 @@ describe('MemberForm - Additional Coverage', () => {
 
         render(<MemberForm {...propsWithoutOnValuesChange} />);
 
-        const fullNameInput = screen.getByLabelText('Ім\'я та Прізвище');
+        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         fireEvent.change(fullNameInput, { target: { value: 'Jane Doe' } });
 
         expect(fullNameInput).toHaveValue('Jane Doe');
@@ -222,17 +220,17 @@ describe('MemberForm - Additional Coverage', () => {
     it('handles file input change without files (edge case)', () => {
         render(<MemberForm {...defaultProps} />);
 
-        const fullNameInput = screen.getByLabelText('Ім\'я та Прізвище');
+        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
 
         fireEvent.change(fullNameInput, {
             target: { name: 'fullName', value: 'Test Name' },
-            currentTarget: { files: null }
+            currentTarget: { files: null },
         });
 
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
             expect.objectContaining({
                 fullName: 'Test Name',
-            })
+            }),
         );
     });
 
@@ -243,7 +241,7 @@ describe('MemberForm - Additional Coverage', () => {
 
         const mockEvent = {
             target: { name: 'img', value: null },
-            currentTarget: { files: { length: 0 } }
+            currentTarget: { files: { length: 0 } },
         };
 
         fireEvent.change(fileInput, mockEvent);
@@ -251,7 +249,7 @@ describe('MemberForm - Additional Coverage', () => {
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
             expect.objectContaining({
                 img: null,
-            })
+            }),
         );
     });
 
@@ -271,8 +269,8 @@ describe('MemberForm - Additional Coverage', () => {
 
         Object.defineProperty(dropEvent, 'dataTransfer', {
             value: {
-                files: []
-            }
+                files: [],
+            },
         });
 
         dropEvent.preventDefault = jest.fn();
@@ -326,7 +324,7 @@ describe('MemberForm - Extra Function Coverage', () => {
 
     it('does not submit if category is empty', () => {
         render(<MemberForm {...defaultProps} />);
-        const fullNameInput = screen.getByLabelText('Ім\'я та Прізвище');
+        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         const descriptionTextarea = screen.getByLabelText('Опис');
         fireEvent.change(fullNameInput, { target: { value: 'Test' } });
         fireEvent.change(descriptionTextarea, { target: { value: 'Test desc' } });
@@ -349,7 +347,7 @@ describe('MemberForm - Extra Function Coverage', () => {
     it('does not submit if description is empty', () => {
         render(<MemberForm {...defaultProps} />);
         const categorySelect = screen.getByLabelText('Категорія');
-        const fullNameInput = screen.getByLabelText('Ім\'я та Прізвище');
+        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         fireEvent.change(categorySelect, { target: { value: 'Основна команда' } });
         fireEvent.change(fullNameInput, { target: { value: 'Test' } });
         const form = screen.getByTestId('test-form');
@@ -362,7 +360,7 @@ describe('MemberForm - Extra Function Coverage', () => {
         const dropArea = screen.getByTestId('drop-area');
         const dropEvent = {
             preventDefault: jest.fn(),
-            dataTransfer: { files: null }
+            dataTransfer: { files: null },
         };
         fireEvent.drop(dropArea, dropEvent);
         expect(screen.getByText('0/50')).toBeInTheDocument();
@@ -384,14 +382,14 @@ describe('MemberForm - Extra Function Coverage', () => {
         // Not directly possible, but we can check that the effect is not called if onValuesChange is not provided (already covered)
         // So this is just for completeness
         render(<MemberForm {...defaultProps} onValuesChange={undefined} />);
-        const fullNameInput = screen.getByLabelText('Ім\'я та Прізвище');
+        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         fireEvent.change(fullNameInput, { target: { value: 'Test' } });
         expect(fullNameInput).toHaveValue('Test');
     });
 
     it('enforces max length for fullName and description', async () => {
         render(<MemberForm {...defaultProps} />);
-        const fullNameInput = screen.getByLabelText('Ім\'я та Прізвище');
+        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         const descriptionTextarea = screen.getByLabelText('Опис');
         const longName = 'a'.repeat(60);
         const longDesc = 'b'.repeat(250);
@@ -416,4 +414,3 @@ describe('MemberForm - Extra Function Coverage', () => {
         expect(imageLoadedSection?.children).toHaveLength(1);
     });
 });
-

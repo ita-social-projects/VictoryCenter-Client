@@ -37,7 +37,7 @@ describe('<LoginForm />', () => {
         render(
             <MemoryRouter>
                 <LoginForm setShowErrorModal={jest.fn()} />
-            </MemoryRouter>
+            </MemoryRouter>,
         );
 
         const logo = screen.getByAltText(LOGO_ALT) as HTMLImageElement;
@@ -48,7 +48,7 @@ describe('<LoginForm />', () => {
 
         const emailInput = screen.getByLabelText(EMAIL_FIELD_LABEL) as HTMLInputElement;
         expect(emailInput.value).toBe('');
-        
+
         const passwordInput = screen.getByLabelText(PASSWORD_FIELD_LABEL) as HTMLInputElement;
         expect(passwordInput.value).toBe('');
         expect(passwordInput.type).toBe('password');
@@ -64,7 +64,7 @@ describe('<LoginForm />', () => {
         render(
             <MemoryRouter>
                 <LoginForm setShowErrorModal={jest.fn()} />
-            </MemoryRouter>
+            </MemoryRouter>,
         );
 
         const emailInput = screen.getByLabelText(EMAIL_FIELD_LABEL) as HTMLInputElement;
@@ -85,7 +85,7 @@ describe('<LoginForm />', () => {
         render(
             <MemoryRouter>
                 <LoginForm setShowErrorModal={jest.fn()} />
-            </MemoryRouter>
+            </MemoryRouter>,
         );
 
         const passwordInput = screen.getByLabelText(PASSWORD_FIELD_LABEL) as HTMLInputElement;
@@ -93,7 +93,6 @@ describe('<LoginForm />', () => {
             name: EYE_CLOSED_ALT,
         });
 
-        
         fireEvent.click(toggleBtn);
         expect(passwordInput.type).toBe('text');
         expect(screen.getByRole('button', { name: EYE_OPENED_ALT })).toBeInTheDocument();
@@ -110,7 +109,7 @@ describe('<LoginForm />', () => {
         render(
             <MemoryRouter>
                 <LoginForm setShowErrorModal={setShowErrorModal} />
-            </MemoryRouter>
+            </MemoryRouter>,
         );
 
         fireEvent.change(screen.getByLabelText(EMAIL_FIELD_LABEL), {
@@ -126,7 +125,7 @@ describe('<LoginForm />', () => {
             expect(loginMock).toHaveBeenCalledWith({
                 email: 'a@b.com',
                 password: 'secret',
-            })
+            }),
         );
         expect(setShowErrorModal).not.toHaveBeenCalled();
     });
@@ -138,7 +137,7 @@ describe('<LoginForm />', () => {
         render(
             <MemoryRouter>
                 <LoginForm setShowErrorModal={setShowErrorModal} />
-            </MemoryRouter>
+            </MemoryRouter>,
         );
 
         fireEvent.click(screen.getByRole('button', { name: SUBMIT_BUTTON }));

@@ -40,12 +40,12 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="form" spellCheck={false}>
+        <form onSubmit={handleSubmit} className="login-form" spellCheck={false}>
             <NavLink to="/" className="logo">
                 <img src={Logo} alt={LOGO_ALT} />
             </NavLink>
-            <h2 className="form-title">{FORM_TITLE}</h2>
-            <div className="form-group">
+            <h2 className="login-form-title">{FORM_TITLE}</h2>
+            <div className="login-form-group">
                 <label htmlFor="email">{EMAIL_FIELD_LABEL}</label>
                 <input
                     id="email"
@@ -58,7 +58,7 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
                 />
             </div>
 
-            <div className="form-group">
+            <div className="login-form-group">
                 <label htmlFor="password">{PASSWORD_FIELD_LABEL}</label>
                 <div className="password-input-container">
                     <input
@@ -73,9 +73,7 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
                     <button
                         type="button"
                         className="visibility-toggle"
-                        onClick={() =>
-                            setIsPasswordVisible((isPasswordVisible) => !isPasswordVisible)
-                        }
+                        onClick={() => setIsPasswordVisible((isPasswordVisible) => !isPasswordVisible)}
                     >
                         <img
                             src={isPasswordVisible ? EyeOpened : EyeClosed}
@@ -85,7 +83,7 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
                     </button>
                 </div>
             </div>
-            <div className="form-group">
+            <div className="login-form-group">
                 <Button type="submit" buttonStyle="primary" className="submit-button">
                     {SUBMIT_BUTTON}
                 </Button>

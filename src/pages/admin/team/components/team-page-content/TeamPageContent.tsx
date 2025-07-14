@@ -3,11 +3,11 @@ import {StatusFilter, TeamPageToolbar} from "../team-page-toolbar/TeamPageToolba
 import {MembersList} from "../members-list/MembersList";
 import {MemberFormValues} from "../member-form/MemberForm";
 import {TeamMembersApi} from "../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi";
-import { useAdminClient } from "../../../../../utils/hooks/useAdminClient/useAdminClient";
+import { useAdminClient } from "../../../../../utils/hooks/use-admin-client/useAdminClient";
 
 export const TeamPageContent = () => {
     const [searchByNameQuery, setSearchByNameQuery] = useState<string>('');
-    const [statusFilter, setStatusFilter] = useState<StatusFilter>("Усі");
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>('Усі');
     const [autocompleteValues, setAutocompleteValues] = useState<string[]>([]);
     const [refetchKey, setRefetchKey] = useState(0);
 
@@ -36,7 +36,7 @@ export const TeamPageContent = () => {
     }
 
     return (
-        <div className='wrapper'>
+        <div className="wrapper">
             <TeamPageToolbar
                 autocompleteValues={autocompleteValues}
                 onSearchQueryChange={handleSearchQueryByName}
@@ -52,5 +52,4 @@ export const TeamPageContent = () => {
             />
         </div>
     );
-}
-
+};

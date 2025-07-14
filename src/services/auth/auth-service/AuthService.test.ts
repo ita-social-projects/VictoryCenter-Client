@@ -1,10 +1,4 @@
-import {
-    isAccessTokenValid,
-    isTokenExpired,
-    hasValidStructure,
-    getTokenPayload,
-    decodeToken,
-} from './AuthService';
+import { isAccessTokenValid, isTokenExpired, hasValidStructure, getTokenPayload, decodeToken } from './AuthService';
 import { JwtPayload } from '../../../types/Auth';
 
 describe('AuthService functions', () => {
@@ -14,9 +8,7 @@ describe('AuthService functions', () => {
     const malformedExpPayload: JwtPayload = {};
 
     function createToken(payload: object): string {
-        const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString(
-            'base64url'
-        );
+        const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
         const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
         return `${header}.${body}.signature`;
     }
@@ -61,9 +53,8 @@ describe('AuthService functions', () => {
 
         it('returns false if token is empty or malformed', () => {
             expect(hasValidStructure('')).toBe(false);
-
-            const token = createToken(malformedExpPayload);
-            expect(isAccessTokenValid(token)).toBe(false);
+            expect(hasValidStructure('invalid')).toBe(false);
+            expect(hasValidStructure('invalid.token')).toBe(false);
         });
     });
 

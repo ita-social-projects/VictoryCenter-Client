@@ -1,11 +1,11 @@
-import PlusIcon from "../../../../../assets/icons/plus.svg";
-import React, {useState, useCallback} from "react";
-import {Modal} from "../../../../../components/common/modal/Modal";
-import {TeamCategory} from "../../TeamPage";
-import {Button} from "../../../../../components/common/button/Button";
-import {Select} from "../../../../../components/common/select/Select";
-import {Input} from "../../../../../components/common/input/Input";
-import {MemberForm, MemberFormValues} from "../member-form/MemberForm";
+import PlusIcon from '../../../../../assets/icons/plus.svg';
+import React, { useState, useCallback } from 'react';
+import { Modal } from '../../../../../components/common/modal/Modal';
+import { TeamCategory } from '../../TeamPage';
+import { Button } from '../../../../../components/common/button/Button';
+import { Select } from '../../../../../components/common/select/Select';
+import { Input } from '../../../../../components/common/input/Input';
+import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
 import {
     TEAM_ADD_MEMBER,
     TEAM_SAVE_AS_DRAFT,
@@ -17,7 +17,7 @@ import {
     TEAM_STATUS_ALL,
     TEAM_STATUS_PUBLISHED,
     TEAM_STATUS_DRAFT,
-    SEARCH_BY_NAME
+    SEARCH_BY_NAME,
 } from '../../../../../const/team';
 
 export type TeamPageToolbarProps = {
@@ -28,7 +28,7 @@ export type TeamPageToolbarProps = {
     onMemberSaveDraft?: (member: MemberFormValues) => void;
 };
 
-export type StatusFilter = "Усі" | "Опубліковано" | "Чернетка";
+export type StatusFilter = 'Усі' | 'Опубліковано' | 'Чернетка';
 
 type ModalState = {
     addMember: boolean;
@@ -91,10 +91,10 @@ const AddMemberModal = ({
 );
 
 const ConfirmPublishModal = ({
-                                 isOpen,
-                                 onCancel,
-                                 onConfirm,
-                             }: {
+    isOpen,
+    onCancel,
+    onConfirm,
+}: {
     isOpen: boolean;
     onCancel: () => void;
     onConfirm: () => void;
@@ -116,10 +116,10 @@ const ConfirmPublishModal = ({
 );
 
 const ConfirmCloseModal = ({
-                               isOpen,
-                               onCancel,
-                               onConfirm,
-                           }: {
+    isOpen,
+    onCancel,
+    onConfirm,
+}: {
     isOpen: boolean;
     onCancel: () => void;
     onConfirm: () => void;
@@ -141,12 +141,12 @@ const ConfirmCloseModal = ({
 );
 
 export const TeamPageToolbar = ({
-                                    onSearchQueryChange,
-                                    onStatusFilterChange,
-                                    autocompleteValues,
-                                    onMemberPublish,
-                                    onMemberSaveDraft,
-                                }: TeamPageToolbarProps) => {
+    onSearchQueryChange,
+    onStatusFilterChange,
+    autocompleteValues,
+    onMemberPublish,
+    onMemberSaveDraft,
+}: TeamPageToolbarProps) => {
     const [modalState, setModalState] = useState<ModalState>({
         addMember: false,
         confirmPublish: false,
@@ -157,15 +157,13 @@ export const TeamPageToolbar = ({
     const [formData, setFormData] = useState<MemberFormValues | null>(null);
 
     const updateModalState = useCallback((updates: Partial<ModalState>) => {
-        setModalState(prev => ({...prev, ...updates}));
+        setModalState((prev) => ({ ...prev, ...updates }));
     }, []);
 
     const hasUnsavedChanges = useCallback(() => {
-        return formData !== null && (
-            formData.img !== null ||
-            !!formData.category ||
-            !!formData.fullName ||
-            !!formData.description
+        return (
+            formData !== null &&
+            (formData.img !== null || !!formData.category || !!formData.fullName || !!formData.description)
         );
     }, [formData]);
 
@@ -180,23 +178,29 @@ export const TeamPageToolbar = ({
     }, []);
 
     const handleOpenAddMember = useCallback(() => {
-        updateModalState({addMember: true});
+        updateModalState({ addMember: true });
     }, [updateModalState]);
 
-    const handleFormSubmit = useCallback((member: MemberFormValues) => {
-        setPendingMemberData(member);
-        setFormData(member);
-        updateModalState({confirmPublish: true});
-    }, [updateModalState]);
+    const handleFormSubmit = useCallback(
+        (member: MemberFormValues) => {
+            setPendingMemberData(member);
+            setFormData(member);
+            updateModalState({ confirmPublish: true });
+        },
+        [updateModalState],
+    );
 
-    const handleSaveAsDraft = useCallback((member: MemberFormValues) => {
-        onMemberSaveDraft?.(member);
-        resetState();
-    }, [onMemberSaveDraft, resetState]);
+    const handleSaveAsDraft = useCallback(
+        (member: MemberFormValues) => {
+            onMemberSaveDraft?.(member);
+            resetState();
+        },
+        [onMemberSaveDraft, resetState],
+    );
 
     const handleCancelPublish = useCallback(() => {
         setPendingMemberData(null);
-        updateModalState({confirmPublish: false});
+        updateModalState({ confirmPublish: false });
     }, [updateModalState]);
 
     const handleConfirmPublish = useCallback(() => {
@@ -208,26 +212,29 @@ export const TeamPageToolbar = ({
 
     const handleCloseAddMember = useCallback(() => {
         if (hasUnsavedChanges()) {
-            updateModalState({confirmClose: true});
+            updateModalState({ confirmClose: true });
         } else {
             resetState();
         }
     }, [hasUnsavedChanges, updateModalState, resetState]);
 
     const handleCancelClose = useCallback(() => {
-        updateModalState({confirmClose: false});
+        updateModalState({ confirmClose: false });
     }, [updateModalState]);
 
     const handleConfirmClose = useCallback(() => {
         resetState();
     }, [resetState]);
 
-    const getInternalState = useCallback(() => ({
-        modalState,
-        pendingMemberData,
-        formData,
-        hasUnsavedChanges: hasUnsavedChanges(),
-    }), [modalState, pendingMemberData, formData, hasUnsavedChanges]);
+    const getInternalState = useCallback(
+        () => ({
+            modalState,
+            pendingMemberData,
+            formData,
+            hasUnsavedChanges: hasUnsavedChanges(),
+        }),
+        [modalState, pendingMemberData, formData, hasUnsavedChanges],
+    );
 
     if (process.env.NODE_ENV === 'test') {
         (TeamPageToolbar as any).getInternalState = getInternalState;
@@ -243,21 +250,17 @@ export const TeamPageToolbar = ({
                         }}
                         autocompleteValues={autocompleteValues}
                         data-testid="search-input"
-                        placeholder={SEARCH_BY_NAME}/>
+                        placeholder={SEARCH_BY_NAME}
+                    />
                 </div>
                 <div className="toolbar-actions">
                     <Select onValueChange={onStatusFilterChange} data-testid="status-filter">
-                        <Select.Option key={1} name={TEAM_STATUS_ALL} value={TEAM_STATUS_ALL}/>
-                        <Select.Option key={2} name={TEAM_STATUS_PUBLISHED} value={TEAM_STATUS_PUBLISHED}/>
-                        <Select.Option key={3} name={TEAM_STATUS_DRAFT} value={TEAM_STATUS_DRAFT}/>
+                        <Select.Option key={1} name={TEAM_STATUS_ALL} value={TEAM_STATUS_ALL} />
+                        <Select.Option key={2} name={TEAM_STATUS_PUBLISHED} value={TEAM_STATUS_PUBLISHED} />
+                        <Select.Option key={3} name={TEAM_STATUS_DRAFT} value={TEAM_STATUS_DRAFT} />
                     </Select>
-                    <Button
-                        onClick={handleOpenAddMember}
-                        buttonStyle="primary"
-                        data-testid="add-member-button"
-                    >
-                        {TEAM_ADD_MEMBER}{' '}
-                        <img src={PlusIcon} alt="plus"/>
+                    <Button onClick={handleOpenAddMember} buttonStyle="primary" data-testid="add-member-button">
+                        {TEAM_ADD_MEMBER} <img src={PlusIcon} alt="plus" />
                     </Button>
                 </div>
             </div>
@@ -285,4 +288,3 @@ export const TeamPageToolbar = ({
         </>
     );
 };
-

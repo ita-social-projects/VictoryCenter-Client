@@ -44,7 +44,7 @@ describe('CreateAdminClient', () => {
                     ...(cfg.headers ?? {}),
                     Authorization: `Bearer ${newToken}`,
                 },
-            })
+            }),
         ) as jest.Mock<Promise<InternalAxiosRequestConfig>, [InternalAxiosRequestConfig]>;
     });
 
@@ -54,7 +54,7 @@ describe('CreateAdminClient', () => {
             () => true,
             () => token,
             async () => {},
-            () => {}
+            () => {},
         );
         expect(mockedAxios.create).toHaveBeenCalledWith({
             baseURL,
@@ -70,10 +70,10 @@ describe('CreateAdminClient', () => {
                 () => token,
                 async () => {},
                 () => {},
-                handlerMock
+                handlerMock,
             );
             const [interceptor] = requestUse.mock.calls[0];
-            const cfg = { } as InternalAxiosRequestConfig;
+            const cfg = {} as InternalAxiosRequestConfig;
             expect(interceptor(cfg)).toEqual({
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -86,7 +86,7 @@ describe('CreateAdminClient', () => {
                 () => token,
                 async () => {},
                 () => {},
-                handlerMock
+                handlerMock,
             );
             const [interceptor] = requestUse.mock.calls[0];
             const cfg = { headers: {} } as InternalAxiosRequestConfig;
@@ -108,7 +108,7 @@ describe('CreateAdminClient', () => {
                 () => token,
                 async () => {},
                 () => {},
-                handlerMock
+                handlerMock,
             );
             [successHandler, errorHandler] = responseUse.mock.calls[0];
         });
@@ -136,7 +136,7 @@ describe('CreateAdminClient', () => {
             expect(fakeClient.request).toHaveBeenCalledWith(
                 expect.objectContaining({
                     headers: { Authorization: `Bearer ${newToken}` },
-                })
+                }),
             );
         });
 

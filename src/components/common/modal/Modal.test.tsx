@@ -1,7 +1,7 @@
 import React from 'react';
-import {render, screen, fireEvent, waitFor} from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {Modal} from './Modal';
+import { Modal } from './Modal';
 
 const mockOnClose = jest.fn();
 
@@ -24,7 +24,7 @@ describe('Modal Component', () => {
                 <Modal.Title>Title</Modal.Title>
                 <Modal.Content>Content</Modal.Content>
                 <Modal.Actions>Actions</Modal.Actions>
-            </Modal>
+            </Modal>,
         );
         expect(screen.queryByTestId('modal-overlay')).not.toBeInTheDocument();
         expect(document.querySelector('.modal-container')).toBeNull();
@@ -36,7 +36,7 @@ describe('Modal Component', () => {
                 <Modal.Title>Modal Title</Modal.Title>
                 <Modal.Content>Modal Content</Modal.Content>
                 <Modal.Actions>Modal Actions</Modal.Actions>
-            </Modal>
+            </Modal>,
         );
         expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
         expect(screen.getByText('Modal Title')).toBeInTheDocument();
@@ -50,7 +50,7 @@ describe('Modal Component', () => {
             <Modal {...defaultProps} width="500px" maxWidth="800px">
                 <Modal.Title>Title</Modal.Title>
                 <Modal.Content>Content</Modal.Content>
-            </Modal>
+            </Modal>,
         );
         const modalContainer = document.querySelector('.modal-container');
         expect(modalContainer).toHaveStyle({
@@ -64,7 +64,7 @@ describe('Modal Component', () => {
             <Modal {...defaultProps} width={400}>
                 <Modal.Title>Title</Modal.Title>
                 <Modal.Content>Content</Modal.Content>
-            </Modal>
+            </Modal>,
         );
         const modalContainer = document.querySelector('.modal-container');
         expect(modalContainer).toHaveStyle({
@@ -78,7 +78,7 @@ describe('Modal Component', () => {
             <Modal {...defaultProps}>
                 <Modal.Title>Title</Modal.Title>
                 <Modal.Content>Content</Modal.Content>
-            </Modal>
+            </Modal>,
         );
         await userEvent.click(screen.getByTestId('modal-overlay'));
         expect(mockOnClose).toHaveBeenCalledTimes(1);
@@ -89,7 +89,7 @@ describe('Modal Component', () => {
             <Modal {...defaultProps}>
                 <Modal.Title>Title</Modal.Title>
                 <Modal.Content>Content</Modal.Content>
-            </Modal>
+            </Modal>,
         );
         const closeButton = document.querySelector('.close-icon button');
         expect(closeButton).toBeInTheDocument();
@@ -102,9 +102,9 @@ describe('Modal Component', () => {
             <Modal {...defaultProps}>
                 <Modal.Title>Title</Modal.Title>
                 <Modal.Content>Content</Modal.Content>
-            </Modal>
+            </Modal>,
         );
-        fireEvent.keyDown(document, {key: 'Escape'});
+        fireEvent.keyDown(document, { key: 'Escape' });
         await waitFor(() => {
             expect(mockOnClose).toHaveBeenCalledTimes(1);
         });
@@ -115,13 +115,13 @@ describe('Modal Component', () => {
             <Modal {...defaultProps}>
                 <Modal.Title>Title</Modal.Title>
                 <Modal.Content>Content</Modal.Content>
-            </Modal>
+            </Modal>,
         );
         const overlay = screen.getByTestId('modal-overlay');
-        fireEvent.keyDown(overlay, {key: 'Enter'});
+        fireEvent.keyDown(overlay, { key: 'Enter' });
         expect(mockOnClose).toHaveBeenCalledTimes(1);
         jest.clearAllMocks();
-        fireEvent.keyDown(overlay, {key: ' '});
+        fireEvent.keyDown(overlay, { key: ' ' });
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
@@ -130,7 +130,7 @@ describe('Modal Component', () => {
             <Modal {...defaultProps}>
                 <Modal.Title>Title</Modal.Title>
                 <Modal.Content>Content</Modal.Content>
-            </Modal>
+            </Modal>,
         );
         const modalContainer = document.querySelector('.modal-container');
         await userEvent.click(modalContainer!);
@@ -142,42 +142,41 @@ describe('Modal Component', () => {
             <Modal {...defaultProps}>
                 <Modal.Title>Title</Modal.Title>
                 <Modal.Content>Content</Modal.Content>
-            </Modal>
+            </Modal>,
         );
         const modalContainer = document.querySelector('.modal-container');
-        fireEvent.keyDown(modalContainer!, {key: 'Enter'});
-        fireEvent.keyDown(modalContainer!, {key: ' '});
+        fireEvent.keyDown(modalContainer!, { key: 'Enter' });
+        fireEvent.keyDown(modalContainer!, { key: ' ' });
         expect(mockOnClose).not.toHaveBeenCalled();
     });
 
     test('renders without title, content, or actions when not provided', () => {
         render(<Modal {...defaultProps} />);
         expect(screen.getByTestId('modal-overlay')).toBeInTheDocument();
-        expect(document.querySelector('.modal-header-text')?.textContent).toBe("");
-        expect(document.querySelector('.modal-body')?.textContent).toBe("");
-        expect(document.querySelector('.modal-footer')?.textContent).toBe("");
+        expect(document.querySelector('.modal-header-text')?.textContent).toBe('');
+        expect(document.querySelector('.modal-body')?.textContent).toBe('');
+        expect(document.querySelector('.modal-footer')?.textContent).toBe('');
     });
 
     test('adds and removes keydown event listener and body overflow based on isOpen', () => {
         const addEventListenerSpy = jest.spyOn(document, 'addEventListener');
         const removeEventListenerSpy = jest.spyOn(document, 'removeEventListener');
-        const {rerender} = render(<Modal {...defaultProps} />);
+        const { rerender } = render(<Modal {...defaultProps} />);
         expect(addEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
         expect(document.body.style.overflow).toBe('hidden');
-        rerender(<Modal {...defaultProps} isOpen={false}/>);
+        rerender(<Modal {...defaultProps} isOpen={false} />);
         expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
         expect(document.body.style.overflow).not.toBe('hidden');
     });
-
 
     test('does not call onClose for other keys on overlay', () => {
         render(
             <Modal {...defaultProps}>
                 <Modal.Title>Title</Modal.Title>
-            </Modal>
+            </Modal>,
         );
         const overlay = screen.getByTestId('modal-overlay');
-        fireEvent.keyDown(overlay, {key: 'Tab'});
+        fireEvent.keyDown(overlay, { key: 'Tab' });
         expect(mockOnClose).not.toHaveBeenCalled();
     });
 
@@ -185,29 +184,29 @@ describe('Modal Component', () => {
         render(
             <Modal {...defaultProps}>
                 <Modal.Title>Title</Modal.Title>
-            </Modal>
+            </Modal>,
         );
         const modalContainer = document.querySelector('.modal-container');
-        fireEvent.keyDown(modalContainer!, {key: 'Tab'});
+        fireEvent.keyDown(modalContainer!, { key: 'Tab' });
         expect(mockOnClose).not.toHaveBeenCalled();
     });
 
     test('restores previous body overflow style after close', () => {
         document.body.style.overflow = 'scroll';
-        const {rerender} = render(<Modal {...defaultProps} isOpen={true}/>);
+        const { rerender } = render(<Modal {...defaultProps} isOpen={true} />);
         expect(document.body.style.overflow).toBe('hidden');
-        rerender(<Modal {...defaultProps} isOpen={false}/>);
+        rerender(<Modal {...defaultProps} isOpen={false} />);
         expect(document.body.style.overflow).toBe('scroll');
     });
 
     test('multiple modals do not interfere with each other', () => {
         const onClose1 = jest.fn();
         const onClose2 = jest.fn();
-        const {rerender} = render(
+        const { rerender } = render(
             <>
                 <Modal isOpen={true} onClose={onClose1} />
                 <Modal isOpen={true} onClose={onClose2} />
-            </>
+            </>,
         );
         // Both overlays present
         expect(document.querySelectorAll('.modal-overlay').length).toBe(2);
@@ -216,7 +215,7 @@ describe('Modal Component', () => {
             <>
                 <Modal isOpen={false} onClose={onClose1} />
                 <Modal isOpen={true} onClose={onClose2} />
-            </>
+            </>,
         );
         expect(document.querySelectorAll('.modal-overlay').length).toBe(1);
         // Close both
@@ -224,7 +223,7 @@ describe('Modal Component', () => {
             <>
                 <Modal isOpen={false} onClose={onClose1} />
                 <Modal isOpen={false} onClose={onClose2} />
-            </>
+            </>,
         );
         expect(document.querySelectorAll('.modal-overlay').length).toBe(0);
     });
@@ -232,14 +231,21 @@ describe('Modal Component', () => {
     test('handles Modal.Title/Content/Actions as fragments and arrays', () => {
         render(
             <Modal {...defaultProps}>
-                <Modal.Title><><span>Fragment Title</span></></Modal.Title>
+                <Modal.Title>
+                    <>
+                        <span>Fragment Title</span>
+                    </>
+                </Modal.Title>
                 <Modal.Content>{[<span key="c">Array Content</span>]}</Modal.Content>
-                <Modal.Actions><><span>Fragment Actions</span></></Modal.Actions>
-            </Modal>
+                <Modal.Actions>
+                    <>
+                        <span>Fragment Actions</span>
+                    </>
+                </Modal.Actions>
+            </Modal>,
         );
         expect(screen.getByText('Fragment Title')).toBeInTheDocument();
         expect(screen.getByText('Array Content')).toBeInTheDocument();
         expect(screen.getByText('Fragment Actions')).toBeInTheDocument();
     });
 });
-

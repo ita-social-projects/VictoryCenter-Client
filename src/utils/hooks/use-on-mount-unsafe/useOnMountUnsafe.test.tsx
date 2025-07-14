@@ -24,7 +24,7 @@ describe('useOnMountUnsafe', () => {
         render(
             <StrictMode>
                 <TestComponent effect={effect} />
-            </StrictMode>
+            </StrictMode>,
         );
 
         expect(effect).toHaveBeenCalledTimes(1);

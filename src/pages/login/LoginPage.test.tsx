@@ -1,10 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { LoginPage } from './LoginPage';
-import {
-    ERROR_MODAL_BUTTON,
-    ERROR_MODAL_CONTENT,
-    ERROR_MODAL_TITLE,
-} from '../../const/login-page/login-page';
+import { ERROR_MODAL_BUTTON, ERROR_MODAL_CONTENT, ERROR_MODAL_TITLE } from '../../const/login-page/login-page';
 
 jest.mock('./components/login-form/LoginForm', () => ({
     LoginForm: ({ setShowErrorModal }: { setShowErrorModal: (value: boolean) => void }) => (

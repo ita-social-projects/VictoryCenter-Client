@@ -6,18 +6,18 @@ import {
     loginRequest,
     tokenRefreshRequest,
 } from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
-import { CreateAdminClient } from '../../services/auth/createAdminClient/createAdminClient';
+import { CreateAdminClient } from '../../services/auth/create-admin-client/createAdminClient';
 import { API_ROUTES } from '../../const/urls/main-api';
-import { isAccessTokenValid } from '../../services/auth/AuthService/AuthService';
+import { isAccessTokenValid } from '../../services/auth/auth-service/AuthService';
 
 jest.mock('../../services/data-fetch/login-page-data-fetch/login-page-data-fetch', () => ({
     loginRequest: jest.fn(),
     tokenRefreshRequest: jest.fn(),
 }));
-jest.mock('../../services/auth/AuthService/AuthService', () => ({
+jest.mock('../../services/auth/auth-service/AuthService', () => ({
     isAccessTokenValid: jest.fn(),
 }));
-jest.mock('../../services/auth/createAdminClient/createAdminClient', () => ({
+jest.mock('../../services/auth/create-admin-client/createAdminClient', () => ({
     CreateAdminClient: jest.fn(),
 }));
 jest.mock('../../const/urls/main-api', () => ({
@@ -30,8 +30,7 @@ const isValidMock = isAccessTokenValid as jest.Mock<boolean, [string]>;
 const CreateAdminClientMock = CreateAdminClient as jest.Mock<any, any>;
 
 const Consumer = () => {
-    const { isLoading, isAuthenticated, client, login, logout, refreshAccessToken } =
-        useAdminContext();
+    const { isLoading, isAuthenticated, client, login, logout, refreshAccessToken } = useAdminContext();
 
     return (
         <div>
@@ -68,7 +67,7 @@ describe('<AdminContextProvider />', () => {
         render(
             <AdminContextProvider>
                 <Consumer />
-            </AdminContextProvider>
+            </AdminContextProvider>,
         );
 
         expect(screen.getByTestId('loading')).toHaveTextContent('true');
@@ -89,7 +88,7 @@ describe('<AdminContextProvider />', () => {
             expect.any(Function),
             expect.any(Function),
             expect.any(Function),
-            expect.any(Function)
+            expect.any(Function),
         );
     });
 
@@ -100,7 +99,7 @@ describe('<AdminContextProvider />', () => {
         render(
             <AdminContextProvider>
                 <Consumer />
-            </AdminContextProvider>
+            </AdminContextProvider>,
         );
 
         await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
@@ -112,7 +111,7 @@ describe('<AdminContextProvider />', () => {
         render(
             <AdminContextProvider>
                 <Consumer />
-            </AdminContextProvider>
+            </AdminContextProvider>,
         );
         await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
 
@@ -121,7 +120,7 @@ describe('<AdminContextProvider />', () => {
             expect(loginRequestMock).toHaveBeenCalledWith({
                 email: 'e',
                 password: 'p',
-            })
+            }),
         );
         expect(screen.getByTestId('auth')).toHaveTextContent('true');
     });
@@ -131,7 +130,7 @@ describe('<AdminContextProvider />', () => {
         render(
             <AdminContextProvider>
                 <Consumer />
-            </AdminContextProvider>
+            </AdminContextProvider>,
         );
         await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('true'));
         fireEvent.click(screen.getByTestId('logout-btn'));

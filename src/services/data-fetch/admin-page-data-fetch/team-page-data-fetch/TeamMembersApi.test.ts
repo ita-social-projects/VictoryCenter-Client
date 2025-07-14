@@ -165,4 +165,39 @@ describe('TeamMembersApi', () => {
             category: 'Основна команда',
         });
     });
+
+    it('should throw a 404 error when member list not found', async () => {
+        mockClient.get.mockRejectedValue({
+            response: { status: 404, data: 'Not found' },
+        });
+
+        await expect(TeamMembersApi.getAll(mockClient)).rejects.toMatchObject({
+            response: { status: 404 },
+        });
+
+        expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers');
+    });
+
+    it('should throw a 500 error when the server fails', async () => {
+        mockClient.get.mockRejectedValue({
+            response: { status: 500, data: 'Server error' },
+        });
+
+        await expect(TeamMembersApi.getAll(mockClient)).rejects.toMatchObject({
+            response: { status: 500 },
+        });
+
+        expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers');
+    });
+
+    it('should return an empty array when the API sends an empty list', async () => {
+        const emptyDto: [] = [];
+
+        mockClient.get.mockResolvedValue({ data: emptyDto });
+
+        const members = await TeamMembersApi.getAll(mockClient);
+
+        expect(Array.isArray(members)).toBe(true);
+        expect(members).toHaveLength(0);
+    });
 });

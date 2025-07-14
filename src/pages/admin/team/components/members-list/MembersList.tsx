@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { categoryMap, TeamCategory } from '../../TeamPage';
+import { categoryMap } from '../../../../../const/admin/team-page';
+import { TeamCategory } from '../../../../../types/TeamPage';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { MemberDragPreview } from '../member-drag-preview/MemberDragPreview';
 import { MembersListItem } from '../members-list-item/MembersListItem';

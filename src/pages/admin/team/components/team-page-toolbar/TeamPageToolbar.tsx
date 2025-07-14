@@ -1,7 +1,7 @@
 import PlusIcon from '../../../../../assets/icons/plus.svg';
 import React, { useState, useCallback } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
-import { TeamCategory } from '../../TeamPage';
+import { TeamCategory } from '../../../../../types/TeamPage';
 import { Button } from '../../../../../components/common/button/Button';
 import { Select } from '../../../../../components/common/select/Select';
 import { Input } from '../../../../../components/common/input/Input';

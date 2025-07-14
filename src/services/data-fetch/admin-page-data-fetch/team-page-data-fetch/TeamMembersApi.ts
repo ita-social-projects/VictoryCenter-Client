@@ -1,5 +1,7 @@
 import { Member } from '../../../../pages/admin/team/components/members-list/MembersList';
-import { categoryMap, reverseCategoryMap, TeamCategory } from '../../../../pages/admin/team/TeamPage';
+import { reverseCategoryMap } from '../../../../pages/admin/team/TeamPage';
+import { TeamCategory } from '../../../../types/TeamPage';
+import { categoryMap } from '../../../../const/admin/team-page';
 import { TeamMemberDto } from '../../../../types/TeamPage';
 import { MemberFormValues } from '../../../../pages/admin/team/components/member-form/MemberForm';
 import { AxiosInstance } from 'axios';

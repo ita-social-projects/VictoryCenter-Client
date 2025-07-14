@@ -1,9 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { TeamMember } from './TeamMemberCard';
+import { Member } from '../../../../types/TeamPage';
 
 describe('TeamMember component', () => {
-    const mockMember = {
+    const mockMember: Member = {
         id: 1,
         name: 'Іван Іванов',
         role: 'учасник',

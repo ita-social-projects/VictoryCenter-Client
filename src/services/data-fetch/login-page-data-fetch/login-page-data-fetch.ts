@@ -1,0 +1,13 @@
+import { AuthResponse, Credentials } from '../../../types/Auth';
+import { API_ROUTES } from '../../../const/urls/main-api';
+import { AuthClient } from '../../auth/AuthClient';
+
+export const loginRequest = async (creds: Credentials): Promise<string> => {
+    const response = await AuthClient.post<AuthResponse>(API_ROUTES.AUTH.LOGIN, creds);
+    return response.data.accessToken;
+};
+
+export const tokenRefreshRequest = async (): Promise<string> => {
+    const response = await AuthClient.post<AuthResponse>(API_ROUTES.AUTH.REFRESH_TOKEN);
+    return response.data.accessToken;
+};

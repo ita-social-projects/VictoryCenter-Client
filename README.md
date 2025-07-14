@@ -51,11 +51,13 @@ victory-center-client/
 │   │   │   ├── inline-loader/
 │   │   │   ├── input/
 │   │   │   ├── modal/
+│   │   │   ├── scrollable-program-frame/
 │   │   │   ├── page-loader/
 │   │   │   └── select/
 │   │   ├── footer/
 │   │   └── header/                         # Header-related components
 │   ├── const/                              # Constants used across the project
+│   │   ├── about-us-page/
 │   │   ├── admin/
 │   │   ├── footer/
 │   │   ├── header/
@@ -71,6 +73,14 @@ victory-center-client/
 │   │   ├── admin-layout/
 │   │   └── main-layout/
 │   ├── pages/                              # Pages
+│   │   ├── about-us-page/
+│   │   │   ├── company-values/
+│   │   │   ├── donate-section/
+│   │   │   ├── intro-section/
+│   │   │   ├── main-value/
+│   │   │   ├── our-mission/
+│   │   │   ├── our-team-section/
+│   │   │   └── support-section/
 │   │   ├── admin/                          # Admin pages
 │   │   │   ├── admin-page-content/         # Content components for admin pages
 │   │   │   └── team/                       # Team management page
@@ -153,6 +163,12 @@ victory-center-client/
 ## Available Scripts
 
 In the project directory, you can run:
+
+# Setup
+
+To setup this project use this command in project folder:
+
+### `npm install`
 
 ### `npm start`
 

@@ -5,12 +5,12 @@ import { MainLayout } from '../../layouts/main-layout/MainLayout';
 
 import { AdminPage } from '../../pages/admin/AdminPage';
 
-import { HomePage } from '../../pages/user-pages/home/HomePage';
 import { TeamPage } from '../../pages/user-pages/team-page/TeamPage';
 
 import { NotFound } from '../../pages/not-found/NotFound';
 import { ProgramPage } from '../../pages/program-page/ProgramPage';
 
+import { AboutUsPage } from '../../pages/about-us-page/AboutUsPage';
 import { routes } from '../../const/routers/routes';
 import { AdminLayout } from '../../layouts/admin-layout/AdminLayout';
 import { TeamPageAdmin } from '../../pages/admin/team/TeamPage';
@@ -24,6 +24,7 @@ import { PublicRoute } from '../../components/admin/public-route/PublicRoute';
 const {
     programPage,
     adminRoutes,
+    aboutUsRoute,
     userPageRoutes: { teamPageRoute, page2Route },
 } = routes;
 
@@ -31,10 +32,11 @@ export const AppRouter = () => (
     <BrowserRouter>
         <Routes>
             <Route path="/" element={<MainLayout />}>
-                <Route index element={<HomePage />} />
+                <Route index element={<AboutUsPage />} />
                 <Route path={teamPageRoute} element={<TeamPage />} />
                 <Route path={page2Route} element={<ProgramPage />} />
                 <Route path={programPage} element={<ProgramPage />} />
+                <Route path={aboutUsRoute} element={<AboutUsPage />} />
                 <Route path="*" element={<NotFound />} />
             </Route>
 

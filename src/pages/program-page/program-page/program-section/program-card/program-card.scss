@@ -1,10 +1,11 @@
 .card-block {
-    height: 32.5rem;
+    height: 70vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+    background-color: #fdfdfb;
 
     .card-img {
         width: 100%;
@@ -20,7 +21,7 @@
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
-        gap: 5rem;
+        gap: 10vh;
         align-items: center;
         padding: 0.5rem;
         box-sizing: border-box;

@@ -1,7 +1,7 @@
 import PlusIcon from '../../../../../assets/icons/plus.svg';
 import React, { useState, useCallback } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
-import { TeamCategory } from '../../TeamPage';
+import { TeamCategory } from '../../../../../types/TeamPage';
 import { Button } from '../../../../../components/common/button/Button';
 import { Select } from '../../../../../components/common/select/Select';
 import { Input } from '../../../../../components/common/input/Input';
@@ -48,19 +48,39 @@ const AddMemberModal = ({
     onClose,
     onPublish,
     onSaveDraft,
+    formData,
+    onFormDataChange,
 }: {
     isOpen: boolean;
     onClose: () => void;
     onPublish: (member: MemberFormValues) => void;
     onSaveDraft: (member: MemberFormValues) => void;
+    formData: MemberFormValues | null;
+    onFormDataChange: (formData: MemberFormValues) => void;
 }) => (
     <Modal onClose={onClose} isOpen={isOpen} data-testid="add-member-modal">
         <Modal.Title>{TEAM_ADD_MEMBER}</Modal.Title>
         <Modal.Content>
-            <MemberForm id="add-member-modal" onSubmit={onPublish} />
+            <MemberForm
+                id="add-member-modal"
+                onSubmit={onPublish}
+                existingMemberFormValues={formData}
+                onValuesChange={onFormDataChange}
+            />
         </Modal.Content>
         <Modal.Actions>
-            <Button onClick={() => onSaveDraft({} as MemberFormValues)} buttonStyle="secondary">
+            <Button
+                onClick={() => {
+                    if (formData?.description && formData?.fullName) {
+                        const safeFormData = {
+                            ...formData,
+                            category: formData.category || 'Основна команда',
+                        };
+                        onSaveDraft(safeFormData);
+                    }
+                }}
+                buttonStyle="secondary"
+            >
                 {TEAM_SAVE_AS_DRAFT}
             </Button>
             <Button form="add-member-modal" type="submit" buttonStyle="primary">
@@ -134,7 +154,7 @@ export const TeamPageToolbar = ({
     });
 
     const [pendingMemberData, setPendingMemberData] = useState<MemberFormData>(null);
-    const [formData, setFormData] = useState<MemberFormData>(null);
+    const [formData, setFormData] = useState<MemberFormValues | null>(null);
 
     const updateModalState = useCallback((updates: Partial<ModalState>) => {
         setModalState((prev) => ({ ...prev, ...updates }));
@@ -250,6 +270,8 @@ export const TeamPageToolbar = ({
                 onClose={handleCloseAddMember}
                 onPublish={handleFormSubmit}
                 onSaveDraft={handleSaveAsDraft}
+                formData={formData}
+                onFormDataChange={setFormData}
             />
 
             <ConfirmPublishModal

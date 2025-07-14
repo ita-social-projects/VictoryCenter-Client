@@ -1,6 +1,6 @@
 import CloudDownload from '../../../../../assets/icons/cloud-download.svg';
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { TeamCategory } from '../../TeamPage';
+import { TeamCategory } from '../../../../../types/TeamPage';
 import {
     TEAM_CATEGORY_MAIN,
     TEAM_CATEGORY_SUPERVISORY,

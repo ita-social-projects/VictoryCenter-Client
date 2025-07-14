@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { act } from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TeamPageToolbar, TeamPageToolbarProps } from './TeamPageToolbar';
@@ -70,29 +70,34 @@ jest.mock('../../../../../components/common/input/Input', () => ({
 }));
 
 // Mock MemberForm with controllable behavior
+let capturedOnValuesChange: (data: MemberFormValues) => void = () => {};
 const mockMemberForm = jest.fn();
 jest.mock('../member-form/MemberForm', () => ({
     MemberForm: (props: any) => {
         mockMemberForm(props);
+        capturedOnValuesChange = props.onValuesChange;
+        const defaultData: MemberFormValues = {
+            category: 'Основна команда',
+            fullName: 'Test User',
+            description: 'Test Description',
+            img: null,
+        };
         return (
             <form
                 id={props.id}
                 data-testid="member-form"
                 onSubmit={(e) => {
                     e.preventDefault();
-                    const mockMemberData: MemberFormValues = {
-                        category: 'Керівництво' as any,
-                        fullName: 'Test User',
-                        description: 'Test Description',
-                        img: null,
-                    };
-                    props.onSubmit?.(mockMemberData);
+                    props.onSubmit?.(defaultData);
                 }}
             >
                 <input
                     data-testid="form-fullname"
                     onChange={(e) => {
-                        props.onFormDataChange?.(e.target.value);
+                        props.onFormDataChange?.({
+                            ...defaultData,
+                            fullName: e.target.value,
+                        });
                     }}
                 />
                 <button type="submit" data-testid="form-submit">
@@ -218,6 +223,15 @@ describe('TeamPageToolbar', () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
             await userEvent.click(screen.getByTestId('add-member-button'));
+            act(() => {
+                capturedOnValuesChange({
+                    category: 'Основна команда',
+                    fullName: 'From test',
+                    description: 'from test desc',
+                    img: null,
+                });
+            });
+
             await userEvent.click(screen.getByText('Зберегти як чернетку'));
 
             expect(defaultProps.onMemberSaveDraft).toHaveBeenCalled();
@@ -270,7 +284,7 @@ describe('TeamPageToolbar', () => {
             await userEvent.click(screen.getByText('Так'));
 
             expect(defaultProps.onMemberPublish).toHaveBeenCalledWith({
-                category: 'Керівництво',
+                category: 'Основна команда',
                 fullName: 'Test User',
                 description: 'Test Description',
                 img: null,
@@ -375,6 +389,14 @@ describe('TeamPageToolbar', () => {
             render(<TeamPageToolbar {...propsWithoutCallbacks} />);
 
             await userEvent.click(screen.getByTestId('add-member-button'));
+            act(() => {
+                capturedOnValuesChange({
+                    category: 'Основна команда',
+                    fullName: 'From test',
+                    description: 'from test desc',
+                    img: null,
+                });
+            });
             await userEvent.click(screen.getByText('Зберегти як чернетку'));
 
             // Should not throw errors

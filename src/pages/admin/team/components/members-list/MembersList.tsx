@@ -165,6 +165,7 @@ export const MembersList = ({
             setIsMembersLoading(false);
             isFetchingRef.current = false;
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [searchByNameQuery, statusFilter],
     );
 

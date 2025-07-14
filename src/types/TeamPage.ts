@@ -42,3 +42,5 @@ export interface TeamMemberDto {
     photo: string;
     email: string;
 }
+
+export type TeamCategory = 'Основна команда' | 'Наглядова рада' | 'Радники';

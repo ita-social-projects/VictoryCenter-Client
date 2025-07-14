@@ -15,6 +15,12 @@ import { routes } from '../../const/routers/routes';
 import { AdminLayout } from '../../layouts/admin-layout/AdminLayout';
 import { TeamPageAdmin } from '../../pages/admin/team/TeamPage';
 
+import { LoginPage } from '../../pages/login/LoginPage';
+import { AdminContextWrapper } from '../../components/admin/admin-context-wrapper/AdminContextWrapper';
+
+import { PrivateRoute } from '../../components/admin/private-route/PrivateRoute';
+import { PublicRoute } from '../../components/admin/public-route/PublicRoute';
+
 const {
     programPage,
     adminRoutes,
@@ -32,10 +38,17 @@ export const AppRouter = () => (
                 <Route path="*" element={<NotFound />} />
             </Route>
 
-            <Route path={adminRoutes.adminRoute} element={<AdminLayout />}>
-                <Route index element={<AdminPage />} />
-                <Route path={adminRoutes.teamSubRoute} element={<TeamPageAdmin />} />
-                <Route path={adminRoutes.testSubRoute} element={<div>hello</div>}></Route>
+            <Route element={<AdminContextWrapper />}>
+                <Route element={<PublicRoute />}>
+                    <Route path={adminRoutes.loginRoute} element={<LoginPage />} />
+                </Route>
+
+                <Route element={<PrivateRoute />}>
+                    <Route path={adminRoutes.adminRoute} element={<AdminLayout />}>
+                        <Route index element={<AdminPage />} />
+                        <Route path={adminRoutes.teamSubRoute} element={<TeamPageAdmin />} />
+                    </Route>
+                </Route>
             </Route>
         </Routes>
     </BrowserRouter>

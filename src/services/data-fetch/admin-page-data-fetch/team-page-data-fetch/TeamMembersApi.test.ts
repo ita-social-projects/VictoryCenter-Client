@@ -1,4 +1,4 @@
-import { AxiosInstance, AxiosResponse } from 'axios';
+import { AxiosInstance } from 'axios';
 import { MemberFormValues } from '../../../../pages/admin/team/components/member-form/MemberForm';
 import { TeamMemberDto } from '../../../../types/TeamPage';
 import { mapTeamMemberDtoToTeamMember, TeamMembersApi } from './TeamMembersApi';

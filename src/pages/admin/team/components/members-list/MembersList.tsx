@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { TeamCategory } from '../../TeamPage';
+import { categoryMap } from '../../../../../const/admin/team-page';
+import { TeamCategory } from '../../../../../types/TeamPage';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { MemberDragPreview } from '../member-drag-preview/MemberDragPreview';
 import { MembersListItem } from '../members-list-item/MembersListItem';
@@ -10,7 +11,9 @@ import ArrowUpIcon from '../../../../../assets/icons/arrow-up.svg';
 import { StatusFilter } from '../team-page-toolbar/TeamPageToolbar';
 import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
 import './members-list.scss';
-import { mockMembers } from '../../../../../utils/mock-data/admin-page/teamPage';
+import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
+import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
+import { AxiosInstance } from 'axios';
 import {
     TEAM_DELETE_MEMBER,
     TEAM_EDIT_MEMBER,
@@ -39,6 +42,7 @@ export type MembersListProps = {
     searchByNameQuery: string | null;
     statusFilter: StatusFilter;
     onAutocompleteValuesChange: (autocompleteValue: string[]) => void;
+    refetchTrigger?: number;
 };
 
 export type MemberDragPreviewModel = {
@@ -55,12 +59,14 @@ export const fetchMembers = async (
     pageNumber: number,
     searchQuery: string = '',
     statusFilter: StatusFilter = 'Усі',
+    client: AxiosInstance,
 ): Promise<{
     newMembers: Member[];
     totalCountOfPages: number;
 }> => {
     await new Promise((resolve) => setTimeout(resolve, 200));
-    let filtered = mockMembers;
+
+    let filtered = await TeamMembersApi.getAll(client);
     if (category) {
         filtered = filtered.filter((m) => m.category === category);
     }
@@ -70,7 +76,6 @@ export const fetchMembers = async (
     if (statusFilter && statusFilter !== 'Усі') {
         filtered = filtered.filter((m) => m.status === statusFilter);
     }
-    filtered = filtered.sort((a, b) => a.id - b.id);
     const some = (pageNumber - 1) * pageSize;
     return {
         newMembers: filtered.slice(some, some + pageSize),
@@ -78,7 +83,12 @@ export const fetchMembers = async (
     };
 };
 
-export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteValuesChange }: MembersListProps) => {
+export const MembersList = ({
+    searchByNameQuery,
+    statusFilter,
+    onAutocompleteValuesChange,
+    refetchTrigger,
+}: MembersListProps) => {
     const pageSize = 5;
     const [totalPages, setTotalPages] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -111,6 +121,8 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
     const totalPagesRef = useRef<number | null>(totalPages);
     const categoryRef = useRef<TeamCategory | undefined>(category);
 
+    const client = useAdminClient();
+
     useEffect(() => {
         currentPageRef.current = currentPage;
     }, [currentPage]);
@@ -142,6 +154,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
                 pageToFetch,
                 currentSearch,
                 currentStatus,
+                client,
             );
 
             setMembers((prev) => (reset ? [...newMembers] : [...prev, ...newMembers]));
@@ -153,6 +166,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
             setIsMembersLoading(false);
             isFetchingRef.current = false;
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [searchByNameQuery, statusFilter],
     );
 
@@ -162,7 +176,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
         setTotalPages(null);
         isFetchingRef.current = false;
         loadMembers(true);
-    }, [category, searchByNameQuery, statusFilter, loadMembers]);
+    }, [category, searchByNameQuery, statusFilter, loadMembers, refetchTrigger]);
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
         setDraggedIndex(index);
@@ -202,7 +216,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
         e.preventDefault();
     };
 
-    const handleDrop = (index: number) => {
+    const handleDrop = async (index: number) => {
         if (draggedIndex === null || draggedIndex === index) return;
 
         const updatedMembers = [...members];
@@ -212,6 +226,11 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
 
         setMembers(updatedMembers);
         setDraggedIndex(null);
+
+        const orderedIds = updatedMembers.map((m) => m.id);
+        const categoryId = categoryMap[category];
+
+        await TeamMembersApi.reorder(client, categoryId, orderedIds);
     };
 
     const handleOnDeleteMember = (fullName: string) => {
@@ -219,10 +238,18 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
         setIsDeleteTeamMemberModalOpen(true);
     };
 
-    const handleDeleteMember = () => {
-        setMembers((prev) => prev.filter((m) => m.fullName !== teamMemberToDelete));
-        setIsDeleteTeamMemberModalOpen(false);
-        setTeamMemberToDelete(null);
+    const handleDeleteMember = async () => {
+        try {
+            const member = members.find((m) => m.fullName === teamMemberToDelete);
+            if (!member) {
+                return;
+            }
+            await TeamMembersApi.delete(client, member.id);
+            setMembers((prev) => prev.filter((m) => m.id !== member.id));
+        } finally {
+            setIsDeleteTeamMemberModalOpen(false);
+            setTeamMemberToDelete(null);
+        }
     };
 
     useEffect(() => {
@@ -335,21 +362,10 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
         setIsEditMemberModalOpen(false);
     };
 
-    const handleSaveAsDraft = () => {
-        if (memberToEdit) {
-            setMembers((prev) =>
-                [
-                    ...prev.filter((m) => m.id !== memberIdToEdit),
-                    {
-                        id: memberIdToEdit!,
-                        status: 'Чернетка',
-                        category: memberToEdit.category,
-                        fullName: memberToEdit.fullName,
-                        description: memberToEdit.description,
-                        img: '',
-                    },
-                ].sort((a, b) => a.id - b.id),
-            );
+    const handleSaveAsDraft = async () => {
+        if (memberToEdit && memberIdToEdit != null) {
+            await TeamMembersApi.updateDraft(client, memberIdToEdit, memberToEdit);
+            await loadMembers(true);
         }
     };
 
@@ -357,25 +373,16 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
         setIsConfirmPublishNewMemberModalOpen(false);
     };
 
-    const handleConfirmPublish = () => {
-        if (memberToEdit) {
-            //todo: handle photo
-            setMembers((prev) =>
-                [
-                    ...prev.filter((m) => m.id !== memberIdToEdit),
-                    {
-                        id: memberIdToEdit!,
-                        status: 'Опубліковано',
-                        category: memberToEdit.category,
-                        fullName: memberToEdit.fullName,
-                        description: memberToEdit.description,
-                        img: '',
-                    },
-                ].sort((a, b) => a.id - b.id),
-            );
-            setIsConfirmPublishNewMemberModalOpen(false);
-            setIsEditMemberModalOpen(false);
-            setMemberToEdit(null);
+    const handleConfirmPublish = async () => {
+        if (memberToEdit && memberIdToEdit != null) {
+            try {
+                await TeamMembersApi.updatePublish(client, memberIdToEdit, memberToEdit);
+                await loadMembers(true);
+            } finally {
+                setIsConfirmPublishNewMemberModalOpen(false);
+                setIsEditMemberModalOpen(false);
+                setMemberToEdit(null);
+            }
         }
     };
     const handleConfirmClose = () => {

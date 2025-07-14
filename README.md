@@ -100,6 +100,7 @@ victory-center-client/
 │   │   │   └── resolve-with-new-token/
 │   │   └── data-fetch
 │   │       ├── admin-page-data-fetch
+|   |           └── team-page-data-fetch
 │   │       ├── login-page-data-fetch
 │   │       ├── program-page-data-fetch
 │   │       └── user-pages-data-fetch

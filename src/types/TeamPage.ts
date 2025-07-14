@@ -31,3 +31,16 @@ export interface TeamPageData {
 export interface TeamMemberProps {
     member: Member;
 }
+
+export interface TeamMemberDto {
+    id: number;
+    fullName: string;
+    categoryId: number;
+    priority: number;
+    status: number;
+    description: string;
+    photo: string;
+    email: string;
+}
+
+export type TeamCategory = 'Основна команда' | 'Наглядова рада' | 'Радники';

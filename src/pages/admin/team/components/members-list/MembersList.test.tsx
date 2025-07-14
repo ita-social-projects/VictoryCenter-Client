@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { MembersList, MembersListProps, Member } from './MembersList';
 import * as React from 'react';
-import {mockMembers} from "../../../../../utils/mock-data/admin-page/teamPage";
-import {TeamMembersApi} from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
+import { mockMembers } from '../../../../../utils/mock-data/admin-page/teamPage';
+import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
 
 const mockDataTransfer = {
     setDragImage: jest.fn(),
@@ -13,14 +13,14 @@ const mockDataTransfer = {
 };
 
 jest.mock('../../../../../context/admin-context-provider/AdminContextProvider', () => ({
-  useAdminContext: () => ({
-    client: {
-      get: jest.fn(),
-      post: jest.fn(),
-      put: jest.fn(),
-      delete: jest.fn(),
-    },
-  }),
+    useAdminContext: () => ({
+        client: {
+            get: jest.fn(),
+            post: jest.fn(),
+            put: jest.fn(),
+            delete: jest.fn(),
+        },
+    }),
 }));
 
 jest.mock('../../../../../components/common/modal/Modal', () => {
@@ -174,7 +174,7 @@ describe('MembersList', () => {
         jest.clearAllMocks();
         localStorageMock.clear();
         resetMockMembers();
-        
+
         jest.spyOn(TeamMembersApi, 'getAll').mockResolvedValue(mockMembers);
         jest.spyOn(TeamMembersApi, 'updateDraft').mockResolvedValue(undefined);
         jest.spyOn(TeamMembersApi, 'updatePublish').mockResolvedValue(undefined);
@@ -182,7 +182,7 @@ describe('MembersList', () => {
         jest.spyOn(TeamMembersApi, 'postDraft').mockResolvedValue(undefined);
         jest.spyOn(TeamMembersApi, 'postPublished').mockResolvedValue(undefined);
         jest.spyOn(TeamMembersApi, 'reorder').mockResolvedValue(undefined);
-        
+
         mockFetchMembers = jest.spyOn(require('./MembersList'), 'fetchMembers');
         mockFetchMembers.mockImplementation(async (category: string, pageSize: number, pageNumber: number) => {
             const filtered = mockMembers.filter((m) => m.category === category);

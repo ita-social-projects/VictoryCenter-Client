@@ -1,7 +1,7 @@
-import { AxiosInstance, AxiosResponse } from "axios";
-import { MemberFormValues } from "../../../../pages/admin/team/components/member-form/MemberForm";
-import { TeamMemberDto } from "../../../../types/TeamPage";
-import { mapTeamMemberDtoToTeamMember, TeamMembersApi } from "./TeamMembersApi";
+import { AxiosInstance, AxiosResponse } from 'axios';
+import { MemberFormValues } from '../../../../pages/admin/team/components/member-form/MemberForm';
+import { TeamMemberDto } from '../../../../types/TeamPage';
+import { mapTeamMemberDtoToTeamMember, TeamMembersApi } from './TeamMembersApi';
 
 const mockClient = {
     get: jest.fn(),
@@ -9,7 +9,6 @@ const mockClient = {
     put: jest.fn(),
     delete: jest.fn(),
 } as unknown as jest.Mocked<AxiosInstance>;
-
 
 describe('TeamMembersApi', () => {
     it('should fetch and map team members', async () => {
@@ -22,8 +21,8 @@ describe('TeamMembersApi', () => {
                 status: 0,
                 description: 'Test description',
                 photo: 'photo.png',
-                email: 'test@example.com'
-            }
+                email: 'test@example.com',
+            },
         ];
 
         mockClient.get.mockResolvedValue({ data: mockDto });
@@ -33,13 +32,13 @@ describe('TeamMembersApi', () => {
         expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers');
         expect(members).toEqual([
             {
-            id: 1,
-            img: 'photo.png',
-            fullName: 'Test Member',
-            description: 'Test description',
-            status: 'Опубліковано',
-            category: 'Основна команда',
-            }
+                id: 1,
+                img: 'photo.png',
+                fullName: 'Test Member',
+                description: 'Test description',
+                status: 'Опубліковано',
+                category: 'Основна команда',
+            },
         ]);
     });
 
@@ -60,7 +59,7 @@ describe('TeamMembersApi', () => {
             categoryId: 1,
             status: 1,
             description: 'desc',
-            email: ''
+            email: '',
         });
     });
 
@@ -81,7 +80,7 @@ describe('TeamMembersApi', () => {
             categoryId: 1,
             status: 0,
             description: 'desc',
-            email: ''
+            email: '',
         });
     });
 
@@ -90,7 +89,7 @@ describe('TeamMembersApi', () => {
             fullName: 'Draft Member',
             category: 'Основна команда',
             description: 'description',
-            img: null
+            img: null,
         };
 
         const postMock = jest.spyOn(mockClient, 'post').mockResolvedValue({});
@@ -102,7 +101,7 @@ describe('TeamMembersApi', () => {
             categoryId: 1,
             status: 1,
             description: 'description',
-            email: ''
+            email: '',
         });
     });
 
@@ -111,7 +110,7 @@ describe('TeamMembersApi', () => {
             fullName: 'Draft Member',
             category: 'Основна команда',
             description: 'description',
-            img: null
+            img: null,
         };
 
         const postMock = jest.spyOn(mockClient, 'post').mockResolvedValue({});
@@ -123,7 +122,7 @@ describe('TeamMembersApi', () => {
             categoryId: 1,
             status: 0,
             description: 'description',
-            email: ''
+            email: '',
         });
     });
 
@@ -139,7 +138,7 @@ describe('TeamMembersApi', () => {
 
         expect(putMock).toHaveBeenCalledWith('/TeamMembers/reorder', {
             categoryId: 1,
-            orderedIds: [3, 2, 1]
+            orderedIds: [3, 2, 1],
         });
     });
 
@@ -152,7 +151,7 @@ describe('TeamMembersApi', () => {
             status: 1,
             description: 'Desc',
             photo: 'photo.jpg',
-            email: ''
+            email: '',
         };
 
         const result = mapTeamMemberDtoToTeamMember(dto);
@@ -166,4 +165,4 @@ describe('TeamMembersApi', () => {
             category: 'Основна команда',
         });
     });
-})
+});

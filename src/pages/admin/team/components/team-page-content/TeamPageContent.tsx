@@ -1,9 +1,9 @@
-import React, {useCallback, useState} from "react";
-import {StatusFilter, TeamPageToolbar} from "../team-page-toolbar/TeamPageToolbar";
-import {MembersList} from "../members-list/MembersList";
-import {MemberFormValues} from "../member-form/MemberForm";
-import {TeamMembersApi} from "../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi";
-import { useAdminClient } from "../../../../../utils/hooks/use-admin-client/useAdminClient";
+import React, { useCallback, useState } from 'react';
+import { StatusFilter, TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
+import { MembersList } from '../members-list/MembersList';
+import { MemberFormValues } from '../member-form/MemberForm';
+import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
+import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
 
 export const TeamPageContent = () => {
     const [searchByNameQuery, setSearchByNameQuery] = useState<string>('');
@@ -27,13 +27,13 @@ export const TeamPageContent = () => {
 
     const handleAddMember = async (member: MemberFormValues) => {
         await TeamMembersApi.postPublished(client, member);
-        setRefetchKey(prev => prev+1);
-    }
+        setRefetchKey((prev) => prev + 1);
+    };
 
     const handleSaveDraft = async (member: MemberFormValues) => {
         await TeamMembersApi.postDraft(client, member);
-        setRefetchKey(prev => prev+1);
-    }
+        setRefetchKey((prev) => prev + 1);
+    };
 
     return (
         <div className="wrapper">

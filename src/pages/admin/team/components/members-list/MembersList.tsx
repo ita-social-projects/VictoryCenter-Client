@@ -1,18 +1,18 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
-import {categoryMap, TeamCategory} from "../../TeamPage";
-import {Modal} from "../../../../../components/common/modal/Modal";
-import {MemberDragPreview} from "../member-drag-preview/MemberDragPreview";
-import {MembersListItem} from "../members-list-item/MembersListItem";
-import NotFoundIcon from "../../../../../assets/icons/not-found.svg";
-import {Button} from "../../../../../components/common/button/Button";
-import LoaderIcon from "../../../../../assets/icons/load.svg";
-import ArrowUpIcon from "../../../../../assets/icons/arrow-up.svg"
-import {StatusFilter} from "../team-page-toolbar/TeamPageToolbar";
-import {MemberForm, MemberFormValues} from "../member-form/MemberForm";
-import "./members-list.scss";
-import {TeamMembersApi} from "../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi";
-import { useAdminClient } from "../../../../../utils/hooks/use-admin-client/useAdminClient";
-import { AxiosInstance } from "axios";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { categoryMap, TeamCategory } from '../../TeamPage';
+import { Modal } from '../../../../../components/common/modal/Modal';
+import { MemberDragPreview } from '../member-drag-preview/MemberDragPreview';
+import { MembersListItem } from '../members-list-item/MembersListItem';
+import NotFoundIcon from '../../../../../assets/icons/not-found.svg';
+import { Button } from '../../../../../components/common/button/Button';
+import LoaderIcon from '../../../../../assets/icons/load.svg';
+import ArrowUpIcon from '../../../../../assets/icons/arrow-up.svg';
+import { StatusFilter } from '../team-page-toolbar/TeamPageToolbar';
+import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
+import './members-list.scss';
+import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
+import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
+import { AxiosInstance } from 'axios';
 import {
     TEAM_DELETE_MEMBER,
     TEAM_EDIT_MEMBER,
@@ -53,36 +53,41 @@ export type MemberDragPreviewModel = {
 
 const currentTabKey = 'currentTab';
 export const fetchMembers = async (
-  category: string,
-  pageSize: number,
-  pageNumber: number,
-  searchQuery: string = '',
-  statusFilter: StatusFilter = 'Усі',
-  client: AxiosInstance
+    category: string,
+    pageSize: number,
+    pageNumber: number,
+    searchQuery: string = '',
+    statusFilter: StatusFilter = 'Усі',
+    client: AxiosInstance,
 ): Promise<{
     newMembers: Member[];
     totalCountOfPages: number;
 }> => {
-  await new Promise((resolve) => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
-  let filtered = await TeamMembersApi.getAll(client);
-  if (category) {
-    filtered = filtered.filter(m => m.category === category);
-  }
-  if (searchQuery) {
-    filtered = filtered.filter(m => m.fullName.toLowerCase().includes(searchQuery.toLowerCase()));
-  }
-  if (statusFilter && statusFilter !== 'Усі') {
-    filtered = filtered.filter(m => m.status === statusFilter);
-  }
-  const some = (pageNumber - 1) * pageSize;
-  return {
-    newMembers: filtered.slice(some, some + pageSize),
-    totalCountOfPages: Math.ceil(filtered.length / pageSize)
-  };
+    let filtered = await TeamMembersApi.getAll(client);
+    if (category) {
+        filtered = filtered.filter((m) => m.category === category);
+    }
+    if (searchQuery) {
+        filtered = filtered.filter((m) => m.fullName.toLowerCase().includes(searchQuery.toLowerCase()));
+    }
+    if (statusFilter && statusFilter !== 'Усі') {
+        filtered = filtered.filter((m) => m.status === statusFilter);
+    }
+    const some = (pageNumber - 1) * pageSize;
+    return {
+        newMembers: filtered.slice(some, some + pageSize),
+        totalCountOfPages: Math.ceil(filtered.length / pageSize),
+    };
 };
 
-export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValuesChange, refetchTrigger}: MembersListProps) => {
+export const MembersList = ({
+    searchByNameQuery,
+    statusFilter,
+    onAutocompleteValuesChange,
+    refetchTrigger,
+}: MembersListProps) => {
     const pageSize = 5;
     const [totalPages, setTotalPages] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -142,14 +147,14 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
             const pageToFetch = reset ? 1 : currentPageRef.current;
 
-        const { newMembers, totalCountOfPages } = await fetchMembers(
-            currentCategory,
-            pageSize,
-            pageToFetch,
-            currentSearch,
-            currentStatus,
-            client
-        );
+            const { newMembers, totalCountOfPages } = await fetchMembers(
+                currentCategory,
+                pageSize,
+                pageToFetch,
+                currentSearch,
+                currentStatus,
+                client,
+            );
 
             setMembers((prev) => (reset ? [...newMembers] : [...prev, ...newMembers]));
             setCurrentPage((prev) => (reset ? 2 : prev + 1));
@@ -220,7 +225,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
         setMembers(updatedMembers);
         setDraggedIndex(null);
 
-        const orderedIds = updatedMembers.map(m => m.id);
+        const orderedIds = updatedMembers.map((m) => m.id);
         const categoryId = categoryMap[category];
 
         await TeamMembersApi.reorder(client, categoryId, orderedIds);
@@ -233,12 +238,12 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
 
     const handleDeleteMember = async () => {
         try {
-            const member = members.find(m => m.fullName === teamMemberToDelete);
-            if (!member){
+            const member = members.find((m) => m.fullName === teamMemberToDelete);
+            if (!member) {
                 return;
             }
             await TeamMembersApi.delete(client, member.id);
-            setMembers(prev => prev.filter(m => m.id !== member.id));
+            setMembers((prev) => prev.filter((m) => m.id !== member.id));
         } finally {
             setIsDeleteTeamMemberModalOpen(false);
             setTeamMemberToDelete(null);
@@ -369,7 +374,7 @@ export const MembersList = ({searchByNameQuery, statusFilter, onAutocompleteValu
     const handleConfirmPublish = async () => {
         if (memberToEdit && memberIdToEdit != null) {
             try {
-                await TeamMembersApi.updatePublish(client, memberIdToEdit, memberToEdit)
+                await TeamMembersApi.updatePublish(client, memberIdToEdit, memberToEdit);
                 await loadMembers(true);
             } finally {
                 setIsConfirmPublishNewMemberModalOpen(false);

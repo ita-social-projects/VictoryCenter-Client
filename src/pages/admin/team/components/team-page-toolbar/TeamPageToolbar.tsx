@@ -44,13 +44,13 @@ type MemberFormData = {
 } | null;
 
 const AddMemberModal = ({
-                            isOpen,
-                            onClose,
-                            onPublish,
-                            onSaveDraft,
-                            formData,
-                            onFormDataChange,
-                        }: {
+    isOpen,
+    onClose,
+    onPublish,
+    onSaveDraft,
+    formData,
+    onFormDataChange,
+}: {
     isOpen: boolean;
     onClose: () => void;
     onPublish: (member: MemberFormValues) => void;

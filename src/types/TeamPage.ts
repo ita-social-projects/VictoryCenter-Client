@@ -15,12 +15,12 @@ export interface TeamMemberProps {
 }
 
 export interface TeamMemberDto {
-  id: number;
-  fullName: string,
-  categoryId: number;
-  priority: number;
-  status: number;
-  description: string;
-  photo: string;
-  email: string;
+    id: number;
+    fullName: string;
+    categoryId: number;
+    priority: number;
+    status: number;
+    description: string;
+    photo: string;
+    email: string;
 }

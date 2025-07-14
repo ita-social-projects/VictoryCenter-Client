@@ -1,5 +1,5 @@
 import React, { act } from 'react';
-import {render, screen, fireEvent, waitFor} from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TeamPageToolbar, TeamPageToolbarProps } from './TeamPageToolbar';
 import { MemberFormValues } from '../member-form/MemberForm';
@@ -80,7 +80,7 @@ jest.mock('../member-form/MemberForm', () => ({
             category: 'Основна команда',
             fullName: 'Test User',
             description: 'Test Description',
-            img: null
+            img: null,
         };
         return (
             <form
@@ -96,7 +96,7 @@ jest.mock('../member-form/MemberForm', () => ({
                     onChange={(e) => {
                         props.onFormDataChange?.({
                             ...defaultData,
-                            fullName: e.target.value
+                            fullName: e.target.value,
                         });
                     }}
                 />
@@ -228,7 +228,7 @@ describe('TeamPageToolbar', () => {
                     category: 'Основна команда',
                     fullName: 'From test',
                     description: 'from test desc',
-                    img: null
+                    img: null,
                 });
             });
 
@@ -394,7 +394,7 @@ describe('TeamPageToolbar', () => {
                     category: 'Основна команда',
                     fullName: 'From test',
                     description: 'from test desc',
-                    img: null
+                    img: null,
                 });
             });
             await userEvent.click(screen.getByText('Зберегти як чернетку'));

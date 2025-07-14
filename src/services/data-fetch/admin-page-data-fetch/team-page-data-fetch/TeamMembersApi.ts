@@ -1,8 +1,7 @@
 import { Member } from '../../../../pages/admin/team/components/members-list/MembersList';
 import { reverseCategoryMap } from '../../../../pages/admin/team/TeamPage';
-import { TeamCategory } from '../../../../types/TeamPage';
-import { categoryMap } from '../../../../const/admin/team-page';
 import { TeamMemberDto } from '../../../../types/TeamPage';
+import { categoryMap } from '../../../../const/admin/team-page';
 import { MemberFormValues } from '../../../../pages/admin/team/components/member-form/MemberForm';
 import { AxiosInstance } from 'axios';
 
@@ -70,5 +69,5 @@ export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): Member => ({
     fullName: dto.fullName,
     description: dto.description,
     status: dto.status === 0 ? 'Опубліковано' : 'Чернетка',
-    category: reverseCategoryMap[dto.categoryId] as TeamCategory,
+    category: reverseCategoryMap[dto.categoryId],
 });

@@ -5,7 +5,6 @@ import { MainLayout } from '../../layouts/main-layout/MainLayout';
 
 import { AdminPage } from '../../pages/admin/AdminPage';
 
-import { HomePage } from '../../pages/user-pages/home/HomePage';
 import { TeamPage } from '../../pages/user-pages/team-page/TeamPage';
 
 import { NotFound } from '../../pages/not-found/NotFound';
@@ -33,7 +32,7 @@ export const AppRouter = () => (
     <BrowserRouter>
         <Routes>
             <Route path="/" element={<MainLayout />}>
-                <Route index element={<HomePage />} />
+                <Route index element={<AboutUsPage />} />
                 <Route path={teamPageRoute} element={<TeamPage />} />
                 <Route path={page2Route} element={<ProgramPage />} />
                 <Route path={programPage} element={<ProgramPage />} />

@@ -2,12 +2,13 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { TeamPage } from './TeamPage';
 import * as TeamPageDataFetchModule from '../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch';
+import { TeamItem, TeamMemberProps } from '../../../types/TeamPage';
 
 jest.mock('../../../assets/team_page_images/horse_video.mp4', () => 'mocked-video.mp4');
 
 const spyTeamPageDataFetch = jest.spyOn(TeamPageDataFetchModule, 'teamPageDataFetch');
 
-const mockTeamDataSingle = [
+const mockTeamDataSingle: TeamItem[] = [
     {
         title: 'Основна команда',
         description:
@@ -23,7 +24,7 @@ const mockTeamDataSingle = [
     },
 ];
 
-const mockTeamDataMultiple = [
+const mockTeamDataMultiple: TeamItem[] = [
     ...mockTeamDataSingle,
     {
         title: 'Додаткова команда',
@@ -40,7 +41,7 @@ const mockTeamDataMultiple = [
 ];
 
 jest.mock('./TeamMemberCard/TeamMemberCard', () => ({
-    TeamMember: ({ member }: any) => (
+    TeamMember: ({ member }: TeamMemberProps) => (
         <div data-testid="team-member">
             <img alt={member.name} src={member.photo} />
             <div>{member.name}</div>

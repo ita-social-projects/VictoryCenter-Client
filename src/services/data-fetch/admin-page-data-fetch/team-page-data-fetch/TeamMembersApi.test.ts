@@ -18,7 +18,7 @@ describe('TeamMembersApi', () => {
                 fullName: 'Test Member',
                 categoryId: 1,
                 priority: 1,
-                status: 0,
+                status: 1,
                 description: 'Test description',
                 photo: 'photo.png',
                 email: 'test@example.com',
@@ -57,7 +57,7 @@ describe('TeamMembersApi', () => {
         expect(putMock).toHaveBeenCalledWith('/TeamMembers/5', {
             fullName: 'Member',
             categoryId: 1,
-            status: 1,
+            status: 0,
             description: 'desc',
             email: '',
         });
@@ -78,7 +78,7 @@ describe('TeamMembersApi', () => {
         expect(putMock).toHaveBeenCalledWith('/TeamMembers/5', {
             fullName: 'Member',
             categoryId: 1,
-            status: 0,
+            status: 1,
             description: 'desc',
             email: '',
         });
@@ -99,7 +99,7 @@ describe('TeamMembersApi', () => {
         expect(postMock).toHaveBeenCalledWith('/TeamMembers', {
             fullName: 'Draft Member',
             categoryId: 1,
-            status: 1,
+            status: 0,
             description: 'description',
             email: '',
         });
@@ -120,7 +120,7 @@ describe('TeamMembersApi', () => {
         expect(postMock).toHaveBeenCalledWith('/TeamMembers', {
             fullName: 'Draft Member',
             categoryId: 1,
-            status: 0,
+            status: 1,
             description: 'description',
             email: '',
         });
@@ -148,7 +148,7 @@ describe('TeamMembersApi', () => {
             fullName: 'Name',
             categoryId: 1,
             priority: 1,
-            status: 1,
+            status: 0,
             description: 'Desc',
             photo: 'photo.jpg',
             email: '',

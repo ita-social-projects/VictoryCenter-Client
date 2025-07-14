@@ -11,6 +11,8 @@ export const TeamPageContent = () => {
     const [autocompleteValues, setAutocompleteValues] = useState<string[]>([]);
     const [refetchKey, setRefetchKey] = useState(0);
 
+    const [error, setError] = useState<string | null>(null);
+
     const client = useAdminClient();
 
     const handleSearchQueryByName = useCallback((query: string) => {
@@ -26,13 +28,23 @@ export const TeamPageContent = () => {
     }, []);
 
     const handleAddMember = async (member: MemberFormValues) => {
-        await TeamMembersApi.postPublished(client, member);
-        setRefetchKey((prev) => prev + 1);
+        setError(null);
+        try {
+            await TeamMembersApi.postPublished(client, member);
+            setRefetchKey((prev) => prev + 1);
+        } catch (err) {
+            setError('Не вдалося опублікувати учасника. Спробуйте ще раз.');
+        }
     };
 
     const handleSaveDraft = async (member: MemberFormValues) => {
-        await TeamMembersApi.postDraft(client, member);
-        setRefetchKey((prev) => prev + 1);
+        setError(null);
+        try {
+            await TeamMembersApi.postDraft(client, member);
+            setRefetchKey((prev) => prev + 1);
+        } catch (err) {
+            setError('Не вдалося зберегти чернетку. Спробуйте ще раз.');
+        }
     };
 
     return (
@@ -44,11 +56,21 @@ export const TeamPageContent = () => {
                 onMemberPublish={handleAddMember}
                 onMemberSaveDraft={handleSaveDraft}
             />
+            {error && (
+                <div
+                    className="error-message"
+                    role="alert"
+                    style={{ color: 'red', marginBottom: '1rem', marginLeft: '3rem' }}
+                >
+                    {error}
+                </div>
+            )}
             <MembersList
                 searchByNameQuery={searchByNameQuery}
                 statusFilter={statusFilter}
                 onAutocompleteValuesChange={handleAutocompleteValuesChange}
                 refetchTrigger={refetchKey}
+                onError={setError}
             />
         </div>
     );

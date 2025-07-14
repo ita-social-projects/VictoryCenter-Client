@@ -44,6 +44,7 @@ export type MembersListProps = {
     statusFilter: StatusFilter;
     onAutocompleteValuesChange: (autocompleteValue: string[]) => void;
     refetchTrigger?: number;
+    onError?: (msg: string | null) => void;
 };
 
 export type MemberDragPreviewModel = {
@@ -61,11 +62,18 @@ export const fetchMembers = async (
     searchQuery: string = '',
     statusFilter: StatusFilter = 'Усі',
     client: AxiosInstance,
+    onError?: (msg: string | null) => void,
 ): Promise<{
     newMembers: Member[];
     totalCountOfPages: number;
 }> => {
-    let filtered = await TeamMembersApi.getAll(client);
+    let filtered = [] as Member[];
+    try {
+        filtered = await TeamMembersApi.getAll(client);
+    } catch (err) {
+        onError?.((err as Error).message);
+    }
+
     if (category) {
         filtered = filtered.filter((m) => m.category === category);
     }
@@ -82,7 +90,13 @@ export const fetchMembers = async (
     };
 };
 
-export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteValuesChange }: MembersListProps) => {
+export const MembersList = ({
+    searchByNameQuery,
+    statusFilter,
+    onAutocompleteValuesChange,
+    refetchTrigger,
+    onError,
+}: MembersListProps) => {
     const [pageSize, setPageSize] = useState(0);
     const [totalPages, setTotalPages] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -168,7 +182,8 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
                 pageToFetch,
                 currentSearch,
                 currentStatus,
-                clientRef.current,
+                client,
+                onError,
             );
 
             setMembers((prev) => (reset ? [...newMembers] : [...prev, ...newMembers]));
@@ -189,7 +204,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
         setTotalPages(null);
         isFetchingRef.current = false;
         loadMembers(true);
-    }, [category, searchByNameQuery, statusFilter, loadMembers, pageSize]);
+    }, [category, searchByNameQuery, statusFilter, loadMembers, pageSize, refetchTrigger]);
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
         setDraggedIndex(index);
@@ -230,20 +245,24 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
     };
 
     const handleDrop = async (index: number) => {
-        if (draggedIndex === null || draggedIndex === index) return;
+        try {
+            if (draggedIndex === null || draggedIndex === index) return;
 
-        const updatedMembers = [...members];
-        const draggedItem = updatedMembers[draggedIndex];
-        updatedMembers.splice(draggedIndex, 1);
-        updatedMembers.splice(index, 0, draggedItem);
+            const updatedMembers = [...members];
+            const draggedItem = updatedMembers[draggedIndex];
+            updatedMembers.splice(draggedIndex, 1);
+            updatedMembers.splice(index, 0, draggedItem);
 
-        setMembers(updatedMembers);
-        setDraggedIndex(null);
+            setMembers(updatedMembers);
+            setDraggedIndex(null);
 
-        const orderedIds = updatedMembers.map((m) => m.id);
-        const categoryId = categoryMap[category];
+            const orderedIds = updatedMembers.map((m) => m.id);
+            const categoryId = categoryMap[category];
 
-        await TeamMembersApi.reorder(client, categoryId, orderedIds);
+            await TeamMembersApi.reorder(client, categoryId, orderedIds);
+        } catch (err) {
+            onError?.((err as Error).message);
+        }
     };
 
     const handleOnDeleteMember = (fullName: string) => {
@@ -259,6 +278,8 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
             }
             await TeamMembersApi.delete(client, member.id);
             setMembers((prev) => prev.filter((m) => m.id !== member.id));
+        } catch (err) {
+            onError?.((err as Error).message);
         } finally {
             setIsDeleteTeamMemberModalOpen(false);
             setTeamMemberToDelete(null);
@@ -376,9 +397,13 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
     };
 
     const handleSaveAsDraft = async () => {
-        if (memberToEdit && memberIdToEdit != null) {
-            await TeamMembersApi.updateDraft(client, memberIdToEdit, memberToEdit);
-            await loadMembers(true);
+        try {
+            if (memberToEdit && memberIdToEdit != null) {
+                await TeamMembersApi.updateDraft(client, memberIdToEdit, memberToEdit);
+                await loadMembers(true);
+            }
+        } catch (err) {
+            onError?.((err as Error).message);
         }
     };
 
@@ -391,6 +416,8 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
             try {
                 await TeamMembersApi.updatePublish(client, memberIdToEdit, memberToEdit);
                 await loadMembers(true);
+            } catch (err) {
+                onError?.((err as Error).message);
             } finally {
                 setIsConfirmPublishNewMemberModalOpen(false);
                 setIsEditMemberModalOpen(false);

@@ -15,7 +15,7 @@ export const TeamMembersApi = {
         await client.put(`/TeamMembers/${id}`, {
             fullName: member.fullName,
             categoryId: categoryMap[member.category],
-            status: 1,
+            status: 0,
             description: member.description,
             email: '', //TODO implement email update
         });
@@ -25,7 +25,7 @@ export const TeamMembersApi = {
         await client.put(`/TeamMembers/${id}`, {
             fullName: member.fullName,
             categoryId: categoryMap[member.category],
-            status: 0,
+            status: 1,
             description: member.description,
             email: '', //TODO implement email update
         });
@@ -35,7 +35,7 @@ export const TeamMembersApi = {
         await client.post(`/TeamMembers`, {
             fullName: member.fullName,
             categoryId: categoryMap[member.category],
-            status: 1,
+            status: 0,
             description: member.description,
             email: '', //TODO implement email post
         });
@@ -45,7 +45,7 @@ export const TeamMembersApi = {
         await client.post(`/TeamMembers`, {
             fullName: member.fullName,
             categoryId: categoryMap[member.category],
-            status: 0,
+            status: 1,
             description: member.description,
             email: '', //TODO implement email post
         });
@@ -68,6 +68,6 @@ export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): Member => ({
     img: dto.photo,
     fullName: dto.fullName,
     description: dto.description,
-    status: dto.status === 0 ? 'Опубліковано' : 'Чернетка',
+    status: dto.status === 0 ? 'Чернетка' : 'Опубліковано',
     category: reverseCategoryMap[dto.categoryId],
 });

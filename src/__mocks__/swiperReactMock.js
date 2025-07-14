@@ -8,6 +8,8 @@ SwiperSlide.propTypes = {
     children: PropTypes.node.isRequired,
 };
 export class SwiperClass {
+    // this constructor is used just for mocks
+    // eslint-disable-next-line no-useless-constructor
     constructor() {
         // mock constructor
     }

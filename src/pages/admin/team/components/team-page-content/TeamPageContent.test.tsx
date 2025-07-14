@@ -2,6 +2,17 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TeamPageContent } from './TeamPageContent';
 
+jest.mock('../../../../../context/admin-context-provider/AdminContextProvider', () => ({
+    useAdminContext: () => ({
+        client: {
+            get: jest.fn(),
+            post: jest.fn(),
+            put: jest.fn(),
+            delete: jest.fn(),
+        },
+    }),
+}));
+
 jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
     TeamPageToolbar: ({ onSearchQueryChange, onStatusFilterChange, autocompleteValues }: any) => {
         return (

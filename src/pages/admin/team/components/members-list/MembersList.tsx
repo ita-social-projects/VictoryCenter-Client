@@ -115,6 +115,11 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
     const categoryRef = useRef<TeamCategory | undefined>(category);
 
     const client = useAdminClient();
+    const clientRef = useRef(client);
+
+    useEffect(() => {
+        clientRef.current = client;
+    }, [client]);
 
     useEffect(() => {
         currentPageRef.current = currentPage;
@@ -144,7 +149,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
     }, [memberListRef]);
 
     const loadMembers = useCallback(
-        async (client: AxiosInstance, reset: boolean = false) => {
+        async (reset: boolean = false) => {
             const currentCategory = categoryRef.current;
             const currentSearch = searchByNameQuery || '';
             const currentStatus = statusFilter;
@@ -162,7 +167,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
                 pageToFetch,
                 currentSearch,
                 currentStatus,
-                client,
+                clientRef.current,
             );
 
             setMembers((prev) => (reset ? [...newMembers] : [...prev, ...newMembers]));
@@ -182,7 +187,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
         setCurrentPage(1);
         setTotalPages(null);
         isFetchingRef.current = false;
-        loadMembers(client, true);
+        loadMembers(true);
     }, [category, searchByNameQuery, statusFilter, loadMembers, pageSize]);
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
@@ -321,7 +326,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
 
         const bottomReached = Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight) <= 5;
         if (bottomReached) {
-            loadMembers(client);
+            loadMembers();
         }
     };
 
@@ -372,7 +377,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
     const handleSaveAsDraft = async () => {
         if (memberToEdit && memberIdToEdit != null) {
             await TeamMembersApi.updateDraft(client, memberIdToEdit, memberToEdit);
-            await loadMembers(client, true);
+            await loadMembers(true);
         }
     };
 
@@ -384,7 +389,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
         if (memberToEdit && memberIdToEdit != null) {
             try {
                 await TeamMembersApi.updatePublish(client, memberIdToEdit, memberToEdit);
-                await loadMembers(client, true);
+                await loadMembers(true);
             } finally {
                 setIsConfirmPublishNewMemberModalOpen(false);
                 setIsEditMemberModalOpen(false);

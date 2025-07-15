@@ -144,7 +144,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
     }, [memberListRef]);
 
     const loadMembers = useCallback(
-        async (reset: boolean = false) => {
+        async (client: AxiosInstance, reset: boolean = false) => {
             const currentCategory = categoryRef.current;
             const currentSearch = searchByNameQuery || '';
             const currentStatus = statusFilter;
@@ -182,7 +182,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
         setCurrentPage(1);
         setTotalPages(null);
         isFetchingRef.current = false;
-        loadMembers(true);
+        loadMembers(client, true);
     }, [category, searchByNameQuery, statusFilter, loadMembers, pageSize]);
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
@@ -321,7 +321,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
 
         const bottomReached = Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight) <= 5;
         if (bottomReached) {
-            loadMembers();
+            loadMembers(client);
         }
     };
 
@@ -372,7 +372,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
     const handleSaveAsDraft = async () => {
         if (memberToEdit && memberIdToEdit != null) {
             await TeamMembersApi.updateDraft(client, memberIdToEdit, memberToEdit);
-            await loadMembers(true);
+            await loadMembers(client, true);
         }
     };
 
@@ -384,7 +384,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
         if (memberToEdit && memberIdToEdit != null) {
             try {
                 await TeamMembersApi.updatePublish(client, memberIdToEdit, memberToEdit);
-                await loadMembers(true);
+                await loadMembers(client, true);
             } finally {
                 setIsConfirmPublishNewMemberModalOpen(false);
                 setIsEditMemberModalOpen(false);

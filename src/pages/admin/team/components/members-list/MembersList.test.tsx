@@ -691,7 +691,7 @@ describe('MembersList', () => {
             Object.defineProperty(membersList, 'scrollTop', { writable: true, value: 1000 });
             Object.defineProperty(membersList, 'scrollHeight', { writable: true, value: 1000 });
             Object.defineProperty(membersList, 'clientHeight', { writable: true, value: 1 });
-            await fireEvent.scroll(membersList);
+            fireEvent.scroll(membersList);
 
             await waitFor(async () => expect(await screen.findByText('Member 6')).toBeInTheDocument());
         });

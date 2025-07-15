@@ -64,8 +64,6 @@ export const fetchMembers = async (
     newMembers: Member[];
     totalCountOfPages: number;
 }> => {
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
     let filtered = await TeamMembersApi.getAll(client);
     if (category) {
         filtered = filtered.filter((m) => m.category === category);
@@ -83,13 +81,8 @@ export const fetchMembers = async (
     };
 };
 
-export const MembersList = ({
-    searchByNameQuery,
-    statusFilter,
-    onAutocompleteValuesChange,
-    refetchTrigger,
-}: MembersListProps) => {
-    const pageSize = 5;
+export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteValuesChange }: MembersListProps) => {
+    const [pageSize, setPageSize] = useState(0);
     const [totalPages, setTotalPages] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [teamMemberToDelete, setTeamMemberToDelete] = useState<string | null>(null);
@@ -122,6 +115,11 @@ export const MembersList = ({
     const categoryRef = useRef<TeamCategory | undefined>(category);
 
     const client = useAdminClient();
+    const clientRef = useRef(client);
+
+    useEffect(() => {
+        clientRef.current = client;
+    }, [client]);
 
     useEffect(() => {
         currentPageRef.current = currentPage;
@@ -134,6 +132,21 @@ export const MembersList = ({
     useEffect(() => {
         categoryRef.current = category;
     }, [category]);
+
+    const updatePageSize = () => {
+        if (memberListRef.current) {
+            setPageSize(memberListRef.current.clientHeight / 120 + 1);
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener('resize', updatePageSize);
+        return () => window.removeEventListener('resize', updatePageSize);
+    }, []);
+
+    useEffect(() => {
+        updatePageSize();
+    }, [memberListRef]);
 
     const loadMembers = useCallback(
         async (reset: boolean = false) => {
@@ -154,7 +167,7 @@ export const MembersList = ({
                 pageToFetch,
                 currentSearch,
                 currentStatus,
-                client,
+                clientRef.current,
             );
 
             setMembers((prev) => (reset ? [...newMembers] : [...prev, ...newMembers]));
@@ -166,8 +179,7 @@ export const MembersList = ({
             setIsMembersLoading(false);
             isFetchingRef.current = false;
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [searchByNameQuery, statusFilter],
+        [searchByNameQuery, statusFilter, pageSize],
     );
 
     useEffect(() => {
@@ -176,7 +188,7 @@ export const MembersList = ({
         setTotalPages(null);
         isFetchingRef.current = false;
         loadMembers(true);
-    }, [category, searchByNameQuery, statusFilter, loadMembers, refetchTrigger]);
+    }, [category, searchByNameQuery, statusFilter, loadMembers, pageSize]);
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
         setDraggedIndex(index);

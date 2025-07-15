@@ -168,7 +168,14 @@ const resetMockMembers = (members: Member[] = [createMockMember()]) => {
 
 describe('MembersList', () => {
     let mockFetchMembers: jest.SpyInstance;
-
+    beforeAll(() => {
+        Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
+            configurable: true,
+            get() {
+                return 800;
+            },
+        });
+    });
     beforeEach(() => {
         idCounter = 0;
         jest.clearAllMocks();
@@ -339,7 +346,9 @@ describe('MembersList', () => {
         it('saves selected category to localStorage', async () => {
             render(<MembersList {...sharedDefaultProps} />);
             fireEvent.click(screen.getByText('Наглядова рада'));
-            expect(localStorageMock.getItem('currentTab')).toBe('Наглядова рада');
+            await waitFor(() => {
+                expect(localStorageMock.getItem('currentTab')).toBe('Наглядова рада');
+            });
         });
     });
 
@@ -494,6 +503,54 @@ describe('MembersList', () => {
                 expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
             });
         });
+
+        it('closes edit modal when memberToEdit is null', async () => {
+            render(<MembersList {...sharedDefaultProps} />);
+
+            await waitFor(() => {
+                expect(screen.getByText('Test Member')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('edit-button-0'));
+
+            const nameInput = screen.getByTestId('form-fullName');
+            fireEvent.change(nameInput, { target: { value: '' } });
+            const descInput = screen.getByTestId('form-description');
+            fireEvent.change(descInput, { target: { value: '' } });
+            const catInput = screen.getByTestId('form-category');
+            fireEvent.change(catInput, { target: { value: '' } });
+
+            fireEvent.click(screen.getByTestId('modal'));
+            expect(await screen.findByText('Зміни буде втрачено. Бажаєте продовжити?')).toBeInTheDocument();
+
+            const confirmCloseButton = screen.getByRole('button', { name: /Так/i });
+            fireEvent.click(confirmCloseButton);
+
+            await waitFor(() => {
+                expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
+            });
+        });
+
+        it('closes edit modal when memberToEdit is an empty object (all fields falsy)', async () => {
+            resetMockMembers([createMockMember({ id: 1, fullName: 'Alpha', description: 'A' })]);
+            render(<MembersList {...sharedDefaultProps} />);
+            expect(await screen.findByText('Alpha')).toBeInTheDocument();
+            fireEvent.click(screen.getByTestId('edit-button-0'));
+
+            fireEvent.change(screen.getByTestId('form-fullName'), { target: { value: '' } });
+            fireEvent.change(screen.getByTestId('form-description'), { target: { value: '' } });
+            fireEvent.change(screen.getByTestId('form-category'), { target: { value: '' } });
+
+            fireEvent.click(screen.getByTestId('modal'));
+            expect(await screen.findByText('Зміни буде втрачено. Бажаєте продовжити?')).toBeInTheDocument();
+
+            const confirmCloseButton = screen.getByRole('button', { name: /Так/i });
+            fireEvent.click(confirmCloseButton);
+
+            await waitFor(() => {
+                expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
+            });
+        });
     });
 
     describe('MembersList - Search Functionality', () => {
@@ -634,7 +691,7 @@ describe('MembersList', () => {
             Object.defineProperty(membersList, 'scrollTop', { writable: true, value: 1000 });
             Object.defineProperty(membersList, 'scrollHeight', { writable: true, value: 1000 });
             Object.defineProperty(membersList, 'clientHeight', { writable: true, value: 1 });
-            await fireEvent.scroll(membersList);
+            fireEvent.scroll(membersList);
 
             await waitFor(async () => expect(await screen.findByText('Member 6')).toBeInTheDocument());
         });

@@ -88,6 +88,15 @@ describe('Select Component', () => {
         expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-up.svg');
     });
 
+    it('does not open select when a non-Space/Enter key is pressed', () => {
+        const { container } = render(<Select {...defaultProps} />);
+        const selectContainer = container.firstChild as HTMLElement;
+
+        fireEvent.keyDown(selectContainer, { key: 'a', code: 'KeyA', charCode: 65 });
+        expect(selectContainer).toHaveClass('select-closed');
+        expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-down.svg');
+    });
+
     it('closes select when Space or Enter is pressed again', () => {
         const { container } = render(<Select {...defaultProps} />);
         const selectContainer = container.firstChild as HTMLElement;
@@ -105,6 +114,19 @@ describe('Select Component', () => {
         fireEvent.keyDown(selectContainer, { key: 'Enter', code: 'Enter', charCode: 13 });
         expect(selectContainer).toHaveClass('select-closed');
         expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-down.svg');
+    });
+
+    it('does not close select when a non-Space/Enter key is pressed', () => {
+        const { container } = render(<Select {...defaultProps} />);
+        const selectContainer = container.firstChild as HTMLElement;
+
+        fireEvent.click(selectContainer);
+        expect(selectContainer).toHaveClass('select-opened');
+        expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-up.svg');
+
+        fireEvent.keyDown(selectContainer, { key: 'a', code: 'KeyA', charCode: 65 });
+        expect(selectContainer).toHaveClass('select-opened');
+        expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-up.svg');
     });
 
     it('toggles select state multiple times', () => {

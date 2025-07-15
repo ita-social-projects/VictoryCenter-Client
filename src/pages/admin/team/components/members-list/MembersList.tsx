@@ -64,8 +64,6 @@ export const fetchMembers = async (
     newMembers: Member[];
     totalCountOfPages: number;
 }> => {
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
     let filtered = await TeamMembersApi.getAll(client);
     if (category) {
         filtered = filtered.filter((m) => m.category === category);

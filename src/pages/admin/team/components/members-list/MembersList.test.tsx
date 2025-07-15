@@ -346,7 +346,9 @@ describe('MembersList', () => {
         it('saves selected category to localStorage', async () => {
             render(<MembersList {...sharedDefaultProps} />);
             fireEvent.click(screen.getByText('Наглядова рада'));
-            expect(localStorageMock.getItem('currentTab')).toBe('Наглядова рада');
+            await waitFor(() => {
+                expect(localStorageMock.getItem('currentTab')).toBe('Наглядова рада');
+            });
         });
     });
 

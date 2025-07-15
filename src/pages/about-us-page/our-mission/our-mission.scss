@@ -1,0 +1,70 @@
+@import '../../../assets/sass/variables/_variables.colors.scss';
+.our-mission-block * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.our-mission-block {
+    .what-we-do {
+        padding: 7.1875rem 3.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        .mission-title {
+            font-family: Mulish, sans-serif;
+            font-weight: 700;
+            font-size: 2rem;
+            line-height: 2.5rem;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+            color: $blue-900;
+        }
+
+        .details-block {
+            width: 26.875rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 1.5rem;
+
+            .mission-details {
+                font-family: Mulish, sans-serif;
+                font-weight: 400;
+                font-size: 1.125rem;
+                line-height: 1.75rem;
+                letter-spacing: -0.02em;
+                color: $blue-900;
+            }
+
+            .link-to-programs {
+                width: 100%;
+                display: flex;
+                padding: 0.5rem 0;
+                justify-content: flex-end;
+                align-items: flex-end;
+                text-decoration: none;
+
+                .link-block {
+                    width: 11.625rem;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 0.5rem;
+                    border-bottom: 1px solid $blue-900;
+
+                    .link-title {
+                        font-family: Mulish, sans-serif;
+                        font-weight: 400;
+                        font-size: 1rem;
+                        line-height: 1.5rem;
+                        letter-spacing: -0.02em;
+                        vertical-align: middle;
+                        color: $blue-900;
+                    }
+                }
+            }
+        }
+    }
+}

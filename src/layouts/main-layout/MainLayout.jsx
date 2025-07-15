@@ -4,15 +4,15 @@ import { Header } from '../../components/header/Header';
 import { Footer } from '../../components/footer/Footer';
 
 export const MainLayout = () => (
-  <div>
-    <div className="header-container">
-      <Header />
+    <div>
+        <div className="header-container">
+            <Header />
+        </div>
+        <div className="page-container">
+            <Outlet />
+        </div>
+        <div className="footer-container">
+            <Footer />
+        </div>
     </div>
-    <div className="page-container">
-      <Outlet />
-    </div>
-    <div className="footer-container">
-      <Footer />
-    </div>
-  </div>
 );

@@ -1,41 +1,34 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import './admin-page-content.scss';
 
-import { useAdminContext } from "../../../context/admin-context-provider/AdminContextProvider";
-import { adminPageDataFetch } from "../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch";
-import {NavLink} from "react-router";
+import { adminPageDataFetch } from '../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch';
+import { NavLink } from 'react-router';
 
 export const AdminPageContent = () => {
-  const { token } = useAdminContext();
-  
-  // eslint-disable-next-line no-console
-  console.log("Here is our token", token);
+    const [headerInfo, setHeaderInfo] = useState('');
+    const [contentInfo, setContentInfo] = useState('');
 
-  const [headerInfo, setHeaderInfo] = useState("");
-  const [contentInfo, setContentInfo] = useState("");
+    useEffect(() => {
+        (async () => {
+            const responce = await adminPageDataFetch();
 
-  useEffect(() => {
-    (async () => {
-      const responce = await adminPageDataFetch();
+            const { header, content } = responce;
 
-      const { header, content } = responce;
+            // DEV NOTE: in React 18 and higher there is a term "Automatic Batching"
+            // https://react.dev/blog/2022/03/08/react-18-upgrade-guide#automatic-batching
+            // that means if you are calling setState one after another it will set data in ONE render cycle
+            // please follow the pattern
 
-      // DEV NOTE: in React 18 and higher there is a term "Automatic Batching"
-      // https://react.dev/blog/2022/03/08/react-18-upgrade-guide#automatic-batching
-      // that means if you are calling setState one after another it will set data in ONE render cycle
-      // please follow the pattern
+            setHeaderInfo(header);
+            setContentInfo(content);
+        })();
+    }, []);
 
-      setHeaderInfo(header);
-      setContentInfo(content);
-    })();
-  }, []);
-
-  return (
-    <div className="admin-page-content">
-      <h1 className='header'>{headerInfo}</h1>
-      <p className='content'>{contentInfo}</p>
-      <NavLink to='/admin-page/team'>teams</NavLink>
-    </div>
-  );
+    return (
+        <div className="admin-page-content">
+            <h1 className="header">{headerInfo}</h1>
+            <p className="content">{contentInfo}</p>
+            <NavLink to="/admin-page/team">teams</NavLink>
+        </div>
+    );
 };
-

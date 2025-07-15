@@ -1,46 +1,45 @@
 .btn {
-  &-primary {
-    padding: 8px 24px;
-    gap: 8px;
-    color: white;
-    background-color: #0F2957;
-    outline: none;
-    border: none;
-    transition: background-color 0.2s;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    &-primary {
+        padding: 8px 24px;
+        gap: 8px;
+        color: white;
+        background-color: #0f2957;
+        outline: none;
+        border: none;
+        transition: background-color 0.2s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-    &:active {
-      background-color: #061125;
-      cursor: pointer;
+        &:active {
+            background-color: #061125;
+            cursor: pointer;
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
     }
 
-    &:hover {
-      cursor: pointer;
-    }
-  }
+    &-secondary {
+        padding: 8px 24px;
+        gap: 8px;
+        border: 1px solid #0f2957;
+        color: #0f2957;
+        background-color: white;
+        outline: none;
+        transition: background-color 0.2s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
-  &-secondary {
-    padding: 8px 24px;
-    gap: 8px;
-    border: 1px solid #0F2957;
-    color: #0F2957;
-    background-color: white;
-    outline: none;
-    transition: background-color 0.2s;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+        &:active {
+            background-color: #e7eaee;
+            cursor: pointer;
+        }
 
-    &:active {
-      background-color: #E7EAEE;
-      cursor: pointer;
+        &:hover {
+            cursor: pointer;
+        }
     }
-
-    &:hover {
-      cursor: pointer;
-    }
-  }
 }
-

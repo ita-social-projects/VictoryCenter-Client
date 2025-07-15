@@ -5,34 +5,34 @@ import * as Page2DataFetchModule from '../../../services/data-fetch/user-pages-d
 const spyPage2DataFetch = jest.spyOn(Page2DataFetchModule, 'page2DataFetch');
 
 describe('Page2', () => {
-  const mockHeader = 'Test Header';
-  const mockContent = 'Test Content';
+    const mockHeader = 'Test Header';
+    const mockContent = 'Test Content';
 
-  beforeEach(() => {
-    spyPage2DataFetch.mockResolvedValue({
-      header: mockHeader,
-      content: mockContent,
+    beforeEach(() => {
+        spyPage2DataFetch.mockResolvedValue({
+            header: mockHeader,
+            content: mockContent,
+        });
     });
-  });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('renders the component', async () => {
-    const { container } = render(<Page2 />);
-
-    const header = container.querySelector('.header');
-    const content = container.querySelector('.content');
-
-    expect(header).toBeInTheDocument();
-    expect(content).toBeInTheDocument();
-
-    await waitFor(() => {
-      expect(header?.textContent).toEqual(mockHeader);
-      expect(content?.textContent).toEqual(mockContent);
+    afterEach(() => {
+        jest.clearAllMocks();
     });
-    
-    expect(spyPage2DataFetch).toHaveBeenCalledTimes(1);
-  });
+
+    it('renders the component', async () => {
+        const { container } = render(<Page2 />);
+
+        const header = container.querySelector('.header');
+        const content = container.querySelector('.content');
+
+        expect(header).toBeInTheDocument();
+        expect(content).toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(header?.textContent).toEqual(mockHeader);
+            expect(content?.textContent).toEqual(mockContent);
+        });
+
+        expect(spyPage2DataFetch).toHaveBeenCalledTimes(1);
+    });
 });

@@ -4,7 +4,7 @@ export interface Program {
     subtitle: string;
     description: string;
 }
-export interface Question{
+export interface Question {
     question: string;
     answer: string;
 }

@@ -1,11 +1,9 @@
-import {render, waitFor} from '@testing-library/react';
-import {AdminPageContent} from './AdminPageContent';
+import { render, waitFor } from '@testing-library/react';
+import { AdminPageContent } from './AdminPageContent';
 import * as AdminPageDataFetchModule from '../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch';
-import * as AdminContextProviderModule from '../../../context/admin-context-provider/AdminContextProvider';
-import {MemoryRouter} from "react-router";
+import { MemoryRouter } from 'react-router';
 
 const spyAdminPageDataFetch = jest.spyOn(AdminPageDataFetchModule, 'adminPageDataFetch');
-const spyUseAdminContext = jest.spyOn(AdminContextProviderModule, 'useAdminContext');
 
 describe('AdminPageContent', () => {
     const mockHeader = 'Test Header';
@@ -16,10 +14,6 @@ describe('AdminPageContent', () => {
             header: mockHeader,
             content: mockContent,
         });
-
-        spyUseAdminContext.mockReturnValue({
-            token: 'fake-token'
-        })
     });
 
     afterEach(() => {
@@ -27,7 +21,12 @@ describe('AdminPageContent', () => {
     });
 
     it('renders the component', async () => {
-        const {container} = render(<MemoryRouter> <AdminPageContent/></MemoryRouter>);
+        const { container } = render(
+            <MemoryRouter>
+                {' '}
+                <AdminPageContent />
+            </MemoryRouter>,
+        );
 
         const header = container.querySelector('.header');
         const content = container.querySelector('.content');
@@ -43,4 +42,3 @@ describe('AdminPageContent', () => {
         expect(spyAdminPageDataFetch).toHaveBeenCalledTimes(1);
     });
 });
-

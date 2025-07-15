@@ -1,0 +1,39 @@
+@import '../../../assets/sass/variables/_variables.colors.scss';
+.our-team-block {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8%;
+    font-family: Mulish, sans-serif;
+    font-weight: 400;
+
+    .our-team-image {
+        width: 51%;
+    }
+
+    .team-info {
+        width: 27rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-end;
+        gap: 4rem;
+
+        .team-description {
+            font-size: 1.125rem;
+            line-height: 1.75rem;
+            letter-spacing: -0.02em;
+        }
+
+        .link-ro-team {
+            text-decoration: none;
+            font-size: 1rem;
+            line-height: 1.5rem;
+            letter-spacing: -0.02em;
+            vertical-align: middle;
+            border-bottom: 1px solid $main-black;
+            color: $main-black;
+            padding: 0.5rem 0;
+        }
+    }
+}

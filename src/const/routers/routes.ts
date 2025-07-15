@@ -1,23 +1,24 @@
 export const adminRoutes = {
-    adminRoute:      "/admin-page",
-    teamSubRoute:    "team",
-    testSubRoute:    "test",
-    teamPageRoute:   "/admin-page/team",
-    testAdminRoute:  "/admin-page/test",
+    loginRoute: '/login',
+    adminRoute: '/admin-page',
+    teamSubRoute: 'team',
+    teamPageRoute: '/admin-page/team',
 };
 
 // user pages routes
 export const teamPageRoute = '/team-page';
+export const aboutUsRoute = '/about-us-page';
 export const page2Route = '/page-2';
 export const programPage = '/programPage';
 
 export const userPageRoutes = {
     teamPageRoute,
-    page2Route
+    page2Route,
 };
 
 export const routes = {
     adminRoutes,
     programPage,
-    userPageRoutes
+    aboutUsRoute,
+    userPageRoutes,
 };

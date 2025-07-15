@@ -22,5 +22,5 @@ export const TEAM_LABEL_SELECT_CATEGORY = 'Виберіть категорію';
 export const TEAM_LABEL_FULLNAME = "Ім'я та Прізвище";
 export const TEAM_LABEL_DESCRIPTION = 'Опис';
 export const TEAM_LABEL_PHOTO = 'Фото';
-export const TEAM_LABEL_DRAG_DROP = 'Перетягніть файл сюди або натисніть для завантаження'; 
-export const SEARCH_BY_NAME = "Пошук за ім'ям"
+export const TEAM_LABEL_DRAG_DROP = 'Перетягніть файл сюди або натисніть для завантаження';
+export const SEARCH_BY_NAME = "Пошук за ім'ям";

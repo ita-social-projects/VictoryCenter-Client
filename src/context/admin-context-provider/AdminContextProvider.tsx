@@ -1,51 +1,92 @@
-import React, { createContext, useContext, useMemo, ReactNode } from "react";
-import { getIsLoginSuccessfulMock } from "../../utils/mock-data/admin-page/loginMethod";
-
-// DEV NOTE: This is a exaple how we can implement log in procces using React Context
-// if you are more comfortable with AutLayout for React Router then go for it
+import React, { createContext, useContext, useMemo, ReactNode, useState, useCallback, useRef } from 'react';
+import {
+    loginRequest,
+    tokenRefreshRequest,
+} from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
+import { CreateAdminClient } from '../../services/auth/create-admin-client/createAdminClient';
+import { AxiosInstance } from 'axios';
+import { useOnMountUnsafe } from '../../utils/hooks/use-on-mount-unsafe/useOnMountUnsafe';
+import { Credentials } from '../../types/Auth';
+import { API_ROUTES } from '../../const/urls/main-api';
+import { isAccessTokenValid } from '../../services/auth/auth-service/AuthService';
 
 type Props = {
-  children: ReactNode;
+    children: ReactNode;
 };
 
 type ContextType = {
-  token: string;
+    client: AxiosInstance;
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    login: (creds: Credentials) => Promise<void>;
+    logout: () => void;
+    refreshAccessToken: () => Promise<void>;
 };
 
 const AdminContext = createContext<ContextType | undefined>(undefined);
 
 export const AdminContextProvider = ({ children }: Props) => {
-  // DEV NOTE:
-  // here you need to call login method to init login proccess
-  // for example
+    const [token, setToken] = useState<string>('');
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // const isLoginSuccessful =  initLogin();
-  // additional logic to show log in page if needed
+    const isAuthenticated = isAccessTokenValid(token);
 
-  // if isLoginSuccessful = true then we will "leed" user to admin page
-  // if isLoginSuccessful = false then we will show user error message
+    const tokenRef = useRef<string>(token);
 
-  const isLoginSuccessful = getIsLoginSuccessfulMock(); // <-- true
+    const updateToken = useCallback((newToken: string) => {
+        tokenRef.current = newToken;
+        setToken(newToken);
+    }, []);
 
-  const token = "fake-token"; // <-- in a future provide real token here
+    const login = useCallback(
+        async (creds: Credentials) => {
+            const newToken = await loginRequest(creds);
+            updateToken(newToken);
+        },
+        [updateToken],
+    );
 
-  const contextValue = useMemo(
-    () => ({
-      token,
-    }),
-    [token]
-  );
+    const logout = useCallback(() => {
+        updateToken('');
+    }, [updateToken]);
 
-  return isLoginSuccessful ? (
-    <AdminContext.Provider value={contextValue}>
-      {children}
-    </AdminContext.Provider>
-  ) : (
-    <div className="error-message-container">
-      <p>YOU SHALL NOT PASS!!!</p>
-      <img src={"https://i.gifer.com/36Ja.gif"} alt="you shall not pass!" />
-    </div>
-  );
+    const refreshAccessToken = useCallback(async () => {
+        const newToken = await tokenRefreshRequest();
+        updateToken(newToken);
+    }, [updateToken]);
+
+    // silent refresh on mount
+    useOnMountUnsafe(() => {
+        (async () => {
+            try {
+                await refreshAccessToken();
+            } catch {
+                logout();
+            } finally {
+                setIsLoading(false);
+            }
+        })();
+    });
+
+    // axios client for admin page requests
+    const client = useMemo(
+        () =>
+            CreateAdminClient(
+                API_ROUTES.BASE,
+                () => isAccessTokenValid(tokenRef.current),
+                () => tokenRef.current,
+                refreshAccessToken,
+                logout,
+            ),
+        [logout, refreshAccessToken],
+    );
+
+    const contextValue = useMemo(
+        () => ({ client, isAuthenticated, isLoading, login, logout, refreshAccessToken }),
+        [client, isAuthenticated, isLoading, login, logout, refreshAccessToken],
+    );
+
+    return <AdminContext.Provider value={contextValue}>{children}</AdminContext.Provider>;
 };
 
 export const useAdminContext = () => useContext(AdminContext) as ContextType;

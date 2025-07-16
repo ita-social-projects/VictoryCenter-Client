@@ -13,6 +13,7 @@ import {
     VIDEO_TEXT_STRING5,
     VIDEO_TEXT_AUTHOR,
 } from '../../../const/team-page/team-page';
+import classNames from 'classnames';
 
 export const TeamPage: React.FC = () => {
     const [teamData, setTeamData] = useState<TeamItem[]>([]);
@@ -43,7 +44,10 @@ export const TeamPage: React.FC = () => {
             )}
 
             {teamData.map((team, index) => (
-                <div key={index} className={`team-section ${index === teamData.length - 1 ? 'last-section' : ''}`}>
+                <div
+                    key={index}
+                    className={classNames('team-section', { 'last-section': index === teamData.length - 1 })}
+                >
                     <div className="team_info">
                         <div className="team_description">
                             <h2>{team.title}</h2>

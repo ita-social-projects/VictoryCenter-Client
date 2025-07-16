@@ -1,6 +1,7 @@
 import './input.scss';
 import React, { useRef, useState, useCallback } from 'react';
 import { Select } from '../select/Select';
+import classNames from 'classnames';
 
 export type InputProps = {
     onChange: (query: string) => void;
@@ -48,16 +49,20 @@ export const Input = ({ onChange, autocompleteValues, placeholder }: InputProps)
         handleOnChange('');
     }, [handleOnChange]);
 
+    const buttonClasses = {
+        'input-icon': true,
+    };
+
     return (
         <div className="input" data-testid="input-root">
             <button
                 onClick={handleSearchIconClick}
-                className="input-icon input-search-icon"
+                className={classNames({ ...buttonClasses, 'input-search-icon': true })}
                 data-testid="search-icon"
             />
             <button
                 onClick={handleRemoveQueryIconClick}
-                className="input-icon input-remove-query-icon"
+                className={classNames({ ...buttonClasses, 'input-remove-query-icon': true })}
                 data-testid="remove-query-icon"
             />
             <input

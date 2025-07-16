@@ -3,6 +3,7 @@ import DragIcon from '../../../../../assets/icons/dragger.svg';
 import React from 'react';
 import { MemberComponent } from '../member-component/MemberComponent';
 import './members-list-item.scss';
+import classNames from 'classnames';
 
 type MembersListItemProps = {
     member: Member;
@@ -31,7 +32,7 @@ export const MembersListItem = ({
 }: MembersListItemProps) => {
     return (
         <div
-            className={`members-wrapper ${draggedIndex === index ? 'dragging' : ''}`}
+            className={classNames('members-wrapper', { dragging: draggedIndex === index })}
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(index)}
             onDragEnd={handleDragEnd}

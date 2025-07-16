@@ -2,6 +2,7 @@ import React from 'react';
 import { Member } from '../members-list/MembersList';
 import './member-component.scss';
 import BlankUserImage from '../../../../../assets/images/admin/blank-user.svg';
+import classNames from 'classnames';
 export const MemberComponent = ({
     member,
     handleOnDeleteMember,
@@ -22,7 +23,10 @@ export const MemberComponent = ({
             </div>
             <div className="members-controls">
                 <div
-                    className={`members-status ${member.status === 'Чернетка' ? 'members-status-draft' : 'members-status-published'}`}
+                    className={classNames('members-status', {
+                        'members-status-draft': member.status === 'Чернетка',
+                        'members-status-published': member.status !== 'Чернетка',
+                    })}
                 >
                     <span>•</span>
                     <span>{member.status}</span>

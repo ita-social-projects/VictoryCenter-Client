@@ -52,7 +52,7 @@
 
 export const PROGRAM_CATEGORY_TEXT = {
     BUTTON:{
-        ADD_CATEGORY: 'Додати',
+        ADD_CATEGORY: 'Додати категорії',
         EDIT_CATEGORY: 'Редагувати',
         DELETE_CATEGORY: 'Видалити',
     },
@@ -110,12 +110,15 @@ export const PROGRAM_CATEGORY_VALIDATION = {
     name: {
         min: 2,
         max: 20,
+        allowed_chars: /^[A-Za-zА-Яа-яҐґЄєІіЇї0-9'’\-\s]+$/,
+        requiredError: 'Назва є обов\'язковою',
+        getAllowedCharsError: () => 'Недопустимі символи в назві категорії',
         getUniqueNameError: () => 'Категорія з такою назвою вже існує',
         getMinError: () => `Назва повинна містити щонайменше ${PROGRAM_CATEGORY_VALIDATION.name.min} символи`,
         getMaxError: () => `Назва не повинна перевищувати ${PROGRAM_CATEGORY_VALIDATION.name.max} символів`,
     },
     programsCount:{
-        getRelocationOrRemovalNotice: () => 'Перенесіть їх в іншу категорію або видаліть, щоб продовжити',
-        getProgramsCountWarning: (count: number) => `Категорія містить ${count} програм`,
+        getRelocationOrRemovalHint: () => 'Перенесіть їх в іншу категорію або видаліть, щоб продовжити',
+        getProgramsCountHintTitle: (count: number) => `Категорія містить ${count} програм`,
     }
 }

@@ -1,89 +1,89 @@
 * {
-  margin: 0;
-  box-sizing: border-box;
+    margin: 0;
+    box-sizing: border-box;
 }
 .intro-section {
-  padding-top: 14.5rem;
-  padding-bottom: 8.875rem;
-  display: flex;
-  flex-direction: column;
-  gap: 8.25rem;
-  justify-content: center;
-  align-items: center;
-  
-  h1 {
-    width: 68.875rem;
-    height: 21rem;
-    font-family: Mulish, sans-serif;
-    font-weight: 500;
-    font-size: 6rem;
-    line-height: 7rem;
-    letter-spacing: -0.02em;
-    text-align: center;
-    text-transform: uppercase;
-  }
-  
-  span {
-    font-family: Mulish, sans-serif;
-    font-weight: 800;
-    font-style: italic;
-    font-size: 6rem;
-    line-height: 7rem;
-    letter-spacing: -0.02em;
-    text-align: center;
-    text-transform: uppercase;
-    position: relative;
-    display: inline-block;
-    background: antiquewhite;
-  }
-  
-  span:nth-child(1) {
-    background: #FFF481;
-    position: relative;
-  }
-  
-  span:nth-child(1):before {
-    content: '';
-    width: 100vw;
-    height: 7rem;
-    background: #FFF481;
-    position: absolute;
-    transform: translateX(-100%);
-  }
-  
-  span:nth-child(2) {
-    background: #B2DBEE;
-    position: relative;     
-    z-index: 1;
-  }
-  
-  span:nth-child(2):before {
-    content: '';
-    width: 48.65vw;
-    height: 7rem;
-    background: #B2DBEE;
-    position: absolute;
-    z-index: -1;
-  }
-  
-  .additional-info {
+    padding-top: 14.5rem;
+    padding-bottom: 8.875rem;
     display: flex;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 8.25rem;
     justify-content: center;
     align-items: center;
-    font-family: Mulish, sans-serif;
-    font-weight: 500;
-    font-size: 1.25rem;
-    line-height: 1.75rem;
-    letter-spacing: -0.02em;
-    vertical-align: middle;
-    
-    p:nth-child(1) {
-      width: 26.9rem;
+
+    h1 {
+        width: 68.875rem;
+        height: 21rem;
+        font-family: Mulish, sans-serif;
+        font-weight: 500;
+        font-size: 6rem;
+        line-height: 7rem;
+        letter-spacing: -0.02em;
+        text-align: center;
+        text-transform: uppercase;
     }
-    
-    p:nth-child(2) {
-      width: 27rem;
+
+    span {
+        font-family: Mulish, sans-serif;
+        font-weight: 800;
+        font-style: italic;
+        font-size: 6rem;
+        line-height: 7rem;
+        letter-spacing: -0.02em;
+        text-align: center;
+        text-transform: uppercase;
+        position: relative;
+        display: inline-block;
+        background: antiquewhite;
     }
-  }
+
+    span:nth-child(1) {
+        background: #fff481;
+        position: relative;
+    }
+
+    span:nth-child(1):before {
+        content: '';
+        width: 100vw;
+        height: 7rem;
+        background: #fff481;
+        position: absolute;
+        transform: translateX(-100%);
+    }
+
+    span:nth-child(2) {
+        background: #b2dbee;
+        position: relative;
+        z-index: 1;
+    }
+
+    span:nth-child(2):before {
+        content: '';
+        width: 48.65vw;
+        height: 7rem;
+        background: #b2dbee;
+        position: absolute;
+        z-index: -1;
+    }
+
+    .additional-info {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        align-items: center;
+        font-family: Mulish, sans-serif;
+        font-weight: 500;
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+        letter-spacing: -0.02em;
+        vertical-align: middle;
+
+        p:nth-child(1) {
+            width: 26.9rem;
+        }
+
+        p:nth-child(2) {
+            width: 27rem;
+        }
+    }
 }

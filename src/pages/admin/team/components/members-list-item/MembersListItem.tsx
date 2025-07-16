@@ -1,12 +1,12 @@
-import {Member} from "../members-list/MembersList";
-import DragIcon from "../../../../../assets/icons/dragger.svg";
-import React from "react";
-import {MemberComponent} from "../member-component/MemberComponent";
-import "./members-list-item.scss"
-import classNames from "classnames";
+import { Member } from '../members-list/MembersList';
+import DragIcon from '../../../../../assets/icons/dragger.svg';
+import React from 'react';
+import { MemberComponent } from '../member-component/MemberComponent';
+import './members-list-item.scss';
+import classNames from 'classnames';
 
 type MembersListItemProps = {
-    member: Member,
+    member: Member;
     handleDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
     handleDragStart: (e: React.DragEvent<HTMLDivElement>, index: number) => void;
     handleDrag: (e: React.DragEvent<HTMLDivElement>) => void;
@@ -19,20 +19,20 @@ type MembersListItemProps = {
 };
 
 export const MembersListItem = ({
-                                    draggedIndex,
-                                    index,
-                                    member,
-                                    handleDragOver,
-                                    handleDragEnd,
-                                    handleDragStart,
-                                    handleDrop,
-                                    handleDrag,
-                                    handleOnDeleteMember,
-                                    handleOnEditMember
-                                }: MembersListItemProps) => {
+    draggedIndex,
+    index,
+    member,
+    handleDragOver,
+    handleDragEnd,
+    handleDragStart,
+    handleDrop,
+    handleDrag,
+    handleOnDeleteMember,
+    handleOnEditMember,
+}: MembersListItemProps) => {
     return (
         <div
-            className={classNames("members-wrapper", {"dragging": draggedIndex === index})}
+            className={classNames('members-wrapper', { dragging: draggedIndex === index })}
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(index)}
             onDragEnd={handleDragEnd}
@@ -57,4 +57,4 @@ export const MembersListItem = ({
             />
         </div>
     );
-}
+};

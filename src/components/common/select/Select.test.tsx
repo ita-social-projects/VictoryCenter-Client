@@ -13,9 +13,9 @@ describe('Select Component', () => {
         children: [
             <Select.Option key="1" value="option1" name="Option 1" />,
             <Select.Option key="2" value="option2" name="Option 2" />,
-            <Select.Option key="3" value="option3" name="Option 3" />
+            <Select.Option key="3" value="option3" name="Option 3" />,
         ],
-        onValueChange: jest.fn()
+        onValueChange: jest.fn(),
     };
 
     beforeEach(() => {
@@ -88,6 +88,15 @@ describe('Select Component', () => {
         expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-up.svg');
     });
 
+    it('does not open select when a non-Space/Enter key is pressed', () => {
+        const { container } = render(<Select {...defaultProps} />);
+        const selectContainer = container.firstChild as HTMLElement;
+
+        fireEvent.keyDown(selectContainer, { key: 'a', code: 'KeyA', charCode: 65 });
+        expect(selectContainer).toHaveClass('select-closed');
+        expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-down.svg');
+    });
+
     it('closes select when Space or Enter is pressed again', () => {
         const { container } = render(<Select {...defaultProps} />);
         const selectContainer = container.firstChild as HTMLElement;
@@ -105,6 +114,19 @@ describe('Select Component', () => {
         fireEvent.keyDown(selectContainer, { key: 'Enter', code: 'Enter', charCode: 13 });
         expect(selectContainer).toHaveClass('select-closed');
         expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-down.svg');
+    });
+
+    it('does not close select when a non-Space/Enter key is pressed', () => {
+        const { container } = render(<Select {...defaultProps} />);
+        const selectContainer = container.firstChild as HTMLElement;
+
+        fireEvent.click(selectContainer);
+        expect(selectContainer).toHaveClass('select-opened');
+        expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-up.svg');
+
+        fireEvent.keyDown(selectContainer, { key: 'a', code: 'KeyA', charCode: 65 });
+        expect(selectContainer).toHaveClass('select-opened');
+        expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-up.svg');
     });
 
     it('toggles select state multiple times', () => {
@@ -180,7 +202,7 @@ describe('Select Component', () => {
         expect(span).toHaveClass('empty');
 
         fireEvent.click(selectContainer);
-        
+
         const option = screen.getByText('Option 1');
         fireEvent.click(option);
 
@@ -232,11 +254,8 @@ describe('Select Component', () => {
     it('handles numeric values', () => {
         const mockOnValueChange = jest.fn();
         const numericProps: SelectProps<number> = {
-            children: [
-                <Select.Option key="1" value={1} name="One" />,
-                <Select.Option key="2" value={2} name="Two" />
-            ],
-            onValueChange: mockOnValueChange
+            children: [<Select.Option key="1" value={1} name="One" />, <Select.Option key="2" value={2} name="Two" />],
+            onValueChange: mockOnValueChange,
         };
 
         const { container } = render(<Select {...numericProps} />);
@@ -255,9 +274,9 @@ describe('Select Component', () => {
         const booleanProps: SelectProps<boolean> = {
             children: [
                 <Select.Option key="1" value={true} name="True" />,
-                <Select.Option key="2" value={false} name="False" />
+                <Select.Option key="2" value={false} name="False" />,
             ],
-            onValueChange: mockOnValueChange
+            onValueChange: mockOnValueChange,
         };
 
         const { container } = render(<Select {...booleanProps} />);
@@ -274,7 +293,7 @@ describe('Select Component', () => {
     it('handles empty children array', () => {
         const emptyProps: SelectProps<string> = {
             children: [],
-            onValueChange: jest.fn()
+            onValueChange: jest.fn(),
         };
 
         const { container } = render(<Select {...emptyProps} />);
@@ -292,9 +311,9 @@ describe('Select Component', () => {
                 <Select.Option key="1" value="option1" name="Option 1" />,
                 <div key="2">Invalid child</div>,
                 <Select.Option key="3" value="option2" name="Option 2" />,
-                "String child"
+                'String child',
             ],
-            onValueChange: jest.fn()
+            onValueChange: jest.fn(),
         };
 
         const { container } = render(<Select {...mixedProps} />);
@@ -346,10 +365,10 @@ describe('Select Component', () => {
     });
 
     it('renders Select.Option component correctly', () => {
-        const {container} = render(
+        const { container } = render(
             <Select.Option value="test" name="Test Option">
                 Child content
-            </Select.Option>
+            </Select.Option>,
         );
 
         expect(container.textContent).toBe('Child content');
@@ -375,4 +394,3 @@ describe('Select Component', () => {
         expect(ref.current).toHaveClass('select-opened');
     });
 });
-

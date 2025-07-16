@@ -5,6 +5,7 @@
 This repo contains front end part of the Victory center
 
 Main structure of this project
+
 <pre><code>
 victory-center-client/
 ├── .github/
@@ -19,6 +20,8 @@ victory-center-client/
 │   └── nginx.conf
 ├── public/
 │   └── index.html
+├── scripts/
+│   └── start-in-dev-over-https.mjs
 ├── src/
 │   ├── assets/                             # Images, icons, fonts, etc.
 │   │   ├── images
@@ -39,27 +42,51 @@ victory-center-client/
 │   │   └── styles/                         # Additional styles
 │   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
 │   │   ├── admin/                          # Admin-specific components
-│   │   │   └── admin-navigation/
+│   │   │   ├── admin-context-wrapper/
+│   │   │   ├── admin-navigation/
+│   │   │   ├── private-route/
+│   │   │   └── public-route/
 │   │   ├── common/                         # Shared UI components
 │   │   │   ├── button/
+│   │   │   ├── inline-loader/
 │   │   │   ├── input/
 │   │   │   ├── modal/
+│   │   │   ├── scrollable-program-frame/
+│   │   │   ├── page-loader/
 │   │   │   └── select/
 │   │   ├── footer/
 │   │   └── header/                         # Header-related components
 │   ├── const/                              # Constants used across the project
+│   │   ├── about-us-page/
+│   │   ├── admin/
 │   │   ├── footer/
 │   │   ├── header/
+│   │   ├── loader/
+│   │   ├── login-page/
 │   │   ├── program-page/
+│   │   ├── routers/
 |   |   ├── team-page/
-│   │   └── routes/
+│   │   └── urls/
+│   ├── context/                            # React context providers
+│   │   └── admin-context-provider
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
-│   │   └──main-layout
+│   │   ├── admin-layout/
+│   │   └── main-layout/
 │   ├── pages/                              # Pages
+│   │   ├── about-us-page/
+│   │   │   ├── company-values/
+│   │   │   ├── donate-section/
+│   │   │   ├── intro-section/
+│   │   │   ├── main-value/
+│   │   │   ├── our-mission/
+│   │   │   ├── our-team-section/
+│   │   │   └── support-section/
 │   │   ├── admin/                          # Admin pages
 │   │   │   ├── admin-page-content/         # Content components for admin pages
 │   │   │   └── team/                       # Team management page
 │   │   │       └── components/             # Components specific to team page
+│   │   ├── login/
+│   │   │   └── components/
 │   │   ├── not-found/
 │   │   ├── program-page/
 │   │   │   └── program-page/
@@ -76,11 +103,15 @@ victory-center-client/
 │   ├── routes/                             # Route configuration
 │   │   └── app-router
 │   ├── hooks/                              # Custom React hooks
-│   ├── context/                            # React context providers
-│   │   └── admin-context-provider
 │   ├── services/                           # API calls, data services
+│   │   ├── auth/
+│   │   │   ├── auth-service/
+│   │   │   ├── create-admin-client/
+│   │   │   └── resolve-with-new-token/
 │   │   └── data-fetch
 │   │       ├── admin-page-data-fetch
+|   |           └── team-page-data-fetch
+│   │       ├── login-page-data-fetch
 │   │       ├── program-page-data-fetch
 │   │       └── user-pages-data-fetch
 │   │           ├── home-page-data-fetch
@@ -88,6 +119,10 @@ victory-center-client/
 │   │           └── page-2-data-fetch
 │   ├── types/
 │   ├── utils/                              # Utility functions
+│   │   ├── functions/
+│   │   ├── hooks/
+│   │   │   ├── use-admin-client/
+│   │   │   └── use-on-mount-unsafe/
 │   │   └── mock-data/
 │   │       ├── admin-page/                 # Mock data for admin pages
 │   │       ├── program-page/
@@ -99,9 +134,11 @@ victory-center-client/
 │   ├── index.css                           # Global styles (normalizer)
 │   ├── react-app-env.d.ts
 │   ├── reportWebVitals.ts
+│   ├── setupProxy.ts
 │   └── setupTests.ts
 ├── .coderabbit.yaml
 ├── .dockerignore
+├── .env.development
 ├── .gitignore
 ├── Dockerfile
 ├── LICENSE
@@ -111,6 +148,7 @@ victory-center-client/
 └── tsconfig.json
 </code></pre>
 
+<div>
 [![Build Status](https://img.shields.io/travis/ita-social-projects/VictoryCenter-Client/main?style=flat-square)](https://travis-ci.org/github/ita-social-projects/VictoryCenter-Client)
 [![Coverage Status](https://img.shields.io/gitlab/coverage/ita-social-projects/VictoryCenter-Client/main?style=flat-square)](https://coveralls.io)
 [![Github Issues](https://img.shields.io/github/issues/ita-social-projects/VictoryCenter-Client?style=flat-square)](https://github.com/ita-social-projects/VictoryCenter-Client/issues)
@@ -118,7 +156,7 @@ victory-center-client/
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=alert_status)](https://sonarcloud.io/project/overview?id=ita-social-projects_VictoryCenter-Client) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=coverage)](https://sonarcloud.io/dashboard?id=ita-social-projects_VictoryCenter-Client) [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=bugs)](https://sonarcloud.io/dashboard?id=ita-social-projects_VictoryCenter-Client) [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=code_smells)](https://sonarcloud.io/dashboard?id=ita-social-projects_VictoryCenter-Client) [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects_VictoryCenter-Client&metric=security_rating)](https://sonarcloud.io/dashboard?id=ita-social-projects_VictoryCenter-Client)
 
-- For more on these wonderful  badges, refer to <a href="https://shields.io/" target="_blank">shields.io</a>.
+- For more on these wonderful badges, refer to <a href="https://shields.io/" target="_blank">shields.io</a>.
 
 ---
 
@@ -127,6 +165,7 @@ victory-center-client/
 In the project directory, you can run:
 
 # Setup
+
 To setup this project use this command in project folder:
 
 ### `npm install`
@@ -134,8 +173,15 @@ To setup this project use this command in project folder:
 ### `npm start`
 
 Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Open [https://localhost:3000](https://localhost:3000) to view it in the browser.
 
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
+
+### `npm run start-with-cert`
+
+Runs the app in development mode over HTTPS, generating and trusting a local SSL certificate.\
+Open [https://localhost:3000](https://localhost:3000) to view it in the browser without certificate warnings.\
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
@@ -153,6 +199,10 @@ and present it in a form of a table in terminal.
 
 Launches the lint check that will allow to debug lint errors locally.
 
+### `npm run format`
+
+Lunches code formating process
+
 ### `npm run build`
 
 Builds the app for production to the `build` folder.\
@@ -168,15 +218,70 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 **Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
 ## Installation
- - Modify this section later
+
+Ensure you have installed the [back-end project](https://github.com/ita-social-projects/VictoryCenter-Back) and the following prerequisites:
 
 ### Required to install
- - Modify this section later
+
+- Node.js (24.0.0) or higher
+- npm (11.4.2) or higher
+
+### Clone
+
+Clone this repo to your local machine using:
+
+```
+git clone https://github.com/ita-social-projects/VictoryCenter-Client
+```
+
+### Setup
+
+To setup this project use this command in project folder:
+
+```
+npm install
+```
+
+To enable HTTPS locally, you have two options:
+
+- Either install OpenSSL, add it to your PATH and use this command to handle configuration for you and start the project:
+
+```
+npm run start-with-cert
+```
+
+- Or if you have any troubles, we have a few manual setup steps. Follow these instructions carefully:
+
+#### Prerequisites
+
+Before proceeding, ensure you have [mkcert](https://github.com/FiloSottile/mkcert?tab=readme-ov-file#installation) installed on your system.
+
+#### Installation Steps
+
+1. Create a `certs` folder in the root directory of cloned project.
+2. Navigate to the `certs` folder in your console.
+3. Run the following command to install local certificate authority:
+
+```
+mkcert -install
+```
+
+4. Run the following command to configure SSL certificates:
+
+```
+mkcert -key-file localhost-key.pem -cert-file localhost-cert.pem localhost 127.0.0.1 ::1
+```
+
+### Required to install
+
+- Modify this section later
 
 ### Environment
+
 - Modify this section later
 
 environmental variables
+
 ```properties
 spring.datasource.url=${DATASOURCE_URL}
 spring.datasource.username=${DATASOURCE_USER}
@@ -191,7 +296,9 @@ api.secret=${API_SECRET}
 ## Contributing
 
 ### Git flow
+
 > To get started...
+
 #### Step 1
 
 - **Option 1**
@@ -219,7 +326,6 @@ api.secret=${API_SECRET}
 [![@IrynaZavushchak](https://avatars.githubusercontent.com/u/45690640?s=100&v=4)](https://github.com/IrynaZavushchak)
 [![@LanchevychMaxym](https://avatars.githubusercontent.com/u/47561209?s=100&v=4)](https://github.com/LanchevychMaxym)
 
-
 - You can just grab their GitHub profile image URL
 - You should probably resize their picture using `?s=200` at the end of the image URL.
 
@@ -236,5 +342,6 @@ Reach out to us at one of the following places!
 ---
 
 ## License
+
 - **[MIT license](http://opensource.org/licenses/mit-license.php)**
 - Copyright 2025 © <a href="https://softserve.academy/" target="_blank"> SoftServe Academy</a>.

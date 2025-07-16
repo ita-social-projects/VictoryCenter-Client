@@ -1,0 +1,72 @@
+.login-form {
+    width: 32rem;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 2rem 3rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+    &-title {
+        font-size: 2rem;
+        font-weight: 400;
+        margin: 1rem 0 1rem 0;
+        text-align: center;
+        color: #041128;
+    }
+
+    &-group {
+        width: 26rem;
+        margin: 0.625rem 0 0.625rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+
+        label {
+            font-size: 1rem;
+            display: block;
+            color: #414651;
+        }
+
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 62.5rem #fff inset;
+            outline: none;
+        }
+
+        input {
+            height: 2.5rem;
+            width: 100%;
+            font-size: 1rem;
+            border: 1px solid #d5d7da;
+            box-shadow: 0px 1px 2px 0px #0a0d120d;
+            padding: 0.75rem 3.75rem 0.75rem 0.75rem;
+        }
+
+        .password-input-container {
+            position: relative;
+
+            .visibility-toggle {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                right: 0.75rem;
+                background: none;
+                border: none;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: inherit;
+            }
+        }
+
+        .submit-button {
+            margin-top: 0.625rem;
+            height: 2.5rem;
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+    }
+}

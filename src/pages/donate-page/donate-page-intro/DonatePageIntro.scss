@@ -1,0 +1,14 @@
+$mulish-font-family: 'Mulish', sans-serif;
+
+.donatePageIntro {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+
+    h1 {
+        font-family: $mulish-font-family;
+        font-weight: 700;
+        font-size: 4rem;
+        text-align: center;
+    }
+}

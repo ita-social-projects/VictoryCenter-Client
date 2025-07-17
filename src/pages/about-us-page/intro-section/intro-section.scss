@@ -4,19 +4,21 @@
 
     .background-img {
         width: 100%;
-        height: 56rem;
+        height: 60rem;
         object-fit: cover;
+        object-position: top;
         filter: grayscale(100%) contrast(120%) brightness(0.8);
     }
 
     .color-overlay {
         position: absolute;
         width: 100%;
-        height: 56rem;
+        height: 60rem;
         top: 0;
         left: 0;
-        clip-path: inset(5rem 34rem 18rem 1.25rem);
+        clip-path: inset(9rem 34rem 18rem 1.25rem);
         object-fit: cover;
+        object-position: top;
         z-index: 2;
         filter: grayscale(0%) brightness(1) saturate(130%) sepia(0.1);
         animation: revealColor 4s ease-out forwards;
@@ -66,7 +68,7 @@
 }
 @keyframes revealColor {
     0% {
-        clip-path: inset(5rem 34rem 18rem 1.25rem);
+        clip-path: inset(9rem 34rem 18rem 1.25rem);
     }
     100% {
         clip-path: inset(0 0 0 0);

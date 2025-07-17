@@ -14,6 +14,7 @@ import { AboutUsPage } from '../../pages/about-us-page/AboutUsPage';
 import { routes } from '../../const/routers/routes';
 import { AdminLayout } from '../../layouts/admin-layout/AdminLayout';
 import { TeamPageAdmin } from '../../pages/admin/team/TeamPage';
+import { ProgramsPageAdmin } from "../../pages/admin/programs/ProgramsPageAdmin";
 
 import { LoginPage } from '../../pages/login/LoginPage';
 import { AdminContextWrapper } from '../../components/admin/admin-context-wrapper/AdminContextWrapper';
@@ -49,6 +50,7 @@ export const AppRouter = () => (
                     <Route path={adminRoutes.adminRoute} element={<AdminLayout />}>
                         <Route index element={<AdminPage />} />
                         <Route path={adminRoutes.teamSubRoute} element={<TeamPageAdmin />} />
+                        <Route path={adminRoutes.programsSubRoute} element={<ProgramsPageAdmin/>}/>
                     </Route>
                 </Route>
             </Route>

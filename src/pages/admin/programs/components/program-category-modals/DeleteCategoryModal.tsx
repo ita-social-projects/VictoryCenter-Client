@@ -3,123 +3,125 @@ import { Modal } from "../../../../../components/common/modal/Modal";
 import { Button } from "../../../../../components/common/button/Button";
 import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from "../../../../../const/admin/programs";
-import InfoIcon from "../../../../../assets/icons/info.svg";
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
+import InfoIcon from "../../../../../assets/icons/info.svg";
 
-export const DeleteCategoryModal: React.FC<{
-    isOpen: boolean;
-    onClose: () => void;
-    onDeleteCategory: (categoryId: number) => void;
-    categories: ProgramCategory[];
-}> = ({ isOpen, onClose, onDeleteCategory, categories }) => {
-    const [categoryToDelete, setCategoryToDelete] = useState<ProgramCategory | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    const [error, setError] = useState<string>('');
-    const isSubmittingRef = useRef(false);
+type DeleteCategoryModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  onDeleteCategory: (categoryId: number) => void;
+  categories: ProgramCategory[];
+};
 
-    const handleDelete = async () => {
-        if (!categoryToDelete) return;
+export const DeleteCategoryModal = ({
+  isOpen,
+  onClose,
+  onDeleteCategory,
+  categories,
+}: DeleteCategoryModalProps) => {
+  const [categoryId, setCategoryId] = useState<number>(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false);
 
-        try {
-            isSubmittingRef.current = true;
-            setIsSubmitting(true);
-            setError('');
+  const selectedCategory = categories.find(cat => cat.id === categoryId);
 
-            await ProgramsApi.deleteCategory(categoryToDelete.id);
+  const handleSubmit = async () => {
+    if (isSubmittingRef.current || !selectedCategory || selectedCategory.programsCount > 0) return;
 
-            onDeleteCategory(categoryToDelete.id);
-            handleClose();
-        } catch (error) {
-            setError(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
-        } finally {
-            isSubmittingRef.current = false;
-            setIsSubmitting(false);
-        }
-    };
+    try {
+      isSubmittingRef.current = true;
+      setIsSubmitting(true);
 
-    const handleClose = () => {
-        setCategoryToDelete(null);
-        setError('');
-        onClose();
-    };
+      await ProgramsApi.deleteCategory(selectedCategory.id);
 
-    useEffect(() => {
-        if (isOpen && categories.length > 0) {
-            setCategoryToDelete(categories[0]);
-        }
-    }, [isOpen, categories]);
+      onDeleteCategory(selectedCategory.id);
+      setCategoryId(0);
+      onClose();
+    } catch (error) {
+      // Handle in your way
+    } finally {
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
+    }
+  };
 
-    return (
-        <Modal isOpen={isOpen} onClose={handleClose}>
-            <Modal.Title>
-                <span className={'program-form-header'}>Видалити категорію</span>
-            </Modal.Title>
-            <Modal.Content>
-                <div className="program-form-main">
-                    <div className='form-group'>
-                        <label htmlFor="delete-category-select">Категорія</label>
-                        <select
-                            id="delete-category-select"
-                            value={categoryToDelete?.id || ''}
-                            onChange={(e) => {
-                                const selectedId = parseInt(e.target.value);
-                                const selected = categories.find(cat => cat.id === selectedId);
-                                if (selected) {
-                                    setCategoryToDelete(selected);
-                                }
-                            }}
-                            disabled={isSubmitting}
-                        >
-                            {categories.map(category => (
-                                <option key={category.id} value={category.id}>
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+  const handleClose = () => {
+    if (isSubmitting) return;
+    setCategoryId(0);
+    onClose();
+  };
 
-                    {categoryToDelete && categoryToDelete.programsCount > 0 && (
-                        <div className="delete-category-warning">
-                            <div className="warning-icon-container">
-                                <img src={InfoIcon} alt="info-icon" className="warning-info-icon" />
-                            </div>
-                            <div className="warning-text">
-                                <div className="warning-title">
-                                    {PROGRAM_CATEGORY_VALIDATION.programsCount
-                                        .getProgramsCountWarning(categoryToDelete.programsCount)}
-                                </div>
-                                <div className="warning-description">
-                                    {PROGRAM_CATEGORY_VALIDATION.programsCount
-                                        .getRelocationOrRemovalNotice()}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    {error && (<span className='error'>{error}</span>)}
-                </div>
-            </Modal.Content>
-            <Modal.Actions>
-                <div className="program-form-buttons-container">
-                    <Button
-                        type='button'
-                        buttonStyle='secondary'
-                        className={'cancel-button'}
-                        onClick={handleClose}
-                        disabled={isSubmitting}
-                    >
-                        {PROGRAM_CATEGORY_TEXT.FORM.BUTTON.CANCEL_DELETE}
-                    </Button>
-                    <Button
-                        type='submit'
-                        buttonStyle='primary'
-                        disabled={!!(categoryToDelete && categoryToDelete.programsCount > 0) || isSubmitting}
-                        className={'publisher-button'}
-                        onClick={handleDelete}
-                    >
-                        {PROGRAM_CATEGORY_TEXT.FORM.BUTTON.CONFIRM_DELETE}
-                    </Button>
-                </div>
-            </Modal.Actions>
-        </Modal>
-    );
+  useEffect(() => {
+    if (isOpen && categories.length > 0) {
+      setCategoryId(categories[0].id);
+    }
+  }, [isOpen, categories]);
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = parseInt(e.target.value);
+    setCategoryId(selectedId);
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={handleClose}>
+      <Modal.Title>
+        {PROGRAM_CATEGORY_TEXT.FORM.TITLE.DELETE_CATEGORY}
+      </Modal.Title>
+      <Modal.Content>
+        <div className="program-form-main">
+          <div className='form-group'>
+            <label htmlFor="delete-category-select">
+              <span className='required-field'>*</span>
+              {PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
+            </label>
+            <select
+              id="delete-category-select"
+              onChange={handleCategoryChange}
+              disabled={isSubmitting}
+              value={categoryId}
+            >
+              {categories.map(category => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {selectedCategory && selectedCategory.programsCount > 0 && (
+            <div className='hint-container'>
+              <div className='hint-container-title'>
+                <img src={InfoIcon} alt="info-icon" />
+                <span>
+                  {PROGRAM_CATEGORY_VALIDATION.programsCount
+                    .getProgramsCountHintTitle(selectedCategory.programsCount)}
+                </span>
+              </div>
+              {PROGRAM_CATEGORY_VALIDATION.programsCount.getRelocationOrRemovalHint()}
+            </div>
+          )}
+        </div>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button
+          type='button'
+          buttonStyle='secondary'
+          className={'cancel-button'}
+          onClick={handleClose}
+          disabled={isSubmitting}
+        >
+          {PROGRAM_CATEGORY_TEXT.FORM.BUTTON.CANCEL_DELETE}
+        </Button>
+        <Button
+          type='button'
+          buttonStyle='primary'
+          className={'publisher-button'}
+          onClick={handleSubmit}
+          disabled={!!(selectedCategory && selectedCategory.programsCount > 0) || isSubmitting}
+        >
+          {PROGRAM_CATEGORY_TEXT.FORM.BUTTON.CONFIRM_DELETE}
+        </Button>
+      </Modal.Actions>
+    </Modal>
+  );
 };

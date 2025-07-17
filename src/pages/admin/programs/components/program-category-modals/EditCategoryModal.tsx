@@ -1,143 +1,171 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Modal } from "../../../../../components/common/modal/Modal";
 import { Button } from "../../../../../components/common/button/Button";
-import {ProgramCategory, ProgramCategoryCreateUpdate} from '../../../../../types/ProgramAdminPage';
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/ProgramAdminPage';
+import { ProgramCategoryValidationSchema } from '../../../../../validation/admin/program-category-schema/program-category-schema';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from "../../../../../const/admin/programs";
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
+import InfoIcon from "../../../../../assets/icons/info.svg";
+import classNames from "classnames";
 
-export const EditCategoryModal: React.FC<{
-    isOpen: boolean;
-    onClose: () => void;
-    onEditCategory: (category: ProgramCategory) => void;
-    categories: ProgramCategory[];
-}> = ({ isOpen, onClose, onEditCategory, categories }) => {
-    const [categoryToEdit, setCategoryToEdit] = useState<ProgramCategory | null>(null);
-    const [editCategoryName, setEditCategoryName] = useState<string>('');
-    const [isDuplicateName, setIsDuplicateName] = useState<boolean>(false);
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    const [error, setError] = useState<string>('');
-    const isSubmittingRef = useRef(false);
+type EditProgramCategoryFormValues = {
+  name: string;
+};
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+type EditCategoryModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  onEditCategory: (category: ProgramCategory) => void;
+  categories: ProgramCategory[];
+};
 
-        if (!categoryToEdit || !editCategoryName.trim() || isDuplicateName) {
-            return;
-        }
+export const EditCategoryModal = ({
+  isOpen,
+  onClose,
+  onEditCategory,
+  categories,
+}: EditCategoryModalProps) => {
+  const selectedCategoryRef = useRef<null | ProgramCategory>(null);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<EditProgramCategoryFormValues>({
+    mode: 'onChange',
+    resolver: yupResolver(ProgramCategoryValidationSchema),
+    defaultValues: {
+      name: '',
+    },
+  });
 
-        try {
-            isSubmittingRef.current = true;
-            setIsSubmitting(true);
-            setError('');
+  const nameValue = watch('name') || '';
 
-            const categoryToUpdate: ProgramCategoryCreateUpdate = {
-                id: categoryToEdit.id,
-                name: editCategoryName.trim()
-            };
+  const isDuplicateName = categories.some(
+    (category) =>
+      category.id !== selectedCategoryRef.current?.id &&
+      category.name.trim().toLowerCase() === nameValue.trim().toLowerCase()
+  );
 
-            const updatedCategory = await ProgramsApi.editCategory(categoryToUpdate);
-            onEditCategory(updatedCategory);
-            handleClose();
-        } catch (error) {
-            // Or handle in your way
-            setError(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY);
-        } finally {
-            isSubmittingRef.current = false;
-            setIsSubmitting(false);
-        }
-    };
+  const onSubmit = async (data: EditProgramCategoryFormValues) => {
+    if (isSubmitting || isDuplicateName || !selectedCategoryRef.current) return;
 
-    const handleClose = () => {
-        setCategoryToEdit(null);
-        setEditCategoryName('');
-        setError('');
-        setIsDuplicateName(false);
-        onClose();
-    };
+    try {
+      const categoryToUpdate: ProgramCategoryCreateUpdate = {
+        id: selectedCategoryRef.current.id,
+        name: data.name.trim(),
+      };
 
-    useEffect(() => {
-        if (editCategoryName.trim() && categoryToEdit) {
-            const isDuplicate = categories.some(category =>
-                category.id !== categoryToEdit.id &&
-                category.name.toLowerCase() === editCategoryName.trim().toLowerCase()
-            );
-            setIsDuplicateName(isDuplicate);
-        } else {
-            setIsDuplicateName(false);
-        }
-    }, [editCategoryName, categories, categoryToEdit]);
+      const updatedCategory = await ProgramsApi.editCategory(categoryToUpdate);
 
-    useEffect(() => {
-        if (isOpen && categories.length > 0) {
-            setCategoryToEdit(categories[0]);
-            setEditCategoryName(categories[0].name);
-        }
-    }, [isOpen, categories]);
+      onEditCategory(updatedCategory);
+      reset();
+      onClose();
+    } catch (error) {
+      // Handle in your way
+    } finally {
+      // Handle in your way
+    }
+  };
 
-    return (
-        <Modal isOpen={isOpen} onClose={handleClose}>
-            <Modal.Title>
-                <span className={'program-form-header'}>{PROGRAM_CATEGORY_TEXT.FORM.TITLE.EDIT_CATEGORY}</span>
-            </Modal.Title>
-            <Modal.Content>
-                <form onSubmit={handleSubmit} className="program-form-main">
-                    <div className='form-group'>
-                        <label htmlFor="edit-category-select">{PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}</label>
-                        <select
-                            id="edit-category-select"
-                            value={categoryToEdit?.id || ''}
-                            onChange={(e) => {
-                                const selectedId = parseInt(e.target.value);
-                                const selected = categories.find(cat => cat.id === selectedId);
-                                if (selected) {
-                                    setCategoryToEdit(selected);
-                                    setEditCategoryName(selected.name);
-                                }
-                            }}
-                            disabled={isSubmitting}
-                        >
-                            {categories.map(category => (
-                                <option key={category.id} value={category.id}>
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className='form-group form-group-name'>
-                        <label htmlFor="edit-category-name">{PROGRAM_CATEGORY_TEXT.FORM.LABEL.NAME}</label>
-                        <input
-                            value={editCategoryName}
-                            onChange={(e) => setEditCategoryName(e.target.value)}
-                            maxLength={PROGRAM_CATEGORY_VALIDATION.name.max}
-                            name='name'
-                            type="text"
-                            id='edit-category-name'
-                            required
-                            disabled={isSubmitting}
-                        />
-                        <div className='form-group-name-lenght-limit'>
-                            {editCategoryName.length}/{PROGRAM_CATEGORY_VALIDATION.name.max}
-                        </div>
-                        {isDuplicateName && (
-                            <span className='error'>
-                                {PROGRAM_CATEGORY_VALIDATION.name.getUniqueNameError()}
-                            </span>
-                        )}
-                        {error && (<span className='error'>{error}</span>)}
-                    </div>
-                </form>
-            </Modal.Content>
-            <Modal.Actions>
-                <div className='program-form-buttons-container'>
-                    <Button
-                        type="submit"
-                        buttonStyle="primary"
-                        disabled={isSubmitting || isDuplicateName || !editCategoryName.trim()}
-                    >
-                        {PROGRAM_CATEGORY_TEXT.FORM.BUTTON.CONFIRM_SAVE}
-                    </Button>
-                </div>
-            </Modal.Actions>
-        </Modal>
-    );
+  const handleClose = () => {
+    if (isSubmitting) return;
+    reset();
+    selectedCategoryRef.current = null;
+    onClose();
+  };
+
+  useEffect(() => {
+    if (isOpen && categories.length > 0) {
+      const firstCategory = categories[0];
+      selectedCategoryRef.current = firstCategory;
+      setValue('name', firstCategory.name);
+    }
+  }, [isOpen, categories, setValue]);
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedId = parseInt(e.target.value);
+    const selected = categories.find(cat => cat.id === selectedId);
+    if (selected) {
+      selectedCategoryRef.current = selected;
+      setValue('name', selected.name);
+    }
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={handleClose}>
+      <Modal.Title>
+        {PROGRAM_CATEGORY_TEXT.FORM.TITLE.EDIT_CATEGORY}
+      </Modal.Title>
+      <Modal.Content>
+        <form onSubmit={handleSubmit(onSubmit)} className="program-form-main" id="edit-program-category-form">
+          <div className='form-group'>
+            <label htmlFor="edit-category-select">
+                <span className='required-field'>*</span>
+              {PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
+            </label>
+            <select
+              id="edit-category-select"
+              onChange={handleCategoryChange}
+              disabled={isSubmitting}
+              value={selectedCategoryRef.current?.id || ''}
+            >
+              {categories.map(category => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className='form-group form-group-name'>
+            <label htmlFor="edit-category-name">
+              <span className='required-field'>*</span>
+              {PROGRAM_CATEGORY_TEXT.FORM.LABEL.NAME}
+            </label>
+            <div className={classNames('input-line-wrapper', { disabled: isSubmitting })}>
+              <input
+                {...register('name')}
+                maxLength={PROGRAM_CATEGORY_VALIDATION.name.max}
+                className='input'
+                name='name'
+                type="text"
+                id='edit-category-name'
+                disabled={isSubmitting}
+              />
+              <div className='character-limit'>
+                {nameValue.length}/{PROGRAM_CATEGORY_VALIDATION.name.max}
+              </div>
+            </div>
+            {errors.name && (
+              <span className="error">{errors.name.message}</span>
+            )}
+          </div>
+
+          {isDuplicateName && (
+            <div className='hint-container'>
+              <div className='hint-container-title'>
+                <img src={InfoIcon} alt="info-icon" />
+                <span>{PROGRAM_CATEGORY_VALIDATION.name.getUniqueNameError()}</span>
+              </div>
+            </div>
+          )}
+        </form>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button
+          type="submit"
+          form="edit-program-category-form"
+          buttonStyle="primary"
+          disabled={isSubmitting || isDuplicateName || !nameValue.trim()}
+        >
+          {PROGRAM_CATEGORY_TEXT.FORM.BUTTON.CONFIRM_SAVE}
+        </Button>
+      </Modal.Actions>
+    </Modal>
+  );
 };

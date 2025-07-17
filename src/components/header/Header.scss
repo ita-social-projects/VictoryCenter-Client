@@ -4,10 +4,23 @@ $mulish-font-family: 'Mulish', sans-serif;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+
+    height: 64px;
     padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
     padding-left: 3.5rem;
     padding-right: 3.5rem;
+
+    box-sizing: border-box;
+
+    background-color: #fdfdfb80;
+
+    backdrop-filter: blur(166px);
 
     .logoContainer {
         .logo {
@@ -42,7 +55,7 @@ $mulish-font-family: 'Mulish', sans-serif;
         gap: 0.5rem;
 
         .contactUsButton {
-            background-color: white;
+            background-color: rgba(255, 255, 255, 0);
             width: 8.2em;
             height: 2.5rem;
             font-family: $mulish-font-family;

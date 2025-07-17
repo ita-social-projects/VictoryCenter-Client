@@ -1,11 +1,11 @@
 FROM node:20 AS build
 WORKDIR /app
-COPY package*.json ./
-RUN npm install --ignore-scripts
-COPY tsconfig.json ./
-COPY public ./public
-COPY src ./src
+COPY package*.json /app/
+RUN npm install
+RUN npm install --global serve
+COPY ./ ./
 RUN npm run build
+
 
 FROM nginxinc/nginx-unprivileged  
 COPY --from=build /app/build /usr/share/nginx/html

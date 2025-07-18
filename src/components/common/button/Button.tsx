@@ -1,26 +1,40 @@
-import React from 'react';
-import classNames from 'classnames';
-import './button.scss';
+import React from "react";
+import "./button.scss";
+
 type ButtonProps = {
-    children: React.ReactNode;
-    buttonStyle?: 'primary' | 'secondary';
+    children: React.ReactNode,
+    buttonStyle?: 'primary' | 'secondary',
     onClick?: () => void;
-    type?: 'submit' | 'reset' | 'button';
+    type?: "submit" | "reset" | "button"
     form?: string;
     className?: string;
+    disabled?: boolean | undefined;
 };
-export const Button = ({ children, onClick, buttonStyle, type = 'button', form, className = '' }: ButtonProps) => {
-    return (
-        <button
-            form={form}
-            type={type}
-            className={classNames(className, {
-                'btn-primary': buttonStyle === 'primary',
-                'btn-secondary': buttonStyle === 'secondary',
-            })}
-            onClick={onClick}
-        >
-            {children}
-        </button>
-    );
-};
+
+export const Button = ({children, onClick, buttonStyle, type = "button", form, disabled = false, className = ''}: ButtonProps) => {
+    const getClassName = () => {
+        let baseClass = "";
+        switch (buttonStyle) {
+            case "primary":
+                baseClass = "btn-primary";
+                break;
+            case "secondary":
+                baseClass = "btn-secondary";
+                break;
+            default:
+                baseClass = "";
+        }
+
+        if (disabled && baseClass) {
+            return `${baseClass} ${baseClass}-disabled`;
+        }
+
+        return baseClass;
+    }
+
+    return (<button form={form} type={type} className={`${getClassName()} ${className}`} onClick={onClick} disabled={disabled}>
+        {children}
+    </button>);
+}
+
+export default Button;

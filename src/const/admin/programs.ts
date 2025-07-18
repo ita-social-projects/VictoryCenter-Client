@@ -1,32 +1,10 @@
 ﻿export const PROGRAMS_TEXT = {
-    LIST: {
-        NOT_FOUND: 'Нічого не знайдено',
-    },
-    TOOLTIP: {
-        PUBLISHED_IN: 'Опубліковано в:',
-        DRAFTED_IN: 'Збережено в:',
-    },
-
-    BUTTONS: {
+    BUTTON: {
         ADD_PROGRAM: 'Додати програму',
-        SAVE: 'Зберегти',
-    },
-
-    FILTER: {
-        SEARCH_BY_NAME: 'Пошук за назвою',
-        STATUS: {
-            ALL: 'Усі',
-            PUBLISHED: 'Опубліковано',
-            DRAFT: 'Чернетка',
-        },
     },
 
     QUESTION: {
         PUBLISH_PROGRAM: 'Опублікувати нову програму?',
-        SAVE_AS_DRAFT: 'Зберегти як чернетку?',
-        CHANGES_LOST: 'Зміни буде втрачено. Бажаєте продовжити?',
-        CONFIRM: 'Так',
-        CANCEL: 'Ні',
     },
 
     FORM: {
@@ -35,15 +13,11 @@
             EDIT_PROGRAM: 'Редагування програми',
             DELETE_PROGRAM: 'Видалити програму?',
         },
-        BUTTON: {
-            SAVE_AS_DRAFT: 'Зберегти як чернетку',
-            PUBLISH: 'Опублікувати',
-        },
         LABEL: {
-            CATEGORY: 'Категорія',
-            SELECT_CATEGORY: 'Виберіть категорію',
             NAME: 'Назва',
             DESCRIPTION: 'Опис',
+            CATEGORY: 'Категорія',
+            SELECT_CATEGORY: 'Виберіть категорію',
             PHOTO: 'Фото',
             PHOTO_DRAG_DROP: 'Перетягніть файл сюди або натисніть для завантаження',
         },
@@ -68,11 +42,6 @@ export const PROGRAM_CATEGORY_TEXT = {
             FAIL_TO_UPDATE_CATEGORY: 'Виникла помилка під час оновлення категорії',
             FAIL_TO_DELETE_CATEGORY: 'Виникла помилка під час видалення категорії',
         },
-        BUTTON:{
-            CONFIRM_SAVE: 'Зберегти',
-            CONFIRM_DELETE: 'Видалити',
-            CANCEL_DELETE: 'Відмінити',
-        },
         LABEL:{
             NAME: 'Назва',
             CATEGORY: 'Категорія',
@@ -82,43 +51,40 @@ export const PROGRAM_CATEGORY_TEXT = {
 
 export const PROGRAM_VALIDATION = {
     name: {
-        min: 2,
-        max: 100,
-        allowed_chars: /^[A-Za-zА-Яа-яҐґЄєІіЇї'’\-\s]+$/,
-        getAllowedCharsError: () => 'Недопустимі символи в назві програми',
-        getMinError: () => `Назва повинна містити щонайменше ${PROGRAM_VALIDATION.name.min} символи`,
-        getMaxError: () => `Назва не повинна перевищувати ${PROGRAM_VALIDATION.name.max} символів`,
+        min: 5,
+        max: 200,
+        getMinError: () => `Не менше ${PROGRAM_VALIDATION.name.min} символів`,
+        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.name.max} символів`,
         getRequiredError: () => 'Назва обов’язкова',
     },
     description: {
-        max: 400,
-        getMaxError: () => `Опис не повинен перевищувати ${PROGRAM_VALIDATION.description.max} символів`,
-        getRequiredError: () => 'Опис обов’язковий при публікації',
+        min: 10,
+        max: 1000,
+        getMinError: () => `Не менше ${PROGRAM_VALIDATION.description.min} символів`,
+        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.description.max} символів`,
+        getRequiredError: () => 'Опис обов’язковий',
     },
     categories: {
-        getMinError: () => 'Потрібно обрати хоча б одну категорію',
+        getOneRequiredError: () => 'Потрібно обрати хоча б одну категорію',
     },
     img: {
         maxSizeBytes: 3 * 1024 * 1024,
         allowedFormats: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
-        getFormatError: () => 'Невірний формат зображення, дозволено jpeg, jpg, png, webp',
-        getSizeError: () => `Зображення має бути не більше ${PROGRAM_VALIDATION.img.maxSizeBytes / (1024 * 1024)} МБ`,
+        getFormatError: () => 'Невірний формат фото, дозволено jpeg, jpg, png, webp',
+        getSizeError: () => `Фото не більше ${PROGRAM_VALIDATION.img.maxSizeBytes / (1024 * 1024)} Mb`,
     },
 };
 
 export const PROGRAM_CATEGORY_VALIDATION = {
     name: {
-        min: 2,
+        min: 5,
         max: 20,
-        allowed_chars: /^[A-Za-zА-Яа-яҐґЄєІіЇї0-9'’\-\s]+$/,
-        requiredError: 'Назва є обов\'язковою',
-        getAllowedCharsError: () => 'Недопустимі символи в назві категорії',
-        getUniqueNameError: () => 'Категорія з такою назвою вже існує',
-        getMinError: () => `Назва повинна містити щонайменше ${PROGRAM_CATEGORY_VALIDATION.name.min} символи`,
-        getMaxError: () => `Назва не повинна перевищувати ${PROGRAM_CATEGORY_VALIDATION.name.max} символів`,
+        getCategoryWithThisNameAlreadyExistsError: () => 'Категорія з такою назвою вже існує',
+        getMinError: () => `Не менше ${PROGRAM_CATEGORY_VALIDATION.name.min} символи`,
+        getMaxError: () => `Не більше ${PROGRAM_CATEGORY_VALIDATION.name.max} символів`,
     },
     programsCount:{
         getRelocationOrRemovalHint: () => 'Перенесіть їх в іншу категорію або видаліть, щоб продовжити',
-        getProgramsCountHintTitle: (count: number) => `Категорія містить ${count} програм`,
+        getHasProgramsCountError: (count: number) => `Категорія містить ${count} програм`,
     }
 }

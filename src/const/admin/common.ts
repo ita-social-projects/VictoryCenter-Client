@@ -1,0 +1,41 @@
+﻿export const COMMON_TEXT_ADMIN = {
+
+    STATUS: {
+        DRAFT: 'Чернетка',
+        PUBLISHED: 'Опубліковано'
+    },
+
+    TOOLTIP: {
+        PUBLISHED_IN: 'Опубліковано в:',
+        DRAFTED_IN: 'Збережено в:',
+    },
+
+    LIST: {
+        NOT_FOUND: 'Нічого не знайдено',
+    },
+
+    FILTER: {
+        SEARCH_BY_NAME: 'Пошук за назвою',
+        STATUS: {
+            ALL: 'Усі',
+            PUBLISHED: 'Опубліковано',
+            DRAFT: 'Чернетка',
+        },
+    },
+
+    QUESTION: {
+        CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE: 'Зміни буде втрачено. Бажаєте продовжити?',
+        REMOVE_FROM_PUBLICATION: 'Зняти з публікації?',
+        PUBLISH_CHANGES: 'Опублікувати зміни?',
+    },
+
+    BUTTON: {
+        YES: 'Так',
+        NO: 'Ні',
+        SAVE: 'Зберегти',
+        DELETE: 'Видалити',
+        CANCEL: 'Відмінити',
+        SAVE_AS_DRAFTED: 'Зберегти як чернетку',
+        SAVE_AS_PUBLISHED: 'Опублікувати',
+    }
+}

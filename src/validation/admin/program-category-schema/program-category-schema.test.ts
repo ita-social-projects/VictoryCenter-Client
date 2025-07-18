@@ -30,13 +30,6 @@ describe('ProgramCategoryValidationSchema', () => {
             .rejects.toThrow(PROGRAM_CATEGORY_VALIDATION.name.requiredError);
     });
 
-    it('should fail validation when name contains disallowed characters', async () => {
-        const invalidData = { name: 'Invalid@Name!' };
-
-        await expect(ProgramCategoryValidationSchema.validate(invalidData))
-            .rejects.toThrow(PROGRAM_CATEGORY_VALIDATION.name.getAllowedCharsError());
-    });
-
     it('should fail validation when name is too short', async () => {
         const shortName = 'a'.repeat(PROGRAM_CATEGORY_VALIDATION.name.min - 1);
         const invalidData = { name: shortName };

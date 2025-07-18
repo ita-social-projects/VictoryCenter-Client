@@ -1,0 +1,26 @@
+﻿.status {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 36px;
+  padding: 4px 16px;
+  border-radius: 30px;
+  border: 1px solid;
+  font-size: 18px;
+  font-weight: 400;
+  white-space: nowrap;
+
+  &.draft {
+    color: #61615C;
+    background-color: #ffffff;
+    border-color: #61615C;
+  }
+
+  &.published {
+    color: #0F2957;
+    background-color: #E5ECFF;
+    border-color: #0F2957;
+  }
+}

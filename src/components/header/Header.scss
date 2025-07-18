@@ -35,17 +35,19 @@ $mulish-font-family: 'Mulish', sans-serif;
             gap: 3rem;
 
             a {
-                color: black;
+                color: #061125;
                 font-family: $mulish-font-family;
                 font-size: 1rem;
                 font-weight: 600;
                 text-decoration: none;
-            }
-            a:hover {
-                text-decoration: underline;
-            }
-            a:focus {
-                text-decoration: underline;
+
+                &:hover {
+                    color: #5E708E;
+                }
+
+                &:active {
+                    color: #B5BDCB;
+                }
             }
         }
     }

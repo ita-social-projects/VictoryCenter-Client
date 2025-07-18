@@ -1,9 +1,9 @@
 ﻿import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Status from './Status';
-import { COMMON_TEXT_ADMIN } from "../../../const/common/common-text";
+import { COMMON_TEXT_ADMIN } from "../../../const/admin/common";
 
-jest.mock("../../../const/common/common-text", () => ({
+jest.mock("../../../const/admin/common", () => ({
     COMMON_TEXT_ADMIN: {
         STATUS: {
             DRAFT: 'Чернетка',

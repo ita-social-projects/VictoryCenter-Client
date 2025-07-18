@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import { VisibilityStatus } from "../../../types/Common";
-import { COMMON_TEXT_ADMIN } from "../../../const/common/common-text";
+import { COMMON_TEXT_ADMIN } from "../../../const/admin/common";
 
 const Status = ({ status }: { status: VisibilityStatus }) => {
     const statusTypeToText = (statusType: VisibilityStatus) => {

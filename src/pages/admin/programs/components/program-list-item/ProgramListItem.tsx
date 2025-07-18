@@ -1,20 +1,16 @@
 ﻿import BlankImage from '../../../../../assets/images/admin/blank-image.svg';
 import InfoIcon from '../../../../../assets/icons/info.svg';
-import { Program, ProgramStatus } from '../../../../../types/ProgramAdminPage';
-import { Tooltip } from '../../../../../components/common/tooltip/Tooltip';
-import classNames from 'classnames';
+import { Program } from '../../../../../types/ProgramAdminPage';
+import {COMMON_TEXT_ADMIN} from "../../../../../const/admin/common";
+import Tooltip  from '../../../../../components/common/tooltip/Tooltip';
+import Status from "../../../../../components/common/status/Status";
 import './programs-list-item.scss';
-import {PROGRAMS_TEXT} from "../../../../../const/admin/programs";
 
 export interface ProgramListItemProps {
   program: Program;
   handleOnDeleteProgram: (program: Program) => void;
   handleOnEditProgram: (program: Program) => void;
 }
-
-const statusTypeToText = (status: ProgramStatus): string => {
-  return status === 'Published' ? 'Опубліковано' : 'Чернетка';
-};
 
 export const ProgramListItem = ({
   program,
@@ -32,15 +28,7 @@ export const ProgramListItem = ({
           <p>{program.description}</p>
         </div>
         <div className="program-info-status">
-          <div
-            className={classNames('program-status', {
-              'draft': program.status === 'Draft',
-              'published': program.status === 'Published',
-            })}
-          >
-            <span>•</span>
-            <span>{statusTypeToText(program.status)}</span>
-          </div>
+          <Status status={program.status} />
         </div>
       </div>
 
@@ -52,8 +40,8 @@ export const ProgramListItem = ({
           <Tooltip.Content>
             <div className="program-actions-tooltip">
               <b>{program.status == 'Published' ?
-                  PROGRAMS_TEXT.TOOLTIP.PUBLISHED_IN :
-                  PROGRAMS_TEXT.TOOLTIP.DRAFTED_IN}</b>
+                  COMMON_TEXT_ADMIN.TOOLTIP.PUBLISHED_IN :
+                  COMMON_TEXT_ADMIN.TOOLTIP.DRAFTED_IN}</b>
               {program.categories.map((c) => (
                 <span key={c.id}>{c.name}</span>
               ))}
@@ -77,3 +65,5 @@ export const ProgramListItem = ({
     </div>
   );
 };
+
+export default ProgramListItem;

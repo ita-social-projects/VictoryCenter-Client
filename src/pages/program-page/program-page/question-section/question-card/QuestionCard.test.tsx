@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { Question } from '../../../../../types/ProgramPage';
+import { Question } from '../../../../../types/public/ProgramPage';
 import { QuestionCard } from './QuestionCard';
 
 describe('test question card component', () => {

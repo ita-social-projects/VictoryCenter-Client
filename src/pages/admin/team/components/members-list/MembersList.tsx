@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { categoryMap } from '../../../../../const/admin/team-page';
-import { TeamCategory } from '../../../../../types/TeamPage';
+import { TeamCategory } from '../../../../../types/public/TeamPage';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { MemberDragPreview } from '../member-drag-preview/MemberDragPreview';
 import { MembersListItem } from '../members-list-item/MembersListItem';
@@ -8,7 +8,7 @@ import NotFoundIcon from '../../../../../assets/icons/not-found.svg';
 import { Button } from '../../../../../components/common/button/Button';
 import LoaderIcon from '../../../../../assets/icons/load.svg';
 import ArrowUpIcon from '../../../../../assets/icons/arrow-up.svg';
-import { StatusFilter } from '../team-page-toolbar/TeamPageToolbar';
+import { StatusFilter } from '../../../../../types/Common';
 import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
 import './members-list.scss';
 import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
@@ -29,15 +29,8 @@ import {
     TEAM_NOT_FOUND,
 } from '../../../../../const/team';
 import classNames from 'classnames';
-
-export type Member = {
-    id: number;
-    img: string;
-    fullName: string;
-    description: string;
-    status: string;
-    category: TeamCategory;
-};
+import { DragPreviewModel } from '../../../../../types/admin/Common';
+import { Member } from '../../../../../types/admin/TeamMembers';
 
 export type MembersListProps = {
     searchByNameQuery: string | null;
@@ -45,13 +38,6 @@ export type MembersListProps = {
     onAutocompleteValuesChange: (autocompleteValue: string[]) => void;
     refetchTrigger?: number;
     onError?: (msg: string | null) => void;
-};
-
-export type MemberDragPreviewModel = {
-    visible: boolean;
-    x: number;
-    y: number;
-    member: Member | null;
 };
 
 const currentTabKey = 'currentTab';
@@ -107,7 +93,7 @@ export const MembersList = ({
     );
     const [isDeleteTeamMemberModalOpen, setIsDeleteTeamMemberModalOpen] = useState(false);
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-    const [dragPreview, setDragPreview] = useState<MemberDragPreviewModel>({
+    const [dragPreview, setDragPreview] = useState<DragPreviewModel<Member>>({
         visible: false,
         x: 0,
         y: 0,

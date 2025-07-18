@@ -1,13 +1,35 @@
-import { Member } from '../../../../pages/admin/team/components/members-list/MembersList';
+import { Member, TeamMemberDto } from '../../../../types/admin/TeamMembers';
 import { reverseCategoryMap } from '../../../../pages/admin/team/TeamPage';
-import { TeamMemberDto } from '../../../../types/TeamPage';
+
 import { categoryMap } from '../../../../const/admin/team-page';
 import { MemberFormValues } from '../../../../pages/admin/team/components/member-form/MemberForm';
 import { AxiosInstance } from 'axios';
+import { Status } from '../../../../types/Common';
 
 export const TeamMembersApi = {
-    getAll: async (client: AxiosInstance): Promise<Member[]> => {
-        const response = await client.get<TeamMemberDto[]>('/TeamMembers');
+    getAll: async (
+        client: AxiosInstance,
+        categoryId?: number,
+        status?: Status,
+        offset?: number,
+        limit?: number,
+    ): Promise<Member[]> => {
+        const params: Record<string, any> = {};
+
+        if (categoryId !== undefined && categoryId !== null) {
+            params.categoryId = categoryId;
+        }
+        if (status !== undefined && status !== null) {
+            params.status = status;
+        }
+        if (offset !== undefined && offset !== null) {
+            params.offset = offset;
+        }
+        if (limit !== undefined && limit !== null) {
+            params.limit = limit;
+        }
+
+        const response = await client.get<TeamMemberDto[]>('/TeamMembers', { params });
         return response.data.map(mapTeamMemberDtoToTeamMember);
     },
 

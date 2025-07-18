@@ -1,4 +1,4 @@
-import { Member } from '../members-list/MembersList';
+import { Member } from '../../../../../types/admin/TeamMembers';
 import DragIcon from '../../../../../assets/icons/dragger.svg';
 import React from 'react';
 import { MemberComponent } from '../member-component/MemberComponent';

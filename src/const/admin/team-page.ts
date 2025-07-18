@@ -1,9 +1,9 @@
-import { TeamCategory } from '../../types/TeamPage';
+// import { TeamCategory } from '../../types/public/TeamPage';
 
-export const TEAM_STATUS_DEFAULT = 'Статус';
+// export const TEAM_STATUS_DEFAULT = 'Статус';
 
-export const categoryMap: Record<TeamCategory, number> = {
-    'Основна команда': 1,
-    'Наглядова рада': 2,
-    Радники: 3,
-};
+// export const categoryMap: Record<TeamCategory, number> = {
+//     'Основна команда': 59,
+//     'Наглядова рада': 60,
+//     Радники: 3,
+// };

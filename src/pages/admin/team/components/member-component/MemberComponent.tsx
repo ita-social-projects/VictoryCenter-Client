@@ -1,5 +1,5 @@
 import React from 'react';
-import { Member } from '../members-list/MembersList';
+import { Member } from '../../../../../types/admin/TeamMembers';
 import './member-component.scss';
 import BlankUserImage from '../../../../../assets/images/admin/blank-user.svg';
 import classNames from 'classnames';

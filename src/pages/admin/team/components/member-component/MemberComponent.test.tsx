@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemberComponent } from './MemberComponent';
-import { Member } from '../members-list/MembersList';
+import { Member } from '../../../../../types/admin/TeamMembers';
 
 const mockMemberDraft: Member = {
     id: 1,

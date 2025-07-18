@@ -1,11 +1,12 @@
 import DragIcon from '../../../../../assets/icons/dragger.svg';
 import React from 'react';
-import { MemberDragPreviewModel } from '../members-list/MembersList';
+import { DragPreviewModel } from '../../../../../types/admin/Common';
 import { MemberComponent } from '../member-component/MemberComponent';
 import './member-drag-preview.scss';
+import { Member } from '../../../../../types/admin/TeamMembers';
 
 export type MemberDragPreviewProps = {
-    dragPreview: MemberDragPreviewModel;
+    dragPreview: DragPreviewModel<Member>;
 };
 export const MemberDragPreview = ({ dragPreview }: MemberDragPreviewProps) => {
     if (!dragPreview.visible || !dragPreview.member) return <></>;

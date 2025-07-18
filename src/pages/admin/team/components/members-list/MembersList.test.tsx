@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { MembersList, MembersListProps, Member } from './MembersList';
+import { MembersList, MembersListProps } from './MembersList';
+import { Member } from '../../../../../types/admin/TeamMembers';
 import * as React from 'react';
 import { mockMembers } from '../../../../../utils/mock-data/admin-page/teamPage';
 import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';

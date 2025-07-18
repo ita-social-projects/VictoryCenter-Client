@@ -2,7 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemberDragPreview } from './MemberDragPreview';
-import { Member, MemberDragPreviewModel } from '../members-list/MembersList';
+import { DragPreviewModel } from '../../../../../types/admin/Common';
+import { Member } from '../../../../../types/admin/TeamMembers';
 
 jest.mock('../../../../../assets/icons/dragger.svg', () => 'mock-dragger-icon');
 jest.mock('../member-component/MemberComponent', () => ({
@@ -35,14 +36,14 @@ const mockMember: Member = {
     category: 'Основна команда',
 };
 
-const mockDragPreview: MemberDragPreviewModel = {
+const mockDragPreview: DragPreviewModel<Member> = {
     visible: true,
     x: 100,
     y: 150,
     member: mockMember,
 };
 
-const mockDragPreviewWithoutMember: MemberDragPreviewModel = {
+const mockDragPreviewWithoutMember: DragPreviewModel<Member> = {
     visible: true,
     x: 100,
     y: 150,
@@ -154,7 +155,7 @@ describe('MemberDragPreview', () => {
                 category: 'Наглядова рада',
             };
 
-            const dragPreview: MemberDragPreviewModel = { ...mockDragPreview, member: differentMember };
+            const dragPreview: DragPreviewModel<Member> = { ...mockDragPreview, member: differentMember };
             render(<MemberDragPreview dragPreview={dragPreview} />);
 
             expect(screen.getByText('Jane Smith')).toBeInTheDocument();
@@ -223,7 +224,7 @@ describe('MemberDragPreview', () => {
 
     describe('Edge cases', () => {
         test('handles undefined member gracefully', () => {
-            const dragPreview: MemberDragPreviewModel = { ...mockDragPreview, member: null };
+            const dragPreview: DragPreviewModel<Member> = { ...mockDragPreview, member: null };
             const { container } = render(<MemberDragPreview dragPreview={dragPreview} />);
 
             expect(container.firstChild).toBeNull();

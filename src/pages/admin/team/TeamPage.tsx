@@ -1,7 +1,7 @@
 import './team-page.scss';
 import React from 'react';
 import { TeamPageContent } from './components/team-page-content/TeamPageContent';
-import { TeamCategory } from '../../../types/TeamPage';
+import { TeamCategory } from '../../../types/public/TeamPage';
 import { categoryMap } from '../../../const/admin/team-page';
 
 export const reverseCategoryMap: Record<number, TeamCategory> = Object.entries(categoryMap).reduce(

@@ -6,7 +6,7 @@ import {
 import { CreateAdminClient } from '../../services/auth/create-admin-client/createAdminClient';
 import { AxiosInstance } from 'axios';
 import { useOnMountUnsafe } from '../../utils/hooks/use-on-mount-unsafe/useOnMountUnsafe';
-import { Credentials } from '../../types/Auth';
+import { Credentials } from '../../types/admin/Auth';
 import { API_ROUTES } from '../../const/urls/main-api';
 import { isAccessTokenValid } from '../../services/auth/auth-service/AuthService';
 

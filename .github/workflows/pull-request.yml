@@ -60,4 +60,4 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}.${{ github.run_number }}
           labels: ${{ steps.meta.outputs.labels }}
           secrets: |
-            REACT_APP_BACKEND_URL=${{ secrets.REACT_APP_BACKEND_URL }
+            REACT_APP_BACKEND_URL=${{ secrets.REACT_APP_BACKEND_URL }}

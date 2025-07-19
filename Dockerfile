@@ -7,9 +7,16 @@ COPY ./ ./
 RUN npm run build
 
 
-FROM nginxinc/nginx-unprivileged  
-COPY --from=build /app/build /usr/share/nginx/html
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx/nginx.conf /etc/nginx/conf.d
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+
+WORKDIR /usr/share/nginx/html
+COPY ./env.sh .
+COPY .env .
+RUN apk add --no-cache bash
+RUN chmod +x env.sh
+
+CMD ["/bin/bash", "-c", "/usr/share/nginx/html/env.sh && nginx -g \"daemon off;\""]

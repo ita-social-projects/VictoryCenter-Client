@@ -1,6 +1,7 @@
 ﻿import React from 'react';
 import { VisibilityStatus } from "../../../types/Common";
 import { COMMON_TEXT_ADMIN } from "../../../const/admin/common";
+import './status.scss';
 
 const Status = ({ status }: { status: VisibilityStatus }) => {
     const statusTypeToText = (statusType: VisibilityStatus) => {
@@ -19,7 +20,7 @@ const Status = ({ status }: { status: VisibilityStatus }) => {
     };
 
     return (
-        <div className={`program-status ${getStatusClass(status)}`}>
+        <div className={`status ${getStatusClass(status)}`}>
             <span>•</span>
             <span>{statusTypeToText(status)}</span>
         </div>

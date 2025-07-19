@@ -1,0 +1,53 @@
+﻿.textarea-with-limit {
+  display: inline-block;
+  width: 100%;
+
+  .textarea-wrapper {
+    display: flex;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #0F2957;
+    box-shadow: 0 1px 2px 0 #0A0D120D;
+    padding: 10px;
+    background: white;
+    color: #041128;
+
+    &-focused  {
+      border-color: #A4A49B;
+    }
+
+    &.disabled {
+      background: #D2D2C7;
+      border: 1px solid #61615C;
+    }
+
+    .textarea {
+      flex: 1;
+      border: none;
+      outline: none;
+      resize: none;
+      padding: 0;
+      background: none;
+      min-height: 80px;
+      font-family: inherit;
+      font-size: 16px;
+      color: #041128;
+
+      &::placeholder {
+        color: #A4A49B;
+      }
+
+      &:disabled {
+        background: transparent;
+      }
+    }
+  }
+
+  .character-limit {
+    color: #717680;
+    white-space: nowrap;
+    font-size: 14px;
+    margin-top: 4px;
+    text-align: right;
+  }
+}

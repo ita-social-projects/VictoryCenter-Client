@@ -4,6 +4,7 @@ COPY package*.json /app/
 RUN npm install
 RUN npm install --global serve
 COPY ./ ./
+ENV ENV REACT_APP_BACKEND_URL="http://backend.historycode.online/"
 RUN npm run build
 
 

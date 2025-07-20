@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { MemberFormValues } from '../../../../pages/admin/team/components/member-form/MemberForm';
-import { TeamMemberDto } from '../../../../types/public/TeamPage';
+import { TeamMemberDto } from '../../../../types/admin/TeamMembers';
 import { mapTeamMemberDtoToTeamMember, TeamMembersApi } from './TeamMembersApi';
 
 const mockClient = {
@@ -37,7 +37,11 @@ describe('TeamMembersApi', () => {
                 fullName: 'Test Member',
                 description: 'Test description',
                 status: 'Опубліковано',
-                category: 'Основна команда',
+                category: {
+                    id: 1,
+                    name: 'Основна команда',
+                    description: 'Test',
+                },
             },
         ]);
     });
@@ -45,7 +49,11 @@ describe('TeamMembersApi', () => {
     it('should send PUT request with draft status', async () => {
         const member: MemberFormValues = {
             fullName: 'Member',
-            category: 'Основна команда',
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
             description: 'desc',
             img: null,
         };
@@ -66,7 +74,11 @@ describe('TeamMembersApi', () => {
     it('should send PUT request with published status', async () => {
         const member: MemberFormValues = {
             fullName: 'Member',
-            category: 'Основна команда',
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
             description: 'desc',
             img: null,
         };
@@ -87,7 +99,11 @@ describe('TeamMembersApi', () => {
     it('should post member as draft', async () => {
         const member: MemberFormValues = {
             fullName: 'Draft Member',
-            category: 'Основна команда',
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
             description: 'description',
             img: null,
         };
@@ -108,7 +124,11 @@ describe('TeamMembersApi', () => {
     it('should post member as published', async () => {
         const member: MemberFormValues = {
             fullName: 'Draft Member',
-            category: 'Основна команда',
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
             description: 'description',
             img: null,
         };
@@ -146,7 +166,11 @@ describe('TeamMembersApi', () => {
         const dto: TeamMemberDto = {
             id: 1,
             fullName: 'Name',
-            categoryId: 1,
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
             priority: 1,
             status: 0,
             description: 'Desc',
@@ -162,7 +186,11 @@ describe('TeamMembersApi', () => {
             img: 'photo.jpg',
             description: 'Desc',
             status: 'Чернетка',
-            category: 'Основна команда',
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
         });
     });
 

@@ -1,9 +1,10 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { MembersList, MembersListProps } from './MembersList';
-import { Member } from '../../../../../types/admin/TeamMembers';
+import { TeamMember } from '../../../../../types/admin/TeamMembers';
 import * as React from 'react';
 import { mockMembers } from '../../../../../utils/mock-data/admin-page/teamPage';
 import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
+import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi';
 
 const mockDataTransfer = {
     setDragImage: jest.fn(),
@@ -148,17 +149,21 @@ const sharedDefaultProps: MembersListProps = {
 };
 
 let idCounter = 0;
-const createMockMember = (overrides = {}): Member => ({
+const createMockMember = (overrides = {}): TeamMember => ({
     id: ++idCounter,
     img: 'https://randomuser.me/api/portraits/men/1.jpg',
     fullName: 'First First',
     description: 'Software Engineer',
     status: 'Опубліковано',
-    category: 'Основна команда',
+    category: {
+        id: 1,
+        name: 'Основна команда',
+        description: 'Test',
+    },
     ...overrides,
 });
 
-const resetMockMembers = (members: Member[] = [createMockMember()]) => {
+const resetMockMembers = (members: TeamMember[] = [createMockMember()]) => {
     const membersWithUniqueIds = members.map((member, index) => ({
         ...member,
         id: member.id || index + 1,
@@ -183,6 +188,24 @@ describe('MembersList', () => {
         localStorageMock.clear();
         resetMockMembers();
 
+        jest.spyOn(TeamCategoriesApi, 'getAll').mockResolvedValue([
+            {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Головна категорія',
+            },
+            {
+                id: 2,
+                name: 'Наглядова рада',
+                description: 'Додаткова категорія',
+            },
+            {
+                id: 3,
+                name: 'Радники',
+                description: 'Додаткова категорія',
+            },
+        ]);
+
         jest.spyOn(TeamMembersApi, 'getAll').mockResolvedValue(mockMembers);
         jest.spyOn(TeamMembersApi, 'updateDraft').mockResolvedValue(undefined);
         jest.spyOn(TeamMembersApi, 'updatePublish').mockResolvedValue(undefined);
@@ -193,7 +216,7 @@ describe('MembersList', () => {
 
         mockFetchMembers = jest.spyOn(require('./MembersList'), 'fetchMembers');
         mockFetchMembers.mockImplementation(async (category: string, pageSize: number, pageNumber: number) => {
-            const filtered = mockMembers.filter((m) => m.category === category);
+            const filtered = mockMembers.filter((m) => m.category.name === category);
             const start = (pageNumber - 1) * pageSize;
             return {
                 newMembers: filtered.slice(start, start + pageSize),
@@ -332,14 +355,22 @@ describe('MembersList', () => {
                     img: 'https://randomuser.me/api/portraits/women/1.jpg',
                     fullName: 'Board Member',
                     description: 'Director',
-                    category: 'Наглядова рада',
+                    category: {
+                        id: 1,
+                        name: 'Наглядова рада',
+                        description: 'Test',
+                    },
                 }),
                 createMockMember({
                     id: 3,
                     img: 'https://randomuser.me/api/portraits/men/2.jpg',
                     fullName: 'Advisor Member',
                     description: 'Consultant',
-                    category: 'Радники',
+                    category: {
+                        id: 1,
+                        name: 'Радники',
+                        description: 'Test',
+                    },
                 }),
             ]);
         });
@@ -745,7 +776,11 @@ describe('MembersList', () => {
                     {
                         id: 1,
                         fullName: 'Alpha',
-                        category: 'Основна команда',
+                        category: {
+                            id: 1,
+                            name: 'Основна команда',
+                            description: 'Test',
+                        },
                         description: '',
                         status: 'Чернетка',
                         img: '',

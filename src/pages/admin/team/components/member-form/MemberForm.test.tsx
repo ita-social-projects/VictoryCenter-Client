@@ -28,7 +28,11 @@ describe('MemberForm', () => {
 
     it('initializes with existingMemberFormValues', () => {
         const initialValues: MemberFormValues = {
-            category: 'Основна команда',
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
             fullName: 'John Doe',
             description: 'Test description',
             img: null,
@@ -61,7 +65,11 @@ describe('MemberForm', () => {
 
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
             expect.objectContaining({
-                category: 'Наглядова рада',
+                category: {
+                    id: 1,
+                    name: 'Наглядова рада',
+                    description: 'Test',
+                },
             }),
         );
     });
@@ -94,7 +102,11 @@ describe('MemberForm', () => {
         fireEvent.submit(form);
 
         expect(defaultProps.onSubmit).toHaveBeenCalledWith({
-            category: 'Радники',
+            category: {
+                id: 1,
+                name: 'Радники',
+                description: 'Test',
+            },
             fullName: 'Jane Doe',
             description: 'Test description',
             img: null,
@@ -167,7 +179,11 @@ describe('MemberForm - Additional Coverage', () => {
         const fileList = [file1, file2] as any as FileList;
 
         const initialValues: MemberFormValues = {
-            category: 'Основна команда',
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
             fullName: 'John Doe',
             description: 'Test description',
             img: fileList,
@@ -203,7 +219,11 @@ describe('MemberForm - Additional Coverage', () => {
 
     it('handles form submission when memberFormValues exists', () => {
         const initialValues: MemberFormValues = {
-            category: 'Основна команда',
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
             fullName: 'John Doe',
             description: 'Test description',
             img: null,

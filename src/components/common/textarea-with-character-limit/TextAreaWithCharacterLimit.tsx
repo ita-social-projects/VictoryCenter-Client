@@ -53,6 +53,7 @@ export const TextAreaWithCharacterLimit = ({
         )}
       >
         <textarea
+            className='textarea-input'
           value={value}
           onChange={onChange}
           onFocus={handleFocus}
@@ -71,3 +72,5 @@ export const TextAreaWithCharacterLimit = ({
     </div>
   );
 };
+
+export default TextAreaWithCharacterLimit;

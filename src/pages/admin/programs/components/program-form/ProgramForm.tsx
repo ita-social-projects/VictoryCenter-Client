@@ -1,17 +1,17 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
+import React, {useEffect, useState, forwardRef, useImperativeHandle, useRef} from 'react';
+import { useForm, Controller, Resolver } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { programValidationSchema, ProgramValidationContext } from '../../../../../validation/admin/program-schema/program-scheme';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
-import { useForm, Controller } from 'react-hook-form';
 import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { getProgramValidationSchema } from './program-form-validation';
-import './program-form.scss';
-import MultiSelect from '../../../../../components/common/multi-select/MultiSelect';
-import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
-import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
-import { TextAreaWithCharacterLimit } from '../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { VisibilityStatus } from '../../../../../types/Common';
+import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
+import MultiSelect from '../../../../../components/common/multi-select/MultiSelect';
 import PhotoInput from '../../../../../components/common/photo-input/PhotoInput';
+import InputWithCharacterLimit from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
+import TextAreaWithCharacterLimit from '../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import './program-form.scss';
 
 export type ProgramFormValues = {
     name: string;
@@ -34,6 +34,10 @@ export interface ProgramFormProps {
 export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
     ({ initialData = null, onSubmit, formDisabled }: ProgramFormProps, ref) => {
         const [availableCategories, setAvailableCategories] = useState<ProgramCategory[]>([]);
+        const [validationContext, setValidationContext] = useState<ProgramValidationContext>({
+            isPublishing: false,
+        });
+        const statusRef = useRef<VisibilityStatus | null>(null);
 
         const {
             control,
@@ -42,14 +46,27 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             trigger,
             reset,
         } = useForm<ProgramFormValues>({
-            resolver: yupResolver(getProgramValidationSchema('Draft')),
+            context: validationContext,
+            resolver: yupResolver(programValidationSchema) as Resolver<ProgramFormValues>,
             mode: 'onBlur',
             defaultValues: {
                 name: '',
+                categories: [],
                 description: '',
                 img: null,
             },
         });
+
+        useEffect(() => {
+            if (statusRef.current) {
+                try {
+                    handleSubmit((data) => onSubmit(data, statusRef.current!))();
+                }
+                finally {
+                    statusRef.current = null;
+                }
+            }
+        }, [validationContext, handleSubmit, onSubmit]);
 
         useEffect(() => {
             if (initialData) {
@@ -71,14 +88,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             fetchCategories();
         }, []);
 
-        const submit = async (status: VisibilityStatus) => {
+        const submit = (status: VisibilityStatus) => {
             const isPublishing = status === 'Published';
-            //const isValid = await trigger(undefined, { context: { isPublishing } });
-            const isValid = await trigger();
-
-            if (isValid) {
-                await handleSubmit((data) => onSubmit(data, status))();
-            }
+            statusRef.current = status;
+            setValidationContext({ isPublishing });
         };
 
         useImperativeHandle(ref, () => ({
@@ -169,6 +182,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 onChange={(value) => {
                                     // OnBlur event is not triggered in file input, that's why onChange event overridden
                                     field.onChange(value);
+                                    console.log(value);
                                     trigger('img');
                                 }}
                             />
@@ -180,5 +194,3 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
     },
 );
-
-ProgramForm.displayName = 'ProgramForm';

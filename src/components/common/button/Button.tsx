@@ -13,7 +13,7 @@ type ButtonProps = {
 
 export const Button = ({children, onClick, buttonStyle, type = "button", form, disabled = false, className = ''}: ButtonProps) => {
     const getClassName = () => {
-        let baseClass = "";
+        let baseClass: string;
         switch (buttonStyle) {
             case "primary":
                 baseClass = "btn-primary";

@@ -8,6 +8,7 @@ import ProgramsApi from '../../../../../services/api/admin/programs/programs-api
 import { PROGRAMS_TEXT } from "../../../../../const/admin/programs";
 import { VisibilityStatus } from "../../../../../types/Common";
 import { COMMON_TEXT_ADMIN } from "../../../../../const/admin/common";
+import './program-modal.scss';
 
 export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit } : {
     isOpen: boolean;
@@ -129,7 +130,7 @@ export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit
                             onSubmit={handleFormSubmit}
                         />
                     )}
-                    {error && <span className='error'>{error}</span>}
+                    {error && <div className='error-container'>{error}</div>}
                 </Modal.Content>
                 <Modal.Actions>
                     <Button

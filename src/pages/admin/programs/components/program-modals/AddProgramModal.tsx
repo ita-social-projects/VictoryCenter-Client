@@ -8,6 +8,7 @@ import QuestionModal from "../../../../../components/common/question-modal/Quest
 import {VisibilityStatus} from "../../../../../types/Common";
 import {PROGRAMS_TEXT} from "../../../../../const/admin/programs";
 import {COMMON_TEXT_ADMIN} from "../../../../../const/admin/common";
+import './program-modal.scss';
 
 export const AddProgramModal = ({ isOpen, onClose, onAddProgram } : {
     isOpen: boolean;
@@ -114,7 +115,7 @@ export const AddProgramModal = ({ isOpen, onClose, onAddProgram } : {
                         formDisabled={isSubmitting}
                         onSubmit={handleFormSubmit}
                     />
-                    {error && <span className='error'>{error}</span>}
+                    {error && <div className='error-container'>{error}</div>}
                 </Modal.Content>
                 <Modal.Actions>
                     <Button

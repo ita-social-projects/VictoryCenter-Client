@@ -5,6 +5,7 @@ import { Program } from '../../../../../types/ProgramAdminPage';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAMS_TEXT } from "../../../../../const/admin/programs";
 import {COMMON_TEXT_ADMIN} from "../../../../../const/admin/common";
+import './program-modal.scss';
 
 export const DeleteProgramModal = ({
     isOpen,
@@ -52,7 +53,7 @@ export const DeleteProgramModal = ({
         >
             <Modal.Title>{PROGRAMS_TEXT.FORM.TITLE.DELETE_PROGRAM}</Modal.Title>
             <Modal.Content>
-                {error && (<span className="error">{error}</span>)}
+                {error && <div className='error-container'>{error}</div>}
             </Modal.Content>
             <Modal.Actions>
                 <Button

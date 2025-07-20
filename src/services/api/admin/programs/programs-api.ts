@@ -3,14 +3,15 @@
     ProgramCategory,
     ProgramCategoryCreateUpdate,
     ProgramCreateUpdate,
-    ProgramStatus
 } from "../../../../types/ProgramAdminPage";
 import { mockCategories, mockPrograms } from "../../../../utils/mock-data/admin-page/programPage";
-import { PaginationResult } from "../../../../types/Common";
+import {PaginationResult, VisibilityStatus} from "../../../../types/Common";
 
 // Delete after actual integration with backend
 let mockProgramId = Math.max(...mockPrograms.map(p => p.id), 0) + 1;
 let mockCategoryId = Math.max(...mockCategories.map(c => c.id), 0) + 1;
+const mockDelay = 2200;
+const throwErrorsInApi = false;
 
 // Change this when integrating the client with the backend
 const ProgramsApi = {
@@ -28,7 +29,7 @@ const ProgramsApi = {
         categoryId: number,
         pageNumber: number,
         pageSize: number,
-        status?: ProgramStatus
+        status?: VisibilityStatus
     ): Promise<PaginationResult<Program>> => {
         await new Promise((resolve) => setTimeout(resolve, 200));
 
@@ -50,14 +51,20 @@ const ProgramsApi = {
     },
 
     addProgram: async (program: ProgramCreateUpdate): Promise<Program> => {
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, mockDelay));
+
+        if (throwErrorsInApi) throw new Error('Error imitation');
+
+        let imageUrl = null;
+        if (program.img instanceof File) imageUrl = URL.createObjectURL(program.img);
+        else if (typeof program.img === "string") imageUrl = program.img;
 
         const newProgram: Program = {
             id: ++mockProgramId,
             name: program.name,
             description: program.description,
             status: program.status,
-            img: program.img,
+            img: imageUrl,
             categories: mockCategories.filter(c => program.categoryIds.includes(c.id)),
         };
 
@@ -66,17 +73,23 @@ const ProgramsApi = {
     },
 
     editProgram: async (program: ProgramCreateUpdate): Promise<Program> => {
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, mockDelay));
+
+        if (throwErrorsInApi) throw new Error('Error imitation');
 
         const index = mockPrograms.findIndex(p => p.id === program.id);
         if (index === -1) throw new Error('Program not found');
+
+        let imageUrl = null;
+        if (program.img instanceof File) imageUrl = URL.createObjectURL(program.img);
+        else if (typeof program.img === "string") imageUrl = program.img;
 
         const updatedProgram: Program = {
             id: program.id!,
             name: program.name,
             description: program.description,
             status: program.status,
-            img: program.img,
+            img: imageUrl,
             categories: mockCategories.filter(c => program.categoryIds.includes(c.id)),
         };
 
@@ -85,14 +98,19 @@ const ProgramsApi = {
     },
 
     deleteProgram: async (id: number): Promise<void> => {
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, mockDelay));
+
+        if (throwErrorsInApi) throw new Error('Error imitation');
+
         const index = mockPrograms.findIndex(p => p.id === id);
         if (index === -1) throw new Error('Program not found');
         mockPrograms.splice(index, 1);
     },
 
     addProgramCategory: async (category: ProgramCategoryCreateUpdate): Promise<ProgramCategory> => {
-        await new Promise((resolve) => setTimeout(resolve, 1200));
+        await new Promise((resolve) => setTimeout(resolve, mockDelay));
+
+        if (throwErrorsInApi) throw new Error('Error imitation');
 
         const newCategory: ProgramCategory = {
             id: ++mockCategoryId,
@@ -105,7 +123,9 @@ const ProgramsApi = {
     },
 
     editCategory: async (category: ProgramCategoryCreateUpdate): Promise<ProgramCategory> => {
-        await new Promise((resolve) => setTimeout(resolve, 1200));
+        await new Promise((resolve) => setTimeout(resolve, mockDelay));
+
+        if (throwErrorsInApi) throw new Error('Error imitation');
 
         const index = mockCategories.findIndex(c => c.id === category.id);
         if (index === -1) throw new Error('Category not found');
@@ -121,7 +141,9 @@ const ProgramsApi = {
     },
 
     deleteCategory: async (id: number): Promise<void> => {
-        await new Promise((resolve) => setTimeout(resolve, 1200));
+        await new Promise((resolve) => setTimeout(resolve, mockDelay));
+
+        if (throwErrorsInApi) throw new Error('Error imitation');
 
         const index = mockCategories.findIndex(c => c.id === id);
         if (index === -1) throw new Error('Category not found');

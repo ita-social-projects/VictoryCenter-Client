@@ -5,8 +5,6 @@ import { MemberDragPreview } from '../member-drag-preview/MemberDragPreview';
 import { MembersListItem } from '../members-list-item/MembersListItem';
 import NotFoundIcon from '../../../../../assets/icons/not-found.svg';
 import { Button } from '../../../../../components/common/button/Button';
-import LoaderIcon from '../../../../../assets/icons/load.svg';
-import ArrowUpIcon from '../../../../../assets/icons/arrow-up.svg';
 import { mapStatusFilterToStatus, StatusFilter } from '../../../../../types/Common';
 import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
 import './members-list.scss';
@@ -24,10 +22,10 @@ import {
     TEAM_CHANGES_LOST,
     TEAM_NOT_FOUND,
 } from '../../../../../const/team';
-import classNames from 'classnames';
 import { DragPreviewModel } from '../../../../../types/admin/Common';
 import { TeamMember } from '../../../../../types/admin/TeamMembers';
 import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi';
+import { PaginatedSortableList } from '../../../../../components/shared/PaginatedSortedList';
 
 export type MembersListProps = {
     searchByNameQuery: string | null;
@@ -80,7 +78,7 @@ export const MembersList = ({
     const [currentPage, setCurrentPage] = useState(1);
     const [teamMemberToDelete, setTeamMemberToDelete] = useState<string | null>(null);
     const [members, setMembers] = useState<TeamMember[]>([]);
-    const [category, setCategory] = useState<TeamCategory | null>(() => {
+    const [category, setCategory] = useState<TeamCategoryDto | null>(() => {
         const savedName = localStorage.getItem(currentTabKey);
         return savedName as TeamCategory | null;
     });
@@ -191,7 +189,7 @@ export const MembersList = ({
             setIsMembersLoading(false);
             isFetchingRef.current = false;
         },
-        [searchByNameQuery, statusFilter, pageSize],
+        [searchByNameQuery, statusFilter, pageSize, client, onError],
     );
 
     useEffect(() => {
@@ -444,6 +442,7 @@ export const MembersList = ({
     let content;
 
     if (members.length > 0) {
+        console.log(memberListRef?.current?.clientHeight, pageSize);
         const filteredMembers = members.filter((m) => {
             if (statusFilter === 'Усі') return true;
             return m.status === statusFilter;
@@ -479,42 +478,17 @@ export const MembersList = ({
         <>
             {dragPreview?.visible && dragPreview?.member ? <MemberDragPreview dragPreview={dragPreview} /> : <></>}
 
-            <div className="members">
-                <div
-                    data-testid="members-categories"
-                    className="members-categories"
-                    style={{ pointerEvents: isMembersLoading ? 'none' : 'all' }}
-                >
-                    {teamCategories.map((cat) => (
-                        <button
-                            key={cat.id}
-                            onClick={() => setCategory(cat)}
-                            className={classNames({
-                                'members-categories-selected': category?.id === cat.id,
-                            })}
-                        >
-                            {cat.name}
-                        </button>
-                    ))}
-                </div>
-                <div ref={memberListRef} onScroll={handleOnScroll} data-testid="members-list" className="members-list">
-                    {content}
-                    {isMembersLoading ? (
-                        <div className="members-list-loader" data-testid="members-list-loader">
-                            <img src={LoaderIcon} alt="loader-icon" data-testid="members-list-loader-icon" />
-                        </div>
-                    ) : (
-                        <></>
-                    )}
-                    {isMoveToTopVisible ? (
-                        <button onClick={moveToTop} className="members-list-list-to-top">
-                            <img src={ArrowUpIcon} alt="arrow-up-icon" data-testid="members-list-list-to-top" />
-                        </button>
-                    ) : (
-                        <></>
-                    )}
-                </div>
-            </div>
+            <PaginatedSortableList
+                tabs={teamCategories}
+                selectedTab={category}
+                setSelectedTab={setCategory}
+                isItemsLoading={isMembersLoading}
+                content={content}
+                handleOnScroll={handleOnScroll}
+                moveToTop={moveToTop}
+                isMoveToTopVisible={isMoveToTopVisible}
+                listRef={memberListRef}
+            />
             <Modal onClose={() => setIsDeleteTeamMemberModalOpen(false)} isOpen={isDeleteTeamMemberModalOpen}>
                 <Modal.Title>
                     <div className="members-delete-modal-header">{TEAM_DELETE_MEMBER}</div>

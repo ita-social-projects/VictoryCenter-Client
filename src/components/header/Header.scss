@@ -1,3 +1,4 @@
+@import '../../assets/sass/variables/variables.colors';
 $mulish-font-family: 'Mulish', sans-serif;
 
 .headerBlock {
@@ -18,7 +19,7 @@ $mulish-font-family: 'Mulish', sans-serif;
 
     box-sizing: border-box;
 
-    background-color: #fdfdfb80;
+    background-color: $header-background-grey;
 
     backdrop-filter: blur(10.375rem);
 
@@ -35,18 +36,18 @@ $mulish-font-family: 'Mulish', sans-serif;
             gap: 3rem;
 
             a {
-                color: #061125;
+                color: $blue-900;
                 font-family: $mulish-font-family;
                 font-size: 1rem;
                 font-weight: 600;
                 text-decoration: none;
 
                 &:hover {
-                    color: #5E708E;
+                    color: $link-hover-blue;
                 }
 
                 &:active {
-                    color: #B5BDCB;
+                    color: $link-pressed-blue;
                 }
             }
         }
@@ -57,24 +58,24 @@ $mulish-font-family: 'Mulish', sans-serif;
         gap: 0.5rem;
 
         .contactUsButton {
-            background-color: rgba(255, 255, 255, 0);
+            background-color: transparent;
             width: 8.2em;
             height: 2.5rem;
             font-family: $mulish-font-family;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
-            border: 1px solid #061125;
+            border: 1px solid $blue-900;
         }
         .donateButton {
-            background-color: #061125;
+            background-color: $blue-900;
             color: white;
             font-family: $mulish-font-family;
             font-size: 1rem;
             width: 7.5rem;
             height: 2.5rem;
             cursor: pointer;
-            border: 1px solid #061125;
+            border: 1px solid $blue-900;
         }
     }
 }

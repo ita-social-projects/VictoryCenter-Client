@@ -13,6 +13,11 @@
             EDIT_PROGRAM: 'Редагування програми',
             DELETE_PROGRAM: 'Видалити програму?',
         },
+        MESSAGE: {
+            FAIL_TO_CREATE_CATEGORY: 'Виникла помилка під час додавання програми',
+            FAIL_TO_UPDATE_CATEGORY: 'Виникла помилка під час оновлення програми',
+            FAIL_TO_DELETE_CATEGORY: 'Виникла помилка під час видалення програми',
+        },
         LABEL: {
             NAME: 'Назва',
             DESCRIPTION: 'Опис',
@@ -53,23 +58,23 @@ export const PROGRAM_VALIDATION = {
     name: {
         min: 5,
         max: 200,
+        getRequiredError: () => 'Назва обов’язкова',
         getMinError: () => `Не менше ${PROGRAM_VALIDATION.name.min} символів`,
         getMaxError: () => `Не більше ${PROGRAM_VALIDATION.name.max} символів`,
-        getRequiredError: () => 'Назва обов’язкова',
     },
     description: {
         min: 10,
         max: 1000,
-        getMinError: () => `Не менше ${PROGRAM_VALIDATION.description.min} символів`,
-        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.description.max} символів`,
         getRequiredError: () => 'Опис обов’язковий',
-    },
+        getMinError: () => `Не менше ${PROGRAM_VALIDATION.description.min} символів`,
+        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.description.max} символів`,},
     categories: {
-        getOneRequiredError: () => 'Потрібно обрати хоча б одну категорію',
+        getAtLeastOneRequiredError: () => 'Потрібно обрати хоча б одну категорію',
     },
     img: {
         maxSizeBytes: 3 * 1024 * 1024,
         allowedFormats: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+        getRequiredWhenPublishingError: () => 'Фото обов’язкове при публікації',
         getFormatError: () => 'Невірний формат фото, дозволено jpeg, jpg, png, webp',
         getSizeError: () => `Фото не більше ${PROGRAM_VALIDATION.img.maxSizeBytes / (1024 * 1024)} Mb`,
     },
@@ -79,9 +84,10 @@ export const PROGRAM_CATEGORY_VALIDATION = {
     name: {
         min: 5,
         max: 20,
-        getCategoryWithThisNameAlreadyExistsError: () => 'Категорія з такою назвою вже існує',
+        getRequiredError: () => 'Назва обов’язкова',
         getMinError: () => `Не менше ${PROGRAM_CATEGORY_VALIDATION.name.min} символи`,
         getMaxError: () => `Не більше ${PROGRAM_CATEGORY_VALIDATION.name.max} символів`,
+        getCategoryWithThisNameAlreadyExistsError: () => 'Категорія з такою назвою вже існує',
     },
     programsCount:{
         getRelocationOrRemovalHint: () => 'Перенесіть їх в іншу категорію або видаліть, щоб продовжити',

@@ -1,0 +1,31 @@
+$mulish-font-family: 'Mulish', sans-serif;
+
+.UkrainePaymentDetails {
+    h2 {
+        font-family: $mulish-font-family;
+        color: #061125;
+        font-weight: 700;
+        font-size: 2rem;
+    }
+
+    .paymentDetails {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding-top: 2rem;
+
+        h3 {
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: #061125;
+            font-family: $mulish-font-family;
+        }
+
+        .label {
+            font-family: $mulish-font-family;
+            color: #061125;
+            font-size: 1.125rem;
+            font-weight: 400;
+        }
+    }
+}

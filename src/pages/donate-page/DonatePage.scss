@@ -1,9 +1,13 @@
 .donatePage {
     background-color: #ecf5f9;
+    padding-top: 4.125rem;
 
     .donatePageContent {
         display: flex;
         flex-direction: row;
-        justify-content: space-evenly;
+        gap: 7.94rem;
+        padding-top: 6rem;
+        padding-bottom: 6rem;
+        padding-left: 12.5rem;
     }
 }

@@ -1,0 +1,89 @@
+$mulish-font-family: 'Mulish', sans-serif;
+
+.rightSection {
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+        width: 0;
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    scrollbar-width: none;
+    scrollbar-color: transparent transparent;
+    -ms-overflow-style: none;
+}
+
+.locationToggleContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 2.75rem;
+    height: 1.5rem;
+    margin-right: 1rem;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #061125;
+    transition: 0.4s;
+    border-radius: 0.75rem;
+}
+
+.slider::before {
+    position: absolute;
+    content: '';
+    height: 1.25rem;
+    width: 1.25rem;
+    left: 0.0625rem;
+    bottom: 0.125rem;
+
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+.switch input:checked + .slider {
+    background-color: #58b1da;
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(1.375rem);
+}
+
+.switch input:focus + .slider {
+    box-shadow: 0 0 1px #2196f3;
+}
+
+.toggleLabel {
+    font-size: 1.5rem;
+    font-family: $mulish-font-family;
+    color: #061125;
+    font-weight: 600;
+}
+
+.donatePaymentDetails {
+    padding-top: 1.5rem;
+}

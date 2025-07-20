@@ -26,24 +26,12 @@ describe('InputWithCharacterLimit', () => {
     expect(screen.getByText('4/50')).toBeInTheDocument();
   });
 
-  test('applies has-text class when input has value', () => {
-    render(<InputWithCharacterLimit {...defaultProps} value="abc" />);
-    const input = screen.getByRole('textbox');
-    expect(input).toHaveClass('has-text');
-  });
-
-  test('does not apply has-text class when input is empty', () => {
-    render(<InputWithCharacterLimit {...defaultProps} value="" />);
-    const input = screen.getByRole('textbox');
-    expect(input).not.toHaveClass('has-text');
-  });
-
   test('applies disabled class and attribute when disabled', () => {
     render(<InputWithCharacterLimit {...defaultProps} disabled={true} />);
     const wrapper = screen.getByRole('textbox').parentElement;
     const input = screen.getByRole('textbox');
 
-    expect(wrapper).toHaveClass('disabled');
+    expect(wrapper).toHaveClass('input-line-wrapper-disabled');
     expect(input).toBeDisabled();
   });
 
@@ -62,6 +50,31 @@ describe('InputWithCharacterLimit', () => {
     expect(onBlur).toHaveBeenCalled();
   });
 
+  test('calls onFocus when input gains focus', () => {
+    const onFocus = jest.fn();
+    render(<InputWithCharacterLimit {...defaultProps} onFocus={onFocus} />);
+    const input = screen.getByRole('textbox');
+    fireEvent.focus(input);
+    expect(onFocus).toHaveBeenCalled();
+  });
+
+  test('adds focused class to wrapper on input focus', () => {
+    render(<InputWithCharacterLimit {...defaultProps} />);
+    const input = screen.getByRole('textbox');
+    const wrapper = input.parentElement!;
+    fireEvent.focus(input);
+    expect(wrapper).toHaveClass('input-line-wrapper-focused');
+  });
+
+  test('removes focused class from wrapper on input blur', () => {
+    render(<InputWithCharacterLimit {...defaultProps} />);
+    const input = screen.getByRole('textbox');
+    const wrapper = input.parentElement!;
+    fireEvent.focus(input);
+    fireEvent.blur(input);
+    expect(wrapper).not.toHaveClass('input-line-wrapper-focused');
+  });
+
   test('renders correct placeholder and input type', () => {
     render(<InputWithCharacterLimit {...defaultProps} placeholder="Enter text" type="email" />);
     const input = screen.getByRole('textbox');
@@ -74,17 +87,5 @@ describe('InputWithCharacterLimit', () => {
     const input = screen.getByRole('textbox');
     expect(input).toHaveAttribute('id', 'test-id');
     expect(input).toHaveAttribute('name', 'testName');
-  });
-
-  test('wrapper has input-line-wrapper-has-value class when value is present', () => {
-    render(<InputWithCharacterLimit {...defaultProps} value="abc" />);
-    const wrapper = screen.getByRole('textbox').parentElement;
-    expect(wrapper).toHaveClass('input-line-wrapper-has-value');
-  });
-
-  test('wrapper does not have input-line-wrapper-has-value class when value is empty', () => {
-    render(<InputWithCharacterLimit {...defaultProps} value="" />);
-    const wrapper = screen.getByRole('textbox').parentElement;
-    expect(wrapper).not.toHaveClass('input-line-wrapper-has-value');
   });
 });

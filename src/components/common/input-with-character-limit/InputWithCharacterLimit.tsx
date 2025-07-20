@@ -1,4 +1,4 @@
-﻿import React from 'react';
+﻿import React, {useState} from 'react';
 import classNames from 'classnames';
 import './input-with-character-limit.scss';
 
@@ -6,6 +6,7 @@ interface InputWithCharacterLimitProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
   name: string;
   id: string;
   maxLength: number;
@@ -19,30 +20,41 @@ export const InputWithCharacterLimit = ({
   value,
   onChange,
   onBlur,
+    onFocus,
   name,
   id,
   maxLength,
   disabled = false,
   type = 'text',
-  className = 'input',
   placeholder
 }: InputWithCharacterLimitProps) => {
+  const [isFocused, setIsFocused] = useState(false);
   const currentLength = value?.length ?? 0;
-  const hasValue = currentLength > 0;
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(true);
+    onFocus?.(e);
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    setIsFocused(false);
+    onBlur?.(e);
+  };
 
   return (
     <div
       className={classNames('input-line-wrapper', {
-        disabled,
-        'input-line-wrapper-has-value': hasValue
+        'input-line-wrapper-disabled': disabled,
+        'input-line-wrapper-focused': isFocused,
       })}
     >
       <input
+          className='input-line-wrapper-input'
         value={value}
         onChange={onChange}
-        onBlur={onBlur}
         maxLength={maxLength}
-        className={classNames(className, { 'has-text': hasValue })}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         name={name}
         type={type}
         id={id}
@@ -55,3 +67,5 @@ export const InputWithCharacterLimit = ({
     </div>
   );
 };
+
+export default InputWithCharacterLimit;

@@ -1,0 +1,156 @@
+$mulish-font-family: 'Mulish', sans-serif;
+
+.donateSection {
+    background-color: white;
+    max-width: 27rem;
+    min-height: 22.125rem;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    box-shadow: 0px -5px 15px rgba(#20689dbf, 0.75);
+
+    .donateTabsContainer {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        padding-top: 1.5rem;
+        padding-right: 1.5rem;
+        padding-left: 1.5rem;
+
+        .donateTab {
+            background-color: transparent;
+            font-family: $mulish-font-family;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #939699;
+            min-width: 12rem;
+            min-height: 2.68rem;
+            border: none;
+            cursor: pointer;
+            border-bottom: 0.125rem solid #d2d2c7;
+        }
+
+        .donateTab:hover {
+            border-bottom: 0.125rem solid #61615c;
+            color: #61615c;
+        }
+
+        .donateTab.active {
+            border-bottom: 0.125rem solid #58b1da;
+            color: #1f1919;
+        }
+    }
+
+    .donateAmountSection {
+        padding-top: 1.5rem;
+        margin-right: 1.5rem;
+        margin-left: 1.5rem;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        border-bottom: 0.125rem solid #61615c;
+
+        .donateAmountInput {
+            padding-left: 1rem;
+            border: none;
+            max-width: 16rem;
+            min-height: 5rem;
+            font-size: 4rem;
+            font-weight: 500;
+            font-family: $mulish-font-family;
+            color: #1f1919;
+        }
+
+        .donateAmountInput:focus {
+            @extend .donateAmountInput;
+            outline: none;
+        }
+
+        .currencySelector {
+            position: relative;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            color: #939699;
+            cursor: pointer;
+            margin-bottom: 0.75rem;
+        }
+
+        .currencySelector select {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: inherit;
+            z-index: 1;
+
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border: none;
+            background: transparent;
+            margin: 0;
+
+            outline: none;
+            box-shadow: none;
+        }
+
+        .currencySelector select:focus,
+        .currencySelector select:focus-visible {
+            outline: none;
+            border: none;
+            box-shadow: none;
+        }
+
+        .currencyText {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: $mulish-font-family;
+        }
+
+        .arrowIcon {
+            font-size: 1.25rem;
+            color: #7f7f78;
+            line-height: 1;
+            margin-right: 0.69rem;
+        }
+    }
+
+    .fastDonateOptionsSection {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+
+        .donateFastOptionButton {
+            background-color: white;
+            border-radius: 2.69rem;
+            width: 7.67rem;
+            height: 3.19rem;
+            font-family: $mulish-font-family;
+            font-size: 1.125rem;
+            color: #061125;
+            font-weight: 600;
+
+            .donateFastValueText {
+                font-weight: 700;
+            }
+        }
+    }
+
+    .donateButton {
+        margin-top: 1.5rem;
+        margin-left: 1.5rem;
+        margin-right: 1.5rem;
+        min-height: 2.75rem;
+        color: white;
+        font-family: $mulish-font-family;
+        font-size: 1.125rem;
+        font-weight: 700;
+        background-color: #061125;
+        cursor: pointer;
+    }
+}

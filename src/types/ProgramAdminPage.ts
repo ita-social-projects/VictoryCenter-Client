@@ -1,17 +1,17 @@
-﻿export interface ProgramCategory {
+﻿import {VisibilityStatus} from "./Common";
+
+export interface ProgramCategory {
     id: number;
     name: string;
     programsCount: number;
 }
-
-export type ProgramStatus = 'Draft' | 'Published';
 
 export interface Program {
     id: number;
     name: string;
     description: string;
     categories: ProgramCategory[];
-    status: ProgramStatus;
+    status: VisibilityStatus;
     img: string | null;
 }
 
@@ -20,8 +20,8 @@ export interface ProgramCreateUpdate {
     name: string;
     description: string;
     categoryIds: number[];
-    status: ProgramStatus;
-    img: string | null;
+    status: VisibilityStatus;
+    img: File | string | null;
 }
 
 export interface ProgramCategoryCreateUpdate {

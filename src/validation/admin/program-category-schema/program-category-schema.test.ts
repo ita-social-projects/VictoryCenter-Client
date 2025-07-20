@@ -13,21 +13,21 @@ describe('ProgramCategoryValidationSchema', () => {
         const invalidData = {};
 
         await expect(ProgramCategoryValidationSchema.validate(invalidData))
-            .rejects.toThrow(PROGRAM_CATEGORY_VALIDATION.name.requiredError);
+            .rejects.toThrow(PROGRAM_CATEGORY_VALIDATION.name.getRequiredError());
     });
 
     it('should fail validation when name is empty string', async () => {
         const invalidData = { name: '' };
 
         await expect(ProgramCategoryValidationSchema.validate(invalidData))
-            .rejects.toThrow(PROGRAM_CATEGORY_VALIDATION.name.requiredError);
+            .rejects.toThrow(PROGRAM_CATEGORY_VALIDATION.name.getRequiredError());
     });
 
     it('should fail validation when name is only whitespace', async () => {
         const invalidData = { name: '   ' };
 
         await expect(ProgramCategoryValidationSchema.validate(invalidData))
-            .rejects.toThrow(PROGRAM_CATEGORY_VALIDATION.name.requiredError);
+            .rejects.toThrow(PROGRAM_CATEGORY_VALIDATION.name.getRequiredError());
     });
 
     it('should fail validation when name is too short', async () => {

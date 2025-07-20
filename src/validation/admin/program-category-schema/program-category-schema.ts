@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 export const ProgramCategoryValidationSchema = Yup.object({
     name: Yup.string()
         .trim()
-        .required(PROGRAM_CATEGORY_VALIDATION.name.requiredError)
+        .required(PROGRAM_CATEGORY_VALIDATION.name.getRequiredError)
         .min(
             PROGRAM_CATEGORY_VALIDATION.name.min,
             PROGRAM_CATEGORY_VALIDATION.name.getMinError()
@@ -14,5 +14,3 @@ export const ProgramCategoryValidationSchema = Yup.object({
             PROGRAM_CATEGORY_VALIDATION.name.getMaxError()
         )
 });
-
-export type ProgramCategoryFormSchemaType = Yup.InferType<typeof ProgramCategoryValidationSchema>;

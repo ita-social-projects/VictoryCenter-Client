@@ -1,10 +1,7 @@
 import CloudDownload from '../../../../../assets/icons/cloud-download.svg';
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { TeamCategory } from '../../../../../types/public/TeamPage';
+import { TeamCategory, TeamCategoryDto } from '../../../../../types/admin/TeamMembers';
 import {
-    TEAM_CATEGORY_MAIN,
-    TEAM_CATEGORY_SUPERVISORY,
-    TEAM_CATEGORY_ADVISORS,
     TEAM_LABEL_CATEGORY,
     TEAM_LABEL_SELECT_CATEGORY,
     TEAM_LABEL_FULLNAME,
@@ -12,6 +9,8 @@ import {
     TEAM_LABEL_PHOTO,
     TEAM_LABEL_DRAG_DROP,
 } from '../../../../../const/team';
+import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
+import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi';
 
 export type MemberFormValues = {
     category: TeamCategory;
@@ -30,12 +29,15 @@ export type MemberFormProps = {
 const MAX_FULLNAME_LENGTH = 50;
 const MAX_DESCRIPTION_LENGTH = 200;
 export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onValuesChange }: MemberFormProps) => {
+    const client = useAdminClient();
+    const [categories, setCategories] = useState<TeamCategoryDto[]>([]);
+    const [isLoadingCategories, setIsLoadingCategories] = useState(true);
     const [memberFormValues, setMemberFormValues] = useState<MemberFormValues>(
         existingMemberFormValues || {
             fullName: '',
             img: null,
             description: '',
-            category: '' as TeamCategory,
+            category: null as unknown as TeamCategory,
         },
     );
     const handleOnSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -50,6 +52,14 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
     ) => {
         const { name, value } = e.target;
         const inputTarget = e.currentTarget as EventTarget & HTMLInputElement;
+        if (name === 'category') {
+            const selectedCategory = categories.find((c) => c.name === value);
+            setMemberFormValues((prev) => ({
+                ...prev,
+                category: selectedCategory as TeamCategory,
+            }));
+            return;
+        }
         if (inputTarget.files && inputTarget.files.length > 0) {
             const file = inputTarget.files;
             setMemberFormValues((prev) => ({
@@ -70,6 +80,20 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
         }
     }, [memberFormValues, onValuesChange]);
 
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await TeamCategoriesApi.getAll(client);
+                setCategories(data);
+            } catch (error) {
+                console.error('Не вдалося завантажити категорії:', error);
+            } finally {
+                setIsLoadingCategories(false);
+            }
+        };
+        fetchCategories();
+    }, [client]);
+
     const handleFileDrop = (e: React.DragEvent<HTMLLabelElement>) => {
         e.preventDefault();
 
@@ -88,17 +112,20 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
                 <div className="form-group">
                     <label htmlFor="category">{TEAM_LABEL_CATEGORY}</label>
                     <select
-                        value={memberFormValues ? memberFormValues.category : ''}
+                        value={memberFormValues?.category?.name ?? ''}
                         onChange={handleMemberFormValuesChange}
                         name="category"
                         id="category"
+                        disabled={isLoadingCategories}
                     >
                         <option value="" disabled>
                             {TEAM_LABEL_SELECT_CATEGORY}
                         </option>
-                        <option value={TEAM_CATEGORY_MAIN}>{TEAM_CATEGORY_MAIN}</option>
-                        <option value={TEAM_CATEGORY_SUPERVISORY}>{TEAM_CATEGORY_SUPERVISORY}</option>
-                        <option value={TEAM_CATEGORY_ADVISORS}>{TEAM_CATEGORY_ADVISORS}</option>
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.name}>
+                                {category.name}
+                            </option>
+                        ))}
                     </select>
                 </div>
                 <div className="form-group">

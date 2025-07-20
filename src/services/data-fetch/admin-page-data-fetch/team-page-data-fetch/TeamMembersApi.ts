@@ -1,7 +1,4 @@
-import { Member, TeamMemberDto } from '../../../../types/admin/TeamMembers';
-import { reverseCategoryMap } from '../../../../pages/admin/team/TeamPage';
-
-import { categoryMap } from '../../../../const/admin/team-page';
+import { TeamMember, TeamMemberDto } from '../../../../types/admin/TeamMembers';
 import { MemberFormValues } from '../../../../pages/admin/team/components/member-form/MemberForm';
 import { AxiosInstance } from 'axios';
 import { Status } from '../../../../types/Common';
@@ -10,23 +7,23 @@ export const TeamMembersApi = {
     getAll: async (
         client: AxiosInstance,
         categoryId?: number,
-        status?: Status,
+        status?: Status | null,
         offset?: number,
         limit?: number,
-    ): Promise<Member[]> => {
+    ): Promise<TeamMember[]> => {
         const params: Record<string, any> = {};
 
         if (categoryId !== undefined && categoryId !== null) {
             params.categoryId = categoryId;
         }
-        if (status !== undefined && status !== null) {
+        if (status !== undefined) {
             params.status = status;
         }
         if (offset !== undefined && offset !== null) {
             params.offset = offset;
         }
         if (limit !== undefined && limit !== null) {
-            params.limit = limit;
+            params.limit = Math.floor(limit);
         }
 
         const response = await client.get<TeamMemberDto[]>('/TeamMembers', { params });
@@ -36,7 +33,7 @@ export const TeamMembersApi = {
     updateDraft: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
         await client.put(`/TeamMembers/${id}`, {
             fullName: member.fullName,
-            categoryId: categoryMap[member.category],
+            categoryId: member.category.id,
             status: 0,
             description: member.description,
             email: '', //TODO implement email update
@@ -46,7 +43,7 @@ export const TeamMembersApi = {
     updatePublish: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
         await client.put(`/TeamMembers/${id}`, {
             fullName: member.fullName,
-            categoryId: categoryMap[member.category],
+            categoryId: member.category.id,
             status: 1,
             description: member.description,
             email: '', //TODO implement email update
@@ -56,7 +53,7 @@ export const TeamMembersApi = {
     postDraft: async (client: AxiosInstance, member: MemberFormValues) => {
         await client.post(`/TeamMembers`, {
             fullName: member.fullName,
-            categoryId: categoryMap[member.category],
+            categoryId: member.category.id,
             status: 0,
             description: member.description,
             email: '', //TODO implement email post
@@ -66,7 +63,7 @@ export const TeamMembersApi = {
     postPublished: async (client: AxiosInstance, member: MemberFormValues) => {
         await client.post(`/TeamMembers`, {
             fullName: member.fullName,
-            categoryId: categoryMap[member.category],
+            categoryId: member.category.id,
             status: 1,
             description: member.description,
             email: '', //TODO implement email post
@@ -85,11 +82,11 @@ export const TeamMembersApi = {
     },
 };
 
-export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): Member => ({
+export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): TeamMember => ({
     id: dto.id,
     img: dto.photo,
     fullName: dto.fullName,
     description: dto.description,
     status: dto.status === 0 ? 'Чернетка' : 'Опубліковано',
-    category: reverseCategoryMap[dto.categoryId],
+    category: dto.category,
 });

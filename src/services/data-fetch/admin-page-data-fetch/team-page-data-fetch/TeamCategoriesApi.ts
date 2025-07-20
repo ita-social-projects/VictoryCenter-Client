@@ -1,8 +1,5 @@
-import { Member, TeamCategory, TeamCategoryDto } from '../../../../types/admin/TeamMembers';
-import { reverseCategoryMap } from '../../../../pages/admin/team/TeamPage';
-import { MemberFormValues } from '../../../../pages/admin/team/components/member-form/MemberForm';
+import { TeamCategory, TeamCategoryDto } from '../../../../types/admin/TeamMembers';
 import { AxiosInstance } from 'axios';
-import { Status } from '../../../../types/Common';
 
 export const TeamCategoriesApi = {
     getAll: async (client: AxiosInstance): Promise<TeamCategory[]> => {

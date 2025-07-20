@@ -20,6 +20,7 @@ import {
     TEAM_STATUS_DRAFT,
     SEARCH_BY_NAME,
 } from '../../../../../const/team';
+import { TeamCategory } from '../../../../../types/admin/TeamMembers';
 
 export type TeamPageToolbarProps = {
     onSearchQueryChange: (query: string) => void;

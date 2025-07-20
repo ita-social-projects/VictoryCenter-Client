@@ -3,10 +3,10 @@ import React from 'react';
 import { DragPreviewModel } from '../../../../../types/admin/Common';
 import { MemberComponent } from '../member-component/MemberComponent';
 import './member-drag-preview.scss';
-import { Member } from '../../../../../types/admin/TeamMembers';
+import { TeamMember } from '../../../../../types/admin/TeamMembers';
 
 export type MemberDragPreviewProps = {
-    dragPreview: DragPreviewModel<Member>;
+    dragPreview: DragPreviewModel<TeamMember>;
 };
 export const MemberDragPreview = ({ dragPreview }: MemberDragPreviewProps) => {
     if (!dragPreview.visible || !dragPreview.member) return <></>;

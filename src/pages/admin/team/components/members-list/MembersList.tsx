@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { categoryMap } from '../../../../../const/admin/team-page';
-import { TeamCategory } from '../../../../../types/public/TeamPage';
+import { TeamCategory, TeamCategoryDto } from '../../../../../types/admin/TeamMembers';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { MemberDragPreview } from '../member-drag-preview/MemberDragPreview';
 import { MembersListItem } from '../members-list-item/MembersListItem';
@@ -8,7 +7,7 @@ import NotFoundIcon from '../../../../../assets/icons/not-found.svg';
 import { Button } from '../../../../../components/common/button/Button';
 import LoaderIcon from '../../../../../assets/icons/load.svg';
 import ArrowUpIcon from '../../../../../assets/icons/arrow-up.svg';
-import { StatusFilter } from '../../../../../types/Common';
+import { mapStatusFilterToStatus, StatusFilter } from '../../../../../types/Common';
 import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
 import './members-list.scss';
 import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
@@ -23,14 +22,12 @@ import {
     TEAM_CONFIRM,
     TEAM_CANCEL,
     TEAM_CHANGES_LOST,
-    TEAM_CATEGORY_MAIN,
-    TEAM_CATEGORY_SUPERVISORY,
-    TEAM_CATEGORY_ADVISORS,
     TEAM_NOT_FOUND,
 } from '../../../../../const/team';
 import classNames from 'classnames';
 import { DragPreviewModel } from '../../../../../types/admin/Common';
-import { Member } from '../../../../../types/admin/TeamMembers';
+import { TeamMember } from '../../../../../types/admin/TeamMembers';
+import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi';
 
 export type MembersListProps = {
     searchByNameQuery: string | null;
@@ -42,7 +39,7 @@ export type MembersListProps = {
 
 const currentTabKey = 'currentTab';
 export const fetchMembers = async (
-    category: string,
+    category: TeamCategory,
     pageSize: number,
     pageNumber: number,
     searchQuery: string = '',
@@ -50,28 +47,23 @@ export const fetchMembers = async (
     client: AxiosInstance,
     onError?: (msg: string | null) => void,
 ): Promise<{
-    newMembers: Member[];
+    newMembers: TeamMember[];
     totalCountOfPages: number;
 }> => {
-    let filtered = [] as Member[];
+    let filtered = [] as TeamMember[];
     try {
-        filtered = await TeamMembersApi.getAll(client);
+        filtered = await TeamMembersApi.getAll(
+            client,
+            category.id,
+            mapStatusFilterToStatus(statusFilter),
+            (pageNumber - 1) * pageSize,
+            pageNumber * pageSize,
+        );
     } catch (err) {
         onError?.((err as Error).message);
     }
-
-    if (category) {
-        filtered = filtered.filter((m) => m.category === category);
-    }
-    if (searchQuery) {
-        filtered = filtered.filter((m) => m.fullName.toLowerCase().includes(searchQuery.toLowerCase()));
-    }
-    if (statusFilter && statusFilter !== 'Усі') {
-        filtered = filtered.filter((m) => m.status === statusFilter);
-    }
-    const some = (pageNumber - 1) * pageSize;
     return {
-        newMembers: filtered.slice(some, some + pageSize),
+        newMembers: filtered,
         totalCountOfPages: Math.ceil(filtered.length / pageSize),
     };
 };
@@ -87,13 +79,15 @@ export const MembersList = ({
     const [totalPages, setTotalPages] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [teamMemberToDelete, setTeamMemberToDelete] = useState<string | null>(null);
-    const [members, setMembers] = useState<Member[]>([]);
-    const [category, setCategory] = useState<TeamCategory>(
-        () => (localStorage.getItem(currentTabKey) as TeamCategory) || 'Основна команда',
-    );
+    const [members, setMembers] = useState<TeamMember[]>([]);
+    const [category, setCategory] = useState<TeamCategory | null>(() => {
+        const savedName = localStorage.getItem(currentTabKey);
+        return savedName as TeamCategory | null;
+    });
+    const [teamCategories, setTeamCategories] = useState<TeamCategoryDto[]>([]);
     const [isDeleteTeamMemberModalOpen, setIsDeleteTeamMemberModalOpen] = useState(false);
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-    const [dragPreview, setDragPreview] = useState<DragPreviewModel<Member>>({
+    const [dragPreview, setDragPreview] = useState<DragPreviewModel<TeamMember>>({
         visible: false,
         x: 0,
         y: 0,
@@ -113,7 +107,7 @@ export const MembersList = ({
 
     const currentPageRef = useRef<number>(currentPage);
     const totalPagesRef = useRef<number | null>(totalPages);
-    const categoryRef = useRef<TeamCategory | undefined>(category);
+    const categoryRef = useRef<TeamCategory | null>(category);
 
     const client = useAdminClient();
     const clientRef = useRef(client);
@@ -139,6 +133,22 @@ export const MembersList = ({
             setPageSize(memberListRef.current.clientHeight / 120 + 1);
         }
     };
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            let categories = await TeamCategoriesApi.getAll(client);
+            setTeamCategories(categories);
+            const saved = localStorage.getItem(currentTabKey);
+            if (saved) {
+                const savedCat = categories.find((c) => c.name === JSON.parse(saved).name);
+                if (savedCat) setCategory(savedCat);
+                else setCategory(categories[0]);
+            } else {
+                setCategory(categories[0]);
+            }
+        };
+        fetchCategories();
+    }, [client]);
 
     useEffect(() => {
         window.addEventListener('resize', updatePageSize);
@@ -243,7 +253,7 @@ export const MembersList = ({
             setDraggedIndex(null);
 
             const orderedIds = updatedMembers.map((m) => m.id);
-            const categoryId = categoryMap[category];
+            const categoryId = category?.id ?? 0;
 
             await TeamMembersApi.reorder(client, categoryId, orderedIds);
         } catch (err) {
@@ -299,7 +309,7 @@ export const MembersList = ({
 
     useEffect(() => {
         if (category) {
-            localStorage.setItem(currentTabKey, category);
+            localStorage.setItem(currentTabKey, JSON.stringify(category));
         }
     }, [category]);
 
@@ -475,26 +485,17 @@ export const MembersList = ({
                     className="members-categories"
                     style={{ pointerEvents: isMembersLoading ? 'none' : 'all' }}
                 >
-                    <button
-                        onClick={() => setCategory(TEAM_CATEGORY_MAIN)}
-                        className={classNames({ 'members-categories-selected': category === TEAM_CATEGORY_MAIN })}
-                    >
-                        {TEAM_CATEGORY_MAIN}
-                    </button>
-                    <button
-                        onClick={() => setCategory(TEAM_CATEGORY_SUPERVISORY)}
-                        className={classNames({
-                            'members-categories-selected': category === TEAM_CATEGORY_SUPERVISORY,
-                        })}
-                    >
-                        {TEAM_CATEGORY_SUPERVISORY}
-                    </button>
-                    <button
-                        onClick={() => setCategory(TEAM_CATEGORY_ADVISORS)}
-                        className={classNames({ 'members-categories-selected': category === TEAM_CATEGORY_ADVISORS })}
-                    >
-                        {TEAM_CATEGORY_ADVISORS}
-                    </button>
+                    {teamCategories.map((cat) => (
+                        <button
+                            key={cat.id}
+                            onClick={() => setCategory(cat)}
+                            className={classNames({
+                                'members-categories-selected': category?.id === cat.id,
+                            })}
+                        >
+                            {cat.name}
+                        </button>
+                    ))}
                 </div>
                 <div ref={memberListRef} onScroll={handleOnScroll} data-testid="members-list" className="members-list">
                     {content}

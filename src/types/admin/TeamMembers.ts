@@ -1,4 +1,4 @@
-export type Member = {
+export type TeamMember = {
     id: number;
     img: string;
     fullName: string;
@@ -10,7 +10,7 @@ export type Member = {
 export interface TeamMemberDto {
     id: number;
     fullName: string;
-    categoryId: number;
+    category: TeamCategory;
     priority: number;
     status: number;
     description: string;

@@ -1,6 +1,6 @@
 .programs {
-  padding-left: 44px;
-  padding-right: 44px;
+  padding-left: 54px;
+  padding-right: 54px;
 
   &-not-found {
     height: 100%;
@@ -15,44 +15,11 @@
     }
   }
 
-  &-categories {
-    border-bottom: 1px solid #A4A49B;
-    margin-bottom: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
-    font-size: 24px;
-    font-weight: 600;
-    display: flex;
-    background-color: #F8F8F8;
-    box-shadow: 0 0 4px rgba(128, 128, 128, 0.22);
-
-    &-button {
-      font-size: 24px;
-      border: none;
-      background: transparent;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.2s;
-      padding: 15px;
-
-      &.programs-categories-selected {
-        border-bottom: 1px solid #041128;
-      }
-
-      &:hover {
-        cursor: pointer;
-        background-color: rgba(128, 128, 128, 0.15);
-      }
-    }
-  }
-
   &-list {
     position: relative;
+    margin-top: 10px;
     height: 70vh;
     max-height: 70vh;
-    padding-left: 10px;
     overflow-y: auto;
     scroll-behavior: smooth;
 

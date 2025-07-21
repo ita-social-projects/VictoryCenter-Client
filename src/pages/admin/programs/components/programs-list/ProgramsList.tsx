@@ -7,25 +7,22 @@
     useImperativeHandle
 } from 'react';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
-import { ProgramListItem } from '../program-list-item/ProgramListItem'
-import { ContextMenu } from "../../../../../components/common/context-menu/ContextMenu";
-import {
-    Program,
-    ProgramCategory,
-    ProgramStatus
-} from '../../../../../types/ProgramAdminPage';
-import { PROGRAMS_TEXT, PROGRAM_CATEGORY_TEXT } from "../../../../../const/admin/programs";
-import classNames from "classnames";
+import { Program, ProgramCategory } from '../../../../../types/ProgramAdminPage';
+import { PROGRAM_CATEGORY_TEXT } from "../../../../../const/admin/programs";
+import { COMMON_TEXT_ADMIN } from "../../../../../const/admin/common";
+import { VisibilityStatus } from "../../../../../types/Common";
 import LoaderIcon from "../../../../../assets/icons/load.svg";
 import ArrowUpIcon from "../../../../../assets/icons/arrow-up.svg"
 import NotFoundIcon from "../../../../../assets/icons/not-found.svg";
+import ProgramListItem from '../program-list-item/ProgramListItem'
+import AddCategoryModal from "../program-category-modals/AddCategoryModal";
+import EditCategoryModal from "../program-category-modals/EditCategoryModal";
+import DeleteCategoryModal from "../program-category-modals/DeleteCategoryModal";
+import CategoryBar from "../../../../../components/common/category-bar/CategoryBar";
 import './programs-list.scss'
-import { AddCategoryModal } from "../program-category-modals/AddCategoryModal";
-import { EditCategoryModal } from "../program-category-modals/EditCategoryModal";
-import {DeleteCategoryModal} from "../program-category-modals/DeleteCategoryModal";
 
 export interface ProgramsListProps {
-    searchByStatus: ProgramStatus | undefined;
+    searchByStatus: VisibilityStatus | undefined;
     onEditProgram: (program: Program) => void;
     onDeleteProgram: (program: Program) => void;
 }
@@ -220,17 +217,9 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(({
         el.scrollTop = 0;
     };
 
-    function handleOnOptionSelected(option: string) {
-        if (option === "add") {
-            setIsAddCategoryModalOpen(true);
-        }
-        else if (option === "edit") {
-             setIsEditCategoryModalOpen(true);
-        }
-        else if (option === "delete") {
-            setIsDeleteCategoryModalOpen(true);
-        }
-    }
+    const handleCategorySelect = (category: ProgramCategory) => {
+        setSelectedCategory(category);
+    };
 
     const handleAddCategory = (newCategory: ProgramCategory) => {
         setCategories(prev => [...prev, newCategory]);
@@ -271,7 +260,7 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(({
                     alt="members-not-found"
                     data-testid="members-not-found-icon"
                 />
-                <p>{PROGRAMS_TEXT.LIST.NOT_FOUND}</p>
+                <p>{COMMON_TEXT_ADMIN.LIST.NOT_FOUND}</p>
             </div>
         );
     } else {
@@ -302,30 +291,33 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(({
             />
 
             <div className='programs'>
-                <div data-testid="programs-categories" className='programs-categories'>
-                    <ContextMenu onOptionSelected={handleOnOptionSelected} className='programs-categories-context-menu'>
-                        <ContextMenu.Option value={"add"}>
-                            {PROGRAM_CATEGORY_TEXT.BUTTON.ADD_CATEGORY}
-                        </ContextMenu.Option>
-                         <ContextMenu.Option value={"edit"}>
-                            {PROGRAM_CATEGORY_TEXT.BUTTON.EDIT_CATEGORY}
-                        </ContextMenu.Option>
-                        <ContextMenu.Option value={"delete"}>
-                            {PROGRAM_CATEGORY_TEXT.BUTTON.DELETE_CATEGORY}
-                        </ContextMenu.Option>
-                    </ContextMenu>
-                    {categories.map(((c, index) => (
-                        <button
-                            key={index}
-                            onClick={() => setSelectedCategory(c)}
-                            className={classNames('programs-categories-button', {
-                                'programs-categories-selected': selectedCategory === c
-                            })}
-                        >
-                            {c.name}
-                        </button>
-                    )))}
-                </div>
+                <CategoryBar<ProgramCategory>
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    onCategorySelect={handleCategorySelect}
+                    getItemName={(category) => category.name}
+                    getItemKey={(category) => category.id}
+                    displayContextMenu={true}
+                    contextMenuOptions={[
+                      { id: "add", name: PROGRAM_CATEGORY_TEXT.BUTTON.ADD_CATEGORY },
+                      { id: "edit", name: PROGRAM_CATEGORY_TEXT.BUTTON.EDIT_CATEGORY },
+                      { id: "delete", name: PROGRAM_CATEGORY_TEXT.BUTTON.DELETE_CATEGORY },
+                    ]}
+                    onContextMenuOptionSelected={(id) => {
+                        switch (id) {
+                        case "add":
+                            setIsAddCategoryModalOpen(true);
+                          break;
+                        case "edit":
+                            setIsEditCategoryModalOpen(true);
+                            break;
+                        case "delete":
+                            setIsDeleteCategoryModalOpen(true);
+                            break;
+                        }
+                    }}
+                />
+
                 <div ref={programListRef} onScroll={handleOnScroll} data-testid="programs-list" className="programs-list">
                     {content}
                     {isProgramsLoading

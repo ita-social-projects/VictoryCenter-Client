@@ -74,3 +74,5 @@ export const DeleteProgramModal = ({
         </Modal>
     );
 };
+
+export default DeleteProgramModal;

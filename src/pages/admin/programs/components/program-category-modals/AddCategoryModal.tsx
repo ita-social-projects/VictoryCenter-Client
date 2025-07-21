@@ -113,3 +113,5 @@ export const AddCategoryModal = ({ isOpen, onClose, onAddCategory, categories }:
         </Modal>
     );
 };
+
+export default AddCategoryModal;

@@ -176,3 +176,5 @@ export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit
         </>
     );
 };
+
+export default EditProgramModal;

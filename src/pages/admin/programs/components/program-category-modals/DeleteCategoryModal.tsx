@@ -115,3 +115,5 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
         </Modal>
     );
 };
+
+export default DeleteCategoryModal;

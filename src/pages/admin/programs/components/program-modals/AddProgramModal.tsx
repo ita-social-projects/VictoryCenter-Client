@@ -159,3 +159,5 @@ export const AddProgramModal = ({ isOpen, onClose, onAddProgram } : {
         </>
     );
 };
+
+export default AddProgramModal;

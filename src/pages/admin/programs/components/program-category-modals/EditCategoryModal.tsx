@@ -155,3 +155,5 @@ export const EditCategoryModal = ({ isOpen, onClose, onEditCategory, categories 
         </Modal>
     );
 };
+
+export default EditCategoryModal;

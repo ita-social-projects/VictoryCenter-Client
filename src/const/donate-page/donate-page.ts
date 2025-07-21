@@ -26,11 +26,11 @@ export const IBAN_USD_NUMBER_LABEL = 'UA613052990000026006020145317';
 export const SWIFT_CODE_LABEL = 'SWIFT-код банку';
 export const SWIFT_CODE_VALUE_LABEL = 'PBANUA2X';
 export const BANK_RECEIVER_LABEL = 'Банк-отримувач';
-export const BANK_NAME_TRANSLITERATED_LABEL = 'JSC CB "PRIVATBANK",';
-export const BANK_STREET_TRANSLITERATED_LABEL = '1D Hrushevskoho Str.,';
+export const BANK_NAME_TRANSLITERATED_LABEL = 'JSC CB "PRIVATBANK", ';
+export const BANK_STREET_TRANSLITERATED_LABEL = '1D Hrushevskoho Str., ';
 export const BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL = 'Kyiv, 01001, Ukraine';
 export const ADDRESS_LABEL = 'Адреса';
-export const COUNTRY_LABEL = '01001, Україна,';
+export const COUNTRY_LABEL = '01001, Україна, ';
 export const CITY_LABEL = 'м. Київ, вул. Шулявська, б. 20/22, кв. 41';
 
 export const CORRESPONDENT_BANKS_LABEL = 'Кореспондентські банки (один із варіантів на вибір)';

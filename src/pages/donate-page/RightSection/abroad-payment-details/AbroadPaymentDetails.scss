@@ -49,5 +49,11 @@ $mulish-font-family: 'Mulish', sans-serif;
             color: #061125;
             font-size: 1.125rem;
         }
+
+        .labelWithCopyButton {
+            padding-top: 0.125rem;
+            display: flex;
+            gap: 0.5rem;
+        }
     }
 }

@@ -27,5 +27,11 @@ $mulish-font-family: 'Mulish', sans-serif;
             font-size: 1.125rem;
             font-weight: 400;
         }
+
+        .labelWithCopyButton {
+            padding-top: 0.125rem;
+            display: flex;
+            gap: 0.5rem;
+        }
     }
 }

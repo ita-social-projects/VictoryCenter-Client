@@ -20,7 +20,7 @@ enum Currency {
 
 export const DonateSection = () => {
     const [activeTab, setActiveTab] = useState<DonateTab>(DonateTab.oneTime);
-    const [donationAmount, setDonationAmount] = useState<number | string>(0);
+    const [donationAmount, setDonationAmount] = useState<number>(0);
     const [currency, setCurrency] = useState<Currency>(Currency.UAH);
 
     const setDonateTabClass = (donateTabType: DonateTab): string => {
@@ -34,7 +34,7 @@ export const DonateSection = () => {
             inputValue = inputValue.replace(/-/g, '');
             inputValue = inputValue.replace(/\+/g, '');
         }
-        setDonationAmount(inputValue === '' ? inputValue : Number(inputValue));
+        setDonationAmount(isNaN(Number(inputValue)) ? 0 : Number(inputValue));
     };
 
     const handleQuickAmountChange = (amount: number) => {

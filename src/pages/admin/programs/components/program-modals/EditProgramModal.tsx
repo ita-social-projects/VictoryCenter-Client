@@ -5,9 +5,9 @@ import Button from "../../../../../components/common/button/Button";
 import QuestionModal from "../../../../../components/common/question-modal/QuestionModal";
 import { Program } from '../../../../../types/ProgramAdminPage';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
-import { PROGRAMS_TEXT } from "../../../../../const/admin/programs";
 import { VisibilityStatus } from "../../../../../types/Common";
 import { COMMON_TEXT_ADMIN } from "../../../../../const/admin/common";
+import { PROGRAMS_TEXT } from "../../../../../const/admin/programs";
 import './program-modal.scss';
 
 export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit } : {
@@ -95,8 +95,8 @@ export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit
     };
 
     const handleConfirmClose = () => {
-        setShowCloseConfirmModal(false);
         setError('');
+        setShowCloseConfirmModal(false);
         setShowFormConfirmModal(false);
         setPendingAction(null);
         setPendingFormData(null);
@@ -107,6 +107,7 @@ export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit
         setShowCloseConfirmModal(false);
     };
 
+    // clear all on open
     useEffect(() => {
         if (isOpen) {
             setError('');

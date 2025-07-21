@@ -82,8 +82,8 @@ export const AddProgramModal = ({ isOpen, onClose, onAddProgram } : {
     };
 
     const handleConfirmClose = () => {
-        setShowCloseConfirmModal(false);
         setError('');
+        setShowCloseConfirmModal(false);
         setShowFormConfirmModal(false);
         setPendingAction(null);
         setPendingFormData(null);

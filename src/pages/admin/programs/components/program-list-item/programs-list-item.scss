@@ -38,12 +38,12 @@
 
       p {
         margin: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
         display: -webkit-box;
         -webkit-line-clamp: 4;
         -webkit-box-orient: vertical;
-        word-wrap: break-word;
+        overflow: hidden;
+        overflow-wrap: break-word;
+        word-break: break-word;
         text-align: left;
       }
     }
@@ -59,13 +59,13 @@
 
       p {
         margin: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
         display: -webkit-box;
         -webkit-line-clamp: 4;
         -webkit-box-orient: vertical;
-        word-wrap: break-word;
-        text-align: left;
+        overflow: hidden;
+        overflow-wrap: break-word;
+        word-break: break-word;
+        text-overflow: ellipsis;
       }
     }
 

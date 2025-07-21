@@ -28,7 +28,17 @@ export const DonateSection = () => {
     };
 
     const handleDonateAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setDonationAmount(e.target.value === '' ? e.target.value : Number(e.target.value));
+        const inputValue = e.target.value;
+
+        if (inputValue.includes('-')) {
+            setDonationAmount(inputValue.replace(/-/g, ''));
+        } else {
+            setDonationAmount(inputValue === '' ? inputValue : Number(inputValue));
+        }
+    };
+
+    const handleQuickAmountChange = (amount: number) => {
+        setDonationAmount((donationAmount as number) + amount);
     };
 
     const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -69,15 +79,15 @@ export const DonateSection = () => {
                 </div>
             </div>
             <div className="fastDonateOptionsSection">
-                <button className="donateFastOptionButton">
+                <button className="donateFastOptionButton" onClick={() => handleQuickAmountChange(10)}>
                     <span className="donateFastValueText">+10 </span>
                     {currency}
                 </button>
-                <button className="donateFastOptionButton">
+                <button className="donateFastOptionButton" onClick={() => handleQuickAmountChange(50)}>
                     <span className="donateFastValueText">+50 </span>
                     {currency}
                 </button>
-                <button className="donateFastOptionButton">
+                <button className="donateFastOptionButton" onClick={() => handleQuickAmountChange(100)}>
                     <span className="donateFastValueText">+100 </span>
                     {currency}
                 </button>

@@ -1,4 +1,4 @@
-﻿import React, { RefObject, useState } from "react";
+﻿import React, {RefObject, useEffect, useRef, useState} from "react";
 import classNames from "classnames";
 import DefaultIcon from "../../../assets/icons/menu.svg";
 import "./context-menu.scss";
@@ -7,7 +7,6 @@ export type ContextMenuProps = {
     children: React.ReactNode;
     onOptionSelected: (value: string, data?: any) => void;
     containerRef?: RefObject<HTMLDivElement | null>;
-    className?: string;
     customIcon?: string;
 };
 
@@ -15,10 +14,10 @@ export const ContextMenu = ({
     children,
     onOptionSelected,
     containerRef,
-    className,
     customIcon
 }: ContextMenuProps) => {
     const [isOpen, setIsOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
 
     const handleToggle = () => {
         setIsOpen(!isOpen);
@@ -29,11 +28,27 @@ export const ContextMenu = ({
         onOptionSelected(value, data);
     };
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (isOpen && menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isOpen]);
+
     return (
         <div
             role="toolbar"
-            ref={containerRef}
-            className={classNames("context-menu", className, {
+            ref={containerRef || menuRef}
+            className={classNames("context-menu", {
                 "context-menu-active": isOpen,
             })}
             tabIndex={0}

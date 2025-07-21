@@ -1,6 +1,12 @@
 $mulish-font-family: 'Mulish', sans-serif;
 
 .abroadPaymentDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+}
+
+.abroadPaymentDetailsBlock {
     h2 {
         font-family: $mulish-font-family;
         color: #061125;
@@ -13,11 +19,16 @@ $mulish-font-family: 'Mulish', sans-serif;
         gap: 1.5rem;
         padding-top: 2rem;
 
+        .labelsContainers {
+            padding-top: 0.375rem;
+        }
+
         h3 {
             font-weight: 600;
             font-size: 1.5rem;
             color: #061125;
             font-family: $mulish-font-family;
+            padding-bottom: 0.125rem;
         }
 
         .label {
@@ -25,6 +36,18 @@ $mulish-font-family: 'Mulish', sans-serif;
             color: #061125;
             font-size: 1.125rem;
             font-weight: 400;
+            padding-bottom: 0.125rem;
+        }
+
+        .labelsContainer {
+            padding-bottom: 0.125rem;
+        }
+
+        .highlightedLabel {
+            font-family: $mulish-font-family;
+            font-weight: 700;
+            color: #061125;
+            font-size: 1.125rem;
         }
     }
 }

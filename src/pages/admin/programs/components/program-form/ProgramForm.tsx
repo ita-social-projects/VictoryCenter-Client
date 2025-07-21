@@ -83,7 +83,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     const categories = await ProgramsApi.fetchProgramCategories();
                     setAvailableCategories(categories);
                 } catch (error) {
-                    console.error('Error fetching categories:', error);
+                    // Or handle in other way
+                    console.error('Error fetching categories:');
                 }
             };
             fetchCategories();
@@ -104,9 +105,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             <form className="program-form-main" data-testid="test-form" noValidate>
                 {/* Categories Field */}
                 <div className="form-group">
-                    <label>
+                    <label htmlFor="categories">
                         <span className="required-field">*</span>
-                        Категорії
+                        {PROGRAMS_TEXT.FORM.LABEL.CATEGORY}
                     </label>
                     <Controller
                         name="categories"
@@ -137,6 +138,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             <InputWithCharacterLimit
                                 {...field}
                                 id="name"
+                                name="name"
                                 maxLength={PROGRAM_VALIDATION.name.max}
                                 disabled={isSubmitting || formDisabled}
                             />
@@ -155,8 +157,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         render={({ field }) => (
                             <TextAreaWithCharacterLimit
                                 {...field}
-                                name="description"
                                 id="description"
+                                name="description"
                                 rows={8}
                                 disabled={isSubmitting || formDisabled}
                                 maxLength={PROGRAM_VALIDATION.description.max}
@@ -166,10 +168,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     {errors.description && <span className="error">{errors.description.message}</span>}
                 </div>
                 {/* Image Field */}
-                <div className="form-group form-group-image">
-                    <span>
+                <div className="form-group">
+                    <label htmlFor="img">
                         {PROGRAMS_TEXT.FORM.LABEL.PHOTO}
-                    </span>
+                    </label>
                     <Controller
                         name={'img'}
                         control={control}
@@ -177,11 +179,11 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             <PhotoInput
                                 {...field}
                                 id="img"
+                                name="img"
                                 disabled={isSubmitting || formDisabled}
                                 onChange={(value) => {
                                     // OnBlur event is not triggered in file input, that's why onChange event overridden
                                     field.onChange(value);
-                                    console.log(value);
                                     trigger('img');
                                 }}
                             />

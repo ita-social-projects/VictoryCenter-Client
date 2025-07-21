@@ -6,7 +6,7 @@ import { COMMON_TEXT_ADMIN } from "../../../../../const/admin/common";
 import { VisibilityStatus } from "../../../../../types/Common";
 import PlusIcon from "../../../../../assets/icons/plus.svg";
 
-export type ProgramPageToolbarProps = {
+export interface ProgramPageToolbarProps {
     onSearchQueryChange: (query: string) => void;
     onStatusFilterChange: (categoryFilter: VisibilityStatus | undefined) => void;
     autocompleteValues: string[];

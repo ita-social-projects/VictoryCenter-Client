@@ -10,11 +10,13 @@ import {PROGRAMS_TEXT} from "../../../../../const/admin/programs";
 import {COMMON_TEXT_ADMIN} from "../../../../../const/admin/common";
 import './program-modal.scss';
 
-export const AddProgramModal = ({ isOpen, onClose, onAddProgram } : {
+export  interface AddProgramModalProps {
     isOpen: boolean;
     onClose: () => void;
     onAddProgram: (program: Program) => void;
-}) => {
+}
+
+export const AddProgramModal = ({ isOpen, onClose, onAddProgram } : AddProgramModalProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [showFormConfirmModal, setShowFormConfirmModal] = useState(false);

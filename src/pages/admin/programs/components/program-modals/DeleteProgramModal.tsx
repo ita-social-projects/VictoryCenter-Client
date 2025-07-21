@@ -1,23 +1,25 @@
 ﻿import React, { useState } from 'react';
-import { Modal } from "../../../../../components/common/modal/Modal";
-import { Button } from "../../../../../components/common/button/Button";
+import Modal from "../../../../../components/common/modal/Modal";
+import Button from "../../../../../components/common/button/Button";
 import { Program } from '../../../../../types/ProgramAdminPage';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAMS_TEXT } from "../../../../../const/admin/programs";
-import {COMMON_TEXT_ADMIN} from "../../../../../const/admin/common";
+import { COMMON_TEXT_ADMIN } from "../../../../../const/admin/common";
 import './program-modal.scss';
+
+export interface DeleteProgramModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onDeleteProgram: (program: Program) => void;
+    programToDelete: Program | null;
+}
 
 export const DeleteProgramModal = ({
     isOpen,
     onClose,
     onDeleteProgram,
     programToDelete,
-}: {
-    isOpen: boolean;
-    onClose: () => void;
-    onDeleteProgram: (program: Program) => void;
-    programToDelete: Program | null;
-}) => {
+}: DeleteProgramModalProps) => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
 

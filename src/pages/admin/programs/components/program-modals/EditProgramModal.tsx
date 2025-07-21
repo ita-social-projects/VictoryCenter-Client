@@ -10,12 +10,14 @@ import { COMMON_TEXT_ADMIN } from "../../../../../const/admin/common";
 import { PROGRAMS_TEXT } from "../../../../../const/admin/programs";
 import './program-modal.scss';
 
-export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit } : {
+export interface EditProgramModalProps {
     isOpen: boolean;
     onClose: () => void;
     onEditProgram: (program: Program) => void;
     programToEdit: Program | null;
-}) => {
+}
+
+export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit } : EditProgramModalProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [showFormConfirmModal, setShowFormConfirmModal] = useState(false);

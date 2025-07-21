@@ -4,8 +4,9 @@ import Button from '../../../../../components/common/button/Button';
 import HintContainer from '../../../../../components/common/hint/HintContainer';
 import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
-import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
+import './program-category-modal.scss';
 
 interface DeleteCategoryModalProps {
     isOpen: boolean;
@@ -17,12 +18,15 @@ interface DeleteCategoryModalProps {
 export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categories }: DeleteCategoryModalProps) => {
     const [categoryId, setCategoryId] = useState<number>(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
     const isSubmittingRef = useRef(false);
 
     const selectedCategory = categories.find((cat) => cat.id === categoryId);
 
     const handleSubmit = async () => {
         if (isSubmittingRef.current || !selectedCategory || selectedCategory.programsCount > 0) return;
+
+        setError('');
 
         try {
             isSubmittingRef.current = true;
@@ -33,8 +37,8 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
             onDeleteCategory(selectedCategory.id);
             setCategoryId(0);
             onClose();
-        } catch (error) {
-            // Handle in your way
+        } catch (err) {
+            setError(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
         } finally {
             isSubmittingRef.current = false;
             setIsSubmitting(false);
@@ -52,6 +56,12 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
             setCategoryId(categories[0].id);
         }
     }, [isOpen, categories]);
+
+    useEffect(() => {
+        if (isOpen) {
+            setError('');
+        }
+    }, [isOpen]);
 
     const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedId = parseInt(e.target.value);
@@ -81,7 +91,6 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
                             ))}
                         </select>
                     </div>
-
                     {selectedCategory && selectedCategory.programsCount > 0 && (
                         <HintContainer
                             title={PROGRAM_CATEGORY_VALIDATION.programsCount.getHasProgramsCountError(
@@ -90,22 +99,19 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
                             text={PROGRAM_CATEGORY_VALIDATION.programsCount.getRelocationOrRemovalHint()}
                         />
                     )}
+                    {error && <div className='error-container'>{error}</div>}
                 </div>
             </Modal.Content>
             <Modal.Actions>
                 <Button
-                    type="button"
                     buttonStyle="secondary"
-                    className={'cancel-button'}
                     onClick={handleClose}
                     disabled={isSubmitting}
                 >
                     {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                 </Button>
                 <Button
-                    type="button"
                     buttonStyle="primary"
-                    className={'publisher-button'}
                     onClick={handleSubmit}
                     disabled={!!(selectedCategory && selectedCategory.programsCount > 0) || isSubmitting}
                 >

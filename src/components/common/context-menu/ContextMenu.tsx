@@ -46,7 +46,7 @@ export const ContextMenu = ({
 
     return (
         <div
-            role="toolbar"
+            role="context-menu"
             ref={containerRef || menuRef}
             className={classNames("context-menu", {
                 "context-menu-active": isOpen,

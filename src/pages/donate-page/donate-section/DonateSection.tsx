@@ -28,13 +28,13 @@ export const DonateSection = () => {
     };
 
     const handleDonateAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const inputValue = e.target.value;
+        let inputValue = e.target.value;
 
-        if (inputValue.includes('-')) {
-            setDonationAmount(inputValue.replace(/-/g, ''));
-        } else {
-            setDonationAmount(inputValue === '' ? inputValue : Number(inputValue));
+        if (inputValue.includes('-') || inputValue.includes('+')) {
+            inputValue = inputValue.replace(/-/g, '');
+            inputValue = inputValue.replace(/\+/g, '');
         }
+        setDonationAmount(inputValue === '' ? inputValue : Number(inputValue));
     };
 
     const handleQuickAmountChange = (amount: number) => {

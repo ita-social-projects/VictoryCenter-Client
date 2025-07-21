@@ -48,6 +48,7 @@ export const ContextMenu = ({
         <div
             role="context-menu"
             ref={containerRef || menuRef}
+            data-testid="context-menu"
             className={classNames("context-menu", {
                 "context-menu-active": isOpen,
             })}

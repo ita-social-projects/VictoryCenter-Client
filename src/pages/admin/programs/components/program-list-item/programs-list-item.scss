@@ -89,6 +89,8 @@
     &-tooltip {
       display: flex;
       flex-direction: column;
+      width: auto;
+      white-space: nowrap;
       gap: 4px;
 
       b {

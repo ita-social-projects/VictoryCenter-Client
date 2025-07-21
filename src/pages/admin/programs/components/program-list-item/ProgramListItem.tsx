@@ -2,7 +2,7 @@
 import InfoIcon from '../../../../../assets/icons/info.svg';
 import { Program } from '../../../../../types/ProgramAdminPage';
 import {COMMON_TEXT_ADMIN} from "../../../../../const/admin/common";
-import Tooltip  from '../../../../../components/common/tooltip/Tooltip';
+import TooltipButton  from '../../../../../components/common/button-tooltip/ButtonTooltip';
 import Status from "../../../../../components/common/status/Status";
 import './programs-list-item.scss';
 
@@ -33,12 +33,8 @@ export const ProgramListItem = ({
       </div>
 
       <div className="program-actions">
-        <Tooltip position="bottom">
-          <Tooltip.Trigger>
-            <img src={InfoIcon} alt="info" className="tooltip-icon" />
-          </Tooltip.Trigger>
-          <Tooltip.Content>
-            <div className="program-actions-tooltip">
+        <TooltipButton position="bottom">
+          <div className="program-actions-tooltip">
               <b>{program.status == 'Published' ?
                   COMMON_TEXT_ADMIN.TOOLTIP.PUBLISHED_IN :
                   COMMON_TEXT_ADMIN.TOOLTIP.DRAFTED_IN}</b>
@@ -46,8 +42,7 @@ export const ProgramListItem = ({
                 <span key={c.id}>{c.name}</span>
               ))}
             </div>
-          </Tooltip.Content>
-        </Tooltip>
+        </TooltipButton>
 
         <div className="program-actions-buttons">
           <button

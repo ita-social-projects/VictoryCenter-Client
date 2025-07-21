@@ -27,7 +27,7 @@ export interface ProgramsListProps {
     onDeleteProgram: (program: Program) => void;
 }
 
-export type ProgramListRef = {
+export interface ProgramListRef {
   addProgram: (program: Program) => void;
   editProgram: (program: Program) => void;
   deleteProgram: (program: Program) => void;

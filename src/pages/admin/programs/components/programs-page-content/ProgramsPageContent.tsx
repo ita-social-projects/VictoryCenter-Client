@@ -9,7 +9,6 @@ import DeleteProgramModal from "../program-modals/DeleteProgramModal";
 import '../program-form/program-form.scss';
 
 export const ProgramsPageContent = () => {
-    const [debouncedSearchByNameTerm, setDebouncedSearchByNameTerm] = useState<string>('');
     const [searchByNameTerm, setSearchByNameTerm] = useState<string>('');
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [autocompleteValues] = useState<string[]>([]);
@@ -22,19 +21,8 @@ export const ProgramsPageContent = () => {
     const programListRef = useRef<ProgramListRef>(null);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setDebouncedSearchByNameTerm(searchByNameTerm);
-        }, 200);
-        return () => clearTimeout(timer);
+        // fetch autocomplete values
     }, [searchByNameTerm]);
-
-    useEffect(() => {
-/*        const fetchAutocompleteValues = async () => {
-            const autocompleteValues = await fetchProgramAutocompleteSuggestions(debouncedSearchByNameTerm);
-            setAutocompleteValues(autocompleteValues.map(x => x.name));
-        }
-        fetchAutocompleteValues();*/
-    }, [debouncedSearchByNameTerm]);
 
     const handleSearchQueryByName = useCallback((query: string) => {
         setSearchByNameTerm(query);
@@ -71,7 +59,7 @@ export const ProgramsPageContent = () => {
     }
 
     return (
-        <div className='wrapper'>
+        <div className='wrapper' data-testid="programs-page-content">
             <AddProgramModal
                 onAddProgram={handleAddProgram}
                 onClose={() => setIsAddProgramModalOpen(false)}

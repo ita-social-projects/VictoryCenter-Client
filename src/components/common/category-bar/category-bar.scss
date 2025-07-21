@@ -1,0 +1,29 @@
+﻿.category-bar {
+  border-bottom: 1px solid #A4A49B;
+  font-size: 24px;
+  font-weight: 600;
+  display: flex;
+  background-color: #F8F8F8;
+  box-shadow: 0 0 4px rgba(128, 128, 128, 0.22);
+
+  &-button {
+    font-size: 24px;
+    border: none;
+    background: transparent;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    padding: 15px;
+
+    &.category-bar-selected {
+      border-bottom: 1px solid #041128;
+    }
+
+    &:hover {
+      cursor: pointer;
+      background-color: rgba(128, 128, 128, 0.15);
+    }
+  }
+}

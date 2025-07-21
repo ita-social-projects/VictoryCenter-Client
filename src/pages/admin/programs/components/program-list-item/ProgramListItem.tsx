@@ -1,9 +1,8 @@
-﻿import BlankImage from '../../../../../assets/images/admin/blank-image.svg';
-import InfoIcon from '../../../../../assets/icons/info.svg';
-import { Program } from '../../../../../types/ProgramAdminPage';
+﻿import { Program } from '../../../../../types/ProgramAdminPage';
 import {COMMON_TEXT_ADMIN} from "../../../../../const/admin/common";
-import TooltipButton  from '../../../../../components/common/button-tooltip/ButtonTooltip';
+import ButtonTooltip  from '../../../../../components/common/button-tooltip/ButtonTooltip';
 import Status from "../../../../../components/common/status/Status";
+import BlankImage from '../../../../../assets/images/admin/blank-image.svg';
 import './programs-list-item.scss';
 
 export interface ProgramListItemProps {
@@ -31,9 +30,8 @@ export const ProgramListItem = ({
           <Status status={program.status} />
         </div>
       </div>
-
       <div className="program-actions">
-        <TooltipButton position="bottom">
+        <ButtonTooltip position="bottom">
           <div className="program-actions-tooltip">
               <b>{program.status == 'Published' ?
                   COMMON_TEXT_ADMIN.TOOLTIP.PUBLISHED_IN :
@@ -42,8 +40,7 @@ export const ProgramListItem = ({
                 <span key={c.id}>{c.name}</span>
               ))}
             </div>
-        </TooltipButton>
-
+        </ButtonTooltip>
         <div className="program-actions-buttons">
           <button
             type="button"

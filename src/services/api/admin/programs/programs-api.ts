@@ -7,13 +7,17 @@
 import { mockCategories, mockPrograms } from "../../../../utils/mock-data/admin-page/programPage";
 import {PaginationResult, VisibilityStatus} from "../../../../types/Common";
 
+// !!!
 // Delete after actual integration with backend
+// !!!
 let mockProgramId = Math.max(...mockPrograms.map(p => p.id), 0) + 1;
 let mockCategoryId = Math.max(...mockCategories.map(c => c.id), 0) + 1;
 const mockDelay = 2200;
 const throwErrorsInApi = false;
 
+// !!!
 // Change this when integrating the client with the backend
+// !!!
 const ProgramsApi = {
     fetchProgramCategories: async (): Promise<ProgramCategory[]> => {
         await new Promise((resolve) => setTimeout(resolve, 200));
@@ -68,6 +72,8 @@ const ProgramsApi = {
             categories: mockCategories.filter(c => program.categoryIds.includes(c.id)),
         };
 
+        console.log(`Add with status: ${program.status}`);
+
         mockPrograms.push(newProgram);
         return newProgram;
     },
@@ -92,6 +98,8 @@ const ProgramsApi = {
             img: imageUrl,
             categories: mockCategories.filter(c => program.categoryIds.includes(c.id)),
         };
+
+        console.log(`Edit with status: ${program.status}`);
 
         mockPrograms[index] = updatedProgram;
         return updatedProgram;

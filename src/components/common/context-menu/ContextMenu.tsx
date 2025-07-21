@@ -109,3 +109,5 @@ ContextMenu.Option = ({
         </button>
     );
 };
+
+export default ContextMenu;

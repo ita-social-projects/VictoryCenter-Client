@@ -146,7 +146,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 {/* Description Field */}
                 <div className="form-group">
                     <label htmlFor="description">
-                        <span className="required-field">*</span>
+                        <span>*</span>
                         {PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION}
                     </label>
                     <Controller
@@ -168,7 +168,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 {/* Image Field */}
                 <div className="form-group form-group-image">
                     <span>
-                        <span className="required-field">*</span>
+                        <span>*</span>
                         {PROGRAMS_TEXT.FORM.LABEL.PHOTO}
                     </span>
                     <Controller

@@ -1,4 +1,4 @@
-import { BaseTab } from '../../components/shared/PaginatedSortedList';
+import { BaseTab } from '../../components/admin/shared/PaginatedSortedList';
 
 export type TeamMember = {
     id: number;

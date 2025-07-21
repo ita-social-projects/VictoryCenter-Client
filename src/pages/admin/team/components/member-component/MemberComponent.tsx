@@ -9,8 +9,8 @@ export const MemberComponent = ({
     handleOnEditMember,
 }: {
     member: TeamMember;
-    handleOnDeleteMember: (fullName: string) => void;
-    handleOnEditMember: (id: number) => void;
+    handleOnDeleteMember: (member: TeamMember) => void;
+    handleOnEditMember: (member: TeamMember) => void;
 }) => {
     return (
         <div className="members-item">
@@ -32,14 +32,10 @@ export const MemberComponent = ({
                     <span>{member.status}</span>
                 </div>
                 <div className="members-actions">
+                    <button type="button" onClick={() => handleOnEditMember(member)} className="members-actions-edit" />
                     <button
                         type="button"
-                        onClick={() => handleOnEditMember(member.id)}
-                        className="members-actions-edit"
-                    />
-                    <button
-                        type="button"
-                        onClick={() => handleOnDeleteMember(member.fullName)}
+                        onClick={() => handleOnDeleteMember(member)}
                         className="members-actions-delete"
                     />
                 </div>

@@ -10,7 +10,6 @@ import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
 import './members-list.scss';
 import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
-import { AxiosInstance } from 'axios';
 import {
     TEAM_DELETE_MEMBER,
     TEAM_EDIT_MEMBER,
@@ -25,7 +24,7 @@ import {
 import { DragPreviewModel } from '../../../../../types/admin/Common';
 import { TeamMember } from '../../../../../types/admin/TeamMembers';
 import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi';
-import { PaginatedSortableList } from '../../../../../components/shared/PaginatedSortedList';
+import { PaginatedSortableList } from '../../../../../components/admin/shared/PaginatedSortedList';
 
 export type MembersListProps = {
     searchByNameQuery: string | null;
@@ -36,35 +35,6 @@ export type MembersListProps = {
 };
 
 const currentTabKey = 'currentTab';
-export const fetchMembers = async (
-    category: TeamCategory,
-    pageSize: number,
-    pageNumber: number,
-    searchQuery: string = '',
-    statusFilter: StatusFilter = 'Усі',
-    client: AxiosInstance,
-    onError?: (msg: string | null) => void,
-): Promise<{
-    newMembers: TeamMember[];
-    totalCountOfPages: number;
-}> => {
-    let filtered = [] as TeamMember[];
-    try {
-        filtered = await TeamMembersApi.getAll(
-            client,
-            category.id,
-            mapStatusFilterToStatus(statusFilter),
-            (pageNumber - 1) * pageSize,
-            pageNumber * pageSize,
-        );
-    } catch (err) {
-        onError?.((err as Error).message);
-    }
-    return {
-        newMembers: filtered,
-        totalCountOfPages: Math.ceil(filtered.length / pageSize),
-    };
-};
 
 export const MembersList = ({
     searchByNameQuery,
@@ -76,7 +46,7 @@ export const MembersList = ({
     const [pageSize, setPageSize] = useState(0);
     const [totalPages, setTotalPages] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [teamMemberToDelete, setTeamMemberToDelete] = useState<string | null>(null);
+    const [teamMemberToDelete, setTeamMemberToDelete] = useState<TeamMember | null>(null);
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [category, setCategory] = useState<TeamCategoryDto | null>(() => {
         const savedName = localStorage.getItem(currentTabKey);
@@ -160,8 +130,6 @@ export const MembersList = ({
     const loadMembers = useCallback(
         async (reset: boolean = false) => {
             const currentCategory = categoryRef.current;
-            const currentSearch = searchByNameQuery || '';
-            const currentStatus = statusFilter;
             if (!currentCategory || isFetchingRef.current) return;
             if (!reset && totalPagesRef.current && currentPageRef.current > totalPagesRef.current) return;
 
@@ -170,15 +138,19 @@ export const MembersList = ({
 
             const pageToFetch = reset ? 1 : currentPageRef.current;
 
-            const { newMembers, totalCountOfPages } = await fetchMembers(
-                currentCategory,
-                pageSize,
-                pageToFetch,
-                currentSearch,
-                currentStatus,
-                client,
-                onError,
-            );
+            let newMembers = [] as TeamMember[];
+            try {
+                newMembers = await TeamMembersApi.getAll(
+                    client,
+                    category?.id,
+                    mapStatusFilterToStatus(statusFilter),
+                    (pageToFetch - 1) * pageSize,
+                    pageToFetch * pageSize,
+                );
+            } catch (err) {
+                onError?.((err as Error).message);
+            }
+            let totalCountOfPages = Math.ceil(newMembers.length / pageSize);
 
             setMembers((prev) => (reset ? [...newMembers] : [...prev, ...newMembers]));
             setCurrentPage((prev) => (reset ? 2 : prev + 1));
@@ -189,7 +161,7 @@ export const MembersList = ({
             setIsMembersLoading(false);
             isFetchingRef.current = false;
         },
-        [searchByNameQuery, statusFilter, pageSize, client, onError],
+        [pageSize, client, category?.id, statusFilter, onError],
     );
 
     useEffect(() => {
@@ -259,19 +231,18 @@ export const MembersList = ({
         }
     };
 
-    const handleOnDeleteMember = (fullName: string) => {
-        setTeamMemberToDelete(fullName);
+    const handleOnDeleteMember = (member: TeamMember) => {
+        setTeamMemberToDelete(member);
         setIsDeleteTeamMemberModalOpen(true);
     };
 
     const handleDeleteMember = async () => {
         try {
-            const member = members.find((m) => m.fullName === teamMemberToDelete);
-            if (!member) {
+            if (!teamMemberToDelete) {
                 return;
             }
-            await TeamMembersApi.delete(client, member.id);
-            setMembers((prev) => prev.filter((m) => m.id !== member.id));
+            await TeamMembersApi.delete(client, teamMemberToDelete.id);
+            setMembers((prev) => prev.filter((m) => m.id !== teamMemberToDelete.id));
         } catch (err) {
             onError?.((err as Error).message);
         } finally {
@@ -353,17 +324,16 @@ export const MembersList = ({
         el.scrollTop = 0;
     };
 
-    const handleOnEditMember = (id: number) => {
-        const memberToEdit = members.filter((m) => m.id === id)[0];
-        if (memberToEdit) {
+    const handleOnEditMember = (member: TeamMember) => {
+        if (member) {
             setMemberToEdit({
-                category: memberToEdit.category,
+                category: member.category,
                 //TODO: handle with photos
                 img: null,
-                fullName: memberToEdit.fullName,
-                description: memberToEdit.description,
+                fullName: member.fullName,
+                description: member.description,
             });
-            setMemberIdToEdit(id);
+            setMemberIdToEdit(member.id);
             setIsEditMemberModalOpen(true);
         }
     };
@@ -442,13 +412,7 @@ export const MembersList = ({
     let content;
 
     if (members.length > 0) {
-        console.log(memberListRef?.current?.clientHeight, pageSize);
-        const filteredMembers = members.filter((m) => {
-            if (statusFilter === 'Усі') return true;
-            return m.status === statusFilter;
-        });
-
-        content = filteredMembers.map((m, index) => (
+        content = members.map((m, index) => (
             <MembersListItem
                 key={m.id}
                 draggedIndex={draggedIndex}

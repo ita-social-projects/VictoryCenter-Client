@@ -9,5 +9,12 @@
         padding-top: 6rem;
         padding-bottom: 6rem;
         padding-left: 12.5rem;
+
+        .stickyBlock {
+            position: sticky;
+            top: 2rem;
+            display: flex;
+            height: 100%;
+        }
     }
 }

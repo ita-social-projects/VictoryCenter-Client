@@ -8,7 +8,9 @@ export const DonatePage = () => {
         <div className="donatePage">
             <DonatePageIntro />
             <div className="donatePageContent">
-                <DonateSection />
+                <div className="stickyBlock">
+                    <DonateSection />
+                </div>
                 <RightSection />
             </div>
         </div>

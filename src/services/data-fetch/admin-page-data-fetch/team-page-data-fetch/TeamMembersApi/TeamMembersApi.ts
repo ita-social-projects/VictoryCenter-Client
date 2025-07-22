@@ -1,7 +1,7 @@
-import { TeamMember, TeamMemberDto } from '../../../../types/admin/TeamMembers';
-import { MemberFormValues } from '../../../../pages/admin/team/components/member-form/MemberForm';
+import { TeamMember, TeamMemberDto } from '../../../../../types/admin/TeamMembers';
+import { MemberFormValues } from '../../../../../pages/admin/team/components/member-form/MemberForm';
 import { AxiosInstance } from 'axios';
-import { Status } from '../../../../types/Common';
+import { Status } from '../../../../../types/Common';
 
 export const TeamMembersApi = {
     getAll: async (

@@ -1,6 +1,6 @@
 import { TeamCategoriesApi, mapTeamCategoryDtoToTeamCategory } from './TeamCategoriesApi';
 import { AxiosInstance } from 'axios';
-import { TeamCategoryDto, TeamCategory } from '../../../../types/admin/TeamMembers';
+import { TeamCategoryDto, TeamCategory } from '../../../../../types/admin/TeamMembers';
 
 describe('mapTeamCategoryDtoToTeamCategory', () => {
     it('should correctly map DTO to TeamCategory', () => {

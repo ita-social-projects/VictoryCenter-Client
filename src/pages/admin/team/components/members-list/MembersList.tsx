@@ -10,7 +10,7 @@ import ArrowUpIcon from '../../../../../assets/icons/arrow-up.svg';
 import { mapStatusFilterToStatus, StatusFilter } from '../../../../../types/Common';
 import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
 import './members-list.scss';
-import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
+import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
 import {
     TEAM_DELETE_MEMBER,
@@ -26,7 +26,7 @@ import {
 import classNames from 'classnames';
 import { DragPreviewModel } from '../../../../../types/admin/Common';
 import { TeamMember } from '../../../../../types/admin/TeamMembers';
-import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi';
+import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
 
 export type MembersListProps = {
     searchByNameQuery: string | null;

@@ -10,7 +10,7 @@ import {
     TEAM_LABEL_DRAG_DROP,
 } from '../../../../../const/team';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
-import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi';
+import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
 
 export type MemberFormValues = {
     category: TeamCategory;

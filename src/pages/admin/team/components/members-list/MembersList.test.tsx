@@ -2,9 +2,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MembersList, MembersListProps } from './MembersList';
 import { TeamCategory, TeamMember } from '../../../../../types/admin/TeamMembers';
 import * as React from 'react';
-import { mockMembers } from '../../../../../utils/mock-data/admin-page/teamPage';
-import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
-import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi';
+import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi';
+import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
+
+const mockMembers = [] as TeamMember[];
 
 const mockDataTransfer = {
     setDragImage: jest.fn(),
@@ -234,7 +235,7 @@ describe('MembersList', () => {
 
     it('shows loader when members are loading', async () => {
         jest.spyOn(TeamMembersApi, 'getAll').mockImplementation(
-            () => new Promise((resolve) => setTimeout(() => resolve(mockMembers), 1000)),
+            () => new Promise((resolve) => setTimeout(() => resolve(mockMembers), 10)),
         );
         render(<MembersList {...sharedDefaultProps} />);
         expect(await screen.findByTestId('members-list-loader-icon')).toHaveAttribute('src', 'loader-icon');
@@ -280,7 +281,7 @@ describe('MembersList', () => {
 
     it('disables category buttons when loading', async () => {
         jest.spyOn(TeamMembersApi, 'getAll').mockImplementation(
-            () => new Promise((resolve) => setTimeout(() => resolve(mockMembers), 1000)),
+            () => new Promise((resolve) => setTimeout(() => resolve(mockMembers), 10)),
         );
 
         render(<MembersList {...sharedDefaultProps} />);

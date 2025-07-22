@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
-import { MemberFormValues } from '../../../../pages/admin/team/components/member-form/MemberForm';
-import { TeamMemberDto } from '../../../../types/admin/TeamMembers';
+import { MemberFormValues } from '../../../../../pages/admin/team/components/member-form/MemberForm';
+import { TeamMemberDto } from '../../../../../types/admin/TeamMembers';
 import { mapTeamMemberDtoToTeamMember, TeamMembersApi } from './TeamMembersApi';
 
 const mockClient = {

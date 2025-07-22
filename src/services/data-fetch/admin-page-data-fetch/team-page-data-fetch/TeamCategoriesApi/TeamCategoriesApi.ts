@@ -1,4 +1,4 @@
-import { TeamCategory, TeamCategoryDto } from '../../../../types/admin/TeamMembers';
+import { TeamCategory, TeamCategoryDto } from '../../../../../types/admin/TeamMembers';
 import { AxiosInstance } from 'axios';
 
 export const TeamCategoriesApi = {

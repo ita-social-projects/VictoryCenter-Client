@@ -192,6 +192,8 @@ export const MembersList = ({
         setTotalPages(null);
         isFetchingRef.current = false;
         loadMembers(true);
+        // TODO remove eslint disable
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [category, searchByNameQuery, statusFilter, pageSize, refetchTrigger]);
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
@@ -535,6 +537,7 @@ export const MembersList = ({
                             existingMemberFormValues={memberToEdit}
                             id="edit-member-modal"
                             onSubmit={handleMemberEdit}
+                            onError={onError}
                         />
                     </Modal.Content>
                     <Modal.Actions>

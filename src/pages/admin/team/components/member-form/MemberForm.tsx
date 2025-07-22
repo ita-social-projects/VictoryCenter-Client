@@ -24,11 +24,18 @@ export type MemberFormProps = {
     onSubmit: (memberFormValues: MemberFormValues) => void;
     existingMemberFormValues?: MemberFormValues | null;
     onValuesChange?: (memberFormValues: MemberFormValues) => void;
+    onError?: (msg: string | null) => void;
 };
 
 const MAX_FULLNAME_LENGTH = 50;
 const MAX_DESCRIPTION_LENGTH = 200;
-export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onValuesChange }: MemberFormProps) => {
+export const MemberForm = ({
+    onSubmit,
+    id,
+    existingMemberFormValues = null,
+    onValuesChange,
+    onError,
+}: MemberFormProps) => {
     const client = useAdminClient();
     const [categories, setCategories] = useState<TeamCategory[]>([]);
     const [isLoadingCategories, setIsLoadingCategories] = useState(true);
@@ -86,13 +93,13 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
                 const data = await TeamCategoriesApi.getAll(client);
                 setCategories(data);
             } catch (error) {
-                console.error('Не вдалося завантажити категорії:', error);
+                onError?.((error as Error).message);
             } finally {
                 setIsLoadingCategories(false);
             }
         };
         fetchCategories();
-    }, [client]);
+    }, [client, onError]);
 
     const handleFileDrop = (e: React.DragEvent<HTMLLabelElement>) => {
         e.preventDefault();

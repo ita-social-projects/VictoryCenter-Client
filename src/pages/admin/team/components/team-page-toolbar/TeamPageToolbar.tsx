@@ -28,6 +28,7 @@ export type TeamPageToolbarProps = {
     autocompleteValues: string[];
     onMemberPublish?: (member: MemberFormValues) => void;
     onMemberSaveDraft?: (member: MemberFormValues) => void;
+    onError?: (msg: string | null) => void;
 };
 
 type MemberFormData = {
@@ -44,6 +45,7 @@ const AddMemberModal = ({
     onSaveDraft,
     formData,
     onFormDataChange,
+    onError,
 }: {
     isOpen: boolean;
     onClose: () => void;
@@ -51,6 +53,7 @@ const AddMemberModal = ({
     onSaveDraft: (member: MemberFormValues) => void;
     formData: MemberFormValues | null;
     onFormDataChange: (formData: MemberFormValues) => void;
+    onError?: (msg: string | null) => void;
 }) => (
     <Modal onClose={onClose} isOpen={isOpen} data-testid="add-member-modal">
         <Modal.Title>{TEAM_ADD_MEMBER}</Modal.Title>
@@ -60,6 +63,7 @@ const AddMemberModal = ({
                 onSubmit={onPublish}
                 existingMemberFormValues={formData}
                 onValuesChange={onFormDataChange}
+                onError={onError}
             />
         </Modal.Content>
         <Modal.Actions>

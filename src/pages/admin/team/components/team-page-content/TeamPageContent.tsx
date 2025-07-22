@@ -56,6 +56,7 @@ export const TeamPageContent = () => {
                 onStatusFilterChange={onCategoryFilterChange}
                 onMemberPublish={handleAddMember}
                 onMemberSaveDraft={handleSaveDraft}
+                onError={setError}
             />
             {error && (
                 <div

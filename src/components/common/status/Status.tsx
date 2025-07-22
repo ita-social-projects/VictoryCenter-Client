@@ -20,7 +20,7 @@ export const Status = ({ status }: StatusProps) => {
     };
 
     const getStatusClass = (statusType: VisibilityStatus) => {
-        return statusType === 'Draft' ? 'draft' : 'published';
+        return statusType === 'Draft' ? 'status-draft' : 'status-published';
     };
 
     return (

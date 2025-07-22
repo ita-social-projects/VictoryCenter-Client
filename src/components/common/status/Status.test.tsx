@@ -18,8 +18,8 @@ describe('Status Component', () => {
 
         const statusElement = screen.getByText('Чернетка').closest('div');
 
-        expect(statusElement).toHaveClass('program-status');
-        expect(statusElement).toHaveClass('draft');
+        expect(statusElement).toHaveClass('status');
+        expect(statusElement).toHaveClass('status-draft');
         expect(screen.getByText('Чернетка')).toBeInTheDocument();
     });
 
@@ -28,8 +28,8 @@ describe('Status Component', () => {
 
         const statusElement = screen.getByText('Опубліковано').closest('div');
 
-        expect(statusElement).toHaveClass('program-status');
-        expect(statusElement).toHaveClass('published');
+        expect(statusElement).toHaveClass('status');
+        expect(statusElement).toHaveClass('status-published');
         expect(screen.getByText('Опубліковано')).toBeInTheDocument();
     });
 
@@ -49,8 +49,8 @@ describe('Status Component', () => {
 
         const statusElement = screen.getByText('Чернетка').closest('div');
 
-        expect(statusElement).toHaveClass('program-status', 'draft');
-        expect(statusElement).not.toHaveClass('published');
+        expect(statusElement).toHaveClass('status', 'status-draft');
+        expect(statusElement).not.toHaveClass('status-published');
     });
 
     it('applies correct class for Published status', () => {
@@ -58,8 +58,8 @@ describe('Status Component', () => {
 
         const statusElement = screen.getByText('Опубліковано').closest('div');
 
-        expect(statusElement).toHaveClass('program-status', 'published');
-        expect(statusElement).not.toHaveClass('draft');
+        expect(statusElement).toHaveClass('status', 'status-published');
+        expect(statusElement).not.toHaveClass('status-draft');
     });
 
     it('uses correct constants for text', () => {

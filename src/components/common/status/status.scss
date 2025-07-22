@@ -13,13 +13,13 @@
     font-weight: 400;
     white-space: nowrap;
 
-    &.draft {
+    &-draft {
         color: #61615c;
         background-color: #ffffff;
         border-color: #61615c;
     }
 
-    &.published {
+    &-published {
         color: #0f2957;
         background-color: #e5ecff;
         border-color: #0f2957;

@@ -16,7 +16,7 @@ export interface Program {
 }
 
 export interface ProgramCreateUpdate {
-    id?: number;
+    id: number | null;
     name: string;
     description: string;
     categoryIds: number[];
@@ -25,6 +25,6 @@ export interface ProgramCreateUpdate {
 }
 
 export interface ProgramCategoryCreateUpdate {
-    id?: number;
+    id: number | null;
     name: string;
 }

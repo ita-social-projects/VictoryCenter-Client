@@ -9,6 +9,7 @@ interface CopyTextButtonProps {
 export const CopyTextButton: React.FC<CopyTextButtonProps> = ({ textToCopy }) => {
     const handleCopy = async () => {
         await navigator.clipboard.writeText(textToCopy);
+        alert('Copied!');
     };
 
     return <CopyIcon className="copyTextButton" onClick={handleCopy} />;

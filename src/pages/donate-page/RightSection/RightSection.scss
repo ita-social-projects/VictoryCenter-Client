@@ -1,6 +1,7 @@
 $mulish-font-family: 'Mulish', sans-serif;
 
 .rightSection {
+    max-width: 33.1rem;
     overflow-y: auto;
 
     &::-webkit-scrollbar {

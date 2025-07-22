@@ -1,9 +1,9 @@
-import { Member } from '../members-list/MembersList';
 import DragIcon from '../../../../../assets/icons/dragger.svg';
 import React from 'react';
 import { MemberComponent } from '../member-component/MemberComponent';
 import './members-list-item.scss';
 import classNames from 'classnames';
+import { Member } from '../../../../../types/TeamPage';
 
 type MembersListItemProps = {
     member: Member;

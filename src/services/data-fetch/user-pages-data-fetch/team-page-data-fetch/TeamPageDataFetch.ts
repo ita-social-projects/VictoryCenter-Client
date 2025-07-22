@@ -1,5 +1,5 @@
 import {
-    Member,
+    MemberCard,
     PublicCategoryWithTeamMembersDto,
     PublicTeamMemberDto,
     TeamItem,
@@ -19,7 +19,7 @@ const isValidTeamMember = (member: PublicTeamMemberDto): boolean => {
     return Boolean(member?.fullName?.trim());
 };
 
-const mapTeamMemberDtoToTeamMember = (dto: PublicTeamMemberDto): Member => ({
+const mapTeamMemberDtoToTeamMember = (dto: PublicTeamMemberDto): MemberCard => ({
     id: dto.id,
     name: dto.fullName,
     role: dto.description || '',

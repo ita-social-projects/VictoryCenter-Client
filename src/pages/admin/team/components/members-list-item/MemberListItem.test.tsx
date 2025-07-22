@@ -1,13 +1,17 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import { MembersListItem } from './MembersListItem';
-import { Member } from '../members-list/MembersList';
+import { Member } from '../../../../../types/TeamPage';
 
 jest.mock('../../../../../assets/icons/dragger.svg', () => 'drag-icon.svg');
 
 const mockMember: Member = {
     id: 1,
-    img: 'avatar.png',
+    img: {
+        id: 1,
+        base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
+        mimeType: 'image/jpeg',
+    },
     fullName: 'John Doe',
     description: 'Senior Developer',
     status: 'Чернетка',

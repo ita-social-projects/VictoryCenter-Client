@@ -1,4 +1,3 @@
-import CloudDownload from '../../../../../assets/icons/cloud-download.svg';
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { TeamCategory } from '../../../../../types/TeamPage';
 import {
@@ -9,15 +8,15 @@ import {
     TEAM_LABEL_SELECT_CATEGORY,
     TEAM_LABEL_FULLNAME,
     TEAM_LABEL_DESCRIPTION,
-    TEAM_LABEL_PHOTO,
-    TEAM_LABEL_DRAG_DROP,
 } from '../../../../../const/team';
+import { ImageUploadField } from '../member-photo-uploader/ImageUploadField';
+import {Image, ImageValues} from '../../../../../types/Image';
 
 export type MemberFormValues = {
     category: TeamCategory;
     fullName: string;
     description: string;
-    img: FileList | null;
+    image: Image | null;
 };
 
 export type MemberFormProps = {
@@ -33,7 +32,7 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
     const [memberFormValues, setMemberFormValues] = useState<MemberFormValues>(
         existingMemberFormValues || {
             fullName: '',
-            img: null,
+            image: null,
             description: '',
             category: '' as TeamCategory,
         },
@@ -41,6 +40,7 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
     const handleOnSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (memberFormValues?.category && memberFormValues?.description && memberFormValues?.fullName) {
+            console.log('onValuesChange', memberFormValues);
             onSubmit(memberFormValues);
         }
     };
@@ -49,14 +49,7 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
     ) => {
         const { name, value } = e.target;
-        const inputTarget = e.currentTarget as EventTarget & HTMLInputElement;
-        if (inputTarget.files && inputTarget.files.length > 0) {
-            const file = inputTarget.files;
-            setMemberFormValues((prev) => ({
-                ...prev,
-                img: file,
-            }));
-        } else {
+        if (name !== 'imgId') {
             setMemberFormValues((prev) => ({
                 ...prev,
                 [name]: value,
@@ -64,23 +57,23 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
         }
     };
 
+    const onFileChange = (item: ImageValues) => {
+        var newImage: Image = {
+            id: existingMemberFormValues?.image?.id ?? null,
+            base64: item.base64,
+            mimeType: item.mimeType,
+        }
+        setMemberFormValues((prev) => ({
+            ...prev,
+            image: newImage,
+        }));
+    };
+
     useEffect(() => {
         if (onValuesChange && memberFormValues) {
             onValuesChange(memberFormValues);
         }
     }, [memberFormValues, onValuesChange]);
-
-    const handleFileDrop = (e: React.DragEvent<HTMLLabelElement>) => {
-        e.preventDefault();
-
-        const files = e.dataTransfer.files;
-        if (files) {
-            setMemberFormValues((prev) => ({
-                ...prev,
-                img: files,
-            }));
-        }
-    };
 
     return (
         <form id={id} onSubmit={handleOnSubmit} data-testid="test-form">
@@ -130,40 +123,7 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
                         {MAX_DESCRIPTION_LENGTH}
                     </div>
                 </div>
-                <div className="form-group form-group-image">
-                    <span>
-                        <span className="form-group-image-required">*</span>
-                        {TEAM_LABEL_PHOTO}
-                    </span>
-                    <div className="form-group-image-details">
-                        <label
-                            onDragOver={(e) => e.preventDefault()}
-                            onDragLeave={(e) => e.preventDefault()}
-                            onDrop={handleFileDrop}
-                            htmlFor="image"
-                            className="form-group-image-choose-file"
-                        >
-                            <div className="form-group-image-choose-file-inner" data-testid="drop-area">
-                                <img src={CloudDownload} alt="cloud-download" />
-                                <span>{TEAM_LABEL_DRAG_DROP}</span>
-                            </div>
-                        </label>
-                        <input
-                            data-testid="image"
-                            onChange={handleMemberFormValuesChange}
-                            name="img"
-                            type="file"
-                            id="image"
-                        />
-                        <div className="form-group-image-loaded">
-                            {memberFormValues.img ? (
-                                Array.from(memberFormValues.img).map((f) => <div key={f.name}>{f.name}</div>)
-                            ) : (
-                                <div></div>
-                            )}
-                        </div>
-                    </div>
-                </div>
+                <ImageUploadField image={memberFormValues.image} onChange={(image: ImageValues) => onFileChange(image)} />
             </div>
         </form>
     );

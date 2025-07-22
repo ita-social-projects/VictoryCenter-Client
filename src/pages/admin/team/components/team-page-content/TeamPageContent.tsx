@@ -4,6 +4,8 @@ import { MembersList } from '../members-list/MembersList';
 import { MemberFormValues } from '../member-form/MemberForm';
 import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
+import {ImagesApi} from "../../../../../services/data-fetch/admin-page-data-fetch/image-data-fetch/ImageDataApi";
+import {Image} from "../../../../../types/Image";
 
 export const TeamPageContent = () => {
     const [searchByNameQuery, setSearchByNameQuery] = useState<string>('');
@@ -26,11 +28,24 @@ export const TeamPageContent = () => {
     }, []);
 
     const handleAddMember = async (member: MemberFormValues) => {
+
+        if(member.image != null) {
+
+                member.image = await ImagesApi.post(client, member.image);
+
+        }
+
         await TeamMembersApi.postPublished(client, member);
         setRefetchKey((prev) => prev + 1);
     };
 
     const handleSaveDraft = async (member: MemberFormValues) => {
+
+        if(member.image != null) {
+
+                member.image = await ImagesApi.post(client, member.image);
+        }
+
         await TeamMembersApi.postDraft(client, member);
         setRefetchKey((prev) => prev + 1);
     };

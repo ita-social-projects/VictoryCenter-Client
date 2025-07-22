@@ -19,6 +19,7 @@ import {
     TEAM_STATUS_DRAFT,
     SEARCH_BY_NAME,
 } from '../../../../../const/team';
+import { Image } from '../../../../../types/Image';
 
 export type TeamPageToolbarProps = {
     onSearchQueryChange: (query: string) => void;
@@ -40,7 +41,7 @@ type MemberFormData = {
     category: TeamCategory;
     fullName: string;
     description: string;
-    img: FileList | null;
+    image: Image | null;
 } | null;
 
 const AddMemberModal = ({
@@ -163,7 +164,7 @@ export const TeamPageToolbar = ({
     const hasUnsavedChanges = useCallback(() => {
         return (
             formData !== null &&
-            (formData.img !== null || !!formData.category || !!formData.fullName || !!formData.description)
+            (formData.image !== null || !!formData.category || !!formData.fullName || !!formData.description)
         );
     }, [formData]);
 

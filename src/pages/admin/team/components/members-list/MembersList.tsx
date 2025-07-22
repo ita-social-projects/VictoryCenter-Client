@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { categoryMap } from '../../../../../const/admin/team-page';
-import { TeamCategory } from '../../../../../types/TeamPage';
+import { Member, TeamCategory } from '../../../../../types/TeamPage';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { MemberDragPreview } from '../member-drag-preview/MemberDragPreview';
 import { MembersListItem } from '../members-list-item/MembersListItem';
@@ -29,15 +29,6 @@ import {
     TEAM_NOT_FOUND,
 } from '../../../../../const/team';
 import classNames from 'classnames';
-
-export type Member = {
-    id: number;
-    img: string;
-    fullName: string;
-    description: string;
-    status: string;
-    category: TeamCategory;
-};
 
 export type MembersListProps = {
     searchByNameQuery: string | null;
@@ -344,7 +335,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
             setMemberToEdit({
                 category: memberToEdit.category,
                 //TODO: handle with photos
-                img: null,
+                image: memberToEdit.img,
                 fullName: memberToEdit.fullName,
                 description: memberToEdit.description,
             });
@@ -408,7 +399,7 @@ export const MembersList = ({ searchByNameQuery, statusFilter, onAutocompleteVal
         if (
             isEditMemberModalOpen &&
             (memberToEdit === null ||
-                (memberToEdit.img === null &&
+                (memberToEdit.image === null &&
                     !memberToEdit.category &&
                     !memberToEdit.fullName &&
                     !memberToEdit.description))

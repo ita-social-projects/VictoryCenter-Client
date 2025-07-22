@@ -1,14 +1,25 @@
-export interface Member {
+import { Image } from './Image';
+
+export interface MemberCard {
     id: number;
     name: string;
     role: string;
     photo: string;
 }
 
+export type Member = {
+    id: number;
+    img: Image | null;
+    fullName: string;
+    description: string;
+    status: string;
+    category: TeamCategory;
+};
+
 export interface TeamItem {
     title: string;
     description: string;
-    members: Member[];
+    members: MemberCard[];
 }
 
 export interface PublicCategoryWithTeamMembersDto {
@@ -29,7 +40,7 @@ export interface TeamPageData {
 }
 
 export interface TeamMemberProps {
-    member: Member;
+    member: MemberCard;
 }
 
 export interface TeamMemberDto {
@@ -39,7 +50,7 @@ export interface TeamMemberDto {
     priority: number;
     status: number;
     description: string;
-    photo: string;
+    image: Image | null;
     email: string;
 }
 

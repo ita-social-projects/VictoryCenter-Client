@@ -2,7 +2,9 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemberDragPreview } from './MemberDragPreview';
-import { Member, MemberDragPreviewModel } from '../members-list/MembersList';
+import { MemberDragPreviewModel } from '../members-list/MembersList';
+import { Member } from '../../../../../types/TeamPage';
+import { Image } from '../../../../../types/Image';
 
 jest.mock('../../../../../assets/icons/dragger.svg', () => 'mock-dragger-icon');
 jest.mock('../member-component/MemberComponent', () => ({
@@ -26,11 +28,17 @@ jest.mock('../member-component/MemberComponent', () => ({
     },
 }));
 
+const mockImage: Image = {
+    id: 1,
+    base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
+    mimeType: 'image/jpeg',
+};
+
 const mockMember: Member = {
     id: 1,
     fullName: 'John Doe',
     description: 'Software Engineer',
-    img: 'https://example.com/john.jpg',
+    img: mockImage,
     status: 'Чернетка',
     category: 'Основна команда',
 };
@@ -149,7 +157,7 @@ describe('MemberDragPreview', () => {
                 id: 2,
                 fullName: 'Jane Smith',
                 description: 'Product Manager',
-                img: 'https://example.com/jane.jpg',
+                img: mockImage,
                 status: 'Опубліковано',
                 category: 'Наглядова рада',
             };

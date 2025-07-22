@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { MembersList, MembersListProps, Member } from './MembersList';
+import { MembersList, MembersListProps } from './MembersList';
+import { Member } from '../../../../../types/TeamPage';
 import * as React from 'react';
 import { mockMembers } from '../../../../../utils/mock-data/admin-page/teamPage';
 import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
@@ -149,7 +150,11 @@ const sharedDefaultProps: MembersListProps = {
 let idCounter = 0;
 const createMockMember = (overrides = {}): Member => ({
     id: ++idCounter,
-    img: 'https://randomuser.me/api/portraits/men/1.jpg',
+    img: {
+        id: 1,
+        base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
+        mimeType: 'image/jpeg',
+    },
     fullName: 'First First',
     description: 'Software Engineer',
     status: 'Опубліковано',
@@ -747,7 +752,7 @@ describe('MembersList', () => {
                         category: 'Основна команда',
                         description: '',
                         status: 'Чернетка',
-                        img: '',
+                        img: null,
                     },
                 ]);
             });

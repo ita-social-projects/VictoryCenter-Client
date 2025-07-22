@@ -80,7 +80,7 @@ jest.mock('../member-form/MemberForm', () => ({
             category: 'Основна команда',
             fullName: 'Test User',
             description: 'Test Description',
-            img: null,
+            image: null,
         };
         return (
             <form
@@ -228,7 +228,7 @@ describe('TeamPageToolbar', () => {
                     category: 'Основна команда',
                     fullName: 'From test',
                     description: 'from test desc',
-                    img: null,
+                    image: null,
                 });
             });
 
@@ -394,7 +394,7 @@ describe('TeamPageToolbar', () => {
                     category: 'Основна команда',
                     fullName: 'From test',
                     description: 'from test desc',
-                    img: null,
+                    image: null,
                 });
             });
             await userEvent.click(screen.getByText('Зберегти як чернетку'));

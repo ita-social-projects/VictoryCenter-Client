@@ -1,17 +1,18 @@
-import { Member } from '../../../pages/admin/team/components/members-list/MembersList';
+import {} from '../../../pages/admin/team/components/members-list/MembersList';
+import { Member } from '../../../types/TeamPage';
 
 export const mockMembers: Member[] = [
     {
         id: 1,
-        img: 'https://randomuser.me/api/portraits/women/1.jpg',
         fullName: 'John Brown',
+        img: null,
         description: 'Software Engineer',
         status: 'Опубліковано',
         category: 'Наглядова рада',
     },
     {
         id: 2,
-        img: 'https://randomuser.me/api/portraits/men/2.jpg',
+        img: null,
         fullName: 'John Jones',
         description: 'HR Specialist',
         status: 'Опубліковано',
@@ -19,7 +20,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 3,
-        img: 'https://randomuser.me/api/portraits/women/3.jpg',
+        img: null,
         fullName: 'Emma Anderson',
         description: 'DevOps Engineer',
         status: 'Опубліковано',
@@ -27,7 +28,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 4,
-        img: 'https://randomuser.me/api/portraits/men/4.jpg',
+        img: null,
         fullName: 'Daniel Miller',
         description: 'HR Specialist',
         status: 'Опубліковано',
@@ -35,7 +36,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 5,
-        img: 'https://randomuser.me/api/portraits/women/5.jpg',
+        img: null,
         fullName: 'John Williams',
         description: 'Software Engineer',
         status: 'Чернетка',
@@ -43,7 +44,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 6,
-        img: 'https://randomuser.me/api/portraits/men/6.jpg',
+        img: null,
         fullName: 'Mia Garcia',
         description: 'Marketing Manager',
         status: 'Чернетка',
@@ -51,7 +52,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 7,
-        img: 'https://randomuser.me/api/portraits/women/7.jpg',
+        img: null,
         fullName: 'Mia Brown',
         description: 'Marketing Manager',
         status: 'Опубліковано',
@@ -59,7 +60,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 8,
-        img: 'https://randomuser.me/api/portraits/men/8.jpg',
+        img: null,
         fullName: 'Michael Williams',
         description: 'DevOps Engineer',
         status: 'Опубліковано',
@@ -67,7 +68,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 9,
-        img: 'https://randomuser.me/api/portraits/women/9.jpg',
+        img: null,
         fullName: 'Olivia Davis',
         description: 'Frontend Developer',
         status: 'Опубліковано',
@@ -75,7 +76,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 10,
-        img: 'https://randomuser.me/api/portraits/men/10.jpg',
+        img: null,
         fullName: 'John Brown',
         description: 'QA Analyst',
         status: 'Чернетка',
@@ -83,7 +84,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 11,
-        img: 'https://randomuser.me/api/portraits/women/11.jpg',
+        img: null,
         fullName: 'Olivia Garcia',
         description: 'DevOps Engineer',
         status: 'Чернетка',
@@ -91,7 +92,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 12,
-        img: 'https://randomuser.me/api/portraits/men/12.jpg',
+        img: null,
         fullName: 'Daniel Smith',
         description: 'Business Analyst',
         status: 'Опубліковано',
@@ -99,7 +100,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 13,
-        img: 'https://randomuser.me/api/portraits/women/13.jpg',
+        img: null,
         fullName: 'David Jones',
         description: 'Marketing Manager',
         status: 'Чернетка',
@@ -107,7 +108,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 14,
-        img: 'https://randomuser.me/api/portraits/men/14.jpg',
+        img: null,
         fullName: 'David Miller',
         description: 'DevOps Engineer',
         status: 'Опубліковано',
@@ -115,7 +116,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 15,
-        img: 'https://randomuser.me/api/portraits/women/15.jpg',
+        img: null,
         fullName: 'Olivia Garcia',
         description: 'Backend Developer',
         status: 'Опубліковано',
@@ -123,7 +124,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 16,
-        img: 'https://randomuser.me/api/portraits/men/16.jpg',
+        img: null,
         fullName: 'David Garcia',
         description: 'Marketing Manager',
         status: 'Чернетка',
@@ -131,7 +132,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 17,
-        img: 'https://randomuser.me/api/portraits/women/17.jpg',
+        img: null,
         fullName: 'Mia Garcia',
         description: 'HR Specialist',
         status: 'Чернетка',
@@ -139,7 +140,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 18,
-        img: 'https://randomuser.me/api/portraits/men/18.jpg',
+        img: null,
         fullName: 'Michael Johnson',
         description: 'Frontend Developer',
         status: 'Опубліковано',
@@ -147,7 +148,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 19,
-        img: 'https://randomuser.me/api/portraits/women/19.jpg',
+        img: null,
         fullName: 'Mia Johnson',
         description: 'Project Manager',
         status: 'Чернетка',
@@ -155,7 +156,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 20,
-        img: 'https://randomuser.me/api/portraits/men/20.jpg',
+        img: null,
         fullName: 'Mia Smith',
         description: 'DevOps Engineer',
         status: 'Чернетка',
@@ -163,7 +164,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 21,
-        img: 'https://randomuser.me/api/portraits/women/21.jpg',
+        img: null,
         fullName: 'James Williams',
         description: 'Frontend Developer',
         status: 'Опубліковано',
@@ -171,7 +172,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 22,
-        img: 'https://randomuser.me/api/portraits/men/22.jpg',
+        img: null,
         fullName: 'David Garcia',
         description: 'Frontend Developer',
         status: 'Чернетка',
@@ -179,7 +180,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 23,
-        img: 'https://randomuser.me/api/portraits/women/23.jpg',
+        img: null,
         fullName: 'James Davis',
         description: 'QA Analyst',
         status: 'Опубліковано',
@@ -187,7 +188,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 24,
-        img: 'https://randomuser.me/api/portraits/men/24.jpg',
+        img: null,
         fullName: 'Daniel Miller',
         description: 'Backend Developer',
         status: 'Чернетка',
@@ -195,7 +196,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 25,
-        img: 'https://randomuser.me/api/portraits/women/25.jpg',
+        img: null,
         fullName: 'Daniel Smith',
         description: 'Marketing Manager',
         status: 'Опубліковано',
@@ -203,7 +204,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 26,
-        img: 'https://randomuser.me/api/portraits/men/26.jpg',
+        img: null,
         fullName: 'Daniel Brown',
         description: 'DevOps Engineer',
         status: 'Чернетка',
@@ -211,7 +212,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 27,
-        img: 'https://randomuser.me/api/portraits/women/27.jpg',
+        img: null,
         fullName: 'John Jones',
         description: 'Business Analyst',
         status: 'Опубліковано',
@@ -219,7 +220,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 28,
-        img: 'https://randomuser.me/api/portraits/men/28.jpg',
+        img: null,
         fullName: 'John Smith',
         description: 'UI/UX Designer',
         status: 'Опубліковано',
@@ -227,7 +228,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 29,
-        img: 'https://randomuser.me/api/portraits/women/29.jpg',
+        img: null,
         fullName: 'Emma Williams',
         description: 'DevOps Engineer',
         status: 'Опубліковано',
@@ -235,7 +236,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 30,
-        img: 'https://randomuser.me/api/portraits/men/30.jpg',
+        img: null,
         fullName: 'Michael Miller',
         description: 'Software Engineer',
         status: 'Опубліковано',
@@ -243,7 +244,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 31,
-        img: 'https://randomuser.me/api/portraits/women/31.jpg',
+        img: null,
         fullName: 'Ava Johnson',
         description: 'Backend Developer',
         status: 'Чернетка',
@@ -251,7 +252,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 32,
-        img: 'https://randomuser.me/api/portraits/men/32.jpg',
+        img: null,
         fullName: 'Olivia Anderson',
         description: 'Project Manager',
         status: 'Чернетка',
@@ -259,7 +260,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 33,
-        img: 'https://randomuser.me/api/portraits/women/33.jpg',
+        img: null,
         fullName: 'David Johnson',
         description: 'Marketing Manager',
         status: 'Чернетка',
@@ -267,7 +268,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 34,
-        img: 'https://randomuser.me/api/portraits/men/34.jpg',
+        img: null,
         fullName: 'Daniel Brown',
         description: 'UI/UX Designer',
         status: 'Чернетка',
@@ -275,7 +276,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 35,
-        img: 'https://randomuser.me/api/portraits/women/35.jpg',
+        img: null,
         fullName: 'David Johnson',
         description: 'Marketing Manager',
         status: 'Опубліковано',
@@ -283,7 +284,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 36,
-        img: 'https://randomuser.me/api/portraits/men/36.jpg',
+        img: null,
         fullName: 'Ava Anderson',
         description: 'Marketing Manager',
         status: 'Чернетка',
@@ -291,7 +292,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 37,
-        img: 'https://randomuser.me/api/portraits/women/37.jpg',
+        img: null,
         fullName: 'John Brown',
         description: 'Project Manager',
         status: 'Опубліковано',
@@ -299,7 +300,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 38,
-        img: 'https://randomuser.me/api/portraits/men/38.jpg',
+        img: null,
         fullName: 'James Davis',
         description: 'Project Manager',
         status: 'Опубліковано',
@@ -307,7 +308,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 39,
-        img: 'https://randomuser.me/api/portraits/women/39.jpg',
+        img: null,
         fullName: 'Emma Smith',
         description: 'UI/UX Designer',
         status: 'Чернетка',
@@ -315,7 +316,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 40,
-        img: 'https://randomuser.me/api/portraits/men/40.jpg',
+        img: null,
         fullName: 'Mia Brown',
         description: 'Software Engineer',
         status: 'Опубліковано',
@@ -323,7 +324,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 41,
-        img: 'https://randomuser.me/api/portraits/women/41.jpg',
+        img: null,
         fullName: 'Olivia Williams',
         description: 'Backend Developer',
         status: 'Опубліковано',
@@ -331,7 +332,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 42,
-        img: 'https://randomuser.me/api/portraits/men/42.jpg',
+        img: null,
         fullName: 'David Jones',
         description: 'DevOps Engineer',
         status: 'Опубліковано',
@@ -339,7 +340,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 43,
-        img: 'https://randomuser.me/api/portraits/women/43.jpg',
+        img: null,
         fullName: 'Mia Wilson',
         description: 'QA Analyst',
         status: 'Чернетка',
@@ -347,7 +348,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 44,
-        img: 'https://randomuser.me/api/portraits/men/44.jpg',
+        img: null,
         fullName: 'Mia Brown',
         description: 'Marketing Manager',
         status: 'Опубліковано',
@@ -355,7 +356,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 45,
-        img: 'https://randomuser.me/api/portraits/women/45.jpg',
+        img: null,
         fullName: 'Michael Brown',
         description: 'UI/UX Designer',
         status: 'Опубліковано',
@@ -363,7 +364,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 46,
-        img: 'https://randomuser.me/api/portraits/men/46.jpg',
+        img: null,
         fullName: 'James Davis',
         description: 'HR Specialist',
         status: 'Чернетка',
@@ -371,7 +372,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 47,
-        img: 'https://randomuser.me/api/portraits/women/47.jpg',
+        img: null,
         fullName: 'James Brown',
         description: 'Marketing Manager',
         status: 'Чернетка',
@@ -379,7 +380,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 48,
-        img: 'https://randomuser.me/api/portraits/men/48.jpg',
+        img: null,
         fullName: 'Olivia Brown',
         description: 'HR Specialist',
         status: 'Опубліковано',
@@ -387,7 +388,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 49,
-        img: 'https://randomuser.me/api/portraits/women/49.jpg',
+        img: null,
         fullName: 'Olivia Miller',
         description: 'DevOps Engineer',
         status: 'Чернетка',
@@ -395,7 +396,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 50,
-        img: 'https://randomuser.me/api/portraits/men/50.jpg',
+        img: null,
         fullName: 'James Jones',
         description: 'Business Analyst',
         status: 'Опубліковано',
@@ -403,7 +404,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 51,
-        img: 'https://randomuser.me/api/portraits/women/51.jpg',
+        img: null,
         fullName: 'John Jones',
         description: 'DevOps Engineer',
         status: 'Чернетка',
@@ -411,7 +412,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 52,
-        img: 'https://randomuser.me/api/portraits/men/52.jpg',
+        img: null,
         fullName: 'Mia Williams',
         description: 'DevOps Engineer',
         status: 'Чернетка',
@@ -419,7 +420,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 53,
-        img: 'https://randomuser.me/api/portraits/women/53.jpg',
+        img: null,
         fullName: 'John Anderson',
         description: 'Software Engineer',
         status: 'Опубліковано',
@@ -427,7 +428,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 54,
-        img: 'https://randomuser.me/api/portraits/men/54.jpg',
+        img: null,
         fullName: 'James Miller',
         description: 'Backend Developer',
         status: 'Чернетка',
@@ -435,7 +436,7 @@ export const mockMembers: Member[] = [
     },
     {
         id: 55,
-        img: 'https://randomuser.me/api/portraits/women/55.jpg',
+        img: null,
         fullName: 'Emma Wilson',
         description: 'DevOps Engineer',
         status: 'Чернетка',

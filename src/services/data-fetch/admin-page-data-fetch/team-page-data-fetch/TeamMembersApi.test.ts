@@ -2,6 +2,7 @@ import { AxiosInstance } from 'axios';
 import { MemberFormValues } from '../../../../pages/admin/team/components/member-form/MemberForm';
 import { TeamMemberDto } from '../../../../types/TeamPage';
 import { mapTeamMemberDtoToTeamMember, TeamMembersApi } from './TeamMembersApi';
+import { Image } from '../../../../types/Image';
 
 const mockClient = {
     get: jest.fn(),
@@ -20,7 +21,7 @@ describe('TeamMembersApi', () => {
                 priority: 1,
                 status: 0,
                 description: 'Test description',
-                photo: 'photo.png',
+                image: 'photo.png',
                 email: 'test@example.com',
             },
         ];
@@ -47,7 +48,7 @@ describe('TeamMembersApi', () => {
             fullName: 'Member',
             category: 'Основна команда',
             description: 'desc',
-            img: null,
+            image: null,
         };
 
         const putMock = jest.spyOn(mockClient, 'put').mockResolvedValue({});
@@ -68,7 +69,7 @@ describe('TeamMembersApi', () => {
             fullName: 'Member',
             category: 'Основна команда',
             description: 'desc',
-            img: null,
+            image: null,
         };
 
         const putMock = jest.spyOn(mockClient, 'put').mockResolvedValue({});
@@ -89,7 +90,7 @@ describe('TeamMembersApi', () => {
             fullName: 'Draft Member',
             category: 'Основна команда',
             description: 'description',
-            img: null,
+            image: null,
         };
 
         const postMock = jest.spyOn(mockClient, 'post').mockResolvedValue({});
@@ -110,7 +111,7 @@ describe('TeamMembersApi', () => {
             fullName: 'Draft Member',
             category: 'Основна команда',
             description: 'description',
-            img: null,
+            image: null,
         };
 
         const postMock = jest.spyOn(mockClient, 'post').mockResolvedValue({});
@@ -143,6 +144,11 @@ describe('TeamMembersApi', () => {
     });
 
     it('should map DTO to internal member format', () => {
+        const image: Image = {
+            id: 1,
+            base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+iF9kAAAAASUVORK5CYII=',
+            mimeType: 'image/jpeg',
+        };
         const dto: TeamMemberDto = {
             id: 1,
             fullName: 'Name',
@@ -150,7 +156,7 @@ describe('TeamMembersApi', () => {
             priority: 1,
             status: 1,
             description: 'Desc',
-            photo: 'photo.jpg',
+            image: image,
             email: '',
         };
 

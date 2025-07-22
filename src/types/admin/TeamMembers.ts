@@ -1,5 +1,3 @@
-import { BaseTab } from '../../components/shared/PaginatedSortedList';
-
 export type TeamMember = {
     id: number;
     img: string;
@@ -26,6 +24,8 @@ export type TeamCategory = {
     description: string;
 };
 
-export interface TeamCategoryDto extends BaseTab {
+export interface TeamCategoryDto {
+    id: number;
+    name: string;
     description: string;
 }

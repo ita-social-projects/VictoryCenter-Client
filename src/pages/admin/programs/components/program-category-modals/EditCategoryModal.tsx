@@ -11,6 +11,7 @@ import { ProgramCategoryValidationSchema } from '../../../../../validation/admin
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import './program-category-modal.scss';
 
 type EditProgramCategoryFormValues = {
     name: string;
@@ -112,7 +113,11 @@ export const EditCategoryModal = ({ isOpen, onClose, onEditCategory, categories 
             <Modal isOpen={isOpen} onClose={handleClose}>
                 <Modal.Title>{PROGRAM_CATEGORY_TEXT.FORM.TITLE.EDIT_CATEGORY}</Modal.Title>
                 <Modal.Content>
-                    <form onSubmit={handleSubmit(onSubmit)} className="program-form-main" id="edit-program-category-form">
+                    <form
+                        onSubmit={handleSubmit(onSubmit)}
+                        className="program-form-main"
+                        id="edit-program-category-form"
+                    >
                         <div className="form-group">
                             <label htmlFor="edit-category-select">
                                 <span className="required-field">*</span>
@@ -156,7 +161,7 @@ export const EditCategoryModal = ({ isOpen, onClose, onEditCategory, categories 
                                 title={PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError()}
                             />
                         )}
-                        {error && <div className='error-container'>{error}</div>}
+                        {error && <div className="error-container">{error}</div>}
                     </form>
                 </Modal.Content>
                 <Modal.Actions>

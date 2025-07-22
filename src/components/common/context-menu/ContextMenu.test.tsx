@@ -15,7 +15,7 @@ describe('ContextMenu', () => {
             <ContextMenu onOptionSelected={mockOnOptionSelected}>
                 <ContextMenu.Option value="option1">Option 1</ContextMenu.Option>
                 <ContextMenu.Option value="option2">Option 2</ContextMenu.Option>
-            </ContextMenu>
+            </ContextMenu>,
         );
 
         expect(screen.getByRole('context-menu')).toBeInTheDocument();
@@ -29,7 +29,7 @@ describe('ContextMenu', () => {
         render(
             <ContextMenu onOptionSelected={mockOnOptionSelected} customIcon={customIcon}>
                 <ContextMenu.Option value="option1">Option 1</ContextMenu.Option>
-            </ContextMenu>
+            </ContextMenu>,
         );
 
         const iconElement = screen.getByAltText('menu');
@@ -40,7 +40,7 @@ describe('ContextMenu', () => {
         render(
             <ContextMenu onOptionSelected={mockOnOptionSelected}>
                 <ContextMenu.Option value="option1">Option 1</ContextMenu.Option>
-            </ContextMenu>
+            </ContextMenu>,
         );
 
         const contextMenuElement = screen.getByRole('context-menu');
@@ -61,7 +61,7 @@ describe('ContextMenu', () => {
         render(
             <ContextMenu onOptionSelected={mockOnOptionSelected}>
                 <ContextMenu.Option value="option1">Option 1</ContextMenu.Option>
-            </ContextMenu>
+            </ContextMenu>,
         );
 
         const contextMenuElement = screen.getByRole('context-menu');
@@ -78,9 +78,11 @@ describe('ContextMenu', () => {
     it('calls onOptionSelected and closes menu when option is clicked', () => {
         render(
             <ContextMenu onOptionSelected={mockOnOptionSelected}>
-                <ContextMenu.Option value="option1" data={{ id: 123 }}>Option 1</ContextMenu.Option>
+                <ContextMenu.Option value="option1" data={{ id: 123 }}>
+                    Option 1
+                </ContextMenu.Option>
                 <ContextMenu.Option value="option2">Option 2</ContextMenu.Option>
-            </ContextMenu>
+            </ContextMenu>,
         );
 
         // Open
@@ -102,7 +104,7 @@ describe('ContextMenu', () => {
                     <ContextMenu.Option value="option1">Option 1</ContextMenu.Option>
                 </ContextMenu>
                 <div data-testid="outside-element">Outside</div>
-            </div>
+            </div>,
         );
 
         const contextMenuElement = screen.getByRole('context-menu');
@@ -122,9 +124,11 @@ describe('ContextMenu', () => {
     it('handles disabled options correctly', () => {
         render(
             <ContextMenu onOptionSelected={mockOnOptionSelected}>
-                <ContextMenu.Option value="option1" disabled>Disabled Option</ContextMenu.Option>
+                <ContextMenu.Option value="option1" disabled>
+                    Disabled Option
+                </ContextMenu.Option>
                 <ContextMenu.Option value="option2">Enabled Option</ContextMenu.Option>
-            </ContextMenu>
+            </ContextMenu>,
         );
 
         // Open menu

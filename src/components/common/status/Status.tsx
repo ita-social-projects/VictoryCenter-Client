@@ -1,9 +1,13 @@
 ﻿import React from 'react';
-import { VisibilityStatus } from "../../../types/Common";
-import { COMMON_TEXT_ADMIN } from "../../../const/admin/common";
+import { VisibilityStatus } from '../../../types/Common';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './status.scss';
 
-const Status = ({ status }: { status: VisibilityStatus }) => {
+export interface StatusProps{
+    status: VisibilityStatus;
+}
+
+export const Status = ({ status }: StatusProps) => {
     const statusTypeToText = (statusType: VisibilityStatus) => {
         switch (statusType) {
             case 'Draft':

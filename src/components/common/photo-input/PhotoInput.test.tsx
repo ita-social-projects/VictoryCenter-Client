@@ -2,119 +2,117 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import PhotoInput from './PhotoInput';
 
-const createImageFile = () =>
-  new File(['dummy content'], 'example.png', { type: 'image/png' });
+const createImageFile = () => new File(['dummy content'], 'example.png', { type: 'image/png' });
 
 describe('PhotoInput', () => {
-  let onChangeMock: jest.Mock;
+    let onChangeMock: jest.Mock;
 
-  beforeEach(() => {
-    onChangeMock = jest.fn();
-    global.URL.createObjectURL = jest.fn(() => 'mock-preview-url');
-    global.URL.revokeObjectURL = jest.fn();
-    jest.clearAllMocks();
-  });
+    beforeEach(() => {
+        onChangeMock = jest.fn();
+        global.URL.createObjectURL = jest.fn(() => 'mock-preview-url');
+        global.URL.revokeObjectURL = jest.fn();
+        jest.clearAllMocks();
+    });
 
-  it('renders placeholder when no image is selected', () => {
-    render(<PhotoInput value={null} onChange={onChangeMock} />);
-    expect(screen.getByText(/перетягніть файл/i)).toBeInTheDocument();
-    expect(screen.getByAltText(/upload/i)).toBeInTheDocument();
-  });
+    it('renders placeholder when no image is selected', () => {
+        render(<PhotoInput value={null} onChange={onChangeMock} />);
+        expect(screen.getByText(/перетягніть файл/i)).toBeInTheDocument();
+        expect(screen.getByAltText(/upload/i)).toBeInTheDocument();
+    });
 
-  it('renders image preview when string value is provided', () => {
-    render(<PhotoInput value="http://example.com/image.jpg" onChange={onChangeMock} />);
-    expect(screen.getByAltText(/preview/i)).toBeInTheDocument();
-  });
+    it('renders image preview when string value is provided', () => {
+        render(<PhotoInput value="http://example.com/image.jpg" onChange={onChangeMock} />);
+        expect(screen.getByAltText(/preview/i)).toBeInTheDocument();
+    });
 
-  it('renders image preview when file value is provided', () => {
-    const file = createImageFile();
-    render(<PhotoInput value={file} onChange={onChangeMock} />);
-    expect(screen.getByAltText(/preview/i)).toBeInTheDocument();
-  });
+    it('renders image preview when file value is provided', () => {
+        const file = createImageFile();
+        render(<PhotoInput value={file} onChange={onChangeMock} />);
+        expect(screen.getByAltText(/preview/i)).toBeInTheDocument();
+    });
 
     it('calls onChange when file is selected via input', () => {
-      const file = createImageFile();
+        const file = createImageFile();
 
-      render(<PhotoInput value={null} onChange={onChangeMock} />);
+        render(<PhotoInput value={null} onChange={onChangeMock} />);
 
-      const fileInput = screen.getByTestId('photo-input-hidden') as HTMLInputElement;
+        const fileInput = screen.getByTestId('photo-input-hidden') as HTMLInputElement;
 
-      fireEvent.change(fileInput, {
-        target: { files: [file] },
-      });
+        fireEvent.change(fileInput, {
+            target: { files: [file] },
+        });
 
-      expect(onChangeMock).toHaveBeenCalledWith(file);
+        expect(onChangeMock).toHaveBeenCalledWith(file);
     });
 
+    it('calls onChange with null when remove button is clicked', () => {
+        const file = createImageFile();
+        render(<PhotoInput value={file} onChange={onChangeMock} />);
 
-  it('calls onChange with null when remove button is clicked', () => {
-    const file = createImageFile();
-    render(<PhotoInput value={file} onChange={onChangeMock} />);
+        const removeButton = screen.getByRole('button');
+        fireEvent.click(removeButton);
 
-    const removeButton = screen.getByRole('button');
-    fireEvent.click(removeButton);
-
-    expect(onChangeMock).toHaveBeenCalledWith(null);
-  });
-
-  it('does not call onChange for non-image file', () => {
-    const file = new File(['dummy content'], 'example.txt', { type: 'text/plain' });
-    render(<PhotoInput value={null} onChange={onChangeMock} />);
-
-    const fileInput = screen.getByTestId('photo-input-hidden') as HTMLInputElement;
-
-    fireEvent.change(fileInput, {
-      target: { files: [file] },
+        expect(onChangeMock).toHaveBeenCalledWith(null);
     });
 
-    expect(onChangeMock).not.toHaveBeenCalled();
-  });
+    it('does not call onChange for non-image file', () => {
+        const file = new File(['dummy content'], 'example.txt', { type: 'text/plain' });
+        render(<PhotoInput value={null} onChange={onChangeMock} />);
 
-  it('handles drag and drop image', () => {
-    render(<PhotoInput value={null} onChange={onChangeMock} />);
-    const dropZone = screen.getByText(/перетягніть файл/i).parentElement!;
+        const fileInput = screen.getByTestId('photo-input-hidden') as HTMLInputElement;
 
-    const file = createImageFile();
+        fireEvent.change(fileInput, {
+            target: { files: [file] },
+        });
 
-    const data = {
-      dataTransfer: {
-        files: [file],
-        types: ['Files'],
-      },
-    };
+        expect(onChangeMock).not.toHaveBeenCalled();
+    });
 
-    fireEvent.dragOver(dropZone);
-    fireEvent.drop(dropZone, data as unknown as DragEvent);
+    it('handles drag and drop image', () => {
+        render(<PhotoInput value={null} onChange={onChangeMock} />);
+        const dropZone = screen.getByText(/перетягніть файл/i).parentElement!;
 
-    expect(onChangeMock).toHaveBeenCalledWith(file);
-  });
+        const file = createImageFile();
 
-  it('adds focus class on drag over and removes on drag leave', () => {
-    render(<PhotoInput value={null} onChange={onChangeMock} />);
-    const wrapper = screen.getByText(/перетягніть файл/i).closest('.photo-input-wrapper')!;
+        const data = {
+            dataTransfer: {
+                files: [file],
+                types: ['Files'],
+            },
+        };
 
-    fireEvent.dragOver(wrapper);
-    expect(wrapper.classList.contains('photo-input-wrapper-focused')).toBe(true);
+        fireEvent.dragOver(dropZone);
+        fireEvent.drop(dropZone, data as unknown as DragEvent);
 
-    fireEvent.dragLeave(wrapper);
-    expect(wrapper.classList.contains('photo-input-wrapper-focused')).toBe(false);
-  });
+        expect(onChangeMock).toHaveBeenCalledWith(file);
+    });
 
-  it('does not open file dialog or allow drop when disabled', () => {
-    render(<PhotoInput value={null} onChange={onChangeMock} disabled />);
-    const wrapper = screen.getByText(/перетягніть файл/i).closest('.photo-input-wrapper')!;
-    const input = wrapper.querySelector('input[type="file"]')!;
+    it('adds focus class on drag over and removes on drag leave', () => {
+        render(<PhotoInput value={null} onChange={onChangeMock} />);
+        const wrapper = screen.getByText(/перетягніть файл/i).closest('.photo-input-wrapper')!;
 
-    expect(wrapper.classList.contains('photo-input-wrapper-disabled')).toBe(true);
+        fireEvent.dragOver(wrapper);
+        expect(wrapper.classList.contains('photo-input-wrapper-focused')).toBe(true);
 
-    fireEvent.click(wrapper);
-    expect(document.activeElement).not.toBe(input);
+        fireEvent.dragLeave(wrapper);
+        expect(wrapper.classList.contains('photo-input-wrapper-focused')).toBe(false);
+    });
 
-    const file = createImageFile();
-    fireEvent.drop(wrapper, {
-      dataTransfer: { files: [file] },
-    } as unknown as DragEvent);
+    it('does not open file dialog or allow drop when disabled', () => {
+        render(<PhotoInput value={null} onChange={onChangeMock} disabled />);
+        const wrapper = screen.getByText(/перетягніть файл/i).closest('.photo-input-wrapper')!;
+        const input = wrapper.querySelector('input[type="file"]')!;
 
-    expect(onChangeMock).not.toHaveBeenCalled();
-  });
+        expect(wrapper.classList.contains('photo-input-wrapper-disabled')).toBe(true);
+
+        fireEvent.click(wrapper);
+        expect(document.activeElement).not.toBe(input);
+
+        const file = createImageFile();
+        fireEvent.drop(wrapper, {
+            dataTransfer: { files: [file] },
+        } as unknown as DragEvent);
+
+        expect(onChangeMock).not.toHaveBeenCalled();
+    });
 });

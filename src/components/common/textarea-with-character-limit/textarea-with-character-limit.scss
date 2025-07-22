@@ -1,55 +1,55 @@
 ﻿.textarea-with-limit {
-  display: inline-block;
-  width: 100%;
+    display: inline-block;
+    width: 100%;
 
-  .textarea-wrapper {
-    display: flex;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 1px solid #0F2957;
-    box-shadow: 0 1px 2px 0 #0A0D120D;
-    padding: 10px;
-    background: white;
-    color: #041128;
+    .textarea-wrapper {
+        display: flex;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid #0f2957;
+        box-shadow: 0 1px 2px 0 #0a0d120d;
+        padding: 10px;
+        background: white;
+        color: #041128;
 
-    &-focused  {
-      border-color: #A4A49B;
+        &-focused {
+            border-color: #a4a49b;
+        }
+
+        &.disabled {
+            background: #d2d2c7;
+            border: 1px solid #61615c;
+        }
+
+        .textarea-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            resize: none;
+            padding: 0;
+            background: none;
+            min-height: 80px;
+            font-family: inherit;
+            font-size: 16px;
+            color: #414651;
+
+            &::placeholder {
+                color: #a4a49b;
+            }
+
+            &:disabled {
+                background: transparent;
+            }
+        }
     }
 
-    &.disabled {
-      background: #D2D2C7;
-      border: 1px solid #61615C;
+    .character-limit {
+        color: #717680;
+        white-space: nowrap;
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 400;
+        margin-top: 4px;
+        text-align: right;
     }
-
-    .textarea-input {
-      flex: 1;
-      border: none;
-      outline: none;
-      resize: none;
-      padding: 0;
-      background: none;
-      min-height: 80px;
-      font-family: inherit;
-      font-size: 16px;
-      color: #414651;
-
-      &::placeholder {
-        color: #A4A49B;
-      }
-
-      &:disabled {
-        background: transparent;
-      }
-    }
-  }
-
-  .character-limit {
-    color: #717680;
-    white-space: nowrap;
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 400;
-    margin-top: 4px;
-    text-align: right;
-  }
 }

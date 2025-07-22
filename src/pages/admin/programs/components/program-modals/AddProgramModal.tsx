@@ -1,22 +1,22 @@
 ﻿import React, { useRef, useState, useEffect } from 'react';
-import Modal from "../../../../../components/common/modal/Modal";
-import { ProgramForm, ProgramFormValues, ProgramFormRef } from "../program-form/ProgramForm";
-import {Program, ProgramCreateUpdate} from '../../../../../types/ProgramAdminPage';
+import Modal from '../../../../../components/common/modal/Modal';
+import { ProgramForm, ProgramFormValues, ProgramFormRef } from '../program-form/ProgramForm';
+import { Program, ProgramCreateUpdate } from '../../../../../types/ProgramAdminPage';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
-import Button from "../../../../../components/common/button/Button";
-import QuestionModal from "../../../../../components/common/question-modal/QuestionModal";
-import {VisibilityStatus} from "../../../../../types/Common";
-import {PROGRAMS_TEXT} from "../../../../../const/admin/programs";
-import {COMMON_TEXT_ADMIN} from "../../../../../const/admin/common";
+import Button from '../../../../../components/common/button/Button';
+import QuestionModal from '../../../../../components/common/question-modal/QuestionModal';
+import { VisibilityStatus } from '../../../../../types/Common';
+import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './program-modal.scss';
 
-export  interface AddProgramModalProps {
+export interface AddProgramModalProps {
     isOpen: boolean;
     onClose: () => void;
     onAddProgram: (program: Program) => void;
 }
 
-export const AddProgramModal = ({ isOpen, onClose, onAddProgram } : AddProgramModalProps) => {
+export const AddProgramModal = ({ isOpen, onClose, onAddProgram }: AddProgramModalProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [showFormConfirmModal, setShowFormConfirmModal] = useState(false);
@@ -44,7 +44,7 @@ export const AddProgramModal = ({ isOpen, onClose, onAddProgram } : AddProgramMo
             const programToCreate: ProgramCreateUpdate = {
                 name: pendingFormData.name,
                 description: pendingFormData.description,
-                categoryIds: pendingFormData.categories.map(cat => cat.id),
+                categoryIds: pendingFormData.categories.map((cat) => cat.id),
                 img: pendingFormData.img,
                 status: status,
             };
@@ -112,23 +112,19 @@ export const AddProgramModal = ({ isOpen, onClose, onAddProgram } : AddProgramMo
             <Modal isOpen={isOpen} onClose={handleClose}>
                 <Modal.Title>{PROGRAMS_TEXT.FORM.TITLE.ADD_PROGRAM}</Modal.Title>
                 <Modal.Content>
-                    <ProgramForm
-                        ref={formRef}
-                        formDisabled={isSubmitting}
-                        onSubmit={handleFormSubmit}
-                    />
-                    {error && <div className='error-container'>{error}</div>}
+                    <ProgramForm ref={formRef} formDisabled={isSubmitting} onSubmit={handleFormSubmit} />
+                    {error && <div className="error-container">{error}</div>}
                 </Modal.Content>
                 <Modal.Actions>
                     <Button
-                        buttonStyle='secondary'
+                        buttonStyle="secondary"
                         onClick={() => formRef.current?.submit('Draft')}
                         disabled={isSubmitting}
                     >
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFTED}
                     </Button>
                     <Button
-                        buttonStyle='primary'
+                        buttonStyle="primary"
                         onClick={() => formRef.current?.submit('Published')}
                         disabled={isSubmitting}
                     >

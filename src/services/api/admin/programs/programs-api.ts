@@ -3,21 +3,19 @@
     ProgramCategory,
     ProgramCategoryCreateUpdate,
     ProgramCreateUpdate,
-} from "../../../../types/ProgramAdminPage";
-import { mockCategories, mockPrograms } from "../../../../utils/mock-data/admin-page/programPage";
-import {PaginationResult, VisibilityStatus} from "../../../../types/Common";
+} from '../../../../types/ProgramAdminPage';
+import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin-page/programPage';
+import { PaginationResult, VisibilityStatus } from '../../../../types/Common';
 
 // !!!
 // Delete after actual integration with backend
 // !!!
-let mockProgramId = Math.max(...mockPrograms.map(p => p.id), 0) + 1;
-let mockCategoryId = Math.max(...mockCategories.map(c => c.id), 0) + 1;
+let mockProgramId = Math.max(...mockPrograms.map((p) => p.id), 0) + 1;
+let mockCategoryId = Math.max(...mockCategories.map((c) => c.id), 0) + 1;
 const mockDelay = 2200;
 const throwErrorsInApi = false;
+// !!!
 
-// !!!
-// Change this when integrating the client with the backend
-// !!!
 const ProgramsApi = {
     fetchProgramCategories: async (): Promise<ProgramCategory[]> => {
         await new Promise((resolve) => setTimeout(resolve, 200));
@@ -33,7 +31,7 @@ const ProgramsApi = {
         categoryId: number,
         pageNumber: number,
         pageSize: number,
-        status?: VisibilityStatus
+        status?: VisibilityStatus,
     ): Promise<PaginationResult<Program>> => {
         await new Promise((resolve) => setTimeout(resolve, 200));
 
@@ -61,7 +59,7 @@ const ProgramsApi = {
 
         let imageUrl = null;
         if (program.img instanceof File) imageUrl = URL.createObjectURL(program.img);
-        else if (typeof program.img === "string") imageUrl = program.img;
+        else if (typeof program.img === 'string') imageUrl = program.img;
 
         const newProgram: Program = {
             id: ++mockProgramId,
@@ -69,7 +67,7 @@ const ProgramsApi = {
             description: program.description,
             status: program.status,
             img: imageUrl,
-            categories: mockCategories.filter(c => program.categoryIds.includes(c.id)),
+            categories: mockCategories.filter((c) => program.categoryIds.includes(c.id)),
         };
 
         console.log(`Add with status: ${program.status}`);
@@ -83,12 +81,12 @@ const ProgramsApi = {
 
         if (throwErrorsInApi) throw new Error('Error imitation');
 
-        const index = mockPrograms.findIndex(p => p.id === program.id);
+        const index = mockPrograms.findIndex((p) => p.id === program.id);
         if (index === -1) throw new Error('Program not found');
 
         let imageUrl = null;
         if (program.img instanceof File) imageUrl = URL.createObjectURL(program.img);
-        else if (typeof program.img === "string") imageUrl = program.img;
+        else if (typeof program.img === 'string') imageUrl = program.img;
 
         const updatedProgram: Program = {
             id: program.id!,
@@ -96,7 +94,7 @@ const ProgramsApi = {
             description: program.description,
             status: program.status,
             img: imageUrl,
-            categories: mockCategories.filter(c => program.categoryIds.includes(c.id)),
+            categories: mockCategories.filter((c) => program.categoryIds.includes(c.id)),
         };
 
         console.log(`Edit with status: ${program.status}`);
@@ -110,7 +108,7 @@ const ProgramsApi = {
 
         if (throwErrorsInApi) throw new Error('Error imitation');
 
-        const index = mockPrograms.findIndex(p => p.id === id);
+        const index = mockPrograms.findIndex((p) => p.id === id);
         if (index === -1) throw new Error('Program not found');
         mockPrograms.splice(index, 1);
     },
@@ -135,12 +133,12 @@ const ProgramsApi = {
 
         if (throwErrorsInApi) throw new Error('Error imitation');
 
-        const index = mockCategories.findIndex(c => c.id === category.id);
+        const index = mockCategories.findIndex((c) => c.id === category.id);
         if (index === -1) throw new Error('Category not found');
 
         const updated = {
             ...mockCategories[index],
-            name: category.name
+            name: category.name,
         };
 
         mockCategories[index] = updated;
@@ -153,12 +151,12 @@ const ProgramsApi = {
 
         if (throwErrorsInApi) throw new Error('Error imitation');
 
-        const index = mockCategories.findIndex(c => c.id === id);
+        const index = mockCategories.findIndex((c) => c.id === id);
         if (index === -1) throw new Error('Category not found');
 
         const category = mockCategories[index];
 
-        if (category.programsCount > 0){
+        if (category.programsCount > 0) {
             throw new Error('Category has at least one program');
         }
 

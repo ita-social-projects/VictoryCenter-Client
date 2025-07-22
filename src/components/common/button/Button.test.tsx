@@ -157,14 +157,22 @@ describe('Button Component', () => {
     });
 
     it('sets disabled attribute when disabled prop is true', () => {
-        render(<Button buttonStyle="primary" disabled={true}>Disabled Button</Button>);
+        render(
+            <Button buttonStyle="primary" disabled={true}>
+                Disabled Button
+            </Button>,
+        );
         const button = screen.getByRole('button');
         expect(button).toBeDisabled();
     });
 
     it('does not call onClick handler when button is disabled', () => {
         const mockOnClick = jest.fn();
-        render(<Button buttonStyle="primary" disabled={true} onClick={mockOnClick}>Disabled Button</Button>);
+        render(
+            <Button buttonStyle="primary" disabled={true} onClick={mockOnClick}>
+                Disabled Button
+            </Button>,
+        );
 
         const button = screen.getByRole('button');
         fireEvent.click(button);
@@ -173,14 +181,22 @@ describe('Button Component', () => {
     });
 
     it('applies disabled class when disabled and buttonStyle is provided', () => {
-        render(<Button buttonStyle="primary" disabled={true}>Disabled Primary Button</Button>);
+        render(
+            <Button buttonStyle="primary" disabled={true}>
+                Disabled Primary Button
+            </Button>,
+        );
         const button = screen.getByRole('button');
         expect(button).toHaveClass('btn-primary');
         expect(button).toHaveClass('btn-primary-disabled');
     });
 
     it('applies disabled class for secondary button when disabled', () => {
-        render(<Button buttonStyle="secondary" disabled={true}>Disabled Secondary Button</Button>);
+        render(
+            <Button buttonStyle="secondary" disabled={true}>
+                Disabled Secondary Button
+            </Button>,
+        );
         const button = screen.getByRole('button');
         expect(button).toHaveClass('btn-secondary');
         expect(button).toHaveClass('btn-secondary-disabled');

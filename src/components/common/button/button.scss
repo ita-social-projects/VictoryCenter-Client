@@ -16,15 +16,15 @@
             cursor: pointer;
         }
 
-    &:hover {
-      cursor: pointer;
-    }
+        &:hover {
+            cursor: pointer;
+        }
 
-    &-disabled {
-      cursor: not-allowed;
-      background: #D2D2C7;
+        &-disabled {
+            cursor: not-allowed;
+            background: #d2d2c7;
+        }
     }
-  }
 
     &-secondary {
         padding: 8px 24px;
@@ -43,13 +43,13 @@
             cursor: pointer;
         }
 
-    &:hover {
-      cursor: pointer;
-    }
+        &:hover {
+            cursor: pointer;
+        }
 
-    &-disabled {
-      cursor: not-allowed;
-      border: 1px solid #D2D2C7
+        &-disabled {
+            cursor: not-allowed;
+            border: 1px solid #d2d2c7;
+        }
     }
-  }
 }

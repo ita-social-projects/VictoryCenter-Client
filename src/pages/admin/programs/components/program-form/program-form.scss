@@ -1,53 +1,53 @@
 ﻿.program-form-body {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
 }
 
-.program-form-header{
-  color: #061125;
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 24px;
-  text-align: center;
-  vertical-align: middle;
+.program-form-header {
+    color: #061125;
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 24px;
+    text-align: center;
+    vertical-align: middle;
 }
 
-.program-form-main{
+.program-form-main {
     display: flex;
     flex-direction: column;
     gap: 7px;
 
-  .form-group {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    .form-group {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
 
-    label {
-      color: #414651;
-      font-size: 16px;
+        label {
+            color: #414651;
+            font-size: 16px;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            outline: none;
+            border-radius: 8px;
+            border: 1px solid #d5d7da;
+            box-shadow: 0 1px 2px 0 #0a0d120d;
+        }
     }
 
-    select {
-      padding: 10px;
-      font-size: 16px;
-      outline: none;
-      border-radius: 8px;
-      border: 1px solid #D5D7DA;
-      box-shadow: 0 1px 2px 0 #0A0D120D;
+    .required-field {
+        color: #f04438;
+        font-size: 16px;
     }
-  }
 
-  .required-field {
-    color: #F04438;
-    font-size: 16px;
-  }
-
-  .error {
-    color: #F04438;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 20px;
-  }
+    .error {
+        color: #f04438;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 20px;
+    }
 }

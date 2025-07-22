@@ -1,68 +1,68 @@
 .programs {
-  padding-left: 54px;
-  padding-right: 54px;
+    padding-left: 54px;
+    padding-right: 54px;
 
-  &-not-found {
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+    &-not-found {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
 
-    p {
-      font-weight: 600;
-      font-size: 40px;
-    }
-  }
-
-  &-list {
-    position: relative;
-    margin-top: 10px;
-    height: 70vh;
-    max-height: 70vh;
-    overflow-y: auto;
-    scroll-behavior: smooth;
-
-    &-loader {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-
-      img {
-        animation: rotate infinite 1s;
-      }
+        p {
+            font-weight: 600;
+            font-size: 40px;
+        }
     }
 
-    &-list-to-top {
-      right: 150px;
-      bottom: 50px;
-      position: fixed;
-      width: 60px;
-      height: 60px;
-      background-color: #0F2957;
-      border-radius: 1000%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border: none;
+    &-list {
+        position: relative;
+        margin-top: 10px;
+        height: 70vh;
+        max-height: 70vh;
+        overflow-y: auto;
+        scroll-behavior: smooth;
 
-      &:hover {
-        cursor: pointer;
-      }
+        &-loader {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
-      &:active {
-        background-color: #061125;
-      }
+            img {
+                animation: rotate infinite 1s;
+            }
+        }
+
+        &-list-to-top {
+            right: 150px;
+            bottom: 50px;
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            background-color: #0f2957;
+            border-radius: 1000%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+
+            &:hover {
+                cursor: pointer;
+            }
+
+            &:active {
+                background-color: #061125;
+            }
+        }
     }
-  }
 }
 
 @keyframes rotate {
-  from {
-    transform: rotate(0)
-  }
-  to {
-    transform: rotate(360deg);
-  }
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }

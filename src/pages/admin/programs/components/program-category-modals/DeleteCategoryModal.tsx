@@ -99,15 +99,11 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
                             text={PROGRAM_CATEGORY_VALIDATION.programsCount.getRelocationOrRemovalHint()}
                         />
                     )}
-                    {error && <div className='error-container'>{error}</div>}
+                    {error && <div className="error-container">{error}</div>}
                 </div>
             </Modal.Content>
             <Modal.Actions>
-                <Button
-                    buttonStyle="secondary"
-                    onClick={handleClose}
-                    disabled={isSubmitting}
-                >
+                <Button buttonStyle="secondary" onClick={handleClose} disabled={isSubmitting}>
                     {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                 </Button>
                 <Button

@@ -1,7 +1,5 @@
-﻿import {ProgramsPageContent} from "./components/programs-page-content/ProgramsPageContent";
+﻿import { ProgramsPageContent } from './components/programs-page-content/ProgramsPageContent';
 
 export const ProgramsPageAdmin = () => {
-    return (
-        <ProgramsPageContent></ProgramsPageContent>
-    );
-}
+    return <ProgramsPageContent></ProgramsPageContent>;
+};

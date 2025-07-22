@@ -1,13 +1,13 @@
-﻿import React, {useRef, useState, useEffect, useMemo} from 'react';
-import { ProgramForm, ProgramFormValues, ProgramFormRef } from "../program-form/ProgramForm";
-import Modal from "../../../../../components/common/modal/Modal";
-import Button from "../../../../../components/common/button/Button";
-import QuestionModal from "../../../../../components/common/question-modal/QuestionModal";
+﻿import React, { useRef, useState, useEffect, useMemo } from 'react';
+import { ProgramForm, ProgramFormValues, ProgramFormRef } from '../program-form/ProgramForm';
+import Modal from '../../../../../components/common/modal/Modal';
+import Button from '../../../../../components/common/button/Button';
+import QuestionModal from '../../../../../components/common/question-modal/QuestionModal';
 import { Program } from '../../../../../types/ProgramAdminPage';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
-import { VisibilityStatus } from "../../../../../types/Common";
-import { COMMON_TEXT_ADMIN } from "../../../../../const/admin/common";
-import { PROGRAMS_TEXT } from "../../../../../const/admin/programs";
+import { VisibilityStatus } from '../../../../../types/Common';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import './program-modal.scss';
 
 export interface EditProgramModalProps {
@@ -17,7 +17,7 @@ export interface EditProgramModalProps {
     programToEdit: Program | null;
 }
 
-export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit } : EditProgramModalProps) => {
+export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit }: EditProgramModalProps) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [showFormConfirmModal, setShowFormConfirmModal] = useState(false);
@@ -58,9 +58,9 @@ export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit
                 id: programToEdit.id,
                 name: pendingFormData.name,
                 description: pendingFormData.description,
-                categoryIds: pendingFormData.categories.map(cat => cat.id),
+                categoryIds: pendingFormData.categories.map((cat) => cat.id),
                 status: status,
-                img: pendingFormData.img
+                img: pendingFormData.img,
             };
 
             const updatedProgram = await ProgramsApi.editProgram(programToUpdate);
@@ -133,18 +133,18 @@ export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit
                             onSubmit={handleFormSubmit}
                         />
                     )}
-                    {error && <div className='error-container'>{error}</div>}
+                    {error && <div className="error-container">{error}</div>}
                 </Modal.Content>
                 <Modal.Actions>
                     <Button
-                        buttonStyle='secondary'
+                        buttonStyle="secondary"
                         onClick={() => formRef.current?.submit('Draft')}
                         disabled={isSubmitting}
                     >
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFTED}
                     </Button>
                     <Button
-                        buttonStyle='primary'
+                        buttonStyle="primary"
                         onClick={() => formRef.current?.submit('Published')}
                         disabled={isSubmitting}
                     >
@@ -156,9 +156,11 @@ export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit
             <QuestionModal
                 isOpen={showFormConfirmModal}
                 isSubmitting={isSubmitting}
-                title={ programToEdit?.status === 'Published' && pendingAction === 'draft'
-                    ? COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION
-                    : COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
+                title={
+                    programToEdit?.status === 'Published' && pendingAction === 'draft'
+                        ? COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION
+                        : COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES
+                }
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                 onClose={handleCancelConfirmation}

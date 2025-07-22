@@ -1,4 +1,4 @@
-﻿import {VisibilityStatus} from "./Common";
+﻿import { VisibilityStatus } from './Common';
 
 export interface ProgramCategory {
     id: number;
@@ -25,6 +25,6 @@ export interface ProgramCreateUpdate {
 }
 
 export interface ProgramCategoryCreateUpdate {
-    id: number | null;
+    id?: number;
     name: string;
 }

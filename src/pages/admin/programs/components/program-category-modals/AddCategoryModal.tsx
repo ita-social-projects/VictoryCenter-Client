@@ -3,7 +3,7 @@ import Modal from '../../../../../components/common/modal/Modal';
 import Button from '../../../../../components/common/button/Button';
 import HintContainer from '../../../../../components/common/hint/HintContainer';
 import InputWithCharacterLimit from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
-import QuestionModal from "../../../../../components/common/question-modal/QuestionModal";
+import QuestionModal from '../../../../../components/common/question-modal/QuestionModal';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Controller, useForm } from 'react-hook-form';
 import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/ProgramAdminPage';
@@ -96,7 +96,11 @@ export const AddCategoryModal = ({ isOpen, onClose, onAddCategory, categories }:
             <Modal isOpen={isOpen} onClose={handleClose}>
                 <Modal.Title>{PROGRAM_CATEGORY_TEXT.FORM.TITLE.ADD_CATEGORY}</Modal.Title>
                 <Modal.Content>
-                    <form onSubmit={handleSubmit(onSubmit)} className="program-form-main" id="add-program-category-form">
+                    <form
+                        onSubmit={handleSubmit(onSubmit)}
+                        className="program-form-main"
+                        id="add-program-category-form"
+                    >
                         <div className="form-group">
                             <label htmlFor="add-category-name">
                                 <span className="required-field">*</span>
@@ -121,7 +125,7 @@ export const AddCategoryModal = ({ isOpen, onClose, onAddCategory, categories }:
                                 title={PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError()}
                             />
                         )}
-                        {error && <div className='error-container'>{error}</div>}
+                        {error && <div className="error-container">{error}</div>}
                     </form>
                 </Modal.Content>
                 <Modal.Actions>

@@ -1,21 +1,21 @@
-﻿.hint-container{
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-  color: #0F2957;
-
-  &-title {
+﻿.hint-container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 4px;
-    font-weight: 600;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    color: #0f2957;
 
-    img {
-      height: 24px;
-      width: 24px;
+    &-title {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        font-weight: 600;
+
+        img {
+            height: 24px;
+            width: 24px;
+        }
     }
-  }
 }

@@ -29,20 +29,12 @@ export const AdminNavigation = () => {
                         to={adminRoutes.programsPageRoute}
                         end
                         className={({ isActive }) =>
-                            isActive ? "admin-pages-selected admin-page-link" : "admin-page-link"
+                            classNames('admin-page-link', {
+                                'admin-pages-selected': isActive,
+                            })
                         }
                     >
                         Програми
-                    </NavLink>
-
-                    <NavLink
-                        to={adminRoutes.testAdminRoute}
-                        end
-                        className={({ isActive }) =>
-                            isActive ? "admin-pages-selected admin-page-link" : "admin-page-link"
-                        }
-                    >
-                        Test
                     </NavLink>
                 </nav>
             </div>

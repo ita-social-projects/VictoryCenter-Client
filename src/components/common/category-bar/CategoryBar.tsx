@@ -1,6 +1,6 @@
 ﻿import React from 'react';
-import classNames from "classnames";
-import ContextMenu from "../context-menu/ContextMenu";
+import classNames from 'classnames';
+import ContextMenu from '../context-menu/ContextMenu';
 import './category-bar.scss';
 
 export interface ContextMenuOption {
@@ -34,7 +34,7 @@ export const CategoryBar = <T,>({
     };
 
     return (
-        <div className='category-bar'>
+        <div className="category-bar">
             {displayContextMenu && contextMenuOptions.length > 0 && (
                 <ContextMenu onOptionSelected={handleContextMenuOptionSelected}>
                     {contextMenuOptions.map((option) => (
@@ -54,7 +54,7 @@ export const CategoryBar = <T,>({
                         key={key}
                         onClick={() => onCategorySelect(category)}
                         className={classNames('category-bar-button', {
-                            'category-bar-selected': selected
+                            'category-bar-selected': selected,
                         })}
                     >
                         {name}

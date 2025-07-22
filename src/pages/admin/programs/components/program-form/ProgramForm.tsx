@@ -1,7 +1,10 @@
-import React, {useEffect, useState, forwardRef, useImperativeHandle, useRef} from 'react';
+import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from 'react';
 import { useForm, Controller, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { programValidationSchema, ProgramValidationContext } from '../../../../../validation/admin/program-schema/program-scheme';
+import {
+    programValidationSchema,
+    ProgramValidationContext,
+} from '../../../../../validation/admin/program-schema/program-scheme';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
@@ -62,8 +65,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 try {
                     const status: VisibilityStatus = statusRef.current;
                     handleSubmit((data) => onSubmit(data, status))();
-                }
-                finally {
+                } finally {
                     statusRef.current = null;
                 }
             }
@@ -148,9 +150,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 </div>
                 {/* Description Field */}
                 <div className="form-group">
-                    <label htmlFor="description">
-                        {PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION}
-                    </label>
+                    <label htmlFor="description">{PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION}</label>
                     <Controller
                         control={control}
                         name={'description'}
@@ -169,9 +169,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 </div>
                 {/* Image Field */}
                 <div className="form-group">
-                    <label htmlFor="img">
-                        {PROGRAMS_TEXT.FORM.LABEL.PHOTO}
-                    </label>
+                    <label htmlFor="img">{PROGRAMS_TEXT.FORM.LABEL.PHOTO}</label>
                     <Controller
                         name={'img'}
                         control={control}

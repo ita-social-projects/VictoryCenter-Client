@@ -11,12 +11,7 @@ export type ButtonTooltipProps = {
     position?: 'top' | 'bottom';
 };
 
-export const ButtonTooltip = ({
-    children,
-    className,
-    position = 'bottom',
-    offset = 8,
-}: ButtonTooltipProps) => {
+export const ButtonTooltip = ({ children, className, position = 'bottom', offset = 8 }: ButtonTooltipProps) => {
     const [isVisible, setIsVisible] = useState(false);
     const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -85,14 +80,8 @@ export const ButtonTooltip = ({
     };
 
     return (
-        <div
-            ref={wrapperRef}
-            className={classNames('button-tooltip-wrapper', className)}
-            onClick={toggleTooltip}
-        >
-            <img className="button-tooltip-icon"
-                 src={isVisible ? InfoIconActive : InfoIcon}
-                 alt="info"/>
+        <div ref={wrapperRef} className={classNames('button-tooltip-wrapper', className)} onClick={toggleTooltip}>
+            <img className="button-tooltip-icon" src={isVisible ? InfoIconActive : InfoIcon} alt="info" />
 
             {isVisible && (
                 <div

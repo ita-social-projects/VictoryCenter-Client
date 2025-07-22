@@ -30,13 +30,13 @@
 };
 
 export const PROGRAM_CATEGORY_TEXT = {
-    BUTTON:{
+    BUTTON: {
         ADD_CATEGORY: 'Додати категорії',
         EDIT_CATEGORY: 'Редагувати',
         DELETE_CATEGORY: 'Видалити',
     },
-    FORM:{
-        TITLE:{
+    FORM: {
+        TITLE: {
             ADD_CATEGORY: 'Додати категорію',
             EDIT_CATEGORY: 'Редагувати категорію',
             DELETE_CATEGORY: 'Видалити категорію',
@@ -47,12 +47,12 @@ export const PROGRAM_CATEGORY_TEXT = {
             FAIL_TO_UPDATE_CATEGORY: 'Виникла помилка під час оновлення категорії',
             FAIL_TO_DELETE_CATEGORY: 'Виникла помилка під час видалення категорії',
         },
-        LABEL:{
+        LABEL: {
             NAME: 'Назва',
             CATEGORY: 'Категорія',
         },
-    }
-}
+    },
+};
 
 export const PROGRAM_VALIDATION = {
     name: {
@@ -67,7 +67,8 @@ export const PROGRAM_VALIDATION = {
         max: 1000,
         getRequiredError: () => 'Опис обов’язковий',
         getMinError: () => `Не менше ${PROGRAM_VALIDATION.description.min} символів`,
-        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.description.max} символів`,},
+        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.description.max} символів`,
+    },
     categories: {
         getAtLeastOneRequiredError: () => 'Потрібно обрати хоча б одну категорію',
     },
@@ -89,8 +90,8 @@ export const PROGRAM_CATEGORY_VALIDATION = {
         getMaxError: () => `Не більше ${PROGRAM_CATEGORY_VALIDATION.name.max} символів`,
         getCategoryWithThisNameAlreadyExistsError: () => 'Категорія з такою назвою вже існує',
     },
-    programsCount:{
+    programsCount: {
         getRelocationOrRemovalHint: () => 'Перенесіть їх в іншу категорію або видаліть, щоб продовжити',
         getHasProgramsCountError: (count: number) => `Категорія містить ${count} програм`,
-    }
-}
+    },
+};

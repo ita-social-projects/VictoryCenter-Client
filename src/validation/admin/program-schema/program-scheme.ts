@@ -1,5 +1,5 @@
-﻿import {ProgramCategory} from "../../../types/ProgramAdminPage";
-import { PROGRAM_VALIDATION } from "../../../const/admin/programs";
+﻿import { ProgramCategory } from '../../../types/ProgramAdminPage';
+import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
 import * as Yup from 'yup';
 
 export interface ProgramValidationContext {
@@ -18,7 +18,7 @@ export const programValidationSchema = Yup.object({
                 id: Yup.number().required(),
                 name: Yup.string().required(),
                 programsCount: Yup.number().required(),
-            })
+            }),
         )
         .required(PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError())
         .min(1, PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError()),
@@ -28,11 +28,9 @@ export const programValidationSchema = Yup.object({
         .when('$isPublishing', ([isPublishing], schema) =>
             isPublishing
                 ? schema
-                    .required(PROGRAM_VALIDATION.description.getRequiredError())
-                    .min(PROGRAM_VALIDATION.description.min,
-                        PROGRAM_VALIDATION.description.getMinError())
-                : schema
-                    .notRequired()
+                      .required(PROGRAM_VALIDATION.description.getRequiredError())
+                      .min(PROGRAM_VALIDATION.description.min, PROGRAM_VALIDATION.description.getMinError())
+                : schema.notRequired(),
         ),
 
     img: Yup.mixed<File | string>()
@@ -41,7 +39,8 @@ export const programValidationSchema = Yup.object({
         .when('$isPublishing', ([isPublishing], schema) =>
             isPublishing
                 ? schema.required(PROGRAM_VALIDATION.img.getRequiredWhenPublishingError())
-                : schema.notRequired())
+                : schema.notRequired(),
+        )
         .transform((value) => {
             if (value === undefined || value === '') return null;
             if (value instanceof FileList && value.length > 0) return value[0];
@@ -49,23 +48,19 @@ export const programValidationSchema = Yup.object({
             if (typeof value === 'string') return value;
             return null;
         })
-        .test(
-            'fileFormat',
-            PROGRAM_VALIDATION.img.getFormatError(), (value) => {
-                if (typeof value === 'string') return true;
-                if (value instanceof File) {
-                    return PROGRAM_VALIDATION.img.allowedFormats.includes(value.type);
-                }
-                return true;
-            })
-        .test(
-            'fileSize',
-            PROGRAM_VALIDATION.img.getSizeError(), (value) => {
-                if (value === null) return true;
-                if (typeof value === 'string') return true;
-                if (value instanceof File) {
-                    return value.size <= PROGRAM_VALIDATION.img.maxSizeBytes;
-                }
-                return true;
-            }),
+        .test('fileFormat', PROGRAM_VALIDATION.img.getFormatError(), (value) => {
+            if (typeof value === 'string') return true;
+            if (value instanceof File) {
+                return PROGRAM_VALIDATION.img.allowedFormats.includes(value.type);
+            }
+            return true;
+        })
+        .test('fileSize', PROGRAM_VALIDATION.img.getSizeError(), (value) => {
+            if (value === null) return true;
+            if (typeof value === 'string') return true;
+            if (value instanceof File) {
+                return value.size <= PROGRAM_VALIDATION.img.maxSizeBytes;
+            }
+            return true;
+        }),
 });

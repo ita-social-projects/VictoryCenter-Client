@@ -1,8 +1,7 @@
 ﻿export const COMMON_TEXT_ADMIN = {
-
     STATUS: {
         DRAFT: 'Чернетка',
-        PUBLISHED: 'Опубліковано'
+        PUBLISHED: 'Опубліковано',
     },
 
     TOOLTIP: {
@@ -37,5 +36,5 @@
         CANCEL: 'Відмінити',
         SAVE_AS_DRAFTED: 'Зберегти як чернетку',
         SAVE_AS_PUBLISHED: 'Опублікувати',
-    }
-}
+    },
+};

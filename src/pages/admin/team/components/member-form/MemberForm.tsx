@@ -1,6 +1,6 @@
 import CloudDownload from '../../../../../assets/icons/cloud-download.svg';
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { TeamCategory, TeamCategoryDto } from '../../../../../types/admin/TeamMembers';
+import { TeamCategory } from '../../../../../types/admin/TeamMembers';
 import {
     TEAM_LABEL_CATEGORY,
     TEAM_LABEL_SELECT_CATEGORY,
@@ -30,7 +30,7 @@ const MAX_FULLNAME_LENGTH = 50;
 const MAX_DESCRIPTION_LENGTH = 200;
 export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onValuesChange }: MemberFormProps) => {
     const client = useAdminClient();
-    const [categories, setCategories] = useState<TeamCategoryDto[]>([]);
+    const [categories, setCategories] = useState<TeamCategory[]>([]);
     const [isLoadingCategories, setIsLoadingCategories] = useState(true);
     const [memberFormValues, setMemberFormValues] = useState<MemberFormValues>(
         existingMemberFormValues || {

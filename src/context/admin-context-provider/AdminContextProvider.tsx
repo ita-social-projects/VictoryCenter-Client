@@ -23,7 +23,7 @@ type ContextType = {
     refreshAccessToken: () => Promise<void>;
 };
 
-const AdminContext = createContext<ContextType | undefined>(undefined);
+export const AdminContext = createContext<ContextType | undefined>(undefined);
 
 export const AdminContextProvider = ({ children }: Props) => {
     const [token, setToken] = useState<string>('');

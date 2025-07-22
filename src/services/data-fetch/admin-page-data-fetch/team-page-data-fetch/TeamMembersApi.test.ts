@@ -16,7 +16,11 @@ describe('TeamMembersApi', () => {
             {
                 id: 1,
                 fullName: 'Test Member',
-                categoryId: 1,
+                category: {
+                    id: 1,
+                    name: 'Основна команда',
+                    description: 'Test',
+                },
                 priority: 1,
                 status: 1,
                 description: 'Test description',
@@ -29,7 +33,7 @@ describe('TeamMembersApi', () => {
 
         const members = await TeamMembersApi.getAll(mockClient);
 
-        expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers');
+        expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', { params: {} });
         expect(members).toEqual([
             {
                 id: 1,
@@ -203,7 +207,7 @@ describe('TeamMembersApi', () => {
             response: { status: 404 },
         });
 
-        expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers');
+        expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', { params: {} });
     });
 
     it('should throw a 500 error when the server fails', async () => {
@@ -215,7 +219,7 @@ describe('TeamMembersApi', () => {
             response: { status: 500 },
         });
 
-        expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers');
+        expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', { params: {} });
     });
 
     it('should return an empty array when the API sends an empty list', async () => {

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { TeamCategory, TeamCategoryDto } from '../../../../../types/admin/TeamMembers';
+import { TeamCategory } from '../../../../../types/admin/TeamMembers';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { MemberDragPreview } from '../member-drag-preview/MemberDragPreview';
 import { MembersListItem } from '../members-list-item/MembersListItem';
@@ -12,7 +12,6 @@ import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
 import './members-list.scss';
 import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
-import { AxiosInstance } from 'axios';
 import {
     TEAM_DELETE_MEMBER,
     TEAM_EDIT_MEMBER,
@@ -38,35 +37,6 @@ export type MembersListProps = {
 };
 
 const currentTabKey = 'currentTab';
-export const fetchMembers = async (
-    category: TeamCategory,
-    pageSize: number,
-    pageNumber: number,
-    searchQuery: string = '',
-    statusFilter: StatusFilter = 'Усі',
-    client: AxiosInstance,
-    onError?: (msg: string | null) => void,
-): Promise<{
-    newMembers: TeamMember[];
-    totalCountOfPages: number;
-}> => {
-    let filtered = [] as TeamMember[];
-    try {
-        filtered = await TeamMembersApi.getAll(
-            client,
-            category.id,
-            mapStatusFilterToStatus(statusFilter),
-            (pageNumber - 1) * pageSize,
-            pageNumber * pageSize,
-        );
-    } catch (err) {
-        onError?.((err as Error).message);
-    }
-    return {
-        newMembers: filtered,
-        totalCountOfPages: Math.ceil(filtered.length / pageSize),
-    };
-};
 
 export const MembersList = ({
     searchByNameQuery,
@@ -84,7 +54,7 @@ export const MembersList = ({
         const savedName = localStorage.getItem(currentTabKey);
         return savedName as TeamCategory | null;
     });
-    const [teamCategories, setTeamCategories] = useState<TeamCategoryDto[]>([]);
+    const [teamCategories, setTeamCategories] = useState<TeamCategory[]>([]);
     const [isDeleteTeamMemberModalOpen, setIsDeleteTeamMemberModalOpen] = useState(false);
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [dragPreview, setDragPreview] = useState<DragPreviewModel<TeamMember>>({
@@ -136,17 +106,33 @@ export const MembersList = ({
 
     useEffect(() => {
         const fetchCategories = async () => {
-            let categories = await TeamCategoriesApi.getAll(client);
+            const categories = await TeamCategoriesApi.getAll(client);
             setTeamCategories(categories);
-            const saved = localStorage.getItem(currentTabKey);
-            if (saved) {
-                const savedCat = categories.find((c) => c.name === JSON.parse(saved).name);
-                if (savedCat) setCategory(savedCat);
-                else setCategory(categories[0]);
+
+            const savedRaw = localStorage.getItem(currentTabKey);
+
+            if (savedRaw) {
+                try {
+                    let saved = JSON.parse(savedRaw);
+                    let ss;
+                    if (saved.id === undefined) {
+                        ss = JSON.parse(saved);
+                    }
+                    saved = ss;
+                    const match = categories.find((c) => c.id === saved.id);
+                    if (match) {
+                        setCategory(match);
+                    } else {
+                        setCategory(categories[0]);
+                    }
+                } catch (err) {
+                    setCategory(categories[0]);
+                }
             } else {
                 setCategory(categories[0]);
             }
         };
+
         fetchCategories();
     }, [client]);
 
@@ -163,7 +149,6 @@ export const MembersList = ({
         async (reset: boolean = false) => {
             const currentCategory = categoryRef.current;
             const currentSearch = searchByNameQuery || '';
-            const currentStatus = statusFilter;
             if (!currentCategory || isFetchingRef.current) return;
             if (!reset && totalPagesRef.current && currentPageRef.current > totalPagesRef.current) return;
 
@@ -172,15 +157,22 @@ export const MembersList = ({
 
             const pageToFetch = reset ? 1 : currentPageRef.current;
 
-            const { newMembers, totalCountOfPages } = await fetchMembers(
-                currentCategory,
-                pageSize,
-                pageToFetch,
-                currentSearch,
-                currentStatus,
-                client,
-                onError,
-            );
+            let newMembers = [] as TeamMember[];
+            try {
+                newMembers = await TeamMembersApi.getAll(
+                    client,
+                    currentCategory.id,
+                    mapStatusFilterToStatus(statusFilter),
+                    (pageToFetch - 1) * pageSize,
+                    pageToFetch * pageSize,
+                );
+            } catch (err) {
+                onError?.((err as Error).message);
+            }
+            if (currentSearch) {
+                newMembers = newMembers.filter((m) => m.fullName.toLowerCase().includes(currentSearch.toLowerCase()));
+            }
+            const totalCountOfPages = Math.ceil(newMembers.length / pageSize);
 
             setMembers((prev) => (reset ? [...newMembers] : [...prev, ...newMembers]));
             setCurrentPage((prev) => (reset ? 2 : prev + 1));
@@ -191,7 +183,7 @@ export const MembersList = ({
             setIsMembersLoading(false);
             isFetchingRef.current = false;
         },
-        [searchByNameQuery, statusFilter, pageSize],
+        [searchByNameQuery, statusFilter, pageSize, client, onError],
     );
 
     useEffect(() => {
@@ -200,7 +192,7 @@ export const MembersList = ({
         setTotalPages(null);
         isFetchingRef.current = false;
         loadMembers(true);
-    }, [category, searchByNameQuery, statusFilter, loadMembers, pageSize, refetchTrigger]);
+    }, [category, searchByNameQuery, statusFilter, pageSize, refetchTrigger]);
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
         setDraggedIndex(index);

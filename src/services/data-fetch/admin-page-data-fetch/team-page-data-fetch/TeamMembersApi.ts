@@ -34,7 +34,7 @@ export const TeamMembersApi = {
         await client.put(`/TeamMembers/${id}`, {
             fullName: member.fullName,
             categoryId: member.category.id,
-            status: 0,
+            status: Status.Draft,
             description: member.description,
             email: '', //TODO implement email update
         });
@@ -44,7 +44,7 @@ export const TeamMembersApi = {
         await client.put(`/TeamMembers/${id}`, {
             fullName: member.fullName,
             categoryId: member.category.id,
-            status: 1,
+            status: Status.Published,
             description: member.description,
             email: '', //TODO implement email update
         });
@@ -54,7 +54,7 @@ export const TeamMembersApi = {
         await client.post(`/TeamMembers`, {
             fullName: member.fullName,
             categoryId: member.category.id,
-            status: 0,
+            status: Status.Draft,
             description: member.description,
             email: '', //TODO implement email post
         });
@@ -64,7 +64,7 @@ export const TeamMembersApi = {
         await client.post(`/TeamMembers`, {
             fullName: member.fullName,
             categoryId: member.category.id,
-            status: 1,
+            status: Status.Published,
             description: member.description,
             email: '', //TODO implement email post
         });
@@ -87,6 +87,6 @@ export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): TeamMember => 
     img: dto.photo,
     fullName: dto.fullName,
     description: dto.description,
-    status: dto.status === 0 ? 'Чернетка' : 'Опубліковано',
+    status: dto.status === Status.Draft ? 'Чернетка' : 'Опубліковано',
     category: dto.category,
 });

@@ -1,9 +1,26 @@
 import React from 'react';
-import { render, screen, fireEvent, createEvent } from '@testing-library/react';
+import { render, screen, fireEvent, createEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemberForm, MemberFormProps, MemberFormValues } from './MemberForm';
+import { AdminContext } from '../../../../../context/admin-context-provider/AdminContextProvider';
+import axios from 'axios';
+import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi';
 
 jest.mock('../../../../../assets/icons/cloud-download.svg', () => 'cloud-download.svg');
+
+const mockAdminContext = {
+    client: axios.create(),
+    isAuthenticated: true,
+    isLoading: false,
+    login: jest.fn(),
+    logout: jest.fn(),
+    refreshAccessToken: jest.fn(),
+};
+
+const renderWithAdminContext = async (ui: React.ReactElement) => {
+    render(<AdminContext.Provider value={mockAdminContext}>{ui}</AdminContext.Provider>);
+    await screen.findByLabelText("Ім'я та Прізвище");
+};
 
 describe('MemberForm', () => {
     const defaultProps: MemberFormProps = {
@@ -15,10 +32,17 @@ describe('MemberForm', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.spyOn(TeamCategoriesApi, 'getAll').mockImplementation(() =>
+            Promise.resolve([
+                { id: 1, name: 'Основна команда', description: 'Test' },
+                { id: 2, name: 'Наглядова рада', description: 'Test' },
+                { id: 3, name: 'Радники', description: 'Test' },
+            ]),
+        );
     });
 
     it('renders form with all fields', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         expect(screen.getByLabelText('Категорія')).toBeInTheDocument();
         expect(screen.getByLabelText("Ім'я та Прізвище")).toBeInTheDocument();
@@ -26,7 +50,7 @@ describe('MemberForm', () => {
         expect(screen.getByText('Фото')).toBeInTheDocument();
     });
 
-    it('initializes with existingMemberFormValues', () => {
+    it('initializes with existingMemberFormValues', async () => {
         const initialValues: MemberFormValues = {
             category: {
                 id: 1,
@@ -37,15 +61,17 @@ describe('MemberForm', () => {
             description: 'Test description',
             img: null,
         };
-        render(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
 
-        expect(screen.getByDisplayValue('Основна команда')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByDisplayValue('Основна команда')).toBeInTheDocument();
+        });
         expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
         expect(screen.getByDisplayValue('Test description')).toBeInTheDocument();
     });
 
     it('updates form values and calls onValuesChange on input change', async () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         fireEvent.change(fullNameInput, { target: { value: 'Jane Doe' } });
@@ -58,7 +84,11 @@ describe('MemberForm', () => {
     });
 
     it('updates category and calls onValuesChange', async () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
+
+        await waitFor(() => {
+            expect(screen.getByRole('option', { name: 'Наглядова рада' })).toBeInTheDocument();
+        });
 
         const categorySelect = screen.getByLabelText('Категорія');
         fireEvent.change(categorySelect, { target: { value: 'Наглядова рада' } });
@@ -66,7 +96,7 @@ describe('MemberForm', () => {
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
             expect.objectContaining({
                 category: {
-                    id: 1,
+                    id: 2,
                     name: 'Наглядова рада',
                     description: 'Test',
                 },
@@ -75,7 +105,7 @@ describe('MemberForm', () => {
     });
 
     it('updates description and calls onValuesChange', async () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         const descriptionTextarea = screen.getByLabelText('Опис');
         fireEvent.change(descriptionTextarea, { target: { value: 'New description' } });
@@ -88,33 +118,43 @@ describe('MemberForm', () => {
     });
 
     it('submits form with valid data', async () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
+
+        await waitFor(() => {
+            expect(screen.getByText('Радники')).toBeInTheDocument();
+        });
 
         const categorySelect = screen.getByLabelText('Категорія');
         const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         const descriptionTextarea = screen.getByLabelText('Опис');
 
-        fireEvent.change(categorySelect, { target: { value: 'Радники' } });
+        fireEvent.change(categorySelect, {
+            target: {
+                value: 'Радники',
+            },
+        });
         await userEvent.type(fullNameInput, 'Jane Doe');
         await userEvent.type(descriptionTextarea, 'Test description');
 
         const form = screen.getByTestId('test-form');
         fireEvent.submit(form);
 
-        expect(defaultProps.onSubmit).toHaveBeenCalledWith({
-            category: {
-                id: 1,
-                name: 'Радники',
-                description: 'Test',
-            },
-            fullName: 'Jane Doe',
-            description: 'Test description',
-            img: null,
+        await waitFor(() => {
+            expect(defaultProps.onSubmit).toHaveBeenCalledWith({
+                category: {
+                    id: 3,
+                    name: 'Радники',
+                    description: 'Test',
+                },
+                fullName: 'Jane Doe',
+                description: 'Test description',
+                img: null,
+            });
         });
     });
 
     it('displays character count for fullName', async () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         await userEvent.type(fullNameInput, 'Jane Doe');
@@ -123,7 +163,7 @@ describe('MemberForm', () => {
     });
 
     it('displays character count for description', async () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         const descriptionTextarea = screen.getByLabelText('Опис');
         await userEvent.type(descriptionTextarea, 'Test description');
@@ -132,7 +172,7 @@ describe('MemberForm', () => {
     });
 
     it('prevents form submission if memberFormValues is null', () => {
-        render(<MemberForm {...defaultProps} existingMemberFormValues={null} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} existingMemberFormValues={null} />);
 
         const form = screen.getByTestId('test-form');
         fireEvent.submit(form);
@@ -141,7 +181,7 @@ describe('MemberForm', () => {
     });
 
     it('handles drag over and drag leave events', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         const dropArea = screen.getByLabelText('Перетягніть файл сюди або натисніть для завантаження');
         fireEvent.dragOver(dropArea);
@@ -151,7 +191,7 @@ describe('MemberForm', () => {
     });
 
     it('renders with correct input attributes', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         expect(fullNameInput).toHaveAttribute('maxLength', '50');
@@ -171,6 +211,13 @@ describe('MemberForm - Additional Coverage', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.spyOn(TeamCategoriesApi, 'getAll').mockImplementation(() =>
+            Promise.resolve([
+                { id: 1, name: 'Основна команда', description: 'Test' },
+                { id: 2, name: 'Наглядова рада', description: 'Test' },
+                { id: 3, name: 'Радники', description: 'Test' },
+            ]),
+        );
     });
 
     it('displays uploaded file names', () => {
@@ -189,14 +236,14 @@ describe('MemberForm - Additional Coverage', () => {
             img: fileList,
         };
 
-        render(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
 
         expect(screen.getByText('test1.jpg')).toBeInTheDocument();
         expect(screen.getByText('test2.jpg')).toBeInTheDocument();
     });
 
     it('renders empty div when no files are uploaded', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         const imageLoadedSection = document.querySelector('.form-group-image-loaded');
         expect(imageLoadedSection).toBeInTheDocument();
@@ -209,7 +256,7 @@ describe('MemberForm - Additional Coverage', () => {
             onValuesChange: undefined,
         };
 
-        render(<MemberForm {...propsWithoutOnValuesChange} />);
+        renderWithAdminContext(<MemberForm {...propsWithoutOnValuesChange} />);
 
         const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         fireEvent.change(fullNameInput, { target: { value: 'Jane Doe' } });
@@ -229,7 +276,7 @@ describe('MemberForm - Additional Coverage', () => {
             img: null,
         };
 
-        render(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
 
         const form = screen.getByTestId('test-form');
         fireEvent.submit(form);
@@ -238,7 +285,7 @@ describe('MemberForm - Additional Coverage', () => {
     });
 
     it('handles file input change without files (edge case)', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
 
@@ -255,7 +302,7 @@ describe('MemberForm - Additional Coverage', () => {
     });
 
     it('handles file input with empty FileList', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         const fileInput = screen.getByTestId('image');
 
@@ -274,14 +321,14 @@ describe('MemberForm - Additional Coverage', () => {
     });
 
     it('displays 0 character count when fields are empty', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         expect(screen.getByText('0/50')).toBeInTheDocument();
         expect(screen.getByText('0/200')).toBeInTheDocument();
     });
 
     it('handles drag events without files in dataTransfer', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         const dropArea = screen.getByTestId('drop-area');
 
@@ -301,7 +348,7 @@ describe('MemberForm - Additional Coverage', () => {
     });
 
     it('handles drag events with files in dataTransfer', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         const dropArea = screen.getByTestId('drop-area');
         const file = new File(['hello'], 'hello.png', { type: 'image/png' });
@@ -329,10 +376,17 @@ describe('MemberForm - Extra Function Coverage', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.spyOn(TeamCategoriesApi, 'getAll').mockImplementation(() =>
+            Promise.resolve([
+                { id: 1, name: 'Основна команда', description: 'Test' },
+                { id: 2, name: 'Наглядова рада', description: 'Test' },
+                { id: 3, name: 'Радники', description: 'Test' },
+            ]),
+        );
     });
 
     it('updates file input after already set', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
         const fileInput = screen.getByTestId('image');
         const file1 = new File(['a'], 'a.png', { type: 'image/png' });
         fireEvent.change(fileInput, { target: { files: [file1], name: 'img' }, currentTarget: { files: [file1] } });
@@ -343,7 +397,7 @@ describe('MemberForm - Extra Function Coverage', () => {
     });
 
     it('does not submit if category is empty', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
         const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         const descriptionTextarea = screen.getByLabelText('Опис');
         fireEvent.change(fullNameInput, { target: { value: 'Test' } });
@@ -354,7 +408,7 @@ describe('MemberForm - Extra Function Coverage', () => {
     });
 
     it('does not submit if fullName is empty', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
         const categorySelect = screen.getByLabelText('Категорія');
         const descriptionTextarea = screen.getByLabelText('Опис');
         fireEvent.change(categorySelect, { target: { value: 'Основна команда' } });
@@ -365,7 +419,7 @@ describe('MemberForm - Extra Function Coverage', () => {
     });
 
     it('does not submit if description is empty', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
         const categorySelect = screen.getByLabelText('Категорія');
         const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         fireEvent.change(categorySelect, { target: { value: 'Основна команда' } });
@@ -376,7 +430,7 @@ describe('MemberForm - Extra Function Coverage', () => {
     });
 
     it('handles drag-and-drop with empty FileList', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
         const dropArea = screen.getByTestId('drop-area');
         const dropEvent = {
             preventDefault: jest.fn(),
@@ -387,7 +441,7 @@ describe('MemberForm - Extra Function Coverage', () => {
     });
 
     it('handles drag-and-drop with multiple files', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
         const dropArea = screen.getByTestId('drop-area');
         const file1 = new File(['a'], 'a.png', { type: 'image/png' });
         const file2 = new File(['b'], 'b.png', { type: 'image/png' });
@@ -401,14 +455,18 @@ describe('MemberForm - Extra Function Coverage', () => {
         // Simulate effect with falsy memberFormValues
         // Not directly possible, but we can check that the effect is not called if onValuesChange is not provided (already covered)
         // So this is just for completeness
-        render(<MemberForm {...defaultProps} onValuesChange={undefined} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} onValuesChange={undefined} />);
         const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         fireEvent.change(fullNameInput, { target: { value: 'Test' } });
         expect(fullNameInput).toHaveValue('Test');
     });
 
     it('enforces max length for fullName and description', async () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
+        await waitFor(() => {
+            expect(screen.getByLabelText("Ім'я та Прізвище")).toBeInTheDocument();
+        });
+
         const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
         const descriptionTextarea = screen.getByLabelText('Опис');
         const longName = 'a'.repeat(60);
@@ -422,7 +480,7 @@ describe('MemberForm - Extra Function Coverage', () => {
     });
 
     it('removes file input (sets to null) after file was set', () => {
-        render(<MemberForm {...defaultProps} />);
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
         const fileInput = screen.getByTestId('image');
         const file1 = new File(['a'], 'a.png', { type: 'image/png' });
         fireEvent.change(fileInput, { target: { files: [file1], name: 'img' }, currentTarget: { files: [file1] } });

@@ -2,27 +2,17 @@ import './paginated-sorted-list.scss';
 import classNames from 'classnames';
 import LoaderIcon from '../../assets/icons/load.svg';
 import ArrowUpIcon from '../../assets/icons/arrow-up.svg';
-import { ListContent } from './ListContent/ListContent';
-import { MembersListItem } from '../../../pages/admin/team/components/members-list-item/MembersListItem';
-import { TeamMember } from '../../../types/admin/TeamMembers';
 
 export interface BaseTab {
-    //TODO
     id: number;
     name: string;
 }
 
-export interface BaseItem {
-    //TODO
-    id: number;
-}
-
-interface PaginatedSortableListProps<TItem extends BaseItem, TTab extends BaseTab> {
+interface PaginatedSortableListProps<TTab extends BaseTab> {
     tabs: TTab[];
     selectedTab: TTab | null;
     setSelectedTab: (tab: TTab) => void;
     isItemsLoading: boolean;
-    items: TItem[];
     content: React.ReactNode;
     handleOnScroll: () => void;
     moveToTop: () => void;
@@ -30,18 +20,17 @@ interface PaginatedSortableListProps<TItem extends BaseItem, TTab extends BaseTa
     listRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export function PaginatedSortableList<TItem extends BaseItem, TTab extends BaseTab>({
+export function PaginatedSortableList<TTab extends BaseTab>({
     tabs,
     selectedTab,
     setSelectedTab,
     isItemsLoading,
-    items,
     content,
     handleOnScroll,
     moveToTop,
     isMoveToTopVisible,
     listRef,
-}: PaginatedSortableListProps<TItem, TTab>) {
+}: PaginatedSortableListProps<TTab>) {
     return (
         <div className="paginated-list">
             <div
@@ -63,31 +52,7 @@ export function PaginatedSortableList<TItem extends BaseItem, TTab extends BaseT
             </div>
 
             <div ref={listRef} onScroll={handleOnScroll} data-testid="list" className="paginated-list-scroll">
-                <ListContent
-                    items={items}
-                    isLoading={isItemsLoading}
-                    renderItem={(m, index) => (
-                        <MembersListItem
-                            key={m.id}
-                            draggedIndex={draggedIndex}
-                            member={m as unknown as TeamMember} //TODO
-                            handleDragOver={handleDragOver}
-                            handleDragStart={handleDragStart}
-                            handleDrag={handleDrag}
-                            handleDragEnd={handleDragEnd}
-                            handleDrop={handleDrop}
-                            handleOnDeleteMember={handleOnDeleteMember}
-                            handleOnEditMember={handleOnEditMember}
-                            index={index}
-                        />
-                    )}
-                    emptyState={
-                        <div className="members-not-found" data-testid="members-not-found">
-                            <img src={NotFoundIcon} alt="members-not-found" data-testid="members-not-found-icon" />
-                            <p>{TEAM_NOT_FOUND}</p>
-                        </div>
-                    }
-                />
+                {content}
 
                 {isItemsLoading && (
                     <div className="paginated-list-scroll-loader" data-testid="list-loader">

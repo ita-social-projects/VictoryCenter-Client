@@ -12,8 +12,8 @@ type MembersListItemProps = {
     handleDrag: (e: React.DragEvent<HTMLDivElement>) => void;
     handleDragEnd: () => void;
     handleDrop: (index: number) => void;
-    handleOnDeleteMember: (member: TeamMember) => void;
-    handleOnEditMember: (member: TeamMember) => void;
+    handleOnDeleteMember: (fullName: string) => void;
+    handleOnEditMember: (id: number) => void;
     index: number;
     draggedIndex: number | null;
 };

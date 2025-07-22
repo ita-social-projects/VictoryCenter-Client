@@ -9,7 +9,7 @@ import {InputProps} from "../../../../../components/common/input/Input";
 
 // Mock the components
 jest.mock('../../../../../components/common/button/Button', () => ({
-    Button: ({ children, onClick, buttonStyle, ...props }: ButtonProps)=> (
+    Button: ({ children, onClick, buttonStyle, ...props }: ButtonProps) => (
         <button onClick={onClick} className={buttonStyle} {...props}>
             {children}
         </button>

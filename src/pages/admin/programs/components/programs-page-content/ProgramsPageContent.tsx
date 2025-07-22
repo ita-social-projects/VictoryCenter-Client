@@ -22,6 +22,7 @@ export const ProgramsPageContent = () => {
 
     useEffect(() => {
         // fetch autocomplete values
+        // finish when integrating search with backend
     }, [searchByNameTerm]);
 
     const handleSearchQueryByName = useCallback((query: string) => {
@@ -32,16 +33,16 @@ export const ProgramsPageContent = () => {
         setStatusFilter(status);
     }, []);
 
-    const onAddStarted = () => {
+    const handleAddStarted = () => {
         setIsAddProgramModalOpen(true);
     };
 
-    const onDeleteStarted = (program: Program) => {
+    const handleDeleteStarted = (program: Program) => {
         setProgramToDelete(program);
         setIsDeleteProgramModalOpen(true);
     };
 
-    const onEditStarted = (program: Program) => {
+    const handleEditStarted = (program: Program) => {
         setProgramToEdit(program);
         setIsEditProgramModalOpen(true);
     };
@@ -84,13 +85,13 @@ export const ProgramsPageContent = () => {
                 autocompleteValues={autocompleteValues}
                 onSearchQueryChange={handleSearchQueryByName}
                 onStatusFilterChange={onStatusFilterChange}
-                onAddProgram={onAddStarted}
+                onAddProgram={handleAddStarted}
             />
             <ProgramsList
                 ref={programListRef}
                 searchByStatus={statusFilter}
-                onEditProgram={onEditStarted}
-                onDeleteProgram={onDeleteStarted}
+                onEditProgram={handleEditStarted}
+                onDeleteProgram={handleDeleteStarted}
             />
         </div>
     );

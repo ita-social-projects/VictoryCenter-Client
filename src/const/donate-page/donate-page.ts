@@ -64,3 +64,10 @@ export const CITY_BANK_IRELAND_LABEL = 'Citibank Europe PLC, Ireland';
 export const SWIFT_CITY_BANK_IRELAND_CODE_LABEL = 'CITIIE2X';
 export const ACCOUNT_CITY_BANK_IRELAND_CODE_LABEL = '0042997188';
 export const IBAN_CITY_BANK_IRELAND_CODE_LABEL = 'IE96CITI99005142997188';
+
+export const ALTERNATIVE_SUPPORT_WAYS_LABEL = 'Інші варіанти підтримки';
+export const PAY_PAL_LABEL = 'Pay Pal';
+export const PAY_PAL_EMAIL_LABEL = 'victorycenterua@gmail.com';
+export const MONOBANK_JAR_LABEL = 'Monobank баночка';
+export const MONOBANK_JAR_LINK_LABEL = 'https://send.monobank.ua/jar/2JGG2F8rHQ';
+export const DOWNLOAD_PAYMENT_DETAILS_BUTTON_LABEL = 'Завантажити реквізити PDF';

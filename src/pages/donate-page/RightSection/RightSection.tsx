@@ -3,6 +3,7 @@ import './RightSection.scss';
 import { IN_UKRAINE_LABEL, NOT_IN_UKRAINE_LABEL } from '../../../const/donate-page/donate-page';
 import { UkrainePaymentDetails } from './Ukraine-payment-details/UkrainePaymentDetails';
 import { AbroadPaymentDetails } from './abroad-payment-details/AbroadPaymentDetails';
+import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSupportWays';
 
 export const RightSection = () => {
     const [isAbroad, setIsAbroad] = React.useState(false);
@@ -18,6 +19,7 @@ export const RightSection = () => {
             </div>
             <div className="donatePaymentDetails">
                 {isAbroad ? <AbroadPaymentDetails /> : <UkrainePaymentDetails />}
+                <AlternativeSupportWays />
             </div>
         </div>
     );

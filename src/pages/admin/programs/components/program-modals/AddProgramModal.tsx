@@ -42,6 +42,7 @@ export const AddProgramModal = ({ isOpen, onClose, onAddProgram }: AddProgramMod
             const status: VisibilityStatus = pendingAction === 'publish' ? 'Published' : 'Draft';
 
             const programToCreate: ProgramCreateUpdate = {
+                id: null,
                 name: pendingFormData.name,
                 description: pendingFormData.description,
                 categoryIds: pendingFormData.categories.map((cat) => cat.id),

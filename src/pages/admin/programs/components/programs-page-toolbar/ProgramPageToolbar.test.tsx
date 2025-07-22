@@ -3,10 +3,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramsPageToolbar } from './ProgramsPageToolbar';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import {ButtonProps} from "../../../../../components/common/button/Button";
+import {SelectProps} from "../../../../../components/common/select/Select";
+import {InputProps} from "../../../../../components/common/input/Input";
 
 // Mock the components
 jest.mock('../../../../../components/common/button/Button', () => ({
-    Button: ({ children, onClick, buttonStyle, ...props }): any => (
+    Button: ({ children, onClick, buttonStyle, ...props }: ButtonProps)=> (
         <button onClick={onClick} className={buttonStyle} {...props}>
             {children}
         </button>
@@ -20,7 +23,7 @@ jest.mock('../../../../../components/common/select/Select', () => {
         </option>
     );
 
-    const MockSelect = ({ children, onValueChange, ...props }: any) => {
+    const MockSelect = ({ children, onValueChange, ...props }: SelectProps<any>) => {
         const handleChange = (e: any) => {
             const value = e.target.value === 'undefined' ? undefined : e.target.value;
             onValueChange(value);
@@ -40,7 +43,7 @@ jest.mock('../../../../../components/common/select/Select', () => {
 });
 
 jest.mock('../../../../../components/common/input/Input', () => ({
-    Input: ({ onChange, autocompleteValues, placeholder, ...props }): any => (
+    Input: ({ onChange, autocompleteValues, placeholder, ...props }: InputProps): any => (
         <input onChange={(e) => onChange(e.target.value)} placeholder={placeholder} {...props} />
     ),
 }));

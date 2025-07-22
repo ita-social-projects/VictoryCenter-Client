@@ -1,7 +1,7 @@
 import React from 'react';
 import './button.scss';
 
-type ButtonProps = {
+export type ButtonProps = {
     children: React.ReactNode;
     buttonStyle?: 'primary' | 'secondary';
     onClick?: () => void;

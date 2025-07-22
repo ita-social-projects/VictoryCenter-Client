@@ -7,7 +7,7 @@ $mulish-font-family: 'Mulish', sans-serif;
     display: flex;
     flex-direction: column;
     align-content: center;
-    box-shadow: 0px -5px 15px rgba(#20689dbf, 0.75);
+    box-shadow: 0 1rem 1.5rem -1rem rgba(#20689dbf, 0.75);
 
     .donateTabsContainer {
         display: flex;
@@ -134,6 +134,7 @@ $mulish-font-family: 'Mulish', sans-serif;
             font-size: 1.125rem;
             color: #061125;
             font-weight: 600;
+            cursor: pointer;
 
             .donateFastValueText {
                 font-weight: 700;

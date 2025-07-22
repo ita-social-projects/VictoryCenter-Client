@@ -1,23 +1,7 @@
 $mulish-font-family: 'Mulish', sans-serif;
 
 .rightSection {
-    max-width: 33.1rem;
-    overflow-y: auto;
-
-    &::-webkit-scrollbar {
-        width: 0;
-        background: transparent;
-    }
-    &::-webkit-scrollbar-thumb {
-        background: transparent;
-    }
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    scrollbar-width: none;
-    scrollbar-color: transparent transparent;
-    -ms-overflow-style: none;
+    width: 33.1rem;
 }
 
 .locationToggleContainer {

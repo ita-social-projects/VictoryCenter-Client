@@ -1,5 +1,5 @@
 import React from 'react';
-import { Member } from '../../../../../types/TeamPage';
+import { TeamMember } from '../../../../../types/admin/TeamMembers';
 import './member-component.scss';
 import BlankUserImage from '../../../../../assets/images/admin/blank-user.svg';
 import classNames from 'classnames';
@@ -9,7 +9,7 @@ export const MemberComponent = ({
     handleOnDeleteMember,
     handleOnEditMember,
 }: {
-    member: Member;
+    member: TeamMember;
     handleOnDeleteMember: (fullName: string) => void;
     handleOnEditMember: (id: number) => void;
 }) => {

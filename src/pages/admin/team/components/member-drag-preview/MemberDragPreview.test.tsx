@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemberDragPreview } from './MemberDragPreview';
-import { MemberDragPreviewModel } from '../members-list/MembersList';
-import { Member } from '../../../../../types/TeamPage';
+import { TeamMember } from '../../../../../types/admin/TeamMembers';
+import { DragPreviewModel } from '../../../../../types/admin/Common';
 import { Image } from '../../../../../types/Image';
 
 jest.mock('../../../../../assets/icons/dragger.svg', () => 'mock-dragger-icon');
@@ -13,7 +13,7 @@ jest.mock('../member-component/MemberComponent', () => ({
         handleOnDeleteMember,
         handleOnEditMember,
     }: {
-        member: Member;
+        member: TeamMember;
         handleOnDeleteMember: (fullName: string) => void;
         handleOnEditMember: (id: number) => void;
     }) => {
@@ -34,23 +34,27 @@ const mockImage: Image = {
     mimeType: 'image/jpeg',
 };
 
-const mockMember: Member = {
+const mockMember: TeamMember = {
     id: 1,
     fullName: 'John Doe',
     description: 'Software Engineer',
     img: mockImage,
     status: 'Чернетка',
-    category: 'Основна команда',
+    category: {
+        id: 1,
+        name: 'Основна команда',
+        description: 'Test',
+    },
 };
 
-const mockDragPreview: MemberDragPreviewModel = {
+const mockDragPreview: DragPreviewModel<TeamMember> = {
     visible: true,
     x: 100,
     y: 150,
     member: mockMember,
 };
 
-const mockDragPreviewWithoutMember: MemberDragPreviewModel = {
+const mockDragPreviewWithoutMember: DragPreviewModel<TeamMember> = {
     visible: true,
     x: 100,
     y: 150,
@@ -153,16 +157,20 @@ describe('MemberDragPreview', () => {
         });
 
         test('renders different member data correctly', () => {
-            const differentMember: Member = {
+            const differentMember: TeamMember = {
                 id: 2,
                 fullName: 'Jane Smith',
                 description: 'Product Manager',
                 img: mockImage,
                 status: 'Опубліковано',
-                category: 'Наглядова рада',
+                category: {
+                    id: 1,
+                    name: 'Наглядова рада',
+                    description: 'Test',
+                },
             };
 
-            const dragPreview: MemberDragPreviewModel = { ...mockDragPreview, member: differentMember };
+            const dragPreview: DragPreviewModel<TeamMember> = { ...mockDragPreview, member: differentMember };
             render(<MemberDragPreview dragPreview={dragPreview} />);
 
             expect(screen.getByText('Jane Smith')).toBeInTheDocument();
@@ -231,7 +239,7 @@ describe('MemberDragPreview', () => {
 
     describe('Edge cases', () => {
         test('handles undefined member gracefully', () => {
-            const dragPreview: MemberDragPreviewModel = { ...mockDragPreview, member: null };
+            const dragPreview: DragPreviewModel<TeamMember> = { ...mockDragPreview, member: null };
             const { container } = render(<MemberDragPreview dragPreview={dragPreview} />);
 
             expect(container.firstChild).toBeNull();

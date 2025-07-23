@@ -4,7 +4,7 @@ import {
     PublicTeamMemberDto,
     TeamItem,
     TeamPageData,
-} from '../../../../types/TeamPage';
+} from '../../../../types/public/TeamPage';
 import default_team_member_photo from '../../../../assets/team_page_images/team_member_not_found_photo.svg';
 import { axiosInstance } from '../../../api/axios';
 import { API_ROUTES } from '../../../../const/api-routes-constants';

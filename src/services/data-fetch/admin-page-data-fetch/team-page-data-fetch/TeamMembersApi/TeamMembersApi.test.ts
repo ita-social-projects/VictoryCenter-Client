@@ -1,8 +1,8 @@
 import { AxiosInstance } from 'axios';
-import { MemberFormValues } from '../../../../pages/admin/team/components/member-form/MemberForm';
-import { TeamMemberDto } from '../../../../types/TeamPage';
+import { MemberFormValues } from '../../../../../pages/admin/team/components/member-form/MemberForm';
+import { TeamMemberDto } from '../../../../../types/admin/TeamMembers';
 import { mapTeamMemberDtoToTeamMember, TeamMembersApi } from './TeamMembersApi';
-import { Image } from '../../../../types/Image';
+import { Image } from '../../../../../types/Image';
 
 const mockClient = {
     get: jest.fn(),
@@ -17,9 +17,13 @@ describe('TeamMembersApi', () => {
             {
                 id: 1,
                 fullName: 'Test Member',
-                categoryId: 1,
+                category: {
+                    id: 1,
+                    name: 'Основна команда',
+                    description: 'Test',
+                },
                 priority: 1,
-                status: 0,
+                status: 1,
                 description: 'Test description',
                 image: 'photo.png',
                 email: 'test@example.com',
@@ -30,7 +34,7 @@ describe('TeamMembersApi', () => {
 
         const members = await TeamMembersApi.getAll(mockClient);
 
-        expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers');
+        expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', { params: {} });
         expect(members).toEqual([
             {
                 id: 1,
@@ -38,7 +42,11 @@ describe('TeamMembersApi', () => {
                 fullName: 'Test Member',
                 description: 'Test description',
                 status: 'Опубліковано',
-                category: 'Основна команда',
+                category: {
+                    id: 1,
+                    name: 'Основна команда',
+                    description: 'Test',
+                },
             },
         ]);
     });
@@ -46,7 +54,11 @@ describe('TeamMembersApi', () => {
     it('should send PUT request with draft status', async () => {
         const member: MemberFormValues = {
             fullName: 'Member',
-            category: 'Основна команда',
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
             description: 'desc',
             image: null,
         };
@@ -58,7 +70,7 @@ describe('TeamMembersApi', () => {
         expect(putMock).toHaveBeenCalledWith('/TeamMembers/5', {
             fullName: 'Member',
             categoryId: 1,
-            status: 1,
+            status: 0,
             description: 'desc',
             email: '',
         });
@@ -67,7 +79,11 @@ describe('TeamMembersApi', () => {
     it('should send PUT request with published status', async () => {
         const member: MemberFormValues = {
             fullName: 'Member',
-            category: 'Основна команда',
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
             description: 'desc',
             image: null,
         };
@@ -79,7 +95,7 @@ describe('TeamMembersApi', () => {
         expect(putMock).toHaveBeenCalledWith('/TeamMembers/5', {
             fullName: 'Member',
             categoryId: 1,
-            status: 0,
+            status: 1,
             description: 'desc',
             email: '',
         });
@@ -88,7 +104,11 @@ describe('TeamMembersApi', () => {
     it('should post member as draft', async () => {
         const member: MemberFormValues = {
             fullName: 'Draft Member',
-            category: 'Основна команда',
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
             description: 'description',
             image: null,
         };
@@ -100,7 +120,7 @@ describe('TeamMembersApi', () => {
         expect(postMock).toHaveBeenCalledWith('/TeamMembers', {
             fullName: 'Draft Member',
             categoryId: 1,
-            status: 1,
+            status: 0,
             description: 'description',
             email: '',
         });
@@ -109,7 +129,11 @@ describe('TeamMembersApi', () => {
     it('should post member as published', async () => {
         const member: MemberFormValues = {
             fullName: 'Draft Member',
-            category: 'Основна команда',
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
             description: 'description',
             image: null,
         };
@@ -121,7 +145,7 @@ describe('TeamMembersApi', () => {
         expect(postMock).toHaveBeenCalledWith('/TeamMembers', {
             fullName: 'Draft Member',
             categoryId: 1,
-            status: 0,
+            status: 1,
             description: 'description',
             email: '',
         });
@@ -144,19 +168,24 @@ describe('TeamMembersApi', () => {
     });
 
     it('should map DTO to internal member format', () => {
-        const image: Image = {
+        const image1: Image = {
             id: 1,
             base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+iF9kAAAAASUVORK5CYII=',
             mimeType: 'image/jpeg',
         };
+
         const dto: TeamMemberDto = {
             id: 1,
             fullName: 'Name',
-            categoryId: 1,
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
             priority: 1,
-            status: 1,
+            status: 0,
             description: 'Desc',
-            image: image,
+            image: image1,
             email: '',
         };
 
@@ -168,7 +197,46 @@ describe('TeamMembersApi', () => {
             img: 'photo.jpg',
             description: 'Desc',
             status: 'Чернетка',
-            category: 'Основна команда',
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
         });
+    });
+
+    it('should throw a 404 error when member list not found', async () => {
+        mockClient.get.mockRejectedValue({
+            response: { status: 404, data: 'Not found' },
+        });
+
+        await expect(TeamMembersApi.getAll(mockClient)).rejects.toMatchObject({
+            response: { status: 404 },
+        });
+
+        expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', { params: {} });
+    });
+
+    it('should throw a 500 error when the server fails', async () => {
+        mockClient.get.mockRejectedValue({
+            response: { status: 500, data: 'Server error' },
+        });
+
+        await expect(TeamMembersApi.getAll(mockClient)).rejects.toMatchObject({
+            response: { status: 500 },
+        });
+
+        expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', { params: {} });
+    });
+
+    it('should return an empty array when the API sends an empty list', async () => {
+        const emptyDto: [] = [];
+
+        mockClient.get.mockResolvedValue({ data: emptyDto });
+
+        const members = await TeamMembersApi.getAll(mockClient);
+
+        expect(Array.isArray(members)).toBe(true);
+        expect(members).toHaveLength(0);
     });
 });

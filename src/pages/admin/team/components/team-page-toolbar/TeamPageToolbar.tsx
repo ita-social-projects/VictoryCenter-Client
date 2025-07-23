@@ -1,11 +1,12 @@
 import PlusIcon from '../../../../../assets/icons/plus.svg';
 import React, { useState, useCallback } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
-import { TeamCategory } from '../../../../../types/TeamPage';
 import { Button } from '../../../../../components/common/button/Button';
 import { Select } from '../../../../../components/common/select/Select';
 import { Input } from '../../../../../components/common/input/Input';
 import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
+import { StatusFilter } from '../../../../../types/Common';
+import { ModalState } from '../../../../../types/Common';
 import {
     TEAM_ADD_MEMBER,
     TEAM_SAVE_AS_DRAFT,
@@ -20,6 +21,7 @@ import {
     SEARCH_BY_NAME,
 } from '../../../../../const/team';
 import { Image } from '../../../../../types/Image';
+import { TeamCategory } from '../../../../../types/admin/TeamMembers';
 
 export type TeamPageToolbarProps = {
     onSearchQueryChange: (query: string) => void;
@@ -27,14 +29,7 @@ export type TeamPageToolbarProps = {
     autocompleteValues: string[];
     onMemberPublish?: (member: MemberFormValues) => void;
     onMemberSaveDraft?: (member: MemberFormValues) => void;
-};
-
-export type StatusFilter = 'Усі' | 'Опубліковано' | 'Чернетка';
-
-type ModalState = {
-    addMember: boolean;
-    confirmPublish: boolean;
-    confirmClose: boolean;
+    onError?: (msg: string | null) => void;
 };
 
 type MemberFormData = {
@@ -51,6 +46,7 @@ const AddMemberModal = ({
     onSaveDraft,
     formData,
     onFormDataChange,
+    onError,
 }: {
     isOpen: boolean;
     onClose: () => void;
@@ -58,6 +54,7 @@ const AddMemberModal = ({
     onSaveDraft: (member: MemberFormValues) => void;
     formData: MemberFormValues | null;
     onFormDataChange: (formData: MemberFormValues) => void;
+    onError?: (msg: string | null) => void;
 }) => (
     <Modal onClose={onClose} isOpen={isOpen} data-testid="add-member-modal">
         <Modal.Title>{TEAM_ADD_MEMBER}</Modal.Title>
@@ -67,6 +64,7 @@ const AddMemberModal = ({
                 onSubmit={onPublish}
                 existingMemberFormValues={formData}
                 onValuesChange={onFormDataChange}
+                onError={onError}
             />
         </Modal.Content>
         <Modal.Actions>
@@ -149,7 +147,7 @@ export const TeamPageToolbar = ({
     onMemberSaveDraft,
 }: TeamPageToolbarProps) => {
     const [modalState, setModalState] = useState<ModalState>({
-        addMember: false,
+        add: false,
         confirmPublish: false,
         confirmClose: false,
     });
@@ -172,14 +170,14 @@ export const TeamPageToolbar = ({
         setPendingMemberData(null);
         setFormData(null);
         setModalState({
-            addMember: false,
+            add: false,
             confirmPublish: false,
             confirmClose: false,
         });
     }, []);
 
     const handleOpenAddMember = useCallback(() => {
-        updateModalState({ addMember: true });
+        updateModalState({ add: true });
     }, [updateModalState]);
 
     const handleFormSubmit = useCallback(
@@ -267,7 +265,7 @@ export const TeamPageToolbar = ({
             </div>
 
             <AddMemberModal
-                isOpen={modalState.addMember}
+                isOpen={modalState.add}
                 onClose={handleCloseAddMember}
                 onPublish={handleFormSubmit}
                 onSaveDraft={handleSaveAsDraft}

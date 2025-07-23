@@ -1,16 +1,18 @@
+import CloudDownload from '../../../../../assets/icons/cloud-download.svg';
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { TeamCategory } from '../../../../../types/TeamPage';
+import { TeamCategory } from '../../../../../types/admin/TeamMembers';
 import {
-    TEAM_CATEGORY_MAIN,
-    TEAM_CATEGORY_SUPERVISORY,
-    TEAM_CATEGORY_ADVISORS,
     TEAM_LABEL_CATEGORY,
     TEAM_LABEL_SELECT_CATEGORY,
     TEAM_LABEL_FULLNAME,
     TEAM_LABEL_DESCRIPTION,
+    TEAM_LABEL_PHOTO,
+    TEAM_LABEL_DRAG_DROP,
 } from '../../../../../const/team';
 import { ImageUploadField } from '../member-photo-uploader/ImageUploadField';
 import { Image, ImageValues } from '../../../../../types/Image';
+import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
+import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
 
 export type MemberFormValues = {
     category: TeamCategory;
@@ -24,17 +26,27 @@ export type MemberFormProps = {
     onSubmit: (memberFormValues: MemberFormValues) => void;
     existingMemberFormValues?: MemberFormValues | null;
     onValuesChange?: (memberFormValues: MemberFormValues) => void;
+    onError?: (msg: string | null) => void;
 };
 
 const MAX_FULLNAME_LENGTH = 50;
 const MAX_DESCRIPTION_LENGTH = 200;
-export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onValuesChange }: MemberFormProps) => {
+export const MemberForm = ({
+    onSubmit,
+    id,
+    existingMemberFormValues = null,
+    onValuesChange,
+    onError,
+}: MemberFormProps) => {
+    const client = useAdminClient();
+    const [categories, setCategories] = useState<TeamCategory[]>([]);
+    const [isLoadingCategories, setIsLoadingCategories] = useState(true);
     const [memberFormValues, setMemberFormValues] = useState<MemberFormValues>(
         existingMemberFormValues || {
             fullName: '',
             image: null,
             description: '',
-            category: '' as TeamCategory,
+            category: null as unknown as TeamCategory,
         },
     );
     const handleOnSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -49,7 +61,17 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
     ) => {
         const { name, value } = e.target;
-        if (name !== 'imgId') {
+        const inputTarget = e.currentTarget as EventTarget & HTMLInputElement;
+        if (name === 'category') {
+            const selectedCategory = categories.find((c) => c.name === value);
+            setMemberFormValues((prev) => ({
+                ...prev,
+                category: selectedCategory as TeamCategory,
+            }));
+            return;
+        }
+        if (inputTarget.files && inputTarget.files.length > 0) {
+            const file = inputTarget.files;
             setMemberFormValues((prev) => ({
                 ...prev,
                 [name]: value,
@@ -75,23 +97,52 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
         }
     }, [memberFormValues, onValuesChange]);
 
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await TeamCategoriesApi.getAll(client);
+                setCategories(data);
+            } catch (error) {
+                onError?.((error as Error).message);
+            } finally {
+                setIsLoadingCategories(false);
+            }
+        };
+        fetchCategories();
+    }, [client, onError]);
+
+    const handleFileDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+
+        const files = e.dataTransfer.files;
+        if (files) {
+            setMemberFormValues((prev) => ({
+                ...prev,
+                img: files,
+            }));
+        }
+    };
+
     return (
         <form id={id} onSubmit={handleOnSubmit} data-testid="test-form">
             <div className="members-add-modal-body">
                 <div className="form-group">
                     <label htmlFor="category">{TEAM_LABEL_CATEGORY}</label>
                     <select
-                        value={memberFormValues ? memberFormValues.category : ''}
+                        value={memberFormValues?.category?.name ?? ''}
                         onChange={handleMemberFormValuesChange}
                         name="category"
                         id="category"
+                        disabled={isLoadingCategories}
                     >
                         <option value="" disabled>
                             {TEAM_LABEL_SELECT_CATEGORY}
                         </option>
-                        <option value={TEAM_CATEGORY_MAIN}>{TEAM_CATEGORY_MAIN}</option>
-                        <option value={TEAM_CATEGORY_SUPERVISORY}>{TEAM_CATEGORY_SUPERVISORY}</option>
-                        <option value={TEAM_CATEGORY_ADVISORS}>{TEAM_CATEGORY_ADVISORS}</option>
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.name}>
+                                {category.name}
+                            </option>
+                        ))}
                     </select>
                 </div>
                 <div className="form-group">

@@ -6,7 +6,7 @@ import {
     PROGRAMS_ALL,
     FAILED_TO_LOAD_THE_PROGRAMS,
 } from '../../../../const/program-page/program-page';
-import { Program } from '../../../../types/ProgramPage';
+import { Program } from '../../../../types/public/ProgramPage';
 import { ProgramCard } from './program-card/ProgramCard';
 import { programPageDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
 import './program-section.scss';

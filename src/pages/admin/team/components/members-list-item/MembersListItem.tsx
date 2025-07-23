@@ -1,12 +1,12 @@
+import { TeamMember } from '../../../../../types/admin/TeamMembers';
 import DragIcon from '../../../../../assets/icons/dragger.svg';
 import React from 'react';
 import { MemberComponent } from '../member-component/MemberComponent';
 import './members-list-item.scss';
 import classNames from 'classnames';
-import { Member } from '../../../../../types/TeamPage';
 
 type MembersListItemProps = {
-    member: Member;
+    member: TeamMember;
     handleDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
     handleDragStart: (e: React.DragEvent<HTMLDivElement>, index: number) => void;
     handleDrag: (e: React.DragEvent<HTMLDivElement>) => void;

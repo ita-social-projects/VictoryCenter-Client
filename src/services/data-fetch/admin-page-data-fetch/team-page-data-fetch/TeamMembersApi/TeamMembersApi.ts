@@ -1,20 +1,40 @@
-import { reverseCategoryMap } from '../../../../pages/admin/team/TeamPage';
-import { Member, TeamMemberDto } from '../../../../types/TeamPage';
-import { categoryMap } from '../../../../const/admin/team-page';
-import { MemberFormValues } from '../../../../pages/admin/team/components/member-form/MemberForm';
+import { TeamMember, TeamMemberDto } from '../../../../../types/admin/TeamMembers';
+import { MemberFormValues } from '../../../../../pages/admin/team/components/member-form/MemberForm';
 import { AxiosInstance } from 'axios';
+import { Status } from '../../../../../types/Common';
 
 export const TeamMembersApi = {
-    getAll: async (client: AxiosInstance): Promise<Member[]> => {
-        const response = await client.get<TeamMemberDto[]>('/TeamMembers');
+    getAll: async (
+        client: AxiosInstance,
+        categoryId?: number,
+        status?: Status | null,
+        offset?: number,
+        limit?: number,
+    ): Promise<TeamMember[]> => {
+        const params: Record<string, any> = {};
+
+        if (categoryId !== undefined && categoryId !== null) {
+            params.categoryId = categoryId;
+        }
+        if (status !== undefined) {
+            params.status = status;
+        }
+        if (offset !== undefined && offset !== null) {
+            params.offset = offset;
+        }
+        if (limit !== undefined && limit !== null) {
+            params.limit = Math.floor(limit);
+        }
+
+        const response = await client.get<TeamMemberDto[]>('/TeamMembers', { params });
         return response.data.map(mapTeamMemberDtoToTeamMember);
     },
 
     updateDraft: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
         await client.put(`/TeamMembers/${id}`, {
             fullName: member.fullName,
-            categoryId: categoryMap[member.category],
-            status: 1,
+            categoryId: member.category.id,
+            status: Status.Draft,
             description: member.description,
             email: '', //TODO implement email update
             imageId: member.image?.id,
@@ -24,8 +44,8 @@ export const TeamMembersApi = {
     updatePublish: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
         await client.put(`/TeamMembers/${id}`, {
             fullName: member.fullName,
-            categoryId: categoryMap[member.category],
-            status: 0,
+            categoryId: member.category.id,
+            status: Status.Published,
             description: member.description,
             email: '', //TODO implement email update
             imageId: member.image?.id,
@@ -35,8 +55,8 @@ export const TeamMembersApi = {
     postDraft: async (client: AxiosInstance, member: MemberFormValues) => {
         await client.post(`/TeamMembers`, {
             fullName: member.fullName,
-            categoryId: categoryMap[member.category],
-            status: 1,
+            categoryId: member.category.id,
+            status: Status.Draft,
             description: member.description,
             email: '', //TODO implement email post
             imageId: member.image?.id,
@@ -44,11 +64,10 @@ export const TeamMembersApi = {
     },
 
     postPublished: async (client: AxiosInstance, member: MemberFormValues) => {
-        console.log(member);
         await client.post(`/TeamMembers`, {
             fullName: member.fullName,
-            categoryId: categoryMap[member.category],
-            status: 0,
+            categoryId: member.category.id,
+            status: Status.Published,
             description: member.description,
             email: '', //TODO implement email post
             imageId: member.image?.id,
@@ -67,11 +86,11 @@ export const TeamMembersApi = {
     },
 };
 
-export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): Member => ({
+export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): TeamMember => ({
     id: dto.id,
     img: dto.image,
     fullName: dto.fullName,
     description: dto.description,
-    status: dto.status === 0 ? 'Опубліковано' : 'Чернетка',
-    category: reverseCategoryMap[dto.categoryId],
+    status: dto.status === Status.Draft ? 'Чернетка' : 'Опубліковано',
+    category: dto.category,
 });

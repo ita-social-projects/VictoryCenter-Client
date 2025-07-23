@@ -1,5 +1,5 @@
 import { loginRequest, tokenRefreshRequest } from './login-page-data-fetch';
-import { AuthResponse, Credentials } from '../../../types/Auth';
+import { AuthResponse, Credentials } from '../../../types/admin/Auth';
 import { AuthClient } from '../../auth/AuthClient';
 
 jest.mock('../../auth/AuthClient', () => ({

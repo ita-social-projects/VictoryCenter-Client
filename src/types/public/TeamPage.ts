@@ -1,4 +1,5 @@
-import { Image } from './Image';
+import { TeamCategory } from '../admin/TeamMembers';
+import { Image } from '../Image';
 
 export interface MemberCard {
     id: number;
@@ -53,5 +54,3 @@ export interface TeamMemberDto {
     image: Image | null;
     email: string;
 }
-
-export type TeamCategory = 'Основна команда' | 'Наглядова рада' | 'Радники';

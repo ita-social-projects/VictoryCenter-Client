@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { COMMON_QUESTIONS } from '../../../../const/program-page/program-page';
-import { Question } from '../../../../types/ProgramPage';
+import { Question } from '../../../../types/public/ProgramPage';
 import { QuestionCard } from './question-card/QuestionCard';
 import { questionDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
 import './question-section.scss';

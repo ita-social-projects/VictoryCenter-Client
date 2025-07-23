@@ -10,7 +10,7 @@ import {
     TEAM_LABEL_DESCRIPTION,
 } from '../../../../../const/team';
 import { ImageUploadField } from '../member-photo-uploader/ImageUploadField';
-import {Image, ImageValues} from '../../../../../types/Image';
+import { Image, ImageValues } from '../../../../../types/Image';
 
 export type MemberFormValues = {
     category: TeamCategory;
@@ -62,7 +62,7 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
             id: existingMemberFormValues?.image?.id ?? null,
             base64: item.base64,
             mimeType: item.mimeType,
-        }
+        };
         setMemberFormValues((prev) => ({
             ...prev,
             image: newImage,
@@ -123,7 +123,10 @@ export const MemberForm = ({ onSubmit, id, existingMemberFormValues = null, onVa
                         {MAX_DESCRIPTION_LENGTH}
                     </div>
                 </div>
-                <ImageUploadField image={memberFormValues.image} onChange={(image: ImageValues) => onFileChange(image)} />
+                <ImageUploadField
+                    image={memberFormValues.image}
+                    onChange={(image: ImageValues) => onFileChange(image)}
+                />
             </div>
         </form>
     );

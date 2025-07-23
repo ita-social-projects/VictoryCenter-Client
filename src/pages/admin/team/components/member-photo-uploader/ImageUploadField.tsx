@@ -3,7 +3,7 @@ import CloudDownload from '../../../../../assets/icons/cloud-download.svg';
 import React from 'react';
 import { convertFileToBase64 } from '../../../../../utils/functions/fileConverter';
 import { mapImageToBase64 } from '../../../../../utils/functions/mapImageToBase64';
-import { ImageValues} from '../../../../../types/Image';
+import { ImageValues } from '../../../../../types/Image';
 
 type ImageUploadFieldProps = {
     onChange: (image: ImageValues) => void;
@@ -26,9 +26,9 @@ export function ImageUploadField({ onChange, image }: ImageUploadFieldProps) {
         e.preventDefault();
         const files = e.dataTransfer.files;
         if (files && files.length > 0) {
-                const imgItem = await convertFileToBase64(files[0]);
-                onChange(imgItem);
-                setActiveImage(imgItem);
+            const imgItem = await convertFileToBase64(files[0]);
+            onChange(imgItem);
+            setActiveImage(imgItem);
         }
     };
 

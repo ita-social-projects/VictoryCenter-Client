@@ -1,4 +1,5 @@
 ﻿import React, { useRef, useState, useCallback, useEffect } from 'react';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import DeleteIcon from '../../../assets/icons/delete.svg';
 import UploadIcon from '../../../assets/icons/cloud-download.svg';
 import classNames from 'classnames';
@@ -9,12 +10,11 @@ interface PhotoInputProps {
     onChange: (file: File | string | null) => void;
     onBlur?: () => void;
     disabled?: boolean;
-    error?: boolean;
     id?: string;
     name?: string;
 }
 
-const PhotoInput = ({ value, onChange, onBlur, disabled = false }: PhotoInputProps) => {
+const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: PhotoInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -98,6 +98,8 @@ const PhotoInput = ({ value, onChange, onBlur, disabled = false }: PhotoInputPro
                 style={{ display: 'none' }}
                 disabled={disabled}
                 data-testid="photo-input-hidden"
+                id={id}
+                name={name}
             />
 
             {previewUrl ? (
@@ -111,13 +113,13 @@ const PhotoInput = ({ value, onChange, onBlur, disabled = false }: PhotoInputPro
                             handleRemove();
                         }}
                     >
-                        <img src={DeleteIcon} alt="Видалити" className="delete-icon" />
+                        <img src={DeleteIcon} alt={COMMON_TEXT_ADMIN.ALT.DELETE} className="delete-icon" />
                     </button>
                 </div>
             ) : (
                 <div className="photo-placeholder">
-                    <img src={UploadIcon} alt="Upload" className="placeholder-icon" />
-                    <span>Перетягніть файл сюди або натисніть для завантаження</span>
+                    <img src={UploadIcon} alt={COMMON_TEXT_ADMIN.ALT.UPLOAD} className="placeholder-icon" />
+                    <span>{COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER}</span>
                 </div>
             )}
         </div>

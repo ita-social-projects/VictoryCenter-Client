@@ -69,8 +69,9 @@ export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit
             setPendingAction(null);
             setPendingFormData(null);
             onClose();
-        } catch (err) {
-            setError(PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY);
+        } catch (error) {
+            setError(PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_PROGRAM);
+            console.log(`Error occurred while updating program: ${error}`);
         } finally {
             setIsSubmitting(false);
         }

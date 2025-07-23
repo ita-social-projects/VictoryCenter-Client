@@ -5,19 +5,19 @@
     align-items: center;
     width: 146px;
     height: 152px;
-    border-radius: 8px;
     padding: 16px;
-    background: #ffffff;
     border: 1px solid #a4a49b;
+    border-radius: 8px;
+    background: #ffffff;
     box-shadow: 0 1px 0 0 #00000040;
 
     &-focused {
-        background: #e7eaee;
+        background-color: #e7eaee;
         border-color: #d5d7dacc;
     }
 
     &-disabled {
-        background: #d2d2c7;
+        background-color: #d2d2c7;
     }
 
     .photo-placeholder {
@@ -26,13 +26,14 @@
         justify-content: center;
         align-items: center;
         gap: 4px;
-        background: none;
-        border-radius: 4px;
+        padding: 0;
         border: 1px dashed #61615c;
+        border-radius: 4px;
+        background: none;
         color: #61615c;
-        font-weight: 400;
         font-size: 14px;
         line-height: 20px;
+        font-weight: 400;
         text-align: center;
 
         .placeholder-icon {
@@ -42,32 +43,32 @@
     }
 
     .photo-preview {
+        position: relative;
         width: 100%;
         height: 100%;
-        position: relative;
         border-radius: 4px;
         overflow: hidden;
 
         .preview-image {
+            display: block;
             width: 100%;
             height: 100%;
             object-fit: contain;
             object-position: center;
-            display: block;
         }
 
         .delete-button {
-            display: none;
             position: absolute;
             inset: 0;
+            display: none;
             align-items: center;
             justify-content: center;
-            background: #61615c;
             width: 44px;
             height: 44px;
-            border-radius: 8px;
             padding: 10px;
             margin: auto;
+            border-radius: 8px;
+            background: #61615c;
             opacity: 0.8;
 
             &:hover {

@@ -1,4 +1,18 @@
 ﻿export const COMMON_TEXT_ADMIN = {
+    TAB: {
+        TEAM_MEMBERS: 'Команда',
+        PROGRAMS: 'Програми',
+    },
+
+    ALT: {
+        DELETE: 'Видалити',
+        UPLOAD: 'Завантажити',
+    },
+
+    INPUT: {
+        PHOTO_PLACEHOLDER: 'Перетягніть файл сюди або натисніть для завантаження',
+    },
+
     STATUS: {
         DRAFT: 'Чернетка',
         PUBLISHED: 'Опубліковано',

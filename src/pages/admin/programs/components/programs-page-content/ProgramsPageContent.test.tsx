@@ -39,16 +39,8 @@ jest.mock('../programs-list/ProgramsList', () => {
 
         return (
             <div>
-                <button
-                    onClick={() => props.onEditProgram(mockProgram)}
-                >
-                    Trigger Edit
-                </button>
-                <button
-                    onClick={() => props.onDeleteProgram(mockProgram)}
-                >
-                    Trigger Delete
-                </button>
+                <button onClick={() => props.onEditProgram(mockProgram)}>Trigger Edit</button>
+                <button onClick={() => props.onDeleteProgram(mockProgram)}>Trigger Delete</button>
             </div>
         );
     });
@@ -72,10 +64,14 @@ jest.mock(
         props.isOpen ? (
             <div>
                 <h2>Add Program Modal</h2>
-                <button onClick={() => {
-                    props.onAddProgram(mockProgram);
-                    props.onClose();
-                }}>Confirm Add</button>
+                <button
+                    onClick={() => {
+                        props.onAddProgram(mockProgram);
+                        props.onClose();
+                    }}
+                >
+                    Confirm Add
+                </button>
                 <button onClick={props.onClose}>Close Add</button>
             </div>
         ) : null,
@@ -88,10 +84,14 @@ jest.mock(
             <div>
                 <h2>Edit Program Modal</h2>
                 <p>Editing: {props.programToEdit?.name}</p>
-                <button onClick={() => {
-                    props.onEditProgram(props.programToEdit!);
-                    props.onClose();
-                }}>Confirm Edit</button>
+                <button
+                    onClick={() => {
+                        props.onEditProgram(props.programToEdit!);
+                        props.onClose();
+                    }}
+                >
+                    Confirm Edit
+                </button>
                 <button onClick={props.onClose}>Close Edit</button>
             </div>
         ) : null,
@@ -104,10 +104,14 @@ jest.mock(
             <div>
                 <h2>Delete Program Modal</h2>
                 <p>Deleting: {props.programToDelete?.name}</p>
-                <button onClick={() => {
-                    props.onDeleteProgram(props.programToDelete!);
-                    props.onClose();
-                }}>Confirm Delete</button>
+                <button
+                    onClick={() => {
+                        props.onDeleteProgram(props.programToDelete!);
+                        props.onClose();
+                    }}
+                >
+                    Confirm Delete
+                </button>
                 <button onClick={props.onClose}>Close Delete</button>
             </div>
         ) : null,

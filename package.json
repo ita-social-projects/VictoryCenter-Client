@@ -78,7 +78,7 @@
             "^swiper/css/scrollbar$": "<rootDir>/src/__mocks__/styleMock.js"
         },
         "transformIgnorePatterns": [
-            "node_modules/(?!axios)/"
+            "node_modules/(?!(swiper|axios)/)"
         ],
         "collectCoverageFrom": [
             "src/**/*.{ts,js,tsx,jsx}"

@@ -3,9 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramsPageToolbar } from './ProgramsPageToolbar';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import {ButtonProps} from "../../../../../components/common/button/Button";
-import {SelectProps} from "../../../../../components/common/select/Select";
-import {InputProps} from "../../../../../components/common/input/Input";
+import { ButtonProps } from '../../../../../components/common/button/Button';
+import { SelectProps } from '../../../../../components/common/select/Select';
+import { InputProps } from '../../../../../components/common/input/Input';
 
 // Mock the components
 jest.mock('../../../../../components/common/button/Button', () => ({

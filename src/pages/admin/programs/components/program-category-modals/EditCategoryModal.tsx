@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Modal from '../../../../../components/common/modal/Modal';
-import Button from '../../../../../components/common/button/Button';
-import HintContainer from '../../../../../components/common/hint/HintContainer';
-import InputWithCharacterLimit from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
+import { Modal } from '../../../../../components/common/modal/Modal';
+import { Button } from '../../../../../components/common/button/Button';
+import { HintBox } from '../../../../../components/common/hint/HintBox';
+import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
 import QuestionModal from '../../../../../components/common/question-modal/QuestionModal';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Controller, useForm } from 'react-hook-form';
@@ -157,7 +157,7 @@ export const EditCategoryModal = ({ isOpen, onClose, onEditCategory, categories 
                             {errors.name && <span className="error">{errors.name.message}</span>}
                         </div>
                         {isDuplicateName && (
-                            <HintContainer
+                            <HintBox
                                 title={PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError()}
                             />
                         )}

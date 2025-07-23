@@ -87,5 +87,3 @@ export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '60
 Modal.Title = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 Modal.Content = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 Modal.Actions = ({ children }: { children: React.ReactNode }) => <>{children}</>;
-
-export default Modal;

@@ -1,9 +1,9 @@
 ﻿import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ContextMenu from './ContextMenu';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { ContextMenuButton } from './ContextMenuButton';
 
-describe('ContextMenu', () => {
+describe('ContextMenuButton', () => {
     const mockOnOptionSelected = jest.fn();
 
     beforeEach(() => {
@@ -12,13 +12,13 @@ describe('ContextMenu', () => {
 
     it('renders with default icon and children', () => {
         render(
-            <ContextMenu onOptionSelected={mockOnOptionSelected}>
-                <ContextMenu.Option value="option1">Option 1</ContextMenu.Option>
-                <ContextMenu.Option value="option2">Option 2</ContextMenu.Option>
-            </ContextMenu>,
+            <ContextMenuButton onOptionSelected={mockOnOptionSelected}>
+                <ContextMenuButton.Option value="option1">Option 1</ContextMenuButton.Option>
+                <ContextMenuButton.Option value="option2">Option 2</ContextMenuButton.Option>
+            </ContextMenuButton>,
         );
 
-        expect(screen.getByRole('context-menu')).toBeInTheDocument();
+        expect(screen.getByRole('menu')).toBeInTheDocument();
         expect(screen.getByAltText('menu')).toBeInTheDocument();
         expect(screen.getByText('Option 1')).toBeInTheDocument();
         expect(screen.getByText('Option 2')).toBeInTheDocument();
@@ -27,9 +27,9 @@ describe('ContextMenu', () => {
     it('renders with custom icon when provided', () => {
         const customIcon = 'custom-icon.svg';
         render(
-            <ContextMenu onOptionSelected={mockOnOptionSelected} customIcon={customIcon}>
-                <ContextMenu.Option value="option1">Option 1</ContextMenu.Option>
-            </ContextMenu>,
+            <ContextMenuButton onOptionSelected={mockOnOptionSelected} customIcon={customIcon}>
+                <ContextMenuButton.Option value="option1">Option 1</ContextMenuButton.Option>
+            </ContextMenuButton>,
         );
 
         const iconElement = screen.getByAltText('menu');
@@ -38,12 +38,12 @@ describe('ContextMenu', () => {
 
     it('toggles menu visibility when clicked', () => {
         render(
-            <ContextMenu onOptionSelected={mockOnOptionSelected}>
-                <ContextMenu.Option value="option1">Option 1</ContextMenu.Option>
-            </ContextMenu>,
+            <ContextMenuButton onOptionSelected={mockOnOptionSelected}>
+                <ContextMenuButton.Option value="option1">Option 1</ContextMenuButton.Option>
+            </ContextMenuButton>,
         );
 
-        const contextMenuElement = screen.getByRole('context-menu');
+        const contextMenuElement = screen.getByRole('menu');
 
         // Initially closed
         expect(contextMenuElement).not.toHaveClass('context-menu-active');
@@ -59,12 +59,12 @@ describe('ContextMenu', () => {
 
     it('handles keyboard navigation with Enter and Space keys', () => {
         render(
-            <ContextMenu onOptionSelected={mockOnOptionSelected}>
-                <ContextMenu.Option value="option1">Option 1</ContextMenu.Option>
-            </ContextMenu>,
+            <ContextMenuButton onOptionSelected={mockOnOptionSelected}>
+                <ContextMenuButton.Option value="option1">Option 1</ContextMenuButton.Option>
+            </ContextMenuButton>,
         );
 
-        const contextMenuElement = screen.getByRole('context-menu');
+        const contextMenuElement = screen.getByRole('menu');
 
         // Test Enter key
         fireEvent.keyDown(contextMenuElement, { key: 'Enter' });
@@ -77,37 +77,37 @@ describe('ContextMenu', () => {
 
     it('calls onOptionSelected and closes menu when option is clicked', () => {
         render(
-            <ContextMenu onOptionSelected={mockOnOptionSelected}>
-                <ContextMenu.Option value="option1" data={{ id: 123 }}>
+            <ContextMenuButton onOptionSelected={mockOnOptionSelected}>
+                <ContextMenuButton.Option value="option1" data={{ id: 123 }}>
                     Option 1
-                </ContextMenu.Option>
-                <ContextMenu.Option value="option2">Option 2</ContextMenu.Option>
-            </ContextMenu>,
+                </ContextMenuButton.Option>
+                <ContextMenuButton.Option value="option2">Option 2</ContextMenuButton.Option>
+            </ContextMenuButton>,
         );
 
         // Open
-        fireEvent.click(screen.getByRole('context-menu'));
-        expect(screen.getByRole('context-menu')).toHaveClass('context-menu-active');
+        fireEvent.click(screen.getByRole('menu'));
+        expect(screen.getByRole('menu')).toHaveClass('context-menu-active');
 
         // Click on option
         fireEvent.click(screen.getByText('Option 1'));
 
         expect(mockOnOptionSelected).toHaveBeenCalledWith('option1', { id: 123 });
         expect(mockOnOptionSelected).toHaveBeenCalledTimes(1);
-        expect(screen.getByRole('context-menu')).not.toHaveClass('context-menu-active');
+        expect(screen.getByRole('menu')).not.toHaveClass('context-menu-active');
     });
 
     it('closes menu when clicking outside', async () => {
         render(
             <div>
-                <ContextMenu onOptionSelected={mockOnOptionSelected}>
-                    <ContextMenu.Option value="option1">Option 1</ContextMenu.Option>
-                </ContextMenu>
+                <ContextMenuButton onOptionSelected={mockOnOptionSelected}>
+                    <ContextMenuButton.Option value="option1">Option 1</ContextMenuButton.Option>
+                </ContextMenuButton>
                 <div data-testid="outside-element">Outside</div>
             </div>,
         );
 
-        const contextMenuElement = screen.getByRole('context-menu');
+        const contextMenuElement = screen.getByRole('menu');
 
         // Open
         fireEvent.click(contextMenuElement);
@@ -123,16 +123,16 @@ describe('ContextMenu', () => {
 
     it('handles disabled options correctly', () => {
         render(
-            <ContextMenu onOptionSelected={mockOnOptionSelected}>
-                <ContextMenu.Option value="option1" disabled>
+            <ContextMenuButton onOptionSelected={mockOnOptionSelected}>
+                <ContextMenuButton.Option value="option1" disabled>
                     Disabled Option
-                </ContextMenu.Option>
-                <ContextMenu.Option value="option2">Enabled Option</ContextMenu.Option>
-            </ContextMenu>,
+                </ContextMenuButton.Option>
+                <ContextMenuButton.Option value="option2">Enabled Option</ContextMenuButton.Option>
+            </ContextMenuButton>,
         );
 
         // Open menu
-        fireEvent.click(screen.getByRole('context-menu'));
+        fireEvent.click(screen.getByRole('menu'));
 
         const disabledButton = screen.getByText('Disabled Option');
         const enabledButton = screen.getByText('Enabled Option');

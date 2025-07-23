@@ -1,23 +1,23 @@
 ﻿.category-bar {
+    display: flex;
     border-bottom: 1px solid #a4a49b;
     font-size: 24px;
     font-weight: 600;
-    display: flex;
-    background-color: #f8f8f8;
+    background: #f8f8f8;
     box-shadow: 0 0 4px rgba(128, 128, 128, 0.22);
 
     &-button {
-        font-size: 24px;
-        border: none;
-        background: transparent;
-        text-align: center;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background-color 0.2s;
         padding: 15px;
+        border: none;
+        background: transparent;
+        font-size: 24px;
+        text-align: center;
+        transition: background-color 0.2s;
 
-        &.category-bar-selected {
+        &-selected {
             border-bottom: 1px solid #041128;
         }
 

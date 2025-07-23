@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './admin-page-content.scss';
 
 import { adminPageDataFetch } from '../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch';
-import { NavLink } from 'react-router';
+import { NavLink } from 'react-router-dom';
 
 export const AdminPageContent = () => {
     const [headerInfo, setHeaderInfo] = useState('');

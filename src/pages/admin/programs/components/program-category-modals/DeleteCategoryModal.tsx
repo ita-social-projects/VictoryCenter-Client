@@ -1,7 +1,7 @@
 ﻿import React, { useEffect, useRef, useState } from 'react';
-import Modal from '../../../../../components/common/modal/Modal';
-import Button from '../../../../../components/common/button/Button';
-import HintContainer from '../../../../../components/common/hint/HintContainer';
+import { Modal } from '../../../../../components/common/modal/Modal';
+import { Button } from '../../../../../components/common/button/Button';
+import { HintBox } from '../../../../../components/common/hint/HintBox';
 import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
@@ -92,7 +92,7 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
                         </select>
                     </div>
                     {selectedCategory && selectedCategory.programsCount > 0 && (
-                        <HintContainer
+                        <HintBox
                             title={PROGRAM_CATEGORY_VALIDATION.programsCount.getHasProgramsCountError(
                                 selectedCategory.programsCount,
                             )}

@@ -1,17 +1,16 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect, useCallback } from 'react';
 import InfoIcon from '../../../assets/icons/info.svg';
 import InfoIconActive from '../../../assets/icons/info-active.svg';
 import classNames from 'classnames';
 import './button-tooltip.scss';
 
-export type ButtonTooltipProps = {
+export interface ButtonTooltipProps {
     children: React.ReactNode;
-    className?: string;
     offset?: number;
     position?: 'top' | 'bottom';
-};
+}
 
-export const ButtonTooltip = ({ children, className, position = 'bottom', offset = 8 }: ButtonTooltipProps) => {
+export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: ButtonTooltipProps) => {
     const [isVisible, setIsVisible] = useState(false);
     const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -22,11 +21,11 @@ export const ButtonTooltip = ({ children, className, position = 'bottom', offset
         setIsVisible((prev) => !prev);
     };
 
-    const hideTooltip = () => {
+    const hideTooltip = useCallback(() => {
         setIsVisible(false);
-    };
+    }, []);
 
-    const calculatePosition = () => {
+    const calculatePosition = useCallback(() => {
         if (!wrapperRef.current || !tooltipRef.current) return;
 
         const wrapperWidth = wrapperRef.current.offsetWidth;
@@ -48,16 +47,13 @@ export const ButtonTooltip = ({ children, className, position = 'bottom', offset
         }
 
         setTooltipPosition({ top, left });
-    };
+    }, [position, offset]);
 
     useEffect(() => {
         if (isVisible) {
-            const timer = setTimeout(() => {
-                calculatePosition();
-            }, 0);
-            return () => clearTimeout(timer);
+            calculatePosition();
         }
-    }, [isVisible]);
+    }, [isVisible, position, offset]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -73,15 +69,26 @@ export const ButtonTooltip = ({ children, className, position = 'bottom', offset
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [isVisible]);
+    }, [isVisible, hideTooltip]);
 
     const handleTooltipClick = (e: React.MouseEvent) => {
         e.stopPropagation();
     };
 
     return (
-        <div ref={wrapperRef} className={classNames('button-tooltip-wrapper', className)} onClick={toggleTooltip}>
-            <img className="button-tooltip-icon" src={isVisible ? InfoIconActive : InfoIcon} alt="info" />
+        <div
+            ref={wrapperRef}
+            className="button-tooltip-wrapper"
+            onClick={toggleTooltip}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') toggleTooltip(e as any);
+            }}
+            aria-haspopup="true"
+            aria-expanded={isVisible}
+        >
+            <img className="button-tooltip-icon" src={isVisible ? InfoIconActive : InfoIcon} alt="tooltip icon" />
 
             {isVisible && (
                 <div
@@ -92,6 +99,7 @@ export const ButtonTooltip = ({ children, className, position = 'bottom', offset
                         left: `${tooltipPosition.left}px`,
                     }}
                     onClick={handleTooltipClick}
+                    role="tooltip"
                 >
                     {children}
                 </div>
@@ -99,5 +107,3 @@ export const ButtonTooltip = ({ children, className, position = 'bottom', offset
         </div>
     );
 };
-
-export default ButtonTooltip;

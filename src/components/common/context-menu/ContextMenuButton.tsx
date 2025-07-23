@@ -1,27 +1,30 @@
-﻿import React, { RefObject, useEffect, useRef, useState } from 'react';
-import classNames from 'classnames';
+﻿import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import DefaultIcon from '../../../assets/icons/menu.svg';
-import './context-menu.scss';
+import classNames from 'classnames';
+import './context-menu-button.scss';
 
-export type ContextMenuProps = {
+export type ContextMenuButtonProps = {
     children: React.ReactNode;
     onOptionSelected: (value: string, data?: any) => void;
     containerRef?: RefObject<HTMLDivElement | null>;
     customIcon?: string;
 };
 
-export const ContextMenu = ({ children, onOptionSelected, containerRef, customIcon }: ContextMenuProps) => {
+export const ContextMenuButton = ({ children, onOptionSelected, containerRef, customIcon }: ContextMenuButtonProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
-    const handleToggle = () => {
-        setIsOpen(!isOpen);
-    };
+    const handleToggle = useCallback(() => {
+        setIsOpen((prev) => !prev);
+    }, []);
 
-    const handleOptionClick = (value: string, data?: any) => {
-        setIsOpen(false);
-        onOptionSelected(value, data);
-    };
+    const handleOptionClick = useCallback(
+        (value: string, data?: any) => {
+            setIsOpen(false);
+            onOptionSelected(value, data);
+        },
+        [onOptionSelected],
+    );
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -41,7 +44,7 @@ export const ContextMenu = ({ children, onOptionSelected, containerRef, customIc
 
     return (
         <div
-            role="context-menu"
+            role="menu"
             ref={containerRef || menuRef}
             data-testid="context-menu"
             className={classNames('context-menu', {
@@ -64,7 +67,10 @@ export const ContextMenu = ({ children, onOptionSelected, containerRef, customIc
                 })}
             >
                 {React.Children.map(children, (child) => {
-                    if (React.isValidElement<ContextMenuOptionProps>(child) && child.type === ContextMenu.Option) {
+                    if (
+                        React.isValidElement<ContextMenuOptionProps>(child) &&
+                        child.type === ContextMenuButton.Option
+                    ) {
                         return React.cloneElement(child, { onOptionClick: handleOptionClick });
                     }
                     return child;
@@ -83,7 +89,7 @@ export type ContextMenuOptionProps = {
     disabled?: boolean;
 };
 
-ContextMenu.Option = ({
+ContextMenuButton.Option = ({
     children,
     value,
     data,
@@ -91,17 +97,21 @@ ContextMenu.Option = ({
     className,
     disabled = false,
 }: ContextMenuOptionProps) => {
-    const handleClick = () => {
+    const handleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
         if (!disabled && onOptionClick) {
             onOptionClick(value, data);
         }
     };
 
     return (
-        <button className={classNames('context-menu-option', className)} onClick={handleClick} disabled={disabled}>
+        <button
+            role="menuitem"
+            className={classNames('context-menu-option', className)}
+            onClick={handleClick}
+            disabled={disabled}
+        >
             {children}
         </button>
     );
 };
-
-export default ContextMenu;

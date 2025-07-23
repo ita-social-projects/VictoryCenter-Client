@@ -4,12 +4,12 @@
     align-items: center;
     justify-content: center;
     width: 24px;
-    background-color: transparent;
+    background: transparent;
     border-bottom: 1px solid transparent;
     cursor: pointer;
 
     &-active {
-        border-bottom: 1px solid #041128;
+        border-bottom-color: #041128;
     }
 
     &-icon {
@@ -22,10 +22,10 @@
         top: calc(100% + 2px);
         left: 0;
         display: none;
-        z-index: 99999;
+        z-index: 1000;
         width: 180px;
         border: 1px solid #061125;
-        background-color: #ffffff;
+        background: #ffffff;
         box-shadow: 0 2px 8px -4px #00000029;
 
         &-visible {
@@ -41,7 +41,7 @@
         border: none;
         text-align: left;
         color: #061125;
-        background-color: transparent;
+        background: transparent;
         font-size: 16px;
         font-weight: 400;
         line-height: 24px;

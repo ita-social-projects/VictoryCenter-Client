@@ -1,16 +1,16 @@
 ﻿import React from 'react';
 import InfoIcon from '../../../assets/icons/info.svg';
-import './hint-container.scss';
+import './hint-box.scss';
 
-interface HintContainerProps {
+export interface HintBoxProps {
     title: string;
     text?: string;
 }
 
-const HintContainer = ({ title, text }: HintContainerProps) => {
+export const HintBox = ({ title, text }: HintBoxProps) => {
     return (
-        <div className="hint-container">
-            <div className="hint-container-title">
+        <div className="hint-box">
+            <div className="hint-box-title">
                 <img src={InfoIcon} alt="hint-icon" />
                 <span>{title}</span>
             </div>
@@ -18,5 +18,3 @@ const HintContainer = ({ title, text }: HintContainerProps) => {
         </div>
     );
 };
-
-export default HintContainer;

@@ -1,28 +1,34 @@
 ﻿import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import CategoryBar from './CategoryBar';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { CategoryBar } from './CategoryBar';
 
-// Mock the ContextMenu component
-jest.mock('../context-menu/ContextMenu', () => {
+interface MockContextMenuButtonProps {
+    children: React.ReactNode;
+    onOptionSelected?: (value: string, data?: any) => void;
+}
+
+interface MockContextMenuButtonOptionProps {
+    children: React.ReactNode;
+    value: string;
+}
+
+jest.mock('../context-menu/ContextMenuButton', () => {
     const React = require('react');
 
-    type MockProps = {
-        children: React.ReactNode;
-        onOptionSelected?: (value: string, data?: any) => void;
-    };
-
-    const MockContextMenu = ({ children, onOptionSelected }: MockProps) => (
+    const MockContextMenuButton = ({ children, onOptionSelected }: MockContextMenuButtonProps) => (
         <div data-testid="context-menu" onClick={() => onOptionSelected?.('test-option')}>
             {children}
         </div>
     );
 
-    MockContextMenu.Option = ({ children, value }: { children: React.ReactNode; value: string }) => (
+    MockContextMenuButton.Option = ({ children, value }: MockContextMenuButtonOptionProps) => (
         <div data-testid={`context-menu-option-${value}`}>{children}</div>
     );
 
-    return MockContextMenu;
+    return {
+        ContextMenuButton: MockContextMenuButton,
+    };
 });
 
 interface MockContextMenuOption {
@@ -81,8 +87,8 @@ describe('CategoryBar', () => {
         const selectedButton = screen.getByRole('button', { name: 'Category 2' });
         const unselectedButton = screen.getByRole('button', { name: 'Category 1' });
 
-        expect(selectedButton).toHaveClass('category-bar-selected');
-        expect(unselectedButton).not.toHaveClass('category-bar-selected');
+        expect(selectedButton).toHaveClass('category-bar-button-selected');
+        expect(unselectedButton).not.toHaveClass('category-bar-button-selected');
     });
 
     it('calls onCategorySelect when a category button is clicked', () => {

@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import classNames from 'classnames';
-import ContextMenu from '../context-menu/ContextMenu';
+import { ContextMenuButton } from '../context-menu/ContextMenuButton';
 import './category-bar.scss';
 
 export interface ContextMenuOption {
@@ -36,13 +36,13 @@ export const CategoryBar = <T,>({
     return (
         <div className="category-bar">
             {displayContextMenu && contextMenuOptions.length > 0 && (
-                <ContextMenu onOptionSelected={handleContextMenuOptionSelected}>
+                <ContextMenuButton onOptionSelected={handleContextMenuOptionSelected}>
                     {contextMenuOptions.map((option) => (
-                        <ContextMenu.Option key={option.id} value={option.id}>
+                        <ContextMenuButton.Option key={option.id} value={option.id}>
                             {option.name}
-                        </ContextMenu.Option>
+                        </ContextMenuButton.Option>
                     ))}
-                </ContextMenu>
+                </ContextMenuButton>
             )}
             {categories.map((category) => {
                 const key = getItemKey(category);
@@ -54,7 +54,7 @@ export const CategoryBar = <T,>({
                         key={key}
                         onClick={() => onCategorySelect(category)}
                         className={classNames('category-bar-button', {
-                            'category-bar-selected': selected,
+                            'category-bar-button-selected': selected,
                         })}
                     >
                         {name}
@@ -64,5 +64,3 @@ export const CategoryBar = <T,>({
         </div>
     );
 };
-
-export default CategoryBar;

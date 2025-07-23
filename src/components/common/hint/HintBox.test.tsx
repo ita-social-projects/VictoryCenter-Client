@@ -1,14 +1,13 @@
 ﻿import { render, screen } from '@testing-library/react';
-import HintContainer from './HintContainer';
+import { HintBox } from './HintBox';
 
-// Mock the icon
 jest.mock('../../../assets/icons/info.svg', () => 'mocked-info-icon.svg');
 
 describe('HintContainer', () => {
     it('renders title and icon', () => {
         const title = 'Test title';
 
-        render(<HintContainer title={title} />);
+        render(<HintBox title={title} />);
 
         expect(screen.getByText(title)).toBeInTheDocument();
         expect(screen.getByAltText('hint-icon')).toBeInTheDocument();
@@ -18,7 +17,7 @@ describe('HintContainer', () => {
         const title = 'Test title';
         const text = 'Test hint text';
 
-        render(<HintContainer title={title} text={text} />);
+        render(<HintBox title={title} text={text} />);
 
         expect(screen.getByText(title)).toBeInTheDocument();
         expect(screen.getByText(text)).toBeInTheDocument();
@@ -27,12 +26,11 @@ describe('HintContainer', () => {
     it('does not render additional text when text is not provided', () => {
         const title = 'Test title';
 
-        render(<HintContainer title={title} />);
+        render(<HintBox title={title} />);
 
         expect(screen.getByText(title)).toBeInTheDocument();
 
-        // Check that additional div with text is not created
-        const container = screen.getByText(title).closest('.hint-container');
+        const container = screen.getByText(title).closest('.hint-box');
         expect(container?.children).toHaveLength(1); // Only title div
     });
 
@@ -40,16 +38,16 @@ describe('HintContainer', () => {
         const title = 'Test title';
         const text = 'Test text';
 
-        render(<HintContainer title={title} text={text} />);
+        render(<HintBox title={title} text={text} />);
 
-        expect(screen.getByText(title).closest('.hint-container')).toBeInTheDocument();
-        expect(screen.getByText(title).closest('.hint-container-title')).toBeInTheDocument();
+        expect(screen.getByText(title).closest('.hint-box')).toBeInTheDocument();
+        expect(screen.getByText(title).closest('.hint-box-title')).toBeInTheDocument();
     });
 
     it('icon has correct src and alt attributes', () => {
         const title = 'Test title';
 
-        render(<HintContainer title={title} />);
+        render(<HintBox title={title} />);
 
         const icon = screen.getByAltText('hint-icon') as HTMLImageElement;
         expect(icon.src).toContain('mocked-info-icon.svg');
@@ -60,11 +58,12 @@ describe('HintContainer', () => {
         const title = 'Title';
         const text = '';
 
-        render(<HintContainer title={title} text={text} />);
+        render(<HintBox title={title} text={text} />);
 
         expect(screen.getByText(title)).toBeInTheDocument();
+
         // Empty text should not render due to conditional rendering
-        const container = screen.getByText(title).closest('.hint-container');
+        const container = screen.getByText(title).closest('.hint-box');
         expect(container?.children).toHaveLength(1);
     });
 });

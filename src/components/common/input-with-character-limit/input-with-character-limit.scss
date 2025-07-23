@@ -2,36 +2,37 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
-    border-radius: 8px;
-    border: 1px solid #0f2957;
-    box-shadow: 0 1px 2px 0 #0a0d120d;
-    padding: 10px;
     gap: 8px;
+    padding: 10px;
+    border: 1px solid #0f2957;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 #0a0d120d;
+    font-size: 16px;
 
     &-focused {
         border-color: #a4a49b;
     }
 
     &-disabled {
-        border: 1px solid #61615c;
-        background: #d2d2c7;
+        background-color: #d2d2c7;
+        border-color: #61615c;
     }
 
     &-input {
         flex: 1;
+        padding: 0;
         border: none;
         outline: none;
-        padding: 0;
         background: none;
+
         color: #414651;
         font-size: 16px;
         font-weight: 400;
         line-height: 24px;
     }
 
-    .character-limit {
-        color: #717680;
+    &-character-limit {
         white-space: nowrap;
+        color: #717680;
     }
 }

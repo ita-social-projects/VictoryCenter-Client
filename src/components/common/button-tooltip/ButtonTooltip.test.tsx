@@ -3,7 +3,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ButtonTooltip } from './ButtonTooltip';
 
-// Mock the SVG imports
 jest.mock('../../../assets/icons/info.svg', () => 'info-icon.svg');
 jest.mock('../../../assets/icons/info-active.svg', () => 'info-active-icon.svg');
 
@@ -19,22 +18,16 @@ describe('ButtonTooltip', () => {
     it('renders the component with default props', () => {
         render(<ButtonTooltip {...defaultProps} />);
 
-        expect(screen.getByRole('img', { name: /info/i })).toBeInTheDocument();
-        expect(screen.getByRole('img')).toHaveAttribute('src', 'info-icon.svg');
+        const icon = screen.getByRole('img', { name: 'tooltip icon' });
+        expect(icon).toBeInTheDocument();
+        expect(icon).toHaveAttribute('src', 'info-icon.svg');
         expect(screen.queryByText('Tooltip content')).not.toBeInTheDocument();
-    });
-
-    it('applies custom className to wrapper', () => {
-        const { container } = render(<ButtonTooltip {...defaultProps} className="custom-class" />);
-
-        const wrapper = container.querySelector('.button-tooltip-wrapper');
-        expect(wrapper).toHaveClass('custom-class');
     });
 
     it('shows tooltip when clicked and changes icon', () => {
         render(<ButtonTooltip {...defaultProps} />);
 
-        const icon = screen.getByRole('img', { name: /info/i });
+        const icon = screen.getByRole('img', { name: 'tooltip icon' });
         fireEvent.click(icon);
 
         expect(screen.getByText('Tooltip content')).toBeInTheDocument();
@@ -94,19 +87,14 @@ describe('ButtonTooltip', () => {
         });
     });
 
-    it('prevents event propagation when clicking on tooltip content', () => {
-        const mockHandler = jest.fn();
+    it('shows tooltip when pressing Enter key on button wrapper', () => {
+        render(<ButtonTooltip {...defaultProps} />);
 
-        render(
-            <div onClick={mockHandler}>
-                <ButtonTooltip {...defaultProps} />
-            </div>,
-        );
+        const wrapper = screen.getByRole('button', { name: 'tooltip icon' });
 
-        fireEvent.click(screen.getByRole('img'));
-        fireEvent.click(screen.getByText('Tooltip content'));
+        wrapper.focus();
+        fireEvent.keyDown(wrapper, { key: 'Enter' });
 
-        // The parent handler should not be called due to stopPropagation
-        expect(mockHandler).not.toHaveBeenCalled();
+        expect(screen.getByText('Tooltip content')).toBeInTheDocument();
     });
 });

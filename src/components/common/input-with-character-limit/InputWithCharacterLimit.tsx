@@ -2,7 +2,7 @@
 import classNames from 'classnames';
 import './input-with-character-limit.scss';
 
-interface InputWithCharacterLimitProps {
+export interface InputWithCharacterLimitProps {
     value: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
@@ -41,11 +41,13 @@ export const InputWithCharacterLimit = ({
         onBlur?.(e);
     };
 
+    const countId = `${id}-character-count`;
+
     return (
         <div
             className={classNames('input-line-wrapper', {
                 'input-line-wrapper-disabled': disabled,
-                'input-line-wrapper-focused': isFocused,
+                'input-line-wrapper-focused': isFocused && !disabled,
             })}
         >
             <input
@@ -60,12 +62,12 @@ export const InputWithCharacterLimit = ({
                 id={id}
                 disabled={disabled}
                 placeholder={placeholder}
+                aria-describedby={countId}
+                aria-invalid={currentLength > maxLength}
             />
-            <div className="character-limit">
+            <div className="input-line-wrapper-character-limit" id={countId} aria-live="polite" role="status">
                 {currentLength}/{maxLength}
             </div>
         </div>
     );
 };
-
-export default InputWithCharacterLimit;

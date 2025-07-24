@@ -107,7 +107,9 @@ describe('CategoryBar', () => {
             { id: 'option2', name: 'Option 2' },
         ];
 
-        render(<CategoryBar {...defaultProps} displayContextMenu={true} contextMenuOptions={contextMenuOptions} />);
+        render(
+            <CategoryBar {...defaultProps} displayContextMenuButton={true} contextMenuOptions={contextMenuOptions} />,
+        );
 
         expect(screen.getByTestId('context-menu-button')).toBeInTheDocument();
         expect(screen.getByTestId('context-menu-button-option-option1')).toBeInTheDocument();
@@ -117,7 +119,9 @@ describe('CategoryBar', () => {
     it('does not render context menu when displayContextMenu is false', () => {
         const contextMenuOptions = [{ id: 'option1', name: 'Option 1' }];
 
-        render(<CategoryBar {...defaultProps} displayContextMenu={false} contextMenuOptions={contextMenuOptions} />);
+        render(
+            <CategoryBar {...defaultProps} displayContextMenuButton={false} contextMenuOptions={contextMenuOptions} />,
+        );
 
         expect(screen.queryByTestId('context-menu-button')).not.toBeInTheDocument();
     });
@@ -129,7 +133,7 @@ describe('CategoryBar', () => {
         render(
             <CategoryBar
                 {...defaultProps}
-                displayContextMenu={true}
+                displayContextMenuButton={true}
                 contextMenuOptions={contextMenuOptions}
                 onContextMenuOptionSelected={mockOnContextMenuOptionSelected}
             />,

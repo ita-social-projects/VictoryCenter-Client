@@ -1,6 +1,6 @@
-import React from 'react';
+﻿import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Status from './Status';
+import { Status } from './Status';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 jest.mock('../../../const/admin/common', () => ({

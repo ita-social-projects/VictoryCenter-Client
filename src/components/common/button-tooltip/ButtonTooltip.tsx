@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useId } from 'react';
 import InfoIcon from '../../../assets/icons/info.svg';
-import InfoIconActive from '../../../assets/icons/info-active.svg';
 import classNames from 'classnames';
 import './button-tooltip.scss';
 
@@ -13,7 +12,7 @@ export interface ButtonTooltipProps {
 export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: ButtonTooltipProps) => {
     const [isVisible, setIsVisible] = useState(false);
     const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
-    const wrapperRef = useRef<HTMLDivElement>(null);
+    const wrapperRef = useRef<HTMLButtonElement>(null);
     const tooltipRef = useRef<HTMLDivElement>(null);
 
     const toggleTooltip = (e: React.MouseEvent) => {
@@ -71,39 +70,36 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
         };
     }, [isVisible, hideTooltip]);
 
-    const handleTooltipClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-    };
+    const tooltipId = useId();
 
     return (
-        <div
+        <button
             ref={wrapperRef}
             className="button-tooltip-wrapper"
             onClick={toggleTooltip}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') toggleTooltip(e as any);
-            }}
+            type="button"
             aria-haspopup="true"
             aria-expanded={isVisible}
+            aria-label="Show additional information"
+            aria-describedby={isVisible ? tooltipId : undefined}
         >
-            <img className="button-tooltip-icon" src={isVisible ? InfoIconActive : InfoIcon} alt="tooltip icon" />
+            <img className="button-tooltip-icon" src={InfoIcon} alt="tooltip icon" />
 
             {isVisible && (
                 <div
+                    id={tooltipId}
                     ref={tooltipRef}
                     className={classNames('button-tooltip-popup', `button-tooltip-popup--${position}`)}
                     style={{
                         top: `${tooltipPosition.top}px`,
                         left: `${tooltipPosition.left}px`,
                     }}
-                    onClick={handleTooltipClick}
+                    onMouseDown={(event) => event.stopPropagation()}
                     role="tooltip"
                 >
                     {children}
                 </div>
             )}
-        </div>
+        </button>
     );
 };

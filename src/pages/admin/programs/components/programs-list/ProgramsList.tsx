@@ -7,7 +7,7 @@ import { VisibilityStatus } from '../../../../../types/Common';
 import LoaderIcon from '../../../../../assets/icons/load.svg';
 import ArrowUpIcon from '../../../../../assets/icons/arrow-up.svg';
 import NotFoundIcon from '../../../../../assets/icons/not-found.svg';
-import ProgramListItem from '../program-list-item/ProgramListItem';
+import { ProgramListItem } from '../program-list-item/ProgramListItem';
 import AddCategoryModal from '../program-category-modals/AddCategoryModal';
 import EditCategoryModal from '../program-category-modals/EditCategoryModal';
 import DeleteCategoryModal from '../program-category-modals/DeleteCategoryModal';
@@ -229,9 +229,9 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(
         let content;
 
         if (programs.length > 0) {
-            content = programs.map((program, index) => (
+            content = programs.map((program) => (
                 <ProgramListItem
-                    key={index}
+                    key={program.id}
                     program={program}
                     handleOnEditProgram={onEditProgram}
                     handleOnDeleteProgram={onDeleteProgram}
@@ -278,7 +278,7 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(
                         onCategorySelect={handleCategorySelect}
                         getItemName={(category) => category.name}
                         getItemKey={(category) => category.id}
-                        displayContextMenu={true}
+                        displayContextMenuButton={true}
                         contextMenuOptions={[
                             { id: 'add', name: PROGRAM_CATEGORY_TEXT.BUTTON.ADD_CATEGORY },
                             { id: 'edit', name: PROGRAM_CATEGORY_TEXT.BUTTON.EDIT_CATEGORY },

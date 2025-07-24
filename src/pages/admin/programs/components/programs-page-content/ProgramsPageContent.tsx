@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ProgramListRef, ProgramsList } from '../programs-list/ProgramsList';
 import { Program } from '../../../../../types/ProgramAdminPage';
 import { VisibilityStatus } from '../../../../../types/Common';
-import ProgramsPageToolbar from '../programs-page-toolbar/ProgramsPageToolbar';
+import { ProgramsPageToolbar } from '../programs-page-toolbar/ProgramsPageToolbar';
 import AddProgramModal from '../program-modals/AddProgramModal';
 import EditProgramModal from '../program-modals/EditProgramModal';
 import DeleteProgramModal from '../program-modals/DeleteProgramModal';
@@ -47,17 +47,17 @@ export const ProgramsPageContent = () => {
         setIsEditProgramModalOpen(true);
     };
 
-    const handleAddProgram = (program: Program) => {
+    const handleAddProgram = useCallback((program: Program) => {
         programListRef.current?.addProgram(program);
-    };
+    }, []);
 
-    const handleEditProgram = (program: Program) => {
+    const handleEditProgram = useCallback((program: Program) => {
         programListRef.current?.editProgram(program);
-    };
+    }, []);
 
-    const handleDeleteProgram = (program: Program) => {
+    const handleDeleteProgram = useCallback((program: Program) => {
         programListRef.current?.deleteProgram(program);
-    };
+    }, []);
 
     return (
         <div className="wrapper" data-testid="programs-page-content">

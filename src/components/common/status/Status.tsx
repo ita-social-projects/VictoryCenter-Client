@@ -8,7 +8,14 @@ export interface StatusProps {
 }
 
 const getStatusClass = (statusType: VisibilityStatus) => {
-    return statusType === 'Draft' ? 'status-draft' : 'status-published';
+    switch (statusType) {
+        case 'Published':
+            return 'status-published';
+        case 'Draft':
+            return 'status-draft';
+        default:
+            return 'status-draft';
+    }
 };
 
 const statusTypeToText = (statusType: VisibilityStatus) => {
@@ -30,5 +37,3 @@ export const Status = ({ status }: StatusProps) => {
         </div>
     );
 };
-
-export default Status;

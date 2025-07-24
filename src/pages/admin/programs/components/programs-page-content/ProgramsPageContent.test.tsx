@@ -48,12 +48,16 @@ jest.mock('../programs-list/ProgramsList', () => {
     };
 });
 
-jest.mock('../programs-page-toolbar/ProgramsPageToolbar', () => (props: ProgramPageToolbarProps) => (
-    <div>
-        <button onClick={props.onAddProgram}>Add Program</button>
-        <button onClick={() => props.onStatusFilterChange('Published')}>Filter Published</button>
-    </div>
-));
+jest.mock('../programs-page-toolbar/ProgramsPageToolbar', () => {
+    return {
+        ProgramsPageToolbar: (props: ProgramPageToolbarProps) => (
+            <div>
+                <button onClick={props.onAddProgram}>Add Program</button>
+                <button onClick={() => props.onStatusFilterChange('Published')}>Filter Published</button>
+            </div>
+        ),
+    };
+});
 
 jest.mock(
     '../program-modals/AddProgramModal',

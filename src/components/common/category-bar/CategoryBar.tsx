@@ -11,7 +11,7 @@ export interface ContextMenuOption {
 export interface CategoryBarProps<T> {
     categories: T[];
     selectedCategory: T | undefined;
-    displayContextMenu?: boolean;
+    displayContextMenuButton?: boolean;
     getItemName: (item: T) => string;
     getItemKey: (item: T) => string | number;
     onCategorySelect: (category: T) => void;
@@ -22,7 +22,7 @@ export interface CategoryBarProps<T> {
 export const CategoryBar = <T,>({
     categories,
     selectedCategory,
-    displayContextMenu = false,
+    displayContextMenuButton = false,
     getItemName,
     getItemKey,
     onCategorySelect,
@@ -35,7 +35,7 @@ export const CategoryBar = <T,>({
 
     return (
         <div className="category-bar">
-            {displayContextMenu && contextMenuOptions.length > 0 && (
+            {displayContextMenuButton && contextMenuOptions.length > 0 && (
                 <ContextMenuButton onOptionSelected={handleContextMenuOptionSelected}>
                     {contextMenuOptions.map((option) => (
                         <ContextMenuButton.Option key={option.id} value={option.id}>

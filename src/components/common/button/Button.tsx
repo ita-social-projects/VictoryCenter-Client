@@ -8,7 +8,7 @@ export type ButtonProps = {
     type?: 'submit' | 'reset' | 'button';
     form?: string;
     className?: string;
-    disabled?: boolean | undefined;
+    disabled?: boolean;
 };
 
 export const Button = ({

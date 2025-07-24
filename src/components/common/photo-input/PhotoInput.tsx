@@ -47,9 +47,7 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
-
         if (disabled) return;
-
         const file = e.dataTransfer.files?.[0];
         if (file) handleFile(file);
         setIsFocused(false);
@@ -64,8 +62,31 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
         setIsFocused(false);
     };
 
+    const handleMouseEnter = () => {
+        if (!disabled) setIsFocused(true);
+    };
+
+    const handleMouseLeave = () => {
+        if (!disabled) setIsFocused(false);
+    };
+
+    const handleFocus = () => {
+        if (!disabled) setIsFocused(true);
+    };
+
+    const handleBlurEvent = () => {
+        if (!disabled) setIsFocused(false);
+    };
+
     const handleClick = () => {
         if (!disabled) inputRef.current?.click();
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if ((e.key === 'Enter' || e.key === ' ') && !disabled) {
+            e.preventDefault();
+            inputRef.current?.click();
+        }
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,7 +108,15 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
             onClick={handleClick}
+            onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
+            onBlur={handleBlurEvent}
+            tabIndex={disabled ? -1 : 0}
+            role="button"
+            aria-label={COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo'}
         >
             <input
                 ref={inputRef}
@@ -101,13 +130,13 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
                 id={id}
                 name={name}
             />
-
             {previewUrl ? (
                 <div className="photo-preview">
                     <img src={previewUrl} alt="Preview" className="preview-image" />
                     <button
                         type="button"
                         className="delete-button"
+                        disabled={disabled}
                         onClick={(e) => {
                             e.stopPropagation();
                             handleRemove();

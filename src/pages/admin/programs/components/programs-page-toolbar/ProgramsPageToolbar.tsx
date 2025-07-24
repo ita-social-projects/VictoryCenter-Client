@@ -57,5 +57,3 @@ export const ProgramsPageToolbar = ({
         </>
     );
 };
-
-export default ProgramsPageToolbar;

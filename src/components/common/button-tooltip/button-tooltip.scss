@@ -4,10 +4,25 @@ $tooltip-text-color: #1c1c1c;
 
 .button-tooltip-wrapper {
     position: relative;
-    display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+
+    border: none;
+    padding: 0;
+    background: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+
+    &:hover {
+        background-color: #e7eaee;
+    }
+
+    &:focus {
+        background-color: #e7eaee;
+    }
 }
 
 .button-tooltip-icon {

@@ -9,7 +9,7 @@ import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
 import { VisibilityStatus } from '../../../../../types/Common';
-import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { MultiSelect } from '../../../../../components/common/multi-select/MultiSelect';
 import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
 import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';

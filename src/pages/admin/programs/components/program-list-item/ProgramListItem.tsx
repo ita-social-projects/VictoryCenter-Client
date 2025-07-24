@@ -47,5 +47,3 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
         </div>
     );
 };
-
-export default ProgramListItem;

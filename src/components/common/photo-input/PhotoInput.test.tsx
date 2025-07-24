@@ -50,7 +50,7 @@ describe('PhotoInput', () => {
         const file = createImageFile();
         render(<PhotoInput value={file} onChange={onChangeMock} />);
 
-        const removeButton = screen.getByRole('button');
+        const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
         fireEvent.click(removeButton);
 
         expect(onChangeMock).toHaveBeenCalledWith(null);

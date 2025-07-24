@@ -92,7 +92,7 @@ export const MultiSelect = <T extends Record<string, any>>(props: MultiselectPro
         const joinedNames = names.join(', ');
 
         if (joinedNames.length > 50) {
-            return `${names.slice(0, 2).join(', ')}${names.length > 2 ? ` +${names.length - 2} more` : ''}`;
+            return `${names.slice(0, 2).join(', ')}...`;
         }
 
         return joinedNames;

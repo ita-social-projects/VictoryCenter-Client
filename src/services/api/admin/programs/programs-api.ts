@@ -12,8 +12,8 @@ import { PaginationResult, VisibilityStatus } from '../../../../types/Common';
 // !!!
 let mockProgramId = Math.max(...mockPrograms.map((p) => p.id), 0) + 1;
 let mockCategoryId = Math.max(...mockCategories.map((c) => c.id), 0) + 1;
-const mockDelay = 2200;
-const throwErrorsInApi = false;
+export let mockDelay = 2200;
+export let throwErrorsInApi = false;
 // !!!
 
 export const ProgramsApi = {

@@ -134,7 +134,7 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
             />
             {previewUrl ? (
                 <div className="photo-preview">
-                    <img src={previewUrl} alt="Preview" className="preview-image" />
+                    <img src={previewUrl} alt="Preview" className="preview-image" data-testid="preview-image" />
                     {!disabled && (
                         <button
                             type="button"

@@ -34,11 +34,7 @@ const expectValidationToFail = async (data: any, expectedError: string, context?
 
 describe('Program Validation Schema', () => {
     describe('Name validation', () => {
-        it('should pass with a valid name', async () => {
-            await expectValidationToPass(getValidData());
-        });
-
-        const invalidCases = [
+        const invalidNameCases = [
             {
                 description: 'is empty',
                 data: getValidData({ name: '' }),
@@ -56,131 +52,128 @@ describe('Program Validation Schema', () => {
             },
         ];
 
-        invalidCases.forEach(({ description, data, expectedError }) => {
-            it(`should fail when name ${description}`, async () => {
-                await expectValidationToFail(data, expectedError);
-            });
+        it('should pass with a valid name', async () => {
+            await expectValidationToPass(getValidData());
+        });
+
+        it.each(invalidNameCases)('should fail when name $description', async ({ data, expectedError }) => {
+            await expectValidationToFail(data, expectedError);
         });
     });
 
     describe('Categories validation', () => {
-        it('should pass with valid categories', async () => {
-            await expectValidationToPass(getValidData());
-        });
-
-        const invalidCases = [
+        const invalidCategoryCases = [
             {
                 description: 'is an empty array',
                 data: getValidData({ categories: [] }),
+                expectedError: PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError(),
             },
             {
                 description: 'is null',
                 data: getValidData({ categories: null }),
+                expectedError: PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError(),
             },
         ];
 
-        invalidCases.forEach(({ description, data }) => {
-            it(`should fail when categories ${description}`, async () => {
-                await expectValidationToFail(data, PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError());
-            });
+        it('should pass with valid categories', async () => {
+            await expectValidationToPass(getValidData());
+        });
+
+        it.each(invalidCategoryCases)('should fail when categories $description', async ({ data, expectedError }) => {
+            await expectValidationToFail(data, expectedError);
         });
     });
 
-    describe('Description validation', () => {
-        describe('Draft mode (isPublishing: false)', () => {
-            it('should pass with empty description', async () => {
-                await expectValidationToPass(getValidData({ description: '' }));
-            });
-
-            it('should fail when description exceeds max length', async () => {
-                const data = getValidData({ description: 'A'.repeat(PROGRAM_VALIDATION.description.max + 1) });
-                await expectValidationToFail(data, PROGRAM_VALIDATION.description.getMaxError());
-            });
+    describe('Description validation (Draft mode)', () => {
+        it('should pass with empty description', async () => {
+            await expectValidationToPass(getValidData({ description: '' }));
         });
 
-        describe('Publish mode (isPublishing: true)', () => {
-            const publishContext = { isPublishing: true };
-            const validDataForPublish = getValidData({ img: createMockFile() });
+        it('should fail when description exceeds max length', async () => {
+            const data = getValidData({ description: 'A'.repeat(PROGRAM_VALIDATION.description.max + 1) });
+            await expectValidationToFail(data, PROGRAM_VALIDATION.description.getMaxError());
+        });
+    });
 
-            it('should pass with a valid description', async () => {
-                await expectValidationToPass(validDataForPublish, publishContext);
-            });
+    describe('Description validation (Publish mode)', () => {
+        const publishContext = { isPublishing: true };
+        const validDataForPublish = getValidData({ img: createMockFile() });
 
-            const invalidCases = [
-                {
-                    description: 'is empty',
-                    data: { ...validDataForPublish, description: '' },
-                    expectedError: PROGRAM_VALIDATION.description.getRequiredError(),
-                },
-                {
-                    description: 'is too short',
-                    data: { ...validDataForPublish, description: 'Short' },
-                    expectedError: PROGRAM_VALIDATION.description.getMinError(),
-                },
-                {
-                    description: 'is too long',
-                    data: { ...validDataForPublish, description: 'A'.repeat(PROGRAM_VALIDATION.description.max + 1) },
-                    expectedError: PROGRAM_VALIDATION.description.getMaxError(),
-                },
-            ];
+        const invalidPublishCases = [
+            {
+                description: 'is empty',
+                data: { ...validDataForPublish, description: '' },
+                expectedError: PROGRAM_VALIDATION.description.getRequiredError(),
+            },
+            {
+                description: 'is too short',
+                data: { ...validDataForPublish, description: 'Short' },
+                expectedError: PROGRAM_VALIDATION.description.getMinError(),
+            },
+            {
+                description: 'is too long',
+                data: { ...validDataForPublish, description: 'A'.repeat(PROGRAM_VALIDATION.description.max + 1) },
+                expectedError: PROGRAM_VALIDATION.description.getMaxError(),
+            },
+        ];
 
-            invalidCases.forEach(({ description, data, expectedError }) => {
-                it(`should fail when description ${description}`, async () => {
-                    await expectValidationToFail(data, expectedError, publishContext);
-                });
-            });
+        it('should pass with a valid description', async () => {
+            await expectValidationToPass(validDataForPublish, publishContext);
+        });
+
+        it.each(invalidPublishCases)('should fail when description $description', async ({ data, expectedError }) => {
+            await expectValidationToFail(data, expectedError, publishContext);
         });
     });
 
     describe('Image validation', () => {
-        describe('General validation', () => {
-            const invalidCases = [
-                {
-                    description: 'is required for publishing but is null',
-                    data: getValidData({ img: null }),
-                    context: { isPublishing: true },
-                    expectedError: PROGRAM_VALIDATION.img.getRequiredWhenPublishingError(),
-                },
-                {
-                    description: 'has invalid file format (GIF)',
-                    data: getValidData({ img: createMockFile('image/gif') }),
-                    expectedError: PROGRAM_VALIDATION.img.getFormatError(),
-                },
-                {
-                    description: 'is too large',
-                    data: getValidData({ img: createMockFile('image/jpeg', PROGRAM_VALIDATION.img.maxSizeBytes + 1) }),
-                    expectedError: PROGRAM_VALIDATION.img.getSizeError(),
-                },
-            ];
+        const invalidImageCases = [
+            {
+                description: 'is required for publishing but is null',
+                data: getValidData({ img: null }),
+                context: { isPublishing: true },
+                expectedError: PROGRAM_VALIDATION.img.getRequiredWhenPublishingError(),
+            },
+            {
+                description: 'has invalid file format (GIF)',
+                data: getValidData({ img: createMockFile('image/gif') }),
+                context: undefined,
+                expectedError: PROGRAM_VALIDATION.img.getFormatError(),
+            },
+            {
+                description: 'is too large',
+                data: getValidData({ img: createMockFile('image/jpeg', PROGRAM_VALIDATION.img.maxSizeBytes + 1) }),
+                context: undefined,
+                expectedError: PROGRAM_VALIDATION.img.getSizeError(),
+            },
+        ];
 
-            invalidCases.forEach(({ description, data, expectedError, context }) => {
-                it(`should fail when image ${description}`, async () => {
-                    await expectValidationToFail(data, expectedError, context);
-                });
-            });
+        const validImageCases: [string, any, ProgramValidationContext | undefined][] = [
+            ['is null in draft mode', getValidData({ img: null }), { isPublishing: false }],
+            ['is a string path in publish mode', getValidData({ img: 'path/to/img.jpg' }), { isPublishing: true }],
+            ['is a valid File in publish mode', getValidData({ img: createMockFile() }), { isPublishing: true }],
+        ];
+
+        it.each(invalidImageCases)('should fail when image $description', async ({ data, expectedError, context }) => {
+            await expectValidationToFail(data, expectedError, context);
         });
 
-        describe('Valid cases', () => {
-            it.each([
-                ['is null in draft mode', getValidData({ img: null }), { isPublishing: false }],
-                ['is a string path in publish mode', getValidData({ img: 'path/to/img.jpg' }), { isPublishing: true }],
-                ['is a valid File in publish mode', getValidData({ img: createMockFile() }), { isPublishing: true }],
-            ])('should pass when image %s', async (description, data, context) => {
-                // @ts-ignore
-                await expectValidationToPass(data, context);
-            });
+        it.each(validImageCases)('should pass when image %s', async (description, data, context) => {
+            await expectValidationToPass(data, context);
         });
+    });
 
-        describe('Transform function', () => {
-            it.each([
-                ['an empty string', ''],
-                ['undefined', undefined],
-                ['an empty FileList', { length: 0 } as unknown as FileList],
-            ])('should transform %s to null', async (description, value) => {
-                const data = getValidData({ img: value });
-                const result = await programValidationSchema.validate(data);
-                expect(result.img).toBeNull();
-            });
+    describe('Image transform function', () => {
+        const transformCases = [
+            { description: 'an empty string', value: '' },
+            { description: 'undefined', value: undefined },
+            { description: 'an empty FileList', value: { length: 0 } as unknown as FileList },
+        ];
+
+        it.each(transformCases)('should transform $description to null', async ({ value }) => {
+            const data = getValidData({ img: value });
+            const result = await programValidationSchema.validate(data);
+            expect(result.img).toBeNull();
         });
     });
 });

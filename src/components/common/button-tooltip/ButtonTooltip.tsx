@@ -56,7 +56,12 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+            if (
+                wrapperRef.current &&
+                !wrapperRef.current.contains(event.target as Node) &&
+                tooltipRef.current &&
+                !tooltipRef.current.contains(event.target as Node)
+            ) {
                 hideTooltip();
             }
         };
@@ -89,13 +94,12 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
                 <div
                     id={tooltipId}
                     ref={tooltipRef}
+                    role="tooltip"
                     className={classNames('button-tooltip-popup', `button-tooltip-popup--${position}`)}
                     style={{
                         top: `${tooltipPosition.top}px`,
                         left: `${tooltipPosition.left}px`,
                     }}
-                    onMouseDown={(event) => event.stopPropagation()}
-                    role="tooltip"
                 >
                     {children}
                 </div>

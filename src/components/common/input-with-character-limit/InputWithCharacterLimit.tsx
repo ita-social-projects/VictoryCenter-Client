@@ -12,7 +12,6 @@ export interface InputWithCharacterLimitProps {
     maxLength: number;
     disabled?: boolean;
     type?: 'text' | 'email' | 'password' | 'number';
-    className?: string;
     placeholder?: string;
 }
 

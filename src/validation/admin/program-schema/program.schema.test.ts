@@ -1,4 +1,4 @@
-import { programValidationSchema } from './program-scheme';
+import { programValidationSchema, ProgramValidationContext } from './program-scheme';
 import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
 
 const createMockFile = (type = 'image/jpeg', size = 1024) => {
@@ -16,453 +16,171 @@ const mockCategory = {
     programsCount: 5,
 };
 
+const getValidData = (overrides?: any) => ({
+    name: 'Valid Program Name',
+    categories: [mockCategory],
+    description: 'This is a valid description with enough characters.',
+    img: 'existing-image.jpg',
+    ...overrides,
+});
+
+const expectValidationToPass = async (data: any, context?: ProgramValidationContext) => {
+    await expect(programValidationSchema.validate(data, { context })).resolves.toBeDefined();
+};
+
+const expectValidationToFail = async (data: any, expectedError: string, context?: ProgramValidationContext) => {
+    await expect(programValidationSchema.validate(data, { context })).rejects.toThrow(expectedError);
+};
+
 describe('Program Validation Schema', () => {
     describe('Name validation', () => {
-        it('should pass with valid name', async () => {
-            const data = {
-                name: 'Valid Program Name',
-                categories: [mockCategory],
-                description: 'Valid description with enough characters',
-                img: 'existing-image.jpg',
-            };
-
-            await expect(
-                programValidationSchema.validate(data, { context: { isPublishing: false } }),
-            ).resolves.toBeDefined();
+        it('should pass with a valid name', async () => {
+            await expectValidationToPass(getValidData());
         });
 
-        it('should fail when name is empty', async () => {
-            const data = {
-                name: '',
-                categories: [mockCategory],
-                description: 'Valid description',
-                img: null,
-            };
+        const invalidCases = [
+            {
+                description: 'is empty',
+                data: getValidData({ name: '' }),
+                expectedError: PROGRAM_VALIDATION.name.getRequiredError(),
+            },
+            {
+                description: 'is too short',
+                data: getValidData({ name: 'A' }),
+                expectedError: PROGRAM_VALIDATION.name.getMinError(),
+            },
+            {
+                description: 'is too long',
+                data: getValidData({ name: 'A'.repeat(PROGRAM_VALIDATION.name.max + 1) }),
+                expectedError: PROGRAM_VALIDATION.name.getMaxError(),
+            },
+        ];
 
-            await expect(programValidationSchema.validate(data)).rejects.toThrow(
-                PROGRAM_VALIDATION.name.getRequiredError(),
-            );
-        });
-
-        it('should fail when name is too short', async () => {
-            const data = {
-                name: 'AB',
-                categories: [mockCategory],
-                description: 'Valid description',
-                img: null,
-            };
-
-            await expect(programValidationSchema.validate(data)).rejects.toThrow(PROGRAM_VALIDATION.name.getMinError());
-        });
-
-        it('should fail when name is too long', async () => {
-            const data = {
-                name: 'A'.repeat(PROGRAM_VALIDATION.name.max + 1),
-                categories: [mockCategory],
-                description: 'Valid description',
-                img: null,
-            };
-
-            await expect(programValidationSchema.validate(data)).rejects.toThrow(PROGRAM_VALIDATION.name.getMaxError());
+        invalidCases.forEach(({ description, data, expectedError }) => {
+            it(`should fail when name ${description}`, async () => {
+                await expectValidationToFail(data, expectedError);
+            });
         });
     });
 
     describe('Categories validation', () => {
-        it('should pass with valid categories array', async () => {
-            const data = {
-                name: 'Valid Name',
-                categories: [mockCategory],
-                description: 'Valid description',
-                img: null,
-            };
-
-            await expect(
-                programValidationSchema.validate(data, { context: { isPublishing: false } }),
-            ).resolves.toBeDefined();
+        it('should pass with valid categories', async () => {
+            await expectValidationToPass(getValidData());
         });
 
-        it('should fail when categories array is empty', async () => {
-            const data = {
-                name: 'Valid Name',
-                categories: [],
-                description: 'Valid description',
-                img: null,
-            };
+        const invalidCases = [
+            {
+                description: 'is an empty array',
+                data: getValidData({ categories: [] }),
+            },
+            {
+                description: 'is null',
+                data: getValidData({ categories: null }),
+            },
+        ];
 
-            await expect(programValidationSchema.validate(data)).rejects.toThrow(
-                PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError(),
-            );
-        });
-
-        it('should fail when categories is null', async () => {
-            const data = {
-                name: 'Valid Name',
-                categories: null,
-                description: 'Valid description',
-                img: null,
-            };
-
-            await expect(programValidationSchema.validate(data)).rejects.toThrow(
-                PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError(),
-            );
-        });
-
-        it('should pass with multiple categories', async () => {
-            const data = {
-                name: 'Valid Name',
-                categories: [mockCategory, { id: 2, name: 'Another Category', programsCount: 3 }],
-                description: 'Valid description',
-                img: null,
-            };
-
-            await expect(
-                programValidationSchema.validate(data, { context: { isPublishing: false } }),
-            ).resolves.toBeDefined();
+        invalidCases.forEach(({ description, data }) => {
+            it(`should fail when categories ${description}`, async () => {
+                await expectValidationToFail(data, PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError());
+            });
         });
     });
 
     describe('Description validation', () => {
         describe('Draft mode (isPublishing: false)', () => {
             it('should pass with empty description', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: '',
-                    img: null,
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).resolves.toBeDefined();
-            });
-
-            it('should pass without description field', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    img: null,
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).resolves.toBeDefined();
+                await expectValidationToPass(getValidData({ description: '' }));
             });
 
             it('should fail when description exceeds max length', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'A'.repeat(PROGRAM_VALIDATION.description.max + 1),
-                    img: null,
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).rejects.toThrow(PROGRAM_VALIDATION.description.getMaxError());
+                const data = getValidData({ description: 'A'.repeat(PROGRAM_VALIDATION.description.max + 1) });
+                await expectValidationToFail(data, PROGRAM_VALIDATION.description.getMaxError());
             });
         });
 
         describe('Publish mode (isPublishing: true)', () => {
-            it('should pass with valid description', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description with enough characters',
-                    img: createMockFile(),
-                };
+            const publishContext = { isPublishing: true };
+            const validDataForPublish = getValidData({ img: createMockFile() });
 
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: true } }),
-                ).resolves.toBeDefined();
+            it('should pass with a valid description', async () => {
+                await expectValidationToPass(validDataForPublish, publishContext);
             });
 
-            it('should fail when description is empty', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: '',
-                    img: createMockFile(),
-                };
+            const invalidCases = [
+                {
+                    description: 'is empty',
+                    data: { ...validDataForPublish, description: '' },
+                    expectedError: PROGRAM_VALIDATION.description.getRequiredError(),
+                },
+                {
+                    description: 'is too short',
+                    data: { ...validDataForPublish, description: 'Short' },
+                    expectedError: PROGRAM_VALIDATION.description.getMinError(),
+                },
+                {
+                    description: 'is too long',
+                    data: { ...validDataForPublish, description: 'A'.repeat(PROGRAM_VALIDATION.description.max + 1) },
+                    expectedError: PROGRAM_VALIDATION.description.getMaxError(),
+                },
+            ];
 
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: true } }),
-                ).rejects.toThrow(PROGRAM_VALIDATION.description.getRequiredError());
-            });
-
-            it('should fail when description is too short', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Short',
-                    img: createMockFile(),
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: true } }),
-                ).rejects.toThrow(PROGRAM_VALIDATION.description.getMinError());
-            });
-
-            it('should fail when description exceeds max length', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'A'.repeat(PROGRAM_VALIDATION.description.max + 1),
-                    img: createMockFile(),
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: true } }),
-                ).rejects.toThrow(PROGRAM_VALIDATION.description.getMaxError());
+            invalidCases.forEach(({ description, data, expectedError }) => {
+                it(`should fail when description ${description}`, async () => {
+                    await expectValidationToFail(data, expectedError, publishContext);
+                });
             });
         });
     });
 
     describe('Image validation', () => {
-        describe('Draft mode (isPublishing: false)', () => {
-            it('should pass without image', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description',
-                    img: null,
-                };
+        describe('General validation', () => {
+            const invalidCases = [
+                {
+                    description: 'is required for publishing but is null',
+                    data: getValidData({ img: null }),
+                    context: { isPublishing: true },
+                    expectedError: PROGRAM_VALIDATION.img.getRequiredWhenPublishingError(),
+                },
+                {
+                    description: 'has invalid file format (GIF)',
+                    data: getValidData({ img: createMockFile('image/gif') }),
+                    expectedError: PROGRAM_VALIDATION.img.getFormatError(),
+                },
+                {
+                    description: 'is too large',
+                    data: getValidData({ img: createMockFile('image/jpeg', PROGRAM_VALIDATION.img.maxSizeBytes + 1) }),
+                    expectedError: PROGRAM_VALIDATION.img.getSizeError(),
+                },
+            ];
 
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).resolves.toBeDefined();
-            });
-
-            it('should pass with string image path', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description',
-                    img: 'existing-image.jpg',
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).resolves.toBeDefined();
-            });
-
-            it('should pass with valid file', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description',
-                    img: createMockFile(),
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).resolves.toBeDefined();
+            invalidCases.forEach(({ description, data, expectedError, context }) => {
+                it(`should fail when image ${description}`, async () => {
+                    await expectValidationToFail(data, expectedError, context);
+                });
             });
         });
 
-        describe('Publish mode (isPublishing: true)', () => {
-            it('should fail without image', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description with enough characters',
-                    img: null,
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: true } }),
-                ).rejects.toThrow(PROGRAM_VALIDATION.img.getRequiredWhenPublishingError());
-            });
-
-            it('should pass with string image path', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description with enough characters',
-                    img: 'existing-image.jpg',
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: true } }),
-                ).resolves.toBeDefined();
-            });
-
-            it('should pass with valid file', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description with enough characters',
-                    img: createMockFile(),
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: true } }),
-                ).resolves.toBeDefined();
-            });
-        });
-
-        describe('File format validation', () => {
-            it('should pass with JPEG file', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description',
-                    img: createMockFile('image/jpeg'),
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).resolves.toBeDefined();
-            });
-
-            it('should pass with PNG file', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description',
-                    img: createMockFile('image/png'),
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).resolves.toBeDefined();
-            });
-
-            it('should fail with GIF file', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description',
-                    img: createMockFile('image/gif'),
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).rejects.toThrow(PROGRAM_VALIDATION.img.getFormatError());
-            });
-
-            it('should fail with invalid file format', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description',
-                    img: createMockFile('text/plain'),
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).rejects.toThrow(PROGRAM_VALIDATION.img.getFormatError());
-            });
-        });
-
-        describe('File size validation', () => {
-            it('should pass with file under size limit', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description',
-                    img: createMockFile('image/jpeg', 1024 * 1024), // 1MB
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).resolves.toBeDefined();
-            });
-
-            it('should fail with file over size limit', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description',
-                    img: createMockFile('image/jpeg', PROGRAM_VALIDATION.img.maxSizeBytes + 1),
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).rejects.toThrow(PROGRAM_VALIDATION.img.getSizeError());
-            });
-
-            it('should pass with file at exact size limit', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description',
-                    img: createMockFile('image/jpeg', PROGRAM_VALIDATION.img.maxSizeBytes),
-                };
-
-                await expect(
-                    programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).resolves.toBeDefined();
+        describe('Valid cases', () => {
+            it.each([
+                ['is null in draft mode', getValidData({ img: null }), { isPublishing: false }],
+                ['is a string path in publish mode', getValidData({ img: 'path/to/img.jpg' }), { isPublishing: true }],
+                ['is a valid File in publish mode', getValidData({ img: createMockFile() }), { isPublishing: true }],
+            ])('should pass when image %s', async (description, data, context) => {
+                // @ts-ignore
+                await expectValidationToPass(data, context);
             });
         });
 
         describe('Transform function', () => {
-            it('should transform empty string to null', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description',
-                    img: '',
-                };
-
-                const result = await programValidationSchema.validate(data, { context: { isPublishing: false } });
+            it.each([
+                ['an empty string', ''],
+                ['undefined', undefined],
+                ['an empty FileList', { length: 0 } as unknown as FileList],
+            ])('should transform %s to null', async (description, value) => {
+                const data = getValidData({ img: value });
+                const result = await programValidationSchema.validate(data);
                 expect(result.img).toBeNull();
             });
-
-            it('should transform undefined to null', async () => {
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description',
-                    img: undefined,
-                };
-
-                const result = await programValidationSchema.validate(data, { context: { isPublishing: false } });
-                expect(result.img).toBeNull();
-            });
-
-            it('should handle empty FileList', async () => {
-                const fileList = {
-                    length: 0,
-                } as unknown as FileList;
-
-                const data = {
-                    name: 'Valid Name',
-                    categories: [mockCategory],
-                    description: 'Valid description',
-                    img: fileList,
-                };
-
-                const result = await programValidationSchema.validate(data, { context: { isPublishing: false } });
-                expect(result.img).toBeNull();
-            });
-        });
-    });
-
-    describe('Complete validation scenarios', () => {
-        it('should pass complete draft form', async () => {
-            const data = {
-                name: 'Complete Program Name',
-                categories: [mockCategory],
-                description: '', // Can be empty in draft
-                img: null, // Can be null in draft
-            };
-
-            await expect(
-                programValidationSchema.validate(data, { context: { isPublishing: false } }),
-            ).resolves.toBeDefined();
-        });
-
-        it('should pass complete publish form', async () => {
-            const data = {
-                name: 'Complete Program Name',
-                categories: [mockCategory],
-                description: 'Complete description with enough characters',
-                img: createMockFile(),
-            };
-
-            await expect(
-                programValidationSchema.validate(data, { context: { isPublishing: true } }),
-            ).resolves.toBeDefined();
         });
     });
 });

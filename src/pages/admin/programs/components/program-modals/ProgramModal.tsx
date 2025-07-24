@@ -6,7 +6,7 @@ import { Button } from '../../../../../components/common/button/Button';
 import { QuestionModal } from '../../../../../components/common/question-modal/QuestionModal';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { useProgramModal } from '../../../../../hooks/admin/useProgramModal';
+import { useProgramModal } from '../../../../../hooks/admin/useProgramModal/useProgramModal';
 import './program-modal.scss';
 
 type BaseProps = {

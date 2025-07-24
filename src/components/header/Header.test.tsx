@@ -4,14 +4,7 @@ import '@testing-library/jest-dom';
 import { Header } from './Header';
 import { MemoryRouter } from 'react-router';
 import { routes } from '../../const/routers/routes';
-import {
-    ABOUT_US,
-    PROGRAMS,
-    REPORTING,
-    HOW_TO_SUPPORT,
-    CONTACT_US,
-    DONATE,
-} from '../../const/header/header';
+import { ABOUT_US, PROGRAMS, REPORTING, HOW_TO_SUPPORT, CONTACT_US, DONATE } from '../../const/header/header';
 
 jest.mock('./Header.scss', () => ({}));
 jest.mock('../../assets/images/header/VictoryCenterLogo.svg', () => ({
@@ -36,10 +29,16 @@ describe('Header', () => {
     it('renders nav links with correct text and href', () => {
         render(<Header />, { wrapper: MemoryRouter });
 
-        expect(screen.getByRole('link', { name: ABOUT_US })).toHaveAttribute('href', routes.userPageRoutes.teamPageRoute);
+        expect(screen.getByRole('link', { name: ABOUT_US })).toHaveAttribute(
+            'href',
+            routes.userPageRoutes.teamPageRoute,
+        );
         expect(screen.getByRole('link', { name: PROGRAMS })).toHaveAttribute('href', routes.userPageRoutes.page2Route);
         expect(screen.getByRole('link', { name: REPORTING })).toHaveAttribute('href', routes.userPageRoutes.page2Route);
-        expect(screen.getByRole('link', { name: HOW_TO_SUPPORT })).toHaveAttribute('href', routes.userPageRoutes.page2Route);
+        expect(screen.getByRole('link', { name: HOW_TO_SUPPORT })).toHaveAttribute(
+            'href',
+            routes.userPageRoutes.page2Route,
+        );
     });
 
     it('renders Contact Us and Donate buttons', () => {

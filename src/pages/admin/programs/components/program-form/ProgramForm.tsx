@@ -29,7 +29,7 @@ export interface ProgramFormRef {
 }
 
 export interface ProgramFormProps {
-    onSubmit: (data: ProgramFormValues, status: VisibilityStatus) => Promise<void>;
+    onSubmit: (data: ProgramFormValues, status: VisibilityStatus) => void;
     initialData?: ProgramFormValues | null;
     formDisabled?: boolean;
 }

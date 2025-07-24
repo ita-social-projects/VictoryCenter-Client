@@ -3,17 +3,14 @@ import { ProgramListRef, ProgramsList } from '../programs-list/ProgramsList';
 import { Program } from '../../../../../types/ProgramAdminPage';
 import { VisibilityStatus } from '../../../../../types/Common';
 import { ProgramsPageToolbar } from '../programs-page-toolbar/ProgramsPageToolbar';
-import AddProgramModal from '../program-modals/AddProgramModal';
-import EditProgramModal from '../program-modals/EditProgramModal';
 import DeleteProgramModal from '../program-modals/DeleteProgramModal';
 import '../program-form/program-form.scss';
+import { ProgramModal } from '../program-modals/ProgramModal';
 
 export const ProgramsPageContent = () => {
     const [searchByNameTerm, setSearchByNameTerm] = useState<string>('');
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [autocompleteValues] = useState<string[]>([]);
-    const [isDeleteProgramModalOpen, setIsDeleteProgramModalOpen] = useState(false);
-    const [isEditProgramModalOpen, setIsEditProgramModalOpen] = useState(false);
     const [isAddProgramModalOpen, setIsAddProgramModalOpen] = useState(false);
     const [programToDelete, setProgramToDelete] = useState<Program | null>(null);
     const [programToEdit, setProgramToEdit] = useState<Program | null>(null);
@@ -39,12 +36,10 @@ export const ProgramsPageContent = () => {
 
     const handleDeleteStarted = (program: Program) => {
         setProgramToDelete(program);
-        setIsDeleteProgramModalOpen(true);
     };
 
     const handleEditStarted = (program: Program) => {
         setProgramToEdit(program);
-        setIsEditProgramModalOpen(true);
     };
 
     const handleAddProgram = useCallback((program: Program) => {
@@ -61,24 +56,26 @@ export const ProgramsPageContent = () => {
 
     return (
         <div className="wrapper" data-testid="programs-page-content">
-            <AddProgramModal
-                onAddProgram={handleAddProgram}
-                onClose={() => setIsAddProgramModalOpen(false)}
+            <ProgramModal
+                mode="add"
                 isOpen={isAddProgramModalOpen}
+                onClose={() => setIsAddProgramModalOpen(false)}
+                onAddProgram={handleAddProgram}
             />
 
-            <EditProgramModal
-                programToEdit={programToEdit}
+            <ProgramModal
+                mode="edit"
+                isOpen={!!programToEdit}
+                onClose={() => setProgramToEdit(null)}
+                programToEdit={programToEdit!!}
                 onEditProgram={handleEditProgram}
-                onClose={() => setIsEditProgramModalOpen(false)}
-                isOpen={isEditProgramModalOpen}
             />
 
             <DeleteProgramModal
                 programToDelete={programToDelete}
                 onDeleteProgram={handleDeleteProgram}
-                onClose={() => setIsDeleteProgramModalOpen(false)}
-                isOpen={isDeleteProgramModalOpen}
+                onClose={() => setProgramToDelete(null)}
+                isOpen={!!programToDelete}
             />
 
             <ProgramsPageToolbar

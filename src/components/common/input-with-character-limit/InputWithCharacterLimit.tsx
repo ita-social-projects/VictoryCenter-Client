@@ -65,9 +65,9 @@ export const InputWithCharacterLimit = ({
                 aria-describedby={countId}
                 aria-invalid={currentLength > maxLength}
             />
-            <div className="input-line-wrapper-character-limit" id={countId} aria-live="polite" role="status">
+            <output htmlFor={id} className="input-line-wrapper-character-limit" id={countId}>
                 {currentLength}/{maxLength}
-            </div>
+            </output>
         </div>
     );
 };

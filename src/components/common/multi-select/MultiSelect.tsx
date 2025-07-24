@@ -37,10 +37,7 @@ export const MultiSelect = <T extends Record<string, any>>(props: MultiselectPro
     const isSelected = useCallback(
         (option: T): boolean => {
             const optionId = getOptionId(option);
-            if (optionId === null || optionId === undefined) {
-                return false;
-            }
-            return selectedIds.has(optionId);
+            return optionId != null && selectedIds.has(optionId);
         },
         [selectedIds, getOptionId],
     );
@@ -48,19 +45,13 @@ export const MultiSelect = <T extends Record<string, any>>(props: MultiselectPro
     const toggleOption = useCallback(
         (optionValue: T) => {
             if (disabled) return;
-
             const optionId = getOptionId(optionValue);
-
-            if (optionId === null || optionId === undefined) {
-                return;
-            }
+            if (optionId == null) return;
 
             const exists = selectedIds.has(optionId);
-
             const newSelectedValues = exists
                 ? value.filter((v) => getOptionId(v) !== optionId)
                 : [...value, optionValue];
-
             onChange?.(newSelectedValues);
         },
         [value, selectedIds, getOptionId, onChange, disabled],
@@ -70,6 +61,13 @@ export const MultiSelect = <T extends Record<string, any>>(props: MultiselectPro
         if (disabled) return;
         setIsOpen((prev) => !prev);
     }, [disabled]);
+
+    const handleOptionKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, option: T) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleOption(option);
+        }
+    };
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -87,25 +85,23 @@ export const MultiSelect = <T extends Record<string, any>>(props: MultiselectPro
 
     const displayLabel = useMemo(() => {
         if (value.length === 0) return placeholder;
-
         const names = value.map(getOptionName);
         const joinedNames = names.join(', ');
-
-        if (joinedNames.length > 50) {
-            return `${names.slice(0, 2).join(', ')}...`;
-        }
-
-        return joinedNames;
+        return joinedNames.length > 50 ? `${names.slice(0, 2).join(', ')}...` : joinedNames;
     }, [value, getOptionName, placeholder]);
 
     return (
-        <div className={classNames('multiselect')} ref={containerRef}>
-            <div
+        <div className="multiselect" ref={containerRef}>
+            <button
+                type="button"
                 className={classNames('multiselect-placeholder-container', {
                     'multiselect-placeholder-container-selected': isOpen,
                     'multiselect-placeholder-container-disabled': disabled,
                 })}
                 onClick={toggleDropdown}
+                disabled={disabled}
+                aria-haspopup="listbox"
+                aria-expanded={isOpen}
             >
                 <div
                     className={classNames('placeholder', {
@@ -117,20 +113,22 @@ export const MultiSelect = <T extends Record<string, any>>(props: MultiselectPro
                         <img src={isOpen ? ArrowUp : ArrowDown} alt={isOpen ? 'Collapse options' : 'Expand options'} />
                     </div>
                 </div>
-            </div>
+            </button>
 
             {isOpen && !disabled && (
-                <div className="multiselect-options-container">
+                <div className="multiselect-options-container" role="listbox" aria-multiselectable="true">
                     {options.map((option) => {
                         const selected = isSelected(option);
                         const optionId = getOptionId(option);
                         return (
                             <div
                                 key={optionId}
-                                className={classNames('option', {
-                                    'option-selected': selected,
-                                })}
+                                className={classNames('option', { 'option-selected': selected })}
                                 onClick={() => toggleOption(option)}
+                                onKeyDown={(e) => handleOptionKeyDown(e, option)}
+                                role="option"
+                                aria-selected={selected}
+                                tabIndex={0}
                             >
                                 <div className="checkbox">
                                     <img

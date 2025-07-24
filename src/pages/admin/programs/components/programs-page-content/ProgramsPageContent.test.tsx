@@ -2,11 +2,10 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ProgramsPageContent } from './ProgramsPageContent';
 import { Program } from '../../../../../types/ProgramAdminPage';
-import { AddProgramModalProps } from '../program-modals/AddProgramModal';
-import { EditProgramModalProps } from '../program-modals/EditProgramModal';
 import { DeleteProgramModalProps } from '../program-modals/DeleteProgramModal';
 import { ProgramPageToolbarProps } from '../programs-page-toolbar/ProgramsPageToolbar';
 import { ProgramsListProps } from '../programs-list/ProgramsList';
+import { ProgramModalProps } from '../program-modals/ProgramModal';
 
 const mockProgram: Program = {
     id: 1,
@@ -50,6 +49,7 @@ jest.mock('../programs-list/ProgramsList', () => {
 
 jest.mock('../programs-page-toolbar/ProgramsPageToolbar', () => {
     return {
+        __esModule: true,
         ProgramsPageToolbar: (props: ProgramPageToolbarProps) => (
             <div>
                 <button onClick={props.onAddProgram}>Add Program</button>
@@ -59,44 +59,37 @@ jest.mock('../programs-page-toolbar/ProgramsPageToolbar', () => {
     };
 });
 
-jest.mock(
-    '../program-modals/AddProgramModal',
-    () => (props: AddProgramModalProps) =>
-        props.isOpen ? (
-            <div>
-                <h2>Add Program Modal</h2>
-                <button
-                    onClick={() => {
-                        props.onAddProgram(mockProgram);
-                        props.onClose();
-                    }}
-                >
-                    Confirm Add
-                </button>
-                <button onClick={props.onClose}>Close Add</button>
-            </div>
-        ) : null,
-);
+jest.mock('../program-modals/ProgramModal', () => {
+    return {
+        __esModule: true,
+        ProgramModal: (props: ProgramModalProps) => {
+            if (!props.isOpen) return null;
 
-jest.mock(
-    '../program-modals/EditProgramModal',
-    () => (props: EditProgramModalProps) =>
-        props.isOpen ? (
-            <div>
-                <h2>Edit Program Modal</h2>
-                <p>Editing: {props.programToEdit?.name}</p>
-                <button
-                    onClick={() => {
-                        props.onEditProgram(props.programToEdit!);
-                        props.onClose();
-                    }}
-                >
-                    Confirm Edit
-                </button>
-                <button onClick={props.onClose}>Close Edit</button>
-            </div>
-        ) : null,
-);
+            const isAddMode = props.mode === 'add';
+            const isEditMode = props.mode === 'edit';
+
+            return (
+                <div>
+                    <h2>{isAddMode ? 'Add Program Modal' : 'Edit Program Modal'}</h2>
+                    {isEditMode && 'programToEdit' in props && <p>Editing: {props.programToEdit?.name}</p>}
+                    <button
+                        onClick={() => {
+                            if (isAddMode && 'onAddProgram' in props) {
+                                props.onAddProgram(mockProgram);
+                            } else if (isEditMode && 'onEditProgram' in props && 'programToEdit' in props) {
+                                props.onEditProgram(props.programToEdit);
+                            }
+                            props.onClose();
+                        }}
+                    >
+                        {isAddMode ? 'Confirm Add' : 'Confirm Edit'}
+                    </button>
+                    <button onClick={props.onClose}>{isAddMode ? 'Close Add' : 'Close Edit'}</button>
+                </div>
+            );
+        },
+    };
+});
 
 jest.mock(
     '../program-modals/DeleteProgramModal',

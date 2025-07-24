@@ -19,7 +19,6 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    // Generate preview when file is selected
     useEffect(() => {
         if (value) {
             if (value instanceof File) {
@@ -35,7 +34,6 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
         }
     }, [value]);
 
-    // Handle file drop or selection
     const handleFile = useCallback(
         (file: File) => {
             if (!file.type.startsWith('image/')) return;
@@ -76,6 +74,9 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
 
     const handleBlurEvent = () => {
         if (!disabled) setIsFocused(false);
+        if (onBlur) {
+            onBlur();
+        }
     };
 
     const handleClick = () => {
@@ -83,7 +84,7 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if ((e.key === 'Enter' || e.key === ' ') && !disabled) {
+        if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
             e.preventDefault();
             inputRef.current?.click();
         }
@@ -102,8 +103,8 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
     return (
         <div
             className={classNames('photo-input-wrapper', {
-                'photo-input-wrapper-disabled': disabled,
                 'photo-input-wrapper-focused': isFocused && !disabled,
+                'photo-input-wrapper-disabled': disabled,
             })}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
@@ -114,9 +115,9 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
             onKeyDown={handleKeyDown}
             onFocus={handleFocus}
             onBlur={handleBlurEvent}
+            aria-label={COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo'}
             tabIndex={disabled ? -1 : 0}
             role="button"
-            aria-label={COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo'}
         >
             <input
                 ref={inputRef}
@@ -129,21 +130,24 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
                 data-testid="photo-input-hidden"
                 id={id}
                 name={name}
+                tabIndex={-1}
             />
             {previewUrl ? (
                 <div className="photo-preview">
                     <img src={previewUrl} alt="Preview" className="preview-image" />
-                    <button
-                        type="button"
-                        className="delete-button"
-                        disabled={disabled}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemove();
-                        }}
-                    >
-                        <img src={DeleteIcon} alt={COMMON_TEXT_ADMIN.ALT.DELETE} className="delete-icon" />
-                    </button>
+                    {!disabled && (
+                        <button
+                            type="button"
+                            className="delete-button"
+                            disabled={disabled}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemove();
+                            }}
+                        >
+                            <img src={DeleteIcon} alt={COMMON_TEXT_ADMIN.ALT.DELETE} className="delete-icon" />
+                        </button>
+                    )}
                 </div>
             ) : (
                 <div className="photo-placeholder">

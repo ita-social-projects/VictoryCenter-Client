@@ -3,7 +3,7 @@ import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/common/button/Button';
 import { HintBox } from '../../../../../components/common/hint-box/HintBox';
 import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
-import QuestionModal from '../../../../../components/common/question-modal/QuestionModal';
+import { QuestionModal } from '../../../../../components/common/question-modal/QuestionModal';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Controller, useForm } from 'react-hook-form';
 import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/ProgramAdminPage';

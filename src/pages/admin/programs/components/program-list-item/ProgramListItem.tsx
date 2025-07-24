@@ -1,7 +1,7 @@
 ﻿import { Program } from '../../../../../types/ProgramAdminPage';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import ButtonTooltip from '../../../../../components/common/button-tooltip/ButtonTooltip';
-import Status from '../../../../../components/common/status/Status';
+import { ButtonTooltip } from '../../../../../components/common/button-tooltip/ButtonTooltip';
+import { Status } from '../../../../../components/common/status/Status';
 import BlankImage from '../../../../../assets/images/admin/blank-image.svg';
 import './programs-list-item.scss';
 

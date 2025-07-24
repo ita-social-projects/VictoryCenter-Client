@@ -1,6 +1,6 @@
 ﻿import React from 'react';
-import Button from '../button/Button';
-import Modal from '../modal/Modal';
+import { Button } from '../button/Button';
+import { Modal } from '../modal/Modal';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 type QuestionModalProps = {
@@ -41,5 +41,3 @@ export const QuestionModal = ({
         </Modal>
     );
 };
-
-export default QuestionModal;

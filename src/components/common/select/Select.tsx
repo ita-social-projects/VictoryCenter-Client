@@ -1,14 +1,15 @@
 import React, { RefObject, useState } from 'react';
-import classNames from 'classnames';
-import './select.scss';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import ArrowDown from '../../../assets/icons/chevron-down.svg';
 import ArrowUp from '../../../assets/icons/chevron-up.svg';
-import { TEAM_STATUS_DEFAULT } from '../../../const/admin/team-page';
+import classNames from 'classnames';
+import './select.scss';
 
 export type SelectProps<TValue> = {
     children: React.ReactNode;
     onValueChange: (value: TValue) => void;
     selectContainerRef?: RefObject<HTMLDivElement | null>;
+    placeholder?: string;
     className?: string;
     isAutocomplete?: boolean;
 };
@@ -18,6 +19,7 @@ export const Select = <TValue,>({
     onValueChange,
     selectContainerRef,
     className,
+    placeholder,
     isAutocomplete = false,
 }: SelectProps<TValue>) => {
     const options = React.Children.toArray(children).filter((x) => React.isValidElement(x) && x.type === Select.Option);
@@ -33,13 +35,23 @@ export const Select = <TValue,>({
         setSelectedValue(value);
         setSelectedName(name);
         onValueChange(value);
+        setIsOpen(false);
+    };
+
+    const handleContainerClick = () => {
+        handleOpenSelect();
+    };
+
+    const handleOptionClick = (e: React.MouseEvent, value: TValue, name: string) => {
+        e.stopPropagation();
+        handleSelect(value, name);
     };
 
     return (
         <div
             role={'toolbar'}
             ref={selectContainerRef}
-            onClick={handleOpenSelect}
+            onClick={handleContainerClick}
             className={`${className ?? ''} select ${isOpen ? 'select-opened' : 'select-closed'}`}
             tabIndex={0}
             onKeyDown={(e) => {
@@ -53,24 +65,26 @@ export const Select = <TValue,>({
                     'not-empty': selectedValue !== null && selectedValue !== undefined,
                 })}
             >
-                {selectedName !== null ? selectedName : TEAM_STATUS_DEFAULT}
+                {selectedName !== null ? selectedName : (placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT)}
             </span>
             <img src={isOpen ? ArrowUp : ArrowDown} alt="arrow-down" />
-            <div className={`select-options ${isOpen ? 'select-options-visible' : ''}`}>
-                {options.map((opt, index) => {
-                    if (!React.isValidElement(opt)) return <></>;
-                    const { name, value } = opt.props as { children: React.ReactNode; value: TValue; name: string };
-                    return (
-                        <button
-                            key={`${name}-${index}`}
-                            className={!isAutocomplete && selectedValue === value ? 'select-options-selected' : ''}
-                            onClick={() => handleSelect(value, name)}
-                        >
-                            <span>{name}</span>
-                        </button>
-                    );
-                })}
-            </div>
+            {isOpen && (
+                <div className={'select-options'}>
+                    {options.map((opt, index) => {
+                        if (!React.isValidElement(opt)) return null;
+                        const { name, value } = opt.props as { children: React.ReactNode; value: TValue; name: string };
+                        return (
+                            <button
+                                key={`${name}-${index}`}
+                                className={!isAutocomplete && selectedValue === value ? 'select-options-selected' : ''}
+                                onClick={(e) => handleOptionClick(e, value, name)}
+                            >
+                                <span>{name}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
         </div>
     );
 };

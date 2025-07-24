@@ -11,7 +11,7 @@ import ProgramListItem from '../program-list-item/ProgramListItem';
 import AddCategoryModal from '../program-category-modals/AddCategoryModal';
 import EditCategoryModal from '../program-category-modals/EditCategoryModal';
 import DeleteCategoryModal from '../program-category-modals/DeleteCategoryModal';
-import CategoryBar from '../../../../../components/common/category-bar/CategoryBar';
+import { CategoryBar } from '../../../../../components/common/category-bar/CategoryBar';
 import './programs-list.scss';
 
 export interface ProgramsListProps {

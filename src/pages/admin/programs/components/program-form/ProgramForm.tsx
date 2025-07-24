@@ -11,9 +11,9 @@ import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
 import { VisibilityStatus } from '../../../../../types/Common';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
 import MultiSelect from '../../../../../components/common/multi-select/MultiSelect';
-import PhotoInput from '../../../../../components/common/photo-input/PhotoInput';
-import InputWithCharacterLimit from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
-import TextAreaWithCharacterLimit from '../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
+import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
+import { TextAreaWithCharacterLimit } from '../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import './program-form.scss';
 
 export type ProgramFormValues = {
@@ -92,7 +92,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             fetchCategories();
         }, []);
 
-        const submit = (status: VisibilityStatus) => {
+        const submit = async (status: VisibilityStatus) => {
             const isPublishing = status === 'Published';
             statusRef.current = status;
             setValidationContext({ isPublishing });

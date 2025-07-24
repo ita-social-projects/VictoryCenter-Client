@@ -1,9 +1,9 @@
 ﻿.multiselect {
     position: relative;
-    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    width: 100%;
     gap: 2px;
 
     &-placeholder-container {
@@ -11,8 +11,8 @@
         flex-direction: row;
         align-items: center;
         gap: 8px;
-        padding: 10px 16px;
         width: 100%;
+        padding: 10px 16px;
         box-sizing: border-box;
         background: #ffffff;
         border: 1px solid #0f2957;
@@ -33,13 +33,13 @@
             flex-direction: row;
             align-items: center;
             justify-content: space-between;
-            width: 100%;
             flex: 1;
+            width: 100%;
             color: #a4a49b;
 
             &-content {
-                font-weight: 400;
                 font-size: 16px;
+                font-weight: 400;
                 line-height: 24px;
             }
 
@@ -49,11 +49,11 @@
         }
 
         .chevron {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             width: 24px;
             height: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
     }
 
@@ -61,14 +61,14 @@
         position: absolute;
         top: calc(100% + 4px);
         left: 0;
-        z-index: 99999;
+        z-index: 1000;
         width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
         background: #ffffff;
         border: 1px solid #a4a49b;
         border-radius: 8px;
         box-shadow: 0 1px 2px rgba(10, 13, 18, 0.05);
-        max-height: 200px;
-        overflow-y: auto;
 
         .option {
             display: flex;
@@ -87,18 +87,18 @@
             }
 
             &-content {
-                font-weight: 400;
                 font-size: 16px;
+                font-weight: 400;
                 line-height: 24px;
                 color: #414651;
             }
 
             .checkbox {
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 width: 24px;
                 height: 24px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
             }
         }
     }

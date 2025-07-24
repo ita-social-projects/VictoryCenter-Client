@@ -43,7 +43,7 @@ export const programValidationSchema = Yup.object({
         )
         .transform((value) => {
             if (value === undefined || value === '') return null;
-            if (value instanceof FileList){
+            if (value instanceof FileList) {
                 return value.length > 0 ? value[0] : null;
             }
             if (value instanceof File) return value;

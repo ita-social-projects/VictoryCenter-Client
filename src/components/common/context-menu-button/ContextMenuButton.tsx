@@ -47,8 +47,8 @@ export const ContextMenuButton = ({ children, onOptionSelected, containerRef, cu
             role="menu"
             ref={containerRef || menuRef}
             data-testid="context-menu"
-            className={classNames('context-menu', {
-                'context-menu-active': isOpen,
+            className={classNames('context-menu-button', {
+                'context-menu-button-active': isOpen,
             })}
             tabIndex={0}
             onClick={handleToggle}
@@ -59,11 +59,11 @@ export const ContextMenuButton = ({ children, onOptionSelected, containerRef, cu
                 }
             }}
         >
-            <img src={customIcon || DefaultIcon} alt="menu" className="context-menu-icon" />
+            <img src={customIcon || DefaultIcon} alt="menu" className="context-menu-button-icon" />
 
             <div
                 className={classNames('context-menu-button-options', {
-                    'context-menu-options-visible': isOpen,
+                    'context-menu-button-options-visible': isOpen,
                 })}
             >
                 {React.Children.map(children, (child) => {

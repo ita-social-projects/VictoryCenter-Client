@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { PhotoInput } from './PhotoInput';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 const createImageFile = () => new File(['dummy content'], 'example.png', { type: 'image/png' });
 
@@ -16,8 +17,8 @@ describe('PhotoInput', () => {
 
     it('renders placeholder when no image is selected', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} />);
-        expect(screen.getByText(/перетягніть файл/i)).toBeInTheDocument();
-        expect(screen.getByAltText(/upload/i)).toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER)).toBeInTheDocument();
+        expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.UPLOAD)).toBeInTheDocument();
     });
 
     it('renders image preview when string value is provided', () => {

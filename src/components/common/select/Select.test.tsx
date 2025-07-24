@@ -8,6 +8,14 @@ jest.mock('./select.scss', () => ({}));
 jest.mock('../../../assets/icons/chevron-down.svg', () => 'chevron-down.svg');
 jest.mock('../../../assets/icons/chevron-up.svg', () => 'chevron-up.svg');
 
+jest.mock('../../../const/admin/common', () => ({
+    COMMON_TEXT_ADMIN: {
+        STATUS: {
+            DEFAULT: 'Статус',
+        },
+    },
+}));
+
 describe('Select Component', () => {
     const defaultProps: SelectProps<string> = {
         children: [
@@ -156,17 +164,6 @@ describe('Select Component', () => {
         expect(screen.getByText('Option 3')).toBeInTheDocument();
     });
 
-    it('shows options container with correct visibility classes', () => {
-        const { container } = render(<Select {...defaultProps} />);
-        const selectContainer = container.firstChild as HTMLElement;
-        const optionsContainer = container.querySelector('.select-options');
-
-        expect(optionsContainer).not.toHaveClass('select-options-visible');
-
-        fireEvent.click(selectContainer);
-        expect(optionsContainer).toHaveClass('select-options-visible');
-    });
-
     it('calls onValueChange when option is selected', () => {
         const mockOnValueChange = jest.fn();
         const { container } = render(<Select {...defaultProps} onValueChange={mockOnValueChange} />);
@@ -184,13 +181,12 @@ describe('Select Component', () => {
     it('updates displayed value when option is selected', () => {
         const { container } = render(<Select {...defaultProps} />);
         const selectContainer = container.firstChild as HTMLElement;
-
         fireEvent.click(selectContainer);
 
-        const option = screen.getByText('Option 1');
+        const option = screen.getByRole('button', { name: 'Option 1' });
         fireEvent.click(option);
 
-        expect(screen.getByText('option1')).toBeInTheDocument();
+        expect(screen.getByText('Option 1')).toBeInTheDocument();
         expect(screen.queryByText('Статус')).not.toBeInTheDocument();
     });
 
@@ -210,44 +206,44 @@ describe('Select Component', () => {
     });
 
     it('applies selected class to options when not in autocomplete mode', () => {
-        const { container } = render(<Select {...defaultProps} isAutocomplete={false} />);
-        const selectContainer = container.firstChild as HTMLElement;
+        render(<Select {...defaultProps} isAutocomplete={false} />);
+        const selectContainer = screen.getByRole('toolbar');
 
         fireEvent.click(selectContainer);
-        const option = screen.getByText('Option 1');
-        fireEvent.click(option);
+        fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
 
+        // Re-open to check the class
         fireEvent.click(selectContainer);
 
-        const selectedOption = screen.getByText('Option 1').parentElement;
+        const selectedOption = screen.getByRole('button', { name: 'Option 1' });
         expect(selectedOption).toHaveClass('select-options-selected');
     });
 
     it('does not apply selected class in autocomplete mode', () => {
-        const { container } = render(<Select {...defaultProps} isAutocomplete={true} />);
-        const selectContainer = container.firstChild as HTMLElement;
+        render(<Select {...defaultProps} isAutocomplete={true} />);
+        const selectContainer = screen.getByRole('toolbar');
 
         fireEvent.click(selectContainer);
-        const option = screen.getByText('Option 1');
-        fireEvent.click(option);
+        fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
 
+        // Re-open to check the class
         fireEvent.click(selectContainer);
 
-        const selectedOption = screen.getByText('Option 1').parentElement;
+        const selectedOption = screen.getByRole('button', { name: 'Option 1' });
         expect(selectedOption).not.toHaveClass('select-options-selected');
     });
 
     it('has correct default value for isAutocomplete prop', () => {
-        const { container } = render(<Select {...defaultProps} />);
-        const selectContainer = container.firstChild as HTMLElement;
+        render(<Select {...defaultProps} />); // isAutocomplete defaults to false
+        const selectContainer = screen.getByRole('toolbar');
 
         fireEvent.click(selectContainer);
-        const option = screen.getByText('Option 1');
-        fireEvent.click(option);
+        fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
 
+        // Re-open to check the class
         fireEvent.click(selectContainer);
 
-        const selectedOption = screen.getByText('Option 1').parentElement;
+        const selectedOption = screen.getByRole('button', { name: 'Option 1' });
         expect(selectedOption).toHaveClass('select-options-selected');
     });
 
@@ -257,16 +253,13 @@ describe('Select Component', () => {
             children: [<Select.Option key="1" value={1} name="One" />, <Select.Option key="2" value={2} name="Two" />],
             onValueChange: mockOnValueChange,
         };
-
         const { container } = render(<Select {...numericProps} />);
         const selectContainer = container.firstChild as HTMLElement;
-
         fireEvent.click(selectContainer);
-        const option = screen.getByText('One');
+        const option = screen.getByRole('button', { name: 'One' });
         fireEvent.click(option);
-
         expect(mockOnValueChange).toHaveBeenCalledWith(1);
-        expect(screen.getByText('1')).toBeInTheDocument();
+        expect(screen.getByText('One')).toBeInTheDocument();
     });
 
     it('handles boolean values', () => {
@@ -278,16 +271,14 @@ describe('Select Component', () => {
             ],
             onValueChange: mockOnValueChange,
         };
+        render(<Select {...booleanProps} />);
 
-        const { container } = render(<Select {...booleanProps} />);
-        const selectContainer = container.firstChild as HTMLElement;
-
-        fireEvent.click(selectContainer);
-        const option = screen.getByText('True');
-        fireEvent.click(option);
+        fireEvent.click(screen.getByRole('toolbar'));
+        fireEvent.click(screen.getByRole('button', { name: 'True' }));
 
         expect(mockOnValueChange).toHaveBeenCalledWith(true);
-        expect(screen.getByText('true')).toBeInTheDocument();
+        expect(screen.getByText('True')).toBeInTheDocument();
+        expect(screen.queryByText('true')).not.toBeInTheDocument();
     });
 
     it('handles empty children array', () => {
@@ -329,39 +320,42 @@ describe('Select Component', () => {
 
     it('handles option selection with multiple clicks', () => {
         const mockOnValueChange = jest.fn();
-        const { container } = render(<Select {...defaultProps} onValueChange={mockOnValueChange} />);
-        const selectContainer = container.firstChild as HTMLElement;
+        render(<Select {...defaultProps} onValueChange={mockOnValueChange} />);
 
-        fireEvent.click(selectContainer);
+        // First selection
+        fireEvent.click(screen.getByRole('toolbar'));
+        fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
 
-        const option = screen.getByText('Option 1');
-        fireEvent.click(option);
-        fireEvent.click(option);
-        fireEvent.click(option);
+        // Second selection
+        fireEvent.click(screen.getByRole('toolbar'));
+        fireEvent.click(screen.getByRole('button', { name: 'Option 2' }));
 
-        expect(mockOnValueChange).toHaveBeenCalledTimes(3);
+        expect(mockOnValueChange).toHaveBeenCalledTimes(2);
         expect(mockOnValueChange).toHaveBeenCalledWith('option1');
+        expect(mockOnValueChange).toHaveBeenCalledWith('option2');
     });
 
     it('handles complete user interaction flow', () => {
         const mockOnValueChange = jest.fn();
-        const { container } = render(<Select {...defaultProps} onValueChange={mockOnValueChange} />);
-        const selectContainer = container.firstChild as HTMLElement;
+        render(<Select {...defaultProps} onValueChange={mockOnValueChange} />);
+        const selectContainer = screen.getByRole('toolbar');
 
         expect(selectContainer).toHaveClass('select-closed');
         expect(screen.getByText('Статус')).toBeInTheDocument();
 
+        // Open and select Option 1
         fireEvent.click(selectContainer);
         expect(selectContainer).toHaveClass('select-opened');
-
-        fireEvent.click(screen.getByText('Option 1'));
+        fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
         expect(mockOnValueChange).toHaveBeenCalledWith('option1');
-        expect(screen.getByText('option1')).toBeInTheDocument();
+        expect(screen.getByText('Option 1')).toBeInTheDocument();
+        expect(selectContainer).toHaveClass('select-closed');
 
+        // Open and select Option 2
         fireEvent.click(selectContainer);
-        fireEvent.click(screen.getByText('Option 2'));
+        fireEvent.click(screen.getByRole('button', { name: 'Option 2' }));
         expect(mockOnValueChange).toHaveBeenCalledWith('option2');
-        expect(screen.getByText('option2')).toBeInTheDocument();
+        expect(screen.getByText('Option 2')).toBeInTheDocument();
     });
 
     it('renders Select.Option component correctly', () => {

@@ -40,7 +40,7 @@ describe('Program Validation Schema', () => {
             };
 
             await expect(programValidationSchema.validate(data)).rejects.toThrow(
-                PROGRAM_VALIDATION.name.getRequiredError()
+                PROGRAM_VALIDATION.name.getRequiredError(),
             );
         });
 
@@ -52,9 +52,7 @@ describe('Program Validation Schema', () => {
                 img: null,
             };
 
-            await expect(programValidationSchema.validate(data)).rejects.toThrow(
-                PROGRAM_VALIDATION.name.getMinError()
-            );
+            await expect(programValidationSchema.validate(data)).rejects.toThrow(PROGRAM_VALIDATION.name.getMinError());
         });
 
         it('should fail when name is too long', async () => {
@@ -65,9 +63,7 @@ describe('Program Validation Schema', () => {
                 img: null,
             };
 
-            await expect(programValidationSchema.validate(data)).rejects.toThrow(
-                PROGRAM_VALIDATION.name.getMaxError()
-            );
+            await expect(programValidationSchema.validate(data)).rejects.toThrow(PROGRAM_VALIDATION.name.getMaxError());
         });
     });
 
@@ -94,7 +90,7 @@ describe('Program Validation Schema', () => {
             };
 
             await expect(programValidationSchema.validate(data)).rejects.toThrow(
-                PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError()
+                PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError(),
             );
         });
 
@@ -107,7 +103,7 @@ describe('Program Validation Schema', () => {
             };
 
             await expect(programValidationSchema.validate(data)).rejects.toThrow(
-                PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError()
+                PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError(),
             );
         });
 
@@ -467,7 +463,6 @@ describe('Program Validation Schema', () => {
             await expect(
                 programValidationSchema.validate(data, { context: { isPublishing: true } }),
             ).resolves.toBeDefined();
-
         });
     });
 });

@@ -1,10 +1,10 @@
 ﻿import React, { useRef, useState, useEffect } from 'react';
-import Modal from '../../../../../components/common/modal/Modal';
+import { Modal } from '../../../../../components/common/modal/Modal';
 import { ProgramForm, ProgramFormValues, ProgramFormRef } from '../program-form/ProgramForm';
 import { Program, ProgramCreateUpdate } from '../../../../../types/ProgramAdminPage';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
-import Button from '../../../../../components/common/button/Button';
-import QuestionModal from '../../../../../components/common/question-modal/QuestionModal';
+import { Button } from '../../../../../components/common/button/Button';
+import { QuestionModal } from '../../../../../components/common/question-modal/QuestionModal';
 import { VisibilityStatus } from '../../../../../types/Common';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';

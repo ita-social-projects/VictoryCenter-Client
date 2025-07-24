@@ -1,8 +1,8 @@
 ﻿import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { ProgramForm, ProgramFormValues, ProgramFormRef } from '../program-form/ProgramForm';
-import Modal from '../../../../../components/common/modal/Modal';
-import Button from '../../../../../components/common/button/Button';
-import QuestionModal from '../../../../../components/common/question-modal/QuestionModal';
+import { Modal } from '../../../../../components/common/modal/Modal';
+import { Button } from '../../../../../components/common/button/Button';
+import { QuestionModal } from '../../../../../components/common/question-modal/QuestionModal';
 import { Program } from '../../../../../types/ProgramAdminPage';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
 import { VisibilityStatus } from '../../../../../types/Common';

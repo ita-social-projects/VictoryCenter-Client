@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
 import './input-with-character-limit.scss';
 

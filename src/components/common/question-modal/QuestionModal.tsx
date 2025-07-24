@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Button } from '../button/Button';
 import { Modal } from '../modal/Modal';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';

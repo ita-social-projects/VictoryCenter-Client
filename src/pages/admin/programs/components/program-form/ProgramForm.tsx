@@ -10,7 +10,7 @@ import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
 import { VisibilityStatus } from '../../../../../types/Common';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
-import MultiSelect from '../../../../../components/common/multi-select/MultiSelect';
+import { Multiselect } from '../../../../../components/common/multi-select/MultiSelect';
 import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
 import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
 import { TextAreaWithCharacterLimit } from '../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit';
@@ -115,7 +115,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         name="categories"
                         control={control}
                         render={({ field }) => (
-                            <MultiSelect
+                            <Multiselect
                                 {...field}
                                 options={availableCategories}
                                 disabled={isSubmitting || formDisabled}

@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import CheckedBox from '../../../assets/icons/chevron-checked.svg';
 import UncheckedBox from '../../../assets/icons/chevron-unchecked.svg';
 import ArrowDown from '../../../assets/icons/chevron-down.svg';
@@ -17,7 +17,7 @@ interface MultiselectProps<T extends Record<string, any>> {
     disabled?: boolean;
 }
 
-const Multiselect = <T extends Record<string, any>>(props: MultiselectProps<T>) => {
+export const Multiselect = <T extends Record<string, any>>(props: MultiselectProps<T>) => {
     const {
         options,
         value = [],
@@ -38,7 +38,6 @@ const Multiselect = <T extends Record<string, any>>(props: MultiselectProps<T>) 
         (option: T): boolean => {
             const optionId = getOptionId(option);
             if (optionId === null || optionId === undefined) {
-                console.warn('getOptionId returned null/undefined for option:', option);
                 return false;
             }
             return selectedIds.has(optionId);
@@ -53,7 +52,6 @@ const Multiselect = <T extends Record<string, any>>(props: MultiselectProps<T>) 
             const optionId = getOptionId(optionValue);
 
             if (optionId === null || optionId === undefined) {
-                console.warn('getOptionId returned null/undefined for option:', optionValue);
                 return;
             }
 
@@ -63,11 +61,7 @@ const Multiselect = <T extends Record<string, any>>(props: MultiselectProps<T>) 
                 ? value.filter((v) => getOptionId(v) !== optionId)
                 : [...value, optionValue];
 
-            try {
-                onChange?.(newSelectedValues);
-            } catch (error) {
-                console.error('Error in onChange callback:', error);
-            }
+             onChange?.(newSelectedValues);
         },
         [value, selectedIds, getOptionId, onChange, disabled],
     );
@@ -81,11 +75,7 @@ const Multiselect = <T extends Record<string, any>>(props: MultiselectProps<T>) 
         const handleClickOutside = (event: MouseEvent) => {
             if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
-                try {
-                    onBlur?.();
-                } catch (error) {
-                    console.error('Error in onBlur callback:', error);
-                }
+                onBlur?.();
             }
         };
 
@@ -157,5 +147,3 @@ const Multiselect = <T extends Record<string, any>>(props: MultiselectProps<T>) 
         </div>
     );
 };
-
-export default Multiselect;

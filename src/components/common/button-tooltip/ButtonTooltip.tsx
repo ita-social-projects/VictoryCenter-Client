@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import InfoIcon from '../../../assets/icons/info.svg';
 import InfoIconActive from '../../../assets/icons/info-active.svg';
 import classNames from 'classnames';

@@ -34,6 +34,7 @@ export interface PublicTeamMemberDto {
     id: number;
     fullName: string;
     description: string | null;
+    image: Image | null;
 }
 
 export interface TeamPageData {

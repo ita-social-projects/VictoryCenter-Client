@@ -2,6 +2,7 @@ import { TeamMember, TeamMemberDto } from '../../../../../types/admin/TeamMember
 import { MemberFormValues } from '../../../../../pages/admin/team/components/member-form/MemberForm';
 import { AxiosInstance } from 'axios';
 import { Status } from '../../../../../types/Common';
+import { Image } from '../../../../../types/Image';
 
 export const TeamMembersApi = {
     getAll: async (
@@ -31,46 +32,102 @@ export const TeamMembersApi = {
     },
 
     updateDraft: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
+        let imageId: number | null = null;
+
+        if (member.image) {
+            if (member.image.id != null) {
+                const imageResult = await client.put<Image>(`/image${member.image.id}`, {
+                    base64: member.image.base64,
+                    mimeType: member.image.mimeType,
+                });
+                imageId = imageResult.data.id;
+            } else {
+                const imageResult = await client.post<Image>(`/image`, {
+                    base64: member.image.base64,
+                    mimeType: member.image.mimeType,
+                });
+                imageId = imageResult.data.id;
+            }
+            await client.put(`/TeamMembers/${id}`, {
+                fullName: member.fullName,
+                categoryId: member.category.id,
+                status: Status.Published,
+                description: member.description,
+                email: '', //TODO implement email update
+                imageId: imageId,
+            });
+        }
+
         await client.put(`/TeamMembers/${id}`, {
             fullName: member.fullName,
             categoryId: member.category.id,
             status: Status.Draft,
             description: member.description,
             email: '', //TODO implement email update
-            imageId: member.image?.id,
+            imageId: imageId,
         });
     },
 
     updatePublish: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
+        let imageId: number | null = null;
+
+        if (member.image) {
+            const imageResult = await client.post<Image>(`/image`, {
+                base64: member.image.base64,
+                mimeType: member.image.mimeType,
+            });
+            imageId = imageResult.data.id;
+        }
+
         await client.put(`/TeamMembers/${id}`, {
             fullName: member.fullName,
             categoryId: member.category.id,
             status: Status.Published,
             description: member.description,
             email: '', //TODO implement email update
-            imageId: member.image?.id,
+            imageId: imageId,
         });
     },
 
     postDraft: async (client: AxiosInstance, member: MemberFormValues) => {
+        let imageId: number | null = null;
+
+        if (member.image) {
+            const imageResult = await client.post<Image>(`/image`, {
+                base64: member.image.base64,
+                mimeType: member.image.mimeType,
+            });
+            imageId = imageResult.data.id;
+        }
+
         await client.post(`/TeamMembers`, {
             fullName: member.fullName,
             categoryId: member.category.id,
             status: Status.Draft,
             description: member.description,
-            email: '', //TODO implement email post
-            imageId: member.image?.id,
+            email: '', // TODO: implement email post
+            imageId: imageId,
         });
     },
 
     postPublished: async (client: AxiosInstance, member: MemberFormValues) => {
+        let imageId: number | null = null;
+
+        if (member.image) {
+            const imageResult = await client.post<Image>(`/image`, {
+                base64: member.image.base64,
+                mimeType: member.image.mimeType,
+            });
+            imageId = imageResult.data.id;
+        }
+
         await client.post(`/TeamMembers`, {
             fullName: member.fullName,
             categoryId: member.category.id,
             status: Status.Published,
             description: member.description,
             email: '', //TODO implement email post
-            imageId: member.image?.id,
+            imageId: imageId,
         });
     },
 

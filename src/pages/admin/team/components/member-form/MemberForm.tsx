@@ -1,4 +1,3 @@
-import CloudDownload from '../../../../../assets/icons/cloud-download.svg';
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { TeamCategory } from '../../../../../types/admin/TeamMembers';
 import {
@@ -6,13 +5,11 @@ import {
     TEAM_LABEL_SELECT_CATEGORY,
     TEAM_LABEL_FULLNAME,
     TEAM_LABEL_DESCRIPTION,
-    TEAM_LABEL_PHOTO,
-    TEAM_LABEL_DRAG_DROP,
 } from '../../../../../const/team';
-import { ImageUploadField } from '../member-photo-uploader/ImageUploadField';
 import { Image, ImageValues } from '../../../../../types/Image';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
 import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
+import PhotoInput from '../../../../../components/common/photo-input/PhotoInput';
 
 export type MemberFormValues = {
     category: TeamCategory;
@@ -61,7 +58,7 @@ export const MemberForm = ({
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
     ) => {
         const { name, value } = e.target;
-        const inputTarget = e.currentTarget as EventTarget & HTMLInputElement;
+
         if (name === 'category') {
             const selectedCategory = categories.find((c) => c.name === value);
             setMemberFormValues((prev) => ({
@@ -70,25 +67,30 @@ export const MemberForm = ({
             }));
             return;
         }
-        if (inputTarget.files && inputTarget.files.length > 0) {
-            const file = inputTarget.files;
-            setMemberFormValues((prev) => ({
-                ...prev,
-                [name]: value,
-            }));
-        }
-    };
 
-    const onFileChange = (item: ImageValues) => {
-        var newImage: Image = {
-            id: existingMemberFormValues?.image?.id ?? null,
-            base64: item.base64,
-            mimeType: item.mimeType,
-        };
         setMemberFormValues((prev) => ({
             ...prev,
-            image: newImage,
+            [name]: value,
         }));
+    };
+
+    const onFileChange = (item: ImageValues | null) => {
+        if (!item) {
+            setMemberFormValues((prev) => ({
+                ...prev,
+                image: null,
+            }));
+        } else {
+            const image: Image = {
+                id: existingMemberFormValues?.image?.id ?? null,
+                base64: item?.base64,
+                mimeType: item?.mimeType,
+            };
+            setMemberFormValues((prev) => ({
+                ...prev,
+                image: image,
+            }));
+        }
     };
 
     useEffect(() => {
@@ -110,19 +112,6 @@ export const MemberForm = ({
         };
         fetchCategories();
     }, [client, onError]);
-
-    const handleFileDrop = (e: React.DragEvent<HTMLLabelElement>) => {
-        e.preventDefault();
-
-        const files = e.dataTransfer.files;
-        if (files) {
-            setMemberFormValues((prev) => ({
-                ...prev,
-                img: files,
-            }));
-        }
-    };
-
     return (
         <form id={id} onSubmit={handleOnSubmit} data-testid="test-form">
             <div className="members-add-modal-body">
@@ -174,10 +163,7 @@ export const MemberForm = ({
                         {MAX_DESCRIPTION_LENGTH}
                     </div>
                 </div>
-                <ImageUploadField
-                    image={memberFormValues.image}
-                    onChange={(image: ImageValues) => onFileChange(image)}
-                />
+                <PhotoInput value={memberFormValues?.image ?? null} onChange={onFileChange} />
             </div>
         </form>
     );

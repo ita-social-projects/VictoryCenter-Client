@@ -5,7 +5,6 @@ import { MemberFormValues } from '../member-form/MemberForm';
 import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
-import { ImagesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/image-data-fetch/ImageDataApi';
 
 export const TeamPageContent = () => {
     const [searchByNameQuery, setSearchByNameQuery] = useState<string>('');
@@ -37,23 +36,12 @@ export const TeamPageContent = () => {
         } catch (err) {
             setError('Не вдалося опублікувати учасника. Спробуйте ще раз.');
         }
-        if (member.image != null) {
-            member.image = await ImagesApi.post(client, member.image);
-        }
-
-        await TeamMembersApi.postPublished(client, member);
-        setRefetchKey((prev) => prev + 1);
     };
 
     const handleSaveDraft = async (member: MemberFormValues) => {
         setError(null);
         try {
-            if (member.image != null) {
-                member.image = await ImagesApi.post(client, member.image);
-            }
-
             await TeamMembersApi.postDraft(client, member);
-            setRefetchKey((prev) => prev + 1);
         } catch (err) {
             setError('Не вдалося зберегти чернетку. Спробуйте ще раз.');
         }

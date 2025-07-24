@@ -8,21 +8,13 @@ import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page
 const mockMembers = [] as TeamMember[];
 
 const mockDataTransfer = {
-    data: {},
-    setData(key, value) {
-        this.data[key] = value;
-    },
-    getData(key) {
-        return this.data[key];
-    },
-    clearData() {
-        this.data = {};
-    },
     setDragImage: jest.fn(),
-    dropEffect: 'move',
-    effectAllowed: 'all',
+    setData: jest.fn(),
+    getData: jest.fn(),
+    clearData: jest.fn(),
     types: [],
 };
+
 
 jest.mock('../../../../../context/admin-context-provider/AdminContextProvider', () => ({
     useAdminContext: () => ({

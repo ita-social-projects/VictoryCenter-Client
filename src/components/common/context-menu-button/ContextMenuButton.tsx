@@ -62,7 +62,7 @@ export const ContextMenuButton = ({ children, onOptionSelected, containerRef, cu
             <img src={customIcon || DefaultIcon} alt="menu" className="context-menu-icon" />
 
             <div
-                className={classNames('context-menu-options', {
+                className={classNames('context-menu-button-options', {
                     'context-menu-options-visible': isOpen,
                 })}
             >
@@ -107,7 +107,7 @@ ContextMenuButton.Option = ({
     return (
         <button
             role="menuitem"
-            className={classNames('context-menu-option', className)}
+            className={classNames('context-menu-button-option', className)}
             onClick={handleClick}
             disabled={disabled}
         >

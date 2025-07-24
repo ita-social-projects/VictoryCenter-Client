@@ -14,6 +14,7 @@
     },
 
     STATUS: {
+        DEFAULT: 'Статус',
         DRAFT: 'Чернетка',
         PUBLISHED: 'Опубліковано',
     },

@@ -11,7 +11,6 @@ interface TextAreaWithCharacterLimitProps {
     id: string;
     maxLength: number;
     disabled?: boolean;
-    wrapperClassName?: string;
     placeholder?: string;
     rows?: number;
 }
@@ -41,12 +40,14 @@ export const TextAreaWithCharacterLimit = ({
         onBlur?.(e);
     };
 
+    const countId = `${id}-character-count`;
+
     return (
         <div className="textarea-with-limit">
             <div
                 className={classNames('textarea-wrapper', {
-                    disabled,
-                    'textarea-wrapper-focused': isFocused,
+                    'textarea-wrapper-disabled': disabled,
+                    'textarea-wrapper-focused': isFocused && !disabled,
                 })}
             >
                 <textarea
@@ -61,13 +62,13 @@ export const TextAreaWithCharacterLimit = ({
                     disabled={disabled}
                     placeholder={placeholder}
                     rows={rows}
+                    aria-describedby={countId}
+                    aria-invalid={currentLength > maxLength}
                 />
             </div>
-            <div className="character-limit">
+            <div className="character-limit" id={countId} aria-live="polite" role="status">
                 {currentLength}/{maxLength}
             </div>
         </div>
     );
 };
-
-export default TextAreaWithCharacterLimit;

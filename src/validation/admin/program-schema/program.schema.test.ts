@@ -1,42 +1,6 @@
 ﻿import { programValidationSchema } from './program-scheme';
 import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
 
-jest.mock('../../../const/admin/programs', () => ({
-    PROGRAM_VALIDATION: {
-        name: {
-            min: 3,
-            max: 100,
-            getRequiredError: () => 'Name is required',
-            getMinError: () => 'Name must be at least 3 characters',
-            getMaxError: () => 'Name must not exceed 100 characters',
-        },
-        categories: {
-            getAtLeastOneRequiredError: () => 'At least one category is required',
-        },
-        description: {
-            min: 10,
-            max: 500,
-            getRequiredError: () => 'Description is required',
-            getMinError: () => 'Description must be at least 10 characters',
-            getMaxError: () => 'Description must not exceed 500 characters',
-        },
-        img: {
-            allowedFormats: ['image/jpeg', 'image/png', 'image/gif'],
-            maxSizeBytes: 5 * 1024 * 1024, // 5MB
-            getRequiredWhenPublishingError: () => 'Image is required when publishing',
-            getFormatError: () => 'Invalid image format',
-            getSizeError: () => 'Image size too large',
-        },
-    },
-}));
-
-const mockCategory = {
-    id: 1,
-    name: 'Test Category',
-    programsCount: 5,
-};
-
-// Helper function to create a valid File object
 const createMockFile = (type = 'image/jpeg', size = 1024) => {
     const file = new File(['test'], 'test.jpg', { type });
     Object.defineProperty(file, 'size', {
@@ -44,6 +8,12 @@ const createMockFile = (type = 'image/jpeg', size = 1024) => {
         writable: false,
     });
     return file;
+};
+
+const mockCategory = {
+    id: 1,
+    name: 'Test Category',
+    programsCount: 5,
 };
 
 describe('Program Validation Schema', () => {
@@ -69,7 +39,9 @@ describe('Program Validation Schema', () => {
                 img: null,
             };
 
-            await expect(programValidationSchema.validate(data)).rejects.toThrow('Name is required');
+            await expect(programValidationSchema.validate(data)).rejects.toThrow(
+                PROGRAM_VALIDATION.name.getRequiredError()
+            );
         });
 
         it('should fail when name is too short', async () => {
@@ -80,18 +52,22 @@ describe('Program Validation Schema', () => {
                 img: null,
             };
 
-            await expect(programValidationSchema.validate(data)).rejects.toThrow('Name must be at least 3 characters');
+            await expect(programValidationSchema.validate(data)).rejects.toThrow(
+                PROGRAM_VALIDATION.name.getMinError()
+            );
         });
 
         it('should fail when name is too long', async () => {
             const data = {
-                name: 'A'.repeat(101),
+                name: 'A'.repeat(PROGRAM_VALIDATION.name.max + 1),
                 categories: [mockCategory],
                 description: 'Valid description',
                 img: null,
             };
 
-            await expect(programValidationSchema.validate(data)).rejects.toThrow('Name must not exceed 100 characters');
+            await expect(programValidationSchema.validate(data)).rejects.toThrow(
+                PROGRAM_VALIDATION.name.getMaxError()
+            );
         });
     });
 
@@ -117,7 +93,9 @@ describe('Program Validation Schema', () => {
                 img: null,
             };
 
-            await expect(programValidationSchema.validate(data)).rejects.toThrow('At least one category is required');
+            await expect(programValidationSchema.validate(data)).rejects.toThrow(
+                PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError()
+            );
         });
 
         it('should fail when categories is null', async () => {
@@ -128,7 +106,9 @@ describe('Program Validation Schema', () => {
                 img: null,
             };
 
-            await expect(programValidationSchema.validate(data)).rejects.toThrow('At least one category is required');
+            await expect(programValidationSchema.validate(data)).rejects.toThrow(
+                PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError()
+            );
         });
 
         it('should pass with multiple categories', async () => {
@@ -176,13 +156,13 @@ describe('Program Validation Schema', () => {
                 const data = {
                     name: 'Valid Name',
                     categories: [mockCategory],
-                    description: 'A'.repeat(501),
+                    description: 'A'.repeat(PROGRAM_VALIDATION.description.max + 1),
                     img: null,
                 };
 
                 await expect(
                     programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).rejects.toThrow('Description must not exceed 500 characters');
+                ).rejects.toThrow(PROGRAM_VALIDATION.description.getMaxError());
             });
         });
 
@@ -210,7 +190,7 @@ describe('Program Validation Schema', () => {
 
                 await expect(
                     programValidationSchema.validate(data, { context: { isPublishing: true } }),
-                ).rejects.toThrow('Description is required');
+                ).rejects.toThrow(PROGRAM_VALIDATION.description.getRequiredError());
             });
 
             it('should fail when description is too short', async () => {
@@ -223,20 +203,20 @@ describe('Program Validation Schema', () => {
 
                 await expect(
                     programValidationSchema.validate(data, { context: { isPublishing: true } }),
-                ).rejects.toThrow('Description must be at least 10 characters');
+                ).rejects.toThrow(PROGRAM_VALIDATION.description.getMinError());
             });
 
             it('should fail when description exceeds max length', async () => {
                 const data = {
                     name: 'Valid Name',
                     categories: [mockCategory],
-                    description: 'A'.repeat(501),
+                    description: 'A'.repeat(PROGRAM_VALIDATION.description.max + 1),
                     img: createMockFile(),
                 };
 
                 await expect(
                     programValidationSchema.validate(data, { context: { isPublishing: true } }),
-                ).rejects.toThrow('Description must not exceed 500 characters');
+                ).rejects.toThrow(PROGRAM_VALIDATION.description.getMaxError());
             });
         });
     });
@@ -294,7 +274,7 @@ describe('Program Validation Schema', () => {
 
                 await expect(
                     programValidationSchema.validate(data, { context: { isPublishing: true } }),
-                ).rejects.toThrow('Image is required when publishing');
+                ).rejects.toThrow(PROGRAM_VALIDATION.img.getRequiredWhenPublishingError());
             });
 
             it('should pass with string image path', async () => {
@@ -351,7 +331,7 @@ describe('Program Validation Schema', () => {
                 ).resolves.toBeDefined();
             });
 
-            it('should pass with GIF file', async () => {
+            it('should fail with GIF file', async () => {
                 const data = {
                     name: 'Valid Name',
                     categories: [mockCategory],
@@ -361,7 +341,7 @@ describe('Program Validation Schema', () => {
 
                 await expect(
                     programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).resolves.toBeDefined();
+                ).rejects.toThrow(PROGRAM_VALIDATION.img.getFormatError());
             });
 
             it('should fail with invalid file format', async () => {
@@ -374,7 +354,7 @@ describe('Program Validation Schema', () => {
 
                 await expect(
                     programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).rejects.toThrow('Invalid image format');
+                ).rejects.toThrow(PROGRAM_VALIDATION.img.getFormatError());
             });
         });
 
@@ -397,12 +377,12 @@ describe('Program Validation Schema', () => {
                     name: 'Valid Name',
                     categories: [mockCategory],
                     description: 'Valid description',
-                    img: createMockFile('image/jpeg', 6 * 1024 * 1024), // 6MB
+                    img: createMockFile('image/jpeg', PROGRAM_VALIDATION.img.maxSizeBytes + 1),
                 };
 
                 await expect(
                     programValidationSchema.validate(data, { context: { isPublishing: false } }),
-                ).rejects.toThrow('Image size too large');
+                ).rejects.toThrow(PROGRAM_VALIDATION.img.getSizeError());
             });
 
             it('should pass with file at exact size limit', async () => {
@@ -410,7 +390,7 @@ describe('Program Validation Schema', () => {
                     name: 'Valid Name',
                     categories: [mockCategory],
                     description: 'Valid description',
-                    img: createMockFile('image/jpeg', 5 * 1024 * 1024), // 5MB
+                    img: createMockFile('image/jpeg', PROGRAM_VALIDATION.img.maxSizeBytes),
                 };
 
                 await expect(
@@ -487,6 +467,7 @@ describe('Program Validation Schema', () => {
             await expect(
                 programValidationSchema.validate(data, { context: { isPublishing: true } }),
             ).resolves.toBeDefined();
+
         });
     });
 });

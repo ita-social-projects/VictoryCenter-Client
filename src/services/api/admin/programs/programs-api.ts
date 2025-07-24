@@ -16,7 +16,7 @@ const mockDelay = 2200;
 const throwErrorsInApi = false;
 // !!!
 
-const ProgramsApi = {
+export const ProgramsApi = {
     fetchProgramCategories: async (): Promise<ProgramCategory[]> => {
         await new Promise((resolve) => setTimeout(resolve, 200));
         return [...mockCategories];

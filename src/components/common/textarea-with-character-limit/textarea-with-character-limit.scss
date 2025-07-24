@@ -4,52 +4,52 @@
 
     .textarea-wrapper {
         display: flex;
-        font-size: 16px;
-        border-radius: 8px;
-        border: 1px solid #0f2957;
-        box-shadow: 0 1px 2px 0 #0a0d120d;
         padding: 10px;
         background: white;
+        border: 1px solid #0f2957;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px 0 #0a0d120d;
         color: #041128;
+        font-size: 16px;
 
         &-focused {
             border-color: #a4a49b;
         }
 
-        &.disabled {
-            background: #d2d2c7;
-            border: 1px solid #61615c;
+        &-disabled {
+            background-color: #d2d2c7;
+            border-color: #61615c;
         }
 
         .textarea-input {
             flex: 1;
+            padding: 0;
+            min-height: 80px;
             border: none;
             outline: none;
             resize: none;
-            padding: 0;
             background: none;
-            min-height: 80px;
+            color: #414651;
             font-family: inherit;
             font-size: 16px;
-            color: #414651;
 
             &::placeholder {
                 color: #a4a49b;
             }
 
             &:disabled {
-                background: transparent;
+                background-color: transparent;
             }
         }
     }
 
     .character-limit {
-        color: #717680;
-        white-space: nowrap;
-        font-size: 16px;
-        line-height: 24px;
-        font-weight: 400;
         margin-top: 4px;
+        color: #717680;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 24px;
         text-align: right;
+        white-space: nowrap;
     }
 }

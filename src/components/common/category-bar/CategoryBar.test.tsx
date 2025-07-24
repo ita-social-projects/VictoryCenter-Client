@@ -13,9 +13,7 @@ interface MockContextMenuButtonOptionProps {
     value: string;
 }
 
-jest.mock('../context-menu/ContextMenuButton', () => {
-    const React = require('react');
-
+jest.mock('../context-menu-button/ContextMenuButton', () => {
     const MockContextMenuButton = ({ children, onOptionSelected }: MockContextMenuButtonProps) => (
         <div data-testid="context-menu" onClick={() => onOptionSelected?.('test-option')}>
             {children}
@@ -110,9 +108,9 @@ describe('CategoryBar', () => {
 
         render(<CategoryBar {...defaultProps} displayContextMenu={true} contextMenuOptions={contextMenuOptions} />);
 
-        expect(screen.getByTestId('context-menu')).toBeInTheDocument();
-        expect(screen.getByTestId('context-menu-option-option1')).toBeInTheDocument();
-        expect(screen.getByTestId('context-menu-option-option2')).toBeInTheDocument();
+        expect(screen.getByTestId('context-menu-button')).toBeInTheDocument();
+        expect(screen.getByTestId('context-menu-button-option-option1')).toBeInTheDocument();
+        expect(screen.getByTestId('context-menu-button-option-option2')).toBeInTheDocument();
     });
 
     it('does not render context menu when displayContextMenu is false', () => {
@@ -120,7 +118,7 @@ describe('CategoryBar', () => {
 
         render(<CategoryBar {...defaultProps} displayContextMenu={false} contextMenuOptions={contextMenuOptions} />);
 
-        expect(screen.queryByTestId('context-menu')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('context-menu-button')).not.toBeInTheDocument();
     });
 
     it('calls onContextMenuOptionSelected when context menu option is selected', () => {
@@ -136,7 +134,7 @@ describe('CategoryBar', () => {
             />,
         );
 
-        const contextMenu = screen.getByTestId('context-menu');
+        const contextMenu = screen.getByTestId('context-menu-button');
         fireEvent.click(contextMenu);
 
         expect(mockOnContextMenuOptionSelected).toHaveBeenCalledTimes(1);

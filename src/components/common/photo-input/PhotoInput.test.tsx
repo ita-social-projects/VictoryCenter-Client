@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import PhotoInput from './PhotoInput';
+import { PhotoInput } from './PhotoInput';
 
 const createImageFile = () => new File(['dummy content'], 'example.png', { type: 'image/png' });
 

@@ -14,7 +14,7 @@ interface PhotoInputProps {
     name?: string;
 }
 
-const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: PhotoInputProps) => {
+export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: PhotoInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -81,8 +81,8 @@ const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: Pho
     return (
         <div
             className={classNames('photo-input-wrapper', {
-                'photo-input-wrapper-focused': isFocused,
                 'photo-input-wrapper-disabled': disabled,
+                'photo-input-wrapper-focused': isFocused && !disabled,
             })}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
@@ -125,5 +125,3 @@ const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: Pho
         </div>
     );
 };
-
-export default PhotoInput;

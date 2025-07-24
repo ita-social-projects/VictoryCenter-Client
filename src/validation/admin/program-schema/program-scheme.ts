@@ -43,9 +43,11 @@ export const programValidationSchema = Yup.object({
         )
         .transform((value) => {
             if (value === undefined || value === '') return null;
-            if (value instanceof FileList && value.length > 0) return value[0];
+            if (value instanceof FileList){
+                return value.length > 0 ? value[0] : null;
+            }
             if (value instanceof File) return value;
-            if (typeof value === 'string') return value;
+            if (typeof value === 'string' && value.trim()) return value;
             return null;
         })
         .test('fileFormat', PROGRAM_VALIDATION.img.getFormatError(), (value) => {

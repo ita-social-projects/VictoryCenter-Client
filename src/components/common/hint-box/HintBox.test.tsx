@@ -1,4 +1,4 @@
-﻿import { render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { HintBox } from './HintBox';
 
 jest.mock('../../../assets/icons/info.svg', () => 'mocked-info-icon.svg');

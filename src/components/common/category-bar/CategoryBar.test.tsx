@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CategoryBar } from './CategoryBar';
@@ -29,7 +29,6 @@ jest.mock('../context-menu-button/ContextMenuButton', () => {
         ContextMenuButton: MockContextMenuButton,
     };
 });
-
 
 interface MockContextMenuOption {
     id: number;

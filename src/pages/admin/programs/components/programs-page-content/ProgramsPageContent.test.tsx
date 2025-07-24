@@ -1,14 +1,13 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { ProgramsPageContent } from './ProgramsPageContent';
 import { Program } from '../../../../../types/ProgramAdminPage';
-import addProgramModal, { AddProgramModalProps } from '../program-modals/AddProgramModal';
+import { AddProgramModalProps } from '../program-modals/AddProgramModal';
 import { EditProgramModalProps } from '../program-modals/EditProgramModal';
 import { DeleteProgramModalProps } from '../program-modals/DeleteProgramModal';
 import { ProgramPageToolbarProps } from '../programs-page-toolbar/ProgramsPageToolbar';
-import { ProgramsListProps, ProgramListRef } from '../programs-list/ProgramsList';
+import { ProgramsListProps } from '../programs-list/ProgramsList';
 
-// Mock data for tests
 const mockProgram: Program = {
     id: 1,
     name: 'Test Program Alpha',
@@ -22,12 +21,10 @@ const mockAddProgram = jest.fn();
 const mockEditProgram = jest.fn();
 const mockDeleteProgram = jest.fn();
 
-// Mock child components to isolate ProgramsPageContent logic
 jest.mock('../programs-list/ProgramsList', () => {
     const React = require('react');
 
     const MockProgramsList = React.forwardRef((props: ProgramsListProps, ref: any) => {
-        // Create mock functions for each render
         const mockRef = {
             addProgram: mockAddProgram,
             editProgram: mockEditProgram,

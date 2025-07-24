@@ -15,7 +15,6 @@ const mockDataTransfer = {
     types: [],
 };
 
-
 jest.mock('../../../../../context/admin-context-provider/AdminContextProvider', () => ({
     useAdminContext: () => ({
         client: {
@@ -324,25 +323,25 @@ describe('MembersList', () => {
     // TODO
     it('should reset dragPreview and draggedIndex state', async () => {
         render(<MembersList {...sharedDefaultProps} />);
-    
+
         const dragItem = await screen.findByTestId('member-item-0');
-    
+
         fireEvent.dragStart(dragItem, { dataTransfer: mockDataTransfer });
-        
+
         expect(screen.getByTestId('drag-preview')).toBeInTheDocument();
-    
+
         fireEvent.dragEnd(dragItem, { dataTransfer: mockDataTransfer });
-    
+
         await waitFor(
             () => {
                 expect(screen.queryByTestId('drag-preview')).not.toBeInTheDocument();
             },
-            { 
+            {
                 timeout: 3000,
-                interval: 100 // Check every 100ms
-            }
+                interval: 100, // Check every 100ms
+            },
         );
-    
+
         expect(screen.queryByTestId('dragged-indicator')).not.toBeInTheDocument();
     });
 

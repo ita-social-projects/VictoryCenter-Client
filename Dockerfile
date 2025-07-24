@@ -1,15 +1,17 @@
-FROM node:alpine AS build
+FROM node:20 AS build
 WORKDIR /app
-COPY package*.json ./
-RUN npm install --ignore-scripts
-COPY tsconfig.json ./
-COPY public ./public
-COPY src ./src
+COPY package*.json /app/
+RUN npm install
+RUN npm install --global serve
+COPY ./ ./
+ENV REACT_APP_BACKEND_URL="https://backend.historycode.online/api"
 RUN npm run build
+
 
 FROM nginxinc/nginx-unprivileged  
 COPY --from=build /app/build /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx/nginx.conf /etc/nginx/conf.d
+ENV REACT_APP_BACKEND_URL="https://backend.historycode.online/api"
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

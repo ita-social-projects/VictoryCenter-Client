@@ -18,8 +18,6 @@ import {
     EVENTS_AND_NEWS,
     PROGRAMS,
     PROGRAMS_SESSIONS,
-    VICTORY_STARTS_WITH_YOU,
-    STAY_UP_TO_DATE_WITH_THE_NEWS,
     ENTER_YOUR_EMAIL,
     SIGN_UP,
     WHAT_IS_HIPPOTHERAPY,
@@ -44,11 +42,8 @@ function escapeRegExp(string: string) {
 }
 
 describe('Footer', () => {
-    beforeEach(() => {
-        render(<Footer />, { wrapper: MemoryRouter });
-    });
-
     it('renders email input and clears on subscribe click', () => {
+        render(<Footer />, { wrapper: MemoryRouter });
         const input = screen.getByPlaceholderText(ENTER_YOUR_EMAIL) as HTMLInputElement;
         fireEvent.change(input, { target: { value: 'user@example.com' } });
         expect(input.value).toBe('user@example.com');
@@ -59,10 +54,9 @@ describe('Footer', () => {
     });
 
     it('renders the menu section with correct links', () => {
-        // Check menu title
+        render(<Footer />, { wrapper: MemoryRouter });
         expect(screen.getByText(MENU)).toBeInTheDocument();
 
-        // Check all links in menu
         expect(screen.getByRole('link', { name: REPORTING })).toHaveAttribute(
             'href',
             routes.userPageRoutes.teamPageRoute,
@@ -79,7 +73,8 @@ describe('Footer', () => {
     });
 
     it('renders the about us section with correct links', () => {
-        expect(screen.getAllByText(ABOUT_US)[1]).toBeInTheDocument(); // The second ABOUT_US span
+        render(<Footer />, { wrapper: MemoryRouter });
+        expect(screen.getAllByText(ABOUT_US)[1]).toBeInTheDocument();
 
         expect(screen.getByRole('link', { name: ABOUT_US })).toHaveAttribute(
             'href',
@@ -98,6 +93,7 @@ describe('Footer', () => {
     });
 
     it('renders the hippotherapy section with correct links', () => {
+        render(<Footer />, { wrapper: MemoryRouter });
         expect(screen.getByText(HIPPOTHERAPY)).toBeInTheDocument();
 
         expect(screen.getByRole('link', { name: WHAT_IS_HIPPOTHERAPY })).toHaveAttribute(
@@ -115,6 +111,7 @@ describe('Footer', () => {
     });
 
     it('renders contact buttons with correct text', () => {
+        render(<Footer />, { wrapper: MemoryRouter });
         expect(screen.getByRole('button', { name: new RegExp(escapeRegExp(EMAIL), 'i') })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: new RegExp(escapeRegExp(PHONE), 'i') })).toBeInTheDocument();
 
@@ -124,30 +121,35 @@ describe('Footer', () => {
     });
 
     it('copies email to clipboard on click', () => {
+        render(<Footer />, { wrapper: MemoryRouter });
         const emailButton = screen.getByRole('button', { name: new RegExp(escapeRegExp(EMAIL), 'i') });
         fireEvent.click(emailButton);
         expect(navigator.clipboard.writeText).toHaveBeenCalledWith(EMAIL);
     });
 
     it('copies phone to clipboard on click', () => {
+        render(<Footer />, { wrapper: MemoryRouter });
         const phoneButton = screen.getByRole('button', { name: new RegExp(escapeRegExp(PHONE), 'i') });
         fireEvent.click(phoneButton);
         expect(navigator.clipboard.writeText).toHaveBeenCalledWith(PHONE);
     });
 
     it('copies Facebook to clipboard on click', () => {
+        render(<Footer />, { wrapper: MemoryRouter });
         const fbButton = screen.getByRole('button', { name: /facebook/i });
         fireEvent.click(fbButton);
         expect(navigator.clipboard.writeText).toHaveBeenCalledWith(FACEBOOK);
     });
 
     it('copies Telegram to clipboard on click', () => {
+        render(<Footer />, { wrapper: MemoryRouter });
         const tgButton = screen.getByRole('button', { name: /telegram/i });
         fireEvent.click(tgButton);
         expect(navigator.clipboard.writeText).toHaveBeenCalledWith(TELEGRAM);
     });
 
     it('copies Instagram to clipboard on click', () => {
+        render(<Footer />, { wrapper: MemoryRouter });
         const igButton = screen.getByRole('button', { name: /instagram/i });
         fireEvent.click(igButton);
         expect(navigator.clipboard.writeText).toHaveBeenCalledWith(INSTAGRAM);

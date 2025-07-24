@@ -100,7 +100,9 @@ export const MembersList = ({
 
     const updatePageSize = () => {
         if (memberListRef.current) {
-            setPageSize(memberListRef.current.clientHeight / 120 + 1);
+            const calculatedPageSize = Math.floor(memberListRef.current.clientHeight / 120) + 1;
+            setPageSize(calculatedPageSize);
+        } else {
         }
     };
 
@@ -149,8 +151,9 @@ export const MembersList = ({
         async (reset: boolean = false) => {
             const currentCategory = categoryRef.current;
             const currentSearch = searchByNameQuery || '';
-            if (!currentCategory || isFetchingRef.current) return;
-            if (!reset && totalPagesRef.current && currentPageRef.current > totalPagesRef.current) return;
+            if (!currentCategory || isFetchingRef.current) {
+                return;
+            }
 
             isFetchingRef.current = true;
             setIsMembersLoading(true);
@@ -158,23 +161,30 @@ export const MembersList = ({
             const pageToFetch = reset ? 1 : currentPageRef.current;
 
             let newMembers = [] as TeamMember[];
+            let totalCount = 0;
             try {
-                newMembers = await TeamMembersApi.getAll(
+                const response = await TeamMembersApi.getAll(
                     client,
                     currentCategory.id,
                     mapStatusFilterToStatus(statusFilter),
                     (pageToFetch - 1) * pageSize,
                     pageToFetch * pageSize,
                 );
+                newMembers = response;
+                totalCount = response.length;
             } catch (err) {
                 onError?.((err as Error).message);
             }
             if (currentSearch) {
                 newMembers = newMembers.filter((m) => m.fullName.toLowerCase().includes(currentSearch.toLowerCase()));
             }
-            const totalCountOfPages = Math.ceil(newMembers.length / pageSize);
 
-            setMembers((prev) => (reset ? [...newMembers] : [...prev, ...newMembers]));
+            const totalCountOfPages = Math.ceil(totalCount / pageSize);
+
+            setMembers((prev) => {
+                const updatedMembers = reset ? [...newMembers] : [...prev, ...newMembers];
+                return updatedMembers;
+            });
             setCurrentPage((prev) => (reset ? 2 : prev + 1));
             if (totalPagesRef.current === null || reset) {
                 setTotalPages(totalCountOfPages);

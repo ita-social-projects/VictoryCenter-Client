@@ -15,19 +15,21 @@ interface MockContextMenuButtonOptionProps {
 
 jest.mock('../context-menu-button/ContextMenuButton', () => {
     const MockContextMenuButton = ({ children, onOptionSelected }: MockContextMenuButtonProps) => (
-        <div data-testid="context-menu" onClick={() => onOptionSelected?.('test-option')}>
+        <div data-testid="context-menu-button" onClick={() => onOptionSelected?.('test-option')}>
             {children}
         </div>
     );
 
     MockContextMenuButton.Option = ({ children, value }: MockContextMenuButtonOptionProps) => (
-        <div data-testid={`context-menu-option-${value}`}>{children}</div>
+        <div data-testid={`context-menu-button-option-${value}`}>{children}</div>
     );
 
     return {
+        __esModule: true,
         ContextMenuButton: MockContextMenuButton,
     };
 });
+
 
 interface MockContextMenuOption {
     id: number;

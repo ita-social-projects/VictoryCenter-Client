@@ -6,27 +6,6 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { Program } from '../../../../../types/ProgramAdminPage';
 import { VisibilityStatus } from '../../../../../types/Common';
 
-// Mock the imported components and constants
-jest.mock('../../../../../components/common/button-tooltip/ButtonTooltip', () => {
-    return function MockTooltipButton({ children, position }: { children: React.ReactNode; position: string }) {
-        return (
-            <div data-testid="tooltip-button" data-position={position}>
-                {children}
-            </div>
-        );
-    };
-});
-
-jest.mock('../../../../../components/common/status/Status', () => {
-    return function MockStatus({ status }: { status: VisibilityStatus }) {
-        return (
-            <div data-testid="status" data-status={status}>
-                {status}
-            </div>
-        );
-    };
-});
-
 jest.mock('../../../../../assets/images/admin/blank-image.svg', () => 'blank-image.svg');
 
 jest.mock('../../../../../const/admin/common', () => ({
@@ -35,6 +14,28 @@ jest.mock('../../../../../const/admin/common', () => ({
             PUBLISHED_IN: 'Published in:',
             DRAFTED_IN: 'Drafted in:',
         },
+    },
+}));
+
+jest.mock('../../../../../components/common/button-tooltip/ButtonTooltip', () => ({
+    __esModule: true,
+    ButtonTooltip: ({ children, position }: { children: React.ReactNode; position: string }) => {
+        return (
+            <div data-testid="tooltip-button" data-position={position}>
+                {children}
+            </div>
+        );
+    },
+}));
+
+jest.mock('../../../../../components/common/status/Status', () => ({
+    __esModule: true,
+    Status: ({ status }: { status: VisibilityStatus }) => {
+        return (
+            <div data-testid="status" data-status={status}>
+                {status}
+            </div>
+        );
     },
 }));
 

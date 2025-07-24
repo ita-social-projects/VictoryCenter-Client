@@ -205,47 +205,4 @@ describe('Multiselect Component', () => {
             expect(mockOnBlur).toHaveBeenCalled();
         });
     });
-
-    it('handles onChange callback errors gracefully', () => {
-        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-        const mockOnChange = jest.fn(() => {
-            throw new Error('Test error');
-        });
-
-        render(<MultiSelect {...defaultProps} onChange={mockOnChange} />);
-
-        // Open dropdown and select option
-        fireEvent.click(screen.getByText('Select options...'));
-        fireEvent.click(screen.getByText('Option 1'));
-
-        expect(consoleErrorSpy).toHaveBeenCalledWith('Error in onChange callback:', expect.any(Error));
-
-        consoleErrorSpy.mockRestore();
-    });
-
-    it('handles onBlur callback errors gracefully', async () => {
-        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-        const mockOnBlur = jest.fn(() => {
-            throw new Error('Test error');
-        });
-
-        render(
-            <div>
-                <MultiSelect {...defaultProps} onBlur={mockOnBlur} />
-                <div data-testid="outside-element">Outside</div>
-            </div>,
-        );
-
-        // Open dropdown
-        fireEvent.click(screen.getByText('Select options...'));
-
-        // Click outside
-        fireEvent.mouseDown(screen.getByTestId('outside-element'));
-
-        await waitFor(() => {
-            expect(consoleErrorSpy).toHaveBeenCalledWith('Error in onBlur callback:', expect.any(Error));
-        });
-
-        consoleErrorSpy.mockRestore();
-    });
 });

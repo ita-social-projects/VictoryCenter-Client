@@ -46,15 +46,15 @@ describe('ContextMenuButton', () => {
         const contextMenuElement = screen.getByRole('menu');
 
         // Initially closed
-        expect(contextMenuElement).not.toHaveClass('context-menu-active');
+        expect(contextMenuElement).not.toHaveClass('context-menu-button-active');
 
         // Open
         fireEvent.click(contextMenuElement);
-        expect(contextMenuElement).toHaveClass('context-menu-active');
+        expect(contextMenuElement).toHaveClass('context-menu-button-active');
 
         // Close
         fireEvent.click(contextMenuElement);
-        expect(contextMenuElement).not.toHaveClass('context-menu-active');
+        expect(contextMenuElement).not.toHaveClass('context-menu-button-active');
     });
 
     it('handles keyboard navigation with Enter and Space keys', () => {
@@ -68,11 +68,11 @@ describe('ContextMenuButton', () => {
 
         // Test Enter key
         fireEvent.keyDown(contextMenuElement, { key: 'Enter' });
-        expect(contextMenuElement).toHaveClass('context-menu-active');
+        expect(contextMenuElement).toHaveClass('context-menu-button-active');
 
         // Test Space key
         fireEvent.keyDown(contextMenuElement, { key: ' ' });
-        expect(contextMenuElement).not.toHaveClass('context-menu-active');
+        expect(contextMenuElement).not.toHaveClass('context-menu-button-active');
     });
 
     it('calls onOptionSelected and closes menu when option is clicked', () => {
@@ -87,14 +87,14 @@ describe('ContextMenuButton', () => {
 
         // Open
         fireEvent.click(screen.getByRole('menu'));
-        expect(screen.getByRole('menu')).toHaveClass('context-menu-active');
+        expect(screen.getByRole('menu')).toHaveClass('context-menu-button-active');
 
         // Click on option
         fireEvent.click(screen.getByText('Option 1'));
 
         expect(mockOnOptionSelected).toHaveBeenCalledWith('option1', { id: 123 });
         expect(mockOnOptionSelected).toHaveBeenCalledTimes(1);
-        expect(screen.getByRole('menu')).not.toHaveClass('context-menu-active');
+        expect(screen.getByRole('menu')).not.toHaveClass('context-menu-button-active');
     });
 
     it('closes menu when clicking outside', async () => {
@@ -111,13 +111,13 @@ describe('ContextMenuButton', () => {
 
         // Open
         fireEvent.click(contextMenuElement);
-        expect(contextMenuElement).toHaveClass('context-menu-active');
+        expect(contextMenuElement).toHaveClass('context-menu-button-active');
 
         // Click outside
         fireEvent.mouseDown(screen.getByTestId('outside-element'));
 
         await waitFor(() => {
-            expect(contextMenuElement).not.toHaveClass('context-menu-active');
+            expect(contextMenuElement).not.toHaveClass('context-menu-button-active');
         });
     });
 

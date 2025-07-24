@@ -9,19 +9,44 @@
     &-profile {
         display: flex;
         gap: 16px;
-        font-size: 18px;
         width: 33%;
+        align-items: center;
 
         img {
             width: 60px;
             height: 60px;
             border-radius: 100%;
+            margin: 0.25rem;
+        }
+
+        p {
+            margin: 0;
+            display: -webkit-box;
+            font-size: 18px;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            text-overflow: ellipsis;
         }
     }
 
     &-position {
         text-align: start;
         width: 33%;
+
+        p {
+            font-size: 18px;
+            padding-right: 2.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            text-overflow: ellipsis;
+        }
     }
 
     &-controls {

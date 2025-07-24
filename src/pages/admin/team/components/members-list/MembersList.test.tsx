@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MembersList, MembersListProps } from './MembersList';
 import { TeamCategory, TeamMember } from '../../../../../types/admin/TeamMembers';
 import * as React from 'react';

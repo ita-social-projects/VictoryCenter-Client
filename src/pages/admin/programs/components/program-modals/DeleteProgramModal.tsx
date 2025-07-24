@@ -31,7 +31,6 @@ export const DeleteProgramModal = ({ isOpen, onClose, onDeleteProgram, programTo
         } catch (error) {
             // Or handle in other way
             setError(PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_PROGRAM);
-            console.log(`Error occurred while deleting program: ${error}`);
         } finally {
             setIsSubmitting(false);
         }

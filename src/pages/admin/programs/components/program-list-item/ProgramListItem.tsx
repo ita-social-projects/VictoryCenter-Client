@@ -30,7 +30,7 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
                 <ButtonTooltip position="bottom">
                     <div className="program-actions-tooltip">
                         <b>
-                            {program.status == 'Published'
+                            {program.status === 'Published'
                                 ? COMMON_TEXT_ADMIN.TOOLTIP.PUBLISHED_IN
                                 : COMMON_TEXT_ADMIN.TOOLTIP.DRAFTED_IN}
                         </b>

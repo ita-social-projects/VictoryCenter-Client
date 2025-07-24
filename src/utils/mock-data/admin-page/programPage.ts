@@ -1,4 +1,4 @@
-﻿import program1 from '../../../assets/program_page_images/images/first.png';
+import program1 from '../../../assets/program_page_images/images/first.png';
 import program2 from '../../../assets/program_page_images/images/second.png';
 import program3 from '../../../assets/program_page_images/images/third.png';
 import program4 from '../../../assets/program_page_images/images/fourth.png';

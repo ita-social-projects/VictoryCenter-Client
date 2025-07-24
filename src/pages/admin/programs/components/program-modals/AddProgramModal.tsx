@@ -59,7 +59,6 @@ export const AddProgramModal = ({ isOpen, onClose, onAddProgram }: AddProgramMod
         } catch (error) {
             // Or handle in other way
             setError(PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_PROGRAM);
-            console.log(`Error occurred while creating program: ${error}`);
         } finally {
             setIsSubmitting(false);
         }

@@ -1,4 +1,4 @@
-﻿import { PROGRAM_CATEGORY_VALIDATION } from '../../../const/admin/programs';
+import { PROGRAM_CATEGORY_VALIDATION } from '../../../const/admin/programs';
 import * as Yup from 'yup';
 
 export const ProgramCategoryValidationSchema = Yup.object({

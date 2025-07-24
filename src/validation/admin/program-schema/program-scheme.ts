@@ -1,4 +1,4 @@
-﻿import { ProgramCategory } from '../../../types/ProgramAdminPage';
+import { ProgramCategory } from '../../../types/ProgramAdminPage';
 import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
 import * as Yup from 'yup';
 

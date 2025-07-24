@@ -113,7 +113,6 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(
 
         useEffect(() => {
             const fetchCategories = async () => {
-                console.log('fetchCategories');
                 const categoriesFetch = await ProgramsApi.fetchProgramCategories();
                 setCategories(categoriesFetch);
 
@@ -158,7 +157,7 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(
                     setIsProgramsLoading(false);
                 }
             },
-            [searchByStatus, selectedCategory],
+            [searchByStatus],
         );
 
         useEffect(() => {

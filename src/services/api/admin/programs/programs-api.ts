@@ -1,4 +1,4 @@
-﻿import {
+import {
     Program,
     ProgramCategory,
     ProgramCategoryCreateUpdate,
@@ -41,8 +41,6 @@ export const ProgramsApi = {
             return inCategory && statusMatches;
         });
 
-        console.log(`Status: ${status}`);
-
         const start = (pageNumber - 1) * pageSize;
         const end = start + pageSize;
 
@@ -70,8 +68,6 @@ export const ProgramsApi = {
             categories: mockCategories.filter((c) => program.categoryIds.includes(c.id)),
         };
 
-        console.log(`Add with status: ${program.status}`);
-
         mockPrograms.push(newProgram);
         return newProgram;
     },
@@ -96,8 +92,6 @@ export const ProgramsApi = {
             img: imageUrl,
             categories: mockCategories.filter((c) => program.categoryIds.includes(c.id)),
         };
-
-        console.log(`Edit with status: ${program.status}`);
 
         mockPrograms[index] = updatedProgram;
         return updatedProgram;

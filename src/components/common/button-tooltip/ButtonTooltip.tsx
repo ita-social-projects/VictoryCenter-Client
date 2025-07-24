@@ -53,7 +53,7 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
         if (isVisible) {
             calculatePosition();
         }
-    }, [isVisible, position, offset]);
+    }, [isVisible, position, offset, calculatePosition]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {

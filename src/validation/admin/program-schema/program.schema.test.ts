@@ -1,4 +1,4 @@
-﻿import { programValidationSchema } from './program-scheme';
+import { programValidationSchema } from './program-scheme';
 import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
 
 const createMockFile = (type = 'image/jpeg', size = 1024) => {

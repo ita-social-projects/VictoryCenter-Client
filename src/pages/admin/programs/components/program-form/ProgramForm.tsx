@@ -86,7 +86,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     setAvailableCategories(categories);
                 } catch (error) {
                     // Or handle in other way
-                    console.error('Error fetching categories:');
                 }
             };
             fetchCategories();

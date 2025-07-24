@@ -71,7 +71,6 @@ export const EditProgramModal = ({ isOpen, onClose, onEditProgram, programToEdit
             onClose();
         } catch (error) {
             setError(PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_PROGRAM);
-            console.log(`Error occurred while updating program: ${error}`);
         } finally {
             setIsSubmitting(false);
         }

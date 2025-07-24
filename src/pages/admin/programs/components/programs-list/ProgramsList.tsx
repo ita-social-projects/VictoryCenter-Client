@@ -1,4 +1,4 @@
-﻿import React, { useCallback, useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useCallback, useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
 import { Program, ProgramCategory } from '../../../../../types/ProgramAdminPage';
 import { PROGRAM_CATEGORY_TEXT } from '../../../../../const/admin/programs';

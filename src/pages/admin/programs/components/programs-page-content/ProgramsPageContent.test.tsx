@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramsPageContent } from './ProgramsPageContent';
 import { Program } from '../../../../../types/ProgramAdminPage';

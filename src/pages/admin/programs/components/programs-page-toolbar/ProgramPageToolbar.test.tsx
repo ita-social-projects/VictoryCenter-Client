@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramsPageToolbar } from './ProgramsPageToolbar';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';

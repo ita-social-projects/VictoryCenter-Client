@@ -1,4 +1,4 @@
-﻿export const COMMON_TEXT_ADMIN = {
+export const COMMON_TEXT_ADMIN = {
     TAB: {
         TEAM_MEMBERS: 'Команда',
         PROGRAMS: 'Програми',

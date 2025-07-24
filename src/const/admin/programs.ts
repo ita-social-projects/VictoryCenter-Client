@@ -1,4 +1,4 @@
-﻿export const PROGRAMS_TEXT = {
+export const PROGRAMS_TEXT = {
     BUTTON: {
         ADD_PROGRAM: 'Додати програму',
     },

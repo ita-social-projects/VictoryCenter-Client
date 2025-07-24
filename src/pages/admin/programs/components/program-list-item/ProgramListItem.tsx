@@ -1,4 +1,4 @@
-﻿import { Program } from '../../../../../types/ProgramAdminPage';
+import { Program } from '../../../../../types/ProgramAdminPage';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonTooltip } from '../../../../../components/common/button-tooltip/ButtonTooltip';
 import { Status } from '../../../../../components/common/status/Status';

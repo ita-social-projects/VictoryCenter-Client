@@ -1,4 +1,4 @@
-﻿import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { ProgramForm, ProgramFormValues, ProgramFormRef } from '../program-form/ProgramForm';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/common/button/Button';

@@ -17,7 +17,7 @@ interface MultiselectProps<T extends Record<string, any>> {
     disabled?: boolean;
 }
 
-export const Multiselect = <T extends Record<string, any>>(props: MultiselectProps<T>) => {
+export const MultiSelect = <T extends Record<string, any>>(props: MultiselectProps<T>) => {
     const {
         options,
         value = [],
@@ -61,7 +61,7 @@ export const Multiselect = <T extends Record<string, any>>(props: MultiselectPro
                 ? value.filter((v) => getOptionId(v) !== optionId)
                 : [...value, optionValue];
 
-             onChange?.(newSelectedValues);
+            onChange?.(newSelectedValues);
         },
         [value, selectedIds, getOptionId, onChange, disabled],
     );

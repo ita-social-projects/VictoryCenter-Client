@@ -156,10 +156,6 @@ export const MembersList = ({
                 return;
             }
             if (!reset && totalPagesRef.current && currentPageRef.current > totalPagesRef.current) {
-                console.log('Blocked: All pages loaded', {
-                    currentPage: currentPageRef.current,
-                    totalPages: totalPagesRef.current,
-                });
                 setIsMembersLoading(false);
                 isFetchingRef.current = false;
                 return;
@@ -181,7 +177,6 @@ export const MembersList = ({
                 );
                 newMembers = response;
                 setTotalCount(response.length);
-                console.log(totalCount);
             } catch (err) {
                 onError?.((err as Error).message);
             }
@@ -205,7 +200,7 @@ export const MembersList = ({
             setIsMembersLoading(false);
             isFetchingRef.current = false;
         },
-        [searchByNameQuery, statusFilter, pageSize, client, onError],
+        [searchByNameQuery, totalCount, pageSize, client, statusFilter, onError],
     );
 
     useEffect(() => {

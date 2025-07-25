@@ -61,9 +61,10 @@ export const DonateSection = () => {
     return (
         <form
             className="donateSection"
-            action="https://localhost:5001/api/payments/donate"
+            action={`${process.env.REACT_APP_BACKEND_URL}/payments/donate`}
             method="post"
             onSubmit={handleSubmit}
+            data-testid="donate-section-form"
         >
             <input
                 type="hidden"

@@ -1,3 +1,4 @@
+import React from 'react';
 import './AbroadPaymentDetails.scss';
 import {
     ADDRESS_LABEL,

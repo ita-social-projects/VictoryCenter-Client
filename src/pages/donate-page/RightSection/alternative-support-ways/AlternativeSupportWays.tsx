@@ -8,8 +8,9 @@ import {
     PAY_PAL_LABEL,
 } from '../../../../const/donate-page/donate-page';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
-import { ReactComponent as ArrowUpRight } from '../../../../assets/icons/arrow-up-right.svg';
-import { ReactComponent as ShareForwardArrow } from '../../../../assets/icons/share-forward-arrow.svg';
+import ArrowUpRight from '../../../../assets/icons/arrow-up-right.svg';
+import ShareForwardArrow from '../../../../assets/icons/share-forward-arrow.svg';
+import React from 'react';
 
 export const AlternativeSupportWays = () => {
     return (
@@ -34,10 +35,10 @@ export const AlternativeSupportWays = () => {
             <div className="buttonsContainer">
                 <button className="downloadPaymentDetailsButton">
                     {DOWNLOAD_PAYMENT_DETAILS_BUTTON_LABEL}
-                    <ArrowUpRight className="downloadButtonIcon" />
+                    <img src={ArrowUpRight} alt="arrow-up-right" />
                 </button>
                 <button className="shareButton">
-                    <ShareForwardArrow />
+                    <img src={ShareForwardArrow} alt="share-forward-arrow" />
                 </button>
             </div>
         </div>

@@ -1,6 +1,5 @@
 import './CopyTextButton.scss';
 import React from 'react';
-import { ReactComponent as CopyIcon } from '../../../assets/icons/copy.svg';
 
 interface CopyTextButtonProps {
     textToCopy: string;
@@ -12,5 +11,5 @@ export const CopyTextButton: React.FC<CopyTextButtonProps> = ({ textToCopy }) =>
         alert('Copied!');
     };
 
-    return <CopyIcon className="copyTextButton" onClick={handleCopy} />;
+    return <button className="copyTextButton" onClick={handleCopy}></button>;
 };

@@ -13,6 +13,7 @@ import {
     UKRAINE_PAYMENT_DETAILS_LABEL,
 } from '../../../../const/donate-page/donate-page';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
+import React from 'react';
 
 export const UkrainePaymentDetails = () => {
     return (

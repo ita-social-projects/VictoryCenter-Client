@@ -55,8 +55,10 @@ export const DonateSection = () => {
             return;
         }
 
+        const form = e.currentTarget;
+
         setTimeout(() => {
-            e.currentTarget.submit();
+            form.submit();
         }, 0);
     };
 

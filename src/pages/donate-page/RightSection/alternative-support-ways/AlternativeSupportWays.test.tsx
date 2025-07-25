@@ -6,7 +6,7 @@ describe('AlternativeSupportWays', () => {
         render(<AlternativeSupportWays />);
         expect(screen.getByText(/Pay Pal/i)).toBeInTheDocument();
         expect(screen.getAllByText(/Monobank/i).length).toBeGreaterThan(0);
-        expect(screen.getAllByRole('button')).toHaveLength(2);
-        expect(screen.getAllByRole('img')).toHaveLength(4);
+        expect(screen.getAllByRole('button')).toHaveLength(4);
+        expect(screen.getAllByRole('img')).toHaveLength(2);
     });
 });

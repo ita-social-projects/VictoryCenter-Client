@@ -45,7 +45,9 @@ describe('Header', () => {
         render(<Header />, { wrapper: MemoryRouter });
 
         expect(screen.getByRole('button', { name: CONTACT_US })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: DONATE })).toBeInTheDocument();
+        const donateLink = screen.getByRole('link', { name: DONATE });
+        expect(donateLink).toBeInTheDocument();
+        expect(donateLink).toHaveAttribute('href', routes.donatePageRoute);
     });
 
     it('check if Contact Us button is clicked', () => {
@@ -56,15 +58,5 @@ describe('Header', () => {
 
         // eslint-disable-next-line no-console
         expect(console.log).toHaveBeenCalledWith('CONTACT USED!');
-    });
-
-    it('check if Donate button is clicked', () => {
-        render(<Header />, { wrapper: MemoryRouter });
-
-        const donateBtn = screen.getByRole('button', { name: DONATE });
-        fireEvent.click(donateBtn);
-
-        // eslint-disable-next-line no-console
-        expect(console.log).toHaveBeenCalledWith('DONATE!');
     });
 });

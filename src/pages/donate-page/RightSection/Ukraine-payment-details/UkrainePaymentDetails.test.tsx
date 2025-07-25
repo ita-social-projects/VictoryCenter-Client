@@ -5,6 +5,6 @@ describe('UkrainePaymentDetails', () => {
     it('renders all payment labels and copy buttons', () => {
         render(<UkrainePaymentDetails />);
         expect(screen.getByText(/IBAN/i)).toBeInTheDocument();
-        expect(screen.getAllByRole('img').length).toBeGreaterThan(0);
+        expect(screen.getAllByRole('button').length).toBeGreaterThan(0);
     });
 });

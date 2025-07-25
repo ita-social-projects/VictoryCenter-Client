@@ -10,6 +10,6 @@ describe('AbroadPaymentDetails', () => {
             return content.includes('Кореспондентські банки');
         });
         expect(correspondentBanksElements.length).toBeGreaterThan(0);
-        expect(screen.getAllByRole('img').length).toBeGreaterThan(0);
+        expect(screen.getAllByRole('button').length).toBeGreaterThan(0);
     });
 });

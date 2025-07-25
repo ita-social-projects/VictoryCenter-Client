@@ -16,12 +16,12 @@ describe('CopyTextButton', () => {
 
     it('renders the copy icon', () => {
         render(<CopyTextButton textToCopy="test123" />);
-        expect(screen.getByRole('img')).toBeInTheDocument();
+        expect(screen.getByRole('button')).toBeInTheDocument();
     });
 
     it('copies text and shows alert on click', async () => {
         render(<CopyTextButton textToCopy="test123" />);
-        fireEvent.click(screen.getByRole('img'));
+        fireEvent.click(screen.getByRole('button'));
         await waitFor(() => {
             expect(navigator.clipboard.writeText).toHaveBeenCalledWith('test123');
             expect(window.alert).toHaveBeenCalledWith('Copied!');

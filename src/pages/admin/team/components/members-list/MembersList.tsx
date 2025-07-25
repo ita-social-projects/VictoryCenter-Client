@@ -47,8 +47,9 @@ export const MembersList = ({
 }: MembersListProps) => {
     const [pageSize, setPageSize] = useState(0);
     const [totalPages, setTotalPages] = useState<number | null>(null);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(0);
     const [teamMemberToDelete, setTeamMemberToDelete] = useState<string | null>(null);
+    const [totalCount, setTotalCount] = useState<number>(0);
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [category, setCategory] = useState<TeamCategory | null>(() => {
         const savedName = localStorage.getItem(currentTabKey);
@@ -154,6 +155,15 @@ export const MembersList = ({
             if (!currentCategory || isFetchingRef.current) {
                 return;
             }
+            if (!reset && totalPagesRef.current && currentPageRef.current > totalPagesRef.current) {
+                console.log('Blocked: All pages loaded', {
+                    currentPage: currentPageRef.current,
+                    totalPages: totalPagesRef.current,
+                });
+                setIsMembersLoading(false);
+                isFetchingRef.current = false;
+                return;
+            }
 
             isFetchingRef.current = true;
             setIsMembersLoading(true);
@@ -161,7 +171,6 @@ export const MembersList = ({
             const pageToFetch = reset ? 1 : currentPageRef.current;
 
             let newMembers = [] as TeamMember[];
-            let totalCount = 0;
             try {
                 const response = await TeamMembersApi.getAll(
                     client,
@@ -171,7 +180,8 @@ export const MembersList = ({
                     pageToFetch * pageSize,
                 );
                 newMembers = response;
-                totalCount = response.length;
+                setTotalCount(response.length);
+                console.log(totalCount);
             } catch (err) {
                 onError?.((err as Error).message);
             }
@@ -183,7 +193,9 @@ export const MembersList = ({
 
             setMembers((prev) => {
                 const updatedMembers = reset ? [...newMembers] : [...prev, ...newMembers];
-                return updatedMembers;
+                return updatedMembers.filter((m, index, self) => {
+                    return index === self.findIndex((t) => t.id === m.id);
+                });
             });
             setCurrentPage((prev) => (reset ? 2 : prev + 1));
             if (totalPagesRef.current === null || reset) {

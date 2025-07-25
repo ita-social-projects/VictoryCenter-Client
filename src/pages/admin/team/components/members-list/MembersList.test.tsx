@@ -55,7 +55,6 @@ jest.mock('../member-drag-preview/MemberDragPreview', () => ({
     MemberDragPreview: ({ dragPreview }: any) =>
         dragPreview.visible ? <div data-testid="drag-preview">{dragPreview.member.fullName}</div> : null,
 }));
-
 jest.mock('../members-list-item/MembersListItem', () => ({
     MembersListItem: ({
         member,
@@ -237,17 +236,30 @@ describe('MembersList', () => {
         );
     });
 
-    // TODO
-    // it('shows loader when members are loading', async () => {
-    //     jest.spyOn(TeamMembersApi, 'getAll').mockImplementation(
-    //         () => new Promise((resolve) => setTimeout(() => resolve(mockMembers), 10)),
-    //     );
-    //     render(<MembersList {...sharedDefaultProps} />);
-    //     expect(await screen.findByTestId('members-list-loader-icon')).toHaveAttribute('src', 'loader-icon');
-    //     await waitFor(() => {
-    //         expect(screen.queryByTestId('members-list-loader')).not.toBeInTheDocument();
-    //     });
-    // });
+    it('shows loader when members are loading', async () => {
+        jest.spyOn(TeamCategoriesApi, 'getAll').mockResolvedValue([
+            { id: 1, name: 'Test Category', description: '123' },
+        ]);
+
+        jest.spyOn(TeamMembersApi, 'getAll').mockImplementation(
+            () => new Promise((resolve) => setTimeout(() => resolve(mockMembers), 50)),
+        );
+
+        render(<MembersList {...sharedDefaultProps} />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('members-list-loader-icon')).toBeInTheDocument();
+        });
+
+        expect(screen.getByTestId('members-list-loader-icon')).toHaveAttribute('src', 'loader-icon');
+
+        await waitFor(
+            () => {
+                expect(screen.queryByTestId('members-list-loader')).not.toBeInTheDocument();
+            },
+            { timeout: 200 },
+        );
+    });
 
     it('filters members by status', async () => {
         mockMembers.push(
@@ -284,35 +296,58 @@ describe('MembersList', () => {
         });
     });
 
+    it('disables category buttons when loading', async () => {
+        jest.spyOn(TeamCategoriesApi, 'getAll').mockResolvedValue([
+            { id: 1, name: 'Test Category 1', description: '123' },
+            { id: 2, name: 'Test Category 2', description: '123' },
+        ]);
+
+        jest.spyOn(TeamMembersApi, 'getAll').mockImplementation(
+            () => new Promise((resolve) => setTimeout(() => resolve(mockMembers), 50)),
+        );
+
+        render(<MembersList {...sharedDefaultProps} />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('members-categories')).toBeInTheDocument();
+        });
+
+        await waitFor(() => {
+            expect(screen.getByTestId('members-categories')).toHaveStyle('pointer-events: none');
+        });
+
+        await waitFor(
+            () => {
+                expect(screen.getByTestId('members-categories')).toHaveStyle('pointer-events: all');
+            },
+            { timeout: 200 },
+        );
+    });
+
     // TODO
-    // it('disables category buttons when loading', async () => {
-    //     jest.spyOn(TeamMembersApi, 'getAll').mockImplementation(
-    //         () => new Promise((resolve) => setTimeout(() => resolve(mockMembers), 10)),
-    //     );
+    it.skip('should reset dragPreview and draggedIndex state', async () => {
+        render(<MembersList {...sharedDefaultProps} />);
 
-    //     render(<MembersList {...sharedDefaultProps} />);
-    //     await waitFor(() => {
-    //         expect(screen.getByTestId('members-categories')).toHaveStyle({ pointerEvents: 'none' });
-    //     });
+        const dragItem = await screen.findByTestId('member-item-0');
 
-    //     await waitFor(() => {
-    //         expect(screen.getByTestId('members-categories')).toHaveStyle({ pointerEvents: 'all' });
-    //     });
-    // });
+        fireEvent.dragStart(dragItem, { dataTransfer: mockDataTransfer });
 
-    // TODO
-    // it('should reset dragPreview and draggedIndex state', async () => {
-    //     render(<MembersList {...sharedDefaultProps} />);
+        expect(screen.getByTestId('drag-preview')).toBeInTheDocument();
 
-    //     const dragItem = await screen.findByTestId('member-item-0');
+        fireEvent.dragEnd(dragItem, { dataTransfer: mockDataTransfer });
 
-    //     fireEvent.dragStart(dragItem, { dataTransfer: mockDataTransfer });
-    //     fireEvent.dragEnd(dragItem);
+        await waitFor(
+            () => {
+                expect(screen.queryByTestId('drag-preview')).not.toBeInTheDocument();
+            },
+            {
+                timeout: 3000,
+                interval: 100, // Check every 100ms
+            },
+        );
 
-    //     await waitFor(() => {
-    //         expect(screen.queryByTestId('drag-preview')).not.toBeInTheDocument();
-    //     });
-    // });
+        expect(screen.queryByTestId('dragged-indicator')).not.toBeInTheDocument();
+    });
 
     describe('MembersList - Category Switching', () => {
         beforeEach(() => {

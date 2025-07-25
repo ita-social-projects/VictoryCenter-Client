@@ -7,9 +7,9 @@ import {
     TEAM_LABEL_DESCRIPTION,
 } from '../../../../../const/team';
 import { Image, ImageValues } from '../../../../../types/Image';
+import PhotoInput from '../../../../../components/common/photo-input/PhotoInput';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
 import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
-import PhotoInput from '../../../../../components/common/photo-input/PhotoInput';
 
 export type MemberFormValues = {
     category: TeamCategory;
@@ -58,12 +58,20 @@ export const MemberForm = ({
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
     ) => {
         const { name, value } = e.target;
-
+        const inputTarget = e.currentTarget as EventTarget & HTMLInputElement;
         if (name === 'category') {
             const selectedCategory = categories.find((c) => c.name === value);
             setMemberFormValues((prev) => ({
                 ...prev,
                 category: selectedCategory as TeamCategory,
+            }));
+            return;
+        }
+        if (inputTarget.files && inputTarget.files.length > 0) {
+            const file = inputTarget.files;
+            setMemberFormValues((prev) => ({
+                ...prev,
+                img: file,
             }));
             return;
         }
@@ -112,6 +120,19 @@ export const MemberForm = ({
         };
         fetchCategories();
     }, [client, onError]);
+
+    const handleFileDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+
+        const files = e.dataTransfer.files;
+        if (files) {
+            setMemberFormValues((prev) => ({
+                ...prev,
+                img: files,
+            }));
+        }
+    };
+
     return (
         <form id={id} onSubmit={handleOnSubmit} data-testid="test-form">
             <div className="members-add-modal-body">

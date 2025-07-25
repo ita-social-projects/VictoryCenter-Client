@@ -47,8 +47,9 @@ export const MembersList = ({
 }: MembersListProps) => {
     const [pageSize, setPageSize] = useState(0);
     const [totalPages, setTotalPages] = useState<number | null>(null);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(0);
     const [teamMemberToDelete, setTeamMemberToDelete] = useState<string | null>(null);
+    const [totalCount, setTotalCount] = useState<number>(0);
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [category, setCategory] = useState<TeamCategory | null>(() => {
         const savedName = localStorage.getItem(currentTabKey);
@@ -100,7 +101,9 @@ export const MembersList = ({
 
     const updatePageSize = () => {
         if (memberListRef.current) {
-            setPageSize(memberListRef.current.clientHeight / 120 + 1);
+            const calculatedPageSize = Math.floor(memberListRef.current.clientHeight / 120) + 1;
+            setPageSize(calculatedPageSize);
+        } else {
         }
     };
 
@@ -149,8 +152,14 @@ export const MembersList = ({
         async (reset: boolean = false) => {
             const currentCategory = categoryRef.current;
             const currentSearch = searchByNameQuery || '';
-            if (!currentCategory || isFetchingRef.current) return;
-            if (!reset && totalPagesRef.current && currentPageRef.current > totalPagesRef.current) return;
+            if (!currentCategory || isFetchingRef.current) {
+                return;
+            }
+            if (!reset && totalPagesRef.current && currentPageRef.current > totalPagesRef.current) {
+                setIsMembersLoading(false);
+                isFetchingRef.current = false;
+                return;
+            }
 
             isFetchingRef.current = true;
             setIsMembersLoading(true);
@@ -159,22 +168,30 @@ export const MembersList = ({
 
             let newMembers = [] as TeamMember[];
             try {
-                newMembers = await TeamMembersApi.getAll(
+                const response = await TeamMembersApi.getAll(
                     client,
                     currentCategory.id,
                     mapStatusFilterToStatus(statusFilter),
                     (pageToFetch - 1) * pageSize,
                     pageToFetch * pageSize,
                 );
+                newMembers = response;
+                setTotalCount(response.length);
             } catch (err) {
                 onError?.((err as Error).message);
             }
             if (currentSearch) {
                 newMembers = newMembers.filter((m) => m.fullName.toLowerCase().includes(currentSearch.toLowerCase()));
             }
-            const totalCountOfPages = Math.ceil(newMembers.length / pageSize);
 
-            setMembers((prev) => (reset ? [...newMembers] : [...prev, ...newMembers]));
+            const totalCountOfPages = Math.ceil(totalCount / pageSize);
+
+            setMembers((prev) => {
+                const updatedMembers = reset ? [...newMembers] : [...prev, ...newMembers];
+                return updatedMembers.filter((m, index, self) => {
+                    return index === self.findIndex((t) => t.id === m.id);
+                });
+            });
             setCurrentPage((prev) => (reset ? 2 : prev + 1));
             if (totalPagesRef.current === null || reset) {
                 setTotalPages(totalCountOfPages);
@@ -183,7 +200,7 @@ export const MembersList = ({
             setIsMembersLoading(false);
             isFetchingRef.current = false;
         },
-        [searchByNameQuery, statusFilter, pageSize, client, onError],
+        [searchByNameQuery, totalCount, pageSize, client, statusFilter, onError],
     );
 
     useEffect(() => {

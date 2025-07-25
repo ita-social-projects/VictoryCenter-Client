@@ -48,272 +48,198 @@ import {
 } from '../../../../const/donate-page/donate-page';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
 
+const PaymentLabelWithCopy: React.FC<{ label: React.ReactNode; value: React.ReactNode; copyValue: string }> = ({
+    label,
+    value,
+    copyValue,
+}) => (
+    <div className="paymentLabel">
+        <h3>{label}</h3>
+        <div className="labelWithCopyButton">
+            <span className="label">{value}</span>
+            <CopyTextButton textToCopy={copyValue} />
+        </div>
+    </div>
+);
+
+const MultiFieldLabelWithCopy: React.FC<{ label: React.ReactNode; values: string[]; copyValue: string }> = ({
+    label,
+    values,
+    copyValue,
+}) => (
+    <div className="paymentLabel">
+        <h3>{label}</h3>
+        <div className="labelWithCopyButton">
+            <div>
+                {values.map((v) => (
+                    <p className="label" key={v}>
+                        {v}
+                    </p>
+                ))}
+            </div>
+            <CopyTextButton textToCopy={copyValue} />
+        </div>
+    </div>
+);
+
+const CorrespondentBankBlock: React.FC<{ title: string; fields: { label: string; value: string }[] }> = ({
+    title,
+    fields,
+}) => (
+    <div className="paymentLabel">
+        <h3>{title}</h3>
+        <div className="labelsContainers">
+            {fields.map((f) => (
+                <div className="labelsContainer" key={`${f.label}-${f.value}`}>
+                    <div className="labelWithCopyButton">
+                        <span className="highlightedLabel">{f.label}</span>
+                        <span className="label">{f.value}</span>
+                        <CopyTextButton textToCopy={f.value} />
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+);
+
 export const AbroadPaymentDetails = () => {
     return (
         <div className="abroadPaymentDetails">
             <div className="abroadPaymentDetailsBlock">
                 <h2>{USD_PAYMENT_DETAILS_LABEL}</h2>
                 <div className="abroadPaymentDetailsContent">
-                    <div className="paymentLabel">
-                        <h3>{RECIPIENT_LABEL}</h3>
-                        <div className="labelWithCopyButton">
-                            <span className="label">{RECIPIENT_NAME_LABEL}</span>
-                            <CopyTextButton textToCopy={RECIPIENT_NAME_LABEL} />
-                        </div>
-                    </div>
-                    <div className="paymentLabel">
-                        <h3>{IBAN_USD_LABEL}</h3>
-                        <div className="labelWithCopyButton">
-                            <span className="label">{IBAN_USD_NUMBER_LABEL}</span>
-                            <CopyTextButton textToCopy={IBAN_USD_NUMBER_LABEL} />
-                        </div>
-                    </div>
-                    <div className="paymentLabel">
-                        <h3>{SWIFT_CODE_LABEL}</h3>
-                        <div className="labelWithCopyButton">
-                            <span className="label">{SWIFT_CODE_VALUE_LABEL}</span>
-                            <CopyTextButton textToCopy={SWIFT_CODE_VALUE_LABEL} />
-                        </div>
-                    </div>
-                    <div className="paymentLabel">
-                        <h3>{BANK_RECEIVER_LABEL}</h3>
-                        <div className="labelWithCopyButton">
-                            <div>
-                                <p className="label">{BANK_NAME_TRANSLITERATED_LABEL}</p>
-                                <p className="label">{BANK_STREET_TRANSLITERATED_LABEL}</p>
-                                <p className="label">{BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL}</p>
-                            </div>
-                            <CopyTextButton
-                                textToCopy={
-                                    BANK_NAME_TRANSLITERATED_LABEL +
-                                    BANK_STREET_TRANSLITERATED_LABEL +
-                                    BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL
-                                }
-                            />
-                        </div>
-                    </div>
-                    <div className="paymentLabel">
-                        <h3>{ADDRESS_LABEL}</h3>
-                        <div className="labelWithCopyButton">
-                            <div>
-                                <p className="label">{COUNTRY_LABEL}</p>
-                                <p className="label">{CITY_LABEL}</p>
-                            </div>
-                            <CopyTextButton textToCopy={COUNTRY_LABEL + CITY_LABEL} />
-                        </div>
-                    </div>
+                    <PaymentLabelWithCopy
+                        label={RECIPIENT_LABEL}
+                        value={RECIPIENT_NAME_LABEL}
+                        copyValue={RECIPIENT_NAME_LABEL}
+                    />
+                    <PaymentLabelWithCopy
+                        label={IBAN_USD_LABEL}
+                        value={IBAN_USD_NUMBER_LABEL}
+                        copyValue={IBAN_USD_NUMBER_LABEL}
+                    />
+                    <PaymentLabelWithCopy
+                        label={SWIFT_CODE_LABEL}
+                        value={SWIFT_CODE_VALUE_LABEL}
+                        copyValue={SWIFT_CODE_VALUE_LABEL}
+                    />
+                    <MultiFieldLabelWithCopy
+                        label={BANK_RECEIVER_LABEL}
+                        values={[
+                            BANK_NAME_TRANSLITERATED_LABEL,
+                            BANK_STREET_TRANSLITERATED_LABEL,
+                            BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL,
+                        ]}
+                        copyValue={
+                            BANK_NAME_TRANSLITERATED_LABEL +
+                            BANK_STREET_TRANSLITERATED_LABEL +
+                            BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL
+                        }
+                    />
+                    <MultiFieldLabelWithCopy
+                        label={ADDRESS_LABEL}
+                        values={[COUNTRY_LABEL, CITY_LABEL]}
+                        copyValue={COUNTRY_LABEL + CITY_LABEL}
+                    />
                 </div>
             </div>
             <div className="abroadPaymentDetailsBlock">
                 <h2>{CORRESPONDENT_BANKS_LABEL}</h2>
                 <div className="abroadPaymentDetailsContent">
-                    <div className="paymentLabel">
-                        <h3>{JP_MORGAN_CHASE_BANK_USA_LABEL}</h3>
-                        <div className="labelsContainers">
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{SWIFT_LABEL}</span>
-                                    <span className="label">{SWIFT_JP_MORGAN_CODE_USA_LABEL}</span>
-                                    <CopyTextButton textToCopy={SWIFT_JP_MORGAN_CODE_USA_LABEL} />
-                                </div>
-                            </div>
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{ACCOUNT_LABEL}</span>
-                                    <span className="label">{ACCOUNT_JP_MORGAN_CODE_USA_LABEL}</span>
-                                    <CopyTextButton textToCopy={ACCOUNT_JP_MORGAN_CODE_USA_LABEL} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="paymentLabel">
-                        <h3>{BANK_OF_NEW_YORK_MELLON_USA_LABEL}</h3>
-                        <div className="labelsContainers">
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{SWIFT_LABEL}</span>
-                                    <span className="label">{SWIFT_BANK_OF_NEW_YORK_MELLON_USA_CODE_LABEL}</span>
-                                    <CopyTextButton textToCopy={SWIFT_BANK_OF_NEW_YORK_MELLON_USA_CODE_LABEL} />
-                                </div>
-                            </div>
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{ACCOUNT_LABEL}</span>
-                                    <span className="label">{ACCOUNT_BANK_OF_NEW_YORK_MELLON_USA_CODE_LABEL}</span>
-                                    <CopyTextButton textToCopy={ACCOUNT_BANK_OF_NEW_YORK_MELLON_USA_CODE_LABEL} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="paymentLabel">
-                        <h3>{CITY_BANK_USA_LABEL}</h3>
-                        <div className="labelsContainers">
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{SWIFT_LABEL}</span>
-                                    <span className="label">{SWIFT_CITY_BANK_USA_CODE_LABEL}</span>
-                                    <CopyTextButton textToCopy={SWIFT_CITY_BANK_USA_CODE_LABEL} />
-                                </div>
-                            </div>
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{ACCOUNT_LABEL}</span>
-                                    <span className="label">{ACCOUNT_CITY_BANK_USA_CODE_LABEL}</span>
-                                    <CopyTextButton textToCopy={ACCOUNT_CITY_BANK_USA_CODE_LABEL} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <CorrespondentBankBlock
+                        title={JP_MORGAN_CHASE_BANK_USA_LABEL}
+                        fields={[
+                            { label: SWIFT_LABEL, value: SWIFT_JP_MORGAN_CODE_USA_LABEL },
+                            { label: ACCOUNT_LABEL, value: ACCOUNT_JP_MORGAN_CODE_USA_LABEL },
+                        ]}
+                    />
+                    <CorrespondentBankBlock
+                        title={BANK_OF_NEW_YORK_MELLON_USA_LABEL}
+                        fields={[
+                            { label: SWIFT_LABEL, value: SWIFT_BANK_OF_NEW_YORK_MELLON_USA_CODE_LABEL },
+                            { label: ACCOUNT_LABEL, value: ACCOUNT_BANK_OF_NEW_YORK_MELLON_USA_CODE_LABEL },
+                        ]}
+                    />
+                    <CorrespondentBankBlock
+                        title={CITY_BANK_USA_LABEL}
+                        fields={[
+                            { label: SWIFT_LABEL, value: SWIFT_CITY_BANK_USA_CODE_LABEL },
+                            { label: ACCOUNT_LABEL, value: ACCOUNT_CITY_BANK_USA_CODE_LABEL },
+                        ]}
+                    />
                 </div>
             </div>
             <div className="abroadPaymentDetailsBlock">
                 <h2>{EUR_PAYMENT_DETAILS_LABEL}</h2>
                 <div className="abroadPaymentDetailsContent">
-                    <div className="paymentLabel">
-                        <h3>{RECIPIENT_LABEL}</h3>
-                        <div className="labelWithCopyButton">
-                            <span className="label">{RECIPIENT_NAME_LABEL}</span>
-                            <CopyTextButton textToCopy={RECIPIENT_NAME_LABEL} />
-                        </div>
-                    </div>
-                    <div className="paymentLabel">
-                        <h3>{IBAN_EUR_LABEL}</h3>
-                        <div className="labelWithCopyButton">
-                            <span className="label">{IBAN_EUR_NUMBER_LABEL}</span>
-                            <CopyTextButton textToCopy={IBAN_EUR_NUMBER_LABEL} />
-                        </div>
-                    </div>
-                    <div className="paymentLabel">
-                        <h3>{SWIFT_CODE_LABEL}</h3>
-                        <div className="labelWithCopyButton">
-                            <span className="label">{SWIFT_CODE_VALUE_LABEL}</span>
-                            <CopyTextButton textToCopy={SWIFT_CODE_VALUE_LABEL} />
-                        </div>
-                    </div>
-                    <div className="paymentLabel">
-                        <h3>{BANK_RECEIVER_LABEL}</h3>
-                        <div className="labelWithCopyButton">
-                            <div>
-                                <p className="label">{BANK_NAME_TRANSLITERATED_LABEL}</p>
-                                <p className="label">{BANK_STREET_TRANSLITERATED_LABEL}</p>
-                                <p className="label">{BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL}</p>
-                            </div>
-                            <CopyTextButton
-                                textToCopy={
-                                    BANK_NAME_TRANSLITERATED_LABEL +
-                                    BANK_STREET_TRANSLITERATED_LABEL +
-                                    BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL
-                                }
-                            />
-                        </div>
-                    </div>
-                    <div className="paymentLabel">
-                        <h3>{ADDRESS_LABEL}</h3>
-                        <div className="labelWithCopyButton">
-                            <div>
-                                <p className="label">{COUNTRY_LABEL}</p>
-                                <p className="label">{CITY_LABEL}</p>
-                            </div>
-                            <CopyTextButton textToCopy={COUNTRY_LABEL + CITY_LABEL} />
-                        </div>
-                    </div>
+                    <PaymentLabelWithCopy
+                        label={RECIPIENT_LABEL}
+                        value={RECIPIENT_NAME_LABEL}
+                        copyValue={RECIPIENT_NAME_LABEL}
+                    />
+                    <PaymentLabelWithCopy
+                        label={IBAN_EUR_LABEL}
+                        value={IBAN_EUR_NUMBER_LABEL}
+                        copyValue={IBAN_EUR_NUMBER_LABEL}
+                    />
+                    <PaymentLabelWithCopy
+                        label={SWIFT_CODE_LABEL}
+                        value={SWIFT_CODE_VALUE_LABEL}
+                        copyValue={SWIFT_CODE_VALUE_LABEL}
+                    />
+                    <MultiFieldLabelWithCopy
+                        label={BANK_RECEIVER_LABEL}
+                        values={[
+                            BANK_NAME_TRANSLITERATED_LABEL,
+                            BANK_STREET_TRANSLITERATED_LABEL,
+                            BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL,
+                        ]}
+                        copyValue={
+                            BANK_NAME_TRANSLITERATED_LABEL +
+                            BANK_STREET_TRANSLITERATED_LABEL +
+                            BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL
+                        }
+                    />
+                    <MultiFieldLabelWithCopy
+                        label={ADDRESS_LABEL}
+                        values={[COUNTRY_LABEL, CITY_LABEL]}
+                        copyValue={COUNTRY_LABEL + CITY_LABEL}
+                    />
                 </div>
             </div>
             <div className="abroadPaymentDetailsBlock">
                 <h2>{CORRESPONDENT_BANKS_LABEL}</h2>
                 <div className="abroadPaymentDetailsContent">
-                    <div className="paymentLabel">
-                        <h3>{COMMERZBANK_AG_GERMANY_LABEL}</h3>
-                        <div className="labelsContainers">
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{SWIFT_LABEL}</span>
-                                    <span className="label">{SWIFT_COMMERZBANK_AG_GERMANY_CODE_LABEL}</span>
-                                    <CopyTextButton textToCopy={SWIFT_COMMERZBANK_AG_GERMANY_CODE_LABEL} />
-                                </div>
-                            </div>
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{ACCOUNT_LABEL}</span>
-                                    <span className="label">{ACCOUNT_COMMERZBANK_AG_GERMANY_CODE_LABEL}</span>
-                                    <CopyTextButton textToCopy={ACCOUNT_COMMERZBANK_AG_GERMANY_CODE_LABEL} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="paymentLabel">
-                        <h3>{JP_MORGAN_AG_GERMANY_LABEL}</h3>
-                        <div className="labelsContainers">
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{SWIFT_LABEL}</span>
-                                    <span className="label">{SWIFT_JP_MORGAN_AG_GERMANY_CODE_LABEL}</span>
-                                    <CopyTextButton textToCopy={SWIFT_JP_MORGAN_AG_GERMANY_CODE_LABEL} />
-                                </div>
-                            </div>
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{ACCOUNT_LABEL}</span>
-                                    <span className="label">{ACCOUNT_JP_MORGAN_AG_GERMANY_CODE_LABEL}</span>
-                                    <CopyTextButton textToCopy={ACCOUNT_JP_MORGAN_AG_GERMANY_CODE_LABEL} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="paymentLabel">
-                        <h3>{BANK_OF_NEW_YORK_MELLON_FRANKFURT_LABEL}</h3>
-                        <div className="labelsContainers">
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{SWIFT_LABEL}</span>
-                                    <span className="label">{SWIFT_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL}</span>
-                                    <CopyTextButton textToCopy={SWIFT_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL} />
-                                </div>
-                            </div>
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{ACCOUNT_LABEL}</span>
-                                    <span className="label">
-                                        {ACCOUNT_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL}
-                                    </span>
-                                    <CopyTextButton textToCopy={ACCOUNT_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL} />
-                                </div>
-                            </div>
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{IBAN_LABEL}</span>
-                                    <span className="label">{IBAN_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL}</span>
-                                    <CopyTextButton textToCopy={IBAN_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="paymentLabel">
-                        <h3>{CITY_BANK_IRELAND_LABEL}</h3>
-                        <div className="labelsContainers">
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{SWIFT_LABEL}</span>
-                                    <span className="label">{SWIFT_CITY_BANK_IRELAND_CODE_LABEL}</span>
-                                    <CopyTextButton textToCopy={SWIFT_CITY_BANK_IRELAND_CODE_LABEL} />
-                                </div>
-                            </div>
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{ACCOUNT_LABEL}</span>
-                                    <span className="label">{ACCOUNT_CITY_BANK_IRELAND_CODE_LABEL}</span>
-                                    <CopyTextButton textToCopy={ACCOUNT_CITY_BANK_IRELAND_CODE_LABEL} />
-                                </div>
-                            </div>
-                            <div className="labelsContainer">
-                                <div className="labelWithCopyButton">
-                                    <span className="highlightedLabel">{IBAN_LABEL}</span>
-                                    <span className="label">{IBAN_CITY_BANK_IRELAND_CODE_LABEL}</span>
-                                    <CopyTextButton textToCopy={IBAN_CITY_BANK_IRELAND_CODE_LABEL} />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <CorrespondentBankBlock
+                        title={COMMERZBANK_AG_GERMANY_LABEL}
+                        fields={[
+                            { label: SWIFT_LABEL, value: SWIFT_COMMERZBANK_AG_GERMANY_CODE_LABEL },
+                            { label: ACCOUNT_LABEL, value: ACCOUNT_COMMERZBANK_AG_GERMANY_CODE_LABEL },
+                        ]}
+                    />
+                    <CorrespondentBankBlock
+                        title={JP_MORGAN_AG_GERMANY_LABEL}
+                        fields={[
+                            { label: SWIFT_LABEL, value: SWIFT_JP_MORGAN_AG_GERMANY_CODE_LABEL },
+                            { label: ACCOUNT_LABEL, value: ACCOUNT_JP_MORGAN_AG_GERMANY_CODE_LABEL },
+                        ]}
+                    />
+                    <CorrespondentBankBlock
+                        title={BANK_OF_NEW_YORK_MELLON_FRANKFURT_LABEL}
+                        fields={[
+                            { label: SWIFT_LABEL, value: SWIFT_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL },
+                            { label: ACCOUNT_LABEL, value: ACCOUNT_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL },
+                            { label: IBAN_LABEL, value: IBAN_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL },
+                        ]}
+                    />
+                    <CorrespondentBankBlock
+                        title={CITY_BANK_IRELAND_LABEL}
+                        fields={[
+                            { label: SWIFT_LABEL, value: SWIFT_CITY_BANK_IRELAND_CODE_LABEL },
+                            { label: ACCOUNT_LABEL, value: ACCOUNT_CITY_BANK_IRELAND_CODE_LABEL },
+                            { label: IBAN_LABEL, value: IBAN_CITY_BANK_IRELAND_CODE_LABEL },
+                        ]}
+                    />
                 </div>
             </div>
         </div>

@@ -41,8 +41,8 @@ $mulish-font-family: 'Mulish', sans-serif;
                 @include link-base(#000, $link-hover-blue, $link-pressed-blue);
                 font-weight: 600;
 
-                &.active {
-                    @include link-active();
+                &.disable {
+                    @include link-disabled();
                 }
             }
         }

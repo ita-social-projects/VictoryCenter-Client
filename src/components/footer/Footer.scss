@@ -31,8 +31,8 @@
         a {
             @include link-base(#000, c.$link-hover-blue, c.$link-pressed-blue);
 
-            &.active {
-                @include link-active();
+            &.disable {
+                @include link-disabled();
             }
         }
 

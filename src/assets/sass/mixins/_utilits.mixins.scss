@@ -15,8 +15,8 @@
 @mixin link-base($color, $hoverColor, $activeColor) {
     color: $color;
     text-decoration: none;
-    pointer-events: none;
-    opacity: 0.3;
+    pointer-events: auto;
+    opacity: 1;
     font-family: ft.$mulish-regular-font;
 
     &:hover {
@@ -28,7 +28,7 @@
     }
 }
 
-@mixin link-active() {
-    opacity: 1;
-    pointer-events: auto;
+@mixin link-disabled() {
+    opacity: 0.3;
+    pointer-events: none;
 }

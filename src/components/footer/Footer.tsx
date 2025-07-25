@@ -66,28 +66,48 @@ export const Footer = () => {
 
                 <div className="menu">
                     <span className="title">{MENU}</span>
-                    <Link to={teamPageRoute}>{REPORTING}</Link>
-                    <Link to={page2Route}>{STORE}</Link>
-                    <Link to={page2Route}>{HOW_TO_SUPPORT}</Link>
-                    <Link to={page2Route}>{STORIES_OF_VICTORIES}</Link>
+                    <Link to={teamPageRoute} className="disable">
+                        {REPORTING}
+                    </Link>
+                    <Link to={page2Route} className="disable">
+                        {STORE}
+                    </Link>
+                    <Link to={page2Route} className="disable">
+                        {HOW_TO_SUPPORT}
+                    </Link>
+                    <Link to={page2Route} className="disable">
+                        {STORIES_OF_VICTORIES}
+                    </Link>
                 </div>
 
                 <div className="about_us">
                     <span className="title">{ABOUT_US}</span>
-                    <Link to={teamPageRoute} className="active">
-                        {ABOUT_US}
+                    <Link to={teamPageRoute}>{ABOUT_US}</Link>
+                    <Link to={page2Route} className="disable">
+                        {OUR_HISTORY}
                     </Link>
-                    <Link to={page2Route}>{OUR_HISTORY}</Link>
-                    <Link to={page2Route}>{OUR_TEAM}</Link>
-                    <Link to={page2Route}>{PARTNERS}</Link>
-                    <Link to={page2Route}>{EVENTS_AND_NEWS}</Link>
+                    <Link to={page2Route} className="disable">
+                        {OUR_TEAM}
+                    </Link>
+                    <Link to={page2Route} className="disable">
+                        {PARTNERS}
+                    </Link>
+                    <Link to={page2Route} className="disable">
+                        {EVENTS_AND_NEWS}
+                    </Link>
                 </div>
 
                 <div className="hippotherapy">
                     <span className="title">{HIPPOTHERAPY}</span>
-                    <Link to={teamPageRoute}>{WHAT_IS_HIPPOTHERAPY}</Link>
-                    <Link to={teamPageRoute}>{PROGRAMS}</Link>
-                    <Link to={teamPageRoute}>{PROGRAMS_SESSIONS}</Link>
+                    <Link to={teamPageRoute} className="disable">
+                        {WHAT_IS_HIPPOTHERAPY}
+                    </Link>
+                    <Link to={teamPageRoute} className="disable">
+                        {PROGRAMS}
+                    </Link>
+                    <Link to={teamPageRoute} className="disable">
+                        {PROGRAMS_SESSIONS}
+                    </Link>
                 </div>
             </div>
 

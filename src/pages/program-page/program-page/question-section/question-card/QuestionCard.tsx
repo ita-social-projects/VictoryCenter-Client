@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Question } from '../../../../../types/ProgramPage';
+import { Question } from '../../../../../types/public/ProgramPage';
 import openIcon from '../../../../../assets/program_page_images/icons/arrowDown.svg';
 import closeIcon from '../../../../../assets/program_page_images/icons/Cross.svg';
 import openBlue from '../../../../../assets/program_page_images/icons/arrowDownBlue.svg';

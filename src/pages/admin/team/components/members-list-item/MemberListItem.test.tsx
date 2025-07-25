@@ -1,17 +1,21 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import { MembersListItem } from './MembersListItem';
-import { Member } from '../members-list/MembersList';
+import { TeamMember } from '../../../../../types/admin/TeamMembers';
 
 jest.mock('../../../../../assets/icons/dragger.svg', () => 'drag-icon.svg');
 
-const mockMember: Member = {
+const mockMember: TeamMember = {
     id: 1,
     img: 'avatar.png',
     fullName: 'John Doe',
     description: 'Senior Developer',
     status: 'Чернетка',
-    category: 'Основна команда',
+    category: {
+        id: 1,
+        name: 'Основна команда',
+        description: 'Test',
+    },
 };
 
 describe('MembersListItem', () => {

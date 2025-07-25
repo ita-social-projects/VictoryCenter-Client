@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { routes } from '../../const/routers/routes';
 import './Footer.scss';
 import arrowIcon from '../../assets/images/footer/arrow-up-right.svg';

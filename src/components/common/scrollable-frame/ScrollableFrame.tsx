@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide, SwiperClass } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
 import { programPageDataFetch } from '../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
 import React, { useState, useEffect, useRef } from 'react';
-import { Program } from '../../../types/ProgramPage';
+import { Program } from '../../../types/public/ProgramPage';
 import arrowRight from '../../../assets/about-us-images/icons/arrow-right.png';
 import arrowLeft from '../../../assets/about-us-images/icons/arrow-left.png';
 import arrowRightBlack from '../../../assets/about-us-images/icons/arrow-right-black.png';

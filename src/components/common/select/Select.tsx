@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import './select.scss';
 import ArrowDown from '../../../assets/icons/chevron-down.svg';
 import ArrowUp from '../../../assets/icons/chevron-up.svg';
-import { TEAM_STATUS_DEFAULT } from '../../../const/admin/team-page';
+import { TEAM_STATUS_DEFAULT } from '../../../const/admin/common';
 
 export type SelectProps<TValue> = {
     children: React.ReactNode;

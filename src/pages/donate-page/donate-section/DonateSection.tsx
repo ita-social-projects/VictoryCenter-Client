@@ -34,7 +34,7 @@ export const DonateSection = () => {
     const handleDonateAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let inputValue = e.target.value;
 
-        inputValue = inputValue.replace(/[^0-9.]/g, '');
+        inputValue = inputValue.replace(/[^0-9]/g, '');
         inputValue = inputValue.replace(/[-+]/g, '');
 
         setDonationAmount(isNaN(Number(inputValue)) ? 0 : Number(inputValue));
@@ -51,7 +51,7 @@ export const DonateSection = () => {
     const handleSubmit: React.FormEventHandler<HTMLFormElement> | undefined = (e) => {
         e.preventDefault();
 
-        if (donationAmount <= 0) {
+        if (donationAmount <= 0 || !Number.isInteger(donationAmount)) {
             return;
         }
 

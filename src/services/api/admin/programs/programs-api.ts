@@ -9,21 +9,57 @@ import { PaginationResult, VisibilityStatus } from '../../../../types/Common';
 
 // !!!
 // Delete after actual integration with backend
-// !!!
+// ============================================
 let mockProgramId = Math.max(...mockPrograms.map((p) => p.id), 0) + 1;
 let mockCategoryId = Math.max(...mockCategories.map((c) => c.id), 0) + 1;
 export let mockDelay = 2200;
 export let throwErrorsInApi = false;
+
+// Simulates an async delay with AbortSignal support — used for testing fetch cancellation behavior
+const simulateAsyncOperation = (delay: number, signal?: AbortSignal): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        const timeoutId = setTimeout(() => {
+            cleanup();
+            resolve();
+        }, delay);
+
+        const cleanup = () => {
+            clearTimeout(timeoutId);
+            signal?.removeEventListener('abort', onAbort);
+        };
+
+        const onAbort = () => {
+            cleanup();
+            const error = new Error('Request was cancelled');
+            error.name = 'AbortError';
+            reject(error);
+        };
+
+        if (signal?.aborted) {
+            onAbort();
+        } else {
+            signal?.addEventListener('abort', onAbort, { once: true });
+        }
+    });
+};
+// ============================================
 // !!!
+// !!!
+
+export interface ApiOptions {
+    signal?: AbortSignal;
+}
 
 export const ProgramsApi = {
     fetchProgramCategories: async (): Promise<ProgramCategory[]> => {
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, mockDelay));
+        if (throwErrorsInApi) throw new Error('Error fetching program categories');
         return [...mockCategories];
     },
 
     fetchProgramById: async (id: number): Promise<Program | null> => {
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, mockDelay));
+        if (throwErrorsInApi) throw new Error('Error fetching program');
         return mockPrograms.find((program) => program.id === id) ?? null;
     },
 
@@ -32,8 +68,10 @@ export const ProgramsApi = {
         pageNumber: number,
         pageSize: number,
         status?: VisibilityStatus,
+        options?: ApiOptions,
     ): Promise<PaginationResult<Program>> => {
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        await simulateAsyncOperation(mockDelay, options?.signal);
+        if (throwErrorsInApi) throw new Error('Error fetching programs');
 
         const filtered = mockPrograms.filter((program) => {
             const inCategory = program.categories.some((category) => category.id === categoryId);

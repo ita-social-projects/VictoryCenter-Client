@@ -11,6 +11,26 @@ export type ButtonProps = {
     disabled?: boolean;
 };
 
+const getClassName = (buttonStyle?: 'primary' | 'secondary', disabled: boolean = false) => {
+    let baseClass: string;
+    switch (buttonStyle) {
+        case 'primary':
+            baseClass = 'btn-primary';
+            break;
+        case 'secondary':
+            baseClass = 'btn-secondary';
+            break;
+        default:
+            baseClass = '';
+    }
+
+    if (disabled && baseClass) {
+        return `${baseClass} ${baseClass}-disabled`;
+    }
+
+    return baseClass;
+};
+
 export const Button = ({
     children,
     onClick,
@@ -20,31 +40,11 @@ export const Button = ({
     disabled = false,
     className = '',
 }: ButtonProps) => {
-    const getClassName = () => {
-        let baseClass: string;
-        switch (buttonStyle) {
-            case 'primary':
-                baseClass = 'btn-primary';
-                break;
-            case 'secondary':
-                baseClass = 'btn-secondary';
-                break;
-            default:
-                baseClass = '';
-        }
-
-        if (disabled && baseClass) {
-            return `${baseClass} ${baseClass}-disabled`;
-        }
-
-        return baseClass;
-    };
-
     return (
         <button
             form={form}
             type={type}
-            className={`${getClassName()} ${className}`}
+            className={`${getClassName(buttonStyle, disabled)} ${className}`}
             onClick={onClick}
             disabled={disabled}
         >

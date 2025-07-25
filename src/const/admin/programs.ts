@@ -3,6 +3,10 @@ export const PROGRAMS_TEXT = {
         ADD_PROGRAM: 'Додати програму',
     },
 
+    MESSAGE: {
+        FAIL_TO_FETCH_PROGRAMS: 'Виникла помилка, не вдалось завантажити програми',
+    },
+
     QUESTION: {
         PUBLISH_PROGRAM: 'Опублікувати нову програму?',
     },
@@ -29,11 +33,16 @@ export const PROGRAMS_TEXT = {
 };
 
 export const PROGRAM_CATEGORY_TEXT = {
+    MESSAGE: {
+        FAIL_TO_FETCH_CATEGORIES: 'Виникла помилка, не вдалось завантажити категорії',
+    },
+
     BUTTON: {
         ADD_CATEGORY: 'Додати категорії',
         EDIT_CATEGORY: 'Редагувати',
         DELETE_CATEGORY: 'Видалити',
     },
+
     FORM: {
         TITLE: {
             ADD_CATEGORY: 'Додати категорію',

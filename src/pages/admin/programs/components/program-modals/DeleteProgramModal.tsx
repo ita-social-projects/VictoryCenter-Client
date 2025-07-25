@@ -28,8 +28,7 @@ export const DeleteProgramModal = ({ isOpen, onClose, onDeleteProgram, programTo
             await ProgramsApi.deleteProgram(programToDelete.id);
             onDeleteProgram(programToDelete);
             onClose();
-        } catch (error) {
-            // Or handle in other way
+        } catch {
             setError(PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_PROGRAM);
         } finally {
             setIsSubmitting(false);

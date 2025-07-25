@@ -239,4 +239,20 @@ describe('Multiselect Component', () => {
         const displayText = screen.getByText(/Very Long Option Name 1, Very Long Option Name 2\.\.\.$/);
         expect(displayText).toBeInTheDocument();
     });
+
+    it('does not trigger option selection on non-Enter/Space key events', () => {
+        const mockOnChange = jest.fn();
+        render(<MultiSelect {...defaultProps} onChange={mockOnChange} />);
+
+        fireEvent.click(screen.getByText('Select options...'));
+
+        const firstOption = screen.getByText('Option 1');
+
+        fireEvent.keyDown(firstOption, { key: 'Tab' });
+        fireEvent.keyDown(firstOption, { key: 'Escape' });
+        fireEvent.keyDown(firstOption, { key: 'ArrowDown' });
+        fireEvent.keyDown(firstOption, { key: 'a' });
+
+        expect(mockOnChange).not.toHaveBeenCalled();
+    });
 });

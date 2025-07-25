@@ -3,51 +3,42 @@ import { render, screen } from '@testing-library/react';
 import { Status } from './Status';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
-jest.mock('../../../const/admin/common', () => ({
-    COMMON_TEXT_ADMIN: {
-        STATUS: {
-            DRAFT: 'Чернетка',
-            PUBLISHED: 'Опубліковано',
-        },
-    },
-}));
-
 describe('Status Component', () => {
     it('renders Draft status with correct text and class', () => {
         render(<Status status="Draft" />);
 
-        const statusElement = screen.getByText('Чернетка').closest('div');
+        const statusElement = screen.getByText(COMMON_TEXT_ADMIN.STATUS.DRAFT).closest('div');
 
         expect(statusElement).toHaveClass('status');
         expect(statusElement).toHaveClass('status-draft');
-        expect(screen.getByText('Чернетка')).toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.DRAFT)).toBeInTheDocument();
     });
 
     it('renders Published status with correct text and class', () => {
         render(<Status status="Published" />);
 
-        const statusElement = screen.getByText('Опубліковано').closest('div');
+        const statusElement = screen.getByText(COMMON_TEXT_ADMIN.STATUS.PUBLISHED).closest('div');
 
         expect(statusElement).toHaveClass('status');
         expect(statusElement).toHaveClass('status-published');
-        expect(screen.getByText('Опубліковано')).toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.PUBLISHED)).toBeInTheDocument();
     });
 
     it('renders correct DOM structure', () => {
         render(<Status status="Draft" />);
 
-        const statusContainer = screen.getByText('Чернетка').closest('div');
+        const statusContainer = screen.getByText(COMMON_TEXT_ADMIN.STATUS.DRAFT).closest('div');
         const spans = statusContainer!.querySelectorAll('span');
 
         expect(spans).toHaveLength(2);
         expect(spans[0]).toHaveTextContent('•');
-        expect(spans[1]).toHaveTextContent('Чернетка');
+        expect(spans[1]).toHaveTextContent(COMMON_TEXT_ADMIN.STATUS.DRAFT);
     });
 
     it('applies correct class for Draft status', () => {
         render(<Status status="Draft" />);
 
-        const statusElement = screen.getByText('Чернетка').closest('div');
+        const statusElement = screen.getByText(COMMON_TEXT_ADMIN.STATUS.DRAFT).closest('div');
 
         expect(statusElement).toHaveClass('status', 'status-draft');
         expect(statusElement).not.toHaveClass('status-published');
@@ -56,7 +47,7 @@ describe('Status Component', () => {
     it('applies correct class for Published status', () => {
         render(<Status status="Published" />);
 
-        const statusElement = screen.getByText('Опубліковано').closest('div');
+        const statusElement = screen.getByText(COMMON_TEXT_ADMIN.STATUS.PUBLISHED).closest('div');
 
         expect(statusElement).toHaveClass('status', 'status-published');
         expect(statusElement).not.toHaveClass('status-draft');

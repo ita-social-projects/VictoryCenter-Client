@@ -4,20 +4,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramListItem } from './ProgramListItem';
 import { Program } from '../../../../../types/ProgramAdminPage';
 import { VisibilityStatus } from '../../../../../types/Common';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
 jest.mock('../../../../../assets/images/admin/blank-image.svg', () => 'blank-image.svg');
 
-jest.mock('../../../../../const/admin/common', () => ({
-    COMMON_TEXT_ADMIN: {
-        TOOLTIP: {
-            PUBLISHED_IN: 'Published in:',
-            DRAFTED_IN: 'Drafted in:',
-        },
-    },
-}));
-
 jest.mock('../../../../../components/common/button-tooltip/ButtonTooltip', () => ({
-    __esModule: true,
     ButtonTooltip: ({ children, position }: { children: React.ReactNode; position: string }) => {
         return (
             <div data-testid="tooltip-button" data-position={position}>
@@ -28,7 +19,6 @@ jest.mock('../../../../../components/common/button-tooltip/ButtonTooltip', () =>
 }));
 
 jest.mock('../../../../../components/common/status/Status', () => ({
-    __esModule: true,
     Status: ({ status }: { status: VisibilityStatus }) => {
         return (
             <div data-testid="status" data-status={status}>
@@ -60,86 +50,115 @@ describe('ProgramListItem', () => {
         handleOnEditProgram: mockHandleOnEditProgram,
     };
 
+    const renderProgramListItem = (overrideProps: Partial<typeof defaultProps> = {}) =>
+        render(<ProgramListItem {...defaultProps} {...overrideProps} />);
+
+    const getProgramName = () => screen.getByText('Test Program');
+    const getProgramDescription = () => screen.getByText('Test program description');
+    const getProgramImage = () => screen.getByAltText('Test Program-img');
+    const getStatusComponent = () => screen.getByTestId('status');
+    const getTooltipButton = () => screen.getByTestId('tooltip-button');
+
+    const getPublishedTooltipText = () => screen.getByText(COMMON_TEXT_ADMIN.TOOLTIP.PUBLISHED_IN);
+    const getDraftedTooltipText = () => screen.getByText(COMMON_TEXT_ADMIN.TOOLTIP.DRAFTED_IN);
+    const getEditButton = () => document.querySelector('.edit-btn') as HTMLElement;
+    const getDeleteButton = () => document.querySelector('.delete-btn') as HTMLElement;
+
+    const getProgramItem = () => document.querySelector('.program-item');
+    const getProgramInfo = () => document.querySelector('.program-info');
+    const getProgramActions = () => document.querySelector('.program-actions');
+    const getProgramActionsButtons = () => document.querySelector('.program-actions-buttons');
+
+    const clickEditButton = () => fireEvent.click(getEditButton());
+    const clickDeleteButton = () => fireEvent.click(getDeleteButton());
+
+    const expectEditProgramCalled = () => {
+        expect(mockHandleOnEditProgram).toHaveBeenCalledTimes(1);
+        expect(mockHandleOnEditProgram).toHaveBeenCalledWith(mockProgram);
+    };
+
+    const expectDeleteProgramCalled = () => {
+        expect(mockHandleOnDeleteProgram).toHaveBeenCalledTimes(1);
+        expect(mockHandleOnDeleteProgram).toHaveBeenCalledWith(mockProgram);
+    };
+
     afterEach(() => {
         jest.clearAllMocks();
     });
 
     it('renders program information correctly', () => {
-        render(<ProgramListItem {...defaultProps} />);
+        renderProgramListItem();
 
-        expect(screen.getByText('Test Program')).toBeInTheDocument();
-        expect(screen.getByText('Test program description')).toBeInTheDocument();
-        expect(screen.getByAltText('Test Program-img')).toBeInTheDocument();
-        expect(screen.getByAltText('Test Program-img')).toHaveAttribute('src', 'test-image.jpg');
+        expect(getProgramName()).toBeInTheDocument();
+        expect(getProgramDescription()).toBeInTheDocument();
+        expect(getProgramImage()).toBeInTheDocument();
+        expect(getProgramImage()).toHaveAttribute('src', 'test-image.jpg');
     });
 
     it('uses blank image when program image is not provided', () => {
         const programWithoutImage = { ...mockProgram, img: null };
-        render(<ProgramListItem {...defaultProps} program={programWithoutImage} />);
+        renderProgramListItem({ program: programWithoutImage });
 
-        const image = screen.getByAltText('Test Program-img');
+        const image = getProgramImage();
         expect(image).toHaveAttribute('src', 'blank-image.svg');
     });
 
     it('renders status component with correct status', () => {
-        render(<ProgramListItem {...defaultProps} />);
+        renderProgramListItem();
 
-        const statusComponent = screen.getByTestId('status');
+        const statusComponent = getStatusComponent();
         expect(statusComponent).toHaveAttribute('data-status', 'Published');
         expect(statusComponent).toHaveTextContent('Published');
     });
 
     it('displays published tooltip text and categories for published program', () => {
-        render(<ProgramListItem {...defaultProps} />);
+        renderProgramListItem();
 
-        expect(screen.getByText('Published in:')).toBeInTheDocument();
+        // Використання константи замість hardcoded text
+        expect(getPublishedTooltipText()).toBeInTheDocument();
         expect(screen.getByText('Category 1')).toBeInTheDocument();
         expect(screen.getByText('Category 2')).toBeInTheDocument();
     });
 
     it('displays drafted tooltip text for drafted program', () => {
         const draftProgram: Program = { ...mockProgram, status: 'Draft' };
-        render(<ProgramListItem {...defaultProps} program={draftProgram} />);
+        renderProgramListItem({ program: draftProgram });
 
-        expect(screen.getByText('Drafted in:')).toBeInTheDocument();
+        // Використання константи замість hardcoded text
+        expect(getDraftedTooltipText()).toBeInTheDocument();
         expect(screen.getByText('Category 1')).toBeInTheDocument();
         expect(screen.getByText('Category 2')).toBeInTheDocument();
     });
 
     it('calls handleOnEditProgram when edit button is clicked', () => {
-        const { container } = render(<ProgramListItem {...defaultProps} />);
+        renderProgramListItem();
 
-        const editButton = container.querySelector('.edit-btn');
-        expect(editButton).not.toBeNull();
+        expect(getEditButton()).not.toBeNull();
 
-        fireEvent.click(editButton!);
+        clickEditButton();
 
-        expect(mockHandleOnEditProgram).toHaveBeenCalledTimes(1);
-        expect(mockHandleOnEditProgram).toHaveBeenCalledWith(mockProgram);
+        expectEditProgramCalled();
     });
 
     it('calls handleOnDeleteProgram when delete button is clicked', () => {
-        render(<ProgramListItem {...defaultProps} />);
+        renderProgramListItem();
 
-        const deleteButton = document.querySelector('.delete-btn');
+        expect(getDeleteButton()).not.toBeNull();
 
-        expect(deleteButton).not.toBeNull();
+        clickDeleteButton();
 
-        fireEvent.click(deleteButton!!);
-
-        expect(mockHandleOnDeleteProgram).toHaveBeenCalledTimes(1);
-        expect(mockHandleOnDeleteProgram).toHaveBeenCalledWith(mockProgram);
+        expectDeleteProgramCalled();
     });
 
     it('renders tooltip button with correct position and applies proper CSS classes', () => {
-        const { container } = render(<ProgramListItem {...defaultProps} />);
+        renderProgramListItem();
 
-        const tooltipButton = screen.getByTestId('tooltip-button');
+        const tooltipButton = getTooltipButton();
         expect(tooltipButton).toHaveAttribute('data-position', 'bottom');
 
-        expect(container.querySelector('.program-item')).toBeInTheDocument();
-        expect(container.querySelector('.program-info')).toBeInTheDocument();
-        expect(container.querySelector('.program-actions')).toBeInTheDocument();
-        expect(container.querySelector('.program-actions-buttons')).toBeInTheDocument();
+        expect(getProgramItem()).toBeInTheDocument();
+        expect(getProgramInfo()).toBeInTheDocument();
+        expect(getProgramActions()).toBeInTheDocument();
+        expect(getProgramActionsButtons()).toBeInTheDocument();
     });
 });

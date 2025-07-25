@@ -51,5 +51,6 @@ export const COMMON_TEXT_ADMIN = {
         CANCEL: 'Відмінити',
         SAVE_AS_DRAFTED: 'Зберегти як чернетку',
         SAVE_AS_PUBLISHED: 'Опублікувати',
+        TRY_AGAIN: 'Спробувати ще раз',
     },
 };

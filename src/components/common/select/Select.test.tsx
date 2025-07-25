@@ -1,20 +1,13 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Select, SelectProps } from './Select';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 jest.mock('./select.scss', () => ({}));
 
 jest.mock('../../../assets/icons/chevron-down.svg', () => 'chevron-down.svg');
 jest.mock('../../../assets/icons/chevron-up.svg', () => 'chevron-up.svg');
-
-jest.mock('../../../const/admin/common', () => ({
-    COMMON_TEXT_ADMIN: {
-        STATUS: {
-            DEFAULT: 'Статус',
-        },
-    },
-}));
 
 describe('Select Component', () => {
     const defaultProps: SelectProps<string> = {
@@ -33,7 +26,7 @@ describe('Select Component', () => {
     it('renders select component with default state', () => {
         render(<Select {...defaultProps} />);
 
-        expect(screen.getByText('Статус')).toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).toBeInTheDocument();
         expect(screen.getByAltText('arrow-down')).toBeInTheDocument();
         expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-down.svg');
     });
@@ -187,7 +180,7 @@ describe('Select Component', () => {
         fireEvent.click(option);
 
         expect(screen.getByText('Option 1')).toBeInTheDocument();
-        expect(screen.queryByText('Статус')).not.toBeInTheDocument();
+        expect(screen.queryByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).not.toBeInTheDocument();
     });
 
     it('changes text color when value is selected', () => {
@@ -292,7 +285,7 @@ describe('Select Component', () => {
 
         fireEvent.click(selectContainer);
 
-        expect(screen.getByText('Статус')).toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).toBeInTheDocument();
         expect(container.querySelector('.select-options')).toBeInTheDocument();
     });
 
@@ -341,7 +334,7 @@ describe('Select Component', () => {
         const selectContainer = screen.getByRole('toolbar');
 
         expect(selectContainer).toHaveClass('select-closed');
-        expect(screen.getByText('Статус')).toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).toBeInTheDocument();
 
         // Open and select Option 1
         fireEvent.click(selectContainer);

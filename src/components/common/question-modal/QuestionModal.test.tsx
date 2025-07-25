@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { QuestionModal } from './QuestionModal';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 describe('QuestionModal', () => {
     const defaultProps = {
@@ -51,5 +52,23 @@ describe('QuestionModal', () => {
         const cancelButton = screen.getByText('Cancel');
         expect(confirmButton).toBeDisabled();
         expect(cancelButton).toBeDisabled();
+    });
+
+    test('uses default cancel text when cancelText is empty', () => {
+        render(<QuestionModal {...defaultProps} cancelText="" />);
+        expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO)).toBeInTheDocument();
+        expect(screen.queryByText('Cancel')).not.toBeInTheDocument();
+    });
+
+    test('uses default confirm text when confirmText is empty', () => {
+        render(<QuestionModal {...defaultProps} confirmText="" />);
+        expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES)).toBeInTheDocument();
+        expect(screen.queryByText('Yes, delete')).not.toBeInTheDocument();
+    });
+
+    test('uses default texts when both cancelText and confirmText are empty', () => {
+        render(<QuestionModal {...defaultProps} cancelText="" confirmText="" />);
+        expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO)).toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES)).toBeInTheDocument();
     });
 });

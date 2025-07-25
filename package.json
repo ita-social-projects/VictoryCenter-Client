@@ -43,7 +43,6 @@
         "extends": [
             "react-app",
             "react-app/jest",
-            "plugin:@typescript-eslint/recommended",
             "plugin:prettier/recommended"
         ],
         "rules": {
@@ -58,8 +57,6 @@
                     "destructuredArrayIgnorePattern": "^_"
                 }
             ],
-            "@typescript-eslint/no-inferrable-types": "off",
-            "@typescript-eslint/no-empty-function": "off",
             "testing-library/no-wait-for-multiple-assertions": 0,
             "testing-library/no-container": 0,
             "testing-library/no-node-access": 0

@@ -1,6 +1,5 @@
 @import '../../assets/sass/variables/variables.colors';
 @import '../../assets/sass/mixins/utilits.mixins';
-@import '../../assets/sass/mixins/utilits.mixins';
 
 $mulish-font-family: 'Mulish', sans-serif;
 
@@ -40,6 +39,8 @@ $mulish-font-family: 'Mulish', sans-serif;
 
             a {
                 @include link-base(#000, $link-hover-blue, $link-pressed-blue);
+                font-weight: 600;
+
                 &.active {
                     @include link-active();
                 }

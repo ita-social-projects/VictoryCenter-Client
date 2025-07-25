@@ -69,4 +69,20 @@ describe('Status Component', () => {
         render(<Status status="Published" />);
         expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.PUBLISHED)).toBeInTheDocument();
     });
+
+    it('handles invalid status type with default class', () => {
+        render(<Status status={'InvalidStatus' as any} />);
+
+        const statusElement = screen.getByText('InvalidStatus').closest('div');
+
+        expect(statusElement).toHaveClass('status');
+        expect(statusElement).toHaveClass('status-draft'); // default 'status-draft'
+    });
+
+    it('handles invalid status type with default text', () => {
+        const invalidStatus = 'InvalidStatus' as any;
+        render(<Status status={invalidStatus} />);
+
+        expect(screen.getByText('InvalidStatus')).toBeInTheDocument();
+    });
 });

@@ -125,6 +125,7 @@ export const EditCategoryModal = ({ isOpen, onClose, onEditCategory, categories 
                             </label>
                             <select
                                 id="edit-category-select"
+                                data-testid="category-select"
                                 onChange={handleCategoryChange}
                                 disabled={isSubmitting}
                                 value={selectedCategoryRef.current?.id || ''}

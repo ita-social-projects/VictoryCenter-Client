@@ -37,7 +37,7 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
             onDeleteCategory(selectedCategory.id);
             setCategoryId(0);
             onClose();
-        } catch (err) {
+        } catch {
             setError(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
         } finally {
             isSubmittingRef.current = false;

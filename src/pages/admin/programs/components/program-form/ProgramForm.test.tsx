@@ -1,7 +1,6 @@
 import React, { createRef } from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from './ProgramForm';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
@@ -171,8 +170,6 @@ describe('ProgramForm', () => {
         expect(await screen.findByText(PROGRAM_VALIDATION.description.getMaxError())).toBeInTheDocument();
     });
 
-    // --- Submission Tests ---
-
     it('should successfully submit valid data in "Draft" mode', async () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
 
@@ -185,28 +182,22 @@ describe('ProgramForm', () => {
 
         await act(async () => {
             formRef.current?.submit('Draft');
-            // Give React time to process the useEffect and handleSubmit
-            await new Promise((resolve) => setTimeout(resolve, 100));
         });
 
-        await waitFor(
-            () => {
-                expect(mockOnSubmit).toHaveBeenCalledWith(
-                    expect.objectContaining({
-                        name: 'Нова чернетка',
-                        categories: [mockCategories[0]],
-                    }),
-                    'Draft',
-                );
-            },
-            { timeout: 1000 },
-        );
+        await waitFor(() => {
+            expect(mockOnSubmit).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    name: 'Нова чернетка',
+                    categories: [mockCategories[0]],
+                }),
+                'Draft',
+            );
+        });
     });
 
     it('should successfully submit valid data in "Published" mode', async () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
 
-        // Wait for categories to be loaded
         await waitFor(() => {
             expect(mockedProgramsApi.fetchProgramCategories).toHaveBeenCalled();
         });
@@ -218,24 +209,19 @@ describe('ProgramForm', () => {
 
         await act(async () => {
             formRef.current?.submit('Published');
-            // Give React time to process the useEffect and handleSubmit
-            await new Promise((resolve) => setTimeout(resolve, 100));
         });
 
-        await waitFor(
-            () => {
-                expect(mockOnSubmit).toHaveBeenCalledWith(
-                    expect.objectContaining({
-                        name: 'Нова публікація',
-                        categories: [mockCategories[1]],
-                        description: 'Дуже важливий опис',
-                        img: mockFile,
-                    }),
-                    'Published',
-                );
-            },
-            { timeout: 1000 },
-        );
+        await waitFor(() => {
+            expect(mockOnSubmit).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    name: 'Нова публікація',
+                    categories: [mockCategories[1]],
+                    description: 'Дуже важливий опис',
+                    img: mockFile,
+                }),
+                'Published',
+            );
+        });
     });
 
     it('should not submit if validation fails', async () => {
@@ -245,10 +231,9 @@ describe('ProgramForm', () => {
             formRef.current?.submit('Published');
         });
 
-        // Let yup validation run
-        await new Promise((resolve) => setTimeout(resolve, 50));
-
-        expect(mockOnSubmit).not.toHaveBeenCalled();
+        await waitFor(() => {
+            expect(mockOnSubmit).not.toHaveBeenCalled();
+        });
     });
 
     it('should expose `isDirty` state via ref', async () => {

@@ -4,36 +4,11 @@ import '@testing-library/jest-dom';
 import { DeleteProgramModal, DeleteProgramModalProps } from './DeleteProgramModal';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
 import { Program } from '../../../../../types/ProgramAdminPage';
+import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
-
-const TEXT = {
-    TITLE: 'Delete program?',
-    ERROR: 'Failed to delete the program.',
-    BUTTON: {
-        CANCEL: 'Cancel',
-        DELETE: 'Delete',
-    },
-};
-
-jest.mock('../../../../../const/admin/programs', () => ({
-    PROGRAMS_TEXT: {
-        FORM: {
-            TITLE: { DELETE_PROGRAM: TEXT.TITLE },
-            MESSAGE: { FAIL_TO_DELETE_PROGRAM: TEXT.ERROR },
-        },
-    },
-}));
-
-jest.mock('../../../../../const/admin/common', () => ({
-    COMMON_TEXT_ADMIN: {
-        BUTTON: {
-            CANCEL: TEXT.BUTTON.CANCEL,
-            DELETE: TEXT.BUTTON.DELETE,
-        },
-    },
-}));
 
 jest.mock('../../../../../components/common/modal/Modal', () => {
     const ModalMock = ({ isOpen, onClose, children, 'data-testid': dataTestId }: any) =>
@@ -56,6 +31,14 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     };
 });
 
+jest.mock('../../../../../components/common/button/Button', () => ({
+    Button: ({ children, onClick, disabled }: any) => (
+        <button onClick={onClick} disabled={disabled}>
+            {children}
+        </button>
+    ),
+}));
+
 describe('DeleteProgramModal', () => {
     const mockProgram: Program = {
         id: 1,
@@ -66,115 +49,149 @@ describe('DeleteProgramModal', () => {
         categories: [],
     };
 
-    let mockProps: DeleteProgramModalProps;
+    const defaultProps: DeleteProgramModalProps = {
+        isOpen: true,
+        onClose: jest.fn(),
+        onDeleteProgram: jest.fn(),
+        programToDelete: mockProgram,
+    };
+
+    // Helper functions
+    const renderDeleteProgramModal = (overrideProps: Partial<DeleteProgramModalProps> = {}) =>
+        render(<DeleteProgramModal {...defaultProps} {...overrideProps} />);
+
+    const getCancelButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+    const getDeleteButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.DELETE);
+    const getModal = () => screen.queryByTestId('delete-program-modal');
+    const getErrorMessage = () => screen.queryByText(PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_PROGRAM);
+    const getTitle = () => screen.queryByText(PROGRAMS_TEXT.FORM.TITLE.DELETE_PROGRAM);
+
+    const clickCancelButton = () => fireEvent.click(getCancelButton());
+    const clickDeleteButton = () => fireEvent.click(getDeleteButton());
+
+    const expectModalClosed = () => {
+        expect(defaultProps.onClose).toHaveBeenCalled();
+    };
+
+    const expectModalNotClosed = () => {
+        expect(defaultProps.onClose).not.toHaveBeenCalled();
+    };
+
+    const expectProgramDeleted = () => {
+        expect(defaultProps.onDeleteProgram).toHaveBeenCalledWith(mockProgram);
+    };
+
+    const expectProgramNotDeleted = () => {
+        expect(defaultProps.onDeleteProgram).not.toHaveBeenCalled();
+    };
 
     beforeEach(() => {
         jest.clearAllMocks();
-        mockProps = {
-            isOpen: true,
-            onClose: jest.fn(),
-            onDeleteProgram: jest.fn(),
-            programToDelete: mockProgram,
-        };
     });
 
-    it('should render correctly when open', () => {
-        render(<DeleteProgramModal {...mockProps} />);
+    describe('Rendering', () => {
+        it('should render correctly when open', () => {
+            renderDeleteProgramModal();
 
-        expect(screen.getByText(TEXT.TITLE)).toBeInTheDocument();
-        expect(screen.getByText(TEXT.BUTTON.CANCEL)).toBeInTheDocument();
-        expect(screen.getByText(TEXT.BUTTON.DELETE)).toBeInTheDocument();
-        expect(screen.queryByText(TEXT.ERROR)).not.toBeInTheDocument();
+            expect(getTitle()).toBeInTheDocument();
+            expect(getCancelButton()).toBeInTheDocument();
+            expect(getDeleteButton()).toBeInTheDocument();
+            expect(getErrorMessage()).not.toBeInTheDocument();
+        });
+
+        it('should not render when isOpen is false', () => {
+            renderDeleteProgramModal({ isOpen: false });
+
+            expect(getModal()).not.toBeInTheDocument();
+        });
     });
 
-    it('should not render when isOpen is false', () => {
-        mockProps.isOpen = false;
-        render(<DeleteProgramModal {...mockProps} />);
+    describe('User interactions', () => {
+        it('should call onClose when the cancel button is clicked', () => {
+            renderDeleteProgramModal();
 
-        expect(screen.queryByTestId('delete-program-modal')).not.toBeInTheDocument();
+            clickCancelButton();
+
+            expectModalClosed();
+        });
+
+        it('should not do anything if programToDelete is null', () => {
+            renderDeleteProgramModal({ programToDelete: null });
+
+            clickDeleteButton();
+
+            expect(mockedProgramsApi.deleteProgram).not.toHaveBeenCalled();
+        });
     });
 
-    it('should call onClose when the cancel button is clicked', () => {
-        render(<DeleteProgramModal {...mockProps} />);
-        fireEvent.click(screen.getByText(TEXT.BUTTON.CANCEL));
-        expect(mockProps.onClose).toHaveBeenCalledTimes(1);
-    });
+    describe('Program deletion', () => {
+        it('should handle successful deletion', async () => {
+            mockedProgramsApi.deleteProgram.mockResolvedValue();
+            renderDeleteProgramModal();
 
-    it('should handle successful deletion', async () => {
-        mockedProgramsApi.deleteProgram.mockResolvedValue();
-        render(<DeleteProgramModal {...mockProps} />);
+            clickDeleteButton();
 
-        fireEvent.click(screen.getByText(TEXT.BUTTON.DELETE));
+            await waitFor(() => {
+                expect(mockedProgramsApi.deleteProgram).toHaveBeenCalledWith(mockProgram.id);
+            });
 
-        await waitFor(() => {
+            expectProgramDeleted();
+            expectModalClosed();
+        });
+
+        it('should handle failed deletion and show an error message', async () => {
+            mockedProgramsApi.deleteProgram.mockRejectedValue(new Error('API Error'));
+            renderDeleteProgramModal();
+
+            clickDeleteButton();
+
+            const errorMessage = await screen.findByText(PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_PROGRAM);
+            expect(errorMessage).toBeInTheDocument();
+
             expect(mockedProgramsApi.deleteProgram).toHaveBeenCalledWith(mockProgram.id);
+            expectProgramNotDeleted();
+            expectModalNotClosed();
         });
 
-        expect(mockProps.onDeleteProgram).toHaveBeenCalledWith(mockProgram);
-        expect(mockProps.onClose).toHaveBeenCalledTimes(1);
-    });
+        it('should disable buttons while submitting', async () => {
+            let resolveRequest!: () => void;
+            const longRunningPromise = new Promise<void>((resolve) => {
+                resolveRequest = resolve;
+            });
+            mockedProgramsApi.deleteProgram.mockReturnValue(longRunningPromise);
 
-    it('should handle failed deletion and show an error message', async () => {
-        mockedProgramsApi.deleteProgram.mockRejectedValue(new Error('API Error'));
-        render(<DeleteProgramModal {...mockProps} />);
+            renderDeleteProgramModal();
 
-        fireEvent.click(screen.getByText(TEXT.BUTTON.DELETE));
+            clickDeleteButton();
 
-        const errorMessage = await screen.findByText(TEXT.ERROR);
-        expect(errorMessage).toBeInTheDocument();
+            await waitFor(() => {
+                expect(getDeleteButton()).toBeDisabled();
+                expect(getCancelButton()).toBeDisabled();
+            });
 
-        expect(mockedProgramsApi.deleteProgram).toHaveBeenCalledWith(mockProgram.id);
-        expect(mockProps.onDeleteProgram).not.toHaveBeenCalled();
-        expect(mockProps.onClose).not.toHaveBeenCalled();
-    });
+            resolveRequest();
 
-    it('should disable buttons while submitting', async () => {
-        let resolveRequest!: () => void;
-        const longRunningPromise = new Promise<void>((resolve) => {
-            resolveRequest = resolve;
-        });
-        mockedProgramsApi.deleteProgram.mockReturnValue(longRunningPromise);
-
-        render(<DeleteProgramModal {...mockProps} />);
-
-        const deleteButton = screen.getByText<HTMLButtonElement>(TEXT.BUTTON.DELETE);
-        const cancelButton = screen.getByText<HTMLButtonElement>(TEXT.BUTTON.CANCEL);
-
-        fireEvent.click(deleteButton);
-
-        await waitFor(() => {
-            expect(deleteButton).toBeDisabled();
-            expect(cancelButton).toBeDisabled();
-        });
-
-        resolveRequest();
-
-        await waitFor(() => {
-            expect(mockProps.onClose).toHaveBeenCalled();
+            await waitFor(() => {
+                expectModalClosed();
+            });
         });
     });
 
-    it('should not do anything if programToDelete is null', () => {
-        mockProps.programToDelete = null;
-        render(<DeleteProgramModal {...mockProps} />);
+    describe('Error handling', () => {
+        it('should clear error on close', async () => {
+            mockedProgramsApi.deleteProgram.mockRejectedValue(new Error('API Error'));
+            const { rerender } = renderDeleteProgramModal();
 
-        fireEvent.click(screen.getByText(TEXT.BUTTON.DELETE));
+            clickDeleteButton();
+            await screen.findByText(PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_PROGRAM);
 
-        expect(mockedProgramsApi.deleteProgram).not.toHaveBeenCalled();
-    });
+            clickCancelButton();
+            expectModalClosed();
 
-    it('should clear error on close', async () => {
-        mockedProgramsApi.deleteProgram.mockRejectedValue(new Error('API Error'));
-        const { rerender } = render(<DeleteProgramModal {...mockProps} />);
-        fireEvent.click(screen.getByText(TEXT.BUTTON.DELETE));
-        await screen.findByText(TEXT.ERROR);
+            rerender(<DeleteProgramModal {...defaultProps} isOpen={false} />);
+            rerender(<DeleteProgramModal {...defaultProps} isOpen={true} />);
 
-        fireEvent.click(screen.getByText(TEXT.BUTTON.CANCEL));
-        expect(mockProps.onClose).toHaveBeenCalledTimes(1);
-
-        rerender(<DeleteProgramModal {...mockProps} isOpen={false} />);
-        rerender(<DeleteProgramModal {...mockProps} isOpen={true} />);
-
-        expect(screen.queryByText(TEXT.ERROR)).not.toBeInTheDocument();
+            expect(getErrorMessage()).not.toBeInTheDocument();
+        });
     });
 });

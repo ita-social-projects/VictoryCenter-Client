@@ -4,55 +4,6 @@ import { ProgramsPageContent } from './ProgramsPageContent';
 import { Program } from '../../../../../types/ProgramAdminPage';
 import { VisibilityStatus } from '../../../../../types/Common';
 
-// Mock словники
-jest.mock('../../../../../const/admin/programs', () => ({
-    PROGRAMS_TEXT: {
-        FORM: {
-            TITLE: {
-                ADD_PROGRAM: 'Додати програму',
-                EDIT_PROGRAM: 'Редагувати програму',
-            },
-        },
-        QUESTION: {
-            PUBLISH_PROGRAM: 'Опублікувати програму?',
-        },
-    },
-}));
-
-jest.mock('../../../../../const/admin/common', () => ({
-    COMMON_TEXT_ADMIN: {
-        BUTTON: {
-            SAVE_AS_DRAFTED: 'Зберегти як чернетку',
-            SAVE_AS_PUBLISHED: 'Зберегти та опублікувати',
-            YES: 'Так',
-            NO: 'Ні',
-        },
-        QUESTION: {
-            REMOVE_FROM_PUBLICATION: 'Зняти з публікації?',
-            PUBLISH_CHANGES: 'Опублікувати зміни?',
-            CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE: 'Зміни буде втрачено. Продовжити?',
-        },
-    },
-}));
-
-const MOCKED_TEXT = {
-    ADD_PROGRAM: 'Add Program',
-    TRIGGER_EDIT: 'Trigger Edit',
-    TRIGGER_DELETE: 'Trigger Delete',
-    FILTER_PUBLISHED: 'Filter Published',
-    ADD_PROGRAM_MODAL: 'Add Program Modal',
-    EDIT_PROGRAM_MODAL: 'Edit Program Modal',
-    DELETE_PROGRAM_MODAL: 'Delete Program Modal',
-    EDITING: 'Editing:',
-    DELETING: 'Deleting:',
-    CONFIRM_ADD: 'Confirm Add',
-    CONFIRM_EDIT: 'Confirm Edit',
-    CONFIRM_DELETE: 'Confirm Delete',
-    CLOSE_ADD: 'Close Add',
-    CLOSE_EDIT: 'Close Edit',
-    CLOSE_DELETE: 'Close Delete',
-};
-
 const mockProgram: Program = {
     id: 1,
     name: 'Test Program Alpha',
@@ -81,9 +32,9 @@ jest.mock('../programs-list/ProgramsList', () => {
         React.useImperativeHandle(ref, () => mockRef);
 
         return (
-            <div>
-                <button onClick={() => props.onEditProgram(mockProgram)}>{MOCKED_TEXT.TRIGGER_EDIT}</button>
-                <button onClick={() => props.onDeleteProgram(mockProgram)}>{MOCKED_TEXT.TRIGGER_DELETE}</button>
+            <div data-testid="programs-list">
+                <button onClick={() => props.onEditProgram(mockProgram)}>Trigger Edit</button>
+                <button onClick={() => props.onDeleteProgram(mockProgram)}>Trigger Delete</button>
             </div>
         );
     });
@@ -95,10 +46,10 @@ jest.mock('../programs-list/ProgramsList', () => {
 
 jest.mock('../programs-page-toolbar/ProgramsPageToolbar', () => ({
     ProgramsPageToolbar: (props: any) => (
-        <div>
-            <button onClick={props.onAddProgram}>{MOCKED_TEXT.ADD_PROGRAM}</button>
+        <div data-testid="programs-toolbar">
+            <button onClick={props.onAddProgram}>Add Program</button>
             <button onClick={() => props.onStatusFilterChange('Published' as VisibilityStatus)}>
-                {MOCKED_TEXT.FILTER_PUBLISHED}
+                Filter Published
             </button>
             <input
                 data-testid="search-input"
@@ -117,14 +68,11 @@ jest.mock('../program-modals/ProgramModal', () => ({
         const isEditMode = props.mode === 'edit';
 
         return (
-            <div>
-                <h2>{isAddMode ? MOCKED_TEXT.ADD_PROGRAM_MODAL : MOCKED_TEXT.EDIT_PROGRAM_MODAL}</h2>
-                {isEditMode && props.programToEdit && (
-                    <p>
-                        {MOCKED_TEXT.EDITING} {props.programToEdit.name}
-                    </p>
-                )}
+            <div data-testid={isAddMode ? 'add-program-modal' : 'edit-program-modal'}>
+                <h2>{isAddMode ? 'Add Program Modal' : 'Edit Program Modal'}</h2>
+                {isEditMode && props.programToEdit && <p>Editing: {props.programToEdit.name}</p>}
                 <button
+                    data-testid={isAddMode ? 'confirm-add' : 'confirm-edit'}
                     onClick={() => {
                         if (isAddMode && props.onAddProgram) {
                             props.onAddProgram(mockProgram);
@@ -134,9 +82,11 @@ jest.mock('../program-modals/ProgramModal', () => ({
                         props.onClose();
                     }}
                 >
-                    {isAddMode ? MOCKED_TEXT.CONFIRM_ADD : MOCKED_TEXT.CONFIRM_EDIT}
+                    {isAddMode ? 'Confirm Add' : 'Confirm Edit'}
                 </button>
-                <button onClick={props.onClose}>{isAddMode ? MOCKED_TEXT.CLOSE_ADD : MOCKED_TEXT.CLOSE_EDIT}</button>
+                <button data-testid={isAddMode ? 'close-add' : 'close-edit'} onClick={props.onClose}>
+                    {isAddMode ? 'Close Add' : 'Close Edit'}
+                </button>
             </div>
         );
     },
@@ -146,20 +96,21 @@ jest.mock('../program-modals/DeleteProgramModal', () => ({
     __esModule: true,
     default: (props: any) =>
         props.isOpen ? (
-            <div>
-                <h2>{MOCKED_TEXT.DELETE_PROGRAM_MODAL}</h2>
-                <p>
-                    {MOCKED_TEXT.DELETING} {props.programToDelete?.name}
-                </p>
+            <div data-testid="delete-program-modal">
+                <h2>Delete Program Modal</h2>
+                <p>Deleting: {props.programToDelete?.name}</p>
                 <button
+                    data-testid="confirm-delete"
                     onClick={() => {
                         props.onDeleteProgram(props.programToDelete);
                         props.onClose();
                     }}
                 >
-                    {MOCKED_TEXT.CONFIRM_DELETE}
+                    Confirm Delete
                 </button>
-                <button onClick={props.onClose}>{MOCKED_TEXT.CLOSE_DELETE}</button>
+                <button data-testid="close-delete" onClick={props.onClose}>
+                    Close Delete
+                </button>
             </div>
         ) : null,
 }));
@@ -175,11 +126,13 @@ describe('ProgramsPageContent', () => {
 
             expect(container.firstChild).toHaveClass('wrapper');
             expect(screen.getByTestId('programs-page-content')).toBeInTheDocument();
-            expect(screen.getByText(MOCKED_TEXT.ADD_PROGRAM)).toBeInTheDocument();
-            expect(screen.getByText(MOCKED_TEXT.TRIGGER_EDIT)).toBeInTheDocument();
-            expect(screen.queryByText(MOCKED_TEXT.ADD_PROGRAM_MODAL)).not.toBeInTheDocument();
-            expect(screen.queryByText(MOCKED_TEXT.EDIT_PROGRAM_MODAL)).not.toBeInTheDocument();
-            expect(screen.queryByText(MOCKED_TEXT.DELETE_PROGRAM_MODAL)).not.toBeInTheDocument();
+            expect(screen.getByTestId('programs-toolbar')).toBeInTheDocument();
+            expect(screen.getByTestId('programs-list')).toBeInTheDocument();
+            expect(screen.getByText('Add Program')).toBeInTheDocument();
+            expect(screen.getByText('Trigger Edit')).toBeInTheDocument();
+            expect(screen.queryByTestId('add-program-modal')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('edit-program-modal')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('delete-program-modal')).not.toBeInTheDocument();
         });
     });
 
@@ -190,67 +143,70 @@ describe('ProgramsPageContent', () => {
         };
 
         it('should open the Add Program modal when the add button is clicked', () => {
-            renderAndOpenModal(MOCKED_TEXT.ADD_PROGRAM);
-            expect(screen.getByText(MOCKED_TEXT.ADD_PROGRAM_MODAL)).toBeInTheDocument();
+            renderAndOpenModal('Add Program');
+            expect(screen.getByTestId('add-program-modal')).toBeInTheDocument();
+            expect(screen.getByText('Add Program Modal')).toBeInTheDocument();
         });
 
         it('should close the Add Program modal when close button is clicked', () => {
-            renderAndOpenModal(MOCKED_TEXT.ADD_PROGRAM);
-            fireEvent.click(screen.getByText(MOCKED_TEXT.CLOSE_ADD));
-            expect(screen.queryByText(MOCKED_TEXT.ADD_PROGRAM_MODAL)).not.toBeInTheDocument();
+            renderAndOpenModal('Add Program');
+            fireEvent.click(screen.getByTestId('close-add'));
+            expect(screen.queryByTestId('add-program-modal')).not.toBeInTheDocument();
         });
 
         it('should open the Edit Program modal when onEditProgram is triggered', () => {
-            renderAndOpenModal(MOCKED_TEXT.TRIGGER_EDIT);
-            expect(screen.getByText(MOCKED_TEXT.EDIT_PROGRAM_MODAL)).toBeInTheDocument();
-            expect(screen.getByText(`${MOCKED_TEXT.EDITING} ${mockProgram.name}`)).toBeInTheDocument();
+            renderAndOpenModal('Trigger Edit');
+            expect(screen.getByTestId('edit-program-modal')).toBeInTheDocument();
+            expect(screen.getByText('Edit Program Modal')).toBeInTheDocument();
+            expect(screen.getByText(`Editing: ${mockProgram.name}`)).toBeInTheDocument();
         });
 
         it('should close the Edit Program modal when close button is clicked', () => {
-            renderAndOpenModal(MOCKED_TEXT.TRIGGER_EDIT);
-            fireEvent.click(screen.getByText(MOCKED_TEXT.CLOSE_EDIT));
-            expect(screen.queryByText(MOCKED_TEXT.EDIT_PROGRAM_MODAL)).not.toBeInTheDocument();
+            renderAndOpenModal('Trigger Edit');
+            fireEvent.click(screen.getByTestId('close-edit'));
+            expect(screen.queryByTestId('edit-program-modal')).not.toBeInTheDocument();
         });
 
         it('should open the Delete Program modal when onDeleteProgram is triggered', () => {
-            renderAndOpenModal(MOCKED_TEXT.TRIGGER_DELETE);
-            expect(screen.getByText(MOCKED_TEXT.DELETE_PROGRAM_MODAL)).toBeInTheDocument();
-            expect(screen.getByText(`${MOCKED_TEXT.DELETING} ${mockProgram.name}`)).toBeInTheDocument();
+            renderAndOpenModal('Trigger Delete');
+            expect(screen.getByTestId('delete-program-modal')).toBeInTheDocument();
+            expect(screen.getByText('Delete Program Modal')).toBeInTheDocument();
+            expect(screen.getByText(`Deleting: ${mockProgram.name}`)).toBeInTheDocument();
         });
 
         it('should close the Delete Program modal when close button is clicked', () => {
-            renderAndOpenModal(MOCKED_TEXT.TRIGGER_DELETE);
-            fireEvent.click(screen.getByText(MOCKED_TEXT.CLOSE_DELETE));
-            expect(screen.queryByText(MOCKED_TEXT.DELETE_PROGRAM_MODAL)).not.toBeInTheDocument();
+            renderAndOpenModal('Trigger Delete');
+            fireEvent.click(screen.getByTestId('close-delete'));
+            expect(screen.queryByTestId('delete-program-modal')).not.toBeInTheDocument();
         });
     });
 
     describe('Program operations', () => {
         it('should call addProgram on the list ref when a program is added via modal', () => {
             render(<ProgramsPageContent />);
-            fireEvent.click(screen.getByText(MOCKED_TEXT.ADD_PROGRAM));
-            fireEvent.click(screen.getByText(MOCKED_TEXT.CONFIRM_ADD));
+            fireEvent.click(screen.getByText('Add Program'));
+            fireEvent.click(screen.getByTestId('confirm-add'));
 
             expect(mockAddProgram).toHaveBeenCalledWith(mockProgram);
-            expect(screen.queryByText(MOCKED_TEXT.ADD_PROGRAM_MODAL)).not.toBeInTheDocument();
+            expect(screen.queryByTestId('add-program-modal')).not.toBeInTheDocument();
         });
 
         it('should call editProgram on the list ref when a program is edited via modal', () => {
             render(<ProgramsPageContent />);
-            fireEvent.click(screen.getByText(MOCKED_TEXT.TRIGGER_EDIT));
-            fireEvent.click(screen.getByText(MOCKED_TEXT.CONFIRM_EDIT));
+            fireEvent.click(screen.getByText('Trigger Edit'));
+            fireEvent.click(screen.getByTestId('confirm-edit'));
 
             expect(mockEditProgram).toHaveBeenCalledWith(mockProgram);
-            expect(screen.queryByText(MOCKED_TEXT.EDIT_PROGRAM_MODAL)).not.toBeInTheDocument();
+            expect(screen.queryByTestId('edit-program-modal')).not.toBeInTheDocument();
         });
 
         it('should call deleteProgram on the list ref when a program is deleted via modal', () => {
             render(<ProgramsPageContent />);
-            fireEvent.click(screen.getByText(MOCKED_TEXT.TRIGGER_DELETE));
-            fireEvent.click(screen.getByText(MOCKED_TEXT.CONFIRM_DELETE));
+            fireEvent.click(screen.getByText('Trigger Delete'));
+            fireEvent.click(screen.getByTestId('confirm-delete'));
 
             expect(mockDeleteProgram).toHaveBeenCalledWith(mockProgram);
-            expect(screen.queryByText(MOCKED_TEXT.DELETE_PROGRAM_MODAL)).not.toBeInTheDocument();
+            expect(screen.queryByTestId('delete-program-modal')).not.toBeInTheDocument();
         });
     });
 
@@ -267,9 +223,9 @@ describe('ProgramsPageContent', () => {
         it('should handle status filter changes', () => {
             render(<ProgramsPageContent />);
 
-            fireEvent.click(screen.getByText(MOCKED_TEXT.FILTER_PUBLISHED));
+            fireEvent.click(screen.getByText('Filter Published'));
 
-            expect(screen.getByText(MOCKED_TEXT.FILTER_PUBLISHED)).toBeInTheDocument();
+            expect(screen.getByText('Filter Published')).toBeInTheDocument();
         });
     });
 

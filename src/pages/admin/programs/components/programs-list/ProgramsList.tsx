@@ -8,10 +8,9 @@ import LoaderIcon from '../../../../../assets/icons/load.svg';
 import ArrowUpIcon from '../../../../../assets/icons/arrow-up.svg';
 import NotFoundIcon from '../../../../../assets/icons/not-found.svg';
 import { ProgramListItem } from '../program-list-item/ProgramListItem';
-import AddCategoryModal from '../program-category-modals/AddCategoryModal';
-import EditCategoryModal from '../program-category-modals/EditCategoryModal';
-import DeleteCategoryModal from '../program-category-modals/DeleteCategoryModal';
+import { DeleteCategoryModal } from '../program-category-modals/DeleteCategoryModal';
 import { CategoryBar } from '../../../../../components/common/category-bar/CategoryBar';
+import { ProgramCategoryModal } from '../program-category-modals/ProgramCategoryModal';
 import './programs-list.scss';
 
 export interface ProgramsListProps {
@@ -250,18 +249,20 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(
 
         return (
             <>
-                <AddCategoryModal
+                <ProgramCategoryModal
+                    mode="add"
                     isOpen={isAddCategoryModalOpen}
                     onClose={() => setIsAddCategoryModalOpen(false)}
-                    onAddCategory={handleAddCategory}
                     categories={categories}
+                    onAddCategory={handleAddCategory}
                 />
 
-                <EditCategoryModal
+                <ProgramCategoryModal
+                    mode="edit"
                     isOpen={isEditCategoryModalOpen}
                     onClose={() => setIsEditCategoryModalOpen(false)}
-                    onEditCategory={handleEditCategory}
                     categories={categories}
+                    onEditCategory={handleEditCategory}
                 />
 
                 <DeleteCategoryModal

@@ -4,52 +4,11 @@ import '@testing-library/jest-dom';
 import { DeleteCategoryModal } from './DeleteCategoryModal';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
 import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
+import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
-
-const TEXT = {
-    TITLE: 'Delete category',
-    LABEL: {
-        CATEGORY: 'Category',
-    },
-    MESSAGE: {
-        FAIL_TO_DELETE: 'Failed to delete category.',
-    },
-    HINT: {
-        TITLE: (count: number) => `This category has ${count} programs`,
-        TEXT: 'To delete it, you need to either relocate the programs or delete them.',
-    },
-    BUTTON: {
-        CANCEL: 'Cancel',
-        DELETE: 'Delete',
-    },
-};
-
-jest.mock('../../../../../const/admin/programs', () => ({
-    PROGRAM_CATEGORY_TEXT: {
-        FORM: {
-            TITLE: { DELETE_CATEGORY: TEXT.TITLE },
-            LABEL: { CATEGORY: TEXT.LABEL.CATEGORY },
-            MESSAGE: { FAIL_TO_DELETE_CATEGORY: TEXT.MESSAGE.FAIL_TO_DELETE },
-        },
-    },
-    PROGRAM_CATEGORY_VALIDATION: {
-        programsCount: {
-            getHasProgramsCountError: TEXT.HINT.TITLE,
-            getRelocationOrRemovalHint: () => TEXT.HINT.TEXT,
-        },
-    },
-}));
-
-jest.mock('../../../../../const/admin/common', () => ({
-    COMMON_TEXT_ADMIN: {
-        BUTTON: {
-            CANCEL: TEXT.BUTTON.CANCEL,
-            DELETE: TEXT.BUTTON.DELETE,
-        },
-    },
-}));
 
 jest.mock('../../../../../components/common/modal/Modal', () => {
     const ModalMock = ({ isOpen, onClose, children }: any) =>
@@ -84,89 +43,131 @@ describe('DeleteCategoryModal', () => {
         { id: 3, name: 'Another empty category', programsCount: 0 },
     ];
 
-    let mockProps: any;
+    const defaultProps = {
+        isOpen: true,
+        onClose: jest.fn(),
+        onDeleteCategory: jest.fn(),
+        categories: mockCategories,
+    };
+
+    // Helper functions
+    const renderDeleteCategoryModal = (overrideProps = {}) =>
+        render(<DeleteCategoryModal {...defaultProps} {...overrideProps} />);
+
+    const getModal = () => screen.queryByTestId('modal');
+    const getTitle = () => screen.queryByText(PROGRAM_CATEGORY_TEXT.FORM.TITLE.DELETE_CATEGORY);
+    const getCategorySelect = () =>
+        screen.getByRole('combobox', { name: `* ${PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}` });
+    const getCancelButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+    const getDeleteButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.DELETE);
+    const getHintBox = () => screen.queryByTestId('hint-box');
+    const getErrorMessage = () => screen.queryByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
+    const getHasProgramsError = (programsCount: number) =>
+        screen.queryByText(PROGRAM_CATEGORY_VALIDATION.programsCount.getHasProgramsCountError(programsCount));
+
+    const clickCancelButton = () => fireEvent.click(getCancelButton());
+    const clickDeleteButton = () => fireEvent.click(getDeleteButton());
+    const changeCategorySelect = (categoryId: number) =>
+        fireEvent.change(getCategorySelect(), { target: { value: categoryId } });
+
+    const expectModalClosed = () => {
+        expect(defaultProps.onClose).toHaveBeenCalled();
+    };
+
+    const expectModalNotClosed = () => {
+        expect(defaultProps.onClose).not.toHaveBeenCalled();
+    };
+
+    const expectCategoryDeleted = (categoryId: number) => {
+        expect(defaultProps.onDeleteCategory).toHaveBeenCalledWith(categoryId);
+    };
+
+    const expectCategoryNotDeleted = () => {
+        expect(defaultProps.onDeleteCategory).not.toHaveBeenCalled();
+    };
+
+    const expectDeleteApiCalled = (categoryId: number) => {
+        expect(mockedProgramsApi.deleteCategory).toHaveBeenCalledWith(categoryId);
+    };
 
     beforeEach(() => {
         jest.clearAllMocks();
-        mockProps = {
-            isOpen: true,
-            onClose: jest.fn(),
-            onDeleteCategory: jest.fn(),
-            categories: mockCategories,
-        };
     });
 
     it('should render correctly when open', () => {
-        render(<DeleteCategoryModal {...mockProps} />);
-        expect(screen.getByText(TEXT.TITLE)).toBeInTheDocument();
-        expect(screen.getByRole('combobox', { name: /Category/i })).toBeInTheDocument();
-        expect(screen.getByText(TEXT.BUTTON.CANCEL)).toBeInTheDocument();
-        expect(screen.getByText(TEXT.BUTTON.DELETE)).toBeInTheDocument();
+        renderDeleteCategoryModal();
+
+        expect(getTitle()).toBeInTheDocument();
+        expect(getCategorySelect()).toBeInTheDocument();
+        expect(getCancelButton()).toBeInTheDocument();
+        expect(getDeleteButton()).toBeInTheDocument();
     });
 
     it('should not render when isOpen is false', () => {
-        render(<DeleteCategoryModal {...mockProps} isOpen={false} />);
-        expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
+        renderDeleteCategoryModal({ isOpen: false });
+
+        expect(getModal()).not.toBeInTheDocument();
     });
 
     it('should select the first category by default', () => {
-        render(<DeleteCategoryModal {...mockProps} />);
-        const select = screen.getByRole('combobox', { name: /Category/i }) as HTMLSelectElement;
+        renderDeleteCategoryModal();
+
+        const select = getCategorySelect() as HTMLSelectElement;
         expect(select.value).toBe(mockCategories[0].id.toString());
     });
 
     it('should call onClose when the cancel button is clicked', () => {
-        render(<DeleteCategoryModal {...mockProps} />);
-        fireEvent.click(screen.getByText(TEXT.BUTTON.CANCEL));
-        expect(mockProps.onClose).toHaveBeenCalledTimes(1);
+        renderDeleteCategoryModal();
+
+        clickCancelButton();
+
+        expectModalClosed();
     });
 
     it('should handle successful category deletion', async () => {
         mockedProgramsApi.deleteCategory.mockResolvedValue(undefined);
-        render(<DeleteCategoryModal {...mockProps} />);
+        renderDeleteCategoryModal();
 
-        fireEvent.click(screen.getByText(TEXT.BUTTON.DELETE));
+        clickDeleteButton();
 
         await waitFor(() => {
-            expect(mockedProgramsApi.deleteCategory).toHaveBeenCalledWith(mockCategories[0].id);
+            expectDeleteApiCalled(mockCategories[0].id);
         });
 
-        expect(mockProps.onDeleteCategory).toHaveBeenCalledWith(mockCategories[0].id);
-        expect(mockProps.onClose).toHaveBeenCalledTimes(1);
+        expectCategoryDeleted(mockCategories[0].id);
+        expectModalClosed();
     });
 
     it('should handle failed deletion and show an error message', async () => {
         mockedProgramsApi.deleteCategory.mockRejectedValue(new Error('API Error'));
-        render(<DeleteCategoryModal {...mockProps} />);
+        renderDeleteCategoryModal();
 
-        fireEvent.click(screen.getByText(TEXT.BUTTON.DELETE));
+        clickDeleteButton();
 
-        expect(await screen.findByText(TEXT.MESSAGE.FAIL_TO_DELETE)).toBeInTheDocument();
-        expect(mockProps.onDeleteCategory).not.toHaveBeenCalled();
-        expect(mockProps.onClose).not.toHaveBeenCalled();
+        expect(await screen.findByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY)).toBeInTheDocument();
+        expectCategoryNotDeleted();
+        expectModalNotClosed();
     });
 
     it('should disable delete button and show hint for a category with programs', () => {
-        render(<DeleteCategoryModal {...mockProps} />);
-        const select = screen.getByRole('combobox', { name: /Category/i });
+        renderDeleteCategoryModal();
 
-        fireEvent.change(select, { target: { value: mockCategories[1].id } });
+        changeCategorySelect(mockCategories[1].id);
 
-        expect(screen.getByText(TEXT.BUTTON.DELETE)).toBeDisabled();
-        expect(screen.getByTestId('hint-box')).toBeInTheDocument();
-        expect(screen.getByText(TEXT.HINT.TITLE(mockCategories[1].programsCount))).toBeInTheDocument();
+        expect(getDeleteButton()).toBeDisabled();
+        expect(getHintBox()).toBeInTheDocument();
+        expect(getHasProgramsError(mockCategories[1].programsCount)).toBeInTheDocument();
     });
 
     it('should enable delete button for a category without programs', () => {
-        render(<DeleteCategoryModal {...mockProps} />);
-        const select = screen.getByRole('combobox', { name: /Category/i });
+        renderDeleteCategoryModal();
 
-        fireEvent.change(select, { target: { value: mockCategories[1].id } });
-        expect(screen.getByText(TEXT.BUTTON.DELETE)).toBeDisabled();
+        changeCategorySelect(mockCategories[1].id);
+        expect(getDeleteButton()).toBeDisabled();
 
-        fireEvent.change(select, { target: { value: mockCategories[2].id } });
-        expect(screen.getByText(TEXT.BUTTON.DELETE)).not.toBeDisabled();
-        expect(screen.queryByTestId('hint-box')).not.toBeInTheDocument();
+        changeCategorySelect(mockCategories[2].id);
+        expect(getDeleteButton()).not.toBeDisabled();
+        expect(getHintBox()).not.toBeInTheDocument();
     });
 
     it('should disable all controls while submitting', async () => {
@@ -176,13 +177,13 @@ describe('DeleteCategoryModal', () => {
         });
         mockedProgramsApi.deleteCategory.mockReturnValue(longRunningPromise);
 
-        render(<DeleteCategoryModal {...mockProps} />);
+        renderDeleteCategoryModal();
 
-        const deleteButton = screen.getByText<HTMLButtonElement>(TEXT.BUTTON.DELETE);
-        const cancelButton = screen.getByText<HTMLButtonElement>(TEXT.BUTTON.CANCEL);
-        const select = screen.getByRole('combobox', { name: /Category/i }) as HTMLSelectElement;
+        const deleteButton = getDeleteButton() as HTMLButtonElement;
+        const cancelButton = getCancelButton() as HTMLButtonElement;
+        const select = getCategorySelect() as HTMLSelectElement;
 
-        fireEvent.click(deleteButton);
+        clickDeleteButton();
 
         await waitFor(() => {
             expect(deleteButton).toBeDisabled();
@@ -193,20 +194,20 @@ describe('DeleteCategoryModal', () => {
         resolveRequest();
 
         await waitFor(() => {
-            expect(mockProps.onClose).toHaveBeenCalled();
+            expectModalClosed();
         });
     });
 
     it('should clear the error message when the modal re-opens', async () => {
         mockedProgramsApi.deleteCategory.mockRejectedValue(new Error('API error'));
-        const { rerender } = render(<DeleteCategoryModal {...mockProps} />);
+        const { rerender } = renderDeleteCategoryModal();
 
-        fireEvent.click(screen.getByText(TEXT.BUTTON.DELETE));
-        await screen.findByText(TEXT.MESSAGE.FAIL_TO_DELETE);
+        clickDeleteButton();
+        await screen.findByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
 
-        rerender(<DeleteCategoryModal {...mockProps} isOpen={false} />);
-        rerender(<DeleteCategoryModal {...mockProps} isOpen={true} />);
+        rerender(<DeleteCategoryModal {...defaultProps} isOpen={false} />);
+        rerender(<DeleteCategoryModal {...defaultProps} isOpen={true} />);
 
-        expect(screen.queryByText(TEXT.MESSAGE.FAIL_TO_DELETE)).not.toBeInTheDocument();
+        expect(getErrorMessage()).not.toBeInTheDocument();
     });
 });

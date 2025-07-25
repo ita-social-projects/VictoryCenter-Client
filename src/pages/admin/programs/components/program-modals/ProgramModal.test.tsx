@@ -3,58 +3,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramModal, ProgramModalProps } from './ProgramModal';
 import { Program } from '../../../../../types/ProgramAdminPage';
 import { useProgramModal } from '../../../../../hooks/admin/useProgramModal/useProgramModal';
-
-jest.mock('../../../../../const/admin/programs', () => ({
-    PROGRAMS_TEXT: {
-        FORM: {
-            TITLE: {
-                ADD_PROGRAM: 'Додати програму',
-                EDIT_PROGRAM: 'Редагувати програму',
-            },
-        },
-        QUESTION: {
-            PUBLISH_PROGRAM: 'Опублікувати програму?',
-        },
-    },
-}));
-
-jest.mock('../../../../../const/admin/common', () => ({
-    COMMON_TEXT_ADMIN: {
-        BUTTON: {
-            SAVE_AS_DRAFTED: 'Зберегти як чернетку',
-            SAVE_AS_PUBLISHED: 'Зберегти та опублікувати',
-            YES: 'Так',
-            NO: 'Ні',
-        },
-        QUESTION: {
-            REMOVE_FROM_PUBLICATION: 'Зняти з публікації?',
-            PUBLISH_CHANGES: 'Опублікувати зміни?',
-            CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE: 'Зміни буде втрачено. Продовжити?',
-        },
-    },
-}));
-
-const MOCKED_TEXT = {
-    PROGRAMS_TEXT: {
-        FORM: {
-            TITLE: {
-                ADD_PROGRAM: 'Додати програму',
-                EDIT_PROGRAM: 'Редагувати програму',
-            },
-        },
-    },
-    COMMON_TEXT_ADMIN: {
-        BUTTON: {
-            SAVE_AS_DRAFTED: 'Зберегти як чернетку',
-            SAVE_AS_PUBLISHED: 'Зберегти та опублікувати',
-        },
-        QUESTION: {
-            REMOVE_FROM_PUBLICATION: 'Зняти з публікації?',
-            PUBLISH_CHANGES: 'Опублікувати зміни?',
-            CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE: 'Зміни буде втрачено. Продовжити?',
-        },
-    },
-};
+import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
 jest.mock('../../../../../components/common/modal/Modal', () => {
     const MockModal = ({ isOpen, children }: { isOpen: boolean; children: React.ReactNode }) =>
@@ -146,12 +96,42 @@ describe('ProgramModal', () => {
         handleClose: jest.fn(),
     };
 
+    const renderProgramModal = (props: ProgramModalProps) => render(<ProgramModal {...props} />);
+
+    const getProgramForm = () => screen.getByTestId('program-form');
+    const getDraftButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFTED);
+    const getPublishButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED);
+    const getQuestionModal = () => screen.queryByTestId('question-modal');
+    const getAddTitle = () => screen.queryByText(PROGRAMS_TEXT.FORM.TITLE.ADD_PROGRAM);
+    const getEditTitle = () => screen.queryByText(PROGRAMS_TEXT.FORM.TITLE.EDIT_PROGRAM);
+
+    const clickDraftButton = () => fireEvent.click(getDraftButton());
+    const clickPublishButton = () => fireEvent.click(getPublishButton());
+
+    const expectButtonsEnabled = () => {
+        expect(getDraftButton()).not.toBeDisabled();
+        expect(getPublishButton()).not.toBeDisabled();
+    };
+
+    const expectButtonsDisabled = () => {
+        expect(getDraftButton()).toBeDisabled();
+        expect(getPublishButton()).toBeDisabled();
+    };
+
+    const expectFormSubmittedWith = (status: string) => {
+        expect(mockFormRefSubmit).toHaveBeenCalledWith(status);
+    };
+
+    const mockHookWithValues = (overrides = {}) => {
+        mockUseProgramModal.mockReturnValue({ ...defaultMockHookValues, ...overrides });
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
         mockUseProgramModal.mockReturnValue(defaultMockHookValues);
     });
 
-    describe('in "add" mode', () => {
+    describe('Add mode', () => {
         const addProps: ProgramModalProps = {
             mode: 'add',
             isOpen: true,
@@ -160,42 +140,35 @@ describe('ProgramModal', () => {
         };
 
         it('should render correct title for add mode', () => {
-            render(<ProgramModal {...addProps} />);
-            expect(screen.getByText(MOCKED_TEXT.PROGRAMS_TEXT.FORM.TITLE.ADD_PROGRAM)).toBeInTheDocument();
+            renderProgramModal(addProps);
+            expect(getAddTitle()).toBeInTheDocument();
         });
 
         it('should render the ProgramForm component', () => {
-            render(<ProgramModal {...addProps} />);
-            expect(screen.getByTestId('program-form')).toBeInTheDocument();
+            renderProgramModal(addProps);
+            expect(getProgramForm()).toBeInTheDocument();
         });
 
-        it('should enable action buttons when not submitting', () => {
-            render(<ProgramModal {...addProps} />);
-            expect(screen.getByText(MOCKED_TEXT.COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFTED)).not.toBeDisabled();
-            expect(screen.getByText(MOCKED_TEXT.COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED)).not.toBeDisabled();
+        it.each([
+            { isSubmitting: false, expectation: 'enable', testFn: expectButtonsEnabled },
+            { isSubmitting: true, expectation: 'disable', testFn: expectButtonsDisabled },
+        ])('should $expectation action buttons when submitting is $isSubmitting', ({ isSubmitting, testFn }) => {
+            mockHookWithValues({ isSubmitting });
+            renderProgramModal(addProps);
+            testFn();
         });
 
-        it('should disable action buttons when submitting', () => {
-            mockUseProgramModal.mockReturnValue({ ...defaultMockHookValues, isSubmitting: true });
-            render(<ProgramModal {...addProps} />);
-            expect(screen.getByText(MOCKED_TEXT.COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFTED)).toBeDisabled();
-            expect(screen.getByText(MOCKED_TEXT.COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED)).toBeDisabled();
-        });
-
-        it('should call form submit with "Draft" status on draft button click', () => {
-            render(<ProgramModal {...addProps} />);
-            fireEvent.click(screen.getByText(MOCKED_TEXT.COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFTED));
-            expect(mockFormRefSubmit).toHaveBeenCalledWith('Draft');
-        });
-
-        it('should call form submit with "Published" status on publish button click', () => {
-            render(<ProgramModal {...addProps} />);
-            fireEvent.click(screen.getByText(MOCKED_TEXT.COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED));
-            expect(mockFormRefSubmit).toHaveBeenCalledWith('Published');
+        it.each([
+            { buttonAction: clickDraftButton, status: 'Draft', buttonName: 'draft' },
+            { buttonAction: clickPublishButton, status: 'Published', buttonName: 'publish' },
+        ])('should call form submit with "$status" status on $buttonName button click', ({ buttonAction, status }) => {
+            renderProgramModal(addProps);
+            buttonAction();
+            expectFormSubmittedWith(status);
         });
     });
 
-    describe('in "edit" mode', () => {
+    describe('Edit mode', () => {
         const editProps: ProgramModalProps = {
             mode: 'edit',
             isOpen: true,
@@ -205,72 +178,74 @@ describe('ProgramModal', () => {
         };
 
         it('should render correct title for edit mode', () => {
-            render(<ProgramModal {...editProps} />);
-            expect(screen.getByText(MOCKED_TEXT.PROGRAMS_TEXT.FORM.TITLE.EDIT_PROGRAM)).toBeInTheDocument();
+            renderProgramModal(editProps);
+            expect(getEditTitle()).toBeInTheDocument();
         });
 
         it('should display an error message when an error is present', () => {
             const errorText = 'Failed to update';
-            mockUseProgramModal.mockReturnValue({ ...defaultMockHookValues, error: errorText });
-            render(<ProgramModal {...editProps} />);
+            mockHookWithValues({ error: errorText });
+            renderProgramModal(editProps);
             expect(screen.getByText(errorText)).toBeInTheDocument();
         });
 
-        it('should display form confirmation modal when it is open', () => {
-            mockUseProgramModal.mockReturnValue({
-                ...defaultMockHookValues,
-                modals: {
-                    ...defaultMockHookValues.modals,
-                    formConfirm: { ...defaultMockHookValues.modals.formConfirm, isOpen: true },
+        describe('Confirmation modals', () => {
+            it.each([
+                {
+                    modalType: 'formConfirm',
+                    expectedText: COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES,
+                    description: 'form confirmation modal',
                 },
+                {
+                    modalType: 'closeConfirm',
+                    expectedText: COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+                    description: 'close confirmation modal',
+                },
+            ])('should display $description when it is open', ({ modalType, expectedText }) => {
+                mockHookWithValues({
+                    modals: {
+                        ...defaultMockHookValues.modals,
+                        [modalType]: {
+                            ...defaultMockHookValues.modals[modalType as keyof typeof defaultMockHookValues.modals],
+                            isOpen: true,
+                        },
+                    },
+                });
+                renderProgramModal(editProps);
+                expect(getQuestionModal()).toBeInTheDocument();
+                expect(screen.getByText(expectedText)).toBeInTheDocument();
             });
-            render(<ProgramModal {...editProps} />);
-            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
-            expect(screen.getByText(MOCKED_TEXT.COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).toBeInTheDocument();
         });
 
-        it('should display close confirmation modal when it is open', () => {
-            mockUseProgramModal.mockReturnValue({
-                ...defaultMockHookValues,
-                modals: {
-                    ...defaultMockHookValues.modals,
-                    closeConfirm: { ...defaultMockHookValues.modals.closeConfirm, isOpen: true },
+        describe('Program status-based confirmation titles', () => {
+            it.each([
+                {
+                    programStatus: 'Draft' as const,
+                    pendingAction: null,
+                    expectedText: COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES,
+                    description: 'publish changes for draft program',
                 },
-            });
-            render(<ProgramModal {...editProps} />);
-            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
-            expect(
-                screen.getByText(MOCKED_TEXT.COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
-            ).toBeInTheDocument();
-        });
-
-        it('should show "publish changes" title in confirm modal for a draft program', () => {
-            mockUseProgramModal.mockReturnValue({
-                ...defaultMockHookValues,
-                modals: {
-                    ...defaultMockHookValues.modals,
-                    formConfirm: { ...defaultMockHookValues.modals.formConfirm, isOpen: true },
+                {
+                    programStatus: 'Published' as const,
+                    pendingAction: 'draft',
+                    expectedText: COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION,
+                    description: 'remove from publication for published program',
                 },
-            });
-            const draftProgram = { ...mockProgram, status: 'Draft' as const };
-            render(<ProgramModal {...editProps} programToEdit={draftProgram} />);
-            expect(screen.getByText(MOCKED_TEXT.COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).toBeInTheDocument();
-        });
-
-        it('should show "remove from publication" title in confirm modal for a published program', () => {
-            mockUseProgramModal.mockReturnValue({
-                ...defaultMockHookValues,
-                pendingAction: 'draft',
-                modals: {
-                    ...defaultMockHookValues.modals,
-                    formConfirm: { ...defaultMockHookValues.modals.formConfirm, isOpen: true },
+            ])(
+                'should show "$description" title in confirm modal',
+                ({ programStatus, pendingAction, expectedText }) => {
+                    mockHookWithValues({
+                        pendingAction,
+                        modals: {
+                            ...defaultMockHookValues.modals,
+                            formConfirm: { ...defaultMockHookValues.modals.formConfirm, isOpen: true },
+                        },
+                    });
+                    const programWithStatus = { ...mockProgram, status: programStatus };
+                    renderProgramModal({ ...editProps, programToEdit: programWithStatus });
+                    expect(screen.getByText(expectedText)).toBeInTheDocument();
                 },
-            });
-            const publishedProgram = { ...mockProgram, status: 'Published' as const };
-            render(<ProgramModal {...editProps} programToEdit={publishedProgram} />);
-            expect(
-                screen.getByText(MOCKED_TEXT.COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION),
-            ).toBeInTheDocument();
+            );
         });
     });
 });

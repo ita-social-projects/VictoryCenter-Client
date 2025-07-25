@@ -54,6 +54,7 @@ describe('Header', () => {
         const contactUsBtn = screen.getByRole('button', { name: CONTACT_US });
         fireEvent.click(contactUsBtn);
 
+        // eslint-disable-next-line no-console
         expect(console.log).toHaveBeenCalledWith('CONTACT USED!');
     });
 
@@ -63,6 +64,7 @@ describe('Header', () => {
         const donateBtn = screen.getByRole('button', { name: DONATE });
         fireEvent.click(donateBtn);
 
+        // eslint-disable-next-line no-console
         expect(console.log).toHaveBeenCalledWith('DONATE!');
     });
 });

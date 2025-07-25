@@ -13,7 +13,7 @@ export const MainValues = () => {
                 </h2>
             </div>
             <div className="people-block">
-                {peopleData.map(({ img, alt, info, cardClass }, index) => (
+                {peopleData.map(({ img, alt, info, cardClass }) => (
                     <div key={alt} className={`people-card ${cardClass}`}>
                         <img src={img} alt={alt} />
                         <p className="people-info">{info}</p>

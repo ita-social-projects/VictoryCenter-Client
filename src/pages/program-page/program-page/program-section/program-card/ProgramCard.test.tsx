@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { ProgramCard } from './ProgramCard';
-import { Program } from '../../../../../types/ProgramPage';
+import { Program } from '../../../../../types/public/ProgramPage';
 
 describe('test program-card component', () => {
     const mockProgram: Program = {

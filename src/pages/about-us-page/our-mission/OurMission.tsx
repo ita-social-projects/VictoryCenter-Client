@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router';
-import { ScrollableFrame } from '../../../components/common/scrollable-program-frame/ScrollableFrame';
+import { ScrollableFrame } from '../../../components/common/scrollable-frame/ScrollableFrame';
 import ArrowIcon from '../../../assets/program_page_images/icons/arrow-up-black.png';
 import { WHAT_WE_DO, WHAT_WE_DO_DETAILS, GO_TO_PROGRAMS } from '../../../const/about-us-page/about-us-page';
 import { programPage } from '../../../const/routers/routes';

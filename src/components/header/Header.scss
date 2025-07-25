@@ -1,13 +1,27 @@
+@import '../../assets/sass/variables/variables.colors';
 $mulish-font-family: 'Mulish', sans-serif;
 
 .headerBlock {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+
+    height: 4rem;
     padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
     padding-left: 3.5rem;
     padding-right: 3.5rem;
+
+    box-sizing: border-box;
+
+    background-color: $header-background-grey;
+
+    backdrop-filter: blur(10.375rem);
 
     .logoContainer {
         .logo {
@@ -22,17 +36,19 @@ $mulish-font-family: 'Mulish', sans-serif;
             gap: 3rem;
 
             a {
-                color: black;
+                color: $blue-900;
                 font-family: $mulish-font-family;
                 font-size: 1rem;
                 font-weight: 600;
                 text-decoration: none;
-            }
-            a:hover {
-                text-decoration: underline;
-            }
-            a:focus {
-                text-decoration: underline;
+
+                &:hover {
+                    color: $link-hover-blue;
+                }
+
+                &:active {
+                    color: $link-pressed-blue;
+                }
             }
         }
     }
@@ -42,16 +58,17 @@ $mulish-font-family: 'Mulish', sans-serif;
         gap: 0.5rem;
 
         .contactUsButton {
-            background-color: white;
+            background-color: transparent;
             width: 8.2em;
             height: 2.5rem;
             font-family: $mulish-font-family;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
+            border: 1px solid $blue-900;
         }
         .donateButton {
-            background-color: #061125;
+            background-color: $blue-900;
             color: white;
             font-family: $mulish-font-family;
             font-size: 1rem;
@@ -62,6 +79,7 @@ $mulish-font-family: 'Mulish', sans-serif;
             display: inline-flex;
             justify-content: center;
             align-items: center;
+            border: 1px solid $blue-900;
         }
     }
 }

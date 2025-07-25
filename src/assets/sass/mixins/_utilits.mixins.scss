@@ -11,3 +11,24 @@
         font-display: swap;
     }
 }
+
+@mixin link-base($color, $hoverColor, $activeColor) {
+    color: $color;
+    text-decoration: none;
+    pointer-events: none;
+    opacity: 0.3;
+    font-family: ft.$mulish-regular-font;
+
+    &:hover {
+        color: $hoverColor;
+    }
+
+    &:active {
+        color: $activeColor;
+    }
+}
+
+@mixin link-active(){
+    opacity: 1;
+    pointer-events: auto;
+}

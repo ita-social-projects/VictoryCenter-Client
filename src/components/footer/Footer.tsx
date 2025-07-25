@@ -74,7 +74,9 @@ export const Footer = () => {
 
                 <div className="about_us">
                     <span className="title">{ABOUT_US}</span>
-                    <Link to={teamPageRoute}>{ABOUT_US}</Link>
+                    <Link to={teamPageRoute} className="active">
+                        {ABOUT_US}
+                    </Link>
                     <Link to={page2Route}>{OUR_HISTORY}</Link>
                     <Link to={page2Route}>{OUR_TEAM}</Link>
                     <Link to={page2Route}>{PARTNERS}</Link>

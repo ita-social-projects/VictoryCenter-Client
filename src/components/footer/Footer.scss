@@ -1,5 +1,6 @@
 @use '../../assets/sass/variables/variables.fonts.scss' as ft;
 @use '../../assets/sass/variables/variables.colors' as c;
+@import '../../assets/sass/mixins/utilits.mixins';
 
 .footer-content {
     font-weight: 600;
@@ -28,15 +29,10 @@
         gap: 5rem;
 
         a {
-            text-decoration: none;
-            color: #000;
+            @include link-base(#000, c.$link-hover-blue, c.$link-pressed-blue);
 
-            &:hover {
-                color: c.$link-hover-blue;
-            }
-
-            &:active {
-                color: c.$link-pressed-blue;
+            &.active {
+                @include link-active();
             }
         }
 

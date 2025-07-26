@@ -384,11 +384,6 @@ describe('ProgramsList', () => {
     });
 
     describe('Category Context Menu', () => {
-        beforeEach(async () => {
-            renderProgramsList();
-            await waitFor(() => expect(getProgramItems()).toHaveLength(2));
-        });
-
         it.each([
             {
                 action: 'add',
@@ -405,10 +400,15 @@ describe('ProgramsList', () => {
                 buttonTestId: 'context-menu-delete',
                 modalTestId: 'delete-category-modal',
             },
-        ])('should open the $action category modal when its button is clicked', ({ buttonTestId, modalTestId }) => {
-            expect(screen.queryByTestId(modalTestId)).not.toBeInTheDocument();
-            fireEvent.click(screen.getByTestId(buttonTestId));
-            expect(screen.getByTestId(modalTestId)).toBeInTheDocument();
-        });
+        ])(
+            'should open the $action category modal when its button is clicked',
+            async ({ buttonTestId, modalTestId }) => {
+                renderProgramsList();
+                await waitFor(() => expect(getProgramItems()).toHaveLength(2));
+                expect(screen.queryByTestId(modalTestId)).not.toBeInTheDocument();
+                fireEvent.click(screen.getByTestId(buttonTestId));
+                expect(screen.getByTestId(modalTestId)).toBeInTheDocument();
+            },
+        );
     });
 });

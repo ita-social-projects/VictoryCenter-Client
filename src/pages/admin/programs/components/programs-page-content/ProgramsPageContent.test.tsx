@@ -71,6 +71,7 @@ jest.mock('../program-modals/ProgramModal', () => ({
             <div data-testid={isAddMode ? 'add-program-modal' : 'edit-program-modal'}>
                 <h2>{isAddMode ? 'Add Program Modal' : 'Edit Program Modal'}</h2>
                 {isEditMode && props.programToEdit && <p>Editing: {props.programToEdit.name}</p>}
+                {isAddMode && <p>Adding new program</p>}
                 <button
                     data-testid={isAddMode ? 'confirm-add' : 'confirm-edit'}
                     onClick={() => {
@@ -144,7 +145,7 @@ describe('ProgramsPageContent', () => {
                 modalTestId: 'add-program-modal',
                 closeTestId: 'close-add',
                 expectedTitle: 'Add Program Modal',
-                expectedContent: null,
+                expectedContent: 'Adding new program',
             },
             {
                 modalType: 'Edit Program',
@@ -174,10 +175,7 @@ describe('ProgramsPageContent', () => {
                     // Check modal opened
                     expect(screen.getByTestId(modalTestId)).toBeInTheDocument();
                     expect(screen.getByText(expectedTitle)).toBeInTheDocument();
-
-                    if (expectedContent) {
-                        expect(screen.getByText(expectedContent)).toBeInTheDocument();
-                    }
+                    expect(screen.getByText(expectedContent)).toBeInTheDocument();
                 });
 
                 it('should close when the close button is clicked', () => {

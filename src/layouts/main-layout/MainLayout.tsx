@@ -1,9 +1,7 @@
-import { Outlet } from 'react-router-dom';
-
 import { Header } from '../../components/header/Header';
 import { Footer } from '../../components/footer/Footer';
 
-import { useLocation } from 'react-router-dom';
+import { useLocation, Outlet } from 'react-router-dom';
 import { useEffect } from 'react';
 
 export const MainLayout = ({ behavior = 'auto' }: { behavior?: 'auto' | 'smooth' }) => {

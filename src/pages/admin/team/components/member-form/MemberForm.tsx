@@ -43,7 +43,7 @@ export const MemberForm = ({
         existingMemberFormValues || {
             fullName: '',
             image: null,
-            imageId: 0,
+            imageId: null,
             description: '',
             category: null as unknown as TeamCategory,
         },
@@ -59,7 +59,7 @@ export const MemberForm = ({
     const handleMemberFormValuesChange = (
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
     ) => {
-        const {name, value} = e.target;
+        const { name, value } = e.target;
         const inputTarget = e.currentTarget as EventTarget & HTMLInputElement;
         if (name === 'category') {
             const selectedCategory = categories.find((c) => c.name === value);
@@ -85,89 +85,86 @@ export const MemberForm = ({
     };
 
     const onFileChange = (item: ImageValues | null) => {
-
         setMemberFormValues((prev) => ({
             ...prev,
             image: item,
         }));
-    }
+    };
 
+    useEffect(() => {
+        if (onValuesChange && memberFormValues) {
+            onValuesChange(memberFormValues);
+        }
+    }, [memberFormValues, onValuesChange]);
 
-        useEffect(() => {
-            if (onValuesChange && memberFormValues) {
-                onValuesChange(memberFormValues);
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await TeamCategoriesApi.getAll(client);
+                setCategories(data);
+            } catch (error) {
+                onError?.((error as Error).message);
+            } finally {
+                setIsLoadingCategories(false);
             }
-        }, [memberFormValues, onValuesChange]);
+        };
+        fetchCategories();
+    }, [client, onError]);
 
-        useEffect(() => {
-            const fetchCategories = async () => {
-                try {
-                    const data = await TeamCategoriesApi.getAll(client);
-                    setCategories(data);
-                } catch (error) {
-                    onError?.((error as Error).message);
-                } finally {
-                    setIsLoadingCategories(false);
-                }
-            };
-            fetchCategories();
-        }, [client, onError]);
-
-        return (
-            <form id={id} onSubmit={handleOnSubmit} data-testid="test-form">
-                <div className="members-add-modal-body">
-                    <div className="form-group">
-                        <label htmlFor="category">{TEAM_LABEL_CATEGORY}</label>
-                        <select
-                            value={memberFormValues?.category?.name ?? ''}
-                            onChange={handleMemberFormValuesChange}
-                            name="category"
-                            id="category"
-                            disabled={isLoadingCategories}
-                        >
-                            <option value="" disabled>
-                                {TEAM_LABEL_SELECT_CATEGORY}
+    return (
+        <form id={id} onSubmit={handleOnSubmit} data-testid="test-form">
+            <div className="members-add-modal-body">
+                <div className="form-group">
+                    <label htmlFor="category">{TEAM_LABEL_CATEGORY}</label>
+                    <select
+                        value={memberFormValues?.category?.name ?? ''}
+                        onChange={handleMemberFormValuesChange}
+                        name="category"
+                        id="category"
+                        disabled={isLoadingCategories}
+                    >
+                        <option value="" disabled>
+                            {TEAM_LABEL_SELECT_CATEGORY}
+                        </option>
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.name}>
+                                {category.name}
                             </option>
-                            {categories.map((category) => (
-                                <option key={category.id} value={category.name}>
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="fullName">{TEAM_LABEL_FULLNAME}</label>
-                        <input
-                            value={memberFormValues ? memberFormValues.fullName : ''}
-                            maxLength={MAX_FULLNAME_LENGTH}
-                            onChange={handleMemberFormValuesChange}
-                            name="fullName"
-                            type="text"
-                            id="fullName"
-                        />
-                        <div className="form-group-fullname-length-limit">
-                            {memberFormValues?.fullName ? memberFormValues.fullName.length : 0}/{MAX_FULLNAME_LENGTH}
-                        </div>
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="description">{TEAM_LABEL_DESCRIPTION}</label>
-                        <textarea
-                            value={memberFormValues ? memberFormValues.description : ''}
-                            maxLength={MAX_DESCRIPTION_LENGTH}
-                            onChange={handleMemberFormValuesChange}
-                            name="description"
-                            className="form-group-description"
-                            id="description"
-                        />
-                        <div className="form-group-description-length-limit">
-                            {memberFormValues?.description ? memberFormValues.description.length : 0}/
-                            {MAX_DESCRIPTION_LENGTH}
-                        </div>
-                    </div>
-
-                    <PhotoInput value={memberFormValues?.image ?? null} onChange={onFileChange}/>
+                        ))}
+                    </select>
                 </div>
-            </form>
-        );
-    }
+                <div className="form-group">
+                    <label htmlFor="fullName">{TEAM_LABEL_FULLNAME}</label>
+                    <input
+                        value={memberFormValues ? memberFormValues.fullName : ''}
+                        maxLength={MAX_FULLNAME_LENGTH}
+                        onChange={handleMemberFormValuesChange}
+                        name="fullName"
+                        type="text"
+                        id="fullName"
+                    />
+                    <div className="form-group-fullname-length-limit">
+                        {memberFormValues?.fullName ? memberFormValues.fullName.length : 0}/{MAX_FULLNAME_LENGTH}
+                    </div>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="description">{TEAM_LABEL_DESCRIPTION}</label>
+                    <textarea
+                        value={memberFormValues ? memberFormValues.description : ''}
+                        maxLength={MAX_DESCRIPTION_LENGTH}
+                        onChange={handleMemberFormValuesChange}
+                        name="description"
+                        className="form-group-description"
+                        id="description"
+                    />
+                    <div className="form-group-description-length-limit">
+                        {memberFormValues?.description ? memberFormValues.description.length : 0}/
+                        {MAX_DESCRIPTION_LENGTH}
+                    </div>
+                </div>
 
+                <PhotoInput value={memberFormValues?.image ?? null} onChange={onFileChange} id="photo" />
+            </div>
+        </form>
+    );
+};

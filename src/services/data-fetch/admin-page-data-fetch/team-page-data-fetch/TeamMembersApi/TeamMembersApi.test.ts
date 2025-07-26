@@ -74,6 +74,7 @@ describe('TeamMembersApi', () => {
             status: 0,
             description: 'desc',
             email: '',
+            imageId: null,
         });
     });
 
@@ -100,6 +101,7 @@ describe('TeamMembersApi', () => {
             status: 1,
             description: 'desc',
             email: '',
+            imageId: null,
         });
     });
 
@@ -126,6 +128,7 @@ describe('TeamMembersApi', () => {
             status: 0,
             description: 'description',
             email: '',
+            imageId: null,
         });
     });
 
@@ -152,6 +155,7 @@ describe('TeamMembersApi', () => {
             status: 1,
             description: 'description',
             email: '',
+            imageId: null,
         });
     });
 
@@ -198,7 +202,7 @@ describe('TeamMembersApi', () => {
         expect(result).toEqual({
             id: 1,
             fullName: 'Name',
-            img: 'photo.jpg',
+            img: image1,
             description: 'Desc',
             status: 'Чернетка',
             category: {

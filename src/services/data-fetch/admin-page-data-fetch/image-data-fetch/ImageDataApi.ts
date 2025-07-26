@@ -13,7 +13,7 @@ export const ImagesApi = {
 
     put: async (client: AxiosInstance, image: ImageValues, id: number): Promise<Image> => {
         console.log(image);
-        const response = await client.put<Image>(`/Image/${id}`, {
+        const response: AxiosResponse<Image> = await client.put<Image>(`/Image/${id}`, {
             base64: image.base64,
             mimeType: image.mimeType,
         });
@@ -24,4 +24,9 @@ export const ImagesApi = {
         const response = await client.delete(`/Image/${id}`);
         return response.data;
     },
+
+    get: async (client: AxiosInstance, id: number) => {
+        const response: AxiosResponse<Image> = await client.get<Image>(`/Image/${id}`);
+        return response.data;
+    }
 };

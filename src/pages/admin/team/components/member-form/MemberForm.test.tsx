@@ -5,7 +5,7 @@ import { MemberForm, MemberFormProps, MemberFormValues } from './MemberForm';
 import { AdminContext } from '../../../../../context/admin-context-provider/AdminContextProvider';
 import axios from 'axios';
 import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
-import { Image } from '../../../../../types/Image';
+import {Image, ImageValues} from '../../../../../types/Image';
 import { mapImageToBase64 } from '../../../../../utils/functions/mapImageToBase64';
 
 jest.mock('../../../../../assets/icons/cloud-download.svg', () => 'cloud-download.svg');
@@ -49,7 +49,7 @@ describe('MemberForm', () => {
         expect(screen.getByLabelText('Категорія')).toBeInTheDocument();
         expect(screen.getByLabelText("Ім'я та Прізвище")).toBeInTheDocument();
         expect(screen.getByLabelText('Опис')).toBeInTheDocument();
-        expect(screen.getByText('Фото')).toBeInTheDocument();
+        expect(screen.getByTestId('photo-input-hidden')).toBeInTheDocument();
     });
 
     it('initializes with existingMemberFormValues', async () => {
@@ -61,8 +61,8 @@ describe('MemberForm', () => {
             },
             fullName: 'John Doe',
             description: 'Test description',
+            imageId: 1,
             image: {
-                id: 1,
                 base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
                 mimeType: 'image/jpeg',
             },
@@ -154,7 +154,8 @@ describe('MemberForm', () => {
                 },
                 fullName: 'Jane Doe',
                 description: 'Test description',
-                img: null,
+                image: null,
+                imageId: null
             });
         });
     });
@@ -207,37 +208,8 @@ describe('MemberForm', () => {
     });
 
     describe('Additional Coverage', () => {
-        it('displays uploaded file names', () => {
-            const image: Image = {
-                id: 1,
-                base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=\n',
-                mimeType: 'image/jpg',
-            };
 
-            const initialValues: MemberFormValues = {
-                category: {
-                    id: 1,
-                    name: 'Основна команда',
-                    description: 'Test',
-                },
-                fullName: 'John Doe',
-                description: 'Test description',
-                image: image,
-            };
 
-            renderWithAdminContext(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
-
-            // expect(screen.getByText(mapImageToBase64(image))).toBeInTheDocument();
-            expect(screen.getByText('test2.jpg')).toBeInTheDocument();
-        });
-
-        it('renders empty div when no files are uploaded', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-
-            const imageLoadedSection = document.querySelector('.form-group-image-loaded');
-            expect(imageLoadedSection).toBeInTheDocument();
-            expect(imageLoadedSection?.children).toHaveLength(1);
-        });
 
         it('does not call onValuesChange when onValuesChange prop is not provided', () => {
             const propsWithoutOnValuesChange = {
@@ -263,6 +235,7 @@ describe('MemberForm', () => {
                 fullName: 'John Doe',
                 description: 'Test description',
                 image: null,
+                imageId: null
             };
 
             renderWithAdminContext(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
@@ -290,24 +263,6 @@ describe('MemberForm', () => {
             );
         });
 
-        it('handles file input with empty FileList', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-
-            const fileInput = screen.getByTestId('image');
-
-            const mockEvent = {
-                target: { name: 'img', value: null },
-                currentTarget: { files: { length: 0 } },
-            };
-
-            fireEvent.change(fileInput, mockEvent);
-
-            expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    img: null,
-                }),
-            );
-        });
 
         it('displays 0 character count when fields are empty', () => {
             renderWithAdminContext(<MemberForm {...defaultProps} />);
@@ -316,56 +271,11 @@ describe('MemberForm', () => {
             expect(screen.getByText('0/200')).toBeInTheDocument();
         });
 
-        it('handles drag events without files in dataTransfer', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
 
-            const dropArea = screen.getByTestId('drop-area');
 
-            const dropEvent = createEvent.drop(dropArea);
-
-            Object.defineProperty(dropEvent, 'dataTransfer', {
-                value: {
-                    files: [],
-                },
-            });
-
-            dropEvent.preventDefault = jest.fn();
-
-            fireEvent(dropArea, dropEvent);
-
-            expect(dropEvent.preventDefault).toHaveBeenCalled();
-        });
-
-        it('handles drag events with files in dataTransfer', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-
-            const dropArea = screen.getByTestId('drop-area');
-            const file = new File(['hello'], 'hello.png', { type: 'image/png' });
-
-            const data = {
-                files: [file],
-                types: ['Files'],
-            };
-
-            fireEvent.drop(dropArea, {
-                dataTransfer: data,
-            });
-
-            expect(screen.getByText('hello.png')).toBeInTheDocument();
-        });
     });
 
     describe('Extra Function Coverage', () => {
-        it('updates file input after already set', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-            const fileInput = screen.getByTestId('image');
-            const file1 = new File(['a'], 'a.png', { type: 'image/png' });
-            fireEvent.change(fileInput, { target: { files: [file1], name: 'img' }, currentTarget: { files: [file1] } });
-            expect(screen.getByText('a.png')).toBeInTheDocument();
-            const file2 = new File(['b'], 'b.png', { type: 'image/png' });
-            fireEvent.change(fileInput, { target: { files: [file2], name: 'img' }, currentTarget: { files: [file2] } });
-            expect(screen.getByText('b.png')).toBeInTheDocument();
-        });
 
         it('does not submit if category is empty', () => {
             renderWithAdminContext(<MemberForm {...defaultProps} />);
@@ -400,27 +310,6 @@ describe('MemberForm', () => {
             expect(defaultProps.onSubmit).not.toHaveBeenCalled();
         });
 
-        it('handles drag-and-drop with empty FileList', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-            const dropArea = screen.getByTestId('drop-area');
-            const dropEvent = {
-                preventDefault: jest.fn(),
-                dataTransfer: { files: null },
-            };
-            fireEvent.drop(dropArea, dropEvent);
-            expect(screen.getByText('0/50')).toBeInTheDocument();
-        });
-
-        it('handles drag-and-drop with multiple files', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-            const dropArea = screen.getByTestId('drop-area');
-            const file1 = new File(['a'], 'a.png', { type: 'image/png' });
-            const file2 = new File(['b'], 'b.png', { type: 'image/png' });
-            const data = { files: [file1, file2], types: ['Files'] };
-            fireEvent.drop(dropArea, { dataTransfer: data, preventDefault: jest.fn() });
-            expect(screen.getByText('a.png')).toBeInTheDocument();
-            expect(screen.getByText('b.png')).toBeInTheDocument();
-        });
 
         it('does not call onValuesChange if memberFormValues is falsy (defensive)', () => {
             // Simulate effect with falsy memberFormValues
@@ -450,17 +339,5 @@ describe('MemberForm', () => {
             expect(screen.getByText('200/200')).toBeInTheDocument();
         });
 
-        it('removes file input (sets to null) after file was set', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-            const fileInput = screen.getByTestId('image');
-            const file1 = new File(['a'], 'a.png', { type: 'image/png' });
-            fireEvent.change(fileInput, { target: { files: [file1], name: 'img' }, currentTarget: { files: [file1] } });
-            expect(screen.getByText('a.png')).toBeInTheDocument();
-            // Now remove file
-            fireEvent.change(fileInput, { target: { files: null, name: 'img' }, currentTarget: { files: null } });
-            // Should render empty div
-            const imageLoadedSection = document.querySelector('.form-group-image-loaded');
-            expect(imageLoadedSection?.children).toHaveLength(1);
-        });
     });
 });

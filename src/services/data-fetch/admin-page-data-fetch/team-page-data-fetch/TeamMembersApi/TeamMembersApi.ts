@@ -33,13 +33,12 @@ export const TeamMembersApi = {
     },
 
     updateDraft: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
-        await TeamMembersApi.updateMember(client, id, member, Status.Published);
+        await TeamMembersApi.updateMember(client, id, member, Status.Draft);
     },
 
     updatePublish: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
         await TeamMembersApi.updateMember(client, id, member, Status.Published);
     },
-
 
     postDraft: async (client: AxiosInstance, member: MemberFormValues) => {
         let imageId: number | null = null;
@@ -110,7 +109,6 @@ export const TeamMembersApi = {
                 imageId: finalImageId,
             });
         } else if (finalImageId) {
-
             await client.put(`/TeamMembers/${id}`, {
                 fullName: member.fullName,
                 categoryId: member.category.id,
@@ -134,8 +132,6 @@ export const TeamMembersApi = {
         }
     },
 };
-
-
 
 export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): TeamMember => ({
     id: dto.id,

@@ -15,7 +15,8 @@ export type MemberFormValues = {
     category: TeamCategory;
     fullName: string;
     description: string;
-    image: Image | null;
+    image: ImageValues | null;
+    imageId: number | null;
 };
 
 export type MemberFormProps = {
@@ -42,10 +43,12 @@ export const MemberForm = ({
         existingMemberFormValues || {
             fullName: '',
             image: null,
+            imageId: 0,
             description: '',
             category: null as unknown as TeamCategory,
         },
     );
+
     const handleOnSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (memberFormValues?.category && memberFormValues?.description && memberFormValues?.fullName) {
@@ -57,7 +60,7 @@ export const MemberForm = ({
     const handleMemberFormValuesChange = (
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
     ) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         const inputTarget = e.currentTarget as EventTarget & HTMLInputElement;
         if (name === 'category') {
             const selectedCategory = categories.find((c) => c.name === value);
@@ -83,109 +86,89 @@ export const MemberForm = ({
     };
 
     const onFileChange = (item: ImageValues | null) => {
-        if (!item) {
-            setMemberFormValues((prev) => ({
-                ...prev,
-                image: null,
-            }));
-        } else {
-            const image: Image = {
-                id: existingMemberFormValues?.image?.id ?? null,
-                base64: item?.base64,
-                mimeType: item?.mimeType,
-            };
-            setMemberFormValues((prev) => ({
-                ...prev,
-                image: image,
-            }));
-        }
-    };
 
-    useEffect(() => {
-        if (onValuesChange && memberFormValues) {
-            onValuesChange(memberFormValues);
-        }
-    }, [memberFormValues, onValuesChange]);
+        setMemberFormValues((prev) => ({
+            ...prev,
+            image: item,
+        }));
+    }
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const data = await TeamCategoriesApi.getAll(client);
-                setCategories(data);
-            } catch (error) {
-                onError?.((error as Error).message);
-            } finally {
-                setIsLoadingCategories(false);
+
+        useEffect(() => {
+            if (onValuesChange && memberFormValues) {
+                onValuesChange(memberFormValues);
             }
-        };
-        fetchCategories();
-    }, [client, onError]);
+        }, [memberFormValues, onValuesChange]);
 
-    const handleFileDrop = (e: React.DragEvent<HTMLLabelElement>) => {
-        e.preventDefault();
+        useEffect(() => {
+            const fetchCategories = async () => {
+                try {
+                    const data = await TeamCategoriesApi.getAll(client);
+                    setCategories(data);
+                } catch (error) {
+                    onError?.((error as Error).message);
+                } finally {
+                    setIsLoadingCategories(false);
+                }
+            };
+            fetchCategories();
+        }, [client, onError]);
 
-        const files = e.dataTransfer.files;
-        if (files) {
-            setMemberFormValues((prev) => ({
-                ...prev,
-                img: files,
-            }));
-        }
-    };
-
-    return (
-        <form id={id} onSubmit={handleOnSubmit} data-testid="test-form">
-            <div className="members-add-modal-body">
-                <div className="form-group">
-                    <label htmlFor="category">{TEAM_LABEL_CATEGORY}</label>
-                    <select
-                        value={memberFormValues?.category?.name ?? ''}
-                        onChange={handleMemberFormValuesChange}
-                        name="category"
-                        id="category"
-                        disabled={isLoadingCategories}
-                    >
-                        <option value="" disabled>
-                            {TEAM_LABEL_SELECT_CATEGORY}
-                        </option>
-                        {categories.map((category) => (
-                            <option key={category.id} value={category.name}>
-                                {category.name}
+        return (
+            <form id={id} onSubmit={handleOnSubmit} data-testid="test-form">
+                <div className="members-add-modal-body">
+                    <div className="form-group">
+                        <label htmlFor="category">{TEAM_LABEL_CATEGORY}</label>
+                        <select
+                            value={memberFormValues?.category?.name ?? ''}
+                            onChange={handleMemberFormValuesChange}
+                            name="category"
+                            id="category"
+                            disabled={isLoadingCategories}
+                        >
+                            <option value="" disabled>
+                                {TEAM_LABEL_SELECT_CATEGORY}
                             </option>
-                        ))}
-                    </select>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="fullName">{TEAM_LABEL_FULLNAME}</label>
-                    <input
-                        value={memberFormValues ? memberFormValues.fullName : ''}
-                        maxLength={MAX_FULLNAME_LENGTH}
-                        onChange={handleMemberFormValuesChange}
-                        name="fullName"
-                        type="text"
-                        id="fullName"
-                    />
-                    <div className="form-group-fullname-length-limit">
-                        {memberFormValues?.fullName ? memberFormValues.fullName.length : 0}/{MAX_FULLNAME_LENGTH}
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.name}>
+                                    {category.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="description">{TEAM_LABEL_DESCRIPTION}</label>
-                    <textarea
-                        value={memberFormValues ? memberFormValues.description : ''}
-                        maxLength={MAX_DESCRIPTION_LENGTH}
-                        onChange={handleMemberFormValuesChange}
-                        name="description"
-                        className="form-group-description"
-                        id="description"
-                    />
-                    <div className="form-group-description-length-limit">
-                        {memberFormValues?.description ? memberFormValues.description.length : 0}/
-                        {MAX_DESCRIPTION_LENGTH}
+                    <div className="form-group">
+                        <label htmlFor="fullName">{TEAM_LABEL_FULLNAME}</label>
+                        <input
+                            value={memberFormValues ? memberFormValues.fullName : ''}
+                            maxLength={MAX_FULLNAME_LENGTH}
+                            onChange={handleMemberFormValuesChange}
+                            name="fullName"
+                            type="text"
+                            id="fullName"
+                        />
+                        <div className="form-group-fullname-length-limit">
+                            {memberFormValues?.fullName ? memberFormValues.fullName.length : 0}/{MAX_FULLNAME_LENGTH}
+                        </div>
                     </div>
+                    <div className="form-group">
+                        <label htmlFor="description">{TEAM_LABEL_DESCRIPTION}</label>
+                        <textarea
+                            value={memberFormValues ? memberFormValues.description : ''}
+                            maxLength={MAX_DESCRIPTION_LENGTH}
+                            onChange={handleMemberFormValuesChange}
+                            name="description"
+                            className="form-group-description"
+                            id="description"
+                        />
+                        <div className="form-group-description-length-limit">
+                            {memberFormValues?.description ? memberFormValues.description.length : 0}/
+                            {MAX_DESCRIPTION_LENGTH}
+                        </div>
+                    </div>
+
+                    <PhotoInput value={memberFormValues?.image ?? null} onChange={onFileChange}/>
                 </div>
-                <PhotoInput value={memberFormValues?.image ?? null} onChange={onFileChange} />
-            </div>
-        </form>
-    );
-};
+            </form>
+        );
+    }
+

@@ -61,6 +61,7 @@ describe('TeamMembersApi', () => {
             },
             description: 'desc',
             image: null,
+            imageId: null,
         };
 
         const putMock = jest.spyOn(mockClient, 'put').mockResolvedValue({});
@@ -86,6 +87,7 @@ describe('TeamMembersApi', () => {
             },
             description: 'desc',
             image: null,
+            imageId: null,
         };
 
         const putMock = jest.spyOn(mockClient, 'put').mockResolvedValue({});
@@ -111,6 +113,7 @@ describe('TeamMembersApi', () => {
             },
             description: 'description',
             image: null,
+            imageId: null,
         };
 
         const postMock = jest.spyOn(mockClient, 'post').mockResolvedValue({});
@@ -136,6 +139,7 @@ describe('TeamMembersApi', () => {
             },
             description: 'description',
             image: null,
+            imageId: null,
         };
 
         const postMock = jest.spyOn(mockClient, 'post').mockResolvedValue({});

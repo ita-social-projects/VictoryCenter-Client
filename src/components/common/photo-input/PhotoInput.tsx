@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import './photo-input.scss';
 import { ImageValues } from '../../../types/Image';
 import { mapImageToBase64 } from '../../../utils/functions/mapImageToBase64';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 interface PhotoInputProps {
     value: ImageValues | null;
@@ -21,14 +22,12 @@ const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: Pho
     const [previewImage, setPreviewImage] = useState<ImageValues | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    // Generate preview when file is selected
     useEffect(() => {
         if (value) {
             setPreviewImage(value);
         }
     }, [value]);
 
-    // Handle file drop or selection
     const handleFile = useCallback(
         async (file: File) => {
             if (!file.type.startsWith('image/')) return;
@@ -58,6 +57,32 @@ const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: Pho
         setIsFocused(false);
     };
 
+    const handleMouseEnter = () => {
+        if (!disabled) setIsFocused(true);
+    };
+
+    const handleMouseLeave = () => {
+        if (!disabled) setIsFocused(false);
+    };
+
+    const handleFocus = () => {
+        if (!disabled) setIsFocused(true);
+    };
+
+    const handleBlurEvent = () => {
+        if (!disabled) setIsFocused(false);
+        if (onBlur) {
+            onBlur();
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            inputRef.current?.click();
+        }
+    };
+
     const handleClick = () => {
         if (!disabled) inputRef.current?.click();
     };
@@ -76,13 +101,21 @@ const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: Pho
     return (
         <div
             className={classNames('photo-input-wrapper', {
-                'photo-input-wrapper-focused': isFocused,
+                'photo-input-wrapper-focused': isFocused && !disabled,
                 'photo-input-wrapper-disabled': disabled,
             })}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
             onClick={handleClick}
+            onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
+            onBlur={handleBlurEvent}
+            aria-label={COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo'}
+            tabIndex={disabled ? -1 : 0}
+            role="button"
         >
             <input
                 ref={inputRef}
@@ -93,26 +126,32 @@ const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: Pho
                 style={{ display: 'none' }}
                 disabled={disabled}
                 data-testid="photo-input-hidden"
+                id={id}
+                name={name}
+                tabIndex={-1}
             />
 
             {previewImage ? (
                 <div className="photo-preview">
                     <img src={mapImageToBase64(previewImage) ?? undefined} alt="Preview" className="preview-image" />
-                    <button
-                        type="button"
-                        className="delete-button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemove();
-                        }}
-                    >
-                        <img src={DeleteIcon} alt="Видалити" className="delete-icon" />
-                    </button>
+                    {!disabled && (
+                        <button
+                            type="button"
+                            className="delete-button"
+                            disabled={disabled}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemove();
+                            }}
+                        >
+                            <img src={DeleteIcon} alt={COMMON_TEXT_ADMIN.ALT.DELETE} className="delete-icon" />
+                        </button>
+                    )}
                 </div>
             ) : (
                 <div className="photo-placeholder">
-                    <img src={UploadIcon} alt="Upload" className="placeholder-icon" />
-                    <span>Перетягніть файл сюди або натисніть для завантаження</span>
+                    <img src={UploadIcon} alt={COMMON_TEXT_ADMIN.ALT.UPLOAD} className="placeholder-icon" />
+                    <span>{COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER}</span>
                 </div>
             )}
         </div>

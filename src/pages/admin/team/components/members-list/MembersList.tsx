@@ -368,11 +368,11 @@ export const MembersList = ({
 
     const handleOnEditMember = (id: number) => {
         const memberToEdit = members.filter((m) => m.id === id)[0];
-        if (memberToEdit) {
+        if (memberToEdit && category) {
             setMemberToEdit({
-                category: memberToEdit.category,
-                //TODO: handle with photos
+                category: category,
                 image: memberToEdit.img,
+                imageId: memberToEdit.img?.id ?? null,
                 fullName: memberToEdit.fullName,
                 description: memberToEdit.description,
             });

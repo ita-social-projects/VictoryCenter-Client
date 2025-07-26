@@ -20,7 +20,7 @@ import {
     TEAM_STATUS_DRAFT,
     SEARCH_BY_NAME,
 } from '../../../../../const/team';
-import { Image } from '../../../../../types/Image';
+import { Image, ImageValues } from '../../../../../types/Image';
 import { TeamCategory } from '../../../../../types/admin/TeamMembers';
 
 export type TeamPageToolbarProps = {
@@ -36,7 +36,8 @@ type MemberFormData = {
     category: TeamCategory;
     fullName: string;
     description: string;
-    image: Image | null;
+    image: ImageValues | null;
+    imageId: number | null;
 } | null;
 
 const AddMemberModal = ({

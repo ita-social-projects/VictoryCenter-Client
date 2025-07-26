@@ -1,10 +1,10 @@
 import { Image, ImageValues } from '../../../../types/Image';
-import { AxiosInstance } from 'axios';
+import { AxiosInstance, AxiosResponse } from 'axios';
 
 export const ImagesApi = {
     post: async (client: AxiosInstance, image: ImageValues): Promise<Image> => {
         console.log(image);
-        const response = await client.post<Image>(`/Image`, {
+        const response: AxiosResponse<Image> = await client.post<Image>(`/Image`, {
             base64: image.base64,
             mimeType: image.mimeType,
         });

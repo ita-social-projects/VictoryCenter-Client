@@ -3,6 +3,7 @@ import { MemberFormValues } from '../../../../../pages/admin/team/components/mem
 import { AxiosInstance } from 'axios';
 import { Status } from '../../../../../types/Common';
 import { Image } from '../../../../../types/Image';
+import { ImagesApi } from '../../image-data-fetch/ImageDataApi';
 
 export const TeamMembersApi = {
     getAll: async (
@@ -32,72 +33,20 @@ export const TeamMembersApi = {
     },
 
     updateDraft: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
-        let imageId: number | null = null;
-
-        if (member.image) {
-            if (member.image.id != null) {
-                const imageResult = await client.put<Image>(`/image${member.image.id}`, {
-                    base64: member.image.base64,
-                    mimeType: member.image.mimeType,
-                });
-                imageId = imageResult.data.id;
-            } else {
-                const imageResult = await client.post<Image>(`/image`, {
-                    base64: member.image.base64,
-                    mimeType: member.image.mimeType,
-                });
-                imageId = imageResult.data.id;
-            }
-            await client.put(`/TeamMembers/${id}`, {
-                fullName: member.fullName,
-                categoryId: member.category.id,
-                status: Status.Published,
-                description: member.description,
-                email: '', //TODO implement email update
-                imageId: imageId,
-            });
-        }
-
-        await client.put(`/TeamMembers/${id}`, {
-            fullName: member.fullName,
-            categoryId: member.category.id,
-            status: Status.Draft,
-            description: member.description,
-            email: '', //TODO implement email update
-            imageId: imageId,
-        });
+        await TeamMembersApi.updateMember(client, id, member, Status.Published);
     },
 
     updatePublish: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
-        let imageId: number | null = null;
-
-        if (member.image) {
-            const imageResult = await client.post<Image>(`/image`, {
-                base64: member.image.base64,
-                mimeType: member.image.mimeType,
-            });
-            imageId = imageResult.data.id;
-        }
-
-        await client.put(`/TeamMembers/${id}`, {
-            fullName: member.fullName,
-            categoryId: member.category.id,
-            status: Status.Published,
-            description: member.description,
-            email: '', //TODO implement email update
-            imageId: imageId,
-        });
+        await TeamMembersApi.updateMember(client, id, member, Status.Published);
     },
+
 
     postDraft: async (client: AxiosInstance, member: MemberFormValues) => {
         let imageId: number | null = null;
 
         if (member.image) {
-            const imageResult = await client.post<Image>(`/image`, {
-                base64: member.image.base64,
-                mimeType: member.image.mimeType,
-            });
-            imageId = imageResult.data.id;
+            const imageResult = await ImagesApi.post(client, member.image);
+            imageId = imageResult.id;
         }
 
         await client.post(`/TeamMembers`, {
@@ -111,14 +60,12 @@ export const TeamMembersApi = {
     },
 
     postPublished: async (client: AxiosInstance, member: MemberFormValues) => {
+        console.log(member);
         let imageId: number | null = null;
 
         if (member.image) {
-            const imageResult = await client.post<Image>(`/image`, {
-                base64: member.image.base64,
-                mimeType: member.image.mimeType,
-            });
-            imageId = imageResult.data.id;
+            const imageResult = await ImagesApi.post(client, member.image);
+            imageId = imageResult.id;
         }
 
         await client.post(`/TeamMembers`, {
@@ -141,7 +88,54 @@ export const TeamMembersApi = {
             orderedIds,
         });
     },
+
+    updateMember: async (client: AxiosInstance, id: number, member: MemberFormValues, status: Status) => {
+        let finalImageId = member.imageId;
+
+        if (member.image) {
+            if (finalImageId) {
+                const imageResult = await ImagesApi.put(client, member.image, finalImageId);
+                finalImageId = imageResult.id;
+            } else {
+                const imageResult = await ImagesApi.post(client, member.image);
+                finalImageId = imageResult.id;
+            }
+
+            await client.put(`/TeamMembers/${id}`, {
+                fullName: member.fullName,
+                categoryId: member.category.id,
+                status: status,
+                description: member.description,
+                email: '', // TODO
+                imageId: finalImageId,
+            });
+        } else if (finalImageId) {
+
+            await client.put(`/TeamMembers/${id}`, {
+                fullName: member.fullName,
+                categoryId: member.category.id,
+                status: status,
+                description: member.description,
+                email: '', // TODO
+                imageId: null,
+            });
+            // Потім видаляємо зображення
+            await ImagesApi.delete(client, finalImageId);
+        } else {
+            // Просто оновлюємо без зображення
+            await client.put(`/TeamMembers/${id}`, {
+                fullName: member.fullName,
+                categoryId: member.category.id,
+                status: status,
+                description: member.description,
+                email: '', // TODO
+                imageId: null,
+            });
+        }
+    },
 };
+
+
 
 export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): TeamMember => ({
     id: dto.id,

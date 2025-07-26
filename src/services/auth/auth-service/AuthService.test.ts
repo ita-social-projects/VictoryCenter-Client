@@ -1,5 +1,5 @@
 import { isAccessTokenValid, isTokenExpired, hasValidStructure, getTokenPayload, decodeToken } from './AuthService';
-import { JwtPayload } from '../../../types/Auth';
+import { JwtPayload } from '../../../types/admin/Auth';
 
 describe('AuthService functions', () => {
     const nowSec = Math.floor(Date.now() / 1000);

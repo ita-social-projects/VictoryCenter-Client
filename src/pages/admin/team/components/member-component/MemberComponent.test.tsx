@@ -2,24 +2,32 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemberComponent } from './MemberComponent';
-import { Member } from '../members-list/MembersList';
+import { TeamMember } from '../../../../../types/admin/TeamMembers';
 
-const mockMemberDraft: Member = {
+const mockMemberDraft: TeamMember = {
     id: 1,
     fullName: 'John Doe',
     description: 'Software Engineer',
     img: 'https://example.com/john.jpg',
     status: 'Чернетка',
-    category: 'Основна команда',
+    category: {
+        id: 1,
+        name: 'Основна команда',
+        description: 'Test',
+    },
 };
 
-const mockMemberPublished: Member = {
+const mockMemberPublished: TeamMember = {
     id: 2,
     fullName: 'Jane Smith',
     description: 'Product Manager',
     img: 'https://example.com/jane.jpg',
     status: 'Опубліковано',
-    category: 'Наглядова рада',
+    category: {
+        id: 1,
+        name: 'Наглядова рада',
+        description: 'Test',
+    },
 };
 
 const mockHandleOnDeleteMember = jest.fn();
@@ -202,13 +210,17 @@ describe('MemberComponent', () => {
 
     describe('Edge cases', () => {
         test('handles empty string values gracefully', () => {
-            const emptyMember: Member = {
+            const emptyMember: TeamMember = {
                 id: 3,
                 fullName: '',
                 description: '',
                 img: '',
                 status: 'Чернетка',
-                category: 'Радники',
+                category: {
+                    id: 1,
+                    name: 'Радники',
+                    description: 'Test',
+                },
             };
 
             render(
@@ -226,13 +238,17 @@ describe('MemberComponent', () => {
         });
 
         test('handles special characters in member data', () => {
-            const specialMember: Member = {
+            const specialMember: TeamMember = {
                 id: 4,
                 fullName: 'José María Ñoño',
                 description: 'Designer & Developer',
                 img: 'https://example.com/josé.jpg',
                 status: 'Чернетка',
-                category: 'Основна команда',
+                category: {
+                    id: 1,
+                    name: 'Основна команда',
+                    description: 'Test',
+                },
             };
 
             render(
@@ -248,13 +264,17 @@ describe('MemberComponent', () => {
         });
 
         test('handles different status values correctly', () => {
-            const customStatusMember: Member = {
+            const customStatusMember: TeamMember = {
                 id: 5,
                 fullName: 'Test User',
                 description: 'Tester',
                 img: 'test.jpg',
                 status: 'Custom Status',
-                category: 'Наглядова рада',
+                category: {
+                    id: 1,
+                    name: 'Наглядова рада',
+                    description: 'Test',
+                },
             };
 
             render(
@@ -273,13 +293,17 @@ describe('MemberComponent', () => {
 
     describe('Props validation', () => {
         test('component receives and uses all required props', () => {
-            const testMember: Member = {
+            const testMember: TeamMember = {
                 id: 6,
                 fullName: 'Props Test',
                 description: 'Testing props',
                 img: 'props.jpg',
                 status: 'Чернетка',
-                category: 'Радники',
+                category: {
+                    id: 1,
+                    name: 'Радники',
+                    description: 'Test',
+                },
             };
 
             const { container } = render(

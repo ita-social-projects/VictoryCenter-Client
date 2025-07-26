@@ -77,7 +77,11 @@ jest.mock('../member-form/MemberForm', () => ({
         mockMemberForm(props);
         capturedOnValuesChange = props.onValuesChange;
         const defaultData: MemberFormValues = {
-            category: 'Основна команда',
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: 'Test',
+            },
             fullName: 'Test User',
             description: 'Test Description',
             img: null,
@@ -225,7 +229,11 @@ describe('TeamPageToolbar', () => {
             await userEvent.click(screen.getByTestId('add-member-button'));
             act(() => {
                 capturedOnValuesChange({
-                    category: 'Основна команда',
+                    category: {
+                        id: 1,
+                        name: 'Основна команда',
+                        description: 'Test',
+                    },
                     fullName: 'From test',
                     description: 'from test desc',
                     img: null,
@@ -284,7 +292,11 @@ describe('TeamPageToolbar', () => {
             await userEvent.click(screen.getByText('Так'));
 
             expect(defaultProps.onMemberPublish).toHaveBeenCalledWith({
-                category: 'Основна команда',
+                category: {
+                    id: 1,
+                    name: 'Основна команда',
+                    description: 'Test',
+                },
                 fullName: 'Test User',
                 description: 'Test Description',
                 img: null,
@@ -391,7 +403,11 @@ describe('TeamPageToolbar', () => {
             await userEvent.click(screen.getByTestId('add-member-button'));
             act(() => {
                 capturedOnValuesChange({
-                    category: 'Основна команда',
+                    category: {
+                        id: 1,
+                        name: 'Основна команда',
+                        description: 'Test',
+                    },
                     fullName: 'From test',
                     description: 'from test desc',
                     img: null,

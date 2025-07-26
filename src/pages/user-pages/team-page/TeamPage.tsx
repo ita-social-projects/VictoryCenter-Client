@@ -3,7 +3,7 @@ import './TeamPage.scss';
 import horseVideo from '../../../assets/team_page_images/horse_video.mp4';
 import { teamPageDataFetch } from '../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch';
 import { TeamMember } from './TeamMemberCard/TeamMemberCard';
-import { TeamItem } from '../../../types/TeamPage';
+import { TeamItem } from '../../../types/public/TeamPage';
 import {
     DOWNLOAD_ERROR,
     VIDEO_TEXT_STRING1,

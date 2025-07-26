@@ -54,3 +54,5 @@ export const COMMON_TEXT_ADMIN = {
         TRY_AGAIN: 'Спробувати ще раз',
     },
 };
+
+export const TEAM_STATUS_DEFAULT = 'Статус';

@@ -14,7 +14,7 @@ import {
 import Logo from '../../../../assets/icons/logo.svg';
 import EyeOpened from '../../../../assets/icons/eye-opened.svg';
 import EyeClosed from '../../../../assets/icons/eye-closed.svg';
-import { Credentials } from '../../../../types/Auth';
+import { Credentials } from '../../../../types/admin/Auth';
 import './login-form.scss';
 
 type LoginFormProps = {

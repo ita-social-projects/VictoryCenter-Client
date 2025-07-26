@@ -62,194 +62,179 @@ const CorrespondentBankBlock = ({ title, fields }: { title: string; fields: { la
     </div>
 );
 
+const PaymentDetailsSection = ({
+    title,
+    ibanLabel,
+    ibanValue,
+}: {
+    title: string;
+    ibanLabel: string;
+    ibanValue: string;
+}) => (
+    <div className="abroadPaymentDetailsBlock">
+        <h2>{title}</h2>
+        <div className="abroadPaymentDetailsContent">
+            <PaymentLabelWithCopy
+                label={PAYMENT_DETAILS_COMMON.RECIPIENT_LABEL}
+                value={PAYMENT_DETAILS_COMMON.RECIPIENT_NAME_LABEL}
+                copyValue={PAYMENT_DETAILS_COMMON.RECIPIENT_NAME_LABEL}
+            />
+            <PaymentLabelWithCopy label={ibanLabel} value={ibanValue} copyValue={ibanValue} />
+            <PaymentLabelWithCopy
+                label={ABROAD_PAYMENT_DETAILS.SWIFT_CODE_LABEL}
+                value={ABROAD_PAYMENT_DETAILS.SWIFT_CODE_VALUE_LABEL}
+                copyValue={ABROAD_PAYMENT_DETAILS.SWIFT_CODE_VALUE_LABEL}
+            />
+            <MultiFieldLabelWithCopy
+                label={ABROAD_PAYMENT_DETAILS.BANK_RECEIVER_LABEL}
+                values={[
+                    ABROAD_PAYMENT_DETAILS.BANK_NAME_TRANSLITERATED_LABEL,
+                    ABROAD_PAYMENT_DETAILS.BANK_STREET_TRANSLITERATED_LABEL,
+                    ABROAD_PAYMENT_DETAILS.BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL,
+                ]}
+                copyValue={
+                    ABROAD_PAYMENT_DETAILS.BANK_NAME_TRANSLITERATED_LABEL +
+                    ABROAD_PAYMENT_DETAILS.BANK_STREET_TRANSLITERATED_LABEL +
+                    ABROAD_PAYMENT_DETAILS.BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL
+                }
+            />
+            <MultiFieldLabelWithCopy
+                label={ABROAD_PAYMENT_DETAILS.ADDRESS_LABEL}
+                values={[ABROAD_PAYMENT_DETAILS.COUNTRY_LABEL, ABROAD_PAYMENT_DETAILS.CITY_LABEL]}
+                copyValue={ABROAD_PAYMENT_DETAILS.COUNTRY_LABEL + ABROAD_PAYMENT_DETAILS.CITY_LABEL}
+            />
+        </div>
+    </div>
+);
+
+const USD_CORRESPONDENT_BANKS = [
+    {
+        title: ABROAD_PAYMENT_DETAILS.JP_MORGAN_CHASE_BANK_USA_LABEL,
+        fields: [
+            { label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL, value: ABROAD_PAYMENT_DETAILS.SWIFT_JP_MORGAN_CODE_USA_LABEL },
+            {
+                label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
+                value: ABROAD_PAYMENT_DETAILS.ACCOUNT_JP_MORGAN_CODE_USA_LABEL,
+            },
+        ],
+    },
+    {
+        title: ABROAD_PAYMENT_DETAILS.BANK_OF_NEW_YORK_MELLON_USA_LABEL,
+        fields: [
+            {
+                label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
+                value: ABROAD_PAYMENT_DETAILS.SWIFT_BANK_OF_NEW_YORK_MELLON_USA_CODE_LABEL,
+            },
+            {
+                label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
+                value: ABROAD_PAYMENT_DETAILS.ACCOUNT_BANK_OF_NEW_YORK_MELLON_USA_CODE_LABEL,
+            },
+        ],
+    },
+    {
+        title: ABROAD_PAYMENT_DETAILS.CITY_BANK_USA_LABEL,
+        fields: [
+            { label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL, value: ABROAD_PAYMENT_DETAILS.SWIFT_CITY_BANK_USA_CODE_LABEL },
+            {
+                label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
+                value: ABROAD_PAYMENT_DETAILS.ACCOUNT_CITY_BANK_USA_CODE_LABEL,
+            },
+        ],
+    },
+];
+
+const EUR_CORRESPONDENT_BANKS = [
+    {
+        title: ABROAD_PAYMENT_DETAILS.COMMERZBANK_AG_GERMANY_LABEL,
+        fields: [
+            {
+                label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
+                value: ABROAD_PAYMENT_DETAILS.SWIFT_COMMERZBANK_AG_GERMANY_CODE_LABEL,
+            },
+            {
+                label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
+                value: ABROAD_PAYMENT_DETAILS.ACCOUNT_COMMERZBANK_AG_GERMANY_CODE_LABEL,
+            },
+        ],
+    },
+    {
+        title: ABROAD_PAYMENT_DETAILS.JP_MORGAN_AG_GERMANY_LABEL,
+        fields: [
+            {
+                label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
+                value: ABROAD_PAYMENT_DETAILS.SWIFT_JP_MORGAN_AG_GERMANY_CODE_LABEL,
+            },
+            {
+                label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
+                value: ABROAD_PAYMENT_DETAILS.ACCOUNT_JP_MORGAN_AG_GERMANY_CODE_LABEL,
+            },
+        ],
+    },
+    {
+        title: ABROAD_PAYMENT_DETAILS.BANK_OF_NEW_YORK_MELLON_FRANKFURT_LABEL,
+        fields: [
+            {
+                label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
+                value: ABROAD_PAYMENT_DETAILS.SWIFT_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL,
+            },
+            {
+                label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
+                value: ABROAD_PAYMENT_DETAILS.ACCOUNT_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL,
+            },
+            {
+                label: ABROAD_PAYMENT_DETAILS.IBAN_LABEL,
+                value: ABROAD_PAYMENT_DETAILS.IBAN_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL,
+            },
+        ],
+    },
+    {
+        title: ABROAD_PAYMENT_DETAILS.CITY_BANK_IRELAND_LABEL,
+        fields: [
+            {
+                label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
+                value: ABROAD_PAYMENT_DETAILS.SWIFT_CITY_BANK_IRELAND_CODE_LABEL,
+            },
+            {
+                label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
+                value: ABROAD_PAYMENT_DETAILS.ACCOUNT_CITY_BANK_IRELAND_CODE_LABEL,
+            },
+            {
+                label: ABROAD_PAYMENT_DETAILS.IBAN_LABEL,
+                value: ABROAD_PAYMENT_DETAILS.IBAN_CITY_BANK_IRELAND_CODE_LABEL,
+            },
+        ],
+    },
+];
+
+const CorrespondentBanksSection = ({ banks }: { banks: typeof USD_CORRESPONDENT_BANKS }) => (
+    <div className="abroadPaymentDetailsBlock">
+        <h2>{ABROAD_PAYMENT_DETAILS.CORRESPONDENT_BANKS_LABEL}</h2>
+        <div className="abroadPaymentDetailsContent">
+            {banks.map((bank) => (
+                <CorrespondentBankBlock key={bank.title} title={bank.title} fields={bank.fields} />
+            ))}
+        </div>
+    </div>
+);
+
 export const AbroadPaymentDetails = () => {
     return (
         <div className="abroadPaymentDetails">
-            <div className="abroadPaymentDetailsBlock">
-                <h2>{ABROAD_PAYMENT_DETAILS.USD_PAYMENT_DETAILS_LABEL}</h2>
-                <div className="abroadPaymentDetailsContent">
-                    <PaymentLabelWithCopy
-                        label={PAYMENT_DETAILS_COMMON.RECIPIENT_LABEL}
-                        value={PAYMENT_DETAILS_COMMON.RECIPIENT_NAME_LABEL}
-                        copyValue={PAYMENT_DETAILS_COMMON.RECIPIENT_NAME_LABEL}
-                    />
-                    <PaymentLabelWithCopy
-                        label={ABROAD_PAYMENT_DETAILS.IBAN_USD_LABEL}
-                        value={ABROAD_PAYMENT_DETAILS.IBAN_USD_NUMBER_LABEL}
-                        copyValue={ABROAD_PAYMENT_DETAILS.IBAN_USD_NUMBER_LABEL}
-                    />
-                    <PaymentLabelWithCopy
-                        label={ABROAD_PAYMENT_DETAILS.SWIFT_CODE_LABEL}
-                        value={ABROAD_PAYMENT_DETAILS.SWIFT_CODE_VALUE_LABEL}
-                        copyValue={ABROAD_PAYMENT_DETAILS.SWIFT_CODE_VALUE_LABEL}
-                    />
-                    <MultiFieldLabelWithCopy
-                        label={ABROAD_PAYMENT_DETAILS.BANK_RECEIVER_LABEL}
-                        values={[
-                            ABROAD_PAYMENT_DETAILS.BANK_NAME_TRANSLITERATED_LABEL,
-                            ABROAD_PAYMENT_DETAILS.BANK_STREET_TRANSLITERATED_LABEL,
-                            ABROAD_PAYMENT_DETAILS.BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL,
-                        ]}
-                        copyValue={
-                            ABROAD_PAYMENT_DETAILS.BANK_NAME_TRANSLITERATED_LABEL +
-                            ABROAD_PAYMENT_DETAILS.BANK_STREET_TRANSLITERATED_LABEL +
-                            ABROAD_PAYMENT_DETAILS.BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL
-                        }
-                    />
-                    <MultiFieldLabelWithCopy
-                        label={ABROAD_PAYMENT_DETAILS.ADDRESS_LABEL}
-                        values={[ABROAD_PAYMENT_DETAILS.COUNTRY_LABEL, ABROAD_PAYMENT_DETAILS.CITY_LABEL]}
-                        copyValue={ABROAD_PAYMENT_DETAILS.COUNTRY_LABEL + ABROAD_PAYMENT_DETAILS.CITY_LABEL}
-                    />
-                </div>
-            </div>
-            <div className="abroadPaymentDetailsBlock">
-                <h2>{ABROAD_PAYMENT_DETAILS.CORRESPONDENT_BANKS_LABEL}</h2>
-                <div className="abroadPaymentDetailsContent">
-                    <CorrespondentBankBlock
-                        title={ABROAD_PAYMENT_DETAILS.JP_MORGAN_CHASE_BANK_USA_LABEL}
-                        fields={[
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.SWIFT_JP_MORGAN_CODE_USA_LABEL,
-                            },
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.ACCOUNT_JP_MORGAN_CODE_USA_LABEL,
-                            },
-                        ]}
-                    />
-                    <CorrespondentBankBlock
-                        title={ABROAD_PAYMENT_DETAILS.BANK_OF_NEW_YORK_MELLON_USA_LABEL}
-                        fields={[
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.SWIFT_BANK_OF_NEW_YORK_MELLON_USA_CODE_LABEL,
-                            },
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.ACCOUNT_BANK_OF_NEW_YORK_MELLON_USA_CODE_LABEL,
-                            },
-                        ]}
-                    />
-                    <CorrespondentBankBlock
-                        title={ABROAD_PAYMENT_DETAILS.CITY_BANK_USA_LABEL}
-                        fields={[
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.SWIFT_CITY_BANK_USA_CODE_LABEL,
-                            },
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.ACCOUNT_CITY_BANK_USA_CODE_LABEL,
-                            },
-                        ]}
-                    />
-                </div>
-            </div>
-            <div className="abroadPaymentDetailsBlock">
-                <h2>{ABROAD_PAYMENT_DETAILS.EUR_PAYMENT_DETAILS_LABEL}</h2>
-                <div className="abroadPaymentDetailsContent">
-                    <PaymentLabelWithCopy
-                        label={PAYMENT_DETAILS_COMMON.RECIPIENT_LABEL}
-                        value={PAYMENT_DETAILS_COMMON.RECIPIENT_NAME_LABEL}
-                        copyValue={PAYMENT_DETAILS_COMMON.RECIPIENT_NAME_LABEL}
-                    />
-                    <PaymentLabelWithCopy
-                        label={ABROAD_PAYMENT_DETAILS.IBAN_EUR_LABEL}
-                        value={ABROAD_PAYMENT_DETAILS.IBAN_EUR_NUMBER_LABEL}
-                        copyValue={ABROAD_PAYMENT_DETAILS.IBAN_EUR_NUMBER_LABEL}
-                    />
-                    <PaymentLabelWithCopy
-                        label={ABROAD_PAYMENT_DETAILS.SWIFT_CODE_LABEL}
-                        value={ABROAD_PAYMENT_DETAILS.SWIFT_CODE_VALUE_LABEL}
-                        copyValue={ABROAD_PAYMENT_DETAILS.SWIFT_CODE_VALUE_LABEL}
-                    />
-                    <MultiFieldLabelWithCopy
-                        label={ABROAD_PAYMENT_DETAILS.BANK_RECEIVER_LABEL}
-                        values={[
-                            ABROAD_PAYMENT_DETAILS.BANK_NAME_TRANSLITERATED_LABEL,
-                            ABROAD_PAYMENT_DETAILS.BANK_STREET_TRANSLITERATED_LABEL,
-                            ABROAD_PAYMENT_DETAILS.BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL,
-                        ]}
-                        copyValue={
-                            ABROAD_PAYMENT_DETAILS.BANK_NAME_TRANSLITERATED_LABEL +
-                            ABROAD_PAYMENT_DETAILS.BANK_STREET_TRANSLITERATED_LABEL +
-                            ABROAD_PAYMENT_DETAILS.BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL
-                        }
-                    />
-                    <MultiFieldLabelWithCopy
-                        label={ABROAD_PAYMENT_DETAILS.ADDRESS_LABEL}
-                        values={[ABROAD_PAYMENT_DETAILS.COUNTRY_LABEL, ABROAD_PAYMENT_DETAILS.CITY_LABEL]}
-                        copyValue={ABROAD_PAYMENT_DETAILS.COUNTRY_LABEL + ABROAD_PAYMENT_DETAILS.CITY_LABEL}
-                    />
-                </div>
-            </div>
-            <div className="abroadPaymentDetailsBlock">
-                <h2>{ABROAD_PAYMENT_DETAILS.CORRESPONDENT_BANKS_LABEL}</h2>
-                <div className="abroadPaymentDetailsContent">
-                    <CorrespondentBankBlock
-                        title={ABROAD_PAYMENT_DETAILS.COMMERZBANK_AG_GERMANY_LABEL}
-                        fields={[
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.SWIFT_COMMERZBANK_AG_GERMANY_CODE_LABEL,
-                            },
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.ACCOUNT_COMMERZBANK_AG_GERMANY_CODE_LABEL,
-                            },
-                        ]}
-                    />
-                    <CorrespondentBankBlock
-                        title={ABROAD_PAYMENT_DETAILS.JP_MORGAN_AG_GERMANY_LABEL}
-                        fields={[
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.SWIFT_JP_MORGAN_AG_GERMANY_CODE_LABEL,
-                            },
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.ACCOUNT_JP_MORGAN_AG_GERMANY_CODE_LABEL,
-                            },
-                        ]}
-                    />
-                    <CorrespondentBankBlock
-                        title={ABROAD_PAYMENT_DETAILS.BANK_OF_NEW_YORK_MELLON_FRANKFURT_LABEL}
-                        fields={[
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.SWIFT_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL,
-                            },
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.ACCOUNT_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL,
-                            },
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.IBAN_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.IBAN_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL,
-                            },
-                        ]}
-                    />
-                    <CorrespondentBankBlock
-                        title={ABROAD_PAYMENT_DETAILS.CITY_BANK_IRELAND_LABEL}
-                        fields={[
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.SWIFT_CITY_BANK_IRELAND_CODE_LABEL,
-                            },
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.ACCOUNT_CITY_BANK_IRELAND_CODE_LABEL,
-                            },
-                            {
-                                label: ABROAD_PAYMENT_DETAILS.IBAN_LABEL,
-                                value: ABROAD_PAYMENT_DETAILS.IBAN_CITY_BANK_IRELAND_CODE_LABEL,
-                            },
-                        ]}
-                    />
-                </div>
-            </div>
+            <PaymentDetailsSection
+                title={ABROAD_PAYMENT_DETAILS.USD_PAYMENT_DETAILS_LABEL}
+                ibanLabel={ABROAD_PAYMENT_DETAILS.IBAN_USD_LABEL}
+                ibanValue={ABROAD_PAYMENT_DETAILS.IBAN_USD_NUMBER_LABEL}
+            />
+
+            <CorrespondentBanksSection banks={USD_CORRESPONDENT_BANKS} />
+
+            <PaymentDetailsSection
+                title={ABROAD_PAYMENT_DETAILS.EUR_PAYMENT_DETAILS_LABEL}
+                ibanLabel={ABROAD_PAYMENT_DETAILS.IBAN_EUR_LABEL}
+                ibanValue={ABROAD_PAYMENT_DETAILS.IBAN_EUR_NUMBER_LABEL}
+            />
+
+            <CorrespondentBanksSection banks={EUR_CORRESPONDENT_BANKS} />
         </div>
     );
 };

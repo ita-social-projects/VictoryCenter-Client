@@ -3,10 +3,14 @@ import './AbroadPaymentDetails.scss';
 import { ABROAD_PAYMENT_DETAILS, PAYMENT_DETAILS_COMMON } from '../../../../const/donate-page/donate-page';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
 
-const PaymentLabelWithCopy: React.FC<{ label: React.ReactNode; value: React.ReactNode; copyValue: string }> = ({
+const PaymentLabelWithCopy = ({
     label,
     value,
     copyValue,
+}: {
+    label: React.ReactNode;
+    value: React.ReactNode;
+    copyValue: string;
 }) => (
     <div className="paymentLabel">
         <h3>{label}</h3>
@@ -17,10 +21,14 @@ const PaymentLabelWithCopy: React.FC<{ label: React.ReactNode; value: React.Reac
     </div>
 );
 
-const MultiFieldLabelWithCopy: React.FC<{ label: React.ReactNode; values: string[]; copyValue: string }> = ({
+const MultiFieldLabelWithCopy = ({
     label,
     values,
     copyValue,
+}: {
+    label: React.ReactNode;
+    values: string[];
+    copyValue: string;
 }) => (
     <div className="paymentLabel">
         <h3>{label}</h3>
@@ -37,10 +45,7 @@ const MultiFieldLabelWithCopy: React.FC<{ label: React.ReactNode; values: string
     </div>
 );
 
-const CorrespondentBankBlock: React.FC<{ title: string; fields: { label: string; value: string }[] }> = ({
-    title,
-    fields,
-}) => (
+const CorrespondentBankBlock = ({ title, fields }: { title: string; fields: { label: string; value: string }[] }) => (
     <div className="paymentLabel">
         <h3>{title}</h3>
         <div className="labelsContainers">

@@ -2,21 +2,9 @@ import './DonateSection.scss';
 import React, { useState } from 'react';
 import { DONATE_SECTION } from '../../../const/donate-page/donate-page';
 import { getEnvVariable } from '../../../utils/functions/getEnvVariable';
-
-enum DonateTab {
-    oneTime,
-    subscription,
-}
-
-enum Currency {
-    UAH = 'UAH',
-    USD = 'USD',
-    EUR = 'EUR',
-}
-
-enum PaymentSystem {
-    WayForPay = 'WayForPay',
-}
+import { DonateTab } from '../../../types/public/donate-page/DonateTab';
+import { Currency } from '../../../types/public/donate-page/Currency';
+import { PaymentSystem } from '../../../types/public/donate-page/PaymentStatus';
 
 export const DonateSection = () => {
     const [activeTab, setActiveTab] = useState<DonateTab>(DonateTab.oneTime);

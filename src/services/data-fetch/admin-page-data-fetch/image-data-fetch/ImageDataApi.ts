@@ -3,7 +3,6 @@ import { AxiosInstance, AxiosResponse } from 'axios';
 
 export const ImagesApi = {
     post: async (client: AxiosInstance, image: ImageValues): Promise<Image> => {
-        console.log(image);
         const response: AxiosResponse<Image> = await client.post<Image>(`/Image`, {
             base64: image.base64,
             mimeType: image.mimeType,
@@ -12,7 +11,6 @@ export const ImagesApi = {
     },
 
     put: async (client: AxiosInstance, image: ImageValues, id: number): Promise<Image> => {
-        console.log(image);
         const response: AxiosResponse<Image> = await client.put<Image>(`/Image/${id}`, {
             base64: image.base64,
             mimeType: image.mimeType,

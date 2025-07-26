@@ -85,10 +85,10 @@ jest.mock('../member-form/MemberForm', () => ({
             fullName: 'Test User',
             description: 'Test Description',
             image: {
-                base64:"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABDQottAAAAABJRU5ErkJggg==",
-                mimeType:"image/png",
+                base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABDQottAAAAABJRU5ErkJggg==',
+                mimeType: 'image/png',
             },
-            imageId: 1
+            imageId: 1,
         };
         return (
             <form
@@ -305,7 +305,7 @@ describe('TeamPageToolbar', () => {
                 fullName: 'Test User',
                 description: 'Test Description',
                 image: {
-                    base64:"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABDQottAAAAABJRU5ErkJggg==",
+                    base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABDQottAAAAABJRU5ErkJggg==',
                     mimeType: 'image/png',
                 },
                 imageId: 1,
@@ -420,7 +420,7 @@ describe('TeamPageToolbar', () => {
                     fullName: 'From test',
                     description: 'from test desc',
                     image: null,
-                    imageId: null
+                    imageId: null,
                 });
             });
             await userEvent.click(screen.getByText('Зберегти як чернетку'));

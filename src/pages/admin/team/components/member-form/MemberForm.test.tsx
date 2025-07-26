@@ -5,7 +5,7 @@ import { MemberForm, MemberFormProps, MemberFormValues } from './MemberForm';
 import { AdminContext } from '../../../../../context/admin-context-provider/AdminContextProvider';
 import axios from 'axios';
 import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
-import {Image, ImageValues} from '../../../../../types/Image';
+import { Image, ImageValues } from '../../../../../types/Image';
 import { mapImageToBase64 } from '../../../../../utils/functions/mapImageToBase64';
 
 jest.mock('../../../../../assets/icons/cloud-download.svg', () => 'cloud-download.svg');
@@ -155,7 +155,7 @@ describe('MemberForm', () => {
                 fullName: 'Jane Doe',
                 description: 'Test description',
                 image: null,
-                imageId: null
+                imageId: null,
             });
         });
     });
@@ -208,9 +208,6 @@ describe('MemberForm', () => {
     });
 
     describe('Additional Coverage', () => {
-
-
-
         it('does not call onValuesChange when onValuesChange prop is not provided', () => {
             const propsWithoutOnValuesChange = {
                 ...defaultProps,
@@ -235,7 +232,7 @@ describe('MemberForm', () => {
                 fullName: 'John Doe',
                 description: 'Test description',
                 image: null,
-                imageId: null
+                imageId: null,
             };
 
             renderWithAdminContext(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
@@ -263,20 +260,15 @@ describe('MemberForm', () => {
             );
         });
 
-
         it('displays 0 character count when fields are empty', () => {
             renderWithAdminContext(<MemberForm {...defaultProps} />);
 
             expect(screen.getByText('0/50')).toBeInTheDocument();
             expect(screen.getByText('0/200')).toBeInTheDocument();
         });
-
-
-
     });
 
     describe('Extra Function Coverage', () => {
-
         it('does not submit if category is empty', () => {
             renderWithAdminContext(<MemberForm {...defaultProps} />);
             const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
@@ -310,7 +302,6 @@ describe('MemberForm', () => {
             expect(defaultProps.onSubmit).not.toHaveBeenCalled();
         });
 
-
         it('does not call onValuesChange if memberFormValues is falsy (defensive)', () => {
             // Simulate effect with falsy memberFormValues
             // Not directly possible, but we can check that the effect is not called if onValuesChange is not provided (already covered)
@@ -338,6 +329,5 @@ describe('MemberForm', () => {
             expect(screen.getByText('50/50')).toBeInTheDocument();
             expect(screen.getByText('200/200')).toBeInTheDocument();
         });
-
     });
 });

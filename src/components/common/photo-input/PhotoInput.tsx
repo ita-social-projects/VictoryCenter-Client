@@ -133,7 +133,12 @@ const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: Pho
 
             {previewImage ? (
                 <div className="photo-preview">
-                    <img src={mapImageToBase64(previewImage) ?? undefined} alt="Preview" className="preview-image" data-testid="preview-image" />
+                    <img
+                        src={mapImageToBase64(previewImage) ?? undefined}
+                        alt="Preview"
+                        className="preview-image"
+                        data-testid="preview-image"
+                    />
                     {!disabled && (
                         <button
                             type="button"

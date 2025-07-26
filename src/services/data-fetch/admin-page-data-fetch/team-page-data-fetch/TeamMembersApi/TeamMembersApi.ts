@@ -89,46 +89,33 @@ export const TeamMembersApi = {
     },
 
     updateMember: async (client: AxiosInstance, id: number, member: MemberFormValues, status: Status) => {
+        let imageIdToDelete: number | null = null;
         let finalImageId = member.imageId;
 
         if (member.image) {
-            if (finalImageId) {
-                const imageResult = await ImagesApi.put(client, member.image, finalImageId);
+            if (member.imageId) {
+                const imageResult = await ImagesApi.put(client, member.image, member.imageId);
                 finalImageId = imageResult.id;
             } else {
                 const imageResult = await ImagesApi.post(client, member.image);
                 finalImageId = imageResult.id;
             }
+        } else if (member.imageId && !member.image) {
+            imageIdToDelete = member.imageId;
+            finalImageId = null;
+        }
 
-            await client.put(`/TeamMembers/${id}`, {
-                fullName: member.fullName,
-                categoryId: member.category.id,
-                status: status,
-                description: member.description,
-                email: '', // TODO
-                imageId: finalImageId,
-            });
-        } else if (finalImageId) {
-            await client.put(`/TeamMembers/${id}`, {
-                fullName: member.fullName,
-                categoryId: member.category.id,
-                status: status,
-                description: member.description,
-                email: '', // TODO
-                imageId: null,
-            });
-            // Потім видаляємо зображення
-            await ImagesApi.delete(client, finalImageId);
-        } else {
-            // Просто оновлюємо без зображення
-            await client.put(`/TeamMembers/${id}`, {
-                fullName: member.fullName,
-                categoryId: member.category.id,
-                status: status,
-                description: member.description,
-                email: '', // TODO
-                imageId: null,
-            });
+        await client.put(`/TeamMembers/${id}`, {
+            fullName: member.fullName,
+            categoryId: member.category.id,
+            status: status,
+            description: member.description,
+            email: '',
+            imageId: finalImageId,
+        });
+
+        if (imageIdToDelete && imageIdToDelete !== finalImageId) {
+            await ImagesApi.delete(client, imageIdToDelete);
         }
     },
 };

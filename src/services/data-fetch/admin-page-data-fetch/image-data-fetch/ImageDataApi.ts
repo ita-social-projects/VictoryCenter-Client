@@ -28,5 +28,5 @@ export const ImagesApi = {
     get: async (client: AxiosInstance, id: number) => {
         const response: AxiosResponse<Image> = await client.get<Image>(`/Image/${id}`);
         return response.data;
-    }
+    },
 };

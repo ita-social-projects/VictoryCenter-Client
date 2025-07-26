@@ -2,15 +2,13 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import PhotoInput from './PhotoInput';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import {ImageValues} from "../../../types/Image";
+import { ImageValues } from '../../../types/Image';
 
 const createImageFile = () => new File(['dummy content'], 'example.png', { type: 'image/png' });
-const MockImageValue : ImageValues = {
-    base64 : "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAocB9eQ6vqoAAAAASUVORK5CYII=",
-    mimeType: "image/jpeg",
-
-}
-
+const MockImageValue: ImageValues = {
+    base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAocB9eQ6vqoAAAAASUVORK5CYII=',
+    mimeType: 'image/jpeg',
+};
 
 describe('PhotoInput', () => {
     let onChangeMock: jest.Mock;
@@ -29,13 +27,11 @@ describe('PhotoInput', () => {
     });
 
     it('renders image preview when ImageValue is provided', () => {
-        render(<PhotoInput value= {MockImageValue} onChange={onChangeMock} />);
+        render(<PhotoInput value={MockImageValue} onChange={onChangeMock} />);
         const previewImage = screen.getByTestId('preview-image');
         expect(previewImage).toBeInTheDocument();
-        expect(previewImage).toHaveAttribute('src', `data:${MockImageValue.mimeType};base64,${MockImageValue.base64}`
-        );
+        expect(previewImage).toHaveAttribute('src', `data:${MockImageValue.mimeType};base64,${MockImageValue.base64}`);
     });
-
 
     it('calls onChange when file is selected via input', async () => {
         const file = createImageFile();
@@ -136,7 +132,6 @@ describe('PhotoInput', () => {
 
         expect(onChangeMock).not.toHaveBeenCalled();
     });
-
 
     it('handles drag and drop when no files provided', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} />);
@@ -321,8 +316,6 @@ describe('PhotoInput', () => {
         expect(onChangeMock).toHaveBeenCalledWith(null);
         expect(fileInput.value).toBe('');
     });
-
-
 
     it('renders with custom id and name attributes', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} id="custom-id" name="custom-name" />);

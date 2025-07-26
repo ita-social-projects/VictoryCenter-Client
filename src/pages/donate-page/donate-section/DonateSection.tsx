@@ -1,11 +1,7 @@
 import './DonateSection.scss';
 import React, { useState } from 'react';
-import {
-    ONE_TIME_DONATE_BUTTON_LABEL,
-    ONE_TIME_DONATE,
-    SUBSCRIPTION,
-    SUBSCRIPTION_BUTTON_LABEL,
-} from '../../../const/donate-page/donate-page';
+import { DONATE_SECTION } from '../../../const/donate-page/donate-page';
+import { getEnvVariable } from '../../../utils/functions/getEnvVariable';
 
 enum DonateTab {
     oneTime,
@@ -19,7 +15,7 @@ enum Currency {
 }
 
 enum PaymentSystem {
-    WayForPay = 'Way4Pay',
+    WayForPay = 'WayForPay',
 }
 
 export const DonateSection = () => {
@@ -65,7 +61,7 @@ export const DonateSection = () => {
     return (
         <form
             className="donateSection"
-            action={`${process.env.REACT_APP_BACKEND_URL}/payments/donate`}
+            action={`${getEnvVariable('REACT_APP_BACKEND_URL')}/payments/donate`}
             method="post"
             onSubmit={handleSubmit}
             data-testid="donate-section-form"
@@ -82,7 +78,7 @@ export const DonateSection = () => {
                     type="button"
                     onClick={() => setActiveTab(DonateTab.oneTime)}
                 >
-                    {ONE_TIME_DONATE}
+                    {DONATE_SECTION.ONE_TIME_DONATE}
                 </button>
                 <div className="tooltip-container top">
                     <button
@@ -91,7 +87,7 @@ export const DonateSection = () => {
                         onClick={() => setActiveTab(DonateTab.subscription)}
                         disabled
                     >
-                        {SUBSCRIPTION}
+                        {DONATE_SECTION.SUBSCRIPTION}
                     </button>
                     <span className="tooltip-text">
                         <div className="text-center">
@@ -134,7 +130,9 @@ export const DonateSection = () => {
                 </button>
             </div>
             <button className="donateButton" type="submit">
-                {activeTab === DonateTab.oneTime ? ONE_TIME_DONATE_BUTTON_LABEL : SUBSCRIPTION_BUTTON_LABEL}
+                {activeTab === DonateTab.oneTime
+                    ? DONATE_SECTION.ONE_TIME_DONATE_BUTTON_LABEL
+                    : DONATE_SECTION.SUBSCRIPTION_BUTTON_LABEL}
             </button>
         </form>
     );

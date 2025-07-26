@@ -1,4 +1,4 @@
-﻿import React, { createRef } from 'react';
+import React, { createRef } from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { ProgramsList, ProgramsListProps, ProgramListRef } from './ProgramsList';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
@@ -333,7 +333,7 @@ describe('ProgramsList', () => {
 
         it('should edit an existing program via editProgram', async () => {
             renderProgramsList({}, ref);
-            await waitFor(() => expect(screen.getByText('Program 1')).toBeInTheDocument());
+            await screen.findByText('Program 1');
 
             const editedProgram: Program = { ...mockProgramsPage1[0], name: 'Edited Program 1' };
 
@@ -384,31 +384,31 @@ describe('ProgramsList', () => {
     });
 
     describe('Category Context Menu', () => {
-        it('should open the add category modal', async () => {
+        beforeEach(async () => {
             renderProgramsList();
             await waitFor(() => expect(getProgramItems()).toHaveLength(2));
-
-            expect(screen.queryByTestId('program-category-modal-add')).not.toBeInTheDocument();
-            fireEvent.click(screen.getByTestId('context-menu-add'));
-            expect(screen.getByTestId('program-category-modal-add')).toBeInTheDocument();
         });
 
-        it('should open the edit category modal', async () => {
-            renderProgramsList();
-            await waitFor(() => expect(getProgramItems()).toHaveLength(2));
-
-            expect(screen.queryByTestId('program-category-modal-edit')).not.toBeInTheDocument();
-            fireEvent.click(screen.getByTestId('context-menu-edit'));
-            expect(screen.getByTestId('program-category-modal-edit')).toBeInTheDocument();
-        });
-
-        it('should open the delete category modal', async () => {
-            renderProgramsList();
-            await waitFor(() => expect(getProgramItems()).toHaveLength(2));
-
-            expect(screen.queryByTestId('delete-category-modal')).not.toBeInTheDocument();
-            fireEvent.click(screen.getByTestId('context-menu-delete'));
-            expect(screen.getByTestId('delete-category-modal')).toBeInTheDocument();
+        it.each([
+            {
+                action: 'add',
+                buttonTestId: 'context-menu-add',
+                modalTestId: 'program-category-modal-add',
+            },
+            {
+                action: 'edit',
+                buttonTestId: 'context-menu-edit',
+                modalTestId: 'program-category-modal-edit',
+            },
+            {
+                action: 'delete',
+                buttonTestId: 'context-menu-delete',
+                modalTestId: 'delete-category-modal',
+            },
+        ])('should open the $action category modal when its button is clicked', ({ buttonTestId, modalTestId }) => {
+            expect(screen.queryByTestId(modalTestId)).not.toBeInTheDocument();
+            fireEvent.click(screen.getByTestId(buttonTestId));
+            expect(screen.getByTestId(modalTestId)).toBeInTheDocument();
         });
     });
 });

@@ -137,48 +137,60 @@ describe('ProgramsPageContent', () => {
     });
 
     describe('Modal interactions', () => {
-        const renderAndOpenModal = (buttonText: string) => {
-            render(<ProgramsPageContent />);
-            fireEvent.click(screen.getByText(buttonText));
-        };
+        const modalTestCases = [
+            {
+                modalType: 'Add Program',
+                triggerText: 'Add Program',
+                modalTestId: 'add-program-modal',
+                closeTestId: 'close-add',
+                expectedTitle: 'Add Program Modal',
+                expectedContent: null,
+            },
+            {
+                modalType: 'Edit Program',
+                triggerText: 'Trigger Edit',
+                modalTestId: 'edit-program-modal',
+                closeTestId: 'close-edit',
+                expectedTitle: 'Edit Program Modal',
+                expectedContent: `Editing: ${mockProgram.name}`,
+            },
+            {
+                modalType: 'Delete Program',
+                triggerText: 'Trigger Delete',
+                modalTestId: 'delete-program-modal',
+                closeTestId: 'close-delete',
+                expectedTitle: 'Delete Program Modal',
+                expectedContent: `Deleting: ${mockProgram.name}`,
+            },
+        ];
 
-        it('should open the Add Program modal when the add button is clicked', () => {
-            renderAndOpenModal('Add Program');
-            expect(screen.getByTestId('add-program-modal')).toBeInTheDocument();
-            expect(screen.getByText('Add Program Modal')).toBeInTheDocument();
-        });
+        describe.each(modalTestCases)(
+            '$modalType Modal',
+            ({ triggerText, modalTestId, closeTestId, expectedTitle, expectedContent }) => {
+                it('should open correctly', () => {
+                    render(<ProgramsPageContent />);
+                    fireEvent.click(screen.getByText(triggerText));
 
-        it('should close the Add Program modal when close button is clicked', () => {
-            renderAndOpenModal('Add Program');
-            fireEvent.click(screen.getByTestId('close-add'));
-            expect(screen.queryByTestId('add-program-modal')).not.toBeInTheDocument();
-        });
+                    // Check modal opened
+                    expect(screen.getByTestId(modalTestId)).toBeInTheDocument();
+                    expect(screen.getByText(expectedTitle)).toBeInTheDocument();
 
-        it('should open the Edit Program modal when onEditProgram is triggered', () => {
-            renderAndOpenModal('Trigger Edit');
-            expect(screen.getByTestId('edit-program-modal')).toBeInTheDocument();
-            expect(screen.getByText('Edit Program Modal')).toBeInTheDocument();
-            expect(screen.getByText(`Editing: ${mockProgram.name}`)).toBeInTheDocument();
-        });
+                    if (expectedContent) {
+                        expect(screen.getByText(expectedContent)).toBeInTheDocument();
+                    }
+                });
 
-        it('should close the Edit Program modal when close button is clicked', () => {
-            renderAndOpenModal('Trigger Edit');
-            fireEvent.click(screen.getByTestId('close-edit'));
-            expect(screen.queryByTestId('edit-program-modal')).not.toBeInTheDocument();
-        });
-
-        it('should open the Delete Program modal when onDeleteProgram is triggered', () => {
-            renderAndOpenModal('Trigger Delete');
-            expect(screen.getByTestId('delete-program-modal')).toBeInTheDocument();
-            expect(screen.getByText('Delete Program Modal')).toBeInTheDocument();
-            expect(screen.getByText(`Deleting: ${mockProgram.name}`)).toBeInTheDocument();
-        });
-
-        it('should close the Delete Program modal when close button is clicked', () => {
-            renderAndOpenModal('Trigger Delete');
-            fireEvent.click(screen.getByTestId('close-delete'));
-            expect(screen.queryByTestId('delete-program-modal')).not.toBeInTheDocument();
-        });
+                it('should close when the close button is clicked', () => {
+                    render(<ProgramsPageContent />);
+                    // Open modal
+                    fireEvent.click(screen.getByText(triggerText));
+                    // Click close button
+                    fireEvent.click(screen.getByTestId(closeTestId));
+                    // Check modal closed
+                    expect(screen.queryByTestId(modalTestId)).not.toBeInTheDocument();
+                });
+            },
+        );
     });
 
     describe('Program operations', () => {

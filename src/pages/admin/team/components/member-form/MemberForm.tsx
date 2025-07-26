@@ -52,7 +52,6 @@ export const MemberForm = ({
     const handleOnSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (memberFormValues?.category && memberFormValues?.description && memberFormValues?.fullName) {
-            console.log('onValuesChange', memberFormValues);
             onSubmit(memberFormValues);
         }
     };

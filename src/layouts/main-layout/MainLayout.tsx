@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 export const MainLayout = ({ behavior = 'auto' }: { behavior?: 'auto' | 'smooth' }) => {
     const pathname = useLocation().pathname;
 
+    //TODO: temp fix for issue when after redirecting view area would not be on top
     useEffect(() => {
         window.scrollTo({
             top: 0,

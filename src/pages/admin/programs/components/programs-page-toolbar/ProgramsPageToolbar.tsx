@@ -5,6 +5,7 @@ import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { VisibilityStatus } from '../../../../../types/Common';
 import PlusIcon from '../../../../../assets/icons/plus.svg';
+import './program-page-toolbar.scss';
 
 export interface ProgramPageToolbarProps {
     onSearchQueryChange: (query: string) => void;
@@ -21,8 +22,8 @@ export const ProgramsPageToolbar = ({
 }: ProgramPageToolbarProps) => {
     return (
         <>
-            <div className="toolbar">
-                <div className="toolbar-search">
+            <div className="programs-toolbar">
+                <div className="programs-toolbar-search">
                     <Input
                         onChange={(e) => {
                             onSearchQueryChange(e);
@@ -32,7 +33,7 @@ export const ProgramsPageToolbar = ({
                         placeholder={COMMON_TEXT_ADMIN.FILTER.SEARCH_BY_NAME}
                     />
                 </div>
-                <div className="toolbar-actions">
+                <div className="programs-toolbar-actions">
                     <Select<VisibilityStatus | undefined>
                         onValueChange={onStatusFilterChange}
                         data-testid="status-filter"

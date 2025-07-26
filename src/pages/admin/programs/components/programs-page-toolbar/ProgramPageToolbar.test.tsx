@@ -7,7 +7,6 @@ import { ButtonProps } from '../../../../../components/common/button/Button';
 import { SelectProps } from '../../../../../components/common/select/Select';
 import { InputProps } from '../../../../../components/common/input/Input';
 
-// Mock the components
 jest.mock('../../../../../components/common/button/Button', () => ({
     Button: ({ children, onClick, buttonStyle, ...props }: ButtonProps) => (
         <button onClick={onClick} className={buttonStyle} {...props}>
@@ -64,7 +63,7 @@ describe('ProgramsPageToolbar', () => {
 
     it('should render the toolbar with correct CSS class', () => {
         render(<ProgramsPageToolbar {...mockProps} />);
-        const toolbar = document.querySelector('.toolbar');
+        const toolbar = document.querySelector('.programs-toolbar');
         expect(toolbar).toBeInTheDocument();
     });
 
@@ -119,8 +118,8 @@ describe('ProgramsPageToolbar', () => {
 
     it('should render toolbar sections with correct CSS classes', () => {
         render(<ProgramsPageToolbar {...mockProps} />);
-        const toolbarSearch = document.querySelector('.toolbar-search');
-        const toolbarActions = document.querySelector('.toolbar-actions');
+        const toolbarSearch = document.querySelector('.programs-toolbar-search');
+        const toolbarActions = document.querySelector('.programs-toolbar-actions');
 
         expect(toolbarSearch).toBeInTheDocument();
         expect(toolbarActions).toBeInTheDocument();

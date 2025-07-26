@@ -147,7 +147,6 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(
             } catch (error) {
                 setError(PROGRAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES);
                 setErrorType('categories');
-                console.error('Failed to fetch categories:', error);
             } finally {
                 setIsCategoriesLoading(false);
             }
@@ -155,7 +154,7 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(
 
         useEffect(() => {
             fetchCategories();
-        }, []);
+        }, [fetchCategories]);
 
         const fetchPrograms = useCallback(
             async (shouldResetPage: boolean = false) => {
@@ -214,7 +213,6 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(
 
                     setError(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAMS);
                     setErrorType('programs');
-                    console.error('Failed to fetch programs:', error);
                 } finally {
                     // Only update loading state if this request wasn't aborted
                     if (!abortController.signal.aborted) {
@@ -313,15 +311,11 @@ export const ProgramsList = forwardRef<ProgramListRef, ProgramsListProps>(
 
         // Retry function for error recovery - Added retry functionality
         const handleRetry = useCallback(() => {
-            console.log('fdfsd');
-            console.log(errorType);
             if (errorType === 'programs') {
-                console.log('1111');
                 setError(null);
                 setErrorType(null);
                 fetchPrograms(true);
             } else if (errorType === 'categories') {
-                console.log('2222');
                 setError(null);
                 setErrorType(null);
                 fetchCategories();

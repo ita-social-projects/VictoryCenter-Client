@@ -20,7 +20,7 @@ import {
     TEAM_STATUS_DRAFT,
     SEARCH_BY_NAME,
 } from '../../../../../const/team';
-import { Image, ImageValues } from '../../../../../types/Image';
+import { ImageValues } from '../../../../../types/Image';
 import { TeamCategory } from '../../../../../types/admin/TeamMembers';
 
 export type TeamPageToolbarProps = {

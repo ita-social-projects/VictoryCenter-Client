@@ -2,7 +2,6 @@ import { TeamMember, TeamMemberDto } from '../../../../../types/admin/TeamMember
 import { MemberFormValues } from '../../../../../pages/admin/team/components/member-form/MemberForm';
 import { AxiosInstance } from 'axios';
 import { Status } from '../../../../../types/Common';
-import { Image } from '../../../../../types/Image';
 import { ImagesApi } from '../../image-data-fetch/ImageDataApi';
 
 export const TeamMembersApi = {
@@ -59,7 +58,6 @@ export const TeamMembersApi = {
     },
 
     postPublished: async (client: AxiosInstance, member: MemberFormValues) => {
-        console.log(member);
         let imageId: number | null = null;
 
         if (member.image) {

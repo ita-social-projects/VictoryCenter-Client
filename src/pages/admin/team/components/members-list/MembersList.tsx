@@ -27,7 +27,6 @@ import classNames from 'classnames';
 import { DragPreviewModel } from '../../../../../types/admin/Common';
 import { TeamMember } from '../../../../../types/admin/TeamMembers';
 import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
-import { log } from 'console';
 
 export type MembersListProps = {
     searchByNameQuery: string | null;
@@ -130,12 +129,16 @@ export const MembersList = ({
                     if (ss) {
                         saved = ss;
                     }
-                    const match = categories.find((c) => c.id === saved.id);
-                    if (match) {
-                        setCategory(match);
-                    } else {
+                    const exists = categories.filter((x) => x.id === saved.id);
+                    if (!exists) {
                         setCategory(categories[0]);
                     }
+                    // const match = categories.find((c) => c.id === saved.id);
+                    // if (match) {
+                    //     setCategory(match);
+                    // } else {
+                    //     setCategory(categories[0]);
+                    // }
                 } catch (err) {
                     setCategory(categories[0]);
                 }
@@ -213,11 +216,6 @@ export const MembersList = ({
 
     useEffect(() => {
         if (pageSize === 0) return;
-        console.log(category);
-        console.log(searchByNameQuery);
-        console.log(statusFilter);
-        console.log(pageSize);
-        console.log(refetchTrigger);
 
         setMembers([]);
         setCurrentPage(1);

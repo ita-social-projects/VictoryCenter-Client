@@ -1,4 +1,5 @@
-$mulish-font-family: 'Mulish', sans-serif;
+@import "../../../../assets/sass/variables/variables.fonts";
+
 
 .abroadPaymentDetails {
     display: flex;
@@ -8,7 +9,7 @@ $mulish-font-family: 'Mulish', sans-serif;
 
 .abroadPaymentDetailsBlock {
     h2 {
-        font-family: $mulish-font-family;
+        font-family: $mulish-regular-font;
         color: #061125;
         font-weight: 700;
         font-size: 2rem;
@@ -27,12 +28,12 @@ $mulish-font-family: 'Mulish', sans-serif;
             font-weight: 600;
             font-size: 1.5rem;
             color: #061125;
-            font-family: $mulish-font-family;
+            font-family: $mulish-regular-font;
             padding-bottom: 0.125rem;
         }
 
         .label {
-            font-family: $mulish-font-family;
+            font-family: $mulish-regular-font;
             color: #061125;
             font-size: 1.125rem;
             font-weight: 400;
@@ -44,7 +45,7 @@ $mulish-font-family: 'Mulish', sans-serif;
         }
 
         .highlightedLabel {
-            font-family: $mulish-font-family;
+            font-family: $mulish-regular-font;
             font-weight: 700;
             color: #061125;
             font-size: 1.125rem;

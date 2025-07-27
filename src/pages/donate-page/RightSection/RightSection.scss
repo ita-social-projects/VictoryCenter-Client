@@ -1,4 +1,4 @@
-$mulish-font-family: 'Mulish', sans-serif;
+@import "../../../assets/sass/variables/variables.fonts";
 
 .rightSection {
     width: 33.1rem;
@@ -64,7 +64,7 @@ $mulish-font-family: 'Mulish', sans-serif;
 
 .toggleLabel {
     font-size: 1.5rem;
-    font-family: $mulish-font-family;
+    font-family: $mulish-regular-font;
     color: #061125;
     font-weight: 600;
 }

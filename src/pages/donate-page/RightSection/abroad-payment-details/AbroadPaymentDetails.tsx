@@ -1,113 +1,10 @@
 import React from 'react';
 import './AbroadPaymentDetails.scss';
-import { ABROAD_PAYMENT_DETAILS, PAYMENT_DETAILS_COMMON } from '../../../../const/donate-page/donate-page';
-import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
+import { ABROAD_PAYMENT_DETAILS } from '../../../../const/donate-page/donate-page';
+import { CorrespondentBanksSection } from './CorrespondentBanksSection';
+import { PaymentDetailsSection } from './PaymentDetailsSection';
 
-const PaymentLabelWithCopy = ({
-    label,
-    value,
-    copyValue,
-}: {
-    label: React.ReactNode;
-    value: React.ReactNode;
-    copyValue: string;
-}) => (
-    <div className="paymentLabel">
-        <h3>{label}</h3>
-        <div className="labelWithCopyButton">
-            <span className="label">{value}</span>
-            <CopyTextButton textToCopy={copyValue} />
-        </div>
-    </div>
-);
-
-const MultiFieldLabelWithCopy = ({
-    label,
-    values,
-    copyValue,
-}: {
-    label: React.ReactNode;
-    values: string[];
-    copyValue: string;
-}) => (
-    <div className="paymentLabel">
-        <h3>{label}</h3>
-        <div className="labelWithCopyButton">
-            <div>
-                {values.map((v) => (
-                    <p className="label" key={v}>
-                        {v}
-                    </p>
-                ))}
-            </div>
-            <CopyTextButton textToCopy={copyValue} />
-        </div>
-    </div>
-);
-
-const CorrespondentBankBlock = ({ title, fields }: { title: string; fields: { label: string; value: string }[] }) => (
-    <div className="paymentLabel">
-        <h3>{title}</h3>
-        <div className="labelsContainers">
-            {fields.map((f) => (
-                <div className="labelsContainer" key={`${f.label}-${f.value}`}>
-                    <div className="labelWithCopyButton">
-                        <span className="highlightedLabel">{f.label}</span>
-                        <span className="label">{f.value}</span>
-                        <CopyTextButton textToCopy={f.value} />
-                    </div>
-                </div>
-            ))}
-        </div>
-    </div>
-);
-
-const PaymentDetailsSection = ({
-    title,
-    ibanLabel,
-    ibanValue,
-}: {
-    title: string;
-    ibanLabel: string;
-    ibanValue: string;
-}) => (
-    <div className="abroadPaymentDetailsBlock">
-        <h2>{title}</h2>
-        <div className="abroadPaymentDetailsContent">
-            <PaymentLabelWithCopy
-                label={PAYMENT_DETAILS_COMMON.RECIPIENT_LABEL}
-                value={PAYMENT_DETAILS_COMMON.RECIPIENT_NAME_LABEL}
-                copyValue={PAYMENT_DETAILS_COMMON.RECIPIENT_NAME_LABEL}
-            />
-            <PaymentLabelWithCopy label={ibanLabel} value={ibanValue} copyValue={ibanValue} />
-            <PaymentLabelWithCopy
-                label={ABROAD_PAYMENT_DETAILS.SWIFT_CODE_LABEL}
-                value={ABROAD_PAYMENT_DETAILS.SWIFT_CODE_VALUE_LABEL}
-                copyValue={ABROAD_PAYMENT_DETAILS.SWIFT_CODE_VALUE_LABEL}
-            />
-            <MultiFieldLabelWithCopy
-                label={ABROAD_PAYMENT_DETAILS.BANK_RECEIVER_LABEL}
-                values={[
-                    ABROAD_PAYMENT_DETAILS.BANK_NAME_TRANSLITERATED_LABEL,
-                    ABROAD_PAYMENT_DETAILS.BANK_STREET_TRANSLITERATED_LABEL,
-                    ABROAD_PAYMENT_DETAILS.BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL,
-                ]}
-                copyValue={
-                    ABROAD_PAYMENT_DETAILS.BANK_NAME_TRANSLITERATED_LABEL +
-                    ABROAD_PAYMENT_DETAILS.BANK_STREET_TRANSLITERATED_LABEL +
-                    ABROAD_PAYMENT_DETAILS.BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL
-                }
-            />
-            <MultiFieldLabelWithCopy
-                label={ABROAD_PAYMENT_DETAILS.ADDRESS_LABEL}
-                values={[ABROAD_PAYMENT_DETAILS.COUNTRY_LABEL, ABROAD_PAYMENT_DETAILS.CITY_LABEL]}
-                copyValue={ABROAD_PAYMENT_DETAILS.COUNTRY_LABEL + ABROAD_PAYMENT_DETAILS.CITY_LABEL}
-            />
-        </div>
-    </div>
-);
-
-const USD_CORRESPONDENT_BANKS = [
+export const USD_CORRESPONDENT_BANKS = [
     {
         title: ABROAD_PAYMENT_DETAILS.JP_MORGAN_CHASE_BANK_USA_LABEL,
         fields: [
@@ -143,7 +40,7 @@ const USD_CORRESPONDENT_BANKS = [
     },
 ];
 
-const EUR_CORRESPONDENT_BANKS = [
+export const EUR_CORRESPONDENT_BANKS = [
     {
         title: ABROAD_PAYMENT_DETAILS.COMMERZBANK_AG_GERMANY_LABEL,
         fields: [
@@ -205,17 +102,6 @@ const EUR_CORRESPONDENT_BANKS = [
         ],
     },
 ];
-
-const CorrespondentBanksSection = ({ banks }: { banks: typeof USD_CORRESPONDENT_BANKS }) => (
-    <div className="abroadPaymentDetailsBlock">
-        <h2>{ABROAD_PAYMENT_DETAILS.CORRESPONDENT_BANKS_LABEL}</h2>
-        <div className="abroadPaymentDetailsContent">
-            {banks.map((bank) => (
-                <CorrespondentBankBlock key={bank.title} title={bank.title} fields={bank.fields} />
-            ))}
-        </div>
-    </div>
-);
 
 export const AbroadPaymentDetails = () => {
     return (

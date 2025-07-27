@@ -1,8 +1,8 @@
-$mulish-font-family: 'Mulish', sans-serif;
+@import "../../../../assets/sass/variables/variables.fonts";
 
 .UkrainePaymentDetails {
     h2 {
-        font-family: $mulish-font-family;
+        font-family: $mulish-regular-font;
         color: #061125;
         font-weight: 700;
         font-size: 2rem;
@@ -18,11 +18,11 @@ $mulish-font-family: 'Mulish', sans-serif;
             font-weight: 600;
             font-size: 1.5rem;
             color: #061125;
-            font-family: $mulish-font-family;
+            font-family: $mulish-regular-font;
         }
 
         .label {
-            font-family: $mulish-font-family;
+            font-family: $mulish-regular-font;
             color: #061125;
             font-size: 1.125rem;
             font-weight: 400;

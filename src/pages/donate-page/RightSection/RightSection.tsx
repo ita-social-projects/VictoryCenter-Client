@@ -8,11 +8,15 @@ import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSu
 export const RightSection = () => {
     const [isAbroad, setIsAbroad] = useState(false);
 
+    const handleOnChange = () => {
+        setIsAbroad(!isAbroad);
+    };
+
     return (
         <div className="rightSection">
             <div className="locationToggleContainer">
                 <label className="switch">
-                    <input type="checkbox" checked={isAbroad} onChange={() => setIsAbroad(!isAbroad)} />
+                    <input type="checkbox" checked={isAbroad} onChange={handleOnChange} />
                     <span className="slider round"></span>
                 </label>
                 <span className="toggleLabel">{isAbroad ? NOT_IN_UKRAINE_LABEL : IN_UKRAINE_LABEL}</span>

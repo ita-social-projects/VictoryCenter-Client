@@ -19,7 +19,6 @@
     }
 
     .team-section {
-        /* REMOVE display: flex, justify-content: center, and gap */
         width: 98%;
         border-bottom: 1px solid #ccc;
         padding-bottom: 5rem;
@@ -51,14 +50,11 @@
         }
     }
 
-    // This styles the individual member cards.
     .team-member {
         img {
             width: 100%;
             display: block;
-            // This forces every photo into the same shape.
             aspect-ratio: 3 / 4;
-            // This prevents photos from being distorted.
             object-fit: cover;
         }
 
@@ -78,18 +74,15 @@
     }
 
     .members-grid {
-        /* This rule is crucial for making the grid wrap correctly */
         overflow: hidden;
 
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-        gap: 3.5rem 2rem;
+        gap: 3.5rem 1rem;
     }
 
-    /* CORRECTED Media query for stacking the layout on smaller screens */
     @media (max-width: 1024px) {
         .team_description {
-            /* Disable the float so it stacks on top */
             float: none;
             width: 100%;
             margin-right: 0;

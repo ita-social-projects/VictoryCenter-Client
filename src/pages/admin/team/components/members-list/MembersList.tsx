@@ -52,9 +52,14 @@ export const MembersList = ({
     const [totalCount, setTotalCount] = useState<number>(0);
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [category, setCategory] = useState<TeamCategory | null>(() => {
-        const savedName = localStorage.getItem(currentTabKey);
-        return savedName as TeamCategory | null;
+    const savedName = localStorage.getItem(currentTabKey);
+    if (savedName) {
+        const s = JSON.parse(savedName) as TeamCategory;
+        return s;
+    }
+    return null;
     });
+
     const [teamCategories, setTeamCategories] = useState<TeamCategory[]>([]);
     const [isDeleteTeamMemberModalOpen, setIsDeleteTeamMemberModalOpen] = useState(false);
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -121,11 +126,11 @@ export const MembersList = ({
                     if (saved.id === undefined) {
                         ss = JSON.parse(saved);
                     }
-                    saved = ss;
-                    const match = categories.find((c) => c.id === saved.id);
-                    if (match) {
-                        setCategory(match);
-                    } else {
+                    if (ss) {
+                        saved = ss;
+                    }
+                    const exists = categories.filter((x) => x.id === saved.id);
+                    if (exists.length === 0){
                         setCategory(categories[0]);
                     }
                 } catch (err) {
@@ -204,6 +209,8 @@ export const MembersList = ({
     );
 
     useEffect(() => {
+        if (pageSize === 0) return;
+
         setMembers([]);
         setCurrentPage(1);
         setTotalPages(null);
@@ -408,6 +415,7 @@ export const MembersList = ({
             if (memberToEdit && memberIdToEdit != null) {
                 await TeamMembersApi.updateDraft(client, memberIdToEdit, memberToEdit);
                 await loadMembers(true);
+                setIsEditMemberModalOpen(false);
             }
         } catch (err) {
             onError?.((err as Error).message);

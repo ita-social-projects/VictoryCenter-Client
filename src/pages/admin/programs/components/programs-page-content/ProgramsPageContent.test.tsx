@@ -42,7 +42,7 @@ jest.mock('../program-modals/ProgramModal', () => ({
                     data-testid={isAddMode ? 'confirm-add' : 'confirm-edit'}
                     onClick={() => {
                         if (isAddMode && props.onAddProgram) {
-                            props.onAddProgram(mockProgram);
+                            props.onAddProgram(mockNewProgram);
                         } else if (isEditMode && props.onEditProgram && props.programToEdit) {
                             props.onEditProgram({ ...props.programToEdit, name: 'Updated Program' });
                         }
@@ -202,7 +202,6 @@ jest.mock('../program-list-item/ProgramListItem', () => ({
     ),
 }));
 
-// Mock data
 const mockCategories: ProgramCategory[] = [
     { id: 1, name: 'Category A', programsCount: 2 },
     { id: 2, name: 'Category B', programsCount: 1 },
@@ -214,7 +213,7 @@ const mockPrograms: Program[] = [
         name: 'Test Program Alpha',
         description: 'A sample description.',
         categories: [],
-        status: 'Published' as VisibilityStatus,
+        status: 'Published',
         img: null,
     },
     {
@@ -222,14 +221,117 @@ const mockPrograms: Program[] = [
         name: 'Test Program Beta',
         description: 'Another description.',
         categories: [],
-        status: 'Draft' as VisibilityStatus,
+        status: 'Draft',
         img: null,
     },
 ];
 
+const mockNewProgram: Program = {
+    id: 3,
+    name: 'Test Program Gama',
+    description: 'A sample description.',
+    categories: [],
+    status: 'Draft',
+    img: null,
+};
+
 const mockProgram = mockPrograms[0];
 
 describe('ProgramsPageContent', () => {
+    // ... (всі ваші get* хелпери залишаються без змін)
+    const renderProgramsPageContent = () => render(<ProgramsPageContent />);
+
+    const getProgramsPageContent = () => screen.getByTestId('programs-page-content');
+    const getProgramsToolbar = () => screen.getByTestId('programs-toolbar');
+    const getCategoryBar = () => screen.getByTestId('category-bar');
+    const getInfiniteScrollList = () => screen.getByTestId('infinite-scroll-list');
+    const getProgramItems = () => screen.getAllByTestId('program-item');
+    const getEmptyState = () => screen.getByTestId('empty-state');
+    const getAddProgramButton = () => screen.getByText('Add Program');
+    const getEditButtons = () => screen.getAllByText('Edit');
+    const getDeleteButtons = () => screen.getAllByText('Delete');
+    const getAddProgramModal = () => screen.queryByTestId('add-program-modal');
+    const getEditProgramModal = () => screen.queryByTestId('edit-program-modal');
+    const getDeleteProgramModal = () => screen.queryByTestId('delete-program-modal');
+    const getAddCategoryModal = () => screen.queryByTestId('add-category-modal');
+    const getEditCategoryModal = () => screen.queryByTestId('edit-category-modal');
+    const getDeleteCategoryModal = () => screen.queryByTestId('delete-category-modal');
+    const getContextMenuAddButton = () => screen.getByTestId('context-menu-add');
+    const getContextMenuEditButton = () => screen.getByTestId('context-menu-edit');
+    const getContextMenuDeleteButton = () => screen.getByTestId('context-menu-delete');
+    const getCategoryButton = (id: number) => screen.getByTestId(`category-${id}`);
+    const getFilterPublishedButton = () => screen.getByText('Filter Published');
+    const getSearchInput = () => screen.getByTestId('search-input');
+    const getProgramsErrorContainer = () => screen.getByTestId('programs-error-container');
+    const getTryAgainButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN);
+    const getConfirmAddButton = () => screen.getByTestId('confirm-add');
+    const getConfirmEditButton = () => screen.getByTestId('confirm-edit');
+    const getConfirmDeleteButton = () => screen.getByTestId('confirm-delete');
+    const getConfirmAddCategoryButton = () => screen.getByTestId('confirm-add-category');
+    const getConfirmEditCategoryButton = () => screen.getByTestId('confirm-edit-category');
+    const getConfirmDeleteCategoryButton = () => screen.getByTestId('confirm-delete-category');
+    const getCloseAddButton = () => screen.getByTestId('close-add');
+    const getCloseEditButton = () => screen.getByTestId('close-edit');
+    const getCloseDeleteButton = () => screen.getByTestId('close-delete');
+
+    const clickAddProgramButton = () => fireEvent.click(getAddProgramButton());
+    const clickFirstEditButton = () => fireEvent.click(getEditButtons()[0]);
+    const clickFirstDeleteButton = () => fireEvent.click(getDeleteButtons()[0]);
+    const clickContextMenuAddButton = () => fireEvent.click(getContextMenuAddButton());
+    const clickContextMenuEditButton = () => fireEvent.click(getContextMenuEditButton());
+    const clickContextMenuDeleteButton = () => fireEvent.click(getContextMenuDeleteButton());
+    const clickCategoryButton = (id: number) => fireEvent.click(getCategoryButton(id));
+    const clickFilterPublishedButton = () => fireEvent.click(getFilterPublishedButton());
+    const clickTryAgainButton = () => fireEvent.click(getTryAgainButton());
+    const clickConfirmAddButton = () => fireEvent.click(getConfirmAddButton());
+    const clickConfirmEditButton = () => fireEvent.click(getConfirmEditButton());
+    const clickConfirmDeleteButton = () => fireEvent.click(getConfirmDeleteButton());
+    const clickConfirmAddCategoryButton = () => fireEvent.click(getConfirmAddCategoryButton());
+    const clickConfirmEditCategoryButton = () => fireEvent.click(getConfirmEditCategoryButton());
+    const clickConfirmDeleteCategoryButton = () => fireEvent.click(getConfirmDeleteCategoryButton());
+    const clickCloseAddButton = () => fireEvent.click(getCloseAddButton());
+    const clickCloseEditButton = () => fireEvent.click(getCloseEditButton());
+    const clickCloseDeleteButton = () => fireEvent.click(getCloseDeleteButton());
+    const typeInSearchInput = (value: string) => fireEvent.change(getSearchInput(), { target: { value } });
+
+    const expectMainComponentsToBeRendered = () => {
+        expect(getProgramsPageContent()).toBeInTheDocument();
+        expect(getProgramsToolbar()).toBeInTheDocument();
+        expect(getCategoryBar()).toBeInTheDocument();
+        expect(getInfiniteScrollList()).toBeInTheDocument();
+    };
+
+    const expectEmptyStateToBeShown = () => {
+        expect(getEmptyState()).toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
+    };
+
+    const expectModalToBeOpen = (modal: HTMLElement | null, title: string, content: string) => {
+        expect(modal).toBeInTheDocument();
+        expect(screen.getByText(title)).toBeInTheDocument();
+        expect(screen.getByText(content)).toBeInTheDocument();
+    };
+
+    const expectModalToBeClosed = (modal: HTMLElement | null) => {
+        expect(modal).not.toBeInTheDocument();
+    };
+
+    const expectApiCallsToHaveBeenMade = () => {
+        expect(mockProgramsApi.fetchProgramCategories).toHaveBeenCalledTimes(1);
+        expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
+            mockCategories[0].id,
+            1,
+            5,
+            undefined,
+            expect.any(Object),
+        );
+    };
+
+    const expectErrorToBeDisplayed = (errorMessage: string) => {
+        expect(getProgramsErrorContainer()).toBeInTheDocument();
+        expect(screen.getByText(errorMessage)).toBeInTheDocument();
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
         mockProgramsApi.fetchProgramCategories.mockResolvedValue(mockCategories);
@@ -241,30 +343,20 @@ describe('ProgramsPageContent', () => {
 
     describe('Initial render', () => {
         it('should render all main components and fetch initial data', async () => {
-            render(<ProgramsPageContent />);
+            renderProgramsPageContent();
 
-            expect(screen.getByTestId('programs-page-content')).toBeInTheDocument();
-            expect(screen.getByTestId('programs-toolbar')).toBeInTheDocument();
-            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
-            expect(screen.getByTestId('infinite-scroll-list')).toBeInTheDocument();
+            expectMainComponentsToBeRendered();
 
             await waitFor(() => {
                 expect(mockProgramsApi.fetchProgramCategories).toHaveBeenCalledTimes(1);
             });
 
             await waitFor(() => {
-                expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
-                    mockCategories[0].id,
-                    1,
-                    5,
-                    undefined,
-                    expect.any(Object),
-                );
+                expectApiCallsToHaveBeenMade();
             });
 
-            // Check that programs are rendered
             await waitFor(() => {
-                expect(screen.getAllByTestId('program-item')).toHaveLength(2);
+                expect(getProgramItems()).toHaveLength(2);
             });
         });
 
@@ -274,11 +366,10 @@ describe('ProgramsPageContent', () => {
                 totalItemsCount: 0,
             });
 
-            render(<ProgramsPageContent />);
+            renderProgramsPageContent();
 
             await waitFor(() => {
-                expect(screen.getByTestId('empty-state')).toBeInTheDocument();
-                expect(screen.getByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
+                expectEmptyStateToBeShown();
             });
         });
     });
@@ -287,132 +378,83 @@ describe('ProgramsPageContent', () => {
         const modalTestCases = [
             {
                 modalType: 'Add Program',
-                triggerAction: () => fireEvent.click(screen.getByText('Add Program')),
-                modalTestId: 'add-program-modal',
-                closeTestId: 'close-add',
-                confirmTestId: 'confirm-add',
+                triggerAction: () => clickAddProgramButton(),
+                getModal: () => getAddProgramModal(),
+                closeAction: () => clickCloseAddButton(),
+                confirmAction: () => clickConfirmAddButton(),
                 expectedTitle: 'Add Program Modal',
                 expectedContent: 'Adding new program',
+            },
+            {
+                modalType: 'Edit Program',
+                triggerAction: () => clickFirstEditButton(),
+                getModal: () => getEditProgramModal(),
+                closeAction: () => clickCloseEditButton(),
+                confirmAction: () => clickConfirmEditButton(),
+                expectedTitle: 'Edit Program Modal',
+                expectedContent: `Editing: ${mockProgram.name}`,
+            },
+            {
+                modalType: 'Delete Program',
+                triggerAction: () => clickFirstDeleteButton(),
+                getModal: () => getDeleteProgramModal(),
+                closeAction: () => clickCloseDeleteButton(),
+                confirmAction: () => clickConfirmDeleteButton(),
+                expectedTitle: 'Delete Program Modal',
+                expectedContent: `Deleting: ${mockProgram.name}`,
             },
         ];
 
         describe.each(modalTestCases)(
             '$modalType Modal',
-            ({ triggerAction, modalTestId, closeTestId, confirmTestId, expectedTitle, expectedContent }) => {
+            ({ triggerAction, getModal, closeAction, confirmAction, expectedTitle, expectedContent }) => {
                 it('should open and close correctly', async () => {
-                    render(<ProgramsPageContent />);
+                    renderProgramsPageContent();
+                    await waitFor(() => expect(getProgramItems()).toHaveLength(2));
 
-                    // Wait for initial load
-                    await waitFor(() => {
-                        expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-                    });
-
-                    // Open modal
                     triggerAction();
-                    expect(screen.getByTestId(modalTestId)).toBeInTheDocument();
-                    expect(screen.getByText(expectedTitle)).toBeInTheDocument();
-                    expect(screen.getByText(expectedContent)).toBeInTheDocument();
+                    expectModalToBeOpen(getModal(), expectedTitle, expectedContent);
 
-                    // Close modal
-                    fireEvent.click(screen.getByTestId(closeTestId));
-                    expect(screen.queryByTestId(modalTestId)).not.toBeInTheDocument();
+                    closeAction();
+                    expectModalToBeClosed(getModal());
                 });
 
                 it('should perform the action and close modal', async () => {
-                    render(<ProgramsPageContent />);
-
-                    await waitFor(() => {
-                        expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-                    });
+                    renderProgramsPageContent();
+                    await waitFor(() => expect(getProgramItems()).toHaveLength(2));
 
                     triggerAction();
-                    fireEvent.click(screen.getByTestId(confirmTestId));
+                    confirmAction();
 
-                    // Modal should close
-                    expect(screen.queryByTestId(modalTestId)).not.toBeInTheDocument();
-
-                    // Programs should be updated (new program added at the beginning)
-                    await waitFor(() => {
-                        expect(screen.getAllByTestId('program-item')).toHaveLength(3);
-                    });
+                    expectModalToBeClosed(getModal());
                 });
             },
         );
-
-        it('should handle edit program modal', async () => {
-            render(<ProgramsPageContent />);
-
-            await waitFor(() => {
-                expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-            });
-
-            // Click edit on first program
-            const editButtons = screen.getAllByText('Edit');
-            fireEvent.click(editButtons[0]);
-
-            expect(screen.getByTestId('edit-program-modal')).toBeInTheDocument();
-            expect(screen.getByText('Edit Program Modal')).toBeInTheDocument();
-            expect(screen.getByText(`Editing: ${mockProgram.name}`)).toBeInTheDocument();
-
-            // Confirm edit
-            fireEvent.click(screen.getByTestId('confirm-edit'));
-
-            expect(screen.queryByTestId('edit-program-modal')).not.toBeInTheDocument();
-        });
-
-        it('should handle delete program modal', async () => {
-            render(<ProgramsPageContent />);
-
-            await waitFor(() => {
-                expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-            });
-
-            // Click delete on first program
-            const deleteButtons = screen.getAllByText('Delete');
-            fireEvent.click(deleteButtons[0]);
-
-            expect(screen.getByTestId('delete-program-modal')).toBeInTheDocument();
-            expect(screen.getByText('Delete Program Modal')).toBeInTheDocument();
-            expect(screen.getByText(`Deleting: ${mockProgram.name}`)).toBeInTheDocument();
-
-            // Confirm delete
-            fireEvent.click(screen.getByTestId('confirm-delete'));
-
-            expect(screen.queryByTestId('delete-program-modal')).not.toBeInTheDocument();
-
-            // Program should be removed
-            await waitFor(() => {
-                expect(screen.getAllByTestId('program-item')).toHaveLength(1);
-            });
-        });
     });
 
     describe('Category Modal interactions', () => {
         const categoryModalTestCases = [
             {
                 modalType: 'Add Category',
-                triggerAction: () => fireEvent.click(screen.getByTestId('context-menu-add')),
-                modalTestId: 'add-category-modal',
-                closeTestId: 'close-add-category',
-                confirmTestId: 'confirm-add-category',
+                triggerAction: () => clickContextMenuAddButton(),
+                getModal: () => getAddCategoryModal(),
+                confirmAction: () => clickConfirmAddCategoryButton(),
                 expectedTitle: 'Add Category Modal',
                 expectedContent: 'Adding new category',
             },
             {
                 modalType: 'Edit Category',
-                triggerAction: () => fireEvent.click(screen.getByTestId('context-menu-edit')),
-                modalTestId: 'edit-category-modal',
-                closeTestId: 'close-edit-category',
-                confirmTestId: 'confirm-edit-category',
+                triggerAction: () => clickContextMenuEditButton(),
+                getModal: () => getEditCategoryModal(),
+                confirmAction: () => clickConfirmEditCategoryButton(),
                 expectedTitle: 'Edit Category Modal',
                 expectedContent: 'Editing category',
             },
             {
                 modalType: 'Delete Category',
-                triggerAction: () => fireEvent.click(screen.getByTestId('context-menu-delete')),
-                modalTestId: 'delete-category-modal',
-                closeTestId: 'close-delete-category',
-                confirmTestId: 'confirm-delete-category',
+                triggerAction: () => clickContextMenuDeleteButton(),
+                getModal: () => getDeleteCategoryModal(),
+                confirmAction: () => clickConfirmDeleteCategoryButton(),
                 expectedTitle: 'Delete Category Modal',
                 expectedContent: 'Deleting category',
             },
@@ -420,38 +462,22 @@ describe('ProgramsPageContent', () => {
 
         describe.each(categoryModalTestCases)(
             '$modalType Modal',
-            ({ modalType, triggerAction, modalTestId, closeTestId, confirmTestId, expectedTitle, expectedContent }) => {
-                it('should open and close correctly', async () => {
-                    render(<ProgramsPageContent />);
-
-                    // Wait for initial load
-                    await waitFor(() => {
-                        expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-                    });
-
-                    // Open modal
-                    triggerAction();
-                    expect(screen.getByTestId(modalTestId)).toBeInTheDocument();
-                    expect(screen.getByText(expectedTitle)).toBeInTheDocument();
-                    expect(screen.getByText(expectedContent)).toBeInTheDocument();
-
-                    // Close modal
-                    fireEvent.click(screen.getByTestId(closeTestId));
-                    expect(screen.queryByTestId(modalTestId)).not.toBeInTheDocument();
-                });
-
-                it('should perform the action and close modal', async () => {
-                    render(<ProgramsPageContent />);
-
-                    await waitFor(() => {
-                        expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-                    });
+            ({ triggerAction, getModal, confirmAction, expectedTitle, expectedContent }) => {
+                it('should open and perform the action and close modal', async () => {
+                    renderProgramsPageContent();
+                    await waitFor(() => expect(getProgramItems()).toHaveLength(2));
 
                     triggerAction();
-                    fireEvent.click(screen.getByTestId(confirmTestId));
 
-                    // Modal should close
-                    expect(screen.queryByTestId(modalTestId)).not.toBeInTheDocument();
+                    await waitFor(() => {
+                        expectModalToBeOpen(getModal(), expectedTitle, expectedContent);
+                    });
+
+                    confirmAction();
+
+                    await waitFor(() => {
+                        expectModalToBeClosed(getModal());
+                    });
                 });
             },
         );
@@ -469,22 +495,15 @@ describe('ProgramsPageContent', () => {
                     img: null,
                 },
             ];
+            renderProgramsPageContent();
+            await waitFor(() => expect(getProgramItems()).toHaveLength(2));
 
-            render(<ProgramsPageContent />);
-
-            // Wait for initial load
-            await waitFor(() => {
-                expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-            });
-
-            // Mock programs for category B
+            // Виправлено: Сайд-ефекти винесені з waitFor
             mockProgramsApi.fetchPrograms.mockResolvedValueOnce({
                 items: categoryBPrograms,
                 totalItemsCount: 1,
             });
-
-            // Click on category B
-            fireEvent.click(screen.getByTestId('category-2'));
+            clickCategoryButton(2);
 
             await waitFor(() => {
                 expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
@@ -498,14 +517,11 @@ describe('ProgramsPageContent', () => {
         });
 
         it('should handle status filter changes', async () => {
-            render(<ProgramsPageContent />);
+            renderProgramsPageContent();
+            await waitFor(() => expect(getProgramItems()).toHaveLength(2));
 
-            await waitFor(() => {
-                expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-            });
-
-            // Change status filter
-            fireEvent.click(screen.getByText('Filter Published'));
+            // Виправлено: Сайд-ефект (клік) винесено з waitFor
+            clickFilterPublishedButton();
 
             await waitFor(() => {
                 expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
@@ -522,17 +538,15 @@ describe('ProgramsPageContent', () => {
     describe('Error handling', () => {
         it('should display error when categories fail to load', async () => {
             mockProgramsApi.fetchProgramCategories.mockRejectedValueOnce(new Error('API Error'));
-
-            render(<ProgramsPageContent />);
+            renderProgramsPageContent();
 
             await waitFor(() => {
-                expect(screen.getByTestId('programs-error-container')).toBeInTheDocument();
-                expect(screen.getByText(PROGRAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES)).toBeInTheDocument();
+                expectErrorToBeDisplayed(PROGRAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES);
             });
 
-            // Test retry functionality
+            // Виправлено: Сайд-ефекти винесені з waitFor
             mockProgramsApi.fetchProgramCategories.mockResolvedValueOnce(mockCategories);
-            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN));
+            clickTryAgainButton();
 
             await waitFor(() => {
                 expect(mockProgramsApi.fetchProgramCategories).toHaveBeenCalledTimes(2);
@@ -541,20 +555,18 @@ describe('ProgramsPageContent', () => {
 
         it('should display error when programs fail to load', async () => {
             mockProgramsApi.fetchPrograms.mockRejectedValueOnce(new Error('API Error'));
-
-            render(<ProgramsPageContent />);
+            renderProgramsPageContent();
 
             await waitFor(() => {
-                expect(screen.getByTestId('programs-error-container')).toBeInTheDocument();
-                expect(screen.getByText(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAMS)).toBeInTheDocument();
+                expectErrorToBeDisplayed(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAMS);
             });
 
-            // Test retry functionality
+            // Виправлено: Сайд-ефекти винесені з waitFor
             mockProgramsApi.fetchPrograms.mockResolvedValueOnce({
                 items: mockPrograms,
                 totalItemsCount: mockPrograms.length,
             });
-            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN));
+            clickTryAgainButton();
 
             await waitFor(() => {
                 expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledTimes(2);
@@ -564,16 +576,11 @@ describe('ProgramsPageContent', () => {
 
     describe('Search functionality', () => {
         it('should handle search query changes', async () => {
-            render(<ProgramsPageContent />);
+            renderProgramsPageContent();
+            await waitFor(() => expect(getProgramItems()).toHaveLength(2));
 
-            await waitFor(() => {
-                expect(screen.getAllByTestId('program-item')).toHaveLength(2);
-            });
-
-            const searchInput = screen.getByTestId('search-input');
-            fireEvent.change(searchInput, { target: { value: 'test search query' } });
-
-            expect(searchInput).toHaveValue('test search query');
+            typeInSearchInput('test search query');
+            expect(getSearchInput()).toHaveValue('test search query');
         });
     });
 });

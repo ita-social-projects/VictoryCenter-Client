@@ -114,7 +114,6 @@ describe('ProgramListItem', () => {
     it('displays published tooltip text and categories for published program', () => {
         renderProgramListItem();
 
-        // Використання константи замість hardcoded text
         expect(getPublishedTooltipText()).toBeInTheDocument();
         expect(screen.getByText('Category 1')).toBeInTheDocument();
         expect(screen.getByText('Category 2')).toBeInTheDocument();

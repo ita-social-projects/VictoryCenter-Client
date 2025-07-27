@@ -19,7 +19,6 @@ const PAGE_SIZE = 5;
 
 export const ProgramsPageContent = () => {
     // UI state
-    const [searchByNameTerm, setSearchByNameTerm] = useState<string>('');
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [autocompleteValues] = useState<string[]>([]);
 
@@ -187,9 +186,7 @@ export const ProgramsPageContent = () => {
     }, []);
 
     // Toolbar handlers
-    const handleSearchQueryByName = useCallback((query: string) => {
-        setSearchByNameTerm(query);
-    }, []);
+    const handleSearchQueryByName = useCallback((query: string) => {}, []);
 
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
         setStatusFilter(status);

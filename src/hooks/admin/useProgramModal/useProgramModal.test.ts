@@ -6,14 +6,12 @@ import { Program } from '../../../types/ProgramAdminPage';
 import { VisibilityStatus } from '../../../types/Common';
 import { ProgramFormValues } from '../../../pages/admin/programs/components/program-form/ProgramForm';
 
-// Mock dependencies
 jest.mock('../../../services/api/admin/programs/programs-api');
 jest.mock('../../../const/admin/programs');
 
 const mockProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 const mockProgramsText = PROGRAMS_TEXT as jest.Mocked<typeof PROGRAMS_TEXT>;
 
-// Mock data
 const mockProgram: Program = {
     id: 1,
     name: 'Test Program',
@@ -40,7 +38,6 @@ const mockFormRef = {
     },
 };
 
-// Setup default props
 const defaultProps = {
     isOpen: true,
     onSuccess: jest.fn(),

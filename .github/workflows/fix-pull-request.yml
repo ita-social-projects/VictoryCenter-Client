@@ -110,8 +110,8 @@ jobs:
         INITIAL_ADMIN_PASSWORD: ${{ secrets.INITIAL_ADMIN_PASSWORD }}
         JWTOPTIONS_SECRETKEY: ${{ secrets.JWTOPTIONS_SECRETKEY }}
         JWTOPTIONS_REFRESH_TOKEN_SECRETKEY: ${{ secrets.JWTOPTIONS_REFRESH_TOKEN_SECRETKEY }}
-        DOCKER_TAG_FRONTEND: ${{ steps.frontend_tag.outputs.frontend_tag }}
-        DOCKER_TAG_BACKEND: ${GITHUB_REF##*/}.${RUN_NUM}
+        DOCKER_TAG_FRONTEND: ${GITHUB_REF##*/}.${RUN_NUM}
+        DOCKER_TAG_BACKEND: ${{ steps.backend_tag.outputs.backend_tag }}
         DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
       run: |
         docker compose up -d

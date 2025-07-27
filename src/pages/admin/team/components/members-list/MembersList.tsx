@@ -130,7 +130,7 @@ export const MembersList = ({
                         saved = ss;
                     }
                     const exists = categories.filter((x) => x.id === saved.id);
-                    if (!exists) {
+                    if (exists.length === 0) {
                         setCategory(categories[0]);
                     }
                     // const match = categories.find((c) => c.id === saved.id);

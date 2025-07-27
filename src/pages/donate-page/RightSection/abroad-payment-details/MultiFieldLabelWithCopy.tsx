@@ -14,8 +14,8 @@ export const MultiFieldLabelWithCopy = ({
         <h3>{label}</h3>
         <div className="labelWithCopyButton">
             <div>
-                {values.map((v) => (
-                    <p className="label" key={v}>
+                {values.map((v, index) => (
+                    <p className="label" key={`${v}-${index}`}>
                         {v}
                     </p>
                 ))}

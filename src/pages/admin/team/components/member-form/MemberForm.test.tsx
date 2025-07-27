@@ -5,8 +5,6 @@ import { MemberForm, MemberFormProps, MemberFormValues } from './MemberForm';
 import { AdminContext } from '../../../../../context/admin-context-provider/AdminContextProvider';
 import axios from 'axios';
 import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
-import { Image, ImageValues } from '../../../../../types/Image';
-import { mapImageToBase64 } from '../../../../../utils/functions/mapImageToBase64';
 
 jest.mock('../../../../../assets/icons/cloud-download.svg', () => 'cloud-download.svg');
 

@@ -133,12 +133,6 @@ export const MembersList = ({
                     if (exists.length === 0) {
                         setCategory(categories[0]);
                     }
-                    // const match = categories.find((c) => c.id === saved.id);
-                    // if (match) {
-                    //     setCategory(match);
-                    // } else {
-                    //     setCategory(categories[0]);
-                    // }
                 } catch (err) {
                     setCategory(categories[0]);
                 }

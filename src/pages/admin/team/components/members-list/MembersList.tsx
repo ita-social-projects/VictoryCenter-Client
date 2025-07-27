@@ -27,6 +27,7 @@ import classNames from 'classnames';
 import { DragPreviewModel } from '../../../../../types/admin/Common';
 import { TeamMember } from '../../../../../types/admin/TeamMembers';
 import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
+import { log } from 'console';
 
 export type MembersListProps = {
     searchByNameQuery: string | null;
@@ -53,8 +54,13 @@ export const MembersList = ({
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [category, setCategory] = useState<TeamCategory | null>(() => {
         const savedName = localStorage.getItem(currentTabKey);
-        return savedName as TeamCategory | null;
+        if (savedName) {
+            const s = JSON.parse(savedName) as TeamCategory;
+            return s;
+        }
+        return null;
     });
+
     const [teamCategories, setTeamCategories] = useState<TeamCategory[]>([]);
     const [isDeleteTeamMemberModalOpen, setIsDeleteTeamMemberModalOpen] = useState(false);
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -121,7 +127,9 @@ export const MembersList = ({
                     if (saved.id === undefined) {
                         ss = JSON.parse(saved);
                     }
-                    saved = ss;
+                    if (ss) {
+                        saved = ss;
+                    }
                     const match = categories.find((c) => c.id === saved.id);
                     if (match) {
                         setCategory(match);
@@ -204,6 +212,13 @@ export const MembersList = ({
     );
 
     useEffect(() => {
+        if (pageSize === 0) return;
+        console.log(category);
+        console.log(searchByNameQuery);
+        console.log(statusFilter);
+        console.log(pageSize);
+        console.log(refetchTrigger);
+
         setMembers([]);
         setCurrentPage(1);
         setTotalPages(null);

@@ -163,6 +163,8 @@ export const ProgramsPageContent = () => {
 
     // Reset and fetch programs when category or filter changes
     useEffect(() => {
+        if (!selectedCategory) return;
+
         setPrograms([]);
         setCurrentPage(1);
         setTotalItems(null);

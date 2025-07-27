@@ -52,12 +52,12 @@ export const MembersList = ({
     const [totalCount, setTotalCount] = useState<number>(0);
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [category, setCategory] = useState<TeamCategory | null>(() => {
-    const savedName = localStorage.getItem(currentTabKey);
-    if (savedName) {
-        const s = JSON.parse(savedName) as TeamCategory;
-        return s;
-    }
-    return null;
+        const savedName = localStorage.getItem(currentTabKey);
+        if (savedName) {
+            const s = JSON.parse(savedName) as TeamCategory;
+            return s;
+        }
+        return null;
     });
 
     const [teamCategories, setTeamCategories] = useState<TeamCategory[]>([]);
@@ -130,7 +130,7 @@ export const MembersList = ({
                         saved = ss;
                     }
                     const exists = categories.filter((x) => x.id === saved.id);
-                    if (exists.length === 0){
+                    if (exists.length === 0) {
                         setCategory(categories[0]);
                     }
                 } catch (err) {

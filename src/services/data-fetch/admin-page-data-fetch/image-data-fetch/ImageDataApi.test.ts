@@ -23,13 +23,10 @@ describe('fetchImageDataApi', () => {
         mockClient.get.mockResolvedValue({ data: mockImage });
 
         const image = await ImagesApi.get(mockClient, 1);
-        expect(image).toEqual({
-            id: 1,
-            base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+iF9kAAAAASUVORK5CYII=',
-            mimeType: 'image/png',
-        });
+        expect(mockClient.get).toHaveBeenCalledWith('/Image/1');
+        expect(image).toEqual(mockImage);
     });
-    it('should post image ', async () => {
+    it('should post image', async () => {
         mockClient.post.mockResolvedValue({ data: mockImage });
 
         const result = await ImagesApi.post(mockClient, imageValue);
@@ -41,7 +38,7 @@ describe('fetchImageDataApi', () => {
         expect(result).toEqual(mockImage);
     });
 
-    it('should update image ', async () => {
+    it('should update image', async () => {
         mockClient.put.mockResolvedValue({ data: mockImage });
 
         const result = await ImagesApi.put(mockClient, imageValue, 1);
@@ -54,7 +51,7 @@ describe('fetchImageDataApi', () => {
     });
 
     it('should delete the image', async () => {
-        var id = 1;
+        const id = 1;
         mockClient.delete.mockResolvedValue({ data: id });
 
         const result = await ImagesApi.delete(mockClient, id);

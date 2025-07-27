@@ -40,39 +40,11 @@ export const TeamMembersApi = {
     },
 
     postDraft: async (client: AxiosInstance, member: MemberFormValues) => {
-        let imageId: number | null = null;
-
-        if (member.image) {
-            const imageResult = await ImagesApi.post(client, member.image);
-            imageId = imageResult.id;
-        }
-
-        await client.post(`/TeamMembers`, {
-            fullName: member.fullName,
-            categoryId: member.category.id,
-            status: Status.Draft,
-            description: member.description,
-            email: '', // TODO: implement email post
-            imageId: imageId,
-        });
+        await TeamMembersApi.postMember(client, member, Status.Draft);
     },
 
     postPublished: async (client: AxiosInstance, member: MemberFormValues) => {
-        let imageId: number | null = null;
-
-        if (member.image) {
-            const imageResult = await ImagesApi.post(client, member.image);
-            imageId = imageResult.id;
-        }
-
-        await client.post(`/TeamMembers`, {
-            fullName: member.fullName,
-            categoryId: member.category.id,
-            status: Status.Published,
-            description: member.description,
-            email: '', //TODO implement email post
-            imageId: imageId,
-        });
+        await TeamMembersApi.postMember(client, member, Status.Published);
     },
 
     delete: async (client: AxiosInstance, id: number) => {
@@ -115,6 +87,22 @@ export const TeamMembersApi = {
         if (imageIdToDelete && imageIdToDelete !== finalImageId) {
             await ImagesApi.delete(client, imageIdToDelete);
         }
+    },
+
+    postMember: async (client: AxiosInstance, member: MemberFormValues, status: Status) => {
+        let imageId: number | null = null;
+        if (member.image) {
+            const imageResult = await ImagesApi.post(client, member.image);
+            imageId = imageResult.id;
+        }
+        await client.post(`/TeamMembers`, {
+            fullName: member.fullName,
+            categoryId: member.category.id,
+            status: status,
+            description: member.description,
+            email: '', // TODO: implement email post
+            imageId: imageId,
+        });
     },
 };
 

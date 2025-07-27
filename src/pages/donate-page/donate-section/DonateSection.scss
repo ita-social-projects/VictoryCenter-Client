@@ -1,4 +1,4 @@
-$mulish-font-family: 'Mulish', sans-serif;
+@import "../../../assets/sass/variables/variables.fonts";
 
 .donateSection {
     background-color: white;
@@ -19,7 +19,7 @@ $mulish-font-family: 'Mulish', sans-serif;
 
         .donateTab {
             background-color: transparent;
-            font-family: $mulish-font-family;
+            font-family: $mulish-regular-font;
             font-size: 1.125rem;
             font-weight: 600;
             color: #939699;
@@ -57,7 +57,7 @@ $mulish-font-family: 'Mulish', sans-serif;
             min-height: 5rem;
             font-size: 4rem;
             font-weight: 500;
-            font-family: $mulish-font-family;
+            font-family: $mulish-regular-font;
             color: #1f1919;
         }
 
@@ -107,7 +107,7 @@ $mulish-font-family: 'Mulish', sans-serif;
         .currencyText {
             font-size: 2rem;
             font-weight: 700;
-            font-family: $mulish-font-family;
+            font-family: $mulish-regular-font;
         }
 
         .arrowIcon {
@@ -130,7 +130,7 @@ $mulish-font-family: 'Mulish', sans-serif;
             border-radius: 2.69rem;
             width: 7.67rem;
             height: 3.19rem;
-            font-family: $mulish-font-family;
+            font-family: $mulish-regular-font;
             font-size: 1.125rem;
             color: #061125;
             font-weight: 600;
@@ -148,7 +148,7 @@ $mulish-font-family: 'Mulish', sans-serif;
         margin-right: 1.5rem;
         min-height: 2.75rem;
         color: white;
-        font-family: $mulish-font-family;
+        font-family: $mulish-regular-font;
         font-size: 1.125rem;
         font-weight: 700;
         background-color: #061125;

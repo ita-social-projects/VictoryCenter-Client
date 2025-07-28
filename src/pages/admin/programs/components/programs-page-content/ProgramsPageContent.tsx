@@ -255,7 +255,7 @@ export const ProgramsPageContent = () => {
     }, []);
 
     // Toolbar handlers
-    const handleSearchQueryByName = useCallback((query: string) => {
+    const handleSearchQueryByName = useCallback((_: string) => {
         // TODO: Finish search by name
     }, []);
 

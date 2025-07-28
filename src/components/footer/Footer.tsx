@@ -102,9 +102,7 @@ export const Footer = () => {
                     <Link to={teamPageRoute} className="disable">
                         {WHAT_IS_HIPPOTHERAPY}
                     </Link>
-                    <Link to={teamPageRoute} className="disable">
-                        {PROGRAMS}
-                    </Link>
+                    <Link to={teamPageRoute}>{PROGRAMS}</Link>
                     <Link to={teamPageRoute} className="disable">
                         {PROGRAMS_SESSIONS}
                     </Link>

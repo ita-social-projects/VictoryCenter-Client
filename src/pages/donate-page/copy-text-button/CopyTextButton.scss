@@ -1,0 +1,17 @@
+.copyTextButton {
+    border: none;
+    cursor: pointer;
+    width: 1.25rem;
+    height: 1.25rem;
+    stroke: #939699;
+    opacity: 0.6;
+    background-image: url("../../../assets/icons/copy.svg");
+}
+
+.copyTextButton:hover {
+    opacity: 1;
+}
+
+.copyTextButton:active {
+    stroke: black;
+}

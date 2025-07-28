@@ -238,7 +238,6 @@ const mockNewProgram: Program = {
 const mockProgram = mockPrograms[0];
 
 describe('ProgramsPageContent', () => {
-    // ... (всі ваші get* хелпери залишаються без змін)
     const renderProgramsPageContent = () => render(<ProgramsPageContent />);
 
     const getProgramsPageContent = () => screen.getByTestId('programs-page-content');
@@ -320,7 +319,7 @@ describe('ProgramsPageContent', () => {
         expect(mockProgramsApi.fetchProgramCategories).toHaveBeenCalledTimes(1);
         expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
             mockCategories[0].id,
-            1,
+            0,
             5,
             undefined,
             expect.any(Object),
@@ -498,7 +497,6 @@ describe('ProgramsPageContent', () => {
             renderProgramsPageContent();
             await waitFor(() => expect(getProgramItems()).toHaveLength(2));
 
-            // Виправлено: Сайд-ефекти винесені з waitFor
             mockProgramsApi.fetchPrograms.mockResolvedValueOnce({
                 items: categoryBPrograms,
                 totalItemsCount: 1,
@@ -508,7 +506,7 @@ describe('ProgramsPageContent', () => {
             await waitFor(() => {
                 expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
                     mockCategories[1].id,
-                    1,
+                    0,
                     5,
                     undefined,
                     expect.any(Object),
@@ -520,13 +518,12 @@ describe('ProgramsPageContent', () => {
             renderProgramsPageContent();
             await waitFor(() => expect(getProgramItems()).toHaveLength(2));
 
-            // Виправлено: Сайд-ефект (клік) винесено з waitFor
             clickFilterPublishedButton();
 
             await waitFor(() => {
                 expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
                     mockCategories[0].id,
-                    1,
+                    0,
                     5,
                     'Published',
                     expect.any(Object),
@@ -544,7 +541,6 @@ describe('ProgramsPageContent', () => {
                 expectErrorToBeDisplayed(PROGRAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES);
             });
 
-            // Виправлено: Сайд-ефекти винесені з waitFor
             mockProgramsApi.fetchProgramCategories.mockResolvedValueOnce(mockCategories);
             clickTryAgainButton();
 
@@ -561,7 +557,6 @@ describe('ProgramsPageContent', () => {
                 expectErrorToBeDisplayed(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAMS);
             });
 
-            // Виправлено: Сайд-ефекти винесені з waitFor
             mockProgramsApi.fetchPrograms.mockResolvedValueOnce({
                 items: mockPrograms,
                 totalItemsCount: mockPrograms.length,

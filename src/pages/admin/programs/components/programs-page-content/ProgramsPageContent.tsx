@@ -1,15 +1,15 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Program, ProgramCategory } from '../../../../../types/ProgramAdminPage';
 import { VisibilityStatus } from '../../../../../types/Common';
 import { ProgramsPageToolbar } from '../programs-page-toolbar/ProgramsPageToolbar';
 import { DeleteProgramModal } from '../program-modals/DeleteProgramModal';
 import { InfiniteScrollList } from '../../../../../components/common/infinite-scroll-list/InfiniteScrollList';
 import { ProgramModal } from '../program-modals/ProgramModal';
-import { CategoryBar } from '../../../../../components/common/category-bar/CategoryBar';
+import { CategoryBar, ContextMenuOption } from '../../../../../components/common/category-bar/CategoryBar';
 import { DeleteCategoryModal } from '../program-category-modals/DeleteCategoryModal';
 import { ProgramCategoryModal } from '../program-category-modals/ProgramCategoryModal';
 import { ProgramListItem } from '../program-list-item/ProgramListItem';
-import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import axios from 'axios';
@@ -17,116 +17,173 @@ import './programs-page-content.scss';
 
 const PAGE_SIZE = 5;
 
+type ContextMenuAction = 'add' | 'edit' | 'delete';
+
+interface ModalState {
+    isAddProgramModalOpen: boolean;
+    programToDelete: Program | null;
+    programToEdit: Program | null;
+    isAddCategoryModalOpen: boolean;
+    isEditCategoryModalOpen: boolean;
+    isDeleteCategoryModalOpen: boolean;
+}
+
+interface ErrorState {
+    message: string | null;
+    type: 'categories' | 'programs' | null;
+}
+
 export const ProgramsPageContent = () => {
-    // UI state
-    const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
-    const [autocompleteValues] = useState<string[]>([]);
-
-    // Modal states
-    const [isAddProgramModalOpen, setIsAddProgramModalOpen] = useState(false);
-    const [programToDelete, setProgramToDelete] = useState<Program | null>(null);
-    const [programToEdit, setProgramToEdit] = useState<Program | null>(null);
-    const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState<boolean>(false);
-    const [isEditCategoryModalOpen, setIsEditCategoryModalOpen] = useState<boolean>(false);
-    const [isDeleteCategoryModalOpen, setIsDeleteCategoryModalOpen] = useState<boolean>(false);
-
-    // Data state
-    const [selectedCategory, setSelectedCategory] = useState<ProgramCategory>();
     const [categories, setCategories] = useState<ProgramCategory[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<ProgramCategory | null>(null);
     const [programs, setPrograms] = useState<Program[]>([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalItems, setTotalItems] = useState<number | null>(null);
     const [hasMore, setHasMore] = useState(true);
     const [isProgramsLoading, setIsProgramsLoading] = useState(false);
     const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [errorType, setErrorType] = useState<'categories' | 'programs' | null>(null);
+    const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
+    const [autocompleteValues] = useState<string[]>([]);
+    const [error, setError] = useState<ErrorState>({ message: null, type: null });
+    const [modalState, setModalState] = useState<ModalState>({
+        isAddProgramModalOpen: false,
+        programToDelete: null,
+        programToEdit: null,
+        isAddCategoryModalOpen: false,
+        isEditCategoryModalOpen: false,
+        isDeleteCategoryModalOpen: false,
+    });
 
-    // Refs for managing state in async operations
-    const cureItemsCountRef = useRef<number>(0);
+    const currentItemsCountRef = useRef<number>(0);
     const totalItemsCountRef = useRef<number | null>(null);
-    const selectedCategoryRef = useRef<ProgramCategory | undefined>(null);
+    const selectedCategoryRef = useRef<ProgramCategory | null>(null);
     const currentPageRef = useRef<number>(1);
     const hasMoreRef = useRef<boolean>(true);
     const isProgramsLoadingRef = useRef(false);
+    const isCategoriesLoadingRef = useRef(false);
+    // Cancellation of previous unfinished requests
     const abortControllerRef = useRef<AbortController | null>(null);
 
-    const fetchCategories = useCallback(async () => {
-        try {
-            setIsCategoriesLoading(true);
-            setError(null);
-            setErrorType(null);
-            const categoriesFetch = await ProgramsApi.fetchProgramCategories();
-            setCategories(categoriesFetch);
+    const isAnyModalOpened = useMemo(() => {
+        return Object.values(modalState).some((value) => (typeof value === 'boolean' ? value : value !== null));
+    }, [modalState]);
 
-            if (categoriesFetch.length > 0) {
-                setSelectedCategory(categoriesFetch[0]);
-            }
-        } catch (error) {
-            setError(PROGRAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES);
-            setErrorType('categories');
-        } finally {
-            setIsCategoriesLoading(false);
-        }
+    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
+        () => [
+            { id: 'add', name: PROGRAM_CATEGORY_TEXT.BUTTON.ADD_CATEGORY },
+            { id: 'edit', name: PROGRAM_CATEGORY_TEXT.BUTTON.EDIT_CATEGORY },
+            { id: 'delete', name: PROGRAM_CATEGORY_TEXT.BUTTON.DELETE_CATEGORY },
+        ],
+        [],
+    );
+
+    const setErrorState = useCallback((message: string, type: 'categories' | 'programs') => {
+        setError({ message, type });
     }, []);
 
-    const fetchPrograms = useCallback(
-        async (shouldResetPage: boolean = false) => {
-            if (isProgramsLoadingRef.current || !selectedCategoryRef.current || !hasMoreRef.current) return;
+    const clearError = useCallback(() => {
+        setError({ message: null, type: null });
+    }, []);
 
-            // Cancel previous request if exists
+    const updateModalState = useCallback((updates: Partial<ModalState>) => {
+        setModalState((prev) => ({ ...prev, ...updates }));
+    }, []);
+
+    const resetProgramsState = useCallback(() => {
+        setPrograms([]);
+        setHasMore(true);
+        clearError();
+        currentPageRef.current = 1;
+        currentItemsCountRef.current = 0;
+        totalItemsCountRef.current = null;
+        isProgramsLoadingRef.current = false;
+        hasMoreRef.current = true;
+    }, [clearError]);
+
+    const fetchCategories = useCallback(async () => {
+        console.log('trying to load categories.');
+
+        if (isCategoriesLoadingRef.current) {
+            return;
+        }
+
+        try {
+            isCategoriesLoadingRef.current = true;
+            setIsCategoriesLoading(true);
+            clearError();
+
+            const fetchedCategories = await ProgramsApi.fetchProgramCategories();
+            setCategories(fetchedCategories);
+
+            if (fetchedCategories.length > 0) {
+                setSelectedCategory((prevSelected) => prevSelected ?? fetchedCategories[0]);
+            }
+        } catch (error) {
+            setErrorState(PROGRAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
+        } finally {
+            isCategoriesLoadingRef.current = false;
+            setIsCategoriesLoading(false);
+        }
+    }, [clearError, setErrorState]);
+
+    const fetchPrograms = useCallback(
+        async (shouldResetList: boolean = false) => {
+            console.log('trying to load programs');
+
+            if (
+                isProgramsLoadingRef.current ||
+                !selectedCategoryRef.current ||
+                !hasMoreRef.current ||
+                abortControllerRef.current?.signal.aborted
+            ) {
+                return;
+            }
+
+            // Cancel previous request
             if (abortControllerRef.current) {
                 abortControllerRef.current.abort();
             }
 
-            // Create new AbortController for this request
             const abortController = new AbortController();
             abortControllerRef.current = abortController;
 
             try {
                 isProgramsLoadingRef.current = true;
                 setIsProgramsLoading(true);
-                setError(null);
-                setErrorType(null);
+                clearError();
 
                 const searchCategoryId = selectedCategoryRef.current;
                 const searchStatus = statusFilter;
-                const pageToFetch = shouldResetPage ? 1 : currentPageRef.current;
+                const pageToFetch = shouldResetList ? 0 : currentPageRef.current;
+                const offset = pageToFetch * PAGE_SIZE;
+                const limit = PAGE_SIZE;
 
-                const fetchResult = await ProgramsApi.fetchPrograms(
-                    searchCategoryId.id,
-                    pageToFetch,
-                    PAGE_SIZE,
-                    searchStatus,
-                    { signal: abortController.signal },
-                );
+                const fetchResult = await ProgramsApi.fetchPrograms(searchCategoryId.id, offset, limit, searchStatus, {
+                    cancellationSignal: abortController.signal,
+                });
 
                 if (abortController.signal.aborted) {
                     return;
                 }
 
-                setPrograms((prev) => (shouldResetPage ? [...fetchResult.items] : [...prev, ...fetchResult.items]));
-                setCurrentPage((prev) => (shouldResetPage ? 2 : prev + 1));
+                const { items: fetchedPrograms, totalItemsCount: fetchedTotalItemsCount } = fetchResult;
 
-                if (totalItemsCountRef.current === null || shouldResetPage) {
-                    setTotalItems(fetchResult.totalItemsCount);
-                    totalItemsCountRef.current = fetchResult.totalItemsCount;
-                }
+                setPrograms((prev) => (shouldResetList ? [...fetchedPrograms] : [...prev, ...fetchedPrograms]));
+                currentPageRef.current = pageToFetch + 1;
 
-                if (shouldResetPage) {
-                    cureItemsCountRef.current = fetchResult.items.length;
+                if (shouldResetList) {
+                    currentItemsCountRef.current = fetchedPrograms.length;
                 } else {
-                    cureItemsCountRef.current += fetchResult.items.length;
+                    currentItemsCountRef.current += fetchedPrograms.length;
                 }
 
-                setHasMore(cureItemsCountRef.current < (totalItemsCountRef.current || 0));
+                totalItemsCountRef.current = fetchedTotalItemsCount;
+                setHasMore(currentItemsCountRef.current < fetchedTotalItemsCount);
             } catch (error: any) {
+                console.log(error);
                 if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                     return;
                 }
 
-                setError(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAMS);
-                setErrorType('programs');
+                setErrorState(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAMS, 'programs');
             } finally {
                 // Only update loading state if this request wasn't aborted
                 if (!abortController.signal.aborted) {
@@ -139,44 +196,27 @@ export const ProgramsPageContent = () => {
                 }
             }
         },
-        [statusFilter],
+        [statusFilter, clearError, setErrorState],
     );
 
     useEffect(() => {
-        currentPageRef.current = currentPage;
-        totalItemsCountRef.current = totalItems;
-        selectedCategoryRef.current = selectedCategory;
         hasMoreRef.current = hasMore;
+        selectedCategoryRef.current = selectedCategory;
         isProgramsLoadingRef.current = isProgramsLoading;
-    }, [currentPage, totalItems, selectedCategory, hasMore, isProgramsLoading]);
-
-    // Clear errors when filters change
-    useEffect(() => {
-        setError(null);
-        setErrorType(null);
-    }, [selectedCategory, statusFilter]);
+    }, [selectedCategory, hasMore, isProgramsLoading]);
 
     // Initialize categories on mount
     useEffect(() => {
         fetchCategories();
     }, [fetchCategories]);
 
-    // Reset and fetch programs when category or filter changes
+    // Clear errors, reset and fetch programs when category or filter changes
     useEffect(() => {
         if (!selectedCategory) return;
 
-        setPrograms([]);
-        setCurrentPage(1);
-        setTotalItems(null);
-        setHasMore(true);
-        setError(null);
-        setErrorType(null);
-        cureItemsCountRef.current = 0;
-        isProgramsLoadingRef.current = false;
-        hasMoreRef.current = true;
-
+        resetProgramsState();
         fetchPrograms(true);
-    }, [selectedCategory, statusFilter, fetchPrograms]);
+    }, [selectedCategory, statusFilter, resetProgramsState, fetchPrograms]);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -188,7 +228,9 @@ export const ProgramsPageContent = () => {
     }, []);
 
     // Toolbar handlers
-    const handleSearchQueryByName = useCallback((query: string) => {}, []);
+    const handleSearchQueryByName = useCallback((query: string) => {
+        // TODO: Finish search by name
+    }, []);
 
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
         setStatusFilter(status);
@@ -196,85 +238,141 @@ export const ProgramsPageContent = () => {
 
     // Program handlers
     const handleAddProgramStarted = useCallback(() => {
-        setIsAddProgramModalOpen(true);
-    }, []);
+        updateModalState({ isAddProgramModalOpen: true });
+    }, [updateModalState]);
 
-    const handleEditProgramStarted = useCallback((program: Program) => {
-        setProgramToEdit(program);
-    }, []);
+    const handleEditProgramStarted = useCallback(
+        (program: Program) => {
+            updateModalState({ programToEdit: program });
+        },
+        [updateModalState],
+    );
 
-    const handleDeleteProgramStarted = useCallback((program: Program) => {
-        setProgramToDelete(program);
-    }, []);
+    const handleDeleteProgramStarted = useCallback(
+        (program: Program) => {
+            updateModalState({ programToDelete: program });
+        },
+        [updateModalState],
+    );
 
-    const handleAddProgram = useCallback((program: Program) => {
-        setPrograms((prevPrograms) => {
-            cureItemsCountRef.current += 1;
-            if (totalItemsCountRef.current) {
-                totalItemsCountRef.current += 1;
-            }
+    const handleAddProgram = useCallback(
+        (program: Program) => {
+            setPrograms((prevPrograms) => {
+                currentItemsCountRef.current += 1;
+                if (totalItemsCountRef.current !== null) {
+                    totalItemsCountRef.current += 1;
+                }
+                return [program, ...prevPrograms];
+            });
+            updateModalState({ isAddProgramModalOpen: false });
+        },
+        [updateModalState],
+    );
 
-            return [program, ...prevPrograms];
-        });
-    }, []);
+    const handleEditProgram = useCallback(
+        (program: Program) => {
+            setPrograms((prevPrograms) => prevPrograms.map((p) => (p.id === program.id ? program : p)));
+            updateModalState({ programToEdit: null });
+        },
+        [updateModalState],
+    );
 
-    const handleEditProgram = useCallback((program: Program) => {
-        setPrograms((prevPrograms) => prevPrograms.map((p) => (p.id === program.id ? program : p)));
-    }, []);
+    const handleDeleteProgram = useCallback(
+        (program: Program) => {
+            setPrograms((prevPrograms) => {
+                const filtered = prevPrograms.filter((p) => p.id !== program.id);
 
-    const handleDeleteProgram = useCallback((program: Program) => {
-        setPrograms((prevPrograms) => {
-            const filtered = prevPrograms.filter((p) => p.id !== program.id);
+                currentItemsCountRef.current = Math.max(0, currentItemsCountRef.current - 1);
+                if (totalItemsCountRef.current !== null) {
+                    totalItemsCountRef.current = Math.max(0, totalItemsCountRef.current - 1);
+                }
 
-            // Update counts when deleting
-            cureItemsCountRef.current = Math.max(0, cureItemsCountRef.current - 1);
-            if (totalItemsCountRef.current) {
-                totalItemsCountRef.current = Math.max(0, totalItemsCountRef.current - 1);
-            }
-
-            return filtered;
-        });
-    }, []);
+                return filtered;
+            });
+            updateModalState({ programToDelete: null });
+        },
+        [updateModalState],
+    );
 
     // Category handlers
     const handleCategorySelect = useCallback((category: ProgramCategory) => {
         setSelectedCategory(category);
     }, []);
 
-    const handleAddCategory = useCallback((newCategory: ProgramCategory) => {
-        setCategories((prev) => [...prev, newCategory]);
-    }, []);
+    const handleAddCategory = useCallback(
+        (newCategory: ProgramCategory) => {
+            setCategories((prev) => [...prev, newCategory]);
+            updateModalState({ isAddCategoryModalOpen: false });
+        },
+        [updateModalState],
+    );
 
-    const handleEditCategory = useCallback((updatedCategory: ProgramCategory) => {
-        setCategories((prev) => prev.map((cat) => (cat.id === updatedCategory.id ? updatedCategory : cat)));
-    }, []);
+    const handleEditCategory = useCallback(
+        (updatedCategory: ProgramCategory) => {
+            setCategories((prev) => prev.map((cat) => (cat.id === updatedCategory.id ? updatedCategory : cat)));
+            updateModalState({ isEditCategoryModalOpen: false });
+        },
+        [updateModalState],
+    );
 
     const handleDeleteCategory = useCallback(
         (categoryId: number) => {
-            setCategories((prev) => prev.filter((cat) => cat.id !== categoryId));
-            // If deleted category was selected, select first available
-            if (selectedCategory?.id === categoryId) {
-                const remaining = categories.filter((cat) => cat.id !== categoryId);
-                if (remaining.length > 0) {
-                    setSelectedCategory(remaining[0]);
+            setCategories((prev) => {
+                const filtered = prev.filter((category) => category.id !== categoryId);
+
+                if (selectedCategory?.id === categoryId && filtered.length > 0) {
+                    if (filtered.length > 0) {
+                        // Look for first available category
+                        const currentCategoryIndex = prev.findIndex((category) => category.id === categoryId);
+                        const nextCategory = filtered[Math.min(currentCategoryIndex, filtered.length - 1)];
+                        selectedCategoryRef.current = nextCategory;
+                        setSelectedCategory(nextCategory);
+                    } else {
+                        selectedCategoryRef.current = null;
+                        setSelectedCategory(null);
+                    }
                 }
-            }
+
+                return filtered;
+            });
+            updateModalState({ isDeleteCategoryModalOpen: false });
         },
-        [selectedCategory, categories],
+        [selectedCategory, updateModalState],
     );
 
     // Retry function for error recovery
     const handleRetry = useCallback(() => {
-        if (errorType === 'programs') {
-            setError(null);
-            setErrorType(null);
+        if (error.type === 'programs') {
+            clearError();
             fetchPrograms(true);
-        } else if (errorType === 'categories') {
-            setError(null);
-            setErrorType(null);
+        } else if (error.type === 'categories') {
+            clearError();
             fetchCategories();
         }
-    }, [errorType, fetchPrograms, fetchCategories]);
+    }, [error.type, fetchPrograms, fetchCategories, clearError]);
+
+    // Context menu handlers
+    const onContextMenuOptionSelected = useCallback(
+        (id: string) => {
+            if (isAnyModalOpened) return;
+
+            const action = id as ContextMenuAction;
+            switch (action) {
+                case 'add':
+                    updateModalState({ isAddCategoryModalOpen: true });
+                    break;
+                case 'edit':
+                    updateModalState({ isEditCategoryModalOpen: true });
+                    break;
+                case 'delete':
+                    updateModalState({ isDeleteCategoryModalOpen: true });
+                    break;
+                default:
+                    break;
+            }
+        },
+        [isAnyModalOpened, updateModalState],
+    );
 
     const renderProgramItem = useCallback(
         (program: Program) => (
@@ -288,6 +386,18 @@ export const ProgramsPageContent = () => {
         [handleEditProgramStarted, handleDeleteProgramStarted],
     );
 
+    const closeModalActions = useMemo(
+        () => ({
+            addProgram: () => updateModalState({ isAddProgramModalOpen: false }),
+            editProgram: () => updateModalState({ programToEdit: null }),
+            deleteProgram: () => updateModalState({ programToDelete: null }),
+            addCategory: () => updateModalState({ isAddCategoryModalOpen: false }),
+            editCategory: () => updateModalState({ isEditCategoryModalOpen: false }),
+            deleteCategory: () => updateModalState({ isDeleteCategoryModalOpen: false }),
+        }),
+        [updateModalState],
+    );
+
     return (
         <div className="programs-page-wrapper" data-testid="programs-page-content">
             <div className="programs-page-toolbar-container">
@@ -298,37 +408,22 @@ export const ProgramsPageContent = () => {
                     onAddProgram={handleAddProgramStarted}
                 />
             </div>
+
             <div className="programs-page-list-container">
                 <CategoryBar<ProgramCategory>
                     categories={categories}
                     selectedCategory={selectedCategory}
                     onCategorySelect={handleCategorySelect}
-                    getItemName={(category) => category.name}
+                    getItemDisplayName={(category) => category.name}
                     getItemKey={(category) => category.id}
                     displayContextMenuButton={true}
-                    contextMenuOptions={[
-                        { id: 'add', name: PROGRAM_CATEGORY_TEXT.BUTTON.ADD_CATEGORY },
-                        { id: 'edit', name: PROGRAM_CATEGORY_TEXT.BUTTON.EDIT_CATEGORY },
-                        { id: 'delete', name: PROGRAM_CATEGORY_TEXT.BUTTON.DELETE_CATEGORY },
-                    ]}
-                    onContextMenuOptionSelected={(id) => {
-                        switch (id) {
-                            case 'add':
-                                setIsAddCategoryModalOpen(true);
-                                break;
-                            case 'edit':
-                                setIsEditCategoryModalOpen(true);
-                                break;
-                            case 'delete':
-                                setIsDeleteCategoryModalOpen(true);
-                                break;
-                        }
-                    }}
+                    contextMenuOptions={categoryBarContextMenuOptions}
+                    onContextMenuOptionSelected={onContextMenuOptionSelected}
                 />
 
-                {error && (
+                {error.message && (
                     <div className="programs-page-error-container" data-testid="programs-error-container">
-                        <span>{error}</span>
+                        <span>{error.message}</span>
                         <button onClick={handleRetry} type="button" className="retry-link">
                             {COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN}
                         </button>
@@ -348,46 +443,48 @@ export const ProgramsPageContent = () => {
             {/* Program Modals */}
             <ProgramModal
                 mode="add"
-                isOpen={isAddProgramModalOpen}
-                onClose={() => setIsAddProgramModalOpen(false)}
+                isOpen={modalState.isAddProgramModalOpen}
+                onClose={closeModalActions.addProgram}
                 onAddProgram={handleAddProgram}
+                categories={categories}
             />
 
             <ProgramModal
                 mode="edit"
-                isOpen={!!programToEdit}
-                onClose={() => setProgramToEdit(null)}
-                programToEdit={programToEdit!!}
+                isOpen={!!modalState.programToEdit}
+                onClose={closeModalActions.editProgram}
+                programToEdit={modalState.programToEdit!}
                 onEditProgram={handleEditProgram}
+                categories={categories}
             />
 
             <DeleteProgramModal
-                programToDelete={programToDelete}
+                programToDelete={modalState.programToDelete}
                 onDeleteProgram={handleDeleteProgram}
-                onClose={() => setProgramToDelete(null)}
-                isOpen={!!programToDelete}
+                onClose={closeModalActions.deleteProgram}
+                isOpen={!!modalState.programToDelete}
             />
 
             {/* Category Modals */}
             <ProgramCategoryModal
                 mode="add"
-                isOpen={isAddCategoryModalOpen}
-                onClose={() => setIsAddCategoryModalOpen(false)}
+                isOpen={modalState.isAddCategoryModalOpen}
+                onClose={closeModalActions.addCategory}
                 categories={categories}
                 onAddCategory={handleAddCategory}
             />
 
             <ProgramCategoryModal
                 mode="edit"
-                isOpen={isEditCategoryModalOpen}
-                onClose={() => setIsEditCategoryModalOpen(false)}
+                isOpen={modalState.isEditCategoryModalOpen}
+                onClose={closeModalActions.editCategory}
                 categories={categories}
                 onEditCategory={handleEditCategory}
             />
 
             <DeleteCategoryModal
-                isOpen={isDeleteCategoryModalOpen}
-                onClose={() => setIsDeleteCategoryModalOpen(false)}
+                isOpen={modalState.isDeleteCategoryModalOpen}
+                onClose={closeModalActions.deleteCategory}
                 onDeleteCategory={handleDeleteCategory}
                 categories={categories}
             />

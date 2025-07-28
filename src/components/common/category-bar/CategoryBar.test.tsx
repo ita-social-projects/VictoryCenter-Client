@@ -44,8 +44,8 @@ describe('CategoryBar', () => {
 
     const defaultProps = {
         categories: mockCategories,
-        selectedCategory: undefined,
-        getItemName: (item: MockContextMenuOption) => item.title,
+        selectedCategory: null,
+        getItemDisplayName: (item: MockContextMenuOption) => item.title,
         getItemKey: (item: MockContextMenuOption) => item.id,
         onCategorySelect: jest.fn(),
     };

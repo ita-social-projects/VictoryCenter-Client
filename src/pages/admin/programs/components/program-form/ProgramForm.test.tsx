@@ -2,12 +2,8 @@ import React, { createRef } from 'react';
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from './ProgramForm';
-import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
-
-jest.mock('../../../../../services/api/admin/programs/programs-api');
-const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
 jest.mock('../../../../../components/common/multi-select/MultiSelect', () => ({
     MultiSelect: (props: any) => (
@@ -70,13 +66,10 @@ describe('ProgramForm', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        mockedProgramsApi.fetchProgramCategories.mockResolvedValue(mockCategories);
     });
 
     it('should render empty form and fetch categories on initial load', async () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
-
-        await waitFor(() => expect(mockedProgramsApi.fetchProgramCategories).toHaveBeenCalledTimes(1));
 
         expect(screen.getByTestId('input-name')).toHaveValue('');
         expect(screen.getByTestId('textarea-description')).toHaveValue('');
@@ -102,15 +95,6 @@ describe('ProgramForm', () => {
             expect(screen.getByTestId('categories-select')).toBeDisabled();
             expect(screen.getByTestId('img-input')).toBeDisabled();
         });
-    });
-
-    it('should handle category fetch failure gracefully', async () => {
-        mockedProgramsApi.fetchProgramCategories.mockRejectedValue(new Error('API Error'));
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
-
-        await waitFor(() => expect(mockedProgramsApi.fetchProgramCategories).toHaveBeenCalled());
-        expect(screen.getByTestId('input-name')).toBeInTheDocument();
-        expect(screen.getByTestId('categories-select').children.length).toBe(0);
     });
 
     it('should reset form fields when initialData prop changes', async () => {
@@ -171,11 +155,7 @@ describe('ProgramForm', () => {
     });
 
     it('should successfully submit valid data in "Draft" mode', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
-
-        await waitFor(() => {
-            expect(mockedProgramsApi.fetchProgramCategories).toHaveBeenCalled();
-        });
+        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} categories={mockCategories} />);
 
         fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Нова чернетка' } });
         fireEvent.change(screen.getByTestId('categories-select'), { target: { value: ['1'] } });
@@ -196,11 +176,7 @@ describe('ProgramForm', () => {
     });
 
     it('should successfully submit valid data in "Published" mode', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
-
-        await waitFor(() => {
-            expect(mockedProgramsApi.fetchProgramCategories).toHaveBeenCalled();
-        });
+        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} categories={mockCategories} />);
 
         fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Нова публікація' } });
         fireEvent.change(screen.getByTestId('categories-select'), { target: { value: ['2'] } });

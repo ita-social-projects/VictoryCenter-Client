@@ -9,7 +9,6 @@ import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
 import { VisibilityStatus } from '../../../../../types/Common';
-import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { MultiSelect } from '../../../../../components/common/multi-select/MultiSelect';
 import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
 import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
@@ -32,11 +31,11 @@ export interface ProgramFormProps {
     onSubmit: (data: ProgramFormValues, status: VisibilityStatus) => void;
     initialData?: ProgramFormValues | null;
     formDisabled?: boolean;
+    categories?: ProgramCategory[];
 }
 
 export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
-    ({ initialData = null, onSubmit, formDisabled }: ProgramFormProps, ref) => {
-        const [availableCategories, setAvailableCategories] = useState<ProgramCategory[]>([]);
+    ({ initialData = null, onSubmit, formDisabled, categories = [] }: ProgramFormProps, ref) => {
         const [validationContext, setValidationContext] = useState<ProgramValidationContext>({
             isPublishing: false,
         });
@@ -79,18 +78,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             }
         }, [initialData, reset]);
 
-        useEffect(() => {
-            const fetchCategories = async () => {
-                try {
-                    const categories = await ProgramsApi.fetchProgramCategories();
-                    setAvailableCategories(categories);
-                } catch (error) {
-                    // Or handle in other way
-                }
-            };
-            fetchCategories();
-        }, []);
-
         const submit = async (status: VisibilityStatus) => {
             const isPublishing = status === 'Published';
             statusRef.current = status;
@@ -116,7 +103,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         render={({ field }) => (
                             <MultiSelect
                                 {...field}
-                                options={availableCategories}
+                                options={categories}
                                 disabled={isSubmitting || formDisabled}
                                 placeholder={PROGRAMS_TEXT.FORM.LABEL.SELECT_CATEGORY}
                                 getOptionId={(cat: ProgramCategory) => cat.id}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { ProgramForm } from '../program-form/ProgramForm';
-import { Program } from '../../../../../types/ProgramAdminPage';
+import { Program, ProgramCategory } from '../../../../../types/ProgramAdminPage';
 import { Button } from '../../../../../components/common/button/Button';
 import { QuestionModal } from '../../../../../components/common/question-modal/QuestionModal';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
@@ -12,6 +12,7 @@ import './program-modal.scss';
 type BaseProps = {
     isOpen: boolean;
     onClose: () => void;
+    categories: ProgramCategory[];
 };
 
 type AddModalProps = {
@@ -28,7 +29,7 @@ type EditModalProps = {
 export type ProgramModalProps = BaseProps & (AddModalProps | EditModalProps);
 
 export const ProgramModal = (props: ProgramModalProps) => {
-    const { isOpen, onClose, mode } = props;
+    const { isOpen, onClose, mode, categories } = props;
     const isEditMode = mode === 'edit';
 
     const { formRef, isSubmitting, error, initialData, pendingAction, modals, handleFormSubmit, handleClose } =
@@ -69,6 +70,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                         initialData={initialData}
                         formDisabled={isSubmitting}
                         onSubmit={handleFormSubmit}
+                        categories={categories}
                     />
                     {error && <div className="error-container">{error}</div>}
                 </Modal.Content>

@@ -12,7 +12,7 @@ import { PaginationResult, VisibilityStatus } from '../../../../types/Common';
 // ============================================
 let mockProgramId = Math.max(...mockPrograms.map((p) => p.id), 0) + 1;
 let mockCategoryId = Math.max(...mockCategories.map((c) => c.id), 0) + 1;
-export let mockDelay = 2200;
+export let mockDelay = 1200;
 export let throwErrorsInApi = false;
 
 // Simulates an async delay with AbortSignal support — used for testing fetch cancellation behavior
@@ -47,7 +47,7 @@ const simulateAsyncOperation = (delay: number, signal?: AbortSignal): Promise<vo
 // !!!
 
 export interface ApiOptions {
-    signal?: AbortSignal;
+    cancellationSignal?: AbortSignal;
 }
 
 export const ProgramsApi = {
@@ -65,12 +65,12 @@ export const ProgramsApi = {
 
     fetchPrograms: async (
         categoryId: number,
-        pageNumber: number,
-        pageSize: number,
+        offset: number,
+        limit: number,
         status?: VisibilityStatus,
         options?: ApiOptions,
     ): Promise<PaginationResult<Program>> => {
-        await simulateAsyncOperation(mockDelay, options?.signal);
+        await simulateAsyncOperation(mockDelay, options?.cancellationSignal);
         if (throwErrorsInApi) throw new Error('Error fetching programs');
 
         const filtered = mockPrograms.filter((program) => {
@@ -79,8 +79,8 @@ export const ProgramsApi = {
             return inCategory && statusMatches;
         });
 
-        const start = (pageNumber - 1) * pageSize;
-        const end = start + pageSize;
+        const start = offset;
+        const end = offset + limit;
 
         return {
             items: filtered.slice(start, end),

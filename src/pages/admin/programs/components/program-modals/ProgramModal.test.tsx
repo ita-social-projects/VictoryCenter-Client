@@ -137,6 +137,7 @@ describe('ProgramModal', () => {
             isOpen: true,
             onClose,
             onAddProgram,
+            categories: [],
         };
 
         it('should render correct title for add mode', () => {
@@ -175,6 +176,7 @@ describe('ProgramModal', () => {
             onClose,
             programToEdit: mockProgram,
             onEditProgram,
+            categories: [],
         };
 
         it('should render correct title for edit mode', () => {

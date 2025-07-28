@@ -16,6 +16,7 @@ import axios from 'axios';
 import './programs-page-content.scss';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
+const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
 
 type ContextMenuAction = 'add' | 'edit' | 'delete';
 
@@ -37,6 +38,7 @@ export const ProgramsPageContent = () => {
     const [categories, setCategories] = useState<ProgramCategory[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<ProgramCategory | null>(null);
     const [programs, setPrograms] = useState<Program[]>([]);
+    const [pageSize, setPageSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
     const [hasMore, setHasMore] = useState(true);
     const [isProgramsLoading, setIsProgramsLoading] = useState(false);
     const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
@@ -99,6 +101,14 @@ export const ProgramsPageContent = () => {
         hasMoreRef.current = true;
     }, [clearError]);
 
+    const updatePageSize = () => {
+        if (listContainerRef.current) {
+            const calculatedPageSize =
+                Math.floor(listContainerRef.current.clientHeight / LIST_ITEM_HEIGHT_IN_PIXELS) + 1;
+            setPageSize(Math.max(calculatedPageSize, DEFAULT_LOAD_ITEMS_COUNT));
+        }
+    };
+
     const fetchCategories = useCallback(async () => {
         if (isCategoriesLoadingRef.current) {
             return;
@@ -124,7 +134,7 @@ export const ProgramsPageContent = () => {
     }, [clearError, setErrorState]);
 
     const fetchPrograms = useCallback(
-        async (shouldResetList: boolean = false, itemsToFetch: number | null = null) => {
+        async (shouldResetList: boolean = false) => {
             if (
                 isProgramsLoadingRef.current ||
                 !selectedCategoryRef.current ||
@@ -150,8 +160,8 @@ export const ProgramsPageContent = () => {
                 const searchCategoryId = selectedCategoryRef.current;
                 const searchStatus = statusFilter;
                 const pageToFetch = shouldResetList ? 0 : currentPageRef.current;
-                const offset = pageToFetch * DEFAULT_LOAD_ITEMS_COUNT;
-                const limit = DEFAULT_LOAD_ITEMS_COUNT;
+                const offset = pageToFetch * pageSize;
+                const limit = pageSize;
 
                 const fetchResult = await ProgramsApi.fetchPrograms(searchCategoryId.id, offset, limit, searchStatus, {
                     cancellationSignal: abortController.signal,
@@ -202,9 +212,20 @@ export const ProgramsPageContent = () => {
                 }
             }
         },
-        [statusFilter, clearError, setErrorState],
+        [pageSize, statusFilter, clearError, setErrorState],
     );
 
+    // Resize handling
+    useEffect(() => {
+        window.addEventListener('resize', updatePageSize);
+        return () => window.removeEventListener('resize', updatePageSize);
+    }, []);
+
+    useEffect(() => {
+        updatePageSize();
+    }, [listContainerRef]);
+
+    // Sync refs with state for use in async functions and callbacks
     useEffect(() => {
         hasMoreRef.current = hasMore;
         selectedCategoryRef.current = selectedCategory;
@@ -222,7 +243,7 @@ export const ProgramsPageContent = () => {
 
         resetProgramsState();
         fetchPrograms(true);
-    }, [selectedCategory, statusFilter, resetProgramsState, fetchPrograms]);
+    }, [pageSize, selectedCategory, statusFilter, resetProgramsState, fetchPrograms]);
 
     // Cleanup on unmount
     useEffect(() => {

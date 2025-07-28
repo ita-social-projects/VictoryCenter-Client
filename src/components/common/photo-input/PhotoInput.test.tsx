@@ -47,7 +47,7 @@ describe('PhotoInput', () => {
         await waitFor(() => {
             expect(onChangeMock).toHaveBeenCalledWith({
                 base64: expect.any(String),
-                mimeType: 'image/png', // або той mime, який у твоєму createImageFile()
+                mimeType: 'image/png',
             });
         });
     });
@@ -141,7 +141,7 @@ describe('PhotoInput', () => {
 
         const data = {
             dataTransfer: {
-                files: [], // Порожній масив файлів
+                files: [],
                 types: ['Files'],
             },
         };
@@ -155,7 +155,7 @@ describe('PhotoInput', () => {
         const fileInput = screen.getByTestId('photo-input-hidden') as HTMLInputElement;
 
         fireEvent.change(fileInput, {
-            target: { files: null }, // Відсутні файли
+            target: { files: null },
         });
 
         expect(onChangeMock).not.toHaveBeenCalled();
@@ -203,13 +203,11 @@ describe('PhotoInput', () => {
 
         const clickSpy = jest.spyOn(fileInput, 'click');
 
-        // Тест Enter key
         fireEvent.keyDown(wrapper, { key: 'Enter' });
         expect(clickSpy).toHaveBeenCalled();
 
         clickSpy.mockClear();
 
-        // Тест Space key
         fireEvent.keyDown(wrapper, { key: ' ' });
         expect(clickSpy).toHaveBeenCalled();
 
@@ -276,7 +274,7 @@ describe('PhotoInput', () => {
 
         fireEvent.blur(wrapper);
         expect(wrapper.classList.contains('photo-input-wrapper-focused')).toBe(false);
-        expect(onBlurMock).toHaveBeenCalled(); // onBlur все ще викликається
+        expect(onBlurMock).toHaveBeenCalled();
     });
 
     it('calls onBlur even without onBlur prop', () => {
@@ -285,7 +283,6 @@ describe('PhotoInput', () => {
             name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
         });
 
-        // Не повинно падати без onBlur prop
         expect(() => fireEvent.blur(wrapper)).not.toThrow();
     });
 
@@ -305,7 +302,6 @@ describe('PhotoInput', () => {
         const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
         const fileInput = screen.getByTestId('photo-input-hidden') as HTMLInputElement;
 
-        // Симулюємо наявність значення в input
         Object.defineProperty(fileInput, 'value', {
             writable: true,
             value: 'test-file.png',

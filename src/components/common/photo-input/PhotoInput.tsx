@@ -169,9 +169,13 @@ export function convertFileToBase64(file: File): Promise<ImageValues> {
 
         reader.onload = () => {
             const result = reader.result as string;
-            const base64 = result.split(',')[1];
+            const parts = result.split(',');
+            if (parts.length !== 2) {
+                reject(new Error('Invalid data URL format'));
+                return;
+            }
             resolve({
-                base64,
+                base64: parts[1],
                 mimeType: file.type,
             });
         };

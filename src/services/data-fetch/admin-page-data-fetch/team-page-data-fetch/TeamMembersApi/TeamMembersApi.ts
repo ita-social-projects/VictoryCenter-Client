@@ -3,6 +3,7 @@ import { MemberFormValues } from '../../../../../pages/admin/team/components/mem
 import { AxiosInstance } from 'axios';
 import { Status } from '../../../../../types/Common';
 import { ImagesApi } from '../../image-data-fetch/ImageDataApi';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
 export const TeamMembersApi = {
     getAll: async (
@@ -111,6 +112,6 @@ export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): TeamMember => 
     img: dto.image,
     fullName: dto.fullName,
     description: dto.description,
-    status: dto.status === Status.Draft ? 'Чернетка' : 'Опубліковано',
+    status: dto.status === Status.Draft ? COMMON_TEXT_ADMIN.STATUS.DRAFT : COMMON_TEXT_ADMIN.STATUS.PUBLISHED,
     category: dto.category,
 });

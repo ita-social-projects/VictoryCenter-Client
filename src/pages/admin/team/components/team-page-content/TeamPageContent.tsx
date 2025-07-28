@@ -42,6 +42,7 @@ export const TeamPageContent = () => {
         setError(null);
         try {
             await TeamMembersApi.postDraft(client, member);
+            setRefetchKey((prev) => prev + 1);
         } catch (err) {
             setError('Не вдалося зберегти чернетку. Спробуйте ще раз.');
         }

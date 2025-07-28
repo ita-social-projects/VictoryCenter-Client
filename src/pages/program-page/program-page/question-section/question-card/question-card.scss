@@ -47,6 +47,7 @@
         line-height: 1.75rem;
         letter-spacing: -0.02em;
         vertical-align: middle;
+        cursor: text;
     }
 
     &[open] {
@@ -63,6 +64,7 @@
     }
 
     &:hover {
+        cursor: pointer;
         p {
             color: #50a1c6;
         }

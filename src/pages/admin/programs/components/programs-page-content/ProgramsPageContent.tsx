@@ -15,7 +15,7 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import axios from 'axios';
 import './programs-page-content.scss';
 
-const PAGE_SIZE = 5;
+const DEFAULT_LOAD_ITEMS_COUNT = 5;
 
 type ContextMenuAction = 'add' | 'edit' | 'delete';
 
@@ -52,6 +52,7 @@ export const ProgramsPageContent = () => {
         isDeleteCategoryModalOpen: false,
     });
 
+    const listContainerRef = useRef<HTMLDivElement>(null);
     const currentItemsCountRef = useRef<number>(0);
     const totalItemsCountRef = useRef<number | null>(null);
     const selectedCategoryRef = useRef<ProgramCategory | null>(null);
@@ -99,8 +100,6 @@ export const ProgramsPageContent = () => {
     }, [clearError]);
 
     const fetchCategories = useCallback(async () => {
-        console.log('trying to load categories.');
-
         if (isCategoriesLoadingRef.current) {
             return;
         }
@@ -125,9 +124,7 @@ export const ProgramsPageContent = () => {
     }, [clearError, setErrorState]);
 
     const fetchPrograms = useCallback(
-        async (shouldResetList: boolean = false) => {
-            console.log('trying to load programs');
-
+        async (shouldResetList: boolean = false, itemsToFetch: number | null = null) => {
             if (
                 isProgramsLoadingRef.current ||
                 !selectedCategoryRef.current ||
@@ -153,8 +150,8 @@ export const ProgramsPageContent = () => {
                 const searchCategoryId = selectedCategoryRef.current;
                 const searchStatus = statusFilter;
                 const pageToFetch = shouldResetList ? 0 : currentPageRef.current;
-                const offset = pageToFetch * PAGE_SIZE;
-                const limit = PAGE_SIZE;
+                const offset = pageToFetch * DEFAULT_LOAD_ITEMS_COUNT;
+                const limit = DEFAULT_LOAD_ITEMS_COUNT;
 
                 const fetchResult = await ProgramsApi.fetchPrograms(searchCategoryId.id, offset, limit, searchStatus, {
                     cancellationSignal: abortController.signal,
@@ -166,7 +163,17 @@ export const ProgramsPageContent = () => {
 
                 const { items: fetchedPrograms, totalItemsCount: fetchedTotalItemsCount } = fetchResult;
 
-                setPrograms((prev) => (shouldResetList ? [...fetchedPrograms] : [...prev, ...fetchedPrograms]));
+                setPrograms((prev) => {
+                    if (shouldResetList) {
+                        return [...fetchedPrograms];
+                    } else {
+                        // Prevent duplicate programs when appending new items to existing list
+                        const existingIds = new Set(prev.map((p) => p.id));
+                        const uniqueFetchedPrograms = fetchedPrograms.filter((p) => !existingIds.has(p.id));
+                        return [...prev, ...uniqueFetchedPrograms];
+                    }
+                });
+
                 currentPageRef.current = pageToFetch + 1;
 
                 if (shouldResetList) {
@@ -178,7 +185,6 @@ export const ProgramsPageContent = () => {
                 totalItemsCountRef.current = fetchedTotalItemsCount;
                 setHasMore(currentItemsCountRef.current < fetchedTotalItemsCount);
             } catch (error: any) {
-                console.log(error);
                 if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                     return;
                 }
@@ -238,21 +244,24 @@ export const ProgramsPageContent = () => {
 
     // Program handlers
     const handleAddProgramStarted = useCallback(() => {
+        if (isAnyModalOpened) return;
         updateModalState({ isAddProgramModalOpen: true });
-    }, [updateModalState]);
+    }, [updateModalState, isAnyModalOpened]);
 
     const handleEditProgramStarted = useCallback(
         (program: Program) => {
+            if (isAnyModalOpened) return;
             updateModalState({ programToEdit: program });
         },
-        [updateModalState],
+        [updateModalState, isAnyModalOpened],
     );
 
     const handleDeleteProgramStarted = useCallback(
         (program: Program) => {
+            if (isAnyModalOpened) return;
             updateModalState({ programToDelete: program });
         },
-        [updateModalState],
+        [updateModalState, isAnyModalOpened],
     );
 
     const handleAddProgram = useCallback(
@@ -409,7 +418,7 @@ export const ProgramsPageContent = () => {
                 />
             </div>
 
-            <div className="programs-page-list-container">
+            <div className="programs-page-list-container" ref={listContainerRef}>
                 <CategoryBar<ProgramCategory>
                     categories={categories}
                     selectedCategory={selectedCategory}

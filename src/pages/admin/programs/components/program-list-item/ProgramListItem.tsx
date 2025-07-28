@@ -40,8 +40,18 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
                     </div>
                 </ButtonTooltip>
                 <div className="program-actions-buttons">
-                    <button type="button" onClick={() => handleOnEditProgram(program)} className="edit-btn" />
-                    <button type="button" onClick={() => handleOnDeleteProgram(program)} className="delete-btn" />
+                    <button
+                        type="button"
+                        onClick={() => handleOnEditProgram(program)}
+                        className="edit-btn"
+                        aria-label={`Edit ${program.name}`}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => handleOnDeleteProgram(program)}
+                        className="delete-btn"
+                        aria-label={`Delete ${program.name}`}
+                    />
                 </div>
             </div>
         </div>

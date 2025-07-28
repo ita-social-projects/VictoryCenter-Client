@@ -97,6 +97,7 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
                     role="tooltip"
                     className={classNames('button-tooltip-popup', `button-tooltip-popup--${position}`)}
                     style={{
+                        opacity: tooltipPosition.top !== 0 && tooltipPosition.left !== 0 ? '1' : '0',
                         top: `${tooltipPosition.top}px`,
                         left: `${tooltipPosition.left}px`,
                     }}

@@ -1,10 +1,7 @@
 name: Run on PR from fix/* into release
 
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches:
-      - 'release/**'
+on: workflow_dispatch
+
 
 env:
   RUN_NUM: ${{ github.run_number }}

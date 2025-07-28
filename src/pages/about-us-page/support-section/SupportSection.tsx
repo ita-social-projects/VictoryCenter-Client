@@ -5,8 +5,8 @@ export const SupportSection = () => {
     return (
         <div className="support-block">
             <h2 className="support-title">{SUPPORT_TITLE}</h2>
-            {SUPPORT_DATA.map(({ img, alt, description }) => (
-                <div key={alt} className="support-card">
+            {SUPPORT_DATA.map(({ img, alt, description }, index) => (
+                <div key={`${alt}-${index}`} className="support-card">
                     <img src={img} alt={alt} />
                     <p className="support-description">{description}</p>
                 </div>

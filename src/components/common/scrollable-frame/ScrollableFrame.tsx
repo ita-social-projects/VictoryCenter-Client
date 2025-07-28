@@ -55,8 +55,8 @@ export const ScrollableFrame = () => {
                 navigation={false}
                 scrollbar={{ draggable: true, el: '.custom-scrollbar' }}
             >
-                {programData.map((item) => (
-                    <SwiperSlide key={item.title}>
+                {programData.map((item, index) => (
+                    <SwiperSlide key={`${item.title}-${index}`}>
                         <ProgramCard program={item} />
                     </SwiperSlide>
                 ))}

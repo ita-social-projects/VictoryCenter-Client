@@ -8,7 +8,7 @@ jest.mock('../../../assets/icons/remove-query.svg', () => 'remove-icon.svg');
 jest.mock('../select/Select', () => {
     const mockReact = require('react');
     return {
-        Select: ({ children, selectContainerRef, onValueChange, isAutocomplete, className }: any) => {
+        Select: ({ children, selectContainerRef, onValueChange, className }: any) => {
             mockReact.useEffect(() => {
                 if (selectContainerRef) {
                     selectContainerRef.current = {

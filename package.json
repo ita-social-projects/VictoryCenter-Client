@@ -21,6 +21,7 @@
         "react-dom": "^19.1.0",
         "react-router-dom": "^7.5.3",
         "react-scripts": "5.0.1",
+        "react-select": "^5.10.2",
         "sass": "^1.87.0",
         "swiper": "^11.2.10",
         "ts-node": "^10.9.2",
@@ -46,7 +47,16 @@
         ],
         "rules": {
             "no-console": 1,
-            "no-unused-vars": 2,
+            "no-unused-vars": "off",
+            "@typescript-eslint/no-unused-vars": [
+                "warn",
+                {
+                    "varsIgnorePattern": "^_",
+                    "argsIgnorePattern": "^_",
+                    "caughtErrorsIgnorePattern": "^_",
+                    "destructuredArrayIgnorePattern": "^_"
+                }
+            ],
             "testing-library/no-wait-for-multiple-assertions": 0,
             "testing-library/no-container": 0,
             "testing-library/no-node-access": 0
@@ -75,7 +85,7 @@
             "^swiper/css/scrollbar$": "<rootDir>/src/__mocks__/styleMock.js"
         },
         "transformIgnorePatterns": [
-            "node_modules/(?!(swiper|axios)/)"
+            "node_modules/(?!axios)/"
         ],
         "collectCoverageFrom": [
             "src/**/*.{ts,js,tsx,jsx}"

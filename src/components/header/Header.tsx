@@ -7,6 +7,7 @@ import './Header.scss';
 
 const {
     userPageRoutes: { teamPageRoute, page2Route },
+    donatePageRoute,
 } = routes;
 
 export const Header = () => {
@@ -14,12 +15,6 @@ export const Header = () => {
         //TODO: remove this log after implementing an actual logic
         //eslint-disable-next-line no-console
         console.log('CONTACT USED!');
-    };
-
-    const onDonateClick = () => {
-        //TODO: remove this log after implementing an actual logic
-        //eslint-disable-next-line no-console
-        console.log('DONATE!');
     };
 
     return (
@@ -49,9 +44,9 @@ export const Header = () => {
                 <button className="contactUsButton" onClick={onContactUsClick}>
                     {CONTACT_US}
                 </button>
-                <button className="donateButton" onClick={onDonateClick}>
+                <Link to={donatePageRoute} className="button donateButton">
                     {DONATE}
-                </button>
+                </Link>
             </div>
         </div>
     );

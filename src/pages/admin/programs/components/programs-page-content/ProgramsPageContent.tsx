@@ -286,25 +286,81 @@ export const ProgramsPageContent = () => {
     );
 
     const handleAddProgram = useCallback(
-        (program: Program) => {
+        (addedProgram: Program) => {
             setPrograms((prevPrograms) => {
                 currentItemsCountRef.current += 1;
                 if (totalItemsCountRef.current !== null) {
                     totalItemsCountRef.current += 1;
                 }
-                return [program, ...prevPrograms];
+                return [addedProgram, ...prevPrograms];
             });
+
+            // Update program counters in categories
+            const addedCategoryIds = new Set(addedProgram.categories.map((c) => c.id));
+            setCategories((prevCategories) =>
+                prevCategories.map((cat) =>
+                    addedCategoryIds.has(cat.id) ? { ...cat, programsCount: cat.programsCount + 1 } : cat,
+                ),
+            );
+
             updateModalState({ isAddProgramModalOpen: false });
         },
         [updateModalState],
     );
 
     const handleEditProgram = useCallback(
-        (program: Program) => {
-            setPrograms((prevPrograms) => prevPrograms.map((p) => (p.id === program.id ? program : p)));
+        (updatedProgram: Program) => {
+            // Find original program
+            const originalProgram = programs.find((p) => p.id === updatedProgram.id);
+            if (!originalProgram) return;
+
+            const originalCategoryIds = new Set(originalProgram.categories.map((c) => c.id));
+            const updatedCategoryIds = new Set(updatedProgram.categories.map((c) => c.id));
+
+            // Update program counters in categories
+            setCategories((prevCategories) =>
+                prevCategories.map((category) => {
+                    const wasInCategory = originalCategoryIds.has(category.id);
+                    const isInCategory = updatedCategoryIds.has(category.id);
+
+                    if (!wasInCategory && isInCategory) {
+                        return { ...category, programsCount: category.programsCount + 1 };
+                    }
+                    if (wasInCategory && !isInCategory) {
+                        return { ...category, programsCount: Math.max(0, category.programsCount - 1) };
+                    }
+
+                    // If nothing changed
+                    return category;
+                }),
+            );
+
+            // Apply edited program to list
+            setPrograms((prevPrograms) => {
+                // Check if updated program still belongs to selected category
+                const belongsToSelectedCategory =
+                    selectedCategory && updatedProgram.categories.some((cat) => cat.id === selectedCategory.id);
+
+                if (!belongsToSelectedCategory) {
+                    // Remove program from list if it no longer belongs to selected category
+                    const filtered = prevPrograms.filter((p) => p.id !== updatedProgram.id);
+
+                    // Update counters
+                    currentItemsCountRef.current = Math.max(0, currentItemsCountRef.current - 1);
+                    if (totalItemsCountRef.current !== null) {
+                        totalItemsCountRef.current = Math.max(0, totalItemsCountRef.current - 1);
+                    }
+
+                    return filtered;
+                }
+
+                // Update program in list if it still belongs to selected category
+                return prevPrograms.map((p) => (p.id === updatedProgram.id ? updatedProgram : p));
+            });
+
             updateModalState({ programToEdit: null });
         },
-        [updateModalState],
+        [programs, updateModalState],
     );
 
     const handleDeleteProgram = useCallback(
@@ -319,6 +375,17 @@ export const ProgramsPageContent = () => {
 
                 return filtered;
             });
+
+            // Update program counters in categories
+            const deletedFromCategoryIds = new Set(program.categories.map((c) => c.id));
+            setCategories((prevCategories) =>
+                prevCategories.map((cat) =>
+                    deletedFromCategoryIds.has(cat.id)
+                        ? { ...cat, programsCount: Math.max(0, cat.programsCount - 1) } // Math.max для уникнення від'ємних значень
+                        : cat,
+                ),
+            );
+
             updateModalState({ programToDelete: null });
         },
         [updateModalState],

@@ -360,7 +360,7 @@ export const ProgramsPageContent = () => {
 
             updateModalState({ programToEdit: null });
         },
-        [programs, updateModalState],
+        [selectedCategory, programs, updateModalState],
     );
 
     const handleDeleteProgram = useCallback(

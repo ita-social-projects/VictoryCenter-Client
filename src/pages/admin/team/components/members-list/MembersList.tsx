@@ -84,13 +84,14 @@ export const MembersList = ({
     const currentPageRef = useRef<number>(currentPage);
     const totalPagesRef = useRef<number | null>(totalPages);
     const categoryRef = useRef<TeamCategory | null>(category);
-
     const client = useAdminClient();
     const clientRef = useRef(client);
 
     useEffect(() => {
         clientRef.current = client;
     }, [client]);
+
+    const [isDraftMode, setIsDraftMode] = useState(false);
 
     useEffect(() => {
         currentPageRef.current = currentPage;
@@ -201,7 +202,6 @@ export const MembersList = ({
             if (totalPagesRef.current === null || reset) {
                 setTotalPages(totalCountOfPages);
             }
-
             setIsMembersLoading(false);
             isFetchingRef.current = false;
         },
@@ -337,7 +337,6 @@ export const MembersList = ({
             el.scrollTop = el.scrollHeight;
         }
     }, [isMembersLoading]);
-
     useEffect(() => {
         if (searchByNameQuery) {
             onAutocompleteValuesChange(
@@ -394,12 +393,13 @@ export const MembersList = ({
 
     const handleEditMemberOnClose = () => {
         const existingMember = members.filter((m) => m.id === memberIdToEdit)[0];
-        //check photos as well
+
         if (existingMember && memberToEdit) {
             if (
                 memberToEdit.description !== existingMember.description ||
                 memberToEdit.fullName !== existingMember.fullName ||
-                memberToEdit.category !== existingMember.category
+                memberToEdit.category !== existingMember.category ||
+                memberToEdit.image !== existingMember.img
             ) {
                 setIsConfirmCloseModalOpen(true);
                 return;
@@ -497,7 +497,6 @@ export const MembersList = ({
     return (
         <>
             {dragPreview?.visible && dragPreview?.member ? <MemberDragPreview dragPreview={dragPreview} /> : <></>}
-
             <div className="members">
                 <div
                     data-testid="members-categories"
@@ -552,7 +551,6 @@ export const MembersList = ({
                     </div>
                 </Modal.Actions>
             </Modal>
-
             {isEditMemberModalOpen && (
                 <Modal onClose={handleEditMemberOnClose} isOpen={isEditMemberModalOpen}>
                     <Modal.Title>{TEAM_EDIT_MEMBER}</Modal.Title>
@@ -563,13 +561,25 @@ export const MembersList = ({
                             id="edit-member-modal"
                             onSubmit={handleMemberEdit}
                             onError={onError}
+                            onDraftSubmit={handleConfirmPublish}
+                            isDraft={isDraftMode}
                         />
                     </Modal.Content>
                     <Modal.Actions>
-                        <Button onClick={handleSaveAsDraft} buttonStyle={'secondary'}>
+                        <Button
+                            buttonStyle={'secondary'}
+                            form="edit-member-modal"
+                            type="submit"
+                            onClick={() => setIsDraftMode(true)}
+                        >
                             {TEAM_SAVE_AS_DRAFT}
                         </Button>
-                        <Button form="edit-member-modal" type={'submit'} buttonStyle={'primary'}>
+                        <Button
+                            form="edit-member-modal"
+                            type="submit"
+                            onClick={() => console.log('Publish')}
+                            buttonStyle={'primary'}
+                        >
                             {TEAM_PUBLISH}
                         </Button>
                     </Modal.Actions>

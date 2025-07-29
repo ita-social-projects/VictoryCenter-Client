@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, createEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemberForm, MemberFormProps, MemberFormValues } from './MemberForm';
 import { AdminContext } from '../../../../../context/admin-context-provider/AdminContextProvider';
@@ -28,7 +28,12 @@ describe('MemberForm', () => {
         onSubmit: jest.fn(),
         onValuesChange: jest.fn(),
         existingMemberFormValues: null,
+        isDraft: false,
     };
+
+    beforeAll(() => {
+        global.URL.createObjectURL = jest.fn(() => 'blob:http://localhost/mock');
+    });
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -41,9 +46,26 @@ describe('MemberForm', () => {
         );
     });
 
+    it('calls preventDefault on dragOver and dragLeave', () => {
+        render(<MemberForm {...defaultProps} />);
+
+        const dropArea = screen.getByTestId('drop-area');
+
+        const dragOverEvent = createEvent.dragOver(dropArea);
+        const dragLeaveEvent = createEvent.dragLeave(dropArea);
+
+        dragOverEvent.preventDefault = jest.fn();
+        dragLeaveEvent.preventDefault = jest.fn();
+
+        fireEvent(dropArea, dragOverEvent);
+        fireEvent(dropArea, dragLeaveEvent);
+
+        expect(dragOverEvent.preventDefault).toHaveBeenCalled();
+        expect(dragLeaveEvent.preventDefault).toHaveBeenCalled();
+    });
+
     it('renders form with all fields', () => {
         renderWithAdminContext(<MemberForm {...defaultProps} />);
-
         expect(screen.getByLabelText('Категорія')).toBeInTheDocument();
         expect(screen.getByLabelText("Ім'я та Прізвище")).toBeInTheDocument();
         expect(screen.getByLabelText('Опис')).toBeInTheDocument();
@@ -77,7 +99,7 @@ describe('MemberForm', () => {
     it('updates form values and calls onValuesChange on input change', async () => {
         renderWithAdminContext(<MemberForm {...defaultProps} />);
 
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
         fireEvent.change(fullNameInput, { target: { value: 'Jane Doe' } });
 
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
@@ -94,7 +116,7 @@ describe('MemberForm', () => {
             expect(screen.getByRole('option', { name: 'Наглядова рада' })).toBeInTheDocument();
         });
 
-        const categorySelect = screen.getByLabelText('Категорія');
+        const categorySelect = screen.getByLabelText(/Категорія/);
         fireEvent.change(categorySelect, { target: { value: 'Наглядова рада' } });
 
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
@@ -111,7 +133,7 @@ describe('MemberForm', () => {
     it('updates description and calls onValuesChange', async () => {
         renderWithAdminContext(<MemberForm {...defaultProps} />);
 
-        const descriptionTextarea = screen.getByLabelText('Опис');
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
         fireEvent.change(descriptionTextarea, { target: { value: 'New description' } });
 
         expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
@@ -128,17 +150,37 @@ describe('MemberForm', () => {
             expect(screen.getByText('Радники')).toBeInTheDocument();
         });
 
-        const categorySelect = screen.getByLabelText('Категорія');
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
-        const descriptionTextarea = screen.getByLabelText('Опис');
+        const categorySelect = screen.getByLabelText(/Категорія/);
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
+        const imgInput = screen.getByTestId('image');
 
         fireEvent.change(categorySelect, {
             target: {
                 value: 'Радники',
             },
         });
+        await userEvent.selectOptions(categorySelect, 'Радники');
         await userEvent.type(fullNameInput, 'Jane Doe');
         await userEvent.type(descriptionTextarea, 'Test description');
+
+        const file = new File(['dummy content'], 'test-image.jpg', { type: 'image/jpeg' });
+        Object.defineProperty(file, 'size', { value: 1024 * 1024 });
+
+        const fileList = {
+            0: file,
+            length: 1,
+            item: (index: number) => file,
+            [Symbol.iterator]: function* () {
+                yield file;
+            },
+        };
+
+        Object.setPrototypeOf(fileList, FileList.prototype);
+
+        fireEvent.change(imgInput, {
+            target: { files: fileList },
+        });
 
         const form = screen.getByTestId('test-form');
         fireEvent.submit(form);
@@ -161,7 +203,7 @@ describe('MemberForm', () => {
     it('displays character count for fullName', async () => {
         renderWithAdminContext(<MemberForm {...defaultProps} />);
 
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
         await userEvent.type(fullNameInput, 'Jane Doe');
 
         expect(screen.getByText('8/50')).toBeInTheDocument();
@@ -170,7 +212,7 @@ describe('MemberForm', () => {
     it('displays character count for description', async () => {
         renderWithAdminContext(<MemberForm {...defaultProps} />);
 
-        const descriptionTextarea = screen.getByLabelText('Опис');
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
         await userEvent.type(descriptionTextarea, 'Test description');
 
         expect(screen.getByText('16/200')).toBeInTheDocument();
@@ -198,10 +240,10 @@ describe('MemberForm', () => {
     it('renders with correct input attributes', () => {
         renderWithAdminContext(<MemberForm {...defaultProps} />);
 
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
         expect(fullNameInput).toHaveAttribute('maxLength', '50');
 
-        const descriptionTextarea = screen.getByLabelText('Опис');
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
         expect(descriptionTextarea).toHaveAttribute('maxLength', '200');
     });
 
@@ -237,7 +279,6 @@ describe('MemberForm', () => {
 
             const form = screen.getByTestId('test-form');
             fireEvent.submit(form);
-
             expect(defaultProps.onSubmit).toHaveBeenCalledWith(initialValues);
         });
 

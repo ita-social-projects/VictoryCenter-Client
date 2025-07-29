@@ -102,7 +102,14 @@ victory-center-client/
 │   │       └── page-2
 │   ├── routes/                             # Route configuration
 │   │   └── app-router
+<<<<<<< HEAD
 │   ├── hooks/                              # Custom React hooks
+=======
+│   ├── hooks/# Custom React hooks
+│   │   └── admin/
+│   ├── context/                            # React context providers
+│   │   └── admin-context-provider
+>>>>>>> feature/issue-12
 │   ├── services/                           # API calls, data services
 │   │   ├── auth/
 │   │   │   ├── auth-service/
@@ -130,6 +137,8 @@ victory-center-client/
 │   │           ├── home-page/
 │   │           ├── team-page/
 │   │           └── page-2/
+│   ├── validation
+│   │   └── admin-create-member-form
 │   ├── index.jsx                           # Entry point (ReactDOM.createRoot)
 │   ├── index.css                           # Global styles (normalizer)
 │   ├── react-app-env.d.ts

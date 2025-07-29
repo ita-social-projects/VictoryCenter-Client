@@ -49,7 +49,7 @@ export const MembersList = ({
     const [totalPages, setTotalPages] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [teamMemberToDelete, setTeamMemberToDelete] = useState<string | null>(null);
-    const [totalCount, setTotalCount] = useState<number>(0);
+    // const [totalCount, setTotalCount] = useState<number>(0);
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [category, setCategory] = useState<TeamCategory | null>(() => {
         const savedName = localStorage.getItem(currentTabKey);
@@ -156,11 +156,9 @@ export const MembersList = ({
 
     const loadMembers = useCallback(
         async (reset: boolean = false) => {
-            console.log('got to load members');
             const currentCategory = categoryRef.current;
             const currentSearch = searchByNameQuery || '';
-            console.log('current' + currentPageRef.current);
-            console.log('total' + totalPagesRef.current);
+
             if (!currentCategory || isFetchingRef.current) {
                 return;
             }
@@ -184,8 +182,13 @@ export const MembersList = ({
                     (pageToFetch - 1) * pageSize,
                     pageSize,
                 );
+                if (response.length === 0) {
+                    setIsMembersLoading(false);
+                    isFetchingRef.current = false;
+                    return;
+                }
                 newMembers = response;
-                setTotalCount(response.length);
+                // setTotalCount(response.length);
             } catch (err) {
                 onError?.((err as Error).message);
             }
@@ -193,9 +196,8 @@ export const MembersList = ({
                 newMembers = newMembers.filter((m) => m.fullName.toLowerCase().includes(currentSearch.toLowerCase()));
             }
 
-            console.log('totalCount ' + newMembers.length);
-            console.log('pageSize ' + pageSize);
-            const totalCountOfPages = Math.ceil(totalCount / pageSize);
+            // totalCount must be fetched from the API
+            // const totalCountOfPages = Math.ceil(totalCount / pageSize);
 
             setMembers((prev) => {
                 const updatedMembers = reset ? [...newMembers] : [...prev, ...newMembers];
@@ -205,13 +207,13 @@ export const MembersList = ({
             });
             setCurrentPage((prev) => (reset ? 2 : prev + 1));
             if (totalPagesRef.current === null || reset) {
-                console.log('totalCount from back ' + totalCountOfPages);
-                setTotalPages(totalCountOfPages);
+                // temporary solution until we can fetch totalCount from the api
+                setTotalPages(null);
             }
             setIsMembersLoading(false);
             isFetchingRef.current = false;
         },
-        [searchByNameQuery, totalCount, pageSize, client, statusFilter, onError],
+        [searchByNameQuery, pageSize, client, statusFilter, onError],
     );
 
     useEffect(() => {
@@ -221,10 +223,25 @@ export const MembersList = ({
         setCurrentPage(1);
         setTotalPages(null);
         isFetchingRef.current = false;
+        currentPageRef.current = 1;
         loadMembers(true);
         // TODO remove eslint disable
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [category, searchByNameQuery, statusFilter, pageSize, refetchTrigger]);
+    }, [category, searchByNameQuery, statusFilter, pageSize]);
+
+    useEffect(() => {
+        if (pageSize === 0) return;
+        if (members.length === pageSize) {
+            return;
+        }
+        setMembers([]);
+        setCurrentPage(1);
+        setTotalPages(null);
+        isFetchingRef.current = false;
+        currentPageRef.current = 1;
+        loadMembers(true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [refetchTrigger, pageSize]);
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
         setDraggedIndex(index);
@@ -365,10 +382,8 @@ export const MembersList = ({
             setIsMoveToTopVisible(false);
         }
 
-        const bottomReached = Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight) <= 5;
-        console.log('here');
+        const bottomReached = Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight) === 0;
         if (bottomReached) {
-            console.log('end reached');
             loadMembers();
         }
     };
@@ -377,7 +392,12 @@ export const MembersList = ({
         const el = memberListRef.current;
         if (!el) return;
 
-        el.scrollTop = 0;
+        const firstChild = el.firstElementChild;
+        if (firstChild) {
+            firstChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            el.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
 
     const handleOnEditMember = (id: number) => {
@@ -424,6 +444,7 @@ export const MembersList = ({
                 await TeamMembersApi.updateDraft(client, memberIdToEdit, memberToEdit);
                 await loadMembers(true);
                 setIsEditMemberModalOpen(false);
+                setIsDraftMode(false);
             }
         } catch (err) {
             onError?.((err as Error).message);
@@ -569,7 +590,7 @@ export const MembersList = ({
                             id="edit-member-modal"
                             onSubmit={handleMemberEdit}
                             onError={onError}
-                            onDraftSubmit={handleConfirmPublish}
+                            onDraftSubmit={handleSaveAsDraft}
                             isDraft={isDraftMode}
                         />
                     </Modal.Content>
@@ -582,12 +603,7 @@ export const MembersList = ({
                         >
                             {TEAM_SAVE_AS_DRAFT}
                         </Button>
-                        <Button
-                            form="edit-member-modal"
-                            type="submit"
-                            onClick={() => console.log('Publish')}
-                            buttonStyle={'primary'}
-                        >
+                        <Button form="edit-member-modal" type="submit" buttonStyle={'primary'}>
                             {TEAM_PUBLISH}
                         </Button>
                     </Modal.Actions>

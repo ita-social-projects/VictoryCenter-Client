@@ -13,10 +13,12 @@ const mockImage: Image = {
     id: 1,
     base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+iF9kAAAAASUVORK5CYII=',
     mimeType: 'image/png',
+    size: 0,
 };
 const imageValue: ImageValues = {
     base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+iF9kAAAAASUVORK5CYII=',
     mimeType: 'image/png',
+    size: 0,
 };
 describe('fetchImageDataApi', () => {
     it('should fetch image data', async () => {

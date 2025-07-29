@@ -8,6 +8,7 @@ const createImageFile = () => new File(['dummy content'], 'example.png', { type:
 const MockImageValue: ImageValues = {
     base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAocB9eQ6vqoAAAAASUVORK5CYII=',
     mimeType: 'image/jpeg',
+    size: 0,
 };
 
 describe('PhotoInput', () => {
@@ -48,6 +49,7 @@ describe('PhotoInput', () => {
             expect(onChangeMock).toHaveBeenCalledWith({
                 base64: expect.any(String),
                 mimeType: 'image/png',
+                size: 13,
             });
         });
     });
@@ -96,6 +98,7 @@ describe('PhotoInput', () => {
             expect(onChangeMock).toHaveBeenCalledWith({
                 base64: expect.any(String),
                 mimeType: file.type,
+                size: 13,
             });
         });
     });

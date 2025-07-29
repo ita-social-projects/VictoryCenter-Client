@@ -24,12 +24,14 @@ jest.mock('../../image-data-fetch/ImageDataApi', () => ({
 const mockImageValues: ImageValues = {
     base64: 'base64-string-for-new-image',
     mimeType: 'image/png',
+    size: 0,
 };
 
 const mockImageResponse: Image = {
     id: 1,
     base64: 'base64-string-for-new-image',
     mimeType: 'image/png',
+    size: 0,
 };
 
 describe('TeamMembersApi', () => {

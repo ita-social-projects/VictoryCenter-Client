@@ -177,6 +177,7 @@ const createMockMember = (overrides = {}): TeamMember => ({
         id: 1,
         base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
         mimeType: 'image/jpeg',
+        size: 0,
     },
     fullName: 'First First',
     description: 'Software Engineer',
@@ -462,10 +463,25 @@ describe('MembersList', () => {
                 expect(screen.getByText('Member 1')).toBeInTheDocument();
             });
             const membersList = screen.getByTestId('members-list');
+
+            // Mock scrollTop property
             Object.defineProperty(membersList, 'scrollTop', {
                 writable: true,
                 value: 100,
             });
+
+            // Mock scrollTo method
+            membersList.scrollTo = jest.fn();
+
+            // Mock firstElementChild with scrollIntoView method
+            const mockFirstChild = {
+                scrollIntoView: jest.fn(),
+            };
+            Object.defineProperty(membersList, 'firstElementChild', {
+                value: mockFirstChild,
+                writable: true,
+            });
+
             fireEvent.scroll(membersList);
             return membersList;
         };
@@ -477,9 +493,14 @@ describe('MembersList', () => {
 
         it('scrolls to top when "move to top" button is clicked', async () => {
             const membersList = await setupScrolledMembersList();
-            const moveToTopButton = screen.getByTestId('members-list-list-to-top');
-            fireEvent.click(moveToTopButton);
-            expect(membersList.scrollTop).toBe(0);
+            const moveToTopButton = screen.getByTestId('members-list-list-to-top').closest('button');
+            fireEvent.click(moveToTopButton!);
+
+            // Check that scrollIntoView was called on the first child
+            expect(membersList.firstElementChild?.scrollIntoView).toHaveBeenCalledWith({
+                behavior: 'smooth',
+                block: 'start',
+            });
         });
     });
 

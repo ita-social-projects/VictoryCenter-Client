@@ -1,5 +1,4 @@
 import { useCreateMemberSchema } from './create-member-schema';
-import { TEAM_CATEGORY_MAIN } from '../../const/team';
 import {
     FULLNAME_MIN,
     FULLNAME_MAX,
@@ -12,18 +11,12 @@ import {
     DESCRIPTIONS_MIN,
 } from '../../const/admin/data-validation';
 
-function createMockFileList(file: File): FileList {
-    const fileList = {
-        0: file,
-        length: 1,
-        item: (index: number) => (index === 0 ? file : null),
-        [Symbol.iterator]: function* () {
-            yield file;
-        },
+function createMockImageValues(file: File): { base64: string; mimeType: string; size: number } {
+    return {
+        base64: 'data:image/png;base64,dummy',
+        mimeType: file.type,
+        size: file.size,
     };
-    Object.setPrototypeOf(fileList, FileList.prototype);
-
-    return fileList as FileList;
 }
 
 describe('Create Member Schema', () => {
@@ -32,10 +25,10 @@ describe('Create Member Schema', () => {
     });
 
     const requiredBase = {
-        category: TEAM_CATEGORY_MAIN,
+        category: 'Main',
         fullName: 'John Doe',
         description: 'This is a valid description with enough length.',
-        img: createMockFileList(validFile),
+        image: createMockImageValues(validFile),
     };
 
     it('validates correctly for published entry', async () => {
@@ -43,13 +36,13 @@ describe('Create Member Schema', () => {
         const validFile = new File(['dummy content'], 'avatar.png', {
             type: SUPPORTED_FORMATS[0],
         });
-        const fileList = createMockFileList(validFile);
+        const imageValues = createMockImageValues(validFile);
 
         const validData = {
-            category: TEAM_CATEGORY_MAIN,
+            category: 'main',
             fullName: 'John Doe',
             description: 'This is a valid description with enough length.',
-            img: fileList,
+            image: imageValues,
         };
 
         await expect(schema.validate(validData)).resolves.toBeTruthy();
@@ -85,14 +78,16 @@ describe('Create Member Schema', () => {
         await expect(schema.validate({ ...requiredBase, description: 'short' })).rejects.toThrow(DESCRIPTIONS_MIN);
     });
 
-    it('fails if img not provided and not draft', async () => {
+    it('fails if image not provided and not draft', async () => {
         const schema = useCreateMemberSchema(false);
-        await expect(schema.validate({ ...requiredBase, img: undefined })).rejects.toThrow(IMG_REQUIRED);
+        await expect(schema.validate({ ...requiredBase, image: undefined })).rejects.toThrow(IMG_REQUIRED);
     });
 
-    it('passes if img is string (already uploaded)', async () => {
+    it('passes if image is string (already uploaded)', async () => {
         const schema = useCreateMemberSchema(false);
-        await expect(schema.validate({ ...requiredBase, img: 'https://some-url.com/image.png' })).resolves.toBeTruthy();
+        await expect(
+            schema.validate({ ...requiredBase, image: 'https://some-url.com/image.png' }),
+        ).resolves.toBeTruthy();
     });
 
     it('fails if file is too large', async () => {
@@ -100,21 +95,21 @@ describe('Create Member Schema', () => {
         const bigFile = new File(['a'.repeat(FILE_SIZE_LIMIT + 1)], 'big.png', {
             type: SUPPORTED_FORMATS[0],
         });
-        const fileList = createMockFileList(bigFile);
+        const imageValues = createMockImageValues(bigFile);
 
-        await expect(schema.validate({ ...requiredBase, img: fileList })).rejects.toThrow(FILE_SIZE);
+        await expect(schema.validate({ ...requiredBase, image: imageValues })).rejects.toThrow(FILE_SIZE);
     });
 
     it('fails if file has unsupported format', async () => {
         const schema = useCreateMemberSchema(false);
         const badFile = new File([''], 'file.txt', { type: 'text/plain' });
-        const fileList = createMockFileList(badFile);
+        const imageValues = createMockImageValues(badFile);
 
-        await expect(schema.validate({ ...requiredBase, img: fileList })).rejects.toThrow(FILE_FORMAT);
+        await expect(schema.validate({ ...requiredBase, image: imageValues })).rejects.toThrow(FILE_FORMAT);
     });
 
-    it('passes if img is not required and draft is true', async () => {
+    it('passes if image is not required and draft is true', async () => {
         const schema = useCreateMemberSchema(true);
-        await expect(schema.validate({ ...requiredBase, img: undefined })).resolves.toBeTruthy();
+        await expect(schema.validate({ ...requiredBase, image: undefined })).resolves.toBeTruthy();
     });
 });

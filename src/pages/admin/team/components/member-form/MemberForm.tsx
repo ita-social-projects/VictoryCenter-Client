@@ -150,6 +150,7 @@ export const MemberForm = ({
                                 setValue('category', selected, { shouldValidate: true });
                             }
                         }}
+                        disabled={isLoadingCategories}
                         id="category"
                         className="custom-select"
                         onClick={handleOpenSelect}
@@ -178,7 +179,6 @@ export const MemberForm = ({
                     </div>
                     {errors.fullName && <p className="error">{errors.fullName.message}</p>}
                 </div>
-
                 <div className="form-group">
                     <label htmlFor="description">{TEAM_LABEL_DESCRIPTION}</label>
                     <textarea
@@ -192,7 +192,10 @@ export const MemberForm = ({
                         {watch('description')?.length || 0}/{MAX_DESCRIPTION_LENGTH}
                     </div>
                 </div>
-                <PhotoInput value={memberFormValues?.image ?? null} onChange={onFileChange} id="photo" />
+                <div className="form-group">
+                    <PhotoInput value={memberFormValues?.image ?? null} onChange={onFileChange} id="photo" />
+                    {errors.image && <p className="error">{errors.image.message}</p>}
+                </div>
             </div>
         </form>
     );

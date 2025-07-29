@@ -177,6 +177,7 @@ export function convertFileToBase64(file: File): Promise<ImageValues> {
             resolve({
                 base64: parts[1],
                 mimeType: file.type,
+                size: file.size,
             });
         };
 

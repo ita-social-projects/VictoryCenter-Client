@@ -1,6 +1,7 @@
 import * as yup from 'yup';
 import { TeamCategory } from '../../types/admin/TeamMembers';
-// import { TEAM_CATEGORY_MAIN, TEAM_CATEGORY_SUPERVISORY, TEAM_CATEGORY_ADVISORS } from '../../const/team';
+import { ImageValues } from '../../types/Image';
+
 import {
     CATEGORY_REQUIRED,
     FULLNAME_REQUIRED,
@@ -18,6 +19,7 @@ import {
     FILE_SIZE_LIMIT,
     SUPPORTED_FORMATS,
     DESCRIPTIONS_REQUIRED,
+    IMG_REQUIRED,
 } from '../../const/admin/data-validation';
 
 export const useCreateMemberSchema = (isDraft: boolean) => {
@@ -49,19 +51,23 @@ export const useCreateMemberSchema = (isDraft: boolean) => {
             }),
 
         image: yup
-            .mixed<FileList | string>()
+            .mixed<ImageValues | string>()
             .transform((value) => (value === null ? undefined : value))
+            .test('image-required-if-not-draft', IMG_REQUIRED, (value) => {
+                if (isDraft) return true;
+                return value !== undefined && value !== null;
+            })
             .test('fileSize', FILE_SIZE, (value) => {
                 if (typeof value === 'string') return true;
-                if (value && value instanceof FileList && value.length > 0) {
-                    return value[0].size <= FILE_SIZE_LIMIT;
+                if (value) {
+                    return value.size <= FILE_SIZE_LIMIT;
                 }
                 return true;
             })
             .test('fileType', FILE_FORMAT, (value) => {
-                if (typeof value === 'string') return true;
-                if (value && value instanceof FileList && value.length > 0) {
-                    return SUPPORTED_FORMATS.includes(value[0].type);
+                if (!value || typeof value === 'string') return true;
+                if (value) {
+                    return SUPPORTED_FORMATS.includes(value.mimeType);
                 }
                 return true;
             })

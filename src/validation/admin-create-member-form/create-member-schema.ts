@@ -58,6 +58,9 @@ export const useCreateMemberSchema = (isDraft: boolean) => {
                 return value !== undefined && value !== null;
             })
             .test('fileSize', FILE_SIZE, (value) => {
+                if (value && typeof value === 'object' && 'id' in value && typeof value.id === 'number') {
+                    return true;
+                }
                 if (typeof value === 'string') return true;
                 if (value) {
                     return value.size <= FILE_SIZE_LIMIT;

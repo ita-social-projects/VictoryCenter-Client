@@ -28,9 +28,7 @@ export const Header = () => {
             <div className="linkContainer">
                 <nav>
                     <Link to={teamPageRoute}>{ABOUT_US}</Link>
-                    <Link to={page2Route} className="disable">
-                        {PROGRAMS}
-                    </Link>
+                    <Link to={page2Route}>{PROGRAMS}</Link>
                     <Link to={page2Route} className="disable">
                         {REPORTING}
                     </Link>

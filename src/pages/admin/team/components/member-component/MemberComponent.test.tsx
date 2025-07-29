@@ -3,12 +3,20 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { MemberComponent } from './MemberComponent';
 import { TeamMember } from '../../../../../types/admin/TeamMembers';
+import { Image } from '../../../../../types/Image';
+
+const mockImage: Image = {
+    id: 1,
+    base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
+    mimeType: 'image/jpeg',
+    size: 0,
+};
 
 const mockMemberDraft: TeamMember = {
     id: 1,
     fullName: 'John Doe',
     description: 'Software Engineer',
-    img: 'https://example.com/john.jpg',
+    img: mockImage,
     status: 'Чернетка',
     category: {
         id: 1,
@@ -21,7 +29,7 @@ const mockMemberPublished: TeamMember = {
     id: 2,
     fullName: 'Jane Smith',
     description: 'Product Manager',
-    img: 'https://example.com/jane.jpg',
+    img: mockImage,
     status: 'Опубліковано',
     category: {
         id: 1,
@@ -66,7 +74,7 @@ describe('MemberComponent', () => {
             );
 
             const image = screen.getByRole('img');
-            expect(image).toHaveAttribute('src', 'https://example.com/john.jpg');
+            expect(image).toHaveAttribute('src', `data:${mockImage.mimeType};base64,${mockImage.base64}`);
             expect(image).toHaveAttribute('alt', 'John Doe-img');
         });
 
@@ -214,7 +222,7 @@ describe('MemberComponent', () => {
                 id: 3,
                 fullName: '',
                 description: '',
-                img: '',
+                img: null,
                 status: 'Чернетка',
                 category: {
                     id: 1,
@@ -242,7 +250,7 @@ describe('MemberComponent', () => {
                 id: 4,
                 fullName: 'José María Ñoño',
                 description: 'Designer & Developer',
-                img: 'https://example.com/josé.jpg',
+                img: mockImage,
                 status: 'Чернетка',
                 category: {
                     id: 1,
@@ -268,7 +276,7 @@ describe('MemberComponent', () => {
                 id: 5,
                 fullName: 'Test User',
                 description: 'Tester',
-                img: 'test.jpg',
+                img: mockImage,
                 status: 'Custom Status',
                 category: {
                     id: 1,
@@ -297,7 +305,7 @@ describe('MemberComponent', () => {
                 id: 6,
                 fullName: 'Props Test',
                 description: 'Testing props',
-                img: 'props.jpg',
+                img: mockImage,
                 status: 'Чернетка',
                 category: {
                     id: 1,
@@ -316,7 +324,10 @@ describe('MemberComponent', () => {
 
             expect(screen.getByText('Props Test')).toBeInTheDocument();
             expect(screen.getByText('Testing props')).toBeInTheDocument();
-            expect(screen.getByRole('img')).toHaveAttribute('src', 'props.jpg');
+            expect(screen.getByRole('img')).toHaveAttribute(
+                'src',
+                `data:${mockImage.mimeType};base64,${mockImage.base64}`,
+            );
             expect(screen.getByText('Чернетка')).toBeInTheDocument();
 
             const deleteButton = container.querySelector('.members-actions-delete');

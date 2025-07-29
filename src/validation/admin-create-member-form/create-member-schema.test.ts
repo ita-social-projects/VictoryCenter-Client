@@ -1,5 +1,4 @@
 import { useCreateMemberSchema } from './create-member-schema';
-import { TEAM_CATEGORY_MAIN } from '../../const/team';
 import {
     FULLNAME_MIN,
     FULLNAME_MAX,
@@ -32,7 +31,7 @@ describe('Create Member Schema', () => {
     });
 
     const requiredBase = {
-        category: TEAM_CATEGORY_MAIN,
+        category: 'Main',
         fullName: 'John Doe',
         description: 'This is a valid description with enough length.',
         img: createMockFileList(validFile),
@@ -46,7 +45,7 @@ describe('Create Member Schema', () => {
         const fileList = createMockFileList(validFile);
 
         const validData = {
-            category: TEAM_CATEGORY_MAIN,
+            category: 'main',
             fullName: 'John Doe',
             description: 'This is a valid description with enough length.',
             img: fileList,

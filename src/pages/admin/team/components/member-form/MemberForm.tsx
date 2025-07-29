@@ -151,7 +151,7 @@ export const MemberForm = ({
                             }
                         }}
                         id="category"
-                        className="custom-select default-select"
+                        className="custom-select"
                         onClick={handleOpenSelect}
                     >
                         <option value="" disabled className="option-value">

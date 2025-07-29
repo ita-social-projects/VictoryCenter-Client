@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { MainLayout } from '../../layouts/main-layout/MainLayout';
 
@@ -11,7 +9,6 @@ import { NotFound } from '../../pages/not-found/NotFound';
 import { ProgramPage } from '../../pages/program-page/ProgramPage';
 
 import { AboutUsPage } from '../../pages/about-us-page/AboutUsPage';
-import { routes } from '../../const/routers/routes';
 import { AdminLayout } from '../../layouts/admin-layout/AdminLayout';
 import { TeamPageAdmin } from '../../pages/admin/team/TeamPage';
 import { ProgramsPageAdmin } from '../../pages/admin/programs/ProgramsPageAdmin';
@@ -21,36 +18,30 @@ import { AdminContextWrapper } from '../../components/admin/admin-context-wrappe
 
 import { PrivateRoute } from '../../components/admin/private-route/PrivateRoute';
 import { PublicRoute } from '../../components/admin/public-route/PublicRoute';
-
-const {
-    programPage,
-    adminRoutes,
-    aboutUsRoute,
-    userPageRoutes: { teamPageRoute, page2Route },
-} = routes;
+import { publicRoutes } from '../../const/routes/public-routes';
+import { adminRoutes } from '../../const/routes/admin-routes';
 
 export const AppRouter = () => (
     <BrowserRouter>
         <Routes>
             <Route path="/" element={<MainLayout />}>
                 <Route index element={<AboutUsPage />} />
-                <Route path={teamPageRoute} element={<TeamPage />} />
-                <Route path={page2Route} element={<ProgramPage />} />
-                <Route path={programPage} element={<ProgramPage />} />
-                <Route path={aboutUsRoute} element={<AboutUsPage />} />
+                <Route path={publicRoutes.TEAM.FULL} element={<TeamPage />} />
+                <Route path={publicRoutes.PROGRAMS.FULL} element={<ProgramPage />} />
+                <Route path={publicRoutes.ABOUT_US.FULL} element={<AboutUsPage />} />
                 <Route path="*" element={<NotFound />} />
             </Route>
 
             <Route element={<AdminContextWrapper />}>
                 <Route element={<PublicRoute />}>
-                    <Route path={adminRoutes.loginRoute} element={<LoginPage />} />
+                    <Route path={adminRoutes.LOGIN.FULL} element={<LoginPage />} />
                 </Route>
 
                 <Route element={<PrivateRoute />}>
-                    <Route path={adminRoutes.adminRoute} element={<AdminLayout />}>
+                    <Route path={adminRoutes.ROOT} element={<AdminLayout />}>
                         <Route index element={<AdminPage />} />
-                        <Route path={adminRoutes.teamSubRoute} element={<TeamPageAdmin />} />
-                        <Route path={adminRoutes.programsSubRoute} element={<ProgramsPageAdmin />} />
+                        <Route path={adminRoutes.TEAM.PATH} element={<TeamPageAdmin />} />
+                        <Route path={adminRoutes.PROGRAMS.PATH} element={<ProgramsPageAdmin />} />
                     </Route>
                 </Route>
             </Route>

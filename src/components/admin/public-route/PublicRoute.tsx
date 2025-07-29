@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
 import { useAdminContext } from '../../../context/admin-context-provider/AdminContextProvider';
 import { PageLoader } from '../../common/page-loader/PageLoader';
-import { adminRoutes } from '../../../const/routers/routes';
+import { adminRoutes } from '../../../const/routes/admin-routes';
 
 export const PublicRoute = () => {
     const { isLoading, isAuthenticated } = useAdminContext();

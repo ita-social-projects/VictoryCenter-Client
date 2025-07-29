@@ -3,24 +3,12 @@ import React, { useState, useCallback } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/common/button/Button';
 import { Select } from '../../../../../components/common/select/Select';
-import { Input } from '../../../../../components/common/input/Input';
 import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
-import { StatusFilter } from '../../../../../types/Common';
-import { ModalState } from '../../../../../types/Common';
-import {
-    TEAM_ADD_MEMBER,
-    TEAM_SAVE_AS_DRAFT,
-    TEAM_PUBLISH,
-    TEAM_PUBLISH_NEW_MEMBER,
-    TEAM_CONFIRM,
-    TEAM_CANCEL,
-    TEAM_CHANGES_LOST,
-    TEAM_STATUS_ALL,
-    TEAM_STATUS_PUBLISHED,
-    TEAM_STATUS_DRAFT,
-    SEARCH_BY_NAME,
-} from '../../../../../const/team';
-import { TeamCategory } from '../../../../../types/admin/TeamMembers';
+import { ModalState, StatusFilter } from '../../../../../types/common';
+import { TeamCategory } from '../../../../../types/admin/team-members';
+import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
 
 export type TeamPageToolbarProps = {
     onSearchQueryChange: (query: string) => void;
@@ -56,7 +44,7 @@ const AddMemberModal = ({
     onError?: (msg: string | null) => void;
 }) => (
     <Modal onClose={onClose} isOpen={isOpen} data-testid="add-member-modal">
-        <Modal.Title>{TEAM_ADD_MEMBER}</Modal.Title>
+        <Modal.Title>{TEAM_MEMBERS_TEXT.BUTTON.ADD_MEMBER}</Modal.Title>
         <Modal.Content>
             <MemberForm
                 id="add-member-modal"
@@ -79,10 +67,10 @@ const AddMemberModal = ({
                 }}
                 buttonStyle="secondary"
             >
-                {TEAM_SAVE_AS_DRAFT}
+                {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
             </Button>
             <Button form="add-member-modal" type="submit" buttonStyle="primary">
-                {TEAM_PUBLISH}
+                {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
             </Button>
         </Modal.Actions>
     </Modal>
@@ -98,16 +86,16 @@ const ConfirmPublishModal = ({
     onConfirm: () => void;
 }) => (
     <Modal isOpen={isOpen} onClose={onCancel} data-testid="publish-confirm-modal">
-        <Modal.Title>{TEAM_PUBLISH_NEW_MEMBER}</Modal.Title>
+        <Modal.Title>{TEAM_MEMBERS_TEXT.QUESTION.PUBLISH_MEMBER}</Modal.Title>
         <Modal.Content>
             <></>
         </Modal.Content>
         <Modal.Actions>
             <Button onClick={onCancel} buttonStyle="secondary">
-                {TEAM_CANCEL}
+                {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
             </Button>
             <Button onClick={onConfirm} buttonStyle="primary">
-                {TEAM_CONFIRM}
+                {COMMON_TEXT_ADMIN.BUTTON.YES}
             </Button>
         </Modal.Actions>
     </Modal>
@@ -123,16 +111,16 @@ const ConfirmCloseModal = ({
     onConfirm: () => void;
 }) => (
     <Modal isOpen={isOpen} onClose={onCancel} data-testid="confirm-close-modal">
-        <Modal.Title>{TEAM_CHANGES_LOST}</Modal.Title>
+        <Modal.Title>{COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}</Modal.Title>
         <Modal.Content>
             <></>
         </Modal.Content>
         <Modal.Actions>
             <Button onClick={onCancel} buttonStyle="secondary">
-                {TEAM_CANCEL}
+                {COMMON_TEXT_ADMIN.BUTTON.NO}
             </Button>
             <Button onClick={onConfirm} buttonStyle="primary">
-                {TEAM_CONFIRM}
+                {COMMON_TEXT_ADMIN.BUTTON.YES}
             </Button>
         </Modal.Actions>
     </Modal>
@@ -242,23 +230,35 @@ export const TeamPageToolbar = ({
         <>
             <div className="toolbar">
                 <div className="toolbar-search">
-                    <Input
+                    <SearchBar
                         onChange={(e) => {
                             onSearchQueryChange(e);
                         }}
                         autocompleteValues={autocompleteValues}
                         data-testid="search-input"
-                        placeholder={SEARCH_BY_NAME}
+                        placeholder={TEAM_MEMBERS_TEXT.FORM.SEARCH.SEARCH_BY_NAME}
                     />
                 </div>
                 <div className="toolbar-actions">
                     <Select onValueChange={onStatusFilterChange} data-testid="status-filter">
-                        <Select.Option key={1} name={TEAM_STATUS_ALL} value={TEAM_STATUS_ALL} />
-                        <Select.Option key={2} name={TEAM_STATUS_PUBLISHED} value={TEAM_STATUS_PUBLISHED} />
-                        <Select.Option key={3} name={TEAM_STATUS_DRAFT} value={TEAM_STATUS_DRAFT} />
+                        <Select.Option
+                            key={1}
+                            name={COMMON_TEXT_ADMIN.FILTER.STATUS.ALL}
+                            value={COMMON_TEXT_ADMIN.FILTER.STATUS.ALL}
+                        />
+                        <Select.Option
+                            key={2}
+                            name={COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED}
+                            value={COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED}
+                        />
+                        <Select.Option
+                            key={3}
+                            name={COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT}
+                            value={COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT}
+                        />
                     </Select>
                     <Button onClick={handleOpenAddMember} buttonStyle="primary" data-testid="add-member-button">
-                        {TEAM_ADD_MEMBER} <img src={PlusIcon} alt="plus" />
+                        {TEAM_MEMBERS_TEXT.BUTTON.ADD_MEMBER} <img src={PlusIcon} alt="plus" />
                     </Button>
                 </div>
             </div>

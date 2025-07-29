@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { LoginPage } from './LoginPage';
-import { ERROR_MODAL_BUTTON, ERROR_MODAL_CONTENT, ERROR_MODAL_TITLE } from '../../const/login-page/login-page';
+import { LOGIN_CONST } from '../../const/admin/login';
 
 jest.mock('./components/login-form/LoginForm', () => ({
     LoginForm: ({ setShowErrorModal }: { setShowErrorModal: (value: boolean) => void }) => (
@@ -15,29 +15,29 @@ describe('LoginPage', () => {
 
     it('does not render the modal by default', () => {
         render(<LoginPage />);
-        expect(screen.queryByText(ERROR_MODAL_TITLE)).not.toBeInTheDocument();
-        expect(screen.queryByText(ERROR_MODAL_CONTENT)).not.toBeInTheDocument();
-        expect(screen.queryByText(ERROR_MODAL_BUTTON)).not.toBeInTheDocument();
+        expect(screen.queryByText(LOGIN_CONST.ERROR_MODAL.TITLE)).not.toBeInTheDocument();
+        expect(screen.queryByText(LOGIN_CONST.ERROR_MODAL.CONTENT)).not.toBeInTheDocument();
+        expect(screen.queryByText(LOGIN_CONST.ERROR_MODAL.BUTTON)).not.toBeInTheDocument();
     });
 
     it('renders the modal when showErrorModal is true', () => {
         render(<LoginPage />);
         fireEvent.click(screen.getByTestId('simulate-error'));
 
-        expect(screen.getByText(ERROR_MODAL_TITLE)).toBeInTheDocument();
-        expect(screen.getByText(ERROR_MODAL_CONTENT)).toBeInTheDocument();
-        expect(screen.getByText(ERROR_MODAL_BUTTON)).toBeInTheDocument();
+        expect(screen.getByText(LOGIN_CONST.ERROR_MODAL.TITLE)).toBeInTheDocument();
+        expect(screen.getByText(LOGIN_CONST.ERROR_MODAL.CONTENT)).toBeInTheDocument();
+        expect(screen.getByText(LOGIN_CONST.ERROR_MODAL.BUTTON)).toBeInTheDocument();
     });
 
     it('closes the modal when action button is clicked', () => {
         render(<LoginPage />);
         fireEvent.click(screen.getByTestId('simulate-error'));
 
-        const closeButton = screen.getByRole('button', { name: ERROR_MODAL_BUTTON });
+        const closeButton = screen.getByRole('button', { name: LOGIN_CONST.ERROR_MODAL.BUTTON });
         fireEvent.click(closeButton);
 
-        expect(screen.queryByText(ERROR_MODAL_TITLE)).not.toBeInTheDocument();
-        expect(screen.queryByText(ERROR_MODAL_CONTENT)).not.toBeInTheDocument();
-        expect(screen.queryByText(ERROR_MODAL_BUTTON)).not.toBeInTheDocument();
+        expect(screen.queryByText(LOGIN_CONST.ERROR_MODAL.TITLE)).not.toBeInTheDocument();
+        expect(screen.queryByText(LOGIN_CONST.ERROR_MODAL.CONTENT)).not.toBeInTheDocument();
+        expect(screen.queryByText(LOGIN_CONST.ERROR_MODAL.BUTTON)).not.toBeInTheDocument();
     });
 });

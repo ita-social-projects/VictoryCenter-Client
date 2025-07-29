@@ -1,9 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MembersList, MembersListProps } from './MembersList';
-import { TeamCategory, TeamMember } from '../../../../../types/admin/TeamMembers';
-import * as React from 'react';
-import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi';
-import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
+import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
+import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-сategories/team-categories-api';
+import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
 
 const mockMembers = [] as TeamMember[];
 

@@ -1,13 +1,12 @@
-import React from 'react';
+import './ProgramModal.scss';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { ProgramForm } from '../program-form/ProgramForm';
-import { Program, ProgramCategory } from '../../../../../types/ProgramAdminPage';
 import { Button } from '../../../../../components/common/button/Button';
 import { QuestionModal } from '../../../../../components/common/question-modal/QuestionModal';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { useProgramModal } from '../../../../../hooks/admin/useProgramModal/useProgramModal';
-import './program-modal.scss';
+import { Program, ProgramCategory } from '../../../../../types/admin/programs';
 
 type BaseProps = {
     isOpen: boolean;
@@ -81,7 +80,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                         onClick={() => formRef.current?.submit('Draft')}
                         disabled={isSubmitting}
                     >
-                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFTED}
+                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
                     </Button>
                     <Button
                         buttonStyle="primary"

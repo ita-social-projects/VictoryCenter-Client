@@ -2,11 +2,11 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramListItem } from './ProgramListItem';
-import { Program } from '../../../../../types/ProgramAdminPage';
-import { VisibilityStatus } from '../../../../../types/Common';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { VisibilityStatus } from '../../../../../types/common';
+import { Program } from '../../../../../types/admin/programs';
 
-jest.mock('../../../../../assets/images/admin/blank-image.svg', () => 'blank-image.svg');
+jest.mock('../../../../../assets/icons/blank-image.svg', () => 'blank-image.svg');
 
 jest.mock('../../../../../components/common/button-tooltip/ButtonTooltip', () => ({
     ButtonTooltip: ({ children, position }: { children: React.ReactNode; position: string }) => {

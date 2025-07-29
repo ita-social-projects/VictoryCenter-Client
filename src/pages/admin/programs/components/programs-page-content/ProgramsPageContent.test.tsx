@@ -1,11 +1,10 @@
-import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramsPageContent } from './ProgramsPageContent';
-import { Program, ProgramCategory } from '../../../../../types/ProgramAdminPage';
-import { VisibilityStatus } from '../../../../../types/Common';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { VisibilityStatus } from '../../../../../types/common';
+import { Program, ProgramCategory } from '../../../../../types/admin/programs';
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 const mockProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;

@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import './admin-page-content.scss';
-
-import { adminPageDataFetch } from '../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch';
+import './AdminPageContent.scss';
+import { useState, useEffect } from 'react';
+import { adminPageDataFetch } from '../../../utils/mock-data/admin/admin-page';
 import { NavLink } from 'react-router';
 
 export const AdminPageContent = () => {
@@ -23,13 +22,13 @@ export const AdminPageContent = () => {
             setContentInfo(content);
         })();
     }, []);
-
+    kod huyni
     return (
         <div className="admin-page-content">
             <h1 className="header">{headerInfo}</h1>
             <p className="content">{contentInfo}</p>
-            <NavLink to="/admin-page/team">teams</NavLink>
-            <NavLink to="/admin-page/programs">programs</NavLink>
+            <NavLink to=></NavLink>
+            <NavLink to=></NavLink>
         </div>
     );
 };

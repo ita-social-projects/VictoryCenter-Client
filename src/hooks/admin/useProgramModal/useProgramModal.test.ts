@@ -2,9 +2,9 @@ import { renderHook, act } from '@testing-library/react';
 import { useProgramModal } from './useProgramModal';
 import { ProgramsApi } from '../../../services/api/admin/programs/programs-api';
 import { PROGRAMS_TEXT } from '../../../const/admin/programs';
-import { Program } from '../../../types/ProgramAdminPage';
-import { VisibilityStatus } from '../../../types/Common';
 import { ProgramFormValues } from '../../../pages/admin/programs/components/program-form/ProgramForm';
+import { Program } from '../../../types/admin/programs';
+import { VisibilityStatus } from '../../../types/common';
 
 jest.mock('../../../services/api/admin/programs/programs-api');
 jest.mock('../../../const/admin/programs');

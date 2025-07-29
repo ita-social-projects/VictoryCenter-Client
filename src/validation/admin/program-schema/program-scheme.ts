@@ -1,6 +1,6 @@
-import { ProgramCategory } from '../../../types/ProgramAdminPage';
 import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
 import * as Yup from 'yup';
+import { ProgramCategory } from '../../../types/admin/programs';
 
 export interface ProgramValidationContext {
     isPublishing: boolean;

@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { VisibilityStatus } from '../../../types/Common';
 import { PROGRAMS_TEXT } from '../../../const/admin/programs';
 import { ProgramFormRef, ProgramFormValues } from '../../../pages/admin/programs/components/program-form/ProgramForm';
 import { ProgramsApi } from '../../../services/api/admin/programs/programs-api';
-import { Program, ProgramCreateUpdate } from '../../../types/ProgramAdminPage';
+import { Program, ProgramCreateUpdate } from '../../../types/admin/programs';
+import { VisibilityStatus } from '../../../types/common';
 
 interface UseProgramModalProps {
     isOpen: boolean;

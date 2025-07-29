@@ -1,14 +1,10 @@
-import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { AdminContextProvider, useAdminContext } from './AdminContextProvider';
-import {
-    loginRequest,
-    tokenRefreshRequest,
-} from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
-import { CreateAdminClient } from '../../services/auth/create-admin-client/createAdminClient';
+import { loginRequest, tokenRefreshRequest } from '../../services/api/admin/login/login-api';
 import { API_ROUTES } from '../../const/urls/main-api';
-import { isAccessTokenValid } from '../../services/auth/auth-service/AuthService';
+import { isAccessTokenValid } from '../../services/auth/auth-service/auth-service';
+import { CreateAdminClient } from '../../services/auth/create-admin-client/create-admin-client';
 
 jest.mock('../../services/data-fetch/login-page-data-fetch/login-page-data-fetch', () => ({
     loginRequest: jest.fn(),

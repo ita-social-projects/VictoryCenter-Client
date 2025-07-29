@@ -1,8 +1,8 @@
-import React from 'react';
-import { TeamMember } from '../../../../../types/admin/TeamMembers';
-import './member-component.scss';
-import BlankUserImage from '../../../../../assets/images/admin/blank-user.svg';
+import './MemberComponent.scss';
+import BlankUserImage from '../../../../../assets/icons/blank-user.svg';
 import classNames from 'classnames';
+import { TeamMember } from '../../../../../types/admin/team-members';
+
 export const MemberComponent = ({
     member,
     handleOnDeleteMember,

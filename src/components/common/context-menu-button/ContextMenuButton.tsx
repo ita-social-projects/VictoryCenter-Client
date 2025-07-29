@@ -1,7 +1,7 @@
 import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import DefaultIcon from '../../../assets/icons/menu.svg';
 import classNames from 'classnames';
-import './context-menu-button.scss';
+import './ContextMenuButton.scss';
 
 export type ContextMenuButtonProps = {
     children: React.ReactNode;

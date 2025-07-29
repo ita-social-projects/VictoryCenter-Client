@@ -1,14 +1,15 @@
 import {
-    Program,
     ProgramCategory,
-    ProgramCategoryCreateUpdate,
     ProgramCreateUpdate,
-} from '../../../../types/ProgramAdminPage';
-import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin-page/programPage';
-import { PaginationResult, VisibilityStatus } from '../../../../types/Common';
+    ProgramCategoryCreateUpdate,
+    Program,
+} from '../../../../types/admin/programs';
+import { VisibilityStatus, PaginationResult } from '../../../../types/common';
+import { mockPrograms, mockCategories } from '../../../../utils/mock-data/admin-page/program-page';
 
 // !!!
 // Delete after actual integration with backend
+
 // ============================================
 let mockProgramId = Math.max(...mockPrograms.map((p) => p.id), 0) + 1;
 let mockCategoryId = Math.max(...mockCategories.map((c) => c.id), 0) + 1;

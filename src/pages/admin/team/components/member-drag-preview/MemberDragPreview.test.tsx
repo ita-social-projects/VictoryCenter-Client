@@ -1,9 +1,8 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { render, screen } from '@testing-library/react';
 import { MemberDragPreview } from './MemberDragPreview';
-import { DragPreviewModel } from '../../../../../types/admin/Common';
-import { TeamMember } from '../../../../../types/admin/TeamMembers';
+import { TeamMember } from '../../../../../types/admin/team-members';
+import { DragPreviewModel } from '../../../../../types/admin/common';
 
 jest.mock('../../../../../assets/icons/dragger.svg', () => 'mock-dragger-icon');
 jest.mock('../member-component/MemberComponent', () => ({

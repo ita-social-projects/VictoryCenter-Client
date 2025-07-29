@@ -1,7 +1,6 @@
-import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import { MembersListItem } from './MembersListItem';
-import { TeamMember } from '../../../../../types/admin/TeamMembers';
+import { TeamMember } from '../../../../../types/admin/team-members';
 
 jest.mock('../../../../../assets/icons/dragger.svg', () => 'drag-icon.svg');
 

@@ -1,0 +1,51 @@
+.search-bar {
+    position: relative;
+
+    &-icon {
+        position: absolute;
+        z-index: 2;
+        border: none;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    &-search-icon {
+        width: 25px;
+        height: 25px;
+        top: 10px;
+        left: 10px;
+        background: url('../../../assets/icons/la_search.svg');
+    }
+
+    &-remove-query-icon {
+        width: 25px;
+        height: 25px;
+        right: 10px;
+        top: 10px;
+        background: url('../../../assets/icons/remove-query.svg');
+    }
+
+    input {
+        position: sticky;
+        z-index: 1000;
+        width: 613px;
+        height: 40px;
+        top: 52px;
+        left: 351px;
+        padding-left: 50px;
+        gap: 10px;
+        border: none;
+        outline: none;
+        box-shadow: 0px 1px 4px 0px #00000040;
+    }
+}
+
+.autocomplete {
+    width: 95%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: none;
+}

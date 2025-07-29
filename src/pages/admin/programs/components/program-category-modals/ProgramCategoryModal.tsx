@@ -1,3 +1,4 @@
+import './ProgramCategoryModal.scss';
 import React, { useEffect, useRef, useState } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/common/button/Button';
@@ -6,12 +7,11 @@ import { InputWithCharacterLimit } from '../../../../../components/common/input-
 import { QuestionModal } from '../../../../../components/common/question-modal/QuestionModal';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Controller, useForm } from 'react-hook-form';
-import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/ProgramAdminPage';
 import { ProgramCategoryValidationSchema } from '../../../../../validation/admin/program-category-schema/program-category-schema';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import './program-category-modal.scss';
+import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/admin/programs';
 
 type ProgramCategoryFormValues = {
     name: string;

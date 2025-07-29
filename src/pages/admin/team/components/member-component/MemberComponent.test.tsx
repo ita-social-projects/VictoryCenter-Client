@@ -1,8 +1,7 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { TeamMember } from '../../../../../types/admin/team-members';
 import { MemberComponent } from './MemberComponent';
-import { TeamMember } from '../../../../../types/admin/TeamMembers';
 
 const mockMemberDraft: TeamMember = {
     id: 1,
@@ -33,7 +32,7 @@ const mockMemberPublished: TeamMember = {
 const mockHandleOnDeleteMember = jest.fn();
 const mockHandleOnEditMember = jest.fn();
 
-jest.mock('../../../../../assets/images/admin/blank-user.svg', () => 'blank-user.svg');
+jest.mock('../../../../../assets/icons/blank-user.svg', () => 'blank-user.svg');
 
 describe('MemberComponent', () => {
     beforeEach(() => {

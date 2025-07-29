@@ -1,18 +1,10 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import * as AdminContext from '../../../../context/admin-context-provider/AdminContextProvider';
 import { LoginForm } from './LoginForm';
-import {
-    EMAIL_FIELD_LABEL,
-    PASSWORD_FIELD_LABEL,
-    FORM_TITLE,
-    LOGO_ALT,
-    EYE_CLOSED_ALT,
-    EYE_OPENED_ALT,
-    SUBMIT_BUTTON,
-} from '../../../../const/login-page/login-page';
 import Logo from '../../../../assets/icons/logo.svg';
 import { MemoryRouter } from 'react-router';
+import { LOGIN_CONST } from '../../../../const/admin/login';
 
 describe('<LoginForm />', () => {
     let loginMock: jest.Mock<Promise<void>, [creds: any]>;
@@ -40,24 +32,24 @@ describe('<LoginForm />', () => {
             </MemoryRouter>,
         );
 
-        const logo = screen.getByAltText(LOGO_ALT) as HTMLImageElement;
+        const logo = screen.getByAltText(LOGIN_CONST.FORM.LOGO_ALT) as HTMLImageElement;
         expect(logo).toBeInTheDocument();
         expect(logo.src).toContain(Logo);
 
-        expect(screen.getByText(FORM_TITLE)).toBeInTheDocument();
+        expect(screen.getByText(LOGIN_CONST.FORM.TITLE)).toBeInTheDocument();
 
-        const emailInput = screen.getByLabelText(EMAIL_FIELD_LABEL) as HTMLInputElement;
+        const emailInput = screen.getByLabelText(LOGIN_CONST.FORM.EMAIL_FIELD_LABEL) as HTMLInputElement;
         expect(emailInput.value).toBe('');
 
-        const passwordInput = screen.getByLabelText(PASSWORD_FIELD_LABEL) as HTMLInputElement;
+        const passwordInput = screen.getByLabelText(LOGIN_CONST.FORM.PASSWORD_FIELD_LABEL) as HTMLInputElement;
         expect(passwordInput.value).toBe('');
         expect(passwordInput.type).toBe('password');
         const toggleBtn = screen.getByRole('button', {
-            name: EYE_CLOSED_ALT,
+            name: LOGIN_CONST.FORM.HIDDEN_PASSWORD_ALT,
         });
         expect(toggleBtn).toBeInTheDocument();
 
-        expect(screen.getByRole('button', { name: SUBMIT_BUTTON })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: LOGIN_CONST.FORM.SUBMIT_BUTTON })).toBeInTheDocument();
     });
 
     it('updates email and password inputs on change', () => {
@@ -67,8 +59,8 @@ describe('<LoginForm />', () => {
             </MemoryRouter>,
         );
 
-        const emailInput = screen.getByLabelText(EMAIL_FIELD_LABEL) as HTMLInputElement;
-        const passwordInput = screen.getByLabelText(PASSWORD_FIELD_LABEL) as HTMLInputElement;
+        const emailInput = screen.getByLabelText(LOGIN_CONST.FORM.EMAIL_FIELD_LABEL) as HTMLInputElement;
+        const passwordInput = screen.getByLabelText(LOGIN_CONST.FORM.PASSWORD_FIELD_LABEL) as HTMLInputElement;
 
         fireEvent.change(emailInput, {
             target: { value: 'user@example.com' },
@@ -88,18 +80,18 @@ describe('<LoginForm />', () => {
             </MemoryRouter>,
         );
 
-        const passwordInput = screen.getByLabelText(PASSWORD_FIELD_LABEL) as HTMLInputElement;
+        const passwordInput = screen.getByLabelText(LOGIN_CONST.FORM.PASSWORD_FIELD_LABEL) as HTMLInputElement;
         const toggleBtn = screen.getByRole('button', {
-            name: EYE_CLOSED_ALT,
+            name: LOGIN_CONST.FORM.HIDDEN_PASSWORD_ALT,
         });
 
         fireEvent.click(toggleBtn);
         expect(passwordInput.type).toBe('text');
-        expect(screen.getByRole('button', { name: EYE_OPENED_ALT })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: LOGIN_CONST.FORM.SHOWED_PASSWORD_ALT })).toBeInTheDocument();
 
-        fireEvent.click(screen.getByRole('button', { name: EYE_OPENED_ALT }));
+        fireEvent.click(screen.getByRole('button', { name: LOGIN_CONST.FORM.SHOWED_PASSWORD_ALT }));
         expect(passwordInput.type).toBe('password');
-        expect(screen.getByRole('button', { name: EYE_CLOSED_ALT })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: LOGIN_CONST.FORM.HIDDEN_PASSWORD_ALT })).toBeInTheDocument();
     });
 
     it('calls login with credentials on submit (success)', async () => {
@@ -112,14 +104,14 @@ describe('<LoginForm />', () => {
             </MemoryRouter>,
         );
 
-        fireEvent.change(screen.getByLabelText(EMAIL_FIELD_LABEL), {
+        fireEvent.change(screen.getByLabelText(LOGIN_CONST.FORM.EMAIL_FIELD_LABEL), {
             target: { value: 'a@b.com' },
         });
-        fireEvent.change(screen.getByLabelText(PASSWORD_FIELD_LABEL), {
+        fireEvent.change(screen.getByLabelText(LOGIN_CONST.FORM.PASSWORD_FIELD_LABEL), {
             target: { value: 'secret' },
         });
 
-        fireEvent.click(screen.getByRole('button', { name: SUBMIT_BUTTON }));
+        fireEvent.click(screen.getByRole('button', { name: LOGIN_CONST.FORM.SUBMIT_BUTTON }));
 
         await waitFor(() =>
             expect(loginMock).toHaveBeenCalledWith({
@@ -140,7 +132,7 @@ describe('<LoginForm />', () => {
             </MemoryRouter>,
         );
 
-        fireEvent.click(screen.getByRole('button', { name: SUBMIT_BUTTON }));
+        fireEvent.click(screen.getByRole('button', { name: LOGIN_CONST.FORM.SUBMIT_BUTTON }));
         await waitFor(() => expect(setShowErrorModal).toHaveBeenCalledWith(true));
     });
 });

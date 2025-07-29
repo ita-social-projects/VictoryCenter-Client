@@ -9,7 +9,7 @@ export const COMMON_TEXT_ADMIN = {
         UPLOAD: 'Завантажити',
     },
 
-    INPUT: {
+    FORM: {
         PHOTO_PLACEHOLDER: 'Перетягніть файл сюди або натисніть для завантаження',
     },
 
@@ -35,6 +35,10 @@ export const COMMON_TEXT_ADMIN = {
             PUBLISHED: 'Опубліковано',
             DRAFT: 'Чернетка',
         },
+        CATEGORY: {
+            CATEGORY_LABEL: 'Категорія',
+            SELECT_CATEGORY: 'Виберіть категорію',
+        },
     },
 
     QUESTION: {
@@ -49,10 +53,8 @@ export const COMMON_TEXT_ADMIN = {
         SAVE: 'Зберегти',
         DELETE: 'Видалити',
         CANCEL: 'Відмінити',
-        SAVE_AS_DRAFTED: 'Зберегти як чернетку',
+        SAVE_AS_DRAFT: 'Зберегти як чернетку',
         SAVE_AS_PUBLISHED: 'Опублікувати',
         TRY_AGAIN: 'Спробувати ще раз',
     },
 };
-
-export const TEAM_STATUS_DEFAULT = 'Статус';

@@ -1,9 +1,9 @@
-import { Program } from '../../../../../types/ProgramAdminPage';
+import './programs-list-item.scss';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonTooltip } from '../../../../../components/common/button-tooltip/ButtonTooltip';
-import { Status } from '../../../../../components/common/status/Status';
-import BlankImage from '../../../../../assets/images/admin/blank-image.svg';
-import './programs-list-item.scss';
+import { Status } from '../../../../../components/admin/status/Status';
+import BlankImage from '../../../../../assets/icons/blank-image.svg';
+import { Program } from '../../../../../types/admin/programs';
 
 export interface ProgramListItemProps {
     program: Program;

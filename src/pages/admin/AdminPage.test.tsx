@@ -1,6 +1,6 @@
 import { render, waitFor } from '@testing-library/react';
 import { AdminPage } from './AdminPage';
-import * as AdminPageDataFetchModule from '../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch';
+import * as AdminPageDataFetchModule from '../../utils/mock-data/admin/admin-page';
 import { MemoryRouter } from 'react-router';
 
 const spyAdminPageDataFetch = jest.spyOn(AdminPageDataFetchModule, 'adminPageDataFetch');

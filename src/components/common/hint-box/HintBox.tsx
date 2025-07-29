@@ -1,6 +1,6 @@
 import React from 'react';
 import InfoIcon from '../../../assets/icons/info.svg';
-import './hint-box.scss';
+import './HintBox.scss';
 
 export interface HintBoxProps {
     title: string;

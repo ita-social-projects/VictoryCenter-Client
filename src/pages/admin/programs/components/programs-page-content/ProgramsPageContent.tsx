@@ -1,11 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Program, ProgramCategory } from '../../../../../types/ProgramAdminPage';
-import { VisibilityStatus } from '../../../../../types/Common';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ProgramsPageToolbar } from '../programs-page-toolbar/ProgramsPageToolbar';
 import { DeleteProgramModal } from '../program-modals/DeleteProgramModal';
 import { InfiniteScrollList } from '../../../../../components/common/infinite-scroll-list/InfiniteScrollList';
 import { ProgramModal } from '../program-modals/ProgramModal';
-import { CategoryBar, ContextMenuOption } from '../../../../../components/common/category-bar/CategoryBar';
+import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/category-bar/CategoryBar';
 import { DeleteCategoryModal } from '../program-category-modals/DeleteCategoryModal';
 import { ProgramCategoryModal } from '../program-category-modals/ProgramCategoryModal';
 import { ProgramListItem } from '../program-list-item/ProgramListItem';
@@ -13,7 +11,9 @@ import { ProgramsApi } from '../../../../../services/api/admin/programs/programs
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import axios from 'axios';
-import './programs-page-content.scss';
+import './ProgramsPageContent.scss';
+import { Program, ProgramCategory } from '../../../../../types/admin/programs';
+import { VisibilityStatus } from '../../../../../types/common';
 
 const PAGE_SIZE = 5;
 
@@ -99,8 +99,6 @@ export const ProgramsPageContent = () => {
     }, [clearError]);
 
     const fetchCategories = useCallback(async () => {
-        console.log('trying to load categories.');
-
         if (isCategoriesLoadingRef.current) {
             return;
         }
@@ -126,8 +124,6 @@ export const ProgramsPageContent = () => {
 
     const fetchPrograms = useCallback(
         async (shouldResetList: boolean = false) => {
-            console.log('trying to load programs');
-
             if (
                 isProgramsLoadingRef.current ||
                 !selectedCategoryRef.current ||
@@ -178,7 +174,6 @@ export const ProgramsPageContent = () => {
                 totalItemsCountRef.current = fetchedTotalItemsCount;
                 setHasMore(currentItemsCountRef.current < fetchedTotalItemsCount);
             } catch (error: any) {
-                console.log(error);
                 if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                     return;
                 }

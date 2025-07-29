@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import LoaderIcon from '../../../assets/icons/load.svg';
 import ArrowUpIcon from '../../../assets/icons/arrow-up.svg';
 import NotFoundIcon from '../../../assets/icons/not-found.svg';
-import './infinite-scroll-list.scss';
+import './InfiniteScrollList.scss';
 
 export interface InfiniteScrollListProps<T> {
     items: T[];

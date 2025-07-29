@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramModal, ProgramModalProps } from './ProgramModal';
-import { Program } from '../../../../../types/ProgramAdminPage';
 import { useProgramModal } from '../../../../../hooks/admin/useProgramModal/useProgramModal';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { Program } from '../../../../../types/admin/programs';
 
 jest.mock('../../../../../components/common/modal/Modal', () => {
     const MockModal = ({ isOpen, children }: { isOpen: boolean; children: React.ReactNode }) =>
@@ -99,7 +99,7 @@ describe('ProgramModal', () => {
     const renderProgramModal = (props: ProgramModalProps) => render(<ProgramModal {...props} />);
 
     const getProgramForm = () => screen.getByTestId('program-form');
-    const getDraftButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFTED);
+    const getDraftButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT);
     const getPublishButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED);
     const getQuestionModal = () => screen.queryByTestId('question-modal');
     const getAddTitle = () => screen.queryByText(PROGRAMS_TEXT.FORM.TITLE.ADD_PROGRAM);

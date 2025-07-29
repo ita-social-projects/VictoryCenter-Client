@@ -1,16 +1,9 @@
 import CloudDownload from '../../../../../assets/icons/cloud-download.svg';
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { TeamCategory } from '../../../../../types/admin/TeamMembers';
-import {
-    TEAM_LABEL_CATEGORY,
-    TEAM_LABEL_SELECT_CATEGORY,
-    TEAM_LABEL_FULLNAME,
-    TEAM_LABEL_DESCRIPTION,
-    TEAM_LABEL_PHOTO,
-    TEAM_LABEL_DRAG_DROP,
-} from '../../../../../const/team';
-import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
-import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
+import { TeamCategory } from '../../../../../types/admin/team-members';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-сategories/team-categories-api';
+import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 
 export type MemberFormValues = {
     category: TeamCategory;
@@ -117,7 +110,7 @@ export const MemberForm = ({
         <form id={id} onSubmit={handleOnSubmit} data-testid="test-form">
             <div className="members-add-modal-body">
                 <div className="form-group">
-                    <label htmlFor="category">{TEAM_LABEL_CATEGORY}</label>
+                    <label htmlFor="category">{TEAM_MEMBERS_TEXT.FORM.LABEL.CATEGORY}</label>
                     <select
                         value={memberFormValues?.category?.name ?? ''}
                         onChange={handleMemberFormValuesChange}
@@ -126,7 +119,7 @@ export const MemberForm = ({
                         disabled={isLoadingCategories}
                     >
                         <option value="" disabled>
-                            {TEAM_LABEL_SELECT_CATEGORY}
+                            {TEAM_MEMBERS_TEXT.FORM.LABEL.SELECT_CATEGORY}
                         </option>
                         {categories.map((category) => (
                             <option key={category.id} value={category.name}>
@@ -136,7 +129,7 @@ export const MemberForm = ({
                     </select>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="fullName">{TEAM_LABEL_FULLNAME}</label>
+                    <label htmlFor="fullName">{TEAM_MEMBERS_TEXT.FORM.LABEL.NAME}</label>
                     <input
                         value={memberFormValues ? memberFormValues.fullName : ''}
                         maxLength={MAX_FULLNAME_LENGTH}
@@ -150,7 +143,7 @@ export const MemberForm = ({
                     </div>
                 </div>
                 <div className="form-group">
-                    <label htmlFor="description">{TEAM_LABEL_DESCRIPTION}</label>
+                    <label htmlFor="description">{TEAM_MEMBERS_TEXT.FORM.LABEL.DESCRIPTION}</label>
                     <textarea
                         value={memberFormValues ? memberFormValues.description : ''}
                         maxLength={MAX_DESCRIPTION_LENGTH}
@@ -167,7 +160,7 @@ export const MemberForm = ({
                 <div className="form-group form-group-image">
                     <span>
                         <span className="form-group-image-required">*</span>
-                        {TEAM_LABEL_PHOTO}
+                        {TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}
                     </span>
                     <div className="form-group-image-details">
                         <label
@@ -179,7 +172,7 @@ export const MemberForm = ({
                         >
                             <div className="form-group-image-choose-file-inner" data-testid="drop-area">
                                 <img src={CloudDownload} alt="cloud-download" />
-                                <span>{TEAM_LABEL_DRAG_DROP}</span>
+                                <span>{TEAM_MEMBERS_TEXT.FORM.LABEL.DRAG_DROP}</span>
                             </div>
                         </label>
                         <input

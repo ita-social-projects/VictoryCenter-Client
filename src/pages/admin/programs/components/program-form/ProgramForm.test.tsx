@@ -3,7 +3,7 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from './ProgramForm';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
-import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
+import { ProgramCategory } from '../../../../../types/admin/programs';
 
 jest.mock('../../../../../components/common/multi-select/MultiSelect', () => ({
     MultiSelect: (props: any) => (

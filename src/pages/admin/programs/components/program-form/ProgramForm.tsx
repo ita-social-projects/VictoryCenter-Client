@@ -1,3 +1,4 @@
+import './ProgramForm.scss';
 import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from 'react';
 import { useForm, Controller, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -7,13 +8,12 @@ import {
 } from '../../../../../validation/admin/program-schema/program-scheme';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
-import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
-import { VisibilityStatus } from '../../../../../types/Common';
 import { MultiSelect } from '../../../../../components/common/multi-select/MultiSelect';
 import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
 import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
 import { TextAreaWithCharacterLimit } from '../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import './program-form.scss';
+import { ProgramCategory } from '../../../../../types/admin/programs';
+import { VisibilityStatus } from '../../../../../types/common';
 
 export type ProgramFormValues = {
     name: string;

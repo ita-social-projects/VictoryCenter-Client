@@ -1,21 +1,13 @@
+import './LoginForm.scss';
 import React, { useState } from 'react';
 import { NavLink } from 'react-router';
 import { useAdminContext } from '../../../../context/admin-context-provider/AdminContextProvider';
 import { Button } from '../../../../components/common/button/Button';
-import {
-    EMAIL_FIELD_LABEL,
-    EYE_CLOSED_ALT,
-    EYE_OPENED_ALT,
-    FORM_TITLE,
-    LOGO_ALT,
-    PASSWORD_FIELD_LABEL,
-    SUBMIT_BUTTON,
-} from '../../../../const/login-page/login-page';
 import Logo from '../../../../assets/icons/logo.svg';
 import EyeOpened from '../../../../assets/icons/eye-opened.svg';
 import EyeClosed from '../../../../assets/icons/eye-closed.svg';
-import { Credentials } from '../../../../types/admin/Auth';
-import './login-form.scss';
+import { Credentials } from '../../../../types/admin/auth';
+import { LOGIN_CONST } from '../../../../const/admin/login';
 
 type LoginFormProps = {
     setShowErrorModal: (value: boolean) => void;
@@ -42,11 +34,11 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
     return (
         <form onSubmit={handleSubmit} className="login-form" spellCheck={false}>
             <NavLink to="/" className="logo">
-                <img src={Logo} alt={LOGO_ALT} />
+                <img src={Logo} alt={LOGIN_CONST.FORM.LOGO_ALT} />
             </NavLink>
-            <h2 className="login-form-title">{FORM_TITLE}</h2>
+            <h2 className="login-form-title">{LOGIN_CONST.FORM.TITLE}</h2>
             <div className="login-form-group">
-                <label htmlFor="email">{EMAIL_FIELD_LABEL}</label>
+                <label htmlFor="email">{LOGIN_CONST.FORM.EMAIL_FIELD_LABEL}</label>
                 <input
                     id="email"
                     name="email"
@@ -59,7 +51,7 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
             </div>
 
             <div className="login-form-group">
-                <label htmlFor="password">{PASSWORD_FIELD_LABEL}</label>
+                <label htmlFor="password">{LOGIN_CONST.FORM.PASSWORD_FIELD_LABEL}</label>
                 <div className="password-input-container">
                     <input
                         id="password"
@@ -77,7 +69,11 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
                     >
                         <img
                             src={isPasswordVisible ? EyeOpened : EyeClosed}
-                            alt={isPasswordVisible ? EYE_OPENED_ALT : EYE_CLOSED_ALT}
+                            alt={
+                                isPasswordVisible
+                                    ? LOGIN_CONST.FORM.SHOWED_PASSWORD_ALT
+                                    : LOGIN_CONST.FORM.HIDDEN_PASSWORD_ALT
+                            }
                             className="toggle-icon"
                         />
                     </button>
@@ -85,7 +81,7 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
             </div>
             <div className="login-form-group">
                 <Button type="submit" buttonStyle="primary" className="submit-button">
-                    {SUBMIT_BUTTON}
+                    {LOGIN_CONST.FORM.SUBMIT_BUTTON}
                 </Button>
             </div>
         </form>

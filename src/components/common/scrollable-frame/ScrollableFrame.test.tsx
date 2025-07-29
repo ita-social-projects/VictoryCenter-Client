@@ -3,10 +3,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { ScrollableFrame } from './ScrollableFrame';
 import * as dataFetch from '../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
 
-jest.mock('../../../assets/about-us-images/icons/arrow-left.png', () => 'arrow-left.png');
-jest.mock('../../../assets/about-us-images/icons/arrow-right.png', () => 'arrow-right.png');
-jest.mock('../../../assets/about-us-images/icons/arrow-left-black.png', () => 'arrow-left-black.png');
-jest.mock('../../../assets/about-us-images/icons/arrow-right-black.png', () => 'arrow-right-black.png');
+jest.mock('../../../assets/icons/arrow-left.png', () => 'arrow-left.png');
+jest.mock('../../../assets/icons/arrow-right.png', () => 'arrow-right.png');
+jest.mock('../../../assets/icons/arrow-left-black.png', () => 'arrow-left-black.png');
+jest.mock('../../../assets/icons/arrow-right-black.png', () => 'arrow-right-black.png');
 
 jest.mock('../../../pages/program-page/program-page/program-section/program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: { program: any }) => <div data-testid="program-card">{program.title}</div>,

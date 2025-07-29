@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
 import { useAdminContext } from '../../../context/admin-context-provider/AdminContextProvider';
-import { adminRoutes } from '../../../const/routers/routes';
+import { adminRoutes } from '../../../const/routes/admin-routes';
 import { PageLoader } from '../../common/page-loader/PageLoader';
 
 export const PrivateRoute = () => {

@@ -156,8 +156,11 @@ export const MembersList = ({
 
     const loadMembers = useCallback(
         async (reset: boolean = false) => {
+            console.log('got to load members');
             const currentCategory = categoryRef.current;
             const currentSearch = searchByNameQuery || '';
+            console.log('current' + currentPageRef.current);
+            console.log('total' + totalPagesRef.current);
             if (!currentCategory || isFetchingRef.current) {
                 return;
             }
@@ -179,7 +182,7 @@ export const MembersList = ({
                     currentCategory.id,
                     mapStatusFilterToStatus(statusFilter),
                     (pageToFetch - 1) * pageSize,
-                    pageToFetch * pageSize,
+                    pageSize,
                 );
                 newMembers = response;
                 setTotalCount(response.length);
@@ -190,6 +193,8 @@ export const MembersList = ({
                 newMembers = newMembers.filter((m) => m.fullName.toLowerCase().includes(currentSearch.toLowerCase()));
             }
 
+            console.log('totalCount ' + newMembers.length);
+            console.log('pageSize ' + pageSize);
             const totalCountOfPages = Math.ceil(totalCount / pageSize);
 
             setMembers((prev) => {
@@ -200,6 +205,7 @@ export const MembersList = ({
             });
             setCurrentPage((prev) => (reset ? 2 : prev + 1));
             if (totalPagesRef.current === null || reset) {
+                console.log('totalCount from back ' + totalCountOfPages);
                 setTotalPages(totalCountOfPages);
             }
             setIsMembersLoading(false);
@@ -360,7 +366,9 @@ export const MembersList = ({
         }
 
         const bottomReached = Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight) <= 5;
+        console.log('here');
         if (bottomReached) {
+            console.log('end reached');
             loadMembers();
         }
     };

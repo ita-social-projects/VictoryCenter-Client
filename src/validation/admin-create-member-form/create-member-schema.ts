@@ -1,10 +1,6 @@
 import * as yup from 'yup';
 import { TeamCategory } from '../../types/admin/TeamMembers';
-<<<<<<< HEAD
 // import { TEAM_CATEGORY_MAIN, TEAM_CATEGORY_SUPERVISORY, TEAM_CATEGORY_ADVISORS } from '../../const/team';
-=======
->>>>>>> ece11d0
-
 import {
     CATEGORY_REQUIRED,
     FULLNAME_REQUIRED,
@@ -74,10 +70,7 @@ export const useCreateMemberSchema = (isDraft: boolean) => {
         imageId: yup
             .number()
             .transform((value) => (value === null ? undefined : value))
-<<<<<<< HEAD
-=======
             .nullable()
->>>>>>> ece11d0
             .notRequired(),
     });
 };

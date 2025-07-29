@@ -1,5 +1,8 @@
-import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { TeamCategory } from '../../../../../types/admin/TeamMembers';
+import { useCreateMemberForm } from '../../../../../hooks/admin/create-member-form';
+import '../members-list/members-list.scss';
+import { MAX_FULLNAME_LENGTH, MAX_DESCRIPTION_LENGTH } from '../../../../../const/admin/data-validation';
 import {
     TEAM_LABEL_CATEGORY,
     TEAM_LABEL_SELECT_CATEGORY,
@@ -10,8 +13,10 @@ import { ImageValues } from '../../../../../types/Image';
 import PhotoInput from '../../../../../components/common/photo-input/PhotoInput';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
 import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
+import ArrowUp from '../../../../../assets/icons/chevron-up.svg';
+import ArrowDown from '../../../../../assets/icons/chevron-down.svg';
 
-export type MemberFormValues = {
+export type PublishMemberFormValues = {
     category: TeamCategory;
     fullName: string;
     description: string;
@@ -19,40 +24,77 @@ export type MemberFormValues = {
     imageId: number | null;
 };
 
+export type DraftMemberFormValues = {
+    category: TeamCategory;
+    fullName: string;
+    description: string;
+    image: ImageValues | null;
+    imageId: number | null;
+};
+
+export type MemberFormValues = PublishMemberFormValues | DraftMemberFormValues;
+
 export type MemberFormProps = {
     id: string;
     onSubmit: (memberFormValues: MemberFormValues) => void;
+    onDraftSubmit?: (data: MemberFormValues) => void;
     existingMemberFormValues?: MemberFormValues | null;
     onValuesChange?: (memberFormValues: MemberFormValues) => void;
     onError?: (msg: string | null) => void;
+    isDraft: boolean;
 };
 
-const MAX_FULLNAME_LENGTH = 50;
-const MAX_DESCRIPTION_LENGTH = 200;
 export const MemberForm = ({
     onSubmit,
+    onDraftSubmit,
     id,
     existingMemberFormValues = null,
     onValuesChange,
     onError,
+    isDraft,
 }: MemberFormProps) => {
     const client = useAdminClient();
     const [categories, setCategories] = useState<TeamCategory[]>([]);
     const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+    const [isInitialized, setIsInitialized] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const [memberFormValues, setMemberFormValues] = useState<MemberFormValues>(
         existingMemberFormValues || {
             fullName: '',
             image: null,
             imageId: null,
             description: '',
-            category: null as unknown as TeamCategory,
+            category: {} as TeamCategory,
         },
     );
 
-    const handleOnSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (memberFormValues?.category && memberFormValues?.description && memberFormValues?.fullName) {
-            onSubmit(memberFormValues);
+    const handleOpenSelect = () => {
+        setIsOpen(!isOpen);
+    };
+
+    const {
+        register,
+        watch,
+        handleSubmit,
+        setValue,
+        reset,
+        formState: { errors },
+    } = useCreateMemberForm(isDraft);
+
+    const {
+        ref: categoryRef,
+        onBlur: categoryOnBlur,
+        onChange: categoryOnChange,
+        name: categoryName,
+    } = register('category');
+
+    const watchedImg = watch('image');
+
+    const handleOnSubmit = (data: MemberFormValues) => {
+        if (isDraft) {
+            onDraftSubmit?.(data);
+        } else {
+            onSubmit(data);
         }
     };
 
@@ -62,10 +104,10 @@ export const MemberForm = ({
         const { name, value } = e.target;
         const inputTarget = e.currentTarget as EventTarget & HTMLInputElement;
         if (name === 'category') {
-            const selectedCategory = categories.find((c) => c.name === value);
+            let selected: TeamCategory | undefined = categories.find((c) => c.name === value);
             setMemberFormValues((prev) => ({
                 ...prev,
-                category: selectedCategory as TeamCategory,
+                category: selected as TeamCategory,
             }));
             return;
         }
@@ -89,13 +131,27 @@ export const MemberForm = ({
             ...prev,
             image: item,
         }));
+        setValue('image', item, { shouldValidate: true });
     };
 
     useEffect(() => {
-        if (onValuesChange && memberFormValues) {
-            onValuesChange(memberFormValues);
+        if (existingMemberFormValues && !isInitialized) {
+            reset({
+                ...existingMemberFormValues,
+                image: existingMemberFormValues.image || null,
+            });
+            setIsInitialized(true);
         }
-    }, [memberFormValues, onValuesChange]);
+    }, [existingMemberFormValues, isInitialized, reset]);
+
+    useEffect(() => {
+        const subscription = watch((value) => {
+            if (onValuesChange) {
+                onValuesChange(value as MemberFormValues);
+            }
+        });
+        return () => subscription.unsubscribe();
+    }, [watch, onValuesChange]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -111,19 +167,38 @@ export const MemberForm = ({
         fetchCategories();
     }, [client, onError]);
 
+    // const handleFileDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    //     e.preventDefault();
+
+    //     const files = e.dataTransfer.files;
+    //     if (files && files.length > 0) {
+    //         setValue('image', files, { shouldValidate: true });
+    //     }
+    // };
+
     return (
-        <form id={id} onSubmit={handleOnSubmit} data-testid="test-form">
+        <form id={id} onSubmit={handleSubmit(handleOnSubmit)} data-testid="test-form">
             <div className="members-add-modal-body">
                 <div className="form-group">
-                    <label htmlFor="category">{TEAM_LABEL_CATEGORY}</label>
+                    <label htmlFor="category" className="no-pointer-events">
+                        <span className="field-required">*</span>
+                        {TEAM_LABEL_CATEGORY}
+                    </label>
                     <select
                         value={memberFormValues?.category?.name ?? ''}
                         onChange={handleMemberFormValuesChange}
-                        name="category"
                         id="category"
                         disabled={isLoadingCategories}
+                        name={categoryName}
+                        ref={categoryRef}
+                        className="custom-select default-select"
+                        onClick={handleOpenSelect}
+                        onBlur={async (e) => {
+                            setIsOpen(false);
+                            await categoryOnBlur(e);
+                        }}
                     >
-                        <option value="" disabled>
+                        <option value="" disabled className="option-value">
                             {TEAM_LABEL_SELECT_CATEGORY}
                         </option>
                         {categories.map((category) => (
@@ -132,37 +207,35 @@ export const MemberForm = ({
                             </option>
                         ))}
                     </select>
+                    <img src={isOpen ? ArrowUp : ArrowDown} className="icon-img" alt="arrow-down" />
+                    {errors.category && <p className="error">{errors.category.message}</p>}
                 </div>
+
                 <div className="form-group">
-                    <label htmlFor="fullName">{TEAM_LABEL_FULLNAME}</label>
-                    <input
-                        value={memberFormValues ? memberFormValues.fullName : ''}
-                        maxLength={MAX_FULLNAME_LENGTH}
-                        onChange={handleMemberFormValuesChange}
-                        name="fullName"
-                        type="text"
-                        id="fullName"
-                    />
+                    <label htmlFor="fullName">
+                        <span className="field-required">*</span>
+                        {TEAM_LABEL_FULLNAME}
+                    </label>
+                    <input maxLength={MAX_FULLNAME_LENGTH} type="text" id="fullName" {...register('fullName')} />
                     <div className="form-group-fullname-length-limit">
-                        {memberFormValues?.fullName ? memberFormValues.fullName.length : 0}/{MAX_FULLNAME_LENGTH}
+                        {watch('fullName')?.length || 0}/{MAX_FULLNAME_LENGTH}
                     </div>
+                    {errors.fullName && <p className="error">{errors.fullName.message}</p>}
                 </div>
+
                 <div className="form-group">
                     <label htmlFor="description">{TEAM_LABEL_DESCRIPTION}</label>
                     <textarea
-                        value={memberFormValues ? memberFormValues.description : ''}
                         maxLength={MAX_DESCRIPTION_LENGTH}
-                        onChange={handleMemberFormValuesChange}
-                        name="description"
                         className="form-group-description"
                         id="description"
+                        {...register('description')}
                     />
+                    {errors.description && <p className="error">{errors.description.message}</p>}
                     <div className="form-group-description-length-limit">
-                        {memberFormValues?.description ? memberFormValues.description.length : 0}/
-                        {MAX_DESCRIPTION_LENGTH}
+                        {watch('description')?.length || 0}/{MAX_DESCRIPTION_LENGTH}
                     </div>
                 </div>
-
                 <PhotoInput value={memberFormValues?.image ?? null} onChange={onFileChange} id="photo" />
             </div>
         </form>

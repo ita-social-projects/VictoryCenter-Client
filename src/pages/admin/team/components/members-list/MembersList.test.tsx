@@ -97,27 +97,49 @@ jest.mock('../members-list-item/MembersListItem', () => ({
         </div>
     ),
 }));
-
 jest.mock('../member-form/MemberForm', () => ({
-    MemberForm: ({ onValuesChange, existingMemberFormValues, id, onSubmit }: any) => (
-        <form data-testid="member-form" id={id} onSubmit={onSubmit}>
-            <input
-                data-testid="form-fullName"
-                value={existingMemberFormValues?.fullName ?? ''}
-                onChange={(e) => onValuesChange({ ...existingMemberFormValues, fullName: e.target.value })}
-            />
-            <input
-                data-testid="form-description"
-                value={existingMemberFormValues?.description ?? ''}
-                onChange={(e) => onValuesChange({ ...existingMemberFormValues, description: e.target.value })}
-            />
-            <input
-                data-testid="form-category"
-                value={existingMemberFormValues?.category ?? ''}
-                onChange={(e) => onValuesChange({ ...existingMemberFormValues, category: e.target.value })}
-            />
-        </form>
-    ),
+    MemberForm: ({ onValuesChange, existingMemberFormValues, id, onSubmit, onDraftSubmit, isDraft }: any) => {
+        const handleSubmit = (e: React.FormEvent) => {
+            e.preventDefault();
+            if (isDraft && onDraftSubmit) {
+                onDraftSubmit(existingMemberFormValues);
+            } else {
+                onSubmit(existingMemberFormValues);
+            }
+        };
+
+        return (
+            <form data-testid="member-form" id={id} onSubmit={handleSubmit}>
+                <input
+                    data-testid="form-fullName"
+                    value={existingMemberFormValues?.fullName ?? 'test-form-fullname'}
+                    onChange={(e) => onValuesChange({ ...existingMemberFormValues, fullName: e.target.value })}
+                />
+                <input
+                    data-testid="form-description"
+                    value={existingMemberFormValues?.description ?? 'test-form-description'}
+                    onChange={(e) => onValuesChange({ ...existingMemberFormValues, description: e.target.value })}
+                />
+                <input
+                    data-testid="form-category"
+                    value={existingMemberFormValues?.category ?? 'Радники'}
+                    onChange={(e) => onValuesChange({ ...existingMemberFormValues, category: e.target.value })}
+                />
+                {/* Кнопка Зберегти як чернетку */}
+                <button
+                    type="button"
+                    data-testid="save-as-draft-button"
+                    onClick={() => {
+                        if (onDraftSubmit) onDraftSubmit(existingMemberFormValues);
+                    }}
+                >
+                    Зберегти як чернетку
+                </button>
+
+                <button type="submit">Submit</button>
+            </form>
+        );
+    },
 }));
 
 jest.mock('../../../../../components/common/button/Button', () => ({
@@ -206,6 +228,29 @@ describe('MembersList', () => {
         jest.spyOn(TeamMembersApi, 'postDraft').mockResolvedValue(undefined);
         jest.spyOn(TeamMembersApi, 'postPublished').mockResolvedValue(undefined);
         jest.spyOn(TeamMembersApi, 'reorder').mockResolvedValue(undefined);
+    });
+
+    it('reorders members when item is dropped on different index', async () => {
+        resetMockMembers([
+            createMockMember({ id: 1, fullName: 'Alpha' }),
+            createMockMember({ id: 2, fullName: 'Beta' }),
+        ]);
+
+        render(<MembersList {...sharedDefaultProps} />);
+
+        await waitFor(() => {
+            expect(screen.getByText((_, el) => el?.textContent === 'Alpha')).toBeInTheDocument();
+            expect(screen.getByText((_, el) => el?.textContent === 'Beta')).toBeInTheDocument();
+        });
+
+        const dragItem = screen.getByTestId('member-item-0');
+        const dropTarget = screen.getByTestId('member-item-1');
+
+        fireEvent.dragStart(dragItem, { dataTransfer: mockDataTransfer });
+        fireEvent.drop(dropTarget, { dataTransfer: mockDataTransfer });
+
+        expect(screen.getByTestId('member-item-0')).toHaveTextContent('Beta');
+        expect(screen.getByTestId('member-item-1')).toHaveTextContent('Alpha');
     });
 
     it('renders without crashing and sets default category from localStorage', async () => {
@@ -807,12 +852,21 @@ describe('MembersList', () => {
                 ]);
             });
             render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
+
+            await screen.findByText('Alpha');
+
             fireEvent.click(screen.getByTestId('edit-button-0'));
-            const draftButton = screen.getByRole('button', { name: /Зберегти як чернетку/i });
+            const draftButton = screen.getByTestId('save-as-draft-button');
             fireEvent.click(draftButton);
+<<<<<<< HEAD
             await waitFor(() => expect(TeamMembersApi.updateDraft).toHaveBeenCalled());
             await waitFor(() => expect(screen.getByTestId('member-item-0')).toHaveTextContent('Чернетка'));
+=======
+
+            await waitFor(() => {
+                expect(screen.getByTestId('member-item-0')).toHaveTextContent('Чернетка');
+            });
+>>>>>>> feature/issue-12
         });
 
         it('cancels publish confirmation and keeps edit modal open', async () => {

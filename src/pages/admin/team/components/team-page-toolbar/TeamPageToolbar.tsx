@@ -48,6 +48,8 @@ const AddMemberModal = ({
     formData,
     onFormDataChange,
     onError,
+    isDraft,
+    setIsDraftMode,
 }: {
     isOpen: boolean;
     onClose: () => void;
@@ -56,6 +58,8 @@ const AddMemberModal = ({
     formData: MemberFormValues | null;
     onFormDataChange: (formData: MemberFormValues) => void;
     onError?: (msg: string | null) => void;
+    isDraft: boolean;
+    setIsDraftMode: (draft: boolean) => void;
 }) => (
     <Modal onClose={onClose} isOpen={isOpen} data-testid="add-member-modal">
         <Modal.Title>{TEAM_ADD_MEMBER}</Modal.Title>
@@ -66,10 +70,13 @@ const AddMemberModal = ({
                 existingMemberFormValues={formData}
                 onValuesChange={onFormDataChange}
                 onError={onError}
+                isDraft={isDraft}
             />
         </Modal.Content>
         <Modal.Actions>
             <Button
+                form="add-member-modal"
+                type="submit"
                 onClick={() => {
                     if (formData?.description && formData?.fullName) {
                         const safeFormData = {
@@ -153,8 +160,10 @@ export const TeamPageToolbar = ({
         confirmClose: false,
     });
 
-    const [pendingMemberData, setPendingMemberData] = useState<MemberFormData>(null);
-    const [formData, setFormData] = useState<MemberFormValues | null>(null);
+    const [pendingMemberData, setPendingMemberData] = useState<MemberFormData>();
+    const [formData, setFormData] = useState<MemberFormData | null>(null);
+    //const [formData, setFormData] = useState<MemberFormData>(null);
+    const [isDraftMode, setIsDraftMode] = useState(false);
 
     const updateModalState = useCallback((updates: Partial<ModalState>) => {
         setModalState((prev) => ({ ...prev, ...updates }));
@@ -179,19 +188,26 @@ export const TeamPageToolbar = ({
 
     const handleOpenAddMember = useCallback(() => {
         updateModalState({ add: true });
+        setIsDraftMode(false);
     }, [updateModalState]);
 
     const handleFormSubmit = useCallback(
         (member: MemberFormValues) => {
-            setPendingMemberData(member);
-            setFormData(member);
-            updateModalState({ confirmPublish: true });
+            if (isDraftMode) {
+                onMemberSaveDraft?.(member);
+                resetState();
+            } else {
+                setPendingMemberData(member);
+                setFormData(member);
+                updateModalState({ confirmPublish: true });
+            }
         },
-        [updateModalState],
+        [isDraftMode, onMemberSaveDraft, resetState, updateModalState],
     );
 
     const handleSaveAsDraft = useCallback(
         (member: MemberFormValues) => {
+            setIsDraftMode(true);
             onMemberSaveDraft?.(member);
             resetState();
         },
@@ -272,6 +288,8 @@ export const TeamPageToolbar = ({
                 onSaveDraft={handleSaveAsDraft}
                 formData={formData}
                 onFormDataChange={setFormData}
+                isDraft={isDraftMode}
+                setIsDraftMode={setIsDraftMode}
             />
 
             <ConfirmPublishModal

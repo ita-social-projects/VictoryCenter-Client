@@ -9,9 +9,9 @@ export const TEAM_DELETE_MEMBER = 'Видалити члена команди?';
 export const TEAM_EDIT_MEMBER = 'Редагування учасника команди';
 export const TEAM_NOT_FOUND = 'Нічого не знайдено';
 
-export const TEAM_CATEGORY_MAIN = 'Основна команда';
-export const TEAM_CATEGORY_SUPERVISORY = 'Наглядова рада';
-export const TEAM_CATEGORY_ADVISORS = 'Радники';
+// export const TEAM_CATEGORY_MAIN = 'Основна команда';
+// export const TEAM_CATEGORY_SUPERVISORY = 'Наглядова рада';
+// export const TEAM_CATEGORY_ADVISORS = 'Радники';
 
 export const TEAM_STATUS_ALL = 'Усі';
 export const TEAM_STATUS_PUBLISHED = 'Опубліковано';

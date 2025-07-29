@@ -92,6 +92,8 @@ export const MembersList = ({
         clientRef.current = client;
     }, [client]);
 
+    const [isDraftMode, setIsDraftMode] = useState(false);
+
     useEffect(() => {
         currentPageRef.current = currentPage;
     }, [currentPage]);
@@ -394,12 +396,13 @@ export const MembersList = ({
 
     const handleEditMemberOnClose = () => {
         const existingMember = members.filter((m) => m.id === memberIdToEdit)[0];
-        //check photos as well
+
         if (existingMember && memberToEdit) {
             if (
                 memberToEdit.description !== existingMember.description ||
                 memberToEdit.fullName !== existingMember.fullName ||
-                memberToEdit.category !== existingMember.category
+                memberToEdit.category !== existingMember.category ||
+                memberToEdit.image !== existingMember.img
             ) {
                 setIsConfirmCloseModalOpen(true);
                 return;
@@ -459,6 +462,32 @@ export const MembersList = ({
             setIsEditMemberModalOpen(false);
         }
     };
+
+    // const handleSaveAsDraftFromForm = (data: MemberFormValues) => {
+    //     if (memberIdToEdit !== null) {
+    //         const updatedImg =
+    //             data.img instanceof FileList && data.img.length > 0
+    //                 ? URL.createObjectURL(data.img[0])
+    //                 : members.find((m) => m.id === memberIdToEdit)?.img || '';
+
+    //         setMembers((prev) =>
+    //             [
+    //                 ...prev.filter((m) => m.id !== memberIdToEdit),
+    //                 {
+    //                     id: memberIdToEdit,
+    //                     status: 'Чернетка',
+    //                     category: data.category,
+    //                     fullName: data.fullName,
+    //                     description: data.description,
+    //                     img: updatedImg,
+    //                 },
+    //             ].sort((a, b) => a.id - b.id),
+    //         );
+    //         setIsEditMemberModalOpen(false);
+    //         setMemberToEdit(null);
+    //         setIsDraftMode(false);
+    //     }
+    // };
 
     let content;
 
@@ -563,13 +592,25 @@ export const MembersList = ({
                             id="edit-member-modal"
                             onSubmit={handleMemberEdit}
                             onError={onError}
+                            onDraftSubmit={handleConfirmPublish}
+                            isDraft={isDraftMode}
                         />
                     </Modal.Content>
                     <Modal.Actions>
-                        <Button onClick={handleSaveAsDraft} buttonStyle={'secondary'}>
+                        <Button
+                            buttonStyle={'secondary'}
+                            form="edit-member-modal"
+                            type="submit"
+                            onClick={() => setIsDraftMode(true)}
+                        >
                             {TEAM_SAVE_AS_DRAFT}
                         </Button>
-                        <Button form="edit-member-modal" type={'submit'} buttonStyle={'primary'}>
+                        <Button
+                            form="edit-member-modal"
+                            type="submit"
+                            onClick={() => console.log('Publish')}
+                            buttonStyle={'primary'}
+                        >
                             {TEAM_PUBLISH}
                         </Button>
                     </Modal.Actions>

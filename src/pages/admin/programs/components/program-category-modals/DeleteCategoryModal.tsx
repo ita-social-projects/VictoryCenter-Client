@@ -32,7 +32,7 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
             isSubmittingRef.current = true;
             setIsSubmitting(true);
 
-            await ProgramsApi.deleteCategory(selectedCategory.id);
+            await ProgramsApi.deleteProgramCategory(selectedCategory.id);
 
             onDeleteCategory(selectedCategory.id);
             setCategoryId(0);

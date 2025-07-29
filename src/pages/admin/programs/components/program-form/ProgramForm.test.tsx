@@ -216,14 +216,14 @@ describe('ProgramForm', () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
 
         // Initially not dirty
-        expect(formRef.current?.isDirty).toBe(false);
+        expect(formRef.current?.isDirty()).toBe(false);
 
         // Change a field
         fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'some change' } });
 
         // Now it should be dirty
         await waitFor(() => {
-            expect(formRef.current?.isDirty).toBe(true);
+            expect(formRef.current?.isDirty()).toBe(true);
         });
     });
 
@@ -231,7 +231,7 @@ describe('ProgramForm', () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} initialData={mockInitialData} />);
 
         await waitFor(() => {
-            expect(formRef.current?.isDirty).toBe(false);
+            expect(formRef.current?.isDirty()).toBe(false);
         });
     });
 
@@ -239,13 +239,13 @@ describe('ProgramForm', () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} initialData={mockInitialData} />);
 
         await waitFor(() => {
-            expect(formRef.current?.isDirty).toBe(false);
+            expect(formRef.current?.isDirty()).toBe(false);
         });
 
         fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Нова зміна' } });
 
         await waitFor(() => {
-            expect(formRef.current?.isDirty).toBe(true);
+            expect(formRef.current?.isDirty()).toBe(true);
         });
     });
 });

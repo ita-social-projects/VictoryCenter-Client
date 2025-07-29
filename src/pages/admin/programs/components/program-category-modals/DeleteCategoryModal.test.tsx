@@ -87,7 +87,7 @@ describe('DeleteCategoryModal', () => {
     };
 
     const expectDeleteApiCalled = (categoryId: number) => {
-        expect(mockedProgramsApi.deleteCategory).toHaveBeenCalledWith(categoryId);
+        expect(mockedProgramsApi.deleteProgramCategory).toHaveBeenCalledWith(categoryId);
     };
 
     beforeEach(() => {
@@ -125,7 +125,7 @@ describe('DeleteCategoryModal', () => {
     });
 
     it('should handle successful category deletion', async () => {
-        mockedProgramsApi.deleteCategory.mockResolvedValue(undefined);
+        mockedProgramsApi.deleteProgramCategory.mockResolvedValue(undefined);
         renderDeleteCategoryModal();
 
         clickDeleteButton();
@@ -139,7 +139,7 @@ describe('DeleteCategoryModal', () => {
     });
 
     it('should handle failed deletion and show an error message', async () => {
-        mockedProgramsApi.deleteCategory.mockRejectedValue(new Error('API Error'));
+        mockedProgramsApi.deleteProgramCategory.mockRejectedValue(new Error('API Error'));
         renderDeleteCategoryModal();
 
         clickDeleteButton();
@@ -175,7 +175,7 @@ describe('DeleteCategoryModal', () => {
         const longRunningPromise = new Promise<void>((resolve) => {
             resolveRequest = resolve;
         });
-        mockedProgramsApi.deleteCategory.mockReturnValue(longRunningPromise);
+        mockedProgramsApi.deleteProgramCategory.mockReturnValue(longRunningPromise);
 
         renderDeleteCategoryModal();
 
@@ -199,7 +199,7 @@ describe('DeleteCategoryModal', () => {
     });
 
     it('should clear the error message when the modal re-opens', async () => {
-        mockedProgramsApi.deleteCategory.mockRejectedValue(new Error('API error'));
+        mockedProgramsApi.deleteProgramCategory.mockRejectedValue(new Error('API error'));
         const { rerender } = renderDeleteCategoryModal();
 
         clickDeleteButton();

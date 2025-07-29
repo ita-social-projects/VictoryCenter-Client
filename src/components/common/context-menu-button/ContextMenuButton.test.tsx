@@ -148,4 +148,20 @@ describe('ContextMenuButton', () => {
         fireEvent.click(enabledButton);
         expect(mockOnOptionSelected).toHaveBeenCalledWith('option2', undefined);
     });
+
+    it('renders non-ContextMenuButton.Option children as-is', () => {
+        render(
+            <ContextMenuButton onOptionSelected={mockOnOptionSelected}>
+                <ContextMenuButton.Option value="option1">Valid Option</ContextMenuButton.Option>
+                <div data-testid="custom-child">Custom Child Element</div>
+                <span>Another non-option child</span>
+            </ContextMenuButton>,
+        );
+
+        // Verify that non-ContextMenuButton.Option children are rendered without modification
+        expect(screen.getByTestId('custom-child')).toBeInTheDocument();
+        expect(screen.getByText('Custom Child Element')).toBeInTheDocument();
+        expect(screen.getByText('Another non-option child')).toBeInTheDocument();
+        expect(screen.getByText('Valid Option')).toBeInTheDocument();
+    });
 });

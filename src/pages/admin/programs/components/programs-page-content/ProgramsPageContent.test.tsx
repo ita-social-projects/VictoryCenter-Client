@@ -578,4 +578,35 @@ describe('ProgramsPageContent', () => {
             expect(getSearchInput()).toHaveValue('test search query');
         });
     });
+
+    describe('Empty categories handling', () => {
+        it('should handle empty categories list without setting selected category', async () => {
+            mockProgramsApi.fetchProgramCategories.mockResolvedValueOnce([]);
+
+            renderProgramsPageContent();
+
+            await waitFor(() => {
+                expect(mockProgramsApi.fetchProgramCategories).toHaveBeenCalledTimes(1);
+            });
+
+            expect(getCategoryBar()).toBeInTheDocument();
+            // Should not call fetchPrograms because no category is selected
+            expect(mockProgramsApi.fetchPrograms).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('Programs fetching with null category', () => {
+        it('should not fetch programs when selectedCategory is null', async () => {
+            mockProgramsApi.fetchProgramCategories.mockResolvedValueOnce([]);
+
+            renderProgramsPageContent();
+
+            await waitFor(() => {
+                expect(mockProgramsApi.fetchProgramCategories).toHaveBeenCalledTimes(1);
+            });
+
+            // Verify fetchPrograms is not called when selectedCategory is null
+            expect(mockProgramsApi.fetchPrograms).not.toHaveBeenCalled();
+        });
+    });
 });

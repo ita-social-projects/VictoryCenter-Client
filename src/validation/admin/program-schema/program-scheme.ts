@@ -66,3 +66,45 @@ export const programValidationSchema = Yup.object({
             return true;
         }),
 });
+
+export const PROGRAM_VALIDATION_FUNCTIONS = {
+    validateName: (value: string, isPublishing: boolean): string | undefined => {
+        const context: ProgramValidationContext = { isPublishing };
+        try {
+            programValidationSchema.validateSyncAt('name', { name: value }, { context });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validateCategories: (value: ProgramCategory[], isPublishing: boolean): string | undefined => {
+        const context: ProgramValidationContext = { isPublishing };
+        try {
+            programValidationSchema.validateSyncAt('categories', { categories: value }, { context });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validateDescription: (value: string, isPublishing: boolean): string | undefined => {
+        const context: ProgramValidationContext = { isPublishing };
+        try {
+            programValidationSchema.validateSyncAt('description', { description: value }, { context });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validateImg: (value: File | string | null, isPublishing: boolean): string | undefined => {
+        const context: ProgramValidationContext = { isPublishing };
+        try {
+            programValidationSchema.validateSyncAt('img', { img: value }, { context });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+};

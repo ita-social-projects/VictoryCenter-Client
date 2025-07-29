@@ -282,7 +282,7 @@ describe('ProgramsApi', () => {
                 name: 'Updated Category Name',
             };
 
-            const promise = ProgramsApi.editCategory(categoryData);
+            const promise = ProgramsApi.editProgramCategory(categoryData);
             jest.runAllTimers();
             const result = await promise;
 
@@ -297,7 +297,7 @@ describe('ProgramsApi', () => {
                 name: 'Non-existent Category',
             };
 
-            const promise = ProgramsApi.editCategory(categoryData);
+            const promise = ProgramsApi.editProgramCategory(categoryData);
             jest.runAllTimers();
             await expect(promise).rejects.toThrow('Category not found');
         });
@@ -308,7 +308,7 @@ describe('ProgramsApi', () => {
             const categoryToDelete = mockCategories.find((c) => c.programsCount === 0)!;
             const initialLength = mockCategories.length;
 
-            const promise = ProgramsApi.deleteCategory(categoryToDelete.id);
+            const promise = ProgramsApi.deleteProgramCategory(categoryToDelete.id);
             jest.runAllTimers();
             await promise;
 
@@ -319,13 +319,13 @@ describe('ProgramsApi', () => {
         it('should throw error when category has programs', async () => {
             const categoryWithPrograms = mockCategories.find((c) => c.programsCount > 0)!;
 
-            const promise = ProgramsApi.deleteCategory(categoryWithPrograms.id);
+            const promise = ProgramsApi.deleteProgramCategory(categoryWithPrograms.id);
             jest.runAllTimers();
             await expect(promise).rejects.toThrow('Category has at least one program');
         });
 
         it('should throw error when category not found', async () => {
-            const promise = ProgramsApi.deleteCategory(999);
+            const promise = ProgramsApi.deleteProgramCategory(999);
             jest.runAllTimers();
             await expect(promise).rejects.toThrow('Category not found');
         });

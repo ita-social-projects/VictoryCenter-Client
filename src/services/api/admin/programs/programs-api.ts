@@ -160,7 +160,7 @@ export const ProgramsApi = {
         return newCategory;
     },
 
-    editCategory: async (category: ProgramCategoryCreateUpdate): Promise<ProgramCategory> => {
+    editProgramCategory: async (category: ProgramCategoryCreateUpdate): Promise<ProgramCategory> => {
         await new Promise((resolve) => setTimeout(resolve, mockDelay));
 
         if (throwErrorsInApi) throw new Error('Error imitation');
@@ -178,7 +178,7 @@ export const ProgramsApi = {
         return updated;
     },
 
-    deleteCategory: async (id: number): Promise<void> => {
+    deleteProgramCategory: async (id: number): Promise<void> => {
         await new Promise((resolve) => setTimeout(resolve, mockDelay));
 
         if (throwErrorsInApi) throw new Error('Error imitation');

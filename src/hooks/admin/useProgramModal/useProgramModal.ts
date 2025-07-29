@@ -95,7 +95,7 @@ export const useProgramModal = ({ isOpen, program, onSuccess, onClose }: UseProg
     };
 
     const handleClose = () => {
-        if (formRef.current?.isDirty) {
+        if (formRef.current?.isDirty()) {
             setShowCloseConfirmModal(true);
         } else if (!isSubmitting) {
             onClose();

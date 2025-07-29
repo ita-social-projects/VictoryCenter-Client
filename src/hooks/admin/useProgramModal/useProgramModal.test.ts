@@ -227,7 +227,7 @@ describe('useProgramModal - Edit Mode', () => {
         const { result } = renderHook(() => useProgramModal({ ...defaultProps, program: mockProgram }));
 
         // Mock form as dirty
-        result.current.formRef.current = { ...mockFormRef.current, isDirty: true };
+        result.current.formRef.current = { ...mockFormRef.current, isDirty: () => true };
 
         act(() => {
             result.current.handleClose();
@@ -241,7 +241,7 @@ describe('useProgramModal - Edit Mode', () => {
         const { result } = renderHook(() => useProgramModal({ ...defaultProps, program: mockProgram }));
 
         // Mock form as dirty and trigger close
-        result.current.formRef.current = { ...mockFormRef.current, isDirty: true };
+        result.current.formRef.current = { ...mockFormRef.current, isDirty: () => true };
 
         act(() => {
             result.current.handleClose();

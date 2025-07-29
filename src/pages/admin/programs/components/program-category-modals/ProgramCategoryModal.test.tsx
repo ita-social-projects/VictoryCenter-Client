@@ -2,7 +2,7 @@ import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramCategoryModal } from './ProgramCategoryModal';
 import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
-import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
@@ -74,10 +74,9 @@ jest.mock('../../../../../components/common/question-modal/QuestionModal', () =>
 }));
 
 jest.mock('../../../../../services/api/admin/programs/programs-api', () => ({
-    __esModule: true,
-    default: {
+    ProgramsApi: {
         addProgramCategory: jest.fn(),
-        editCategory: jest.fn(),
+        editProgramCategory: jest.fn(),
     },
 }));
 
@@ -444,7 +443,7 @@ describe('ProgramCategoryModal', () => {
                 const promise = new Promise<ProgramCategory>((resolve) => {
                     resolvePromise = resolve;
                 });
-                mockedProgramsApi.editCategory.mockReturnValue(promise);
+                mockedProgramsApi.editProgramCategory.mockReturnValue(promise);
 
                 renderModal(editModeProps);
 
@@ -524,14 +523,14 @@ describe('ProgramCategoryModal', () => {
         describe('Form submission', () => {
             it('should successfully update category', async () => {
                 const updatedCategory = { ...mockCategory, name: 'Updated Category' };
-                mockedProgramsApi.editCategory.mockResolvedValue(updatedCategory);
+                mockedProgramsApi.editProgramCategory.mockResolvedValue(updatedCategory);
                 renderModal(editModeProps);
 
                 changeNameInput('Updated Category');
                 clickSaveButton();
 
                 await waitFor(() => {
-                    expect(mockedProgramsApi.editCategory).toHaveBeenCalledWith({
+                    expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledWith({
                         id: 1,
                         name: 'Updated Category',
                     });
@@ -542,14 +541,14 @@ describe('ProgramCategoryModal', () => {
 
             it('should trim whitespace from name', async () => {
                 const updatedCategory = { ...mockCategory, name: 'Updated Category' };
-                mockedProgramsApi.editCategory.mockResolvedValue(updatedCategory);
+                mockedProgramsApi.editProgramCategory.mockResolvedValue(updatedCategory);
                 renderModal(editModeProps);
 
                 changeNameInput('  Updated Category  ');
                 clickSaveButton();
 
                 await waitFor(() => {
-                    expect(mockedProgramsApi.editCategory).toHaveBeenCalledWith({
+                    expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledWith({
                         id: 1,
                         name: 'Updated Category',
                     });
@@ -557,7 +556,7 @@ describe('ProgramCategoryModal', () => {
             });
 
             it('should show error when API fails', async () => {
-                mockedProgramsApi.editCategory.mockRejectedValue(new Error('API Error'));
+                mockedProgramsApi.editProgramCategory.mockRejectedValue(new Error('API Error'));
                 renderModal(editModeProps);
 
                 changeNameInput('Updated Category');
@@ -576,7 +575,7 @@ describe('ProgramCategoryModal', () => {
                 changeNameInput('Another Category');
                 clickSaveButton();
 
-                expect(mockedProgramsApi.editCategory).not.toHaveBeenCalled();
+                expect(mockedProgramsApi.editProgramCategory).not.toHaveBeenCalled();
             });
 
             it('should not submit when no category selected', async () => {
@@ -586,7 +585,7 @@ describe('ProgramCategoryModal', () => {
                 clickSaveButton();
 
                 await waitFor(async () => {
-                    expect(mockedProgramsApi.editCategory).not.toHaveBeenCalled();
+                    expect(mockedProgramsApi.editProgramCategory).not.toHaveBeenCalled();
                 });
             });
 
@@ -595,7 +594,7 @@ describe('ProgramCategoryModal', () => {
                 const promise = new Promise<ProgramCategory>((resolve) => {
                     resolvePromise = resolve;
                 });
-                mockedProgramsApi.editCategory.mockReturnValue(promise);
+                mockedProgramsApi.editProgramCategory.mockReturnValue(promise);
 
                 renderModal(editModeProps);
 
@@ -604,7 +603,7 @@ describe('ProgramCategoryModal', () => {
                 clickSaveButton(); // Second click while submitting
 
                 await waitFor(() => {
-                    expect(mockedProgramsApi.editCategory).toHaveBeenCalledTimes(1);
+                    expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledTimes(1);
                 });
 
                 await act(async () => {
@@ -645,7 +644,7 @@ describe('ProgramCategoryModal', () => {
 
         describe('useEffect behavior', () => {
             it('should reset form when modal opens in edit mode', async () => {
-                mockedProgramsApi.editCategory.mockRejectedValue(new Error('API Error'));
+                mockedProgramsApi.editProgramCategory.mockRejectedValue(new Error('API Error'));
                 const { rerender } = renderModal(editModeProps);
 
                 // Create error state

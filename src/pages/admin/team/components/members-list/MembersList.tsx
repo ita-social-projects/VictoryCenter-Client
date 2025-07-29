@@ -84,7 +84,6 @@ export const MembersList = ({
     const currentPageRef = useRef<number>(currentPage);
     const totalPagesRef = useRef<number | null>(totalPages);
     const categoryRef = useRef<TeamCategory | null>(category);
-
     const client = useAdminClient();
     const clientRef = useRef(client);
 
@@ -203,7 +202,6 @@ export const MembersList = ({
             if (totalPagesRef.current === null || reset) {
                 setTotalPages(totalCountOfPages);
             }
-
             setIsMembersLoading(false);
             isFetchingRef.current = false;
         },
@@ -339,7 +337,6 @@ export const MembersList = ({
             el.scrollTop = el.scrollHeight;
         }
     }, [isMembersLoading]);
-
     useEffect(() => {
         if (searchByNameQuery) {
             onAutocompleteValuesChange(
@@ -463,32 +460,6 @@ export const MembersList = ({
         }
     };
 
-    // const handleSaveAsDraftFromForm = (data: MemberFormValues) => {
-    //     if (memberIdToEdit !== null) {
-    //         const updatedImg =
-    //             data.img instanceof FileList && data.img.length > 0
-    //                 ? URL.createObjectURL(data.img[0])
-    //                 : members.find((m) => m.id === memberIdToEdit)?.img || '';
-
-    //         setMembers((prev) =>
-    //             [
-    //                 ...prev.filter((m) => m.id !== memberIdToEdit),
-    //                 {
-    //                     id: memberIdToEdit,
-    //                     status: 'Чернетка',
-    //                     category: data.category,
-    //                     fullName: data.fullName,
-    //                     description: data.description,
-    //                     img: updatedImg,
-    //                 },
-    //             ].sort((a, b) => a.id - b.id),
-    //         );
-    //         setIsEditMemberModalOpen(false);
-    //         setMemberToEdit(null);
-    //         setIsDraftMode(false);
-    //     }
-    // };
-
     let content;
 
     if (members.length > 0) {
@@ -526,7 +497,6 @@ export const MembersList = ({
     return (
         <>
             {dragPreview?.visible && dragPreview?.member ? <MemberDragPreview dragPreview={dragPreview} /> : <></>}
-
             <div className="members">
                 <div
                     data-testid="members-categories"
@@ -581,7 +551,6 @@ export const MembersList = ({
                     </div>
                 </Modal.Actions>
             </Modal>
-
             {isEditMemberModalOpen && (
                 <Modal onClose={handleEditMemberOnClose} isOpen={isEditMemberModalOpen}>
                     <Modal.Title>{TEAM_EDIT_MEMBER}</Modal.Title>

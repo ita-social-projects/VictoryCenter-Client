@@ -24,6 +24,7 @@ export const MemberComponent = ({
             </div>
             <div className="members-controls">
                 <div
+                    data-testid={`member-status-${member.id}`}
                     className={classNames('members-status', {
                         'members-status-draft': member.status === 'Чернетка',
                         'members-status-published': member.status !== 'Чернетка',

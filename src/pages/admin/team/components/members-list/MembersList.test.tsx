@@ -858,15 +858,14 @@ describe('MembersList', () => {
             fireEvent.click(screen.getByTestId('edit-button-0'));
             const draftButton = screen.getByTestId('save-as-draft-button');
             fireEvent.click(draftButton);
-<<<<<<< HEAD
             await waitFor(() => expect(TeamMembersApi.updateDraft).toHaveBeenCalled());
             await waitFor(() => expect(screen.getByTestId('member-item-0')).toHaveTextContent('Чернетка'));
-=======
 
             await waitFor(() => {
                 expect(screen.getByTestId('member-item-0')).toHaveTextContent('Чернетка');
             });
->>>>>>> feature/issue-12
+            await waitFor(() => expect(TeamMembersApi.updateDraft).toHaveBeenCalled());
+            await waitFor(() => expect(screen.getByTestId('member-item-0')).toHaveTextContent('Чернетка'));
         });
 
         it('cancels publish confirmation and keeps edit modal open', async () => {

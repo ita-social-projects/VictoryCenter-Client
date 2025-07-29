@@ -1,9 +1,5 @@
 import React from 'react';
-<<<<<<< HEAD
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-=======
 import { render, screen, fireEvent, createEvent, waitFor } from '@testing-library/react';
->>>>>>> feature/issue-12
 import userEvent from '@testing-library/user-event';
 import { MemberForm, MemberFormProps, MemberFormValues } from './MemberForm';
 import { AdminContext } from '../../../../../context/admin-context-provider/AdminContextProvider';
@@ -70,18 +66,14 @@ describe('MemberForm', () => {
 
     it('renders form with all fields', () => {
         renderWithAdminContext(<MemberForm {...defaultProps} />);
-
-<<<<<<< HEAD
         expect(screen.getByLabelText('Категорія')).toBeInTheDocument();
         expect(screen.getByLabelText("Ім'я та Прізвище")).toBeInTheDocument();
         expect(screen.getByLabelText('Опис')).toBeInTheDocument();
         expect(screen.getByTestId('photo-input-hidden')).toBeInTheDocument();
-=======
         expect(screen.getByLabelText(/Категорія/)).toBeInTheDocument();
         expect(screen.getByLabelText(/Ім'я та Прізвище/)).toBeInTheDocument();
         expect(screen.getByLabelText(/Опис/)).toBeInTheDocument();
         expect(screen.getByText(/Фото/)).toBeInTheDocument();
->>>>>>> feature/issue-12
     });
 
     it('initializes with existingMemberFormValues', async () => {
@@ -93,15 +85,11 @@ describe('MemberForm', () => {
             },
             fullName: 'John Doe',
             description: 'Test description',
-<<<<<<< HEAD
             imageId: 1,
             image: {
                 base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
                 mimeType: 'image/jpeg',
             },
-=======
-            img: undefined,
->>>>>>> feature/issue-12
         };
         renderWithAdminContext(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
 
@@ -170,16 +158,13 @@ describe('MemberForm', () => {
         const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
         const descriptionTextarea = screen.getByLabelText(/Опис/);
         const imgInput = screen.getByTestId('image');
-
-<<<<<<< HEAD
         fireEvent.change(categorySelect, {
             target: {
                 value: 'Радники',
             },
         });
-=======
         await userEvent.selectOptions(categorySelect, 'Радники');
->>>>>>> feature/issue-12
+        await userEvent.selectOptions(categorySelect, 'Радники');
         await userEvent.type(fullNameInput, 'Jane Doe');
         await userEvent.type(descriptionTextarea, 'Test description');
 
@@ -205,7 +190,6 @@ describe('MemberForm', () => {
         fireEvent.submit(form);
 
         await waitFor(() => {
-<<<<<<< HEAD
             expect(defaultProps.onSubmit).toHaveBeenCalledWith({
                 category: {
                     id: 3,
@@ -217,7 +201,6 @@ describe('MemberForm', () => {
                 image: null,
                 imageId: null,
             });
-=======
             expect(defaultProps.onSubmit).toHaveBeenCalledWith(
                 expect.objectContaining({
                     category: 'Радники',
@@ -226,7 +209,6 @@ describe('MemberForm', () => {
                     img: expect.any(FileList),
                 }),
             );
->>>>>>> feature/issue-12
         });
     });
 
@@ -276,8 +258,6 @@ describe('MemberForm', () => {
         const descriptionTextarea = screen.getByLabelText(/Опис/);
         expect(descriptionTextarea).toHaveAttribute('maxLength', '200');
     });
-
-<<<<<<< HEAD
     describe('Additional Coverage', () => {
         it('does not call onValuesChange when onValuesChange prop is not provided', () => {
             const propsWithoutOnValuesChange = {
@@ -291,7 +271,6 @@ describe('MemberForm', () => {
             fireEvent.change(fullNameInput, { target: { value: 'Jane Doe' } });
 
             expect(fullNameInput).toHaveValue('Jane Doe');
-=======
     it('renders empty div when no files are uploaded', () => {
         render(<MemberForm {...defaultProps} />);
 
@@ -362,7 +341,6 @@ describe('MemberForm', () => {
         fireEvent.change(fullNameInput, {
             target: { name: 'fullName', value: 'Test Name' },
             currentTarget: { files: null },
->>>>>>> feature/issue-12
         });
 
         it('handles form submission when memberFormValues exists', () => {
@@ -382,10 +360,7 @@ describe('MemberForm', () => {
 
             const form = screen.getByTestId('test-form');
             fireEvent.submit(form);
-
-<<<<<<< HEAD
             expect(defaultProps.onSubmit).toHaveBeenCalledWith(initialValues);
-=======
         const mockEvent = {
             target: { name: 'img', value: null },
             currentTarget: { files: { length: 0 } },
@@ -418,7 +393,7 @@ describe('MemberForm', () => {
             value: {
                 files: [],
             },
->>>>>>> feature/issue-12
+            expect(defaultProps.onSubmit).toHaveBeenCalledWith(initialValues);
         });
 
         it('handles file input change without files (edge case)', () => {
@@ -430,8 +405,6 @@ describe('MemberForm', () => {
                 target: { name: 'fullName', value: 'Test Name' },
                 currentTarget: { files: null },
             });
-
-<<<<<<< HEAD
             expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
                 expect.objectContaining({
                     fullName: 'Test Name',
@@ -507,7 +480,6 @@ describe('MemberForm', () => {
             expect(descriptionTextarea).toHaveValue('b'.repeat(200));
             expect(screen.getByText('50/50')).toBeInTheDocument();
             expect(screen.getByText('200/200')).toBeInTheDocument();
-=======
     it('handles drag events with files in dataTransfer', async () => {
         render(<MemberForm {...defaultProps} />);
 
@@ -794,7 +766,6 @@ describe('MemberForm branch coverage additions', () => {
                 }),
             );
             expect(baseProps.onSubmit).not.toHaveBeenCalled();
->>>>>>> feature/issue-12
         });
     });
 });

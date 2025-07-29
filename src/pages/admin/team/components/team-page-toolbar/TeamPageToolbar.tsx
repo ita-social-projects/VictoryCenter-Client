@@ -159,10 +159,8 @@ export const TeamPageToolbar = ({
         confirmPublish: false,
         confirmClose: false,
     });
-
-    const [pendingMemberData, setPendingMemberData] = useState<MemberFormData>();
-    const [formData, setFormData] = useState<MemberFormData | null>(null);
-    //const [formData, setFormData] = useState<MemberFormData>(null);
+    const [pendingMemberData, setPendingMemberData] = useState<MemberFormData>(null);
+    const [formData, setFormData] = useState<MemberFormValues | null>(null);
     const [isDraftMode, setIsDraftMode] = useState(false);
 
     const updateModalState = useCallback((updates: Partial<ModalState>) => {
@@ -187,8 +185,8 @@ export const TeamPageToolbar = ({
     }, []);
 
     const handleOpenAddMember = useCallback(() => {
-        updateModalState({ add: true });
         setIsDraftMode(false);
+        updateModalState({ add: true });
     }, [updateModalState]);
 
     const handleFormSubmit = useCallback(

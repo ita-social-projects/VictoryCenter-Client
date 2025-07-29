@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TeamCategory } from '../../../../../types/admin/TeamMembers';
 import { useCreateMemberForm } from '../../../../../hooks/admin/create-member-form';
 import '../members-list/members-list.scss';
@@ -81,49 +81,12 @@ export const MemberForm = ({
         formState: { errors },
     } = useCreateMemberForm(isDraft);
 
-    const {
-        ref: categoryRef,
-        onBlur: categoryOnBlur,
-        onChange: categoryOnChange,
-        name: categoryName,
-    } = register('category');
-
-    const watchedImg = watch('image');
-
     const handleOnSubmit = (data: MemberFormValues) => {
         if (isDraft) {
             onDraftSubmit?.(data);
         } else {
             onSubmit(data);
         }
-    };
-
-    const handleMemberFormValuesChange = (
-        e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-    ) => {
-        const { name, value } = e.target;
-        const inputTarget = e.currentTarget as EventTarget & HTMLInputElement;
-        if (name === 'category') {
-            let selected: TeamCategory | undefined = categories.find((c) => c.name === value);
-            setMemberFormValues((prev) => ({
-                ...prev,
-                category: selected as TeamCategory,
-            }));
-            return;
-        }
-        if (inputTarget.files && inputTarget.files.length > 0) {
-            const file = inputTarget.files;
-            setMemberFormValues((prev) => ({
-                ...prev,
-                img: file,
-            }));
-            return;
-        }
-
-        setMemberFormValues((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
     };
 
     const onFileChange = (item: ImageValues | null) => {
@@ -167,15 +130,6 @@ export const MemberForm = ({
         fetchCategories();
     }, [client, onError]);
 
-    // const handleFileDrop = (e: React.DragEvent<HTMLLabelElement>) => {
-    //     e.preventDefault();
-
-    //     const files = e.dataTransfer.files;
-    //     if (files && files.length > 0) {
-    //         setValue('image', files, { shouldValidate: true });
-    //     }
-    // };
-
     return (
         <form id={id} onSubmit={handleSubmit(handleOnSubmit)} data-testid="test-form">
             <div className="members-add-modal-body">
@@ -185,24 +139,26 @@ export const MemberForm = ({
                         {TEAM_LABEL_CATEGORY}
                     </label>
                     <select
-                        value={memberFormValues?.category?.name ?? ''}
-                        onChange={handleMemberFormValuesChange}
+                        value={memberFormValues?.category?.id ?? ''}
+                        onChange={(e) => {
+                            const selected = categories.find((c) => c.id === Number(e.target.value));
+                            setMemberFormValues((prev) => ({
+                                ...prev,
+                                category: selected as TeamCategory,
+                            }));
+                            if (selected) {
+                                setValue('category', selected, { shouldValidate: true });
+                            }
+                        }}
                         id="category"
-                        disabled={isLoadingCategories}
-                        name={categoryName}
-                        ref={categoryRef}
                         className="custom-select default-select"
                         onClick={handleOpenSelect}
-                        onBlur={async (e) => {
-                            setIsOpen(false);
-                            await categoryOnBlur(e);
-                        }}
                     >
                         <option value="" disabled className="option-value">
                             {TEAM_LABEL_SELECT_CATEGORY}
                         </option>
                         {categories.map((category) => (
-                            <option key={category.id} value={category.name}>
+                            <option key={category.id} value={category.id}>
                                 {category.name}
                             </option>
                         ))}

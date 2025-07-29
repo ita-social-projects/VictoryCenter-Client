@@ -102,11 +102,21 @@ victory-center-client/
 │   │       └── page-2
 │   ├── routes/                             # Route configuration
 │   │   └── app-router
+<<<<<<< HEAD
                            # Custom React hooks
+=======
+<<<<<<< HEAD
+│   ├── hooks/                              # Custom React hooks
+=======
+>>>>>>> ece11d0
 │   ├── hooks/# Custom React hooks
 │   │   └── admin/
 │   ├── context/                            # React context providers
 │   │   └── admin-context-provider
+<<<<<<< HEAD
+=======
+>>>>>>> feature/issue-12
+>>>>>>> ece11d0
 │   ├── services/                           # API calls, data services
 │   │   ├── auth/
 │   │   │   ├── auth-service/

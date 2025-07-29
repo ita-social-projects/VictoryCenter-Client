@@ -1,10 +1,12 @@
 import * as yup from 'yup';
 import { TeamCategory } from '../../types/admin/TeamMembers';
+<<<<<<< HEAD
 // import { TEAM_CATEGORY_MAIN, TEAM_CATEGORY_SUPERVISORY, TEAM_CATEGORY_ADVISORS } from '../../const/team';
+=======
+>>>>>>> ece11d0
 
 import {
     CATEGORY_REQUIRED,
-    CHOOSE_CATEGORY,
     FULLNAME_REQUIRED,
     FULLNAME_MAX,
     FULLNAME_MIN,
@@ -13,7 +15,6 @@ import {
     DESCRIPTIONS_MIN,
     FILE_SIZE,
     FILE_FORMAT,
-    IMG_REQUIRED,
     MAX_FULLNAME_LENGTH,
     MAX_DESCRIPTION_LENGTH,
     MIN_FULLNAME_LENGTH,
@@ -73,6 +74,10 @@ export const useCreateMemberSchema = (isDraft: boolean) => {
         imageId: yup
             .number()
             .transform((value) => (value === null ? undefined : value))
+<<<<<<< HEAD
+=======
+            .nullable()
+>>>>>>> ece11d0
             .notRequired(),
     });
 };

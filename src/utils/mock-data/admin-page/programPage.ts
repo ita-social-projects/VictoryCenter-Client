@@ -1,11 +1,4 @@
-/*import program1 from '../../../assets/program_page_images/images/first.png';
-import program2 from '../../../assets/program_page_images/images/second.png';
-import program3 from '../../../assets/program_page_images/images/third.png';
-import program4 from '../../../assets/program_page_images/images/fourth.png';
-import program5 from '../../../assets/program_page_images/images/fifth.png';*/
 import { Program, ProgramCategory } from '../../../types/admin/Programs';
-/*import { Image } from '../../../types/Image';
-import { convertFileToBase64 } from '../../../components/common/photo-input/PhotoInput';*/
 
 export const mockCategories: ProgramCategory[] = [
     { id: 1, name: 'Ветеранські', programsCount: 5 },
@@ -21,7 +14,6 @@ export const mockPrograms: Program[] = [
         description: 'Зменшення рівня стресу, тривоги та ПТСР у ветеранів, розвиток внутрішньої сили та опори.',
         categories: [mockCategories[0]],
         status: 'Published',
-        //img: program1,
         img: null,
     },
     {
@@ -40,7 +32,6 @@ export const mockPrograms: Program[] = [
             'Програма для військових з фізичними травмами: підтримка рухливості, баланс, м’язова стабільність.',
         categories: [mockCategories[0]],
         status: 'Published',
-        //img: program3,
         img: null,
     },
     {
@@ -49,7 +40,6 @@ export const mockPrograms: Program[] = [
         description: 'Розвиток уваги, емоційної стабільності та впевненості через взаємодію з кіньми в ігровій формі.',
         categories: [mockCategories[1]],
         status: 'Draft',
-        //img: program4,
         img: null,
     },
     {
@@ -59,7 +49,6 @@ export const mockPrograms: Program[] = [
             'Повернення відчуття контролю та безпеки, адаптація до мирного життя через тілесно-орієнтовану терапію.',
         categories: [mockCategories[0], mockCategories[2]],
         status: 'Published',
-        //img: program5,
         img: null,
     },
     {
@@ -68,7 +57,6 @@ export const mockPrograms: Program[] = [
         description: 'Покращення координації, зменшення м’язової спастики та розвиток моторики у дітей з ДЦП.',
         categories: [mockCategories[1], mockCategories[2]],
         status: 'Published',
-        //img: program1,
         img: null,
     },
     {
@@ -77,7 +65,6 @@ export const mockPrograms: Program[] = [
         description: 'Розвиток довіри, емоційної безпеки та самоповаги через контакт із тваринами.',
         categories: [mockCategories[1]],
         status: 'Draft',
-        //img: program2,
         img: null,
     },
     {
@@ -87,7 +74,6 @@ export const mockPrograms: Program[] = [
             'Підтримка когнітивного та емоційного розвитку у дітей із синдромом Дауна через рухову активність.',
         categories: [mockCategories[1], mockCategories[2]],
         status: 'Published',
-        //img: program3,
         img: null,
     },
     {
@@ -96,7 +82,6 @@ export const mockPrograms: Program[] = [
         description: 'Зменшення тривоги, агресії, повернення до мирного ритму життя.',
         categories: [mockCategories[0]],
         status: 'Draft',
-        //img: program4,
         img: null,
     },
     {
@@ -105,7 +90,6 @@ export const mockPrograms: Program[] = [
         description: 'Розвиток навичок співпраці, самоконтролю, самовираження.',
         categories: [mockCategories[1]],
         status: 'Published',
-        //img: program5,
         img: null,
     },
     {
@@ -114,7 +98,6 @@ export const mockPrograms: Program[] = [
         description: 'Відновлення довіри до тіла, нормалізація сну та емоційний контакт через роботу з конем.',
         categories: [mockCategories[0]],
         status: 'Published',
-        //img: program1,
         img: null,
     },
     {
@@ -123,7 +106,6 @@ export const mockPrograms: Program[] = [
         description: 'Зниження соціальної ізоляції та підтримка самовираження в групі.',
         categories: [mockCategories[1]],
         status: 'Draft',
-        //img: program2,
         img: null,
     },
 ];

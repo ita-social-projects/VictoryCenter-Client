@@ -15,6 +15,7 @@ export const programPage = '/programPage';
 export const donatePageRoute = '/donate-page';
 
 export const userPageRoutes = {
+    aboutUsRoute,
     teamPageRoute,
     page2Route,
 };

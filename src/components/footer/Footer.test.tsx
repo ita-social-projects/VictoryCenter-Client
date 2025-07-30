@@ -78,13 +78,13 @@ describe('Footer', () => {
 
         expect(screen.getByRole('link', { name: ABOUT_US })).toHaveAttribute(
             'href',
-            routes.userPageRoutes.teamPageRoute,
+            routes.userPageRoutes.aboutUsRoute,
         );
         expect(screen.getByRole('link', { name: OUR_HISTORY })).toHaveAttribute(
             'href',
             routes.userPageRoutes.page2Route,
         );
-        expect(screen.getByRole('link', { name: OUR_TEAM })).toHaveAttribute('href', routes.userPageRoutes.page2Route);
+        expect(screen.getByRole('link', { name: OUR_TEAM })).toHaveAttribute('href', routes.userPageRoutes.teamPageRoute);
         expect(screen.getByRole('link', { name: PARTNERS })).toHaveAttribute('href', routes.userPageRoutes.page2Route);
         expect(screen.getByRole('link', { name: EVENTS_AND_NEWS })).toHaveAttribute(
             'href',

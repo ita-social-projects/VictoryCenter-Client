@@ -32,7 +32,7 @@ import {
 } from '../../const/footer/footer';
 
 const {
-    userPageRoutes: { teamPageRoute, page2Route },
+    userPageRoutes: { teamPageRoute, page2Route, aboutUsRoute },
 } = routes;
 
 export const Footer = () => {
@@ -82,13 +82,11 @@ export const Footer = () => {
 
                 <div className="about_us">
                     <span className="title">{ABOUT_US}</span>
-                    <Link to={teamPageRoute}>{ABOUT_US}</Link>
+                    <Link to={aboutUsRoute}>{ABOUT_US}</Link>
                     <Link to={page2Route} className="disable">
                         {OUR_HISTORY}
                     </Link>
-                    <Link to={page2Route} className="disable">
-                        {OUR_TEAM}
-                    </Link>
+                    <Link to={teamPageRoute}>{OUR_TEAM}</Link>
                     <Link to={page2Route} className="disable">
                         {PARTNERS}
                     </Link>

@@ -3,7 +3,7 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonTooltip } from '../../../../../components/common/button-tooltip/ButtonTooltip';
 import { mapImageToBase64 } from '../../../../../utils/functions/mapImageToBase64';
 import { Status } from '../../../../../components/common/status/Status';
-import BlankImage from '../../../../../assets/images/admin/blank-image.svg';
+import BlankImage from '../../../../../assets/icons/blank-image.svg';
 import './programs-list-item.scss';
 
 export interface ProgramListItemProps {

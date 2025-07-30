@@ -6,7 +6,7 @@ import { Program } from '../../../../../types/admin/Programs';
 import { VisibilityStatus } from '../../../../../types/admin/Common';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
-jest.mock('../../../../../assets/images/admin/blank-image.svg', () => 'blank-image.svg');
+jest.mock('../../../../../assets/icons/blank-image.svg', () => 'blank-image.svg');
 
 jest.mock('../../../../../components/common/button-tooltip/ButtonTooltip', () => ({
     ButtonTooltip: ({ children, position }: { children: React.ReactNode; position: string }) => {

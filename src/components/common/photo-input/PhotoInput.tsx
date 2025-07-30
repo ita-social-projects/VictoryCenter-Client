@@ -1,43 +1,38 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import DeleteIcon from '../../../assets/icons/delete.svg';
 import UploadIcon from '../../../assets/icons/cloud-download.svg';
 import classNames from 'classnames';
 import './photo-input.scss';
+import { ImageValues } from '../../../types/Image';
+import { mapImageToBase64 } from '../../../utils/functions/mapImageToBase64';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 interface PhotoInputProps {
-    value: File | string | null;
-    onChange: (file: File | string | null) => void;
+    value: ImageValues | null;
+    onChange: (image: ImageValues | null) => void;
     onBlur?: () => void;
     disabled?: boolean;
+    error?: boolean;
     id?: string;
     name?: string;
 }
 
-export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: PhotoInputProps) => {
+const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: PhotoInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [previewImage, setPreviewImage] = useState<ImageValues | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (value) {
-            if (value instanceof File) {
-                const objectUrl = URL.createObjectURL(value);
-                setPreviewUrl(objectUrl);
-                return () => URL.revokeObjectURL(objectUrl);
-            } else if (typeof value === 'string') {
-                setPreviewUrl(value);
-                return () => {};
-            }
-        } else {
-            setPreviewUrl(null);
+            setPreviewImage(value);
         }
     }, [value]);
 
     const handleFile = useCallback(
-        (file: File) => {
+        async (file: File) => {
             if (!file.type.startsWith('image/')) return;
-            onChange(file);
+            const imgItem = await convertFileToBase64(file);
+            onChange(imgItem);
         },
         [onChange],
     );
@@ -45,7 +40,9 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
+
         if (disabled) return;
+
         const file = e.dataTransfer.files?.[0];
         if (file) handleFile(file);
         setIsFocused(false);
@@ -79,15 +76,15 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
         }
     };
 
-    const handleClick = () => {
-        if (!disabled) inputRef.current?.click();
-    };
-
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
             e.preventDefault();
             inputRef.current?.click();
         }
+    };
+
+    const handleClick = () => {
+        if (!disabled) inputRef.current?.click();
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,6 +93,7 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
     };
 
     const handleRemove = () => {
+        setPreviewImage(null);
         onChange(null);
         if (inputRef.current) inputRef.current.value = '';
     };
@@ -132,9 +130,15 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
                 name={name}
                 tabIndex={-1}
             />
-            {previewUrl ? (
+
+            {previewImage ? (
                 <div className="photo-preview">
-                    <img src={previewUrl} alt="Preview" className="preview-image" data-testid="preview-image" />
+                    <img
+                        src={mapImageToBase64(previewImage) ?? undefined}
+                        alt="Preview"
+                        className="preview-image"
+                        data-testid="preview-image"
+                    />
                     {!disabled && (
                         <button
                             type="button"
@@ -158,3 +162,28 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
         </div>
     );
 };
+
+export function convertFileToBase64(file: File): Promise<ImageValues> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            const result = reader.result as string;
+            const parts = result.split(',');
+            if (parts.length !== 2) {
+                reject(new Error('Invalid data URL format'));
+                return;
+            }
+            resolve({
+                base64: parts[1],
+                mimeType: file.type,
+                size: file.size,
+            });
+        };
+
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+export default PhotoInput;

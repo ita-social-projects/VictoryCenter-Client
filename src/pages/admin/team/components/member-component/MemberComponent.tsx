@@ -1,8 +1,9 @@
 import React from 'react';
 import { TeamMember } from '../../../../../types/admin/TeamMembers';
+import classNames from 'classnames';
 import './member-component.scss';
 import BlankUserImage from '../../../../../assets/images/admin/blank-user.svg';
-import classNames from 'classnames';
+import { mapImageToBase64 } from '../../../../../utils/functions/mapImageToBase64';
 export const MemberComponent = ({
     member,
     handleOnDeleteMember,
@@ -15,7 +16,7 @@ export const MemberComponent = ({
     return (
         <div className="members-item">
             <div className="members-profile">
-                <img src={member.img || BlankUserImage} alt={`${member.fullName}-img`} />
+                <img src={mapImageToBase64(member.img) || BlankUserImage} alt={`${member.fullName}-img`} />
                 <p>{member.fullName}</p>
             </div>
             <div className="members-position">
@@ -23,6 +24,7 @@ export const MemberComponent = ({
             </div>
             <div className="members-controls">
                 <div
+                    data-testid={`member-status-${member.id}`}
                     className={classNames('members-status', {
                         'members-status-draft': member.status === 'Чернетка',
                         'members-status-published': member.status !== 'Чернетка',

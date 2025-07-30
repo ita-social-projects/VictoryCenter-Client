@@ -19,63 +19,66 @@
     }
 
     .team-section {
-        display: flex;
-        justify-content: center;
-        gap: 40px;
         width: 98%;
         border-bottom: 1px solid #ccc;
         padding-bottom: 5rem;
         margin-bottom: 3rem;
     }
 
-    .team-section.last-section {
-        border-bottom: none;
-        padding-bottom: 2rem;
-        margin-bottom: 1rem;
-    }
-
     .team_info {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
+        overflow: hidden;
         width: 100%;
     }
 
     .team_description {
-        font-family: 'Mulish', sans-serif;
-        width: 35rem;
-        flex-shrink: 0;
+        float: left;
+        margin-right: 4.5rem;
+        width: 83%;
+        grid-column: span 2;
 
         h2 {
             font-weight: 700;
-            font-size: 2rem;
+            font-size: 2.5rem;
+            padding-bottom: 1rem;
+            text-transform: uppercase;
         }
 
         p {
-            font-size: 1rem;
+            font-size: 1.25rem;
             font-weight: 500;
             width: 28rem;
         }
     }
 
     .team-member {
-        width: 17rem;
+        img {
+            width: 100%;
+            display: block;
+            aspect-ratio: 3 / 4;
+            object-fit: cover;
+        }
+
+        .member-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .member-role {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #555;
+            margin-top: 0;
+        }
     }
 
-    .team-member img {
-        width: 100%;
-    }
+    .members-grid {
+        overflow: hidden;
 
-    .member-name {
-        font-weight: 700;
-        margin-top: 0.5rem;
-        margin-bottom: 0;
-    }
-
-    .member-role {
-        font-weight: 400;
-        color: #7f7f78;
-        margin-top: 0.25rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+        gap: 3.5rem 1rem;
     }
 
     .video-background-container {

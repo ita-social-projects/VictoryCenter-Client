@@ -16,7 +16,7 @@ export const CompanyValues = () => {
             {chunkedValues.map((group, groupIndex) => (
                 <div className="value-card" key={groupIndex}>
                     {group.map((val, index) => (
-                        <div className="value-item" key={val.name}>
+                        <div className="value-item" key={`${val.name}-${index}`}>
                             <h3 className="value-name">{val.name}</h3>
                             <div className="value-description">{val.description}</div>
                         </div>

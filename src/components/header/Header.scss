@@ -1,4 +1,6 @@
 @import '../../assets/sass/variables/variables.colors';
+@import '../../assets/sass/mixins/utilits.mixins';
+
 $mulish-font-family: 'Mulish', sans-serif;
 
 .headerBlock {
@@ -36,18 +38,11 @@ $mulish-font-family: 'Mulish', sans-serif;
             gap: 3rem;
 
             a {
-                color: $blue-900;
-                font-family: $mulish-font-family;
-                font-size: 1rem;
+                @include link-base(#000, $link-hover-blue, $link-pressed-blue);
                 font-weight: 600;
-                text-decoration: none;
 
-                &:hover {
-                    color: $link-hover-blue;
-                }
-
-                &:active {
-                    color: $link-pressed-blue;
+                &.disable {
+                    @include link-disabled();
                 }
             }
         }
@@ -75,6 +70,10 @@ $mulish-font-family: 'Mulish', sans-serif;
             width: 7.5rem;
             height: 2.5rem;
             cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
             border: 1px solid $blue-900;
         }
     }

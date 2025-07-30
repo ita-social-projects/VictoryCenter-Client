@@ -89,6 +89,4 @@ export const Select = <TValue,>({
     );
 };
 
-Select.Option = <TValue,>({ children, value, name }: { children?: React.ReactNode; value: TValue; name: string }) => (
-    <>{children}</>
-);
+Select.Option = <TValue,>({ children }: { children?: React.ReactNode; value: TValue; name: string }) => <>{children}</>;

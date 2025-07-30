@@ -1,9 +1,15 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { PhotoInput } from './PhotoInput';
+import PhotoInput from './PhotoInput';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { ImageValues } from '../../../types/Image';
 
 const createImageFile = () => new File(['dummy content'], 'example.png', { type: 'image/png' });
+const MockImageValue: ImageValues = {
+    base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAocB9eQ6vqoAAAAASUVORK5CYII=',
+    mimeType: 'image/jpeg',
+    size: 0,
+};
 
 describe('PhotoInput', () => {
     let onChangeMock: jest.Mock;
@@ -21,22 +27,14 @@ describe('PhotoInput', () => {
         expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.UPLOAD)).toBeInTheDocument();
     });
 
-    it('renders image preview when string value is provided', () => {
-        render(<PhotoInput value="http://example.com/image.jpg" onChange={onChangeMock} />);
+    it('renders image preview when ImageValue is provided', () => {
+        render(<PhotoInput value={MockImageValue} onChange={onChangeMock} />);
         const previewImage = screen.getByTestId('preview-image');
         expect(previewImage).toBeInTheDocument();
-        expect(previewImage).toHaveAttribute('src', 'http://example.com/image.jpg');
+        expect(previewImage).toHaveAttribute('src', `data:${MockImageValue.mimeType};base64,${MockImageValue.base64}`);
     });
 
-    it('renders image preview when file value is provided', () => {
-        const file = createImageFile();
-        render(<PhotoInput value={file} onChange={onChangeMock} />);
-        const previewImage = screen.getByTestId('preview-image');
-        expect(previewImage).toBeInTheDocument();
-        expect(previewImage).toHaveAttribute('src', 'mock-preview-url');
-    });
-
-    it('calls onChange when file is selected via input', () => {
+    it('calls onChange when file is selected via input', async () => {
         const file = createImageFile();
 
         render(<PhotoInput value={null} onChange={onChangeMock} />);
@@ -47,12 +45,17 @@ describe('PhotoInput', () => {
             target: { files: [file] },
         });
 
-        expect(onChangeMock).toHaveBeenCalledWith(file);
+        await waitFor(() => {
+            expect(onChangeMock).toHaveBeenCalledWith({
+                base64: expect.any(String),
+                mimeType: 'image/png',
+                size: 13,
+            });
+        });
     });
 
     it('calls onChange with null when remove button is clicked', () => {
-        const file = createImageFile();
-        render(<PhotoInput value={file} onChange={onChangeMock} />);
+        render(<PhotoInput value={MockImageValue} onChange={onChangeMock} />);
 
         const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
         fireEvent.click(removeButton);
@@ -73,7 +76,7 @@ describe('PhotoInput', () => {
         expect(onChangeMock).not.toHaveBeenCalled();
     });
 
-    it('handles drag and drop image', () => {
+    it('handles drag and drop image', async () => {
         render(<PhotoInput value={null} onChange={onChangeMock} />);
         const dropZone = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
@@ -91,7 +94,13 @@ describe('PhotoInput', () => {
         fireEvent.dragOver(dropZone);
         fireEvent.drop(dropZone, data as unknown as DragEvent);
 
-        expect(onChangeMock).toHaveBeenCalledWith(file);
+        await waitFor(() => {
+            expect(onChangeMock).toHaveBeenCalledWith({
+                base64: expect.any(String),
+                mimeType: file.type,
+                size: 13,
+            });
+        });
     });
 
     it('adds focus class on drag over and removes on drag leave', () => {
@@ -127,8 +136,6 @@ describe('PhotoInput', () => {
         expect(onChangeMock).not.toHaveBeenCalled();
     });
 
-    // Нові тести для 100% покриття
-
     it('handles drag and drop when no files provided', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} />);
         const dropZone = screen.getByRole('button', {
@@ -137,7 +144,7 @@ describe('PhotoInput', () => {
 
         const data = {
             dataTransfer: {
-                files: [], // Порожній масив файлів
+                files: [],
                 types: ['Files'],
             },
         };
@@ -151,7 +158,7 @@ describe('PhotoInput', () => {
         const fileInput = screen.getByTestId('photo-input-hidden') as HTMLInputElement;
 
         fireEvent.change(fileInput, {
-            target: { files: null }, // Відсутні файли
+            target: { files: null },
         });
 
         expect(onChangeMock).not.toHaveBeenCalled();
@@ -199,13 +206,11 @@ describe('PhotoInput', () => {
 
         const clickSpy = jest.spyOn(fileInput, 'click');
 
-        // Тест Enter key
         fireEvent.keyDown(wrapper, { key: 'Enter' });
         expect(clickSpy).toHaveBeenCalled();
 
         clickSpy.mockClear();
 
-        // Тест Space key
         fireEvent.keyDown(wrapper, { key: ' ' });
         expect(clickSpy).toHaveBeenCalled();
 
@@ -272,7 +277,7 @@ describe('PhotoInput', () => {
 
         fireEvent.blur(wrapper);
         expect(wrapper.classList.contains('photo-input-wrapper-focused')).toBe(false);
-        expect(onBlurMock).toHaveBeenCalled(); // onBlur все ще викликається
+        expect(onBlurMock).toHaveBeenCalled();
     });
 
     it('calls onBlur even without onBlur prop', () => {
@@ -281,7 +286,6 @@ describe('PhotoInput', () => {
             name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
         });
 
-        // Не повинно падати без onBlur prop
         expect(() => fireEvent.blur(wrapper)).not.toThrow();
     });
 
@@ -296,13 +300,11 @@ describe('PhotoInput', () => {
     });
 
     it('clears input value when removing file', () => {
-        const file = createImageFile();
-        render(<PhotoInput value={file} onChange={onChangeMock} />);
+        render(<PhotoInput value={MockImageValue} onChange={onChangeMock} />);
 
         const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
         const fileInput = screen.getByTestId('photo-input-hidden') as HTMLInputElement;
 
-        // Симулюємо наявність значення в input
         Object.defineProperty(fileInput, 'value', {
             writable: true,
             value: 'test-file.png',
@@ -312,30 +314,6 @@ describe('PhotoInput', () => {
 
         expect(onChangeMock).toHaveBeenCalledWith(null);
         expect(fileInput.value).toBe('');
-    });
-
-    it('revokes object URL when component unmounts with file value', async () => {
-        const file = createImageFile();
-        const { unmount } = render(<PhotoInput value={file} onChange={onChangeMock} />);
-
-        expect(global.URL.createObjectURL).toHaveBeenCalledWith(file);
-
-        unmount();
-
-        // URL.revokeObjectURL викликається в cleanup функції useEffect
-        await waitFor(() => {
-            expect(global.URL.revokeObjectURL).toHaveBeenCalledWith('mock-preview-url');
-        });
-    });
-
-    it('does not revoke URL when value changes to string', () => {
-        const { rerender } = render(<PhotoInput value="http://example.com/image1.jpg" onChange={onChangeMock} />);
-
-        // Змінюємо на іншу строку
-        rerender(<PhotoInput value="http://example.com/image2.jpg" onChange={onChangeMock} />);
-
-        // URL.revokeObjectURL не повинен викликатися для строкових значень
-        expect(global.URL.revokeObjectURL).not.toHaveBeenCalled();
     });
 
     it('renders with custom id and name attributes', () => {

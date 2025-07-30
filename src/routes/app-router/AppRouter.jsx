@@ -21,12 +21,14 @@ import { AdminContextWrapper } from '../../components/admin/admin-context-wrappe
 
 import { PrivateRoute } from '../../components/admin/private-route/PrivateRoute';
 import { PublicRoute } from '../../components/admin/public-route/PublicRoute';
+import { DonatePage } from '../../pages/donate-page/DonatePage';
 
 const {
     programPage,
     adminRoutes,
     aboutUsRoute,
     userPageRoutes: { teamPageRoute, page2Route },
+    donatePageRoute,
 } = routes;
 
 export const AppRouter = () => (
@@ -38,6 +40,7 @@ export const AppRouter = () => (
                 <Route path={page2Route} element={<ProgramPage />} />
                 <Route path={programPage} element={<ProgramPage />} />
                 <Route path={aboutUsRoute} element={<AboutUsPage />} />
+                <Route path={donatePageRoute} element={<DonatePage />} />
                 <Route path="*" element={<NotFound />} />
             </Route>
 

@@ -97,27 +97,49 @@ jest.mock('../members-list-item/MembersListItem', () => ({
         </div>
     ),
 }));
-
 jest.mock('../member-form/MemberForm', () => ({
-    MemberForm: ({ onValuesChange, existingMemberFormValues, id, onSubmit }: any) => (
-        <form data-testid="member-form" id={id} onSubmit={onSubmit}>
-            <input
-                data-testid="form-fullName"
-                value={existingMemberFormValues?.fullName ?? ''}
-                onChange={(e) => onValuesChange({ ...existingMemberFormValues, fullName: e.target.value })}
-            />
-            <input
-                data-testid="form-description"
-                value={existingMemberFormValues?.description ?? ''}
-                onChange={(e) => onValuesChange({ ...existingMemberFormValues, description: e.target.value })}
-            />
-            <input
-                data-testid="form-category"
-                value={existingMemberFormValues?.category ?? ''}
-                onChange={(e) => onValuesChange({ ...existingMemberFormValues, category: e.target.value })}
-            />
-        </form>
-    ),
+    MemberForm: ({ onValuesChange, existingMemberFormValues, id, onSubmit, onDraftSubmit, isDraft }: any) => {
+        const handleSubmit = (e: React.FormEvent) => {
+            e.preventDefault();
+            if (isDraft && onDraftSubmit) {
+                onDraftSubmit(existingMemberFormValues);
+            } else {
+                onSubmit(existingMemberFormValues);
+            }
+        };
+
+        return (
+            <form data-testid="member-form" id={id} onSubmit={handleSubmit}>
+                <input
+                    data-testid="form-fullName"
+                    value={existingMemberFormValues?.fullName ?? 'test-form-fullname'}
+                    onChange={(e) => onValuesChange({ ...existingMemberFormValues, fullName: e.target.value })}
+                />
+                <input
+                    data-testid="form-description"
+                    value={existingMemberFormValues?.description ?? 'test-form-description'}
+                    onChange={(e) => onValuesChange({ ...existingMemberFormValues, description: e.target.value })}
+                />
+                <input
+                    data-testid="form-category"
+                    value={existingMemberFormValues?.category ?? 'Радники'}
+                    onChange={(e) => onValuesChange({ ...existingMemberFormValues, category: e.target.value })}
+                />
+                {/* Кнопка Зберегти як чернетку */}
+                <button
+                    type="button"
+                    data-testid="save-as-draft-button"
+                    onClick={() => {
+                        if (onDraftSubmit) onDraftSubmit(existingMemberFormValues);
+                    }}
+                >
+                    Зберегти як чернетку
+                </button>
+
+                <button type="submit">Submit</button>
+            </form>
+        );
+    },
 }));
 
 jest.mock('../../../../../components/common/button/Button', () => ({
@@ -151,7 +173,12 @@ const sharedDefaultProps: MembersListProps = {
 let idCounter = 0;
 const createMockMember = (overrides = {}): TeamMember => ({
     id: ++idCounter,
-    img: 'https://randomuser.me/api/portraits/men/1.jpg',
+    img: {
+        id: 1,
+        base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
+        mimeType: 'image/jpeg',
+        size: 0,
+    },
     fullName: 'First First',
     description: 'Software Engineer',
     status: 'Опубліковано',
@@ -202,6 +229,29 @@ describe('MembersList', () => {
         jest.spyOn(TeamMembersApi, 'postDraft').mockResolvedValue(undefined);
         jest.spyOn(TeamMembersApi, 'postPublished').mockResolvedValue(undefined);
         jest.spyOn(TeamMembersApi, 'reorder').mockResolvedValue(undefined);
+    });
+
+    it('reorders members when item is dropped on different index', async () => {
+        resetMockMembers([
+            createMockMember({ id: 1, fullName: 'Alpha' }),
+            createMockMember({ id: 2, fullName: 'Beta' }),
+        ]);
+
+        render(<MembersList {...sharedDefaultProps} />);
+
+        await waitFor(() => {
+            expect(screen.getByText((_, el) => el?.textContent === 'Alpha')).toBeInTheDocument();
+            expect(screen.getByText((_, el) => el?.textContent === 'Beta')).toBeInTheDocument();
+        });
+
+        const dragItem = screen.getByTestId('member-item-0');
+        const dropTarget = screen.getByTestId('member-item-1');
+
+        fireEvent.dragStart(dragItem, { dataTransfer: mockDataTransfer });
+        fireEvent.drop(dropTarget, { dataTransfer: mockDataTransfer });
+
+        expect(screen.getByTestId('member-item-0')).toHaveTextContent('Beta');
+        expect(screen.getByTestId('member-item-1')).toHaveTextContent('Alpha');
     });
 
     it('renders without crashing and sets default category from localStorage', async () => {
@@ -413,10 +463,25 @@ describe('MembersList', () => {
                 expect(screen.getByText('Member 1')).toBeInTheDocument();
             });
             const membersList = screen.getByTestId('members-list');
+
+            // Mock scrollTop property
             Object.defineProperty(membersList, 'scrollTop', {
                 writable: true,
                 value: 100,
             });
+
+            // Mock scrollTo method
+            membersList.scrollTo = jest.fn();
+
+            // Mock firstElementChild with scrollIntoView method
+            const mockFirstChild = {
+                scrollIntoView: jest.fn(),
+            };
+            Object.defineProperty(membersList, 'firstElementChild', {
+                value: mockFirstChild,
+                writable: true,
+            });
+
             fireEvent.scroll(membersList);
             return membersList;
         };
@@ -428,9 +493,14 @@ describe('MembersList', () => {
 
         it('scrolls to top when "move to top" button is clicked', async () => {
             const membersList = await setupScrolledMembersList();
-            const moveToTopButton = screen.getByTestId('members-list-list-to-top');
-            fireEvent.click(moveToTopButton);
-            expect(membersList.scrollTop).toBe(0);
+            const moveToTopButton = screen.getByTestId('members-list-list-to-top').closest('button');
+            fireEvent.click(moveToTopButton!);
+
+            // Check that scrollIntoView was called on the first child
+            expect(membersList.firstElementChild?.scrollIntoView).toHaveBeenCalledWith({
+                behavior: 'smooth',
+                block: 'start',
+            });
         });
     });
 
@@ -798,15 +868,23 @@ describe('MembersList', () => {
                         },
                         description: '',
                         status: 'Чернетка',
-                        img: '',
+                        img: null,
                     },
                 ]);
             });
             render(<MembersList {...sharedDefaultProps} />);
-            await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
+
+            await screen.findByText('Alpha');
+
             fireEvent.click(screen.getByTestId('edit-button-0'));
-            const draftButton = screen.getByRole('button', { name: /Зберегти як чернетку/i });
+            const draftButton = screen.getByTestId('save-as-draft-button');
             fireEvent.click(draftButton);
+            await waitFor(() => expect(TeamMembersApi.updateDraft).toHaveBeenCalled());
+            await waitFor(() => expect(screen.getByTestId('member-item-0')).toHaveTextContent('Чернетка'));
+
+            await waitFor(() => {
+                expect(screen.getByTestId('member-item-0')).toHaveTextContent('Чернетка');
+            });
             await waitFor(() => expect(TeamMembersApi.updateDraft).toHaveBeenCalled());
             await waitFor(() => expect(screen.getByTestId('member-item-0')).toHaveTextContent('Чернетка'));
         });

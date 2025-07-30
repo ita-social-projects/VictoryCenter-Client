@@ -12,6 +12,7 @@ export const teamPageRoute = '/team-page';
 export const aboutUsRoute = '/about-us-page';
 export const page2Route = '/page-2';
 export const programPage = '/programPage';
+export const donatePageRoute = '/donate-page';
 
 export const userPageRoutes = {
     teamPageRoute,
@@ -23,4 +24,5 @@ export const routes = {
     programPage,
     aboutUsRoute,
     userPageRoutes,
+    donatePageRoute,
 };

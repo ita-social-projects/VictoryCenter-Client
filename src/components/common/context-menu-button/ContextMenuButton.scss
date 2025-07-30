@@ -1,3 +1,5 @@
+@import '../../../assets/sass/variables/variables.colors';
+
 .context-menu-button {
     position: relative;
     display: flex;
@@ -24,8 +26,8 @@
         display: none;
         z-index: 1000;
         width: 180px;
-        border: 1px solid #061125;
-        background: #ffffff;
+        border: 1px solid $blue-900;
+        background: $pure-white;
         box-shadow: 0 2px 8px -4px #00000029;
 
         &-visible {
@@ -40,7 +42,7 @@
         padding: 8px;
         border: none;
         text-align: left;
-        color: #061125;
+        color: $blue-900;
         background: transparent;
         font-size: 16px;
         font-weight: 400;
@@ -48,7 +50,7 @@
         cursor: pointer;
 
         &:hover {
-            background-color: #e7eaee;
+            background-color: $blue-50;
         }
 
         &:disabled {

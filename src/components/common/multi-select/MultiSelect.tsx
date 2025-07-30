@@ -4,7 +4,7 @@ import UncheckedBox from '../../../assets/icons/chevron-unchecked.svg';
 import ArrowDown from '../../../assets/icons/chevron-down.svg';
 import ArrowUp from '../../../assets/icons/chevron-up.svg';
 import classNames from 'classnames';
-import './multi-select.scss';
+import './MultiSelect.scss';
 
 interface MultiselectProps<T extends Record<string, any>> {
     options: T[];

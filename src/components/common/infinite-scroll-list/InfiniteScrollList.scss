@@ -1,3 +1,5 @@
+@import '../../../assets/sass/variables/variables.colors';
+
 .infinite-scroll-list-container {
     display: flex;
     flex-direction: column;
@@ -41,8 +43,8 @@
         height: 60px;
         border: none;
         border-radius: 50%;
-        background-color: #0f2957;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        background-color: $blue-500;
+        box-shadow: 0 2px 8px #80808026;
         cursor: pointer;
         transition: background-color 0.2s ease;
 

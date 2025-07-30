@@ -1,4 +1,6 @@
-@import '../../../assets/sass/variables/_variables.colors.scss';
+@import '../../../../assets/sass/variables/variables.colors';
+@import '../../../../assets/sass/variables/variables.fonts';
+
 .main-values-block * {
     margin: 0;
     padding: 0;
@@ -7,7 +9,7 @@
 .main-values-block {
     height: 117.75rem;
     color: $blue-900;
-    font-family: Mulish, sans-serif;
+    font-family: $mulish-regular-font;
 
     .main-values-title {
         height: 29rem;
@@ -139,7 +141,7 @@
             padding-top: 2rem;
             width: 41rem;
             height: 6.75rem;
-            border-top: 2px solid $border-blue;
+            border-top: 2px solid #a8daff;
             font-weight: 500;
             font-size: 1.5rem;
             line-height: 2.25rem;

@@ -3,7 +3,7 @@ import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import DeleteIcon from '../../../assets/icons/delete.svg';
 import UploadIcon from '../../../assets/icons/cloud-download.svg';
 import classNames from 'classnames';
-import './photo-input.scss';
+import './PhotoInput.scss';
 
 interface PhotoInputProps {
     value: File | string | null;
@@ -115,7 +115,7 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
             onKeyDown={handleKeyDown}
             onFocus={handleFocus}
             onBlur={handleBlurEvent}
-            aria-label={COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo'}
+            aria-label={COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo'}
             tabIndex={disabled ? -1 : 0}
             role="button"
         >
@@ -152,7 +152,7 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
             ) : (
                 <div className="photo-placeholder">
                     <img src={UploadIcon} alt={COMMON_TEXT_ADMIN.ALT.UPLOAD} className="placeholder-icon" />
-                    <span>{COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER}</span>
+                    <span>{COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER}</span>
                 </div>
             )}
         </div>

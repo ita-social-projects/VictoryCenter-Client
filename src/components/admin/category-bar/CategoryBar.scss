@@ -1,11 +1,13 @@
+@import '../../../assets/sass/variables/variables.colors';
+
 .category-bar {
     min-height: 60px;
     display: flex;
-    border-bottom: 1px solid #a4a49b;
+    border-bottom: 1px solid $grey-700;
     font-size: 24px;
     font-weight: 600;
     background: #f8f8f8;
-    box-shadow: 0 0 4px rgba(128, 128, 128, 0.22);
+    box-shadow: 0 0 4px #80808038;
 
     &-button {
         display: flex;
@@ -24,7 +26,7 @@
 
         &:hover {
             cursor: pointer;
-            background-color: rgba(128, 128, 128, 0.15);
+            background-color: #80808026;
         }
     }
 }

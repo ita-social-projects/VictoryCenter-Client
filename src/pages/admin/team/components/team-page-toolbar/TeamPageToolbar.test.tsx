@@ -58,8 +58,8 @@ jest.mock('../../../../../components/common/select/Select', () => {
     return { Select: MockSelect };
 });
 
-jest.mock('../../../../../components/common/input/Input', () => ({
-    Input: ({ onChange, autocompleteValues, 'data-testid': testId, ...props }: any) => (
+jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
+    SearchBar: ({ onChange, autocompleteValues, 'data-testid': testId, ...props }: any) => (
         <input
             data-testid={testId}
             onChange={(e) => onChange?.(e.target.value)}

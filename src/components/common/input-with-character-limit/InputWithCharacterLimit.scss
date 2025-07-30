@@ -1,21 +1,23 @@
+@import '../../../assets/sass/variables/variables.colors';
+
 .input-line-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     padding: 10px;
-    border: 1px solid #0f2957;
+    border: 1px solid $blue-500;
     border-radius: 8px;
     box-shadow: 0 1px 2px 0 #0a0d120d;
     font-size: 16px;
 
     &-focused {
-        border-color: #a4a49b;
+        border-color: $grey-700;
     }
 
     &-disabled {
-        background-color: #d2d2c7;
-        border-color: #61615c;
+        background-color: $grey-600;
+        border-color: $grey-900;
     }
 
     &-input {

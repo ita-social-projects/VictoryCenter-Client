@@ -5,7 +5,7 @@ import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 describe('AboutUsIntro', () => {
     it('should render images correctly', () => {
         render(<AboutUsIntro />);
-        const images = screen.getAllByAltText('Men and Horse');
+        const images = screen.getAllByAltText('Man and Horse');
         expect(images).toHaveLength(2);
         expect(images[0]).toHaveClass('background-img');
         expect(images[1]).toHaveClass('color-overlay');

@@ -1,3 +1,6 @@
+@import '../../../../../assets/sass/variables/variables.colors';
+@import '../../../../../assets/sass/variables/variables.fonts';
+
 .members {
     &-item {
         display: flex;
@@ -64,15 +67,15 @@
         font-size: 18px;
 
         &-draft {
-            color: #61615c;
+            color: $grey-900;
             background-color: white;
-            border: 1px solid #61615c;
+            border: 1px solid $grey-900;
         }
 
         &-published {
             background-color: #e5ecff;
-            border: 1px solid #0f2957;
-            color: #0f2957;
+            border: 1px solid $blue-500;
+            color: $blue-500;
         }
 
         img {

@@ -1,6 +1,6 @@
 import { ProgramsApi } from './programs-api';
-import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin-page/program-page';
 import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '../../../../types/admin/programs';
+import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin/programs';
 
 global.URL.createObjectURL = jest.fn(() => 'mocked-image-url');
 

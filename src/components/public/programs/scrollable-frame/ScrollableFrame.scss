@@ -1,4 +1,6 @@
-@import '../../../assets/sass/variables/_variables.colors.scss';
+@import '../../../../assets/sass/variables/variables.colors';
+@import '../../../../assets/sass/variables/variables.fonts';
+
 .scroll-block {
     position: relative;
     height: 82vh;
@@ -38,6 +40,8 @@
                 position: absolute;
                 top: 0.5rem;
                 right: 0.5rem;
+                width: 1.5rem;
+                height: 1.5rem;
             }
 
             .arrow-hover-state {
@@ -45,6 +49,8 @@
                 top: 0.5rem;
                 right: 0.5rem;
                 display: none;
+                width: 1.5rem;
+                height: 1.5rem;
             }
 
             &:hover {

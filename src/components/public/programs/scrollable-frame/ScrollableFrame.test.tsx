@@ -1,14 +1,14 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { ScrollableFrame } from './ScrollableFrame';
-import * as dataFetch from '../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
+import * as dataFetch from '../../../../utils/mock-data/public/program-page/programs-page';
+import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
 
-jest.mock('../../../assets/icons/arrow-left.png', () => 'arrow-left.png');
-jest.mock('../../../assets/icons/arrow-right.png', () => 'arrow-right.png');
-jest.mock('../../../assets/icons/arrow-left-black.png', () => 'arrow-left-black.png');
-jest.mock('../../../assets/icons/arrow-right-black.png', () => 'arrow-right-black.png');
+jest.mock('../../../../assets/icons/arrow-left-white.svg', () => 'arrow-left.png');
+jest.mock('../../../../assets/icons/arrow-right-white.svg', () => 'arrow-right.png');
+jest.mock('../../../../assets/icons/arrow-left.svg', () => 'arrow-left-black.png');
+jest.mock('../../../../assets/icons/arrow-right.svg', () => 'arrow-right-black.png');
 
-jest.mock('../../../pages/program-page/program-page/program-section/program-card/ProgramCard', () => ({
+jest.mock('../../../../pages/public/program-page/program-section/program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: { program: any }) => <div data-testid="program-card">{program.title}</div>,
 }));
 
@@ -75,9 +75,7 @@ describe('ScrollableFrame', () => {
         render(<ScrollableFrame />);
 
         await waitFor(() => {
-            expect(screen.getByRole('alert')).toHaveTextContent(
-                'Не вдалося завантажити дані програм. Будь-ласка спробуйте пізніше.',
-            );
+            expect(screen.getByRole('alert')).toHaveTextContent(FAILED_TO_LOAD_THE_PROGRAMS);
         });
 
         expect(screen.queryAllByTestId('program-card').length).toBe(0);

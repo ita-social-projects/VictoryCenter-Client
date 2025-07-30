@@ -1,4 +1,5 @@
-@use '../../assets/sass/variables/variables.fonts.scss' as ft;
+@import '../../../../assets/sass/variables/variables.colors';
+@import '../../../../assets/sass/variables/variables.fonts';
 
 .faq-item {
     width: 48rem;
@@ -7,7 +8,7 @@
     justify-content: flex-start;
     align-items: center;
     padding: 1.5rem 1rem 1.5rem 1rem;
-    border-bottom: 1.5px solid #ecece2;
+    border-bottom: 1.5px solid $grey-400;
 
     .faq-question {
         width: 100%;
@@ -23,7 +24,7 @@
                 position: absolute;
                 left: 50%;
                 transform: translate(-100%, 15%);
-                color: #061125;
+                color: $blue-900;
             }
 
             .faq-close {
@@ -32,18 +33,18 @@
         }
 
         p {
-            font-family: ft.$mulish-regular-font;
+            font-family: $mulish-regular-font;
             font-weight: 500;
             font-size: 1.25rem;
             line-height: 1.75rem;
             letter-spacing: -0.02em;
             vertical-align: middle;
-            color: #061125;
+            color: $blue-900;
         }
     }
 
     .faq-answer {
-        font-family: ft.$mulish-regular-font;
+        font-family: $mulish-regular-font;
         font-weight: 400;
         font-size: 1.125rem;
         line-height: 1.75rem;
@@ -66,7 +67,7 @@
 
     &:hover {
         p {
-            color: #50a1c6;
+            color: $light-blue-600;
         }
     }
 }

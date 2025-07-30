@@ -2,7 +2,7 @@ import { AuthResponse, Credentials } from '../../../../types/admin/auth';
 import { AuthClient } from '../../../auth/auth-client';
 import { loginRequest, tokenRefreshRequest } from './login-api';
 
-jest.mock('../../auth/AuthClient', () => ({
+jest.mock('../../../auth/auth-client', () => ({
     AuthClient: {
         post: jest.fn(),
     },

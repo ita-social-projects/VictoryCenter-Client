@@ -3,19 +3,25 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { OurMission } from './OurMission';
 
-jest.mock('../../../const/about-us-page/about-us-page', () => ({
-    WHAT_WE_DO: 'What we do title',
-    WHAT_WE_DO_DETAILS: 'These are the details of what we do.',
-    GO_TO_PROGRAMS: 'Go to programs',
+jest.mock('../../../../const/public/about-us-page', () => ({
+    ABOUT_US_DATA: {
+        WHAT_WE_DO: 'What we do title',
+        WHAT_WE_DO_DETAILS: 'These are the details of what we do.',
+        GO_TO_PROGRAMS: 'Go to programs',
+    },
 }));
 
-jest.mock('../../../const/routers/routes', () => ({
-    programPage: '/programs',
+jest.mock('../../../../const/public/routes', () => ({
+    PUBLIC_ROUTES: {
+        PROGRAMS: {
+            FULL: '/programs',
+        },
+    },
 }));
 
-jest.mock('../../../assets/icons/arrow-up-right.svg', () => 'arrow-up-right.svg');
+jest.mock('../../../../assets/icons/arrow-up-right.svg', () => 'arrow-up-right.svg');
 
-jest.mock('../../../components/common/scrollable-frame/ScrollableFrame', () => ({
+jest.mock('../../../../components/public/programs/scrollable-frame/ScrollableFrame', () => ({
     ScrollableFrame: () => <div data-testid="scrollable-frame">ScrollableFrame</div>,
 }));
 

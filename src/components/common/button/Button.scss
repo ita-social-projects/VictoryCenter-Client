@@ -1,9 +1,11 @@
+@import '../../../assets/sass/variables/variables.colors';
+
 .btn {
     &-primary {
         padding: 8px 24px;
         gap: 8px;
         color: white;
-        background-color: #0f2957;
+        background-color: $blue-500;
         outline: none;
         border: none;
         transition: background-color 0.2s;
@@ -12,7 +14,7 @@
         align-items: center;
 
         &:active {
-            background-color: #061125;
+            background-color: $blue-900;
             cursor: pointer;
         }
 
@@ -22,15 +24,15 @@
 
         &-disabled {
             cursor: not-allowed;
-            background-color: #d2d2c7;
+            background-color: $grey-600;
         }
     }
 
     &-secondary {
         padding: 8px 24px;
         gap: 8px;
-        border: 1px solid #0f2957;
-        color: #0f2957;
+        border: 1px solid $blue-500;
+        color: $blue-500;
         background-color: white;
         outline: none;
         transition: background-color 0.2s;
@@ -39,7 +41,7 @@
         align-items: center;
 
         &:active {
-            background-color: #e7eaee;
+            background-color: $blue-50;
             cursor: pointer;
         }
 
@@ -49,7 +51,7 @@
 
         &-disabled {
             cursor: not-allowed;
-            border: 1px solid #d2d2c7;
+            border: 1px solid $grey-600;
         }
     }
 }

@@ -5,7 +5,7 @@ import {
     Program,
 } from '../../../../types/admin/programs';
 import { VisibilityStatus, PaginationResult } from '../../../../types/common';
-import { mockPrograms, mockCategories } from '../../../../utils/mock-data/admin-page/program-page';
+import { mockPrograms, mockCategories } from '../../../../utils/mock-data/admin/programs';
 
 // !!!
 // Delete after actual integration with backend

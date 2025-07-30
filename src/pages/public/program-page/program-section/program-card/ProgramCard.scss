@@ -1,3 +1,6 @@
+@import '../../../../../../assets/sass/variables/variables.colors';
+@import '../../../../../../assets/sass/variables/variables.fonts';
+
 .card-block {
     height: 70vh;
     overflow: hidden;
@@ -5,7 +8,7 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    background-color: #fdfdfb;
+    background-color: $grey-50;
 
     .card-img {
         width: 100%;
@@ -45,7 +48,7 @@
                     .program-subtitle {
                         color: #898989;
                         margin: 0;
-                        font-family: Mulish, sans-serif;
+                        font-family: $mulish-regular-font;
                         font-weight: 400;
                         font-size: 1.125rem;
                         line-height: 1.75rem;
@@ -55,7 +58,7 @@
 
                     .program-title {
                         margin: 0;
-                        font-family: Mulish, sans-serif;
+                        font-family: $mulish-regular-font;
                         font-weight: 500;
                         font-size: 1.125rem;
                         line-height: 1.75rem;
@@ -91,7 +94,7 @@
         }
 
         .program-description {
-            font-family: Mulish, sans-serif;
+            font-family: $mulish-regular-font;
             font-weight: 400;
             font-size: 1rem;
             line-height: 1.5rem;

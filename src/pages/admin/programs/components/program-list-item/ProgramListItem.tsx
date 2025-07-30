@@ -1,4 +1,4 @@
-import './programs-list-item.scss';
+import './ProgramListItem.scss';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonTooltip } from '../../../../../components/common/button-tooltip/ButtonTooltip';
 import { Status } from '../../../../../components/admin/status/Status';

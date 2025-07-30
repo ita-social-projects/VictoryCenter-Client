@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router';
 import './Footer.scss';
-import arrowIcon from '../../assets/icons/arrow-up-right.svg';
-import phoneIcon from '../../assets/icons/phone.svg';
-import mailIcon from '../../assets/icons/mail.svg';
+import { useState } from 'react';
+import { Link } from 'react-router';
+import arrowIcon from '../../../assets/icons/arrow-up-right.svg';
+import phoneIcon from '../../../assets/icons/phone.svg';
+import mailIcon from '../../../assets/icons/mail.svg';
 import {
     ABOUT_US,
     HIPPOTHERAPY,
@@ -29,10 +29,7 @@ import {
     INSTAGRAM,
     TELEGRAM,
 } from '../../../const/public/footer';
-
-const {
-    userPageRoutes: { teamPageRoute, page2Route },
-} = routes;
+import { PUBLIC_ROUTES } from '../../../const/public/routes';
 
 export const Footer = () => {
     const [email, setEmail] = useState('');
@@ -65,26 +62,26 @@ export const Footer = () => {
 
                 <div className="menu">
                     <span className="title">{MENU}</span>
-                    <Link to={teamPageRoute}>{REPORTING}</Link>
-                    <Link to={page2Route}>{STORE}</Link>
-                    <Link to={page2Route}>{HOW_TO_SUPPORT}</Link>
-                    <Link to={page2Route}>{STORIES_OF_VICTORIES}</Link>
+                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{REPORTING}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{STORE}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{HOW_TO_SUPPORT}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{STORIES_OF_VICTORIES}</Link>
                 </div>
 
                 <div className="about_us">
                     <span className="title">{ABOUT_US}</span>
-                    <Link to={teamPageRoute}>{ABOUT_US}</Link>
-                    <Link to={page2Route}>{OUR_HISTORY}</Link>
-                    <Link to={page2Route}>{OUR_TEAM}</Link>
-                    <Link to={page2Route}>{PARTNERS}</Link>
-                    <Link to={page2Route}>{EVENTS_AND_NEWS}</Link>
+                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{ABOUT_US}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{OUR_HISTORY}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{OUR_TEAM}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{PARTNERS}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{EVENTS_AND_NEWS}</Link>
                 </div>
 
                 <div className="hippotherapy">
                     <span className="title">{HIPPOTHERAPY}</span>
-                    <Link to={teamPageRoute}>{WHAT_IS_HIPPOTHERAPY}</Link>
-                    <Link to={teamPageRoute}>{PROGRAMS}</Link>
-                    <Link to={teamPageRoute}>{PROGRAMS_SESSIONS}</Link>
+                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{WHAT_IS_HIPPOTHERAPY}</Link>
+                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{PROGRAMS}</Link>
+                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{PROGRAMS_SESSIONS}</Link>
                 </div>
             </div>
 

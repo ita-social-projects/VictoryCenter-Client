@@ -1,3 +1,6 @@
+@import '../../../../../assets/sass/variables/variables.colors';
+@import '../../../../../assets/sass/variables/variables.fonts';
+
 * {
     margin: 0;
     box-sizing: border-box;
@@ -14,7 +17,7 @@
     h1 {
         width: 68.875rem;
         height: 21rem;
-        font-family: Mulish, sans-serif;
+        font-family: $mulish-regular-font;
         font-weight: 500;
         font-size: 6rem;
         line-height: 7rem;
@@ -24,7 +27,7 @@
     }
 
     span {
-        font-family: Mulish, sans-serif;
+        font-family: $mulish-regular-font;
         font-weight: 800;
         font-style: italic;
         font-size: 6rem;
@@ -38,7 +41,7 @@
     }
 
     span:nth-child(1) {
-        background: #fff481;
+        background: $yellow-400;
         position: relative;
     }
 
@@ -46,13 +49,13 @@
         content: '';
         width: 100vw;
         height: 7rem;
-        background: #fff481;
+        background: $yellow-400;
         position: absolute;
         transform: translateX(-100%);
     }
 
     span:nth-child(2) {
-        background: #b2dbee;
+        background: $light-blue-200;
         position: relative;
         z-index: 1;
     }
@@ -61,7 +64,7 @@
         content: '';
         width: 48.65vw;
         height: 7rem;
-        background: #b2dbee;
+        background: $light-blue-200;
         position: absolute;
         z-index: -1;
     }
@@ -71,7 +74,7 @@
         gap: 1rem;
         justify-content: center;
         align-items: center;
-        font-family: Mulish, sans-serif;
+        font-family: $mulish-regular-font;
         font-weight: 500;
         font-size: 1.25rem;
         line-height: 1.75rem;

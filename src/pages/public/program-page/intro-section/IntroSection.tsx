@@ -1,6 +1,6 @@
 import React from 'react';
 import './IntroSection.scss';
-import { ABOUT_PROGRAMS, MAIN_TITLE, VICTORY_CENTER_BELIEF } from '../../../../../const/public/programs-page';
+import { ABOUT_PROGRAMS, MAIN_TITLE, VICTORY_CENTER_BELIEF } from '../../../../const/public/programs-page';
 
 export const IntroSection: React.FC = () => {
     return (

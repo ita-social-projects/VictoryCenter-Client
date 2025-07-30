@@ -1,7 +1,7 @@
 import React from 'react';
 import background from '../../../../assets/videos/public/programs-page/contact_us_background.mp4';
 import './ContactSection.scss';
-import { CONTACT, PROGRAM_PROMPT, TEXT_US } from '../../../../../const/public/programs-page';
+import { CONTACT, PROGRAM_PROMPT, TEXT_US } from '../../../../const/public/programs-page';
 
 export const ContactSection: React.FC = () => {
     return (

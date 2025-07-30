@@ -1,5 +1,5 @@
 import { axiosInstance } from '../../axios';
-import default_team_member_photo from '../../../../assets/images/public/team-page/team_member_not_found_photo.svg';
+import default_team_member_photo from '../../../../assets/icons/team-member-blank.svg';
 import { PublicCategoryWithTeamMembersDto, TeamPageData } from '../../../../types/public/team-page';
 import { teamPageDataFetch } from './team-api';
 

@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap');
+@import '../../assets/sass/variables/variables.colors';
+@import '../../assets/sass/variables/variables.fonts';
 
 .admin {
     color: #041128;
@@ -6,21 +7,21 @@
 
     &__navigation {
         width: 311px;
-        box-shadow: 1px 1px 2px rgba(128, 128, 128, 0.38);
+        box-shadow: 1px 1px 2px #80808061;
         height: 100vh;
         position: sticky;
     }
 
     &__page {
-        background-color: #fdfdfb;
+        background-color: $grey-50;
         width: calc(100% - 311px);
     }
 
-    font-family: 'Mulish', sans-serif;
+    font-family: $mulish-regular-font;
 
     button,
     select,
     input {
-        font-family: 'Mulish', sans-serif;
+        font-family: $mulish-regular-font;
     }
 }

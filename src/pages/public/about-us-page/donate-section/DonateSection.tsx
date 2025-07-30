@@ -1,5 +1,5 @@
 import './DonateSection.scss';
-import background from '../../../assets/images/public/about-us-images/donate-background.png';
+import background from '../../../../assets/images/public/about-us-images/donate-background.jpg';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 
 export const DonateSection = () => {

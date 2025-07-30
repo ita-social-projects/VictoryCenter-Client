@@ -1,3 +1,6 @@
+@import '../../../../../assets/sass/variables/variables.colors';
+@import '../../../../../assets/sass/variables/variables.fonts';
+
 .contact-us-block {
     position: relative;
     height: 100vh;
@@ -21,14 +24,14 @@
         text-align: center;
 
         .contact-title {
-            font-family: Mulish, sans-serif;
+            font-family: $mulish-regular-font;
             font-weight: 700;
             font-size: 4rem;
             line-height: 4.5rem;
             letter-spacing: 0;
             text-align: center;
             text-transform: uppercase;
-            color: #ffffff;
+            color: $pure-white;
             padding-bottom: 19rem;
         }
 
@@ -42,13 +45,13 @@
             gap: 2rem;
 
             h4 {
-                font-family: Mulish, sans-serif;
+                font-family: $mulish-regular-font;
                 font-weight: 500;
                 font-size: 1.125rem;
                 line-height: 1.75rem;
                 letter-spacing: -0.02em;
                 text-align: center;
-                color: #ffffff;
+                color: $pure-white;
             }
 
             button {
@@ -57,14 +60,14 @@
                 height: 2.5rem;
                 gap: 0.5rem;
                 padding: 0.5rem 1.5rem;
-                background: #ffef43;
-                font-family: Mulish, sans-serif;
+                background: $yellow-500;
+                font-family: $mulish-regular-font;
                 font-weight: 400;
                 font-size: 1rem;
                 line-height: 1.5rem;
                 letter-spacing: -0.02em;
                 vertical-align: middle;
-                color: #061125;
+                color: $blue-900;
             }
         }
     }

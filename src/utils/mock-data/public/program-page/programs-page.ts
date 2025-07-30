@@ -1,8 +1,8 @@
-import firstImg from '../../../assets/images/public/program-page/first.png';
-import secondImg from '../../../assets/images/public/program-page/second.png';
-import thirdImg from '../../../assets/images/public/program-page/third.png';
-import fourthImg from '../../../assets/images/public/program-page/fourth.png';
-import fifthImg from '../../../assets/images/public/program-page/fifth.png';
+import firstImg from '../../../../assets/images/public/program-page/first.png';
+import secondImg from '../../../../assets/images/public/program-page/second.png';
+import thirdImg from '../../../../assets/images/public/program-page/third.png';
+import fourthImg from '../../../../assets/images/public/program-page/fourth.png';
+import fifthImg from '../../../../assets/images/public/program-page/fifth.png';
 export const MockCards = {
     programData: [
         {

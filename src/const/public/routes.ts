@@ -1,4 +1,4 @@
-export const publicRoutes = {
+export const PUBLIC_ROUTES = {
     ROOT: '/',
     TEAM: {
         PATH: 'team',

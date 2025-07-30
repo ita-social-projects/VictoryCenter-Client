@@ -1,6 +1,4 @@
-$tooltip-border-color: #a4a49b;
-$tooltip-background-color: #fdfdfb;
-$tooltip-text-color: #1c1c1c;
+@import '../../../assets/sass/variables/variables.colors';
 
 .button-tooltip-wrapper {
     position: relative;
@@ -17,11 +15,11 @@ $tooltip-text-color: #1c1c1c;
     display: flex;
 
     &:hover {
-        background-color: #e7eaee;
+        background-color: $blue-50;
     }
 
     &:focus {
-        background-color: #e7eaee;
+        background-color: $blue-50;
     }
 }
 

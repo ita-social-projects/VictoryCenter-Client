@@ -1,4 +1,6 @@
-@import '../../../assets/sass/variables/_variables.colors.scss';
+@import '../../../../assets/sass/variables/variables.colors';
+@import '../../../../assets/sass/variables/variables.fonts';
+
 .about-us-block {
     position: relative;
 
@@ -31,13 +33,13 @@
         top: 10.5rem;
         left: 5rem;
 
-        font-family: Mulish, sans-serif;
+        font-family: $mulish-regular-font;
         font-weight: 500;
         font-size: 4rem;
         line-height: 5rem;
         letter-spacing: 0;
         text-transform: uppercase;
-        color: $main-white;
+        color: $pure-white;
 
         .highlighted {
             font-weight: 800;
@@ -51,12 +53,12 @@
         z-index: 3;
         top: 34rem;
         left: 66.25vw;
-        font-family: Mulish, sans-serif;
+        font-family: $mulish-regular-font;
         font-weight: 400;
         font-size: 1.125rem;
         line-height: 1.75rem;
         letter-spacing: -0.02em;
-        color: $main-white;
+        color: $pure-white;
 
         .title-details p {
             margin-bottom: 0.5rem;

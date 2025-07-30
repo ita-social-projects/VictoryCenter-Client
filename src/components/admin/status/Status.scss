@@ -1,3 +1,5 @@
+@import '../../../assets/sass/variables/variables.colors';
+
 .status {
     display: flex;
     flex-direction: row;
@@ -14,14 +16,14 @@
     white-space: nowrap;
 
     &-draft {
-        color: #61615c;
-        background-color: #ffffff;
-        border-color: #61615c;
+        color: $grey-900;
+        background-color: $pure-white;
+        border-color: $grey-900;
     }
 
     &-published {
-        color: #0f2957;
+        color: $blue-500;
         background-color: #e5ecff;
-        border-color: #0f2957;
+        border-color: $blue-500;
     }
 }

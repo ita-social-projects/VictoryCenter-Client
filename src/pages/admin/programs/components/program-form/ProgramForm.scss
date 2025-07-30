@@ -1,3 +1,5 @@
+@import '../../../../../assets/sass/variables/variables.colors';
+
 .program-form-body {
     display: flex;
     flex-direction: column;
@@ -5,7 +7,7 @@
 }
 
 .program-form-header {
-    color: #061125;
+    color: $blue-900;
     font-weight: 400;
     font-size: 32px;
     line-height: 24px;

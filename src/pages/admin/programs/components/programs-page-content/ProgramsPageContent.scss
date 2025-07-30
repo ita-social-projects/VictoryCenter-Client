@@ -1,4 +1,6 @@
-﻿.programs-page {
+﻿@import '../../../../../assets/sass/variables/variables.colors';
+
+.programs-page {
     &-wrapper {
         display: flex;
         flex-direction: column;
@@ -44,9 +46,9 @@
             border: none;
             padding: 0;
             font-size: 16px;
-            color: #061125;
+            color: $blue-900;
             text-decoration: underline;
-            text-decoration-color: #061125;
+            text-decoration-color: $blue-900;
             cursor: pointer;
 
             &:hover {

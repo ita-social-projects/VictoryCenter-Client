@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { FaqCard } from './FaqCard';
-import { FaqQuestion } from '../../../../types/public/Faq';
+import { FaqQuestion } from '../../../../types/public/faq';
 
 describe('test question card component', () => {
     const mockQuestion: FaqQuestion = {

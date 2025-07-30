@@ -136,7 +136,7 @@ jest.mock('../program-category-modals/DeleteCategoryModal', () => ({
         ) : null,
 }));
 
-jest.mock('../../../../../components/common/category-bar/CategoryBar', () => ({
+jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({
         categories,
         selectedCategory,

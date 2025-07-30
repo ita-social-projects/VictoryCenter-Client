@@ -1,8 +1,8 @@
+import './ProgramCard.scss';
 import React from 'react';
 import arrowBlack from '../../../../../assets/icons/arrow-up-right.svg';
-import arrowYellow from '../../../../../assets/icons/arrow-up-yellow.png';
-import './ProgramCard.scss';
-import { PublishedProgram } from '../../../../../../types/public/program-page';
+import arrowYellow from '../../../../../assets/icons/arrow-up-right-yellow.svg';
+import { PublishedProgram } from '../../../../../types/public/program-page';
 
 interface ProgramCardProps {
     program: PublishedProgram;

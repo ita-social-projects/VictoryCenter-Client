@@ -2,6 +2,7 @@ import './AdminPageContent.scss';
 import { useState, useEffect } from 'react';
 import { adminPageDataFetch } from '../../../utils/mock-data/admin/admin-page';
 import { NavLink } from 'react-router';
+import { ADMIN_ROUTES } from '../../../const/admin/routes';
 
 export const AdminPageContent = () => {
     const [headerInfo, setHeaderInfo] = useState('');
@@ -22,13 +23,13 @@ export const AdminPageContent = () => {
             setContentInfo(content);
         })();
     }, []);
-    kod huyni
+
     return (
         <div className="admin-page-content">
             <h1 className="header">{headerInfo}</h1>
             <p className="content">{contentInfo}</p>
-            <NavLink to=></NavLink>
-            <NavLink to=></NavLink>
+            <NavLink to={ADMIN_ROUTES.TEAM.FULL}></NavLink>
+            <NavLink to={ADMIN_ROUTES.PROGRAMS.FULL}></NavLink>
         </div>
     );
 };

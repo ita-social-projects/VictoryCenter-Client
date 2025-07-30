@@ -1,7 +1,10 @@
+@import '../../../assets/sass/variables/variables.fonts';
+@import '../../../assets/sass/variables/variables.colors';
+
 .team-page-container {
     width: 93%;
     margin: auto;
-    font-family: 'Mulish', sans-serif;
+    font-family: $mulish-regular-font;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -42,7 +45,7 @@
     }
 
     .team_description {
-        font-family: 'Mulish', sans-serif;
+        font-family: $mulish-regular-font;
         width: 35rem;
         flex-shrink: 0;
 
@@ -74,7 +77,7 @@
 
     .member-role {
         font-weight: 400;
-        color: #7f7f78;
+        color: $grey-800;
         margin-top: 0.25rem;
     }
 
@@ -109,7 +112,7 @@
         z-index: 1;
         max-width: 70%;
         color: white;
-        font-family: 'Mulish', sans-serif;
+        font-family: $mulish-regular-font;
         font-weight: 600;
         padding: 5rem;
         text-align: left;

@@ -2,11 +2,11 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Header } from './Header';
 import { MemoryRouter } from 'react-router';
-import { publicRoutes } from '../../../const/routes/public-routes';
-import { CONTACT_US, DONATE, HOW_TO_SUPPORT, PROGRAMS, REPORTING } from '../../../const/public/header';
+import { PUBLIC_ROUTES } from '../../../const/public/routes';
+import { ABOUT_US, CONTACT_US, DONATE, HOW_TO_SUPPORT, PROGRAMS, REPORTING } from '../../../const/public/header';
 
 jest.mock('./Header.scss', () => ({}));
-jest.mock('../../assets/images/header/VictoryCenterLogo.svg', () => ({
+jest.mock('../../../assets/icons/logo-wth-text.svg', () => ({
     ReactComponent: () => <div data-testid="logo" />,
 }));
 
@@ -28,13 +28,10 @@ describe('Header', () => {
     it('renders nav links with correct text and href', () => {
         render(<Header />, { wrapper: MemoryRouter });
 
-        expect(screen.getByRole('link', { name: publicRoutes.ABOUT_US.FULL })).toHaveAttribute(
-            'href',
-            publicRoutes.ABOUT_US.FULL,
-        );
-        expect(screen.getByRole('link', { name: PROGRAMS })).toHaveAttribute('href', publicRoutes.PROGRAMS.FULL);
-        expect(screen.getByRole('link', { name: REPORTING })).toHaveAttribute('href', publicRoutes.MOCK.FULL);
-        expect(screen.getByRole('link', { name: HOW_TO_SUPPORT })).toHaveAttribute('href', publicRoutes.MOCK.FULL);
+        expect(screen.getByRole('link', { name: ABOUT_US })).toHaveAttribute('href', PUBLIC_ROUTES.ABOUT_US.FULL);
+        expect(screen.getByRole('link', { name: PROGRAMS })).toHaveAttribute('href', PUBLIC_ROUTES.PROGRAMS.FULL);
+        expect(screen.getByRole('link', { name: REPORTING })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
+        expect(screen.getByRole('link', { name: HOW_TO_SUPPORT })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
     });
 
     it('renders Contact Us and Donate buttons', () => {

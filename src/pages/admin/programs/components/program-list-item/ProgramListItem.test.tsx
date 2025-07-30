@@ -18,7 +18,7 @@ jest.mock('../../../../../components/common/button-tooltip/ButtonTooltip', () =>
     },
 }));
 
-jest.mock('../../../../../components/common/status/Status', () => ({
+jest.mock('../../../../../components/admin/status/Status', () => ({
     Status: ({ status }: { status: VisibilityStatus }) => {
         return (
             <div data-testid="status" data-status={status}>

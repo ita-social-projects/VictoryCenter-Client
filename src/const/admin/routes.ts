@@ -1,4 +1,4 @@
-export const adminRoutes = {
+export const ADMIN_ROUTES = {
     ROOT: '/admin-panel',
     LOGIN: {
         PATH: 'login',

@@ -1,3 +1,5 @@
+@import '../../../assets/sass/variables/variables.colors';
+
 .modal {
     &-overlay {
         position: fixed;
@@ -5,7 +7,7 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0, 0, 0, 0.5);
+        background: #00000080;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -15,7 +17,7 @@
     }
 
     &-container {
-        background: #fdfdfb;
+        background: $grey-50;
         border-radius: 8px;
         padding: 1.5rem;
         max-height: calc(100vh - 2rem);

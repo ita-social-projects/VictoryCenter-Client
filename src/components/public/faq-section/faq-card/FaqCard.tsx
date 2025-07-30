@@ -1,9 +1,9 @@
 import './FaqCard.scss';
 import React, { useState } from 'react';
-import openIcon from '../../../../../assets/icons/arrowDown.svg';
-import closeIcon from '../../../../../assets/icons/Cross.svg';
-import openBlue from '../../../../../assets/icons/arrowDownBlue.svg';
-import closeBlue from '../../../../../assets/icons/crossBlue.svg';
+import openIcon from '../../../../assets/icons/arrowDown.svg';
+import closeIcon from '../../../../assets/icons/Cross.svg';
+import openBlue from '../../../../assets/icons/arrowDownBlue.svg';
+import closeBlue from '../../../../assets/icons/crossBlue.svg';
 import { FaqQuestion } from '../../../../types/public/faq';
 
 interface FaqCardProps {

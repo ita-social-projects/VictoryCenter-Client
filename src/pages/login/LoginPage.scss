@@ -1,13 +1,16 @@
+@import '../../assets/sass/variables/variables.colors';
+@import '../../assets/sass/variables/variables.fonts';
+
 .page-layout {
     font-size: 1rem;
-    font-family: 'Mulish', sans-serif;
+    font-family: $mulish-regular-font;
     outline: none;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     width: 100vw;
-    background-color: #fdfdfb;
+    background-color: $grey-50;
 
     .modal-container {
         font-size: 1.15rem;

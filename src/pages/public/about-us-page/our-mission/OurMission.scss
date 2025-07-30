@@ -1,4 +1,6 @@
-@import '../../../assets/sass/variables/_variables.colors.scss';
+@import '../../../../assets/sass/variables/variables.colors';
+@import '../../../../assets/sass/variables/variables.fonts';
+
 .our-mission-block * {
     margin: 0;
     padding: 0;
@@ -12,7 +14,7 @@
         align-items: flex-start;
 
         .mission-title {
-            font-family: Mulish, sans-serif;
+            font-family: $mulish-regular-font;
             font-weight: 700;
             font-size: 2rem;
             line-height: 2.5rem;
@@ -30,7 +32,7 @@
             gap: 1.5rem;
 
             .mission-details {
-                font-family: Mulish, sans-serif;
+                font-family: $mulish-regular-font;
                 font-weight: 400;
                 font-size: 1.125rem;
                 line-height: 1.75rem;
@@ -55,13 +57,18 @@
                     border-bottom: 1px solid $blue-900;
 
                     .link-title {
-                        font-family: Mulish, sans-serif;
+                        font-family: $mulish-regular-font;
                         font-weight: 400;
                         font-size: 1rem;
                         line-height: 1.5rem;
                         letter-spacing: -0.02em;
                         vertical-align: middle;
                         color: $blue-900;
+                    }
+
+                    img {
+                        width: 1.5rem;
+                        height: 1.5rem;
                     }
                 }
             }

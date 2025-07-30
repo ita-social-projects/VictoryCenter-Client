@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { useLocation } from 'react-router';
 import { useAdminContext } from '../../../context/admin-context-provider/AdminContextProvider';
-import { adminRoutes } from '../../../const/routes/admin-routes';
 import { PrivateRoute } from './PrivateRoute';
+import { ADMIN_ROUTES } from '../../../const/admin/routes';
 
 const mockUseAdminContext = useAdminContext as jest.MockedFunction<typeof useAdminContext>;
 const mockUseLocation = useLocation as jest.MockedFunction<typeof useLocation>;
@@ -19,9 +19,6 @@ jest.mock('../../../context/admin-context-provider/AdminContextProvider', () => 
 }));
 jest.mock('../../common/page-loader/PageLoader', () => ({
     PageLoader: () => <div data-testid="loader" />,
-}));
-jest.mock('../../../const/routers/routes', () => ({
-    adminRoutes: { loginRoute: '/login' },
 }));
 
 describe('PrivateRoute', () => {
@@ -42,7 +39,7 @@ describe('PrivateRoute', () => {
 
         render(<PrivateRoute />);
         const nav = screen.getByTestId('navigate');
-        expect(nav).toHaveAttribute('data-to', adminRoutes.loginRoute);
+        expect(nav).toHaveAttribute('data-to', ADMIN_ROUTES.LOGIN.FULL);
         expect(nav).toHaveAttribute('data-from', '/public');
         expect(nav).toHaveAttribute('data-replace', 'true');
     });

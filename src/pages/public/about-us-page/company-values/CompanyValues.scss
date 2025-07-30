@@ -1,4 +1,6 @@
-@import '../../../assets/sass/variables/_variables.colors.scss';
+@import '../../../../assets/sass/variables/variables.colors';
+@import '../../../../assets/sass/variables/variables.fonts';
+
 .values-block * {
     padding: 0;
     margin: 0;
@@ -9,7 +11,7 @@
     min-height: 78rem;
 
     .values-title {
-        font-family: Mulish, sans-serif;
+        font-family: $mulish-regular-font;
         font-weight: 700;
         font-size: 2rem;
         line-height: 2.5rem;
@@ -37,17 +39,17 @@
 
             .value-name {
                 width: 100%;
-                font-family: Mulish, sans-serif;
+                font-family: $mulish-regular-font;
                 font-weight: 500;
                 font-size: 1.5rem;
                 line-height: 2.25rem;
                 letter-spacing: -0.02em;
-                border-bottom: 2px solid $main-white;
+                border-bottom: 2px solid $pure-white;
                 padding-bottom: 0.25rem;
             }
 
             .value-description {
-                font-family: Mulish, sans-serif;
+                font-family: $mulish-regular-font;
                 font-weight: 400;
                 font-size: 1rem;
                 line-height: 1.5rem;

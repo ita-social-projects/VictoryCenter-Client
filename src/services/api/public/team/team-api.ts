@@ -1,4 +1,4 @@
-import default_team_member_photo from '../../../../assets/images/public/team-page/team_member_not_found_photo.svg';
+import default_team_member_photo from '../../../../assets/icons/team-member-blank.svg';
 import { API_ROUTES } from '../../../../const/urls/main-api';
 import {
     Member,

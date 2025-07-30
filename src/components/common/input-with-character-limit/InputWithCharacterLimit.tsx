@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import './input-with-character-limit.scss';
+import './InputWithCharacterLimit.scss';
 
 export interface InputWithCharacterLimitProps {
     value: string;

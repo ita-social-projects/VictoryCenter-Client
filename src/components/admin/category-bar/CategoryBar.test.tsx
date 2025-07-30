@@ -13,7 +13,7 @@ interface MockContextMenuButtonOptionProps {
     value: string;
 }
 
-jest.mock('../context-menu-button/ContextMenuButton', () => {
+jest.mock('../../common/context-menu-button/ContextMenuButton', () => {
     const MockContextMenuButton = ({ children, onOptionSelected }: MockContextMenuButtonProps) => (
         <button data-testid="context-menu-button" onClick={() => onOptionSelected?.('test-option')} type="button">
             {children}

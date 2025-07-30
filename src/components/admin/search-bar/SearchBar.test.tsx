@@ -1,11 +1,9 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SearchBar } from './SearchBar';
 
 jest.mock('../../../assets/icons/la_search.svg', () => 'search-icon.svg');
 jest.mock('../../../assets/icons/remove-query.svg', () => 'remove-icon.svg');
-
-jest.mock('../select/Select', () => {
+jest.mock('../../common/select/Select', () => {
     const mockReact = require('react');
     return {
         Select: ({ children, selectContainerRef, onValueChange, isAutocomplete, className }: any) => {
@@ -40,7 +38,7 @@ jest.mock('../select/Select', () => {
     };
 });
 
-jest.mocked(require('../select/Select').Select).Option = ({ value, name }: any) => (
+jest.mocked(require('../../common/select/Select').Select).Option = ({ value, name }: any) => (
     <div data-testid={`select-option-${value}`}>{name}</div>
 );
 

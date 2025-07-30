@@ -1,3 +1,5 @@
+@import '../../../assets/sass/variables/variables.colors';
+
 .hint-box {
     display: flex;
     flex-direction: column;
@@ -5,7 +7,7 @@
     font-weight: 400;
     font-size: 16px;
     line-height: 24px;
-    color: #0f2957;
+    color: $blue-500;
 
     &-title {
         display: flex;

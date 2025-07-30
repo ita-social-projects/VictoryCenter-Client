@@ -2,7 +2,7 @@ import './AdminNavigation.scss';
 import React from 'react';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
-import { adminRoutes } from '../../../const/routes/admin-routes';
+import { ADMIN_ROUTES } from '../../../const/admin/routes';
 import Logo from '../../../assets/icons/logo.svg';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
@@ -15,7 +15,7 @@ export const AdminNavigation = () => {
             <div className="admin-pages">
                 <nav>
                     <NavLink
-                        to={adminRoutes.TEAM.FULL}
+                        to={ADMIN_ROUTES.TEAM.FULL}
                         end
                         className={({ isActive }) =>
                             classNames('admin-page-link', {
@@ -27,7 +27,7 @@ export const AdminNavigation = () => {
                     </NavLink>
 
                     <NavLink
-                        to={adminRoutes.PROGRAMS.FULL}
+                        to={ADMIN_ROUTES.PROGRAMS.FULL}
                         end
                         className={({ isActive }) =>
                             classNames('admin-page-link', {

@@ -41,8 +41,8 @@ jest.mock('../../../../../components/common/select/Select', () => {
     };
 });
 
-jest.mock('../../../../../components/common/input/Input', () => ({
-    Input: ({ onChange, autocompleteValues, placeholder, ...props }: SearchBarProps): any => (
+jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
+    SearchBar: ({ onChange, autocompleteValues, placeholder, ...props }: SearchBarProps): any => (
         <input onChange={(e) => onChange(e.target.value)} placeholder={placeholder} {...props} />
     ),
 }));

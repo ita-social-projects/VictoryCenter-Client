@@ -92,7 +92,7 @@ const ConfirmPublishModal = ({
         </Modal.Content>
         <Modal.Actions>
             <Button onClick={onCancel} buttonStyle="secondary">
-                {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
+                {COMMON_TEXT_ADMIN.BUTTON.NO}
             </Button>
             <Button onClick={onConfirm} buttonStyle="primary">
                 {COMMON_TEXT_ADMIN.BUTTON.YES}

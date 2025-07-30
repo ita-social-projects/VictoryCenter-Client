@@ -1,4 +1,4 @@
-import './ProgramPageToolbar.scss';
+import './ProgramsPageToolbar.scss';
 import { Button } from '../../../../../components/common/button/Button';
 import { Select } from '../../../../../components/common/select/Select';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';

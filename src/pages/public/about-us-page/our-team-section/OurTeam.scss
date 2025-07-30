@@ -1,10 +1,12 @@
-@import '../../../assets/sass/variables/_variables.colors.scss';
+@import '../../../../assets/sass/variables/variables.colors';
+@import '../../../../assets/sass/variables/variables.fonts';
+
 .our-team-block {
     display: flex;
     align-items: center;
     justify-content: flex-start;
     gap: 8%;
-    font-family: Mulish, sans-serif;
+    font-family: $mulish-regular-font;
     font-weight: 400;
 
     .our-team-image {
@@ -31,8 +33,8 @@
             line-height: 1.5rem;
             letter-spacing: -0.02em;
             vertical-align: middle;
-            border-bottom: 1px solid $main-black;
-            color: $main-black;
+            border-bottom: 1px solid $pure-black;
+            color: $pure-black;
             padding: 0.5rem 0;
         }
     }

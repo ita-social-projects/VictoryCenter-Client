@@ -1,4 +1,5 @@
-@import '../../../assets/sass/variables/_variables.colors.scss';
+@import '../../../../assets/sass/variables/variables.colors';
+@import '../../../../assets/sass/variables/variables.fonts';
 .support-block {
     position: relative;
     min-height: 64rem;
@@ -10,7 +11,7 @@
         top: 6.25rem;
         left: 3.5rem;
 
-        font-family: Mulish, sans-serif;
+        font-family: $mulish-regular-font;
         font-weight: 700;
         font-size: 2rem;
         line-height: 2.5rem;
@@ -19,7 +20,7 @@
     }
 
     .support-description {
-        font-family: Mulish, sans-serif;
+        font-family: $mulish-regular-font;
         padding: 0 1rem;
         font-weight: 400;
         font-size: 1.125rem;

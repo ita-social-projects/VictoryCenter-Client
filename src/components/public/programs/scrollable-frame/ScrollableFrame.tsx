@@ -1,22 +1,22 @@
-import { ProgramCard } from '../../../pages/program-page/program-page/program-section/program-card/ProgramCard';
+import './ScrollableFrame.scss';
 import { Swiper, SwiperSlide, SwiperClass } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
-import { programPageDataFetch } from '../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
-import React, { useState, useEffect, useRef } from 'react';
-import { Program } from '../../../types/public/ProgramPage';
-import arrowRight from '../../../assets/icons/arrow-right.png';
-import arrowLeft from '../../../assets/icons/arrow-left.png';
-import arrowRightBlack from '../../../assets/icons/arrow-right-black.png';
-import arrowLeftBlack from '../../../assets/icons/arrow-left-black.png';
+import { useState, useEffect, useRef } from 'react';
+import arrowRightWhite from '../../../../assets/icons/arrow-right-white.svg';
+import arrowLeftWhite from '../../../../assets/icons/arrow-left-white.svg';
+import arrowRightBlack from '../../../../assets/icons/arrow-right.svg';
+import arrowLeftBlack from '../../../../assets/icons/arrow-left.svg';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
-import './scrollable-frame.scss';
-import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../const/program-page/program-page';
+import { programPageDataFetch } from '../../../../utils/mock-data/public/program-page/programs-page';
+import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
+import { ProgramCard } from '../../../../pages/public/program-page/program-section/program-card/ProgramCard';
+import { PublishedProgram } from '../../../../types/public/program-page';
 
 export const ScrollableFrame = () => {
-    const [programData, setProgramData] = useState<Program[]>([]);
+    const [programData, setProgramData] = useState<PublishedProgram[]>([]);
     const [error, setError] = useState<string | null>(null);
     const swiperRef = useRef<SwiperClass | null>(null);
 
@@ -64,11 +64,11 @@ export const ScrollableFrame = () => {
 
             <div className="button-container">
                 <button onClick={handlePrev} className="arrow-button">
-                    <img src={arrowLeft} alt="" className="arrow-normal-state" />
+                    <img src={arrowLeftWhite} alt="" className="arrow-normal-state" />
                     <img src={arrowLeftBlack} alt="" className="arrow-hover-state" />
                 </button>
                 <button onClick={handleNext} className="arrow-button">
-                    <img src={arrowRight} alt="" className="arrow-normal-state" />
+                    <img src={arrowRightWhite} alt="" className="arrow-normal-state" />
                     <img src={arrowRightBlack} alt="" className="arrow-hover-state" />
                 </button>
             </div>

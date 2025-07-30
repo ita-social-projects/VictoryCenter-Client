@@ -17,7 +17,7 @@ describe('PhotoInput', () => {
 
     it('renders placeholder when no image is selected', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} />);
-        expect(screen.getByText(COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER)).toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER)).toBeInTheDocument();
         expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.UPLOAD)).toBeInTheDocument();
     });
 
@@ -76,7 +76,7 @@ describe('PhotoInput', () => {
     it('handles drag and drop image', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} />);
         const dropZone = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
 
         const file = createImageFile();
@@ -97,7 +97,7 @@ describe('PhotoInput', () => {
     it('adds focus class on drag over and removes on drag leave', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} />);
         const wrapper = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
 
         fireEvent.dragOver(wrapper);
@@ -110,7 +110,7 @@ describe('PhotoInput', () => {
     it('does not open file dialog or allow drop when disabled', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} disabled />);
         const wrapper = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
         const input = wrapper.querySelector('input[type="file"]')!;
 
@@ -132,7 +132,7 @@ describe('PhotoInput', () => {
     it('handles drag and drop when no files provided', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} />);
         const dropZone = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
 
         const data = {
@@ -160,7 +160,7 @@ describe('PhotoInput', () => {
     it('handles mouse enter and leave events', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} />);
         const wrapper = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
 
         fireEvent.mouseEnter(wrapper);
@@ -173,7 +173,7 @@ describe('PhotoInput', () => {
     it('does not add focus class on mouse enter when disabled', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} disabled />);
         const wrapper = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
 
         fireEvent.mouseEnter(wrapper);
@@ -183,7 +183,7 @@ describe('PhotoInput', () => {
     it('does not add focus class on mouse leave when disabled', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} disabled />);
         const wrapper = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
 
         fireEvent.mouseLeave(wrapper);
@@ -193,7 +193,7 @@ describe('PhotoInput', () => {
     it('handles keyboard events (Enter and Space)', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} />);
         const wrapper = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
         const fileInput = screen.getByTestId('photo-input-hidden') as HTMLInputElement;
 
@@ -215,7 +215,7 @@ describe('PhotoInput', () => {
     it('does not handle keyboard events when disabled', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} disabled />);
         const wrapper = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
         const fileInput = screen.getByTestId('photo-input-hidden') as HTMLInputElement;
 
@@ -233,7 +233,7 @@ describe('PhotoInput', () => {
     it('ignores non-Enter/Space keyboard events', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} />);
         const wrapper = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
         const fileInput = screen.getByTestId('photo-input-hidden') as HTMLInputElement;
 
@@ -249,7 +249,7 @@ describe('PhotoInput', () => {
         const onBlurMock = jest.fn();
         render(<PhotoInput value={null} onChange={onChangeMock} onBlur={onBlurMock} />);
         const wrapper = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
 
         fireEvent.focus(wrapper);
@@ -264,7 +264,7 @@ describe('PhotoInput', () => {
         const onBlurMock = jest.fn();
         render(<PhotoInput value={null} onChange={onChangeMock} onBlur={onBlurMock} disabled />);
         const wrapper = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
 
         fireEvent.focus(wrapper);
@@ -278,7 +278,7 @@ describe('PhotoInput', () => {
     it('calls onBlur even without onBlur prop', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} />);
         const wrapper = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
 
         // Не повинно падати без onBlur prop
@@ -288,7 +288,7 @@ describe('PhotoInput', () => {
     it('does not add focus class on drag over when disabled', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} disabled />);
         const wrapper = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
 
         fireEvent.dragOver(wrapper);
@@ -349,7 +349,7 @@ describe('PhotoInput', () => {
     it('sets correct tabIndex when disabled', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} disabled />);
         const wrapper = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
 
         expect(wrapper.getAttribute('tabIndex')).toBe('-1');
@@ -358,7 +358,7 @@ describe('PhotoInput', () => {
     it('sets correct tabIndex when enabled', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} />);
         const wrapper = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo',
+            name: COMMON_TEXT_ADMIN.FORM.PHOTO_PLACEHOLDER || 'Upload photo',
         });
 
         expect(wrapper.getAttribute('tabIndex')).toBe('0');

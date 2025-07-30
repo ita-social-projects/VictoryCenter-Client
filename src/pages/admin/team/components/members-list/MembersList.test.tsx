@@ -3,6 +3,8 @@ import { MembersList, MembersListProps } from './MembersList';
 import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-сategories/team-categories-api';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
+import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
 const mockMembers = [] as TeamMember[];
 
@@ -466,7 +468,7 @@ describe('MembersList', () => {
 
             fireEvent.click(screen.getByTestId('edit-button-0'));
 
-            expect(screen.getByText('Редагування учасника команди')).toBeInTheDocument();
+            expect(screen.getByText(TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER)).toBeInTheDocument();
             expect(screen.getByTestId('member-form')).toBeInTheDocument();
         });
 
@@ -482,7 +484,7 @@ describe('MembersList', () => {
             const form = screen.getByTestId('member-form');
             fireEvent.submit(form);
 
-            expect(screen.getByText('Опублікувати нового члена команди?')).toBeInTheDocument();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED)).toBeInTheDocument();
         });
 
         it('publishes member when confirmation is accepted', async () => {
@@ -504,7 +506,7 @@ describe('MembersList', () => {
             fireEvent.click(confirmButton);
 
             await waitFor(() => {
-                expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
+                expect(screen.queryByText(TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER)).not.toBeInTheDocument();
             });
         });
 
@@ -523,7 +525,7 @@ describe('MembersList', () => {
             const cancelButton = screen.getByText('Ні');
             fireEvent.click(cancelButton);
 
-            expect(screen.getByText('Редагування учасника команди')).toBeInTheDocument();
+            expect(screen.getByText(TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER)).toBeInTheDocument();
         });
 
         it('shows close confirmation when closing modal with unsaved changes', async () => {
@@ -538,7 +540,7 @@ describe('MembersList', () => {
             const confirmCloseButton = await screen.findByRole('button', { name: /Так/i });
             fireEvent.click(confirmCloseButton);
             await waitFor(() => {
-                expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
+                expect(screen.queryByText(TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER)).not.toBeInTheDocument();
             });
         });
 
@@ -565,7 +567,7 @@ describe('MembersList', () => {
             fireEvent.click(confirmCloseButton);
 
             await waitFor(() => {
-                expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
+                expect(screen.queryByText(TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER)).not.toBeInTheDocument();
             });
         });
 
@@ -586,7 +588,7 @@ describe('MembersList', () => {
             fireEvent.click(confirmCloseButton);
 
             await waitFor(() => {
-                expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
+                expect(screen.queryByText(TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER)).not.toBeInTheDocument();
             });
         });
     });
@@ -816,10 +818,10 @@ describe('MembersList', () => {
             fireEvent.click(screen.getByTestId('edit-button-0'));
             const form = screen.getByTestId('member-form');
             fireEvent.submit(form);
-            expect(screen.getByText('Опублікувати нового члена команди?')).toBeInTheDocument();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED)).toBeInTheDocument();
             const cancelButton = screen.getByText('Ні');
             fireEvent.click(cancelButton);
-            expect(screen.getByText('Редагування учасника команди')).toBeInTheDocument();
+            expect(screen.getByText(TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER)).toBeInTheDocument();
         });
 
         it('shows and hides move-to-top button correctly', async () => {

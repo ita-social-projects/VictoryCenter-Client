@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramModal, ProgramModalProps } from './ProgramModal';
-import { Program } from '../../../../../types/ProgramAdminPage';
+import { Program } from '../../../../../types/admin/Programs';
 import { useProgramModal } from '../../../../../hooks/admin/useProgramModal/useProgramModal';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
@@ -70,7 +70,7 @@ const mockProgram: Program = {
     description: 'Test Description',
     categories: [{ id: 1, name: 'Category 1', programsCount: 1 }],
     status: 'Draft',
-    img: 'test.jpg',
+    img: null,
 };
 
 describe('ProgramModal', () => {

@@ -4,3 +4,10 @@ export type DragPreviewModel<T> = {
     y: number;
     member: T | null;
 };
+
+export type VisibilityStatus = 'Draft' | 'Published';
+
+export interface PaginationResult<T> {
+    items: T[];
+    totalItemsCount: number;
+}

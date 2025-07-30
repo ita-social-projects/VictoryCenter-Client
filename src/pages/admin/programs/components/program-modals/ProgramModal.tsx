@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { ProgramForm } from '../program-form/ProgramForm';
-import { Program, ProgramCategory } from '../../../../../types/ProgramAdminPage';
+import { Program, ProgramCategory } from '../../../../../types/admin/Programs';
 import { Button } from '../../../../../components/common/button/Button';
 import { QuestionModal } from '../../../../../components/common/question-modal/QuestionModal';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';

@@ -17,7 +17,7 @@ interface PhotoInputProps {
     name?: string;
 }
 
-const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: PhotoInputProps) => {
+export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: PhotoInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);

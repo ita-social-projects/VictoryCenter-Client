@@ -1,6 +1,7 @@
-import { Program } from '../../../../../types/ProgramAdminPage';
+import { Program } from '../../../../../types/admin/Programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonTooltip } from '../../../../../components/common/button-tooltip/ButtonTooltip';
+import { mapImageToBase64 } from '../../../../../utils/functions/mapImageToBase64';
 import { Status } from '../../../../../components/common/status/Status';
 import BlankImage from '../../../../../assets/images/admin/blank-image.svg';
 import './programs-list-item.scss';
@@ -16,7 +17,7 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
         <div className="program-item">
             <div className="program-info">
                 <div className="program-info-identity">
-                    <img src={program.img || BlankImage} alt={`${program.name}-img`} />
+                    <img src={mapImageToBase64(program.img) || BlankImage} alt={`${program.name}-img`} />
                     <p>{program.name}</p>
                 </div>
                 <div className="program-info-description">

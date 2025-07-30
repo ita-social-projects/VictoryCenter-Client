@@ -2,19 +2,20 @@ import React, { useEffect, useState, forwardRef, useImperativeHandle, useCallbac
 import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-scheme';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
-import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
-import { VisibilityStatus } from '../../../../../types/Common';
+import { ProgramCategory } from '../../../../../types/admin/Programs';
+import { VisibilityStatus } from '../../../../../types/admin/Common';
 import { MultiSelect } from '../../../../../components/common/multi-select/MultiSelect';
 import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
 import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
 import { TextAreaWithCharacterLimit } from '../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import './program-form.scss';
+import { Image, ImageValues } from '../../../../../types/Image';
 
 export interface ProgramFormValues {
     name: string;
     categories: ProgramCategory[];
     description: string;
-    img: File | string | null;
+    img: Image | null;
 }
 
 export interface FormErrorState {
@@ -47,6 +48,28 @@ const validateForm = (formState: ProgramFormValues, isPublishing: boolean): Form
 
 const hasErrors = (errors: FormErrorState): boolean => {
     return Object.values(errors).some((error) => error !== undefined);
+};
+
+const ImageToImageValue = (image: Image | null) => {
+    if (!image) return null;
+
+    return {
+        size: image.size,
+        base64: image.base64,
+        mimeType: image.mimeType,
+    };
+};
+
+const ImageValuesToImage = (imageValues: ImageValues | null) => {
+    if (!imageValues) return null;
+
+    var image: Image = {
+        id: null,
+        size: imageValues.size,
+        base64: imageValues.base64,
+        mimeType: imageValues.mimeType,
+    };
+    return image;
 };
 
 export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
@@ -121,9 +144,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         }, [formState.description]);
 
         // Image handlers
-        const handleImgChange = useCallback((file: File | string | null) => {
-            setFormState((prev) => ({ ...prev, img: file }));
-            const error = PROGRAM_VALIDATION_FUNCTIONS.validateImg(file, false);
+        const handleImgChange = useCallback((file: ImageValues | null) => {
+            const image = ImageValuesToImage(file);
+            setFormState((prev) => ({ ...prev, img: image }));
+            const error = PROGRAM_VALIDATION_FUNCTIONS.validateImg(image, false);
             setErrors((prev) => ({ ...prev, img: error }));
         }, []);
 
@@ -215,7 +239,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 <div className="form-group">
                     <label htmlFor="img">{PROGRAMS_TEXT.FORM.LABEL.PHOTO}</label>
                     <PhotoInput
-                        value={formState.img}
+                        value={ImageToImageValue(formState.img)}
                         onChange={handleImgChange}
                         id="img"
                         name="img"

@@ -1,5 +1,5 @@
 import React from 'react';
-import { VisibilityStatus } from '../../../types/Common';
+import { VisibilityStatus } from '../../../types/admin/Common';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './status.scss';
 

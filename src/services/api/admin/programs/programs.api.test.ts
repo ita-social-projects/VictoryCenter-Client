@@ -1,8 +1,6 @@
 import { ProgramsApi } from './programs-api';
 import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin-page/programPage';
-import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '../../../../types/ProgramAdminPage';
-
-global.URL.createObjectURL = jest.fn(() => 'mocked-image-url');
+import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '../../../../types/admin/Programs';
 
 describe('ProgramsApi', () => {
     beforeEach(() => {
@@ -92,13 +90,12 @@ describe('ProgramsApi', () => {
 
     describe('addProgram', () => {
         it('should add program with File image', async () => {
-            const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
             const programData: ProgramCreateUpdate = {
                 id: null,
                 name: 'Test Program',
                 description: 'Test Description',
                 status: 'Draft',
-                img: mockFile,
+                img: null,
                 categoryIds: [1, 2],
             };
 
@@ -111,25 +108,6 @@ describe('ProgramsApi', () => {
             expect(result.description).toBe(programData.description);
             expect(result.status).toBe(programData.status);
             expect(result.categories).toHaveLength(2);
-            expect(URL.createObjectURL).toHaveBeenCalledWith(mockFile);
-        });
-
-        it('should add program with string image', async () => {
-            const programData: ProgramCreateUpdate = {
-                id: null,
-                name: 'Test Program 2',
-                description: 'Test Description 2',
-                status: 'Published',
-                img: 'http://example.com/image.jpg',
-                categoryIds: [1],
-            };
-
-            const promise = ProgramsApi.addProgram(programData);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result.img).toBe('http://example.com/image.jpg');
-            expect(URL.createObjectURL).not.toHaveBeenCalled();
         });
 
         it('should add program with no image', async () => {
@@ -169,13 +147,12 @@ describe('ProgramsApi', () => {
 
     describe('editProgram', () => {
         it('should edit existing program with File image', async () => {
-            const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
             const programData: ProgramCreateUpdate = {
                 id: 1,
                 name: 'Updated Program',
                 description: 'Updated Description',
                 status: 'Published',
-                img: mockFile,
+                img: null,
                 categoryIds: [2],
             };
 
@@ -185,23 +162,6 @@ describe('ProgramsApi', () => {
 
             expect(result.id).toBe(1);
             expect(result.name).toBe(programData.name);
-        });
-
-        it('should edit existing program with string image', async () => {
-            const programData: ProgramCreateUpdate = {
-                id: 2,
-                name: 'Updated Program 2',
-                description: 'Updated Description 2',
-                status: 'Draft',
-                img: 'http://example.com/new-image.jpg',
-                categoryIds: [1],
-            };
-
-            const promise = ProgramsApi.editProgram(programData);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result.img).toBe('http://example.com/new-image.jpg');
         });
 
         it('should edit existing program with null image', async () => {

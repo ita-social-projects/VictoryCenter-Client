@@ -2,8 +2,8 @@ import { renderHook, act } from '@testing-library/react';
 import { useProgramModal } from './useProgramModal';
 import { ProgramsApi } from '../../../services/api/admin/programs/programs-api';
 import { PROGRAMS_TEXT } from '../../../const/admin/programs';
-import { Program } from '../../../types/ProgramAdminPage';
-import { VisibilityStatus } from '../../../types/Common';
+import { Program } from '../../../types/admin/Programs';
+import { VisibilityStatus } from '../../../types/admin/Common';
 import { ProgramFormValues } from '../../../pages/admin/programs/components/program-form/ProgramForm';
 
 jest.mock('../../../services/api/admin/programs/programs-api');
@@ -21,14 +21,14 @@ const mockProgram: Program = {
         { id: 2, name: 'Category 2', programsCount: 3 },
     ],
     status: 'Draft' as VisibilityStatus,
-    img: 'test-image.jpg',
+    img: null,
 };
 
 const mockFormData: ProgramFormValues = {
     name: 'New Program',
     description: 'New Description',
     categories: [{ id: 1, name: 'Category 1', programsCount: 5 }],
-    img: new File([''], 'test.jpg', { type: 'image/jpeg' }),
+    img: null,
 };
 
 const mockFormRef = {

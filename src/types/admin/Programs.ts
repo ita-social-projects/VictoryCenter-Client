@@ -1,4 +1,5 @@
 import { VisibilityStatus } from './Common';
+import { Image } from '../Image';
 
 export interface ProgramCategory {
     id: number;
@@ -12,7 +13,7 @@ export interface Program {
     description: string;
     categories: ProgramCategory[];
     status: VisibilityStatus;
-    img: string | null;
+    img: Image | null;
 }
 
 export interface ProgramCreateUpdate {
@@ -21,7 +22,7 @@ export interface ProgramCreateUpdate {
     description: string;
     categoryIds: number[];
     status: VisibilityStatus;
-    img: File | string | null;
+    img: Image | null;
 }
 
 export interface ProgramCategoryCreateUpdate {

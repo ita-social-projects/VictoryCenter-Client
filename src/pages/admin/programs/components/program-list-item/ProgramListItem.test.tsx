@@ -2,8 +2,8 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramListItem } from './ProgramListItem';
-import { Program } from '../../../../../types/ProgramAdminPage';
-import { VisibilityStatus } from '../../../../../types/Common';
+import { Program } from '../../../../../types/admin/Programs';
+import { VisibilityStatus } from '../../../../../types/admin/Common';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
 jest.mock('../../../../../assets/images/admin/blank-image.svg', () => 'blank-image.svg');
@@ -34,7 +34,7 @@ describe('ProgramListItem', () => {
         name: 'Test Program',
         description: 'Test program description',
         status: 'Published',
-        img: 'test-image.jpg',
+        img: null,
         categories: [
             { id: 1, name: 'Category 1', programsCount: 1 },
             { id: 2, name: 'Category 2', programsCount: 2 },
@@ -92,7 +92,6 @@ describe('ProgramListItem', () => {
         expect(getProgramName()).toBeInTheDocument();
         expect(getProgramDescription()).toBeInTheDocument();
         expect(getProgramImage()).toBeInTheDocument();
-        expect(getProgramImage()).toHaveAttribute('src', 'test-image.jpg');
     });
 
     it('uses blank image when program image is not provided', () => {

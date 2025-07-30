@@ -3,16 +3,16 @@ import {
     ProgramCategory,
     ProgramCategoryCreateUpdate,
     ProgramCreateUpdate,
-} from '../../../../types/ProgramAdminPage';
+} from '../../../../types/admin/Programs';
 import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin-page/programPage';
-import { PaginationResult, VisibilityStatus } from '../../../../types/Common';
+import { PaginationResult, VisibilityStatus } from '../../../../types/admin/Common';
 
 // !!!
 // Delete after actual integration with backend
 // ============================================
 let mockProgramId = Math.max(...mockPrograms.map((p) => p.id), 0) + 1;
 let mockCategoryId = Math.max(...mockCategories.map((c) => c.id), 0) + 1;
-export let mockDelay = 1200;
+export let mockDelay = 200;
 export let throwErrorsInApi = false;
 
 // Simulates an async delay with AbortSignal support — used for testing fetch cancellation behavior
@@ -74,7 +74,7 @@ export const ProgramsApi = {
         if (throwErrorsInApi) throw new Error('Error fetching programs');
 
         const filtered = mockPrograms.filter((program) => {
-            const inCategory = program.categories.some((category) => category.id === categoryId);
+            const inCategory = program.categories.some((category: ProgramCategory) => category.id === categoryId);
             const statusMatches = !status || program.status === status;
             return inCategory && statusMatches;
         });
@@ -93,16 +93,12 @@ export const ProgramsApi = {
 
         if (throwErrorsInApi) throw new Error('Error imitation');
 
-        let imageUrl = null;
-        if (program.img instanceof File) imageUrl = URL.createObjectURL(program.img);
-        else if (typeof program.img === 'string') imageUrl = program.img;
-
         const newProgram: Program = {
             id: ++mockProgramId,
             name: program.name,
             description: program.description,
             status: program.status,
-            img: imageUrl,
+            img: program.img,
             categories: mockCategories.filter((c) => program.categoryIds.includes(c.id)),
         };
 
@@ -118,16 +114,12 @@ export const ProgramsApi = {
         const index = mockPrograms.findIndex((p) => p.id === program.id);
         if (index === -1) throw new Error('Program not found');
 
-        let imageUrl = null;
-        if (program.img instanceof File) imageUrl = URL.createObjectURL(program.img);
-        else if (typeof program.img === 'string') imageUrl = program.img;
-
         const updatedProgram: Program = {
             id: program.id!,
             name: program.name,
             description: program.description,
             status: program.status,
-            img: imageUrl,
+            img: program.img,
             categories: mockCategories.filter((c) => program.categoryIds.includes(c.id)),
         };
 

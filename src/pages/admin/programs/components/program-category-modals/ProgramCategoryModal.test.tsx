@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramCategoryModal } from './ProgramCategoryModal';
-import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
+import { ProgramCategory } from '../../../../../types/admin/Programs';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/common/button/Button';
 import { HintBox } from '../../../../../components/common/hint-box/HintBox';
-import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
+import { ProgramCategory } from '../../../../../types/admin/Programs';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';

@@ -1,5 +1,6 @@
-import { ProgramCategory } from '../../../types/ProgramAdminPage';
+import { ProgramCategory } from '../../../types/admin/Programs';
 import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
+import { Image } from '../../../types/Image';
 import * as Yup from 'yup';
 
 export interface ProgramValidationContext {
@@ -33,7 +34,7 @@ export const programValidationSchema = Yup.object({
                 : schema.notRequired(),
         ),
 
-    img: Yup.mixed<File | string>()
+    img: Yup.mixed<Image | string>()
         .nullable()
         .default(null)
         .when('$isPublishing', ([isPublishing], schema) =>
@@ -43,27 +44,19 @@ export const programValidationSchema = Yup.object({
         )
         .transform((value) => {
             if (value === undefined || value === '') return null;
-            if (value instanceof FileList) {
-                return value.length > 0 ? value[0] : null;
-            }
-            if (value instanceof File) return value;
-            if (typeof value === 'string' && value.trim()) return value;
-            return null;
+            return value;
         })
         .test('fileFormat', PROGRAM_VALIDATION.img.getFormatError(), (value) => {
             if (typeof value === 'string') return true;
-            if (value instanceof File) {
-                return PROGRAM_VALIDATION.img.allowedFormats.includes(value.type);
+            if (value) {
+                return PROGRAM_VALIDATION.img.allowedFormats.includes(value.mimeType);
             }
             return true;
         })
         .test('fileSize', PROGRAM_VALIDATION.img.getSizeError(), (value) => {
             if (value === null) return true;
             if (typeof value === 'string') return true;
-            if (value instanceof File) {
-                return value.size <= PROGRAM_VALIDATION.img.maxSizeBytes;
-            }
-            return true;
+            return value.size <= PROGRAM_VALIDATION.img.maxSizeBytes;
         }),
 });
 
@@ -98,7 +91,7 @@ export const PROGRAM_VALIDATION_FUNCTIONS = {
         }
     },
 
-    validateImg: (value: File | string | null, isPublishing: boolean): string | undefined => {
+    validateImg: (value: Image | null, isPublishing: boolean): string | undefined => {
         const context: ProgramValidationContext = { isPublishing };
         try {
             programValidationSchema.validateSyncAt('img', { img: value }, { context });

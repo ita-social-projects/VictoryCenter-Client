@@ -3,7 +3,8 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from './ProgramForm';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
-import { ProgramCategory } from '../../../../../types/ProgramAdminPage';
+import { ProgramCategory } from '../../../../../types/admin/Programs';
+import { Image } from '../../../../../types/Image';
 
 jest.mock('../../../../../components/common/multi-select/MultiSelect', () => ({
     MultiSelect: (props: any) => (
@@ -52,13 +53,19 @@ describe('ProgramForm', () => {
         { id: 1, name: 'Ветеранські', programsCount: 1 },
         { id: 2, name: 'Дитячі', programsCount: 1 },
     ];
-    const mockFile = new File(['mock-content'], 'test.png', { type: 'image/png' });
+
+    const mockFile: Image = {
+        id: null,
+        base64: 'ffdfdfdsfgsddgdgsdsg',
+        mimeType: 'image/jpg',
+        size: 1024,
+    };
 
     const mockInitialData: ProgramFormValues = {
         name: 'Існуюча програма',
         description: 'Існуючий опис',
         categories: [mockCategories[0]],
-        img: 'existing-image.jpg',
+        img: null,
     };
 
     const formRef = createRef<ProgramFormRef>();

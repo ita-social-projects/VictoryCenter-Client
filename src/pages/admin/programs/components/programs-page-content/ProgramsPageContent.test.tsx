@@ -1,8 +1,8 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramsPageContent } from './ProgramsPageContent';
-import { Program, ProgramCategory } from '../../../../../types/ProgramAdminPage';
-import { VisibilityStatus } from '../../../../../types/Common';
+import { Program, ProgramCategory } from '../../../../../types/admin/Programs';
+import { VisibilityStatus } from '../../../../../types/admin/Common';
 import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';

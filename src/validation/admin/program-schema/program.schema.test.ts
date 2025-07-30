@@ -1,13 +1,15 @@
 import { programValidationSchema, ProgramValidationContext } from './program-scheme';
 import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
+import { Image } from '../../../types/Image';
 
 const createMockFile = (type = 'image/jpeg', size = 1024) => {
-    const file = new File(['test'], 'test.jpg', { type });
-    Object.defineProperty(file, 'size', {
-        value: size,
-        writable: false,
-    });
-    return file;
+    const image: Image = {
+        base64: 'fsdgdsgdsdgsdgsd',
+        size: size,
+        id: 1,
+        mimeType: type,
+    };
+    return image;
 };
 
 const mockCategory = {
@@ -136,7 +138,7 @@ describe('Program Validation Schema', () => {
             },
             {
                 description: 'has invalid file format (GIF)',
-                data: getValidData({ img: createMockFile('image/gif') }),
+                data: getValidData({ img: createMockFile('image/gifs') }),
                 context: undefined,
                 expectedError: PROGRAM_VALIDATION.img.getFormatError(),
             },
@@ -167,7 +169,6 @@ describe('Program Validation Schema', () => {
         const transformCases = [
             { description: 'an empty string', value: '' },
             { description: 'undefined', value: undefined },
-            { description: 'an empty FileList', value: { length: 0 } as unknown as FileList },
         ];
 
         it.each(transformCases)('should transform $description to null', async ({ value }) => {

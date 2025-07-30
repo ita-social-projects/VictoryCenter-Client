@@ -399,6 +399,7 @@ export const ProgramsPageContent = () => {
     const handleAddCategory = useCallback(
         (newCategory: ProgramCategory) => {
             setCategories((prev) => [...prev, newCategory]);
+            setSelectedCategory(newCategory);
             updateModalState({ isAddCategoryModalOpen: false });
         },
         [updateModalState],

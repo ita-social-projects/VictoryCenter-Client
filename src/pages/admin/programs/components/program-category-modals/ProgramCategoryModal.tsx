@@ -249,8 +249,14 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
 
                         <div className="form-group form-group-name">
                             <label htmlFor={getFieldId('name')}>
-                                <span className="required-field">*</span>
-                                {PROGRAM_CATEGORY_TEXT.FORM.LABEL.NAME}
+                                {mode === 'add' ? (
+                                    <>
+                                        <span className="required-field">*</span>
+                                        {PROGRAM_CATEGORY_TEXT.FORM.LABEL.NAME}
+                                    </>
+                                ) : (
+                                    PROGRAM_CATEGORY_TEXT.FORM.LABEL.EDIT_NAME
+                                )}
                             </label>
                             <InputWithCharacterLimit
                                 value={formState.name}

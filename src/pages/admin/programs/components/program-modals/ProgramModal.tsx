@@ -46,7 +46,9 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 ? COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION
                 : COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES;
         }
-        return PROGRAMS_TEXT.QUESTION.PUBLISH_PROGRAM;
+        return pendingAction === 'publish'
+            ? PROGRAMS_TEXT.QUESTION.PUBLISH_PROGRAM
+            : PROGRAMS_TEXT.QUESTION.DRAFT_PROGRAM;
     };
 
     const getFormKey = () => {

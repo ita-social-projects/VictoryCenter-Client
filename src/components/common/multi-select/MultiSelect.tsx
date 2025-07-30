@@ -85,9 +85,7 @@ export const MultiSelect = <T extends Record<string, any>>(props: MultiselectPro
 
     const displayLabel = useMemo(() => {
         if (value.length === 0) return placeholder;
-        const names = value.map(getOptionName);
-        const joinedNames = names.join(', ');
-        return joinedNames.length > 50 ? `${names.slice(0, 2).join(', ')}...` : joinedNames;
+        return value.map(getOptionName).join(', ');
     }, [value, getOptionName, placeholder]);
 
     return (

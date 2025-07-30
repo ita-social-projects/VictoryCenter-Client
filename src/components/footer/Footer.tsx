@@ -32,7 +32,7 @@ import {
 } from '../../const/footer/footer';
 
 const {
-    userPageRoutes: { teamPageRoute, page2Route, aboutUsRoute },
+    userPageRoutes: { teamPageRoute, page2Route, aboutUsRoute, programPage },
 } = routes;
 
 export const Footer = () => {
@@ -100,7 +100,7 @@ export const Footer = () => {
                     <Link to={teamPageRoute} className="disable">
                         {WHAT_IS_HIPPOTHERAPY}
                     </Link>
-                    <Link to={teamPageRoute}>{PROGRAMS}</Link>
+                    <Link to={programPage}>{PROGRAMS}</Link>
                     <Link to={teamPageRoute} className="disable">
                         {PROGRAMS_SESSIONS}
                     </Link>
@@ -117,13 +117,22 @@ export const Footer = () => {
                     </button>
                 </div>
                 <div className="social_media">
-                    <button className="contact-item" onClick={() => copyToClipboard(FACEBOOK)}>
+                    <button
+                        className="contact-item"
+                        onClick={() => window.open(FACEBOOK, '_blank', 'noopener,noreferrer')}
+                    >
                         Facebook
                     </button>
-                    <button className="contact-item" onClick={() => copyToClipboard(TELEGRAM)}>
+                    <button
+                        className="contact-item"
+                        onClick={() => window.open(TELEGRAM, '_blank', 'noopener,noreferrer')}
+                    >
                         Telegram
                     </button>
-                    <button className="contact-item" onClick={() => copyToClipboard(INSTAGRAM)}>
+                    <button
+                        className="contact-item"
+                        onClick={() => window.open(INSTAGRAM, '_blank', 'noopener,noreferrer')}
+                    >
                         Instagram
                     </button>
                 </div>

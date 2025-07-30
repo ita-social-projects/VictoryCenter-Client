@@ -4,31 +4,22 @@ import './button.scss';
 export type ButtonProps = {
     children: React.ReactNode;
     buttonStyle?: 'primary' | 'secondary';
-    onClick?: () => void;
+    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
     type?: 'submit' | 'reset' | 'button';
     form?: string;
     className?: string;
     disabled?: boolean;
 };
 
-const getClassName = (buttonStyle?: 'primary' | 'secondary', disabled: boolean = false) => {
-    let baseClass: string;
+const getBaseClassName = (buttonStyle?: 'primary' | 'secondary') => {
     switch (buttonStyle) {
         case 'primary':
-            baseClass = 'btn-primary';
-            break;
+            return 'btn-primary';
         case 'secondary':
-            baseClass = 'btn-secondary';
-            break;
+            return 'btn-secondary';
         default:
-            baseClass = '';
+            return '';
     }
-
-    if (disabled && baseClass) {
-        return `${baseClass} ${baseClass}-disabled`;
-    }
-
-    return baseClass;
 };
 
 export const Button = ({
@@ -40,14 +31,10 @@ export const Button = ({
     disabled = false,
     className = '',
 }: ButtonProps) => {
+    const finalClassName = `${getBaseClassName(buttonStyle)} ${className}`.trim();
+
     return (
-        <button
-            form={form}
-            type={type}
-            className={`${getClassName(buttonStyle, disabled)} ${className}`}
-            onClick={onClick}
-            disabled={disabled}
-        >
+        <button form={form} type={type} className={finalClassName} onClick={onClick} disabled={disabled}>
             {children}
         </button>
     );

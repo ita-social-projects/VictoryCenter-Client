@@ -12,7 +12,7 @@ import { PaginationResult, VisibilityStatus } from '../../../../types/admin/Comm
 // ============================================
 let mockProgramId = Math.max(...mockPrograms.map((p) => p.id), 0) + 1;
 let mockCategoryId = Math.max(...mockCategories.map((c) => c.id), 0) + 1;
-export let mockDelay = 200;
+export let mockDelay = 2200;
 export let throwErrorsInApi = false;
 
 // Simulates an async delay with AbortSignal support — used for testing fetch cancellation behavior

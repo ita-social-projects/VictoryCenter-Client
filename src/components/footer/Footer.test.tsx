@@ -30,6 +30,8 @@ import {
 
 jest.mock('./Footer.scss', () => ({}));
 
+global.open = jest.fn();
+
 // Mock clipboard API
 Object.assign(navigator, {
     clipboard: {
@@ -84,7 +86,10 @@ describe('Footer', () => {
             'href',
             routes.userPageRoutes.page2Route,
         );
-        expect(screen.getByRole('link', { name: OUR_TEAM })).toHaveAttribute('href', routes.userPageRoutes.teamPageRoute);
+        expect(screen.getByRole('link', { name: OUR_TEAM })).toHaveAttribute(
+            'href',
+            routes.userPageRoutes.teamPageRoute,
+        );
         expect(screen.getByRole('link', { name: PARTNERS })).toHaveAttribute('href', routes.userPageRoutes.page2Route);
         expect(screen.getByRole('link', { name: EVENTS_AND_NEWS })).toHaveAttribute(
             'href',
@@ -100,10 +105,7 @@ describe('Footer', () => {
             'href',
             routes.userPageRoutes.teamPageRoute,
         );
-        expect(screen.getByRole('link', { name: PROGRAMS })).toHaveAttribute(
-            'href',
-            routes.userPageRoutes.teamPageRoute,
-        );
+        expect(screen.getByRole('link', { name: PROGRAMS })).toHaveAttribute('href', routes.userPageRoutes.programPage);
         expect(screen.getByRole('link', { name: PROGRAMS_SESSIONS })).toHaveAttribute(
             'href',
             routes.userPageRoutes.teamPageRoute,
@@ -120,6 +122,10 @@ describe('Footer', () => {
         expect(screen.getByRole('button', { name: /instagram/i })).toBeInTheDocument();
     });
 
+    it('renders contact button with correct links', () => {
+        render(<Footer />, { wrapper: MemoryRouter });
+    });
+
     it('copies email to clipboard on click', () => {
         render(<Footer />, { wrapper: MemoryRouter });
         const emailButton = screen.getByRole('button', { name: new RegExp(escapeRegExp(EMAIL), 'i') });
@@ -134,24 +140,27 @@ describe('Footer', () => {
         expect(navigator.clipboard.writeText).toHaveBeenCalledWith(PHONE);
     });
 
-    it('copies Facebook to clipboard on click', () => {
+    it('opens Facebook link in a new tab on click', () => {
         render(<Footer />, { wrapper: MemoryRouter });
         const fbButton = screen.getByRole('button', { name: /facebook/i });
         fireEvent.click(fbButton);
-        expect(navigator.clipboard.writeText).toHaveBeenCalledWith(FACEBOOK);
+        // Check if window.open was called with the correct URL and target
+        expect(global.open).toHaveBeenCalledWith(FACEBOOK, '_blank', 'noopener,noreferrer');
     });
 
-    it('copies Telegram to clipboard on click', () => {
+    it('opens Telegram link in a new tab on click', () => {
         render(<Footer />, { wrapper: MemoryRouter });
         const tgButton = screen.getByRole('button', { name: /telegram/i });
         fireEvent.click(tgButton);
-        expect(navigator.clipboard.writeText).toHaveBeenCalledWith(TELEGRAM);
+        // Check if window.open was called with the correct URL and target
+        expect(global.open).toHaveBeenCalledWith(TELEGRAM, '_blank', 'noopener,noreferrer');
     });
 
-    it('copies Instagram to clipboard on click', () => {
+    it('opens Instagram link in a new tab on click', () => {
         render(<Footer />, { wrapper: MemoryRouter });
         const igButton = screen.getByRole('button', { name: /instagram/i });
         fireEvent.click(igButton);
-        expect(navigator.clipboard.writeText).toHaveBeenCalledWith(INSTAGRAM);
+        // Check if window.open was called with the correct URL and target
+        expect(global.open).toHaveBeenCalledWith(INSTAGRAM, '_blank', 'noopener,noreferrer');
     });
 });

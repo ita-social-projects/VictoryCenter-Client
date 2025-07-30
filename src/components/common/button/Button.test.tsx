@@ -188,7 +188,7 @@ describe('Button Component', () => {
         );
         const button = screen.getByRole('button');
         expect(button).toHaveClass('btn-primary');
-        expect(button).toHaveClass('btn-primary-disabled');
+        expect(button).toBeDisabled();
     });
 
     it('applies disabled class for secondary button when disabled', () => {
@@ -199,6 +199,6 @@ describe('Button Component', () => {
         );
         const button = screen.getByRole('button');
         expect(button).toHaveClass('btn-secondary');
-        expect(button).toHaveClass('btn-secondary-disabled');
+        expect(button).toBeDisabled();
     });
 });

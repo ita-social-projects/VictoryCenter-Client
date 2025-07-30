@@ -31,14 +31,14 @@ export const COMMON_TEXT_ADMIN = {
     FILTER: {
         SEARCH_BY_NAME: 'Пошук за назвою',
         STATUS: {
-            ALL: 'Усі',
+            ALL: 'Всі записи',
             PUBLISHED: 'Опубліковано',
             DRAFT: 'Чернетка',
         },
     },
 
     QUESTION: {
-        CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE: 'Зміни буде втрачено. Бажаєте продовжити?',
+        CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE: 'Зміни будуть втрачені. Бажаєте продовжити?',
         REMOVE_FROM_PUBLICATION: 'Зняти з публікації?',
         PUBLISH_CHANGES: 'Опублікувати зміни?',
     },

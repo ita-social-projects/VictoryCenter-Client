@@ -226,20 +226,6 @@ describe('Multiselect Component', () => {
         expect(mockOnChange).toHaveBeenCalledWith([mockOptions[0]]);
     });
 
-    it('truncates display label when many options are selected', () => {
-        const longOptions = Array.from({ length: 10 }, (_, i) => ({
-            id: i + 1,
-            name: `Very Long Option Name ${i + 1}`,
-        }));
-
-        const selectedValues = longOptions.slice(0, 5); // Вибираємо 5 опцій
-
-        render(<MultiSelect {...defaultProps} options={longOptions} value={selectedValues} />);
-
-        const displayText = screen.getByText(/Very Long Option Name 1, Very Long Option Name 2\.\.\.$/);
-        expect(displayText).toBeInTheDocument();
-    });
-
     it('does not trigger option selection on non-Enter/Space key events', () => {
         const mockOnChange = jest.fn();
         render(<MultiSelect {...defaultProps} onChange={mockOnChange} />);

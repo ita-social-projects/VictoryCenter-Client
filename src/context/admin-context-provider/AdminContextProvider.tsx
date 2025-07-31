@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useMemo, ReactNode, useState, useCallback, useRef } from 'react';
 import {
     loginRequest,
+    logoutRequest,
     tokenRefreshRequest,
 } from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
 import { CreateAdminClient } from '../../services/auth/create-admin-client/createAdminClient';
@@ -46,7 +47,8 @@ export const AdminContextProvider = ({ children }: Props) => {
         [updateToken],
     );
 
-    const logout = useCallback(() => {
+    const logout = useCallback(async () => {
+        await logoutRequest(tokenRef.current);
         updateToken('');
     }, [updateToken]);
 

@@ -136,7 +136,9 @@ describe('ProgramForm', () => {
 
         expect(await screen.findByText(PROGRAM_VALIDATION.name.getRequiredError())).toBeInTheDocument();
         expect(await screen.findByText(PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError())).toBeInTheDocument();
-        expect(await screen.findByText(PROGRAM_VALIDATION.description.getRequiredError())).toBeInTheDocument();
+        expect(
+            await screen.findByText(PROGRAM_VALIDATION.description.getRequiredWhenPublishingError()),
+        ).toBeInTheDocument();
         expect(await screen.findByText(PROGRAM_VALIDATION.img.getRequiredWhenPublishingError())).toBeInTheDocument();
         expect(mockOnSubmit).not.toHaveBeenCalled();
     });

@@ -11,8 +11,7 @@ jest.mock('../../../../../services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
 jest.mock('../../../../../components/common/modal/Modal', () => {
-    const ModalMock = ({ isOpen, onClose, children }: any) =>
-        isOpen ? <div data-testid="modal">{children}</div> : null;
+    const ModalMock = ({ isOpen, children }: any) => (isOpen ? <div data-testid="modal">{children}</div> : null);
     ModalMock.Title = ({ children }: { children: React.ReactNode }) => <h1>{children}</h1>;
     ModalMock.Content = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
     ModalMock.Actions = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
@@ -50,7 +49,6 @@ describe('DeleteCategoryModal', () => {
         categories: mockCategories,
     };
 
-    // Helper functions
     const renderDeleteCategoryModal = (overrideProps = {}) =>
         render(<DeleteCategoryModal {...defaultProps} {...overrideProps} />);
 

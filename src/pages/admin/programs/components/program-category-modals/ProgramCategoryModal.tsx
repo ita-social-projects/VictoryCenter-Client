@@ -62,6 +62,7 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
     const [initialFormState, setInitialFormState] = useState<ProgramCategoryFormValues>(defaultFormState);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
+    const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
     const [error, setError] = useState('');
 
     const selectedCategoryRef = useRef<null | ProgramCategory>(null);
@@ -99,25 +100,20 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
         setErrors((prev) => ({ ...prev, name: error }));
     }, [formState.name]);
 
-    // Submit
     const onSubmit = useCallback(
-        async (e: React.FormEvent) => {
-            e.preventDefault();
+        async (e?: React.FormEvent) => {
+            if (e) {
+                e.preventDefault();
+            }
 
             if (isSubmitting || isDuplicateName) return;
             if (mode === 'edit' && !selectedCategoryRef.current) return;
 
             setIsSubmitting(true);
             setError('');
+            setShowSaveConfirmModal(false);
 
             try {
-                const formErrors = validateForm(formState);
-                setErrors(formErrors);
-
-                if (hasErrors(formErrors)) {
-                    return;
-                }
-
                 const categoryData: ProgramCategoryCreateUpdate = {
                     id: mode === 'edit' ? selectedCategoryRef.current!.id : null,
                     name: formState.name.trim(),
@@ -144,6 +140,24 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
         },
         [formState, isSubmitting, isDuplicateName, mode, props, onClose],
     );
+
+    const handleSubmitClick = useCallback(() => {
+        if (isSubmitting || isDuplicateName) return;
+        if (mode === 'edit' && !selectedCategoryRef.current) return;
+
+        const formErrors = validateForm(formState);
+        setErrors(formErrors);
+
+        if (hasErrors(formErrors)) {
+            return;
+        }
+
+        if (mode === 'edit') {
+            setShowSaveConfirmModal(true);
+        } else {
+            onSubmit();
+        }
+    }, [onSubmit, formState, isSubmitting, isDuplicateName, mode]);
 
     const handleClose = useCallback(() => {
         if (isSubmitting) return;
@@ -196,13 +210,19 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
     }, [isOpen, categories, reset, mode]);
 
     const isSubmitDisabled = () => {
-        const baseConditions = isSubmitting || isDuplicateName || !formState.name.trim();
+        const currentValidationError = PROGRAM_CATEGORY_VALIDATION_FUNCTIONS.validateName(formState.name);
+        const hasValidationErrors = currentValidationError !== undefined || isDuplicateName;
+        const hasEmptyName = !formState.name.trim();
 
         if (mode === 'edit') {
-            return baseConditions || !isDirty;
+            const hasNoSelectedCategory = !selectedCategoryRef.current;
+            const nameNotChanged =
+                !!selectedCategoryRef.current && formState.name.trim() === selectedCategoryRef.current.name.trim();
+
+            return isSubmitting || hasValidationErrors || hasEmptyName || hasNoSelectedCategory || nameNotChanged;
         }
 
-        return baseConditions;
+        return isSubmitting || hasValidationErrors || hasEmptyName;
     };
 
     const getTitle = () => {
@@ -224,7 +244,7 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
             <Modal isOpen={isOpen} onClose={handleClose}>
                 <Modal.Title>{getTitle()}</Modal.Title>
                 <Modal.Content>
-                    <form onSubmit={onSubmit} className="program-form-main" id={getFormId()}>
+                    <form onSubmit={(e) => e.preventDefault()} className="program-form-main" id={getFormId()}>
                         {mode === 'edit' && (
                             <div className="form-group">
                                 <label htmlFor={getFieldId('select')}>
@@ -281,8 +301,8 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                 </Modal.Content>
                 <Modal.Actions>
                     <Button
-                        type="submit"
-                        form={getFormId()}
+                        type="button"
+                        onClick={handleSubmitClick}
                         buttonStyle="primary"
                         className="w-100"
                         disabled={isSubmitDisabled()}
@@ -292,6 +312,19 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                 </Modal.Actions>
             </Modal>
 
+            {/* Save confirmation */}
+            <QuestionModal
+                isOpen={showSaveConfirmModal}
+                isSubmitting={false}
+                title={COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                onClose={() => setShowSaveConfirmModal(false)}
+                onCancel={() => setShowSaveConfirmModal(false)}
+                onConfirm={() => onSubmit()}
+            />
+
+            {/* CLose confirmation */}
             <QuestionModal
                 isOpen={showCloseConfirmModal}
                 isSubmitting={false}

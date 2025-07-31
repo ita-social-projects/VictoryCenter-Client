@@ -29,7 +29,7 @@ export const programValidationSchema = Yup.object({
         .when('$isPublishing', ([isPublishing], schema) =>
             isPublishing
                 ? schema
-                      .required(PROGRAM_VALIDATION.description.getRequiredError())
+                      .required(PROGRAM_VALIDATION.description.getRequiredWhenPublishingError())
                       .min(PROGRAM_VALIDATION.description.min, PROGRAM_VALIDATION.description.getMinError())
                 : schema.notRequired(),
         ),

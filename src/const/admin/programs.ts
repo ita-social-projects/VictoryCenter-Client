@@ -75,7 +75,7 @@ export const PROGRAM_VALIDATION = {
     description: {
         min: 10,
         max: 1000,
-        getRequiredError: () => 'Опис обов’язковий',
+        getRequiredWhenPublishingError: () => 'Опис обов’язковий при публікації',
         getMinError: () => `Не менше ${PROGRAM_VALIDATION.description.min} символів`,
         getMaxError: () => `Не більше ${PROGRAM_VALIDATION.description.max} символів`,
     },

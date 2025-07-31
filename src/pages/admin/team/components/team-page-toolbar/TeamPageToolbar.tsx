@@ -73,7 +73,7 @@ const AddMemberModal = ({
         </Modal.Content>
         <Modal.Actions>
             <Button
-                form="add-member-modal"
+                formId="add-member-modal"
                 type="submit"
                 onClick={() => {
                     if (formData?.description && formData?.fullName) {
@@ -88,7 +88,7 @@ const AddMemberModal = ({
             >
                 {TEAM_SAVE_AS_DRAFT}
             </Button>
-            <Button form="add-member-modal" type="submit" buttonStyle="primary">
+            <Button formId="add-member-modal" type="submit" buttonStyle="primary">
                 {TEAM_PUBLISH}
             </Button>
         </Modal.Actions>

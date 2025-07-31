@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
-import { ProgramForm } from '../program-form/ProgramForm';
-import { Program, ProgramCategory } from '../../../../../types/admin/Programs';
+import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../program-form/ProgramForm';
+import { Program, ProgramCategory, ProgramCreateUpdate } from '../../../../../types/admin/Programs';
+import { VisibilityStatus } from '../../../../../types/admin/Common';
 import { Button } from '../../../../../components/common/button/Button';
 import { QuestionModal } from '../../../../../components/common/question-modal/QuestionModal';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { useProgramModal } from '../../../../../hooks/admin/useProgramModal/useProgramModal';
+import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import './program-modal.scss';
 
 type BaseProps = {
@@ -31,20 +32,126 @@ export type ProgramModalProps = BaseProps & (AddModalProps | EditModalProps);
 export const ProgramModal = (props: ProgramModalProps) => {
     const { isOpen, onClose, mode, categories } = props;
     const isEditMode = mode === 'edit';
+    const program = isEditMode ? props.programToEdit : null;
+    const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
 
-    const { formRef, isSubmitting, error, initialData, pendingAction, modals, handleFormSubmit, handleClose } =
-        useProgramModal({
-            isOpen,
-            program: isEditMode ? props.programToEdit : null,
-            onSuccess: isEditMode ? props.onEditProgram : props.onAddProgram,
-            onClose,
-        });
+    const formRef = useRef<ProgramFormRef>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
+    const [showFormConfirmModal, setShowFormConfirmModal] = useState(false);
+    const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
+    const [pendingAction, setPendingAction] = useState<'publish' | 'draft' | null>(null);
+    const [pendingFormData, setPendingFormData] = useState<ProgramFormValues | null>(null);
+    const [isFormValid, setIsFormValid] = useState(false);
+
+    const initialData = useMemo<ProgramFormValues | null>(() => {
+        if (!isEditMode || !program) return null;
+
+        return {
+            name: program.name,
+            description: program.description,
+            categories: program.categories,
+            img: program.img,
+        };
+    }, [program, isEditMode]);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        setError('');
+        setShowFormConfirmModal(false);
+        setShowCloseConfirmModal(false);
+        setPendingAction(null);
+        setPendingFormData(null);
+        setIsFormValid(false);
+    }, [isOpen]);
+
+    const handleFormValidationChange = (isValid: boolean) => {
+        setIsFormValid(isValid);
+    };
+
+    const handleFormSubmit = (data: ProgramFormValues, status: VisibilityStatus) => {
+        const currentIsValid = formRef.current?.isValid(false) || false;
+
+        if (!currentIsValid) {
+            return;
+        }
+
+        setPendingFormData(data);
+        setPendingAction(status === 'Published' ? 'publish' : 'draft');
+        setShowFormConfirmModal(true);
+    };
+
+    const handleConfirmAction = async () => {
+        if (!pendingFormData || !pendingAction) return;
+
+        setShowFormConfirmModal(false);
+        setIsSubmitting(true);
+        setError('');
+
+        try {
+            const status: VisibilityStatus = pendingAction === 'publish' ? 'Published' : 'Draft';
+            const programData: ProgramCreateUpdate = {
+                id: isEditMode && program ? program.id : null,
+                name: pendingFormData.name,
+                description: pendingFormData.description,
+                categoryIds: pendingFormData.categories.map((cat) => cat.id),
+                img: pendingFormData.img,
+                status: status,
+            };
+
+            const resultProgram = isEditMode
+                ? await ProgramsApi.editProgram(programData)
+                : await ProgramsApi.addProgram(programData);
+
+            onSuccess(resultProgram);
+            onClose();
+        } catch {
+            const errorMessage = isEditMode
+                ? PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_PROGRAM
+                : PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_PROGRAM;
+            setError(errorMessage);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const resetPendingState = () => {
+        setPendingAction(null);
+        setPendingFormData(null);
+    };
+
+    const handleCancelConfirmation = () => {
+        setShowFormConfirmModal(false);
+        resetPendingState();
+        setIsSubmitting(false);
+    };
+
+    const handleClose = () => {
+        if (formRef.current?.isDirty()) {
+            setShowCloseConfirmModal(true);
+        } else if (!isSubmitting) {
+            onClose();
+        }
+    };
+
+    const handleConfirmClose = () => {
+        setShowCloseConfirmModal(false);
+        onClose();
+    };
+
+    const handleCancelClose = () => {
+        setShowCloseConfirmModal(false);
+    };
 
     const getFormConfirmTitle = () => {
-        if (isEditMode && props.programToEdit) {
-            return props.programToEdit.status === 'Published' && pendingAction === 'draft'
-                ? COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION
-                : COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES;
+        if (isEditMode && program) {
+            if (program.status === 'Published')
+                return pendingAction === 'draft'
+                    ? COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION
+                    : COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES;
+            return pendingAction === 'draft'
+                ? COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES
+                : PROGRAMS_TEXT.QUESTION.PUBLISH_PROGRAM;
         }
         return pendingAction === 'publish'
             ? PROGRAMS_TEXT.QUESTION.PUBLISH_PROGRAM
@@ -52,11 +159,14 @@ export const ProgramModal = (props: ProgramModalProps) => {
     };
 
     const getFormKey = () => {
-        if (isEditMode && props.programToEdit?.id) {
-            return props.programToEdit.id;
+        if (isEditMode && program?.id) {
+            return program.id;
         }
         return 'add';
     };
+
+    const isDraftDisabled = isSubmitting || !isFormValid;
+    const isPublishDisabled = isSubmitting || !isFormValid;
 
     return (
         <>
@@ -73,6 +183,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                         formDisabled={isSubmitting}
                         onSubmit={handleFormSubmit}
                         categories={categories}
+                        onValidationChange={handleFormValidationChange}
                     />
                     {error && <div className="error-container">{error}</div>}
                 </Modal.Content>
@@ -81,14 +192,14 @@ export const ProgramModal = (props: ProgramModalProps) => {
                     <Button
                         buttonStyle="secondary"
                         onClick={() => formRef.current?.submit('Draft')}
-                        disabled={isSubmitting}
+                        disabled={isDraftDisabled}
                     >
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFTED}
                     </Button>
                     <Button
                         buttonStyle="primary"
                         onClick={() => formRef.current?.submit('Published')}
-                        disabled={isSubmitting}
+                        disabled={isPublishDisabled}
                     >
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                     </Button>
@@ -96,23 +207,23 @@ export const ProgramModal = (props: ProgramModalProps) => {
             </Modal>
 
             <QuestionModal
-                isOpen={modals.formConfirm.isOpen}
+                isOpen={showFormConfirmModal}
                 isSubmitting={isSubmitting}
                 title={getFormConfirmTitle()}
-                onConfirm={modals.formConfirm.onConfirm}
-                onCancel={modals.formConfirm.onCancel}
-                onClose={modals.formConfirm.onCancel}
+                onConfirm={handleConfirmAction}
+                onCancel={handleCancelConfirmation}
+                onClose={handleCancelConfirmation}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
 
             <QuestionModal
-                isOpen={modals.closeConfirm.isOpen}
+                isOpen={showCloseConfirmModal}
                 isSubmitting={false}
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
-                onConfirm={modals.closeConfirm.onConfirm}
-                onCancel={modals.closeConfirm.onCancel}
-                onClose={modals.closeConfirm.onCancel}
+                onConfirm={handleConfirmClose}
+                onCancel={handleCancelClose}
+                onClose={handleCancelClose}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />

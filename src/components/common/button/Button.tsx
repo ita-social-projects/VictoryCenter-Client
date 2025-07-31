@@ -6,7 +6,7 @@ export type ButtonProps = {
     buttonStyle?: 'primary' | 'secondary';
     onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
     type?: 'submit' | 'reset' | 'button';
-    form?: string;
+    formId?: string;
     className?: string;
     disabled?: boolean;
 };
@@ -27,14 +27,14 @@ export const Button = ({
     onClick,
     buttonStyle,
     type = 'button',
-    form,
+    formId,
     disabled = false,
     className = '',
 }: ButtonProps) => {
     const finalClassName = `${getBaseClassName(buttonStyle)} ${className}`.trim();
 
     return (
-        <button form={form} type={type} className={finalClassName} onClick={onClick} disabled={disabled}>
+        <button form={formId} type={type} className={finalClassName} onClick={onClick} disabled={disabled}>
             {children}
         </button>
     );

@@ -28,6 +28,7 @@ export interface FormErrorState {
 export interface ProgramFormRef {
     submit: (status: VisibilityStatus) => void;
     isDirty: () => boolean;
+    isValid: (isPublishing?: boolean) => boolean;
 }
 
 export interface ProgramFormProps {
@@ -35,6 +36,7 @@ export interface ProgramFormProps {
     initialData?: ProgramFormValues | null;
     formDisabled?: boolean;
     categories?: ProgramCategory[];
+    onValidationChange?: (isValid: boolean) => void;
 }
 
 const validateForm = (formState: ProgramFormValues, isPublishing: boolean): FormErrorState => {
@@ -63,7 +65,7 @@ const ImageToImageValue = (image: Image | null) => {
 const ImageValuesToImage = (imageValues: ImageValues | null) => {
     if (!imageValues) return null;
 
-    var image: Image = {
+    const image: Image = {
         id: null,
         size: imageValues.size,
         base64: imageValues.base64,
@@ -73,7 +75,7 @@ const ImageValuesToImage = (imageValues: ImageValues | null) => {
 };
 
 export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
-    ({ initialData = null, onSubmit, formDisabled, categories = [] }: ProgramFormProps, ref) => {
+    ({ initialData = null, onSubmit, formDisabled, categories = [], onValidationChange }: ProgramFormProps, ref) => {
         const defaultFormState = useMemo<ProgramFormValues>(
             () => ({
                 name: '',
@@ -102,6 +104,24 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         const isDirty = useCallback(() => {
             return JSON.stringify(formState) !== JSON.stringify(initialFormState);
         }, [formState, initialFormState]);
+
+        const isValid = useCallback(
+            (isPublishing: boolean = false) => {
+                const formErrors = validateForm(formState, isPublishing);
+                return !hasErrors(formErrors);
+            },
+            [formState],
+        );
+
+        // Валідація форми при зміні стану
+        useEffect(() => {
+            const formErrors = validateForm(formState, false);
+            const isFormValid = !hasErrors(formErrors);
+
+            if (onValidationChange) {
+                onValidationChange(isFormValid);
+            }
+        }, [formState, onValidationChange]);
 
         useEffect(() => {
             if (initialData) {
@@ -178,6 +198,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         useImperativeHandle(ref, () => ({
             submit,
             isDirty,
+            isValid,
         }));
 
         return (

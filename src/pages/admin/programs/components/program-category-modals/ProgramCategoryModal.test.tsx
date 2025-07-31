@@ -114,6 +114,7 @@ describe('ProgramCategoryModal', () => {
     const changeNameInput = (value: string) => fireEvent.change(getNameInput(), { target: { value } });
     const blurNameInput = () => fireEvent.blur(getNameInput());
     const clickSaveButton = () => fireEvent.click(getSaveButton());
+    const clickConfirmButtonInSaveConfirmPopup = () => fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
     const clickModalClose = () => fireEvent.click(getModalCloseButton());
     const changeCategorySelect = (value: string) => fireEvent.change(getCategorySelect(), { target: { value } });
 
@@ -450,7 +451,12 @@ describe('ProgramCategoryModal', () => {
                 changeNameInput('Updated Category');
                 clickSaveButton();
 
-                expect(getCategorySelect()).toBeDisabled();
+                // Click ye in confirmation popup of edit mode
+                clickConfirmButtonInSaveConfirmPopup();
+
+                await waitFor(() => {
+                    expect(getCategorySelect()).toBeDisabled();
+                });
 
                 await act(async () => {
                     resolvePromise!(mockCategory);
@@ -529,6 +535,8 @@ describe('ProgramCategoryModal', () => {
                 changeNameInput('Updated Category');
                 clickSaveButton();
 
+                clickConfirmButtonInSaveConfirmPopup();
+
                 await waitFor(() => {
                     expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledWith({
                         id: 1,
@@ -547,6 +555,8 @@ describe('ProgramCategoryModal', () => {
                 changeNameInput('  Updated Category  ');
                 clickSaveButton();
 
+                clickConfirmButtonInSaveConfirmPopup();
+
                 await waitFor(() => {
                     expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledWith({
                         id: 1,
@@ -561,6 +571,8 @@ describe('ProgramCategoryModal', () => {
 
                 changeNameInput('Updated Category');
                 clickSaveButton();
+
+                clickConfirmButtonInSaveConfirmPopup();
 
                 await waitFor(() => {
                     expect(
@@ -600,6 +612,9 @@ describe('ProgramCategoryModal', () => {
 
                 changeNameInput('Updated Category');
                 clickSaveButton();
+
+                clickConfirmButtonInSaveConfirmPopup();
+
                 clickSaveButton(); // Second click while submitting
 
                 await waitFor(() => {
@@ -651,6 +666,8 @@ describe('ProgramCategoryModal', () => {
                 changeCategorySelect('2');
                 changeNameInput('Updated Category');
                 clickSaveButton();
+
+                clickConfirmButtonInSaveConfirmPopup();
 
                 await waitFor(() => {
                     expect(

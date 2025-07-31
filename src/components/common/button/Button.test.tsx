@@ -57,7 +57,7 @@ describe('Button Component', () => {
 
     it('applies form attribute when provided', () => {
         render(
-            <Button buttonStyle="primary" form="test-form">
+            <Button buttonStyle="primary" formId="test-form">
                 Form Button
             </Button>,
         );
@@ -67,7 +67,7 @@ describe('Button Component', () => {
 
     it('does not apply form attribute when undefined', () => {
         render(
-            <Button buttonStyle="primary" form={undefined}>
+            <Button buttonStyle="primary" formId={undefined}>
                 No Form Button
             </Button>,
         );
@@ -127,7 +127,7 @@ describe('Button Component', () => {
     it('applies all props correctly when provided together', () => {
         const mockOnClick = jest.fn();
         render(
-            <Button buttonStyle="secondary" type="submit" form="test-form" onClick={mockOnClick}>
+            <Button buttonStyle="secondary" type="submit" formId="test-form" onClick={mockOnClick}>
                 Complete Button
             </Button>,
         );

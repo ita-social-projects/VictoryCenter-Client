@@ -105,7 +105,7 @@ describe('Program Validation Schema', () => {
             {
                 description: 'is empty',
                 data: { ...validDataForPublish, description: '' },
-                expectedError: PROGRAM_VALIDATION.description.getRequiredError(),
+                expectedError: PROGRAM_VALIDATION.description.getRequiredWhenPublishingError(),
             },
             {
                 description: 'is too short',

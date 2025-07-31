@@ -1,6 +1,8 @@
-import { loginRequest, tokenRefreshRequest } from './login-page-data-fetch';
+import { loginRequest, logoutRequest, tokenRefreshRequest } from './login-page-data-fetch';
 import { AuthResponse, Credentials } from '../../../types/admin/Auth';
 import { AuthClient } from '../../auth/AuthClient';
+import { AxiosResponse } from 'axios';
+import { API_ROUTES } from '../../../const/urls/main-api';
 
 jest.mock('../../auth/AuthClient', () => ({
     AuthClient: {
@@ -44,5 +46,24 @@ describe('login-page-data-fetch', () => {
     it('tokenRefreshRequest throws on error', async () => {
         (AuthClient.post as jest.Mock).mockRejectedValueOnce(new Error('fail'));
         await expect(tokenRefreshRequest()).rejects.toThrow('fail');
+    });
+
+    it('logoutRequest response', async () => {
+        const mockResponse = { status: 200, data: {} } as AxiosResponse<any>;
+
+        (AuthClient.post as jest.Mock).mockResolvedValueOnce(mockResponse);
+
+        const response = await logoutRequest();
+
+        expect(response).toBe(mockResponse);
+        expect(AuthClient.post).toHaveBeenCalledWith(`${API_ROUTES.AUTH.LOGOUT}`);
+    });
+
+    it('logoutRequest error', async () => {
+        const errorMessage = 'Вихід не вдався';
+        (AuthClient.post as jest.Mock).mockRejectedValueOnce(new Error(errorMessage));
+
+        await expect(logoutRequest()).rejects.toThrow(errorMessage);
+        expect(AuthClient.post).toHaveBeenCalledWith(`${API_ROUTES.AUTH.LOGOUT}`);
     });
 });

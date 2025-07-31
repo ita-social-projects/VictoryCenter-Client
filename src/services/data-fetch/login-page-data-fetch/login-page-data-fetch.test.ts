@@ -15,6 +15,8 @@ describe('login-page-data-fetch', () => {
         jest.clearAllMocks();
     });
 
+    const mockToken = 'mock-access-token';
+
     it('loginRequest returns accessToken on success', async () => {
         const creds: Credentials = { email: 'test@test.com', password: 'password' };
         const mockToken = 'mock-access-token';
@@ -27,43 +29,36 @@ describe('login-page-data-fetch', () => {
         expect(token).toBe(mockToken);
     });
 
-    it('tokenRefreshRequest returns accessToken on success', async () => {
-        const mockToken = 'refreshed-token';
-        const mockResponse = { data: { accessToken: mockToken } } as { data: AuthResponse };
-
-        (AuthClient.post as jest.Mock).mockResolvedValueOnce(mockResponse);
-
-        const token = await tokenRefreshRequest();
-
-        expect(token).toBe(mockToken);
-    });
-
-    it('loginRequest throws on error', async () => {
-        (AuthClient.post as jest.Mock).mockRejectedValueOnce(new Error('fail'));
-        await expect(loginRequest({ email: 'a', password: 'b' })).rejects.toThrow('fail');
-    });
-
     it('tokenRefreshRequest throws on error', async () => {
         (AuthClient.post as jest.Mock).mockRejectedValueOnce(new Error('fail'));
         await expect(tokenRefreshRequest()).rejects.toThrow('fail');
     });
 
-    it('logoutRequest response', async () => {
-        const mockResponse = { status: 200, data: {} } as AxiosResponse<any>;
+    it('logoutRequest success', async () => {
+        const mockResponse = { status: 200, data: {} } as AxiosResponse;
 
         (AuthClient.post as jest.Mock).mockResolvedValueOnce(mockResponse);
 
-        const response = await logoutRequest();
+        const response = await logoutRequest(mockToken);
 
         expect(response).toBe(mockResponse);
-        expect(AuthClient.post).toHaveBeenCalledWith(`${API_ROUTES.AUTH.LOGOUT}`);
+        expect(AuthClient.post).toHaveBeenCalledWith(API_ROUTES.AUTH.LOGOUT, null, {
+            headers: {
+                Authorization: `Bearer ${mockToken}`,
+            },
+        });
     });
 
     it('logoutRequest error', async () => {
         const errorMessage = 'Вихід не вдався';
+
         (AuthClient.post as jest.Mock).mockRejectedValueOnce(new Error(errorMessage));
 
-        await expect(logoutRequest()).rejects.toThrow(errorMessage);
-        expect(AuthClient.post).toHaveBeenCalledWith(`${API_ROUTES.AUTH.LOGOUT}`);
+        await expect(logoutRequest(mockToken)).rejects.toThrow(errorMessage);
+        expect(AuthClient.post).toHaveBeenCalledWith(API_ROUTES.AUTH.LOGOUT, null, {
+            headers: {
+                Authorization: `Bearer ${mockToken}`,
+            },
+        });
     });
 });

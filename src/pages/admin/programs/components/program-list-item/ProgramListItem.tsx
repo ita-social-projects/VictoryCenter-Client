@@ -2,7 +2,8 @@ import { Program } from '../../../../../types/admin/Programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonTooltip } from '../../../../../components/common/button-tooltip/ButtonTooltip';
 import { mapImageToBase64 } from '../../../../../utils/functions/mapImageToBase64';
-import { Status } from '../../../../../components/common/status/Status';
+import { VisibilityStatusLabel } from '../../../../../components/common/visibility-status-label/VisibilityStatusLabel';
+import { VisibilityStatus } from '../../../../../types/admin/Common';
 import BlankImage from '../../../../../assets/icons/blank-image.svg';
 import './programs-list-item.scss';
 
@@ -24,14 +25,14 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
                     <p>{program.description}</p>
                 </div>
                 <div className="program-info-status">
-                    <Status status={program.status} />
+                    <VisibilityStatusLabel status={program.status} />
                 </div>
             </div>
             <div className="program-actions">
                 <ButtonTooltip position="bottom">
                     <div className="program-actions-tooltip">
                         <b>
-                            {program.status === 'Published'
+                            {program.status === VisibilityStatus.Published
                                 ? COMMON_TEXT_ADMIN.TOOLTIP.PUBLISHED_IN
                                 : COMMON_TEXT_ADMIN.TOOLTIP.DRAFTED_IN}
                         </b>

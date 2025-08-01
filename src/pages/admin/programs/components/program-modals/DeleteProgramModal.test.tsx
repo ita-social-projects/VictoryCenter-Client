@@ -2,10 +2,11 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DeleteProgramModal, DeleteProgramModalProps } from './DeleteProgramModal';
-import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { Program } from '../../../../../types/admin/Programs';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { VisibilityStatus } from '../../../../../types/admin/Common';
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
@@ -44,7 +45,7 @@ describe('DeleteProgramModal', () => {
         id: 1,
         name: 'Test program',
         description: 'Description',
-        status: 'Published',
+        status: VisibilityStatus.Published,
         img: null,
         categories: [],
     };

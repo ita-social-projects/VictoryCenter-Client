@@ -185,5 +185,3 @@ export function convertFileToBase64(file: File): Promise<ImageValues> {
         reader.readAsDataURL(file);
     });
 }
-
-export default PhotoInput;

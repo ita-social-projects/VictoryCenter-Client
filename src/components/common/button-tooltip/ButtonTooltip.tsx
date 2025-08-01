@@ -20,10 +20,6 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
         setIsVisible((prev) => !prev);
     };
 
-    const hideTooltip = useCallback(() => {
-        setIsVisible(false);
-    }, []);
-
     const calculatePosition = useCallback(() => {
         if (!wrapperRef.current || !tooltipRef.current) return;
 
@@ -48,6 +44,17 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
         setTooltipPosition({ top, left });
     }, [position, offset]);
 
+    const handleClickOutside = useCallback((event: MouseEvent) => {
+        if (
+            wrapperRef.current &&
+            !wrapperRef.current.contains(event.target as Node) &&
+            tooltipRef.current &&
+            !tooltipRef.current.contains(event.target as Node)
+        ) {
+            setIsVisible(false);
+        }
+    }, []);
+
     useEffect(() => {
         if (isVisible) {
             calculatePosition();
@@ -55,17 +62,6 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
     }, [isVisible, position, offset, calculatePosition]);
 
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                wrapperRef.current &&
-                !wrapperRef.current.contains(event.target as Node) &&
-                tooltipRef.current &&
-                !tooltipRef.current.contains(event.target as Node)
-            ) {
-                hideTooltip();
-            }
-        };
-
         if (isVisible) {
             document.addEventListener('mousedown', handleClickOutside);
         }
@@ -73,7 +69,7 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [isVisible, hideTooltip]);
+    }, [handleClickOutside, isVisible]);
 
     const tooltipId = useId();
 

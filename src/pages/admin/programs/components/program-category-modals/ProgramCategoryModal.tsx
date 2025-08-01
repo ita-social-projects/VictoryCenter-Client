@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/common/button/Button';
 import { HintBox } from '../../../../../components/common/hint-box/HintBox';
+import { InputLabel } from '../../../../../components/common/input-label/InputLabel';
 import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
 import { QuestionModal } from '../../../../../components/common/question-modal/QuestionModal';
 import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/admin/Programs';
@@ -247,10 +248,11 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                     <form onSubmit={(e) => e.preventDefault()} className="program-form-main" id={getFormId()}>
                         {mode === 'edit' && (
                             <div className="form-group">
-                                <label htmlFor={getFieldId('select')}>
-                                    <span className="required-field">*</span>
-                                    {PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
-                                </label>
+                                <InputLabel
+                                    htmlFor={getFieldId('select')}
+                                    text={PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
+                                    isRequired
+                                />
                                 <select
                                     id={getFieldId('select')}
                                     data-testid="category-select"
@@ -268,16 +270,15 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                         )}
 
                         <div className="form-group form-group-name">
-                            <label htmlFor={getFieldId('name')}>
-                                {mode === 'add' ? (
-                                    <>
-                                        <span className="required-field">*</span>
-                                        {PROGRAM_CATEGORY_TEXT.FORM.LABEL.NAME}
-                                    </>
-                                ) : (
-                                    PROGRAM_CATEGORY_TEXT.FORM.LABEL.EDIT_NAME
-                                )}
-                            </label>
+                            <InputLabel
+                                htmlFor={getFieldId('name')}
+                                isRequired={mode === 'add'}
+                                text={
+                                    mode === 'add'
+                                        ? PROGRAM_CATEGORY_TEXT.FORM.LABEL.NAME
+                                        : PROGRAM_CATEGORY_TEXT.FORM.LABEL.EDIT_NAME
+                                }
+                            />
                             <InputWithCharacterLimit
                                 value={formState.name}
                                 onChange={handleNameChange}
@@ -315,7 +316,6 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
             {/* Save confirmation */}
             <QuestionModal
                 isOpen={showSaveConfirmModal}
-                isSubmitting={false}
                 title={COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
@@ -327,7 +327,6 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
             {/* CLose confirmation */}
             <QuestionModal
                 isOpen={showCloseConfirmModal}
-                isSubmitting={false}
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}

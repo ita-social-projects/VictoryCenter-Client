@@ -1,6 +1,7 @@
 import { ProgramsApi } from './programs-api';
 import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin-page/programPage';
 import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '../../../../types/admin/Programs';
+import { VisibilityStatus } from '../../../../types/admin/Common';
 
 describe('ProgramsApi', () => {
     beforeEach(() => {
@@ -54,11 +55,11 @@ describe('ProgramsApi', () => {
         });
 
         it('should filter by status when provided', async () => {
-            const promise = ProgramsApi.fetchPrograms(1, 1, 10, 'Published');
+            const promise = ProgramsApi.fetchPrograms(1, 1, 10, VisibilityStatus.Published);
             jest.runAllTimers();
             const result = await promise;
 
-            expect(result.items.every((program) => program.status === 'Published')).toBe(true);
+            expect(result.items.every((program) => program.status === VisibilityStatus.Published)).toBe(true);
         });
 
         it('should handle pagination correctly', async () => {
@@ -94,7 +95,7 @@ describe('ProgramsApi', () => {
                 id: null,
                 name: 'Test Program',
                 description: 'Test Description',
-                status: 'Draft',
+                status: VisibilityStatus.Draft,
                 img: null,
                 categoryIds: [1, 2],
             };
@@ -115,7 +116,7 @@ describe('ProgramsApi', () => {
                 id: null,
                 name: 'Test Program 3',
                 description: 'Test Description 3',
-                status: 'Draft',
+                status: VisibilityStatus.Draft,
                 img: null,
                 categoryIds: [2],
             };
@@ -132,7 +133,7 @@ describe('ProgramsApi', () => {
                 id: null,
                 name: 'Test Program 4',
                 description: 'Test Description 4',
-                status: 'Draft',
+                status: VisibilityStatus.Draft,
                 img: null,
                 categoryIds: [],
             };
@@ -151,7 +152,7 @@ describe('ProgramsApi', () => {
                 id: 1,
                 name: 'Updated Program',
                 description: 'Updated Description',
-                status: 'Published',
+                status: VisibilityStatus.Published,
                 img: null,
                 categoryIds: [2],
             };
@@ -169,7 +170,7 @@ describe('ProgramsApi', () => {
                 id: 3,
                 name: 'Updated Program 3',
                 description: 'Updated Description 3',
-                status: 'Published',
+                status: VisibilityStatus.Published,
                 img: null,
                 categoryIds: [1, 2],
             };
@@ -186,7 +187,7 @@ describe('ProgramsApi', () => {
                 id: 999,
                 name: 'Non-existent Program',
                 description: 'Description',
-                status: 'Draft',
+                status: VisibilityStatus.Draft,
                 img: null,
                 categoryIds: [1],
             };

@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import CheckedBox from '../../../assets/icons/chevron-checked.svg';
 import UncheckedBox from '../../../assets/icons/chevron-unchecked.svg';
 import ArrowDown from '../../../assets/icons/chevron-down.svg';
 import ArrowUp from '../../../assets/icons/chevron-up.svg';
 import classNames from 'classnames';
-import './multi-select.scss';
+import './multi-select-input.scss';
 
-interface MultiselectProps<T extends Record<string, any>> {
+export interface MultiselectProps<T extends Record<string, any>> {
     options: T[];
     value?: T[];
     onChange?: (selectedValues: T[]) => void;
@@ -17,20 +18,18 @@ interface MultiselectProps<T extends Record<string, any>> {
     disabled?: boolean;
 }
 
-export const MultiSelect = <T extends Record<string, any>>(props: MultiselectProps<T>) => {
-    const {
-        options,
-        value = [],
-        onChange,
-        onBlur,
-        getOptionId,
-        getOptionName,
-        placeholder = 'Select options...',
-        disabled,
-    } = props;
-
+export const MultiSelectInput = <T extends Record<string, any>>({
+    options,
+    value = [],
+    onChange,
+    onBlur,
+    getOptionId,
+    getOptionName,
+    placeholder = 'Select options...',
+    disabled,
+}: MultiselectProps<T>) => {
     const [isOpen, setIsOpen] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const multiselectContainerRef = useRef<HTMLDivElement>(null);
 
     const selectedIds = useMemo(() => new Set(value.map(getOptionId)), [value, getOptionId]);
 
@@ -69,19 +68,22 @@ export const MultiSelect = <T extends Record<string, any>>(props: MultiselectPro
         }
     };
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+    const handleClickOutside = useCallback(
+        (event: MouseEvent) => {
+            if (multiselectContainerRef.current && !multiselectContainerRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
                 onBlur?.();
             }
-        };
+        },
+        [onBlur],
+    );
 
+    useEffect(() => {
         if (isOpen) {
             document.addEventListener('mousedown', handleClickOutside);
             return () => document.removeEventListener('mousedown', handleClickOutside);
         }
-    }, [isOpen, onBlur]);
+    }, [handleClickOutside, isOpen, onBlur]);
 
     const displayLabel = useMemo(() => {
         if (value.length === 0) return placeholder;
@@ -89,7 +91,7 @@ export const MultiSelect = <T extends Record<string, any>>(props: MultiselectPro
     }, [value, getOptionName, placeholder]);
 
     return (
-        <div className="multiselect" ref={containerRef}>
+        <div className="multiselect" ref={multiselectContainerRef}>
             <button
                 type="button"
                 className={classNames('multiselect-placeholder-container', {
@@ -108,7 +110,14 @@ export const MultiSelect = <T extends Record<string, any>>(props: MultiselectPro
                 >
                     <div className="placeholder-content">{displayLabel}</div>
                     <div className="placeholder-chevron">
-                        <img src={isOpen ? ArrowUp : ArrowDown} alt={isOpen ? 'Collapse options' : 'Expand options'} />
+                        <img
+                            src={isOpen ? ArrowUp : ArrowDown}
+                            alt={
+                                isOpen
+                                    ? COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST
+                                    : COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST
+                            }
+                        />
                     </div>
                 </div>
             </button>
@@ -131,7 +140,11 @@ export const MultiSelect = <T extends Record<string, any>>(props: MultiselectPro
                                 <div className="checkbox">
                                     <img
                                         src={selected ? CheckedBox : UncheckedBox}
-                                        alt={selected ? 'Selected' : 'Not selected'}
+                                        alt={
+                                            selected
+                                                ? COMMON_TEXT_ADMIN.ALT.OPTION_SELECTED
+                                                : COMMON_TEXT_ADMIN.ALT.OPTION_NOT_SELECTED
+                                        }
                                     />
                                 </div>
                                 <span className="option-content">{getOptionName(option)}</span>

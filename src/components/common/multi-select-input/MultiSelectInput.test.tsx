@@ -1,7 +1,8 @@
 import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MultiSelect } from './MultiSelect';
+import { MultiSelectInput, MultiselectProps } from './MultiSelectInput';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 jest.mock('../../../assets/icons/chevron-checked.svg', () => 'chevron-checked.svg');
 jest.mock('../../../assets/icons/chevron-unchecked.svg', () => 'chevron-unchecked.svg');
@@ -20,7 +21,7 @@ const mockOptions: TestOption[] = [
     { id: 4, name: 'Option 4' },
 ];
 
-const defaultProps = {
+const defaultProps: MultiselectProps<TestOption> = {
     options: mockOptions,
     getOptionId: (option: TestOption) => option.id,
     getOptionName: (option: TestOption) => option.name,
@@ -28,22 +29,22 @@ const defaultProps = {
 
 describe('Multiselect Component', () => {
     it('renders with default placeholder', () => {
-        render(<MultiSelect {...defaultProps} />);
+        render(<MultiSelectInput {...defaultProps} />);
         expect(screen.getByText('Select options...')).toBeInTheDocument();
     });
 
     it('renders with custom placeholder', () => {
-        render(<MultiSelect {...defaultProps} placeholder="Choose items..." />);
+        render(<MultiSelectInput {...defaultProps} placeholder="Choose items..." />);
         expect(screen.getByText('Choose items...')).toBeInTheDocument();
     });
 
     it('applies correct className to container', () => {
-        const { container } = render(<MultiSelect {...defaultProps} />);
+        const { container } = render(<MultiSelectInput {...defaultProps} />);
         expect(container.firstChild).toHaveClass('multiselect');
     });
 
     it('applies selected className when dropdown is open', () => {
-        const { container } = render(<MultiSelect {...defaultProps} />);
+        const { container } = render(<MultiSelectInput {...defaultProps} />);
         const placeholderContainer = container.querySelector('.multiselect-placeholder-container');
 
         fireEvent.click(placeholderContainer!);
@@ -52,27 +53,27 @@ describe('Multiselect Component', () => {
     });
 
     it('applies disabled className when disabled prop is true', () => {
-        const { container } = render(<MultiSelect {...defaultProps} disabled />);
+        const { container } = render(<MultiSelectInput {...defaultProps} disabled />);
         const placeholderContainer = container.querySelector('.multiselect-placeholder-container');
 
         expect(placeholderContainer).toHaveClass('multiselect-placeholder-container-disabled');
     });
 
     it('shows down arrow when closed and up arrow when open', () => {
-        render(<MultiSelect {...defaultProps} />);
+        render(<MultiSelectInput {...defaultProps} />);
 
         // Initially closed - should show down arrow
-        expect(screen.getByAltText('Expand options')).toBeInTheDocument();
+        expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST)).toBeInTheDocument();
 
         // Open dropdown
         fireEvent.click(screen.getByText('Select options...'));
 
         // Should show up arrow when open
-        expect(screen.getByAltText('Collapse options')).toBeInTheDocument();
+        expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST)).toBeInTheDocument();
     });
 
     it('opens dropdown when placeholder is clicked', () => {
-        render(<MultiSelect {...defaultProps} />);
+        render(<MultiSelectInput {...defaultProps} />);
 
         fireEvent.click(screen.getByText('Select options...'));
 
@@ -81,7 +82,7 @@ describe('Multiselect Component', () => {
     });
 
     it('does not open dropdown when disabled', () => {
-        render(<MultiSelect {...defaultProps} disabled />);
+        render(<MultiSelectInput {...defaultProps} disabled />);
 
         fireEvent.click(screen.getByText('Select options...'));
 
@@ -90,14 +91,14 @@ describe('Multiselect Component', () => {
 
     it('displays selected values in placeholder', () => {
         const selectedValues = [mockOptions[0], mockOptions[1]];
-        render(<MultiSelect {...defaultProps} value={selectedValues} />);
+        render(<MultiSelectInput {...defaultProps} value={selectedValues} />);
 
         expect(screen.getByText('Option 1, Option 2')).toBeInTheDocument();
     });
 
     it('applies placeholder-selected className when items are selected', () => {
         const selectedValues = [mockOptions[0]];
-        const { container } = render(<MultiSelect {...defaultProps} value={selectedValues} />);
+        const { container } = render(<MultiSelectInput {...defaultProps} value={selectedValues} />);
         const placeholder = container.querySelector('.placeholder');
 
         expect(placeholder).toHaveClass('placeholder-selected');
@@ -105,7 +106,7 @@ describe('Multiselect Component', () => {
 
     it('calls onChange when option is selected', () => {
         const mockOnChange = jest.fn();
-        render(<MultiSelect {...defaultProps} onChange={mockOnChange} />);
+        render(<MultiSelectInput {...defaultProps} onChange={mockOnChange} />);
 
         // Open dropdown
         fireEvent.click(screen.getByText('Select options...'));
@@ -120,7 +121,7 @@ describe('Multiselect Component', () => {
         const mockOnChange = jest.fn();
         const selectedValues = [mockOptions[0], mockOptions[1]];
 
-        render(<MultiSelect {...defaultProps} value={selectedValues} onChange={mockOnChange} />);
+        render(<MultiSelectInput {...defaultProps} value={selectedValues} onChange={mockOnChange} />);
 
         // Open dropdown
         fireEvent.click(screen.getByText('Option 1, Option 2'));
@@ -133,7 +134,7 @@ describe('Multiselect Component', () => {
 
     it('does not call onChange when disabled', () => {
         const mockOnChange = jest.fn();
-        render(<MultiSelect {...defaultProps} onChange={mockOnChange} disabled />);
+        render(<MultiSelectInput {...defaultProps} onChange={mockOnChange} disabled />);
 
         // Try to click placeholder (should not open dropdown)
         fireEvent.click(screen.getByText('Select options...'));
@@ -143,7 +144,7 @@ describe('Multiselect Component', () => {
 
     it('applies option-selected className to selected options', () => {
         const selectedValues = [mockOptions[0]];
-        const { container } = render(<MultiSelect {...defaultProps} value={selectedValues} />);
+        const { container } = render(<MultiSelectInput {...defaultProps} value={selectedValues} />);
 
         // Open dropdown
         fireEvent.click(screen.getByText('Option 1'));
@@ -154,22 +155,22 @@ describe('Multiselect Component', () => {
 
     it('shows checked icon for selected options and unchecked for unselected', () => {
         const selectedValues = [mockOptions[0]];
-        render(<MultiSelect {...defaultProps} value={selectedValues} />);
+        render(<MultiSelectInput {...defaultProps} value={selectedValues} />);
 
         // Open dropdown
         fireEvent.click(screen.getByText('Option 1'));
 
         // First option should be selected
-        expect(screen.getByAltText('Selected')).toBeInTheDocument();
+        expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.OPTION_SELECTED)).toBeInTheDocument();
 
         // Other options should not be selected
-        expect(screen.getAllByAltText('Not selected')).toHaveLength(3);
+        expect(screen.getAllByAltText(COMMON_TEXT_ADMIN.ALT.OPTION_NOT_SELECTED)).toHaveLength(3);
     });
 
     it('closes dropdown when clicking outside', async () => {
         render(
             <div>
-                <MultiSelect {...defaultProps} />
+                <MultiSelectInput {...defaultProps} />
                 <div data-testid="outside-element">Outside</div>
             </div>,
         );
@@ -190,7 +191,7 @@ describe('Multiselect Component', () => {
         const mockOnBlur = jest.fn();
         render(
             <div>
-                <MultiSelect {...defaultProps} onBlur={mockOnBlur} />
+                <MultiSelectInput {...defaultProps} onBlur={mockOnBlur} />
                 <div data-testid="outside-element">Outside</div>
             </div>,
         );
@@ -208,7 +209,7 @@ describe('Multiselect Component', () => {
 
     it('handles keyboard events on options (Enter and Space)', () => {
         const mockOnChange = jest.fn();
-        render(<MultiSelect {...defaultProps} onChange={mockOnChange} />);
+        render(<MultiSelectInput {...defaultProps} onChange={mockOnChange} />);
 
         // Open dropdown
         fireEvent.click(screen.getByText('Select options...'));
@@ -228,7 +229,7 @@ describe('Multiselect Component', () => {
 
     it('does not trigger option selection on non-Enter/Space key events', () => {
         const mockOnChange = jest.fn();
-        render(<MultiSelect {...defaultProps} onChange={mockOnChange} />);
+        render(<MultiSelectInput {...defaultProps} onChange={mockOnChange} />);
 
         fireEvent.click(screen.getByText('Select options...'));
 

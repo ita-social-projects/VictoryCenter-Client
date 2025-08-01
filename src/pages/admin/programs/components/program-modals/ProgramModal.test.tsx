@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramModal, ProgramModalProps } from './ProgramModal';
 import { Program, ProgramCategory } from '../../../../../types/admin/Programs';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
@@ -7,7 +7,6 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { VisibilityStatus } from '../../../../../types/admin/Common';
 
-// Mock the API service
 jest.mock('../../../../../services/api/admin/programs/programs-api', () => ({
     ProgramsApi: {
         addProgram: jest.fn(),
@@ -17,9 +16,7 @@ jest.mock('../../../../../services/api/admin/programs/programs-api', () => ({
 
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
-// Mock common components
 jest.mock('../../../../../components/common/modal/Modal', () => {
-    // A simplified Modal mock that renders its children when open
     const MockModal = ({
         isOpen,
         children,
@@ -50,7 +47,6 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
 });
 
 jest.mock('../../../../../components/common/button/Button', () => ({
-    // A simplified Button mock
     Button: ({
         onClick,
         disabled,
@@ -73,8 +69,6 @@ jest.mock('../../../../../components/common/button/Button', () => ({
 }));
 
 jest.mock('../../../../../components/common/question-modal/QuestionModal', () => ({
-    // A simplified QuestionModal mock.
-    // We use hardcoded strings for button text to avoid out-of-scope variable errors in Jest mocks.
     QuestionModal: ({
         isOpen,
         title,
@@ -99,8 +93,6 @@ jest.mock('../../../../../components/common/question-modal/QuestionModal', () =>
         ) : null,
 }));
 
-// --- Enhanced ProgramForm Mock ---
-// This mock allows us to control its state (isValid, isDirty) and capture props from the parent.
 const mockFormRef = {
     submit: jest.fn(),
     isDirty: jest.fn(() => false),
@@ -111,25 +103,20 @@ let capturedFormProps: any = {};
 jest.mock('../program-form/ProgramForm', () => {
     const React = require('react');
     const MockProgramForm = React.forwardRef((props: any, ref: any) => {
-        capturedFormProps = props; // Capture props like onSubmit and onValidationChange
+        capturedFormProps = props;
         React.useImperativeHandle(ref, () => mockFormRef);
-
-        // NOTE: The useEffect that automatically triggered onValidationChange has been removed
-        // to prevent race conditions. Validation is now manually triggered in tests.
 
         return <div data-testid="program-form" />;
     });
     return { ProgramForm: MockProgramForm };
 });
-// --- End of Mocks ---
 
-// --- Test Data ---
 const mockProgram: Program = {
     id: 1,
     name: 'Test Program',
     description: 'Test Description',
     categories: [{ id: 1, name: 'Category 1', programsCount: 1 }],
-    status: 'Draft',
+    status: VisibilityStatus.Draft,
     img: null,
 };
 
@@ -169,7 +156,6 @@ describe('ProgramModal', () => {
         onEditProgram: mockOnEditProgram,
     };
 
-    // --- Helper functions for querying elements ---
     const getModal = () => screen.queryByTestId('modal');
     const getDraftButton = () => screen.getByTestId('draft-button');
     const getPublishButton = () => screen.getByTestId('publish-button');
@@ -181,21 +167,12 @@ describe('ProgramModal', () => {
     const getCreateErrorContainer = () => screen.queryByText(PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_PROGRAM);
     const getUpdateErrorContainer = () => screen.queryByText(PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_PROGRAM);
 
-    // --- Helper functions for simulating events ---
-
-    /**
-     * Simulates the child form component reporting its validity to the modal.
-     * This is used to enable the action buttons.
-     */
     const simulateFormBecomesValid = () => {
         act(() => {
             capturedFormProps.onValidationChange(true);
         });
     };
 
-    /**
-     * Simulates the form's internal onSubmit callback.
-     */
     const simulateFormSubmit = (status: VisibilityStatus) => {
         act(() => {
             capturedFormProps.onSubmit(mockFormData, status);
@@ -203,7 +180,6 @@ describe('ProgramModal', () => {
     };
 
     beforeEach(() => {
-        // Reset all mocks before each test
         jest.clearAllMocks();
         mockFormRef.isDirty.mockReturnValue(false);
         mockFormRef.isValid.mockReturnValue(true);
@@ -211,7 +187,6 @@ describe('ProgramModal', () => {
         mockedProgramsApi.editProgram.mockResolvedValue({ ...mockProgram, ...mockFormData });
     });
 
-    // --- General Rendering and Closing ---
     describe('General rendering and closing behavior', () => {
         it('should not render the modal when isOpen is false', () => {
             render(<ProgramModal {...addModeProps} isOpen={false} />);
@@ -271,7 +246,6 @@ describe('ProgramModal', () => {
         });
     });
 
-    // --- Add Mode ---
     describe('Add Mode', () => {
         it('should render with the correct "Add Program" title', () => {
             render(<ProgramModal {...addModeProps} />);
@@ -283,16 +257,18 @@ describe('ProgramModal', () => {
             simulateFormBecomesValid(); // Enable buttons
 
             fireEvent.click(getDraftButton());
-            expect(mockFormRef.submit).toHaveBeenCalledWith('Draft');
+            expect(mockFormRef.submit).toHaveBeenCalledWith(VisibilityStatus.Draft);
 
-            simulateFormSubmit('Draft');
+            simulateFormSubmit(VisibilityStatus.Draft);
 
             expect(getQuestionTitle()).toHaveTextContent(PROGRAMS_TEXT.QUESTION.DRAFT_PROGRAM);
 
             fireEvent.click(getQuestionConfirmButton());
 
             await waitFor(() => {
-                expect(mockedProgramsApi.addProgram).toHaveBeenCalledWith(expect.objectContaining({ status: 'Draft' }));
+                expect(mockedProgramsApi.addProgram).toHaveBeenCalledWith(
+                    expect.objectContaining({ status: VisibilityStatus.Draft }),
+                );
             });
             expect(mockOnAddProgram).toHaveBeenCalled();
             expect(mockOnClose).toHaveBeenCalled();
@@ -303,9 +279,9 @@ describe('ProgramModal', () => {
             simulateFormBecomesValid(); // Enable buttons
 
             fireEvent.click(getPublishButton());
-            expect(mockFormRef.submit).toHaveBeenCalledWith('Published');
+            expect(mockFormRef.submit).toHaveBeenCalledWith(VisibilityStatus.Published);
 
-            simulateFormSubmit('Published');
+            simulateFormSubmit(VisibilityStatus.Published);
 
             expect(getQuestionTitle()).toHaveTextContent(PROGRAMS_TEXT.QUESTION.PUBLISH_PROGRAM);
 
@@ -313,7 +289,7 @@ describe('ProgramModal', () => {
 
             await waitFor(() => {
                 expect(mockedProgramsApi.addProgram).toHaveBeenCalledWith(
-                    expect.objectContaining({ status: 'Published' }),
+                    expect.objectContaining({ status: VisibilityStatus.Published }),
                 );
             });
             expect(mockOnAddProgram).toHaveBeenCalled();
@@ -326,7 +302,7 @@ describe('ProgramModal', () => {
             simulateFormBecomesValid(); // Enable buttons
 
             fireEvent.click(getPublishButton());
-            simulateFormSubmit('Published');
+            simulateFormSubmit(VisibilityStatus.Published);
             fireEvent.click(getQuestionConfirmButton());
 
             await waitFor(() => {
@@ -342,7 +318,7 @@ describe('ProgramModal', () => {
             simulateFormBecomesValid(); // Enable buttons
 
             fireEvent.click(getPublishButton());
-            simulateFormSubmit('Published');
+            simulateFormSubmit(VisibilityStatus.Published);
 
             fireEvent.click(getQuestionCancelButton());
 
@@ -365,14 +341,14 @@ describe('ProgramModal', () => {
             simulateFormBecomesValid(); // Enable buttons
 
             fireEvent.click(getDraftButton());
-            simulateFormSubmit('Draft');
+            simulateFormSubmit(VisibilityStatus.Draft);
 
             expect(getQuestionTitle()).toHaveTextContent(COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES);
             fireEvent.click(getQuestionConfirmButton());
 
             await waitFor(() => {
                 expect(mockedProgramsApi.editProgram).toHaveBeenCalledWith(
-                    expect.objectContaining({ id: mockProgram.id, status: 'Draft' }),
+                    expect.objectContaining({ id: mockProgram.id, status: VisibilityStatus.Draft }),
                 );
             });
             expect(mockOnEditProgram).toHaveBeenCalled();
@@ -384,29 +360,29 @@ describe('ProgramModal', () => {
             simulateFormBecomesValid(); // Enable buttons
 
             fireEvent.click(getPublishButton());
-            simulateFormSubmit('Published');
+            simulateFormSubmit(VisibilityStatus.Published);
 
             expect(getQuestionTitle()).toHaveTextContent(PROGRAMS_TEXT.QUESTION.PUBLISH_PROGRAM);
         });
 
         it('should show correct confirmation title when saving changes to a published program', async () => {
-            const publishedProgram = { ...mockProgram, status: 'Published' as VisibilityStatus };
+            const publishedProgram = { ...mockProgram, status: VisibilityStatus.Published };
             render(<ProgramModal {...editModeProps} programToEdit={publishedProgram} />);
             simulateFormBecomesValid(); // Enable buttons
 
             fireEvent.click(getPublishButton());
-            simulateFormSubmit('Published');
+            simulateFormSubmit(VisibilityStatus.Published);
 
             expect(getQuestionTitle()).toHaveTextContent(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES);
         });
 
         it('should show correct confirmation title when un-publishing a program', async () => {
-            const publishedProgram = { ...mockProgram, status: 'Published' as VisibilityStatus };
+            const publishedProgram = { ...mockProgram, status: VisibilityStatus.Published };
             render(<ProgramModal {...editModeProps} programToEdit={publishedProgram} />);
             simulateFormBecomesValid(); // Enable buttons
 
             fireEvent.click(getDraftButton());
-            simulateFormSubmit('Draft');
+            simulateFormSubmit(VisibilityStatus.Draft);
 
             expect(getQuestionTitle()).toHaveTextContent(COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION);
         });
@@ -417,7 +393,7 @@ describe('ProgramModal', () => {
             simulateFormBecomesValid(); // Enable buttons
 
             fireEvent.click(getPublishButton());
-            simulateFormSubmit('Published');
+            simulateFormSubmit(VisibilityStatus.Published);
             fireEvent.click(getQuestionConfirmButton());
 
             await waitFor(() => {

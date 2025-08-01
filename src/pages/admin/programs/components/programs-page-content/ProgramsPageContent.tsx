@@ -43,7 +43,6 @@ export const ProgramsPageContent = () => {
     const [isProgramsLoading, setIsProgramsLoading] = useState(false);
     const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
-    const [autocompleteValues] = useState<string[]>([]);
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
     const [modalState, setModalState] = useState<ModalState>({
         isAddProgramModalOpen: false,
@@ -145,9 +144,7 @@ export const ProgramsPageContent = () => {
             }
 
             // Cancel previous request
-            if (abortControllerRef.current) {
-                abortControllerRef.current.abort();
-            }
+            abortControllerRef.current?.abort();
 
             const abortController = new AbortController();
             abortControllerRef.current = abortController;
@@ -248,9 +245,7 @@ export const ProgramsPageContent = () => {
     // Cleanup on unmount
     useEffect(() => {
         return () => {
-            if (abortControllerRef.current) {
-                abortControllerRef.current.abort();
-            }
+            abortControllerRef.current?.abort();
         };
     }, []);
 
@@ -264,12 +259,12 @@ export const ProgramsPageContent = () => {
     }, []);
 
     // Program handlers
-    const handleAddProgramStarted = useCallback(() => {
+    const handleAddProgramModalOpen = useCallback(() => {
         if (isAnyModalOpened) return;
         updateModalState({ isAddProgramModalOpen: true });
     }, [updateModalState, isAnyModalOpened]);
 
-    const handleEditProgramStarted = useCallback(
+    const handleEditProgramModelOpen = useCallback(
         (program: Program) => {
             if (isAnyModalOpened) return;
             updateModalState({ programToEdit: program });
@@ -277,7 +272,7 @@ export const ProgramsPageContent = () => {
         [updateModalState, isAnyModalOpened],
     );
 
-    const handleDeleteProgramStarted = useCallback(
+    const handleDeleteProgramModalOpen = useCallback(
         (program: Program) => {
             if (isAnyModalOpened) return;
             updateModalState({ programToDelete: program });
@@ -381,7 +376,7 @@ export const ProgramsPageContent = () => {
             setCategories((prevCategories) =>
                 prevCategories.map((cat) =>
                     deletedFromCategoryIds.has(cat.id)
-                        ? { ...cat, programsCount: Math.max(0, cat.programsCount - 1) } // Math.max для уникнення від'ємних значень
+                        ? { ...cat, programsCount: Math.max(0, cat.programsCount - 1) }
                         : cat,
                 ),
             );
@@ -477,11 +472,11 @@ export const ProgramsPageContent = () => {
             <ProgramListItem
                 key={program.id}
                 program={program}
-                handleOnEditProgram={handleEditProgramStarted}
-                handleOnDeleteProgram={handleDeleteProgramStarted}
+                handleOnEditProgram={handleEditProgramModelOpen}
+                handleOnDeleteProgram={handleDeleteProgramModalOpen}
             />
         ),
-        [handleEditProgramStarted, handleDeleteProgramStarted],
+        [handleEditProgramModelOpen, handleDeleteProgramModalOpen],
     );
 
     const closeModalActions = useMemo(
@@ -500,10 +495,9 @@ export const ProgramsPageContent = () => {
         <div className="programs-page-wrapper" data-testid="programs-page-content">
             <div className="programs-page-toolbar-container">
                 <ProgramsPageToolbar
-                    autocompleteValues={autocompleteValues}
                     onSearchQueryChange={handleSearchQueryByName}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddProgram={handleAddProgramStarted}
+                    onAddProgram={handleAddProgramModalOpen}
                 />
             </div>
 
@@ -512,8 +506,8 @@ export const ProgramsPageContent = () => {
                     categories={categories}
                     selectedCategory={selectedCategory}
                     onCategorySelect={handleCategorySelect}
-                    getItemDisplayName={(category) => category.name}
-                    getItemKey={(category) => category.id}
+                    getCategoryDisplayName={(category) => category.name}
+                    getCategoryKey={(category) => category.id}
                     displayContextMenuButton={true}
                     contextMenuOptions={categoryBarContextMenuOptions}
                     onContextMenuOptionSelected={onContextMenuOptionSelected}
@@ -557,10 +551,10 @@ export const ProgramsPageContent = () => {
             />
 
             <DeleteProgramModal
+                isOpen={!!modalState.programToDelete}
+                onClose={closeModalActions.deleteProgram}
                 programToDelete={modalState.programToDelete}
                 onDeleteProgram={handleDeleteProgram}
-                onClose={closeModalActions.deleteProgram}
-                isOpen={!!modalState.programToDelete}
             />
 
             {/* Category Modals */}

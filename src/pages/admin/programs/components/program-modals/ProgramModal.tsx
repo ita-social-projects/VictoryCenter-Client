@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../program-form/ProgramForm';
 import { Program, ProgramCategory, ProgramCreateUpdate } from '../../../../../types/admin/Programs';
@@ -10,24 +10,24 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import './program-modal.scss';
 
-type BaseProps = {
+interface BaseProps {
     isOpen: boolean;
     onClose: () => void;
     categories: ProgramCategory[];
-};
+}
 
-type AddModalProps = {
+interface AddModalProps extends BaseProps {
     mode: 'add';
     onAddProgram: (program: Program) => void;
-};
+}
 
-type EditModalProps = {
+interface EditModalProps extends BaseProps {
     mode: 'edit';
     programToEdit: Program;
     onEditProgram: (program: Program) => void;
-};
+}
 
-export type ProgramModalProps = BaseProps & (AddModalProps | EditModalProps);
+export type ProgramModalProps = AddModalProps | EditModalProps;
 
 export const ProgramModal = (props: ProgramModalProps) => {
     const { isOpen, onClose, mode, categories } = props;
@@ -65,11 +65,11 @@ export const ProgramModal = (props: ProgramModalProps) => {
         setIsFormValid(false);
     }, [isOpen]);
 
-    const handleFormValidationChange = (isValid: boolean) => {
+    const handleFormValidationChange = useCallback((isValid: boolean) => {
         setIsFormValid(isValid);
-    };
+    }, []);
 
-    const handleFormSubmit = (data: ProgramFormValues, status: VisibilityStatus) => {
+    const handleFormSubmit = useCallback((data: ProgramFormValues, status: VisibilityStatus) => {
         const currentIsValid = formRef.current?.isValid(false) || false;
 
         if (!currentIsValid) {
@@ -77,11 +77,22 @@ export const ProgramModal = (props: ProgramModalProps) => {
         }
 
         setPendingFormData(data);
-        setPendingAction(status === 'Published' ? 'publish' : 'draft');
+        setPendingAction(status === VisibilityStatus.Published ? 'publish' : 'draft');
         setShowFormConfirmModal(true);
-    };
+    }, []);
 
-    const handleConfirmAction = async () => {
+    const resetPendingState = useCallback(() => {
+        setPendingAction(null);
+        setPendingFormData(null);
+    }, []);
+
+    const handleCancelConfirmation = useCallback(() => {
+        setShowFormConfirmModal(false);
+        resetPendingState();
+        setIsSubmitting(false);
+    }, [resetPendingState]);
+
+    const handleConfirmAction = useCallback(async () => {
         if (!pendingFormData || !pendingAction) return;
 
         setShowFormConfirmModal(false);
@@ -89,7 +100,8 @@ export const ProgramModal = (props: ProgramModalProps) => {
         setError('');
 
         try {
-            const status: VisibilityStatus = pendingAction === 'publish' ? 'Published' : 'Draft';
+            const status: VisibilityStatus =
+                pendingAction === 'publish' ? VisibilityStatus.Published : VisibilityStatus.Draft;
             const programData: ProgramCreateUpdate = {
                 id: isEditMode && program ? program.id : null,
                 name: pendingFormData.name,
@@ -113,39 +125,36 @@ export const ProgramModal = (props: ProgramModalProps) => {
         } finally {
             setIsSubmitting(false);
         }
-    };
+    }, [pendingFormData, pendingAction, isEditMode, program, onSuccess, onClose]);
 
-    const resetPendingState = () => {
-        setPendingAction(null);
-        setPendingFormData(null);
-    };
-
-    const handleCancelConfirmation = () => {
-        setShowFormConfirmModal(false);
-        resetPendingState();
-        setIsSubmitting(false);
-    };
-
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         if (formRef.current?.isDirty()) {
             setShowCloseConfirmModal(true);
         } else if (!isSubmitting) {
             onClose();
         }
-    };
+    }, [isSubmitting, onClose]);
 
-    const handleConfirmClose = () => {
+    const handleConfirmClose = useCallback(() => {
         setShowCloseConfirmModal(false);
         onClose();
-    };
+    }, [onClose]);
 
-    const handleCancelClose = () => {
+    const handleCancelClose = useCallback(() => {
         setShowCloseConfirmModal(false);
-    };
+    }, []);
 
-    const getFormConfirmTitle = () => {
+    const handleDraftSubmit = useCallback(() => {
+        formRef.current?.submit(VisibilityStatus.Draft);
+    }, []);
+
+    const handlePublishSubmit = useCallback(() => {
+        formRef.current?.submit(VisibilityStatus.Published);
+    }, []);
+
+    const getFormConfirmTitle = useCallback(() => {
         if (isEditMode && program) {
-            if (program.status === 'Published')
+            if (program.status === VisibilityStatus.Published)
                 return pendingAction === 'draft'
                     ? COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION
                     : COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES;
@@ -153,20 +162,17 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 ? COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES
                 : PROGRAMS_TEXT.QUESTION.PUBLISH_PROGRAM;
         }
-        return pendingAction === 'publish'
-            ? PROGRAMS_TEXT.QUESTION.PUBLISH_PROGRAM
-            : PROGRAMS_TEXT.QUESTION.DRAFT_PROGRAM;
-    };
+        return pendingAction === 'draft'
+            ? PROGRAMS_TEXT.QUESTION.DRAFT_PROGRAM
+            : PROGRAMS_TEXT.QUESTION.PUBLISH_PROGRAM;
+    }, [isEditMode, program, pendingAction]);
 
-    const getFormKey = () => {
+    const getFormKey = useCallback(() => {
         if (isEditMode && program?.id) {
             return program.id;
         }
         return 'add';
-    };
-
-    const isDraftDisabled = isSubmitting || !isFormValid;
-    const isPublishDisabled = isSubmitting || !isFormValid;
+    }, [isEditMode, program?.id]);
 
     return (
         <>
@@ -189,18 +195,10 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 </Modal.Content>
 
                 <Modal.Actions>
-                    <Button
-                        buttonStyle="secondary"
-                        onClick={() => formRef.current?.submit('Draft')}
-                        disabled={isDraftDisabled}
-                    >
+                    <Button buttonStyle="secondary" onClick={handleDraftSubmit} disabled={isSubmitting || !isFormValid}>
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFTED}
                     </Button>
-                    <Button
-                        buttonStyle="primary"
-                        onClick={() => formRef.current?.submit('Published')}
-                        disabled={isPublishDisabled}
-                    >
+                    <Button buttonStyle="primary" onClick={handlePublishSubmit} disabled={isSubmitting || !isFormValid}>
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                     </Button>
                 </Modal.Actions>
@@ -208,7 +206,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
 
             <QuestionModal
                 isOpen={showFormConfirmModal}
-                isSubmitting={isSubmitting}
+                isButtonsDisabled={isSubmitting}
                 title={getFormConfirmTitle()}
                 onConfirm={handleConfirmAction}
                 onCancel={handleCancelConfirmation}
@@ -219,7 +217,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
 
             <QuestionModal
                 isOpen={showCloseConfirmModal}
-                isSubmitting={false}
+                isButtonsDisabled={false}
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
                 onConfirm={handleConfirmClose}
                 onCancel={handleCancelClose}

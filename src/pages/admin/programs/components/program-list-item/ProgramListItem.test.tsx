@@ -1,10 +1,11 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { ProgramListItem } from './ProgramListItem';
 import { Program } from '../../../../../types/admin/Programs';
 import { VisibilityStatus } from '../../../../../types/admin/Common';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { VisibilityStatusLabelProps } from '../../../../../components/common/visibility-status-label/VisibilityStatusLabel';
 
 jest.mock('../../../../../assets/icons/blank-image.svg', () => 'blank-image.svg');
 
@@ -18,22 +19,21 @@ jest.mock('../../../../../components/common/button-tooltip/ButtonTooltip', () =>
     },
 }));
 
-jest.mock('../../../../../components/common/status/Status', () => ({
-    Status: ({ status }: { status: VisibilityStatus }) => {
-        return (
-            <div data-testid="status" data-status={status}>
-                {status}
-            </div>
-        );
-    },
-}));
+jest.mock('../../../../../components/common/visibility-status-label/VisibilityStatusLabel', () => {
+    const { VisibilityStatus } = require('../../../../../types/admin/Common');
+    return {
+        VisibilityStatusLabel: ({ status }: VisibilityStatusLabelProps) => {
+            return <div data-testid="status">{VisibilityStatus[status]}</div>;
+        },
+    };
+});
 
 describe('ProgramListItem', () => {
     const mockProgram: Program = {
         id: 1,
         name: 'Test Program',
         description: 'Test program description',
-        status: 'Published',
+        status: VisibilityStatus.Published,
         img: null,
         categories: [
             { id: 1, name: 'Category 1', programsCount: 1 },
@@ -106,8 +106,7 @@ describe('ProgramListItem', () => {
         renderProgramListItem();
 
         const statusComponent = getStatusComponent();
-        expect(statusComponent).toHaveAttribute('data-status', 'Published');
-        expect(statusComponent).toHaveTextContent('Published');
+        expect(statusComponent).toHaveTextContent(VisibilityStatus[VisibilityStatus.Published]);
     });
 
     it('displays published tooltip text and categories for published program', () => {
@@ -119,7 +118,7 @@ describe('ProgramListItem', () => {
     });
 
     it('displays drafted tooltip text for drafted program', () => {
-        const draftProgram: Program = { ...mockProgram, status: 'Draft' };
+        const draftProgram: Program = { ...mockProgram, status: VisibilityStatus.Draft };
         renderProgramListItem({ program: draftProgram });
 
         // Використання константи замість hardcoded text

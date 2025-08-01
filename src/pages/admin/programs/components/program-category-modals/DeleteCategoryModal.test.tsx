@@ -2,13 +2,22 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DeleteCategoryModal } from './DeleteCategoryModal';
-import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { ProgramCategory } from '../../../../../types/admin/Programs';
+import { InputLabelProps } from '../../../../../components/common/input-label/InputLabel';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
+
+jest.mock('../../../../../components/common/input-label/InputLabel', () => ({
+    InputLabel: ({ htmlFor, text, isRequired }: InputLabelProps) => (
+        <div data-testid="input-label-mock">
+            Label: {text} {isRequired && '*'} (for: {htmlFor})
+        </div>
+    ),
+}));
 
 jest.mock('../../../../../components/common/modal/Modal', () => {
     const ModalMock = ({ isOpen, children }: any) => (isOpen ? <div data-testid="modal">{children}</div> : null);
@@ -54,8 +63,7 @@ describe('DeleteCategoryModal', () => {
 
     const getModal = () => screen.queryByTestId('modal');
     const getTitle = () => screen.queryByText(PROGRAM_CATEGORY_TEXT.FORM.TITLE.DELETE_CATEGORY);
-    const getCategorySelect = () =>
-        screen.getByRole('combobox', { name: `* ${PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}` });
+    const getCategorySelect = () => screen.getByRole('combobox');
     const getCancelButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
     const getDeleteButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.DELETE);
     const getHintBox = () => screen.queryByTestId('hint-box');

@@ -1,4 +1,6 @@
 /* eslint-disable no-unused-vars */
+import { VisibilityStatus } from './admin/Common';
+
 export type ModalState = {
     add: boolean;
     confirmPublish: boolean;
@@ -7,17 +9,12 @@ export type ModalState = {
 
 export type StatusFilter = 'Усі' | 'Опубліковано' | 'Чернетка';
 
-export enum Status {
-    Draft,
-    Published,
-}
-
-export const mapStatusFilterToStatus = (filter: StatusFilter): Status | null => {
+export const mapStatusFilterToStatus = (filter: StatusFilter): VisibilityStatus | null => {
     switch (filter) {
         case 'Опубліковано':
-            return Status.Published;
+            return VisibilityStatus.Published;
         case 'Чернетка':
-            return Status.Draft;
+            return VisibilityStatus.Draft;
         case 'Усі':
         default:
             return null;

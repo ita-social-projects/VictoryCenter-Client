@@ -187,5 +187,3 @@ export const ProgramsApi = {
         mockCategories.splice(index, 1);
     },
 };
-
-export default ProgramsApi;

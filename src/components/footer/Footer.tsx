@@ -45,6 +45,18 @@ export const Footer = () => {
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
     };
+    const handleFacebookClick = () => {
+        window.open(FACEBOOK, '_blank', 'noopener,noreferrer');
+    };
+
+    const handleTelegramClick = () => {
+        window.open(TELEGRAM, '_blank', 'noopener,noreferrer');
+    };
+
+    const handleInstagramClick = () => {
+        window.open(INSTAGRAM, '_blank', 'noopener,noreferrer');
+    };
+
     return (
         <div className="footer-content">
             <div className="main-block">
@@ -117,22 +129,13 @@ export const Footer = () => {
                     </button>
                 </div>
                 <div className="social_media">
-                    <button
-                        className="contact-item"
-                        onClick={() => window.open(FACEBOOK, '_blank', 'noopener,noreferrer')}
-                    >
+                    <button className="contact-item" onClick={handleFacebookClick}>
                         Facebook
                     </button>
-                    <button
-                        className="contact-item"
-                        onClick={() => window.open(TELEGRAM, '_blank', 'noopener,noreferrer')}
-                    >
+                    <button className="contact-item" onClick={handleTelegramClick}>
                         Telegram
                     </button>
-                    <button
-                        className="contact-item"
-                        onClick={() => window.open(INSTAGRAM, '_blank', 'noopener,noreferrer')}
-                    >
+                    <button className="contact-item" onClick={handleInstagramClick}>
                         Instagram
                     </button>
                 </div>

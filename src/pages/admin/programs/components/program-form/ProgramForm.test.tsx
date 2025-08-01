@@ -1,13 +1,23 @@
 import React, { createRef } from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from './ProgramForm';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramCategory } from '../../../../../types/admin/Programs';
+import { InputLabelProps } from '../../../../../components/common/input-label/InputLabel';
 import { Image } from '../../../../../types/Image';
+import { VisibilityStatus } from '../../../../../types/admin/Common';
 
-jest.mock('../../../../../components/common/multi-select/MultiSelect', () => ({
-    MultiSelect: (props: any) => (
+jest.mock('../../../../../components/common/input-label/InputLabel', () => ({
+    InputLabel: ({ htmlFor, text, isRequired }: InputLabelProps) => (
+        <div data-testid="input-label-mock">
+            Label: {text} {isRequired && '*'} (for: {htmlFor})
+        </div>
+    ),
+}));
+
+jest.mock('../../../../../components/common/multi-select-input/MultiSelectInput', () => ({
+    MultiSelectInput: (props: any) => (
         <select
             multiple
             data-testid="categories-select"
@@ -119,7 +129,7 @@ describe('ProgramForm', () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
 
         await act(async () => {
-            formRef.current?.submit('Draft');
+            formRef.current?.submit(VisibilityStatus.Draft);
         });
 
         expect(await screen.findByText(PROGRAM_VALIDATION.name.getRequiredError())).toBeInTheDocument();
@@ -131,7 +141,7 @@ describe('ProgramForm', () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
 
         await act(async () => {
-            formRef.current?.submit('Published');
+            formRef.current?.submit(VisibilityStatus.Published);
         });
 
         expect(await screen.findByText(PROGRAM_VALIDATION.name.getRequiredError())).toBeInTheDocument();
@@ -170,7 +180,7 @@ describe('ProgramForm', () => {
         fireEvent.change(screen.getByTestId('categories-select'), { target: { value: ['1'] } });
 
         await act(async () => {
-            formRef.current?.submit('Draft');
+            formRef.current?.submit(VisibilityStatus.Draft);
         });
 
         await waitFor(() => {
@@ -179,7 +189,7 @@ describe('ProgramForm', () => {
                     name: 'Нова чернетка',
                     categories: [mockCategories[0]],
                 }),
-                'Draft',
+                VisibilityStatus.Draft,
             );
         });
     });
@@ -193,7 +203,7 @@ describe('ProgramForm', () => {
         fireEvent.change(screen.getByTestId('img-input'), { target: { files: [mockFile] } });
 
         await act(async () => {
-            formRef.current?.submit('Published');
+            formRef.current?.submit(VisibilityStatus.Published);
         });
 
         await waitFor(() => {
@@ -204,7 +214,7 @@ describe('ProgramForm', () => {
                     description: 'Дуже важливий опис',
                     img: mockFile,
                 }),
-                'Published',
+                VisibilityStatus.Published,
             );
         });
     });
@@ -213,7 +223,7 @@ describe('ProgramForm', () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
 
         await act(async () => {
-            formRef.current?.submit('Published');
+            formRef.current?.submit(VisibilityStatus.Published);
         });
 
         await waitFor(() => {

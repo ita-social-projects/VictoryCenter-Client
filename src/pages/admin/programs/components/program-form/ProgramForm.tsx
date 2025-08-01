@@ -1,15 +1,15 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle, useCallback, useMemo } from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-scheme';
-import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
+import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { ProgramCategory } from '../../../../../types/admin/Programs';
 import { VisibilityStatus } from '../../../../../types/admin/Common';
-import { MultiSelect } from '../../../../../components/common/multi-select/MultiSelect';
+import { MultiSelectInput } from '../../../../../components/common/multi-select-input/MultiSelectInput';
 import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
+import { InputLabel } from '../../../../../components/common/input-label/InputLabel';
 import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
 import { TextAreaWithCharacterLimit } from '../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { Image, ImageValues, ImageValuesToImage, ImageToImageValue } from '../../../../../types/Image';
 import './program-form.scss';
-import { Image, ImageValues } from '../../../../../types/Image';
 
 export interface ProgramFormValues {
     name: string;
@@ -27,8 +27,8 @@ export interface FormErrorState {
 
 export interface ProgramFormRef {
     submit: (status: VisibilityStatus) => void;
-    isDirty: () => boolean;
     isValid: (isPublishing?: boolean) => boolean;
+    isDirty: () => boolean;
 }
 
 export interface ProgramFormProps {
@@ -52,28 +52,6 @@ const hasErrors = (errors: FormErrorState): boolean => {
     return Object.values(errors).some((error) => error !== undefined);
 };
 
-const ImageToImageValue = (image: Image | null) => {
-    if (!image) return null;
-
-    return {
-        size: image.size,
-        base64: image.base64,
-        mimeType: image.mimeType,
-    };
-};
-
-const ImageValuesToImage = (imageValues: ImageValues | null) => {
-    if (!imageValues) return null;
-
-    const image: Image = {
-        id: null,
-        size: imageValues.size,
-        base64: imageValues.base64,
-        mimeType: imageValues.mimeType,
-    };
-    return image;
-};
-
 export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
     ({ initialData = null, onSubmit, formDisabled, categories = [], onValidationChange }: ProgramFormProps, ref) => {
         const defaultFormState = useMemo<ProgramFormValues>(
@@ -92,7 +70,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         const [isSubmitting, setIsSubmitting] = useState(false);
 
         const reset = useCallback(
-            (data?: ProgramFormValues) => {
+            (data: ProgramFormValues | null) => {
                 const newState = data || defaultFormState;
                 setFormState(newState);
                 setInitialFormState(newState);
@@ -113,7 +91,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [formState],
         );
 
-        // Валідація форми при зміні стану
         useEffect(() => {
             const formErrors = validateForm(formState, false);
             const isFormValid = !hasErrors(formErrors);
@@ -124,11 +101,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         }, [formState, onValidationChange]);
 
         useEffect(() => {
-            if (initialData) {
-                reset(initialData);
-            } else {
-                reset();
-            }
+            reset(initialData);
         }, [initialData, reset]);
 
         // Name handlers
@@ -177,7 +150,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 if (isSubmitting) return;
 
                 setIsSubmitting(true);
-                const isPublishing = status === 'Published';
+                const isPublishing = status === VisibilityStatus.Published;
 
                 try {
                     const formErrors = validateForm(formState, isPublishing);
@@ -205,11 +178,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             <form className="program-form-main" data-testid="test-form" noValidate>
                 {/* Categories Field */}
                 <div className="form-group">
-                    <label htmlFor="categories">
-                        <span className="required-field">*</span>
-                        {PROGRAMS_TEXT.FORM.LABEL.CATEGORY}
-                    </label>
-                    <MultiSelect
+                    <InputLabel htmlFor={'categories'} text={PROGRAMS_TEXT.FORM.LABEL.CATEGORY} isRequired />
+                    <MultiSelectInput
                         value={formState.categories}
                         onChange={handleCategoriesChange}
                         onBlur={handleCategoriesBlur}
@@ -224,10 +194,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
                 {/* Name Field */}
                 <div className="form-group">
-                    <label htmlFor="name">
-                        <span className="required-field">*</span>
-                        {PROGRAMS_TEXT.FORM.LABEL.NAME}
-                    </label>
+                    <InputLabel htmlFor={'name'} text={PROGRAMS_TEXT.FORM.LABEL.NAME} isRequired />
                     <InputWithCharacterLimit
                         value={formState.name}
                         onChange={handleNameChange}
@@ -242,7 +209,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
                 {/* Description Field */}
                 <div className="form-group">
-                    <label htmlFor="description">{PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION}</label>
+                    <InputLabel htmlFor={'description'} text={PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION} />
                     <TextAreaWithCharacterLimit
                         value={formState.description}
                         onChange={handleDescriptionChange}
@@ -258,7 +225,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
                 {/* Image Field */}
                 <div className="form-group">
-                    <label htmlFor="img">{PROGRAMS_TEXT.FORM.LABEL.PHOTO}</label>
+                    <InputLabel htmlFor={'img'} text={PROGRAMS_TEXT.FORM.LABEL.PHOTO} />
                     <PhotoInput
                         value={ImageToImageValue(formState.img)}
                         onChange={handleImgChange}

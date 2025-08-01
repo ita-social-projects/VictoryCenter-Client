@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import PhotoInput from './PhotoInput';
+import { PhotoInput } from './PhotoInput';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ImageValues } from '../../../types/Image';
 

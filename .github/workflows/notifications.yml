@@ -1,0 +1,27 @@
+name: discord message
+on: [push]
+jobs:
+  build:
+    name: Build
+    runs-on: runner-stage-front
+    steps:
+      - uses: actions/checkout@master
+      - name: Get current date and time
+        id: datetime
+        run: echo "datetime=$(date -u)" >> $GITHUB_OUTPUT
+
+      - name: send custom message
+        uses: appleboy/discord-action@v1.2.0
+        with:
+          webhook_url: ${{ secrets.WEBHOOK_URL }}
+          message: |
+              The "${{ github.event_name }}" event triggered first step
+              Time (UTC): ${{ steps.datetime.outputs.datetime }}
+              The Repository: ${{ github.repository }}
+              Runner: ${{ runner.name }} / OS: ${{ runner.os }} / Arch: ${{ runner.arch }}
+              Branch: ${{ github.ref_name }}
+              Job: ${{ github.job }}
+              Actor: ${{ github.actor }}
+              
+
+             

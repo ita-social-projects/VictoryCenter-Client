@@ -1,5 +1,6 @@
 import React from 'react';
 import InfoIcon from '../../../assets/icons/info.svg';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './hint-box.scss';
 
 export interface HintBoxProps {
@@ -11,7 +12,7 @@ export const HintBox = ({ title, text }: HintBoxProps) => {
     return (
         <div className="hint-box">
             <div className="hint-box-title">
-                <img src={InfoIcon} alt="hint-icon" />
+                <img src={InfoIcon} alt={COMMON_TEXT_ADMIN.ALT.HINT} />
                 <span>{title}</span>
             </div>
             {text && <span>{text}</span>}

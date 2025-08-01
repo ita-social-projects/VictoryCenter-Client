@@ -27,7 +27,7 @@ describe('Select Component', () => {
         render(<Select {...defaultProps} />);
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).toBeInTheDocument();
-        expect(screen.getByAltText('arrow-down')).toBeInTheDocument();
+        expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST)).toBeInTheDocument();
         expect(screen.getByRole('img')).toHaveAttribute('src', 'chevron-down.svg');
     });
 

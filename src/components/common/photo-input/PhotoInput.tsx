@@ -135,7 +135,7 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
                 <div className="photo-preview">
                     <img
                         src={mapImageToBase64(previewImage) ?? undefined}
-                        alt="Preview"
+                        alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
                         className="preview-image"
                         data-testid="preview-image"
                     />

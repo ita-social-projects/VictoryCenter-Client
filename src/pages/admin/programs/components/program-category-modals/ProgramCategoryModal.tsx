@@ -240,6 +240,22 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
         return mode === 'add' ? `add-category-${field}` : `edit-category-${field}`;
     };
 
+    const handleSaveConfirmClose = useCallback(() => {
+        setShowSaveConfirmModal(false);
+    }, []);
+
+    const handleSaveConfirmCancel = useCallback(() => {
+        setShowSaveConfirmModal(false);
+    }, []);
+
+    const handleCloseConfirmClose = useCallback(() => {
+        setShowCloseConfirmModal(false);
+    }, []);
+
+    const handleCloseConfirmCancel = useCallback(() => {
+        setShowCloseConfirmModal(false);
+    }, []);
+
     return (
         <>
             <Modal isOpen={isOpen} onClose={handleClose}>
@@ -319,9 +335,9 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                 title={COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-                onClose={() => setShowSaveConfirmModal(false)}
-                onCancel={() => setShowSaveConfirmModal(false)}
-                onConfirm={() => onSubmit()}
+                onClose={handleSaveConfirmClose}
+                onCancel={handleSaveConfirmCancel}
+                onConfirm={onSubmit}
             />
 
             {/* CLose confirmation */}
@@ -330,8 +346,8 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-                onClose={() => setShowCloseConfirmModal(false)}
-                onCancel={() => setShowCloseConfirmModal(false)}
+                onClose={handleCloseConfirmClose}
+                onCancel={handleCloseConfirmCancel}
                 onConfirm={handleConfirmClose}
             />
         </>

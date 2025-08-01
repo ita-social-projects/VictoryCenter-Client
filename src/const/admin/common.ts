@@ -13,6 +13,12 @@ export const COMMON_TEXT_ADMIN = {
         COLLAPSE_OPTIONS_LIST: 'Закрити список опцій',
         OPTION_SELECTED: 'Опцію вибрано',
         OPTION_NOT_SELECTED: 'Опцію не вибрано',
+        SHOW_TOOLTIP: 'Показати підказку',
+        HIDE_TOOLTIP: 'ховати підказку',
+        HINT: 'Підказка',
+        OPEN_MENU: 'Відкрити меню',
+        CLOSE_MENU: 'Закрити меню',
+        IMAGE_PREVIEW: "Прев'ю зображення",
     },
 
     INPUT: {

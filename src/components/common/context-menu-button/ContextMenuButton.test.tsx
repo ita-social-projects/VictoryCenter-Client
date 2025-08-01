@@ -2,6 +2,7 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ContextMenuButton } from './ContextMenuButton';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 describe('ContextMenuButton', () => {
     const mockOnOptionSelected = jest.fn();
@@ -19,7 +20,7 @@ describe('ContextMenuButton', () => {
         );
 
         expect(screen.getByRole('menu')).toBeInTheDocument();
-        expect(screen.getByAltText('menu')).toBeInTheDocument();
+        expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.OPEN_MENU)).toBeInTheDocument();
         expect(screen.getByText('Option 1')).toBeInTheDocument();
         expect(screen.getByText('Option 2')).toBeInTheDocument();
     });
@@ -32,7 +33,7 @@ describe('ContextMenuButton', () => {
             </ContextMenuButton>,
         );
 
-        const iconElement = screen.getByAltText('menu');
+        const iconElement = screen.getByAltText(COMMON_TEXT_ADMIN.ALT.OPEN_MENU)!;
         expect(iconElement).toHaveAttribute('src', customIcon);
     });
 

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback, useId } from 'react';
 import InfoIcon from '../../../assets/icons/info.svg';
 import classNames from 'classnames';
 import './button-tooltip.scss';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 export interface ButtonTooltipProps {
     children: React.ReactNode;
@@ -84,7 +85,11 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
             aria-label="Show additional information"
             aria-describedby={isVisible ? tooltipId : undefined}
         >
-            <img className="button-tooltip-icon" src={InfoIcon} alt="tooltip icon" />
+            <img
+                className="button-tooltip-icon"
+                src={InfoIcon}
+                alt={isVisible ? COMMON_TEXT_ADMIN.ALT.HIDE_TOOLTIP : COMMON_TEXT_ADMIN.ALT.SHOW_TOOLTIP}
+            />
 
             {isVisible && (
                 <div

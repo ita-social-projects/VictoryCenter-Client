@@ -1,7 +1,7 @@
 import { TeamMember, TeamMemberDto } from '../../../../../types/admin/TeamMembers';
 import { MemberFormValues } from '../../../../../pages/admin/team/components/member-form/MemberForm';
 import { AxiosInstance } from 'axios';
-import { Status } from '../../../../../types/Common';
+import { VisibilityStatus } from '../../../../../types/admin/Common';
 import { ImagesApi } from '../../image-data-fetch/ImageDataApi';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
@@ -9,7 +9,7 @@ export const TeamMembersApi = {
     getAll: async (
         client: AxiosInstance,
         categoryId?: number,
-        status?: Status | null,
+        status?: VisibilityStatus | null,
         offset?: number,
         limit?: number,
     ): Promise<TeamMember[]> => {
@@ -33,19 +33,19 @@ export const TeamMembersApi = {
     },
 
     updateDraft: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
-        await TeamMembersApi.updateMember(client, id, member, Status.Draft);
+        await TeamMembersApi.updateMember(client, id, member, VisibilityStatus.Draft);
     },
 
     updatePublish: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
-        await TeamMembersApi.updateMember(client, id, member, Status.Published);
+        await TeamMembersApi.updateMember(client, id, member, VisibilityStatus.Published);
     },
 
     postDraft: async (client: AxiosInstance, member: MemberFormValues) => {
-        await TeamMembersApi.postMember(client, member, Status.Draft);
+        await TeamMembersApi.postMember(client, member, VisibilityStatus.Draft);
     },
 
     postPublished: async (client: AxiosInstance, member: MemberFormValues) => {
-        await TeamMembersApi.postMember(client, member, Status.Published);
+        await TeamMembersApi.postMember(client, member, VisibilityStatus.Published);
     },
 
     delete: async (client: AxiosInstance, id: number) => {
@@ -59,7 +59,7 @@ export const TeamMembersApi = {
         });
     },
 
-    updateMember: async (client: AxiosInstance, id: number, member: MemberFormValues, status: Status) => {
+    updateMember: async (client: AxiosInstance, id: number, member: MemberFormValues, status: VisibilityStatus) => {
         let imageIdToDelete: number | null = null;
         let finalImageId = member.imageId;
 
@@ -90,7 +90,7 @@ export const TeamMembersApi = {
         }
     },
 
-    postMember: async (client: AxiosInstance, member: MemberFormValues, status: Status) => {
+    postMember: async (client: AxiosInstance, member: MemberFormValues, status: VisibilityStatus) => {
         let imageId: number | null = null;
         if (member.image) {
             const imageResult = await ImagesApi.post(client, member.image);
@@ -112,6 +112,6 @@ export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): TeamMember => 
     img: dto.image,
     fullName: dto.fullName,
     description: dto.description,
-    status: dto.status === Status.Draft ? COMMON_TEXT_ADMIN.STATUS.DRAFT : COMMON_TEXT_ADMIN.STATUS.PUBLISHED,
+    status: dto.status === VisibilityStatus.Draft ? COMMON_TEXT_ADMIN.STATUS.DRAFT : COMMON_TEXT_ADMIN.STATUS.PUBLISHED,
     category: dto.category,
 });

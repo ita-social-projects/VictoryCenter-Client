@@ -3,7 +3,7 @@ import { MemberFormValues } from '../../../../../pages/admin/team/components/mem
 import { TeamMemberDto } from '../../../../../types/admin/TeamMembers';
 import { mapTeamMemberDtoToTeamMember, TeamMembersApi } from './TeamMembersApi';
 import { Image, ImageValues } from '../../../../../types/Image';
-import { Status } from '../../../../../types/Common';
+import { VisibilityStatus } from '../../../../../types/admin/Common';
 import { ImagesApi } from '../../image-data-fetch/ImageDataApi';
 
 const mockClient = {
@@ -71,7 +71,7 @@ describe('TeamMembersApi', () => {
         });
 
         it('should send GET request with all query parameters', async () => {
-            const params = { categoryId: 3, status: Status.Published, offset: 10, limit: 5 };
+            const params = { categoryId: 3, status: VisibilityStatus.Published, offset: 10, limit: 5 };
             mockClient.get.mockResolvedValue({ data: [] });
 
             await TeamMembersApi.getAll(mockClient, params.categoryId, params.status, params.offset, params.limit);
@@ -114,7 +114,7 @@ describe('TeamMembersApi', () => {
             expect(mockClient.post).toHaveBeenCalledWith('/TeamMembers', {
                 fullName: memberValues.fullName,
                 categoryId: memberValues.category.id,
-                status: Status.Draft,
+                status: VisibilityStatus.Draft,
                 description: memberValues.description,
                 email: '',
                 imageId: null,
@@ -132,7 +132,7 @@ describe('TeamMembersApi', () => {
             expect(mockClient.post).toHaveBeenCalledWith('/TeamMembers', {
                 fullName: memberValues.fullName,
                 categoryId: memberValues.category.id,
-                status: Status.Draft,
+                status: VisibilityStatus.Draft,
                 description: memberValues.description,
                 email: '',
                 imageId: mockImageResponse.id,
@@ -149,7 +149,7 @@ describe('TeamMembersApi', () => {
             expect(mockClient.post).toHaveBeenCalledWith('/TeamMembers', {
                 fullName: memberValues.fullName,
                 categoryId: memberValues.category.id,
-                status: Status.Published,
+                status: VisibilityStatus.Published,
                 description: memberValues.description,
                 email: '',
                 imageId: mockImageResponse.id,
@@ -175,7 +175,7 @@ describe('TeamMembersApi', () => {
             expect(mockClient.put).toHaveBeenCalledWith(`/TeamMembers/${memberId}`, {
                 fullName: memberWithExistingImage.fullName,
                 categoryId: memberWithExistingImage.category.id,
-                status: Status.Draft,
+                status: VisibilityStatus.Draft,
                 description: memberWithExistingImage.description,
                 email: '',
                 imageId: null,
@@ -195,7 +195,7 @@ describe('TeamMembersApi', () => {
             expect(mockClient.put).toHaveBeenCalledWith(`/TeamMembers/${memberId}`, {
                 fullName: memberWithNewImage.fullName,
                 categoryId: memberWithNewImage.category.id,
-                status: Status.Published,
+                status: VisibilityStatus.Published,
                 description: memberWithNewImage.description,
                 email: '',
                 imageId: mockImageResponse.id,
@@ -212,7 +212,7 @@ describe('TeamMembersApi', () => {
             expect(mockClient.put).toHaveBeenCalledWith(`/TeamMembers/${memberId}`, {
                 fullName: memberWithUpdatedImage.fullName,
                 categoryId: memberWithUpdatedImage.category.id,
-                status: Status.Published,
+                status: VisibilityStatus.Published,
                 description: memberWithUpdatedImage.description,
                 email: '',
                 imageId: mockImageResponse.id,
@@ -227,7 +227,7 @@ describe('TeamMembersApi', () => {
             expect(mockClient.put).toHaveBeenCalledWith(`/TeamMembers/${memberId}`, {
                 fullName: memberWithRemovedImage.fullName,
                 categoryId: memberWithRemovedImage.category.id,
-                status: Status.Published,
+                status: VisibilityStatus.Published,
                 description: memberWithRemovedImage.description,
                 email: '',
                 imageId: null,
@@ -267,17 +267,17 @@ describe('TeamMembersApi', () => {
             description: 'Desc',
             image: mockImageResponse,
             email: '',
-            status: Status.Draft,
+            status: VisibilityStatus.Draft,
         };
 
         it('should map DTO with Draft status correctly', () => {
-            const dto = { ...baseDto, status: Status.Draft };
+            const dto = { ...baseDto, status: VisibilityStatus.Draft };
             const result = mapTeamMemberDtoToTeamMember(dto);
             expect(result.status).toBe('Чернетка');
         });
 
         it('should map DTO with Published status correctly', () => {
-            const dto = { ...baseDto, status: Status.Published };
+            const dto = { ...baseDto, status: VisibilityStatus.Published };
             const result = mapTeamMemberDtoToTeamMember(dto);
             expect(result.status).toBe('Опубліковано');
         });

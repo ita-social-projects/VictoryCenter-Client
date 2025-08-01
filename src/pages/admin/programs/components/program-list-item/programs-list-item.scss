@@ -1,0 +1,151 @@
+.program-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 120px;
+
+    height: 120px;
+    padding: 30px;
+    background: #fdfdfb;
+    border-bottom: 0.3px solid #06112559;
+    box-shadow: 0 1px 2.8px 0 #00000026;
+
+    .program-info {
+        display: flex;
+        flex: 1;
+        flex-direction: row;
+        align-items: center;
+        gap: 70px;
+        height: 60px;
+
+        &-identity {
+            display: flex;
+            flex: 3;
+            flex-direction: row;
+            align-items: center;
+            gap: 16px;
+
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 28px;
+
+            img {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                flex-shrink: 0;
+            }
+
+            p {
+                margin: 0;
+                display: -webkit-box;
+                -webkit-line-clamp: 4;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                overflow-wrap: break-word;
+                word-break: break-word;
+                text-align: left;
+            }
+        }
+
+        &-description {
+            flex: 4;
+            display: flex;
+            align-items: center;
+
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 28px;
+
+            p {
+                margin: 0;
+                display: -webkit-box;
+                -webkit-line-clamp: 4;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                overflow-wrap: break-word;
+                word-break: break-word;
+                text-overflow: ellipsis;
+            }
+        }
+
+        &-status {
+            flex: 0 0 180px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100%;
+        }
+    }
+
+    .program-actions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 84px;
+        height: 100%;
+
+        &-tooltip {
+            display: flex;
+            flex-direction: column;
+            width: auto;
+            white-space: nowrap;
+            gap: 4px;
+
+            b {
+                color: #0f2957;
+                font-size: 18px;
+                font-weight: 500;
+                line-height: 28px;
+            }
+
+            span {
+                color: #0f2957;
+                font-size: 16px;
+                font-weight: 400;
+                line-height: 24px;
+            }
+        }
+
+        &-buttons {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+
+            .edit-btn,
+            .delete-btn {
+                width: 24px;
+                height: 24px;
+                border: none;
+                cursor: pointer;
+                background-repeat: no-repeat;
+                background-size: cover;
+            }
+
+            .edit-btn {
+                background: url('../../../../../assets/icons/edit.svg');
+
+                &:active {
+                    background: url('../../../../../assets/icons/edit-filled.svg');
+                }
+            }
+
+            .delete-btn {
+                background: url('../../../../../assets/icons/delete.svg');
+
+                &:active {
+                    background: url('../../../../../assets/icons/delete-filled.svg');
+                }
+            }
+        }
+    }
+
+    .tooltip-icon {
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+    }
+}

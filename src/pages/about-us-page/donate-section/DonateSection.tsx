@@ -1,12 +1,10 @@
 import './donate-section.scss';
 import background from '../../../assets/about-us-images/images/donate-background.jpg';
+import { routes } from '../../../const/routers/routes';
 import { DONATE_TITLE, DONATE_DETAILS, DONATE, BECOME_PARTNER } from '../../../const/about-us-page/about-us-page';
+import { Link } from 'react-router';
 
 export const DonateSection = () => {
-    const handleDonate = () => {
-        // TODO: implementation of making donats
-    };
-
     const handlePartner = () => {
         // TODO: implementation of becoming a partner
     };
@@ -19,9 +17,9 @@ export const DonateSection = () => {
                 <div className="donate-details">
                     <h3>{DONATE_DETAILS}</h3>
                     <div className="donate-buttons">
-                        <button className="donate-button" onClick={handleDonate} aria-label="Make a donation">
+                        <Link to={routes.donatePageRoute} className="donate-button" aria-label="Make a donation">
                             {DONATE}
-                        </button>
+                        </Link>
                         <button className="partner-button" onClick={handlePartner} aria-label="Become a partner">
                             {BECOME_PARTNER}
                         </button>

@@ -29,6 +29,7 @@ export const AdminPageContent = () => {
             <h1 className="header">{headerInfo}</h1>
             <p className="content">{contentInfo}</p>
             <NavLink to="/admin-page/team">teams</NavLink>
+            <NavLink to="/admin-page/programs">programs</NavLink>
         </div>
     );
 };

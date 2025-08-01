@@ -11,7 +11,7 @@
     align-items: center;
     box-sizing: border-box;
     background-color: white;
-    box-shadow: 0 0 4px #80808073;
+    box-shadow: 0 0 4px rgba($grey-850, 0.451);
     margin-bottom: 8px;
 }
 
@@ -20,7 +20,7 @@
     background: transparent;
     height: 100%;
     width: 60px;
-    box-shadow: 0 0 4px #80808073;
+    box-shadow: 0 0 4px rgba($grey-850, 0.451);
     display: flex;
     justify-content: center;
     align-items: center;

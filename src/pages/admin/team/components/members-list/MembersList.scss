@@ -27,7 +27,7 @@
         font-weight: 600;
         display: flex;
         background-color: #f8f8f8;
-        box-shadow: 0 0 4px #80808038;
+        box-shadow: 0 0 4px rgba($grey-850, 0.22);
 
         button {
             font-size: 24px;
@@ -46,7 +46,7 @@
 
             &:hover {
                 cursor: pointer;
-                background-color: #80808026;
+                background-color: rgba($grey-850, 0.149);
             }
         }
     }
@@ -161,7 +161,7 @@
                         gap: 10px;
                         border-radius: 8px;
                         padding: 16px;
-                        background: $pure-white;
+                        background: white;
                         border: 1px solid #d9d9d9cc;
                         box-shadow: 0 1px 0 0 #00000040;
 
@@ -251,7 +251,7 @@
 
                 &:hover {
                     cursor: pointer;
-                    background-color: #80808026;
+                    background-color: rgba($grey-850, 0.149);
                 }
             }
 

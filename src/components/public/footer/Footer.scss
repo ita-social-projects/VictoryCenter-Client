@@ -29,7 +29,7 @@
 
         a {
             text-decoration: none;
-            color: $pure-black;
+            color: black;
 
             &:hover {
                 color: $blue-300;
@@ -145,7 +145,7 @@
             background: none;
             border: none;
             padding: 0;
-            color: $pure-black;
+            color: black;
             cursor: pointer;
             transition: color 0.2s;
         }

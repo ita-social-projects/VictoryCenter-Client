@@ -1,5 +1,5 @@
-@import '../../../../../../assets/sass/variables/variables.colors';
-@import '../../../../../../assets/sass/variables/variables.fonts';
+@import '../../../../../assets/sass/variables/variables.colors';
+@import '../../../../../assets/sass/variables/variables.fonts';
 
 .card-block {
     height: 70vh;
@@ -75,6 +75,15 @@
                     justify-content: center;
                     align-items: center;
 
+                    .arrow-icon {
+                        position: absolute;
+                        top: 25%;
+                        left: 25%;
+                        width: 1.25rem;
+                        height: 1.25rem;
+                        transition: fill 0.3s ease;
+                    }
+
                     .default-img {
                         position: absolute;
                         top: 25%;
@@ -83,6 +92,8 @@
                     }
 
                     .hover-img {
+                        width: 1.25rem;
+                        height: 1.25rem;
                         position: absolute;
                         top: 0;
                         right: 0;
@@ -117,6 +128,16 @@
 
         .default-img {
             opacity: 0;
+        }
+
+        .arrow-icon {
+            color: $yellow-500;
+            width: 20rem;
+            height: 20rem;
+            position: absolute;
+            top: 0;
+            right: 0;
+            transition: fill 0.3s ease;
         }
     }
 }

@@ -1,6 +1,8 @@
+import { Image } from '../Image';
+
 export type TeamMember = {
     id: number;
-    img: string;
+    img: Image | null;
     fullName: string;
     description: string;
     status: string;
@@ -14,7 +16,7 @@ export interface TeamMemberDto {
     priority: number;
     status: number;
     description: string;
-    photo: string;
+    image: Image;
     email: string;
 }
 

@@ -1,30 +1,34 @@
-import './ProgramForm.scss';
-import React, { useEffect, useState, forwardRef, useImperativeHandle, useRef } from 'react';
-import { useForm, Controller, Resolver } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import {
-    programValidationSchema,
-    ProgramValidationContext,
-} from '../../../../../validation/admin/program-schema/program-scheme';
-import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
-import { MultiSelect } from '../../../../../components/common/multi-select/MultiSelect';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-scheme';
+import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
+import { ProgramCategory } from '../../../../../types/admin/Programs';
+import { MultiSelectInput } from '../../../../../components/common/multi-select-input/MultiSelectInput';
 import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
+import { InputLabel } from '../../../../../components/common/input-label/InputLabel';
 import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
 import { TextAreaWithCharacterLimit } from '../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { ProgramCategory } from '../../../../../types/admin/programs';
-import { VisibilityStatus } from '../../../../../types/common';
+import { Image, ImageValues, ImageValuesToImage, ImageToImageValue } from '../../../../../types/Image';
+import './ProgramForm.scss';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 
-export type ProgramFormValues = {
+export interface ProgramFormValues {
     name: string;
     categories: ProgramCategory[];
     description: string;
-    img: File | string | null;
-};
+    img: Image | null;
+}
+
+export interface FormErrorState {
+    name?: string;
+    categories?: string;
+    description?: string;
+    img?: string;
+}
 
 export interface ProgramFormRef {
     submit: (status: VisibilityStatus) => void;
-    isDirty: boolean;
+    isValid: (isPublishing?: boolean) => boolean;
+    isDirty: () => boolean;
 }
 
 export interface ProgramFormProps {
@@ -32,148 +36,204 @@ export interface ProgramFormProps {
     initialData?: ProgramFormValues | null;
     formDisabled?: boolean;
     categories?: ProgramCategory[];
+    onValidationChange?: (isValid: boolean) => void;
 }
 
-export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
-    ({ initialData = null, onSubmit, formDisabled, categories = [] }: ProgramFormProps, ref) => {
-        const [validationContext, setValidationContext] = useState<ProgramValidationContext>({
-            isPublishing: false,
-        });
-        const statusRef = useRef<VisibilityStatus | null>(null);
+const validateForm = (formState: ProgramFormValues, isPublishing: boolean): FormErrorState => {
+    return {
+        name: PROGRAM_VALIDATION_FUNCTIONS.validateName(formState.name, isPublishing),
+        categories: PROGRAM_VALIDATION_FUNCTIONS.validateCategories(formState.categories, isPublishing),
+        description: PROGRAM_VALIDATION_FUNCTIONS.validateDescription(formState.description, isPublishing),
+        img: PROGRAM_VALIDATION_FUNCTIONS.validateImg(formState.img, isPublishing),
+    };
+};
 
-        const {
-            control,
-            handleSubmit,
-            formState: { errors, isSubmitting, isDirty },
-            trigger,
-            reset,
-        } = useForm<ProgramFormValues>({
-            context: validationContext,
-            resolver: yupResolver(programValidationSchema) as Resolver<ProgramFormValues>,
-            mode: 'onBlur',
-            defaultValues: {
+const hasErrors = (errors: FormErrorState): boolean => {
+    return Object.values(errors).some((error) => error !== undefined);
+};
+
+export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
+    ({ initialData = null, onSubmit, formDisabled, categories = [], onValidationChange }: ProgramFormProps, ref) => {
+        const defaultFormState = useMemo<ProgramFormValues>(
+            () => ({
                 name: '',
                 categories: [],
                 description: '',
                 img: null,
+            }),
+            [],
+        );
+
+        const [formState, setFormState] = useState<ProgramFormValues>(defaultFormState);
+        const [errors, setErrors] = useState<FormErrorState>({});
+        const [initialFormState, setInitialFormState] = useState<ProgramFormValues>(defaultFormState);
+        const [isSubmitting, setIsSubmitting] = useState(false);
+
+        const reset = useCallback(
+            (data: ProgramFormValues | null) => {
+                const newState = data || defaultFormState;
+                setFormState(newState);
+                setInitialFormState(newState);
+                setErrors({});
             },
-        });
+            [defaultFormState],
+        );
+
+        const isDirty = useCallback(() => {
+            return JSON.stringify(formState) !== JSON.stringify(initialFormState);
+        }, [formState, initialFormState]);
+
+        const isValid = useCallback(
+            (isPublishing: boolean = false) => {
+                const formErrors = validateForm(formState, isPublishing);
+                return !hasErrors(formErrors);
+            },
+            [formState],
+        );
 
         useEffect(() => {
-            if (statusRef.current) {
-                try {
-                    const status: VisibilityStatus = statusRef.current;
-                    handleSubmit((data) => onSubmit(data, status))();
-                } finally {
-                    statusRef.current = null;
-                }
+            const formErrors = validateForm(formState, false);
+            const isFormValid = !hasErrors(formErrors);
+
+            if (onValidationChange) {
+                onValidationChange(isFormValid);
             }
-        }, [validationContext, handleSubmit, onSubmit]);
+        }, [formState, onValidationChange]);
 
         useEffect(() => {
-            if (initialData) {
-                reset(initialData);
-            } else {
-                reset({ name: '', description: '', categories: [], img: null });
-            }
+            reset(initialData);
         }, [initialData, reset]);
 
-        const submit = async (status: VisibilityStatus) => {
-            const isPublishing = status === 'Published';
-            statusRef.current = status;
-            setValidationContext({ isPublishing });
-        };
+        // Name handlers
+        const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+            const value = e.target.value;
+            setFormState((prev) => ({ ...prev, name: value }));
+        }, []);
+
+        const handleNameBlur = useCallback(() => {
+            const error = PROGRAM_VALIDATION_FUNCTIONS.validateName(formState.name, false);
+            setErrors((prev) => ({ ...prev, name: error }));
+        }, [formState.name]);
+
+        // Categories handlers
+        const handleCategoriesChange = useCallback((selectedCategories: ProgramCategory[]) => {
+            setFormState((prev) => ({ ...prev, categories: selectedCategories }));
+        }, []);
+
+        const handleCategoriesBlur = useCallback(() => {
+            const error = PROGRAM_VALIDATION_FUNCTIONS.validateCategories(formState.categories, false);
+            setErrors((prev) => ({ ...prev, categories: error }));
+        }, [formState.categories]);
+
+        // Description handlers
+        const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const value = e.target.value;
+            setFormState((prev) => ({ ...prev, description: value }));
+        }, []);
+
+        const handleDescriptionBlur = useCallback(() => {
+            const error = PROGRAM_VALIDATION_FUNCTIONS.validateDescription(formState.description, false);
+            setErrors((prev) => ({ ...prev, description: error }));
+        }, [formState.description]);
+
+        // Image handlers
+        const handleImgChange = useCallback((file: ImageValues | null) => {
+            const image = ImageValuesToImage(file);
+            setFormState((prev) => ({ ...prev, img: image }));
+            const error = PROGRAM_VALIDATION_FUNCTIONS.validateImg(image, false);
+            setErrors((prev) => ({ ...prev, img: error }));
+        }, []);
+
+        // Submit function
+        const submit = useCallback(
+            async (status: VisibilityStatus) => {
+                if (isSubmitting) return;
+
+                setIsSubmitting(true);
+                const isPublishing = status === VisibilityStatus.Published;
+
+                try {
+                    const formErrors = validateForm(formState, isPublishing);
+                    setErrors(formErrors);
+
+                    if (hasErrors(formErrors)) {
+                        return;
+                    }
+
+                    await onSubmit(formState, status);
+                } finally {
+                    setIsSubmitting(false);
+                }
+            },
+            [formState, onSubmit, isSubmitting],
+        );
 
         useImperativeHandle(ref, () => ({
             submit,
             isDirty,
+            isValid,
         }));
 
         return (
             <form className="program-form-main" data-testid="test-form" noValidate>
                 {/* Categories Field */}
                 <div className="form-group">
-                    <label htmlFor="categories">
-                        <span className="required-field">*</span>
-                        {PROGRAMS_TEXT.FORM.LABEL.CATEGORY}
-                    </label>
-                    <Controller
-                        name="categories"
-                        control={control}
-                        render={({ field }) => (
-                            <MultiSelect
-                                {...field}
-                                options={categories}
-                                disabled={isSubmitting || formDisabled}
-                                placeholder={PROGRAMS_TEXT.FORM.LABEL.SELECT_CATEGORY}
-                                getOptionId={(cat: ProgramCategory) => cat.id}
-                                getOptionName={(cat: ProgramCategory) => cat.name}
-                            />
-                        )}
+                    <InputLabel htmlFor={'categories'} text={PROGRAMS_TEXT.FORM.LABEL.CATEGORY} isRequired />
+                    <MultiSelectInput
+                        value={formState.categories}
+                        onChange={handleCategoriesChange}
+                        onBlur={handleCategoriesBlur}
+                        options={categories}
+                        disabled={isSubmitting || formDisabled}
+                        placeholder={PROGRAMS_TEXT.FORM.LABEL.SELECT_CATEGORY}
+                        getOptionId={(cat: ProgramCategory) => cat.id}
+                        getOptionName={(cat: ProgramCategory) => cat.name}
                     />
-                    {errors.categories && <span className="error">{errors.categories.message}</span>}
+                    {errors.categories && <span className="error">{errors.categories}</span>}
                 </div>
+
                 {/* Name Field */}
                 <div className="form-group">
-                    <label htmlFor="name">
-                        <span className="required-field">*</span>
-                        {PROGRAMS_TEXT.FORM.LABEL.NAME}
-                    </label>
-                    <Controller
-                        name={'name'}
-                        control={control}
-                        render={({ field }) => (
-                            <InputWithCharacterLimit
-                                {...field}
-                                id="name"
-                                name="name"
-                                maxLength={PROGRAM_VALIDATION.name.max}
-                                disabled={isSubmitting || formDisabled}
-                            />
-                        )}
+                    <InputLabel htmlFor={'name'} text={PROGRAMS_TEXT.FORM.LABEL.NAME} isRequired />
+                    <InputWithCharacterLimit
+                        value={formState.name}
+                        onChange={handleNameChange}
+                        onBlur={handleNameBlur}
+                        id="name"
+                        name="name"
+                        maxLength={PROGRAM_VALIDATION.name.max}
+                        disabled={isSubmitting || formDisabled}
                     />
-                    {errors.name && <span className="error">{errors.name.message}</span>}
+                    {errors.name && <span className="error">{errors.name}</span>}
                 </div>
+
                 {/* Description Field */}
                 <div className="form-group">
-                    <label htmlFor="description">{PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION}</label>
-                    <Controller
-                        control={control}
-                        name={'description'}
-                        render={({ field }) => (
-                            <TextAreaWithCharacterLimit
-                                {...field}
-                                id="description"
-                                name="description"
-                                rows={8}
-                                disabled={isSubmitting || formDisabled}
-                                maxLength={PROGRAM_VALIDATION.description.max}
-                            />
-                        )}
+                    <InputLabel htmlFor={'description'} text={PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION} />
+                    <TextAreaWithCharacterLimit
+                        value={formState.description}
+                        onChange={handleDescriptionChange}
+                        onBlur={handleDescriptionBlur}
+                        id="description"
+                        name="description"
+                        rows={8}
+                        disabled={isSubmitting || formDisabled}
+                        maxLength={PROGRAM_VALIDATION.description.max}
                     />
-                    {errors.description && <span className="error">{errors.description.message}</span>}
+                    {errors.description && <span className="error">{errors.description}</span>}
                 </div>
+
                 {/* Image Field */}
                 <div className="form-group">
-                    <label htmlFor="img">{PROGRAMS_TEXT.FORM.LABEL.PHOTO}</label>
-                    <Controller
-                        name={'img'}
-                        control={control}
-                        render={({ field }) => (
-                            <PhotoInput
-                                {...field}
-                                id="img"
-                                name="img"
-                                disabled={isSubmitting || formDisabled}
-                                onChange={(value) => {
-                                    // OnBlur event is not triggered in file input, that's why onChange event overridden
-                                    field.onChange(value);
-                                    trigger('img');
-                                }}
-                            />
-                        )}
+                    <InputLabel htmlFor={'img'} text={PROGRAMS_TEXT.FORM.LABEL.PHOTO} />
+                    <PhotoInput
+                        value={ImageToImageValue(formState.img)}
+                        onChange={handleImgChange}
+                        id="img"
+                        name="img"
+                        disabled={isSubmitting || formDisabled}
                     />
-                    {errors.img && <span className="error">{errors.img.message}</span>}
+                    {errors.img && <span className="error">{errors.img}</span>}
                 </div>
             </form>
         );

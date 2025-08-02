@@ -1,32 +1,33 @@
 import { render, screen } from '@testing-library/react';
 import { DonateSection } from './DonateSection';
+import { MemoryRouter } from 'react-router';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 
 describe('DonateSection', () => {
     it('should render section with correct title', () => {
-        render(<DonateSection />);
+        render(<DonateSection />, { wrapper: MemoryRouter });
         expect(screen.getByText(ABOUT_US_DATA.DONATE_TITLE)).toBeInTheDocument();
     });
 
     it('should render subtitle correctly', () => {
-        render(<DonateSection />);
+        render(<DonateSection />, { wrapper: MemoryRouter });
         expect(screen.getByText(ABOUT_US_DATA.DONATE_DETAILS)).toBeInTheDocument();
     });
 
     it('should render donate button', () => {
-        render(<DonateSection />);
+        render(<DonateSection />, { wrapper: MemoryRouter });
         expect(screen.getByText(ABOUT_US_DATA.DONATE)).toBeInTheDocument();
         expect(screen.getByText(ABOUT_US_DATA.DONATE)).toHaveClass('donate-button');
     });
 
     it('should render "become-a-partner" button correctly', () => {
-        render(<DonateSection />);
+        render(<DonateSection />, { wrapper: MemoryRouter });
         expect(screen.getByText(ABOUT_US_DATA.BECOME_PARTNER)).toBeInTheDocument();
         expect(screen.getByText(ABOUT_US_DATA.BECOME_PARTNER)).toHaveClass('partner-button');
     });
 
     it('should render background image with correct className', () => {
-        render(<DonateSection />);
+        render(<DonateSection />, { wrapper: MemoryRouter });
         const image = screen.getByAltText('Background horses');
         expect(image).toHaveClass('donate-background');
         expect(image).toHaveAttribute('src', expect.stringContaining('donate-background'));

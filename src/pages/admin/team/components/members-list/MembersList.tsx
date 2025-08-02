@@ -39,12 +39,17 @@ export const MembersList = ({
     const [totalPages, setTotalPages] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [teamMemberToDelete, setTeamMemberToDelete] = useState<string | null>(null);
-    const [totalCount, setTotalCount] = useState<number>(0);
+    // const [totalCount, setTotalCount] = useState<number>(0);
     const [members, setMembers] = useState<TeamMember[]>([]);
     const [category, setCategory] = useState<TeamCategory | null>(() => {
         const savedName = localStorage.getItem(currentTabKey);
-        return savedName as TeamCategory | null;
+        if (savedName) {
+            const s = JSON.parse(savedName) as TeamCategory;
+            return s;
+        }
+        return null;
     });
+
     const [teamCategories, setTeamCategories] = useState<TeamCategory[]>([]);
     const [isDeleteTeamMemberModalOpen, setIsDeleteTeamMemberModalOpen] = useState(false);
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -69,13 +74,14 @@ export const MembersList = ({
     const currentPageRef = useRef<number>(currentPage);
     const totalPagesRef = useRef<number | null>(totalPages);
     const categoryRef = useRef<TeamCategory | null>(category);
-
     const client = useAdminClient();
     const clientRef = useRef(client);
 
     useEffect(() => {
         clientRef.current = client;
     }, [client]);
+
+    const [isDraftMode, setIsDraftMode] = useState(false);
 
     useEffect(() => {
         currentPageRef.current = currentPage;
@@ -111,11 +117,11 @@ export const MembersList = ({
                     if (saved.id === undefined) {
                         ss = JSON.parse(saved);
                     }
-                    saved = ss;
-                    const match = categories.find((c) => c.id === saved.id);
-                    if (match) {
-                        setCategory(match);
-                    } else {
+                    if (ss) {
+                        saved = ss;
+                    }
+                    const exists = categories.filter((x) => x.id === saved.id);
+                    if (exists.length === 0) {
                         setCategory(categories[0]);
                     }
                 } catch (err) {
@@ -142,6 +148,7 @@ export const MembersList = ({
         async (reset: boolean = false) => {
             const currentCategory = categoryRef.current;
             const currentSearch = searchByNameQuery || '';
+
             if (!currentCategory || isFetchingRef.current) {
                 return;
             }
@@ -163,10 +170,15 @@ export const MembersList = ({
                     currentCategory.id,
                     mapStatusFilterToStatus(statusFilter),
                     (pageToFetch - 1) * pageSize,
-                    pageToFetch * pageSize,
+                    pageSize,
                 );
+                if (response.length === 0) {
+                    setIsMembersLoading(false);
+                    isFetchingRef.current = false;
+                    return;
+                }
                 newMembers = response;
-                setTotalCount(response.length);
+                // setTotalCount(response.length);
             } catch (err) {
                 onError?.((err as Error).message);
             }
@@ -174,7 +186,8 @@ export const MembersList = ({
                 newMembers = newMembers.filter((m) => m.fullName.toLowerCase().includes(currentSearch.toLowerCase()));
             }
 
-            const totalCountOfPages = Math.ceil(totalCount / pageSize);
+            // totalCount must be fetched from the API
+            // const totalCountOfPages = Math.ceil(totalCount / pageSize);
 
             setMembers((prev) => {
                 const updatedMembers = reset ? [...newMembers] : [...prev, ...newMembers];
@@ -184,24 +197,41 @@ export const MembersList = ({
             });
             setCurrentPage((prev) => (reset ? 2 : prev + 1));
             if (totalPagesRef.current === null || reset) {
-                setTotalPages(totalCountOfPages);
+                // temporary solution until we can fetch totalCount from the api
+                setTotalPages(null);
             }
-
             setIsMembersLoading(false);
             isFetchingRef.current = false;
         },
-        [searchByNameQuery, totalCount, pageSize, client, statusFilter, onError],
+        [searchByNameQuery, pageSize, client, statusFilter, onError],
     );
 
     useEffect(() => {
+        if (pageSize === 0) return;
+
         setMembers([]);
         setCurrentPage(1);
         setTotalPages(null);
         isFetchingRef.current = false;
+        currentPageRef.current = 1;
         loadMembers(true);
         // TODO remove eslint disable
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [category, searchByNameQuery, statusFilter, pageSize, refetchTrigger]);
+    }, [category, searchByNameQuery, statusFilter, pageSize]);
+
+    useEffect(() => {
+        if (pageSize === 0) return;
+        if (members.length === pageSize) {
+            return;
+        }
+        setMembers([]);
+        setCurrentPage(1);
+        setTotalPages(null);
+        isFetchingRef.current = false;
+        currentPageRef.current = 1;
+        loadMembers(true);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [refetchTrigger, pageSize]);
 
     const handleDragStart = (e: React.DragEvent<HTMLDivElement>, index: number) => {
         setDraggedIndex(index);
@@ -320,7 +350,6 @@ export const MembersList = ({
             el.scrollTop = el.scrollHeight;
         }
     }, [isMembersLoading]);
-
     useEffect(() => {
         if (searchByNameQuery) {
             onAutocompleteValuesChange(
@@ -343,7 +372,7 @@ export const MembersList = ({
             setIsMoveToTopVisible(false);
         }
 
-        const bottomReached = Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight) <= 5;
+        const bottomReached = Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight) === 0;
         if (bottomReached) {
             loadMembers();
         }
@@ -353,16 +382,21 @@ export const MembersList = ({
         const el = memberListRef.current;
         if (!el) return;
 
-        el.scrollTop = 0;
+        const firstChild = el.firstElementChild;
+        if (firstChild) {
+            firstChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            el.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
 
     const handleOnEditMember = (id: number) => {
         const memberToEdit = members.filter((m) => m.id === id)[0];
-        if (memberToEdit) {
+        if (memberToEdit && category) {
             setMemberToEdit({
-                category: memberToEdit.category,
-                //TODO: handle with photos
-                img: null,
+                category: category,
+                image: memberToEdit.img,
+                imageId: memberToEdit.img?.id ?? null,
                 fullName: memberToEdit.fullName,
                 description: memberToEdit.description,
             });
@@ -377,12 +411,13 @@ export const MembersList = ({
 
     const handleEditMemberOnClose = () => {
         const existingMember = members.filter((m) => m.id === memberIdToEdit)[0];
-        //check photos as well
+
         if (existingMember && memberToEdit) {
             if (
                 memberToEdit.description !== existingMember.description ||
                 memberToEdit.fullName !== existingMember.fullName ||
-                memberToEdit.category !== existingMember.category
+                memberToEdit.category !== existingMember.category ||
+                memberToEdit.image !== existingMember.img
             ) {
                 setIsConfirmCloseModalOpen(true);
                 return;
@@ -398,6 +433,8 @@ export const MembersList = ({
             if (memberToEdit && memberIdToEdit != null) {
                 await TeamMembersApi.updateDraft(client, memberIdToEdit, memberToEdit);
                 await loadMembers(true);
+                setIsEditMemberModalOpen(false);
+                setIsDraftMode(false);
             }
         } catch (err) {
             onError?.((err as Error).message);
@@ -432,7 +469,7 @@ export const MembersList = ({
         if (
             isEditMemberModalOpen &&
             (memberToEdit === null ||
-                (memberToEdit.img === null &&
+                (memberToEdit.image === null &&
                     !memberToEdit.category &&
                     !memberToEdit.fullName &&
                     !memberToEdit.description))
@@ -479,7 +516,6 @@ export const MembersList = ({
     return (
         <>
             {dragPreview?.visible && dragPreview?.member ? <MemberDragPreview dragPreview={dragPreview} /> : <></>}
-
             <div className="members">
                 <div
                     data-testid="members-categories"
@@ -534,7 +570,6 @@ export const MembersList = ({
                     </div>
                 </Modal.Actions>
             </Modal>
-
             {isEditMemberModalOpen && (
                 <Modal onClose={handleEditMemberOnClose} isOpen={isEditMemberModalOpen}>
                     <Modal.Title>{TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER}</Modal.Title>
@@ -545,13 +580,20 @@ export const MembersList = ({
                             id="edit-member-modal"
                             onSubmit={handleMemberEdit}
                             onError={onError}
+                            onDraftSubmit={handleSaveAsDraft}
+                            isDraft={isDraftMode}
                         />
                     </Modal.Content>
                     <Modal.Actions>
-                        <Button onClick={handleSaveAsDraft} buttonStyle={'secondary'}>
+                        <Button
+                            buttonStyle={'secondary'}
+                            formId="edit-member-modal"
+                            type="submit"
+                            onClick={() => setIsDraftMode(true)}
+                        >
                             {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
                         </Button>
-                        <Button form="edit-member-modal" type={'submit'} buttonStyle={'primary'}>
+                        <Button formId="edit-member-modal" type="submit" buttonStyle={'primary'}>
                             {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                         </Button>
                     </Modal.Actions>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, createEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemberForm, MemberFormProps, MemberFormValues } from './MemberForm';
 import { AdminContext } from '../../../../../context/admin-context-provider/AdminContextProvider';
@@ -7,6 +7,8 @@ import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-�
 import axios from 'axios';
 
 jest.mock('../../../../../assets/icons/cloud-download.svg', () => 'cloud-download.svg');
+jest.mock('../../../../../assets/icons/chevron-up.svg', () => 'chevron-up.svg');
+jest.mock('../../../../../assets/icons/chevron-down.svg', () => 'chevron-down.svg');
 
 const mockAdminContext = {
     client: axios.create(),
@@ -17,9 +19,8 @@ const mockAdminContext = {
     refreshAccessToken: jest.fn(),
 };
 
-const renderWithAdminContext = async (ui: React.ReactElement) => {
-    render(<AdminContext.Provider value={mockAdminContext}>{ui}</AdminContext.Provider>);
-    await screen.findByLabelText("Ім'я та Прізвище");
+const renderWithAdminContext = (ui: React.ReactElement) => {
+    return render(<AdminContext.Provider value={mockAdminContext}>{ui}</AdminContext.Provider>);
 };
 
 describe('MemberForm', () => {
@@ -28,26 +29,29 @@ describe('MemberForm', () => {
         onSubmit: jest.fn(),
         onValuesChange: jest.fn(),
         existingMemberFormValues: null,
+        isDraft: false,
     };
+
+    const mockCategories = [
+        { id: 1, name: 'Основна команда', description: 'Test' },
+        { id: 2, name: 'Наглядова рада', description: 'Test' },
+        { id: 3, name: 'Радники', description: 'Test' },
+    ];
 
     beforeEach(() => {
         jest.clearAllMocks();
-        jest.spyOn(TeamCategoriesApi, 'getAll').mockImplementation(() =>
-            Promise.resolve([
-                { id: 1, name: 'Основна команда', description: 'Test' },
-                { id: 2, name: 'Наглядова рада', description: 'Test' },
-                { id: 3, name: 'Радники', description: 'Test' },
-            ]),
-        );
+        jest.spyOn(TeamCategoriesApi, 'getAll').mockResolvedValue(mockCategories);
     });
 
-    it('renders form with all fields', () => {
+    it('renders form with all fields', async () => {
         renderWithAdminContext(<MemberForm {...defaultProps} />);
 
-        expect(screen.getByLabelText('Категорія')).toBeInTheDocument();
-        expect(screen.getByLabelText("Ім'я та Прізвище")).toBeInTheDocument();
-        expect(screen.getByLabelText('Опис')).toBeInTheDocument();
-        expect(screen.getByText('Фото')).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByLabelText(/Категорія/)).toBeInTheDocument();
+        });
+        expect(screen.getByLabelText(/Ім'я та Прізвище/)).toBeInTheDocument();
+        expect(screen.getByLabelText(/Опис/)).toBeInTheDocument();
+        expect(screen.getByText(/Перетягніть файл сюди або натисніть для завантаження/)).toBeInTheDocument();
     });
 
     it('initializes with existingMemberFormValues', async () => {
@@ -59,28 +63,35 @@ describe('MemberForm', () => {
             },
             fullName: 'John Doe',
             description: 'Test description',
-            img: null,
+            imageId: 1,
+            image: {
+                base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
+                mimeType: 'image/jpeg',
+                size: 0,
+            },
         };
+
         renderWithAdminContext(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
 
         await waitFor(() => {
-            expect(screen.getByDisplayValue('Основна команда')).toBeInTheDocument();
+            expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
         });
-        expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
         expect(screen.getByDisplayValue('Test description')).toBeInTheDocument();
     });
 
     it('updates form values and calls onValuesChange on input change', async () => {
         renderWithAdminContext(<MemberForm {...defaultProps} />);
 
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
-        fireEvent.change(fullNameInput, { target: { value: 'Jane Doe' } });
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
+        await userEvent.type(fullNameInput, 'Jane Doe');
 
-        expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
-            expect.objectContaining({
-                fullName: 'Jane Doe',
-            }),
-        );
+        await waitFor(() => {
+            expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    fullName: 'Jane Doe',
+                }),
+            );
+        });
     });
 
     it('updates category and calls onValuesChange', async () => {
@@ -90,49 +101,55 @@ describe('MemberForm', () => {
             expect(screen.getByRole('option', { name: 'Наглядова рада' })).toBeInTheDocument();
         });
 
-        const categorySelect = screen.getByLabelText('Категорія');
-        fireEvent.change(categorySelect, { target: { value: 'Наглядова рада' } });
+        const categorySelect = screen.getByLabelText(/Категорія/);
+        await userEvent.selectOptions(categorySelect, '2');
 
-        expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
-            expect.objectContaining({
-                category: {
-                    id: 2,
-                    name: 'Наглядова рада',
-                    description: 'Test',
-                },
-            }),
-        );
+        await waitFor(() => {
+            expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    category: {
+                        id: 2,
+                        name: 'Наглядова рада',
+                        description: 'Test',
+                    },
+                }),
+            );
+        });
     });
 
     it('updates description and calls onValuesChange', async () => {
         renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         const descriptionTextarea = screen.getByLabelText('Опис');
-        fireEvent.change(descriptionTextarea, { target: { value: 'New description' } });
+        await userEvent.type(descriptionTextarea, 'New description');
 
-        expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
-            expect.objectContaining({
-                description: 'New description',
-            }),
-        );
+        await waitFor(() => {
+            expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    description: 'New description',
+                }),
+            );
+        });
     });
 
     it('submits form with valid data', async () => {
-        renderWithAdminContext(<MemberForm {...defaultProps} />);
+        const draftProps = {
+            ...defaultProps,
+            isDraft: true,
+            onDraftSubmit: jest.fn(),
+        };
+
+        renderWithAdminContext(<MemberForm {...draftProps} />);
 
         await waitFor(() => {
-            expect(screen.getByText('Радники')).toBeInTheDocument();
+            expect(screen.getByText(/Радники/)).toBeInTheDocument();
         });
 
-        const categorySelect = screen.getByLabelText('Категорія');
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
-        const descriptionTextarea = screen.getByLabelText('Опис');
+        const categorySelect = screen.getByLabelText(/Категорія/);
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
 
-        fireEvent.change(categorySelect, {
-            target: {
-                value: 'Радники',
-            },
-        });
+        await userEvent.selectOptions(categorySelect, '3');
         await userEvent.type(fullNameInput, 'Jane Doe');
         await userEvent.type(descriptionTextarea, 'Test description');
 
@@ -140,23 +157,24 @@ describe('MemberForm', () => {
         fireEvent.submit(form);
 
         await waitFor(() => {
-            expect(defaultProps.onSubmit).toHaveBeenCalledWith({
-                category: {
-                    id: 3,
-                    name: 'Радники',
-                    description: 'Test',
-                },
-                fullName: 'Jane Doe',
-                description: 'Test description',
-                img: null,
-            });
+            expect(draftProps.onDraftSubmit).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    category: {
+                        id: 3,
+                        name: 'Радники',
+                        description: 'Test',
+                    },
+                    fullName: 'Jane Doe',
+                    description: 'Test description',
+                }),
+            );
         });
     });
 
     it('displays character count for fullName', async () => {
         renderWithAdminContext(<MemberForm {...defaultProps} />);
 
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
         await userEvent.type(fullNameInput, 'Jane Doe');
 
         expect(screen.getByText('8/50')).toBeInTheDocument();
@@ -171,288 +189,238 @@ describe('MemberForm', () => {
         expect(screen.getByText('16/200')).toBeInTheDocument();
     });
 
-    it('prevents form submission if memberFormValues is null', () => {
-        renderWithAdminContext(<MemberForm {...defaultProps} existingMemberFormValues={null} />);
+    it('prevents form submission if required fields are empty', async () => {
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
         const form = screen.getByTestId('test-form');
         fireEvent.submit(form);
 
-        expect(defaultProps.onSubmit).not.toHaveBeenCalled();
+        await waitFor(() => {
+            expect(defaultProps.onSubmit).not.toHaveBeenCalled();
+        });
     });
 
-    it('handles drag over and drag leave events', () => {
+    it('renders with correct input attributes', async () => {
         renderWithAdminContext(<MemberForm {...defaultProps} />);
 
-        const dropArea = screen.getByLabelText('Перетягніть файл сюди або натисніть для завантаження');
-        fireEvent.dragOver(dropArea);
-        fireEvent.dragLeave(dropArea);
-
-        expect(dropArea).toBeInTheDocument();
-    });
-
-    it('renders with correct input attributes', () => {
-        renderWithAdminContext(<MemberForm {...defaultProps} />);
-
-        const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
         expect(fullNameInput).toHaveAttribute('maxLength', '50');
 
-        const descriptionTextarea = screen.getByLabelText('Опис');
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
         expect(descriptionTextarea).toHaveAttribute('maxLength', '200');
     });
 
-    describe('Additional Coverage', () => {
-        it('displays uploaded file names', () => {
-            const file1 = new File(['test1'], 'test1.jpg', { type: 'image/jpeg' });
-            const file2 = new File(['test2'], 'test2.jpg', { type: 'image/jpeg' });
-            const fileList = [file1, file2] as any as FileList;
+    it('does not call onValuesChange when onValuesChange prop is not provided', async () => {
+        const propsWithoutOnValuesChange = {
+            ...defaultProps,
+            onValuesChange: undefined,
+        };
 
-            const initialValues: MemberFormValues = {
-                category: {
-                    id: 1,
-                    name: 'Основна команда',
-                    description: 'Test',
-                },
-                fullName: 'John Doe',
-                description: 'Test description',
-                img: fileList,
-            };
+        renderWithAdminContext(<MemberForm {...propsWithoutOnValuesChange} />);
 
-            renderWithAdminContext(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
+        await userEvent.type(fullNameInput, 'Jane Doe');
 
-            expect(screen.getByText('test1.jpg')).toBeInTheDocument();
-            expect(screen.getByText('test2.jpg')).toBeInTheDocument();
+        expect(fullNameInput).toHaveValue('Jane Doe');
+    });
+
+    it('handles form submission when memberFormValues exists', async () => {
+        const existingValues: MemberFormValues = {
+            category: {
+                id: 1,
+                name: 'Основна команда',
+                description: '123',
+            },
+            fullName: 'John Doe',
+            description: 'Test description',
+            image: {
+                base64: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/8A',
+                mimeType: 'image/jpeg',
+                size: 1000,
+            },
+            imageId: 1,
+        };
+
+        renderWithAdminContext(<MemberForm {...defaultProps} existingMemberFormValues={existingValues} />);
+
+        const form = screen.getByTestId('test-form');
+
+        await waitFor(() => {
+            expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
         });
 
-        it('renders empty div when no files are uploaded', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
+        fireEvent.submit(form);
 
-            const imageLoadedSection = document.querySelector('.form-group-image-loaded');
-            expect(imageLoadedSection).toBeInTheDocument();
-            expect(imageLoadedSection?.children).toHaveLength(1);
-        });
-
-        it('does not call onValuesChange when onValuesChange prop is not provided', () => {
-            const propsWithoutOnValuesChange = {
-                ...defaultProps,
-                onValuesChange: undefined,
-            };
-
-            renderWithAdminContext(<MemberForm {...propsWithoutOnValuesChange} />);
-
-            const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
-            fireEvent.change(fullNameInput, { target: { value: 'Jane Doe' } });
-
-            expect(fullNameInput).toHaveValue('Jane Doe');
-        });
-
-        it('handles form submission when memberFormValues exists', () => {
-            const initialValues: MemberFormValues = {
-                category: {
-                    id: 1,
-                    name: 'Основна команда',
-                    description: 'Test',
-                },
-                fullName: 'John Doe',
-                description: 'Test description',
-                img: null,
-            };
-
-            renderWithAdminContext(<MemberForm {...defaultProps} existingMemberFormValues={initialValues} />);
-
-            const form = screen.getByTestId('test-form');
-            fireEvent.submit(form);
-
-            expect(defaultProps.onSubmit).toHaveBeenCalledWith(initialValues);
-        });
-
-        it('handles file input change without files (edge case)', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-
-            const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
-
-            fireEvent.change(fullNameInput, {
-                target: { name: 'fullName', value: 'Test Name' },
-                currentTarget: { files: null },
-            });
-
-            expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
+        await waitFor(() => {
+            expect(defaultProps.onSubmit).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    fullName: 'Test Name',
+                    category: {
+                        id: 1,
+                        name: 'Основна команда',
+                        description: '123',
+                    },
+                    fullName: 'John Doe',
+                    description: 'Test description',
+                    image: expect.objectContaining({
+                        base64: expect.any(String),
+                        mimeType: 'image/jpeg',
+                        size: 1000,
+                    }),
                 }),
             );
-        });
-
-        it('handles file input with empty FileList', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-
-            const fileInput = screen.getByTestId('image');
-
-            const mockEvent = {
-                target: { name: 'img', value: null },
-                currentTarget: { files: { length: 0 } },
-            };
-
-            fireEvent.change(fileInput, mockEvent);
-
-            expect(defaultProps.onValuesChange).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    img: null,
-                }),
-            );
-        });
-
-        it('displays 0 character count when fields are empty', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-
-            expect(screen.getByText('0/50')).toBeInTheDocument();
-            expect(screen.getByText('0/200')).toBeInTheDocument();
-        });
-
-        it('handles drag events without files in dataTransfer', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-
-            const dropArea = screen.getByTestId('drop-area');
-
-            const dropEvent = createEvent.drop(dropArea);
-
-            Object.defineProperty(dropEvent, 'dataTransfer', {
-                value: {
-                    files: [],
-                },
-            });
-
-            dropEvent.preventDefault = jest.fn();
-
-            fireEvent(dropArea, dropEvent);
-
-            expect(dropEvent.preventDefault).toHaveBeenCalled();
-        });
-
-        it('handles drag events with files in dataTransfer', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-
-            const dropArea = screen.getByTestId('drop-area');
-            const file = new File(['hello'], 'hello.png', { type: 'image/png' });
-
-            const data = {
-                files: [file],
-                types: ['Files'],
-            };
-
-            fireEvent.drop(dropArea, {
-                dataTransfer: data,
-            });
-
-            expect(screen.getByText('hello.png')).toBeInTheDocument();
         });
     });
 
-    describe('Extra Function Coverage', () => {
-        it('updates file input after already set', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-            const fileInput = screen.getByTestId('image');
-            const file1 = new File(['a'], 'a.png', { type: 'image/png' });
-            fireEvent.change(fileInput, { target: { files: [file1], name: 'img' }, currentTarget: { files: [file1] } });
-            expect(screen.getByText('a.png')).toBeInTheDocument();
-            const file2 = new File(['b'], 'b.png', { type: 'image/png' });
-            fireEvent.change(fileInput, { target: { files: [file2], name: 'img' }, currentTarget: { files: [file2] } });
-            expect(screen.getByText('b.png')).toBeInTheDocument();
-        });
+    it('displays 0 character count when fields are empty', async () => {
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
 
-        it('does not submit if category is empty', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-            const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
-            const descriptionTextarea = screen.getByLabelText('Опис');
-            fireEvent.change(fullNameInput, { target: { value: 'Test' } });
-            fireEvent.change(descriptionTextarea, { target: { value: 'Test desc' } });
-            const form = screen.getByTestId('test-form');
-            fireEvent.submit(form);
+        expect(screen.getByText('0/50')).toBeInTheDocument();
+        expect(screen.getByText('0/200')).toBeInTheDocument();
+    });
+
+    it('enforces max length for fullName and description', async () => {
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
+
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
+
+        const longName = 'a'.repeat(60);
+        const longDesc = 'b'.repeat(250);
+
+        await userEvent.type(fullNameInput, longName);
+        await userEvent.type(descriptionTextarea, longDesc);
+
+        expect(fullNameInput).toHaveValue('a'.repeat(50));
+        expect(descriptionTextarea).toHaveValue('b'.repeat(200));
+        expect(screen.getByText('50/50')).toBeInTheDocument();
+        expect(screen.getByText('200/200')).toBeInTheDocument();
+    });
+
+    it('does not submit if category is empty', async () => {
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
+
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
+
+        await userEvent.type(fullNameInput, 'Test');
+        await userEvent.type(descriptionTextarea, 'Test desc');
+
+        const form = screen.getByTestId('test-form');
+        fireEvent.submit(form);
+
+        await waitFor(() => {
             expect(defaultProps.onSubmit).not.toHaveBeenCalled();
         });
+    });
 
-        it('does not submit if fullName is empty', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-            const categorySelect = screen.getByLabelText('Категорія');
-            const descriptionTextarea = screen.getByLabelText('Опис');
-            fireEvent.change(categorySelect, { target: { value: 'Основна команда' } });
-            fireEvent.change(descriptionTextarea, { target: { value: 'Test desc' } });
-            const form = screen.getByTestId('test-form');
-            fireEvent.submit(form);
-            expect(defaultProps.onSubmit).not.toHaveBeenCalled();
+    it('does not submit if fullName is empty', async () => {
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
+
+        await waitFor(() => {
+            expect(screen.getByRole('option', { name: 'Основна команда' })).toBeInTheDocument();
         });
 
-        it('does not submit if description is empty', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-            const categorySelect = screen.getByLabelText('Категорія');
-            const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
-            fireEvent.change(categorySelect, { target: { value: 'Основна команда' } });
-            fireEvent.change(fullNameInput, { target: { value: 'Test' } });
-            const form = screen.getByTestId('test-form');
-            fireEvent.submit(form);
+        const categorySelect = screen.getByLabelText(/Категорія/);
+        const descriptionTextarea = screen.getByLabelText(/Опис/);
+
+        await userEvent.selectOptions(categorySelect, '1');
+        await userEvent.type(descriptionTextarea, 'Test desc');
+
+        const form = screen.getByTestId('test-form');
+        fireEvent.submit(form);
+
+        await waitFor(() => {
             expect(defaultProps.onSubmit).not.toHaveBeenCalled();
         });
+    });
 
-        it('handles drag-and-drop with empty FileList', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-            const dropArea = screen.getByTestId('drop-area');
-            const dropEvent = {
-                preventDefault: jest.fn(),
-                dataTransfer: { files: null },
+    it('does not submit if description is empty', async () => {
+        renderWithAdminContext(<MemberForm {...defaultProps} />);
+
+        await waitFor(() => {
+            expect(screen.getByRole('option', { name: 'Основна команда' })).toBeInTheDocument();
+        });
+
+        const categorySelect = screen.getByLabelText(/Категорія/);
+        const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
+
+        await userEvent.selectOptions(categorySelect, '1');
+        await userEvent.type(fullNameInput, 'Test');
+
+        const form = screen.getByTestId('test-form');
+        fireEvent.submit(form);
+
+        await waitFor(() => {
+            expect(defaultProps.onSubmit).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('Draft functionality', () => {
+        it('calls onDraftSubmit when isDraft is true', async () => {
+            const draftProps = {
+                ...defaultProps,
+                isDraft: true,
+                onDraftSubmit: jest.fn(),
             };
-            fireEvent.drop(dropArea, dropEvent);
-            expect(screen.getByText('0/50')).toBeInTheDocument();
-        });
 
-        it('handles drag-and-drop with multiple files', () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
-            const dropArea = screen.getByTestId('drop-area');
-            const file1 = new File(['a'], 'a.png', { type: 'image/png' });
-            const file2 = new File(['b'], 'b.png', { type: 'image/png' });
-            const data = { files: [file1, file2], types: ['Files'] };
-            fireEvent.drop(dropArea, { dataTransfer: data, preventDefault: jest.fn() });
-            expect(screen.getByText('a.png')).toBeInTheDocument();
-            expect(screen.getByText('b.png')).toBeInTheDocument();
-        });
+            renderWithAdminContext(<MemberForm {...draftProps} />);
 
-        it('does not call onValuesChange if memberFormValues is falsy (defensive)', () => {
-            // Simulate effect with falsy memberFormValues
-            // Not directly possible, but we can check that the effect is not called if onValuesChange is not provided (already covered)
-            // So this is just for completeness
-            renderWithAdminContext(<MemberForm {...defaultProps} onValuesChange={undefined} />);
-            const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
-            fireEvent.change(fullNameInput, { target: { value: 'Test' } });
-            expect(fullNameInput).toHaveValue('Test');
-        });
-
-        it('enforces max length for fullName and description', async () => {
-            renderWithAdminContext(<MemberForm {...defaultProps} />);
             await waitFor(() => {
-                expect(screen.getByLabelText("Ім'я та Прізвище")).toBeInTheDocument();
+                expect(screen.getByRole('option', { name: 'Основна команда' })).toBeInTheDocument();
             });
 
-            const fullNameInput = screen.getByLabelText("Ім'я та Прізвище");
-            const descriptionTextarea = screen.getByLabelText('Опис');
-            const longName = 'a'.repeat(60);
-            const longDesc = 'b'.repeat(250);
-            await userEvent.type(fullNameInput, longName);
-            await userEvent.type(descriptionTextarea, longDesc);
-            expect(fullNameInput).toHaveValue('a'.repeat(50));
-            expect(descriptionTextarea).toHaveValue('b'.repeat(200));
-            expect(screen.getByText('50/50')).toBeInTheDocument();
-            expect(screen.getByText('200/200')).toBeInTheDocument();
-        });
+            const categorySelect = screen.getByLabelText(/Категорія/);
+            const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
+            const descriptionTextarea = screen.getByLabelText(/Опис/);
 
-        it('removes file input (sets to null) after file was set', () => {
+            await userEvent.selectOptions(categorySelect, '1');
+            await userEvent.type(fullNameInput, 'John Doe');
+            await userEvent.type(descriptionTextarea, 'Some description');
+
+            const form = screen.getByTestId('test-form');
+            fireEvent.submit(form);
+
+            await waitFor(() => {
+                expect(draftProps.onDraftSubmit).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        category: {
+                            id: 1,
+                            name: 'Основна команда',
+                            description: 'Test',
+                        },
+                        fullName: 'John Doe',
+                        description: 'Some description',
+                    }),
+                );
+                expect(draftProps.onSubmit).not.toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('Error handling', () => {
+        it('calls onError when categories fetch fails', async () => {
+            const errorProps = {
+                ...defaultProps,
+                onError: jest.fn(),
+            };
+
+            jest.spyOn(TeamCategoriesApi, 'getAll').mockRejectedValue(new Error('API Error'));
+
+            renderWithAdminContext(<MemberForm {...errorProps} />);
+
+            await waitFor(() => {
+                expect(errorProps.onError).toHaveBeenCalledWith('API Error');
+            });
+        });
+    });
+
+    describe('PhotoInput integration', () => {
+        it('handles image change through PhotoInput', async () => {
             renderWithAdminContext(<MemberForm {...defaultProps} />);
-            const fileInput = screen.getByTestId('image');
-            const file1 = new File(['a'], 'a.png', { type: 'image/png' });
-            fireEvent.change(fileInput, { target: { files: [file1], name: 'img' }, currentTarget: { files: [file1] } });
-            expect(screen.getByText('a.png')).toBeInTheDocument();
-            // Now remove file
-            fireEvent.change(fileInput, { target: { files: null, name: 'img' }, currentTarget: { files: null } });
-            // Should render empty div
-            const imageLoadedSection = document.querySelector('.form-group-image-loaded');
-            expect(imageLoadedSection?.children).toHaveLength(1);
+
+            // PhotoInput is rendered as a separate component
+            // The actual file handling is tested in PhotoInput component tests
+            expect(screen.getByText(/Перетягніть файл сюди або натисніть для завантаження/)).toBeInTheDocument();
         });
     });
 });

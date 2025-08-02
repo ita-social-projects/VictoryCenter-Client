@@ -11,12 +11,6 @@ export const Header = () => {
         console.log('CONTACT USED!');
     };
 
-    const onDonateClick = () => {
-        //TODO: remove this log after implementing an actual logic
-        //eslint-disable-next-line no-console
-        console.log('DONATE!');
-    };
-
     return (
         <div className="headerBlock">
             <div className="logoContainer">
@@ -29,8 +23,12 @@ export const Header = () => {
                 <nav>
                     <Link to={PUBLIC_ROUTES.ABOUT_US.FULL}>{ABOUT_US}</Link>
                     <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{PROGRAMS}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{REPORTING}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{HOW_TO_SUPPORT}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                        {REPORTING}
+                    </Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                        {HOW_TO_SUPPORT}
+                    </Link>
                 </nav>
             </div>
 
@@ -38,9 +36,9 @@ export const Header = () => {
                 <button className="contactUsButton" onClick={onContactUsClick}>
                     {CONTACT_US}
                 </button>
-                <button className="donateButton" onClick={onDonateClick}>
+                <Link to={PUBLIC_ROUTES.DONATE.FULL} className="button donateButton">
                     {DONATE}
-                </button>
+                </Link>
             </div>
         </div>
     );

@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { MemberDragPreview } from './MemberDragPreview';
+import { Image } from '../../../../../types/Image';
 import { TeamMember } from '../../../../../types/admin/team-members';
 import { DragPreviewModel } from '../../../../../types/admin/common';
 
@@ -26,11 +27,18 @@ jest.mock('../member-component/MemberComponent', () => ({
     },
 }));
 
+const mockImage: Image = {
+    id: 1,
+    base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
+    mimeType: 'image/jpeg',
+    size: 0,
+};
+
 const mockMember: TeamMember = {
     id: 1,
     fullName: 'John Doe',
     description: 'Software Engineer',
-    img: 'https://example.com/john.jpg',
+    img: mockImage,
     status: 'Чернетка',
     category: {
         id: 1,
@@ -153,7 +161,7 @@ describe('MemberDragPreview', () => {
                 id: 2,
                 fullName: 'Jane Smith',
                 description: 'Product Manager',
-                img: 'https://example.com/jane.jpg',
+                img: mockImage,
                 status: 'Опубліковано',
                 category: {
                     id: 1,

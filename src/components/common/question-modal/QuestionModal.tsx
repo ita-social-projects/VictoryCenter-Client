@@ -1,4 +1,3 @@
-import React from 'react';
 import { Button } from '../button/Button';
 import { Modal } from '../modal/Modal';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
@@ -12,7 +11,7 @@ type QuestionModalProps = {
     cancelText: string;
     onConfirm: () => void;
     onCancel: () => void;
-    isSubmitting?: boolean;
+    isButtonsDisabled?: boolean;
 };
 
 export const QuestionModal = ({
@@ -24,17 +23,17 @@ export const QuestionModal = ({
     onConfirm,
     onCancel,
     content = null,
-    isSubmitting = false,
+    isButtonsDisabled = false,
 }: QuestionModalProps) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <Modal.Title>{title}</Modal.Title>
             <Modal.Content>{content && <p>{content}</p>}</Modal.Content>
             <Modal.Actions>
-                <Button onClick={onCancel} buttonStyle="secondary" disabled={isSubmitting}>
+                <Button onClick={onCancel} buttonStyle="secondary" disabled={isButtonsDisabled}>
                     {cancelText || COMMON_TEXT_ADMIN.BUTTON.NO}
                 </Button>
-                <Button onClick={onConfirm} buttonStyle="primary" disabled={isSubmitting}>
+                <Button onClick={onConfirm} buttonStyle="primary" disabled={isButtonsDisabled}>
                     {confirmText || COMMON_TEXT_ADMIN.BUTTON.YES}
                 </Button>
             </Modal.Actions>

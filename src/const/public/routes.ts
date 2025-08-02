@@ -12,6 +12,10 @@ export const PUBLIC_ROUTES = {
         PATH: 'programs',
         FULL: '/programs',
     },
+    DONATE: {
+        PATH: 'donate',
+        FULL: '/donate',
+    },
     MOCK: {
         PATH: 'about-us',
         FULL: '/about-us',

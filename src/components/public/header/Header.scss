@@ -1,5 +1,6 @@
 @import '../../../assets/sass/variables/_variables.colors';
 @import '../../../assets/sass/variables/variables.fonts';
+@import '../../../assets/sass/mixins/utilits.mixins';
 
 .headerBlock {
     display: flex;
@@ -36,18 +37,12 @@
             gap: 3rem;
 
             a {
-                color: $blue-900;
-                font-family: $mulish-regular-font;
                 font-size: 1rem;
+                @include link-base($blue-900, $blue-300, $blue-100);
                 font-weight: 600;
-                text-decoration: none;
 
-                &:hover {
-                    color: $blue-300;
-                }
-
-                &:active {
-                    color: $blue-100;
+                &.disable {
+                    @include link-disabled();
                 }
             }
         }
@@ -75,6 +70,10 @@
             width: 7.5rem;
             height: 2.5rem;
             cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
             border: 1px solid $blue-900;
         }
     }

@@ -12,14 +12,16 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
 
         &:active {
             background-color: $blue-900;
             cursor: pointer;
         }
 
-        &:hover {
-            cursor: pointer;
+        &:disabled {
+            background-color: #d2d2c7;
+            cursor: not-allowed;
         }
 
         &-disabled {
@@ -35,18 +37,24 @@
         color: $blue-500;
         background-color: white;
         outline: none;
-        transition: background-color 0.2s;
+        transition:
+            background-color 0.2s,
+            border-color 0.2s;
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
 
         &:active {
             background-color: $blue-50;
             cursor: pointer;
         }
 
-        &:hover {
-            cursor: pointer;
+        &:disabled {
+            border-color: #d2d2c7;
+            color: #a9a9a9;
+            background-color: white;
+            cursor: not-allowed;
         }
 
         &-disabled {

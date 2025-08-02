@@ -52,7 +52,10 @@ export const Select = <TValue,>({
             role={'toolbar'}
             ref={selectContainerRef}
             onClick={handleContainerClick}
-            className={`${className ?? ''} select ${isOpen ? 'select-opened' : 'select-closed'}`}
+            className={classNames('select', className, {
+                'select-opened': isOpen,
+                'select-closed': !isOpen,
+            })}
             tabIndex={0}
             onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -65,9 +68,12 @@ export const Select = <TValue,>({
                     'not-empty': selectedValue !== null && selectedValue !== undefined,
                 })}
             >
-                {selectedName !== null ? selectedName : (placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT)}
+                {selectedName ?? placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT}
             </span>
-            <img src={isOpen ? ArrowUp : ArrowDown} alt="arrow-down" />
+            <img
+                src={isOpen ? ArrowUp : ArrowDown}
+                alt={isOpen ? COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST : COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST}
+            />
             {isOpen && (
                 <div className={'select-options'}>
                     {options.map((opt, index) => {
@@ -76,7 +82,9 @@ export const Select = <TValue,>({
                         return (
                             <button
                                 key={`${name}-${index}`}
-                                className={!isAutocomplete && selectedValue === value ? 'select-options-selected' : ''}
+                                className={classNames({
+                                    'select-options-selected': !isAutocomplete && selectedValue === value,
+                                })}
                                 onClick={(e) => handleOptionClick(e, value, name)}
                             >
                                 <span>{name}</span>
@@ -89,6 +97,4 @@ export const Select = <TValue,>({
     );
 };
 
-Select.Option = <TValue,>({ children, value, name }: { children?: React.ReactNode; value: TValue; name: string }) => (
-    <>{children}</>
-);
+Select.Option = <TValue,>({ children }: { children?: React.ReactNode; value: TValue; name: string }) => <>{children}</>;

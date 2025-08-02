@@ -7,9 +7,21 @@ export const COMMON_TEXT_ADMIN = {
     ALT: {
         DELETE: 'Видалити',
         UPLOAD: 'Завантажити',
+        SCROLL_TO_TOP: 'Прокрутити вгору',
+        NOT_FOUND: 'Не знайдено',
+        EXPAND_OPTIONS_LIST: 'Відкрити список опцій',
+        COLLAPSE_OPTIONS_LIST: 'Закрити список опцій',
+        OPTION_SELECTED: 'Опцію вибрано',
+        OPTION_NOT_SELECTED: 'Опцію не вибрано',
+        SHOW_TOOLTIP: 'Показати підказку',
+        HIDE_TOOLTIP: 'ховати підказку',
+        HINT: 'Підказка',
+        OPEN_MENU: 'Відкрити меню',
+        CLOSE_MENU: 'Закрити меню',
+        IMAGE_PREVIEW: "Прев'ю зображення",
     },
 
-    FORM: {
+    INPUT: {
         PHOTO_PLACEHOLDER: 'Перетягніть файл сюди або натисніть для завантаження',
     },
 
@@ -31,7 +43,7 @@ export const COMMON_TEXT_ADMIN = {
     FILTER: {
         SEARCH_BY_NAME: 'Пошук за назвою',
         STATUS: {
-            ALL: 'Усі',
+            ALL: 'Всі записи',
             PUBLISHED: 'Опубліковано',
             DRAFT: 'Чернетка',
         },
@@ -42,7 +54,8 @@ export const COMMON_TEXT_ADMIN = {
     },
 
     QUESTION: {
-        CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE: 'Зміни буде втрачено. Бажаєте продовжити?',
+        SAVE_CHANGES: 'Зберегти зміни?',
+        CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE: 'Зміни будуть втрачені. Бажаєте продовжити?',
         REMOVE_FROM_PUBLICATION: 'Зняти з публікації?',
         PUBLISH_CHANGES: 'Опублікувати зміни?',
     },

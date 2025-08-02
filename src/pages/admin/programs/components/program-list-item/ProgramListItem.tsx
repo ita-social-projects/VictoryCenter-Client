@@ -1,9 +1,11 @@
-import './ProgramListItem.scss';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonTooltip } from '../../../../../components/common/button-tooltip/ButtonTooltip';
-import { Status } from '../../../../../components/admin/status/Status';
+import { VisibilityStatusLabel } from '../../../../../components/common/visibility-status-label/VisibilityStatusLabel';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { VisibilityStatus } from '../../../../../types/admin/common';
+import { Program } from '../../../../../types/admin/Programs';
+import { mapImageToBase64 } from '../../../../../utils/functions/mapImageToBase64';
 import BlankImage from '../../../../../assets/icons/blank-image.svg';
-import { Program } from '../../../../../types/admin/programs';
+import './ProgramListItem.scss';
 
 export interface ProgramListItemProps {
     program: Program;
@@ -12,25 +14,27 @@ export interface ProgramListItemProps {
 }
 
 export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditProgram }: ProgramListItemProps) => {
+    const OnEditProgram = () => handleOnEditProgram(program);
+    const OnDeleteProgram = () => handleOnDeleteProgram(program);
     return (
         <div className="program-item">
             <div className="program-info">
                 <div className="program-info-identity">
-                    <img src={program.img || BlankImage} alt={`${program.name}-img`} />
+                    <img src={mapImageToBase64(program.img) || BlankImage} alt={`${program.name}-img`} />
                     <p>{program.name}</p>
                 </div>
                 <div className="program-info-description">
                     <p>{program.description}</p>
                 </div>
                 <div className="program-info-status">
-                    <Status status={program.status} />
+                    <VisibilityStatusLabel status={program.status} />
                 </div>
             </div>
             <div className="program-actions">
                 <ButtonTooltip position="bottom">
                     <div className="program-actions-tooltip">
                         <b>
-                            {program.status === 'Published'
+                            {program.status === VisibilityStatus.Published
                                 ? COMMON_TEXT_ADMIN.TOOLTIP.PUBLISHED_IN
                                 : COMMON_TEXT_ADMIN.TOOLTIP.DRAFTED_IN}
                         </b>
@@ -40,8 +44,18 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
                     </div>
                 </ButtonTooltip>
                 <div className="program-actions-buttons">
-                    <button type="button" onClick={() => handleOnEditProgram(program)} className="edit-btn" />
-                    <button type="button" onClick={() => handleOnDeleteProgram(program)} className="delete-btn" />
+                    <button
+                        type="button"
+                        onClick={OnEditProgram}
+                        className="edit-btn"
+                        aria-label={`Edit ${program.name}`}
+                    />
+                    <button
+                        type="button"
+                        onClick={OnDeleteProgram}
+                        className="delete-btn"
+                        aria-label={`Delete ${program.name}`}
+                    />
                 </div>
             </div>
         </div>

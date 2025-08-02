@@ -14,7 +14,7 @@ export const MainValues = () => {
             </div>
             <div className="people-block">
                 {ABOUT_US_DATA.PEOPLE_DATA.map(({ IMG, ALT, INFO, CARD_CLASS }, index) => (
-                    <div key={ALT} className={`people-card ${CARD_CLASS}`}>
+                    <div key={`${ALT}-${index}`} className={`people-card ${CARD_CLASS}`}>
                         <img src={IMG} alt={ALT} />
                         <p className="people-info">{INFO}</p>
                     </div>

@@ -28,8 +28,8 @@ export const AdminPageContent = () => {
         <div className="admin-page-content">
             <h1 className="header">{headerInfo}</h1>
             <p className="content">{contentInfo}</p>
-            <NavLink to={ADMIN_ROUTES.TEAM.FULL}></NavLink>
-            <NavLink to={ADMIN_ROUTES.PROGRAMS.FULL}></NavLink>
+            <NavLink to={ADMIN_ROUTES.TEAM.FULL}>teams</NavLink>
+            <NavLink to={ADMIN_ROUTES.PROGRAMS.FULL}>programs</NavLink>
         </div>
     );
 };

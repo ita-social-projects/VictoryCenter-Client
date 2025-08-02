@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { HintBox } from './HintBox';
 
 jest.mock('../../../assets/icons/info.svg', () => 'mocked-info-icon.svg');
@@ -9,7 +10,7 @@ describe('HintBox', () => {
         render(<HintBox title={title} />);
 
         expect(screen.getByText(title)).toBeInTheDocument();
-        expect(screen.getByAltText('hint-icon')).toBeInTheDocument();
+        expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.HINT)).toBeInTheDocument();
     });
 
     it('renders title and text when text is provided', () => {
@@ -45,9 +46,8 @@ describe('HintBox', () => {
         const title = 'Test title';
         render(<HintBox title={title} />);
 
-        const icon = screen.getByAltText('hint-icon') as HTMLImageElement;
+        const icon = screen.getByAltText(COMMON_TEXT_ADMIN.ALT.HINT) as HTMLImageElement;
         expect(icon.src).toContain('mocked-info-icon.svg');
-        expect(icon.alt).toBe('hint-icon');
     });
 
     it('renders empty text correctly', () => {

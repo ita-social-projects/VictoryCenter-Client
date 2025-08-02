@@ -1,12 +1,13 @@
-import './ProgramCategoryModal.scss';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/common/button/Button';
 import { HintBox } from '../../../../../components/common/hint-box/HintBox';
+import { InputLabel } from '../../../../../components/common/input-label/InputLabel';
+import { ProgramCategory } from '../../../../../types/admin/Programs';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
-import { ProgramCategory } from '../../../../../types/admin/programs';
+import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
+import './ProgramCategoryModal.scss';
 
 interface DeleteCategoryModalProps {
     isOpen: boolean;
@@ -19,20 +20,18 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
     const [categoryId, setCategoryId] = useState<number>(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
-    const isSubmittingRef = useRef(false);
 
     const selectedCategory = categories.find((cat) => cat.id === categoryId);
 
     const handleSubmit = async () => {
-        if (isSubmittingRef.current || !selectedCategory || selectedCategory.programsCount > 0) return;
+        if (isSubmitting || !selectedCategory || selectedCategory.programsCount > 0) return;
 
         setError('');
 
         try {
-            isSubmittingRef.current = true;
             setIsSubmitting(true);
 
-            await ProgramsApi.deleteCategory(selectedCategory.id);
+            await ProgramsApi.deleteProgramCategory(selectedCategory.id);
 
             onDeleteCategory(selectedCategory.id);
             setCategoryId(0);
@@ -40,7 +39,6 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
         } catch {
             setError(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
         } finally {
-            isSubmittingRef.current = false;
             setIsSubmitting(false);
         }
     };
@@ -74,10 +72,11 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
             <Modal.Content>
                 <div className="program-form-main">
                     <div className="form-group">
-                        <label htmlFor="delete-category-select">
-                            <span className="required-field">*</span>
-                            {PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
-                        </label>
+                        <InputLabel
+                            htmlFor={'delete-category-select'}
+                            isRequired={true}
+                            text={PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
+                        />
                         <select
                             id="delete-category-select"
                             onChange={handleCategoryChange}
@@ -109,7 +108,7 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
                 <Button
                     buttonStyle="primary"
                     onClick={handleSubmit}
-                    disabled={!!(selectedCategory && selectedCategory.programsCount > 0) || isSubmitting}
+                    disabled={(!!selectedCategory && selectedCategory.programsCount > 0) || isSubmitting}
                 >
                     {COMMON_TEXT_ADMIN.BUTTON.DELETE}
                 </Button>
@@ -117,5 +116,3 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
         </Modal>
     );
 };
-
-export default DeleteCategoryModal;

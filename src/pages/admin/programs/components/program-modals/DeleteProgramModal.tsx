@@ -1,11 +1,11 @@
-import './ProgramModal.scss';
-import React, { useState } from 'react';
-import { Modal } from '../../../../../components/common/modal/Modal';
+import { useState } from 'react';
 import { Button } from '../../../../../components/common/button/Button';
-import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
-import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
+import { Modal } from '../../../../../components/common/modal/Modal';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { Program } from '../../../../../types/admin/programs';
+import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
+import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
+import { Program } from '../../../../../types/admin/Programs';
+import './ProgramModal.scss';
 
 export interface DeleteProgramModalProps {
     isOpen: boolean;
@@ -56,5 +56,3 @@ export const DeleteProgramModal = ({ isOpen, onClose, onDeleteProgram, programTo
         </Modal>
     );
 };
-
-export default DeleteProgramModal;

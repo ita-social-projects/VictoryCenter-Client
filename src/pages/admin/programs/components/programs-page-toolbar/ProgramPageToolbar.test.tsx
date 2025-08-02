@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramsPageToolbar } from './ProgramsPageToolbar';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
@@ -6,6 +5,7 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonProps } from '../../../../../components/common/button/Button';
 import { SelectProps } from '../../../../../components/common/select/Select';
 import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 
 jest.mock('../../../../../components/common/button/Button', () => ({
     Button: ({ children, onClick, buttonStyle, ...props }: ButtonProps) => (
@@ -42,7 +42,7 @@ jest.mock('../../../../../components/common/select/Select', () => {
 });
 
 jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
-    SearchBar: ({ onChange, autocompleteValues, placeholder, ...props }: SearchBarProps): any => (
+    SearchBar: ({ onChange, placeholder, ...props }: SearchBarProps): any => (
         <input onChange={(e) => onChange(e.target.value)} placeholder={placeholder} {...props} />
     ),
 }));
@@ -101,9 +101,9 @@ describe('ProgramsPageToolbar', () => {
         render(<ProgramsPageToolbar {...mockProps} />);
         const statusFilter = screen.getByTestId('status-filter');
 
-        fireEvent.change(statusFilter, { target: { value: 'Published' } });
+        fireEvent.change(statusFilter, { target: { value: VisibilityStatus.Published } });
 
-        expect(mockProps.onStatusFilterChange).toHaveBeenCalledWith('Published');
+        expect(mockProps.onStatusFilterChange).toHaveBeenCalledWith(String(VisibilityStatus.Published));
         expect(mockProps.onStatusFilterChange).toHaveBeenCalledTimes(1);
     });
 

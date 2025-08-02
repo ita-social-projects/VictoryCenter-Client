@@ -27,6 +27,8 @@ import { PUBLIC_ROUTES } from '../../../const/public/routes';
 
 jest.mock('./Footer.scss', () => ({}));
 
+global.open = jest.fn();
+
 // Mock clipboard API
 Object.assign(navigator, {
     clipboard: {
@@ -67,9 +69,9 @@ describe('Footer', () => {
         render(<Footer />, { wrapper: MemoryRouter });
         expect(screen.getAllByText(ABOUT_US)[1]).toBeInTheDocument();
 
-        expect(screen.getByRole('link', { name: ABOUT_US })).toHaveAttribute('href', PUBLIC_ROUTES.TEAM.FULL);
+        expect(screen.getByRole('link', { name: ABOUT_US })).toHaveAttribute('href', PUBLIC_ROUTES.ABOUT_US.FULL);
         expect(screen.getByRole('link', { name: OUR_HISTORY })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
-        expect(screen.getByRole('link', { name: OUR_TEAM })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
+        expect(screen.getByRole('link', { name: OUR_TEAM })).toHaveAttribute('href', PUBLIC_ROUTES.TEAM.FULL);
         expect(screen.getByRole('link', { name: PARTNERS })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
         expect(screen.getByRole('link', { name: EVENTS_AND_NEWS })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
     });
@@ -80,8 +82,10 @@ describe('Footer', () => {
 
         expect(screen.getByRole('link', { name: WHAT_IS_HIPPOTHERAPY })).toHaveAttribute(
             'href',
-            PUBLIC_ROUTES.TEAM.FULL,
+            PUBLIC_ROUTES.MOCK.FULL,
         );
+        expect(screen.getByRole('link', { name: PROGRAMS })).toHaveAttribute('href', PUBLIC_ROUTES.PROGRAMS.FULL);
+        expect(screen.getByRole('link', { name: PROGRAMS_SESSIONS })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
         expect(screen.getByRole('link', { name: PROGRAMS })).toHaveAttribute('href', PUBLIC_ROUTES.TEAM.FULL);
         expect(screen.getByRole('link', { name: PROGRAMS_SESSIONS })).toHaveAttribute('href', PUBLIC_ROUTES.TEAM.FULL);
     });
@@ -94,6 +98,10 @@ describe('Footer', () => {
         expect(screen.getByRole('button', { name: /facebook/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /telegram/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /instagram/i })).toBeInTheDocument();
+    });
+
+    it('renders contact button with correct links', () => {
+        render(<Footer />, { wrapper: MemoryRouter });
     });
 
     it('copies email to clipboard on click', () => {
@@ -110,24 +118,27 @@ describe('Footer', () => {
         expect(navigator.clipboard.writeText).toHaveBeenCalledWith(PHONE);
     });
 
-    it('copies Facebook to clipboard on click', () => {
+    it('opens Facebook link in a new tab on click', () => {
         render(<Footer />, { wrapper: MemoryRouter });
         const fbButton = screen.getByRole('button', { name: /facebook/i });
         fireEvent.click(fbButton);
-        expect(navigator.clipboard.writeText).toHaveBeenCalledWith(FACEBOOK);
+        // Check if window.open was called with the correct URL and target
+        expect(global.open).toHaveBeenCalledWith(FACEBOOK, '_blank', 'noopener,noreferrer');
     });
 
-    it('copies Telegram to clipboard on click', () => {
+    it('opens Telegram link in a new tab on click', () => {
         render(<Footer />, { wrapper: MemoryRouter });
         const tgButton = screen.getByRole('button', { name: /telegram/i });
         fireEvent.click(tgButton);
-        expect(navigator.clipboard.writeText).toHaveBeenCalledWith(TELEGRAM);
+        // Check if window.open was called with the correct URL and target
+        expect(global.open).toHaveBeenCalledWith(TELEGRAM, '_blank', 'noopener,noreferrer');
     });
 
-    it('copies Instagram to clipboard on click', () => {
+    it('opens Instagram link in a new tab on click', () => {
         render(<Footer />, { wrapper: MemoryRouter });
         const igButton = screen.getByRole('button', { name: /instagram/i });
         fireEvent.click(igButton);
-        expect(navigator.clipboard.writeText).toHaveBeenCalledWith(INSTAGRAM);
+        // Check if window.open was called with the correct URL and target
+        expect(global.open).toHaveBeenCalledWith(INSTAGRAM, '_blank', 'noopener,noreferrer');
     });
 });

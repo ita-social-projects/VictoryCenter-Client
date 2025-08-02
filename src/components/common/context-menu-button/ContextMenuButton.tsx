@@ -2,6 +2,7 @@ import React, { RefObject, useCallback, useEffect, useRef, useState } from 'reac
 import DefaultIcon from '../../../assets/icons/menu.svg';
 import classNames from 'classnames';
 import './ContextMenuButton.scss';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 export type ContextMenuButtonProps = {
     children: React.ReactNode;
@@ -59,7 +60,11 @@ export const ContextMenuButton = ({ children, onOptionSelected, containerRef, cu
                 }
             }}
         >
-            <img src={customIcon || DefaultIcon} alt="menu" className="context-menu-button-icon" />
+            <img
+                src={customIcon || DefaultIcon}
+                alt={isOpen ? COMMON_TEXT_ADMIN.ALT.CLOSE_MENU : COMMON_TEXT_ADMIN.ALT.OPEN_MENU}
+                className="context-menu-button-icon"
+            />
 
             <div
                 className={classNames('context-menu-button-options', {

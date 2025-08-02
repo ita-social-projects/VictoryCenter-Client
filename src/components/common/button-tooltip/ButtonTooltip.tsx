@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback, useId } from 'react';
 import InfoIcon from '../../../assets/icons/info.svg';
 import classNames from 'classnames';
 import './ButtonTooltip.scss';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 export interface ButtonTooltipProps {
     children: React.ReactNode;
@@ -19,10 +20,6 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
         e.stopPropagation();
         setIsVisible((prev) => !prev);
     };
-
-    const hideTooltip = useCallback(() => {
-        setIsVisible(false);
-    }, []);
 
     const calculatePosition = useCallback(() => {
         if (!wrapperRef.current || !tooltipRef.current) return;
@@ -48,6 +45,17 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
         setTooltipPosition({ top, left });
     }, [position, offset]);
 
+    const handleClickOutside = useCallback((event: MouseEvent) => {
+        if (
+            wrapperRef.current &&
+            !wrapperRef.current.contains(event.target as Node) &&
+            tooltipRef.current &&
+            !tooltipRef.current.contains(event.target as Node)
+        ) {
+            setIsVisible(false);
+        }
+    }, []);
+
     useEffect(() => {
         if (isVisible) {
             calculatePosition();
@@ -55,17 +63,6 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
     }, [isVisible, position, offset, calculatePosition]);
 
     useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                wrapperRef.current &&
-                !wrapperRef.current.contains(event.target as Node) &&
-                tooltipRef.current &&
-                !tooltipRef.current.contains(event.target as Node)
-            ) {
-                hideTooltip();
-            }
-        };
-
         if (isVisible) {
             document.addEventListener('mousedown', handleClickOutside);
         }
@@ -73,7 +70,7 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [isVisible, hideTooltip]);
+    }, [handleClickOutside, isVisible]);
 
     const tooltipId = useId();
 
@@ -88,7 +85,11 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
             aria-label="Show additional information"
             aria-describedby={isVisible ? tooltipId : undefined}
         >
-            <img className="button-tooltip-icon" src={InfoIcon} alt="tooltip icon" />
+            <img
+                className="button-tooltip-icon"
+                src={InfoIcon}
+                alt={isVisible ? COMMON_TEXT_ADMIN.ALT.HIDE_TOOLTIP : COMMON_TEXT_ADMIN.ALT.SHOW_TOOLTIP}
+            />
 
             {isVisible && (
                 <div
@@ -97,6 +98,7 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
                     role="tooltip"
                     className={classNames('button-tooltip-popup', `button-tooltip-popup--${position}`)}
                     style={{
+                        opacity: tooltipPosition.top !== 0 && tooltipPosition.left !== 0 ? '1' : '0',
                         top: `${tooltipPosition.top}px`,
                         left: `${tooltipPosition.left}px`,
                     }}

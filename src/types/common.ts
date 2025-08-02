@@ -1,9 +1,4 @@
-export type VisibilityStatus = 'Draft' | 'Published';
-
-export interface PaginationResult<T> {
-    items: T[];
-    totalItemsCount: number;
-}
+import { VisibilityStatus } from './admin/common';
 
 /* eslint-disable no-unused-vars */
 export type ModalState = {
@@ -14,17 +9,12 @@ export type ModalState = {
 
 export type StatusFilter = 'Усі' | 'Опубліковано' | 'Чернетка';
 
-export enum Status {
-    Draft,
-    Published,
-}
-
-export const mapStatusFilterToStatus = (filter: StatusFilter): Status | null => {
+export const mapStatusFilterToStatus = (filter: StatusFilter): VisibilityStatus | null => {
     switch (filter) {
         case 'Опубліковано':
-            return Status.Published;
+            return VisibilityStatus.Published;
         case 'Чернетка':
-            return Status.Draft;
+            return VisibilityStatus.Draft;
         case 'Усі':
         default:
             return null;

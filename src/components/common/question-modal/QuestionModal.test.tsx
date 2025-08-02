@@ -47,7 +47,7 @@ describe('QuestionModal', () => {
     });
 
     test('disables buttons when isSubmitting is true', () => {
-        render(<QuestionModal {...defaultProps} isSubmitting={true} />);
+        render(<QuestionModal {...defaultProps} isButtonsDisabled={true} />);
         const confirmButton = screen.getByText('Yes, delete');
         const cancelButton = screen.getByText('Cancel');
         expect(confirmButton).toBeDisabled();

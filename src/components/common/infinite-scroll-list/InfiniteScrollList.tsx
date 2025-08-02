@@ -1,8 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import LoaderIcon from '../../../assets/icons/load.svg';
 import ArrowUpIcon from '../../../assets/icons/arrow-up.svg';
 import NotFoundIcon from '../../../assets/icons/not-found.svg';
+import { InlineLoader } from '../inline-loader/InlineLoader';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './InfiniteScrollList.scss';
+
+const BOTTOM_REACH_THRESHOLD_IN_PIXELS = 5;
 
 export interface InfiniteScrollListProps<T> {
     items: T[];
@@ -13,8 +16,6 @@ export interface InfiniteScrollListProps<T> {
     emptyStateMessage: string;
 }
 
-const BOTTOM_REACH_THRESHOLD_IN_PIXELS = 5;
-
 export const InfiniteScrollList = <T,>({
     items,
     renderItem,
@@ -24,12 +25,12 @@ export const InfiniteScrollList = <T,>({
     emptyStateMessage,
 }: InfiniteScrollListProps<T>) => {
     const [isMoveToTopVisible, setIsMoveToTopVisible] = useState<boolean>(false);
-    const listRef = useRef<HTMLDivElement>(null);
+    const listContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (isLoading && listRef.current) {
-            const el = listRef.current;
-            el.scrollTop = el.scrollHeight;
+        if (isLoading && listContainerRef.current) {
+            const listContainer = listContainerRef.current;
+            listContainer.scrollTop = listContainer.scrollHeight;
         }
     }, [isLoading]);
 
@@ -40,17 +41,15 @@ export const InfiniteScrollList = <T,>({
     }, [items.length]);
 
     const handleOnScroll = useCallback(() => {
-        const el = listRef.current;
-        if (!el || isLoading) return;
+        const listContainer = listContainerRef.current;
+        if (!listContainer || isLoading) return;
 
-        if (el.scrollTop > 0) {
-            setIsMoveToTopVisible(true);
-        } else {
-            setIsMoveToTopVisible(false);
-        }
+        setIsMoveToTopVisible(listContainer.scrollTop > 0);
 
         if (hasMore) {
-            const distanceToBottom = Math.abs(el.scrollHeight - el.scrollTop - el.clientHeight);
+            const distanceToBottom = Math.abs(
+                listContainer.scrollHeight - listContainer.scrollTop - listContainer.clientHeight,
+            );
             if (distanceToBottom <= BOTTOM_REACH_THRESHOLD_IN_PIXELS) {
                 onLoadMore();
             }
@@ -58,10 +57,10 @@ export const InfiniteScrollList = <T,>({
     }, [isLoading, hasMore, onLoadMore]);
 
     const moveToTop = useCallback(() => {
-        const el = listRef.current;
-        if (!el) return;
+        const listContainer = listContainerRef.current;
+        if (!listContainer) return;
 
-        el.scrollTop = 0;
+        listContainer.scrollTop = 0;
     }, []);
 
     let content;
@@ -71,11 +70,7 @@ export const InfiniteScrollList = <T,>({
     } else if (!isLoading) {
         content = (
             <div className="infinite-scroll-list-not-found" data-testid="infinite-scroll-list-not-found">
-                <img
-                    src={NotFoundIcon}
-                    alt="infinite-scroll-list-not-found"
-                    data-testid="infinite-scroll-list-not-found-icon"
-                />
+                <img src={NotFoundIcon} alt={COMMON_TEXT_ADMIN.ALT.NOT_FOUND} />
                 <p>{emptyStateMessage}</p>
             </div>
         );
@@ -86,21 +81,21 @@ export const InfiniteScrollList = <T,>({
     return (
         <div className="infinite-scroll-list-container">
             <div
-                ref={listRef}
+                ref={listContainerRef}
                 onScroll={handleOnScroll}
                 data-testid="infinite-scroll-list"
                 className="infinite-scroll-list"
             >
                 {content}
                 {isLoading && (
-                    <div className="infinite-scroll-list-loader" data-testid="infinite-scroll-list-loader">
-                        <img src={LoaderIcon} alt="loader-icon" data-testid="infinite-scroll-list-loader-icon" />
+                    <div className="infinite-scroll-list-loader-container">
+                        <InlineLoader size={3} />
                     </div>
                 )}
             </div>
             {isMoveToTopVisible && (
                 <button onClick={moveToTop} className="infinite-scroll-list-to-top">
-                    <img src={ArrowUpIcon} alt="arrow-up-icon" data-testid="infinite-scroll-list-to-top" />
+                    <img src={ArrowUpIcon} alt={COMMON_TEXT_ADMIN.ALT.SCROLL_TO_TOP} />
                 </button>
             )}
         </div>

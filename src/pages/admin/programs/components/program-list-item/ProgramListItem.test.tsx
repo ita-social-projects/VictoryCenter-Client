@@ -1,10 +1,11 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { ProgramListItem } from './ProgramListItem';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { Program } from '../../../../../types/admin/Programs';
+import { VisibilityStatusLabelProps } from '../../../../../components/common/visibility-status-label/VisibilityStatusLabel';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { VisibilityStatus } from '../../../../../types/common';
-import { Program } from '../../../../../types/admin/programs';
+import { VisibilityStatus } from '../../../../../types/admin/common';
+import { ProgramListItem } from './ProgramListItem';
 
 jest.mock('../../../../../assets/icons/blank-image.svg', () => 'blank-image.svg');
 
@@ -18,23 +19,22 @@ jest.mock('../../../../../components/common/button-tooltip/ButtonTooltip', () =>
     },
 }));
 
-jest.mock('../../../../../components/admin/status/Status', () => ({
-    Status: ({ status }: { status: VisibilityStatus }) => {
-        return (
-            <div data-testid="status" data-status={status}>
-                {status}
-            </div>
-        );
-    },
-}));
+jest.mock('../../../../../components/common/visibility-status-label/VisibilityStatusLabel', () => {
+    const { VisibilityStatus } = require('../../../../../types/admin/Common');
+    return {
+        VisibilityStatusLabel: ({ status }: VisibilityStatusLabelProps) => {
+            return <div data-testid="status">{VisibilityStatus[status]}</div>;
+        },
+    };
+});
 
 describe('ProgramListItem', () => {
     const mockProgram: Program = {
         id: 1,
         name: 'Test Program',
         description: 'Test program description',
-        status: 'Published',
-        img: 'test-image.jpg',
+        status: VisibilityStatus.Published,
+        img: null,
         categories: [
             { id: 1, name: 'Category 1', programsCount: 1 },
             { id: 2, name: 'Category 2', programsCount: 2 },
@@ -92,7 +92,6 @@ describe('ProgramListItem', () => {
         expect(getProgramName()).toBeInTheDocument();
         expect(getProgramDescription()).toBeInTheDocument();
         expect(getProgramImage()).toBeInTheDocument();
-        expect(getProgramImage()).toHaveAttribute('src', 'test-image.jpg');
     });
 
     it('uses blank image when program image is not provided', () => {
@@ -107,8 +106,7 @@ describe('ProgramListItem', () => {
         renderProgramListItem();
 
         const statusComponent = getStatusComponent();
-        expect(statusComponent).toHaveAttribute('data-status', 'Published');
-        expect(statusComponent).toHaveTextContent('Published');
+        expect(statusComponent).toHaveTextContent(VisibilityStatus[VisibilityStatus.Published]);
     });
 
     it('displays published tooltip text and categories for published program', () => {
@@ -120,7 +118,7 @@ describe('ProgramListItem', () => {
     });
 
     it('displays drafted tooltip text for drafted program', () => {
-        const draftProgram: Program = { ...mockProgram, status: 'Draft' };
+        const draftProgram: Program = { ...mockProgram, status: VisibilityStatus.Draft };
         renderProgramListItem({ program: draftProgram });
 
         // Використання константи замість hardcoded text

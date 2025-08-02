@@ -2,17 +2,25 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DeleteCategoryModal } from './DeleteCategoryModal';
-import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramCategory } from '../../../../../types/admin/Programs';
+import { InputLabelProps } from '../../../../../components/common/input-label/InputLabel';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { ProgramCategory } from '../../../../../types/admin/programs';
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
+jest.mock('../../../../../components/common/input-label/InputLabel', () => ({
+    InputLabel: ({ htmlFor, text, isRequired }: InputLabelProps) => (
+        <div data-testid="input-label-mock">
+            Label: {text} {isRequired && '*'} (for: {htmlFor})
+        </div>
+    ),
+}));
+
 jest.mock('../../../../../components/common/modal/Modal', () => {
-    const ModalMock = ({ isOpen, onClose, children }: any) =>
-        isOpen ? <div data-testid="modal">{children}</div> : null;
+    const ModalMock = ({ isOpen, children }: any) => (isOpen ? <div data-testid="modal">{children}</div> : null);
     ModalMock.Title = ({ children }: { children: React.ReactNode }) => <h1>{children}</h1>;
     ModalMock.Content = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
     ModalMock.Actions = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
@@ -50,14 +58,12 @@ describe('DeleteCategoryModal', () => {
         categories: mockCategories,
     };
 
-    // Helper functions
     const renderDeleteCategoryModal = (overrideProps = {}) =>
         render(<DeleteCategoryModal {...defaultProps} {...overrideProps} />);
 
     const getModal = () => screen.queryByTestId('modal');
     const getTitle = () => screen.queryByText(PROGRAM_CATEGORY_TEXT.FORM.TITLE.DELETE_CATEGORY);
-    const getCategorySelect = () =>
-        screen.getByRole('combobox', { name: `* ${PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}` });
+    const getCategorySelect = () => screen.getByRole('combobox');
     const getCancelButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
     const getDeleteButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.DELETE);
     const getHintBox = () => screen.queryByTestId('hint-box');
@@ -87,7 +93,7 @@ describe('DeleteCategoryModal', () => {
     };
 
     const expectDeleteApiCalled = (categoryId: number) => {
-        expect(mockedProgramsApi.deleteCategory).toHaveBeenCalledWith(categoryId);
+        expect(mockedProgramsApi.deleteProgramCategory).toHaveBeenCalledWith(categoryId);
     };
 
     beforeEach(() => {
@@ -125,7 +131,7 @@ describe('DeleteCategoryModal', () => {
     });
 
     it('should handle successful category deletion', async () => {
-        mockedProgramsApi.deleteCategory.mockResolvedValue(undefined);
+        mockedProgramsApi.deleteProgramCategory.mockResolvedValue(undefined);
         renderDeleteCategoryModal();
 
         clickDeleteButton();
@@ -139,7 +145,7 @@ describe('DeleteCategoryModal', () => {
     });
 
     it('should handle failed deletion and show an error message', async () => {
-        mockedProgramsApi.deleteCategory.mockRejectedValue(new Error('API Error'));
+        mockedProgramsApi.deleteProgramCategory.mockRejectedValue(new Error('API Error'));
         renderDeleteCategoryModal();
 
         clickDeleteButton();
@@ -175,7 +181,7 @@ describe('DeleteCategoryModal', () => {
         const longRunningPromise = new Promise<void>((resolve) => {
             resolveRequest = resolve;
         });
-        mockedProgramsApi.deleteCategory.mockReturnValue(longRunningPromise);
+        mockedProgramsApi.deleteProgramCategory.mockReturnValue(longRunningPromise);
 
         renderDeleteCategoryModal();
 
@@ -199,7 +205,7 @@ describe('DeleteCategoryModal', () => {
     });
 
     it('should clear the error message when the modal re-opens', async () => {
-        mockedProgramsApi.deleteCategory.mockRejectedValue(new Error('API error'));
+        mockedProgramsApi.deleteProgramCategory.mockRejectedValue(new Error('API error'));
         const { rerender } = renderDeleteCategoryModal();
 
         clickDeleteButton();

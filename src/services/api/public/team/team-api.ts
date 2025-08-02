@@ -1,13 +1,14 @@
 import default_team_member_photo from '../../../../assets/icons/team-member-blank.svg';
 import { API_ROUTES } from '../../../../const/urls/main-api';
 import {
-    Member,
+    MemberCard,
     PublicCategoryWithTeamMembersDto,
     PublicTeamMemberDto,
     TeamItem,
     TeamPageData,
 } from '../../../../types/public/team-page';
 import { axiosInstance } from '../../axios';
+import { mapImageToBase64 } from '../../../../utils/functions/mapImageToBase64';
 
 const isValidCategory = (category: PublicCategoryWithTeamMembersDto): boolean => {
     return Boolean(
@@ -19,11 +20,11 @@ const isValidTeamMember = (member: PublicTeamMemberDto): boolean => {
     return Boolean(member?.fullName?.trim());
 };
 
-const mapTeamMemberDtoToTeamMember = (dto: PublicTeamMemberDto): Member => ({
+const mapTeamMemberDtoToTeamMember = (dto: PublicTeamMemberDto): MemberCard => ({
     id: dto.id,
     name: dto.fullName,
     role: dto.description || '',
-    photo: default_team_member_photo,
+    photo: mapImageToBase64(dto.image) ?? default_team_member_photo,
 });
 
 const mapCategoryDtoToTeamCategory = (dto: PublicCategoryWithTeamMembersDto): TeamItem => {

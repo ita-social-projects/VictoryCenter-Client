@@ -49,13 +49,15 @@ export const TeamPage: React.FC = () => {
                     className={classNames('team-section', { 'last-section': index === teamData.length - 1 })}
                 >
                     <div className="team_info">
-                        <div className="team_description">
-                            <h2>{team.title}</h2>
-                            <p>{team.description}</p>
+                        <div className="members-grid">
+                            <div className="team_description">
+                                <h2>{team.title}</h2>
+                                <p>{team.description}</p>
+                            </div>
+                            {team.members.map((member) => (
+                                <TeamMember key={member.id} member={member} />
+                            ))}
                         </div>
-                        {team.members.map((member) => (
-                            <TeamMember key={member.id} member={member} />
-                        ))}
                     </div>
                 </div>
             ))}

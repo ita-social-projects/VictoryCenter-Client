@@ -1,10 +1,11 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramCategoryModal } from './ProgramCategoryModal';
-import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramCategory } from '../../../../../types/admin/Programs';
+import { InputLabelProps } from '../../../../../components/common/input-label/InputLabel';
+import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { ProgramCategory } from '../../../../../types/admin/programs';
 
 const mockCategory: ProgramCategory = { id: 1, name: 'Test Category', programsCount: 0 };
 const mockCategories: ProgramCategory[] = [
@@ -15,6 +16,14 @@ const mockCategories: ProgramCategory[] = [
 const mockOnClose = jest.fn();
 const mockOnAddCategory = jest.fn();
 const mockOnEditCategory = jest.fn();
+
+jest.mock('../../../../../components/common/input-label/InputLabel', () => ({
+    InputLabel: ({ htmlFor, text, isRequired }: InputLabelProps) => (
+        <div data-testid="input-label-mock">
+            Label: {text} {isRequired && '*'} (for: {htmlFor})
+        </div>
+    ),
+}));
 
 jest.mock('../../../../../components/common/modal/Modal', () => {
     const MockModal = ({ isOpen, children, onClose }: any) =>
@@ -74,10 +83,9 @@ jest.mock('../../../../../components/common/question-modal/QuestionModal', () =>
 }));
 
 jest.mock('../../../../../services/api/admin/programs/programs-api', () => ({
-    __esModule: true,
-    default: {
+    ProgramsApi: {
         addProgramCategory: jest.fn(),
-        editCategory: jest.fn(),
+        editProgramCategory: jest.fn(),
     },
 }));
 
@@ -115,6 +123,7 @@ describe('ProgramCategoryModal', () => {
     const changeNameInput = (value: string) => fireEvent.change(getNameInput(), { target: { value } });
     const blurNameInput = () => fireEvent.blur(getNameInput());
     const clickSaveButton = () => fireEvent.click(getSaveButton());
+    const clickConfirmButtonInSaveConfirmPopup = () => fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
     const clickModalClose = () => fireEvent.click(getModalCloseButton());
     const changeCategorySelect = (value: string) => fireEvent.change(getCategorySelect(), { target: { value } });
 
@@ -444,14 +453,19 @@ describe('ProgramCategoryModal', () => {
                 const promise = new Promise<ProgramCategory>((resolve) => {
                     resolvePromise = resolve;
                 });
-                mockedProgramsApi.editCategory.mockReturnValue(promise);
+                mockedProgramsApi.editProgramCategory.mockReturnValue(promise);
 
                 renderModal(editModeProps);
 
                 changeNameInput('Updated Category');
                 clickSaveButton();
 
-                expect(getCategorySelect()).toBeDisabled();
+                // Click ye in confirmation popup of edit mode
+                clickConfirmButtonInSaveConfirmPopup();
+
+                await waitFor(() => {
+                    expect(getCategorySelect()).toBeDisabled();
+                });
 
                 await act(async () => {
                     resolvePromise!(mockCategory);
@@ -524,14 +538,16 @@ describe('ProgramCategoryModal', () => {
         describe('Form submission', () => {
             it('should successfully update category', async () => {
                 const updatedCategory = { ...mockCategory, name: 'Updated Category' };
-                mockedProgramsApi.editCategory.mockResolvedValue(updatedCategory);
+                mockedProgramsApi.editProgramCategory.mockResolvedValue(updatedCategory);
                 renderModal(editModeProps);
 
                 changeNameInput('Updated Category');
                 clickSaveButton();
 
+                clickConfirmButtonInSaveConfirmPopup();
+
                 await waitFor(() => {
-                    expect(mockedProgramsApi.editCategory).toHaveBeenCalledWith({
+                    expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledWith({
                         id: 1,
                         name: 'Updated Category',
                     });
@@ -542,14 +558,16 @@ describe('ProgramCategoryModal', () => {
 
             it('should trim whitespace from name', async () => {
                 const updatedCategory = { ...mockCategory, name: 'Updated Category' };
-                mockedProgramsApi.editCategory.mockResolvedValue(updatedCategory);
+                mockedProgramsApi.editProgramCategory.mockResolvedValue(updatedCategory);
                 renderModal(editModeProps);
 
                 changeNameInput('  Updated Category  ');
                 clickSaveButton();
 
+                clickConfirmButtonInSaveConfirmPopup();
+
                 await waitFor(() => {
-                    expect(mockedProgramsApi.editCategory).toHaveBeenCalledWith({
+                    expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledWith({
                         id: 1,
                         name: 'Updated Category',
                     });
@@ -557,11 +575,13 @@ describe('ProgramCategoryModal', () => {
             });
 
             it('should show error when API fails', async () => {
-                mockedProgramsApi.editCategory.mockRejectedValue(new Error('API Error'));
+                mockedProgramsApi.editProgramCategory.mockRejectedValue(new Error('API Error'));
                 renderModal(editModeProps);
 
                 changeNameInput('Updated Category');
                 clickSaveButton();
+
+                clickConfirmButtonInSaveConfirmPopup();
 
                 await waitFor(() => {
                     expect(
@@ -576,7 +596,7 @@ describe('ProgramCategoryModal', () => {
                 changeNameInput('Another Category');
                 clickSaveButton();
 
-                expect(mockedProgramsApi.editCategory).not.toHaveBeenCalled();
+                expect(mockedProgramsApi.editProgramCategory).not.toHaveBeenCalled();
             });
 
             it('should not submit when no category selected', async () => {
@@ -586,7 +606,7 @@ describe('ProgramCategoryModal', () => {
                 clickSaveButton();
 
                 await waitFor(async () => {
-                    expect(mockedProgramsApi.editCategory).not.toHaveBeenCalled();
+                    expect(mockedProgramsApi.editProgramCategory).not.toHaveBeenCalled();
                 });
             });
 
@@ -595,16 +615,19 @@ describe('ProgramCategoryModal', () => {
                 const promise = new Promise<ProgramCategory>((resolve) => {
                     resolvePromise = resolve;
                 });
-                mockedProgramsApi.editCategory.mockReturnValue(promise);
+                mockedProgramsApi.editProgramCategory.mockReturnValue(promise);
 
                 renderModal(editModeProps);
 
                 changeNameInput('Updated Category');
                 clickSaveButton();
+
+                clickConfirmButtonInSaveConfirmPopup();
+
                 clickSaveButton(); // Second click while submitting
 
                 await waitFor(() => {
-                    expect(mockedProgramsApi.editCategory).toHaveBeenCalledTimes(1);
+                    expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledTimes(1);
                 });
 
                 await act(async () => {
@@ -645,13 +668,15 @@ describe('ProgramCategoryModal', () => {
 
         describe('useEffect behavior', () => {
             it('should reset form when modal opens in edit mode', async () => {
-                mockedProgramsApi.editCategory.mockRejectedValue(new Error('API Error'));
+                mockedProgramsApi.editProgramCategory.mockRejectedValue(new Error('API Error'));
                 const { rerender } = renderModal(editModeProps);
 
                 // Create error state
                 changeCategorySelect('2');
                 changeNameInput('Updated Category');
                 clickSaveButton();
+
+                clickConfirmButtonInSaveConfirmPopup();
 
                 await waitFor(() => {
                     expect(

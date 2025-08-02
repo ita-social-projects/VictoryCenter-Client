@@ -9,6 +9,7 @@ export const PROGRAMS_TEXT = {
 
     QUESTION: {
         PUBLISH_PROGRAM: 'Опублікувати нову програму?',
+        DRAFT_PROGRAM: 'Зберегти нову програму?',
     },
 
     FORM: {
@@ -38,7 +39,7 @@ export const PROGRAM_CATEGORY_TEXT = {
     },
 
     BUTTON: {
-        ADD_CATEGORY: 'Додати категорії',
+        ADD_CATEGORY: 'Додати категорію',
         EDIT_CATEGORY: 'Редагувати',
         DELETE_CATEGORY: 'Видалити',
     },
@@ -57,6 +58,7 @@ export const PROGRAM_CATEGORY_TEXT = {
         },
         LABEL: {
             NAME: 'Назва',
+            EDIT_NAME: 'Редагувати назву',
             CATEGORY: 'Категорія',
         },
     },
@@ -73,7 +75,7 @@ export const PROGRAM_VALIDATION = {
     description: {
         min: 10,
         max: 1000,
-        getRequiredError: () => 'Опис обов’язковий',
+        getRequiredWhenPublishingError: () => 'Опис обов’язковий при публікації',
         getMinError: () => `Не менше ${PROGRAM_VALIDATION.description.min} символів`,
         getMaxError: () => `Не більше ${PROGRAM_VALIDATION.description.max} символів`,
     },

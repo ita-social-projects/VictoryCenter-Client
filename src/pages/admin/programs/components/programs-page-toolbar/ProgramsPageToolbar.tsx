@@ -1,23 +1,21 @@
-import './ProgramsPageToolbar.scss';
 import { Button } from '../../../../../components/common/button/Button';
 import { Select } from '../../../../../components/common/select/Select';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import PlusIcon from '../../../../../assets/icons/plus.svg';
-import { VisibilityStatus } from '../../../../../types/common';
+import './ProgramsPageToolbar.scss';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
 
 export interface ProgramPageToolbarProps {
     onSearchQueryChange: (query: string) => void;
     onStatusFilterChange: (categoryFilter: VisibilityStatus | undefined) => void;
-    autocompleteValues: string[];
     onAddProgram: () => void;
 }
 
 export const ProgramsPageToolbar = ({
     onSearchQueryChange,
     onStatusFilterChange,
-    autocompleteValues,
     onAddProgram,
 }: ProgramPageToolbarProps) => {
     return (
@@ -28,7 +26,7 @@ export const ProgramsPageToolbar = ({
                         onChange={(e) => {
                             onSearchQueryChange(e);
                         }}
-                        autocompleteValues={autocompleteValues}
+                        autocompleteValues={[]}
                         data-testid="search-input"
                         placeholder={COMMON_TEXT_ADMIN.FILTER.SEARCH_BY_NAME}
                     />
@@ -41,12 +39,12 @@ export const ProgramsPageToolbar = ({
                         <Select.Option key={1} value={undefined} name={COMMON_TEXT_ADMIN.FILTER.STATUS.ALL} />
                         <Select.Option<VisibilityStatus>
                             key={2}
-                            value={'Published'}
+                            value={VisibilityStatus.Published}
                             name={COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED}
                         />
                         <Select.Option<VisibilityStatus>
                             key={3}
-                            value={'Draft'}
+                            value={VisibilityStatus.Draft}
                             name={COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT}
                         />
                     </Select>

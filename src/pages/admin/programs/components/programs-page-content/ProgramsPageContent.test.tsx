@@ -1,28 +1,31 @@
+import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramsPageContent } from './ProgramsPageContent';
-import ProgramsApi from '../../../../../services/api/admin/programs/programs-api';
+import { Program, ProgramCategory } from '../../../../../types/admin/Programs';
+import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { VisibilityStatus } from '../../../../../types/common';
-import { Program, ProgramCategory } from '../../../../../types/admin/programs';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 const mockProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
 jest.mock('../programs-page-toolbar/ProgramsPageToolbar', () => ({
-    ProgramsPageToolbar: (props: any) => (
-        <div data-testid="programs-toolbar">
-            <button onClick={props.onAddProgram}>Add Program</button>
-            <button onClick={() => props.onStatusFilterChange('Published' as VisibilityStatus)}>
-                Filter Published
-            </button>
-            <input
-                data-testid="search-input"
-                onChange={(e) => props.onSearchQueryChange(e.target.value)}
-                placeholder="Search..."
-            />
-        </div>
-    ),
+    ProgramsPageToolbar: (props: any) => {
+        const { VisibilityStatus } = require('../../../../../types/admin/Common');
+
+        return (
+            <div data-testid="programs-toolbar">
+                <button onClick={props.onAddProgram}>Add Program</button>
+                <button onClick={() => props.onStatusFilterChange(VisibilityStatus.Published)}>Filter Published</button>
+                <input
+                    data-testid="search-input"
+                    onChange={(e) => props.onSearchQueryChange(e.target.value)}
+                    placeholder="Search..."
+                />
+            </div>
+        );
+    },
 }));
 
 jest.mock('../program-modals/ProgramModal', () => ({
@@ -136,7 +139,7 @@ jest.mock('../program-category-modals/DeleteCategoryModal', () => ({
         ) : null,
 }));
 
-jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
+jest.mock('../../../../../components/common/category-bar/CategoryBar', () => ({
     CategoryBar: ({
         categories,
         selectedCategory,
@@ -212,7 +215,7 @@ const mockPrograms: Program[] = [
         name: 'Test Program Alpha',
         description: 'A sample description.',
         categories: [],
-        status: 'Published',
+        status: VisibilityStatus.Published,
         img: null,
     },
     {
@@ -220,7 +223,7 @@ const mockPrograms: Program[] = [
         name: 'Test Program Beta',
         description: 'Another description.',
         categories: [],
-        status: 'Draft',
+        status: VisibilityStatus.Draft,
         img: null,
     },
 ];
@@ -230,7 +233,7 @@ const mockNewProgram: Program = {
     name: 'Test Program Gama',
     description: 'A sample description.',
     categories: [],
-    status: 'Draft',
+    status: VisibilityStatus.Draft,
     img: null,
 };
 
@@ -489,7 +492,7 @@ describe('ProgramsPageContent', () => {
                     name: 'Category B Program',
                     description: 'Program from category B',
                     categories: [mockCategories[1]],
-                    status: 'Published' as VisibilityStatus,
+                    status: VisibilityStatus.Published,
                     img: null,
                 },
             ];
@@ -524,7 +527,7 @@ describe('ProgramsPageContent', () => {
                     mockCategories[0].id,
                     0,
                     5,
-                    'Published',
+                    VisibilityStatus.Published,
                     expect.any(Object),
                 );
             });
@@ -575,6 +578,37 @@ describe('ProgramsPageContent', () => {
 
             typeInSearchInput('test search query');
             expect(getSearchInput()).toHaveValue('test search query');
+        });
+    });
+
+    describe('Empty categories handling', () => {
+        it('should handle empty categories list without setting selected category', async () => {
+            mockProgramsApi.fetchProgramCategories.mockResolvedValueOnce([]);
+
+            renderProgramsPageContent();
+
+            await waitFor(() => {
+                expect(mockProgramsApi.fetchProgramCategories).toHaveBeenCalledTimes(1);
+            });
+
+            expect(getCategoryBar()).toBeInTheDocument();
+            // Should not call fetchPrograms because no category is selected
+            expect(mockProgramsApi.fetchPrograms).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('Programs fetching with null category', () => {
+        it('should not fetch programs when selectedCategory is null', async () => {
+            mockProgramsApi.fetchProgramCategories.mockResolvedValueOnce([]);
+
+            renderProgramsPageContent();
+
+            await waitFor(() => {
+                expect(mockProgramsApi.fetchProgramCategories).toHaveBeenCalledTimes(1);
+            });
+
+            // Verify fetchPrograms is not called when selectedCategory is null
+            expect(mockProgramsApi.fetchPrograms).not.toHaveBeenCalled();
         });
     });
 });

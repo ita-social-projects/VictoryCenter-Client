@@ -1,10 +1,15 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { InfiniteScrollList, InfiniteScrollListProps } from './InfiniteScrollList';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 jest.mock('../../../assets/icons/load.svg', () => 'LoaderIcon');
 jest.mock('../../../assets/icons/arrow-up.svg', () => 'ArrowUpIcon');
 jest.mock('../../../assets/icons/not-found.svg', () => 'NotFoundIcon');
+
+jest.mock('../inline-loader/InlineLoader', () => ({
+    InlineLoader: () => <img alt="loader-icon" data-testid="loader-icon" />,
+}));
 
 interface MockItem {
     id: number;
@@ -41,9 +46,10 @@ describe('InfiniteScrollList', () => {
     };
 
     const getScrollContainer = () => screen.getByTestId('infinite-scroll-list');
-    const getLoader = () => screen.queryByTestId('infinite-scroll-list-loader');
-    const getMoveToTopButton = () => screen.queryByTestId('infinite-scroll-list-to-top');
+    const getLoader = () => screen.queryByAltText('loader-icon');
+    const getMoveToTopButton = () => screen.queryByAltText(COMMON_TEXT_ADMIN.ALT.SCROLL_TO_TOP);
     const getEmptyState = () => screen.queryByTestId('infinite-scroll-list-not-found');
+    const getNotFoundIcon = () => screen.getByAltText(COMMON_TEXT_ADMIN.ALT.NOT_FOUND);
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -62,7 +68,7 @@ describe('InfiniteScrollList', () => {
 
         expect(getEmptyState()).toBeInTheDocument();
         expect(screen.getByText(emptyMessage)).toBeInTheDocument();
-        expect(screen.getByTestId('infinite-scroll-list-not-found-icon')).toBeInTheDocument();
+        expect(getNotFoundIcon()).toBeInTheDocument();
     });
 
     it('does not render empty state when loading', () => {
@@ -75,7 +81,6 @@ describe('InfiniteScrollList', () => {
         renderComponent({ isLoading: true });
 
         expect(getLoader()).toBeInTheDocument();
-        expect(screen.getByTestId('infinite-scroll-list-loader-icon')).toBeInTheDocument();
     });
 
     it('hides loader when not loading', () => {

@@ -29,6 +29,7 @@ export const AppRouter = () => (
                 <Route path={PUBLIC_ROUTES.TEAM.FULL} element={<TeamPage />} />
                 <Route path={PUBLIC_ROUTES.PROGRAMS.FULL} element={<ProgramPage />} />
                 <Route path={PUBLIC_ROUTES.ABOUT_US.FULL} element={<AboutUsPage />} />
+                <Route path={PUBLIC_ROUTES.DONATE.FULL} element={<DonatePage />} />
                 <Route path="*" element={<NotFound />} />
             </Route>
 

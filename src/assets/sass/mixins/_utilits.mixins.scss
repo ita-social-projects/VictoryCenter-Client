@@ -1,4 +1,4 @@
-@use '../variables/variables.fonts' as ft;
+@import '../variables/variables.fonts';
 
 @mixin font-face($font-family, $file-name, $font-weight: normal, $font-style: normal) {
     @font-face {
@@ -10,4 +10,25 @@
         font-style: $font-style;
         font-display: swap;
     }
+}
+
+@mixin link-base($color, $hoverColor, $activeColor) {
+    color: $color;
+    text-decoration: none;
+    pointer-events: auto;
+    opacity: 1;
+    font-family: $mulish-regular-font;
+
+    &:hover {
+        color: $hoverColor;
+    }
+
+    &:active {
+        color: $activeColor;
+    }
+}
+
+@mixin link-disabled() {
+    opacity: 0.3;
+    pointer-events: none;
 }

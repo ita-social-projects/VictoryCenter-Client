@@ -1,12 +1,23 @@
 import React, { createRef } from 'react';
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from './ProgramForm';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
-import { ProgramCategory } from '../../../../../types/admin/programs';
+import { ProgramCategory } from '../../../../../types/admin/Programs';
+import { InputLabelProps } from '../../../../../components/common/input-label/InputLabel';
+import { Image } from '../../../../../types/Image';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 
-jest.mock('../../../../../components/common/multi-select/MultiSelect', () => ({
-    MultiSelect: (props: any) => (
+jest.mock('../../../../../components/common/input-label/InputLabel', () => ({
+    InputLabel: ({ htmlFor, text, isRequired }: InputLabelProps) => (
+        <div data-testid="input-label-mock">
+            Label: {text} {isRequired && '*'} (for: {htmlFor})
+        </div>
+    ),
+}));
+
+jest.mock('../../../../../components/common/multi-select-input/MultiSelectInput', () => ({
+    MultiSelectInput: (props: any) => (
         <select
             multiple
             data-testid="categories-select"
@@ -52,13 +63,19 @@ describe('ProgramForm', () => {
         { id: 1, name: 'Ветеранські', programsCount: 1 },
         { id: 2, name: 'Дитячі', programsCount: 1 },
     ];
-    const mockFile = new File(['mock-content'], 'test.png', { type: 'image/png' });
+
+    const mockFile: Image = {
+        id: null,
+        base64: 'ffdfdfdsfgsddgdgsdsg',
+        mimeType: 'image/jpg',
+        size: 1024,
+    };
 
     const mockInitialData: ProgramFormValues = {
         name: 'Існуюча програма',
         description: 'Існуючий опис',
         categories: [mockCategories[0]],
-        img: 'existing-image.jpg',
+        img: null,
     };
 
     const formRef = createRef<ProgramFormRef>();
@@ -112,7 +129,7 @@ describe('ProgramForm', () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
 
         await act(async () => {
-            formRef.current?.submit('Draft');
+            formRef.current?.submit(VisibilityStatus.Draft);
         });
 
         expect(await screen.findByText(PROGRAM_VALIDATION.name.getRequiredError())).toBeInTheDocument();
@@ -124,12 +141,14 @@ describe('ProgramForm', () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
 
         await act(async () => {
-            formRef.current?.submit('Published');
+            formRef.current?.submit(VisibilityStatus.Published);
         });
 
         expect(await screen.findByText(PROGRAM_VALIDATION.name.getRequiredError())).toBeInTheDocument();
         expect(await screen.findByText(PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError())).toBeInTheDocument();
-        expect(await screen.findByText(PROGRAM_VALIDATION.description.getRequiredError())).toBeInTheDocument();
+        expect(
+            await screen.findByText(PROGRAM_VALIDATION.description.getRequiredWhenPublishingError()),
+        ).toBeInTheDocument();
         expect(await screen.findByText(PROGRAM_VALIDATION.img.getRequiredWhenPublishingError())).toBeInTheDocument();
         expect(mockOnSubmit).not.toHaveBeenCalled();
     });
@@ -161,7 +180,7 @@ describe('ProgramForm', () => {
         fireEvent.change(screen.getByTestId('categories-select'), { target: { value: ['1'] } });
 
         await act(async () => {
-            formRef.current?.submit('Draft');
+            formRef.current?.submit(VisibilityStatus.Draft);
         });
 
         await waitFor(() => {
@@ -170,7 +189,7 @@ describe('ProgramForm', () => {
                     name: 'Нова чернетка',
                     categories: [mockCategories[0]],
                 }),
-                'Draft',
+                VisibilityStatus.Draft,
             );
         });
     });
@@ -184,7 +203,7 @@ describe('ProgramForm', () => {
         fireEvent.change(screen.getByTestId('img-input'), { target: { files: [mockFile] } });
 
         await act(async () => {
-            formRef.current?.submit('Published');
+            formRef.current?.submit(VisibilityStatus.Published);
         });
 
         await waitFor(() => {
@@ -195,7 +214,7 @@ describe('ProgramForm', () => {
                     description: 'Дуже важливий опис',
                     img: mockFile,
                 }),
-                'Published',
+                VisibilityStatus.Published,
             );
         });
     });
@@ -204,7 +223,7 @@ describe('ProgramForm', () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
 
         await act(async () => {
-            formRef.current?.submit('Published');
+            formRef.current?.submit(VisibilityStatus.Published);
         });
 
         await waitFor(() => {
@@ -216,14 +235,14 @@ describe('ProgramForm', () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
 
         // Initially not dirty
-        expect(formRef.current?.isDirty).toBe(false);
+        expect(formRef.current?.isDirty()).toBe(false);
 
         // Change a field
         fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'some change' } });
 
         // Now it should be dirty
         await waitFor(() => {
-            expect(formRef.current?.isDirty).toBe(true);
+            expect(formRef.current?.isDirty()).toBe(true);
         });
     });
 
@@ -231,7 +250,7 @@ describe('ProgramForm', () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} initialData={mockInitialData} />);
 
         await waitFor(() => {
-            expect(formRef.current?.isDirty).toBe(false);
+            expect(formRef.current?.isDirty()).toBe(false);
         });
     });
 
@@ -239,13 +258,13 @@ describe('ProgramForm', () => {
         render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} initialData={mockInitialData} />);
 
         await waitFor(() => {
-            expect(formRef.current?.isDirty).toBe(false);
+            expect(formRef.current?.isDirty()).toBe(false);
         });
 
         fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Нова зміна' } });
 
         await waitFor(() => {
-            expect(formRef.current?.isDirty).toBe(true);
+            expect(formRef.current?.isDirty()).toBe(true);
         });
     });
 });

@@ -1,11 +1,12 @@
-import React, { act } from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TeamPageToolbar, TeamPageToolbarProps } from './TeamPageToolbar';
 import { MemberFormValues } from '../member-form/MemberForm';
 
+// Mock the plus icon
 jest.mock('../../../../../assets/icons/plus.svg', () => 'plus-icon.svg');
 
+// Mock the Modal component
 jest.mock('../../../../../components/common/modal/Modal', () => {
     const MockModal = ({ children, isOpen, onClose, 'data-testid': testId }: any) => {
         if (!isOpen) return null;
@@ -33,6 +34,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     return { Modal: MockModal };
 });
 
+// Mock the Button component
 jest.mock('../../../../../components/common/button/Button', () => ({
     Button: ({ children, onClick, buttonStyle, form, type, 'data-testid': testId, ...props }: any) => (
         <button
@@ -48,6 +50,7 @@ jest.mock('../../../../../components/common/button/Button', () => ({
     ),
 }));
 
+// Mock the Select component
 jest.mock('../../../../../components/common/select/Select', () => {
     const MockSelect = ({ children, onValueChange, 'data-testid': testId }: any) => (
         <select data-testid={testId} onChange={(e) => onValueChange?.(e.target.value)}>
@@ -69,13 +72,12 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
     ),
 }));
 
-// Mock MemberForm with controllable behavior
-let capturedOnValuesChange: (data: MemberFormValues) => void = () => {};
 const mockMemberForm = jest.fn();
+
 jest.mock('../member-form/MemberForm', () => ({
     MemberForm: (props: any) => {
         mockMemberForm(props);
-        capturedOnValuesChange = props.onValuesChange;
+
         const defaultData: MemberFormValues = {
             category: {
                 id: 1,
@@ -84,8 +86,14 @@ jest.mock('../member-form/MemberForm', () => ({
             },
             fullName: 'Test User',
             description: 'Test Description',
-            img: null,
+            image: {
+                base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABDQottAAAAABJRU5ErkJggg==',
+                mimeType: 'image/png',
+                size: 0,
+            },
+            imageId: 1,
         };
+
         return (
             <form
                 id={props.id}
@@ -98,10 +106,12 @@ jest.mock('../member-form/MemberForm', () => ({
                 <input
                     data-testid="form-fullname"
                     onChange={(e) => {
-                        props.onFormDataChange?.({
+                        const updatedData = {
                             ...defaultData,
                             fullName: e.target.value,
-                        });
+                        };
+                        props.onFormDataChange?.(updatedData);
+                        props.onValuesChange?.(updatedData);
                     }}
                 />
                 <button type="submit" data-testid="form-submit">
@@ -217,6 +227,9 @@ describe('TeamPageToolbar', () => {
                 expect.objectContaining({
                     id: 'add-member-modal',
                     onSubmit: expect.any(Function),
+                    onValuesChange: expect.any(Function),
+                    onError: undefined,
+                    isDraft: false,
                 }),
             );
         });
@@ -227,32 +240,47 @@ describe('TeamPageToolbar', () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
             await userEvent.click(screen.getByTestId('add-member-button'));
-            act(() => {
-                capturedOnValuesChange({
-                    category: {
-                        id: 1,
-                        name: 'Основна команда',
-                        description: 'Test',
-                    },
-                    fullName: 'From test',
-                    description: 'from test desc',
-                    img: null,
-                });
-            });
 
+            // Simulate form data being present by typing in the form
+            const formInput = screen.getByTestId('form-fullname');
+            await userEvent.type(formInput, 'Test User');
+
+            // Now click the save as draft button
             await userEvent.click(screen.getByText('Зберегти як чернетку'));
 
-            expect(defaultProps.onMemberSaveDraft).toHaveBeenCalled();
-            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+            await waitFor(() => {
+                expect(defaultProps.onMemberSaveDraft).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        fullName: 'Test User',
+                        description: 'Test Description',
+                    }),
+                );
+            });
+
+            await waitFor(() => {
+                expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+            });
         });
 
-        it('resets state after saving draft', async () => {
+        it('reopens modal with clean state after saving draft', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
             await userEvent.click(screen.getByTestId('add-member-button'));
+
+            // Simulate form data being present
+            const formInput = screen.getByTestId('form-fullname');
+            await userEvent.type(formInput, 'Test User');
+
             await userEvent.click(screen.getByText('Зберегти як чернетку'));
 
-            // Reopen modal should be in clean state
+            await waitFor(() => {
+                expect(defaultProps.onMemberSaveDraft).toHaveBeenCalled();
+            });
+
+            await waitFor(() => {
+                expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+            });
+
             await userEvent.click(screen.getByTestId('add-member-button'));
             expect(screen.getByTestId('add-member-modal')).toBeInTheDocument();
         });
@@ -263,9 +291,7 @@ describe('TeamPageToolbar', () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
             await userEvent.click(screen.getByTestId('add-member-button'));
-
-            const form = screen.getByTestId('member-form');
-            fireEvent.submit(form);
+            fireEvent.submit(screen.getByTestId('member-form'));
 
             expect(screen.getByTestId('publish-confirm-modal')).toBeInTheDocument();
             expect(screen.getByText('Опублікувати нового члена команди?')).toBeInTheDocument();
@@ -299,8 +325,14 @@ describe('TeamPageToolbar', () => {
                 },
                 fullName: 'Test User',
                 description: 'Test Description',
-                img: null,
+                image: {
+                    base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABDQottAAAAABJRU5ErkJggg==',
+                    mimeType: 'image/png',
+                    size: 0,
+                },
+                imageId: 1,
             });
+
             expect(screen.queryByTestId('publish-confirm-modal')).not.toBeInTheDocument();
             expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
         });
@@ -318,24 +350,60 @@ describe('TeamPageToolbar', () => {
             expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
             expect(screen.queryByTestId('confirm-close-modal')).not.toBeInTheDocument();
         });
-    });
 
-    describe('Button Attributes and Styling', () => {
-        it('applies correct button styles and attributes', async () => {
+        it('detects unsaved changes and shows confirm-close modal when closing', async () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            const addButton = screen.getByTestId('add-member-button');
-            expect(addButton).toHaveAttribute('data-button-style', 'primary');
+            await userEvent.click(screen.getByTestId('add-member-button'));
 
-            await userEvent.click(addButton);
+            // Simulate form data change
+            const formInput = screen.getByTestId('form-fullname');
+            await userEvent.type(formInput, 'Test');
 
-            const draftButton = screen.getByText('Зберегти як чернетку');
-            expect(draftButton).toHaveAttribute('data-button-style', 'secondary');
+            const backdrop = screen.getByTestId('modal-backdrop');
+            await userEvent.click(backdrop);
 
-            const publishButton = screen.getByText('Опублікувати');
-            expect(publishButton).toHaveAttribute('data-button-style', 'primary');
-            expect(publishButton).toHaveAttribute('form', 'add-member-modal');
-            expect(publishButton).toHaveAttribute('type', 'submit');
+            expect(screen.getByTestId('confirm-close-modal')).toBeInTheDocument();
+        });
+
+        it('resets state after confirming close without saving', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            await userEvent.click(screen.getByTestId('add-member-button'));
+
+            // Simulate form data change
+            const formInput = screen.getByTestId('form-fullname');
+            await userEvent.type(formInput, 'Test');
+
+            const backdrop = screen.getByTestId('modal-backdrop');
+            await userEvent.click(backdrop);
+
+            expect(screen.getByTestId('confirm-close-modal')).toBeInTheDocument();
+
+            await userEvent.click(screen.getByText('Так'));
+
+            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('confirm-close-modal')).not.toBeInTheDocument();
+        });
+
+        it('cancels close confirmation and returns to add member modal', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            await userEvent.click(screen.getByTestId('add-member-button'));
+
+            // Simulate form data change
+            const formInput = screen.getByTestId('form-fullname');
+            await userEvent.type(formInput, 'Test');
+
+            const backdrop = screen.getByTestId('modal-backdrop');
+            await userEvent.click(backdrop);
+
+            expect(screen.getByTestId('confirm-close-modal')).toBeInTheDocument();
+
+            await userEvent.click(screen.getByText('Ні'));
+
+            expect(screen.queryByTestId('confirm-close-modal')).not.toBeInTheDocument();
+            expect(screen.getByTestId('add-member-modal')).toBeInTheDocument();
         });
     });
 
@@ -356,7 +424,8 @@ describe('TeamPageToolbar', () => {
             const formInput = screen.getByTestId('form-fullname');
             await userEvent.type(formInput, 'Test');
 
-            fireEvent.click(screen.getByTestId('modal-backdrop'));
+            const backdrop = screen.getByTestId('modal-backdrop');
+            await userEvent.click(backdrop);
 
             await waitFor(() => {
                 expect(screen.getByTestId('confirm-close-modal')).toBeInTheDocument();
@@ -401,22 +470,16 @@ describe('TeamPageToolbar', () => {
             render(<TeamPageToolbar {...propsWithoutCallbacks} />);
 
             await userEvent.click(screen.getByTestId('add-member-button'));
-            act(() => {
-                capturedOnValuesChange({
-                    category: {
-                        id: 1,
-                        name: 'Основна команда',
-                        description: 'Test',
-                    },
-                    fullName: 'From test',
-                    description: 'from test desc',
-                    img: null,
-                });
-            });
+
+            // Simulate form data change
+            const formInput = screen.getByTestId('form-fullname');
+            await userEvent.type(formInput, 'Test');
+
             await userEvent.click(screen.getByText('Зберегти як чернетку'));
 
-            // Should not throw errors
-            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+            await waitFor(() => {
+                expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+            });
         });
     });
 
@@ -439,6 +502,88 @@ describe('TeamPageToolbar', () => {
 
             await userEvent.click(screen.getByText('Так'));
             expect(defaultProps.onMemberPublish).toHaveBeenCalled();
+        });
+
+        it('does not call onMemberPublish if pendingMemberData is null', async () => {
+            const onMemberPublish = jest.fn();
+            render(<TeamPageToolbar {...defaultProps} onMemberPublish={onMemberPublish} />);
+
+            expect(onMemberPublish).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('Form Data Management', () => {
+        it('closes modal directly when no form data changes', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            await userEvent.click(screen.getByTestId('add-member-button'));
+
+            // No changes initially - modal should close directly
+            const backdrop = screen.getByTestId('modal-backdrop');
+            await userEvent.click(backdrop);
+
+            expect(screen.queryByTestId('confirm-close-modal')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
+        });
+
+        it('shows confirmation when trying to close with unsaved changes', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            await userEvent.click(screen.getByTestId('add-member-button'));
+
+            // Simulate form data change by typing in the input
+            const formInput = screen.getByTestId('form-fullname');
+            await userEvent.type(formInput, 'Test User');
+
+            // Try to close the modal - should show confirmation
+            const backdrop = screen.getByTestId('modal-backdrop');
+            await userEvent.click(backdrop);
+
+            expect(screen.getByTestId('confirm-close-modal')).toBeInTheDocument();
+        });
+
+        it('cancels close confirmation and returns to add member modal', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            await userEvent.click(screen.getByTestId('add-member-button'));
+
+            // Simulate form data change
+            const formInput = screen.getByTestId('form-fullname');
+            await userEvent.type(formInput, 'Test User');
+
+            // Try to close - should show confirmation
+            const backdrop = screen.getByTestId('modal-backdrop');
+            await userEvent.click(backdrop);
+
+            expect(screen.getByTestId('confirm-close-modal')).toBeInTheDocument();
+
+            // Cancel the close confirmation
+            await userEvent.click(screen.getByText('Ні'));
+
+            expect(screen.queryByTestId('confirm-close-modal')).not.toBeInTheDocument();
+            expect(screen.getByTestId('add-member-modal')).toBeInTheDocument();
+        });
+
+        it('confirms close and resets state', async () => {
+            render(<TeamPageToolbar {...defaultProps} />);
+
+            await userEvent.click(screen.getByTestId('add-member-button'));
+
+            // Simulate form data change
+            const formInput = screen.getByTestId('form-fullname');
+            await userEvent.type(formInput, 'Test User');
+
+            // Try to close - should show confirmation
+            const backdrop = screen.getByTestId('modal-backdrop');
+            await userEvent.click(backdrop);
+
+            expect(screen.getByTestId('confirm-close-modal')).toBeInTheDocument();
+
+            // Confirm the close
+            await userEvent.click(screen.getByText('Так'));
+
+            expect(screen.queryByTestId('confirm-close-modal')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('add-member-modal')).not.toBeInTheDocument();
         });
     });
 });

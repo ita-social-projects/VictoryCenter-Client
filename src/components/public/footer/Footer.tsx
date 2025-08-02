@@ -41,6 +41,18 @@ export const Footer = () => {
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
     };
+    const handleFacebookClick = () => {
+        window.open(FACEBOOK, '_blank', 'noopener,noreferrer');
+    };
+
+    const handleTelegramClick = () => {
+        window.open(TELEGRAM, '_blank', 'noopener,noreferrer');
+    };
+
+    const handleInstagramClick = () => {
+        window.open(INSTAGRAM, '_blank', 'noopener,noreferrer');
+    };
+
     return (
         <div className="footer-content">
             <div className="main-block">
@@ -62,26 +74,44 @@ export const Footer = () => {
 
                 <div className="menu">
                     <span className="title">{MENU}</span>
-                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{REPORTING}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{STORE}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{HOW_TO_SUPPORT}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{STORIES_OF_VICTORIES}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                        {REPORTING}
+                    </Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                        {STORE}
+                    </Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                        {HOW_TO_SUPPORT}
+                    </Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                        {STORIES_OF_VICTORIES}
+                    </Link>
                 </div>
 
                 <div className="about_us">
                     <span className="title">{ABOUT_US}</span>
-                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{ABOUT_US}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{OUR_HISTORY}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{OUR_TEAM}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{PARTNERS}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL}>{EVENTS_AND_NEWS}</Link>
+                    <Link to={PUBLIC_ROUTES.ABOUT_US.FULL}>{ABOUT_US}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                        {OUR_HISTORY}
+                    </Link>
+                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{OUR_TEAM}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                        {PARTNERS}
+                    </Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                        {EVENTS_AND_NEWS}
+                    </Link>
                 </div>
 
                 <div className="hippotherapy">
                     <span className="title">{HIPPOTHERAPY}</span>
-                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{WHAT_IS_HIPPOTHERAPY}</Link>
-                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{PROGRAMS}</Link>
-                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{PROGRAMS_SESSIONS}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                        {WHAT_IS_HIPPOTHERAPY}
+                    </Link>
+                    <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{PROGRAMS}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                        {PROGRAMS_SESSIONS}
+                    </Link>
                 </div>
             </div>
 
@@ -95,13 +125,13 @@ export const Footer = () => {
                     </button>
                 </div>
                 <div className="social_media">
-                    <button className="contact-item" onClick={() => copyToClipboard(FACEBOOK)}>
+                    <button className="contact-item" onClick={handleFacebookClick}>
                         Facebook
                     </button>
-                    <button className="contact-item" onClick={() => copyToClipboard(TELEGRAM)}>
+                    <button className="contact-item" onClick={handleTelegramClick}>
                         Telegram
                     </button>
-                    <button className="contact-item" onClick={() => copyToClipboard(INSTAGRAM)}>
+                    <button className="contact-item" onClick={handleInstagramClick}>
                         Instagram
                     </button>
                 </div>

@@ -4,7 +4,7 @@ import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/common/button/Button';
 import { Select } from '../../../../../components/common/select/Select';
 import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
-import { ImageValues } from '../../../../../types/Image';
+import { ImageValues } from '../../../../../types/common/image';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';

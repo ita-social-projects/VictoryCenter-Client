@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { MemberDragPreview } from './MemberDragPreview';
-import { Image } from '../../../../../types/Image';
+import { Image } from '../../../../../types/common/image';
 import { TeamMember } from '../../../../../types/admin/team-members';
 import { DragPreviewModel } from '../../../../../types/admin/common';
 

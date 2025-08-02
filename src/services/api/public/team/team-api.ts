@@ -1,5 +1,5 @@
 import default_team_member_photo from '../../../../assets/icons/team-member-blank.svg';
-import { API_ROUTES } from '../../../../const/urls/main-api';
+import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import {
     MemberCard,
     PublicCategoryWithTeamMembersDto,
@@ -8,7 +8,7 @@ import {
     TeamPageData,
 } from '../../../../types/public/team-page';
 import { axiosInstance } from '../../axios';
-import { mapImageToBase64 } from '../../../../utils/functions/mapImageToBase64';
+import { mapImageToBase64 } from '../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 
 const isValidCategory = (category: PublicCategoryWithTeamMembersDto): boolean => {
     return Boolean(

@@ -1,8 +1,7 @@
-import { ProgramsApi } from './programs-api';
+import { VisibilityStatus } from '../../../../types/admin/common';
 import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '../../../../types/admin/programs';
 import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin/programs';
-
-global.URL.createObjectURL = jest.fn(() => 'mocked-image-url');
+import { ProgramsApi } from './programs-api';
 
 describe('ProgramsApi', () => {
     beforeEach(() => {
@@ -56,11 +55,11 @@ describe('ProgramsApi', () => {
         });
 
         it('should filter by status when provided', async () => {
-            const promise = ProgramsApi.fetchPrograms(1, 1, 10, 'Published');
+            const promise = ProgramsApi.fetchPrograms(1, 1, 10, VisibilityStatus.Published);
             jest.runAllTimers();
             const result = await promise;
 
-            expect(result.items.every((program) => program.status === 'Published')).toBe(true);
+            expect(result.items.every((program) => program.status === VisibilityStatus.Published)).toBe(true);
         });
 
         it('should handle pagination correctly', async () => {
@@ -92,13 +91,12 @@ describe('ProgramsApi', () => {
 
     describe('addProgram', () => {
         it('should add program with File image', async () => {
-            const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
             const programData: ProgramCreateUpdate = {
                 id: null,
                 name: 'Test Program',
                 description: 'Test Description',
-                status: 'Draft',
-                img: mockFile,
+                status: VisibilityStatus.Draft,
+                img: null,
                 categoryIds: [1, 2],
             };
 
@@ -111,25 +109,6 @@ describe('ProgramsApi', () => {
             expect(result.description).toBe(programData.description);
             expect(result.status).toBe(programData.status);
             expect(result.categories).toHaveLength(2);
-            expect(URL.createObjectURL).toHaveBeenCalledWith(mockFile);
-        });
-
-        it('should add program with string image', async () => {
-            const programData: ProgramCreateUpdate = {
-                id: null,
-                name: 'Test Program 2',
-                description: 'Test Description 2',
-                status: 'Published',
-                img: 'http://example.com/image.jpg',
-                categoryIds: [1],
-            };
-
-            const promise = ProgramsApi.addProgram(programData);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result.img).toBe('http://example.com/image.jpg');
-            expect(URL.createObjectURL).not.toHaveBeenCalled();
         });
 
         it('should add program with no image', async () => {
@@ -137,7 +116,7 @@ describe('ProgramsApi', () => {
                 id: null,
                 name: 'Test Program 3',
                 description: 'Test Description 3',
-                status: 'Draft',
+                status: VisibilityStatus.Draft,
                 img: null,
                 categoryIds: [2],
             };
@@ -154,7 +133,7 @@ describe('ProgramsApi', () => {
                 id: null,
                 name: 'Test Program 4',
                 description: 'Test Description 4',
-                status: 'Draft',
+                status: VisibilityStatus.Draft,
                 img: null,
                 categoryIds: [],
             };
@@ -169,13 +148,12 @@ describe('ProgramsApi', () => {
 
     describe('editProgram', () => {
         it('should edit existing program with File image', async () => {
-            const mockFile = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
             const programData: ProgramCreateUpdate = {
                 id: 1,
                 name: 'Updated Program',
                 description: 'Updated Description',
-                status: 'Published',
-                img: mockFile,
+                status: VisibilityStatus.Published,
+                img: null,
                 categoryIds: [2],
             };
 
@@ -187,29 +165,12 @@ describe('ProgramsApi', () => {
             expect(result.name).toBe(programData.name);
         });
 
-        it('should edit existing program with string image', async () => {
-            const programData: ProgramCreateUpdate = {
-                id: 2,
-                name: 'Updated Program 2',
-                description: 'Updated Description 2',
-                status: 'Draft',
-                img: 'http://example.com/new-image.jpg',
-                categoryIds: [1],
-            };
-
-            const promise = ProgramsApi.editProgram(programData);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result.img).toBe('http://example.com/new-image.jpg');
-        });
-
         it('should edit existing program with null image', async () => {
             const programData: ProgramCreateUpdate = {
                 id: 3,
                 name: 'Updated Program 3',
                 description: 'Updated Description 3',
-                status: 'Published',
+                status: VisibilityStatus.Published,
                 img: null,
                 categoryIds: [1, 2],
             };
@@ -226,7 +187,7 @@ describe('ProgramsApi', () => {
                 id: 999,
                 name: 'Non-existent Program',
                 description: 'Description',
-                status: 'Draft',
+                status: VisibilityStatus.Draft,
                 img: null,
                 categoryIds: [1],
             };
@@ -263,7 +224,6 @@ describe('ProgramsApi', () => {
                 id: null,
                 name: 'New Category',
             };
-
             const promise = ProgramsApi.addProgramCategory(categoryData);
             jest.runAllTimers();
             const result = await promise;
@@ -282,7 +242,7 @@ describe('ProgramsApi', () => {
                 name: 'Updated Category Name',
             };
 
-            const promise = ProgramsApi.editCategory(categoryData);
+            const promise = ProgramsApi.editProgramCategory(categoryData);
             jest.runAllTimers();
             const result = await promise;
 
@@ -297,7 +257,7 @@ describe('ProgramsApi', () => {
                 name: 'Non-existent Category',
             };
 
-            const promise = ProgramsApi.editCategory(categoryData);
+            const promise = ProgramsApi.editProgramCategory(categoryData);
             jest.runAllTimers();
             await expect(promise).rejects.toThrow('Category not found');
         });
@@ -308,7 +268,7 @@ describe('ProgramsApi', () => {
             const categoryToDelete = mockCategories.find((c) => c.programsCount === 0)!;
             const initialLength = mockCategories.length;
 
-            const promise = ProgramsApi.deleteCategory(categoryToDelete.id);
+            const promise = ProgramsApi.deleteProgramCategory(categoryToDelete.id);
             jest.runAllTimers();
             await promise;
 
@@ -319,13 +279,13 @@ describe('ProgramsApi', () => {
         it('should throw error when category has programs', async () => {
             const categoryWithPrograms = mockCategories.find((c) => c.programsCount > 0)!;
 
-            const promise = ProgramsApi.deleteCategory(categoryWithPrograms.id);
+            const promise = ProgramsApi.deleteProgramCategory(categoryWithPrograms.id);
             jest.runAllTimers();
             await expect(promise).rejects.toThrow('Category has at least one program');
         });
 
         it('should throw error when category not found', async () => {
-            const promise = ProgramsApi.deleteCategory(999);
+            const promise = ProgramsApi.deleteProgramCategory(999);
             jest.runAllTimers();
             await expect(promise).rejects.toThrow('Category not found');
         });

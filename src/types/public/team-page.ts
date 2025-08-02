@@ -1,5 +1,5 @@
 import { TeamCategory } from '../admin/team-members';
-import { Image } from '../Image';
+import { Image } from '../common/image';
 
 export interface MemberCard {
     id: number;

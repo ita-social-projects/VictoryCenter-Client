@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useCreateMemberForm } from '../../../../../hooks/admin/create-member-form';
+import { useCreateMemberForm } from '../../../../../hooks/admin/use-create-member-form/useCreateMemberForm';
 import '../members-list/Membersist.scss';
 import { MAX_FULLNAME_LENGTH, MAX_DESCRIPTION_LENGTH } from '../../../../../const/admin/data-validation';
-import { ImageValues } from '../../../../../types/Image';
-import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
+import { ImageValues } from '../../../../../types/common/image';
+import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';
 import ArrowUp from '../../../../../assets/icons/chevron-up.svg';
 import ArrowDown from '../../../../../assets/icons/chevron-down.svg';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';

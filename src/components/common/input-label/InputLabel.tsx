@@ -1,5 +1,4 @@
-import React from 'react';
-import './input-label.scss';
+import './InputLabel.scss';
 
 export interface InputLabelProps {
     htmlFor: string;

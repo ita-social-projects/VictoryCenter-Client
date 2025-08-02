@@ -1,5 +1,5 @@
 import './DonateSection.scss';
-import background from '../../../../assets/images/public/about-us-images/donate-background.jpg';
+import background from '../../../../assets/images/public/about-us-page/donate-background.jpg';
 import { Link } from 'react-router';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import { PUBLIC_ROUTES } from '../../../../const/public/routes';

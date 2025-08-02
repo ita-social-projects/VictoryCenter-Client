@@ -5,7 +5,7 @@ import { ProgramForm, ProgramFormRef, ProgramFormValues } from './ProgramForm';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramCategory } from '../../../../../types/admin/Programs';
 import { InputLabelProps } from '../../../../../components/common/input-label/InputLabel';
-import { Image } from '../../../../../types/Image';
+import { Image } from '../../../../../types/common/image';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 
 jest.mock('../../../../../components/common/input-label/InputLabel', () => ({

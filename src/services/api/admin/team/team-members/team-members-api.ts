@@ -1,9 +1,10 @@
 import { MemberFormValues } from '../../../../../pages/admin/team/components/member-form/MemberForm';
 import { AxiosInstance } from 'axios';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { ImagesApi } from '../../../../data-fetch/admin-page-data-fetch/image-data-fetch/ImageDataApi';
 import { TeamMember, TeamMemberDto } from '../../../../../types/admin/team-members';
+import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
+import { VisibilityStatus } from '../../../../../types/admin/common';
+import { ImageApi } from '../../image/image-api';
 
 export const TeamMembersApi = {
     getAll: async (
@@ -28,7 +29,7 @@ export const TeamMembersApi = {
             params.limit = Math.floor(limit);
         }
 
-        const response = await client.get<TeamMemberDto[]>('/TeamMembers', { params });
+        const response = await client.get<TeamMemberDto[]>(API_ROUTES.TEAM.BASE, { params });
         return response.data.map(mapTeamMemberDtoToTeamMember);
     },
 
@@ -49,11 +50,11 @@ export const TeamMembersApi = {
     },
 
     delete: async (client: AxiosInstance, id: number) => {
-        await client.delete(`/TeamMembers/${id}`);
+        await client.delete(`${API_ROUTES.TEAM.BASE}/${id}`);
     },
 
     reorder: async (client: AxiosInstance, categoryId: number, orderedIds: number[]) => {
-        await client.put(`/TeamMembers/reorder`, {
+        await client.put(API_ROUTES.TEAM.REORDER, {
             categoryId,
             orderedIds,
         });
@@ -65,10 +66,10 @@ export const TeamMembersApi = {
 
         if (member.image) {
             if (member.imageId) {
-                const imageResult = await ImagesApi.put(client, member.image, member.imageId);
+                const imageResult = await ImageApi.put(client, member.image, member.imageId);
                 finalImageId = imageResult.id;
             } else {
-                const imageResult = await ImagesApi.post(client, member.image);
+                const imageResult = await ImageApi.post(client, member.image);
                 finalImageId = imageResult.id;
             }
         } else if (member.imageId && !member.image) {
@@ -76,7 +77,7 @@ export const TeamMembersApi = {
             finalImageId = null;
         }
 
-        await client.put(`/TeamMembers/${id}`, {
+        await client.put(`${API_ROUTES.TEAM.BASE}/${id}`, {
             fullName: member.fullName,
             categoryId: member.category.id,
             status: status,
@@ -86,17 +87,17 @@ export const TeamMembersApi = {
         });
 
         if (imageIdToDelete && imageIdToDelete !== finalImageId) {
-            await ImagesApi.delete(client, imageIdToDelete);
+            await ImageApi.delete(client, imageIdToDelete);
         }
     },
 
     postMember: async (client: AxiosInstance, member: MemberFormValues, status: VisibilityStatus) => {
         let imageId: number | null = null;
         if (member.image) {
-            const imageResult = await ImagesApi.post(client, member.image);
+            const imageResult = await ImageApi.post(client, member.image);
             imageId = imageResult.id;
         }
-        await client.post(`/TeamMembers`, {
+        await client.post(API_ROUTES.TEAM.BASE, {
             fullName: member.fullName,
             categoryId: member.category.id,
             status: status,

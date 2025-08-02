@@ -1,8 +1,4 @@
-import program1 from '../../../assets/images/public/program-page/first.png';
-import program2 from '../../../assets/images/public/program-page/second.png';
-import program3 from '../../../assets/images/public/program-page/third.png';
-import program4 from '../../../assets/images/public/program-page/fourth.png';
-import program5 from '../../../assets/images/public/program-page/fifth.png';
+import { VisibilityStatus } from '../../../types/admin/common';
 import { Program, ProgramCategory } from '../../../types/admin/programs';
 
 export const mockCategories: ProgramCategory[] = [
@@ -18,8 +14,8 @@ export const mockPrograms: Program[] = [
         name: 'Кони лікують Літо 2025',
         description: 'Зменшення рівня стресу, тривоги та ПТСР у ветеранів, розвиток внутрішньої сили та опори.',
         categories: [mockCategories[0]],
-        status: 'Published',
-        img: program1,
+        status: VisibilityStatus.Published,
+        img: null,
     },
     {
         id: 2,
@@ -27,7 +23,7 @@ export const mockPrograms: Program[] = [
         description:
             'Покращення комунікаційних навичок, моторики та соціалізації для дітей з розладами спектру аутизму.',
         categories: [mockCategories[1], mockCategories[2]],
-        status: 'Draft',
+        status: VisibilityStatus.Draft,
         img: null,
     },
     {
@@ -36,16 +32,16 @@ export const mockPrograms: Program[] = [
         description:
             'Програма для військових з фізичними травмами: підтримка рухливості, баланс, м’язова стабільність.',
         categories: [mockCategories[0]],
-        status: 'Published',
-        img: program3,
+        status: VisibilityStatus.Published,
+        img: null,
     },
     {
         id: 4,
         name: 'Ігрова іпотерапія для молодших школярів',
         description: 'Розвиток уваги, емоційної стабільності та впевненості через взаємодію з кіньми в ігровій формі.',
         categories: [mockCategories[1]],
-        status: 'Draft',
-        img: program4,
+        status: VisibilityStatus.Draft,
+        img: null,
     },
     {
         id: 5,
@@ -53,24 +49,24 @@ export const mockPrograms: Program[] = [
         description:
             'Повернення відчуття контролю та безпеки, адаптація до мирного життя через тілесно-орієнтовану терапію.',
         categories: [mockCategories[0], mockCategories[2]],
-        status: 'Published',
-        img: program5,
+        status: VisibilityStatus.Published,
+        img: null,
     },
     {
         id: 6,
         name: 'Кінна адаптація для дітей з ДЦП',
         description: 'Покращення координації, зменшення м’язової спастики та розвиток моторики у дітей з ДЦП.',
         categories: [mockCategories[1], mockCategories[2]],
-        status: 'Published',
-        img: program1,
+        status: VisibilityStatus.Published,
+        img: null,
     },
     {
         id: 7,
         name: 'Соціальна адаптація дітей із кризових сімей',
         description: 'Розвиток довіри, емоційної безпеки та самоповаги через контакт із тваринами.',
         categories: [mockCategories[1]],
-        status: 'Draft',
-        img: program2,
+        status: VisibilityStatus.Draft,
+        img: null,
     },
     {
         id: 8,
@@ -78,39 +74,39 @@ export const mockPrograms: Program[] = [
         description:
             'Підтримка когнітивного та емоційного розвитку у дітей із синдромом Дауна через рухову активність.',
         categories: [mockCategories[1], mockCategories[2]],
-        status: 'Published',
-        img: program3,
+        status: VisibilityStatus.Published,
+        img: null,
     },
     {
         id: 9,
         name: 'Кінна психотерапія після бойових дій',
         description: 'Зменшення тривоги, агресії, повернення до мирного ритму життя.',
         categories: [mockCategories[0]],
-        status: 'Draft',
-        img: program4,
+        status: VisibilityStatus.Draft,
+        img: null,
     },
     {
         id: 10,
         name: 'Дитячий табір з елементами іпотерапії',
         description: 'Розвиток навичок співпраці, самоконтролю, самовираження.',
         categories: [mockCategories[1]],
-        status: 'Published',
-        img: program5,
+        status: VisibilityStatus.Published,
+        img: null,
     },
     {
         id: 11,
         name: 'Стабілізаційна програма для ветеранів',
         description: 'Відновлення довіри до тіла, нормалізація сну та емоційний контакт через роботу з конем.',
         categories: [mockCategories[0]],
-        status: 'Published',
-        img: program1,
+        status: VisibilityStatus.Published,
+        img: null,
     },
     {
         id: 12,
         name: 'Групова терапія для дітей з тривожністю',
         description: 'Зниження соціальної ізоляції та підтримка самовираження в групі.',
         categories: [mockCategories[1]],
-        status: 'Draft',
-        img: program2,
+        status: VisibilityStatus.Draft,
+        img: null,
     },
 ];

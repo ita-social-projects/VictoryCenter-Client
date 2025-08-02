@@ -1,5 +1,5 @@
 import './OurTeam.scss';
-import ourTeam from '../../../../assets/images/public/about-us-images/our-team.jpg';
+import ourTeam from '../../../../assets/images/public/about-us-page/our-team.jpg';
 import { NavLink } from 'react-router';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import { PUBLIC_ROUTES } from '../../../../const/public/routes';

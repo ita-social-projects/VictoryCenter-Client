@@ -1,4 +1,4 @@
-import { MockCards, MockQuestions } from '../../../../utils/mock-data/public/program-page/programs-page';
+import { MockCards, MockQuestions } from '../../../../utils/mock-data/public/programs-page';
 import { programPageDataFetch, questionDataFetch } from './programs-api';
 
 describe('programPageDataFetch', () => {

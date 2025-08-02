@@ -3,11 +3,11 @@ import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/pr
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { ProgramCategory } from '../../../../../types/admin/Programs';
 import { MultiSelectInput } from '../../../../../components/common/multi-select-input/MultiSelectInput';
-import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
+import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';
 import { InputLabel } from '../../../../../components/common/input-label/InputLabel';
 import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
 import { TextAreaWithCharacterLimit } from '../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { Image, ImageValues, ImageValuesToImage, ImageToImageValue } from '../../../../../types/Image';
+import { Image, ImageValues, ImageValuesToImage, ImageToImageValue } from '../../../../../types/common/image';
 import './ProgramForm.scss';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 

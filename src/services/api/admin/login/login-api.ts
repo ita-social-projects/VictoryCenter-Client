@@ -1,4 +1,4 @@
-import { API_ROUTES } from '../../../../const/urls/main-api';
+import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import { AuthResponse, Credentials } from '../../../../types/admin/auth';
 import { AuthClient } from '../../../auth/auth-client';
 

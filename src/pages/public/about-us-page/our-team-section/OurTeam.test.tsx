@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { OurTeam } from './OurTeam';
 
-jest.mock('../../../../assets/images/public/about-us-images/our-team.jpg', () => 'our-team.jpg');
+jest.mock('../../../../assets/images/public/about-us-page/our-team.jpg', () => 'our-team.jpg');
 
 jest.mock('../../../../const/public/about-us-page', () => ({
     ABOUT_US_DATA: {

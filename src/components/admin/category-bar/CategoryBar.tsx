@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import { ContextMenuButton } from '../../common/context-menu-button/ContextMenuButton';
+import { ContextMenuButton } from '../context-menu-button/ContextMenuButton';
 import './CategoryBar.scss';
 
 export interface ContextMenuOption {
@@ -12,8 +12,8 @@ export interface CategoryBarProps<T> {
     categories: T[];
     selectedCategory: T | null;
     displayContextMenuButton?: boolean;
-    getItemDisplayName: (item: T) => string;
-    getItemKey: (item: T) => string | number;
+    getCategoryDisplayName: (item: T) => string;
+    getCategoryKey: (item: T) => string | number;
     onCategorySelect: (category: T) => void;
     contextMenuOptions?: ContextMenuOption[];
     onContextMenuOptionSelected?: (id: string) => void;
@@ -23,8 +23,8 @@ export const CategoryBar = <T,>({
     categories,
     selectedCategory,
     displayContextMenuButton = false,
-    getItemDisplayName,
-    getItemKey,
+    getCategoryDisplayName,
+    getCategoryKey,
     onCategorySelect,
     contextMenuOptions = [],
     onContextMenuOptionSelected,
@@ -45,9 +45,9 @@ export const CategoryBar = <T,>({
                 </ContextMenuButton>
             )}
             {categories.map((category) => {
-                const key = getItemKey(category);
-                const name = getItemDisplayName(category);
-                const selected = !!selectedCategory && key === getItemKey(selectedCategory);
+                const key = getCategoryKey(category);
+                const name = getCategoryDisplayName(category);
+                const selected = !!selectedCategory && key === getCategoryKey(selectedCategory);
 
                 return (
                     <button

@@ -1,6 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { TeamCategory, TeamCategoryDto } from '../../../../../types/admin/team-members';
 import { mapTeamCategoryDtoToTeamCategory, TeamCategoriesApi } from './team-categories-api';
+import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
 
 describe('mapTeamCategoryDtoToTeamCategory', () => {
     it('should correctly map DTO to TeamCategory', () => {
@@ -35,7 +36,7 @@ describe('TeamCategoriesApi.getAll', () => {
 
         const result = await TeamCategoriesApi.getAll(mockClient);
 
-        expect(mockClient.get).toHaveBeenCalledWith('/Categories');
+        expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.CATEGORIES);
         expect(result).toEqual([
             { id: 1, name: 'A', description: 'Desc A' },
             { id: 2, name: 'B', description: 'Desc B' },

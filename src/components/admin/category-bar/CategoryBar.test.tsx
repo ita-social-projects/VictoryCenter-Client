@@ -13,7 +13,7 @@ interface MockContextMenuButtonOptionProps {
     value: string;
 }
 
-jest.mock('../../common/context-menu-button/ContextMenuButton', () => {
+jest.mock('../context-menu-button/ContextMenuButton', () => {
     const MockContextMenuButton = ({ children, onOptionSelected }: MockContextMenuButtonProps) => (
         <button data-testid="context-menu-button" onClick={() => onOptionSelected?.('test-option')} type="button">
             {children}
@@ -45,8 +45,8 @@ describe('CategoryBar', () => {
     const defaultProps = {
         categories: mockCategories,
         selectedCategory: null,
-        getItemDisplayName: (item: MockContextMenuOption) => item.title,
-        getItemKey: (item: MockContextMenuOption) => item.id,
+        getCategoryDisplayName: (item: MockContextMenuOption) => item.title,
+        getCategoryKey: (item: MockContextMenuOption) => item.id,
         onCategorySelect: jest.fn(),
     };
 

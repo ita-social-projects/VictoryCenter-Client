@@ -2,9 +2,10 @@ import { AxiosInstance } from 'axios';
 import { MemberFormValues } from '../../../../../pages/admin/team/components/member-form/MemberForm';
 import { TeamMemberDto } from '../../../../../types/admin/team-members';
 import { TeamMembersApi, mapTeamMemberDtoToTeamMember } from './team-members-api';
-import { Image, ImageValues } from '../../../../../types/Image';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
-import { ImagesApi } from '../../../../data-fetch/admin-page-data-fetch/image-data-fetch/ImageDataApi';
+import { Image, ImageValues } from '../../../../../types/common/image';
+import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
+import { VisibilityStatus } from '../../../../../types/admin/common';
+import { ImageApi } from '../../image/image-api';
 
 const mockClient = {
     get: jest.fn(),
@@ -13,8 +14,8 @@ const mockClient = {
     delete: jest.fn(),
 } as unknown as jest.Mocked<AxiosInstance>;
 
-jest.mock('../../image-data-fetch/ImageDataApi', () => ({
-    ImagesApi: {
+jest.mock('../../image/image-api', () => ({
+    ImageApi: {
         post: jest.fn(),
         put: jest.fn(),
         delete: jest.fn(),
@@ -57,7 +58,7 @@ describe('TeamMembersApi', () => {
 
             const members = await TeamMembersApi.getAll(mockClient);
 
-            expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', { params: {} });
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, { params: {} });
             expect(members).toEqual([
                 {
                     id: 1,
@@ -76,7 +77,7 @@ describe('TeamMembersApi', () => {
 
             await TeamMembersApi.getAll(mockClient, params.categoryId, params.status, params.offset, params.limit);
 
-            expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', {
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
                 params: {
                     categoryId: params.categoryId,
                     status: params.status,
@@ -111,7 +112,7 @@ describe('TeamMembersApi', () => {
         it('should post member as draft without an image', async () => {
             await TeamMembersApi.postDraft(mockClient, memberValues);
 
-            expect(mockClient.post).toHaveBeenCalledWith('/TeamMembers', {
+            expect(mockClient.post).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
                 fullName: memberValues.fullName,
                 categoryId: memberValues.category.id,
                 status: VisibilityStatus.Draft,
@@ -119,17 +120,17 @@ describe('TeamMembersApi', () => {
                 email: '',
                 imageId: null,
             });
-            expect(ImagesApi.post).not.toHaveBeenCalled();
+            expect(ImageApi.post).not.toHaveBeenCalled();
         });
 
         it('should post member as draft and create an image', async () => {
-            (ImagesApi.post as jest.Mock).mockResolvedValue(mockImageResponse);
+            (ImageApi.post as jest.Mock).mockResolvedValue(mockImageResponse);
             const memberWithImage = { ...memberValues, image: mockImageValues };
 
             await TeamMembersApi.postDraft(mockClient, memberWithImage);
 
-            expect(ImagesApi.post).toHaveBeenCalledWith(mockClient, mockImageValues);
-            expect(mockClient.post).toHaveBeenCalledWith('/TeamMembers', {
+            expect(ImageApi.post).toHaveBeenCalledWith(mockClient, mockImageValues);
+            expect(mockClient.post).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
                 fullName: memberValues.fullName,
                 categoryId: memberValues.category.id,
                 status: VisibilityStatus.Draft,
@@ -140,13 +141,13 @@ describe('TeamMembersApi', () => {
         });
 
         it('should post member as published and create an image', async () => {
-            (ImagesApi.post as jest.Mock).mockResolvedValue(mockImageResponse);
+            (ImageApi.post as jest.Mock).mockResolvedValue(mockImageResponse);
             const memberWithImage = { ...memberValues, image: mockImageValues };
 
             await TeamMembersApi.postPublished(mockClient, memberWithImage);
 
-            expect(ImagesApi.post).toHaveBeenCalledWith(mockClient, mockImageValues);
-            expect(mockClient.post).toHaveBeenCalledWith('/TeamMembers', {
+            expect(ImageApi.post).toHaveBeenCalledWith(mockClient, mockImageValues);
+            expect(mockClient.post).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
                 fullName: memberValues.fullName,
                 categoryId: memberValues.category.id,
                 status: VisibilityStatus.Published,
@@ -180,19 +181,19 @@ describe('TeamMembersApi', () => {
                 email: '',
                 imageId: null,
             });
-            expect(ImagesApi.post).not.toHaveBeenCalled();
-            expect(ImagesApi.put).not.toHaveBeenCalled();
-            expect(ImagesApi.delete).toHaveBeenCalledTimes(1);
+            expect(ImageApi.post).not.toHaveBeenCalled();
+            expect(ImageApi.put).not.toHaveBeenCalled();
+            expect(ImageApi.delete).toHaveBeenCalledTimes(1);
         });
 
         it('should update member as published and add a new image', async () => {
-            (ImagesApi.post as jest.Mock).mockResolvedValue(mockImageResponse);
+            (ImageApi.post as jest.Mock).mockResolvedValue(mockImageResponse);
             const memberWithNewImage = { ...memberValues, image: mockImageValues, imageId: null };
 
             await TeamMembersApi.updatePublish(mockClient, memberId, memberWithNewImage);
 
-            expect(ImagesApi.post).toHaveBeenCalledWith(mockClient, mockImageValues);
-            expect(mockClient.put).toHaveBeenCalledWith(`/TeamMembers/${memberId}`, {
+            expect(ImageApi.post).toHaveBeenCalledWith(mockClient, mockImageValues);
+            expect(mockClient.put).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}/${memberId}`, {
                 fullName: memberWithNewImage.fullName,
                 categoryId: memberWithNewImage.category.id,
                 status: VisibilityStatus.Published,
@@ -203,13 +204,13 @@ describe('TeamMembersApi', () => {
         });
 
         it('should update member as published and update an existing image', async () => {
-            (ImagesApi.put as jest.Mock).mockResolvedValue(mockImageResponse);
+            (ImageApi.put as jest.Mock).mockResolvedValue(mockImageResponse);
             const memberWithUpdatedImage = { ...memberValues, image: mockImageValues, imageId: 10 };
 
             await TeamMembersApi.updatePublish(mockClient, memberId, memberWithUpdatedImage);
 
-            expect(ImagesApi.put).toHaveBeenCalledWith(mockClient, mockImageValues, 10);
-            expect(mockClient.put).toHaveBeenCalledWith(`/TeamMembers/${memberId}`, {
+            expect(ImageApi.put).toHaveBeenCalledWith(mockClient, mockImageValues, 10);
+            expect(mockClient.put).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}/${memberId}`, {
                 fullName: memberWithUpdatedImage.fullName,
                 categoryId: memberWithUpdatedImage.category.id,
                 status: VisibilityStatus.Published,
@@ -224,7 +225,7 @@ describe('TeamMembersApi', () => {
 
             await TeamMembersApi.updatePublish(mockClient, memberId, memberWithRemovedImage);
 
-            expect(mockClient.put).toHaveBeenCalledWith(`/TeamMembers/${memberId}`, {
+            expect(mockClient.put).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}/${memberId}`, {
                 fullName: memberWithRemovedImage.fullName,
                 categoryId: memberWithRemovedImage.category.id,
                 status: VisibilityStatus.Published,
@@ -232,14 +233,14 @@ describe('TeamMembersApi', () => {
                 email: '',
                 imageId: null,
             });
-            expect(ImagesApi.delete).toHaveBeenCalledWith(mockClient, 10);
+            expect(ImageApi.delete).toHaveBeenCalledWith(mockClient, 10);
         });
     });
 
     describe('delete', () => {
         it('should delete a member by id', async () => {
             await TeamMembersApi.delete(mockClient, 42);
-            expect(mockClient.delete).toHaveBeenCalledWith('/TeamMembers/42');
+            expect(mockClient.delete).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}/42`);
         });
 
         it('should throw an error if delete fails', async () => {
@@ -254,7 +255,7 @@ describe('TeamMembersApi', () => {
             const payload = { categoryId: 1, orderedIds: [3, 2, 1] };
             await TeamMembersApi.reorder(mockClient, payload.categoryId, payload.orderedIds);
 
-            expect(mockClient.put).toHaveBeenCalledWith('/TeamMembers/reorder', payload);
+            expect(mockClient.put).toHaveBeenCalledWith(API_ROUTES.TEAM.REORDER, payload);
         });
     });
 

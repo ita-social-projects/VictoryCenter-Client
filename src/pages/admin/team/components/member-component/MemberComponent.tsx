@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import './MemberComponent.scss';
 import BlankUserImage from '../../../../../assets/icons/blank-user.svg';
-import { mapImageToBase64 } from '../../../../../utils/functions/mapImageToBase64';
+import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 import { TeamMember } from '../../../../../types/admin/team-members';
 export const MemberComponent = ({
     member,

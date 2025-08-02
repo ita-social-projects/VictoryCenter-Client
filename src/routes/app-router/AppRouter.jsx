@@ -1,5 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { MainLayout } from '../../layouts/main-layout/MainLayout';
+import { BrowserRouter, Routes, Route } from 'react-router';
 
 import { AdminPage } from '../../pages/admin/AdminPage';
 
@@ -9,6 +8,7 @@ import { NotFound } from '../../pages/public/not-found/NotFound';
 import { ProgramPage } from '../../pages/public/program-page/ProgramPage';
 
 import { AdminLayout } from '../../layouts/admin-layout/AdminLayout';
+import { PublicLayout } from '../../layouts/public-layout/PublicLayout';
 import { TeamPageAdmin } from '../../pages/admin/team/TeamPage';
 import { ProgramsPageAdmin } from '../../pages/admin/programs/ProgramsPageAdmin';
 
@@ -24,7 +24,7 @@ import { AboutUsPage } from '../../pages/public/about-us-page/AboutUsPage';
 export const AppRouter = () => (
     <BrowserRouter>
         <Routes>
-            <Route path="/" element={<MainLayout />}>
+            <Route path="/" element={<PublicLayout />}>
                 <Route index element={<AboutUsPage />} />
                 <Route path={PUBLIC_ROUTES.TEAM.FULL} element={<TeamPage />} />
                 <Route path={PUBLIC_ROUTES.PROGRAMS.FULL} element={<ProgramPage />} />

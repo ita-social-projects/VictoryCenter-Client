@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TeamMember } from '../../../../../types/admin/team-members';
 import { MemberComponent } from './MemberComponent';
-import { Image } from '../../../../../types/Image';
+import { Image } from '../../../../../types/common/image';
 
 const mockImage: Image = {
     id: 1,

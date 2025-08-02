@@ -29,7 +29,8 @@
         "ts-node": "^10.9.2",
         "typescript": "^4.9.5",
         "web-vitals": "^2.1.4",
-        "yup": "^1.6.1"
+        "yup": "^1.6.1",
+      "@react-buddy/ide-toolbox": "^2.4.0"
     },
     "scripts": {
         "start": "react-scripts start",

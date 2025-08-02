@@ -32,7 +32,7 @@ import {
 } from '../../const/footer/footer';
 
 const {
-    userPageRoutes: { teamPageRoute, page2Route, aboutUsRoute, programPage },
+    userPageRoutes: { teamPageRoute, page2Route, aboutUsRoute, programPage, partnersPageRoute },
 } = routes;
 
 export const Footer = () => {
@@ -99,9 +99,7 @@ export const Footer = () => {
                         {OUR_HISTORY}
                     </Link>
                     <Link to={teamPageRoute}>{OUR_TEAM}</Link>
-                    <Link to={page2Route} className="disable">
-                        {PARTNERS}
-                    </Link>
+                    <Link to={partnersPageRoute}>{PARTNERS}</Link>
                     <Link to={page2Route} className="disable">
                         {EVENTS_AND_NEWS}
                     </Link>

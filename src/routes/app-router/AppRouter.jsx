@@ -9,6 +9,7 @@ import { TeamPage } from '../../pages/user-pages/team-page/TeamPage';
 
 import { NotFound } from '../../pages/not-found/NotFound';
 import { ProgramPage } from '../../pages/program-page/ProgramPage';
+import { PartnersPage } from '../../pages/partners-page/PartnersPage';
 
 import { AboutUsPage } from '../../pages/about-us-page/AboutUsPage';
 import { routes } from '../../const/routers/routes';
@@ -27,7 +28,7 @@ const {
     programPage,
     adminRoutes,
     aboutUsRoute,
-    userPageRoutes: { teamPageRoute, page2Route },
+    userPageRoutes: { teamPageRoute, page2Route, partnersPageRoute },
     donatePageRoute,
 } = routes;
 
@@ -37,6 +38,7 @@ export const AppRouter = () => (
             <Route path="/" element={<MainLayout />}>
                 <Route index element={<AboutUsPage />} />
                 <Route path={teamPageRoute} element={<TeamPage />} />
+                <Route path={partnersPageRoute} element={<PartnersPage />} />
                 <Route path={page2Route} element={<ProgramPage />} />
                 <Route path={programPage} element={<ProgramPage />} />
                 <Route path={aboutUsRoute} element={<AboutUsPage />} />

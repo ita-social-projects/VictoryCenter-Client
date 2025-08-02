@@ -1,0 +1,34 @@
+import React from 'react';
+import {
+    PARTNER_FIRST_SECTION,
+    PARTNERS_FIRST_SECTION_DESCRIPTION,
+    PARTNERS_FIRST_SECTION_TITLE,
+} from '../../../../const/partners-page/partners-page';
+import './partners-first-section.scss';
+
+export const PartnersFirstSection: React.FC = () => {
+    return (
+        <section className="partners-content-section">
+            <div className="container">
+                <div className="partners-header">
+                    <h2 className="section-title">
+                        {PARTNERS_FIRST_SECTION_TITLE.FIRST_LINE}
+                        {PARTNERS_FIRST_SECTION_TITLE.SECOND_LINE}
+                    </h2>
+                    <p className="section-description">
+                        {PARTNERS_FIRST_SECTION_DESCRIPTION.FIRST_LINE}
+                        {PARTNERS_FIRST_SECTION_DESCRIPTION.SECOND_LINE}
+                    </p>
+                </div>
+                <div className="partners-logos">
+                    {PARTNER_FIRST_SECTION.map((partner) => (
+                        <div key={partner.id} className="partner-item">
+                            <img src={partner.logo} alt={`${partner.name} logo`} className="partner-logo" />
+                            <p className="partner-name">{partner.name}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+};

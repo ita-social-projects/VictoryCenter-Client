@@ -1,0 +1,121 @@
+.video-background-container {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  margin-right: 100px;
+  width: 110vw;
+  height: 70vh;
+  overflow: hidden;
+}
+
+.background-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 110vw;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  z-index: -1;
+}
+
+.quote-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  max-width: 70%;
+  color: white;
+  font-family: 'Mulish', sans-serif;
+  padding: 5rem;
+  text-align: center;
+
+  .video-text {
+    font-weight: 600;
+    font-size: 3rem;
+    line-height: 1.2;
+    margin: 0 0 2rem;
+    text-transform: uppercase;
+  }
+
+  .video-description {
+    font-weight: 400;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    margin: 0 0 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .video-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+
+    .btn-primary {
+      background-color: #FFD700;
+      color: #000;
+      border: none;
+      padding: 1rem 2rem;
+      font-family: 'Mulish', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #E6C200;
+      }
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: white;
+      border: 2px solid white;
+      padding: 1rem 2rem;
+      font-family: 'Mulish', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: white;
+        color: #000;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .quote-overlay {
+    max-width: 90%;
+    padding: 2rem;
+
+    .video-text {
+      font-size: 2rem;
+    }
+
+    .video-description {
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .video-buttons {
+      flex-direction: column;
+
+      .btn-primary,
+      .btn-secondary {
+        width: 100%;
+        max-width: 250px;
+      }
+    }
+  }
+}

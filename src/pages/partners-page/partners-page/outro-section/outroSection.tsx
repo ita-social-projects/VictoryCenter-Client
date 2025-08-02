@@ -1,0 +1,23 @@
+import React from 'react';
+import './outro-section.scss';
+import outro from '../../../../assets/partners-page-images/outro.mp4';
+import { OUTRO } from '../../../../const/partners-page/partners-page';
+
+export const OutroSection: React.FC = () => {
+    return (
+        <div className="video-background-container">
+            <video autoPlay muted loop playsInline className="background-video">
+                <source src={outro} type="video/mp4" />
+            </video>
+
+            <div className="quote-overlay">
+                <h1 className="video-text">{OUTRO.TITLE.FIRST_LINE}</h1>
+                <p className="video-description">{OUTRO.TEXT}</p>
+                <div className="video-buttons">
+                    <button className="btn-primary">Стати партнером</button>
+                    <button className="btn-secondary">Підтримати</button>
+                </div>
+            </div>
+        </div>
+    );
+};

@@ -3,6 +3,7 @@ import './TeamPage.scss';
 import horseVideo from '../../../assets/team_page_images/horse_video.mp4';
 import { teamPageDataFetch } from '../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch';
 import { TeamMember } from './TeamMemberCard/TeamMemberCard';
+import { LinearProgress } from '@mui/material';
 import { TeamItem } from '../../../types/public/TeamPage';
 import {
     DOWNLOAD_ERROR,
@@ -14,24 +15,30 @@ import {
     VIDEO_TEXT_AUTHOR,
 } from '../../../const/team-page/team-page';
 import classNames from 'classnames';
+import { set } from 'lodash';
 
 export const TeamPage: React.FC = () => {
     const [teamData, setTeamData] = useState<TeamItem[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchData = async () => {
-            try {
-                const response = await teamPageDataFetch();
-                const { teamData } = response;
-                setTeamData(teamData);
-                setError(null);
-            } catch {
-                setError(DOWNLOAD_ERROR);
-                setTeamData([]);
-            }
+            setLoading(true);
+            setTimeout(async () => {
+                try {
+                    const response = await teamPageDataFetch();
+                    const { teamData } = response;
+                    setTeamData(teamData);
+                    setError(null);
+                } catch {
+                    setError(DOWNLOAD_ERROR);
+                    setTeamData([]);
+                } finally {
+                    setLoading(false);
+                }
+            }, 5000);
         };
-
         fetchData();
     }, []);
 
@@ -43,24 +50,28 @@ export const TeamPage: React.FC = () => {
                 </div>
             )}
 
-            {teamData.map((team, index) => (
-                <div
-                    key={index}
-                    className={classNames('team-section', { 'last-section': index === teamData.length - 1 })}
-                >
-                    <div className="team_info">
-                        <div className="members-grid">
-                            <div className="team_description">
-                                <h2>{team.title}</h2>
-                                <p>{team.description}</p>
+            {loading ? (
+                <LinearProgress className="loader" />
+            ) : (
+                teamData.map((team, index) => (
+                    <div
+                        key={index}
+                        className={classNames('team-section', { 'last-section': index === teamData.length - 1 })}
+                    >
+                        <div className="team_info">
+                            <div className="members-grid">
+                                <div className="team_description">
+                                    <h2>{team.title}</h2>
+                                    <p>{team.description}</p>
+                                </div>
+                                {team.members.map((member) => (
+                                    <TeamMember key={member.id} member={member} />
+                                ))}
                             </div>
-                            {team.members.map((member) => (
-                                <TeamMember key={member.id} member={member} />
-                            ))}
                         </div>
                     </div>
-                </div>
-            ))}
+                ))
+            )}
 
             <div className="video-background-container">
                 <video autoPlay muted loop playsInline className="background-video">

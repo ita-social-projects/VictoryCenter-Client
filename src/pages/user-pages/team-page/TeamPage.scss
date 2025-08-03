@@ -85,8 +85,7 @@
         margin: 0;
         padding: 0;
         position: relative;
-        margin-right: 100px;
-        width: 110vw;
+        width: 100vw;
         height: 70vh;
         overflow: hidden;
     }
@@ -95,7 +94,7 @@
         position: absolute;
         top: 50%;
         left: 50%;
-        min-width: 110vw;
+        min-width: 100vw;
         min-height: 100%;
         width: auto;
         height: auto;
@@ -125,5 +124,10 @@
     .author {
         margin-top: 2rem;
         font-weight: 700;
+    }
+
+    .loader{
+        width: 70%;
+        margin-bottom: 4rem;
     }
 }

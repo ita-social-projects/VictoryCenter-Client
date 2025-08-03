@@ -1,3 +1,5 @@
+@import '../../../../assets/sass/variables/_variables.colors.scss';
+
 .video-background-container {
   margin: 0;
   padding: 0;
@@ -22,69 +24,80 @@
 }
 
 .quote-overlay {
+  min-height: 35rem;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 3.75rem;
+  left: 14%;
   z-index: 1;
-  max-width: 70%;
-  color: white;
-  font-family: 'Mulish', sans-serif;
-  padding: 5rem;
-  text-align: center;
+  width: 72%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
 
   .video-text {
+    font-family: Mulish, sans-serif;
     font-weight: 600;
-    font-size: 3rem;
-    line-height: 1.2;
-    margin: 0 0 2rem;
+    font-size: 4rem;
+    line-height: 4.5rem;
+    letter-spacing: 0;
+    text-align: center;
     text-transform: uppercase;
+    color: $main-white;
   }
 
   .video-description {
-    font-weight: 400;
-    font-size: 1.25rem;
+    font-weight: 350;
+    font-size: 1rem;
     line-height: 1.5;
-    margin: 0 0 3rem;
+    margin-top: 19rem;
     max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
+    text-align: center;
+    color: $main-white;
   }
 
   .video-buttons {
     display: flex;
-    gap: 1rem;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 
     .btn-primary {
-      background-color: #FFD700;
-      color: #000;
-      border: none;
-      padding: 1rem 2rem;
-      font-family: 'Mulish', sans-serif;
-      font-weight: 600;
+      height: 2.5rem;
+      opacity: 1;
+      padding: 0.5rem 1.5rem;
+      background-color: $yellow-500;
+      color: $blue-900;
+      font-family: Mulish, sans-serif;
+      font-weight: 400;
       font-size: 1rem;
-      border-radius: 4px;
+      line-height: 1.5rem;
+      letter-spacing: -0.02em;
+      vertical-align: middle;
+      border: none;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      text-decoration: none;
 
       &:hover {
-        background-color: #E6C200;
+        color: $main-white;
+        background-color: $blue-900;
       }
     }
 
     .btn-secondary {
-      background-color: transparent;
-      color: white;
-      border: 2px solid white;
-      padding: 1rem 2rem;
-      font-family: 'Mulish', sans-serif;
-      font-weight: 600;
+      height: 2.5rem;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid $grey-50;
+      font-family: Mulish, sans-serif;
+      font-weight: 400;
       font-size: 1rem;
-      border-radius: 4px;
+      line-height: 1.5rem;
+      letter-spacing: -0.02em;
+      vertical-align: middle;
+      background: none;
+      color: $grey-50;
       cursor: pointer;
-      transition: all 0.3s ease;
+      text-decoration: none;
 
       &:hover {
         background-color: white;

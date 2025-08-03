@@ -14,8 +14,8 @@ export const OutroSection: React.FC = () => {
                 <h1 className="video-text">{OUTRO.TITLE.FIRST_LINE}</h1>
                 <p className="video-description">{OUTRO.TEXT}</p>
                 <div className="video-buttons">
-                    <button className="btn-primary">Стати партнером</button>
-                    <button className="btn-secondary">Підтримати</button>
+                    <button className="btn-primary">{OUTRO.BUTTON_BECOME_SUPPORT_TEXT}</button>
+                    <button className="btn-secondary">{OUTRO.BUTTON_SUPPORT_TEXT}</button>
                 </div>
             </div>
         </div>

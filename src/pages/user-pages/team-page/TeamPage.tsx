@@ -15,7 +15,6 @@ import {
     VIDEO_TEXT_AUTHOR,
 } from '../../../const/team-page/team-page';
 import classNames from 'classnames';
-import { set } from 'lodash';
 
 export const TeamPage: React.FC = () => {
     const [teamData, setTeamData] = useState<TeamItem[]>([]);

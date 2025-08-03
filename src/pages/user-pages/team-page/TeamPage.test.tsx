@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { TeamPage } from './TeamPage';
 import * as TeamPageDataFetchModule from '../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch';
 import { TeamItem, TeamMemberProps } from '../../../types/public/TeamPage';
+import { TeamPageData } from '../../../types/public/TeamPage';
 
 jest.mock('../../../assets/team_page_images/horse_video.mp4', () => 'mocked-video.mp4');
 
@@ -147,5 +148,22 @@ describe('TeamPage component', () => {
         expect(videoElement?.hasAttribute('autoplay')).toBe(true);
         expect(videoElement?.hasAttribute('loop')).toBe(true);
         expect(videoElement?.hasAttribute('playsinline')).toBe(true);
+    });
+
+    it('should show loader while data is loading and hide it after', async () => {
+        let resolveFetch: any;
+        const fetchPromise = new Promise<TeamPageData>((resolve) => {
+            resolveFetch = resolve;
+        });
+
+        spyTeamPageDataFetch.mockReturnValueOnce(fetchPromise);
+
+        render(<TeamPage />);
+        expect(screen.getByRole('progressbar')).toBeInTheDocument();
+        resolveFetch({ teamData: mockTeamDataSingle });
+        await waitFor(() => {
+            expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+        });
+        expect(screen.getByText('Основна команда')).toBeInTheDocument();
     });
 });

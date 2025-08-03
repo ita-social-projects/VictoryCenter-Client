@@ -25,19 +25,17 @@ export const TeamPage: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            setTimeout(async () => {
-                try {
-                    const response = await teamPageDataFetch();
-                    const { teamData } = response;
-                    setTeamData(teamData);
-                    setError(null);
-                } catch {
-                    setError(DOWNLOAD_ERROR);
-                    setTeamData([]);
-                } finally {
-                    setLoading(false);
-                }
-            }, 5000);
+            try {
+                const response = await teamPageDataFetch();
+                const { teamData } = response;
+                setTeamData(teamData);
+                setError(null);
+            } catch {
+                setError(DOWNLOAD_ERROR);
+                setTeamData([]);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchData();
     }, []);

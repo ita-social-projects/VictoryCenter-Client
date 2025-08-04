@@ -1,17 +1,16 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { FaqCard } from './FaqCard';
-import { FaqQuestion } from '../../../../types/public/faq';
+import { QuestionCard } from './QuestionCard';
+import { Question } from '../../../../../types/public/programs-page';
 
 describe('test question card component', () => {
-    const mockQuestion: FaqQuestion = {
-        id: 1,
+    const mockQuestion: Question = {
         question: 'Як долучитись до програми?',
         answer:
             'Потрібно заповнити коротку анкету або написати координатору через форму на сайті.' +
             " Після цього ми зв'яжемось для уточнення деталей.",
     };
     test('should contain correct information', () => {
-        render(<FaqCard faq={mockQuestion} />);
+        render(<QuestionCard questionCard={mockQuestion} />);
         const question = screen.getByText(mockQuestion.question);
         expect(question).toBeInTheDocument();
 
@@ -25,7 +24,7 @@ describe('test question card component', () => {
         expect(closeIcon).toBeInTheDocument();
     });
     test('should have correct classes', () => {
-        const { container } = render(<FaqCard faq={mockQuestion} />);
+        const { container } = render(<QuestionCard questionCard={mockQuestion} />);
         expect(container.querySelector('.faq-question')).toBeInTheDocument();
         expect(container.querySelector('.button-icons')).toBeInTheDocument();
         expect(container.querySelector('.faq-open')).toBeInTheDocument();
@@ -33,7 +32,7 @@ describe('test question card component', () => {
         expect(container.querySelector('.faq-answer')).toBeInTheDocument();
     });
     test('should change icons on mouse enter and revert on mouse leave', () => {
-        render(<FaqCard faq={mockQuestion} />);
+        render(<QuestionCard questionCard={mockQuestion} />);
         const detailsElement = screen.getByText(mockQuestion.question).closest('details');
         expect(detailsElement).toBeInTheDocument();
 

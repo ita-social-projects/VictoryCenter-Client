@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './ProgramSection.scss';
+import './ProgramsSection.scss';
 import { ProgramCard } from './program-card/ProgramCard';
 import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
 import { PROGRAMS } from '../../../../const/public/footer';
@@ -11,7 +11,7 @@ import {
 } from '../../../../const/public/programs-page';
 import { PublishedProgram } from '../../../../types/public/programs-page';
 
-export const ProgramSection: React.FC = () => {
+export const ProgramsSection: React.FC = () => {
     const [programData, setProgramData] = useState<PublishedProgram[]>([]);
     const [error, setError] = useState<string | null>(null);
 

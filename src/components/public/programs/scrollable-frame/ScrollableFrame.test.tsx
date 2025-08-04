@@ -8,7 +8,7 @@ jest.mock('../../../../assets/icons/arrow-right-white.svg', () => 'arrow-right.p
 jest.mock('../../../../assets/icons/arrow-left.svg', () => 'arrow-left-black.png');
 jest.mock('../../../../assets/icons/arrow-right.svg', () => 'arrow-right-black.png');
 
-jest.mock('../../../../pages/public/program-page/program-section/program-card/ProgramCard', () => ({
+jest.mock('../../../../pages/public/programs-page/programs-section/program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: { program: any }) => <div data-testid="program-card">{program.title}</div>,
 }));
 

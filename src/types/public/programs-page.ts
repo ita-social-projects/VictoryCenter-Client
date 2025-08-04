@@ -4,3 +4,7 @@ export interface PublishedProgram {
     subtitle: string;
     description: string;
 }
+export interface Question {
+    question: string;
+    answer: string;
+}

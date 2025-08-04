@@ -1,9 +1,9 @@
-import { ProgramSection } from './ProgramSection';
+import { ProgramsSection } from './ProgramsSection';
 import { render, screen, waitFor } from '@testing-library/react';
-import * as ProgramPageFetchModule from '../../../../services/api/public/programs/programs-api';
+import * as ProgramsPageFetchModule from '../../../../services/api/public/programs/programs-api';
 import { PublishedProgram } from '../../../../types/public/programs-page';
 
-const spyProgramPageDataFetch = jest.spyOn(ProgramPageFetchModule, 'programPageDataFetch');
+const spyProgramsPageDataFetch = jest.spyOn(ProgramsPageFetchModule, 'programPageDataFetch');
 
 const mockPrograms: PublishedProgram[] = [
     {
@@ -40,9 +40,9 @@ describe('test program section', () => {
         jest.resetAllMocks();
     });
     test('should render correctly', async () => {
-        spyProgramPageDataFetch.mockResolvedValue({ programData: mockPrograms });
-        render(<ProgramSection />);
-        expect(spyProgramPageDataFetch).toHaveBeenCalledTimes(1);
+        spyProgramsPageDataFetch.mockResolvedValue({ programData: mockPrograms });
+        render(<ProgramsSection />);
+        expect(spyProgramsPageDataFetch).toHaveBeenCalledTimes(1);
 
         await waitFor(() => {
             expect(screen.getByText('titletest1')).toBeInTheDocument();
@@ -65,9 +65,9 @@ describe('test program section', () => {
         });
     });
     test('should render with no cards', async () => {
-        spyProgramPageDataFetch.mockResolvedValue({ programData: [] });
-        render(<ProgramSection />);
-        expect(spyProgramPageDataFetch).toHaveBeenCalledTimes(1);
+        spyProgramsPageDataFetch.mockResolvedValue({ programData: [] });
+        render(<ProgramsSection />);
+        expect(spyProgramsPageDataFetch).toHaveBeenCalledTimes(1);
 
         await waitFor(() => {
             const cards = screen.queryAllByTestId('test-card-content');
@@ -75,9 +75,9 @@ describe('test program section', () => {
         });
     });
     test('should render without crashing', async () => {
-        spyProgramPageDataFetch.mockRejectedValueOnce(new Error('Fetch failed'));
-        render(<ProgramSection />);
-        expect(spyProgramPageDataFetch).toHaveBeenCalledTimes(1);
+        spyProgramsPageDataFetch.mockRejectedValueOnce(new Error('Fetch failed'));
+        render(<ProgramsSection />);
+        expect(spyProgramsPageDataFetch).toHaveBeenCalledTimes(1);
 
         await waitFor(() => {
             const cards = screen.queryAllByTestId('test-card-content');

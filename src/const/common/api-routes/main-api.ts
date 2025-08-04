@@ -12,9 +12,6 @@ export const API_ROUTES = {
         CATEGORIES: 'Categories',
         PUBLISHED: 'team/published',
     },
-    FAQ: {
-        PUBLISHED_SLUG: 'faq/published',
-    },
     PAYMENTS: {
         DONATE: 'payments/donate',
     },

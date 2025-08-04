@@ -7,7 +7,7 @@ import './ProgramsPageToolbar.scss';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
 
-export interface ProgramPageToolbarProps {
+export interface ProgramsPageToolbarProps {
     onSearchQueryChange: (query: string) => void;
     onStatusFilterChange: (categoryFilter: VisibilityStatus | undefined) => void;
     onAddProgram: () => void;
@@ -17,7 +17,7 @@ export const ProgramsPageToolbar = ({
     onSearchQueryChange,
     onStatusFilterChange,
     onAddProgram,
-}: ProgramPageToolbarProps) => {
+}: ProgramsPageToolbarProps) => {
     return (
         <>
             <div className="programs-toolbar">

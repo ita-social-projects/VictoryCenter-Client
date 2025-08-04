@@ -3,7 +3,7 @@
 .hint-box {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 0.25rem;
     font-weight: 400;
     font-size: 16px;
     line-height: 24px;
@@ -12,12 +12,12 @@
     &-title {
         display: flex;
         flex-direction: row;
-        gap: 4px;
+        gap: 0.25rem;
         font-weight: 600;
 
         img {
-            height: 24px;
-            width: 24px;
+            height: 1.5rem;
+            width: 1.5rem;
         }
     }
 }

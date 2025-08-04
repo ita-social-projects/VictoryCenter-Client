@@ -2,7 +2,7 @@
 
 .admin {
     &-logo {
-        height: 150px;
+        height: 9.375rem;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -21,7 +21,7 @@
             color: black;
             text-decoration: none;
             position: relative;
-            padding: 15px 10px 15px 40px;
+            padding: 0.9375rem 0.625rem 0.9375rem 2.5rem;
         }
 
         &-selected {
@@ -33,7 +33,7 @@
                 left: 0;
                 top: 0;
                 height: 100%;
-                width: 8px;
+                width: 0.5rem;
                 background-color: $blue-800;
             }
         }

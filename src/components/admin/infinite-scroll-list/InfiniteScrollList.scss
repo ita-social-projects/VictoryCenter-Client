@@ -10,7 +10,7 @@
 .infinite-scroll-list {
     position: relative;
     display: flex;
-    gap: 8px;
+    gap: 0.5rem;
     flex: 1;
     flex-direction: column;
     height: 100%;
@@ -23,25 +23,25 @@
         align-items: center;
         justify-content: center;
         width: 100%;
-        padding: 16px;
+        padding: 1rem;
 
         img {
-            width: 48px;
-            height: 48px;
+            width: 3rem;
+            height: 3rem;
             animation: rotate 1s infinite;
         }
     }
 
     &-to-top {
         position: absolute;
-        right: 150px;
-        bottom: 50px;
+        right: 9.375rem;
+        bottom: 3.125rem;
         z-index: 10;
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 60px;
-        height: 60px;
+        width: 3.75rem;
+        height: 3.75rem;
         border: none;
         border-radius: 50%;
         background-color: $blue-500;
@@ -59,13 +59,13 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 0.5rem;
         height: 100%;
         text-align: center;
 
         img {
-            width: 230px;
-            height: 230px;
+            width: 14.375rem;
+            height: 14.375rem;
         }
 
         p {

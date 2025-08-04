@@ -5,9 +5,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 146px;
-    height: 152px;
-    padding: 16px;
+    width: 9.125rem;
+    height: 9.5rem;
+    padding: 1rem;
     border: 1px solid $grey-700;
     border-radius: 8px;
     background: white;
@@ -27,7 +27,7 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 4px;
+        gap: 0.25rem;
         padding: 0;
         border: 1px dashed $grey-900;
         border-radius: 4px;
@@ -39,8 +39,8 @@
         text-align: center;
 
         .placeholder-icon {
-            width: 24px;
-            height: 24px;
+            width: 1.5rem;
+            height: 1.5rem;
         }
     }
 
@@ -65,9 +65,9 @@
             display: none;
             align-items: center;
             justify-content: center;
-            width: 44px;
-            height: 44px;
-            padding: 10px;
+            width: 2.75rem;
+            height: 2.75rem;
+            padding: 0.625rem;
             margin: auto;
             border-radius: 8px;
             background: $grey-900;
@@ -78,8 +78,8 @@
             }
 
             .delete-icon {
-                width: 16px;
-                height: 16px;
+                width: 1rem;
+                height: 1rem;
                 filter: brightness(0) invert(1);
             }
         }

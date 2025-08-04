@@ -1,7 +1,7 @@
 @import '../../../assets/sass/variables/variables.colors';
 
 .category-bar {
-    min-height: 60px;
+    min-height: 3.75rem;
     display: flex;
     border-bottom: 1px solid $grey-700;
     font-size: 24px;
@@ -13,7 +13,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 15px;
+        padding: 0.9375rem;
         border: none;
         background: transparent;
         font-size: 24px;

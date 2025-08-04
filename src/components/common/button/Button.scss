@@ -2,8 +2,8 @@
 
 .btn {
     &-primary {
-        padding: 8px 24px;
-        gap: 8px;
+        padding: 0.5rem 1.5rem;
+        gap: 0.5rem;
         color: white;
         background-color: $blue-500;
         outline: none;
@@ -31,8 +31,8 @@
     }
 
     &-secondary {
-        padding: 8px 24px;
-        gap: 8px;
+        padding: 0.5rem 1.5rem;
+        gap: 0.5rem;
         border: 1px solid $blue-500;
         color: $blue-500;
         background-color: white;

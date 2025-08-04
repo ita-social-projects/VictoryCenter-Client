@@ -6,20 +6,20 @@
     .toolbar {
         display: flex;
         justify-content: space-between;
-        padding: 54px;
+        padding: 3.375rem;
 
         &-actions {
             display: flex;
             justify-content: space-between;
-            gap: 20px;
+            gap: 1.25rem;
 
             select {
-                width: 131px;
-                height: 40px;
-                top: 52px;
-                left: 1523px;
+                width: 8.1875rem;
+                height: 2.5rem;
+                top: 3.25rem;
+                left: 95.1875rem;
                 text-align: center;
-                gap: 8px;
+                gap: 0.5rem;
                 outline: none;
                 border: 2px solid $blue-900;
 
@@ -35,6 +35,6 @@
 @media (max-width <= 1400px) {
     .toolbar {
         flex-wrap: wrap;
-        gap: 15px;
+        gap: 0.9375rem;
     }
 }

@@ -1,6 +1,6 @@
 import { Application } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import { getEnvVariable } from './utils/functions/det-env-variable/getEnvVariable';
+import { getEnvVariable } from './utils/functions/get-env-variable/get-env-variable';
 
 const backendUrl = getEnvVariable('REACT_APP_BACKEND_URL');
 const targetUrl = getEnvVariable('REACT_APP_PROXY_TARGET');

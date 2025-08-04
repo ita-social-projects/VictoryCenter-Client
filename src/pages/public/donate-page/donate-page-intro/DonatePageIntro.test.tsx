@@ -1,9 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 
 const mockPageTitle = (value: string) => {
     jest.resetModules();
-    jest.doMock('../../../const/donate-page/donate-page', () => ({
+    jest.doMock('../../../../const/public/donate-page', () => ({
         PAGE_TITLE: value,
     }));
     // eslint-disable-next-line @typescript-eslint/no-var-requires

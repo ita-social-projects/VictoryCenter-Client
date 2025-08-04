@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Footer } from './Footer';
@@ -56,7 +55,7 @@ describe('Footer', () => {
         render(<Footer />, { wrapper: MemoryRouter });
         expect(screen.getByText(MENU)).toBeInTheDocument();
 
-        expect(screen.getByRole('link', { name: REPORTING })).toHaveAttribute('href', PUBLIC_ROUTES.TEAM.FULL);
+        expect(screen.getByRole('link', { name: REPORTING })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
         expect(screen.getByRole('link', { name: STORE })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
         expect(screen.getByRole('link', { name: HOW_TO_SUPPORT })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
         expect(screen.getByRole('link', { name: STORIES_OF_VICTORIES })).toHaveAttribute(
@@ -86,8 +85,6 @@ describe('Footer', () => {
         );
         expect(screen.getByRole('link', { name: PROGRAMS })).toHaveAttribute('href', PUBLIC_ROUTES.PROGRAMS.FULL);
         expect(screen.getByRole('link', { name: PROGRAMS_SESSIONS })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
-        expect(screen.getByRole('link', { name: PROGRAMS })).toHaveAttribute('href', PUBLIC_ROUTES.TEAM.FULL);
-        expect(screen.getByRole('link', { name: PROGRAMS_SESSIONS })).toHaveAttribute('href', PUBLIC_ROUTES.TEAM.FULL);
     });
 
     it('renders contact buttons with correct text', () => {

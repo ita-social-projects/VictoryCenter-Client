@@ -1,5 +1,5 @@
-import { ProgramCategory } from '../../../types/admin/Programs';
 import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
+import { ProgramCategory } from '../../../types/admin/programs';
 import { Image } from '../../../types/common/image';
 import * as Yup from 'yup';
 

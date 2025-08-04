@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { LOGIN_CONST } from '../../../const/admin/login';
 import { LoginPage } from './LoginPage';
-import { LOGIN_CONST } from '../../const/admin/login';
 
 jest.mock('./components/login-form/LoginForm', () => ({
     LoginForm: ({ setShowErrorModal }: { setShowErrorModal: (value: boolean) => void }) => (

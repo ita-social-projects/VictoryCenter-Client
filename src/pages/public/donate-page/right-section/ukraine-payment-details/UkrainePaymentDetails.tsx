@@ -1,7 +1,7 @@
 import './UkrainePaymentDetails.scss';
-import { UKRAINE_PAYMENT_DETAILS, PAYMENT_DETAILS_COMMON } from '../../../../const/donate-page/donate-page';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
 import React from 'react';
+import { PAYMENT_DETAILS_COMMON, UKRAINE_PAYMENT_DETAILS } from '../../../../../const/public/donate-page';
 
 export const UkrainePaymentDetails = () => {
     return (

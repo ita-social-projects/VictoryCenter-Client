@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TeamPageToolbar, TeamPageToolbarProps } from './TeamPageToolbar';
 import { MemberFormValues } from '../member-form/MemberForm';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
 // Mock the plus icon
 jest.mock('../../../../../assets/icons/plus.svg', () => 'plus-icon.svg');
@@ -149,9 +150,9 @@ describe('TeamPageToolbar', () => {
         it('renders select options correctly', () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            expect(screen.getByText('Усі')).toBeInTheDocument();
-            expect(screen.getByText('Опубліковано')).toBeInTheDocument();
-            expect(screen.getByText('Чернетка')).toBeInTheDocument();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.ALL)).toBeInTheDocument();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED)).toBeInTheDocument();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT)).toBeInTheDocument();
         });
 
         it('passes autocomplete values to input', () => {
@@ -187,14 +188,14 @@ describe('TeamPageToolbar', () => {
 
             const select = screen.getByTestId('status-filter');
 
-            await userEvent.selectOptions(select, 'Усі');
-            expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith('Усі');
+            await userEvent.selectOptions(select, COMMON_TEXT_ADMIN.FILTER.STATUS.ALL);
+            expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.FILTER.STATUS.ALL);
 
-            await userEvent.selectOptions(select, 'Опубліковано');
-            expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith('Опубліковано');
+            await userEvent.selectOptions(select, COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED);
+            expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED);
 
-            await userEvent.selectOptions(select, 'Чернетка');
-            expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith('Чернетка');
+            await userEvent.selectOptions(select, COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT);
+            expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT);
         });
     });
 

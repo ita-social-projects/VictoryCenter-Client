@@ -1,12 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Program, ProgramCategory } from '../../../../../types/admin/Programs';
 import { ProgramsPageToolbar } from '../programs-page-toolbar/ProgramsPageToolbar';
 import { DeleteProgramModal } from '../program-modals/delete-program-modal/DeleteProgramModal';
-import { InfiniteScrollList } from '../../../../../components/common/infinite-scroll-list/InfiniteScrollList';
 import { ProgramModal } from '../program-modals/program-modal/ProgramModal';
 import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/category-bar/CategoryBar';
-import { DeleteCategoryModal } from '../program-category-modals/delete-program-category-modal/DeleteCategoryModal';
-import { ProgramCategoryModal } from '../program-category-modals/program-category-modal/ProgramCategoryModal';
 import { ProgramListItem } from '../program-list-item/ProgramListItem';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
@@ -14,6 +10,10 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import axios from 'axios';
 import './ProgramsPageContent.scss';
 import { VisibilityStatus } from '../../../../../types/admin/common';
+import { Program, ProgramCategory } from '../../../../../types/admin/programs';
+import { InfiniteScrollList } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
+import { DeleteCategoryModal } from '../program-category-modals/delete-program-category-modal/DeleteCategoryModal';
+import { ProgramCategoryModal } from '../program-category-modals/program-category-modal/ProgramCategoryModal';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;

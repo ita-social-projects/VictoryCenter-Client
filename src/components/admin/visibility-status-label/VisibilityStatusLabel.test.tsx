@@ -1,8 +1,7 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { VisibilityStatus } from '../../../types/admin/Common';
 import { VisibilityStatusLabel } from './VisibilityStatusLabel';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { VisibilityStatus } from '../../../types/admin/common';
 
 describe('Status Component', () => {
     it('renders Draft status with correct text and class', () => {

@@ -1,4 +1,3 @@
-import React from 'react';
 import classNames from 'classnames';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './VisibilityStatusLabel.scss';

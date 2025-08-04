@@ -1,7 +1,7 @@
-import { ABROAD_PAYMENT_DETAILS, PAYMENT_DETAILS_COMMON } from '../../../../const/donate-page/donate-page';
 import React from 'react';
 import { PaymentLabelWithCopy } from './PaymentLabelWithCopy';
 import { MultiFieldLabelWithCopy } from './MultiFieldLabelWithCopy';
+import { PAYMENT_DETAILS_COMMON, ABROAD_PAYMENT_DETAILS } from '../../../../../const/public/donate-page';
 
 export const PaymentDetailsSection = ({
     title,

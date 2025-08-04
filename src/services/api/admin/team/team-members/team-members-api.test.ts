@@ -173,7 +173,7 @@ describe('TeamMembersApi', () => {
 
             await TeamMembersApi.updateDraft(mockClient, memberId, memberWithExistingImage);
 
-            expect(mockClient.put).toHaveBeenCalledWith(`/TeamMembers/${memberId}`, {
+            expect(mockClient.put).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}/${memberId}`, {
                 fullName: memberWithExistingImage.fullName,
                 categoryId: memberWithExistingImage.category.id,
                 status: VisibilityStatus.Draft,

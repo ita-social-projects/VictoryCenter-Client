@@ -3,8 +3,8 @@ import { MembersList } from '../members-list/MembersList';
 import { MemberFormValues } from '../member-form/MemberForm';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
-import { StatusFilter } from '../../../../../types/common';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
+import { StatusFilter } from '../../../../../types/admin/common';
 
 export const TeamPageContent = () => {
     const [searchByNameQuery, setSearchByNameQuery] = useState<string>('');

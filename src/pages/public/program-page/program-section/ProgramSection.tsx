@@ -9,7 +9,7 @@ import {
     PROGRAMS_FOR_VETERANS,
     PROGRAMS_ALL,
 } from '../../../../const/public/programs-page';
-import { PublishedProgram } from '../../../../types/public/program-page';
+import { PublishedProgram } from '../../../../types/public/programs-page';
 
 export const ProgramSection: React.FC = () => {
     const [programData, setProgramData] = useState<PublishedProgram[]>([]);

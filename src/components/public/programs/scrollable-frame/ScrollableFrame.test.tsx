@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { ScrollableFrame } from './ScrollableFrame';
-import * as dataFetch from '../../../../utils/mock-data/public/program-page/programs-page';
+import * as dataFetch from '../../../../services/api/public/programs/programs-api';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
 
 jest.mock('../../../../assets/icons/arrow-left-white.svg', () => 'arrow-left.png');

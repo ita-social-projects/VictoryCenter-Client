@@ -1,17 +1,17 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { DeleteProgramModal, DeleteProgramModalProps } from '../DeleteProgramModal';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
 import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
-import { Program } from '../../../../../../types/admin/Programs';
+import { Program } from '../../../../../../types/admin/programs';
+import { DeleteProgramModalProps, DeleteProgramModal } from './DeleteProgramModal';
 
-jest.mock('../../../../../services/api/admin/programs/programs-api');
+jest.mock('../../../../../../services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
-jest.mock('../../../../../components/common/modal/Modal', () => {
+jest.mock('../../../../../../components/common/modal/Modal', () => {
     const ModalMock = ({ isOpen, onClose, children, 'data-testid': dataTestId }: any) =>
         isOpen ? (
             <div data-testid={dataTestId}>
@@ -32,7 +32,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     };
 });
 
-jest.mock('../../../../../components/common/button/Button', () => ({
+jest.mock('../../../../../../components/common/button/Button', () => ({
     Button: ({ children, onClick, disabled }: any) => (
         <button onClick={onClick} disabled={disabled}>
             {children}

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import './RightSection.scss';
-import { IN_UKRAINE_LABEL, NOT_IN_UKRAINE_LABEL } from '../../../const/donate-page/donate-page';
 import { UkrainePaymentDetails } from './ukraine-payment-details/UkrainePaymentDetails';
 import { AbroadPaymentDetails } from './abroad-payment-details/AbroadPaymentDetails';
 import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSupportWays';
+import { NOT_IN_UKRAINE_LABEL, IN_UKRAINE_LABEL } from '../../../../const/public/donate-page';
 
 export const RightSection = () => {
     const [isAbroad, setIsAbroad] = useState(false);

@@ -9,7 +9,7 @@ import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { TeamCategory } from '../../../../../types/admin/team-members';
-import { StatusFilter, ModalState } from '../../../../../types/common';
+import { StatusFilter, ModalState } from '../../../../../types/admin/common';
 
 export type TeamPageToolbarProps = {
     onSearchQueryChange: (query: string) => void;

@@ -1,9 +1,8 @@
 import './AlternativeSupportWays.scss';
-import { ALTERNATIVE_SUPPORT_WAYS } from '../../../../const/donate-page/donate-page';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
-import ArrowUpRight from '../../../../assets/icons/arrow-up-right.svg';
-import ShareForwardArrow from '../../../../assets/icons/share-forward-arrow.svg';
-import React from 'react';
+import ArrowUpRight from '../../../../../assets/icons/arrow-up-right.svg';
+import ShareForwardArrow from '../../../../../assets/icons/share-forward-arrow.svg';
+import { ALTERNATIVE_SUPPORT_WAYS } from '../../../../../const/public/donate-page';
 
 export const AlternativeSupportWays = () => {
     return (

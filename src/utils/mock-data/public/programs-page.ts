@@ -1,8 +1,8 @@
-import firstImg from '../../../../assets/images/public/programs-page/first.png';
-import secondImg from '../../../../assets/images/public/programs-page/second.png';
-import thirdImg from '../../../../assets/images/public/programs-page/third.png';
-import fourthImg from '../../../../assets/images/public/programs-page/fourth.png';
-import fifthImg from '../../../../assets/images/public/programs-page/fifth.png';
+import firstImg from '../../../assets/images/public/programs-page/first.png';
+import secondImg from '../../../assets/images/public/programs-page/second.png';
+import thirdImg from '../../../assets/images/public/programs-page/third.png';
+import fourthImg from '../../../assets/images/public/programs-page/fourth.png';
+import fifthImg from '../../../assets/images/public/programs-page/fifth.png';
 export const MockCards = {
     programData: [
         {
@@ -58,6 +58,3 @@ export const MockQuestions = {
         },
     ],
 };
-
-export const programPageDataFetch = async () => MockCards;
-export const questionDataFetch = async () => MockQuestions;

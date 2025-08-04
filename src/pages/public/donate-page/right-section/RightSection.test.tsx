@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { RightSection } from './RightSection';
-import { IN_UKRAINE_LABEL, NOT_IN_UKRAINE_LABEL } from '../../../const/donate-page/donate-page';
+import { IN_UKRAINE_LABEL, NOT_IN_UKRAINE_LABEL } from '../../../../const/public/donate-page';
 
 describe('RightSection', () => {
     it('renders location toggle and payment details', () => {

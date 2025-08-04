@@ -1,12 +1,12 @@
-import React, { createRef } from 'react';
+import { createRef } from 'react';
 import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from './ProgramForm';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
-import { ProgramCategory } from '../../../../../types/admin/Programs';
 import { InputLabelProps } from '../../../../../components/common/input-label/InputLabel';
 import { Image } from '../../../../../types/common/image';
 import { VisibilityStatus } from '../../../../../types/admin/common';
+import { ProgramCategory } from '../../../../../types/admin/programs';
 
 jest.mock('../../../../../components/common/input-label/InputLabel', () => ({
     InputLabel: ({ htmlFor, text, isRequired }: InputLabelProps) => (
@@ -39,7 +39,7 @@ jest.mock('../../../../../components/common/multi-select-input/MultiSelectInput'
     ),
 }));
 
-jest.mock('../../../../../components/common/photo-input/PhotoInput', () => ({
+jest.mock('../../../../../components/admin/photo-input/PhotoInput', () => ({
     PhotoInput: (props: any) => (
         <input
             type="file"

@@ -7,7 +7,7 @@ jest.mock('../../../assets/icons/load.svg', () => 'LoaderIcon');
 jest.mock('../../../assets/icons/arrow-up.svg', () => 'ArrowUpIcon');
 jest.mock('../../../assets/icons/not-found.svg', () => 'NotFoundIcon');
 
-jest.mock('../inline-loader/InlineLoader', () => ({
+jest.mock('../../common/inline-loader/InlineLoader', () => ({
     InlineLoader: () => <img alt="loader-icon" data-testid="loader-icon" />,
 }));
 

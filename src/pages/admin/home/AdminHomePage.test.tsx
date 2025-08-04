@@ -1,5 +1,5 @@
 import { render, waitFor } from '@testing-library/react';
-import { AdminPage } from './AdminPage';
+import { AdminHomePage } from './AdminHomePage';
 import * as adminHomeDataFetchModule from '../../../utils/mock-data/admin/home';
 import { MemoryRouter } from 'react-router';
 
@@ -23,7 +23,7 @@ describe('AdminHomePage', () => {
     it('renders the component', async () => {
         const { container } = render(
             <MemoryRouter>
-                <AdminPage />
+                <AdminHomePage />
             </MemoryRouter>,
         );
 

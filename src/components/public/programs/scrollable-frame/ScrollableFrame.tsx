@@ -10,10 +10,10 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
-import { programPageDataFetch } from '../../../../utils/mock-data/public/program-page/programs-page';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
 import { ProgramCard } from '../../../../pages/public/program-page/program-section/program-card/ProgramCard';
-import { PublishedProgram } from '../../../../types/public/program-page';
+import { PublishedProgram } from '../../../../types/public/programs-page';
+import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
 
 export const ScrollableFrame = () => {
     const [programData, setProgramData] = useState<PublishedProgram[]>([]);

@@ -1,10 +1,10 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import * as AdminContext from '../../../../context/admin-context-provider/AdminContextProvider';
+import * as AdminContext from '../../../../../contexts/admin/admin-context-provider/AdminContextProvider';
 import { LoginForm } from './LoginForm';
-import Logo from '../../../../assets/icons/logo.svg';
+import Logo from '../../../../../assets/icons/logo.svg';
 import { MemoryRouter } from 'react-router';
-import { LOGIN_CONST } from '../../../../const/admin/login';
+import { LOGIN_CONST } from '../../../../../const/admin/login';
 
 describe('<LoginForm />', () => {
     let loginMock: jest.Mock<Promise<void>, [creds: any]>;

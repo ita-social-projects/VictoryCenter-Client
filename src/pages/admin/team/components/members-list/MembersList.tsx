@@ -10,13 +10,12 @@ import LoaderIcon from '../../../../../assets/icons/load.svg';
 import ArrowUpIcon from '../../../../../assets/icons/arrow-up.svg';
 import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { mapStatusFilterToStatus, StatusFilter } from '../../../../../types/common';
 import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
-import { DragPreviewModel } from '../../../../../types/admin/common';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-сategories/team-categories-api';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { StatusFilter, DragPreviewModel, mapStatusFilterToStatus } from '../../../../../types/admin/common';
 
 export type MembersListProps = {
     searchByNameQuery: string | null;

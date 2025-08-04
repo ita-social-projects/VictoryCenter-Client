@@ -1,7 +1,6 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-scheme';
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { ProgramCategory } from '../../../../../types/admin/Programs';
 import { MultiSelectInput } from '../../../../../components/common/multi-select-input/MultiSelectInput';
 import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';
 import { InputLabel } from '../../../../../components/common/input-label/InputLabel';
@@ -10,6 +9,7 @@ import { TextAreaWithCharacterLimit } from '../../../../../components/common/tex
 import { Image, ImageValues, ImageValuesToImage, ImageToImageValue } from '../../../../../types/common/image';
 import './ProgramForm.scss';
 import { VisibilityStatus } from '../../../../../types/admin/common';
+import { ProgramCategory } from '../../../../../types/admin/programs';
 
 export interface ProgramFormValues {
     name: string;

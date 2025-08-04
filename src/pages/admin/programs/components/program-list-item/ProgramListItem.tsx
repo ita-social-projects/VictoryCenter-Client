@@ -1,11 +1,11 @@
 import { ButtonTooltip } from '../../../../../components/common/button-tooltip/ButtonTooltip';
-import { VisibilityStatusLabel } from '../../../../../components/common/visibility-status-label/VisibilityStatusLabel';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import { Program } from '../../../../../types/admin/Programs';
 import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 import BlankImage from '../../../../../assets/icons/blank-image.svg';
 import './ProgramListItem.scss';
+import { Program } from '../../../../../types/admin/programs';
+import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
 
 export interface ProgramListItemProps {
     program: Program;

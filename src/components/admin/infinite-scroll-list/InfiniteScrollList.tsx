@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ArrowUpIcon from '../../../assets/icons/arrow-up.svg';
 import NotFoundIcon from '../../../assets/icons/not-found.svg';
-import { InlineLoader } from '../inline-loader/InlineLoader';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './InfiniteScrollList.scss';
+import { InlineLoader } from '../../common/inline-loader/InlineLoader';
 
 const BOTTOM_REACH_THRESHOLD_IN_PIXELS = 5;
 

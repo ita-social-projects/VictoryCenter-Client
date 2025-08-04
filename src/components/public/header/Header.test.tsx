@@ -40,7 +40,7 @@ describe('Header', () => {
         expect(screen.getByRole('button', { name: CONTACT_US })).toBeInTheDocument();
         const donateLink = screen.getByRole('link', { name: DONATE });
         expect(donateLink).toBeInTheDocument();
-        expect(donateLink).toHaveAttribute('href', routes.donatePageRoute);
+        expect(donateLink).toHaveAttribute('href', PUBLIC_ROUTES.DONATE.FULL);
     });
 
     it('check if Contact Us button is clicked', () => {

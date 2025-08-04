@@ -1,13 +1,13 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramModal, ProgramModalProps } from './ProgramModal';
-import { Program, ProgramCategory } from '../../../../../../types/admin/Programs';
 import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
+import { Program, ProgramCategory } from '../../../../../../types/admin/programs';
 
-jest.mock('../../../../../services/api/admin/programs/programs-api', () => ({
+jest.mock('../../../../../../services/api/admin/programs/programs-api', () => ({
     ProgramsApi: {
         addProgram: jest.fn(),
         editProgram: jest.fn(),
@@ -16,7 +16,7 @@ jest.mock('../../../../../services/api/admin/programs/programs-api', () => ({
 
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
-jest.mock('../../../../../components/common/modal/Modal', () => {
+jest.mock('../../../../../../components/common/modal/Modal', () => {
     const MockModal = ({
         isOpen,
         children,
@@ -46,7 +46,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     return { Modal: MockModal };
 });
 
-jest.mock('../../../../../components/common/button/Button', () => ({
+jest.mock('../../../../../../components/common/button/Button', () => ({
     Button: ({
         onClick,
         disabled,
@@ -68,7 +68,7 @@ jest.mock('../../../../../components/common/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/common/question-modal/ConfirmationModal', () => ({
+jest.mock('../../../../../../components/common/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({
         isOpen,
         title,
@@ -100,7 +100,7 @@ const mockFormRef = {
 };
 
 let capturedFormProps: any = {};
-jest.mock('../program-form/ProgramForm', () => {
+jest.mock('../../program-form/ProgramForm', () => {
     const React = require('react');
     const MockProgramForm = React.forwardRef((props: any, ref: any) => {
         capturedFormProps = props;

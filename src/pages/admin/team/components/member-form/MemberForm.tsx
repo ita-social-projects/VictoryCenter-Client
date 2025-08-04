@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useCreateMemberForm } from '../../../../../hooks/admin/use-create-member-form/useCreateMemberForm';
-import '../members-list/Membersist.scss';
+import '../members-list/MembersList.scss';
 import { MAX_FULLNAME_LENGTH, MAX_DESCRIPTION_LENGTH } from '../../../../../const/admin/data-validation';
 import { ImageValues } from '../../../../../types/common/image';
 import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';

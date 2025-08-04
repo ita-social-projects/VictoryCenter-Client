@@ -180,16 +180,16 @@ Main structure of this project
 │   ├───reportWebVitals.ts
 │   ├───setupProxy.ts
 │   └───setupTests.ts
-├── .coderabbit.yaml
-├── .dockerignore
-├── .env.development
-├── .gitignore
-├── Dockerfile
-├── LICENSE
-├── package-lock.json
-├── package.json
-├── README
-└── tsconfig.json
+├───.coderabbit.yaml
+├───.dockerignore
+├───.env.development
+├───.gitignore
+├───Dockerfile
+├───LICENSE
+├───package-lock.json
+├───package.json
+├───README
+└───tsconfig.json
 </code></pre>
 
 <div>

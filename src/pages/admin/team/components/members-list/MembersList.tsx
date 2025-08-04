@@ -561,10 +561,10 @@ export const MembersList = ({
                 <Modal.Actions>
                     <div className="members-delete-modal-actions">
                         <Button buttonStyle={'secondary'} onClick={() => setIsDeleteTeamMemberModalOpen(false)}>
-                            {COMMON_TEXT_ADMIN.BUTTON.YES}
+                            {COMMON_TEXT_ADMIN.BUTTON.NO}
                         </Button>
                         <Button buttonStyle={'primary'} onClick={handleDeleteMember}>
-                            {COMMON_TEXT_ADMIN.BUTTON.NO}
+                            {COMMON_TEXT_ADMIN.BUTTON.YES}
                         </Button>
                     </div>
                 </Modal.Actions>

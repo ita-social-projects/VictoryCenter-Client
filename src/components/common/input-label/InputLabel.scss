@@ -1,8 +1,10 @@
+@import '../../../assets/sass/variables/variables.colors';
+
 label {
-    color: #414651;
+    color: $bluish-grey-50;
     font-size: 16px;
 
     .required-field {
-        color: #f04438;
+        color: $error;
     }
 }

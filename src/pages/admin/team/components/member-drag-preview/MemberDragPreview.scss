@@ -5,10 +5,10 @@
     z-index: 1000;
     pointer-events: none;
     background-color: white;
-    border: 2px solid #007bff;
+    border: 2px solid $drag-preview-blue;
     border-radius: 8px;
     padding: 10px;
-    box-shadow: 0 4px 12px #00000026;
+    box-shadow: 0 4px 12px rgba(black, 0.15);
     opacity: 0.9;
     transition: none;
 

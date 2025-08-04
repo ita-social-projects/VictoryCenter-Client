@@ -5,14 +5,14 @@
     align-items: center;
     background-color: white;
     padding: 2rem 3rem;
-    box-shadow: 0 4px 20px #0000000d;
+    box-shadow: 0 4px 20px rgba(black, 0.051);
 
     &-title {
         font-size: 2rem;
         font-weight: 400;
         margin: 1rem 0 1rem 0;
         text-align: center;
-        color: #041128;
+        color: $blue-900;
     }
 
     &-group {
@@ -25,13 +25,13 @@
         label {
             font-size: 1rem;
             display: block;
-            color: #414651;
+            color: $bluish-grey-50;
         }
 
         input:-webkit-autofill,
         input:-webkit-autofill:hover,
         input:-webkit-autofill:focus {
-            -webkit-box-shadow: 0 0 0 62.5rem #fff inset;
+            -webkit-box-shadow: 0 0 0 62.5rem white inset;
             outline: none;
         }
 
@@ -39,8 +39,8 @@
             height: 2.5rem;
             width: 100%;
             font-size: 1rem;
-            border: 1px solid #d5d7da;
-            box-shadow: 0px 1px 2px 0px #0a0d120d;
+            border: 1px solid $input-border-color;
+            box-shadow: 0px 1px 2px 0px rgba($box-shadow-blue, 0.051);
             padding: 0.75rem 3.75rem 0.75rem 0.75rem;
         }
 

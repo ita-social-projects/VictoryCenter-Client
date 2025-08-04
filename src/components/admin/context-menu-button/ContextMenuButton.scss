@@ -11,7 +11,7 @@
     cursor: pointer;
 
     &-active {
-        border-bottom-color: #041128;
+        border-bottom-color: $blue-900;
     }
 
     &-icon {
@@ -28,7 +28,7 @@
         width: 180px;
         border: 1px solid $blue-900;
         background: white;
-        box-shadow: 0 2px 8px -4px #00000029;
+        box-shadow: 0 2px 8px -4px rgba(black, 0.16);
 
         &-visible {
             display: block;

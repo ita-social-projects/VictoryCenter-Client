@@ -23,7 +23,7 @@
 
     .team-section {
         width: 98%;
-        border-bottom: 1px solid #ccc;
+        border-bottom: 1px solid $grey-600;
         padding-bottom: 5rem;
         margin-bottom: 3rem;
     }
@@ -71,7 +71,7 @@
         .member-role {
             font-size: 1rem;
             font-weight: 400;
-            color: #555;
+            color: $grey-925;
             margin-top: 0;
         }
     }

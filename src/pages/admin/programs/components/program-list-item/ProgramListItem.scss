@@ -9,8 +9,8 @@
     height: 120px;
     padding: 30px;
     background: $grey-50;
-    border-bottom: 0.3px solid #06112559;
-    box-shadow: 0 1px 2.8px 0 #00000026;
+    border-bottom: 0.3px solid $blue-900;
+    box-shadow: 0 1px 2.8px 0 rgba(black, 0.15);
 
     .program-info {
         display: flex;

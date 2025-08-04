@@ -1,9 +1,11 @@
+@import '../../../../assets/sass/variables/variables.colors';
+
 .copyTextButton {
     border: none;
     cursor: pointer;
     width: 1.25rem;
     height: 1.25rem;
-    stroke: #939699;
+    stroke: $grey-700;
     opacity: 0.6;
     background-image: url('../../../../assets/icons/copy.svg');
 }

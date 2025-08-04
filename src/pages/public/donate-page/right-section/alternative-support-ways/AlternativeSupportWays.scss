@@ -1,15 +1,16 @@
 @import '../../../../../assets/sass/variables/variables.fonts';
+@import '../../../../../assets/sass/variables/variables.colors';
 
 .alternativeSupportWays {
     padding-top: 4rem;
     font-family: $mulish-regular-font;
-    color: #061125;
+    color: $blue-900;
 
     h2 {
         padding-bottom: 2rem;
         font-weight: 700;
         font-size: 2rem;
-        color: #061125;
+        color: $blue-900;
     }
 
     h3 {
@@ -22,7 +23,7 @@
     }
 
     a.label {
-        color: #061125;
+        color: $blue-900;
     }
 
     .labelContainer {

@@ -68,11 +68,24 @@ export const TeamPage: React.FC = () => {
                 </video>
 
                 <div className="quote-overlay">
-                    <p className="video-text">{VIDEO_TEXT_STRING1}</p>
-                    <p className="video-text">{VIDEO_TEXT_STRING2}</p>
-                    <p className="video-text">{VIDEO_TEXT_STRING3}</p>
-                    <p className="video-text">{VIDEO_TEXT_STRING4}</p>
-                    <p className="video-text">{VIDEO_TEXT_STRING5}</p>
+                    <p className="video-text desktop">
+                        {VIDEO_TEXT_STRING1}&nbsp;
+                        {VIDEO_TEXT_STRING2}&nbsp;
+                        {VIDEO_TEXT_STRING3}&nbsp;
+                        {VIDEO_TEXT_STRING4}&nbsp;
+                        {VIDEO_TEXT_STRING5}&nbsp;
+                    </p>
+
+                    <p className="video-text mobile">
+                        {VIDEO_TEXT_STRING1}&nbsp;
+                        {VIDEO_TEXT_STRING2}&nbsp;
+                    </p>
+                    <p className="video-text mobile">
+                        {VIDEO_TEXT_STRING3}&nbsp;
+                        {VIDEO_TEXT_STRING4}&nbsp;
+                        {VIDEO_TEXT_STRING5}&nbsp;
+                    </p>
+
                     <p className="author">{VIDEO_TEXT_AUTHOR}</p>
                 </div>
             </div>

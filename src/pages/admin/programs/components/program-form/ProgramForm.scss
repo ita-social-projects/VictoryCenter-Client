@@ -1,0 +1,45 @@
+@import '../../../../../assets/sass/variables/variables.colors';
+
+.program-form-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+.program-form-header {
+    color: $blue-900;
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 24px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.program-form-main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4375rem;
+
+    .form-group {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+
+        select {
+            padding: 0.625rem;
+            font-size: 16px;
+            outline: none;
+            border-radius: 8px;
+            border: 1px solid $input-border-color;
+            box-shadow: 0 1px 2px 0 rgba($box-shadow-blue, 0.051);
+        }
+    }
+
+    .error {
+        color: $error;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 20px;
+    }
+}

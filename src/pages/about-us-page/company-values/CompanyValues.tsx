@@ -1,4 +1,4 @@
-import './company-values.scss';
+import './CompanyValues.scss';
 import { OUR_VALUES, VALUE_ITEMS } from '../../../const/about-us-page/about-us-page';
 
 export const CompanyValues = () => {

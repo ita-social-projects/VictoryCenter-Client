@@ -1,4 +1,4 @@
-import './main-value.scss';
+import './MainValue.scss';
 import { peopleData, MAIN_VALUE, MAIN_VALUE_DETAILS } from '../../../const/about-us-page/about-us-page';
 
 export const MainValues = () => {

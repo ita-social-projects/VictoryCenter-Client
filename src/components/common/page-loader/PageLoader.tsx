@@ -1,6 +1,6 @@
 import LoaderIcon from '../../../assets/icons/load.svg';
 import { LOADER_ALT } from '../../../const/loader/loader';
-import './page-loader.scss';
+import './PageLoader.scss';
 
 export const PageLoader = () => {
     return (

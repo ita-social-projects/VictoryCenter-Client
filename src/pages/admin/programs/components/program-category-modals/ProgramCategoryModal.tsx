@@ -10,7 +10,7 @@ import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '../../../../../validation
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import './program-category-modal.scss';
+import './ProgramCategoryModal.scss';
 
 interface ProgramCategoryFormValues {
     name: string;

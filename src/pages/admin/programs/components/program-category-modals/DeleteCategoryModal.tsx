@@ -7,7 +7,7 @@ import { ProgramCategory } from '../../../../../types/admin/Programs';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
-import './program-category-modal.scss';
+import './ProgramCategoryModal.scss';
 
 interface DeleteCategoryModalProps {
     isOpen: boolean;

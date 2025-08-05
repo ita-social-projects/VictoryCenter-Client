@@ -12,7 +12,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
-import './scrollable-frame.scss';
+import './ScrollableFrame.scss';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../const/program-page/program-page';
 
 export const ScrollableFrame = () => {

@@ -5,7 +5,7 @@ import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { VisibilityStatus } from '../../../../../types/admin/Common';
 import PlusIcon from '../../../../../assets/icons/plus.svg';
-import './program-page-toolbar.scss';
+import './ProgramsPageToolbar.scss';
 
 export interface ProgramPageToolbarProps {
     onSearchQueryChange: (query: string) => void;

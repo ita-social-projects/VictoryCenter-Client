@@ -1,8 +1,7 @@
-import React from 'react';
 import classNames from 'classnames';
 import { VisibilityStatus } from '../../../types/admin/Common';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import './visibility-status-label.scss';
+import './VisibilityStatusLabel.scss';
 
 export interface VisibilityStatusLabelProps {
     status: VisibilityStatus;

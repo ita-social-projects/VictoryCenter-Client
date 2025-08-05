@@ -1,11 +1,11 @@
-@use '../../assets/sass/variables/variables.fonts.scss' as ft;
-@use '../../assets/sass/variables/variables.colors' as c;
+@import '../../assets/sass/variables/variables.fonts';
+@import '../../assets/sass/variables/variables.colors';
 @import '../../assets/sass/mixins/utilits.mixins';
 
 .footer-content {
     font-weight: 600;
     margin-top: 3.75rem;
-    font-family: ft.$mulish-regular-font;
+    font-family: $mulish-regular-font;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -23,13 +23,13 @@
         max-width: 73rem;
         width: 95%;
         box-sizing: border-box;
-        border-top: 1px solid c.$light-gray;
-        border-bottom: 1px solid c.$light-gray;
+        border-top: 1px solid $grey-700;
+        border-bottom: 1px solid $grey-700;
         display: flex;
         gap: 5rem;
 
         a {
-            @include link-base(#000, c.$link-hover-blue, c.$link-pressed-blue);
+            @include link-base(black, $blue-300, $blue-100);
 
             &.disable {
                 @include link-disabled();
@@ -45,7 +45,7 @@
 
             .input_block {
                 margin-top: 1.25rem;
-                border-bottom: 1px solid c.$light-gray;
+                border-bottom: 1px solid $grey-700;
 
                 input {
                     width: 18rem;
@@ -61,7 +61,7 @@
                 input::placeholder {
                     font-size: 1rem;
                     font-weight: 400;
-                    font-family: ft.$mulish-regular-font;
+                    font-family: $mulish-regular-font;
                 }
 
                 button {
@@ -72,6 +72,11 @@
                     color: inherit;
                     padding: 0;
                     margin: 0;
+                }
+
+                img {
+                    width: 1.5rem;
+                    height: 1.5rem;
                 }
             }
         }
@@ -116,11 +121,11 @@
         }
 
         button:hover {
-            color: c.$link-hover-blue;
+            color: $blue-300;
         }
 
         button:hover {
-            color: c.$link-pressed-blue;
+            color: $blue-100;
         }
 
         .social_media {
@@ -132,11 +137,11 @@
         .contact-item {
             font-size: 1rem;
             font-weight: 600;
-            font-family: ft.$mulish-regular-font;
+            font-family: $mulish-regular-font;
             background: none;
             border: none;
             padding: 0;
-            color: #000000;
+            color: black;
             cursor: pointer;
             transition: color 0.2s;
         }
@@ -173,19 +178,19 @@
 
     @keyframes color-change {
         0% {
-            color: #8fcbe6;
+            color: $light-blue-300;
         }
 
         40% {
-            color: #dfe772;
+            color: $footer-yellow;
         }
 
         70% {
-            color: #88dbb5;
+            color: $footer-cyan;
         }
 
         100% {
-            color: #8fcbe6;
+            color: $light-blue-300;
         }
     }
 }

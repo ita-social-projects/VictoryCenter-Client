@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import './page2.scss';
+import { useState, useEffect } from 'react';
+import './Page2.scss';
 
 import { page2DataFetch } from '../../../services/data-fetch/user-pages-data-fetch/page-2-data-fetch/page2DataFetch';
 

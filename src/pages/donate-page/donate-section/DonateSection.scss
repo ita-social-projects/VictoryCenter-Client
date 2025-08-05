@@ -1,3 +1,4 @@
+@import '../../../assets/sass/variables/variables.colors';
 @import '../../../assets/sass/variables/variables.fonts';
 
 .donateSection {
@@ -7,7 +8,7 @@
     display: flex;
     flex-direction: column;
     align-content: center;
-    box-shadow: 0 1rem 1.5rem -1rem rgba(#20689dbf, 0.75);
+    box-shadow: 0 1rem 1.5rem -1rem rgba($donate-box-shadow, 0.75);
 
     .donateTabsContainer {
         display: flex;
@@ -22,22 +23,22 @@
             font-family: $mulish-regular-font;
             font-size: 1.125rem;
             font-weight: 600;
-            color: #939699;
+            color: $grey-700;
             min-width: 12rem;
             min-height: 2.68rem;
             border: none;
             cursor: pointer;
-            border-bottom: 0.125rem solid #d2d2c7;
+            border-bottom: 0.125rem solid $grey-600;
         }
 
         .donateTab:hover {
-            border-bottom: 0.125rem solid #61615c;
-            color: #61615c;
+            border-bottom: 0.125rem solid $grey-900;
+            color: $grey-900;
         }
 
         .donateTab.active {
-            border-bottom: 0.125rem solid #58b1da;
-            color: #1f1919;
+            border-bottom: 0.125rem solid $light-blue-500;
+            color: $tooltip-text-color;
         }
     }
 
@@ -48,7 +49,7 @@
         display: flex;
         flex-direction: row;
         align-items: flex-end;
-        border-bottom: 0.125rem solid #61615c;
+        border-bottom: 0.125rem solid $grey-900;
 
         .donateAmountInput {
             padding-left: 1rem;
@@ -58,7 +59,7 @@
             font-size: 4rem;
             font-weight: 500;
             font-family: $mulish-regular-font;
-            color: #1f1919;
+            color: $tooltip-text-color;
         }
 
         .donateAmountInput:focus {
@@ -71,7 +72,7 @@
             display: flex;
             align-items: center;
             white-space: nowrap;
-            color: #939699;
+            color: $grey-700;
             cursor: pointer;
             margin-bottom: 0.75rem;
         }
@@ -112,7 +113,7 @@
 
         .arrowIcon {
             font-size: 1.25rem;
-            color: #7f7f78;
+            color: $grey-800;
             line-height: 1;
             margin-right: 0.69rem;
         }
@@ -132,7 +133,7 @@
             height: 3.19rem;
             font-family: $mulish-regular-font;
             font-size: 1.125rem;
-            color: #061125;
+            color: $blue-900;
             font-weight: 600;
             cursor: pointer;
 
@@ -151,7 +152,7 @@
         font-family: $mulish-regular-font;
         font-size: 1.125rem;
         font-weight: 700;
-        background-color: #061125;
+        background-color: $blue-900;
         cursor: pointer;
     }
 }
@@ -164,8 +165,8 @@
 
 .tooltip-container .tooltip-text {
     visibility: hidden;
-    background-color: #333;
-    color: #fff;
+    background-color: $donate-tooltip-color;
+    color: white;
     text-align: center;
     border-radius: 0.375rem;
     padding: 0.5rem 1.33rem;
@@ -178,8 +179,8 @@
     white-space: nowrap;
     font-size: 0.875rem;
     box-shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        0 4px 6px -1px rgba(black, 0.1),
+        0 2px 4px -1px rgba(black, 0.06);
 }
 
 .tooltip-container.top .tooltip-text {
@@ -196,7 +197,7 @@
     margin-left: -0.3125rem;
     border-width: 0.3125rem;
     border-style: solid;
-    border-color: #333 transparent transparent transparent;
+    border-color: $donate-tooltip-color transparent transparent transparent;
 }
 
 .tooltip-container:hover .tooltip-text {

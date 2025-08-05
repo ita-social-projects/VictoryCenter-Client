@@ -1,0 +1,29 @@
+@import '../../../assets/sass/variables/variables.colors';
+
+.status {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 2.25rem;
+    padding: 0.25rem 1rem;
+    border-radius: 30px;
+    border: 1px solid;
+    font-size: 18px;
+    line-height: 28px;
+    font-weight: 400;
+    white-space: nowrap;
+
+    &-draft {
+        color: $grey-900;
+        background-color: white;
+        border-color: $grey-900;
+    }
+
+    &-published {
+        color: $blue-500;
+        background-color: $light-blue-50;
+        border-color: $blue-500;
+    }
+}

@@ -1,5 +1,4 @@
-import './admin-navigation.scss';
-import React from 'react';
+import './AdminNavigation.scss';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 import { adminRoutes } from '../../../const/routers/routes';

@@ -1,12 +1,14 @@
+@import '../../../assets/sass/variables/variables.colors';
+
 .select {
     position: relative;
-    width: 179px;
-    height: 40px;
+    width: 11.1875rem;
+    height: 2.5rem;
     display: flex;
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: 1rem;
+    padding-right: 1rem;
     align-items: center;
-    border: 1px solid #0f2957;
+    border: 1px solid $blue-500;
     background-color: white;
     cursor: pointer;
 
@@ -19,11 +21,11 @@
 
         span {
             &.empty {
-                color: #61615c;
+                color: $grey-900;
             }
 
             &.not-empty {
-                color: #061125;
+                color: $blue-900;
             }
         }
     }
@@ -31,10 +33,10 @@
     &-options {
         display: block;
         position: absolute;
-        top: 42px;
-        left: -1px;
+        top: 2.625rem;
+        left: -0.0625rem;
         width: 100%;
-        border: 1px solid #0f2957;
+        border: 1px solid $blue-500;
         background-color: white;
         z-index: 10;
 
@@ -43,9 +45,9 @@
             background-color: white;
             display: flex;
             align-items: center;
-            padding-left: 16px;
-            padding-right: 16px;
-            height: 40px;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            height: 2.5rem;
             cursor: pointer;
             border: none;
             width: 100%;
@@ -53,13 +55,13 @@
             font-size: 16px;
 
             &:hover {
-                background-color: #e7eaee;
+                background-color: $blue-50;
             }
         }
 
         &-selected {
             span {
-                color: #061125;
+                color: $blue-900;
                 border-bottom: 1px solid black;
             }
         }

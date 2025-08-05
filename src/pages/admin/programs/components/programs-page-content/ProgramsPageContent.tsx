@@ -13,7 +13,7 @@ import { ProgramsApi } from '../../../../../services/api/admin/programs/programs
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import axios from 'axios';
-import './programs-page-content.scss';
+import './ProgramsPageContent.scss';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;

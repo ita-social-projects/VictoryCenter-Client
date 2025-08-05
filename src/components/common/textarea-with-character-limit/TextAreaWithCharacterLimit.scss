@@ -1,0 +1,57 @@
+@import '../../../assets/sass/variables/variables.colors';
+
+.textarea-with-limit {
+    display: inline-block;
+    width: 100%;
+
+    .textarea-wrapper {
+        display: flex;
+        padding: 0.625rem;
+        background: white;
+        border: 1px solid $blue-500;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px 0 rgba($box-shadow-blue, 0.051);
+        color: $blue-900;
+        font-size: 16px;
+
+        &-focused {
+            border-color: $grey-700;
+        }
+
+        &-disabled {
+            background-color: $grey-600;
+            border-color: $grey-900;
+        }
+
+        .textarea-input {
+            flex: 1;
+            padding: 0;
+            min-height: 5rem;
+            border: none;
+            outline: none;
+            resize: none;
+            background: none;
+            color: $bluish-grey-50;
+            font-family: inherit;
+            font-size: 16px;
+
+            &::placeholder {
+                color: $grey-700;
+            }
+
+            &:disabled {
+                background-color: transparent;
+            }
+        }
+    }
+
+    .character-limit {
+        margin-top: 0.25rem;
+        color: $bluish-grey-100;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 24px;
+        text-align: right;
+        white-space: nowrap;
+    }
+}

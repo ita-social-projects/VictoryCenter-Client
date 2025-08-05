@@ -1,0 +1,27 @@
+@import '../../assets/sass/variables/variables.colors';
+@import '../../assets/sass/variables/variables.fonts';
+
+.admin {
+    color: $blue-900;
+    display: flex;
+
+    &__navigation {
+        width: 19.4375rem;
+        box-shadow: 1px 1px 2px rgba($grey-850, 0.38);
+        height: 100vh;
+        position: sticky;
+    }
+
+    &__page {
+        background-color: $grey-50;
+        width: calc(100% - 19.4375rem);
+    }
+
+    font-family: $mulish-regular-font;
+
+    button,
+    select,
+    input {
+        font-family: $mulish-regular-font;
+    }
+}

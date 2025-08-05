@@ -1,4 +1,4 @@
-import './donate-section.scss';
+import './DonateSection.scss';
 import background from '../../../assets/images/public/about-us-page/donate-background.jpg';
 import { routes } from '../../../const/routers/routes';
 import { DONATE_TITLE, DONATE_DETAILS, DONATE, BECOME_PARTNER } from '../../../const/about-us-page/about-us-page';

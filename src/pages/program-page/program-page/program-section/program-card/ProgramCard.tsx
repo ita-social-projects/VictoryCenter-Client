@@ -2,7 +2,7 @@ import React from 'react';
 import { Program } from '../../../../../types/public/ProgramPage';
 import arrowBlack from '../../../../../assets/icons/arrow-up-right.svg';
 import arrowYellow from '../../../../../assets/icons/arrow-up-right-yellow.svg';
-import './program-card.scss';
+import './ProgramCard.scss';
 
 interface ProgramCardProps {
     program: Program;

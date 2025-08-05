@@ -4,7 +4,7 @@ import openIcon from '../../../../../assets/icons/arrow-down-right.svg';
 import closeIcon from '../../../../../assets/icons/cross.svg';
 import openBlue from '../../../../../assets/icons/arrow-down-right-blue.svg';
 import closeBlue from '../../../../../assets/icons/cross-blue.svg';
-import './question-card.scss';
+import './QuestionCard.scss';
 
 interface QuestionCardProps {
     questionCard: Question;

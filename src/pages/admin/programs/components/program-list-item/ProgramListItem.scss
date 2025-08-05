@@ -1,0 +1,153 @@
+@import '../../../../../assets/sass/variables/variables.colors';
+
+.program-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 7.5rem;
+
+    height: 7.5rem;
+    padding: 1.875rem;
+    background: $grey-50;
+    border-bottom: 0.3px solid $blue-900;
+    box-shadow: 0 1px 2.8px 0 rgba(black, 0.15);
+
+    .program-info {
+        display: flex;
+        flex: 1;
+        flex-direction: row;
+        align-items: center;
+        gap: 4.375rem;
+        height: 3.75rem;
+
+        &-identity {
+            display: flex;
+            flex: 3;
+            flex-direction: row;
+            align-items: center;
+            gap: 1rem;
+
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 28px;
+
+            img {
+                width: 3.75rem;
+                height: 3.75rem;
+                border-radius: 50%;
+                flex-shrink: 0;
+            }
+
+            p {
+                margin: 0;
+                display: -webkit-box;
+                -webkit-line-clamp: 4;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                overflow-wrap: break-word;
+                word-break: break-word;
+                text-align: left;
+            }
+        }
+
+        &-description {
+            flex: 4;
+            display: flex;
+            align-items: center;
+
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 28px;
+
+            p {
+                margin: 0;
+                display: -webkit-box;
+                -webkit-line-clamp: 4;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                overflow-wrap: break-word;
+                word-break: break-word;
+                text-overflow: ellipsis;
+            }
+        }
+
+        &-status {
+            flex: 0 0 11.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100%;
+        }
+    }
+
+    .program-actions {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 5.25rem;
+        height: 100%;
+
+        &-tooltip {
+            display: flex;
+            flex-direction: column;
+            width: auto;
+            white-space: nowrap;
+            gap: 0.25rem;
+
+            b {
+                color: $blue-500;
+                font-size: 18px;
+                font-weight: 500;
+                line-height: 28px;
+            }
+
+            span {
+                color: $blue-500;
+                font-size: 16px;
+                font-weight: 400;
+                line-height: 24px;
+            }
+        }
+
+        &-buttons {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.625rem;
+
+            .edit-btn,
+            .delete-btn {
+                width: 1.5rem;
+                height: 1.5rem;
+                border: none;
+                cursor: pointer;
+                background-repeat: no-repeat;
+                background-size: cover;
+            }
+
+            .edit-btn {
+                background: url('../../../../../assets/icons/edit.svg');
+
+                &:active {
+                    background: url('../../../../../assets/icons/edit-filled.svg');
+                }
+            }
+
+            .delete-btn {
+                background: url('../../../../../assets/icons/delete.svg');
+
+                &:active {
+                    background: url('../../../../../assets/icons/delete-filled.svg');
+                }
+            }
+        }
+    }
+
+    .tooltip-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+        cursor: pointer;
+    }
+}

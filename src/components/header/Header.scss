@@ -1,7 +1,6 @@
-@import '../../assets/sass/variables/variables.colors';
+@import '../../assets/sass/variables/_variables.colors';
+@import '../../assets/sass/variables/variables.fonts';
 @import '../../assets/sass/mixins/utilits.mixins';
-
-$mulish-font-family: 'Mulish', sans-serif;
 
 .headerBlock {
     display: flex;
@@ -21,7 +20,7 @@ $mulish-font-family: 'Mulish', sans-serif;
 
     box-sizing: border-box;
 
-    background-color: $header-background-grey;
+    background-color: rgba($grey-50, 0.5);
 
     backdrop-filter: blur(10.375rem);
 
@@ -38,7 +37,8 @@ $mulish-font-family: 'Mulish', sans-serif;
             gap: 3rem;
 
             a {
-                @include link-base(#000, $link-hover-blue, $link-pressed-blue);
+                font-size: 1rem;
+                @include link-base($blue-900, $blue-300, $blue-100);
                 font-weight: 600;
 
                 &.disable {
@@ -56,7 +56,7 @@ $mulish-font-family: 'Mulish', sans-serif;
             background-color: transparent;
             width: 8.2em;
             height: 2.5rem;
-            font-family: $mulish-font-family;
+            font-family: $mulish-regular-font;
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
@@ -65,7 +65,7 @@ $mulish-font-family: 'Mulish', sans-serif;
         .donateButton {
             background-color: $blue-900;
             color: white;
-            font-family: $mulish-font-family;
+            font-family: $mulish-regular-font;
             font-size: 1rem;
             width: 7.5rem;
             height: 2.5rem;

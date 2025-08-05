@@ -9,7 +9,7 @@ import {
 import { Program } from '../../../../types/public/ProgramPage';
 import { ProgramCard } from './program-card/ProgramCard';
 import { programPageDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
-import './program-section.scss';
+import './ProgramSection.scss';
 
 export const ProgramSection: React.FC = () => {
     const [programData, setProgramData] = useState<Program[]>([]);

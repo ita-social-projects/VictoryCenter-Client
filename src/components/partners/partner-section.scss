@@ -1,4 +1,4 @@
-@import '../../../../assets/sass/variables/_variables.colors.scss';
+@import '../../assets/sass/variables/_variables.colors.scss';
 
 .partners-content-section {
   padding: 5rem 0;
@@ -48,7 +48,7 @@
     justify-content: flex-start;
     align-items: center;
     gap: 4rem;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     overflow-x: auto;
   }
 

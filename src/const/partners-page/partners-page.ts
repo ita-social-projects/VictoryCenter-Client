@@ -169,7 +169,7 @@ export const PARTNER_THIRD_SECTION = [
     },
     {
         id: 5,
-        name: 'Державна служба Україн у справах дітей',
+        name: 'Державна служба України у справах дітей',
         logo: childrenAffeirsLogo,
         description: 'Державна служба Україн у справах дітей',
     },

@@ -5,7 +5,7 @@
   padding: 0;
   position: relative;
   margin-right: 100px;
-  width: 100%;
+  width: 100vw;
   height: 70vh;
   overflow: hidden;
 }
@@ -14,26 +14,29 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  min-width: 99vw;
-  min-height: 100%;
-  width: auto;
-  height: auto;
+  min-width: 100vw;
+  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
   transform: translate(-50%, -50%);
   object-fit: cover;
   z-index: -1;
 }
 
 .quote-overlay {
-  min-height: 35rem;
   position: absolute;
-  top: 3.75rem;
-  left: 14%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 1;
-  width: 72%;
+  width: 100%;
+  padding: 4rem 15rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
+
 
   .video-text {
     font-family: Mulish, sans-serif;
@@ -44,6 +47,7 @@
     text-align: center;
     text-transform: uppercase;
     color: $main-white;
+    margin-bottom: 2rem;
   }
 
   .video-description {
@@ -54,6 +58,7 @@
     max-width: 600px;
     text-align: center;
     color: $main-white;
+    margin-bottom: 2rem;
   }
 
   .video-buttons {
@@ -108,27 +113,57 @@
 }
 
 @media (max-width: 768px) {
+  .video-background-container {
+    height: 80vh;
+  }
+
+  .background-video {
+    width: 100vw;
+    height: 100vh;
+    min-width: 100vw;
+    min-height: 100vh;
+  }
+
   .quote-overlay {
-    max-width: 90%;
-    padding: 2rem;
+    padding: 2rem 1rem;
 
     .video-text {
-      font-size: 2rem;
+      font-size: 2.5rem;
+      line-height: 2.8rem;
+      margin-bottom: 1.5rem;
     }
 
     .video-description {
-      font-size: 1rem;
-      margin-bottom: 2rem;
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
     }
 
     .video-buttons {
       flex-direction: column;
+      gap: 1rem;
 
       .btn-primary,
       .btn-secondary {
         width: 100%;
         max-width: 250px;
       }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+
+
+  .quote-overlay {
+    padding: 1.5rem 1rem;
+
+    .video-text {
+      font-size: 2rem;
+      line-height: 2.2rem;
+    }
+
+    .video-description {
+      font-size: 0.8rem;
     }
   }
 }

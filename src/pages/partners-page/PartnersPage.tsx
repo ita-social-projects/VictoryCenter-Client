@@ -6,8 +6,6 @@ import { PartnersThirdSection } from './partners-page/partners-third-section/par
 import { PartnersFouthSectionContent } from './partners-page/partners-fouth-section/partnersFouthSection';
 import { OutroSection } from './partners-page/outro-section/outroSection';
 
-import './PartnersPage.scss';
-
 export const PartnersPage: React.FC = () => {
     return (
         <>

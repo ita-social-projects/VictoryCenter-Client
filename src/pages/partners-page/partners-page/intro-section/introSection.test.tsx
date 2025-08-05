@@ -66,8 +66,8 @@ describe('IntroSection', () => {
     });
 
     it('renders subtitle with correct content', () => {
-        const subtitle = screen.getByText(PARTNERS_PAGE_SUBTITLE);
+        const subtitle = screen.getByText('Mocked subtitle text');
         expect(subtitle).toHaveClass('subtitle');
         expect(subtitle.tagName).toBe('P');
-    });
+        });
 });

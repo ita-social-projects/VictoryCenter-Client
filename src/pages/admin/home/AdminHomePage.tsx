@@ -9,9 +9,9 @@ export const AdminHomePage = () => {
 
     useEffect(() => {
         (async () => {
-            const responce = await adminHomeDataFetch();
+            const response = await adminHomeDataFetch();
 
-            const { header, content } = responce;
+            const { header, content } = response;
 
             // DEV NOTE: in React 18 and higher there is a term "Automatic Batching"
             // https://react.dev/blog/2022/03/08/react-18-upgrade-guide#automatic-batching

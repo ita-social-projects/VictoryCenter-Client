@@ -1,6 +1,6 @@
 import './Header.scss';
 import { Link } from 'react-router';
-import { ReactComponent as VictoryCenterLogo } from '../../../assets/icons/logo-wth-text.svg';
+import { ReactComponent as VictoryCenterLogo } from '../../../assets/icons/logo-with-text.svg';
 import { PUBLIC_ROUTES } from '../../../const/public/routes';
 import { ABOUT_US, CONTACT_US, DONATE, HOW_TO_SUPPORT, PROGRAMS, REPORTING } from '../../../const/public/header';
 

@@ -1,7 +1,6 @@
 import '@testing-library/jest-dom';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { useAdminContext, AdminContextProvider } from './AdminContextProvider';
-import { API_ROUTES } from '../../../const/common/api-routes/main-api';
 import { loginRequest, tokenRefreshRequest } from '../../../services/api/admin/login/login-api';
 import { isAccessTokenValid } from '../../../services/auth/auth-service/auth-service';
 import { CreateAdminClient } from '../../../services/auth/create-admin-client/create-admin-client';
@@ -15,6 +14,9 @@ jest.mock('../../../services/auth/auth-service/auth-service', () => ({
 }));
 jest.mock('../../../services/auth/create-admin-client/create-admin-client', () => ({
     CreateAdminClient: jest.fn(),
+}));
+jest.mock('../../../const/common/api-routes/main-api', () => ({
+    API_ROUTES: { BASE: '/base' },
 }));
 
 const loginRequestMock = loginRequest as jest.Mock<Promise<string>, [any]>;
@@ -51,7 +53,6 @@ describe('<AdminContextProvider />', () => {
         loginRequestMock.mockResolvedValue('login_token');
         isValidMock.mockImplementation((t: string) => t === 'initial_token' || t === 'login_token');
         CreateAdminClientMock.mockReturnValue({ marker: 'FAKE_CLIENT' });
-        (API_ROUTES as any).BASE = '/base';
     });
 
     it('on silent-refresh on mount: loading toggles, auth=true, client.marker set', async () => {

@@ -1,5 +1,5 @@
 import './SearchBar.scss';
-import React, { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import { Select } from '../../common/select/Select';
 import classNames from 'classnames';
 
@@ -56,11 +56,15 @@ export const SearchBar = ({ onChange, autocompleteValues, placeholder }: SearchB
     return (
         <div className="search-bar" data-testid="search-bar-root">
             <button
+                type="button"
+                aria-label="search"
                 onClick={handleSearchIconClick}
                 className={classNames({ ...buttonClasses, 'search-bar-search-icon': true })}
                 data-testid="search-icon"
             />
             <button
+                type="button"
+                aria-label="clear search"
                 onClick={handleRemoveQueryIconClick}
                 className={classNames({ ...buttonClasses, 'search-bar-remove-query-icon': true })}
                 data-testid="remove-query-icon"

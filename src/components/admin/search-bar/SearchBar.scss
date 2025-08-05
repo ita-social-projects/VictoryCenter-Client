@@ -3,7 +3,7 @@
 
     &-icon {
         position: absolute;
-        z-index: 2;
+        z-index: 3;
         border: none;
 
         &:hover {
@@ -29,7 +29,7 @@
 
     input {
         position: sticky;
-        z-index: 1000;
+        z-index: 2;
         width: 38.3125rem;
         height: 2.5rem;
         top: 3.25rem;

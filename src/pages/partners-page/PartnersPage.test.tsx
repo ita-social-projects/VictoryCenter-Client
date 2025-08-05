@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { PartnersPage } from './PartnersPage';
 
-// Mock all child components
 jest.mock('./partners-page/intro-section/introSection', () => ({
     IntroSection: () => <div data-testid="intro-section">IntroSection</div>
 }));

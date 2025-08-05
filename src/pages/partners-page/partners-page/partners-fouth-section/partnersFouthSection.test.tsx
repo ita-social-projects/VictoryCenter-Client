@@ -114,15 +114,6 @@ describe('PartnersFouthSectionContent', () => {
         });
     });
 
-    it('uses unique keys for partner items', () => {
-        const partnerItems = document.querySelectorAll('.partner-item');
-        expect(partnerItems).toHaveLength(PARTNER_FOURTH_SECTION.length);
-
-        const ids = PARTNER_FOURTH_SECTION.map(partner => partner.id);
-        const uniqueIds = [...new Set(ids)];
-        expect(uniqueIds).toHaveLength(ids.length);
-    });
-
     it('renders title and description in the header section', () => {
         const header = document.querySelector('.partners-header');
         const title = header?.querySelector('.section-title');

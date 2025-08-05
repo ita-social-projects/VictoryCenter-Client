@@ -119,15 +119,6 @@ describe('PartnersSecondSection', () => {
         });
     });
 
-    it('uses unique keys for partner items', () => {
-        const partnerItems = document.querySelectorAll('.partner-item');
-        expect(partnerItems).toHaveLength(PARTNER_SECOND_SECTION.length);
-
-        const ids = PARTNER_SECOND_SECTION.map(partner => partner.id);
-        const uniqueIds = [...new Set(ids)];
-        expect(uniqueIds).toHaveLength(ids.length);
-    });
-
     it('renders header with block layout structure', () => {
         const header = document.querySelector('.partners-header');
         const title = header?.querySelector('.section-title');

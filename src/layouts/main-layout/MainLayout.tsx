@@ -17,8 +17,14 @@ export const MainLayout = ({ behavior = 'auto' }: { behavior?: 'auto' | 'smooth'
 
     return (
         <div>
+            <div className="header-container">
+                <Header />
+            </div>
             <div className="page-container">
                 <Outlet />
+            </div>
+            <div className="footer-container">
+                <Footer />
             </div>
         </div>
     );

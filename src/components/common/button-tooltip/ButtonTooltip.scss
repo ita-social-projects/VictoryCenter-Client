@@ -1,4 +1,4 @@
-@import '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/colors';
 
 .button-tooltip-wrapper {
     position: relative;
@@ -15,11 +15,11 @@
     display: flex;
 
     &:hover {
-        background-color: $blue-50;
+        background-color: colors.$blue-50;
     }
 
     &:focus {
-        background-color: $blue-50;
+        background-color: colors.$blue-50;
     }
 }
 
@@ -30,13 +30,13 @@
 
 .button-tooltip-popup {
     position: absolute;
-    background: $grey-50;
-    color: $tooltip-text-color;
+    background: colors.$grey-50;
+    color: colors.$tooltip-text-color;
     border-radius: 8px;
     padding: 0.75rem 1rem;
     font-size: 14px;
     word-wrap: break-word;
-    border: 1px solid $grey-700;
+    border: 1px solid colors.$grey-700;
     transition: opacity 0.2s;
     z-index: 1000;
 
@@ -65,7 +65,7 @@
         left: 50%;
         transform: translateX(-50%);
         border-width: 0 9px 9px 9px;
-        border-color: transparent transparent $grey-700 transparent;
+        border-color: transparent transparent colors.$grey-700 transparent;
     }
 
     &--bottom::after {
@@ -73,7 +73,7 @@
         left: 50%;
         transform: translateX(-50%);
         border-width: 0 8px 8px 8px;
-        border-color: transparent transparent $grey-50 transparent;
+        border-color: transparent transparent colors.$grey-50 transparent;
     }
 
     /* Top position (button-tooltip is above the icon) */
@@ -82,7 +82,7 @@
         left: 50%;
         transform: translateX(-50%);
         border-width: 9px 9px 0 9px;
-        border-color: $grey-700 transparent transparent transparent;
+        border-color: colors.$grey-700 transparent transparent transparent;
     }
 
     &--top::after {
@@ -90,6 +90,6 @@
         left: 50%;
         transform: translateX(-50%);
         border-width: 8px 8px 0 8px;
-        border-color: $grey-50 transparent transparent transparent;
+        border-color: colors.$grey-50 transparent transparent transparent;
     }
 }

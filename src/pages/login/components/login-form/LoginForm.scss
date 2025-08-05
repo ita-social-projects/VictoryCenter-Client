@@ -1,4 +1,4 @@
-@import '../../../../assets/sass/variables/colors';
+@use '../../../../assets/sass/variables/colors';
 
 .login-form {
     width: 32rem;
@@ -12,7 +12,7 @@
         font-weight: 400;
         margin: 1rem 0 1rem 0;
         text-align: center;
-        color: $blue-900;
+        color: colors.$blue-900;
     }
 
     &-group {
@@ -25,7 +25,7 @@
         label {
             font-size: 1rem;
             display: block;
-            color: $bluish-grey-50;
+            color: colors.$bluish-grey-50;
         }
 
         input:-webkit-autofill,
@@ -39,8 +39,8 @@
             height: 2.5rem;
             width: 100%;
             font-size: 1rem;
-            border: 1px solid $input-border-color;
-            box-shadow: 0px 1px 2px 0px rgba($box-shadow-blue, 0.051);
+            border: 1px solid colors.$input-border-color;
+            box-shadow: 0px 1px 2px 0px rgba(colors.$box-shadow-blue, 0.051);
             padding: 0.75rem 3.75rem 0.75rem 0.75rem;
         }
 

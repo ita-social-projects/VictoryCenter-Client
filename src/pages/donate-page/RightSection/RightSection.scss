@@ -1,5 +1,5 @@
-@import '../../../assets/sass/variables/fonts';
-@import '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/fonts';
+@use '../../../assets/sass/variables/colors';
 
 .rightSection {
     width: 33.1rem;
@@ -33,7 +33,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: $blue-900;
+    background-color: colors.$blue-900;
     transition: 0.4s;
     border-radius: 0.75rem;
 }
@@ -52,7 +52,7 @@
 }
 
 .switch input:checked + .slider {
-    background-color: $light-blue-500;
+    background-color: colors.$light-blue-500;
 }
 
 .switch input:checked + .slider::before {
@@ -60,13 +60,13 @@
 }
 
 .switch input:focus + .slider {
-    box-shadow: 0 0 1px $slider-blue;
+    box-shadow: 0 0 1px colors.$slider-blue;
 }
 
 .toggleLabel {
     font-size: 1.5rem;
-    font-family: $mulish-regular-font;
-    color: $blue-900;
+    font-family: fonts.$mulish-regular-font;
+    color: colors.$blue-900;
     font-weight: 600;
 }
 

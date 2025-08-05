@@ -1,4 +1,4 @@
-﻿@import '../../../../../assets/sass/variables/colors';
+﻿@use '../../../../../assets/sass/variables/colors';
 
 .programs-page {
     &-wrapper {
@@ -34,7 +34,7 @@
         flex-direction: column;
         justify-content: left;
         align-items: center;
-        color: $error;
+        color: colors.$error;
         font-weight: 400;
         font-size: 16px;
         line-height: 20px;
@@ -46,9 +46,9 @@
             border: none;
             padding: 0;
             font-size: 16px;
-            color: $blue-900;
+            color: colors.$blue-900;
             text-decoration: underline;
-            text-decoration-color: $blue-900;
+            text-decoration-color: colors.$blue-900;
             cursor: pointer;
 
             &:hover {

@@ -1,4 +1,4 @@
-@import '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/colors';
 
 .photo-input-wrapper {
     position: relative;
@@ -8,18 +8,18 @@
     width: 9.125rem;
     height: 9.5rem;
     padding: 1rem;
-    border: 1px solid $grey-700;
+    border: 1px solid colors.$grey-700;
     border-radius: 8px;
     background: white;
     box-shadow: 0 1px 0 0 rgba(black, 0.25);
 
     &-focused {
-        background-color: $blue-50;
-        border-color: rgba($input-border-color, 0.8);
+        background-color: colors.$blue-50;
+        border-color: rgba(colors.$input-border-color, 0.8);
     }
 
     &-disabled {
-        background-color: $grey-600;
+        background-color: colors.$grey-600;
     }
 
     .photo-placeholder {
@@ -29,10 +29,10 @@
         align-items: center;
         gap: 0.25rem;
         padding: 0;
-        border: 1px dashed $grey-900;
+        border: 1px dashed colors.$grey-900;
         border-radius: 4px;
         background: none;
-        color: $grey-900;
+        color: colors.$grey-900;
         font-size: 14px;
         line-height: 20px;
         font-weight: 400;
@@ -70,7 +70,7 @@
             padding: 0.625rem;
             margin: auto;
             border-radius: 8px;
-            background: $grey-900;
+            background: colors.$grey-900;
             opacity: 0.8;
 
             &:hover {

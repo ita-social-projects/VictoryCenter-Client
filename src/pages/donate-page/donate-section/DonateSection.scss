@@ -1,5 +1,5 @@
-@import '../../../assets/sass/variables/colors';
-@import '../../../assets/sass/variables/fonts';
+@use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/fonts';
 
 .donateSection {
     background-color: white;
@@ -8,7 +8,7 @@
     display: flex;
     flex-direction: column;
     align-content: center;
-    box-shadow: 0 1rem 1.5rem -1rem rgba($donate-box-shadow, 0.75);
+    box-shadow: 0 1rem 1.5rem -1rem rgba(colors.$donate-box-shadow, 0.75);
 
     .donateTabsContainer {
         display: flex;
@@ -20,25 +20,25 @@
 
         .donateTab {
             background-color: transparent;
-            font-family: $mulish-regular-font;
+            font-family: fonts.$mulish-regular-font;
             font-size: 1.125rem;
             font-weight: 600;
-            color: $grey-700;
+            color: colors.$grey-700;
             min-width: 12rem;
             min-height: 2.68rem;
             border: none;
             cursor: pointer;
-            border-bottom: 0.125rem solid $grey-600;
+            border-bottom: 0.125rem solid colors.$grey-600;
         }
 
         .donateTab:hover {
-            border-bottom: 0.125rem solid $grey-900;
-            color: $grey-900;
+            border-bottom: 0.125rem solid colors.$grey-900;
+            color: colors.$grey-900;
         }
 
         .donateTab.active {
-            border-bottom: 0.125rem solid $light-blue-500;
-            color: $tooltip-text-color;
+            border-bottom: 0.125rem solid colors.$light-blue-500;
+            color: colors.$tooltip-text-color;
         }
     }
 
@@ -49,7 +49,7 @@
         display: flex;
         flex-direction: row;
         align-items: flex-end;
-        border-bottom: 0.125rem solid $grey-900;
+        border-bottom: 0.125rem solid colors.$grey-900;
 
         .donateAmountInput {
             padding-left: 1rem;
@@ -58,8 +58,8 @@
             min-height: 5rem;
             font-size: 4rem;
             font-weight: 500;
-            font-family: $mulish-regular-font;
-            color: $tooltip-text-color;
+            font-family: fonts.$mulish-regular-font;
+            color: colors.$tooltip-text-color;
         }
 
         .donateAmountInput:focus {
@@ -72,7 +72,7 @@
             display: flex;
             align-items: center;
             white-space: nowrap;
-            color: $grey-700;
+            color: colors.$grey-700;
             cursor: pointer;
             margin-bottom: 0.75rem;
         }
@@ -108,12 +108,12 @@
         .currencyText {
             font-size: 2rem;
             font-weight: 700;
-            font-family: $mulish-regular-font;
+            font-family: fonts.$mulish-regular-font;
         }
 
         .arrowIcon {
             font-size: 1.25rem;
-            color: $grey-800;
+            color: colors.$grey-800;
             line-height: 1;
             margin-right: 0.69rem;
         }
@@ -131,9 +131,9 @@
             border-radius: 2.69rem;
             width: 7.67rem;
             height: 3.19rem;
-            font-family: $mulish-regular-font;
+            font-family: fonts.$mulish-regular-font;
             font-size: 1.125rem;
-            color: $blue-900;
+            color: colors.$blue-900;
             font-weight: 600;
             cursor: pointer;
 
@@ -149,10 +149,10 @@
         margin-right: 1.5rem;
         min-height: 2.75rem;
         color: white;
-        font-family: $mulish-regular-font;
+        font-family: fonts.$mulish-regular-font;
         font-size: 1.125rem;
         font-weight: 700;
-        background-color: $blue-900;
+        background-color: colors.$blue-900;
         cursor: pointer;
     }
 }
@@ -165,7 +165,7 @@
 
 .tooltip-container .tooltip-text {
     visibility: hidden;
-    background-color: $donate-tooltip-color;
+    background-color: colors.$donate-tooltip-color;
     color: white;
     text-align: center;
     border-radius: 0.375rem;
@@ -197,7 +197,7 @@
     margin-left: -0.3125rem;
     border-width: 0.3125rem;
     border-style: solid;
-    border-color: $donate-tooltip-color transparent transparent transparent;
+    border-color: colors.$donate-tooltip-color transparent transparent transparent;
 }
 
 .tooltip-container:hover .tooltip-text {

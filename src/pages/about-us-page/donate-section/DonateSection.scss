@@ -1,5 +1,5 @@
-@import '../../../assets/sass/variables/colors';
-@import '../../../assets/sass/variables/fonts';
+@use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/fonts';
 
 .donate-block {
     position: relative;
@@ -27,7 +27,7 @@
         justify-content: space-between;
 
         .donate-title {
-            font-family: $mulish-regular-font;
+            font-family: fonts.$mulish-regular-font;
             font-weight: 600;
             font-size: 4rem;
             line-height: 4.5rem;
@@ -45,7 +45,7 @@
             gap: 1rem;
 
             h3 {
-                font-family: $mulish-regular-font;
+                font-family: fonts.$mulish-regular-font;
                 font-weight: 400;
                 font-size: 1.125rem;
                 line-height: 1.75rem;
@@ -64,9 +64,9 @@
                     height: 2.5rem;
                     opacity: 1;
                     padding: 0.5rem 1.5rem;
-                    background-color: $yellow-500;
-                    color: $blue-900;
-                    font-family: $mulish-regular-font;
+                    background-color: colors.$yellow-500;
+                    color: colors.$blue-900;
+                    font-family: fonts.$mulish-regular-font;
                     font-weight: 400;
                     font-size: 1rem;
                     line-height: 1.5rem;
@@ -80,15 +80,15 @@
                 .partner-button {
                     height: 2.5rem;
                     padding: 0.5rem 1.5rem;
-                    border: 1px solid $grey-50;
-                    font-family: $mulish-regular-font;
+                    border: 1px solid colors.$grey-50;
+                    font-family: fonts.$mulish-regular-font;
                     font-weight: 400;
                     font-size: 1rem;
                     line-height: 1.5rem;
                     letter-spacing: -0.02em;
                     vertical-align: middle;
                     background: none;
-                    color: $grey-50;
+                    color: colors.$grey-50;
                     cursor: pointer;
                     text-decoration: none;
                 }

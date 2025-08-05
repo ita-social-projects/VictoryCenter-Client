@@ -1,4 +1,4 @@
-@import '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/colors';
 
 .status {
     display: flex;
@@ -16,14 +16,14 @@
     white-space: nowrap;
 
     &-draft {
-        color: $grey-900;
+        color: colors.$grey-900;
         background-color: white;
-        border-color: $grey-900;
+        border-color: colors.$grey-900;
     }
 
     &-published {
-        color: $blue-500;
-        background-color: $light-blue-50;
-        border-color: $blue-500;
+        color: colors.$blue-500;
+        background-color: colors.$light-blue-50;
+        border-color: colors.$blue-500;
     }
 }

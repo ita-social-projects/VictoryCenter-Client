@@ -1,5 +1,5 @@
-@import '../../../../assets/sass/variables/colors';
-@import '../../../../assets/sass/variables/fonts';
+@use '../../../../assets/sass/variables/colors';
+@use '../../../../assets/sass/variables/fonts';
 
 .contact-us-block {
     position: relative;
@@ -24,7 +24,7 @@
         text-align: center;
 
         .contact-title {
-            font-family: $mulish-regular-font;
+            font-family: fonts.$mulish-regular-font;
             font-weight: 700;
             font-size: 4rem;
             line-height: 4.5rem;
@@ -45,7 +45,7 @@
             gap: 2rem;
 
             h4 {
-                font-family: $mulish-regular-font;
+                font-family: fonts.$mulish-regular-font;
                 font-weight: 500;
                 font-size: 1.125rem;
                 line-height: 1.75rem;
@@ -60,14 +60,14 @@
                 height: 2.5rem;
                 gap: 0.5rem;
                 padding: 0.5rem 1.5rem;
-                background: $yellow-500;
-                font-family: $mulish-regular-font;
+                background: colors.$yellow-500;
+                font-family: fonts.$mulish-regular-font;
                 font-weight: 400;
                 font-size: 1rem;
                 line-height: 1.5rem;
                 letter-spacing: -0.02em;
                 vertical-align: middle;
-                color: $blue-900;
+                color: colors.$blue-900;
             }
         }
     }

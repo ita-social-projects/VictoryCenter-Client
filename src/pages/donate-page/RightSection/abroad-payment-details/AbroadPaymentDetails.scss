@@ -1,5 +1,5 @@
-@import '../../../../assets/sass/variables/fonts';
-@import '../../../../assets/sass/variables/colors';
+@use '../../../../assets/sass/variables/fonts';
+@use '../../../../assets/sass/variables/colors';
 
 .abroadPaymentDetails {
     display: flex;
@@ -9,8 +9,8 @@
 
 .abroadPaymentDetailsBlock {
     h2 {
-        font-family: $mulish-regular-font;
-        color: $blue-900;
+        font-family: fonts.$mulish-regular-font;
+        color: colors.$blue-900;
         font-weight: 700;
         font-size: 2rem;
     }
@@ -27,14 +27,14 @@
         h3 {
             font-weight: 600;
             font-size: 1.5rem;
-            color: $blue-900;
-            font-family: $mulish-regular-font;
+            color: colors.$blue-900;
+            font-family: fonts.$mulish-regular-font;
             padding-bottom: 0.125rem;
         }
 
         .label {
-            font-family: $mulish-regular-font;
-            color: $blue-900;
+            font-family: fonts.$mulish-regular-font;
+            color: colors.$blue-900;
             font-size: 1.125rem;
             font-weight: 400;
             padding-bottom: 0.125rem;
@@ -45,9 +45,9 @@
         }
 
         .highlightedLabel {
-            font-family: $mulish-regular-font;
+            font-family: fonts.$mulish-regular-font;
             font-weight: 700;
-            color: $blue-900;
+            color: colors.$blue-900;
             font-size: 1.125rem;
         }
 

@@ -1,11 +1,11 @@
-@import '../../assets/sass/variables/fonts';
-@import '../../assets/sass/variables/colors';
-@import '../../assets/sass/mixins/utilits.mixins';
+@use '../../assets/sass/variables/fonts';
+@use '../../assets/sass/variables/colors';
+@use '../../assets/sass/mixins/utilits.mixins';
 
 .footer-content {
     font-weight: 600;
     margin-top: 3.75rem;
-    font-family: $mulish-regular-font;
+    font-family: fonts.$mulish-regular-font;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -23,16 +23,16 @@
         max-width: 73rem;
         width: 95%;
         box-sizing: border-box;
-        border-top: 1px solid $grey-700;
-        border-bottom: 1px solid $grey-700;
+        border-top: 1px solid colors.$grey-700;
+        border-bottom: 1px solid colors.$grey-700;
         display: flex;
         gap: 5rem;
 
         a {
-            @include link-base(black, $blue-300, $blue-100);
+            @include utilits.link-base(black, colors.$blue-300, colors.$blue-100);
 
             &.disable {
-                @include link-disabled();
+                @include utilits.link-disabled();
             }
         }
 
@@ -45,7 +45,7 @@
 
             .input_block {
                 margin-top: 1.25rem;
-                border-bottom: 1px solid $grey-700;
+                border-bottom: 1px solid colors.$grey-700;
 
                 input {
                     width: 18rem;
@@ -61,7 +61,7 @@
                 input::placeholder {
                     font-size: 1rem;
                     font-weight: 400;
-                    font-family: $mulish-regular-font;
+                    font-family: fonts.$mulish-regular-font;
                 }
 
                 button {
@@ -121,11 +121,11 @@
         }
 
         button:hover {
-            color: $blue-300;
+            color: colors.$blue-300;
         }
 
         button:hover {
-            color: $blue-100;
+            color: colors.$blue-100;
         }
 
         .social_media {
@@ -137,7 +137,7 @@
         .contact-item {
             font-size: 1rem;
             font-weight: 600;
-            font-family: $mulish-regular-font;
+            font-family: fonts.$mulish-regular-font;
             background: none;
             border: none;
             padding: 0;
@@ -178,19 +178,19 @@
 
     @keyframes color-change {
         0% {
-            color: $light-blue-300;
+            color: colors.$light-blue-300;
         }
 
         40% {
-            color: $footer-yellow;
+            color: colors.$footer-yellow;
         }
 
         70% {
-            color: $footer-cyan;
+            color: colors.$footer-cyan;
         }
 
         100% {
-            color: $light-blue-300;
+            color: colors.$light-blue-300;
         }
     }
 }

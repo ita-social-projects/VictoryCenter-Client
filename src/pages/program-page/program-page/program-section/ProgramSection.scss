@@ -1,5 +1,5 @@
-@import '../../../../assets/sass/variables/colors';
-@import '../../../../assets/sass/variables/fonts';
+@use '../../../../assets/sass/variables/colors';
+@use '../../../../assets/sass/variables/fonts';
 
 .program-block {
     width: 100%;
@@ -25,9 +25,9 @@
             .white-button {
                 border-radius: 1.5rem;
                 padding: 0.5rem 1rem;
-                border: 1px solid $blue-100;
+                border: 1px solid colors.$blue-100;
                 background: none;
-                font-family: $mulish-regular-font;
+                font-family: fonts.$mulish-regular-font;
                 font-weight: 400;
                 font-size: 1rem;
                 line-height: 1.5rem;
@@ -36,29 +36,29 @@
                 transition: 0.3s ease;
 
                 &:hover {
-                    background: $blue-50;
+                    background: colors.$blue-50;
                     transition: 0.3s ease;
                 }
             }
 
             .black-button {
-                background: $blue-900;
+                background: colors.$blue-900;
                 padding: 0.5rem 1rem;
                 border-radius: 1.5rem;
-                border: 1px solid $blue-900;
-                font-family: $mulish-regular-font;
+                border: 1px solid colors.$blue-900;
+                font-family: fonts.$mulish-regular-font;
                 font-weight: 400;
                 font-size: 1rem;
                 line-height: 1.5rem;
                 letter-spacing: -0.02rem;
                 vertical-align: middle;
-                color: $grey-50;
+                color: colors.$grey-50;
             }
         }
     }
 
     .menu-block h2 {
-        font-family: $mulish-regular-font;
+        font-family: fonts.$mulish-regular-font;
         font-weight: 600;
         font-size: 2rem;
         line-height: 2.5rem;

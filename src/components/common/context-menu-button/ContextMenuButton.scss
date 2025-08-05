@@ -1,4 +1,4 @@
-@import '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/colors';
 
 .context-menu-button {
     position: relative;
@@ -11,7 +11,7 @@
     cursor: pointer;
 
     &-active {
-        border-bottom-color: $blue-900;
+        border-bottom-color: colors.$blue-900;
     }
 
     &-icon {
@@ -26,7 +26,7 @@
         display: none;
         z-index: 10;
         width: 11.25rem;
-        border: 1px solid $blue-900;
+        border: 1px solid colors.$blue-900;
         background: white;
         box-shadow: 0 2px 8px -4px rgba(black, 0.16);
 
@@ -42,7 +42,7 @@
         padding: 0.5rem;
         border: none;
         text-align: left;
-        color: $blue-900;
+        color: colors.$blue-900;
         background: transparent;
         font-size: 16px;
         font-weight: 400;
@@ -50,7 +50,7 @@
         cursor: pointer;
 
         &:hover {
-            background-color: $blue-50;
+            background-color: colors.$blue-50;
         }
 
         &:disabled {

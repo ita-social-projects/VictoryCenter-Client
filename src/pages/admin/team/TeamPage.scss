@@ -1,4 +1,4 @@
-@import '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/colors';
 
 .wrapper {
     width: 100%;
@@ -21,7 +21,7 @@
                 text-align: center;
                 gap: 0.5rem;
                 outline: none;
-                border: 2px solid $blue-900;
+                border: 2px solid colors.$blue-900;
 
                 option {
                     outline: none;

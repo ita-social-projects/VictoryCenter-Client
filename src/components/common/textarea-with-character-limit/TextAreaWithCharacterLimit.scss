@@ -1,4 +1,4 @@
-@import '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/colors';
 
 .textarea-with-limit {
     display: inline-block;
@@ -8,19 +8,19 @@
         display: flex;
         padding: 0.625rem;
         background: white;
-        border: 1px solid $blue-500;
+        border: 1px solid colors.$blue-500;
         border-radius: 8px;
-        box-shadow: 0 1px 2px 0 rgba($box-shadow-blue, 0.051);
-        color: $blue-900;
+        box-shadow: 0 1px 2px 0 rgba(colors.$box-shadow-blue, 0.051);
+        color: colors.$blue-900;
         font-size: 16px;
 
         &-focused {
-            border-color: $grey-700;
+            border-color: colors.$grey-700;
         }
 
         &-disabled {
-            background-color: $grey-600;
-            border-color: $grey-900;
+            background-color: colors.$grey-600;
+            border-color: colors.$grey-900;
         }
 
         .textarea-input {
@@ -31,12 +31,12 @@
             outline: none;
             resize: none;
             background: none;
-            color: $bluish-grey-50;
+            color: colors.$bluish-grey-50;
             font-family: inherit;
             font-size: 16px;
 
             &::placeholder {
-                color: $grey-700;
+                color: colors.$grey-700;
             }
 
             &:disabled {
@@ -47,7 +47,7 @@
 
     .character-limit {
         margin-top: 0.25rem;
-        color: $bluish-grey-100;
+        color: colors.$bluish-grey-100;
         font-size: 16px;
         font-weight: 400;
         line-height: 24px;

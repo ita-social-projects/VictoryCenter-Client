@@ -1,4 +1,4 @@
-@import '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/colors';
 
 .admin {
     &-logo {
@@ -25,7 +25,7 @@
         }
 
         &-selected {
-            background-color: $blue-100;
+            background-color: colors.$blue-100;
 
             &:before {
                 position: absolute;
@@ -34,7 +34,7 @@
                 top: 0;
                 height: 100%;
                 width: 0.5rem;
-                background-color: $blue-800;
+                background-color: colors.$blue-800;
             }
         }
     }

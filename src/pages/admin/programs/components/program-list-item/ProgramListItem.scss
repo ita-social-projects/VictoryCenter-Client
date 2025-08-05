@@ -1,4 +1,4 @@
-@import '../../../../../assets/sass/variables/colors';
+@use '../../../../../assets/sass/variables/colors';
 
 .program-item {
     display: flex;
@@ -8,8 +8,8 @@
 
     height: 7.5rem;
     padding: 1.875rem;
-    background: $grey-50;
-    border-bottom: 0.3px solid $blue-900;
+    background: colors.$grey-50;
+    border-bottom: 0.3px solid colors.$blue-900;
     box-shadow: 0 1px 2.8px 0 rgba(black, 0.15);
 
     .program-info {
@@ -96,14 +96,14 @@
             gap: 0.25rem;
 
             b {
-                color: $blue-500;
+                color: colors.$blue-500;
                 font-size: 18px;
                 font-weight: 500;
                 line-height: 28px;
             }
 
             span {
-                color: $blue-500;
+                color: colors.$blue-500;
                 font-size: 16px;
                 font-weight: 400;
                 line-height: 24px;

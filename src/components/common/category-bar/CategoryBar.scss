@@ -1,13 +1,13 @@
-@import '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/colors';
 
 .category-bar {
     min-height: 3.75rem;
     display: flex;
-    border-bottom: 1px solid $grey-700;
+    border-bottom: 1px solid colors.$grey-700;
     font-size: 24px;
     font-weight: 600;
-    background: $grey-100;
-    box-shadow: 0 0 4px rgba($grey-850, 0.22);
+    background: colors.$grey-100;
+    box-shadow: 0 0 4px rgba(colors.$grey-850, 0.22);
 
     &-button {
         display: flex;
@@ -21,12 +21,12 @@
         transition: background-color 0.2s;
 
         &-selected {
-            border-bottom: 1px solid $blue-900;
+            border-bottom: 1px solid colors.$blue-900;
         }
 
         &:hover {
             cursor: pointer;
-            background-color: rgba($grey-850, 0.15);
+            background-color: rgba(colors.$grey-850, 0.15);
         }
     }
 }

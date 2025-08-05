@@ -1,4 +1,4 @@
-@import '../variables/fonts';
+@use '../variables/fonts';
 
 @mixin font-face($font-family, $file-name, $font-weight: normal, $font-style: normal) {
     @font-face {
@@ -17,7 +17,7 @@
     text-decoration: none;
     pointer-events: auto;
     opacity: 1;
-    font-family: $mulish-regular-font;
+    font-family: fonts.$mulish-regular-font;
 
     &:hover {
         color: $hoverColor;

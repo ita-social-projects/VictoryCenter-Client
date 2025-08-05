@@ -1,4 +1,4 @@
-@import '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/colors';
 
 .modal {
     &-overlay {
@@ -17,7 +17,7 @@
     }
 
     &-container {
-        background: $grey-50;
+        background: colors.$grey-50;
         border-radius: 8px;
         padding: 1.5rem;
         max-height: calc(100vh - 2rem);

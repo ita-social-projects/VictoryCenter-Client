@@ -1,5 +1,5 @@
-@import '../../../assets/sass/variables/colors';
-@import '../../../assets/sass/variables/fonts';
+@use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/fonts';
 
 .main-values-block * {
     margin: 0;
@@ -8,8 +8,8 @@
 }
 .main-values-block {
     height: 117.75rem;
-    color: $blue-900;
-    font-family: $mulish-regular-font;
+    color: colors.$blue-900;
+    font-family: fonts.$mulish-regular-font;
 
     .main-values-title {
         height: 29rem;
@@ -39,7 +39,7 @@
         }
 
         span:nth-child(3) {
-            background: $light-blue-200;
+            background: colors.$light-blue-200;
             position: relative;
         }
 
@@ -47,14 +47,14 @@
             content: '';
             width: 100vw;
             height: 5rem;
-            background: $light-blue-200;
+            background: colors.$light-blue-200;
             position: absolute;
             top: 0;
             transform: translateX(-100%);
         }
 
         span:nth-child(1) {
-            background: $yellow-300;
+            background: colors.$yellow-300;
             position: relative;
         }
 
@@ -62,7 +62,7 @@
             content: '';
             width: 48.65vw;
             height: 5rem;
-            background: $yellow-300;
+            background: colors.$yellow-300;
             position: absolute;
             top: 0;
             z-index: -1;
@@ -141,7 +141,7 @@
             padding-top: 2rem;
             width: 41rem;
             height: 6.75rem;
-            border-top: 2px solid $main-value-summary-text;
+            border-top: 2px solid colors.$main-value-summary-text;
             font-weight: 500;
             font-size: 1.5rem;
             line-height: 2.25rem;

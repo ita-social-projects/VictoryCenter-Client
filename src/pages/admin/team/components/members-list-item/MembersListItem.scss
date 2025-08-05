@@ -1,4 +1,4 @@
-@import '../../../../../assets/sass/variables/colors';
+@use '../../../../../assets/sass/variables/colors';
 
 .members-wrapper {
     padding: 0;
@@ -11,7 +11,7 @@
     align-items: center;
     box-sizing: border-box;
     background-color: white;
-    box-shadow: 0 0 4px rgba($grey-850, 0.451);
+    box-shadow: 0 0 4px rgba(colors.$grey-850, 0.451);
     margin-bottom: 0.5rem;
 }
 
@@ -20,13 +20,13 @@
     background: transparent;
     height: 100%;
     width: 3.75rem;
-    box-shadow: 0 0 4px rgba($grey-850, 0.451);
+    box-shadow: 0 0 4px rgba(colors.$grey-850, 0.451);
     display: flex;
     justify-content: center;
     align-items: center;
 
     &:hover {
         cursor: grab;
-        background-color: $blue-50;
+        background-color: colors.$blue-50;
     }
 }

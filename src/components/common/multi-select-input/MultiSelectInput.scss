@@ -1,4 +1,4 @@
-@import '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/colors';
 
 .multiselect {
     position: relative;
@@ -17,17 +17,17 @@
         padding: 0.625rem 1rem;
         box-sizing: border-box;
         background: white;
-        border: 1px solid $blue-500;
+        border: 1px solid colors.$blue-500;
         border-radius: 8px;
-        box-shadow: 0 1px 2px rgba($bluish-black, 0.05);
+        box-shadow: 0 1px 2px rgba(colors.$bluish-black, 0.05);
         cursor: pointer;
 
         &-selected {
-            border-color: $grey-700;
+            border-color: colors.$grey-700;
         }
 
         &-disabled {
-            background: $grey-600;
+            background: colors.$grey-600;
             cursor: not-allowed;
         }
 
@@ -39,7 +39,7 @@
             flex: 1;
             min-width: 0;
             width: 100%;
-            color: $grey-700;
+            color: colors.$grey-700;
 
             &-content {
                 font-size: 16px;
@@ -51,7 +51,7 @@
             }
 
             &-selected {
-                color: $bluish-grey-50;
+                color: colors.$bluish-grey-50;
             }
         }
 
@@ -73,9 +73,9 @@
         max-height: 12.5rem;
         overflow-y: auto;
         background: white;
-        border: 1px solid $grey-700;
+        border: 1px solid colors.$grey-700;
         border-radius: 8px;
-        box-shadow: 0 1px 2px rgba($bluish-black, 0.05);
+        box-shadow: 0 1px 2px rgba(colors.$bluish-black, 0.05);
 
         .option {
             display: flex;
@@ -86,18 +86,18 @@
             cursor: pointer;
 
             &:hover {
-                background: $blue-50;
+                background: colors.$blue-50;
             }
 
             &-selected {
-                background: $blue-50;
+                background: colors.$blue-50;
             }
 
             &-content {
                 font-size: 16px;
                 font-weight: 400;
                 line-height: 24px;
-                color: $bluish-grey-50;
+                color: colors.$bluish-grey-50;
             }
 
             .checkbox {

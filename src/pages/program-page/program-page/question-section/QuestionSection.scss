@@ -1,5 +1,5 @@
-@import '../../../../assets/sass/variables/colors';
-@import '../../../../assets/sass/variables/fonts';
+@use '../../../../assets/sass/variables/colors';
+@use '../../../../assets/sass/variables/fonts';
 
 .qa-section {
     box-sizing: content-box;
@@ -14,19 +14,19 @@
         justify-content: space-between;
         align-items: flex-start;
         padding-top: 1rem;
-        border-top: 1.5px solid $grey-400;
+        border-top: 1.5px solid colors.$grey-400;
         gap: 1rem;
 
         h2 {
             width: 34.2rem;
-            font-family: $mulish-regular-font;
+            font-family: fonts.$mulish-regular-font;
             font-weight: 700;
             font-size: 2.5rem;
             line-height: 3rem;
             letter-spacing: 0;
             vertical-align: middle;
             text-transform: uppercase;
-            color: $blue-900;
+            color: colors.$blue-900;
         }
     }
 }

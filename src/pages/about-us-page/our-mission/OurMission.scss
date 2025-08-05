@@ -1,5 +1,5 @@
-@import '../../../assets/sass/variables/colors';
-@import '../../../assets/sass/variables/fonts';
+@use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/fonts';
 
 .our-mission-block * {
     margin: 0;
@@ -14,13 +14,13 @@
         align-items: flex-start;
 
         .mission-title {
-            font-family: $mulish-regular-font;
+            font-family: fonts.$mulish-regular-font;
             font-weight: 700;
             font-size: 2rem;
             line-height: 2.5rem;
             letter-spacing: -0.02em;
             text-transform: uppercase;
-            color: $blue-900;
+            color: colors.$blue-900;
         }
 
         .details-block {
@@ -32,12 +32,12 @@
             gap: 1.5rem;
 
             .mission-details {
-                font-family: $mulish-regular-font;
+                font-family: fonts.$mulish-regular-font;
                 font-weight: 400;
                 font-size: 1.125rem;
                 line-height: 1.75rem;
                 letter-spacing: -0.02em;
-                color: $blue-900;
+                color: colors.$blue-900;
             }
 
             .link-to-programs {
@@ -54,16 +54,16 @@
                     justify-content: center;
                     align-items: center;
                     gap: 0.5rem;
-                    border-bottom: 1px solid $blue-900;
+                    border-bottom: 1px solid colors.$blue-900;
 
                     .link-title {
-                        font-family: $mulish-regular-font;
+                        font-family: fonts.$mulish-regular-font;
                         font-weight: 400;
                         font-size: 1rem;
                         line-height: 1.5rem;
                         letter-spacing: -0.02em;
                         vertical-align: middle;
-                        color: $blue-900;
+                        color: colors.$blue-900;
                     }
 
                     img {

@@ -1,10 +1,10 @@
-@import '../../../../assets/sass/variables/fonts';
-@import '../../../../assets/sass/variables/colors';
+@use '../../../../assets/sass/variables/fonts';
+@use '../../../../assets/sass/variables/colors';
 
 .UkrainePaymentDetails {
     h2 {
-        font-family: $mulish-regular-font;
-        color: $blue-900;
+        font-family: fonts.$mulish-regular-font;
+        color: colors.$blue-900;
         font-weight: 700;
         font-size: 2rem;
     }
@@ -18,13 +18,13 @@
         h3 {
             font-weight: 600;
             font-size: 1.5rem;
-            color: $blue-900;
-            font-family: $mulish-regular-font;
+            color: colors.$blue-900;
+            font-family: fonts.$mulish-regular-font;
         }
 
         .label {
-            font-family: $mulish-regular-font;
-            color: $blue-900;
+            font-family: fonts.$mulish-regular-font;
+            color: colors.$blue-900;
             font-size: 1.125rem;
             font-weight: 400;
         }

@@ -1,5 +1,5 @@
-@import '../../../../../assets/sass/variables/colors';
-@import '../../../../../assets/sass/variables/fonts';
+@use '../../../../../assets/sass/variables/colors';
+@use '../../../../../assets/sass/variables/fonts';
 
 .members {
     &-item {
@@ -67,15 +67,15 @@
         font-size: 18px;
 
         &-draft {
-            color: $grey-900;
+            color: colors.$grey-900;
             background-color: white;
-            border: 1px solid $grey-900;
+            border: 1px solid colors.$grey-900;
         }
 
         &-published {
-            background-color: $light-blue-50;
-            border: 1px solid $blue-500;
-            color: $blue-500;
+            background-color: colors.$light-blue-50;
+            border: 1px solid colors.$blue-500;
+            color: colors.$blue-500;
         }
 
         img {

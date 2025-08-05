@@ -1,7 +1,7 @@
-@import '../../assets/sass/variables/colors';
+@use '../../assets/sass/variables/colors';
 
 .donatePage {
-    background-color: $light-blue-50;
+    background-color: colors.$light-blue-50;
     padding-top: 4.125rem;
 
     .donatePageContent {

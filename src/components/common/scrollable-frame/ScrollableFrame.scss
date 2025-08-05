@@ -1,20 +1,20 @@
-@import '../../../assets/sass/variables/colors';
-@import '../../../assets/sass/variables/fonts';
+@use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/fonts';
 
 .scroll-block {
     position: relative;
     height: 82vh;
-    background-color: $grey-400;
+    background-color: colors.$grey-400;
 
     .custom-scrollbar {
         margin: 6vh 10.5rem;
         height: 0.375rem;
-        background: rgba($grey-50, 0.788);
+        background: rgba(colors.$grey-50, 0.788);
         border-radius: 0;
 
         .swiper-scrollbar-drag {
             border-radius: 0;
-            background-color: $blue-900;
+            background-color: colors.$blue-900;
         }
     }
     .button-container {
@@ -28,7 +28,7 @@
         padding: 0 2rem;
 
         .arrow-button {
-            background-color: $blue-900;
+            background-color: colors.$blue-900;
             position: relative;
             width: 2.5rem;
             height: 2.5rem;
@@ -54,7 +54,7 @@
             }
 
             &:hover {
-                background-color: $yellow-500;
+                background-color: colors.$yellow-500;
 
                 .arrow-hover-state {
                     display: block !important;

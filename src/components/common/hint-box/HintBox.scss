@@ -1,4 +1,4 @@
-@import '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/colors';
 
 .hint-box {
     display: flex;
@@ -7,7 +7,7 @@
     font-weight: 400;
     font-size: 16px;
     line-height: 24px;
-    color: $blue-500;
+    color: colors.$blue-500;
 
     &-title {
         display: flex;

@@ -1,11 +1,11 @@
-@import '../../../../../assets/sass/variables/colors';
+@use '../../../../../assets/sass/variables/colors';
 
 .drag-preview {
     position: fixed;
     z-index: 1000;
     pointer-events: none;
     background-color: white;
-    border: 2px solid $drag-preview-blue;
+    border: 2px solid colors.$drag-preview-blue;
     border-radius: 8px;
     padding: 0.625rem;
     box-shadow: 0 4px 12px rgba(black, 0.15);
@@ -21,6 +21,6 @@
     }
 
     .members-dragger {
-        background-color: $blue-50;
+        background-color: colors.$blue-50;
     }
 }

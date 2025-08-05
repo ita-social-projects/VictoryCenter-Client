@@ -1,4 +1,4 @@
-@import '../../../../../assets/sass/variables/colors';
+@use '../../../../../assets/sass/variables/colors';
 
 .program-form-body {
     display: flex;
@@ -7,7 +7,7 @@
 }
 
 .program-form-header {
-    color: $blue-900;
+    color: colors.$blue-900;
     font-weight: 400;
     font-size: 32px;
     line-height: 24px;
@@ -31,13 +31,13 @@
             font-size: 16px;
             outline: none;
             border-radius: 8px;
-            border: 1px solid $input-border-color;
-            box-shadow: 0 1px 2px 0 rgba($box-shadow-blue, 0.051);
+            border: 1px solid colors.$input-border-color;
+            box-shadow: 0 1px 2px 0 rgba(colors.$box-shadow-blue, 0.051);
         }
     }
 
     .error {
-        color: $error;
+        color: colors.$error;
         font-weight: 400;
         font-size: 14px;
         line-height: 20px;

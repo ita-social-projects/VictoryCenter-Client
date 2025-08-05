@@ -1,4 +1,4 @@
-@import '../variables/variables.fonts';
+@import '../variables/fonts';
 
 @mixin font-face($font-family, $file-name, $font-weight: normal, $font-style: normal) {
     @font-face {

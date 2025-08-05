@@ -130,14 +130,10 @@
         font-weight: 600;
         padding: 5rem 0;
         text-align: left;
-        justify-content: center;
-
-        .mobile {
-            display: none;
-        }
 
         p {
             color: white;
+            display: inline-block;
         }
     }
 
@@ -254,25 +250,21 @@
         }
 
         .quote-overlay {
-            padding: 8.75rem 1rem;
+            padding: 4.5rem 1rem;
 
             .video-text {
                 font-size: 1rem;
                 line-height: 1.5rem;
                 letter-spacing: -0.02rem;
-                padding-bottom: 1.5rem;
-            }
-
-            .mobile {
-                display: block;
-            }
-
-            .desktop {
-                display: none;
             }
 
             .author {
-                margin-top: 0.5rem;
+                margin-top: 2rem;
+            }
+
+            p:nth-of-type(2) {
+                display: block;
+                margin-bottom: 1.5rem;
             }
         }
     }

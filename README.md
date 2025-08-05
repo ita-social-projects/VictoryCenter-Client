@@ -23,23 +23,25 @@ victory-center-client/
 ├── scripts/
 │   └── start-in-dev-over-https.mjs
 ├── src/
-│   ├── assets/                             # Images, icons, fonts, etc.
-│   │   ├── images
-│   │   │   └── header
-│   │   ├── program_page_images
-│   │   │   ├── icons
-│   │   │   ├── images
-│   │   │   └── videos
-│   │   ├── fonts/
-│   │   ├── icons/
-│   │   ├── images/                         # Image assets
-│   │   │   ├── footer
-│   │   │   ├── admin/
-│   │   │   └── header/
-│   │   ├── sass/
-│   │   │     ├── mixins
-│   │   │     └── variables
-│   │   └── styles/                         # Additional styles
+│   ├───assets
+│   │   ├───fonts
+│   │   ├───icons
+│   │   ├───images
+│   │   │   ├───admin
+│   │   │   ├───common
+│   │   │   └───public
+│   │   │       ├───about-us-page
+│   │   │       ├───programs-page
+│   │   │       └───team-page
+│   │   ├───sass
+│   │   │   ├───mixins
+│   │   │   └───variables
+│   │   └───videos
+│   │       ├───admin
+│   │       ├───common
+│   │       └───public
+│   │           ├───programs-page
+│   │           └───team-page
 │   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
 │   │   ├── admin/                          # Admin-specific components
 │   │   │   ├── admin-context-wrapper/

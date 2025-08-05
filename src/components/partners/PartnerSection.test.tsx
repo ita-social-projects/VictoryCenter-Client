@@ -5,44 +5,40 @@ import { PartnerSection } from './PartnerSection';
 
 const mockTitle = {
     FIRST_LINE: 'Test Section Title ',
-    SECOND_LINE: 'Second Line'
+    SECOND_LINE: 'Second Line',
 };
 
 const mockDescription = {
     FIRST_LINE: 'Test section description ',
-    SECOND_LINE: 'with more details'
+    SECOND_LINE: 'with more details',
 };
 
 const mockPartners = [
     {
         id: 1,
         name: 'Partner One',
-        logo: 'partner1-logo.png'
+        logo: 'partner1-logo.png',
     },
     {
         id: 2,
         name: 'Partner Two',
-        logo: 'partner2-logo.png'
+        logo: 'partner2-logo.png',
     },
     {
         id: 3,
         name: 'Partner Three',
-        logo: 'partner3-logo.png'
-    }
+        logo: 'partner3-logo.png',
+    },
 ];
 
-describe('PartnerSection', () => {
-    beforeEach(() => {
-        render(
-            <PartnerSection
-                title={mockTitle}
-                description={mockDescription}
-                partners={mockPartners}
-            />
-        );
-    });
+const renderComponent = () => {
+    return render(<PartnerSection title={mockTitle} description={mockDescription} partners={mockPartners} />);
+};
 
+describe('PartnerSection', () => {
     it('renders the component with correct structure', () => {
+        renderComponent();
+
         const section = document.querySelector('.partners-content-section');
         const container = document.querySelector('.container');
         const header = document.querySelector('.partners-header');
@@ -55,6 +51,8 @@ describe('PartnerSection', () => {
     });
 
     it('displays the section title correctly', () => {
+        renderComponent();
+
         const titleElement = screen.getByRole('heading', { level: 2 });
         expect(titleElement).toBeInTheDocument();
         expect(titleElement).toHaveTextContent('Test Section Title Second Line');
@@ -62,6 +60,8 @@ describe('PartnerSection', () => {
     });
 
     it('displays the section description correctly', () => {
+        renderComponent();
+
         const descriptionElement = screen.getByText('Test section description with more details');
         expect(descriptionElement).toBeInTheDocument();
         expect(descriptionElement).toHaveClass('section-description');
@@ -69,6 +69,8 @@ describe('PartnerSection', () => {
     });
 
     it('renders all partners with correct data', () => {
+        renderComponent();
+
         mockPartners.forEach((partner) => {
             const partnerName = screen.getByText(partner.name);
             const partnerLogo = screen.getByAltText(`${partner.name} logo`);
@@ -81,6 +83,8 @@ describe('PartnerSection', () => {
     });
 
     it('renders partner items with correct structure and classes', () => {
+        renderComponent();
+
         const partnerItems = document.querySelectorAll('.partner-item');
         expect(partnerItems).toHaveLength(mockPartners.length);
 
@@ -97,6 +101,8 @@ describe('PartnerSection', () => {
     });
 
     it('has proper accessibility attributes', () => {
+        renderComponent();
+
         mockPartners.forEach((partner) => {
             const logo = screen.getByAltText(`${partner.name} logo`);
             expect(logo).toHaveAttribute('alt', `${partner.name} logo`);

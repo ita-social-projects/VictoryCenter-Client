@@ -51,6 +51,7 @@ describe('Footer', () => {
         expect(input.value).toBe('user@example.com');
 
         const button = screen.getByRole('button', { name: SIGN_UP });
+
         fireEvent.click(button);
         expect(input.value).toBe('');
     });
@@ -90,7 +91,10 @@ describe('Footer', () => {
             'href',
             routes.userPageRoutes.teamPageRoute,
         );
-        expect(screen.getByRole('link', { name: PARTNERS })).toHaveAttribute('href', routes.userPageRoutes.partnersPageRoute);
+        expect(screen.getByRole('link', { name: PARTNERS })).toHaveAttribute(
+            'href',
+            routes.userPageRoutes.partnersPageRoute,
+        );
         expect(screen.getByRole('link', { name: EVENTS_AND_NEWS })).toHaveAttribute(
             'href',
             routes.userPageRoutes.page2Route,

@@ -9,25 +9,27 @@ jest.mock('../../../../assets/partners-page-images/outro.mp4', () => 'mocked-out
 jest.mock('../../../../const/partners-page/partners-page', () => ({
     OUTRO: {
         TITLE: {
-            FIRST_LINE: 'Mocked Title'
+            FIRST_LINE: 'Mocked Title',
         },
         TEXT: 'Mocked description text',
         BUTTON_BECOME_SUPPORT_TEXT: 'Become Support',
-        BUTTON_SUPPORT_TEXT: 'Support Us'
-    }
+        BUTTON_SUPPORT_TEXT: 'Support Us',
+    },
 }));
 
-describe('OutroSection', () => {
-    beforeEach(() => {
-        render(<OutroSection />);
-    });
+const renderComponent = () => {
+    return render(<OutroSection />);
+};
 
+describe('OutroSection', () => {
     it('renders without crashing', () => {
+        renderComponent();
         const container = document.querySelector('.video-background-container');
         expect(container).toBeInTheDocument();
     });
 
     it('renders video source with correct src and type', () => {
+        renderComponent();
         const videoSource = document.querySelector('source');
         expect(videoSource).toBeInTheDocument();
         expect(videoSource).toHaveAttribute('src', 'mocked-outro-video');
@@ -35,6 +37,7 @@ describe('OutroSection', () => {
     });
 
     it('displays the title from constants', () => {
+        renderComponent();
         const title = screen.getByText('Mocked Title');
         expect(title).toBeInTheDocument();
         expect(title).toHaveClass('video-text');
@@ -42,6 +45,7 @@ describe('OutroSection', () => {
     });
 
     it('displays the description text from constants', () => {
+        renderComponent();
         const description = screen.getByText('Mocked description text');
         expect(description).toBeInTheDocument();
         expect(description).toHaveClass('video-description');
@@ -49,6 +53,7 @@ describe('OutroSection', () => {
     });
 
     it('renders both action buttons with correct text', () => {
+        renderComponent();
         const primaryButton = screen.getByText('Become Support');
         const secondaryButton = screen.getByText('Support Us');
 
@@ -63,6 +68,7 @@ describe('OutroSection', () => {
     });
 
     it('has the correct CSS structure', () => {
+        renderComponent();
         const container = document.querySelector('.video-background-container');
         const overlay = document.querySelector('.quote-overlay');
         const buttonsContainer = document.querySelector('.video-buttons');
@@ -73,6 +79,7 @@ describe('OutroSection', () => {
     });
 
     it('has buttons container with proper structure', () => {
+        renderComponent();
         const buttonsContainer = document.querySelector('.video-buttons');
         const buttons = buttonsContainer?.querySelectorAll('button');
 
@@ -81,6 +88,7 @@ describe('OutroSection', () => {
     });
 
     it('uses constants for all text content', () => {
+        renderComponent();
         expect(screen.getByText(OUTRO.TITLE.FIRST_LINE)).toBeInTheDocument();
         expect(screen.getByText(OUTRO.TEXT)).toBeInTheDocument();
         expect(screen.getByText(OUTRO.BUTTON_BECOME_SUPPORT_TEXT)).toBeInTheDocument();

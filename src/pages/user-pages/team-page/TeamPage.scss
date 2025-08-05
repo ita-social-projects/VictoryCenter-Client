@@ -62,6 +62,10 @@
     }
 
     .team-member {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
         img {
             width: 100%;
             display: block;
@@ -70,10 +74,9 @@
         }
 
         .member-name {
-            font-size: 1.1rem;
+            font-size: 1.125rem;
             font-weight: 700;
-            margin-top: 1rem;
-            margin-bottom: 0.25rem;
+            letter-spacing: -0.0225rem;
         }
 
         .member-role {
@@ -125,13 +128,9 @@
         color: white;
         font-family: 'Mulish', sans-serif;
         font-weight: 600;
-        padding: 5rem;
+        padding: 5rem 0;
         text-align: left;
         justify-content: center;
-
-        .video-text {
-            margin: 0 0 0.3rem;
-        }
 
         .mobile {
             display: none;
@@ -143,7 +142,7 @@
     }
 
     .author {
-        margin-top: 2rem;
+        margin-top: 2.5rem;
         font-weight: 700;
     }
 }
@@ -187,13 +186,10 @@
         }
 
         .team-member {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-
             .member-name {
                 font-size: 1.125rem;
-                margin: 0;
+                line-height: 1.75rem;
+                letter-spacing: -0.0225rem;
             }
 
             .member-role {
@@ -220,7 +216,6 @@
                 font-size: 1.25rem;
                 line-height: 1.75rem;
                 letter-spacing: -0.025rem;
-                margin: 0;
             }
 
             .author {
@@ -259,7 +254,7 @@
         }
 
         .quote-overlay {
-            padding: 8rem 1rem;
+            padding: 8.75rem 1rem;
 
             .video-text {
                 font-size: 1rem;
@@ -274,6 +269,10 @@
 
             .desktop {
                 display: none;
+            }
+
+            .author {
+                margin-top: 0.5rem;
             }
         }
     }

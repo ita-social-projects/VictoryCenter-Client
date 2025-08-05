@@ -1,10 +1,10 @@
-import menAndHorse from '../../assets/about-us-images/images/men-horse.jpg';
-import girlAndHorse from '../../assets/about-us-images/images/girl-horse.jpg';
-import oldMenAndHorse from '../../assets/about-us-images/images/old-men-horse.jpg';
-import womenAndHorse from '../../assets/about-us-images/images/women-horse.jpg';
-import supportVeterans from '../../assets/about-us-images/images/support-veterans.jpg';
-import supportVolunteers from '../../assets/about-us-images/images/support-volunteers.jpg';
-import supportChildren from '../../assets/about-us-images/images/support-children.jpg';
+import menAndHorse from '../../assets/images/public/about-us-page/men-horse.jpg';
+import girlAndHorse from '../../assets/images/public/about-us-page/girl-horse.jpg';
+import oldMenAndHorse from '../../assets/images/public/about-us-page/old-men-horse.jpg';
+import womenAndHorse from '../../assets/images/public/about-us-page/women-horse.jpg';
+import supportVeterans from '../../assets/images/public/about-us-page/support-veterans.jpg';
+import supportVolunteers from '../../assets/images/public/about-us-page/support-volunteers.jpg';
+import supportChildren from '../../assets/images/public/about-us-page/support-children.jpg';
 export const OUR_VALUES = 'Наші Цінності';
 export const VALUE_ITEMS = [
     {

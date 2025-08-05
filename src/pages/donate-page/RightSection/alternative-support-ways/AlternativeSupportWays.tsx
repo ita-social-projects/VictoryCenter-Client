@@ -3,7 +3,6 @@ import { ALTERNATIVE_SUPPORT_WAYS } from '../../../../const/donate-page/donate-p
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
 import ArrowUpRight from '../../../../assets/icons/arrow-up-right.svg';
 import ShareForwardArrow from '../../../../assets/icons/share-forward-arrow.svg';
-import React from 'react';
 
 export const AlternativeSupportWays = () => {
     return (

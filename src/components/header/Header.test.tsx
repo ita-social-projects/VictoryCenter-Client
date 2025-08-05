@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Header } from './Header';
@@ -7,7 +6,7 @@ import { routes } from '../../const/routers/routes';
 import { ABOUT_US, PROGRAMS, REPORTING, HOW_TO_SUPPORT, CONTACT_US, DONATE } from '../../const/header/header';
 
 jest.mock('./Header.scss', () => ({}));
-jest.mock('../../assets/images/header/VictoryCenterLogo.svg', () => ({
+jest.mock('../../assets/icons/logo-with-text.svg', () => ({
     ReactComponent: () => <div data-testid="logo" />,
 }));
 

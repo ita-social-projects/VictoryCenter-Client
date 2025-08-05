@@ -5,7 +5,7 @@ import {
     TeamItem,
     TeamPageData,
 } from '../../../../types/public/TeamPage';
-import default_team_member_photo from '../../../../assets/team_page_images/team_member_not_found_photo.svg';
+import default_team_member_photo from '../../../../assets/icons/team-member-blank.svg';
 import { axiosInstance } from '../../../api/axios';
 import { API_ROUTES } from '../../../../const/api-routes-constants';
 import { mapImageToBase64 } from '../../../../utils/functions/mapImageToBase64';

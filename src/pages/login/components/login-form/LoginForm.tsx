@@ -11,7 +11,7 @@ import {
     PASSWORD_FIELD_LABEL,
     SUBMIT_BUTTON,
 } from '../../../../const/login-page/login-page';
-import Logo from '../../../../assets/icons/logo.svg';
+import Logo from '../../../../assets/icons/logo-with-text.svg';
 import EyeOpened from '../../../../assets/icons/eye-opened.svg';
 import EyeClosed from '../../../../assets/icons/eye-closed.svg';
 import { Credentials } from '../../../../types/admin/Auth';

@@ -1,9 +1,11 @@
 .admin {
     &-logo {
-        height: 150px;
+        margin-top: 2.75rem;
+        margin-left: 2.5rem;
+        margin-bottom: 3.5rem;
         display: flex;
-        justify-content: center;
-        align-items: center;
+        justify-content: start;
+        align-items: start;
         font-size: 0.625rem;
     }
 

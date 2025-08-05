@@ -4,7 +4,7 @@ import { TeamPage } from './TeamPage';
 import * as TeamPageDataFetchModule from '../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch';
 import { TeamItem, TeamMemberProps } from '../../../types/public/TeamPage';
 
-jest.mock('../../../assets/team_page_images/horse_video.mp4', () => 'mocked-video.mp4');
+jest.mock('../../../assets/videos/public/team-page/quote_background.mp4', () => 'mocked-video.mp4');
 
 const spyTeamPageDataFetch = jest.spyOn(TeamPageDataFetchModule, 'teamPageDataFetch');
 

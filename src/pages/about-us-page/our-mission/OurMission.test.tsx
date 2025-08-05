@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { OurMission } from './OurMission';
@@ -13,7 +12,7 @@ jest.mock('../../../const/routers/routes', () => ({
     programPage: '/programs',
 }));
 
-jest.mock('../../../assets/program_page_images/icons/arrow-up-black.png', () => 'arrow-up-black.png');
+jest.mock('../../../assets/icons/arrow-up-right.svg', () => 'arrow-up-black.png');
 
 jest.mock('../../../components/common/scrollable-frame/ScrollableFrame', () => ({
     ScrollableFrame: () => <div data-testid="scrollable-frame">ScrollableFrame</div>,

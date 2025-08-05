@@ -1,4 +1,4 @@
-import ourTeam from '../../../assets/about-us-images/images/our-team.jpg';
+import ourTeam from '../../../assets/images/public/about-us-page/our-team.jpg';
 import { teamPageRoute } from '../../../const/routers/routes';
 import { GO_TO_TEAM, TEAM_DETAILS } from '../../../const/about-us-page/about-us-page';
 import { NavLink } from 'react-router';

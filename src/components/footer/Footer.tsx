@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 import { routes } from '../../const/routers/routes';
 import './Footer.scss';
-import arrowIcon from '../../assets/images/footer/arrow-up-right.svg';
-import phoneIcon from '../../assets/images/footer/phone.svg';
-import mailIcon from '../../assets/images/footer/mail.svg';
+import arrowIcon from '../../assets/icons/arrow-up-right.svg';
+import phoneIcon from '../../assets/icons/phone.svg';
+import mailIcon from '../../assets/icons/mail.svg';
 import {
     ABOUT_US,
     HIPPOTHERAPY,

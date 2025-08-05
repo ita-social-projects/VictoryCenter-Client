@@ -41,7 +41,7 @@ const mockMemberPublished: TeamMember = {
 const mockHandleOnDeleteMember = jest.fn();
 const mockHandleOnEditMember = jest.fn();
 
-jest.mock('../../../../../assets/images/admin/blank-user.svg', () => 'blank-user.svg');
+jest.mock('../../../../../assets/icons/blank-user.svg', () => 'blank-user.svg');
 
 describe('MemberComponent', () => {
     beforeEach(() => {

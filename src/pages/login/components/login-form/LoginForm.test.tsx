@@ -11,7 +11,7 @@ import {
     EYE_OPENED_ALT,
     SUBMIT_BUTTON,
 } from '../../../../const/login-page/login-page';
-import Logo from '../../../../assets/icons/logo.svg';
+import Logo from '../../../../assets/icons/logo-with-text.svg';
 import { MemoryRouter } from 'react-router';
 
 describe('<LoginForm />', () => {

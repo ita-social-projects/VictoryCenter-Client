@@ -2,12 +2,12 @@ import { ProgramCard } from '../../../pages/program-page/program-page/program-se
 import { Swiper, SwiperSlide, SwiperClass } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
 import { programPageDataFetch } from '../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Program } from '../../../types/public/ProgramPage';
-import arrowRight from '../../../assets/about-us-images/icons/arrow-right.png';
-import arrowLeft from '../../../assets/about-us-images/icons/arrow-left.png';
-import arrowRightBlack from '../../../assets/about-us-images/icons/arrow-right-black.png';
-import arrowLeftBlack from '../../../assets/about-us-images/icons/arrow-left-black.png';
+import arrowRight from '../../../assets/icons/arrow-right-white.svg';
+import arrowLeft from '../../../assets/icons/arrow-left-white.svg';
+import arrowRightBlack from '../../../assets/icons/arrow-right.svg';
+import arrowLeftBlack from '../../../assets/icons/arrow-left.svg';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';

@@ -1,7 +1,7 @@
 import React from 'react';
 import './intro-section.scss';
 import background from '../../../../assets/partners-page-images/horses.png';
-import { PARTNERS_PAGE_SUBTITLE } from '../../../../const/partners-page/partners-page';
+import { PARTNERS_PAGE_SUBTITLE, PARTNERS_PAGE_TITLE } from '../../../../const/partners-page/partners-page';
 
 export const IntroSection: React.FC = () => {
     return (
@@ -10,11 +10,13 @@ export const IntroSection: React.FC = () => {
             <div className="content-overlay">
                 <h1 className="main-title">
                     <div className="title-line">
-                        МИ
-                        <span className="bold-text"> НЕ ОДНІ.</span>
+                        {PARTNERS_PAGE_TITLE.FIRST_LINE.REGULAR}
+                        <span className="bold-text">{PARTNERS_PAGE_TITLE.FIRST_LINE.BOLD}</span>
                     </div>
                     <div className="title-line">
-                        <span className="bold-text">І ЦЕ</span> НАША <span className="bold-text"> СИЛА </span>
+                        <span className="bold-text">{PARTNERS_PAGE_TITLE.SECOND_LINE.BOLD_START}</span>
+                        {PARTNERS_PAGE_TITLE.SECOND_LINE.REGULAR}
+                        <span className="bold-text">{PARTNERS_PAGE_TITLE.SECOND_LINE.BOLD_END}</span>
                     </div>
                 </h1>
                 <p className="subtitle">{PARTNERS_PAGE_SUBTITLE}</p>

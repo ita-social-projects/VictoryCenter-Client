@@ -26,8 +26,15 @@ import carpathianEnergyLogo from '../../assets/partners-page-images/carpathian-e
 import psychologyFacultyLogo from '../../assets/partners-page-images/psychology-faculty.png';
 
 export const PARTNERS_PAGE_TITLE = {
-    FIRST_LINE: 'МИ НЕ ОДНІ.',
-    SECOND_LINE: 'І ЦЕ НАША СИЛА',
+    FIRST_LINE: {
+        REGULAR: 'МИ',
+        BOLD: ' НЕ ОДНІ.',
+    },
+    SECOND_LINE: {
+        BOLD_START: 'І ЦЕ ',
+        REGULAR: 'НАША',
+        BOLD_END: ' СИЛА ',
+    },
 };
 
 export const PARTNERS_PAGE_SUBTITLE = 'Дякуємо тим, хто разом із нами!';

@@ -38,7 +38,7 @@
 
         .donateTab.active {
             border-bottom: 0.125rem solid colors.$light-blue-500;
-            color: colors.$tooltip-text-color;
+            color: colors.$blue-500;
         }
     }
 
@@ -59,7 +59,7 @@
             font-size: 4rem;
             font-weight: 500;
             font-family: fonts.$mulish-regular-font;
-            color: colors.$tooltip-text-color;
+            color: colors.$blue-500;
         }
 
         .donateAmountInput:focus {

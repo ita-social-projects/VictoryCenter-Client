@@ -27,7 +27,7 @@
         font-weight: 600;
         display: flex;
         background-color: colors.$grey-100;
-        box-shadow: 0 0 4px rgba(colors.$grey-850, 0.22);
+        box-shadow: 0 0 4px rgba(colors.$blue-50, 0.22);
 
         button {
             font-size: 24px;
@@ -46,7 +46,7 @@
 
             &:hover {
                 cursor: pointer;
-                background-color: rgba(colors.$grey-850, 0.149);
+                background-color: rgba(colors.$blue-50, 0.149);
             }
         }
     }
@@ -124,7 +124,7 @@
                 }
 
                 .option-value {
-                    color: colors.$bluish-grey-50;
+                    color: colors.$grey-900;
                 }
 
                 .error {
@@ -152,7 +152,7 @@
                 }
 
                 label {
-                    color: colors.$bluish-grey-50;
+                    color: colors.$grey-900;
                 }
 
                 &-description {
@@ -162,13 +162,13 @@
                     padding: 0.625rem 0.875rem;
                     border-radius: 8px;
                     box-shadow: 0px 1px 2px 0px rgba(colors.$bluish-black, 0.051);
-                    border: 1px solid colors.$input-border-color;
+                    border: 1px solid colors.$grey-900;
 
                     &-length-limit {
                         display: flex;
                         width: 100%;
                         justify-content: end;
-                        color: colors.$bluish-grey-100;
+                        color: colors.$grey-900;
                     }
                 }
 
@@ -179,7 +179,7 @@
                         position: absolute;
                         display: flex;
                         justify-content: end;
-                        color: colors.$bluish-grey-100;
+                        color: colors.$grey-900;
                         width: fit-content;
                     }
                 }
@@ -237,7 +237,7 @@
                             }
 
                             span {
-                                color: colors.$bluish-grey-100;
+                                color: colors.$grey-900;
                                 font-size: 14px;
                                 text-align: center;
                             }
@@ -254,15 +254,15 @@
                 padding: 0.625rem;
                 font-size: 16px;
                 border-radius: 8px;
-                border: 1px solid colors.$input-border-color;
-                box-shadow: 0px 1px 2px 0px rgba(colors.$box-shadow-blue, 0.051);
+                border: 1px solid colors.$grey-900;
+                box-shadow: 0px 1px 2px 0px rgba(colors.$blue-900, 0.051);
             }
 
             input {
                 font-size: 16px;
                 border-radius: 8px;
-                border: 1px solid colors.$input-border-color;
-                box-shadow: 0px 1px 2px 0px rgba(colors.$box-shadow-blue, 0.051);
+                border: 1px solid colors.$grey-900;
+                box-shadow: 0px 1px 2px 0px rgba(colors.$blue-900, 0.051);
                 padding: 0.625rem 3.75rem 0.625rem 0.625rem;
             }
 
@@ -305,7 +305,7 @@
 
                 &:hover {
                     cursor: pointer;
-                    background-color: rgba(colors.$grey-850, 0.149);
+                    background-color: rgba(colors.$blue-50, 0.149);
                 }
             }
 

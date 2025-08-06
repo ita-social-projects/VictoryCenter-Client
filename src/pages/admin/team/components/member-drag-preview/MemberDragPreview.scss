@@ -2,10 +2,10 @@
 
 .drag-preview {
     position: fixed;
-    z-index: 1000;
+    z-index: 12;
     pointer-events: none;
     background-color: white;
-    border: 2px solid colors.$drag-preview-blue;
+    border: 2px solid colors.$blue-50;
     border-radius: 8px;
     padding: 0.625rem;
     box-shadow: 0 4px 12px rgba(black, 0.15);

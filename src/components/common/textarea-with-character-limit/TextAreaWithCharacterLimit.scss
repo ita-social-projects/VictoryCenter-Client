@@ -10,7 +10,7 @@
         background: white;
         border: 1px solid colors.$blue-500;
         border-radius: 8px;
-        box-shadow: 0 1px 2px 0 rgba(colors.$box-shadow-blue, 0.051);
+        box-shadow: 0 1px 2px 0 rgba(colors.$blue-900, 0.051);
         color: colors.$blue-900;
         font-size: 16px;
 
@@ -31,7 +31,7 @@
             outline: none;
             resize: none;
             background: none;
-            color: colors.$bluish-grey-50;
+            color: colors.$grey-900;
             font-family: inherit;
             font-size: 16px;
 
@@ -47,7 +47,7 @@
 
     .character-limit {
         margin-top: 0.25rem;
-        color: colors.$bluish-grey-100;
+        color: colors.$grey-900;
         font-size: 16px;
         font-weight: 400;
         line-height: 24px;

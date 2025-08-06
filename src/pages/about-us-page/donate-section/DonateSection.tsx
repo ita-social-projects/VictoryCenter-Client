@@ -1,7 +1,7 @@
 import './DonateSection.scss';
 import background from '../../../assets/images/public/about-us-page/donate-background.jpg';
-import { routes } from '../../../const/routers/routes';
-import { DONATE_TITLE, DONATE_DETAILS, DONATE, BECOME_PARTNER } from '../../../const/about-us-page/about-us-page';
+import { PUBLIC_ROUTES } from '../../../const/public/routes';
+import { ABOUT_US_DATA } from '../../../const/public/about-us-page';
 import { Link } from 'react-router';
 
 export const DonateSection = () => {
@@ -13,15 +13,15 @@ export const DonateSection = () => {
         <div className="donate-block">
             <img src={background} alt="Background horses" className="donate-background" />
             <div className="donate-info-block">
-                <h2 className="donate-title">{DONATE_TITLE}</h2>
+                <h2 className="donate-title">{ABOUT_US_DATA.DONATE_TITLE}</h2>
                 <div className="donate-details">
-                    <h3>{DONATE_DETAILS}</h3>
+                    <h3>{ABOUT_US_DATA.DONATE_DETAILS}</h3>
                     <div className="donate-buttons">
-                        <Link to={routes.donatePageRoute} className="donate-button" aria-label="Make a donation">
-                            {DONATE}
+                        <Link to={PUBLIC_ROUTES.DONATE.FULL} className="donate-button" aria-label="Make a donation">
+                            {ABOUT_US_DATA.DONATE}
                         </Link>
                         <button className="partner-button" onClick={handlePartner} aria-label="Become a partner">
-                            {BECOME_PARTNER}
+                            {ABOUT_US_DATA.BECOME_PARTNER}
                         </button>
                     </div>
                 </div>

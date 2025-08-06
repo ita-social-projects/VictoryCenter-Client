@@ -1,13 +1,8 @@
 import { Link } from 'react-router';
-import { routes } from '../../const/routers/routes';
 import { ReactComponent as VictoryCenterLogo } from '../../assets/icons/logo-with-text.svg';
-import { ABOUT_US, PROGRAMS, REPORTING, HOW_TO_SUPPORT, CONTACT_US, DONATE } from '../../const/header/header';
+import { PUBLIC_ROUTES } from '../../const/public/routes';
+import { ABOUT_US, CONTACT_US, DONATE, HOW_TO_SUPPORT, PROGRAMS, REPORTING } from '../../const/public/header';
 import './Header.scss';
-
-const {
-    userPageRoutes: { teamPageRoute, page2Route },
-    donatePageRoute,
-} = routes;
 
 export const Header = () => {
     const onContactUsClick = () => {
@@ -26,12 +21,12 @@ export const Header = () => {
 
             <div className="linkContainer">
                 <nav>
-                    <Link to={teamPageRoute}>{ABOUT_US}</Link>
-                    <Link to={page2Route}>{PROGRAMS}</Link>
-                    <Link to={page2Route} className="disable">
+                    <Link to={PUBLIC_ROUTES.ABOUT_US.FULL}>{ABOUT_US}</Link>
+                    <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{PROGRAMS}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {REPORTING}
                     </Link>
-                    <Link to={page2Route} className="disable">
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {HOW_TO_SUPPORT}
                     </Link>
                 </nav>
@@ -41,7 +36,7 @@ export const Header = () => {
                 <button className="contactUsButton" onClick={onContactUsClick}>
                     {CONTACT_US}
                 </button>
-                <Link to={donatePageRoute} className="button donateButton">
+                <Link to={PUBLIC_ROUTES.DONATE.FULL} className="button donateButton">
                     {DONATE}
                 </Link>
             </div>

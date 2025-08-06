@@ -13,7 +13,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import './ScrollableFrame.scss';
-import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../const/program-page/program-page';
+import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../const/public/programs-page';
 
 export const ScrollableFrame = () => {
     const [programData, setProgramData] = useState<Program[]>([]);

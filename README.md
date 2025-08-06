@@ -58,17 +58,11 @@ victory-center-client/
 │   │   │   └── select/
 │   │   ├── footer/
 │   │   └── header/                         # Header-related components
-│   ├── const/                              # Constants used across the project
-│   │   ├── about-us-page/
-│   │   ├── admin/
-│   │   ├── footer/
-│   │   ├── header/
-│   │   ├── loader/
-│   │   ├── login-page/
-│   │   ├── program-page/
-│   │   ├── routers/
-|   |   ├── team-page/
-│   │   └── urls/
+│   ├───const
+│   │   ├───admin
+│   │   ├───common
+│   │   │   └───api-routes
+│   │   └───public
 │   ├── context/                            # React context providers
 │   │   └── admin-context-provider
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)

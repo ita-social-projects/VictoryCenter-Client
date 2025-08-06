@@ -196,7 +196,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
 
                 <Modal.Actions>
                     <Button buttonStyle="secondary" onClick={handleDraftSubmit} disabled={isSubmitting || !isFormValid}>
-                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFTED}
+                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
                     </Button>
                     <Button buttonStyle="primary" onClick={handlePublishSubmit} disabled={isSubmitting || !isFormValid}>
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}

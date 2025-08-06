@@ -1,8 +1,7 @@
-import React from 'react';
 import './AbroadPaymentDetails.scss';
-import { ABROAD_PAYMENT_DETAILS } from '../../../../const/donate-page/donate-page';
 import { CorrespondentBanksSection } from './CorrespondentBanksSection';
 import { PaymentDetailsSection } from './PaymentDetailsSection';
+import { ABROAD_PAYMENT_DETAILS } from '../../../../const/public/donate-page';
 
 export const USD_CORRESPONDENT_BANKS = [
     {

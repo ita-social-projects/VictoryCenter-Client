@@ -7,8 +7,8 @@ import {
     tokenRefreshRequest,
 } from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
 import { CreateAdminClient } from '../../services/auth/create-admin-client/createAdminClient';
-import { API_ROUTES } from '../../const/urls/main-api';
 import { isAccessTokenValid } from '../../services/auth/auth-service/AuthService';
+import { API_ROUTES } from '../../const/common/api-routes/main-api';
 
 jest.mock('../../services/data-fetch/login-page-data-fetch/login-page-data-fetch', () => ({
     loginRequest: jest.fn(),
@@ -20,7 +20,7 @@ jest.mock('../../services/auth/auth-service/AuthService', () => ({
 jest.mock('../../services/auth/create-admin-client/createAdminClient', () => ({
     CreateAdminClient: jest.fn(),
 }));
-jest.mock('../../const/urls/main-api', () => ({
+jest.mock('../../const/common/api-routes/main-api', () => ({
     API_ROUTES: { BASE: '/base' },
 }));
 

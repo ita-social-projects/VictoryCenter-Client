@@ -1,20 +1,25 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { OurTeam } from './OurTeam';
 
 jest.mock('../../../assets/images/public/about-us-page/our-team.jpg', () => 'our-team.jpg');
 
-jest.mock('../../../const/about-us-page/about-us-page', () => ({
+jest.mock('../../../const/public/about-us-page', () => ({
+    ABOUT_US_DATA: {
     TEAM_DETAILS: {
         FIRST_PART: 'Meet our dedicated team.',
         SECOND_PART: 'We work hard to bring you the best.',
     },
     GO_TO_TEAM: 'Go to team',
+}
 }));
 
-jest.mock('../../../const/routers/routes', () => ({
-    teamPageRoute: '/team',
+jest.mock('../../../const/public/routes', () => ({
+    PUBLIC_ROUTES: {
+        TEAM: {
+            FULL: '/team',
+        },
+    },
 }));
 
 describe('OurTeam component', () => {

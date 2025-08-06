@@ -1,9 +1,7 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Footer } from './Footer';
 import { MemoryRouter } from 'react-router';
-import { routes } from '../../const/routers/routes';
 import {
     ABOUT_US,
     HIPPOTHERAPY,
@@ -26,7 +24,8 @@ import {
     FACEBOOK,
     INSTAGRAM,
     TELEGRAM,
-} from '../../const/footer/footer';
+} from '../../const/public/footer';
+import { PUBLIC_ROUTES } from '../../const/public/routes';
 
 jest.mock('./Footer.scss', () => ({}));
 
@@ -59,18 +58,12 @@ describe('Footer', () => {
         render(<Footer />, { wrapper: MemoryRouter });
         expect(screen.getByText(MENU)).toBeInTheDocument();
 
-        expect(screen.getByRole('link', { name: REPORTING })).toHaveAttribute(
-            'href',
-            routes.userPageRoutes.teamPageRoute,
-        );
-        expect(screen.getByRole('link', { name: STORE })).toHaveAttribute('href', routes.userPageRoutes.page2Route);
-        expect(screen.getByRole('link', { name: HOW_TO_SUPPORT })).toHaveAttribute(
-            'href',
-            routes.userPageRoutes.page2Route,
-        );
+        expect(screen.getByRole('link', { name: REPORTING })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
+        expect(screen.getByRole('link', { name: STORE })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
+        expect(screen.getByRole('link', { name: HOW_TO_SUPPORT })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
         expect(screen.getByRole('link', { name: STORIES_OF_VICTORIES })).toHaveAttribute(
             'href',
-            routes.userPageRoutes.page2Route,
+            PUBLIC_ROUTES.MOCK.FULL,
         );
     });
 
@@ -78,23 +71,11 @@ describe('Footer', () => {
         render(<Footer />, { wrapper: MemoryRouter });
         expect(screen.getAllByText(ABOUT_US)[1]).toBeInTheDocument();
 
-        expect(screen.getByRole('link', { name: ABOUT_US })).toHaveAttribute(
-            'href',
-            routes.userPageRoutes.aboutUsRoute,
-        );
-        expect(screen.getByRole('link', { name: OUR_HISTORY })).toHaveAttribute(
-            'href',
-            routes.userPageRoutes.page2Route,
-        );
-        expect(screen.getByRole('link', { name: OUR_TEAM })).toHaveAttribute(
-            'href',
-            routes.userPageRoutes.teamPageRoute,
-        );
-        expect(screen.getByRole('link', { name: PARTNERS })).toHaveAttribute('href', routes.userPageRoutes.page2Route);
-        expect(screen.getByRole('link', { name: EVENTS_AND_NEWS })).toHaveAttribute(
-            'href',
-            routes.userPageRoutes.page2Route,
-        );
+        expect(screen.getByRole('link', { name: ABOUT_US })).toHaveAttribute('href', PUBLIC_ROUTES.ABOUT_US.FULL);
+        expect(screen.getByRole('link', { name: OUR_HISTORY })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
+        expect(screen.getByRole('link', { name: OUR_TEAM })).toHaveAttribute('href', PUBLIC_ROUTES.TEAM.FULL);
+        expect(screen.getByRole('link', { name: PARTNERS })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
+        expect(screen.getByRole('link', { name: EVENTS_AND_NEWS })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
     });
 
     it('renders the hippotherapy section with correct links', () => {
@@ -103,13 +84,10 @@ describe('Footer', () => {
 
         expect(screen.getByRole('link', { name: WHAT_IS_HIPPOTHERAPY })).toHaveAttribute(
             'href',
-            routes.userPageRoutes.teamPageRoute,
+            PUBLIC_ROUTES.MOCK.FULL,
         );
-        expect(screen.getByRole('link', { name: PROGRAMS })).toHaveAttribute('href', routes.userPageRoutes.programPage);
-        expect(screen.getByRole('link', { name: PROGRAMS_SESSIONS })).toHaveAttribute(
-            'href',
-            routes.userPageRoutes.teamPageRoute,
-        );
+        expect(screen.getByRole('link', { name: PROGRAMS })).toHaveAttribute('href', PUBLIC_ROUTES.PROGRAMS.FULL);
+        expect(screen.getByRole('link', { name: PROGRAMS_SESSIONS })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
     });
 
     it('renders contact buttons with correct text', () => {

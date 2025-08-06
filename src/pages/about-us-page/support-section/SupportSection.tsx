@@ -1,14 +1,14 @@
 import './SupportSection.scss';
-import { SUPPORT_TITLE, SUPPORT_DATA } from '../../../const/about-us-page/about-us-page';
+import { ABOUT_US_DATA } from '../../../const/public/about-us-page';
 
 export const SupportSection = () => {
     return (
         <div className="support-block">
-            <h2 className="support-title">{SUPPORT_TITLE}</h2>
-            {SUPPORT_DATA.map(({ img, alt, description }, index) => (
-                <div key={`${alt}-${index}`} className="support-card">
-                    <img src={img} alt={alt} />
-                    <p className="support-description">{description}</p>
+            <h2 className="support-title">{ABOUT_US_DATA.SUPPORT_TITLE}</h2>
+            {ABOUT_US_DATA.SUPPORT_DATA.map(({ IMG, ALT, DESCRIPTION }, index) => (
+                <div key={`${ALT}-${index}`} className="support-card">
+                    <img src={IMG} alt={ALT} />
+                    <p className="support-description">{DESCRIPTION}</p>
                 </div>
             ))}
         </div>

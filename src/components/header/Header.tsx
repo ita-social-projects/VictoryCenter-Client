@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 import { routes } from '../../const/routers/routes';
 import { ReactComponent as VictoryCenterLogo } from '../../assets/images/header/VictoryCenterLogo.svg';
@@ -11,6 +12,12 @@ const {
 } = routes;
 
 export const Header = () => {
+    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
+
     const onContactUsClick = () => {
         //TODO: remove this log after implementing an actual logic
         //eslint-disable-next-line no-console
@@ -45,7 +52,26 @@ export const Header = () => {
                 <Link to={donatePageRoute} className="button donateButton">
                     {DONATE}
                 </Link>
+                <button onClick={toggleMenu} className="burgerMenuIcon">
+                    ☰
+                </button>
             </div>
+            {isMenuOpen && (
+                <div className="mobileMenu">
+                    <Link to={teamPageRoute} onClick={toggleMenu}>
+                        {ABOUT_US}
+                    </Link>
+                    <Link to={page2Route} onClick={toggleMenu}>
+                        {PROGRAMS}
+                    </Link>
+                    <Link to={page2Route} onClick={toggleMenu}>
+                        {REPORTING}
+                    </Link>
+                    <Link to={page2Route} onClick={toggleMenu}>
+                        {HOW_TO_SUPPORT}
+                    </Link>
+                </div>
+            )}
         </div>
     );
 };

@@ -51,6 +51,7 @@ $mulish-font-family: 'Mulish', sans-serif;
     .buttonContainer {
         display: flex;
         gap: 0.5rem;
+        align-items: center;
 
         .contactUsButton {
             background-color: transparent;
@@ -75,6 +76,82 @@ $mulish-font-family: 'Mulish', sans-serif;
             justify-content: center;
             align-items: center;
             border: 1px solid $blue-900;
+        }
+    }
+}
+
+.burgerMenuIcon {
+    display: none;
+    font-size: 2rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: $blue-900;
+}
+
+.mobileMenu {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .linkContainer {
+        display: none;
+    }
+
+    .mobileMenu {
+    display: flex;
+    position: absolute;
+    top: 4rem;
+    right: 0;
+    background-color: #fff;
+    width: 20%;
+    flex-direction: column;
+    z-index: 999;
+
+    a {
+        font-weight: 600;
+        text-decoration: none;
+        padding: 1rem 1rem;
+        color: #000;
+        position: relative;
+
+        &::after{
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 1px;
+            background-color: #E7EAEE;
+        }
+
+        &:last-child::after {
+            content: none;
+        }
+    }
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    .mobileButtons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+    .burgerMenuIcon {
+        display: block;
+    }
+}
+
+@media (max-width: 524px) {
+    .headerBlock{
+        .buttonContainer{
+            .contactUsButton {
+                display: none;
+            } 
         }
     }
 }

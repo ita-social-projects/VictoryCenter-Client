@@ -102,33 +102,31 @@ victory-center-client/
 │   │   └── admin/
 │   ├── context/                            # React context providers
 │   │   └── admin-context-provider
-│   ├── services/                           # API calls, data services
-│   │   ├── auth/
-│   │   │   ├── auth-service/
-│   │   │   ├── create-admin-client/
-│   │   │   └── resolve-with-new-token/
-│   │   └── data-fetch
-│   │       ├── admin-page-data-fetch
-|   |       │   └── team-page-data-fetch
-│   │       ├── login-page-data-fetch
-│   │       ├── program-page-data-fetch
-│   │       └── user-pages-data-fetch
-│   │           ├── home-page-data-fetch
-│   │           ├── team-page-data-fetch
-│   │           └── page-2-data-fetch
+│   ├───services
+│   │   ├───api
+│   │   │   ├───admin
+│   │   │   │   ├───image
+│   │   │   │   ├───login
+│   │   │   │   ├───programs
+│   │   │   │   └───team
+│   │   │   │       ├───team-members
+│   │   │   │       └───team-сategories
+│   │   │   └───public
+│   │   │       ├───programs
+│   │   │       └───team
+│   │   └───auth
+│   │       ├───auth-service
+│   │       ├───create-admin-client
+│   │       └───resolve-with-new-token
 │   ├── types/
 │   ├── utils/                              # Utility functions
 │   │   ├── functions/
 │   │   ├── hooks/
 │   │   │   ├── use-admin-client/
 │   │   │   └── use-on-mount-unsafe/
-│   │   └── mock-data/
-│   │       ├── admin-page/                 # Mock data for admin pages
-│   │       ├── program-page/
-│   │       └── user-pages/                 # Mock data for user pages
-│   │           ├── home-page/
-│   │           ├── team-page/
-│   │           └── page-2/
+│   │   └───mock-data
+│   │       ├───admin
+│   │       └───public
 │   ├── validation
 │   │   └── admin-create-member-form
 │   ├── index.jsx                           # Entry point (ReactDOM.createRoot)

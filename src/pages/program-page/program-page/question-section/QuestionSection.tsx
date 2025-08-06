@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Question } from '../../../../types/public/ProgramPage';
 import { QuestionCard } from './question-card/QuestionCard';
-import { questionDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
+import { questionDataFetch } from '../../../../services/api/public/programs/programs-api';
 import './QuestionSection.scss';
 import { COMMON_QUESTIONS } from '../../../../const/public/programs-page';
 

@@ -1,9 +1,10 @@
 import { render, waitFor } from '@testing-library/react';
 import { AdminPage } from './AdminPage';
-import * as AdminPageDataFetchModule from '../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch';
+import * as adminHomeDataFetchModule from '../../utils/mock-data/admin/home';
+
 import { MemoryRouter } from 'react-router';
 
-const spyAdminPageDataFetch = jest.spyOn(AdminPageDataFetchModule, 'adminPageDataFetch');
+const spyAdminPageDataFetch = jest.spyOn(adminHomeDataFetchModule, 'adminHomeDataFetch');
 
 // DEV NOTE: This test would be very similar to AdminPageContent
 // since this component will render AdminPageContent.tsx

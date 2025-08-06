@@ -2,10 +2,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MembersList, MembersListProps } from './MembersList';
 import { TeamCategory, TeamMember } from '../../../../../types/admin/TeamMembers';
 import * as React from 'react';
-import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi';
-import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
+import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-сategories/team-categories-api';
 
 const mockMembers = [] as TeamMember[];
 

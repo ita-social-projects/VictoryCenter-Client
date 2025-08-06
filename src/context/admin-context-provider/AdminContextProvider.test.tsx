@@ -1,23 +1,18 @@
-import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { AdminContextProvider, useAdminContext } from './AdminContextProvider';
-import {
-    loginRequest,
-    tokenRefreshRequest,
-} from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
-import { CreateAdminClient } from '../../services/auth/create-admin-client/createAdminClient';
-import { isAccessTokenValid } from '../../services/auth/auth-service/AuthService';
-import { API_ROUTES } from '../../const/common/api-routes/main-api';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { useAdminContext, AdminContextProvider } from './AdminContextProvider';
+import { loginRequest, tokenRefreshRequest } from '../../services/api/admin/login/login-api';
+import { isAccessTokenValid } from '../../services/auth/auth-service/auth-service';
+import { CreateAdminClient } from '../../services/auth/create-admin-client/create-admin-client';
 
-jest.mock('../../services/data-fetch/login-page-data-fetch/login-page-data-fetch', () => ({
+jest.mock('../../services/api/admin/login/login-api', () => ({
     loginRequest: jest.fn(),
     tokenRefreshRequest: jest.fn(),
 }));
-jest.mock('../../services/auth/auth-service/AuthService', () => ({
+jest.mock('../../services/auth/auth-service/auth-service', () => ({
     isAccessTokenValid: jest.fn(),
 }));
-jest.mock('../../services/auth/create-admin-client/createAdminClient', () => ({
+jest.mock('../../services/auth/create-admin-client/create-admin-client', () => ({
     CreateAdminClient: jest.fn(),
 }));
 jest.mock('../../const/common/api-routes/main-api', () => ({
@@ -58,7 +53,6 @@ describe('<AdminContextProvider />', () => {
         loginRequestMock.mockResolvedValue('login_token');
         isValidMock.mockImplementation((t: string) => t === 'initial_token' || t === 'login_token');
         CreateAdminClientMock.mockReturnValue({ marker: 'FAKE_CLIENT' });
-        (API_ROUTES as any).BASE = '/base';
     });
 
     it('on silent-refresh on mount: loading toggles, auth=true, client.marker set', async () => {

@@ -1,12 +1,11 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { TeamPage } from './TeamPage';
-import * as TeamPageDataFetchModule from '../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch';
 import { TeamItem, TeamMemberProps } from '../../../types/public/TeamPage';
+import * as teamPageDataFetch from '../../../services/api/public/team/team-api';
 
 jest.mock('../../../assets/videos/public/team-page/quote_background.mp4', () => 'mocked-video.mp4');
 
-const spyTeamPageDataFetch = jest.spyOn(TeamPageDataFetchModule, 'teamPageDataFetch');
+const spyTeamPageDataFetch = jest.spyOn(teamPageDataFetch, 'teamPageDataFetch');
 
 const mockTeamDataSingle: TeamItem[] = [
     {

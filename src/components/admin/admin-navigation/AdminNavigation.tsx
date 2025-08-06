@@ -3,7 +3,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 import { adminRoutes } from '../../../const/routers/routes';
-import Logo from '../../../assets/icons/logo.svg';
+import Logo from '../../../assets/icons/logo-with-text.svg';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 export const AdminNavigation = () => {

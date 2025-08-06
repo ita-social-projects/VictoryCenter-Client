@@ -23,23 +23,25 @@ victory-center-client/
 ├── scripts/
 │   └── start-in-dev-over-https.mjs
 ├── src/
-│   ├── assets/                             # Images, icons, fonts, etc.
-│   │   ├── images
-│   │   │   └── header
-│   │   ├── program_page_images
-│   │   │   ├── icons
-│   │   │   ├── images
-│   │   │   └── videos
-│   │   ├── fonts/
-│   │   ├── icons/
-│   │   ├── images/                         # Image assets
-│   │   │   ├── footer
-│   │   │   ├── admin/
-│   │   │   └── header/
-│   │   ├── sass/
-│   │   │     ├── mixins
-│   │   │     └── variables
-│   │   └── styles/                         # Additional styles
+│   ├───assets
+│   │   ├───fonts
+│   │   ├───icons
+│   │   ├───images
+│   │   │   ├───admin
+│   │   │   ├───common
+│   │   │   └───public
+│   │   │       ├───about-us-page
+│   │   │       ├───programs-page
+│   │   │       └───team-page
+│   │   ├───sass
+│   │   │   ├───mixins
+│   │   │   └───variables
+│   │   └───videos
+│   │       ├───admin
+│   │       ├───common
+│   │       └───public
+│   │           ├───programs-page
+│   │           └───team-page
 │   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
 │   │   ├── admin/                          # Admin-specific components
 │   │   │   ├── admin-context-wrapper/
@@ -102,21 +104,10 @@ victory-center-client/
 │   │       └── page-2
 │   ├── routes/                             # Route configuration
 │   │   └── app-router
-<<<<<<< HEAD
-                           # Custom React hooks
-=======
-<<<<<<< HEAD
-│   ├── hooks/                              # Custom React hooks
-=======
->>>>>>> ece11d0
-│   ├── hooks/# Custom React hooks
+│   ├── hooks/
 │   │   └── admin/
 │   ├── context/                            # React context providers
 │   │   └── admin-context-provider
-<<<<<<< HEAD
-=======
->>>>>>> feature/issue-12
->>>>>>> ece11d0
 │   ├── services/                           # API calls, data services
 │   │   ├── auth/
 │   │   │   ├── auth-service/
@@ -124,7 +115,7 @@ victory-center-client/
 │   │   │   └── resolve-with-new-token/
 │   │   └── data-fetch
 │   │       ├── admin-page-data-fetch
-|   |           └── team-page-data-fetch
+|   |       │   └── team-page-data-fetch
 │   │       ├── login-page-data-fetch
 │   │       ├── program-page-data-fetch
 │   │       └── user-pages-data-fetch

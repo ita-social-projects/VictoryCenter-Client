@@ -634,7 +634,9 @@ describe('MembersList', () => {
             fireEvent.change(catInput, { target: { value: '' } });
 
             fireEvent.click(await screen.findByTestId('modal'));
-            expect(await screen.findByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
+            expect(
+                await screen.findByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+            ).toBeInTheDocument();
 
             const confirmCloseButton = await screen.findByRole('button', { name: /Так/i });
             fireEvent.click(confirmCloseButton);
@@ -655,7 +657,9 @@ describe('MembersList', () => {
             fireEvent.change(await screen.findByTestId('form-category'), { target: { value: '' } });
 
             fireEvent.click(await screen.findByTestId('modal'));
-            expect(await screen.findByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
+            expect(
+                await screen.findByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+            ).toBeInTheDocument();
 
             const confirmCloseButton = await screen.findByRole('button', { name: /Так/i });
             fireEvent.click(confirmCloseButton);

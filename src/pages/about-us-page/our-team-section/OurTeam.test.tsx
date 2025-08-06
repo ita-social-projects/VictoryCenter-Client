@@ -6,12 +6,12 @@ jest.mock('../../../assets/images/public/about-us-page/our-team.jpg', () => 'our
 
 jest.mock('../../../const/public/about-us-page', () => ({
     ABOUT_US_DATA: {
-    TEAM_DETAILS: {
-        FIRST_PART: 'Meet our dedicated team.',
-        SECOND_PART: 'We work hard to bring you the best.',
+        TEAM_DETAILS: {
+            FIRST_PART: 'Meet our dedicated team.',
+            SECOND_PART: 'We work hard to bring you the best.',
+        },
+        GO_TO_TEAM: 'Go to team',
     },
-    GO_TO_TEAM: 'Go to team',
-}
 }));
 
 jest.mock('../../../const/public/routes', () => ({

@@ -7,6 +7,17 @@ jest.mock('../../../../assets/partners-page-images/horses.png', () => 'mocked-ho
 
 jest.mock('../../../../const/partners-page/partners-page', () => ({
     PARTNERS_PAGE_SUBTITLE: 'Mocked subtitle text',
+    PARTNERS_PAGE_TITLE: {
+        FIRST_LINE: {
+            REGULAR: 'МИ',
+            BOLD: ' НЕ ОДНІ.',
+        },
+        SECOND_LINE: {
+            BOLD_START: 'І ЦЕ',
+            REGULAR: ' НАША ',
+            BOLD_END: ' СИЛА ',
+        },
+    },
 }));
 
 const renderComponent = () => {

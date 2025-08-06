@@ -11,7 +11,10 @@ export const OutroSection: React.FC = () => {
             </video>
 
             <div className="quote-overlay">
-                <h1 className="video-text">{OUTRO.TITLE.FIRST_LINE}</h1>
+                <h1 className="video-text">
+                    {OUTRO.TITLE.FIRST_LINE} <br />
+                    {OUTRO.TITLE.SECOND_LINE}
+                </h1>
                 <p className="video-description">{OUTRO.TEXT}</p>
                 <div className="video-buttons">
                     <button className="btn-primary">{OUTRO.BUTTON_BECOME_SUPPORT_TEXT}</button>

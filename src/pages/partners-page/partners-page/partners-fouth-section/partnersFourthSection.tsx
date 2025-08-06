@@ -6,7 +6,7 @@ import {
 } from '../../../../const/partners-page/partners-page';
 import { PartnerSection } from '../../../../components/partners/PartnerSection';
 
-export const PartnersFouthSectionContent: React.FC = () => {
+export const PartnersFourthSectionContent: React.FC = () => {
     return (
         <PartnerSection
             title={PARTNERS_FOURTH_SECTION_TITLE}

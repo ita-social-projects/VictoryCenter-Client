@@ -38,7 +38,7 @@
     word-wrap: break-word;
     border: 1px solid colors.$grey-700;
     transition: opacity 0.2s;
-    z-index: 1000;
+    z-index: 11;
 
     &::before,
     &::after {

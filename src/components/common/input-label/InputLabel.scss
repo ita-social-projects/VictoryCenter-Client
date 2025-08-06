@@ -1,7 +1,7 @@
 @use '../../../assets/sass/variables/colors';
 
-label {
-    color: colors.$grey-900;
+.input-label {
+    color: colors.$bluish-grey-50;
     font-size: 16px;
 
     .required-field {

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MembersList, MembersListProps } from './MembersList';
-import { TeamCategory, TeamMember } from '../../../../../types/admin/TeamMembers';
+import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
 import * as React from 'react';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
@@ -17,7 +17,7 @@ const mockDataTransfer = {
     types: [],
 };
 
-jest.mock('../../../../../context/admin-context-provider/AdminContextProvider', () => ({
+jest.mock('../../../../../contexts/admin/admin-context-provider/AdminContextProvider', () => ({
     useAdminContext: () => ({
         client: {
             get: jest.fn(),

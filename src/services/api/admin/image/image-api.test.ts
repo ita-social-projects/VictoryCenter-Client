@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios';
-import { Image, ImageValues } from '../../../../types/Image';
+import { Image, ImageValues } from '../../../../types/common/image';
 import { ImageApi } from './image-api';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 

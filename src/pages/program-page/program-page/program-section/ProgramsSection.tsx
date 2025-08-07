@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './ProgramsSection.scss';
-import { ProgramCard } from './program-card/ProgramCard';
 import { PROGRAMS } from '../../../../const/public/footer';
 import {
     FAILED_TO_LOAD_THE_PROGRAMS,
@@ -8,11 +7,12 @@ import {
     PROGRAMS_FOR_VETERANS,
     PROGRAMS_ALL,
 } from '../../../../const/public/programs-page';
-import { Program } from '../../../../types/public/ProgramPage';
 import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
+import { ProgramCard } from './program-card/ProgramCard';
+import { PublishedProgram } from '../../../../types/public/programs-page';
 
 export const ProgramsSection: React.FC = () => {
-    const [programData, setProgramData] = useState<Program[]>([]);
+    const [programData, setProgramData] = useState<PublishedProgram[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {

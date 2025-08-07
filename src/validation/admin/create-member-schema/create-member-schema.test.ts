@@ -9,7 +9,7 @@ import {
     SUPPORTED_FORMATS,
     FILE_SIZE_LIMIT,
     DESCRIPTIONS_MIN,
-} from '../../const/admin/data-validation';
+} from '../../../const/admin/data-validation';
 
 function createMockImageValues(file: File): { base64: string; mimeType: string; size: number } {
     return {

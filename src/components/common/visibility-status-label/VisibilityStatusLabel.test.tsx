@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { VisibilityStatus } from '../../../types/admin/Common';
+import { VisibilityStatus } from '../../../types/admin/common';
 import { VisibilityStatusLabel } from './VisibilityStatusLabel';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 

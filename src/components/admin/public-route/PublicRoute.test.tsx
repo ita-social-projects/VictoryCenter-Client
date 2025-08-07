@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { useLocation } from 'react-router';
-import { useAdminContext } from '../../../context/admin-context-provider/AdminContextProvider';
+import { useAdminContext } from '../../../contexts/admin/admin-context-provider/AdminContextProvider';
 import { PublicRoute } from './PublicRoute';
 import { ADMIN_ROUTES } from '../../../const/admin/routes';
 
@@ -12,7 +12,7 @@ jest.mock('react-router', () => ({
     Outlet: () => <div data-testid="outlet" />,
     useLocation: jest.fn(),
 }));
-jest.mock('../../../context/admin-context-provider/AdminContextProvider', () => ({
+jest.mock('../../../contexts/admin/admin-context-provider/AdminContextProvider', () => ({
     useAdminContext: jest.fn(),
 }));
 jest.mock('../../common/page-loader/PageLoader', () => ({

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TeamMemberProps } from '../../../../types/public/TeamPage';
+import { TeamMemberProps } from '../../../../types/public/team-page';
 
 export const TeamMember: React.FC<TeamMemberProps> = ({ member }) => {
     return (

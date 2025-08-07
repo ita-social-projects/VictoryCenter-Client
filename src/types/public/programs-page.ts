@@ -1,4 +1,4 @@
-export interface Program {
+export interface PublishedProgram {
     image: string;
     title: string;
     subtitle: string;

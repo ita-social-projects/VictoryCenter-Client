@@ -1,10 +1,10 @@
-import { VisibilityStatus, PaginationResult } from '../../../../types/admin/Common';
+import { VisibilityStatus, PaginationResult } from '../../../../types/admin/common';
 import {
     ProgramCategory,
     ProgramCreateUpdate,
     ProgramCategoryCreateUpdate,
     Program,
-} from '../../../../types/admin/Programs';
+} from '../../../../types/admin/programs';
 import { mockPrograms, mockCategories } from '../../../../utils/mock-data/admin/programs';
 
 // !!!

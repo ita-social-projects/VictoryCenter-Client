@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TeamPageContent } from './TeamPageContent';
 import { MemberFormValues } from '../member-form/MemberForm';
-import { AdminContext } from '../../../../../context/admin-context-provider/AdminContextProvider';
+import { AdminContext } from '../../../../../contexts/admin/admin-context-provider/AdminContextProvider';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
 
 // Mock the AdminContext

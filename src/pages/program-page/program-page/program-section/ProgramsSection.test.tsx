@@ -1,11 +1,11 @@
 import { ProgramsSection } from './ProgramsSection';
 import { render, screen, waitFor } from '@testing-library/react';
 import * as ProgramsPageFetchModule from '../../../../services/api/public/programs/programs-api';
-import { Program } from '../../../../types/public/ProgramPage';
+import { PublishedProgram } from '../../../../types/public/programs-page';
 
 const spyProgramsPageDataFetch = jest.spyOn(ProgramsPageFetchModule, 'programPageDataFetch');
 
-const mockPrograms: Program[] = [
+const mockPrograms: PublishedProgram[] = [
     {
         image: 'https://via.placeholder.com/200x200?text=Ponys',
         title: 'titletest1',
@@ -26,7 +26,7 @@ const mockPrograms: Program[] = [
     },
 ];
 jest.mock('./program-card/ProgramCard', () => ({
-    ProgramCard: ({ program }: { program: Program }) => (
+    ProgramCard: ({ program }: { program: PublishedProgram }) => (
         <div data-testid="test-card-content">
             <img src={program.image} alt={program.title} />
             <h2>{program.title}</h2>

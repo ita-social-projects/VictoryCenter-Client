@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { TeamPage } from './TeamPage';
-import { TeamItem, TeamMemberProps } from '../../../types/public/TeamPage';
 import * as teamPageDataFetch from '../../../services/api/public/team/team-api';
+import { TeamItem, TeamMemberProps } from '../../../types/public/team-page';
 
 jest.mock('../../../assets/videos/public/team-page/quote_background.mp4', () => 'mocked-video.mp4');
 

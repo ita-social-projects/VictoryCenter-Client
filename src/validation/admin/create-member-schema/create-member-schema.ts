@@ -1,6 +1,5 @@
 import * as yup from 'yup';
-import { TeamCategory } from '../../types/admin/TeamMembers';
-import { ImageValues } from '../../types/Image';
+import { ImageValues } from '../../../types/common/image';
 
 import {
     CATEGORY_REQUIRED,
@@ -20,7 +19,8 @@ import {
     SUPPORTED_FORMATS,
     DESCRIPTIONS_REQUIRED,
     IMG_REQUIRED,
-} from '../../const/admin/data-validation';
+} from '../../../const/admin/data-validation';
+import { TeamCategory } from '../../../types/admin/team-members';
 
 export const useCreateMemberSchema = (isDraft: boolean) => {
     return yup.object({

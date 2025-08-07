@@ -6,7 +6,7 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonProps } from '../../../../../components/common/button/Button';
 import { SelectProps } from '../../../../../components/common/select/Select';
 import { InputProps } from '../../../../../components/common/input/Input';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 
 jest.mock('../../../../../components/common/button/Button', () => ({
     Button: ({ children, onClick, buttonStyle, ...props }: ButtonProps) => (

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { MemberCard } from '../../../../types/public/team-page';
 import { TeamMember } from './TeamMemberCard';
-import { MemberCard } from '../../../../types/public/TeamPage';
 
 describe('TeamMember component', () => {
     const mockMember: MemberCard = {

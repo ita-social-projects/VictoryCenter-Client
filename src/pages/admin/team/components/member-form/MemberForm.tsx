@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { TeamCategory } from '../../../../../types/admin/TeamMembers';
+import { TeamCategory } from '../../../../../types/admin/team-members';
 import { useCreateMemberForm } from '../../../../../hooks/admin/create-member-form';
 import '../members-list/MembersList.scss';
 import { MAX_FULLNAME_LENGTH, MAX_DESCRIPTION_LENGTH } from '../../../../../const/admin/data-validation';
-import { ImageValues } from '../../../../../types/Image';
+import { ImageValues } from '../../../../../types/common/image';
 import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
 import ArrowUp from '../../../../../assets/icons/chevron-up.svg';

@@ -1,5 +1,5 @@
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
-import { Image, ImageValues } from '../../../../types/Image';
+import { Image, ImageValues } from '../../../../types/common/image';
 import { AxiosInstance, AxiosResponse } from 'axios';
 
 export const ImageApi = {

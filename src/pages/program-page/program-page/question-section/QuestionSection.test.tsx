@@ -1,7 +1,7 @@
 import { QuestionSection } from './QuestionSection';
 import { render, screen, waitFor } from '@testing-library/react';
 import * as ProgramsPageFetchModule from '../../../../services/api/public/programs/programs-api';
-import { Question } from '../../../../types/public/ProgramPage';
+import { Question } from '../../../../types/public/programs-page';
 
 const spyQuestionDataFetch = jest.spyOn(ProgramsPageFetchModule, 'questionDataFetch');
 const mockQuestions: Question[] = [

@@ -1,11 +1,11 @@
 import React from 'react';
-import { Program } from '../../../../../types/public/ProgramPage';
+import { PublishedProgram } from '../../../../../types/public/programs-page';
 import arrowBlack from '../../../../../assets/icons/arrow-up-right.svg';
 import arrowYellow from '../../../../../assets/icons/arrow-up-right-yellow.svg';
 import './ProgramCard.scss';
 
 interface ProgramCardProps {
-    program: Program;
+    program: PublishedProgram;
 }
 export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
     return (

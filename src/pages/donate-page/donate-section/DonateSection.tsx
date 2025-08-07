@@ -1,10 +1,8 @@
 import './DonateSection.scss';
 import React, { useState } from 'react';
 import { getEnvVariable } from '../../../utils/functions/getEnvVariable';
-import { DonateTab } from '../../../types/public/donate-page/DonateTab';
-import { Currency } from '../../../types/public/donate-page/Currency';
-import { PaymentSystem } from '../../../types/public/donate-page/PaymentStatus';
 import { DONATE_SECTION } from '../../../const/public/donate-page';
+import { DonateTab, Currency, PaymentSystem } from '../../../types/public/donate-page';
 
 export const DonateSection = () => {
     const [activeTab, setActiveTab] = useState<DonateTab>(DonateTab.oneTime);

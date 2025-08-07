@@ -1,4 +1,4 @@
-import { TeamMember } from '../../../../../types/admin/TeamMembers';
+import { TeamMember } from '../../../../../types/admin/team-members';
 import classNames from 'classnames';
 import './MemberComponent.scss';
 import BlankUserImage from '../../../../../assets/icons/blank-user.svg';

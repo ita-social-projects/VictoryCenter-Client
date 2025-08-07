@@ -1,4 +1,4 @@
-import { Image } from '../Image';
+import { Image } from '../common/image';
 
 export type TeamMember = {
     id: number;

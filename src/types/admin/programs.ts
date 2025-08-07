@@ -1,5 +1,5 @@
-import { VisibilityStatus } from './Common';
-import { Image } from '../Image';
+import { VisibilityStatus } from './common';
+import { Image } from '../common/image';
 
 export interface ProgramCategory {
     id: number;

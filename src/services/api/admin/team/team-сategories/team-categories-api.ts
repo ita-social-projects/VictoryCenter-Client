@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
-import { TeamCategory, TeamCategoryDto } from '../../../../../types/admin/TeamMembers';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
+import { TeamCategory, TeamCategoryDto } from '../../../../../types/admin/team-members';
 
 export const TeamCategoriesApi = {
     getAll: async (client: AxiosInstance): Promise<TeamCategory[]> => {

@@ -1,10 +1,10 @@
 import { MemberFormValues } from '../../../../../pages/admin/team/components/member-form/MemberForm';
 import { AxiosInstance } from 'axios';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { TeamMember, TeamMemberDto } from '../../../../../types/admin/TeamMembers';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 import { ImageApi } from '../../image/image-api';
+import { TeamMember, TeamMemberDto } from '../../../../../types/admin/team-members';
 
 export const TeamMembersApi = {
     getAll: async (

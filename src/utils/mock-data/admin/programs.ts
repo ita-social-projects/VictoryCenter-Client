@@ -1,5 +1,5 @@
-import { VisibilityStatus } from '../../../types/admin/Common';
-import { Program, ProgramCategory } from '../../../types/admin/Programs';
+import { VisibilityStatus } from '../../../types/admin/common';
+import { Program, ProgramCategory } from '../../../types/admin/programs';
 
 export const mockCategories: ProgramCategory[] = [
     { id: 1, name: 'Ветеранські', programsCount: 5 },

@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { VisibilityStatus } from '../../../types/admin/Common';
+import { VisibilityStatus } from '../../../types/admin/common';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './VisibilityStatusLabel.scss';
 

@@ -1,11 +1,11 @@
 import { AxiosInstance } from 'axios';
 import { MemberFormValues } from '../../../../../pages/admin/team/components/member-form/MemberForm';
-import { TeamMemberDto } from '../../../../../types/admin/TeamMembers';
 import { TeamMembersApi, mapTeamMemberDtoToTeamMember } from './team-members-api';
-import { Image, ImageValues } from '../../../../../types/Image';
+import { Image, ImageValues } from '../../../../../types/common/image';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 import { ImageApi } from '../../image/image-api';
+import { TeamMemberDto } from '../../../../../types/admin/team-members';
 
 const mockClient = {
     get: jest.fn(),

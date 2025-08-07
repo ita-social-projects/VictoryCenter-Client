@@ -1,0 +1,60 @@
+@use '../../../../../assets/sass/variables/fonts';
+@use '../../../../../assets/sass/variables/colors';
+
+.abroadPaymentDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+}
+
+.abroadPaymentDetailsBlock {
+    h2 {
+        font-family: fonts.$mulish-regular-font;
+        color: colors.$blue-900;
+        font-weight: 700;
+        font-size: 2rem;
+    }
+    .abroadPaymentDetailsContent {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding-top: 2rem;
+
+        .labelsContainers {
+            padding-top: 0.375rem;
+        }
+
+        h3 {
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: colors.$blue-900;
+            font-family: fonts.$mulish-regular-font;
+            padding-bottom: 0.125rem;
+        }
+
+        .label {
+            font-family: fonts.$mulish-regular-font;
+            color: colors.$blue-900;
+            font-size: 1.125rem;
+            font-weight: 400;
+            padding-bottom: 0.125rem;
+        }
+
+        .labelsContainer {
+            padding-bottom: 0.125rem;
+        }
+
+        .highlightedLabel {
+            font-family: fonts.$mulish-regular-font;
+            font-weight: 700;
+            color: colors.$blue-900;
+            font-size: 1.125rem;
+        }
+
+        .labelWithCopyButton {
+            padding-top: 0.125rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+    }
+}

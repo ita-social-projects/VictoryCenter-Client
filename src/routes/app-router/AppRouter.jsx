@@ -1,34 +1,33 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { MainLayout } from '../../layouts/main-layout/MainLayout';
+import { BrowserRouter, Routes, Route } from 'react-router';
 
-import { AdminPage } from '../../pages/admin/AdminPage';
+import { TeamPage } from '../../pages/public/team-page/TeamPage';
 
-import { TeamPage } from '../../pages/user-pages/team-page/TeamPage';
+import { NotFound } from '../../pages/public/not-found/NotFound';
+import { ProgramsPage } from '../../pages/public/programs-page/ProgramsPage';
 
-import { NotFound } from '../../pages/not-found/NotFound';
-import { ProgramPage } from '../../pages/program-page/ProgramPage';
-
-import { AboutUsPage } from '../../pages/about-us-page/AboutUsPage';
 import { AdminLayout } from '../../layouts/admin-layout/AdminLayout';
+import { PublicLayout } from '../../layouts/public-layout/PublicLayout';
 import { TeamPageAdmin } from '../../pages/admin/team/TeamPage';
 import { ProgramsPageAdmin } from '../../pages/admin/programs/ProgramsPageAdmin';
 
-import { LoginPage } from '../../pages/login/LoginPage';
 import { AdminContextWrapper } from '../../components/admin/admin-context-wrapper/AdminContextWrapper';
 
-import { PUBLIC_ROUTES } from '../../const/public/routes';
-import { ADMIN_ROUTES } from '../../const/admin/routes';
 import { PrivateRoute } from '../../components/admin/private-route/PrivateRoute';
 import { PublicRoute } from '../../components/admin/public-route/PublicRoute';
-import { DonatePage } from '../../pages/donate-page/DonatePage';
+import { PUBLIC_ROUTES } from '../../const/public/routes';
+import { ADMIN_ROUTES } from '../../const/admin/routes';
+import { AboutUsPage } from '../../pages/public/about-us-page/AboutUsPage';
+import { DonatePage } from '../../pages/public/donate-page/DonatePage';
+import { LoginPage } from '../../pages/admin/login/LoginPage';
+import { AdminHomePage } from '../../pages/admin/home/AdminHomePage';
 
 export const AppRouter = () => (
     <BrowserRouter>
         <Routes>
-            <Route path="/" element={<MainLayout />}>
+            <Route path="/" element={<PublicLayout />}>
                 <Route index element={<AboutUsPage />} />
                 <Route path={PUBLIC_ROUTES.TEAM.FULL} element={<TeamPage />} />
-                <Route path={PUBLIC_ROUTES.PROGRAMS.FULL} element={<ProgramPage />} />
+                <Route path={PUBLIC_ROUTES.PROGRAMS.FULL} element={<ProgramsPage />} />
                 <Route path={PUBLIC_ROUTES.ABOUT_US.FULL} element={<AboutUsPage />} />
                 <Route path={PUBLIC_ROUTES.DONATE.FULL} element={<DonatePage />} />
                 <Route path="*" element={<NotFound />} />
@@ -41,7 +40,7 @@ export const AppRouter = () => (
 
                 <Route element={<PrivateRoute />}>
                     <Route path={ADMIN_ROUTES.ROOT} element={<AdminLayout />}>
-                        <Route index element={<AdminPage />} />
+                        <Route index element={<AdminHomePage />} />
                         <Route path={ADMIN_ROUTES.TEAM.PATH} element={<TeamPageAdmin />} />
                         <Route path={ADMIN_ROUTES.PROGRAMS.PATH} element={<ProgramsPageAdmin />} />
                     </Route>

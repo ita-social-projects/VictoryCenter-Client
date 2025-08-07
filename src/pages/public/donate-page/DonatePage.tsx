@@ -2,7 +2,7 @@ import React from 'react';
 import { DonatePageIntro } from './donate-page-intro/DonatePageIntro';
 import { DonateSection } from './donate-section/DonateSection';
 import './DonatePage.scss';
-import { RightSection } from './RightSection/RightSection';
+import { RightSection } from './right-section/RightSection';
 
 export const DonatePage = () => {
     return (

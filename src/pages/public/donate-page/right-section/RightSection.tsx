@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './RightSection.scss';
-import { UkrainePaymentDetails } from './Ukraine-payment-details/UkrainePaymentDetails';
+import { UkrainePaymentDetails } from './ukraine-payment-details/UkrainePaymentDetails';
 import { AbroadPaymentDetails } from './abroad-payment-details/AbroadPaymentDetails';
 import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSupportWays';
 import { IN_UKRAINE_LABEL, NOT_IN_UKRAINE_LABEL } from '../../../../const/public/donate-page';

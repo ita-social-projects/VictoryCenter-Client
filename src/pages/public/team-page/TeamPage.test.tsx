@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { TeamPage } from './TeamPage';
 import * as teamPageDataFetch from '../../../services/api/public/team/team-api';
-import { TeamItem, TeamMemberProps } from '../../../types/public/team-page';
+import { MemberCard, TeamItem } from '../../../types/public/team-page';
 
 jest.mock('../../../assets/videos/public/team-page/quote_background.mp4', () => 'mocked-video.mp4');
 
@@ -39,8 +39,8 @@ const mockTeamDataMultiple: TeamItem[] = [
     },
 ];
 
-jest.mock('./TeamMemberCard/TeamMemberCard', () => ({
-    TeamMember: ({ member }: TeamMemberProps) => (
+jest.mock('./team-member-card/TeamMemberCard', () => ({
+    TeamMemberCard: ({ member }: { member: MemberCard }) => (
         <div data-testid="team-member">
             <img alt={member.name} src={member.photo} />
             <div>{member.name}</div>

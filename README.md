@@ -79,39 +79,65 @@ victory-center-client/
 │   │   ├───admin
 │   │   │   └───admin-context-provider
 │   │   └───public
-│   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
-│   │   ├── admin-layout/
-│   │   └── main-layout/
-│   ├── pages/                              # Pages
-│   │   ├── about-us-page/
-│   │   │   ├── company-values/
-│   │   │   ├── donate-section/
-│   │   │   ├── intro-section/
-│   │   │   ├── main-value/
-│   │   │   ├── our-mission/
-│   │   │   │   └───scrollable-frame 
-│   │   │   ├── our-team-section/
-│   │   │   └── support-section/
-│   │   ├── admin/                          # Admin pages
-│   │   │   ├── admin-page-content/         # Content components for admin pages
-│   │   │   └── team/                       # Team management page
-│   │   │       └── components/             # Components specific to team page
-│   │   ├── login/
-│   │   │   └── components/
-│   │   ├── not-found/
-│   │   ├── program-page/
-│   │   │   └── program-page/
-│   │   │       ├── contact-section/
-│   │   │       ├── intro-section/
-│   │   │       ├── program-section/
-│   │   │       │   └── program-card/
-│   │   │       └── question-section/
-│   │   │           └── question-card/
-│   │   └── user-pages
-│   │       ├── home-page
-│   │       ├── team-page
-│   │       └── page-2
-│   ├── routes/                             # Route configuration
+│   ├───layouts
+│   │   ├───admin-layout
+│   │   └───public-layout
+│   ├───pages
+│   │   ├───admin
+│   │   │   ├───home
+│   │   │   ├───login
+│   │   │   │   └───components
+│   │   │   │       └───login-form
+│   │   │   ├───programs
+│   │   │   │   └───components
+│   │   │   │       ├───program-category-modals
+│   │   │   │       │   ├───delete-program-category-modal
+│   │   │   │       │   └───program-category-modal
+│   │   │   │       ├───program-form
+│   │   │   │       ├───program-list-item
+│   │   │   │       ├───program-modals
+│   │   │   │       │   ├───delete-program-modal
+│   │   │   │       │   └───program-modal
+│   │   │   │       ├───programs-page-content
+│   │   │   │       └───programs-page-toolbar
+│   │   │   └──team
+│   │   │      └───components
+│   │   │          ├───member-component
+│   │   │          ├───member-drag-preview
+│   │   │          ├───member-form
+│   │   │          ├───members-list
+│   │   │          ├───members-list-item
+│   │   │          ├───team-page-content
+│   │   │          └───team-page-toolbar
+│   │   └───public
+│   │       ├───about-us-page
+│   │       │   ├───company-values
+│   │       │   ├───donate-section
+│   │       │   ├───intro-section
+│   │       │   ├───main-value
+│   │       │   ├───our-mission
+│   │       │   │    └───scrollable-frame 
+│   │       │   ├───our-team-section
+│   │       │   └───support-section
+│   │       ├───donate-page
+│   │       │   ├───copy-text-button
+│   │       │   ├───donate-page-intro
+│   │       │   ├───donate-section
+│   │       │   └───right-section
+│   │       │       ├───abroad-payment-details
+│   │       │       ├───alternative-support-ways
+│   │       │       └───ukraine-payment-details
+│   │       ├───not-found
+│   │       ├───programs-page
+│   │       │   ├───contact-section
+│   │       │   ├───intro-section
+│   │       │   ├───programs-section
+│   │       │   │   └───program-card
+│   │       │   └───question-section
+│   │       │       └───question-card
+│   │       └───team-page
+│   │           └───TeamMemberCard
+│   ├── routes/
 │   │   └── app-router
 │   ├───hooks
 │   │   ├───admin

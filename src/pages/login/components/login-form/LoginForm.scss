@@ -25,7 +25,7 @@
         label {
             font-size: 1rem;
             display: block;
-            color: colors.$bluish-grey-50;
+            color: colors.$grey-900;
         }
 
         input:-webkit-autofill,
@@ -39,8 +39,8 @@
             height: 2.5rem;
             width: 100%;
             font-size: 1rem;
-            border: 1px solid colors.$input-border-color;
-            box-shadow: 0px 1px 2px 0px rgba(colors.$box-shadow-blue, 0.051);
+            border: 1px solid colors.$grey-900;
+            box-shadow: 0px 1px 2px 0px rgba(colors.$blue-900, 0.051);
             padding: 0.75rem 3.75rem 0.75rem 0.75rem;
         }
 

@@ -19,6 +19,7 @@ jest.mock('../../../const/public/routes', () => ({
 }));
 
 jest.mock('../../../assets/icons/arrow-up-right.svg', () => 'arrow-up-black.png');
+
 jest.mock('../../../components/common/scrollable-frame/ScrollableFrame', () => ({
     ScrollableFrame: () => <div data-testid="scrollable-frame">ScrollableFrame</div>,
 }));

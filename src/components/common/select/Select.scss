@@ -5,8 +5,7 @@
     width: 11.1875rem;
     height: 2.5rem;
     display: flex;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 0 1rem;
     align-items: center;
     border: 1px solid colors.$blue-500;
     background-color: white;
@@ -38,7 +37,7 @@
         width: 100%;
         border: 1px solid colors.$blue-500;
         background-color: white;
-        z-index: 10;
+        z-index: 4;
 
         button {
             color: black;

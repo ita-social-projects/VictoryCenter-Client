@@ -9,7 +9,7 @@
     height: 7.5rem;
     padding: 1.875rem;
     background: colors.$grey-50;
-    border-bottom: 0.3px solid colors.$blue-900;
+    border-bottom: 0.3px solid rgba(colors.$blue-900, 0.35);
     box-shadow: 0 1px 2.8px 0 rgba(black, 0.15);
 
     .program-info {

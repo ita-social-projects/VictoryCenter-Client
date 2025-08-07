@@ -86,7 +86,7 @@ $mulish-font-family: 'Mulish', sans-serif;
     cursor: pointer;
     background: none;
     border: none;
-    color: $blue-900;
+    color: #000;
 }
 
 .mobileMenu {
@@ -142,7 +142,7 @@ $mulish-font-family: 'Mulish', sans-serif;
     }
 }
 
-@media (max-width: 368px) {
+@media (max-width: 568px) {
     .headerBlock{
         .buttonContainer{
             .contactUsButton {

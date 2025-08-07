@@ -1,7 +1,6 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MainValues } from './MainValue';
-import { peopleData } from '../../../const/about-us-page/about-us-page';
+import { ABOUT_US_DATA } from '../../../const/public/about-us-page';
 
 describe('MainValues component', () => {
     it('should render main title with correct parts and highlights', () => {
@@ -15,13 +14,13 @@ describe('MainValues component', () => {
     it('should render correct number of people cards', () => {
         render(<MainValues />);
         const cards = screen.getAllByRole('img');
-        expect(cards.length).toBe(peopleData.length);
+        expect(cards.length).toBe(ABOUT_US_DATA.PEOPLE_DATA.length);
     });
 
     it('should render correct people info texts', () => {
         render(<MainValues />);
-        peopleData.forEach(({ info }) => {
-            expect(screen.getByText(info)).toBeInTheDocument();
+        ABOUT_US_DATA.PEOPLE_DATA.forEach(({ INFO }) => {
+            expect(screen.getByText(INFO)).toBeInTheDocument();
         });
     });
 

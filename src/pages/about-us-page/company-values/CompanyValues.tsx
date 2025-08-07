@@ -1,24 +1,24 @@
+import { ABOUT_US_DATA } from '../../../const/public/about-us-page';
 import './CompanyValues.scss';
-import { OUR_VALUES, VALUE_ITEMS } from '../../../const/about-us-page/about-us-page';
 
 export const CompanyValues = () => {
-    const chunkedValues = VALUE_ITEMS.reduce(
+    const chunkedValues = ABOUT_US_DATA.VALUE_ITEMS.reduce(
         (acc, _, i) => {
-            if (i % 3 === 0) acc.push(VALUE_ITEMS.slice(i, i + 3));
+            if (i % 3 === 0) acc.push(ABOUT_US_DATA.VALUE_ITEMS.slice(i, i + 3));
             return acc;
         },
-        [] as (typeof VALUE_ITEMS)[],
+        [] as (typeof ABOUT_US_DATA.VALUE_ITEMS)[],
     );
 
     return (
         <div className="values-block">
-            <h2 className="values-title">{OUR_VALUES}</h2>
+            <h2 className="values-title">{ABOUT_US_DATA.OUR_VALUES}</h2>
             {chunkedValues.map((group, groupIndex) => (
                 <div className="value-card" key={groupIndex}>
                     {group.map((val, index) => (
-                        <div className="value-item" key={`${val.name}-${index}`}>
-                            <h3 className="value-name">{val.name}</h3>
-                            <div className="value-description">{val.description}</div>
+                        <div className="value-item" key={`${val.NAME}-${index}`}>
+                            <h3 className="value-name">{val.NAME}</h3>
+                            <div className="value-description">{val.DESCRIPTION}</div>
                         </div>
                     ))}
                 </div>

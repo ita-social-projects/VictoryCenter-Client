@@ -7,8 +7,8 @@ import {
 } from '../../../../types/public/TeamPage';
 import default_team_member_photo from '../../../../assets/icons/team-member-blank.svg';
 import { axiosInstance } from '../../../api/axios';
-import { API_ROUTES } from '../../../../const/api-routes-constants';
 import { mapImageToBase64 } from '../../../../utils/functions/mapImageToBase64';
+import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 
 const isValidCategory = (category: PublicCategoryWithTeamMembersDto): boolean => {
     return Boolean(

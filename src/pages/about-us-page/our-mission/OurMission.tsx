@@ -1,20 +1,20 @@
-import { NavLink } from 'react-router';
-import { ScrollableFrame } from '../../../components/common/scrollable-frame/ScrollableFrame';
-import ArrowIcon from '../../../assets/icons/arrow-up-right.svg';
-import { WHAT_WE_DO, WHAT_WE_DO_DETAILS, GO_TO_PROGRAMS } from '../../../const/about-us-page/about-us-page';
-import { programPage } from '../../../const/routers/routes';
 import './OurMission.scss';
+import { NavLink } from 'react-router';
+import ArrowIcon from '../../../assets/icons/arrow-up-right.svg';
+import { ABOUT_US_DATA } from '../../../const/public/about-us-page';
+import { ScrollableFrame } from '../../../components/common/scrollable-frame/ScrollableFrame';
+import { PUBLIC_ROUTES } from '../../../const/public/routes';
 
 export const OurMission = () => {
     return (
         <div className="our-mission-block">
             <div className="what-we-do">
-                <h2 className="mission-title">{WHAT_WE_DO}</h2>
+                <h2 className="mission-title">{ABOUT_US_DATA.WHAT_WE_DO}</h2>
                 <div className="details-block">
-                    <p className="mission-details">{WHAT_WE_DO_DETAILS}</p>
-                    <NavLink to={programPage} className="link-to-programs">
+                    <p className="mission-details">{ABOUT_US_DATA.WHAT_WE_DO_DETAILS}</p>
+                    <NavLink to={PUBLIC_ROUTES.PROGRAMS.FULL} className="link-to-programs">
                         <div className="link-block">
-                            <span className="link-title">{GO_TO_PROGRAMS}</span>
+                            <span className="link-title">{ABOUT_US_DATA.GO_TO_PROGRAMS}</span>
                             <img src={ArrowIcon} alt="" />
                         </div>
                     </NavLink>

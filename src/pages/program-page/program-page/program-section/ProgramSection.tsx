@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import {
-    PROGRAMS,
-    PROGRAMS_FOR_KIDS,
-    PROGRAMS_FOR_VETERANS,
-    PROGRAMS_ALL,
-    FAILED_TO_LOAD_THE_PROGRAMS,
-} from '../../../../const/program-page/program-page';
 import { Program } from '../../../../types/public/ProgramPage';
 import { ProgramCard } from './program-card/ProgramCard';
 import { programPageDataFetch } from '../../../../services/data-fetch/program-page-data-fetch/program-page-data-fetch';
 import './ProgramSection.scss';
+import { PROGRAMS } from '../../../../const/public/footer';
+import {
+    FAILED_TO_LOAD_THE_PROGRAMS,
+    PROGRAMS_FOR_KIDS,
+    PROGRAMS_FOR_VETERANS,
+    PROGRAMS_ALL,
+} from '../../../../const/public/programs-page';
 
 export const ProgramSection: React.FC = () => {
     const [programData, setProgramData] = useState<Program[]>([]);

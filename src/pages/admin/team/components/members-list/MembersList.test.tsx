@@ -4,6 +4,8 @@ import { TeamCategory, TeamMember } from '../../../../../types/admin/TeamMembers
 import * as React from 'react';
 import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi';
 import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
+import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
 const mockMembers = [] as TeamMember[];
 
@@ -537,7 +539,7 @@ describe('MembersList', () => {
 
             fireEvent.click(screen.getByTestId('edit-button-0'));
 
-            expect(screen.getByText('Редагування учасника команди')).toBeInTheDocument();
+            expect(screen.getByText(TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER)).toBeInTheDocument();
             expect(screen.getByTestId('member-form')).toBeInTheDocument();
         });
 
@@ -575,7 +577,7 @@ describe('MembersList', () => {
             fireEvent.click(confirmButton);
 
             await waitFor(() => {
-                expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
+                expect(screen.queryByText(TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER)).not.toBeInTheDocument();
             });
         });
 
@@ -594,13 +596,15 @@ describe('MembersList', () => {
             const cancelButton = screen.getByText('Ні');
             fireEvent.click(cancelButton);
 
-            expect(screen.getByText('Редагування учасника команди')).toBeInTheDocument();
+            expect(screen.getByText(TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER)).toBeInTheDocument();
         });
 
         it('shows close confirmation when closing modal with unsaved changes', async () => {
             await setupEditModalWithUnsavedChanges();
             await waitFor(() => {
-                expect(screen.getByText('Зміни буде втрачено. Бажаєте продовжити?')).toBeInTheDocument();
+                expect(
+                    screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+                ).toBeInTheDocument();
             });
         });
 
@@ -609,7 +613,7 @@ describe('MembersList', () => {
             const confirmCloseButton = await screen.findByRole('button', { name: /Так/i });
             fireEvent.click(confirmCloseButton);
             await waitFor(() => {
-                expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
+                expect(screen.queryByText(TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER)).not.toBeInTheDocument();
             });
         });
 
@@ -630,13 +634,15 @@ describe('MembersList', () => {
             fireEvent.change(catInput, { target: { value: '' } });
 
             fireEvent.click(await screen.findByTestId('modal'));
-            expect(await screen.findByText('Зміни буде втрачено. Бажаєте продовжити?')).toBeInTheDocument();
+            expect(
+                await screen.findByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+            ).toBeInTheDocument();
 
             const confirmCloseButton = await screen.findByRole('button', { name: /Так/i });
             fireEvent.click(confirmCloseButton);
 
             await waitFor(() => {
-                expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
+                expect(screen.queryByText(TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER)).not.toBeInTheDocument();
             });
         });
 
@@ -651,13 +657,15 @@ describe('MembersList', () => {
             fireEvent.change(await screen.findByTestId('form-category'), { target: { value: '' } });
 
             fireEvent.click(await screen.findByTestId('modal'));
-            expect(await screen.findByText('Зміни буде втрачено. Бажаєте продовжити?')).toBeInTheDocument();
+            expect(
+                await screen.findByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+            ).toBeInTheDocument();
 
             const confirmCloseButton = await screen.findByRole('button', { name: /Так/i });
             fireEvent.click(confirmCloseButton);
 
             await waitFor(() => {
-                expect(screen.queryByText('Редагування учасника команди')).not.toBeInTheDocument();
+                expect(screen.queryByText(TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER)).not.toBeInTheDocument();
             });
         });
     });
@@ -840,19 +848,25 @@ describe('MembersList', () => {
             render(<MembersList {...sharedDefaultProps} />);
             await waitFor(async () => expect(await screen.findByText('Alpha')).toBeInTheDocument());
             fireEvent.click(screen.getByTestId('delete-button-0'));
-            expect(screen.getByText('Видалити члена команди?')).toBeInTheDocument();
-            const confirmButton = screen.getByRole('button', { name: /Так/i });
+            expect(screen.getByText(TEAM_MEMBERS_TEXT.FORM.TITLE.DELETE_MEMBER)).toBeInTheDocument();
+            const confirmButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
+            expect(confirmButton).toBeInTheDocument();
             fireEvent.click(confirmButton);
-            await waitFor(() => expect(screen.queryByText('Alpha')).not.toBeInTheDocument());
+            await waitFor(() => {
+                expect(screen.queryByText('Alpha')).toBeNull();
+            });
         });
 
         it('cancels delete modal', async () => {
             render(<MembersList {...sharedDefaultProps} />);
             expect(await screen.findByText('Alpha')).toBeInTheDocument();
             fireEvent.click(await screen.findByTestId('delete-button-0'));
-            expect(await screen.findByText('Видалити члена команди?')).toBeInTheDocument();
-            fireEvent.click(await screen.findByRole('button', { name: /Ні/i }));
-            expect(await screen.findByText('Alpha')).toBeInTheDocument();
+            expect(await screen.findByText(TEAM_MEMBERS_TEXT.FORM.TITLE.DELETE_MEMBER)).toBeInTheDocument();
+            const cancelButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO });
+            fireEvent.click(cancelButton);
+            await waitFor(() => {
+                expect(screen.getByText('Alpha')).toBeInTheDocument();
+            });
         });
 
         it('saves member as draft from edit modal', async () => {
@@ -895,10 +909,10 @@ describe('MembersList', () => {
             fireEvent.click(screen.getByTestId('edit-button-0'));
             const form = screen.getByTestId('member-form');
             fireEvent.submit(form);
-            expect(screen.getByText('Опублікувати нового члена команди?')).toBeInTheDocument();
-            const cancelButton = screen.getByText('Ні');
+            expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED)).toBeInTheDocument();
+            const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO);
             fireEvent.click(cancelButton);
-            expect(screen.getByText('Редагування учасника команди')).toBeInTheDocument();
+            expect(screen.getByText(TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER)).toBeInTheDocument();
         });
 
         it('shows and hides move-to-top button correctly', async () => {

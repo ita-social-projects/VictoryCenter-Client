@@ -1,5 +1,5 @@
+import { API_ROUTES } from '../../../const/common/api-routes/main-api';
 import { AuthResponse, Credentials } from '../../../types/admin/Auth';
-import { API_ROUTES } from '../../../const/urls/main-api';
 import { AuthClient } from '../../auth/AuthClient';
 
 export const loginRequest = async (creds: Credentials): Promise<string> => {

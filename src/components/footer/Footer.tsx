@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { routes } from '../../const/routers/routes';
 import './Footer.scss';
 import arrowIcon from '../../assets/icons/arrow-up-right.svg';
 import phoneIcon from '../../assets/icons/phone.svg';
@@ -29,11 +28,8 @@ import {
     FACEBOOK,
     INSTAGRAM,
     TELEGRAM,
-} from '../../const/footer/footer';
-
-const {
-    userPageRoutes: { teamPageRoute, page2Route, aboutUsRoute, programPage },
-} = routes;
+} from '../../const/public/footer';
+import { PUBLIC_ROUTES } from '../../const/public/routes';
 
 export const Footer = () => {
     const [email, setEmail] = useState('');
@@ -78,42 +74,42 @@ export const Footer = () => {
 
                 <div className="menu">
                     <span className="title">{MENU}</span>
-                    <Link to={teamPageRoute} className="disable">
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {REPORTING}
                     </Link>
-                    <Link to={page2Route} className="disable">
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {STORE}
                     </Link>
-                    <Link to={page2Route} className="disable">
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {HOW_TO_SUPPORT}
                     </Link>
-                    <Link to={page2Route} className="disable">
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {STORIES_OF_VICTORIES}
                     </Link>
                 </div>
 
                 <div className="about_us">
                     <span className="title">{ABOUT_US}</span>
-                    <Link to={aboutUsRoute}>{ABOUT_US}</Link>
-                    <Link to={page2Route} className="disable">
+                    <Link to={PUBLIC_ROUTES.ABOUT_US.FULL}>{ABOUT_US}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {OUR_HISTORY}
                     </Link>
-                    <Link to={teamPageRoute}>{OUR_TEAM}</Link>
-                    <Link to={page2Route} className="disable">
+                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{OUR_TEAM}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {PARTNERS}
                     </Link>
-                    <Link to={page2Route} className="disable">
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {EVENTS_AND_NEWS}
                     </Link>
                 </div>
 
                 <div className="hippotherapy">
                     <span className="title">{HIPPOTHERAPY}</span>
-                    <Link to={teamPageRoute} className="disable">
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {WHAT_IS_HIPPOTHERAPY}
                     </Link>
-                    <Link to={programPage}>{PROGRAMS}</Link>
-                    <Link to={teamPageRoute} className="disable">
+                    <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{PROGRAMS}</Link>
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {PROGRAMS_SESSIONS}
                     </Link>
                 </div>

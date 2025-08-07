@@ -1,8 +1,8 @@
-import ourTeam from '../../../assets/images/public/about-us-page/our-team.jpg';
-import { teamPageRoute } from '../../../const/routers/routes';
-import { GO_TO_TEAM, TEAM_DETAILS } from '../../../const/about-us-page/about-us-page';
-import { NavLink } from 'react-router';
 import './OurTeam.scss';
+import ourTeam from '../../../assets/images/public/about-us-page/our-team.jpg';
+import { NavLink } from 'react-router';
+import { ABOUT_US_DATA } from '../../../const/public/about-us-page';
+import { PUBLIC_ROUTES } from '../../../const/public/routes';
 
 export const OurTeam = () => {
     return (
@@ -10,13 +10,13 @@ export const OurTeam = () => {
             <img src={ourTeam} alt="Our Team" className="our-team-image" />
             <div className="team-info">
                 <p className="team-description">
-                    {TEAM_DETAILS.FIRST_PART}
+                    {ABOUT_US_DATA.TEAM_DETAILS.FIRST_PART}
                     <br />
                     <br />
-                    {TEAM_DETAILS.SECOND_PART}
+                    {ABOUT_US_DATA.TEAM_DETAILS.SECOND_PART}
                 </p>
-                <NavLink to={teamPageRoute} className="link-ro-team">
-                    {GO_TO_TEAM}
+                <NavLink to={PUBLIC_ROUTES.TEAM.FULL} className="link-ro-team">
+                    {ABOUT_US_DATA.GO_TO_TEAM}
                 </NavLink>
             </div>
         </div>

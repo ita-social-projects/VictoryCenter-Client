@@ -4,16 +4,16 @@ import horseVideo from '../../../assets/videos/public/team-page/quote_background
 import { teamPageDataFetch } from '../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch';
 import { TeamMember } from './TeamMemberCard/TeamMemberCard';
 import { TeamItem } from '../../../types/public/TeamPage';
+import classNames from 'classnames';
 import {
     DOWNLOAD_ERROR,
+    VIDEO_TEXT_AUTHOR,
     VIDEO_TEXT_STRING1,
     VIDEO_TEXT_STRING2,
     VIDEO_TEXT_STRING3,
     VIDEO_TEXT_STRING4,
     VIDEO_TEXT_STRING5,
-    VIDEO_TEXT_AUTHOR,
-} from '../../../const/team-page/team-page';
-import classNames from 'classnames';
+} from '../../../const/public/team-page';
 
 export const TeamPage: React.FC = () => {
     const [teamData, setTeamData] = useState<TeamItem[]>([]);

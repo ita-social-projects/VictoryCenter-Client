@@ -1,7 +1,6 @@
-import { ABROAD_PAYMENT_DETAILS } from '../../../../const/donate-page/donate-page';
 import { CorrespondentBankBlock } from './CorrespondentBankBlock';
-import React from 'react';
 import { USD_CORRESPONDENT_BANKS } from './AbroadPaymentDetails';
+import { ABROAD_PAYMENT_DETAILS } from '../../../../const/public/donate-page';
 
 export const CorrespondentBanksSection = ({ banks }: { banks: typeof USD_CORRESPONDENT_BANKS }) => (
     <div className="abroadPaymentDetailsBlock">

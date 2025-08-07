@@ -3,18 +3,13 @@ import { TeamCategory } from '../../../../../types/admin/TeamMembers';
 import { useCreateMemberForm } from '../../../../../hooks/admin/create-member-form';
 import '../members-list/MembersList.scss';
 import { MAX_FULLNAME_LENGTH, MAX_DESCRIPTION_LENGTH } from '../../../../../const/admin/data-validation';
-import {
-    TEAM_LABEL_CATEGORY,
-    TEAM_LABEL_SELECT_CATEGORY,
-    TEAM_LABEL_FULLNAME,
-    TEAM_LABEL_DESCRIPTION,
-} from '../../../../../const/team';
 import { ImageValues } from '../../../../../types/Image';
 import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
 import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
 import ArrowUp from '../../../../../assets/icons/chevron-up.svg';
 import ArrowDown from '../../../../../assets/icons/chevron-down.svg';
+import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 
 export type PublishMemberFormValues = {
     category: TeamCategory;
@@ -136,7 +131,7 @@ export const MemberForm = ({
                 <div className="form-group">
                     <label htmlFor="category" className="no-pointer-events">
                         <span className="field-required">*</span>
-                        {TEAM_LABEL_CATEGORY}
+                        {TEAM_MEMBERS_TEXT.FORM.LABEL.CATEGORY}
                     </label>
                     <select
                         value={memberFormValues?.category?.id ?? ''}
@@ -156,7 +151,7 @@ export const MemberForm = ({
                         onClick={handleOpenSelect}
                     >
                         <option value="" disabled className="option-value">
-                            {TEAM_LABEL_SELECT_CATEGORY}
+                            {TEAM_MEMBERS_TEXT.FORM.LABEL.SELECT_CATEGORY}
                         </option>
                         {categories.map((category) => (
                             <option key={category.id} value={category.id}>
@@ -171,7 +166,7 @@ export const MemberForm = ({
                 <div className="form-group">
                     <label htmlFor="fullName">
                         <span className="field-required">*</span>
-                        {TEAM_LABEL_FULLNAME}
+                        {TEAM_MEMBERS_TEXT.FORM.LABEL.NAME}
                     </label>
                     <input maxLength={MAX_FULLNAME_LENGTH} type="text" id="fullName" {...register('fullName')} />
                     <div className="form-group-fullname-length-limit">
@@ -180,7 +175,7 @@ export const MemberForm = ({
                     {errors.fullName && <p className="error">{errors.fullName.message}</p>}
                 </div>
                 <div className="form-group">
-                    <label htmlFor="description">{TEAM_LABEL_DESCRIPTION}</label>
+                    <label htmlFor="description">{TEAM_MEMBERS_TEXT.FORM.LABEL.DESCRIPTION}</label>
                     <textarea
                         maxLength={MAX_DESCRIPTION_LENGTH}
                         className="form-group-description"

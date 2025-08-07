@@ -1,5 +1,5 @@
 import LoaderIcon from '../../../assets/icons/load.svg';
-import { LOADER_ALT } from '../../../const/loader/loader';
+import { LOADER_TEXT } from '../../../const/common/common';
 import './InlineLoader.scss';
 
 type Props = {
@@ -10,7 +10,7 @@ export const InlineLoader = ({ size = 2 }: Props) => {
     return (
         <img
             src={LoaderIcon}
-            alt={LOADER_ALT}
+            alt={LOADER_TEXT.ICON_ALT}
             className="loader"
             style={{ width: `${size}rem`, height: `${size}rem` }}
         />

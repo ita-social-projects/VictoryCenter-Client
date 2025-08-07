@@ -32,7 +32,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     };
 });
 
-jest.mock('../../../../../components/common/button/Button', () => ({
+jest.mock('../../../../../components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled }: any) => (
         <button onClick={onClick} disabled={disabled}>
             {children}

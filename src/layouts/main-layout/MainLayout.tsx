@@ -1,6 +1,5 @@
-import { Header } from '../../components/header/Header';
-import { Footer } from '../../components/footer/Footer';
-
+import { Footer } from '../../components/public/footer/Footer';
+import { Header } from '../../components/public/header/Header';
 import { useLocation, Outlet } from 'react-router-dom';
 import { useEffect } from 'react';
 

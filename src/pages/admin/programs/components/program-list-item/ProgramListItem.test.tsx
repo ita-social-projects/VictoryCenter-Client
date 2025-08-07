@@ -3,13 +3,13 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ProgramListItem } from './ProgramListItem';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { VisibilityStatusLabelProps } from '../../../../../components/common/visibility-status-label/VisibilityStatusLabel';
+import { VisibilityStatusLabelProps } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { Program } from '../../../../../types/admin/programs';
 
 jest.mock('../../../../../assets/icons/blank-image.svg', () => 'blank-image.svg');
 
-jest.mock('../../../../../components/common/button-tooltip/ButtonTooltip', () => ({
+jest.mock('../../../../../components/admin/button-tooltip/ButtonTooltip', () => ({
     ButtonTooltip: ({ children, position }: { children: React.ReactNode; position: string }) => {
         return (
             <div data-testid="tooltip-button" data-position={position}>
@@ -19,7 +19,7 @@ jest.mock('../../../../../components/common/button-tooltip/ButtonTooltip', () =>
     },
 }));
 
-jest.mock('../../../../../components/common/visibility-status-label/VisibilityStatusLabel', () => {
+jest.mock('../../../../../components/admin/visibility-status-label/VisibilityStatusLabel', () => {
     const { VisibilityStatus } = require('../../../../../types/admin/common');
     return {
         VisibilityStatusLabel: ({ status }: VisibilityStatusLabelProps) => {

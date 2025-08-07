@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
-import { Button } from '../../../../../components/common/button/Button';
+import { Button } from '../../../../../components/admin/button/Button';
 import { Program } from '../../../../../types/admin/programs';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';

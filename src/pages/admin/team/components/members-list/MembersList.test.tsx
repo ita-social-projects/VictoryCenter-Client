@@ -144,7 +144,7 @@ jest.mock('../member-form/MemberForm', () => ({
     },
 }));
 
-jest.mock('../../../../../components/common/button/Button', () => ({
+jest.mock('../../../../../components/admin/button/Button', () => ({
     Button: ({ children, onClick, style, form, type }: any) => (
         <button data-testid={`button-${style}${form ? '-' + form : ''}`} type={type ?? 'button'} onClick={onClick}>
             {children}

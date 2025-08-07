@@ -5,7 +5,7 @@ import { API_ROUTES } from '../../../const/common/api-routes/main-api';
 import { Credentials } from '../../../types/admin/auth';
 import { isAccessTokenValid } from '../../../services/auth/auth-service/auth-service';
 import { CreateAdminClient } from '../../../services/auth/create-admin-client/create-admin-client';
-import { useOnMountUnsafe } from '../../../utils/hooks/use-on-mount-unsafe/useOnMountUnsafe';
+import { useOnMountUnsafe } from '../../../hooks/common/use-on-mount-unsafe/useOnMountUnsafe';
 
 type Props = {
     children: ReactNode;

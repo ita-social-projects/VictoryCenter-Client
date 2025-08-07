@@ -2,8 +2,8 @@ import './OurMission.scss';
 import { NavLink } from 'react-router';
 import ArrowIcon from '../../../assets/icons/arrow-up-right.svg';
 import { ABOUT_US_DATA } from '../../../const/public/about-us-page';
-import { ScrollableFrame } from '../../../components/common/scrollable-frame/ScrollableFrame';
 import { PUBLIC_ROUTES } from '../../../const/public/routes';
+import { ScrollableFrame } from './scrollable-frame/ScrollableFrame';
 
 export const OurMission = () => {
     return (

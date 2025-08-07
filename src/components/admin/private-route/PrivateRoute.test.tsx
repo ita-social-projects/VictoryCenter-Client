@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { useLocation } from 'react-router';
-import { useAdminContext } from '../../../contexts/admin/admin-context-provider/AdminContextProvider';
 import { PrivateRoute } from './PrivateRoute';
 import { ADMIN_ROUTES } from '../../../const/admin/routes';
+import { useAdminContext } from '../../../contexts/admin/admin-context-provider/AdminContextProvider';
 
 const mockUseAdminContext = useAdminContext as jest.MockedFunction<typeof useAdminContext>;
 const mockUseLocation = useLocation as jest.MockedFunction<typeof useLocation>;
@@ -19,9 +19,6 @@ jest.mock('../../../contexts/admin/admin-context-provider/AdminContextProvider',
 }));
 jest.mock('../../common/page-loader/PageLoader', () => ({
     PageLoader: () => <div data-testid="loader" />,
-}));
-jest.mock('../../../const/admin/routes', () => ({
-    ADMIN_ROUTES: { LOGIN: { FULL: '/login' } },
 }));
 
 describe('PrivateRoute', () => {

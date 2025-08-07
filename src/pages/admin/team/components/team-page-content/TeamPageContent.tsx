@@ -2,9 +2,9 @@ import { useCallback, useState } from 'react';
 import { StatusFilter } from '../../../../../types/admin/common';
 import { MembersList } from '../members-list/MembersList';
 import { MemberFormValues } from '../member-form/MemberForm';
-import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 export const TeamPageContent = () => {
     const [searchByNameQuery, setSearchByNameQuery] = useState<string>('');

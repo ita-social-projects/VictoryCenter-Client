@@ -46,7 +46,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     return { Modal: MockModal };
 });
 
-jest.mock('../../../../../components/common/button/Button', () => ({
+jest.mock('../../../../../components/admin/button/Button', () => ({
     Button: ({
         onClick,
         disabled,
@@ -68,8 +68,8 @@ jest.mock('../../../../../components/common/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/common/question-modal/QuestionModal', () => ({
-    QuestionModal: ({
+jest.mock('../../../../../components/common/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({
         isOpen,
         title,
         onConfirm,

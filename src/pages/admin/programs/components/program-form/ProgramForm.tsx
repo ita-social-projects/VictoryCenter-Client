@@ -1,11 +1,11 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-schema';
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { MultiSelectInput } from '../../../../../components/common/multi-select-input/MultiSelectInput';
-import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
-import { InputLabel } from '../../../../../components/common/input-label/InputLabel';
-import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
-import { TextAreaWithCharacterLimit } from '../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { MultiSelectInput } from '../../../../../components/admin/multi-select-input/MultiSelectInput';
+import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';
+import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
+import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
+import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { Image, ImageValues, ImageValuesToImage, ImageToImageValue } from '../../../../../types/common/image';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import './ProgramForm.scss';

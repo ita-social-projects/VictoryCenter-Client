@@ -37,7 +37,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
 });
 
 // Mock the Button component
-jest.mock('../../../../../components/common/button/Button', () => ({
+jest.mock('../../../../../components/admin/button/Button', () => ({
     Button: ({ children, onClick, buttonStyle, form, type, 'data-testid': testId, ...props }: any) => (
         <button
             onClick={onClick}
@@ -53,7 +53,7 @@ jest.mock('../../../../../components/common/button/Button', () => ({
 }));
 
 // Mock the Select component
-jest.mock('../../../../../components/common/select/Select', () => {
+jest.mock('../../../../../components/admin/select/Select', () => {
     const MockSelect = ({ children, onValueChange, 'data-testid': testId }: any) => (
         <select data-testid={testId} onChange={(e) => onValueChange?.(e.target.value)}>
             {children}
@@ -63,9 +63,9 @@ jest.mock('../../../../../components/common/select/Select', () => {
     return { Select: MockSelect };
 });
 
-// Mock the Input component
-jest.mock('../../../../../components/common/input/Input', () => ({
-    Input: ({ onChange, autocompleteValues, 'data-testid': testId, ...props }: any) => (
+// Mock the SearchBar component
+jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
+    SearchBar: ({ onChange, autocompleteValues, 'data-testid': testId, ...props }: any) => (
         <input
             data-testid={testId}
             onChange={(e) => onChange?.(e.target.value)}

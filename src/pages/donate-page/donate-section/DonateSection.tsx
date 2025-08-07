@@ -1,6 +1,6 @@
 import './DonateSection.scss';
 import React, { useState } from 'react';
-import { getEnvVariable } from '../../../utils/functions/getEnvVariable';
+import { getEnvVariable } from '../../../utils/functions/get-env-variable/get-env-variable';
 import { DONATE_SECTION } from '../../../const/public/donate-page';
 import { DonateTab, Currency, PaymentSystem } from '../../../types/public/donate-page';
 

@@ -1,4 +1,4 @@
-import './support-section.scss';
+import './SupportSection.scss';
 import { SUPPORT_TITLE, SUPPORT_DATA } from '../../../const/about-us-page/about-us-page';
 
 export const SupportSection = () => {

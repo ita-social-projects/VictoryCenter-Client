@@ -5,7 +5,7 @@ import { mapImageToBase64 } from '../../../../../utils/functions/mapImageToBase6
 import { VisibilityStatusLabel } from '../../../../../components/common/visibility-status-label/VisibilityStatusLabel';
 import { VisibilityStatus } from '../../../../../types/admin/Common';
 import BlankImage from '../../../../../assets/icons/blank-image.svg';
-import './programs-list-item.scss';
+import './ProgramListItem.scss';
 
 export interface ProgramListItemProps {
     program: Program;

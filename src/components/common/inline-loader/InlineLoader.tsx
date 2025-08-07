@@ -1,6 +1,6 @@
 import LoaderIcon from '../../../assets/icons/load.svg';
 import { LOADER_ALT } from '../../../const/loader/loader';
-import './inline-loader.scss';
+import './InlineLoader.scss';
 
 type Props = {
     size?: number;

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import './admin-page-content.scss';
+import { useState, useEffect } from 'react';
+import './AdminPageContent.scss';
 
 import { adminPageDataFetch } from '../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch';
 import { NavLink } from 'react-router';

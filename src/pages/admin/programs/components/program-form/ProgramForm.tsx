@@ -9,7 +9,7 @@ import { InputLabel } from '../../../../../components/common/input-label/InputLa
 import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
 import { TextAreaWithCharacterLimit } from '../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { Image, ImageValues, ImageValuesToImage, ImageToImageValue } from '../../../../../types/Image';
-import './program-form.scss';
+import './ProgramForm.scss';
 
 export interface ProgramFormValues {
     name: string;

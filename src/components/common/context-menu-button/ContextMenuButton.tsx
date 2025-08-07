@@ -1,7 +1,7 @@
 import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import DefaultIcon from '../../../assets/icons/menu.svg';
 import classNames from 'classnames';
-import './context-menu-button.scss';
+import './ContextMenuButton.scss';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 export type ContextMenuButtonProps = {

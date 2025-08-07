@@ -9,7 +9,7 @@ import LoaderIcon from '../../../../../assets/icons/load.svg';
 import ArrowUpIcon from '../../../../../assets/icons/arrow-up.svg';
 import { mapStatusFilterToStatus, StatusFilter } from '../../../../../types/Common';
 import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
-import './members-list.scss';
+import './MembersList.scss';
 import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
 import {

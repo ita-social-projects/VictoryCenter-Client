@@ -2,7 +2,7 @@ import React, { useRef, useState, useCallback, useEffect } from 'react';
 import DeleteIcon from '../../../assets/icons/delete.svg';
 import UploadIcon from '../../../assets/icons/cloud-download.svg';
 import classNames from 'classnames';
-import './photo-input.scss';
+import './PhotoInput.scss';
 import { ImageValues } from '../../../types/Image';
 import { mapImageToBase64 } from '../../../utils/functions/mapImageToBase64';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';

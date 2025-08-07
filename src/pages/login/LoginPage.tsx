@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { LoginForm } from './components/login-form/LoginForm';
 import { Modal } from '../../components/common/modal/Modal';
 import { ERROR_MODAL_BUTTON, ERROR_MODAL_CONTENT, ERROR_MODAL_TITLE } from '../../const/login-page/login-page';
 import { Button } from '../../components/common/button/Button';
-import './login-page.scss';
+import './LoginPage.scss';
 
 export const LoginPage = () => {
     const [showModal, setShowModal] = useState(false);

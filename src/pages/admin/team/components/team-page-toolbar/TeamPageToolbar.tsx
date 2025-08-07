@@ -1,5 +1,5 @@
 import PlusIcon from '../../../../../assets/icons/plus.svg';
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/common/button/Button';
 import { Select } from '../../../../../components/common/select/Select';

@@ -1,5 +1,5 @@
-import './input.scss';
-import React, { useRef, useState, useCallback } from 'react';
+import './Input.scss';
+import { useRef, useState, useCallback } from 'react';
 import { Select } from '../select/Select';
 import classNames from 'classnames';
 

@@ -3,7 +3,7 @@ import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import ArrowDown from '../../../assets/icons/chevron-down.svg';
 import ArrowUp from '../../../assets/icons/chevron-up.svg';
 import classNames from 'classnames';
-import './select.scss';
+import './Select.scss';
 
 export type SelectProps<TValue> = {
     children: React.ReactNode;

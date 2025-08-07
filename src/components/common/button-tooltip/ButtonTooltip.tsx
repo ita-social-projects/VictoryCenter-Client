@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useId } from 'react';
 import InfoIcon from '../../../assets/icons/info.svg';
 import classNames from 'classnames';
-import './button-tooltip.scss';
+import './ButtonTooltip.scss';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 export interface ButtonTooltipProps {

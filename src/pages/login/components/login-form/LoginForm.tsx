@@ -15,7 +15,7 @@ import Logo from '../../../../assets/icons/logo-with-text.svg';
 import EyeOpened from '../../../../assets/icons/eye-opened.svg';
 import EyeClosed from '../../../../assets/icons/eye-closed.svg';
 import { Credentials } from '../../../../types/admin/Auth';
-import './login-form.scss';
+import './LoginForm.scss';
 
 type LoginFormProps = {
     setShowErrorModal: (value: boolean) => void;

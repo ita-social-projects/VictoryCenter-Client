@@ -3,7 +3,7 @@ import ArrowUpIcon from '../../../assets/icons/arrow-up.svg';
 import NotFoundIcon from '../../../assets/icons/not-found.svg';
 import { InlineLoader } from '../inline-loader/InlineLoader';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import './infinite-scroll-list.scss';
+import './InfiniteScrollList.scss';
 
 const BOTTOM_REACH_THRESHOLD_IN_PIXELS = 5;
 

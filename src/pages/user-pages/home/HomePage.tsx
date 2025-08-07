@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import './home-page.scss';
+import { useState, useEffect } from 'react';
+import './HomePage.scss';
 
 import { homePageDataFetch } from '../../../services/data-fetch/user-pages-data-fetch/home-page-data-fetch/homePageDataFetch';
 

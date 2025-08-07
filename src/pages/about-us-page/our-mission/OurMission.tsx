@@ -3,7 +3,7 @@ import { ScrollableFrame } from '../../../components/common/scrollable-frame/Scr
 import ArrowIcon from '../../../assets/icons/arrow-up-right.svg';
 import { WHAT_WE_DO, WHAT_WE_DO_DETAILS, GO_TO_PROGRAMS } from '../../../const/about-us-page/about-us-page';
 import { programPage } from '../../../const/routers/routes';
-import './our-mission.scss';
+import './OurMission.scss';
 
 export const OurMission = () => {
     return (

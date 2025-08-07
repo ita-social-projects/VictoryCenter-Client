@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TeamCategory } from '../../../../../types/admin/TeamMembers';
 import { useCreateMemberForm } from '../../../../../hooks/admin/create-member-form';
-import '../members-list/members-list.scss';
+import '../members-list/MembersList.scss';
 import { MAX_FULLNAME_LENGTH, MAX_DESCRIPTION_LENGTH } from '../../../../../const/admin/data-validation';
 import {
     TEAM_LABEL_CATEGORY,

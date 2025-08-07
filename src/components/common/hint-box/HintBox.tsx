@@ -1,7 +1,6 @@
-import React from 'react';
 import InfoIcon from '../../../assets/icons/info.svg';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import './hint-box.scss';
+import './HintBox.scss';
 
 export interface HintBoxProps {
     title: string;

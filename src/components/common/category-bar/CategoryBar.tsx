@@ -1,7 +1,6 @@
-import React from 'react';
 import classNames from 'classnames';
 import { ContextMenuButton } from '../context-menu-button/ContextMenuButton';
-import './category-bar.scss';
+import './CategoryBar.scss';
 
 export interface ContextMenuOption {
     id: string;

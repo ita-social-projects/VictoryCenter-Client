@@ -8,7 +8,7 @@ import { QuestionModal } from '../../../../../components/common/question-modal/Q
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
-import './program-modal.scss';
+import './ProgramModal.scss';
 
 interface BaseProps {
     isOpen: boolean;

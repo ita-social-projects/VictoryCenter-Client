@@ -130,10 +130,6 @@ $mulish-font-family: 'Mulish', sans-serif;
         }
     }
 
-    &:last-child {
-        border-bottom: none;
-    }
-
     .mobileButtons {
         display: flex;
         flex-direction: column;
@@ -146,7 +142,7 @@ $mulish-font-family: 'Mulish', sans-serif;
     }
 }
 
-@media (max-width: 524px) {
+@media (max-width: 368px) {
     .headerBlock{
         .buttonContainer{
             .contactUsButton {

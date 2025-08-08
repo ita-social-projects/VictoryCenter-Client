@@ -1,9 +1,9 @@
 import './AdminNavigation.scss';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
-import { ADMIN_ROUTES } from '../../../const/admin/routes';
 import Logo from '../../../assets/icons/logo-with-text.svg';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { ADMIN_ROUTES } from '../../../const/admin/routes';
 
 export const AdminNavigation = () => {
     return (

@@ -1,4 +1,3 @@
-import React from 'react';
 import classNames from 'classnames';
 import { ContextMenuButton } from '../context-menu-button/ContextMenuButton';
 import './CategoryBar.scss';

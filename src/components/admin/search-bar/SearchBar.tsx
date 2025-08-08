@@ -1,6 +1,6 @@
 import './SearchBar.scss';
 import { useRef, useState, useCallback } from 'react';
-import { Select } from '../../admin/select/Select';
+import { Select } from '../select/Select';
 import classNames from 'classnames';
 
 export type SearchBarProps = {

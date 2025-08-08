@@ -13,7 +13,7 @@ import {
 } from '../../../const/public/team-page';
 import { teamPageDataFetch } from '../../../services/api/public/team/team-api';
 import { TeamItem } from '../../../types/public/team-page';
-import { TeamMember } from './TeamMemberCard/TeamMemberCard';
+import { TeamMemberCard } from './team-member-card/TeamMemberCard';
 
 export const TeamPage: React.FC = () => {
     const [teamData, setTeamData] = useState<TeamItem[]>([]);
@@ -55,7 +55,7 @@ export const TeamPage: React.FC = () => {
                                 <p>{team.description}</p>
                             </div>
                             {team.members.map((member) => (
-                                <TeamMember key={member.id} member={member} />
+                                <TeamMemberCard key={member.id} member={member} />
                             ))}
                         </div>
                     </div>

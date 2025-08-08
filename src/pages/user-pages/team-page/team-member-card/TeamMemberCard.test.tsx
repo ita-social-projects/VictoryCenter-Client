@@ -1,9 +1,8 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemberCard } from '../../../../types/public/team-page';
-import { TeamMember } from './TeamMemberCard';
+import { TeamMemberCard } from './TeamMemberCard';
 
-describe('TeamMember component', () => {
+describe('TeamMemberCard component', () => {
     const mockMember: MemberCard = {
         id: 1,
         name: 'Іван Іванов',
@@ -12,7 +11,7 @@ describe('TeamMember component', () => {
     };
 
     it("should render the member's name, role, and photo correctly", () => {
-        render(<TeamMember member={mockMember} />);
+        render(<TeamMemberCard member={mockMember} />);
         const nameElement = screen.getByText(mockMember.name);
         expect(nameElement).toBeInTheDocument();
         expect(nameElement).toHaveClass('member-name');
@@ -28,7 +27,7 @@ describe('TeamMember component', () => {
     });
 
     it('should render the container with the correct class', () => {
-        render(<TeamMember member={mockMember} />);
+        render(<TeamMemberCard member={mockMember} />);
         const container = screen.getByText(mockMember.name).closest('.team-member');
         expect(container).toBeInTheDocument();
     });

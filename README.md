@@ -102,8 +102,6 @@ victory-center-client/
 │   │   └── app-router
 │   ├── hooks/
 │   │   └── admin/
-│   ├── context/                            # React context providers
-│   │   └── admin-context-provider
 │   ├───services
 │   │   ├───api
 │   │   │   ├───admin

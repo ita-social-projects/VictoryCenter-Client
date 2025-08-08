@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MembersList, MembersListProps } from './MembersList';
-import { TeamCategory, TeamMember } from '../../../../../types/admin/TeamMembers';
+import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
 import * as React from 'react';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
-import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-сategories/team-categories-api';
+import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 
 const mockMembers = [] as TeamMember[];
 
@@ -17,7 +17,7 @@ const mockDataTransfer = {
     types: [],
 };
 
-jest.mock('../../../../../context/admin-context-provider/AdminContextProvider', () => ({
+jest.mock('../../../../../contexts/admin/admin-context-provider/AdminContextProvider', () => ({
     useAdminContext: () => ({
         client: {
             get: jest.fn(),
@@ -55,7 +55,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
 
 jest.mock('../member-drag-preview/MemberDragPreview', () => ({
     MemberDragPreview: ({ dragPreview }: any) =>
-        dragPreview.visible ? <div data-testid="drag-preview">{dragPreview.member.fullName}</div> : null,
+        dragPreview.visible ? <div data-testid="drag-preview">{dragPreview.item.fullName}</div> : null,
 }));
 jest.mock('../members-list-item/MembersListItem', () => ({
     MembersListItem: ({

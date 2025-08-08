@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Question } from '../../../../../types/public/ProgramPage';
 import openIcon from '../../../../../assets/icons/arrow-down-right.svg';
 import closeIcon from '../../../../../assets/icons/cross.svg';
 import openBlue from '../../../../../assets/icons/arrow-down-right-blue.svg';
 import closeBlue from '../../../../../assets/icons/cross-blue.svg';
 import './QuestionCard.scss';
+import { Question } from '../../../../../types/public/programs-page';
 
 interface QuestionCardProps {
     questionCard: Question;

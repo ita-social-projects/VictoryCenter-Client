@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../program-form/ProgramForm';
-import { Program, ProgramCategory, ProgramCreateUpdate } from '../../../../../types/admin/Programs';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
+import { Program, ProgramCategory, ProgramCreateUpdate } from '../../../../../types/admin/programs';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 import { Button } from '../../../../../components/common/button/Button';
 import { QuestionModal } from '../../../../../components/common/question-modal/QuestionModal';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';

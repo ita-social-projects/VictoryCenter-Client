@@ -5,9 +5,9 @@ import { Button } from '../../../../../components/common/button/Button';
 import { Select } from '../../../../../components/common/select/Select';
 import { Input } from '../../../../../components/common/input/Input';
 import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
-import { StatusFilter, ModalState } from '../../../../../types/Common';
-import { ImageValues } from '../../../../../types/Image';
-import { TeamCategory } from '../../../../../types/admin/TeamMembers';
+import { StatusFilter, ModalState } from '../../../../../types/admin/common';
+import { ImageValues } from '../../../../../types/common/image';
+import { TeamCategory } from '../../../../../types/admin/team-members';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 

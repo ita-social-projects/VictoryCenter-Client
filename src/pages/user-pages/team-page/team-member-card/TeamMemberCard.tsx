@@ -1,7 +1,7 @@
 import React from 'react';
-import { TeamMemberProps } from '../../../../types/public/TeamPage';
+import { TeamMemberProps } from '../../../../types/public/team-page';
 
-export const TeamMember: React.FC<TeamMemberProps> = ({ member }) => {
+export const TeamMemberCard: React.FC<TeamMemberProps> = ({ member }) => {
     return (
         <div className="team-member">
             <img src={member.photo} alt={member.name} className="member-photo" />

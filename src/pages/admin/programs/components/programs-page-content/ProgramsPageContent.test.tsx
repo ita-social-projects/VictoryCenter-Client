@@ -1,8 +1,8 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramsPageContent } from './ProgramsPageContent';
-import { Program, ProgramCategory } from '../../../../../types/admin/Programs';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
+import { Program, ProgramCategory } from '../../../../../types/admin/programs';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
@@ -12,7 +12,7 @@ const mockProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
 jest.mock('../programs-page-toolbar/ProgramsPageToolbar', () => ({
     ProgramsPageToolbar: (props: any) => {
-        const { VisibilityStatus } = require('../../../../../types/admin/Common');
+        const { VisibilityStatus } = require('../../../../../types/admin/common');
 
         return (
             <div data-testid="programs-toolbar">

@@ -1,7 +1,7 @@
 import { axiosInstance } from '../../axios';
 import default_team_member_photo from '../../../../assets/icons/team-member-blank.svg';
-import { PublicCategoryWithTeamMembersDto, TeamPageData } from '../../../../types/public/TeamPage';
 import { teamPageDataFetch } from './team-api';
+import { TeamPageData, PublicCategoryWithTeamMembersDto } from '../../../../types/public/team-page';
 
 jest.mock('../../../api/axios', () => ({
     axiosInstance: {

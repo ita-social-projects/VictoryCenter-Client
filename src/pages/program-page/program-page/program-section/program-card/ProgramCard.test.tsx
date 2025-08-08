@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { ProgramCard } from './ProgramCard';
-import { Program } from '../../../../../types/public/ProgramPage';
+import { PublishedProgram } from '../../../../../types/public/programs-page';
 
 describe('test program-card component', () => {
-    const mockProgram: Program = {
+    const mockProgram: PublishedProgram = {
         image: 'https://via.placeholder.com/200x200?text=Ponys',
         title: 'Коні лікують Літо 2025',
         subtitle: 'Ветеранська програма',

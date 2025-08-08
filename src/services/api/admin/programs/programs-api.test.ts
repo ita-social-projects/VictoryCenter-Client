@@ -1,5 +1,5 @@
-import { VisibilityStatus } from '../../../../types/admin/Common';
-import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '../../../../types/admin/Programs';
+import { VisibilityStatus } from '../../../../types/admin/common';
+import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '../../../../types/admin/programs';
 import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin/programs';
 import { ProgramsApi } from './programs-api';
 

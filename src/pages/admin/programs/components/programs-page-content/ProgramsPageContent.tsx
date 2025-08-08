@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Program, ProgramCategory } from '../../../../../types/admin/Programs';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
+import { Program, ProgramCategory } from '../../../../../types/admin/programs';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 import { ProgramsPageToolbar } from '../programs-page-toolbar/ProgramsPageToolbar';
 import { DeleteProgramModal } from '../program-modals/DeleteProgramModal';
 import { InfiniteScrollList } from '../../../../../components/common/infinite-scroll-list/InfiniteScrollList';

@@ -2,7 +2,7 @@ import { ProgramCard } from '../../../pages/program-page/program-page/program-se
 import { Swiper, SwiperSlide, SwiperClass } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
 import { useState, useEffect, useRef } from 'react';
-import { Program } from '../../../types/public/ProgramPage';
+import { PublishedProgram } from '../../../types/public/programs-page';
 import arrowRight from '../../../assets/icons/arrow-right-white.svg';
 import arrowLeft from '../../../assets/icons/arrow-left-white.svg';
 import arrowRightBlack from '../../../assets/icons/arrow-right.svg';
@@ -16,7 +16,7 @@ import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../const/public/programs-page
 import { programPageDataFetch } from '../../../services/api/public/programs/programs-api';
 
 export const ScrollableFrame = () => {
-    const [programData, setProgramData] = useState<Program[]>([]);
+    const [programData, setProgramData] = useState<PublishedProgram[]>([]);
     const [error, setError] = useState<string | null>(null);
     const swiperRef = useRef<SwiperClass | null>(null);
 

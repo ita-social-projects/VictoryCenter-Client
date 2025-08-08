@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
-import { useAdminContext } from '../../../context/admin-context-provider/AdminContextProvider';
+import { useAdminContext } from '../../../contexts/admin/admin-context-provider/AdminContextProvider';
 import { PageLoader } from '../../common/page-loader/PageLoader';
 import { ADMIN_ROUTES } from '../../../const/admin/routes';
 

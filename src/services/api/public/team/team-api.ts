@@ -1,12 +1,12 @@
 import default_team_member_photo from '../../../../assets/icons/team-member-blank.svg';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import {
-    MemberCard,
     PublicCategoryWithTeamMembersDto,
     PublicTeamMemberDto,
+    MemberCard,
     TeamItem,
     TeamPageData,
-} from '../../../../types/public/TeamPage';
+} from '../../../../types/public/team-page';
 import { mapImageToBase64 } from '../../../../utils/functions/mapImageToBase64';
 import { axiosInstance } from '../../axios';
 

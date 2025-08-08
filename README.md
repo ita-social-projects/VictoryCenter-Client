@@ -63,8 +63,10 @@ victory-center-client/
 │   │   ├───common
 │   │   │   └───api-routes
 │   │   └───public
-│   ├── context/                            # React context providers
-│   │   └── admin-context-provider
+│   ├───contexts
+│   │   ├───admin
+│   │   │   └───admin-context-provider
+│   │   └───public
 │   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
 │   │   ├── admin-layout/
 │   │   └── main-layout/
@@ -100,8 +102,6 @@ victory-center-client/
 │   │   └── app-router
 │   ├── hooks/
 │   │   └── admin/
-│   ├── context/                            # React context providers
-│   │   └── admin-context-provider
 │   ├───services
 │   │   ├───api
 │   │   │   ├───admin
@@ -110,7 +110,7 @@ victory-center-client/
 │   │   │   │   ├───programs
 │   │   │   │   └───team
 │   │   │   │       ├───team-members
-│   │   │   │       └───team-сategories
+│   │   │   │       └───team-categories
 │   │   │   └───public
 │   │   │       ├───programs
 │   │   │       └───team
@@ -118,7 +118,10 @@ victory-center-client/
 │   │       ├───auth-service
 │   │       ├───create-admin-client
 │   │       └───resolve-with-new-token
-│   ├── types/
+│   ├───types
+│   │   ├───admin
+│   │   ├───common
+│   │   └───public
 │   ├── utils/                              # Utility functions
 │   │   ├── functions/
 │   │   ├── hooks/
@@ -127,8 +130,12 @@ victory-center-client/
 │   │   └───mock-data
 │   │       ├───admin
 │   │       └───public
-│   ├── validation
-│   │   └── admin-create-member-form
+│   ├───validation
+│   │   ├───admin
+│   │   │   ├───create-member-schema
+│   │   │   ├───program-category-schema
+│   │   │   └───program-schema
+│   │   └───public
 │   ├── index.jsx                           # Entry point (ReactDOM.createRoot)
 │   ├── index.css                           # Global styles (normalizer)
 │   ├── react-app-env.d.ts

@@ -3,7 +3,7 @@ import { Select } from '../../../../../components/common/select/Select';
 import { Input } from '../../../../../components/common/input/Input';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 import PlusIcon from '../../../../../assets/icons/plus.svg';
 import './ProgramsPageToolbar.scss';
 

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import * as AdminContext from '../../../../context/admin-context-provider/AdminContextProvider';
+import * as AdminContext from '../../../../contexts/admin/admin-context-provider/AdminContextProvider';
 import { LoginForm } from './LoginForm';
 import Logo from '../../../../assets/icons/logo-with-text.svg';
 import { MemoryRouter } from 'react-router';

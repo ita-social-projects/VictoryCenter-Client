@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { StatusFilter } from '../../../../../types/Common';
+import { useCallback, useState } from 'react';
+import { StatusFilter } from '../../../../../types/admin/common';
 import { MembersList } from '../members-list/MembersList';
 import { MemberFormValues } from '../member-form/MemberForm';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';

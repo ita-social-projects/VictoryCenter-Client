@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router';
-import { useAdminContext } from '../../../../context/admin-context-provider/AdminContextProvider';
+import { useAdminContext } from '../../../../contexts/admin/admin-context-provider/AdminContextProvider';
 import { Button } from '../../../../components/common/button/Button';
 import Logo from '../../../../assets/icons/logo-with-text.svg';
 import EyeOpened from '../../../../assets/icons/eye-opened.svg';
 import EyeClosed from '../../../../assets/icons/eye-closed.svg';
-import { Credentials } from '../../../../types/admin/Auth';
+import { Credentials } from '../../../../types/admin/auth';
 import './LoginForm.scss';
 import { LOGIN_CONST } from '../../../../const/admin/login';
 

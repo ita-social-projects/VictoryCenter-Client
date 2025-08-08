@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Question } from '../../../../types/public/ProgramPage';
-import { QuestionCard } from './question-card/QuestionCard';
 import { questionDataFetch } from '../../../../services/api/public/programs/programs-api';
 import './QuestionSection.scss';
 import { COMMON_QUESTIONS } from '../../../../const/public/programs-page';
+import { Question } from '../../../../types/public/programs-page';
+import { QuestionCard } from './question-card/QuestionCard';
 
 export const QuestionSection: React.FC = () => {
     const [questions, setQuestions] = useState<Question[]>([]);

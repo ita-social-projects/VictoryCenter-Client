@@ -2,10 +2,10 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ProgramListItem } from './ProgramListItem';
-import { Program } from '../../../../../types/admin/Programs';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { VisibilityStatusLabelProps } from '../../../../../components/common/visibility-status-label/VisibilityStatusLabel';
+import { VisibilityStatus } from '../../../../../types/admin/common';
+import { Program } from '../../../../../types/admin/programs';
 
 jest.mock('../../../../../assets/icons/blank-image.svg', () => 'blank-image.svg');
 
@@ -20,7 +20,7 @@ jest.mock('../../../../../components/common/button-tooltip/ButtonTooltip', () =>
 }));
 
 jest.mock('../../../../../components/common/visibility-status-label/VisibilityStatusLabel', () => {
-    const { VisibilityStatus } = require('../../../../../types/admin/Common');
+    const { VisibilityStatus } = require('../../../../../types/admin/common');
     return {
         VisibilityStatusLabel: ({ status }: VisibilityStatusLabelProps) => {
             return <div data-testid="status">{VisibilityStatus[status]}</div>;

@@ -6,10 +6,10 @@ import { MAX_FULLNAME_LENGTH, MAX_DESCRIPTION_LENGTH } from '../../../../../cons
 import { ImageValues } from '../../../../../types/Image';
 import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
-import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
 import ArrowUp from '../../../../../assets/icons/chevron-up.svg';
 import ArrowDown from '../../../../../assets/icons/chevron-down.svg';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-сategories/team-categories-api';
 
 export type PublishMemberFormValues = {
     category: TeamCategory;

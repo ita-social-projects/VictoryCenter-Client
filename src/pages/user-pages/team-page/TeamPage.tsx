@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './TeamPage.scss';
 import horseVideo from '../../../assets/videos/public/team-page/quote_background.mp4';
-import { teamPageDataFetch } from '../../../services/data-fetch/user-pages-data-fetch/team-page-data-fetch/TeamPageDataFetch';
 import { TeamMember } from './TeamMemberCard/TeamMemberCard';
 import { TeamItem } from '../../../types/public/TeamPage';
 import classNames from 'classnames';
@@ -14,6 +13,7 @@ import {
     VIDEO_TEXT_STRING4,
     VIDEO_TEXT_STRING5,
 } from '../../../const/public/team-page';
+import { teamPageDataFetch } from '../../../services/api/public/team/team-api';
 
 export const TeamPage: React.FC = () => {
     const [teamData, setTeamData] = useState<TeamItem[]>([]);

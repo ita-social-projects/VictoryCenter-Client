@@ -1,6 +1,6 @@
 import './DonateSection.scss';
 import React, { useState } from 'react';
-import { getEnvVariable } from '../../../utils/functions/getEnvVariable';
+import { API_ROUTES } from '../../../const/common/api-routes/main-api';
 import { DonateTab } from '../../../types/public/donate-page/DonateTab';
 import { Currency } from '../../../types/public/donate-page/Currency';
 import { PaymentSystem } from '../../../types/public/donate-page/PaymentStatus';
@@ -49,7 +49,7 @@ export const DonateSection = () => {
     return (
         <form
             className="donateSection"
-            action={`${getEnvVariable('REACT_APP_BACKEND_URL')}/payments/donate`}
+            action={API_ROUTES.PAYMENTS.DONATE}
             method="post"
             onSubmit={handleSubmit}
             data-testid="donate-section-form"

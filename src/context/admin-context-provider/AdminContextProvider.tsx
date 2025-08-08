@@ -1,14 +1,11 @@
 import { createContext, useContext, useMemo, ReactNode, useState, useCallback, useRef } from 'react';
-import {
-    loginRequest,
-    tokenRefreshRequest,
-} from '../../services/data-fetch/login-page-data-fetch/login-page-data-fetch';
-import { CreateAdminClient } from '../../services/auth/create-admin-client/createAdminClient';
 import { AxiosInstance } from 'axios';
 import { useOnMountUnsafe } from '../../utils/hooks/use-on-mount-unsafe/useOnMountUnsafe';
 import { Credentials } from '../../types/admin/Auth';
-import { isAccessTokenValid } from '../../services/auth/auth-service/AuthService';
 import { API_ROUTES } from '../../const/common/api-routes/main-api';
+import { loginRequest, tokenRefreshRequest } from '../../services/api/admin/login/login-api';
+import { isAccessTokenValid } from '../../services/auth/auth-service/auth-service';
+import { CreateAdminClient } from '../../services/auth/create-admin-client/create-admin-client';
 
 type Props = {
     children: ReactNode;

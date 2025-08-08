@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import './AdminPageContent.scss';
-
-import { adminPageDataFetch } from '../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch';
+import { adminHomeDataFetch } from '../../../utils/mock-data/admin/home';
 import { NavLink } from 'react-router';
 
 export const AdminPageContent = () => {
@@ -10,9 +9,9 @@ export const AdminPageContent = () => {
 
     useEffect(() => {
         (async () => {
-            const responce = await adminPageDataFetch();
+            const response = await adminHomeDataFetch();
 
-            const { header, content } = responce;
+            const { header, content } = response;
 
             // DEV NOTE: in React 18 and higher there is a term "Automatic Batching"
             // https://react.dev/blog/2022/03/08/react-18-upgrade-guide#automatic-batching

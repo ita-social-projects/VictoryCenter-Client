@@ -1,9 +1,9 @@
 import { render, waitFor } from '@testing-library/react';
 import { AdminPageContent } from './AdminPageContent';
-import * as AdminPageDataFetchModule from '../../../services/data-fetch/admin-page-data-fetch/adminPageDataFetch';
+import * as adminHomeDataFetchModule from '../../../utils/mock-data/admin/home';
 import { MemoryRouter } from 'react-router';
 
-const spyAdminPageDataFetch = jest.spyOn(AdminPageDataFetchModule, 'adminPageDataFetch');
+const spyAdminPageDataFetch = jest.spyOn(adminHomeDataFetchModule, 'adminHomeDataFetch');
 
 describe('AdminPageContent', () => {
     const mockHeader = 'Test Header';

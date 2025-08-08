@@ -6,8 +6,8 @@ jest.mock('./program-page/intro-section/IntroSection', () => ({
     IntroSection: () => <div data-testid="intro-section">IntroSection</div>,
 }));
 
-jest.mock('./program-page/program-section/ProgramSection', () => ({
-    ProgramSection: () => <div data-testid="program-section">ProgramSection</div>,
+jest.mock('./program-page/program-section/ProgramsSection', () => ({
+    ProgramsSection: () => <div data-testid="program-section">ProgramSection</div>,
 }));
 
 jest.mock('./program-page/question-section/QuestionSection', () => ({

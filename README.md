@@ -49,6 +49,7 @@ victory-center-client/
 │   │   │   ├── button
 │   │   │   ├── button-tooltip
 │   │   │   ├── category-bar
+│   │   │   ├── confirmation-modal
 │   │   │   ├── context-menu-button
 │   │   │   ├── hint-box
 │   │   │   ├── infinite-scroll-list
@@ -63,10 +64,9 @@ victory-center-client/
 │   │   │   ├── textarea-with-character-limit
 │   │   │   └── visibility-status-label
 │   │   ├── common
-│   │   │   └── confirmation-modal
-│   │   │       ├── inline-loader
-│   │   │       ├── modal
-│   │   │       └── page-loader
+│   │   │   ├── inline-loader
+│   │   │   ├── modal
+│   │   │   └── page-loader
 │   │   └── public
 │   │       ├── footer
 │   │       └── header

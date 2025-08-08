@@ -4,7 +4,7 @@ import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../program-form/
 import { Program, ProgramCategory, ProgramCreateUpdate } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { Button } from '../../../../../components/admin/button/Button';
-import { ConfirmationModal } from '../../../../../components/common/confirmation-modal/ConfirmationModal';
+import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';

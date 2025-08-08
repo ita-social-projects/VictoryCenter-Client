@@ -4,7 +4,7 @@ import { Button } from '../../../../../components/admin/button/Button';
 import { HintBox } from '../../../../../components/admin/hint-box/HintBox';
 import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
 import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { ConfirmationModal } from '../../../../../components/common/confirmation-modal/ConfirmationModal';
+import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-category-schema/program-category-schema';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';

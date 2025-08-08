@@ -35,7 +35,6 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
 
     return (
         <form onSubmit={handleSubmit} className="login-form" spellCheck={false}>
-            ogin
             <NavLink to={PUBLIC_ROUTES.ROOT} className="logo">
                 <img src={Logo} alt={LOGIN_CONST.FORM.LOGO_ALT} />
             </NavLink>

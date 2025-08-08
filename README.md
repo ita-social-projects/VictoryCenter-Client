@@ -112,7 +112,7 @@ victory-center-client/
 │   │   │   │   ├───programs
 │   │   │   │   └───team
 │   │   │   │       ├───team-members
-│   │   │   │       └───team-сategories
+│   │   │   │       └───team-categories
 │   │   │   └───public
 │   │   │       ├───programs
 │   │   │       └───team

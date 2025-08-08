@@ -16,7 +16,7 @@ import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import classNames from 'classnames';
 import { DragPreviewModel } from '../../../../../types/admin/common';
 import { TeamMember } from '../../../../../types/admin/team-members';
-import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-сategories/team-categories-api';
+import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
 
 export type MembersListProps = {
@@ -58,7 +58,7 @@ export const MembersList = ({
         visible: false,
         x: 0,
         y: 0,
-        member: null,
+        item: null,
     });
     const memberListRef = useRef<HTMLDivElement>(null);
     const [isMembersLoading, setIsMembersLoading] = useState(false);
@@ -240,7 +240,7 @@ export const MembersList = ({
             visible: true,
             x: e.clientX,
             y: e.clientY,
-            member: members[index],
+            item: members[index],
         });
 
         const dragImage = new Image();
@@ -263,7 +263,7 @@ export const MembersList = ({
             visible: false,
             x: 0,
             y: 0,
-            member: null,
+            item: null,
         });
         setDraggedIndex(null);
     };
@@ -516,7 +516,7 @@ export const MembersList = ({
 
     return (
         <>
-            {dragPreview?.visible && dragPreview?.member ? <MemberDragPreview dragPreview={dragPreview} /> : <></>}
+            {dragPreview?.visible && dragPreview?.item ? <MemberDragPreview dragPreview={dragPreview} /> : <></>}
             <div className="members">
                 <div
                     data-testid="members-categories"

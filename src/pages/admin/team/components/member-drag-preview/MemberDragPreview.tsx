@@ -8,7 +8,7 @@ export type MemberDragPreviewProps = {
     dragPreview: DragPreviewModel<TeamMember>;
 };
 export const MemberDragPreview = ({ dragPreview }: MemberDragPreviewProps) => {
-    if (!dragPreview.visible || !dragPreview.member) return <></>;
+    if (!dragPreview.visible || !dragPreview.item) return <></>;
 
     return (
         <div
@@ -18,12 +18,12 @@ export const MemberDragPreview = ({ dragPreview }: MemberDragPreviewProps) => {
                 top: dragPreview.y - 55,
             }}
         >
-            <div key={dragPreview.member.fullName} className="members-wrapper">
+            <div key={dragPreview.item.fullName} className="members-wrapper">
                 <div className="members-dragger">
                     <img src={DragIcon} alt="dragger" />
                 </div>
                 <MemberComponent
-                    member={dragPreview.member}
+                    member={dragPreview.item}
                     handleOnDeleteMember={() => {}}
                     handleOnEditMember={() => {}}
                 ></MemberComponent>

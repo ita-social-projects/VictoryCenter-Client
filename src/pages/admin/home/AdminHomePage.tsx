@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import './AdminHomePage.scss';
 import { adminHomeDataFetch } from '../../../utils/mock-data/admin/home';
-import { NavLink } from 'react-router';
 
 export const AdminHomePage = () => {
     const [headerInfo, setHeaderInfo] = useState('');
@@ -27,8 +26,6 @@ export const AdminHomePage = () => {
         <div className="admin-page-content">
             <h1 className="header">{headerInfo}</h1>
             <p className="content">{contentInfo}</p>
-            <NavLink to="/admin-page/team">teams</NavLink>
-            <NavLink to="/admin-page/programs">programs</NavLink>
         </div>
     );
 };

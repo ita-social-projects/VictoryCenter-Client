@@ -52,14 +52,14 @@ const mockDragPreview: DragPreviewModel<TeamMember> = {
     visible: true,
     x: 100,
     y: 150,
-    member: mockMember,
+    item: mockMember,
 };
 
 const mockDragPreviewWithoutMember: DragPreviewModel<TeamMember> = {
     visible: true,
     x: 100,
     y: 150,
-    member: null,
+    item: null,
 };
 
 describe('MemberDragPreview', () => {
@@ -171,7 +171,7 @@ describe('MemberDragPreview', () => {
                 },
             };
 
-            const dragPreview: DragPreviewModel<TeamMember> = { ...mockDragPreview, member: differentMember };
+            const dragPreview: DragPreviewModel<TeamMember> = { ...mockDragPreview, item: differentMember };
             render(<MemberDragPreview dragPreview={dragPreview} />);
 
             expect(screen.getByText('Jane Smith')).toBeInTheDocument();
@@ -208,7 +208,7 @@ describe('MemberDragPreview', () => {
                 visible: true,
                 x: 500,
                 y: 600,
-                member: mockMember,
+                item: mockMember,
             };
 
             const { container } = render(<MemberDragPreview dragPreview={customDragPreview} />);
@@ -240,7 +240,7 @@ describe('MemberDragPreview', () => {
 
     describe('Edge cases', () => {
         test('handles undefined member gracefully', () => {
-            const dragPreview: DragPreviewModel<TeamMember> = { ...mockDragPreview, member: null };
+            const dragPreview: DragPreviewModel<TeamMember> = { ...mockDragPreview, item: null };
             const { container } = render(<MemberDragPreview dragPreview={dragPreview} />);
 
             expect(container.firstChild).toBeNull();

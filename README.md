@@ -7,22 +7,23 @@ This repo contains front end part of the Victory center
 Main structure of this project
 
 <pre><code>
-victory-center-client/
-├── .github/
-│   ├── ISSUE_TEMPLATE
-│   ├── PULL_REQUEST_TEMPLATE
-│   ├── workflows
-│   │   ├── lint.build.yml
-│   │   └── test.build.yml
-│   ├── CODEOWNERS
-│   └── pull_request_template.md
-├── nginx/
-│   └── nginx.conf
-├── public/
-│   └── index.html
-├── scripts/
-│   └── start-in-dev-over-https.mjs
-├── src/
+victory-center-client
+├───.github
+│   ├───ISSUE_TEMPLATE
+│   ├───PULL_REQUEST_TEMPLATE
+│   ├───workflows
+│   │   ├───lint.build.yml
+│   │   └───test.build.yml
+│   ├───CODEOWNERS
+│   └───pull_request_template.md
+├───nginx
+│   └───nginx.conf
+├───public
+│   └───index.html
+├───scripts
+│   └───start-in-dev-over-https.mjs
+├───src
+│   ├───__mocks__
 │   ├───assets
 │   │   ├───fonts
 │   │   ├───icons
@@ -42,39 +43,45 @@ victory-center-client/
 │   │       └───public
 │   │           ├───programs-page
 │   │           └───team-page
-│   ├── components
-│   │   ├── admin
-│   │   │   ├── admin-context-wrapper
-│   │   │   ├── admin-navigation
-│   │   │   ├── button
-│   │   │   ├── button-tooltip
-│   │   │   ├── category-bar
-│   │   │   ├── context-menu-button
-│   │   │   ├── hint-box
-│   │   │   ├── infinite-scroll-list
-│   │   │   ├── input-label
-│   │   │   ├── input-with-character-limit
-│   │   │   ├── multi-select-input
-│   │   │   ├── photo-input
-│   │   │   ├── private-route
-│   │   │   ├── public-route
-│   │   │   ├── search-bar
-│   │   │   ├── select
-│   │   │   ├── textarea-with-character-limit
-│   │   │   └── visibility-status-label
-│   │   ├── common
-│   │   │   └── confirmation-modal
-│   │   │       ├── inline-loader
-│   │   │       ├── modal
-│   │   │       └── page-loader
-│   │   └── public
-│   │       ├── footer
-│   │       └── header
+│   ├───components
+│   │   ├───admin
+│   │   │   ├───admin-context-wrapper
+│   │   │   ├───admin-navigation
+│   │   │   ├───button
+│   │   │   ├───button-tooltip
+│   │   │   ├───category-bar
+│   │   │   ├───confirmation-modal
+│   │   │   ├───context-menu-button
+│   │   │   ├───hint-box
+│   │   │   ├───infinite-scroll-list
+│   │   │   ├───input-label
+│   │   │   ├───input-with-character-limit
+│   │   │   ├───multi-select-input
+│   │   │   ├───photo-input
+│   │   │   ├───private-route
+│   │   │   ├───public-route
+│   │   │   ├───search-bar
+│   │   │   ├───select
+│   │   │   ├───textarea-with-character-limit
+│   │   │   └───visibility-status-label
+│   │   ├───common
+│   │   │   ├───inline-loader
+│   │   │   ├───modal
+│   │   │   └───page-loader
+│   │   └───public
+│   │       ├───footer
+│   │       └───header
 │   ├───const
 │   │   ├───admin
 │   │   ├───common
 │   │   │   └───api-routes
 │   │   └───public
+│   ├───hooks
+│   │   ├───admin
+│   │   │   ├───use-admin-client
+│   │   │   └───use-create-member-form
+│   │   └───common
+│   │       └───use-on-mount-unsafe
 │   ├───contexts
 │   │   ├───admin
 │   │   │   └───admin-context-provider
@@ -86,18 +93,13 @@ victory-center-client/
 │   │   ├───admin
 │   │   │   ├───home
 │   │   │   ├───login
-│   │   │   │   └───components
-│   │   │   │       └───login-form
+│   │   │   │   └───login-form
 │   │   │   ├───programs
 │   │   │   │   └───components
 │   │   │   │       ├───program-category-modals
-│   │   │   │       │   ├───delete-program-category-modal
-│   │   │   │       │   └───program-category-modal
 │   │   │   │       ├───program-form
 │   │   │   │       ├───program-list-item
 │   │   │   │       ├───program-modals
-│   │   │   │       │   ├───delete-program-modal
-│   │   │   │       │   └───program-modal
 │   │   │   │       ├───programs-page-content
 │   │   │   │       └───programs-page-toolbar
 │   │   │   └──team
@@ -137,14 +139,8 @@ victory-center-client/
 │   │       │       └───question-card
 │   │       └───team-page
 │   │           └───TeamMemberCard
-│   ├── routes/
-│   │   └── app-router
-│   ├───hooks
-│   │   ├───admin
-│   │   │   ├───use-admin-client
-│   │   │   └───use-create-member-form
-│   │   └───common
-│   │       └───use-on-mount-unsafe
+│   ├───routes
+│   │   └───app-router
 │   ├───services
 │   │   ├───api
 │   │   │   ├───admin
@@ -153,7 +149,7 @@ victory-center-client/
 │   │   │   │   ├───programs
 │   │   │   │   └───team
 │   │   │   │       ├───team-members
-│   │   │   │       └───team-сategories
+│   │   │   │       └───team-categories
 │   │   │   └───public
 │   │   │       ├───programs
 │   │   │       └───team
@@ -165,35 +161,35 @@ victory-center-client/
 │   │   ├───admin
 │   │   ├───common
 │   │   └───public
-│   ├── utils
-│   │   ├── functions
-│   │   │   ├── get-env-variable
-│   │   │   └── map-image-to-base-64
-│   │   └── mock-data
-│   │       ├── admin
-│   │       └── public
+│   ├───utils
+│   │   ├───functions
+│   │   │   ├───get-env-variable
+│   │   │   └───map-image-to-base-64
+│   │   └───mock-data
+│   │       ├───admin
+│   │       └───public
 │   ├───validation
 │   │   ├───admin
 │   │   │   ├───create-member-schema
 │   │   │   ├───program-category-schema
 │   │   │   └───program-schema
 │   │   └───public
-│   ├── index.jsx                           # Entry point (ReactDOM.createRoot)
-│   ├── index.css                           # Global styles (normalizer)
-│   ├── react-app-env.d.ts
-│   ├── reportWebVitals.ts
-│   ├── setupProxy.ts
-│   └── setupTests.ts
-├── .coderabbit.yaml
-├── .dockerignore
-├── .env.development
-├── .gitignore
-├── Dockerfile
-├── LICENSE
-├── package-lock.json
-├── package.json
-├── README
-└── tsconfig.json
+│   ├───index.jsx                           # Entry point (ReactDOM.createRoot)
+│   ├───index.css                           # Global styles (normalizer)
+│   ├───react-app-env.d.ts
+│   ├───reportWebVitals.ts
+│   ├───setupProxy.ts
+│   └───setupTests.ts
+├───.coderabbit.yaml
+├───.dockerignore
+├───.env.development
+├───.gitignore
+├───Dockerfile
+├───LICENSE
+├───package-lock.json
+├───package.json
+├───README
+└───tsconfig.json
 </code></pre>
 
 <div>

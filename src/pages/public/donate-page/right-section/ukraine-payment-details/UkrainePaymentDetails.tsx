@@ -1,6 +1,5 @@
 import './UkrainePaymentDetails.scss';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
-import React from 'react';
 import { UKRAINE_PAYMENT_DETAILS, PAYMENT_DETAILS_COMMON } from '../../../../../const/public/donate-page';
 
 export const UkrainePaymentDetails = () => {

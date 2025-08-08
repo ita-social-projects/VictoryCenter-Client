@@ -8,7 +8,7 @@ import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useA
 import ArrowUp from '../../../../../assets/icons/chevron-up.svg';
 import ArrowDown from '../../../../../assets/icons/chevron-down.svg';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-сategories/team-categories-api';
+import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 import { useCreateMemberForm } from '../../../../../hooks/admin/use-create-member-form/useCreateMemberForm';
 
 export type PublishMemberFormValues = {

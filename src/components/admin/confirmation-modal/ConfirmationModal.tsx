@@ -1,6 +1,6 @@
-import { Modal } from '../modal/Modal';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { Button } from '../../admin/button/Button';
+import { Modal } from '../../common/modal/Modal';
 
 type ConfirmationModalProps = {
     isOpen: boolean;

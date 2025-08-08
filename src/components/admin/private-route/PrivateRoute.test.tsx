@@ -20,6 +20,9 @@ jest.mock('../../../contexts/admin/admin-context-provider/AdminContextProvider',
 jest.mock('../../common/page-loader/PageLoader', () => ({
     PageLoader: () => <div data-testid="loader" />,
 }));
+jest.mock('../../../const/admin/routes', () => ({
+    ADMIN_ROUTES: { LOGIN: { FULL: '/login' } },
+}));
 
 describe('PrivateRoute', () => {
     beforeEach(() => {

@@ -66,7 +66,7 @@ jest.mock('../../../../../components/admin/input-with-character-limit/InputWithC
     ),
 }));
 
-jest.mock('../../../../../components/common/confirmation-modal/ConfirmationModal', () => ({
+jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, title, confirmText, onConfirm, onCancel }: any) =>
         isOpen ? (
             <div data-testid="question-modal">

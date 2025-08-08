@@ -68,7 +68,7 @@ jest.mock('../../../../../components/admin/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/common/confirmation-modal/ConfirmationModal', () => ({
+jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({
         isOpen,
         title,

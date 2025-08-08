@@ -7,22 +7,23 @@ This repo contains front end part of the Victory center
 Main structure of this project
 
 <pre><code>
-victory-center-client/
-├── .github/
-│   ├── ISSUE_TEMPLATE
-│   ├── PULL_REQUEST_TEMPLATE
-│   ├── workflows
-│   │   ├── lint.build.yml
-│   │   └── test.build.yml
-│   ├── CODEOWNERS
-│   └── pull_request_template.md
-├── nginx/
-│   └── nginx.conf
-├── public/
-│   └── index.html
-├── scripts/
-│   └── start-in-dev-over-https.mjs
-├── src/
+victory-center-client
+├───.github
+│   ├───ISSUE_TEMPLATE
+│   ├───PULL_REQUEST_TEMPLATE
+│   ├───workflows
+│   │   ├───lint.build.yml
+│   │   └───test.build.yml
+│   ├───CODEOWNERS
+│   └───pull_request_template.md
+├───nginx
+│   └───nginx.conf
+├───public
+│   └───index.html
+├───scripts
+│   └───start-in-dev-over-https.mjs
+├───src
+│   ├───__mocks__
 │   ├───assets
 │   │   ├───fonts
 │   │   ├───icons
@@ -42,83 +43,104 @@ victory-center-client/
 │   │       └───public
 │   │           ├───programs-page
 │   │           └───team-page
-│   ├── components
-│   │   ├── admin
-│   │   │   ├── admin-context-wrapper
-│   │   │   ├── admin-navigation
-│   │   │   ├── button
-│   │   │   ├── button-tooltip
-│   │   │   ├── category-bar
-│   │   │   ├── confirmation-modal
-│   │   │   ├── context-menu-button
-│   │   │   ├── hint-box
-│   │   │   ├── infinite-scroll-list
-│   │   │   ├── input-label
-│   │   │   ├── input-with-character-limit
-│   │   │   ├── multi-select-input
-│   │   │   ├── photo-input
-│   │   │   ├── private-route
-│   │   │   ├── public-route
-│   │   │   ├── search-bar
-│   │   │   ├── select
-│   │   │   ├── textarea-with-character-limit
-│   │   │   └── visibility-status-label
-│   │   ├── common
-│   │   │   ├── inline-loader
-│   │   │   ├── modal
-│   │   │   └── page-loader
-│   │   └── public
-│   │       ├── footer
-│   │       └── header
+│   ├───components
+│   │   ├───admin
+│   │   │   ├───admin-context-wrapper
+│   │   │   ├───admin-navigation
+│   │   │   ├───button
+│   │   │   ├───button-tooltip
+│   │   │   ├───category-bar
+│   │   │   ├───confirmation-modal
+│   │   │   ├───context-menu-button
+│   │   │   ├───hint-box
+│   │   │   ├───infinite-scroll-list
+│   │   │   ├───input-label
+│   │   │   ├───input-with-character-limit
+│   │   │   ├───multi-select-input
+│   │   │   ├───photo-input
+│   │   │   ├───private-route
+│   │   │   ├───public-route
+│   │   │   ├───search-bar
+│   │   │   ├───select
+│   │   │   ├───textarea-with-character-limit
+│   │   │   └───visibility-status-label
+│   │   ├───common
+│   │   │   ├───inline-loader
+│   │   │   ├───modal
+│   │   │   └───page-loader
+│   │   └───public
+│   │       ├───footer
+│   │       └───header
 │   ├───const
 │   │   ├───admin
 │   │   ├───common
 │   │   │   └───api-routes
 │   │   └───public
-│   ├───contexts
-│   │   ├───admin
-│   │   │   └───admin-context-provider
-│   │   └───public
-│   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
-│   │   ├── admin-layout/
-│   │   └── main-layout/
-│   ├── pages/                              # Pages
-│   │   ├── about-us-page/
-│   │   │   ├── company-values/
-│   │   │   ├── donate-section/
-│   │   │   ├── intro-section/
-│   │   │   ├── main-value/
-│   │   │   ├── our-mission/
-│   │   │   │   └───scrollable-frame 
-│   │   │   ├── our-team-section/
-│   │   │   └── support-section/
-│   │   ├── admin/                          # Admin pages
-│   │   │   ├── admin-page-content/         # Content components for admin pages
-│   │   │   └── team/                       # Team management page
-│   │   │       └── components/             # Components specific to team page
-│   │   ├── login/
-│   │   │   └── components/
-│   │   ├── not-found/
-│   │   ├── program-page/
-│   │   │   └── program-page/
-│   │   │       ├── contact-section/
-│   │   │       ├── intro-section/
-│   │   │       ├── program-section/
-│   │   │       │   └── program-card/
-│   │   │       └── question-section/
-│   │   │           └── question-card/
-│   │   └── user-pages
-│   │       ├── home-page
-│   │       ├── team-page
-│   │       └── page-2
-│   ├── routes/                             # Route configuration
-│   │   └── app-router
 │   ├───hooks
 │   │   ├───admin
 │   │   │   ├───use-admin-client
 │   │   │   └───use-create-member-form
 │   │   └───common
 │   │       └───use-on-mount-unsafe
+│   ├───contexts
+│   │   ├───admin
+│   │   │   └───admin-context-provider
+│   │   └───public
+│   ├───layouts
+│   │   ├───admin-layout
+│   │   └───public-layout
+│   ├───pages
+│   │   ├───admin
+│   │   │   ├───home
+│   │   │   ├───login
+│   │   │   │   └───login-form
+│   │   │   ├───programs
+│   │   │   │   └───components
+│   │   │   │       ├───program-category-modals
+│   │   │   │       ├───program-form
+│   │   │   │       ├───program-list-item
+│   │   │   │       ├───program-modals
+│   │   │   │       ├───programs-page-content
+│   │   │   │       └───programs-page-toolbar
+│   │   │   └──team
+│   │   │      └───components
+│   │   │          ├───member-component
+│   │   │          ├───member-drag-preview
+│   │   │          ├───member-form
+│   │   │          ├───members-list
+│   │   │          ├───members-list-item
+│   │   │          ├───team-page-content
+│   │   │          └───team-page-toolbar
+│   │   └───public
+│   │       ├───about-us-page
+│   │       │   ├───company-values
+│   │       │   ├───donate-section
+│   │       │   ├───intro-section
+│   │       │   ├───main-value
+│   │       │   ├───our-mission
+│   │       │   │    └───scrollable-frame 
+│   │       │   ├───our-team-section
+│   │       │   └───support-section
+│   │       ├───donate-page
+│   │       │   ├───copy-text-button
+│   │       │   ├───donate-page-intro
+│   │       │   ├───donate-section
+│   │       │   └───right-section
+│   │       │       ├───abroad-payment-details
+│   │       │       ├───alternative-support-ways
+│   │       │       └───ukraine-payment-details
+│   │       ├───not-found
+│   │       ├───programs-page
+│   │       │   ├───contact-section
+│   │       │   ├───intro-section
+│   │       │   ├───programs-section
+│   │       │   │   └───program-card
+│   │       │   └───question-section
+│   │       │       └───question-card
+│   │       └───team-page
+│   │           └───TeamMemberCard
+│   ├───routes
+│   │   └───app-router
 │   ├───services
 │   │   ├───api
 │   │   │   ├───admin
@@ -139,35 +161,35 @@ victory-center-client/
 │   │   ├───admin
 │   │   ├───common
 │   │   └───public
-│   ├── utils
-│   │   ├── functions
-│   │   │   ├── get-env-variable
-│   │   │   └── map-image-to-base-64
-│   │   └── mock-data
-│   │       ├── admin
-│   │       └── public
+│   ├───utils
+│   │   ├───functions
+│   │   │   ├───get-env-variable
+│   │   │   └───map-image-to-base-64
+│   │   └───mock-data
+│   │       ├───admin
+│   │       └───public
 │   ├───validation
 │   │   ├───admin
 │   │   │   ├───create-member-schema
 │   │   │   ├───program-category-schema
 │   │   │   └───program-schema
 │   │   └───public
-│   ├── index.jsx                           # Entry point (ReactDOM.createRoot)
-│   ├── index.css                           # Global styles (normalizer)
-│   ├── react-app-env.d.ts
-│   ├── reportWebVitals.ts
-│   ├── setupProxy.ts
-│   └── setupTests.ts
-├── .coderabbit.yaml
-├── .dockerignore
-├── .env.development
-├── .gitignore
-├── Dockerfile
-├── LICENSE
-├── package-lock.json
-├── package.json
-├── README
-└── tsconfig.json
+│   ├───index.jsx                           # Entry point (ReactDOM.createRoot)
+│   ├───index.css                           # Global styles (normalizer)
+│   ├───react-app-env.d.ts
+│   ├───reportWebVitals.ts
+│   ├───setupProxy.ts
+│   └───setupTests.ts
+├───.coderabbit.yaml
+├───.dockerignore
+├───.env.development
+├───.gitignore
+├───Dockerfile
+├───LICENSE
+├───package-lock.json
+├───package.json
+├───README.md
+└───tsconfig.json
 </code></pre>
 
 <div>

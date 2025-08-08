@@ -41,10 +41,6 @@ export interface TeamPageData {
     teamData: TeamItem[];
 }
 
-export interface TeamMemberProps {
-    member: MemberCard;
-}
-
 export interface TeamMemberDto {
     id: number;
     fullName: string;

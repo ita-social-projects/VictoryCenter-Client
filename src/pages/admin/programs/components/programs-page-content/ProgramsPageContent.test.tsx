@@ -139,7 +139,7 @@ jest.mock('../program-category-modals/DeleteCategoryModal', () => ({
         ) : null,
 }));
 
-jest.mock('../../../../../components/common/category-bar/CategoryBar', () => ({
+jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({
         categories,
         selectedCategory,
@@ -175,7 +175,7 @@ jest.mock('../../../../../components/common/category-bar/CategoryBar', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/common/infinite-scroll-list/InfiniteScrollList', () => ({
+jest.mock('../../../../../components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
     InfiniteScrollList: ({ items, renderItem, onLoadMore, hasMore, isLoading, emptyStateMessage }: any) => (
         <div data-testid="infinite-scroll-list">
             {isLoading && <div data-testid="infinite-scroll-loader">Loading...</div>}

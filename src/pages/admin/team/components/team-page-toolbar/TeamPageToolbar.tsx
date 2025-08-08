@@ -1,9 +1,9 @@
 import PlusIcon from '../../../../../assets/icons/plus.svg';
 import { useState, useCallback } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
-import { Button } from '../../../../../components/common/button/Button';
-import { Select } from '../../../../../components/common/select/Select';
-import { Input } from '../../../../../components/common/input/Input';
+import { Button } from '../../../../../components/admin/button/Button';
+import { Select } from '../../../../../components/admin/select/Select';
+import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
 import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
 import { StatusFilter, ModalState } from '../../../../../types/admin/common';
 import { ImageValues } from '../../../../../types/common/image';
@@ -245,7 +245,7 @@ export const TeamPageToolbar = ({
         <>
             <div className="toolbar">
                 <div className="toolbar-search">
-                    <Input
+                    <SearchBar
                         onChange={(e) => {
                             onSearchQueryChange(e);
                         }}

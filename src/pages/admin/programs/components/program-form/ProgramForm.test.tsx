@@ -1,14 +1,14 @@
-import React, { createRef } from 'react';
+import { createRef } from 'react';
 import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from './ProgramForm';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
-import { InputLabelProps } from '../../../../../components/common/input-label/InputLabel';
+import { InputLabelProps } from '../../../../../components/admin/input-label/InputLabel';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { Image } from '../../../../../types/common/image';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 
-jest.mock('../../../../../components/common/input-label/InputLabel', () => ({
+jest.mock('../../../../../components/admin/input-label/InputLabel', () => ({
     InputLabel: ({ htmlFor, text, isRequired }: InputLabelProps) => (
         <div data-testid="input-label-mock">
             Label: {text} {isRequired && '*'} (for: {htmlFor})
@@ -16,7 +16,7 @@ jest.mock('../../../../../components/common/input-label/InputLabel', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/common/multi-select-input/MultiSelectInput', () => ({
+jest.mock('../../../../../components/admin/multi-select-input/MultiSelectInput', () => ({
     MultiSelectInput: (props: any) => (
         <select
             multiple
@@ -39,7 +39,7 @@ jest.mock('../../../../../components/common/multi-select-input/MultiSelectInput'
     ),
 }));
 
-jest.mock('../../../../../components/common/photo-input/PhotoInput', () => ({
+jest.mock('../../../../../components/admin/photo-input/PhotoInput', () => ({
     PhotoInput: (props: any) => (
         <input
             type="file"
@@ -50,11 +50,11 @@ jest.mock('../../../../../components/common/photo-input/PhotoInput', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/common/input-with-character-limit/InputWithCharacterLimit', () => ({
+jest.mock('../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
     InputWithCharacterLimit: (props: any) => <input {...props} data-testid={`input-${props.name}`} />,
 }));
 
-jest.mock('../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
+jest.mock('../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
     TextAreaWithCharacterLimit: (props: any) => <textarea {...props} data-testid={`textarea-${props.name}`} />,
 }));
 

@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { useLocation } from 'react-router';
-import { useAdminContext } from '../../../contexts/admin/admin-context-provider/AdminContextProvider';
 import { PrivateRoute } from './PrivateRoute';
 import { ADMIN_ROUTES } from '../../../const/admin/routes';
+import { useAdminContext } from '../../../contexts/admin/admin-context-provider/AdminContextProvider';
 
 const mockUseAdminContext = useAdminContext as jest.MockedFunction<typeof useAdminContext>;
 const mockUseLocation = useLocation as jest.MockedFunction<typeof useLocation>;

@@ -42,22 +42,34 @@ victory-center-client/
 │   │       └───public
 │   │           ├───programs-page
 │   │           └───team-page
-│   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
-│   │   ├── admin/                          # Admin-specific components
-│   │   │   ├── admin-context-wrapper/
-│   │   │   ├── admin-navigation/
-│   │   │   ├── private-route/
-│   │   │   └── public-route/
-│   │   ├── common/                         # Shared UI components
-│   │   │   ├── button/
-│   │   │   ├── inline-loader/
-│   │   │   ├── input/
-│   │   │   ├── modal/
-│   │   │   ├── scrollable-program-frame/
-│   │   │   ├── page-loader/
-│   │   │   └── select/
-│   │   ├── footer/
-│   │   └── header/                         # Header-related components
+│   ├── components
+│   │   ├── admin
+│   │   │   ├── admin-context-wrapper
+│   │   │   ├── admin-navigation
+│   │   │   ├── button
+│   │   │   ├── button-tooltip
+│   │   │   ├── category-bar
+│   │   │   ├── confirmation-modal
+│   │   │   ├── context-menu-button
+│   │   │   ├── hint-box
+│   │   │   ├── infinite-scroll-list
+│   │   │   ├── input-label
+│   │   │   ├── input-with-character-limit
+│   │   │   ├── multi-select-input
+│   │   │   ├── photo-input
+│   │   │   ├── private-route
+│   │   │   ├── public-route
+│   │   │   ├── search-bar
+│   │   │   ├── select
+│   │   │   ├── textarea-with-character-limit
+│   │   │   └── visibility-status-label
+│   │   ├── common
+│   │   │   ├── inline-loader
+│   │   │   ├── modal
+│   │   │   └── page-loader
+│   │   └── public
+│   │       ├── footer
+│   │       └── header
 │   ├───const
 │   │   ├───admin
 │   │   ├───common
@@ -77,6 +89,7 @@ victory-center-client/
 │   │   │   ├── intro-section/
 │   │   │   ├── main-value/
 │   │   │   ├── our-mission/
+│   │   │   │   └───scrollable-frame 
 │   │   │   ├── our-team-section/
 │   │   │   └── support-section/
 │   │   ├── admin/                          # Admin pages
@@ -100,8 +113,12 @@ victory-center-client/
 │   │       └── page-2
 │   ├── routes/                             # Route configuration
 │   │   └── app-router
-│   ├── hooks/
-│   │   └── admin/
+│   ├───hooks
+│   │   ├───admin
+│   │   │   ├───use-admin-client
+│   │   │   └───use-create-member-form
+│   │   └───common
+│   │       └───use-on-mount-unsafe
 │   ├───services
 │   │   ├───api
 │   │   │   ├───admin
@@ -122,14 +139,13 @@ victory-center-client/
 │   │   ├───admin
 │   │   ├───common
 │   │   └───public
-│   ├── utils/                              # Utility functions
-│   │   ├── functions/
-│   │   ├── hooks/
-│   │   │   ├── use-admin-client/
-│   │   │   └── use-on-mount-unsafe/
-│   │   └───mock-data
-│   │       ├───admin
-│   │       └───public
+│   ├── utils
+│   │   ├── functions
+│   │   │   ├── get-env-variable
+│   │   │   └── map-image-to-base-64
+│   │   └── mock-data
+│   │       ├── admin
+│   │       └── public
 │   ├───validation
 │   │   ├───admin
 │   │   │   ├───create-member-schema

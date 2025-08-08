@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router';
 import { useAdminContext } from '../../../../contexts/admin/admin-context-provider/AdminContextProvider';
-import { Button } from '../../../../components/common/button/Button';
+import { Button } from '../../../../components/admin/button/Button';
 import Logo from '../../../../assets/icons/logo-with-text.svg';
 import EyeOpened from '../../../../assets/icons/eye-opened.svg';
 import EyeClosed from '../../../../assets/icons/eye-closed.svg';

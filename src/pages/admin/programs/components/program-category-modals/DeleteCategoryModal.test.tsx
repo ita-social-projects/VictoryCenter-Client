@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DeleteCategoryModal } from './DeleteCategoryModal';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
-import { InputLabelProps } from '../../../../../components/common/input-label/InputLabel';
+import { InputLabelProps } from '../../../../../components/admin/input-label/InputLabel';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramCategory } from '../../../../../types/admin/programs';
@@ -11,7 +11,7 @@ import { ProgramCategory } from '../../../../../types/admin/programs';
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
-jest.mock('../../../../../components/common/input-label/InputLabel', () => ({
+jest.mock('../../../../../components/admin/input-label/InputLabel', () => ({
     InputLabel: ({ htmlFor, text, isRequired }: InputLabelProps) => (
         <div data-testid="input-label-mock">
             Label: {text} {isRequired && '*'} (for: {htmlFor})
@@ -27,7 +27,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     return { Modal: ModalMock };
 });
 
-jest.mock('../../../../../components/common/button/Button', () => ({
+jest.mock('../../../../../components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled }: any) => (
         <button onClick={onClick} disabled={disabled}>
             {children}
@@ -35,7 +35,7 @@ jest.mock('../../../../../components/common/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/common/hint-box/HintBox', () => ({
+jest.mock('../../../../../components/admin/hint-box/HintBox', () => ({
     HintBox: ({ title, text }: { title: string; text: string }) => (
         <div data-testid="hint-box">
             <p>{title}</p>

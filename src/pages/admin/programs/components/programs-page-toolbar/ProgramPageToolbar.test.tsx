@@ -1,14 +1,13 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramsPageToolbar } from './ProgramsPageToolbar';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { ButtonProps } from '../../../../../components/common/button/Button';
-import { SelectProps } from '../../../../../components/common/select/Select';
-import { InputProps } from '../../../../../components/common/input/Input';
+import { ButtonProps } from '../../../../../components/admin/button/Button';
+import { SelectProps } from '../../../../../components/admin/select/Select';
 import { VisibilityStatus } from '../../../../../types/admin/common';
+import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
 
-jest.mock('../../../../../components/common/button/Button', () => ({
+jest.mock('../../../../../components/admin/button/Button', () => ({
     Button: ({ children, onClick, buttonStyle, ...props }: ButtonProps) => (
         <button onClick={onClick} className={buttonStyle} {...props}>
             {children}
@@ -16,7 +15,7 @@ jest.mock('../../../../../components/common/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/common/select/Select', () => {
+jest.mock('../../../../../components/admin/select/Select', () => {
     const MockOption = ({ value, name, ...props }: any) => (
         <option value={value} {...props}>
             {name}
@@ -42,8 +41,8 @@ jest.mock('../../../../../components/common/select/Select', () => {
     };
 });
 
-jest.mock('../../../../../components/common/input/Input', () => ({
-    Input: ({ onChange, placeholder, ...props }: InputProps): any => (
+jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
+    SearchBar: ({ onChange, placeholder, ...props }: SearchBarProps): any => (
         <input onChange={(e) => onChange(e.target.value)} placeholder={placeholder} {...props} />
     ),
 }));

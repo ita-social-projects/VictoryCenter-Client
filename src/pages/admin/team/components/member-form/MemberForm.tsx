@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
 import { TeamCategory } from '../../../../../types/admin/team-members';
-import { useCreateMemberForm } from '../../../../../hooks/admin/create-member-form';
 import '../members-list/MembersList.scss';
 import { MAX_FULLNAME_LENGTH, MAX_DESCRIPTION_LENGTH } from '../../../../../const/admin/data-validation';
 import { ImageValues } from '../../../../../types/common/image';
-import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
-import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
+import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import ArrowUp from '../../../../../assets/icons/chevron-up.svg';
 import ArrowDown from '../../../../../assets/icons/chevron-down.svg';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
+import { useCreateMemberForm } from '../../../../../hooks/admin/use-create-member-form/useCreateMemberForm';
 
 export type PublishMemberFormValues = {
     category: TeamCategory;

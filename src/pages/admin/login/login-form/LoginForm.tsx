@@ -1,7 +1,7 @@
 import './LoginForm.scss';
 import React, { useState } from 'react';
 import { NavLink } from 'react-router';
-import Logo from '../../../../assets/icons/logo.svg';
+import Logo from '../../../../assets/icons/logo-with-text.svg';
 import EyeOpened from '../../../../assets/icons/eye-opened.svg';
 import EyeClosed from '../../../../assets/icons/eye-closed.svg';
 import { Button } from '../../../../components/admin/button/Button';
@@ -22,7 +22,7 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
     const handleChange = (field: keyof Credentials) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setCredentials((prev) => ({ ...prev, [field]: e.target.value }));
     };
-    const handleVisibilityChange = () => setIsPasswordVisible(!isPasswordVisible);
+    const handleVisibilityChange = () => setIsPasswordVisible((prev) => !prev);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -35,6 +35,7 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
 
     return (
         <form onSubmit={handleSubmit} className="login-form" spellCheck={false}>
+            ogin
             <NavLink to={PUBLIC_ROUTES.ROOT} className="logo">
                 <img src={Logo} alt={LOGIN_CONST.FORM.LOGO_ALT} />
             </NavLink>
@@ -51,7 +52,6 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
                     required
                 />
             </div>
-
             <div className="login-form-group">
                 <label htmlFor="password">{LOGIN_CONST.FORM.PASSWORD_FIELD_LABEL}</label>
                 <div className="password-input-container">

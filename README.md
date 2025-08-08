@@ -188,7 +188,7 @@ victory-center-client
 ├───LICENSE
 ├───package-lock.json
 ├───package.json
-├───README
+├───README.md
 └───tsconfig.json
 </code></pre>
 

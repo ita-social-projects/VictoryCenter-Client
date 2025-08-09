@@ -1,9 +1,8 @@
-import React from 'react';
-import { TeamMember } from '../../../../../types/admin/TeamMembers';
+import { TeamMember } from '../../../../../types/admin/team-members';
 import classNames from 'classnames';
-import './member-component.scss';
-import BlankUserImage from '../../../../../assets/images/admin/blank-user.svg';
-import { mapImageToBase64 } from '../../../../../utils/functions/mapImageToBase64';
+import './MemberComponent.scss';
+import BlankUserImage from '../../../../../assets/icons/blank-user.svg';
+import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 export const MemberComponent = ({
     member,
     handleOnDeleteMember,

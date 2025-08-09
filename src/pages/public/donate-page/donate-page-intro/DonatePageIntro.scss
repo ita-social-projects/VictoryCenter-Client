@@ -1,0 +1,14 @@
+@use '../../../../assets/sass/variables/fonts';
+
+.donatePageIntro {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+
+    h1 {
+        font-family: fonts.$mulish-regular-font;
+        font-weight: 700;
+        font-size: 4rem;
+        text-align: center;
+    }
+}

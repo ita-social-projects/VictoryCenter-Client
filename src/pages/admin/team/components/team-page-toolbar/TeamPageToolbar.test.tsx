@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TeamPageToolbar, TeamPageToolbarProps } from './TeamPageToolbar';
 import { MemberFormValues } from '../member-form/MemberForm';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
 // Mock the plus icon
 jest.mock('../../../../../assets/icons/plus.svg', () => 'plus-icon.svg');
@@ -36,7 +37,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
 });
 
 // Mock the Button component
-jest.mock('../../../../../components/common/button/Button', () => ({
+jest.mock('../../../../../components/admin/button/Button', () => ({
     Button: ({ children, onClick, buttonStyle, form, type, 'data-testid': testId, ...props }: any) => (
         <button
             onClick={onClick}
@@ -52,7 +53,7 @@ jest.mock('../../../../../components/common/button/Button', () => ({
 }));
 
 // Mock the Select component
-jest.mock('../../../../../components/common/select/Select', () => {
+jest.mock('../../../../../components/admin/select/Select', () => {
     const MockSelect = ({ children, onValueChange, 'data-testid': testId }: any) => (
         <select data-testid={testId} onChange={(e) => onValueChange?.(e.target.value)}>
             {children}
@@ -62,9 +63,9 @@ jest.mock('../../../../../components/common/select/Select', () => {
     return { Select: MockSelect };
 });
 
-// Mock the Input component
-jest.mock('../../../../../components/common/input/Input', () => ({
-    Input: ({ onChange, autocompleteValues, 'data-testid': testId, ...props }: any) => (
+// Mock the SearchBar component
+jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
+    SearchBar: ({ onChange, autocompleteValues, 'data-testid': testId, ...props }: any) => (
         <input
             data-testid={testId}
             onChange={(e) => onChange?.(e.target.value)}
@@ -151,9 +152,9 @@ describe('TeamPageToolbar', () => {
         it('renders select options correctly', () => {
             render(<TeamPageToolbar {...defaultProps} />);
 
-            expect(screen.getByText('Усі')).toBeInTheDocument();
-            expect(screen.getByText('Опубліковано')).toBeInTheDocument();
-            expect(screen.getByText('Чернетка')).toBeInTheDocument();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.ALL)).toBeInTheDocument();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED)).toBeInTheDocument();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT)).toBeInTheDocument();
         });
 
         it('passes autocomplete values to input', () => {
@@ -189,14 +190,14 @@ describe('TeamPageToolbar', () => {
 
             const select = screen.getByTestId('status-filter');
 
-            await userEvent.selectOptions(select, 'Усі');
-            expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith('Усі');
+            await userEvent.selectOptions(select, COMMON_TEXT_ADMIN.FILTER.STATUS.ALL);
+            expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.FILTER.STATUS.ALL);
 
-            await userEvent.selectOptions(select, 'Опубліковано');
-            expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith('Опубліковано');
+            await userEvent.selectOptions(select, COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED);
+            expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED);
 
-            await userEvent.selectOptions(select, 'Чернетка');
-            expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith('Чернетка');
+            await userEvent.selectOptions(select, COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT);
+            expect(defaultProps.onStatusFilterChange).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT);
         });
     });
 

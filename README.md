@@ -7,161 +7,189 @@ This repo contains front end part of the Victory center
 Main structure of this project
 
 <pre><code>
-victory-center-client/
-├── .github/
-│   ├── ISSUE_TEMPLATE
-│   ├── PULL_REQUEST_TEMPLATE
-│   ├── workflows
-│   │   ├── lint.build.yml
-│   │   └── test.build.yml
-│   ├── CODEOWNERS
-│   └── pull_request_template.md
-├── nginx/
-│   └── nginx.conf
-├── public/
-│   └── index.html
-├── scripts/
-│   └── start-in-dev-over-https.mjs
-├── src/
-│   ├── assets/                             # Images, icons, fonts, etc.
-│   │   ├── images
-│   │   │   └── header
-│   │   ├── program_page_images
-│   │   │   ├── icons
-│   │   │   ├── images
-│   │   │   └── videos
-│   │   ├── fonts/
-│   │   ├── icons/
-│   │   ├── images/                         # Image assets
-│   │   │   ├── footer
-│   │   │   ├── admin/
-│   │   │   └── header/
-│   │   ├── sass/
-│   │   │     ├── mixins
-│   │   │     └── variables
-│   │   └── styles/                         # Additional styles
-│   ├── components/                         # Reusable UI components (buttons, inputs, etc.)
-│   │   ├── admin/                          # Admin-specific components
-│   │   │   ├── admin-context-wrapper/
-│   │   │   ├── admin-navigation/
-│   │   │   ├── private-route/
-│   │   │   └── public-route/
-│   │   ├── common/                         # Shared UI components
-│   │   │   ├── button/
-│   │   │   ├── inline-loader/
-│   │   │   ├── input/
-│   │   │   ├── modal/
-│   │   │   ├── scrollable-program-frame/
-│   │   │   ├── page-loader/
-│   │   │   └── select/
-│   │   ├── footer/
-│   │   └── header/                         # Header-related components
-│   ├── const/                              # Constants used across the project
-│   │   ├── about-us-page/
-│   │   ├── admin/
-│   │   ├── footer/
-│   │   ├── header/
-│   │   ├── loader/
-│   │   ├── login-page/
-│   │   ├── program-page/
-│   │   ├── routers/
-|   |   ├── team-page/
-│   │   └── urls/
-│   ├── context/                            # React context providers
-│   │   └── admin-context-provider
-│   ├── layouts/                            # Layout components (e.g., MainLayout, AuthLayout)
-│   │   ├── admin-layout/
-│   │   └── main-layout/
-│   ├── pages/                              # Pages
-│   │   ├── about-us-page/
-│   │   │   ├── company-values/
-│   │   │   ├── donate-section/
-│   │   │   ├── intro-section/
-│   │   │   ├── main-value/
-│   │   │   ├── our-mission/
-│   │   │   ├── our-team-section/
-│   │   │   └── support-section/
-│   │   ├── admin/                          # Admin pages
-│   │   │   ├── admin-page-content/         # Content components for admin pages
-│   │   │   └── team/                       # Team management page
-│   │   │       └── components/             # Components specific to team page
-│   │   ├── login/
-│   │   │   └── components/
-│   │   ├── not-found/
-│   │   ├── program-page/
-│   │   │   └── program-page/
-│   │   │       ├── contact-section/
-│   │   │       ├── intro-section/
-│   │   │       ├── program-section/
-│   │   │       │   └── program-card/
-│   │   │       └── question-section/
-│   │   │           └── question-card/
-│   │   └── user-pages
-│   │       ├── home-page
-│   │       ├── team-page
-│   │       └── page-2
-│   ├── routes/                             # Route configuration
-│   │   └── app-router
-<<<<<<< HEAD
-                           # Custom React hooks
-=======
-<<<<<<< HEAD
-│   ├── hooks/                              # Custom React hooks
-=======
->>>>>>> ece11d0
-│   ├── hooks/# Custom React hooks
-│   │   └── admin/
-│   ├── context/                            # React context providers
-│   │   └── admin-context-provider
-<<<<<<< HEAD
-=======
->>>>>>> feature/issue-12
->>>>>>> ece11d0
-│   ├── services/                           # API calls, data services
-│   │   ├── auth/
-│   │   │   ├── auth-service/
-│   │   │   ├── create-admin-client/
-│   │   │   └── resolve-with-new-token/
-│   │   └── data-fetch
-│   │       ├── admin-page-data-fetch
-|   |           └── team-page-data-fetch
-│   │       ├── login-page-data-fetch
-│   │       ├── program-page-data-fetch
-│   │       └── user-pages-data-fetch
-│   │           ├── home-page-data-fetch
-│   │           ├── team-page-data-fetch
-│   │           └── page-2-data-fetch
-│   ├── types/
-│   ├── utils/                              # Utility functions
-│   │   ├── functions/
-│   │   ├── hooks/
-│   │   │   ├── use-admin-client/
-│   │   │   └── use-on-mount-unsafe/
-│   │   └── mock-data/
-│   │       ├── admin-page/                 # Mock data for admin pages
-│   │       ├── program-page/
-│   │       └── user-pages/                 # Mock data for user pages
-│   │           ├── home-page/
-│   │           ├── team-page/
-│   │           └── page-2/
-│   ├── validation
-│   │   └── admin-create-member-form
-│   ├── index.jsx                           # Entry point (ReactDOM.createRoot)
-│   ├── index.css                           # Global styles (normalizer)
-│   ├── react-app-env.d.ts
-│   ├── reportWebVitals.ts
-│   ├── setupProxy.ts
-│   └── setupTests.ts
-├── .coderabbit.yaml
-├── .dockerignore
-├── .env.development
-├── .gitignore
-├── Dockerfile
-├── LICENSE
-├── package-lock.json
-├── package.json
-├── README
-└── tsconfig.json
+victory-center-client
+├───.github
+│   ├───ISSUE_TEMPLATE
+│   ├───PULL_REQUEST_TEMPLATE
+│   ├───workflows
+│   │   ├───lint.build.yml
+│   │   └───test.build.yml
+│   ├───CODEOWNERS
+│   └───pull_request_template.md
+├───nginx
+│   └───nginx.conf
+├───public
+│   └───index.html
+├───scripts
+│   └───start-in-dev-over-https.mjs
+├───src
+│   ├───__mocks__
+│   ├───assets
+│   │   ├───fonts
+│   │   ├───icons
+│   │   ├───images
+│   │   │   ├───admin
+│   │   │   ├───common
+│   │   │   └───public
+│   │   │       ├───about-us-page
+│   │   │       ├───programs-page
+│   │   │       └───team-page
+│   │   ├───sass
+│   │   │   ├───mixins
+│   │   │   └───variables
+│   │   └───videos
+│   │       ├───admin
+│   │       ├───common
+│   │       └───public
+│   │           ├───programs-page
+│   │           └───team-page
+│   ├───components
+│   │   ├───admin
+│   │   │   ├───admin-context-wrapper
+│   │   │   ├───admin-navigation
+│   │   │   ├───button
+│   │   │   ├───button-tooltip
+│   │   │   ├───category-bar
+│   │   │   ├───confirmation-modal
+│   │   │   ├───context-menu-button
+│   │   │   ├───hint-box
+│   │   │   ├───infinite-scroll-list
+│   │   │   ├───input-label
+│   │   │   ├───input-with-character-limit
+│   │   │   ├───multi-select-input
+│   │   │   ├───photo-input
+│   │   │   ├───private-route
+│   │   │   ├───public-route
+│   │   │   ├───search-bar
+│   │   │   ├───select
+│   │   │   ├───textarea-with-character-limit
+│   │   │   └───visibility-status-label
+│   │   ├───common
+│   │   │   ├───inline-loader
+│   │   │   ├───modal
+│   │   │   └───page-loader
+│   │   └───public
+│   │       ├───footer
+│   │       └───header
+│   ├───const
+│   │   ├───admin
+│   │   ├───common
+│   │   │   └───api-routes
+│   │   └───public
+│   ├───hooks
+│   │   ├───admin
+│   │   │   ├───use-admin-client
+│   │   │   └───use-create-member-form
+│   │   └───common
+│   │       └───use-on-mount-unsafe
+│   ├───contexts
+│   │   ├───admin
+│   │   │   └───admin-context-provider
+│   │   └───public
+│   ├───layouts
+│   │   ├───admin-layout
+│   │   └───public-layout
+│   ├───pages
+│   │   ├───admin
+│   │   │   ├───home
+│   │   │   ├───login
+│   │   │   │   └───login-form
+│   │   │   ├───programs
+│   │   │   │   └───components
+│   │   │   │       ├───program-category-modals
+│   │   │   │       ├───program-form
+│   │   │   │       ├───program-list-item
+│   │   │   │       ├───program-modals
+│   │   │   │       ├───programs-page-content
+│   │   │   │       └───programs-page-toolbar
+│   │   │   └──team
+│   │   │      └───components
+│   │   │          ├───member-component
+│   │   │          ├───member-drag-preview
+│   │   │          ├───member-form
+│   │   │          ├───members-list
+│   │   │          ├───members-list-item
+│   │   │          ├───team-page-content
+│   │   │          └───team-page-toolbar
+│   │   └───public
+│   │       ├───about-us-page
+│   │       │   ├───company-values
+│   │       │   ├───donate-section
+│   │       │   ├───intro-section
+│   │       │   ├───main-value
+│   │       │   ├───our-mission
+│   │       │   │    └───scrollable-frame 
+│   │       │   ├───our-team-section
+│   │       │   └───support-section
+│   │       ├───donate-page
+│   │       │   ├───copy-text-button
+│   │       │   ├───donate-page-intro
+│   │       │   ├───donate-section
+│   │       │   └───right-section
+│   │       │       ├───abroad-payment-details
+│   │       │       ├───alternative-support-ways
+│   │       │       └───ukraine-payment-details
+│   │       ├───not-found
+│   │       ├───programs-page
+│   │       │   ├───contact-section
+│   │       │   ├───intro-section
+│   │       │   ├───programs-section
+│   │       │   │   └───program-card
+│   │       │   └───question-section
+│   │       │       └───question-card
+│   │       └───team-page
+│   │           └───TeamMemberCard
+│   ├───routes
+│   │   └───app-router
+│   ├───services
+│   │   ├───api
+│   │   │   ├───admin
+│   │   │   │   ├───image
+│   │   │   │   ├───login
+│   │   │   │   ├───programs
+│   │   │   │   └───team
+│   │   │   │       ├───team-members
+│   │   │   │       └───team-categories
+│   │   │   └───public
+│   │   │       ├───programs
+│   │   │       └───team
+│   │   └───auth
+│   │       ├───auth-service
+│   │       ├───create-admin-client
+│   │       └───resolve-with-new-token
+│   ├───types
+│   │   ├───admin
+│   │   ├───common
+│   │   └───public
+│   ├───utils
+│   │   ├───functions
+│   │   │   ├───get-env-variable
+│   │   │   └───map-image-to-base-64
+│   │   └───mock-data
+│   │       ├───admin
+│   │       └───public
+│   ├───validation
+│   │   ├───admin
+│   │   │   ├───create-member-schema
+│   │   │   ├───program-category-schema
+│   │   │   └───program-schema
+│   │   └───public
+│   ├───index.jsx                           # Entry point (ReactDOM.createRoot)
+│   ├───index.css                           # Global styles (normalizer)
+│   ├───react-app-env.d.ts
+│   ├───reportWebVitals.ts
+│   ├───setupProxy.ts
+│   └───setupTests.ts
+├───.coderabbit.yaml
+├───.dockerignore
+├───.env.development
+├───.gitignore
+├───Dockerfile
+├───LICENSE
+├───package-lock.json
+├───package.json
+├───README.md
+└───tsconfig.json
 </code></pre>
 
 <div>

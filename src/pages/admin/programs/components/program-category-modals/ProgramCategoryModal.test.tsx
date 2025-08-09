@@ -1,11 +1,10 @@
-import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramCategoryModal } from './ProgramCategoryModal';
-import { ProgramCategory } from '../../../../../types/admin/Programs';
-import { InputLabelProps } from '../../../../../components/common/input-label/InputLabel';
+import { InputLabelProps } from '../../../../../components/admin/input-label/InputLabel';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { ProgramCategory } from '../../../../../types/admin/programs';
 
 const mockCategory: ProgramCategory = { id: 1, name: 'Test Category', programsCount: 0 };
 const mockCategories: ProgramCategory[] = [
@@ -17,7 +16,7 @@ const mockOnClose = jest.fn();
 const mockOnAddCategory = jest.fn();
 const mockOnEditCategory = jest.fn();
 
-jest.mock('../../../../../components/common/input-label/InputLabel', () => ({
+jest.mock('../../../../../components/admin/input-label/InputLabel', () => ({
     InputLabel: ({ htmlFor, text, isRequired }: InputLabelProps) => (
         <div data-testid="input-label-mock">
             Label: {text} {isRequired && '*'} (for: {htmlFor})
@@ -43,7 +42,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     return { Modal: MockModal };
 });
 
-jest.mock('../../../../../components/common/button/Button', () => ({
+jest.mock('../../../../../components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled, type, form }: any) => (
         <button data-testid="save-button" onClick={onClick} disabled={disabled} type={type} form={form}>
             {children}
@@ -51,11 +50,11 @@ jest.mock('../../../../../components/common/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/common/hint-box/HintBox', () => ({
+jest.mock('../../../../../components/admin/hint-box/HintBox', () => ({
     HintBox: ({ title }: any) => <div data-testid="hint-box">{title}</div>,
 }));
 
-jest.mock('../../../../../components/common/input-with-character-limit/InputWithCharacterLimit', () => ({
+jest.mock('../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
     InputWithCharacterLimit: ({ onChange, onBlur, value, disabled }: any) => (
         <input
             data-testid="category-name-input"
@@ -67,8 +66,8 @@ jest.mock('../../../../../components/common/input-with-character-limit/InputWith
     ),
 }));
 
-jest.mock('../../../../../components/common/question-modal/QuestionModal', () => ({
-    QuestionModal: ({ isOpen, title, confirmText, onConfirm, onCancel }: any) =>
+jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({ isOpen, title, confirmText, onConfirm, onCancel }: any) =>
         isOpen ? (
             <div data-testid="question-modal">
                 <p>{title}</p>

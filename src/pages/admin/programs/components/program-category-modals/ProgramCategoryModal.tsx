@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
-import { Button } from '../../../../../components/common/button/Button';
-import { HintBox } from '../../../../../components/common/hint-box/HintBox';
-import { InputLabel } from '../../../../../components/common/input-label/InputLabel';
-import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
-import { QuestionModal } from '../../../../../components/common/question-modal/QuestionModal';
-import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/admin/Programs';
+import { Button } from '../../../../../components/admin/button/Button';
+import { HintBox } from '../../../../../components/admin/hint-box/HintBox';
+import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
+import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
+import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-category-schema/program-category-schema';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import './program-category-modal.scss';
+import './ProgramCategoryModal.scss';
+import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/admin/programs';
 
 interface ProgramCategoryFormValues {
     name: string;
@@ -330,7 +330,7 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
             </Modal>
 
             {/* Save confirmation */}
-            <QuestionModal
+            <ConfirmationModal
                 isOpen={showSaveConfirmModal}
                 title={COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
@@ -341,7 +341,7 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
             />
 
             {/* CLose confirmation */}
-            <QuestionModal
+            <ConfirmationModal
                 isOpen={showCloseConfirmModal}
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}

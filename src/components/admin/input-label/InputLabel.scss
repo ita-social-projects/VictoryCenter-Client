@@ -1,0 +1,10 @@
+@use '../../../assets/sass/variables/colors';
+
+.input-label {
+    color: colors.$grey-900;
+    font-size: 16px;
+
+    .required-field {
+        color: colors.$error;
+    }
+}

@@ -1,0 +1,15 @@
+@use '../../../../../assets/sass/variables/colors';
+
+.error-container {
+    width: 100%;
+    margin: 0.5rem;
+    text-align: center;
+    color: colors.$error;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.w-100 {
+    width: 100% !important;
+}

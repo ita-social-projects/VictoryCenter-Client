@@ -8,7 +8,7 @@ import { mapImageToBase64 } from '../../../utils/functions/map-image-to-base-64/
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 interface PhotoInputProps {
-    value: ImageValues | null;
+    value: ImageValues | string | null;
     onChange: (image: ImageValues | null) => void;
     onBlur?: () => void;
     disabled?: boolean;
@@ -19,7 +19,7 @@ interface PhotoInputProps {
 
 export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: PhotoInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
-    const [previewImage, setPreviewImage] = useState<ImageValues | null>(null);
+    const [previewImage, setPreviewImage] = useState<ImageValues | string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -134,7 +134,7 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
             {previewImage ? (
                 <div className="photo-preview">
                     <img
-                        src={mapImageToBase64(previewImage) ?? undefined}
+                        src={typeof previewImage === 'string' ? previewImage : (mapImageToBase64(previewImage) ?? undefined)}
                         alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
                         className="preview-image"
                         data-testid="preview-image"

@@ -9,7 +9,7 @@ const mockMember: TeamMember = {
     id: 1,
     img: {
         id: 1,
-        base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
+        url: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
         mimeType: 'image/jpeg',
         size: 0,
     },

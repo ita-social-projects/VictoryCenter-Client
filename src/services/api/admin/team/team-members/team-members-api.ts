@@ -64,7 +64,7 @@ export const TeamMembersApi = {
         let imageIdToDelete: number | null = null;
         let finalImageId = member.imageId;
 
-        if (member.image) {
+        if (member.image && typeof member.image !== 'string') {
             if (member.imageId) {
                 const imageResult = await ImageApi.put(client, member.image, member.imageId);
                 finalImageId = imageResult.id;
@@ -110,7 +110,7 @@ export const TeamMembersApi = {
 
 export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): TeamMember => ({
     id: dto.id,
-    img: dto.image,
+    img: dto.image.url,
     fullName: dto.fullName,
     description: dto.description,
     status: dto.status === VisibilityStatus.Draft ? COMMON_TEXT_ADMIN.STATUS.DRAFT : COMMON_TEXT_ADMIN.STATUS.PUBLISHED,

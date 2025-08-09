@@ -15,7 +15,7 @@ export type PublishMemberFormValues = {
     category: TeamCategory;
     fullName: string;
     description: string;
-    image: ImageValues | null;
+    image: ImageValues | string | null;
     imageId: number | null;
 };
 
@@ -23,7 +23,7 @@ export type DraftMemberFormValues = {
     category: TeamCategory;
     fullName: string;
     description: string;
-    image: ImageValues | null;
+    image: ImageValues | string | null;
     imageId: number | null;
 };
 

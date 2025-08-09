@@ -90,7 +90,7 @@ jest.mock('../member-form/MemberForm', () => ({
             fullName: 'Test User',
             description: 'Test Description',
             image: {
-                base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABDQottAAAAABJRU5ErkJggg==',
+                url: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABDQottAAAAABJRU5ErkJggg==',
                 mimeType: 'image/png',
                 size: 0,
             },

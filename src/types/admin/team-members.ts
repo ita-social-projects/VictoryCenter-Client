@@ -2,7 +2,7 @@ import { Image } from '../common/image';
 
 export type TeamMember = {
     id: number;
-    img: Image | null;
+    img: string | null;
     fullName: string;
     description: string;
     status: string;

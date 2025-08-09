@@ -6,7 +6,7 @@ import { ImageValues } from '../../../types/common/image';
 
 const createImageFile = () => new File(['dummy content'], 'example.png', { type: 'image/png' });
 const MockImageValue: ImageValues = {
-    base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAocB9eQ6vqoAAAAASUVORK5CYII=',
+    url: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAocB9eQ6vqoAAAAASUVORK5CYII=',
     mimeType: 'image/jpeg',
     size: 0,
 };
@@ -31,7 +31,7 @@ describe('PhotoInput', () => {
         render(<PhotoInput value={MockImageValue} onChange={onChangeMock} />);
         const previewImage = screen.getByTestId('preview-image');
         expect(previewImage).toBeInTheDocument();
-        expect(previewImage).toHaveAttribute('src', `data:${MockImageValue.mimeType};base64,${MockImageValue.base64}`);
+        expect(previewImage).toHaveAttribute('src', `data:${MockImageValue.mimeType};base64,${MockImageValue.url}`);
     });
 
     it('calls onChange when file is selected via input', async () => {

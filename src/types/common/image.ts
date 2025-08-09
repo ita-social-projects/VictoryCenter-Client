@@ -1,6 +1,6 @@
 export interface Image {
     id: number | null;
-    base64: string;
+    url: string;
     mimeType: string;
     size: number;
 }

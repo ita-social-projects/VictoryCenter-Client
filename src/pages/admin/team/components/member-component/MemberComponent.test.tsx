@@ -7,7 +7,7 @@ import { Image } from '../../../../../types/common/image';
 
 const mockImage: Image = {
     id: 1,
-    base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
+    url: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
     mimeType: 'image/jpeg',
     size: 0,
 };
@@ -74,7 +74,7 @@ describe('MemberComponent', () => {
             );
 
             const image = screen.getByRole('img');
-            expect(image).toHaveAttribute('src', `data:${mockImage.mimeType};base64,${mockImage.base64}`);
+            expect(image).toHaveAttribute('src', `data:${mockImage.mimeType};base64,${mockImage.url}`);
             expect(image).toHaveAttribute('alt', 'John Doe-img');
         });
 
@@ -326,7 +326,7 @@ describe('MemberComponent', () => {
             expect(screen.getByText('Testing props')).toBeInTheDocument();
             expect(screen.getByRole('img')).toHaveAttribute(
                 'src',
-                `data:${mockImage.mimeType};base64,${mockImage.base64}`,
+                `data:${mockImage.mimeType};base64,${mockImage.url}`,
             );
             expect(screen.getByText('Чернетка')).toBeInTheDocument();
 

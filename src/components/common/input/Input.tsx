@@ -60,11 +60,14 @@ export const Input = ({ onChange, autocompleteValues, placeholder }: InputProps)
                 className={classNames({ ...buttonClasses, 'input-search-icon': true })}
                 data-testid="search-icon"
             />
-            <button
-                onClick={handleRemoveQueryIconClick}
-                className={classNames({ ...buttonClasses, 'input-remove-query-icon': true })}
-                data-testid="remove-query-icon"
-            />
+            {value.length > 0 && (
+                <button
+                    onClick={handleRemoveQueryIconClick}
+                    className={classNames({ ...buttonClasses, 'input-remove-query-icon': true })}
+                    data-testid="remove-query-icon"
+                />
+            )}
+
             <input
                 ref={inputRef}
                 value={value}

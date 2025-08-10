@@ -1,23 +1,34 @@
-import { Image } from '../Image';
+import { Image, ImageValues } from '../Image';
+import { VisibilityStatus } from './Common';
 
 export type TeamMember = {
     id: number;
-    img: Image | null;
+    image: Image | null;
     fullName: string;
     description: string;
-    status: string;
-    category: TeamCategory;
+    status: VisibilityStatus;
+    categoryId: number;
 };
 
 export interface TeamMemberDto {
     id: number;
     fullName: string;
-    category: TeamCategory;
+    categoryId: number;
     priority: number;
     status: number;
     description: string;
     image: Image;
     email: string;
+}
+
+export interface TeamMemberCreateUpdateRequest {
+    id: number | null;
+    fullName: string;
+    description: string;
+    image: ImageValues | null;
+    categoryId: number | null;
+    status: VisibilityStatus;
+    imageId: number | null;
 }
 
 export type TeamCategory = {

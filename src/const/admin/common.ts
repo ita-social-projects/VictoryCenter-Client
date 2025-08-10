@@ -43,7 +43,7 @@ export const COMMON_TEXT_ADMIN = {
     FILTER: {
         SEARCH_BY_NAME: 'Пошук за назвою',
         STATUS: {
-            ALL: 'Всі записи',
+            ALL: 'Усі',
             PUBLISHED: 'Опубліковано',
             DRAFT: 'Чернетка',
         },

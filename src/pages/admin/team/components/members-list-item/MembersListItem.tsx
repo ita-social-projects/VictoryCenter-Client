@@ -4,23 +4,24 @@ import React from 'react';
 import { MemberComponent } from '../member-component/MemberComponent';
 import './members-list-item.scss';
 import classNames from 'classnames';
+import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 
-type MembersListItemProps = {
+interface MembersListItemProps {
     member: TeamMember;
     handleDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
     handleDragStart: (e: React.DragEvent<HTMLDivElement>, index: number) => void;
     handleDrag: (e: React.DragEvent<HTMLDivElement>) => void;
     handleDragEnd: () => void;
     handleDrop: (index: number) => void;
-    handleOnDeleteMember: (fullName: string) => void;
-    handleOnEditMember: (id: number) => void;
-    index: number;
+    handleOnDeleteMember: (member: TeamMember) => void;
+    handleOnEditMember: (member: TeamMember) => void;
+    id: number;
     draggedIndex: number | null;
-};
+}
 
 export const MembersListItem = ({
     draggedIndex,
-    index,
+    id,
     member,
     handleDragOver,
     handleDragEnd,
@@ -32,22 +33,22 @@ export const MembersListItem = ({
 }: MembersListItemProps) => {
     return (
         <div
-            className={classNames('members-wrapper', { dragging: draggedIndex === index })}
+            className={classNames('members-wrapper', { dragging: draggedIndex === id })}
             onDragOver={handleDragOver}
-            onDrop={() => handleDrop(index)}
+            onDrop={() => handleDrop(id)}
             onDragEnd={handleDragEnd}
         >
             <div
                 className="members-dragger"
                 draggable
-                onDragStart={(e) => handleDragStart(e, index)}
+                onDragStart={(e) => handleDragStart(e, id)}
                 onDrag={handleDrag}
                 onDragEnd={handleDragEnd}
                 role="button"
                 aria-label="Drag member"
                 tabIndex={0}
             >
-                <img src={DragIcon} alt="Drag Handle" />
+                <img src={DragIcon} alt={TEAM_MEMBERS_TEXT.ACTIONS.REORDER} />
             </div>
 
             <MemberComponent

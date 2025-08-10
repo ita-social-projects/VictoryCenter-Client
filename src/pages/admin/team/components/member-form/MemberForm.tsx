@@ -1,202 +1,238 @@
-import { useEffect, useState } from 'react';
 import { TeamCategory } from '../../../../../types/admin/TeamMembers';
-import { useCreateMemberForm } from '../../../../../hooks/admin/create-member-form';
-import '../members-list/members-list.scss';
-import { MAX_FULLNAME_LENGTH, MAX_DESCRIPTION_LENGTH } from '../../../../../const/admin/data-validation';
-import {
-    TEAM_LABEL_CATEGORY,
-    TEAM_LABEL_SELECT_CATEGORY,
-    TEAM_LABEL_FULLNAME,
-    TEAM_LABEL_DESCRIPTION,
-} from '../../../../../const/team';
-import { ImageValues } from '../../../../../types/Image';
+import './member-form.scss';
+import { ImageValues, ImageValuesToImage } from '../../../../../types/Image';
 import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
-import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
-import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
-import ArrowUp from '../../../../../assets/icons/chevron-up.svg';
-import ArrowDown from '../../../../../assets/icons/chevron-down.svg';
+import { VisibilityStatus } from '../../../../../types/admin/Common';
+import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/team-member-schema/team-member-schema';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { InputLabel } from '../../../../../components/common/input-label/InputLabel';
+import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
+import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { TextAreaWithCharacterLimit } from '../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-scheme';
+import { SingleSelectInput } from '../../../../../components/common/single-select-input/SingleSelectInput';
 
-export type PublishMemberFormValues = {
-    category: TeamCategory;
+export interface TeamMemberFormValues {
+    categoryId: number | null;
     fullName: string;
     description: string;
     image: ImageValues | null;
     imageId: number | null;
-};
+}
 
-export type DraftMemberFormValues = {
-    category: TeamCategory;
-    fullName: string;
-    description: string;
-    image: ImageValues | null;
-    imageId: number | null;
-};
+export interface TeamMemberFormErrorState {
+    category?: string;
+    fullName?: string;
+    description?: string;
+    image?: string;
+}
 
-export type MemberFormValues = PublishMemberFormValues | DraftMemberFormValues;
+export interface TeamMemberFormRef {
+    submit: (status: VisibilityStatus) => void;
+    isValid: (isPublishing?: boolean) => boolean;
+    isDirty: () => boolean;
+}
 
-export type MemberFormProps = {
-    id: string;
-    onSubmit: (memberFormValues: MemberFormValues) => void;
-    onDraftSubmit?: (data: MemberFormValues) => void;
-    existingMemberFormValues?: MemberFormValues | null;
-    onValuesChange?: (memberFormValues: MemberFormValues) => void;
-    onError?: (msg: string | null) => void;
-    isDraft: boolean;
-};
+export interface MemberFormProps {
+    onSubmit: (data: TeamMemberFormValues, status: VisibilityStatus) => void;
+    initialData?: TeamMemberFormValues | null;
+    formDisabled?: boolean;
+    categories: TeamCategory[];
+    onValidationChange?: (isValid: boolean) => void;
+}
 
-export const MemberForm = ({
-    onSubmit,
-    onDraftSubmit,
-    id,
-    existingMemberFormValues = null,
-    onValuesChange,
-    onError,
-    isDraft,
-}: MemberFormProps) => {
-    const client = useAdminClient();
-    const [categories, setCategories] = useState<TeamCategory[]>([]);
-    const [isLoadingCategories, setIsLoadingCategories] = useState(true);
-    const [isInitialized, setIsInitialized] = useState(false);
-    const [isOpen, setIsOpen] = useState(false);
-    const [memberFormValues, setMemberFormValues] = useState<MemberFormValues>(
-        existingMemberFormValues || {
-            fullName: '',
-            image: null,
-            imageId: null,
-            description: '',
-            category: {} as TeamCategory,
-        },
-    );
-
-    const handleOpenSelect = () => {
-        setIsOpen(!isOpen);
+const validateForm = (formState: TeamMemberFormValues, isPublishing: boolean): TeamMemberFormErrorState => {
+    return {
+        fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, isPublishing),
+        image: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(formState.image, isPublishing),
+        description: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(formState.description, isPublishing),
+        category: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateCategory(formState.categoryId, isPublishing),
     };
+};
 
-    const {
-        register,
-        watch,
-        handleSubmit,
-        setValue,
-        reset,
-        formState: { errors },
-    } = useCreateMemberForm(isDraft);
+const hasErrors = (errors: TeamMemberFormErrorState): boolean => {
+    return Object.values(errors).some((error) => error !== undefined);
+};
 
-    const handleOnSubmit = (data: MemberFormValues) => {
-        if (isDraft) {
-            onDraftSubmit?.(data);
-        } else {
-            onSubmit(data);
-        }
-    };
+export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
+    ({ initialData = null, onSubmit, formDisabled, categories, onValidationChange }: MemberFormProps, ref) => {
+        const defaultFormState = useMemo<TeamMemberFormValues>(
+            () => ({
+                fullName: '',
+                categoryId: null,
+                imageId: null,
+                description: '',
+                image: null,
+            }),
+            [],
+        );
 
-    const onFileChange = (item: ImageValues | null) => {
-        setMemberFormValues((prev) => ({
-            ...prev,
-            image: item,
+        const [formState, setFormState] = useState<TeamMemberFormValues>(defaultFormState);
+        const [errors, setErrors] = useState<TeamMemberFormErrorState>({});
+        const [initialFormState, setInitialFormState] = useState<TeamMemberFormValues>(defaultFormState);
+        const [isSubmitting, setIsSubmitting] = useState(false);
+
+        const reset = useCallback(
+            (data: TeamMemberFormValues | null) => {
+                const newState = data || defaultFormState;
+                setFormState(newState);
+                setInitialFormState(newState);
+                setErrors({});
+            },
+            [defaultFormState],
+        );
+
+        const isDirty = useCallback(() => {
+            return JSON.stringify(formState) !== JSON.stringify(initialFormState);
+        }, [formState, initialFormState]);
+
+        const isValid = useCallback(
+            (isPublishing: boolean = false) => {
+                const formErrors = validateForm(formState, isPublishing);
+                return !hasErrors(formErrors);
+            },
+            [formState],
+        );
+
+        useEffect(() => {
+            const formErrors = validateForm(formState, false);
+            const isFormValid = !hasErrors(formErrors);
+
+            if (onValidationChange) {
+                onValidationChange(isFormValid);
+            }
+        }, [formState, onValidationChange]);
+
+        useEffect(() => {
+            reset(initialData);
+        }, [initialData, reset]);
+
+        const handleFullNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+            const value = e.target.value;
+            setFormState((prev) => ({ ...prev, fullName: value }));
+        }, []);
+
+        const handleNameBlur = useCallback(() => {
+            const error = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false);
+            setErrors((prev) => ({ ...prev, fullName: error }));
+        }, [formState.fullName]);
+
+        const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const value = e.target.value;
+            setFormState((prev) => ({ ...prev, description: value }));
+        }, []);
+
+        const handleDescriptionBlur = useCallback(() => {
+            const error = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(formState.description, false);
+            setErrors((prev) => ({ ...prev, description: error }));
+        }, [formState.description]);
+
+        const handleImgChange = useCallback((file: ImageValues | null) => {
+            const image = ImageValuesToImage(file);
+            setFormState((prev) => ({ ...prev, image: image }));
+            const error = PROGRAM_VALIDATION_FUNCTIONS.validateImg(image, false);
+            setErrors((prev) => ({ ...prev, image: error }));
+        }, []);
+
+        const handleCategoryChange = useCallback((category: TeamCategory) => {
+            setFormState((prev) => ({
+                ...prev,
+                categoryId: category.id,
+            }));
+            const error = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateCategory(category.id, false);
+            setErrors((prev) => ({ ...prev, category: error }));
+        }, []);
+
+        const handleCategoryBlur = useCallback(() => {
+            const error = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateCategory(formState.categoryId, false);
+            setErrors((prev) => ({ ...prev, category: error }));
+        }, [formState.categoryId]);
+
+        const submit = useCallback(
+            async (status: VisibilityStatus) => {
+                if (isSubmitting) return;
+
+                setIsSubmitting(true);
+                const isPublishing = status === VisibilityStatus.Published;
+
+                try {
+                    const formErrors = validateForm(formState, isPublishing);
+                    setErrors(formErrors);
+
+                    if (hasErrors(formErrors)) {
+                        return;
+                    }
+
+                    await onSubmit(formState, status);
+                } finally {
+                    setIsSubmitting(false);
+                }
+            },
+            [formState, onSubmit, isSubmitting],
+        );
+
+        useImperativeHandle(ref, () => ({
+            submit,
+            isDirty,
+            isValid,
         }));
-        setValue('image', item, { shouldValidate: true });
-    };
 
-    useEffect(() => {
-        if (existingMemberFormValues && !isInitialized) {
-            reset({
-                ...existingMemberFormValues,
-                image: existingMemberFormValues.image || null,
-            });
-            setIsInitialized(true);
-        }
-    }, [existingMemberFormValues, isInitialized, reset]);
-
-    useEffect(() => {
-        const subscription = watch((value) => {
-            if (onValuesChange) {
-                onValuesChange(value as MemberFormValues);
-            }
-        });
-        return () => subscription.unsubscribe();
-    }, [watch, onValuesChange]);
-
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const data = await TeamCategoriesApi.getAll(client);
-                setCategories(data);
-            } catch (error) {
-                onError?.((error as Error).message);
-            } finally {
-                setIsLoadingCategories(false);
-            }
-        };
-        fetchCategories();
-    }, [client, onError]);
-
-    return (
-        <form id={id} onSubmit={handleSubmit(handleOnSubmit)} data-testid="test-form">
-            <div className="members-add-modal-body">
+        return (
+            <form className="team-member-form-main" data-testid="test-form" noValidate>
                 <div className="form-group">
-                    <label htmlFor="category" className="no-pointer-events">
-                        <span className="field-required">*</span>
-                        {TEAM_LABEL_CATEGORY}
-                    </label>
-                    <select
-                        value={memberFormValues?.category?.id ?? ''}
-                        onChange={(e) => {
-                            const selected = categories.find((c) => c.id === Number(e.target.value));
-                            setMemberFormValues((prev) => ({
-                                ...prev,
-                                category: selected as TeamCategory,
-                            }));
-                            if (selected) {
-                                setValue('category', selected, { shouldValidate: true });
-                            }
-                        }}
-                        disabled={isLoadingCategories}
-                        id="category"
-                        className="custom-select"
-                        onClick={handleOpenSelect}
-                    >
-                        <option value="" disabled className="option-value">
-                            {TEAM_LABEL_SELECT_CATEGORY}
-                        </option>
-                        {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                                {category.name}
-                            </option>
-                        ))}
-                    </select>
-                    <img src={isOpen ? ArrowUp : ArrowDown} className="icon-img" alt="arrow-down" />
-                    {errors.category && <p className="error">{errors.category.message}</p>}
+                    <InputLabel htmlFor={'category'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.CATEGORY} isRequired />
+                    <SingleSelectInput
+                        disabled={isSubmitting || formDisabled}
+                        onBlur={handleCategoryBlur}
+                        onChange={handleCategoryChange}
+                        value={categories.filter((c) => c.id === formState.categoryId)[0]}
+                        options={categories}
+                        getOptionId={(c: TeamCategory) => c.id}
+                        getOptionName={(c: TeamCategory) => c.name}
+                        placeholder={TEAM_MEMBERS_TEXT.FORM.LABEL.SELECT_CATEGORY}
+                    ></SingleSelectInput>
+                    {errors.category && <p className="error">{errors.category}</p>}
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="fullName">
-                        <span className="field-required">*</span>
-                        {TEAM_LABEL_FULLNAME}
-                    </label>
-                    <input maxLength={MAX_FULLNAME_LENGTH} type="text" id="fullName" {...register('fullName')} />
-                    <div className="form-group-fullname-length-limit">
-                        {watch('fullName')?.length || 0}/{MAX_FULLNAME_LENGTH}
-                    </div>
-                    {errors.fullName && <p className="error">{errors.fullName.message}</p>}
-                </div>
-                <div className="form-group">
-                    <label htmlFor="description">{TEAM_LABEL_DESCRIPTION}</label>
-                    <textarea
-                        maxLength={MAX_DESCRIPTION_LENGTH}
-                        className="form-group-description"
-                        id="description"
-                        {...register('description')}
+                    <InputLabel htmlFor={'fullName'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.FULLNAME} isRequired />
+                    <InputWithCharacterLimit
+                        value={formState.fullName}
+                        onChange={handleFullNameChange}
+                        onBlur={handleNameBlur}
+                        id="fullName"
+                        name="fullName"
+                        maxLength={TEAM_MEMBER_VALIDATION.fullName.max}
+                        disabled={isSubmitting || formDisabled}
                     />
-                    {errors.description && <p className="error">{errors.description.message}</p>}
-                    <div className="form-group-description-length-limit">
-                        {watch('description')?.length || 0}/{MAX_DESCRIPTION_LENGTH}
-                    </div>
+                    {errors.fullName && <p className="error">{errors.fullName}</p>}
                 </div>
                 <div className="form-group">
-                    <PhotoInput value={memberFormValues?.image ?? null} onChange={onFileChange} id="photo" />
-                    {errors.image && <p className="error">{errors.image.message}</p>}
+                    <InputLabel htmlFor={'description'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.DESCRIPTION} />
+                    <TextAreaWithCharacterLimit
+                        value={formState.description}
+                        onChange={handleDescriptionChange}
+                        onBlur={handleDescriptionBlur}
+                        id="description"
+                        name="description"
+                        rows={8}
+                        disabled={isSubmitting || formDisabled}
+                        maxLength={TEAM_MEMBER_VALIDATION.description.max}
+                    />
+                    {errors.description && <span className="error">{errors.description}</span>}
                 </div>
-            </div>
-        </form>
-    );
-};
+                <div className="form-group">
+                    <InputLabel htmlFor={'image'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO} />
+                    <PhotoInput
+                        value={formState.image}
+                        onChange={handleImgChange}
+                        id="image"
+                        name="image"
+                        disabled={isSubmitting || formDisabled}
+                    />
+                    {errors.image && <span className="error">{errors.image}</span>}
+                </div>
+            </form>
+        );
+    },
+);

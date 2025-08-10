@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
 import './modal.scss';
 
 interface ModalProps {
@@ -10,6 +10,9 @@ interface ModalProps {
 }
 
 export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '600px' }: ModalProps) => {
+    const mouseDownInsideModal = useRef(false);
+    const modalRef = useRef<HTMLDivElement>(null);
+
     const title = React.Children.toArray(children).find(
         (child) => React.isValidElement(child) && child.type === Modal.Title,
     );
@@ -22,6 +25,7 @@ export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '60
 
     useEffect(() => {
         const prevOverflow = document.body.style.overflow;
+
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape' && isOpen) {
                 onClose();
@@ -39,39 +43,98 @@ export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '60
         };
     }, [isOpen, onClose]);
 
+    useEffect(() => {
+        if (!isOpen || !modalRef.current) return;
+
+        const modalEl = modalRef.current;
+
+        const getFocusableElements = () =>
+            Array.from(
+                modalEl.querySelectorAll<HTMLElement>(
+                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+                ),
+            ).filter((el) => !el.hasAttribute('disabled') && el.tabIndex !== -1);
+
+        // Focus first focusable on open
+        const focusables = getFocusableElements();
+        if (focusables.length > 0) {
+            focusables[0].focus();
+        }
+
+        const trapFocus = (e: KeyboardEvent) => {
+            if (e.key !== 'Tab') return;
+
+            const focusablesNow = getFocusableElements();
+            if (focusablesNow.length === 0) return;
+
+            const first = focusablesNow[0];
+            const last = focusablesNow[focusablesNow.length - 1];
+
+            if (e.shiftKey) {
+                if (document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                }
+            } else {
+                if (document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        };
+
+        modalEl.addEventListener('keydown', trapFocus);
+
+        return () => {
+            modalEl.removeEventListener('keydown', trapFocus);
+        };
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     const modalStyle = {
         width: typeof width === 'number' ? `${width}px` : width,
-        maxWidth: maxWidth,
+        maxWidth,
+    };
+
+    const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.target === e.currentTarget && !mouseDownInsideModal.current) {
+            onClose();
+        }
+        mouseDownInsideModal.current = false;
+    };
+
+    const handleOnMouseDownModal = () => {
+        mouseDownInsideModal.current = true;
+    };
+
+    const handleMouseDownOverlay = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.target === e.currentTarget) {
+            mouseDownInsideModal.current = false;
+        }
     };
 
     return (
         <div
-            role={'toolbar'}
+            role="dialog"
+            aria-modal="true"
             data-testid="modal-overlay"
             className="modal-overlay"
-            onClick={onClose}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    onClose();
-                }
-            }}
+            onClick={handleOverlayClick}
+            onMouseDown={handleMouseDownOverlay}
+            tabIndex={-1}
         >
             <div
-                role={'toolbar'}
+                ref={modalRef}
+                role="toolbar"
                 className="modal-container"
                 style={modalStyle}
+                onMouseDown={handleOnMouseDownModal}
                 onClick={(e) => e.stopPropagation()}
-                onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.stopPropagation();
-                    }
-                }}
             >
                 <div className="modal-header">
                     <div className="close-icon">
-                        <button onClick={onClose} />
+                        <button onClick={onClose} aria-label="Close modal" type="button" />
                     </div>
                     <div className="modal-title-wrapper">
                         <span className="modal-header-text">{title}</span>

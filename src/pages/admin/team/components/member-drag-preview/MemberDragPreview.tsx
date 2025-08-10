@@ -4,10 +4,12 @@ import { DragPreviewModel } from '../../../../../types/admin/Common';
 import { MemberComponent } from '../member-component/MemberComponent';
 import './member-drag-preview.scss';
 import { TeamMember } from '../../../../../types/admin/TeamMembers';
+import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 
-export type MemberDragPreviewProps = {
+export interface MemberDragPreviewProps {
     dragPreview: DragPreviewModel<TeamMember>;
-};
+}
+
 export const MemberDragPreview = ({ dragPreview }: MemberDragPreviewProps) => {
     if (!dragPreview.visible || !dragPreview.member) return <></>;
 
@@ -21,7 +23,7 @@ export const MemberDragPreview = ({ dragPreview }: MemberDragPreviewProps) => {
         >
             <div key={dragPreview.member.fullName} className="members-wrapper">
                 <div className="members-dragger">
-                    <img src={DragIcon} alt="dragger" />
+                    <img src={DragIcon} alt={TEAM_MEMBERS_TEXT.ACTIONS.REORDER} />
                 </div>
                 <MemberComponent
                     member={dragPreview.member}

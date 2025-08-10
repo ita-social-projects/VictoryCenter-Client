@@ -1,0 +1,17 @@
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+
+    &-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+    }
+}
+
+@media (max-width <= 1400px) {
+    .toolbar {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+}

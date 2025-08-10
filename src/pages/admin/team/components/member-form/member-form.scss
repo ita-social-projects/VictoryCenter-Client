@@ -1,0 +1,19 @@
+.team-member-form-main {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  .form-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .error {
+    color: #f04438;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+  }
+}

@@ -414,12 +414,12 @@ describe('MemberForm', () => {
         });
     });
 
-    describe('PhotoInput integration', () => {
-        it('handles image change through PhotoInput', async () => {
+    describe('ImageInput integration', () => {
+        it('handles image change through ImageInput', async () => {
             renderWithAdminContext(<MemberForm {...defaultProps} />);
 
-            // PhotoInput is rendered as a separate component
-            // The actual file handling is tested in PhotoInput component tests
+            // ImageInput is rendered as a separate component
+            // The actual file handling is tested in ImageInput component tests
             expect(screen.getByText(/Перетягніть файл сюди або натисніть для завантаження/)).toBeInTheDocument();
         });
     });

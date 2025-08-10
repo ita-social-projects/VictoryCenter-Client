@@ -2,11 +2,11 @@ import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo
 import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-schema';
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { MultiSelectInput } from '../../../../../components/admin/multi-select-input/MultiSelectInput';
-import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';
+import { ImageInput } from '../../../../../components/admin/image-input/ImageInput';
 import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
 import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { Image, ImageValues, ImageValuesToImage, ImageToImageValue } from '../../../../../types/common/image';
+import { Image, ImageValues } from '../../../../../types/common/image';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import './ProgramForm.scss';
 import { VisibilityStatus } from '../../../../../types/admin/common';
@@ -15,7 +15,8 @@ export interface ProgramFormValues {
     name: string;
     categories: ProgramCategory[];
     description: string;
-    img: Image | null;
+    img: Image | ImageValues | null;
+    imgId: number | null;
 }
 
 export interface FormErrorState {
@@ -60,6 +61,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 categories: [],
                 description: '',
                 img: null,
+                imgId: 0,
             }),
             [],
         );
@@ -138,7 +140,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
         // Image handlers
         const handleImgChange = useCallback((file: ImageValues | null) => {
-            const image = ImageValuesToImage(file);
+            const image = file;
             setFormState((prev) => ({ ...prev, img: image }));
             const error = PROGRAM_VALIDATION_FUNCTIONS.validateImg(image, false);
             setErrors((prev) => ({ ...prev, img: error }));
@@ -226,8 +228,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 {/* Image Field */}
                 <div className="form-group">
                     <InputLabel htmlFor={'img'} text={PROGRAMS_TEXT.FORM.LABEL.PHOTO} />
-                    <PhotoInput
-                        value={ImageToImageValue(formState.img)}
+                    <ImageInput
+                        value={formState.img}
                         onChange={handleImgChange}
                         id="img"
                         name="img"

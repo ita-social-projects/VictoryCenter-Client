@@ -110,7 +110,7 @@ export const TeamMembersApi = {
 
 export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): TeamMember => ({
     id: dto.id,
-    img: dto.image.url,
+    img: dto.image,
     fullName: dto.fullName,
     description: dto.description,
     status: dto.status === VisibilityStatus.Draft ? COMMON_TEXT_ADMIN.STATUS.DRAFT : COMMON_TEXT_ADMIN.STATUS.PUBLISHED,

@@ -22,7 +22,7 @@ export const COMMON_TEXT_ADMIN = {
     },
 
     INPUT: {
-        PHOTO_PLACEHOLDER: 'Перетягніть файл сюди або натисніть для завантаження',
+        IMAGE_PLACEHOLDER: 'Перетягніть файл сюди або натисніть для завантаження',
     },
 
     STATUS: {

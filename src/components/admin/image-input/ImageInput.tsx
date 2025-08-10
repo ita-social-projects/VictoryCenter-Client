@@ -2,13 +2,12 @@ import React, { useRef, useState, useCallback, useEffect } from 'react';
 import DeleteIcon from '../../../assets/icons/delete.svg';
 import UploadIcon from '../../../assets/icons/cloud-download.svg';
 import classNames from 'classnames';
-import './PhotoInput.scss';
-import { ImageValues } from '../../../types/common/image';
-import { mapImageToBase64 } from '../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
+import './ImageInput.scss';
+import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
-interface PhotoInputProps {
-    value: ImageValues | string | null;
+interface imageInputProps {
+    value: ImageValues | Image | null;
     onChange: (image: ImageValues | null) => void;
     onBlur?: () => void;
     disabled?: boolean;
@@ -17,9 +16,9 @@ interface PhotoInputProps {
     name?: string;
 }
 
-export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: PhotoInputProps) => {
+export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false }: imageInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
-    const [previewImage, setPreviewImage] = useState<ImageValues | string | null>(null);
+    const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -98,11 +97,25 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
         if (inputRef.current) inputRef.current.value = '';
     };
 
+    const getImageSrc = (img: Image | ImageValues | null) => {
+        if (!img) return undefined;
+
+        if ('url' in img) {
+            return img.url;
+        }
+
+        if ('base64' in img) {
+            return `data:${img.mimeType};base64,${img.base64}`;
+        }
+
+        return undefined;
+    };
+
     return (
         <div
-            className={classNames('photo-input-wrapper', {
-                'photo-input-wrapper-focused': isFocused && !disabled,
-                'photo-input-wrapper-disabled': disabled,
+            className={classNames('image-input-wrapper', {
+                'image-input-wrapper-focused': isFocused && !disabled,
+                'image-input-wrapper-disabled': disabled,
             })}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
@@ -113,7 +126,7 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
             onKeyDown={handleKeyDown}
             onFocus={handleFocus}
             onBlur={handleBlurEvent}
-            aria-label={COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo'}
+            aria-label={COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image'}
             tabIndex={disabled ? -1 : 0}
             role="button"
         >
@@ -125,16 +138,16 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
                 onBlur={onBlur}
                 style={{ display: 'none' }}
                 disabled={disabled}
-                data-testid="photo-input-hidden"
+                data-testid="image-input-hidden"
                 id={id}
                 name={name}
                 tabIndex={-1}
             />
 
             {previewImage ? (
-                <div className="photo-preview">
+                <div className="image-preview">
                     <img
-                        src={typeof previewImage === 'string' ? previewImage : (mapImageToBase64(previewImage) ?? undefined)}
+                        src={getImageSrc(previewImage)}
                         alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
                         className="preview-image"
                         data-testid="preview-image"
@@ -154,9 +167,9 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
                     )}
                 </div>
             ) : (
-                <div className="photo-placeholder">
+                <div className="image-placeholder">
                     <img src={UploadIcon} alt={COMMON_TEXT_ADMIN.ALT.UPLOAD} className="placeholder-icon" />
-                    <span>{COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER}</span>
+                    <span>{COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER}</span>
                 </div>
             )}
         </div>

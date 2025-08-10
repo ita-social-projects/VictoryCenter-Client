@@ -6,7 +6,6 @@ interface TeamMemberProps {
 }
 
 export const TeamMemberCard = ({ member }: TeamMemberProps) => {
-
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
         e.currentTarget.src = default_team_member_photo;
     };

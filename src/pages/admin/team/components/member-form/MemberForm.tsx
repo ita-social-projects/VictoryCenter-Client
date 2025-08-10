@@ -3,7 +3,7 @@ import { TeamCategory } from '../../../../../types/admin/team-members';
 import '../members-list/MembersList.scss';
 import { MAX_FULLNAME_LENGTH, MAX_DESCRIPTION_LENGTH } from '../../../../../const/admin/data-validation';
 import { ImageValues } from '../../../../../types/common/image';
-import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';
+import { ImageInput } from '../../../../../components/admin/image-input/ImageInput';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import ArrowUp from '../../../../../assets/icons/chevron-up.svg';
 import ArrowDown from '../../../../../assets/icons/chevron-down.svg';
@@ -188,7 +188,7 @@ export const MemberForm = ({
                     </div>
                 </div>
                 <div className="form-group">
-                    <PhotoInput value={memberFormValues?.image ?? null} onChange={onFileChange} id="photo" />
+                    <ImageInput value={memberFormValues?.image ?? null} onChange={onFileChange} id="photo" />
                     {errors.image && <p className="error">{errors.image.message}</p>}
                 </div>
             </div>

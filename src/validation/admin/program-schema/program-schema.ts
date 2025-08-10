@@ -1,6 +1,6 @@
 import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
 import { ProgramCategory } from '../../../types/admin/programs';
-import { Image } from '../../../types/common/image';
+import { Image, ImageValues } from '../../../types/common/image';
 import * as Yup from 'yup';
 
 export interface ProgramValidationContext {
@@ -34,7 +34,7 @@ export const programValidationSchema = Yup.object({
                 : schema.notRequired(),
         ),
 
-    img: Yup.mixed<Image | string>()
+    img: Yup.mixed<Image | ImageValues>()
         .nullable()
         .default(null)
         .when('$isPublishing', ([isPublishing], schema) =>
@@ -47,16 +47,25 @@ export const programValidationSchema = Yup.object({
             return value;
         })
         .test('fileFormat', PROGRAM_VALIDATION.img.getFormatError(), (value) => {
-            if (typeof value === 'string') return true;
-            if (value) {
+            if (!value) return true;
+
+            // Якщо це Image (з бекенду)
+            if ('url' in value && 'mimeType' in value) {
                 return PROGRAM_VALIDATION.img.allowedFormats.includes(value.mimeType);
             }
-            return true;
+
+            // Якщо це ImageValues (base64 з фронту)
+            if ('base64' in value && 'mimeType' in value) {
+                return PROGRAM_VALIDATION.img.allowedFormats.includes(value.mimeType);
+            }
+
+            return false;
         })
         .test('fileSize', PROGRAM_VALIDATION.img.getSizeError(), (value) => {
             if (value === null) return true;
-            if (typeof value === 'string') return true;
-            return value.size <= PROGRAM_VALIDATION.img.maxSizeBytes;
+            if ('base64' in value && 'size' in value) {
+                return value.size <= PROGRAM_VALIDATION.img.maxSizeBytes;
+            }
         }),
 });
 
@@ -91,7 +100,7 @@ export const PROGRAM_VALIDATION_FUNCTIONS = {
         }
     },
 
-    validateImg: (value: Image | null, isPublishing: boolean): string | undefined => {
+    validateImg: (value: Image | ImageValues | null, isPublishing: boolean): string | undefined => {
         const context: ProgramValidationContext = { isPublishing };
         try {
             programValidationSchema.validateSyncAt('img', { img: value }, { context });

@@ -420,7 +420,7 @@ export const TeamPageContent = () => {
                 addToast(TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER, ToastType.Info);
             }
         },
-        [updateModalState, pageSize],
+        [updateModalState, pageSize, addToast],
     );
 
     const handleEditMember = useCallback(

@@ -15,6 +15,9 @@ import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-c
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
 import { InfiniteScrollList } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
+import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '../../../../../types/admin/toast';
+import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -34,6 +37,7 @@ interface ErrorState {
 }
 
 export const TeamPageContent = () => {
+    const { addToast } = useToast();
     const client = useAdminClient();
     const [dragPreview, setDragPreview] = useState<DragPreviewModel<TeamMember>>({
         visible: false,
@@ -417,6 +421,9 @@ export const TeamPageContent = () => {
             currentItemsCountRef.current += 1;
 
             updateModalState({ isAddMemberModalOpen: false });
+            if (member.status === VisibilityStatus.Published) {
+                addToast(TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER, ToastType.Info);
+            }
         },
         [updateModalState, pageSize],
     );
@@ -507,6 +514,8 @@ export const TeamPageContent = () => {
                 memberToDelete={modalState.memberToDelete}
                 onDeleteMember={handleDeleteMember}
             />
+
+            <ToastContainer />
         </div>
     );
 };

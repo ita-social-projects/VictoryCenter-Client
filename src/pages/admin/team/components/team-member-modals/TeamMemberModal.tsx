@@ -108,7 +108,7 @@ export const TeamMemberModal = ({
             if (member.status === VisibilityStatus.Published)
                 return pendingAction === 'draft'
                     ? COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION
-                    : TEAM_MEMBERS_TEXT.QUESTION.PUBLISH_MEMBER;
+                    : COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES;
             return pendingAction === 'draft'
                 ? COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES
                 : TEAM_MEMBERS_TEXT.QUESTION.PUBLISH_MEMBER;

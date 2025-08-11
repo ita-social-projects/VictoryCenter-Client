@@ -21,7 +21,7 @@ const mockTeamCategoriesApi = TeamCategoriesApi as jest.Mocked<typeof TeamCatego
 
 jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
     TeamPageToolbar: (props: any) => {
-        const { VisibilityStatus } = require('../../../../../types/admin/Common');
+        const { VisibilityStatus } = require('../../../../../types/admin/common');
         return (
             <div data-testid="team-page-toolbar">
                 <button onClick={props.onAddMember}>Add Member</button>
@@ -34,6 +34,13 @@ jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
             </div>
         );
     },
+}));
+
+jest.mock('../../../../../contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({
+        addToast: jest.fn(),
+        toasts: [],
+    }),
 }));
 
 jest.mock('../team-member-modals/TeamMemberModal', () => ({

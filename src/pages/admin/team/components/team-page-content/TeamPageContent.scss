@@ -32,7 +32,7 @@
         display: flex;
         gap: 8px;
         flex-direction: column;
-        justify-content: left;
+        justify-content: flex-start;
         align-items: center;
         color: colors.$error;
         font-weight: 400;

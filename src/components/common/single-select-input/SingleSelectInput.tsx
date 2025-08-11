@@ -3,6 +3,7 @@ import ArrowDown from '../../../assets/icons/chevron-down.svg';
 import ArrowUp from '../../../assets/icons/chevron-up.svg';
 import classNames from 'classnames';
 import './SingleSelectInput.scss';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 export interface SingleSelectInputProps<T extends Record<string, any>> {
     options: T[];
@@ -94,7 +95,11 @@ export const SingleSelectInput = <T extends Record<string, any>>({
                     <img
                         src={isOpen ? ArrowUp : ArrowDown}
                         className="icon-img"
-                        alt={isOpen ? 'Collapse options list' : 'Expand options list'}
+                        alt={
+                            isOpen
+                                ? COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST
+                                : COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST
+                        }
                     />
                 </div>
             </button>
@@ -103,7 +108,7 @@ export const SingleSelectInput = <T extends Record<string, any>>({
                 <div
                     className="singleselect-options"
                     role="listbox"
-                    aria-activedescendant={value ? String(getOptionId(value)) : undefined}
+                    aria-activedescendant={value ? `option-${String(getOptionId(value))}` : undefined}
                     tabIndex={0}
                 >
                     {options.map((option) => {
@@ -113,6 +118,7 @@ export const SingleSelectInput = <T extends Record<string, any>>({
                         return (
                             <div
                                 key={id}
+                                id={`option-${String(id)}`}
                                 className={classNames('option', { 'option-selected': isSelected })}
                                 onClick={() => handleSelectOption(option)}
                                 onKeyDown={(e) => handleKeyDown(e, option)}

@@ -3,7 +3,6 @@ import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/c
 import { TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../types/admin/team-members';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
 import { ImageApi } from '../../image/image-api';
-import { TeamMemberDto } from '../../../../../types/public/team-page';
 
 export const TeamMembersApi = {
     getAll: async (
@@ -98,12 +97,3 @@ export const TeamMembersApi = {
         return response.data as TeamMember;
     },
 };
-
-export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): TeamMember => ({
-    id: dto.id,
-    image: dto.image,
-    fullName: dto.fullName,
-    description: dto.description,
-    status: dto.status,
-    categoryId: dto.categoryId,
-});

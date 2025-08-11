@@ -3,13 +3,13 @@ import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from './team-member-schema';
 
 describe('teamMemberValidationSchema', () => {
     const validFullName = 'John Doe';
-    const invalidFullNameShort = 'J';
-    const invalidFullNameLong = 'J'.repeat(101); // assuming max is 100
-    const invalidFullNamePattern = 'John123'; // assuming pattern disallows digits
+    const invalidFullNameShort = 'J'.repeat(TEAM_MEMBER_VALIDATION.fullName.min - 1);
+    const invalidFullNameLong = 'J'.repeat(TEAM_MEMBER_VALIDATION.fullName.max + 1);
+    const invalidFullNamePattern = 'John123';
 
     const validDescription = 'This is a valid description';
-    const invalidDescriptionShort = 'sh'; // less than min
-    const invalidDescriptionLong = 'a'.repeat(501); // assuming max is 500
+    const invalidDescriptionShort = 'a'.repeat(TEAM_MEMBER_VALIDATION.description.min - 1);
+    const invalidDescriptionLong = 'a'.repeat(TEAM_MEMBER_VALIDATION.description.max + 1);
 
     const validCategory = 1;
     const invalidCategory = null;

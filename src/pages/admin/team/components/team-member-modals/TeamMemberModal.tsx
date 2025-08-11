@@ -67,7 +67,10 @@ export const TeamMemberModal = ({
 
     const handleConfirmAction = useCallback(async () => {
         if (!pendingFormData || !pendingAction) return;
-
+        if (isEditMode && !member) {
+            setError(TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_MEMBER);
+            return;
+        }
         setShowFormConfirmModal(false);
         setIsSubmitting(true);
         setError('');
@@ -126,7 +129,8 @@ export const TeamMemberModal = ({
     }, [isEditMode, member?.id]);
 
     const handleFormSubmit = useCallback((data: TeamMemberFormValues, status: VisibilityStatus) => {
-        const currentIsValid = formRef.current?.isValid(false) || false;
+        const isPublishing = status === VisibilityStatus.Published;
+        const currentIsValid = formRef.current?.isValid(isPublishing) || false;
 
         if (!currentIsValid) {
             return;

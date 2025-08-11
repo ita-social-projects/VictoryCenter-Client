@@ -52,6 +52,12 @@
       cursor: pointer;
       transition: background-color 0.2s;
       color: #414651;
+      width: 100%;
+      text-align: start;
+      font-size: 16px;
+      outline: none;
+      border: none;
+      background: white;
 
       &:hover,
       &:focus {

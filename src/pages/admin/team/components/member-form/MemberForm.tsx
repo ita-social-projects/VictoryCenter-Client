@@ -2,8 +2,7 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useSt
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TeamCategory } from '../../../../../types/admin/team-members';
 import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/team-member-schema/team-member-schema';
-import { ImageValues, ImageValuesToImage } from '../../../../../types/common/image';
-import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-schema';
+import { ImageValues } from '../../../../../types/common/image';
 import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
 import { SingleSelectInput } from '../../../../../components/common/single-select-input/SingleSelectInput';
 import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
@@ -127,9 +126,8 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
         }, [formState.description]);
 
         const handleImgChange = useCallback((file: ImageValues | null) => {
-            const image = ImageValuesToImage(file);
-            setFormState((prev) => ({ ...prev, image: image }));
-            const error = PROGRAM_VALIDATION_FUNCTIONS.validateImg(image, false);
+            setFormState((prev) => ({ ...prev, image: file }));
+            const error = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(file, false);
             setErrors((prev) => ({ ...prev, image: error }));
         }, []);
 
@@ -189,7 +187,7 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                         getOptionId={(c: TeamCategory) => c.id}
                         getOptionName={(c: TeamCategory) => c.name}
                         placeholder={TEAM_MEMBERS_TEXT.FORM.LABEL.SELECT_CATEGORY}
-                    ></SingleSelectInput>
+                    />
                     {errors.category && <p className="error">{errors.category}</p>}
                 </div>
 

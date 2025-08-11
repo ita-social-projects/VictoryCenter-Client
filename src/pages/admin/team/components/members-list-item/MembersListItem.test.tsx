@@ -35,23 +35,23 @@ describe('MembersListItem', () => {
         handleOnDeleteMember: jest.fn(),
         handleOnEditMember: jest.fn(),
         id: 42,
-        draggedIndex: null,
+        draggedId: null,
     };
 
     it('renders correctly with MemberComponent and drag icon', () => {
         render(<MembersListItem {...baseProps} />);
         expect(screen.getByTestId('member-component')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /drag member/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Змінити порядок елемента/i })).toBeInTheDocument();
         expect(screen.getByAltText(TEAM_MEMBERS_TEXT.ACTIONS.REORDER)).toBeInTheDocument();
     });
 
     it('applies "dragging" class when draggedIndex matches id', () => {
-        const { container } = render(<MembersListItem {...baseProps} draggedIndex={42} />);
+        const { container } = render(<MembersListItem {...baseProps} draggedId={42} />);
         expect(container.firstChild).toHaveClass('dragging');
     });
 
     it('does not apply "dragging" class when draggedIndex does not match id', () => {
-        const { container } = render(<MembersListItem {...baseProps} draggedIndex={99} />);
+        const { container } = render(<MembersListItem {...baseProps} draggedId={99} />);
         expect(container.firstChild).not.toHaveClass('dragging');
     });
 
@@ -75,7 +75,7 @@ describe('MembersListItem', () => {
 
     it('calls handleDragStart with event and id on dragStart of dragger div', () => {
         render(<MembersListItem {...baseProps} />);
-        const dragger = screen.getByRole('button', { name: /drag member/i });
+        const dragger = screen.getByRole('button', { name: /Змінити порядок елемента/i });
         fireEvent.dragStart(dragger);
         expect(baseProps.handleDragStart).toHaveBeenCalledTimes(1);
         // Check the first arg is event and second arg is id
@@ -85,14 +85,14 @@ describe('MembersListItem', () => {
 
     it('calls handleDrag on drag event of dragger div', () => {
         render(<MembersListItem {...baseProps} />);
-        const dragger = screen.getByRole('button', { name: /drag member/i });
+        const dragger = screen.getByRole('button', { name: /Змінити порядок елемента/i });
         fireEvent.drag(dragger);
         expect(baseProps.handleDrag).toHaveBeenCalledTimes(1);
     });
 
     it('calls handleDragEnd on dragEnd event of dragger div', () => {
         render(<MembersListItem {...baseProps} />);
-        const dragger = screen.getByRole('button', { name: /drag member/i });
+        const dragger = screen.getByRole('button', { name: /Змінити порядок елемента/i });
         fireEvent.dragEnd(dragger);
         expect(baseProps.handleDragEnd).toHaveBeenCalledTimes(2);
     });

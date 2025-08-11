@@ -9,18 +9,18 @@ import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 interface MembersListItemProps {
     member: TeamMember;
     handleDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
-    handleDragStart: (e: React.DragEvent<HTMLDivElement>, index: number) => void;
+    handleDragStart: (e: React.DragEvent<HTMLDivElement>, id: number) => void;
     handleDrag: (e: React.DragEvent<HTMLDivElement>) => void;
     handleDragEnd: () => void;
-    handleDrop: (index: number) => void;
+    handleDrop: (id: number) => void;
     handleOnDeleteMember: (member: TeamMember) => void;
     handleOnEditMember: (member: TeamMember) => void;
     id: number;
-    draggedIndex: number | null;
+    draggedId: number | null;
 }
 
 export const MembersListItem = ({
-    draggedIndex,
+    draggedId,
     id,
     member,
     handleDragOver,
@@ -33,7 +33,7 @@ export const MembersListItem = ({
 }: MembersListItemProps) => {
     return (
         <div
-            className={classNames('members-wrapper', { dragging: draggedIndex === id })}
+            className={classNames('members-wrapper', { dragging: draggedId === id })}
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(id)}
             onDragEnd={handleDragEnd}
@@ -45,7 +45,7 @@ export const MembersListItem = ({
                 onDrag={handleDrag}
                 onDragEnd={handleDragEnd}
                 role="button"
-                aria-label="Drag member"
+                aria-label={TEAM_MEMBERS_TEXT.ACTIONS.REORDER}
                 tabIndex={0}
             >
                 <img src={DragIcon} alt={TEAM_MEMBERS_TEXT.ACTIONS.REORDER} />

@@ -320,11 +320,6 @@ describe('TeamMembersApi', () => {
             expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', { params: { offset: 5 } });
         });
 
-        it('does NOT add limit param if limit is undefined', async () => {
-            await TeamMembersApi.getAll(mockClient, undefined, undefined, undefined, undefined);
-            expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', { params: {} });
-        });
-
         it('does NOT add limit param if limit is null', async () => {
             await TeamMembersApi.getAll(mockClient, undefined, undefined, undefined, undefined);
             expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', { params: {} });

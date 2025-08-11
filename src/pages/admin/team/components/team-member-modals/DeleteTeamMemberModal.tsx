@@ -26,7 +26,7 @@ export const DeleteTeamMemberModal = ({
     const [error, setError] = useState<string>('');
 
     const handleConfirmDelete = async () => {
-        if (!memberToDelete) return;
+        if (isSubmitting || !memberToDelete) return;
 
         try {
             setIsSubmitting(true);
@@ -53,10 +53,15 @@ export const DeleteTeamMemberModal = ({
             <Modal.Title>{TEAM_MEMBERS_TEXT.FORM.TITLE.DELETE_MEMBER}</Modal.Title>
             <Modal.Content>{error && <div className="error-container">{error}</div>}</Modal.Content>
             <Modal.Actions>
-                <Button onClick={handleClose} buttonStyle="secondary">
+                <Button onClick={handleClose} buttonStyle="secondary" disabled={isSubmitting}>
                     {COMMON_TEXT_ADMIN.BUTTON.NO}
                 </Button>
-                <Button onClick={handleConfirmDelete} buttonStyle="primary" className="btn-danger">
+                <Button
+                    onClick={handleConfirmDelete}
+                    buttonStyle="primary"
+                    className="btn-danger"
+                    disabled={isSubmitting || !memberToDelete}
+                >
                     {COMMON_TEXT_ADMIN.BUTTON.YES}
                 </Button>
             </Modal.Actions>

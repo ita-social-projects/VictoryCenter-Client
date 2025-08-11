@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef } from 'react';
+import React, { ReactNode, useEffect, useId, useRef } from 'react';
 import './Modal.scss';
 
 interface ModalProps {
@@ -12,6 +12,7 @@ interface ModalProps {
 export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '600px' }: ModalProps) => {
     const mouseDownInsideModal = useRef(false);
     const modalRef = useRef<HTMLDivElement>(null);
+    const titleId = useId();
 
     const title = React.Children.toArray(children).find(
         (child) => React.isValidElement(child) && child.type === Modal.Title,
@@ -115,8 +116,6 @@ export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '60
 
     return (
         <div
-            role="dialog"
-            aria-modal="true"
             data-testid="modal-overlay"
             className="modal-overlay"
             onClick={handleOverlayClick}
@@ -125,7 +124,9 @@ export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '60
         >
             <div
                 ref={modalRef}
-                role="toolbar"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={titleId}
                 className="modal-container"
                 style={modalStyle}
                 onMouseDown={handleOnMouseDownModal}
@@ -136,7 +137,9 @@ export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '60
                         <button onClick={onClose} aria-label="Close modal" type="button" />
                     </div>
                     <div className="modal-title-wrapper">
-                        <span className="modal-header-text">{title}</span>
+                        <span id={titleId} className="modal-header-text">
+                            {title}
+                        </span>
                     </div>
                 </div>
                 <div className="modal-body">{content}</div>

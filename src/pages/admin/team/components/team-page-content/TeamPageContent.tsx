@@ -195,9 +195,8 @@ export const TeamPageContent = () => {
                     currentItemsCountRef.current += fetchedMembers.items.length;
                 }
 
-                // For now, we'll assume we have more if we got a full page
-                // In a real implementation, you'd get total count from the API
                 setHasMore(currentItemsCountRef.current < fetchedMembers.totalItemsCount);
+                hasMoreRef.current = currentItemsCountRef.current < fetchedMembers.totalItemsCount;
             } catch (error: any) {
                 if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                     return;
@@ -327,7 +326,7 @@ export const TeamPageContent = () => {
                 handleOnDeleteMember={handleDeleteProgramModalOpen}
                 handleOnEditMember={handleEditMemberModalOpen}
                 key={member.id}
-                draggedIndex={draggedId}
+                draggedId={draggedId}
                 handleDragOver={handleDragOver}
                 handleDragStart={handleDragStart}
                 handleDrag={handleDrag}
@@ -392,10 +391,6 @@ export const TeamPageContent = () => {
                 }));
             }
         };
-
-        if (dragPreview.visible) {
-            document.addEventListener('mousemove', handleMouseMove);
-        }
 
         if (dragPreview.visible) {
             document.addEventListener('mousemove', handleMouseMove);

@@ -75,6 +75,16 @@ describe('teamMemberValidationSchema', () => {
         it('accepts valid description when publishing', () => {
             expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(validDescription, true)).toBeUndefined();
         });
+
+        it('accepts valid image object with id property', () => {
+            const imageWithId = { id: 123 };
+            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(imageWithId as any, true)).toBeUndefined();
+        });
+
+        it('accepts image object with id that is a number', () => {
+            const imageWithNumericId = { id: 456, someOtherProp: 'value' };
+            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(imageWithNumericId as any, true)).toBeUndefined();
+        });
     });
 
     describe('category validation', () => {

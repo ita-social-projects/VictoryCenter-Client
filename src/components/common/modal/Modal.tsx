@@ -97,7 +97,7 @@ export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '60
         maxWidth,
     };
 
-    const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => {
         if (e.target === e.currentTarget && !mouseDownInsideModal.current) {
             onClose();
         }
@@ -120,17 +120,20 @@ export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '60
             className="modal-overlay"
             onClick={handleOverlayClick}
             onMouseDown={handleMouseDownOverlay}
-            tabIndex={-1}
+            tabIndex={0}
+            role="button"
+            onKeyDown={handleOverlayClick}
         >
             <div
                 ref={modalRef}
-                role="dialog"
-                aria-modal="true"
+                role="button"
                 aria-labelledby={titleId}
                 className="modal-container"
                 style={modalStyle}
                 onMouseDown={handleOnMouseDownModal}
                 onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                tabIndex={-1}
             >
                 <div className="modal-header">
                     <div className="close-icon">

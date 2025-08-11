@@ -9,7 +9,7 @@
     padding: 1.5rem 1rem 1.5rem 1rem;
     border-bottom: 1.5px solid colors.$grey-400;
 
-    .faq-question {
+    .question-block {
         width: 100%;
         display: flex;
         justify-content: space-between;
@@ -42,7 +42,7 @@
         }
     }
 
-    .faq-answer {
+    .answer-block {
         font-family: fonts.$mulish-regular-font;
         font-weight: 400;
         font-size: 1.125rem;

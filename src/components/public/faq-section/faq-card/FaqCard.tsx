@@ -18,14 +18,14 @@ export const FaqCard = ({ faq }: FaqCardProps) => {
 
     return (
         <details className="faq-item" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-            <summary className="faq-question">
+            <summary className="question-block">
                 <p>{faq.questionText}</p>
                 <div className="button-icons">
                     <img src={isHovered ? openBlue : openIcon} alt="" className="faq-open" />
                     <img src={isHovered ? closeBlue : closeIcon} alt="" className="faq-close" />
                 </div>
             </summary>
-            <div className="faq-answer">{faq.answerText}</div>
+            <div className="answer-block">{faq.answerText}</div>
         </details>
     );
 };

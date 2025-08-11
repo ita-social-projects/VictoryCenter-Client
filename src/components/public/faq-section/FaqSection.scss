@@ -1,14 +1,16 @@
 @use '../../../assets/sass/variables/colors';
 @use '../../../assets/sass/variables/fonts';
 
-.qa-section {
+.faq-section {
     box-sizing: content-box;
     padding: 7.5rem 3.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 83rem;
+    margin: auto;
 
-    .question-block {
+    .faq-block {
         width: 100%;
         display: flex;
         justify-content: space-between;

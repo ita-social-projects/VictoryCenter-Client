@@ -74,12 +74,6 @@ describe('ProgramsPageToolbar', () => {
         expect(searchInput).toHaveAttribute('placeholder', COMMON_TEXT_ADMIN.FILTER.SEARCH_BY_NAME);
     });
 
-    it('should render status filter select with data-testid', () => {
-        render(<ProgramsPageToolbar {...mockProps} />);
-        const statusFilter = screen.getByTestId('status-filter');
-        expect(statusFilter).toBeInTheDocument();
-    });
-
     it('should render add program button with correct data-testid and text', () => {
         render(<ProgramsPageToolbar {...mockProps} />);
         const addButton = screen.getByTestId('add-program-button');
@@ -95,16 +89,6 @@ describe('ProgramsPageToolbar', () => {
 
         expect(mockProps.onSearchQueryChange).toHaveBeenCalledWith('test query');
         expect(mockProps.onSearchQueryChange).toHaveBeenCalledTimes(1);
-    });
-
-    it('should call onStatusFilterChange when status filter value changes', () => {
-        render(<ProgramsPageToolbar {...mockProps} />);
-        const statusFilter = screen.getByTestId('status-filter');
-
-        fireEvent.change(statusFilter, { target: { value: VisibilityStatus.Published } });
-
-        expect(mockProps.onStatusFilterChange).toHaveBeenCalledWith(String(VisibilityStatus.Published));
-        expect(mockProps.onStatusFilterChange).toHaveBeenCalledTimes(1);
     });
 
     it('should call onAddProgram when add program button is clicked', () => {

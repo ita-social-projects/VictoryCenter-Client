@@ -1,8 +1,9 @@
 @use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/fonts';
 
 .team-page-container {
     width: 93%;
-    font-family: 'Mulish', sans-serif;
+    font-family: fonts.$mulish-regular-font;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -25,7 +26,7 @@
 
     .team-section {
         width: 98%;
-        border-bottom: 1px solid #ccc;
+        border-bottom: 2px solid colors.$grey-400;
         padding-bottom: 5rem;
         margin-bottom: 3rem;
 
@@ -100,7 +101,7 @@
         width: 100vw;
         height: 70vh;
         overflow: hidden;
-        background: rgba(0, 0, 0, 0.50);
+        background: rgba(black, 0.50);
     }
 
     .background-video {
@@ -126,7 +127,6 @@
         z-index: 1;
         max-width: 70%;
         color: white;
-        font-family: 'Mulish', sans-serif;
         font-weight: 600;
         padding: 5rem 0;
         justify-content: center;

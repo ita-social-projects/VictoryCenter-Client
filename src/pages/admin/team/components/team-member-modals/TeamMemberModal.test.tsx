@@ -3,26 +3,23 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { TeamMemberModal } from './TeamMemberModal';
-import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi';
-import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
-import { TeamCategory, TeamMember } from '../../../../../types/admin/TeamMembers';
 import { AxiosInstance } from 'axios';
+import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
+import { VisibilityStatus } from '../../../../../types/admin/common';
+import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 // Mock data-fetch API
-jest.mock(
-    '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi',
-    () => ({
-        TeamMembersApi: {
-            postMember: jest.fn(),
-            updateMember: jest.fn(),
-            reorder: jest.fn(),
-        },
-    }),
-);
+jest.mock('../../../../../services/api/admin/team/team-members/team-members-api', () => ({
+    TeamMembersApi: {
+        postMember: jest.fn(),
+        updateMember: jest.fn(),
+        reorder: jest.fn(),
+    },
+}));
 
 // Mock admin client hook
-jest.mock('../../../../../utils/hooks/use-admin-client/useAdminClient', () => ({
+jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
@@ -47,7 +44,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
 });
 
 // Lightweight Button mock with named export
-jest.mock('../../../../../components/common/button/Button', () => ({
+jest.mock('../../../../../components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled }: any) => (
         <button onClick={onClick} disabled={disabled}>
             {children}
@@ -56,8 +53,8 @@ jest.mock('../../../../../components/common/button/Button', () => ({
 }));
 
 // Lightweight QuestionModal mock with named export
-jest.mock('../../../../../components/common/question-modal/QuestionModal', () => ({
-    QuestionModal: ({ isOpen, title, onConfirm, onCancel, isButtonsDisabled }: any) =>
+jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel, isButtonsDisabled }: any) =>
         isOpen ? (
             <div data-testid="question-modal">
                 <div data-testid="modal-title">{title}</div>
@@ -94,7 +91,7 @@ jest.mock('../member-form/MemberForm', () => {
 
             React.useEffect(() => {
                 props.onValidationChange?.(isValid);
-            }, [isValid, props.onValidationChange]);
+            }, [isValid, props, props.onValidationChange]);
 
             return React.createElement(
                 'div',
@@ -120,7 +117,7 @@ jest.mock('../../../../../const/admin/team', () => ({
 
 jest.mock('../../../../../const/admin/common', () => ({
     COMMON_TEXT_ADMIN: {
-        BUTTON: { SAVE_AS_DRAFTED: 'Save Draft', SAVE_AS_PUBLISHED: 'Save Published', YES: 'Yes', NO: 'No' },
+        BUTTON: { SAVE_AS_DRAFT: 'Save Draft', SAVE_AS_PUBLISHED: 'Save Published', YES: 'Yes', NO: 'No' },
         QUESTION: {
             REMOVE_FROM_PUBLICATION: 'Remove?',
             SAVE_CHANGES: 'Save changes?',

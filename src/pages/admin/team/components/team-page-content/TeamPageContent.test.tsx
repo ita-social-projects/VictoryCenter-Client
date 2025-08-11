@@ -1,26 +1,22 @@
 import React from 'react';
-import { createEvent, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { TeamPageContent } from './TeamPageContent';
-import { TeamCategory, TeamMember } from '../../../../../types/admin/TeamMembers';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
-import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi';
-import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
 import { TEAM_CATEGORY_TEXT, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
+import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
+import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 
-jest.mock('../../../../../utils/hooks/use-admin-client/useAdminClient');
+jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient');
 
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 
-jest.mock(
-    '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi',
-);
+jest.mock('../../../../../services/api/admin/team/team-members/team-members-api');
 const mockTeamMembersApi = TeamMembersApi as jest.Mocked<typeof TeamMembersApi>;
 
-jest.mock(
-    '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi',
-);
+jest.mock('../../../../../services/api/admin/team/team-categories/team-categories-api');
 const mockTeamCategoriesApi = TeamCategoriesApi as jest.Mocked<typeof TeamCategoriesApi>;
 
 jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
@@ -95,7 +91,7 @@ jest.mock('../team-member-modals/DeleteTeamMemberModal', () => ({
         ) : null,
 }));
 
-jest.mock('../../../../../components/common/category-bar/CategoryBar', () => ({
+jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({
         categories,
         selectedCategory,
@@ -120,7 +116,7 @@ jest.mock('../../../../../components/common/category-bar/CategoryBar', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/common/infinite-scroll-list/InfiniteScrollList', () => ({
+jest.mock('../../../../../components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
     InfiniteScrollList: ({ items, renderItem, onLoadMore, hasMore, isLoading, emptyStateMessage }: any) => (
         <div data-testid="infinite-scroll-list">
             {isLoading && <div data-testid="infinite-scroll-loader">Loading...</div>}
@@ -738,11 +734,8 @@ describe('TeamPageContent', () => {
 
         describe('AbortController and loading states', () => {
             it('should abort previous request when fetchMembers is called again', async () => {
-                let abortCalls = 0;
                 const mockAbortController = {
-                    abort: jest.fn(() => {
-                        abortCalls++;
-                    }),
+                    abort: jest.fn(() => {}),
                     signal: { aborted: false },
                 };
 

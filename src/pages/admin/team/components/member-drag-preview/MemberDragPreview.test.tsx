@@ -1,8 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemberDragPreview } from './MemberDragPreview';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
-import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 
 const baseMember = {
     id: 1,
@@ -16,19 +15,19 @@ const baseMember = {
 describe('MemberDragPreview', () => {
     it('renders nothing when visible=false', () => {
         const { container } = render(
-            <MemberDragPreview dragPreview={{ visible: false, x: 0, y: 0, member: baseMember }} />,
+            <MemberDragPreview dragPreview={{ visible: false, x: 0, y: 0, item: baseMember }} />,
         );
         expect(container).toBeEmptyDOMElement();
     });
 
     it('renders nothing when member=null', () => {
-        const { container } = render(<MemberDragPreview dragPreview={{ visible: true, x: 0, y: 0, member: null }} />);
+        const { container } = render(<MemberDragPreview dragPreview={{ visible: true, x: 0, y: 0, item: null }} />);
         expect(container).toBeEmptyDOMElement();
     });
 
     it('renders preview with correct position and member details', () => {
         const { container } = render(
-            <MemberDragPreview dragPreview={{ visible: true, x: 100, y: 200, member: baseMember }} />,
+            <MemberDragPreview dragPreview={{ visible: true, x: 100, y: 200, item: baseMember }} />,
         );
 
         fireEvent.click(container.querySelector('.members-actions-edit')!);

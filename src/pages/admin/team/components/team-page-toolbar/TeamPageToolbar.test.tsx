@@ -2,10 +2,9 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TeamPageToolbar } from './TeamPageToolbar';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-
+import { VisibilityStatus } from '../../../../../types/admin/common';
 describe('TeamPageToolbar', () => {
     const autocompleteValues = ['John', 'Jane'];
 

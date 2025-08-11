@@ -1,17 +1,16 @@
 import DragIcon from '../../../../../assets/icons/dragger.svg';
-import React from 'react';
-import { DragPreviewModel } from '../../../../../types/admin/Common';
+import { DragPreviewModel } from '../../../../../types/admin/common';
 import { MemberComponent } from '../member-component/MemberComponent';
-import './member-drag-preview.scss';
-import { TeamMember } from '../../../../../types/admin/TeamMembers';
+import './MemberDragPreview.scss';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { TeamMember } from '../../../../../types/admin/team-members';
 
 export interface MemberDragPreviewProps {
     dragPreview: DragPreviewModel<TeamMember>;
 }
 
 export const MemberDragPreview = ({ dragPreview }: MemberDragPreviewProps) => {
-    if (!dragPreview.visible || !dragPreview.member) return <></>;
+    if (!dragPreview.visible || !dragPreview.item) return <></>;
 
     return (
         <div
@@ -21,12 +20,12 @@ export const MemberDragPreview = ({ dragPreview }: MemberDragPreviewProps) => {
                 top: dragPreview.y - 55,
             }}
         >
-            <div key={dragPreview.member.fullName} className="members-wrapper">
+            <div key={dragPreview.item.fullName} className="members-wrapper">
                 <div className="members-dragger">
                     <img src={DragIcon} alt={TEAM_MEMBERS_TEXT.ACTIONS.REORDER} />
                 </div>
                 <MemberComponent
-                    member={dragPreview.member}
+                    member={dragPreview.item}
                     handleOnDeleteMember={() => {}}
                     handleOnEditMember={() => {}}
                 ></MemberComponent>

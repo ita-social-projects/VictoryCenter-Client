@@ -1,17 +1,16 @@
-import { TeamCategory } from '../../../../../types/admin/TeamMembers';
-import './member-form.scss';
-import { ImageValues, ImageValuesToImage } from '../../../../../types/Image';
-import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { VisibilityStatus } from '../../../../../types/admin/common';
+import { TeamCategory } from '../../../../../types/admin/team-members';
 import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/team-member-schema/team-member-schema';
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
-import { InputLabel } from '../../../../../components/common/input-label/InputLabel';
-import { InputWithCharacterLimit } from '../../../../../components/common/input-with-character-limit/InputWithCharacterLimit';
-import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { TextAreaWithCharacterLimit } from '../../../../../components/common/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-scheme';
+import { ImageValues, ImageValuesToImage } from '../../../../../types/common/image';
+import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-schema';
+import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
 import { SingleSelectInput } from '../../../../../components/common/single-select-input/SingleSelectInput';
-
+import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
+import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';
+import './MemberForm.scss';
 export interface TeamMemberFormValues {
     categoryId: number | null;
     fullName: string;

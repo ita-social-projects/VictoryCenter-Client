@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useRef } from 'react';
-import './modal.scss';
+import './Modal.scss';
 
 interface ModalProps {
     children?: ReactNode;
@@ -55,7 +55,6 @@ export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '60
                 ),
             ).filter((el) => !el.hasAttribute('disabled') && el.tabIndex !== -1);
 
-        // Focus first focusable on open
         const focusables = getFocusableElements();
         if (focusables.length > 0) {
             focusables[0].focus();

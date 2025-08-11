@@ -1,11 +1,11 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramModal, ProgramModalProps } from './ProgramModal';
-import { Program, ProgramCategory } from '../../../../../types/admin/Programs';
+import { Program, ProgramCategory } from '../../../../../types/admin/programs';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 
 jest.mock('../../../../../services/api/admin/programs/programs-api', () => ({
     ProgramsApi: {
@@ -46,7 +46,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     return { Modal: MockModal };
 });
 
-jest.mock('../../../../../components/common/button/Button', () => ({
+jest.mock('../../../../../components/admin/button/Button', () => ({
     Button: ({
         onClick,
         disabled,
@@ -68,8 +68,8 @@ jest.mock('../../../../../components/common/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/common/question-modal/QuestionModal', () => ({
-    QuestionModal: ({
+jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({
         isOpen,
         title,
         onConfirm,

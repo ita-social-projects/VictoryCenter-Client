@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { TEAM_MEMBER_VALIDATION } from '../../../const/admin/team';
-import { ImageValues } from '../../../types/Image';
+import { ImageValues } from '../../../types/common/image';
 
 export interface TeamMemberValidationContext {
     isPublishing: boolean;

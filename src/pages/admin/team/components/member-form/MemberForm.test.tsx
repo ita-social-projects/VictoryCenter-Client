@@ -1,9 +1,9 @@
 import React, { createRef } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemberForm, TeamMemberFormRef, TeamMemberFormValues } from './MemberForm';
-import { TeamCategory } from '../../../../../types/admin/TeamMembers';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
 import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { TeamCategory } from '../../../../../types/admin/team-members';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 
 // Mock SingleSelectInput to a native select for deterministic interaction
 jest.mock('../../../../../components/common/single-select-input/SingleSelectInput', () => ({
@@ -33,7 +33,7 @@ jest.mock('../../../../../components/common/single-select-input/SingleSelectInpu
 }));
 
 // Mock PhotoInput to a simple button that injects an image value
-jest.mock('../../../../../components/common/photo-input/PhotoInput', () => ({
+jest.mock('../../../../../components/admin/photo-input/PhotoInput', () => ({
     PhotoInput: ({ onChange, disabled }: any) => (
         <div>
             <button

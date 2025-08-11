@@ -1,20 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { TeamMember, TeamCategory } from '../../../../../types/admin/TeamMembers';
-import { DragPreviewModel, VisibilityStatus } from '../../../../../types/admin/Common';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
 import { DeleteTeamMemberModal } from '../team-member-modals/DeleteTeamMemberModal';
-import { InfiniteScrollList } from '../../../../../components/common/infinite-scroll-list/InfiniteScrollList';
 import { TeamMemberModal } from '../team-member-modals/TeamMemberModal';
-import { CategoryBar } from '../../../../../components/common/category-bar/CategoryBar';
-import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi';
-import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
 import { TEAM_CATEGORY_TEXT, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
 import axios from 'axios';
-import './team-page-content.scss';
+import './TeamPageContent.scss';
 import { MembersListItem } from '../members-list-item/MembersListItem';
 import { MemberDragPreview } from '../member-drag-preview/MemberDragPreview';
+import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { DragPreviewModel, VisibilityStatus } from '../../../../../types/admin/common';
+import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
+import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
+import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
+import { InfiniteScrollList } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -39,7 +39,7 @@ export const TeamPageContent = () => {
         visible: false,
         x: 0,
         y: 0,
-        member: null,
+        item: null,
     });
     const [categories, setCategories] = useState<TeamCategory[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<TeamCategory | null>(null);
@@ -212,13 +212,9 @@ export const TeamPageContent = () => {
         // Implement search functionality
     }, []);
 
-    const onStatusFilterChange = useCallback(
-        (status: VisibilityStatus | undefined) => {
-            setStatusFilter(status);
-            resetMembersState();
-        },
-        [resetMembersState],
-    );
+    const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
+        setStatusFilter(status);
+    }, []);
 
     const handleCategorySelect = useCallback(
         (category: TeamCategory) => {
@@ -263,7 +259,7 @@ export const TeamPageContent = () => {
                 visible: true,
                 x: e.clientX,
                 y: e.clientY,
-                member: member,
+                item: member,
             });
 
             const dragImage = new Image();
@@ -286,7 +282,7 @@ export const TeamPageContent = () => {
             visible: false,
             x: 0,
             y: 0,
-            member: null,
+            item: null,
         });
         setDraggedId(null);
     };
@@ -380,7 +376,7 @@ export const TeamPageContent = () => {
             resetMembersState();
             fetchMembers(true);
         }
-    }, [selectedCategory, statusFilter, fetchMembers, resetMembersState]);
+    }, [statusFilter, selectedCategory, statusFilter, fetchMembers, resetMembersState]);
 
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {

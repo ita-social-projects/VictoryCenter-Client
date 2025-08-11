@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ArrowDown from '../../../assets/icons/chevron-down.svg';
 import ArrowUp from '../../../assets/icons/chevron-up.svg';
 import classNames from 'classnames';
-import './single-select-input.scss';
+import './SingleSelectInput.scss';
 
 export interface SingleSelectInputProps<T extends Record<string, any>> {
     options: T[];
@@ -104,6 +104,7 @@ export const SingleSelectInput = <T extends Record<string, any>>({
                     className="singleselect-options"
                     role="listbox"
                     aria-activedescendant={value ? String(getOptionId(value)) : undefined}
+                    tabIndex={0}
                 >
                     {options.map((option) => {
                         const id = getOptionId(option);

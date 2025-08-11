@@ -1,10 +1,9 @@
-import './admin-navigation.scss';
-import React from 'react';
+import './AdminNavigation.scss';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
-import { adminRoutes } from '../../../const/routers/routes';
-import Logo from '../../../assets/icons/logo.svg';
+import Logo from '../../../assets/icons/logo-with-text.svg';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { ADMIN_ROUTES } from '../../../const/admin/routes';
 
 export const AdminNavigation = () => {
     return (
@@ -15,7 +14,7 @@ export const AdminNavigation = () => {
             <div className="admin-pages">
                 <nav>
                     <NavLink
-                        to={adminRoutes.teamPageRoute}
+                        to={ADMIN_ROUTES.TEAM.FULL}
                         end
                         className={({ isActive }) =>
                             classNames('admin-page-link', {
@@ -27,7 +26,7 @@ export const AdminNavigation = () => {
                     </NavLink>
 
                     <NavLink
-                        to={adminRoutes.programsPageRoute}
+                        to={ADMIN_ROUTES.PROGRAMS.FULL}
                         end
                         className={({ isActive }) =>
                             classNames('admin-page-link', {

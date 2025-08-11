@@ -1,10 +1,10 @@
 import React from 'react';
-import { TeamMember } from '../../../../../types/admin/TeamMembers';
-import './member-component.scss';
-import BlankUserImage from '../../../../../assets/images/admin/blank-user.svg';
-import { mapImageToBase64 } from '../../../../../utils/functions/mapImageToBase64';
-import { VisibilityStatusLabel } from '../../../../../components/common/visibility-status-label/VisibilityStatusLabel';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import './MemberComponent.scss';
+import BlankUserImage from '../../../../../assets/icons/blank-user.svg';
+import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
+import { TeamMember } from '../../../../../types/admin/team-members';
+import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
 
 export interface MemberComponentProps {
     member: TeamMember;

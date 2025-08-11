@@ -1,14 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { TeamCategory, TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../types/admin/TeamMembers';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { MemberForm, TeamMemberFormRef, TeamMemberFormValues } from '../member-form/MemberForm';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { Button } from '../../../../../components/common/button/Button';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { QuestionModal } from '../../../../../components/common/question-modal/QuestionModal';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
-import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi';
-import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
+import { TeamCategory, TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../types/admin/team-members';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { VisibilityStatus } from '../../../../../types/admin/common';
+import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
+import { Button } from '../../../../../components/admin/button/Button';
+import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
+import './TeamMemberModal.scss';
 
 interface TeamMemberModalProps {
     mode: 'add' | 'edit';
@@ -196,7 +197,7 @@ export const TeamMemberModal = ({
                 </Modal.Content>
                 <Modal.Actions>
                     <Button buttonStyle="secondary" onClick={handleDraftSubmit} disabled={isSubmitting || !isFormValid}>
-                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFTED}
+                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
                     </Button>
                     <Button buttonStyle="primary" onClick={handlePublishSubmit} disabled={isSubmitting || !isFormValid}>
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
@@ -204,7 +205,7 @@ export const TeamMemberModal = ({
                 </Modal.Actions>
             </Modal>
 
-            <QuestionModal
+            <ConfirmationModal
                 isOpen={showFormConfirmModal}
                 isButtonsDisabled={isSubmitting}
                 title={getFormConfirmTitle()}
@@ -215,7 +216,7 @@ export const TeamMemberModal = ({
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
 
-            <QuestionModal
+            <ConfirmationModal
                 isOpen={showCloseConfirmModal}
                 isButtonsDisabled={false}
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}

@@ -1,13 +1,11 @@
-import PlusIcon from '../../../../../assets/icons/plus.svg';
-import React from 'react';
-import { Button } from '../../../../../components/common/button/Button';
-import { Select } from '../../../../../components/common/select/Select';
-import { Input } from '../../../../../components/common/input/Input';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import './team-page-toolbar.scss';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-
+import { Select } from '../../../../../components/admin/select/Select';
+import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
+import { Button } from '../../../../../components/admin/button/Button';
+import PlusIcon from '../../../../../assets/icons/plus.svg';
+import './TeamPageToolbar.scss';
 export interface TeamPageToolbarProps {
     onSearchQueryChange: (query: string) => void;
     onStatusFilterChange: (status: VisibilityStatus | undefined) => void;
@@ -24,7 +22,7 @@ export const TeamPageToolbar = ({
     return (
         <div className="toolbar" data-testid="team-page-toolbar">
             <div>
-                <Input
+                <SearchBar
                     onChange={onSearchQueryChange}
                     autocompleteValues={autocompleteValues}
                     placeholder={TEAM_MEMBERS_TEXT.SEARCH.INPUT_FULLNAME}

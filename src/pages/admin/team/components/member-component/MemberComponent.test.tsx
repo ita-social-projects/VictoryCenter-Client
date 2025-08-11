@@ -1,18 +1,18 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemberComponent, MemberComponentProps } from './MemberComponent';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
-
-import { mapImageToBase64 } from '../../../../../utils/functions/mapImageToBase64';
+import '@testing-library/jest-dom';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { VisibilityStatus } from '../../../../../types/admin/common';
+import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 
-jest.mock('../../../../../utils/functions/mapImageToBase64', () => ({
+jest.mock('../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64', () => ({
     mapImageToBase64: jest.fn(),
 }));
 
-jest.mock('../../../../../assets/images/admin/blank-user.svg', () => 'blank-user.svg');
+jest.mock('../../../../../assets/icons/blank-user.svg', () => 'blank-user.svg');
 
-jest.mock('../../../../../components/common/visibility-status-label/VisibilityStatusLabel', () => ({
+jest.mock('../../../../../components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
     VisibilityStatusLabel: ({ status }: { status: VisibilityStatus }) => (
         <div data-testid="visibility-label">{`Status: ${status}`}</div>
     ),

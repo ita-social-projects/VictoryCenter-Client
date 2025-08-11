@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, fireEvent, screen } from '@testing-library/react';
 import { MembersListItem } from './MembersListItem';
-import { TeamMember } from '../../../../../types/admin/TeamMembers';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { TeamMember } from '../../../../../types/admin/team-members';
 
 // Mock MemberComponent to isolate test scope
 jest.mock('../member-component/MemberComponent', () => ({

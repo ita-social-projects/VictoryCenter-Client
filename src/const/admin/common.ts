@@ -2,6 +2,7 @@ export const COMMON_TEXT_ADMIN = {
     TAB: {
         TEAM_MEMBERS: 'Команда',
         PROGRAMS: 'Програми',
+        FAQ: 'Часті питання',
     },
 
     ALT: {

@@ -1,0 +1,13 @@
+.faq-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+
+    &-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.25rem;
+    }
+}

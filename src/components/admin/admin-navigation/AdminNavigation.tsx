@@ -36,6 +36,18 @@ export const AdminNavigation = () => {
                     >
                         {COMMON_TEXT_ADMIN.TAB.PROGRAMS}
                     </NavLink>
+
+                    <NavLink
+                        to={ADMIN_ROUTES.FAQ.FULL}
+                        end
+                        className={({ isActive }) =>
+                            classNames('admin-page-link', {
+                                'admin-pages-selected': isActive,
+                            })
+                        }
+                    >
+                        {COMMON_TEXT_ADMIN.TAB.FAQ}
+                    </NavLink>
                 </nav>
             </div>
         </>

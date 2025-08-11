@@ -1,3 +1,5 @@
+@use '../../../../../assets/sass/variables/colors';
+
 .team-member-form-main {
   display: flex;
   flex-direction: column;
@@ -11,7 +13,7 @@
   }
 
   .error {
-    color: #f04438;
+    color: colors.$error;
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;

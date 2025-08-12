@@ -251,9 +251,8 @@ describe('TeamPageContent', () => {
         expect(getInfiniteScrollList()).toBeInTheDocument();
     };
 
-    const expectEmptyStateToBeShown = () => {
-        expect(getEmptyState()).toBeInTheDocument();
-        expect(screen.getByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
+    const expectModalToBeClosed = (modal: HTMLElement | null) => {
+        expect(modal).not.toBeInTheDocument();
     };
 
     const expectModalToBeOpen = (modal: HTMLElement | null, title: string, content: string) => {
@@ -262,8 +261,9 @@ describe('TeamPageContent', () => {
         expect(screen.getByText(content)).toBeInTheDocument();
     };
 
-    const expectModalToBeClosed = (modal: HTMLElement | null) => {
-        expect(modal).not.toBeInTheDocument();
+    const expectEmptyStateToBeShown = () => {
+        expect(getEmptyState()).toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
     };
 
     const expectApiCallsToHaveBeenMade = () => {

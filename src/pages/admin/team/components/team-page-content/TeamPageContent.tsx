@@ -409,6 +409,7 @@ export const TeamPageContent = () => {
                     return [...prevMembers, member];
                 } else {
                     setHasMore(true);
+                    hasMoreRef.current = true;
                 }
                 return prevMembers;
             });

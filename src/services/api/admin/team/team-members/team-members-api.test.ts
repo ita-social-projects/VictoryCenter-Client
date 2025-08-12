@@ -2,6 +2,7 @@ import { AxiosInstance } from 'axios';
 import { TeamMembersApi } from './team-members-api';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { ImageApi } from '../../image/image-api';
+
 jest.mock('../../image/image-api');
 
 describe('TeamMembersApi', () => {
@@ -286,8 +287,10 @@ describe('TeamMembersApi', () => {
         });
 
         it('does NOT add categoryId param if categoryId is null', async () => {
-            await TeamMembersApi.getAll(mockClient, undefined, undefined, undefined, undefined);
-            expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', { params: {} });
+            await TeamMembersApi.getAll(mockClient, null!, VisibilityStatus.Published, 1, 1);
+            expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', {
+                params: { status: VisibilityStatus.Published, offset: 1, limit: 1 },
+            });
         });
 
         it('adds categoryId param if categoryId is a number', async () => {
@@ -306,13 +309,25 @@ describe('TeamMembersApi', () => {
         });
 
         it('does NOT add offset param if offset is undefined', async () => {
-            await TeamMembersApi.getAll(mockClient, undefined, undefined, undefined, undefined);
-            expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', { params: {} });
+            await TeamMembersApi.getAll(mockClient, 1, VisibilityStatus.Published, undefined, 1);
+            expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', {
+                params: {
+                    categoryId: 1,
+                    status: VisibilityStatus.Published,
+                    limit: 1,
+                },
+            });
         });
 
         it('does NOT add offset param if offset is null', async () => {
-            await TeamMembersApi.getAll(mockClient, undefined, undefined, undefined, undefined);
-            expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', { params: {} });
+            await TeamMembersApi.getAll(mockClient, 1, VisibilityStatus.Draft, null!, 2);
+            expect(mockClient.get).toHaveBeenCalledWith('/TeamMembers', {
+                params: {
+                    categoryId: 1,
+                    status: VisibilityStatus.Draft,
+                    limit: 2,
+                },
+            });
         });
 
         it('adds offset param if offset is a number', async () => {

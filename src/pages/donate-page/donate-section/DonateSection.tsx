@@ -12,10 +12,6 @@ export const DonateSection = () => {
     const [donationAmount, setDonationAmount] = useState<number>(0);
     const [currency, setCurrency] = useState<Currency>(Currency.UAH);
 
-    const setDonateTabClass = (donateTabType: DonateTab): string => {
-        return activeTab === donateTabType ? 'donateTab active' : 'donateTab';
-    };
-
     const handleDonateAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let inputValue = e.target.value;
 

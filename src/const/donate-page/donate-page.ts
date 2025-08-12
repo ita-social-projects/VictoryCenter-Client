@@ -7,8 +7,11 @@ export const DONATE_SECTION = {
     SUBSCRIPTION_BUTTON_LABEL: 'Донатити щомісячно',
 };
 
-export const IN_UKRAINE_LABEL = 'Я в Україні';
-export const NOT_IN_UKRAINE_LABEL = 'Я не в Україні';
+export const CURRENCY_TABS = {
+    UAH: 'Гривня / UAH',
+    USD: 'Долар / USD',
+    EUR: 'Євро / EUR',
+};
 
 export const UKRAINE_PAYMENT_DETAILS = {
     UKRAINE_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в Україні',

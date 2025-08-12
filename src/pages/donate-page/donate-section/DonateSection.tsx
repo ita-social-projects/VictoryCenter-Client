@@ -5,6 +5,7 @@ import { getEnvVariable } from '../../../utils/functions/getEnvVariable';
 import { DonateTab } from '../../../types/public/donate-page/DonateTab';
 import { Currency } from '../../../types/public/donate-page/Currency';
 import { PaymentSystem } from '../../../types/public/donate-page/PaymentStatus';
+import { Tabs } from '../../../components/common/tabs/Tabs';
 
 export const DonateSection = () => {
     const [activeTab, setActiveTab] = useState<DonateTab>(DonateTab.oneTime);
@@ -60,31 +61,14 @@ export const DonateSection = () => {
                 value={(activeTab === DonateTab.subscription).toString()}
             ></input>
             <input type="hidden" name="paymentSystem" value={PaymentSystem.WayForPay}></input>
-            <div className="donateTabsContainer">
-                <button
-                    className={setDonateTabClass(DonateTab.oneTime)}
-                    type="button"
-                    onClick={() => setActiveTab(DonateTab.oneTime)}
-                >
-                    {DONATE_SECTION.ONE_TIME_DONATE}
-                </button>
-                <div className="tooltip-container top">
-                    <button
-                        className={setDonateTabClass(DonateTab.subscription)}
-                        type="button"
-                        onClick={() => setActiveTab(DonateTab.subscription)}
-                        disabled
-                    >
-                        {DONATE_SECTION.SUBSCRIPTION}
-                    </button>
-                    <span className="tooltip-text">
-                        <div className="text-center">
-                            <p className="font-semibold">Subscription is not yet available.</p>
-                            <p>Please check back later!</p>
-                        </div>
-                    </span>
-                </div>
-            </div>
+            <Tabs
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                tabs={[
+                    { id: DonateTab.oneTime, label: DONATE_SECTION.ONE_TIME_DONATE },
+                    { id: DonateTab.subscription, label: DONATE_SECTION.SUBSCRIPTION, disabled: true },
+                ]}
+            ></Tabs>
             <div className="donateAmountSection">
                 <input
                     name="amount"

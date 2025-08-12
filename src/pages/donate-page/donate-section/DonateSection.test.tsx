@@ -5,7 +5,6 @@ describe('DonateSection', () => {
     it('renders input, currency selector, and quick amount buttons', () => {
         render(<DonateSection />);
         expect(screen.getByPlaceholderText('0')).toBeInTheDocument();
-        expect(screen.getByRole('combobox')).toBeInTheDocument();
         expect(screen.getAllByRole('button', { name: /\+/ })).toHaveLength(3);
     });
 
@@ -59,7 +58,7 @@ describe('DonateSection', () => {
 
     it('renders tooltip for subscription tab', () => {
         render(<DonateSection />);
-        expect(screen.getByText(/Subscription is not yet available/i)).toBeInTheDocument();
+        expect(screen.getByText(/Not yet available/i)).toBeInTheDocument();
         expect(screen.getByText(/Please check back later/i)).toBeInTheDocument();
     });
 

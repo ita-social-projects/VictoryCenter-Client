@@ -1,28 +1,44 @@
 import React, { useState } from 'react';
 import './RightSection.scss';
-import { IN_UKRAINE_LABEL, NOT_IN_UKRAINE_LABEL } from '../../../const/donate-page/donate-page';
-import { UkrainePaymentDetails } from './Ukraine-payment-details/UkrainePaymentDetails';
+
 import { AbroadPaymentDetails } from './abroad-payment-details/AbroadPaymentDetails';
 import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSupportWays';
+import { Tabs } from '../../../components/common/tabs/Tabs';
+import { CurrencyTab } from '../../../types/public/donate-page/DonateTab';
+import { CURRENCY_TABS } from '../../../const/donate-page/donate-page';
+import { UkrainePaymentDetails } from './Ukraine-payment-details/UkrainePaymentDetails';
 
 export const RightSection = () => {
-    const [isAbroad, setIsAbroad] = useState(false);
+    const [activeTab, setActiveTab] = useState<CurrencyTab>(CurrencyTab.uah);
 
-    const handleOnChange = () => {
-        setIsAbroad(!isAbroad);
+    const paymentDetails = () => {
+        switch (activeTab) {
+            case CurrencyTab.uah:
+                return <UkrainePaymentDetails />;
+            case CurrencyTab.usd:
+                return <AbroadPaymentDetails />;
+            case CurrencyTab.eur:
+                return <AbroadPaymentDetails />;
+        }
     };
 
     return (
         <div className="rightSection">
             <div className="locationToggleContainer">
                 <label className="switch">
-                    <input type="checkbox" checked={isAbroad} onChange={handleOnChange} />
-                    <span className="slider round"></span>
+                    <Tabs
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                        tabs={[
+                            { id: CurrencyTab.uah, label: CURRENCY_TABS.UAH },
+                            { id: CurrencyTab.usd, label: CURRENCY_TABS.USD },
+                            { id: CurrencyTab.eur, label: CURRENCY_TABS.EUR, disabled: true },
+                        ]}
+                    ></Tabs>
                 </label>
-                <span className="toggleLabel">{isAbroad ? NOT_IN_UKRAINE_LABEL : IN_UKRAINE_LABEL}</span>
             </div>
             <div className="donatePaymentDetails">
-                {isAbroad ? <AbroadPaymentDetails /> : <UkrainePaymentDetails />}
+                {paymentDetails()}
                 <AlternativeSupportWays />
             </div>
         </div>

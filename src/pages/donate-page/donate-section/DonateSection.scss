@@ -9,37 +9,7 @@
     align-content: center;
     box-shadow: 0 1rem 1.5rem -1rem rgba(#20689dbf, 0.75);
 
-    .donateTabsContainer {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        padding-top: 1.5rem;
-        padding-right: 1.5rem;
-        padding-left: 1.5rem;
-
-        .donateTab {
-            background-color: transparent;
-            font-family: $mulish-regular-font;
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: #939699;
-            min-width: 12rem;
-            min-height: 2.68rem;
-            border: none;
-            cursor: pointer;
-            border-bottom: 0.125rem solid #d2d2c7;
-        }
-
-        .donateTab:hover {
-            border-bottom: 0.125rem solid #61615c;
-            color: #61615c;
-        }
-
-        .donateTab.active {
-            border-bottom: 0.125rem solid #58b1da;
-            color: #1f1919;
-        }
-    }
+    
 
     .donateAmountSection {
         padding-top: 1.5rem;

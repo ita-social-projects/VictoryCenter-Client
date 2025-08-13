@@ -1,9 +1,9 @@
-import { ABROAD_PAYMENT_DETAILS } from '../../../../const/donate-page/donate-page';
+import { ABROAD_PAYMENT_DETAILS, CURRENCY } from '../../../../const/donate-page/donate-page';
 import { CorrespondentBankBlock } from './CorrespondentBankBlock';
 import React from 'react';
-import { USD_CORRESPONDENT_BANKS } from './AbroadPaymentDetails';
+import { CORRESPONDENT_BANKS } from '../../../../const/donate-page/donate-page';
 
-export const CorrespondentBanksSection = ({ banks }: { banks: typeof USD_CORRESPONDENT_BANKS }) => (
+export const CorrespondentBanksSection = ({ banks }: { banks: (typeof CORRESPONDENT_BANKS)[CURRENCY.USD] }) => (
     <div className="abroadPaymentDetailsBlock">
         <h2>{ABROAD_PAYMENT_DETAILS.CORRESPONDENT_BANKS_LABEL}</h2>
         <div className="abroadPaymentDetailsContent">

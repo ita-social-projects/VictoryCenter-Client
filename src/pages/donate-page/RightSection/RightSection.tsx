@@ -5,7 +5,7 @@ import { AbroadPaymentDetails } from './abroad-payment-details/AbroadPaymentDeta
 import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSupportWays';
 import { Tabs } from '../../../components/common/tabs/Tabs';
 import { CurrencyTab } from '../../../types/public/donate-page/DonateTab';
-import { CURRENCY_TABS } from '../../../const/donate-page/donate-page';
+import { CURRENCY, CURRENCY_TABS } from '../../../const/donate-page/donate-page';
 import { UkrainePaymentDetails } from './Ukraine-payment-details/UkrainePaymentDetails';
 
 export const RightSection = () => {
@@ -16,9 +16,9 @@ export const RightSection = () => {
             case CurrencyTab.uah:
                 return <UkrainePaymentDetails />;
             case CurrencyTab.usd:
-                return <AbroadPaymentDetails />;
+                return <AbroadPaymentDetails currency={CURRENCY.USD} />;
             case CurrencyTab.eur:
-                return <AbroadPaymentDetails />;
+                return <AbroadPaymentDetails currency={CURRENCY.EUR} />;
         }
     };
 
@@ -32,7 +32,7 @@ export const RightSection = () => {
                         tabs={[
                             { id: CurrencyTab.uah, label: CURRENCY_TABS.UAH },
                             { id: CurrencyTab.usd, label: CURRENCY_TABS.USD },
-                            { id: CurrencyTab.eur, label: CURRENCY_TABS.EUR, disabled: true },
+                            { id: CurrencyTab.eur, label: CURRENCY_TABS.EUR },
                         ]}
                     ></Tabs>
                 </label>

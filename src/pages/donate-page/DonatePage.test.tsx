@@ -13,7 +13,6 @@ describe('DonatePage', () => {
 
         expect(screen.getByText('Разовий донат')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Донатити/i })).toBeInTheDocument();
-
     });
 
     it('renders all main sections with correct content', () => {

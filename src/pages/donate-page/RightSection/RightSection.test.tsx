@@ -32,19 +32,6 @@ describe('RightSection', () => {
         expect(screen.queryByTestId('ukraine-payment')).not.toBeInTheDocument();
     });
 
-    it('does not switch to EUR tab when it is disabled', () => {
-        render(<RightSection />);
-        const eurButton = screen.getByText(/EUR/i);
-        expect(eurButton).toBeDisabled();
-
-        // Спроба клікнути
-        fireEvent.click(eurButton);
-
-        // Має лишитися UkrainePaymentDetails
-        expect(screen.getByTestId('ukraine-payment')).toBeInTheDocument();
-        expect(screen.queryByTestId('abroad-payment')).not.toBeInTheDocument();
-    });
-
     it('always renders AlternativeSupportWays', () => {
         render(<RightSection />);
         expect(screen.getByTestId('alt-support')).toBeInTheDocument();

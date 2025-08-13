@@ -8,7 +8,7 @@ export const Tabs = ({ tabs, activeTab, setActiveTab }: TabProps<number>) => {
                 const isActive = activeTab === id;
                 const tabClass = `tab ${isActive ? 'active' : ''}`;
                 return disabled ? (
-                    <div className="tooltip-container top">
+                    <div key={id} className="tooltip-container top">
                         <button className={tabClass} type="button" onClick={() => setActiveTab(id)} disabled>
                             {label}
                         </button>
@@ -20,7 +20,7 @@ export const Tabs = ({ tabs, activeTab, setActiveTab }: TabProps<number>) => {
                         </span>
                     </div>
                 ) : (
-                    <button className={tabClass} type="button" onClick={() => setActiveTab(id)}>
+                    <button key={id} className={tabClass} type="button" onClick={() => setActiveTab(id)}>
                         {label}
                     </button>
                 );

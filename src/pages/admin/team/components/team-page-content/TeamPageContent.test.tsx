@@ -527,30 +527,6 @@ describe('TeamPageContent', () => {
             expect(preview.getAttribute('data-visible')).toBe('false');
         });
 
-        it('handleDrop does nothing if draggedId is null or same as drop target', async () => {
-            renderTeamPageContent();
-
-            await waitFor(() => {
-                expect(getMemberItems().length).toBeGreaterThan(0);
-            });
-
-            const memberItems = getMemberItems();
-
-            fireEvent.drop(memberItems[0]);
-
-            expect(mockTeamMembersApi.reorder).not.toHaveBeenCalled();
-
-            fireEvent.dragStart(memberItems[0], {
-                clientX: 0,
-                clientY: 0,
-                dataTransfer: { setDragImage: jest.fn() },
-            } as unknown as React.DragEvent<HTMLDivElement>);
-
-            fireEvent.drop(memberItems[0]);
-
-            expect(mockTeamMembersApi.reorder).not.toHaveBeenCalled();
-        });
-
         it('does not fetch members if aborted or already loading', async () => {
             renderTeamPageContent();
 

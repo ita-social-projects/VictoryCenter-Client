@@ -69,19 +69,6 @@ export const useGenericModal = <
         setIsFormValid(false);
     }, [isOpen]);
 
-    const handleFormSubmit = useCallback((data: TFormValues, status: VisibilityStatus) => {
-        const isPublishing = status === VisibilityStatus.Published;
-        const currentIsValid = formRef.current?.isValid(isPublishing) || false;
-
-        if (!currentIsValid) {
-            return;
-        }
-
-        setPendingFormData(data);
-        setPendingAction(status === VisibilityStatus.Published ? 'publish' : 'draft');
-        setShowFormConfirmModal(true);
-    }, []);
-
     const resetPendingState = useCallback(() => {
         setPendingAction(null);
         setPendingFormData(null);
@@ -115,6 +102,19 @@ export const useGenericModal = <
             setIsSubmitting(false);
         }
     }, [pendingFormData, pendingAction, transformFormData, entity, apiCall, onSuccess, onClose, getErrorMessage, mode]);
+
+    const handleFormSubmit = useCallback((data: TFormValues, status: VisibilityStatus) => {
+        const isPublishing = status === VisibilityStatus.Published;
+        const currentIsValid = formRef.current?.isValid(isPublishing) || false;
+
+        if (!currentIsValid) {
+            return;
+        }
+
+        setPendingFormData(data);
+        setPendingAction(status === VisibilityStatus.Published ? 'publish' : 'draft');
+        setShowFormConfirmModal(true);
+    }, []);
 
     const handleClose = useCallback(() => {
         if (formRef.current?.isDirty()) {

@@ -1,112 +1,154 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { ButtonTooltip } from './ButtonTooltip';
+import { ButtonTooltip, ButtonTooltipProps } from './ButtonTooltip';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 jest.mock('../../../assets/icons/info.svg', () => 'info-icon.svg');
+jest.mock('../tooltip/Tooltip', () => {
+    const React = require('react');
+    return {
+        Tooltip: React.forwardRef(({ id, Children, position }: any, ref: any) => (
+            <div
+                ref={ref}
+                data-testid="tooltip-popup"
+                id={id}
+                role="tooltip"
+                className={`button-tooltip-popup button-tooltip-popup--${position}`}
+            >
+                {Children}
+            </div>
+        )),
+    };
+});
 
 describe('ButtonTooltip', () => {
-    const defaultProps = {
+    const defaultProps: ButtonTooltipProps = {
         children: <div>Tooltip content</div>,
     };
+
+    const renderButtonTooltip = (overrideProps: Partial<ButtonTooltipProps> = {}) =>
+        render(<ButtonTooltip {...defaultProps} {...overrideProps} />);
+
+    const getButton = () => screen.getByRole('button', { name: /Show additional information/i });
+    const getIcon = () => screen.getByRole('img');
+    const getTooltip = () => screen.queryByTestId('tooltip-popup');
+
+    const clickButton = () => fireEvent.click(getButton());
+    const clickTooltip = () => fireEvent.mouseDown(getTooltip()!);
+    const clickOutside = () => fireEvent.mouseDown(document.body);
 
     afterEach(() => {
         jest.clearAllMocks();
     });
 
-    it('renders the component with default props', () => {
-        render(<ButtonTooltip {...defaultProps} />);
+    it('renders with default props and hides tooltip by default', () => {
+        renderButtonTooltip();
 
-        const icon = screen.getByRole('img');
-        expect(icon).toBeInTheDocument();
-        expect(icon).toHaveAttribute('src', 'info-icon.svg');
-        expect(screen.queryByText('Tooltip content')).not.toBeInTheDocument();
+        expect(getIcon()).toHaveAttribute('src', 'info-icon.svg');
+        expect(getTooltip()).not.toBeInTheDocument();
     });
 
     it('shows tooltip when clicked', () => {
-        render(<ButtonTooltip {...defaultProps} />);
-
-        const button = screen.getByRole('button', { name: 'Show additional information' });
-        fireEvent.click(button);
+        renderButtonTooltip();
+        clickButton();
 
         expect(screen.getByText('Tooltip content')).toBeInTheDocument();
+        expect(getButton()).toHaveAttribute('aria-expanded', 'true');
+        expect(getButton()).toHaveAttribute('aria-describedby');
     });
 
     it('hides tooltip when clicked again', () => {
-        render(<ButtonTooltip {...defaultProps} />);
+        renderButtonTooltip();
+        clickButton();
+        expect(getTooltip()).toBeInTheDocument();
 
-        const button = screen.getByRole('button', { name: 'Show additional information' });
-
-        // Show tooltip
-        fireEvent.click(button);
-        expect(screen.getByText('Tooltip content')).toBeInTheDocument();
-
-        // Hide tooltip
-        fireEvent.click(button);
-        expect(screen.queryByText('Tooltip content')).not.toBeInTheDocument();
-    });
-
-    it('applies correct position class for bottom position (default)', () => {
-        render(<ButtonTooltip {...defaultProps} />);
-
-        fireEvent.click(screen.getByRole('button', { name: 'Show additional information' }));
-
-        const tooltip = screen.getByText('Tooltip content').closest('.button-tooltip-popup');
-        expect(tooltip).toHaveClass('button-tooltip-popup--bottom');
-    });
-
-    it('applies correct position class for top position', () => {
-        render(<ButtonTooltip {...defaultProps} position="top" />);
-
-        fireEvent.click(screen.getByRole('button', { name: 'Show additional information' }));
-
-        const tooltip = screen.getByText('Tooltip content').closest('.button-tooltip-popup');
-        expect(tooltip).toHaveClass('button-tooltip-popup--top');
+        clickButton();
+        expect(getTooltip()).not.toBeInTheDocument();
     });
 
     it('hides tooltip when clicking outside', async () => {
-        render(
-            <div>
-                <ButtonTooltip {...defaultProps} />
-                <div data-testid="outside-element">Outside</div>
-            </div>,
-        );
+        renderButtonTooltip();
+        clickButton();
+        expect(getTooltip()).toBeInTheDocument();
 
-        fireEvent.click(screen.getByRole('button', { name: 'Show additional information' }));
-        expect(screen.getByText('Tooltip content')).toBeInTheDocument();
-
-        fireEvent.mouseDown(screen.getByTestId('outside-element'));
-
-        await waitFor(() => {
-            expect(screen.queryByText('Tooltip content')).not.toBeInTheDocument();
-        });
+        clickOutside();
+        await waitFor(() => expect(getTooltip()).not.toBeInTheDocument());
     });
 
-    it('shows tooltip when clicking on button', () => {
-        render(<ButtonTooltip {...defaultProps} />);
+    it('applies correct position class (default bottom)', () => {
+        renderButtonTooltip();
+        clickButton();
 
-        const button = screen.getByRole('button', { name: 'Show additional information' });
+        expect(getTooltip()).toHaveClass('button-tooltip-popup--bottom');
+    });
 
-        fireEvent.click(button);
+    it('applies correct position class when position="top"', () => {
+        renderButtonTooltip({ position: 'top' });
+        clickButton();
 
-        expect(screen.getByText('Tooltip content')).toBeInTheDocument();
+        expect(getTooltip()).toHaveClass('button-tooltip-popup--top');
     });
 
     it('has correct accessibility attributes', () => {
-        render(<ButtonTooltip {...defaultProps} />);
+        renderButtonTooltip();
 
-        const button = screen.getByRole('button');
-
+        const button = getButton();
         expect(button).toHaveAttribute('aria-haspopup', 'true');
         expect(button).toHaveAttribute('aria-expanded', 'false');
-        expect(button).toHaveAttribute('aria-label', 'Show additional information');
+        expect(button).toHaveAttribute('aria-label');
         expect(button).not.toHaveAttribute('aria-describedby');
 
-        fireEvent.click(button);
+        clickButton();
 
         expect(button).toHaveAttribute('aria-expanded', 'true');
         expect(button).toHaveAttribute('aria-describedby');
+    });
 
-        const tooltip = screen.getByRole('tooltip');
-        expect(tooltip).toBeInTheDocument();
+    it('changes alt text depending on tooltip visibility', () => {
+        renderButtonTooltip();
+
+        expect(getIcon()).toHaveAttribute('alt', COMMON_TEXT_ADMIN.ALT.SHOW_TOOLTIP);
+
+        clickButton();
+        expect(getIcon()).toHaveAttribute('alt', COMMON_TEXT_ADMIN.ALT.HIDE_TOOLTIP);
+    });
+
+    it('handles button click and toggles tooltip', () => {
+        renderButtonTooltip();
+
+        // Test that clicking works (this implicitly tests the click handler which calls stopPropagation)
+        expect(getTooltip()).not.toBeInTheDocument();
+
+        clickButton();
+        expect(getTooltip()).toBeInTheDocument();
+
+        clickButton();
+        expect(getTooltip()).not.toBeInTheDocument();
+    });
+
+    it('does not hide tooltip when clicking on tooltip itself', async () => {
+        renderButtonTooltip();
+
+        clickButton();
+        expect(getTooltip()).toBeInTheDocument();
+
+        // Click on the tooltip itself
+        clickTooltip();
+
+        // Should still be visible
+        expect(getTooltip()).toBeInTheDocument();
+    });
+
+    it('removes event listeners on unmount', () => {
+        const removeEventListenerSpy = jest.spyOn(document, 'removeEventListener');
+
+        const { unmount } = renderButtonTooltip();
+        clickButton(); // Show tooltip to add event listener
+
+        unmount();
+
+        expect(removeEventListenerSpy).toHaveBeenCalledWith('mousedown', expect.any(Function));
+
+        removeEventListenerSpy.mockRestore();
     });
 });

@@ -1,85 +1,42 @@
-import React, { useState, useRef, useEffect, useCallback, useId } from 'react';
+import React, { useState, useRef, useCallback, useId } from 'react';
 import InfoIcon from '../../../assets/icons/info.svg';
-import classNames from 'classnames';
-import './ButtonTooltip.scss';
+import { Tooltip, TooltipPosition } from '../tooltip/Tooltip';
+import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/useOnClickOutside';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import './ButtonTooltip.scss';
 
 export interface ButtonTooltipProps {
     children: React.ReactNode;
-    offset?: number;
-    position?: 'top' | 'bottom';
+    position?: TooltipPosition;
 }
 
-export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: ButtonTooltipProps) => {
+export const ButtonTooltip = ({ children, position = 'bottom' }: ButtonTooltipProps) => {
     const [isVisible, setIsVisible] = useState(false);
-    const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
     const wrapperRef = useRef<HTMLButtonElement>(null);
     const tooltipRef = useRef<HTMLDivElement>(null);
+    const tooltipId = useId();
 
     const toggleTooltip = (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsVisible((prev) => !prev);
     };
 
-    const calculatePosition = useCallback(() => {
-        if (!wrapperRef.current || !tooltipRef.current) return;
-
-        const wrapperWidth = wrapperRef.current.offsetWidth;
-        const wrapperHeight = wrapperRef.current.offsetHeight;
-        const tooltipWidth = tooltipRef.current.offsetWidth;
-        const tooltipHeight = tooltipRef.current.offsetHeight;
-
-        let top = 0;
-
-        const left = (wrapperWidth - tooltipWidth) / 2;
-
-        switch (position) {
-            case 'top':
-                top = -tooltipHeight - offset;
-                break;
-            case 'bottom':
-                top = wrapperHeight + offset;
-                break;
-        }
-
-        setTooltipPosition({ top, left });
-    }, [position, offset]);
-
-    const handleClickOutside = useCallback((event: MouseEvent) => {
-        if (
-            wrapperRef.current &&
-            !wrapperRef.current.contains(event.target as Node) &&
-            tooltipRef.current &&
-            !tooltipRef.current.contains(event.target as Node)
-        ) {
-            setIsVisible(false);
-        }
+    const closeTooltip = useCallback(() => {
+        setIsVisible(false);
     }, []);
 
-    useEffect(() => {
-        if (isVisible) {
-            calculatePosition();
-        }
-    }, [isVisible, position, offset, calculatePosition]);
-
-    useEffect(() => {
-        if (isVisible) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [handleClickOutside, isVisible]);
-
-    const tooltipId = useId();
+    useOnClickOutside({
+        ignoreClickRefs: [wrapperRef],
+        onClickOutside: closeTooltip,
+        enabled: isVisible,
+    });
 
     return (
         <button
             ref={wrapperRef}
+            type="button"
             className="button-tooltip-wrapper"
             onClick={toggleTooltip}
-            type="button"
             aria-haspopup="true"
             aria-expanded={isVisible}
             aria-label="Show additional information"
@@ -92,19 +49,16 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
             />
 
             {isVisible && (
-                <div
-                    id={tooltipId}
+                <Tooltip
                     ref={tooltipRef}
-                    role="tooltip"
-                    className={classNames('button-tooltip-popup', `button-tooltip-popup--${position}`)}
-                    style={{
-                        opacity: tooltipPosition.top !== 0 && tooltipPosition.left !== 0 ? '1' : '0',
-                        top: `${tooltipPosition.top}px`,
-                        left: `${tooltipPosition.left}px`,
-                    }}
-                >
-                    {children}
-                </div>
+                    id={tooltipId}
+                    position={position}
+                    offsetInPixels={8}
+                    customMaxWidthInPixels={400}
+                    allowClickThrough={true}
+                    isCentered={true}
+                    children={children}
+                />
             )}
         </button>
     );

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { DONATE_SECTION } from '../../../const/donate-page/donate-page';
 import { getEnvVariable } from '../../../utils/functions/getEnvVariable';
 import { DonateTab } from '../../../types/public/donate-page/DonateTab';
-import { Currency } from '../../../types/public/donate-page/Currency';
+import { Currency, currencyToString } from '../../../types/public/donate-page/Currency';
 import { PaymentSystem } from '../../../types/public/donate-page/PaymentStatus';
 import { Tabs } from '../../../components/common/tabs/Tabs';
 
@@ -11,6 +11,8 @@ export const DonateSection = () => {
     const [activeTab, setActiveTab] = useState<DonateTab>(DonateTab.oneTime);
     const [donationAmount, setDonationAmount] = useState<number>(0);
     const [currency, setCurrency] = useState<Currency>(Currency.UAH);
+
+    const currencyString = currencyToString(currency);
 
     const handleDonateAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let inputValue = e.target.value;
@@ -26,7 +28,7 @@ export const DonateSection = () => {
     };
 
     const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setCurrency(e.target.value as Currency);
+        setCurrency(Number(e.target.value) as Currency);
     };
 
     const handleSubmit: React.FormEventHandler<HTMLFormElement> | undefined = (e) => {
@@ -75,26 +77,26 @@ export const DonateSection = () => {
                 />
                 <div className="currencySelector">
                     <select name="currency" value={currency} onChange={handleCurrencyChange}>
-                        <option value={Currency.UAH}>{Currency[Currency.UAH]}</option>
-                        <option value={Currency.USD}>{Currency[Currency.USD]}</option>
-                        <option value={Currency.EUR}>{Currency[Currency.EUR]}</option>
+                        <option value={Currency.UAH}>{currencyToString(Currency.UAH)}</option>
+                        <option value={Currency.USD}>{currencyToString(Currency.USD)}</option>
+                        <option value={Currency.EUR}>{currencyToString(Currency.EUR)}</option>
                     </select>
                     <span className="arrowIcon">▼</span>
-                    <span className="currencyText">{currency}</span>
+                    <span className="currencyText">{currencyString}</span>
                 </div>
             </div>
             <div className="fastDonateOptionsSection">
                 <button className="donateFastOptionButton" onClick={() => handleQuickAmountChange(10)} type="button">
                     <span className="donateFastValueText">+10 </span>
-                    {currency}
+                    {currencyString}
                 </button>
                 <button className="donateFastOptionButton" onClick={() => handleQuickAmountChange(50)} type="button">
                     <span className="donateFastValueText">+50 </span>
-                    {currency}
+                    {currencyString}
                 </button>
                 <button className="donateFastOptionButton" onClick={() => handleQuickAmountChange(100)} type="button">
                     <span className="donateFastValueText">+100 </span>
-                    {currency}
+                    {currencyString}
                 </button>
             </div>
             <button className="donateButton" type="submit">

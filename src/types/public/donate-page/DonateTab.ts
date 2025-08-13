@@ -3,20 +3,14 @@ export enum DonateTab {
     subscription,
 }
 
-export enum CurrencyTab {
-    uah,
-    usd,
-    eur,
+export interface TabProps {
+    tabs: TabItem[];
+    activeTab: number;
+    setActiveTab: (tab: number) => void;
 }
 
-export interface TabProps<T> {
-    tabs: TabItem<T>[];
-    activeTab: T;
-    setActiveTab: (tab: T) => void;
-}
-
-export interface TabItem<T> {
-    id: T;
+export interface TabItem {
+    id: number;
     label: string;
     disabled?: boolean;
 }

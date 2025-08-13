@@ -8,7 +8,7 @@ export const DONATE_SECTION = {
 };
 
 export const CURRENCY_TABS = {
-    UAH: 'Гривня / UAH',
+    UAH: 'Гривні / UAH',
     USD: 'Долар / USD',
     EUR: 'Євро / EUR',
 };
@@ -29,11 +29,6 @@ export const PAYMENT_DETAILS_COMMON = {
     RECIPIENT_LABEL: 'Одержувач',
     RECIPIENT_NAME_LABEL: 'ГО «ЦЕНТР ПЕРЕМОГИ»',
 };
-
-export enum CURRENCY {
-    EUR = 'EUR',
-    USD = 'USD',
-}
 
 export const ABROAD_PAYMENT_DETAILS = {
     USD_PAYMENT_DETAILS_LABEL: 'Для переказів в USD:',

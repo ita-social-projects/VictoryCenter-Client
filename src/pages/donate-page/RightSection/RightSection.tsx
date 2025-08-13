@@ -4,21 +4,21 @@ import './RightSection.scss';
 import { AbroadPaymentDetails } from './abroad-payment-details/AbroadPaymentDetails';
 import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSupportWays';
 import { Tabs } from '../../../components/common/tabs/Tabs';
-import { CurrencyTab } from '../../../types/public/donate-page/DonateTab';
-import { CURRENCY, CURRENCY_TABS } from '../../../const/donate-page/donate-page';
 import { UkrainePaymentDetails } from './Ukraine-payment-details/UkrainePaymentDetails';
+import { Currency } from '../../../types/public/donate-page/Currency';
+import { CURRENCY_TABS } from '../../../const/donate-page/donate-page';
 
 export const RightSection = () => {
-    const [activeTab, setActiveTab] = useState<CurrencyTab>(CurrencyTab.uah);
+    const [activeTab, setActiveTab] = useState<Currency>(Currency.UAH);
 
     const paymentDetails = () => {
         switch (activeTab) {
-            case CurrencyTab.uah:
+            case Currency.UAH:
                 return <UkrainePaymentDetails />;
-            case CurrencyTab.usd:
-                return <AbroadPaymentDetails currency={CURRENCY.USD} />;
-            case CurrencyTab.eur:
-                return <AbroadPaymentDetails currency={CURRENCY.EUR} />;
+            case Currency.USD:
+                return <AbroadPaymentDetails currency={activeTab} />;
+            case Currency.EUR:
+                return <AbroadPaymentDetails currency={activeTab} />;
         }
     };
 
@@ -30,9 +30,9 @@ export const RightSection = () => {
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}
                         tabs={[
-                            { id: CurrencyTab.uah, label: CURRENCY_TABS.UAH },
-                            { id: CurrencyTab.usd, label: CURRENCY_TABS.USD },
-                            { id: CurrencyTab.eur, label: CURRENCY_TABS.EUR },
+                            { id: Currency.UAH, label: CURRENCY_TABS.UAH },
+                            { id: Currency.USD, label: CURRENCY_TABS.USD },
+                            { id: Currency.EUR, label: CURRENCY_TABS.EUR },
                         ]}
                     ></Tabs>
                 </label>

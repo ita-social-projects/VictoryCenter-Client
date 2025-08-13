@@ -1,11 +1,11 @@
 import { TabProps } from '../../../types/public/donate-page/DonateTab';
 import './Tabs.scss';
 
-export const Tabs = ({ tabs, activeTab, setActiveTab }: TabProps<number>) => {
+export const Tabs = ({ tabs, activeTab, setActiveTab }: TabProps) => {
     return (
         <div className="tabsContainer">
-            {tabs.map(({ id, label, disabled }) => {
-                const isActive = activeTab === id;
+            {tabs.map(({ id, label, disabled }, index) => {
+                const isActive = activeTab === index;
                 const tabClass = `tab ${isActive ? 'active' : ''}`;
                 return disabled ? (
                     <div key={id} className="tooltip-container top">

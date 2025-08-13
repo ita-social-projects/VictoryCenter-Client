@@ -1,6 +1,6 @@
 import React from 'react';
-import { NotFoundMessage } from './notfound-message/NotFoundMessage';
-import { NotFoundIntro } from './notfound-intro/NotFoundIntro';
+import { NotFoundMessage } from './not-found-message/NotFoundMessage';
+import { NotFoundIntro } from './not-found-intro/NotFoundIntro';
 import './NotFound.scss';
 export const NotFound = () => {
     return (

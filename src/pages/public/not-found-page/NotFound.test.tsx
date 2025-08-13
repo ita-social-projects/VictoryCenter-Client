@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { NotFound } from './NotFound';
-jest.mock('./notfound-intro/NotFoundIntro', () => ({
+jest.mock('./not-found-intro/NotFoundIntro', () => ({
     NotFoundIntro: () => <div data-testid="not-found-page-intro-container">NotFoundIntro</div>,
 }));
 
-jest.mock('./notfound-message/NotFoundMessage', () => ({
+jest.mock('./not-found-message/NotFoundMessage', () => ({
     NotFoundMessage: () => <div data-testid="not-found-message-container">NotFoundMessage</div>,
 }));
 

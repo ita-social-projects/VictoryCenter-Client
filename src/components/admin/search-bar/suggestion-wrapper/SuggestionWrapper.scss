@@ -1,0 +1,15 @@
+﻿.suggestion-wrapper {
+    position: relative;
+    overflow: visible;
+    cursor: pointer;
+    min-height: 40px;
+    max-height: 100px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+
+    &-active,
+    &:hover {
+        background: #e7eaee;
+    }
+}

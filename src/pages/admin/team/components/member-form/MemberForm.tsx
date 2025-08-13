@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useMemo } from 'react';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TeamCategory } from '../../../../../types/admin/team-members';
 import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/team-member-schema/team-member-schema';
@@ -10,6 +10,7 @@ import { InputWithCharacterLimit } from '../../../../../components/admin/input-w
 import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';
 import './MemberForm.scss';
+import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
 export interface TeamMemberFormValues {
     categoryId: number | null;
     fullName: string;
@@ -23,6 +24,7 @@ export interface TeamMemberFormErrorState {
     fullName?: string;
     description?: string;
     image?: string;
+    [key: string]: string | undefined;
 }
 
 export interface TeamMemberFormRef {
@@ -48,10 +50,6 @@ const validateForm = (formState: TeamMemberFormValues, isPublishing: boolean): T
     };
 };
 
-const hasErrors = (errors: TeamMemberFormErrorState): boolean => {
-    return Object.values(errors).some((error) => error !== undefined);
-};
-
 export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
     ({ initialData = null, onSubmit, formDisabled, categories, onValidationChange }: MemberFormProps, ref) => {
         const defaultFormState = useMemo<TeamMemberFormValues>(
@@ -65,114 +63,74 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
             [],
         );
 
-        const [formState, setFormState] = useState<TeamMemberFormValues>(defaultFormState);
-        const [errors, setErrors] = useState<TeamMemberFormErrorState>({});
-        const [initialFormState, setInitialFormState] = useState<TeamMemberFormValues>(defaultFormState);
-        const [isSubmitting, setIsSubmitting] = useState(false);
+        const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
+            TeamMemberFormValues,
+            TeamMemberFormErrorState
+        >({
+            defaultFormState,
+            initialData,
+            validateForm,
+            onSubmit,
+            onValidationChange,
+            ref,
+        });
 
-        const reset = useCallback(
-            (data: TeamMemberFormValues | null) => {
-                const newState = data || defaultFormState;
-                setFormState(newState);
-                setInitialFormState(newState);
-                setErrors({});
+        const handleFullNameChange = useCallback(
+            (e: React.ChangeEvent<HTMLInputElement>) => {
+                setFormState((prev) => ({ ...prev, fullName: e.target.value }));
             },
-            [defaultFormState],
+            [setFormState],
         );
-
-        const isDirty = useCallback(() => {
-            return JSON.stringify(formState) !== JSON.stringify(initialFormState);
-        }, [formState, initialFormState]);
-
-        const isValid = useCallback(
-            (isPublishing: boolean = false) => {
-                const formErrors = validateForm(formState, isPublishing);
-                return !hasErrors(formErrors);
-            },
-            [formState],
-        );
-
-        useEffect(() => {
-            const formErrors = validateForm(formState, false);
-            const isFormValid = !hasErrors(formErrors);
-
-            if (onValidationChange) {
-                onValidationChange(isFormValid);
-            }
-        }, [formState, onValidationChange]);
-
-        useEffect(() => {
-            reset(initialData);
-        }, [initialData, reset]);
-
-        const handleFullNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-            const value = e.target.value;
-            setFormState((prev) => ({ ...prev, fullName: value }));
-        }, []);
 
         const handleNameBlur = useCallback(() => {
-            const error = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false);
-            setErrors((prev) => ({ ...prev, fullName: error }));
-        }, [formState.fullName]);
-
-        const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value;
-            setFormState((prev) => ({ ...prev, description: value }));
-        }, []);
-
-        const handleDescriptionBlur = useCallback(() => {
-            const error = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(formState.description, false);
-            setErrors((prev) => ({ ...prev, description: error }));
-        }, [formState.description]);
-
-        const handleImgChange = useCallback((file: ImageValues | null) => {
-            setFormState((prev) => ({ ...prev, image: file }));
-            const error = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(file, false);
-            setErrors((prev) => ({ ...prev, image: error }));
-        }, []);
-
-        const handleCategoryChange = useCallback((category: TeamCategory) => {
-            setFormState((prev) => ({
+            setErrors((prev) => ({
                 ...prev,
-                categoryId: category.id,
+                fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false),
             }));
-            const error = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateCategory(category.id, false);
-            setErrors((prev) => ({ ...prev, category: error }));
-        }, []);
+        }, [formState.fullName, setErrors]);
 
-        const handleCategoryBlur = useCallback(() => {
-            const error = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateCategory(formState.categoryId, false);
-            setErrors((prev) => ({ ...prev, category: error }));
-        }, [formState.categoryId]);
-
-        const submit = useCallback(
-            async (status: VisibilityStatus) => {
-                if (isSubmitting) return;
-
-                setIsSubmitting(true);
-                const isPublishing = status === VisibilityStatus.Published;
-
-                try {
-                    const formErrors = validateForm(formState, isPublishing);
-                    setErrors(formErrors);
-
-                    if (hasErrors(formErrors)) {
-                        return;
-                    }
-
-                    await onSubmit(formState, status);
-                } finally {
-                    setIsSubmitting(false);
-                }
+        const handleDescriptionChange = useCallback(
+            (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                setFormState((prev) => ({ ...prev, description: e.target.value }));
             },
-            [formState, onSubmit, isSubmitting],
+            [setFormState],
         );
 
-        useImperativeHandle(ref, () => ({
-            submit,
-            isDirty,
-            isValid,
-        }));
+        const handleDescriptionBlur = useCallback(() => {
+            setErrors((prev) => ({
+                ...prev,
+                description: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(formState.description, false),
+            }));
+        }, [formState.description, setErrors]);
+
+        const handleImgChange = useCallback(
+            (file: ImageValues | null) => {
+                setFormState((prev) => ({ ...prev, image: file }));
+                setErrors((prev) => ({
+                    ...prev,
+                    image: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(file, false),
+                }));
+            },
+            [setFormState, setErrors],
+        );
+
+        const handleCategoryChange = useCallback(
+            (category: TeamCategory) => {
+                setFormState((prev) => ({ ...prev, categoryId: category.id }));
+                setErrors((prev) => ({
+                    ...prev,
+                    category: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateCategory(category.id, false),
+                }));
+            },
+            [setFormState, setErrors],
+        );
+
+        const handleCategoryBlur = useCallback(() => {
+            setErrors((prev) => ({
+                ...prev,
+                category: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateCategory(formState.categoryId, false),
+            }));
+        }, [formState.categoryId, setErrors]);
 
         return (
             <form className="team-member-form-main" data-testid="test-form" noValidate>

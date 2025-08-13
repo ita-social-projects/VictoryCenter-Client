@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Modal } from '../../../../../components/common/modal/Modal';
+import React, { useMemo } from 'react';
 import { MemberForm, TeamMemberFormRef, TeamMemberFormValues } from '../member-form/MemberForm';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
@@ -7,9 +6,9 @@ import { TeamCategory, TeamMember, TeamMemberCreateUpdateRequest } from '../../.
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
-import { Button } from '../../../../../components/admin/button/Button';
-import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import './TeamMemberModal.scss';
+import { GenericModalWrapper } from '../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
+import { useGenericModal } from '../../../../../hooks/admin/use-generic-modal/useGenericModal';
 
 interface TeamMemberModalProps {
     mode: 'add' | 'edit';
@@ -32,204 +31,106 @@ export const TeamMemberModal = ({
 }: TeamMemberModalProps) => {
     const client = useAdminClient();
     const isEditMode = mode === 'edit';
-    const member = isEditMode ? memberToEdit : null;
     const onSuccess = isEditMode ? onEditMember : onAddMember;
-    const formRef = useRef<TeamMemberFormRef>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState('');
-    const [showFormConfirmModal, setShowFormConfirmModal] = useState(false);
-    const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
-    const [pendingAction, setPendingAction] = useState<'publish' | 'draft' | null>(null);
-    const [pendingFormData, setPendingFormData] = useState<TeamMemberFormValues | null>(null);
-    const [isFormValid, setIsFormValid] = useState(false);
+
+    const modalConfig = useMemo(
+        () => ({
+            mode,
+            isOpen,
+            onClose,
+            entity: memberToEdit,
+            onSuccess: onSuccess!,
+            apiCall: async (data: TeamMemberCreateUpdateRequest) => {
+                return isEditMode
+                    ? await TeamMembersApi.updateMember(client, data.id!, data)
+                    : await TeamMembersApi.postMember(client, data);
+            },
+            getConfirmTitle: (
+                mode: 'add' | 'edit',
+                member: TeamMember | undefined,
+                pendingAction: 'publish' | 'draft' | null,
+            ) => {
+                if (mode === 'edit' && member) {
+                    if (member.status === VisibilityStatus.Published)
+                        return pendingAction === 'draft'
+                            ? COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION
+                            : COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES;
+                    return pendingAction === 'draft'
+                        ? COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES
+                        : TEAM_MEMBERS_TEXT.QUESTION.PUBLISH_MEMBER;
+                }
+                return pendingAction === 'draft'
+                    ? TEAM_MEMBERS_TEXT.QUESTION.DRAFT_MEMBER
+                    : TEAM_MEMBERS_TEXT.QUESTION.PUBLISH_MEMBER;
+            },
+            getErrorMessage: (mode: 'add' | 'edit') => {
+                return mode === 'edit'
+                    ? TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_MEMBER
+                    : TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_MEMBER;
+            },
+            getFormKey: (mode: 'add' | 'edit', member?: TeamMember) => {
+                return mode === 'edit' && member?.id ? member.id : 'add';
+            },
+            transformFormData: (
+                formData: TeamMemberFormValues,
+                status: VisibilityStatus,
+                member?: TeamMember,
+            ): TeamMemberCreateUpdateRequest => ({
+                id: mode === 'edit' && member ? member.id : null,
+                fullName: formData.fullName,
+                categoryId: formData.categoryId,
+                description: formData.description,
+                image: formData.image,
+                status: status,
+                imageId: formData.imageId,
+            }),
+        }),
+        [mode, isOpen, onClose, memberToEdit, onSuccess, client, isEditMode],
+    );
+
+    const modalHookData = useGenericModal<TeamMemberFormValues, TeamMember, TeamMemberFormRef>(modalConfig);
 
     const initialData = useMemo<TeamMemberFormValues | null>(() => {
-        if (!isEditMode || !member) return null;
+        if (!isEditMode || !memberToEdit) return null;
 
         return {
-            fullName: member.fullName,
-            description: member.description,
-            categoryId: member.categoryId,
-            image: member.image,
-            imageId: member.image?.id ?? null,
+            fullName: memberToEdit.fullName,
+            description: memberToEdit.description,
+            categoryId: memberToEdit.categoryId,
+            image: memberToEdit.image,
+            imageId: memberToEdit.image?.id ?? null,
         };
-    }, [member, isEditMode]);
+    }, [memberToEdit, isEditMode]);
 
-    useEffect(() => {
-        if (!isOpen) return;
-        setError('');
-        setShowFormConfirmModal(false);
-        setShowCloseConfirmModal(false);
-        setPendingAction(null);
-        setPendingFormData(null);
-        setIsFormValid(false);
-    }, [isOpen]);
-
-    const handleConfirmAction = useCallback(async () => {
-        if (!pendingFormData || !pendingAction) return;
-        if (isEditMode && !member) {
-            setError(TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_MEMBER);
-            return;
-        }
-        setShowFormConfirmModal(false);
-        setIsSubmitting(true);
-        setError('');
-
-        try {
-            const status: VisibilityStatus =
-                pendingAction === 'publish' ? VisibilityStatus.Published : VisibilityStatus.Draft;
-            const memberData: TeamMemberCreateUpdateRequest = {
-                id: isEditMode && member ? member.id : null,
-                fullName: pendingFormData.fullName,
-                categoryId: pendingFormData.categoryId,
-                description: pendingFormData.description,
-                image: pendingFormData.image,
-                status: status,
-                imageId: pendingFormData.imageId,
-            };
-
-            const resultMember = isEditMode
-                ? await TeamMembersApi.updateMember(client, memberData.id!, memberData)
-                : await TeamMembersApi.postMember(client, memberData);
-
-            if (onSuccess) {
-                onSuccess(resultMember);
-            }
-            onClose();
-        } catch {
-            const errorMessage = isEditMode
-                ? TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_MEMBER
-                : TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_MEMBER;
-            setError(errorMessage);
-        } finally {
-            setIsSubmitting(false);
-        }
-    }, [pendingFormData, pendingAction, isEditMode, member, client, onSuccess, onClose]);
-
-    const getFormConfirmTitle = useCallback(() => {
-        if (isEditMode && member) {
-            if (member.status === VisibilityStatus.Published)
-                return pendingAction === 'draft'
-                    ? COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION
-                    : COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES;
-            return pendingAction === 'draft'
-                ? COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES
-                : TEAM_MEMBERS_TEXT.QUESTION.PUBLISH_MEMBER;
-        }
-        return pendingAction === 'draft'
-            ? TEAM_MEMBERS_TEXT.QUESTION.DRAFT_MEMBER
-            : TEAM_MEMBERS_TEXT.QUESTION.PUBLISH_MEMBER;
-    }, [isEditMode, member, pendingAction]);
-
-    const getFormKey = useCallback(() => {
-        if (isEditMode && member?.id) {
-            return member.id;
-        }
-        return 'add';
-    }, [isEditMode, member?.id]);
-
-    const handleFormSubmit = useCallback((data: TeamMemberFormValues, status: VisibilityStatus) => {
-        const isPublishing = status === VisibilityStatus.Published;
-        const currentIsValid = formRef.current?.isValid(isPublishing) || false;
-
-        if (!currentIsValid) {
-            return;
-        }
-
-        setPendingFormData(data);
-        setPendingAction(status === VisibilityStatus.Published ? 'publish' : 'draft');
-        setShowFormConfirmModal(true);
-    }, []);
-
-    const handleFormValidationChange = useCallback((isValid: boolean) => {
-        setIsFormValid(isValid);
-    }, []);
-
-    const handleDraftSubmit = useCallback(() => {
-        formRef.current?.submit(VisibilityStatus.Draft);
-    }, []);
-
-    const handlePublishSubmit = useCallback(() => {
-        formRef.current?.submit(VisibilityStatus.Published);
-    }, []);
-
-    const resetPendingState = useCallback(() => {
-        setPendingAction(null);
-        setPendingFormData(null);
-    }, []);
-
-    const handleCancelConfirmation = useCallback(() => {
-        setShowFormConfirmModal(false);
-        resetPendingState();
-        setIsSubmitting(false);
-    }, [resetPendingState]);
-
-    const handleConfirmClose = useCallback(() => {
-        setShowCloseConfirmModal(false);
-        onClose();
-    }, [onClose]);
-
-    const handleCancelClose = useCallback(() => {
-        setShowCloseConfirmModal(false);
-    }, []);
-
-    const handleClose = useCallback(() => {
-        if (formRef.current?.isDirty()) {
-            setShowCloseConfirmModal(true);
-        } else if (!isSubmitting) {
-            onClose();
-        }
-    }, [isSubmitting, onClose]);
+    const title = isEditMode ? TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER : TEAM_MEMBERS_TEXT.FORM.TITLE.ADD_MEMBER;
 
     return (
-        <>
-            <Modal isOpen={isOpen} onClose={handleClose}>
-                <Modal.Title>
-                    {isEditMode ? TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER : TEAM_MEMBERS_TEXT.FORM.TITLE.ADD_MEMBER}
-                </Modal.Title>
-                <Modal.Content>
-                    <MemberForm
-                        ref={formRef}
-                        key={getFormKey()}
-                        initialData={initialData}
-                        formDisabled={isSubmitting}
-                        onSubmit={handleFormSubmit}
-                        categories={categories}
-                        onValidationChange={handleFormValidationChange}
-                    />
-                    {error && <div className="error-container">{error}</div>}
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button buttonStyle="secondary" onClick={handleDraftSubmit} disabled={isSubmitting || !isFormValid}>
-                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
-                    </Button>
-                    <Button buttonStyle="primary" onClick={handlePublishSubmit} disabled={isSubmitting || !isFormValid}>
-                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
-                    </Button>
-                </Modal.Actions>
-            </Modal>
-
-            <ConfirmationModal
-                isOpen={showFormConfirmModal}
-                isButtonsDisabled={isSubmitting}
-                title={getFormConfirmTitle()}
-                onConfirm={handleConfirmAction}
-                onCancel={handleCancelConfirmation}
-                onClose={handleCancelConfirmation}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-            />
-
-            <ConfirmationModal
-                isOpen={showCloseConfirmModal}
-                isButtonsDisabled={false}
-                title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
-                onConfirm={handleConfirmClose}
-                onCancel={handleCancelClose}
-                onClose={handleCancelClose}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-            />
-        </>
+        <GenericModalWrapper
+            isOpen={isOpen}
+            onClose={modalHookData.handleClose}
+            onFormValidationChange={modalHookData.handleFormValidationChange}
+            onFormSubmit={modalHookData.handleFormSubmit}
+            onDraftSubmit={modalHookData.handleDraftSubmit}
+            onPublishSubmit={modalHookData.handlePublishSubmit}
+            onConfirmAction={modalHookData.handleConfirmAction}
+            onCancelConfirmation={modalHookData.handleCancelConfirmation}
+            onConfirmClose={modalHookData.handleConfirmClose}
+            onCancelClose={modalHookData.handleCancelClose}
+            {...modalHookData}
+            title={title}
+            initialData={initialData}
+            categories={categories}
+            renderForm={(props) => (
+                <MemberForm
+                    ref={modalHookData.formRef}
+                    key={props.key}
+                    initialData={initialData}
+                    formDisabled={props.formDisabled}
+                    onSubmit={props.onSubmit}
+                    categories={categories}
+                    onValidationChange={props.onValidationChange}
+                />
+            )}
+        />
     );
 };

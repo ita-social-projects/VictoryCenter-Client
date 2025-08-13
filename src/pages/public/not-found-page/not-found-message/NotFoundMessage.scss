@@ -1,13 +1,11 @@
 @use '../../../../assets/sass/variables/colors';
 @use '../../../../assets/sass/variables/fonts';
 
-
 .not-found-message-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 31rem;
+    display: flex;
+    justify-content: space-between;
     align-items: start;
-    width: 82.989rem;
+    width: 82rem;
     margin: 0 auto;
 
     .not-found-message-text {
@@ -18,7 +16,12 @@
             color: colors.$blue-900;
             margin: 0;
             line-height: 1.125rem;
+            white-space: nowrap;
         }
+    }
+
+    .not-found-message-description {
+        margin-left: 30rem;
     }
 }
 
@@ -56,7 +59,7 @@
             border-bottom: 1px solid colors.$blue-900;
 
             .link-title {
-                font-family: Mulish, sans-serif;
+                font-family: fonts.$mulish-regular-font;
                 font-weight: 400;
                 font-size: 1rem;
                 line-height: 1.5rem;

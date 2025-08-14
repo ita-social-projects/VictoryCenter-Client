@@ -1,18 +1,16 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-schema';
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { MultiSelectInput } from '../../../../../components/admin/multi-select-input/MultiSelectInput';
 import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';
 import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
 import { InputError } from '../../../../../components/admin/input-error/InputError';
+import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { MultiSelectInputGroup } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
 import { Image, ImageValues, ImageValuesToImage, ImageToImageValue } from '../../../../../types/common/image';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import './ProgramForm.scss';
-import {
-    InputWithCharacterLimitGroup
-} from "../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup";
 
 export interface ProgramFormValues {
     name: string;
@@ -37,7 +35,7 @@ export interface ProgramFormRef {
 export interface ProgramFormProps {
     onSubmit: (data: ProgramFormValues, status: VisibilityStatus) => void;
     initialData?: ProgramFormValues | null;
-    formDisabled?: boolean;
+    isFormDisabled?: boolean;
     categories?: ProgramCategory[];
     onValidationChange?: (isValid: boolean) => void;
 }
@@ -56,7 +54,7 @@ const hasErrors = (errors: ProgramFormErrors): boolean => {
 };
 
 export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
-    ({ initialData = null, onSubmit, formDisabled, categories = [], onValidationChange }: ProgramFormProps, ref) => {
+    ({ initialData = null, onSubmit, isFormDisabled, categories = [], onValidationChange }: ProgramFormProps, ref) => {
         const defaultFormState = useMemo<ProgramFormValues>(
             () => ({
                 name: '',
@@ -180,50 +178,48 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         return (
             <form className="program-form-main" data-testid="test-form" noValidate>
                 {/* Categories Field */}
-                <div className="form-group">
-                    <InputLabel htmlFor={'categories'} text={PROGRAMS_TEXT.FORM.LABEL.CATEGORY} isRequired />
-                    <MultiSelectInput
-                        value={formState.categories}
-                        onChange={handleCategoriesChange}
-                        onBlur={handleCategoriesBlur}
-                        options={categories}
-                        disabled={isSubmitting || formDisabled}
-                        placeholder={PROGRAMS_TEXT.FORM.LABEL.SELECT_CATEGORY}
-                        getOptionId={(category: ProgramCategory) => category.id}
-                        getOptionName={(category: ProgramCategory) => category.name}
-                    />
-                    <InputError error={errors.categories} />
-                </div>
+                <MultiSelectInputGroup
+                    label={PROGRAMS_TEXT.FORM.LABEL.CATEGORY}
+                    isRequired={true}
+                    id="categories"
+                    options={categories}
+                    value={formState.categories}
+                    onChange={handleCategoriesChange}
+                    onBlur={handleCategoriesBlur}
+                    disabled={isSubmitting || isFormDisabled}
+                    placeholder={PROGRAMS_TEXT.FORM.LABEL.SELECT_CATEGORY}
+                    getOptionId={(category: ProgramCategory) => category.id}
+                    getOptionName={(category: ProgramCategory) => category.name}
+                    error={errors.categories}
+                />
 
                 {/* Name Field */}
                 <InputWithCharacterLimitGroup
+                    label={PROGRAMS_TEXT.FORM.LABEL.NAME}
+                    isRequired={true}
                     id="name"
                     name="name"
-                    label={PROGRAMS_TEXT.FORM.LABEL.NAME}
-                    isRequired
                     value={formState.name}
                     onChange={handleNameChange}
                     onBlur={handleNameBlur}
                     maxLength={PROGRAM_VALIDATION.name.max}
-                    disabled={isSubmitting || formDisabled}
+                    disabled={isSubmitting || isFormDisabled}
                     error={errors.name}
                 />
 
                 {/* Description Field */}
-                <div className="form-group">
-                    <InputLabel htmlFor={'description'} text={PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION} />
-                    <TextAreaWithCharacterLimit
-                        value={formState.description}
-                        onChange={handleDescriptionChange}
-                        onBlur={handleDescriptionBlur}
-                        id="description"
-                        name="description"
-                        rows={8}
-                        disabled={isSubmitting || formDisabled}
-                        maxLength={PROGRAM_VALIDATION.description.max}
-                    />
-                    <InputError error={errors.description} />
-                </div>
+                <TextAreaWithCharacterLimitGroup
+                    label={PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION}
+                    id="description"
+                    name="description"
+                    value={formState.description}
+                    onChange={handleDescriptionChange}
+                    onBlur={handleDescriptionBlur}
+                    rows={8}
+                    disabled={isSubmitting || isFormDisabled}
+                    maxLength={PROGRAM_VALIDATION.description.max}
+                    error={errors.description}
+                />
 
                 {/* Image Field */}
                 <div className="form-group">
@@ -233,7 +229,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         onChange={handleImgChange}
                         id="img"
                         name="img"
-                        disabled={isSubmitting || formDisabled}
+                        disabled={isSubmitting || isFormDisabled}
                     />
                     <InputError error={errors.img} />
                 </div>

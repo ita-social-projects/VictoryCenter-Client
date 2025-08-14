@@ -2,18 +2,18 @@ import React from 'react';
 import { InputLabel, InputLabelProps } from '../../input-label/InputLabel';
 import { InputError, InputErrorProps } from '../../input-error/InputError';
 import {
-    InputWithCharacterLimit,
-    InputWithCharacterLimitProps,
-} from '../../input-with-character-limit/InputWithCharacterLimit';
+    TextAreaWithCharacterLimit,
+    TextAreaWithCharacterLimitProps,
+} from '../../textarea-with-character-limit/TextAreaWithCharacterLimit';
 import '../input-group.scss';
 
-export interface InputWithCharacterLimitGroupProps extends InputWithCharacterLimitProps {
+export interface TextAreaWithCharacterLimitGroupProps extends TextAreaWithCharacterLimitProps {
     label: InputLabelProps['text'];
     isRequired?: InputLabelProps['isRequired'];
     error?: InputErrorProps['error'];
 }
 
-export const InputWithCharacterLimitGroup = ({
+export const TextAreaWithCharacterLimitGroup = ({
     label,
     isRequired,
     id,
@@ -23,15 +23,15 @@ export const InputWithCharacterLimitGroup = ({
     onBlur,
     onFocus,
     maxLength,
-    type,
     disabled,
     placeholder,
+    rows,
     error,
-}: InputWithCharacterLimitGroupProps) => {
+}: TextAreaWithCharacterLimitGroupProps) => {
     return (
         <div className="input-group">
             <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
-            <InputWithCharacterLimit
+            <TextAreaWithCharacterLimit
                 id={id}
                 name={name}
                 value={value}
@@ -39,9 +39,9 @@ export const InputWithCharacterLimitGroup = ({
                 onBlur={onBlur}
                 onFocus={onFocus}
                 maxLength={maxLength}
-                type={type}
                 disabled={disabled}
                 placeholder={placeholder}
+                rows={rows}
             />
             <InputError error={error} />
         </div>

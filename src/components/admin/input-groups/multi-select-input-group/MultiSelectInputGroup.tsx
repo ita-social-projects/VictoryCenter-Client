@@ -1,47 +1,42 @@
 import React from 'react';
 import { InputLabel, InputLabelProps } from '../../input-label/InputLabel';
 import { InputError, InputErrorProps } from '../../input-error/InputError';
-import {
-    InputWithCharacterLimit,
-    InputWithCharacterLimitProps,
-} from '../../input-with-character-limit/InputWithCharacterLimit';
+import { MultiSelectInput, MultiSelectInputProps } from '../../multi-select-input/MultiSelectInput';
 import '../input-group.scss';
 
-export interface InputWithCharacterLimitGroupProps extends InputWithCharacterLimitProps {
+export interface MultiSelectInputGroupProps<T> extends MultiSelectInputProps<T> {
     label: InputLabelProps['text'];
     isRequired?: InputLabelProps['isRequired'];
     error?: InputErrorProps['error'];
 }
 
-export const InputWithCharacterLimitGroup = ({
+export const MultiSelectInputGroup = <T,>({
     label,
     isRequired,
     id,
-    name,
+    options,
     value,
     onChange,
     onBlur,
-    onFocus,
-    maxLength,
-    type,
-    disabled,
+    getOptionId,
+    getOptionName,
     placeholder,
+    disabled,
     error,
-}: InputWithCharacterLimitGroupProps) => {
+}: MultiSelectInputGroupProps<T>) => {
     return (
         <div className="input-group">
             <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
-            <InputWithCharacterLimit
+            <MultiSelectInput
                 id={id}
-                name={name}
+                options={options}
                 value={value}
                 onChange={onChange}
                 onBlur={onBlur}
-                onFocus={onFocus}
-                maxLength={maxLength}
-                type={type}
-                disabled={disabled}
+                getOptionId={getOptionId}
+                getOptionName={getOptionName}
                 placeholder={placeholder}
+                disabled={disabled}
             />
             <InputError error={error} />
         </div>

@@ -1,23 +1,23 @@
 ﻿import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { InputWithCharacterLimitGroup } from './InputWithCharacterLimitGroup';
+import { TextAreaWithCharacterLimitGroup } from './TextAreaWithCharacterLimitGroup';
 
 jest.mock('../../input-label/InputLabel', () => ({
     InputLabel: ({ text }: { text: string }) => <div data-testid="mock-label">{text}</div>,
 }));
 
-jest.mock('../../input-with-character-limit/InputWithCharacterLimit', () => ({
-    InputWithCharacterLimit: () => <input data-testid="mock-input" />,
+jest.mock('../../textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
+    TextAreaWithCharacterLimit: () => <textarea data-testid="mock-input" />,
 }));
 
 jest.mock('../../input-error/InputError', () => ({
     InputError: () => <div data-testid="mock-error">Error</div>,
 }));
 
-describe('InputWithCharacterLimitGroup', () => {
+describe('TextAreaWithCharacterLimitGroup', () => {
     it('renders label, input and error', () => {
         render(
-            <InputWithCharacterLimitGroup
+            <TextAreaWithCharacterLimitGroup
                 name={'test'}
                 id={'test'}
                 label="Test Label"

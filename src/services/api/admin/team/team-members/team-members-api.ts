@@ -27,7 +27,7 @@ export const TeamMembersApi = {
             params.limit = Math.floor(limit);
         }
 
-        const response = await client.get<PaginationResult<TeamMember>>('/TeamMembers', { params });
+        const response = await client.get<PaginationResult<TeamMember>>(`${API_ROUTES.TEAM.BASE}`, { params });
         return response.data;
     },
 
@@ -63,7 +63,7 @@ export const TeamMembersApi = {
             finalImageId = null;
         }
 
-        const response = await client.put(`/TeamMembers/${id}`, {
+        const response = await client.put(`${API_ROUTES.TEAM.BASE}/${id}`, {
             fullName: member.fullName,
             categoryId: member.categoryId,
             status: member.status,
@@ -85,7 +85,7 @@ export const TeamMembersApi = {
             const imageResult = await ImageApi.post(client, member.image);
             imageId = imageResult.id;
         }
-        const response = await client.post(`/TeamMembers`, {
+        const response = await client.post(`${API_ROUTES.TEAM.BASE}`, {
             fullName: member.fullName,
             categoryId: member.categoryId,
             status: member.status,

@@ -98,10 +98,22 @@ export const useGenericModal = <
             onClose();
         } catch {
             setError(getErrorMessage(mode));
+            resetPendingState();
         } finally {
             setIsSubmitting(false);
         }
-    }, [pendingFormData, pendingAction, transformFormData, entity, apiCall, onSuccess, onClose, getErrorMessage, mode]);
+    }, [
+        pendingFormData,
+        pendingAction,
+        transformFormData,
+        entity,
+        apiCall,
+        onSuccess,
+        onClose,
+        getErrorMessage,
+        mode,
+        resetPendingState,
+    ]);
 
     const handleFormSubmit = useCallback((data: TFormValues, status: VisibilityStatus) => {
         const isPublishing = status === VisibilityStatus.Published;

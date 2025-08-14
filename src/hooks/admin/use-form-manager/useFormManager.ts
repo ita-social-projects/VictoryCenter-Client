@@ -12,7 +12,7 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
     defaultFormState: TFormValues;
     initialData?: TFormValues | null;
     validateForm: (values: TFormValues, isPublishing: boolean) => TFormErrors;
-    onSubmit: (data: TFormValues, status: VisibilityStatus) => void;
+    onSubmit: (data: TFormValues, status: VisibilityStatus) => Promise<void> | void;
     onValidationChange?: (isValid: boolean) => void;
     ref?: React.Ref<any>;
 }) {
@@ -20,10 +20,11 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
     const [errors, setErrors] = useState<TFormErrors>({} as TFormErrors);
     const [initialFormState, setInitialFormState] = useState<TFormValues>(defaultFormState);
     const isSubmittingRef = useRef(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const reset = useCallback(
         (data?: TFormValues | null) => {
-            const newState = data || defaultFormState;
+            const newState = data ?? defaultFormState;
             setFormState(newState);
             setInitialFormState(newState);
             setErrors({} as TFormErrors);
@@ -57,6 +58,7 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
         async (status: VisibilityStatus) => {
             if (isSubmittingRef.current) return;
             isSubmittingRef.current = true;
+            setIsSubmitting(true);
             const isPublishing = status === VisibilityStatus.Published;
             try {
                 const formErrors = validateForm(formState, isPublishing) || {};
@@ -65,6 +67,7 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
                 await onSubmit(formState, status);
             } finally {
                 isSubmittingRef.current = false;
+                setIsSubmitting(false);
             }
         },
         [formState, onSubmit, validateForm],
@@ -85,7 +88,7 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
         setFormState,
         errors,
         setErrors,
-        isSubmitting: isSubmittingRef.current,
+        isSubmitting,
         reset,
         isDirty,
         isValid,

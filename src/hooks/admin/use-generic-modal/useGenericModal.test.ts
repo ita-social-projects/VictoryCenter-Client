@@ -88,6 +88,36 @@ describe('useGenericModal', () => {
         expect(apiCall).not.toHaveBeenCalled();
     });
 
+    it('handleConfirmAction sets error and resets submitting on API failure', async () => {
+        const localApiCall = jest.fn().mockRejectedValueOnce(new Error('boom'));
+        const mockGetErrorMessage = jest.fn().mockReturnValue('boom'); // Mock to return 'boom'
+
+        const { result } = renderHook(() =>
+            useGenericModal({
+                ...defaultConfig,
+                apiCall: localApiCall,
+                getErrorMessage: mockGetErrorMessage, // Use the mocked function
+            }),
+        );
+
+        result.current.formRef.current = makeFormRef({ isValid: () => true, isDirty: () => false });
+
+        act(() => {
+            result.current.handleFormSubmit({ a: 1 } as any, VisibilityStatus.Published);
+        });
+
+        // Call handleConfirmAction and wait for state updates
+        await act(async () => {
+            await result.current.handleConfirmAction();
+        });
+
+        expect(localApiCall).toHaveBeenCalled();
+        expect(onSuccess).not.toHaveBeenCalled();
+        expect(mockGetErrorMessage).toHaveBeenCalledWith('add'); // or 'edit' depending on your defaultConfig.mode
+        expect(result.current.error).toBe('boom');
+        expect(result.current.isSubmitting).toBe(false);
+    });
+
     it('handleConfirmAction success path', async () => {
         apiCall.mockResolvedValue({ id: 2 });
         const { result } = renderHook(() => useGenericModal(defaultConfig));
@@ -154,6 +184,41 @@ describe('useGenericModal', () => {
             result.current.handlePublishSubmit();
         });
         expect(submit).toHaveBeenCalledWith(VisibilityStatus.Published);
+    });
+
+    it('transforms form data before API call and passes status/entity to transformer', async () => {
+        const localApiCall = jest.fn().mockResolvedValue({ id: 99 });
+        const transformer = jest.fn((data, status, entity) => ({
+            ...data,
+            status,
+            entityId: entity.id,
+            transformed: true,
+        }));
+        const entity = { id: 123 };
+        const { result } = renderHook(() =>
+            useGenericModal({
+                ...defaultConfig,
+                entity,
+                apiCall: localApiCall,
+                transformFormData: transformer,
+            }),
+        );
+
+        result.current.formRef.current = makeFormRef({ isValid: () => true });
+        act(() => {
+            result.current.handleFormSubmit({ foo: 'bar' } as any, VisibilityStatus.Draft);
+        });
+        await act(async () => {
+            await result.current.handleConfirmAction();
+        });
+
+        expect(transformer).toHaveBeenCalledWith({ foo: 'bar' }, VisibilityStatus.Draft, entity);
+        expect(localApiCall).toHaveBeenCalledWith({
+            foo: 'bar',
+            status: VisibilityStatus.Draft,
+            entityId: 123,
+            transformed: true,
+        });
     });
 
     it('handleDraftSubmit calls submit', () => {

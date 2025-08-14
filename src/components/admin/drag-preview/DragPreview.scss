@@ -11,6 +11,7 @@
   box-shadow: 0 4px 12px rgba(black, 0.15);
   opacity: 0.9;
   transition: none;
+  cursor: grabbing;
 
   &:focus-within {
     cursor: grabbing;

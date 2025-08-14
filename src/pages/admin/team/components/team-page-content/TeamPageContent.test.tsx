@@ -615,16 +615,14 @@ describe('TeamPageContent', () => {
             it('should calculate page size based on container height on mount', async () => {
                 const { container } = renderTeamPageContent();
 
-                // Mock the container height
                 const listContainer = container.querySelector('.team-page-list-container');
                 if (listContainer) {
                     Object.defineProperty(listContainer, 'clientHeight', {
-                        value: 360, // This should result in pageSize = 4 (360/120 + 1)
+                        value: 360,
                         configurable: true,
                     });
                 }
 
-                // The useEffect for updatePageSize should run (line 397)
                 await waitFor(() => {
                     expect(mockTeamMembersApi.getAll).toHaveBeenCalled();
                 });

@@ -39,7 +39,7 @@ export const TeamMemberModal = ({
             isOpen,
             onClose,
             entity: memberToEdit,
-            onSuccess: onSuccess!,
+            onSuccess: onSuccess || (() => {}),
             apiCall: async (data: TeamMemberCreateUpdateRequest) => {
                 return isEditMode
                     ? await TeamMembersApi.updateMember(client, data.id!, data)

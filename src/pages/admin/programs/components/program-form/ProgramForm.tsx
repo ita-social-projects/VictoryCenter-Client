@@ -1,12 +1,10 @@
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-schema';
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';
-import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
-import { InputError } from '../../../../../components/admin/input-error/InputError';
 import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { MultiSelectInputGroup } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
+import { PhotoInputGroup } from '../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { Image, ImageValues, ImageValuesToImage, ImageToImageValue } from '../../../../../types/common/image';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
@@ -222,17 +220,15 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 />
 
                 {/* Image Field */}
-                <div className="form-group">
-                    <InputLabel htmlFor={'img'} text={PROGRAMS_TEXT.FORM.LABEL.PHOTO} />
-                    <PhotoInput
-                        value={ImageToImageValue(formState.img)}
-                        onChange={handleImgChange}
-                        id="img"
-                        name="img"
-                        disabled={isSubmitting || isFormDisabled}
-                    />
-                    <InputError error={errors.img} />
-                </div>
+                <PhotoInputGroup
+                    label={PROGRAMS_TEXT.FORM.LABEL.PHOTO}
+                    id="img"
+                    name="img"
+                    value={ImageToImageValue(formState.img)}
+                    onChange={handleImgChange}
+                    disabled={isSubmitting || isFormDisabled}
+                    error={errors.img}
+                />
             </form>
         );
     },

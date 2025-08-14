@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { NotFound } from '../../pages/public/not-found/NotFound';
+import { NotFound } from '../../pages/public/not-found-page/NotFound';
 import { ProgramsPage } from '../../pages/public/programs-page/ProgramsPage';
 import { AdminLayout } from '../../layouts/admin-layout/AdminLayout';
 import { PublicLayout } from '../../layouts/public-layout/PublicLayout';

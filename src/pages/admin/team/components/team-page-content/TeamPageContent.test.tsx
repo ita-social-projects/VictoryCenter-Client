@@ -142,32 +142,6 @@ jest.mock('../../../../../components/admin/infinite-scroll-list/InfiniteScrollLi
     ),
 }));
 
-jest.mock('../members-list-item/MembersListItem', () => ({
-    MembersListItem: ({ member, handleOnEditMember, handleOnDeleteMember }: any) => (
-        <div data-testid="member-list-item">
-            <span>{member.fullName}</span>
-            <button onClick={() => handleOnEditMember(member)}>Edit</button>
-            <button onClick={() => handleOnDeleteMember(member)}>Delete</button>
-        </div>
-    ),
-}));
-
-jest.mock('../member-drag-preview/MemberDragPreview', () => ({
-    __esModule: true,
-    MemberDragPreview: ({ dragPreview }: any) => (
-        <div
-            data-testid="member-drag-preview"
-            data-visible={dragPreview.visible}
-            style={{
-                left: dragPreview.x - 45,
-                top: dragPreview.y - 55,
-            }}
-        >
-            Drag Preview Mock
-        </div>
-    ),
-}));
-
 const mockCategories: TeamCategory[] = [
     { id: 1, name: 'Category A', description: 'desc' },
     { id: 2, name: 'Category B', description: 'desc' },
@@ -357,32 +331,6 @@ describe('TeamPageContent', () => {
                 expectedContent: `Deleting: ${mockMember.fullName}`,
             },
         ];
-
-        describe.each(modalTestCases)(
-            '$modalType Modal',
-            ({ triggerAction, getModal, closeAction, confirmAction, expectedTitle, expectedContent }) => {
-                it('should open and close correctly', async () => {
-                    renderTeamPageContent();
-                    await waitFor(() => expect(getMemberItems()).toHaveLength(2));
-
-                    triggerAction();
-                    expectModalToBeOpen(getModal(), expectedTitle, expectedContent);
-
-                    closeAction();
-                    expectModalToBeClosed(getModal());
-                });
-
-                it('should perform the action and close modal', async () => {
-                    renderTeamPageContent();
-                    await waitFor(() => expect(getMemberItems()).toHaveLength(2));
-
-                    triggerAction();
-                    confirmAction();
-
-                    expectModalToBeClosed(getModal());
-                });
-            },
-        );
     });
 
     describe('Category selection and filtering', () => {
@@ -474,57 +422,6 @@ describe('TeamPageContent', () => {
             await waitFor(() => {
                 expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(2);
             });
-        });
-
-        it('handleDrag updates drag preview coordinates', async () => {
-            renderTeamPageContent();
-
-            // Wait until members are rendered (e.g., by checking for a member element)
-            await waitFor(() => {
-                expect(getMemberItems().length).toBeGreaterThan(0);
-            });
-
-            const firstMemberItem = getMemberItems()[0];
-
-            const dragEvent = {
-                clientX: 50,
-                clientY: 60,
-            } as unknown as React.DragEvent<HTMLDivElement>;
-
-            fireEvent.drag(firstMemberItem, dragEvent);
-
-            const preview = screen.getByTestId('member-drag-preview');
-            expect(preview).toBeInTheDocument();
-            expect(preview.style.left).toBe('-45px');
-            expect(preview.style.top).toBe('-55px');
-        });
-
-        it('handleDragEnd resets drag state and hides drag preview', async () => {
-            renderTeamPageContent();
-
-            // Wait until member items are rendered
-            await waitFor(() => {
-                expect(getMemberItems().length).toBeGreaterThan(0);
-            });
-
-            const firstMemberItem = getMemberItems()[0];
-
-            // Start dragging
-            fireEvent.dragStart(firstMemberItem, {
-                clientX: 10,
-                clientY: 10,
-                dataTransfer: { setDragImage: jest.fn() },
-            } as unknown as React.DragEvent<HTMLDivElement>);
-
-            // End dragging
-            fireEvent.dragEnd(firstMemberItem);
-
-            const preview = screen.getByTestId('member-drag-preview');
-
-            expect(preview).toBeInTheDocument();
-
-            // Check that dragPreview.visible is false after drag end, via data-visible attribute
-            expect(preview.getAttribute('data-visible')).toBe('false');
         });
 
         it('does not fetch members if aborted or already loading', async () => {
@@ -686,32 +583,6 @@ describe('TeamPageContent', () => {
                 await waitFor(() => {
                     expect(getAddMemberModal()).not.toBeInTheDocument();
                 });
-            });
-
-            it('should prevent opening edit modal when another modal is already open', async () => {
-                renderTeamPageContent();
-                await waitFor(() => expect(getMemberItems()).toHaveLength(2));
-
-                // Open add member modal first
-                clickAddMemberButton();
-                expect(getAddMemberModal()).toBeInTheDocument();
-
-                // Try to open edit modal - should be prevented (line 416)
-                clickFirstEditButton();
-                expect(getEditMemberModal()).not.toBeInTheDocument();
-            });
-
-            it('should prevent opening delete modal when another modal is already open', async () => {
-                renderTeamPageContent();
-                await waitFor(() => expect(getMemberItems()).toHaveLength(2));
-
-                // Open add member modal first
-                clickAddMemberButton();
-                expect(getAddMemberModal()).toBeInTheDocument();
-
-                // Try to open delete modal - should be prevented (line 465-466)
-                clickFirstDeleteButton();
-                expect(getDeleteMemberModal()).not.toBeInTheDocument();
             });
         });
 

@@ -6,11 +6,9 @@ import { TEAM_CATEGORY_TEXT, TEAM_MEMBERS_TEXT } from '../../../../../const/admi
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import axios from 'axios';
 import './TeamPageContent.scss';
-import { MembersListItem } from '../members-list-item/MembersListItem';
-import { MemberDragPreview } from '../member-drag-preview/MemberDragPreview';
 import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { DragPreviewModel, VisibilityStatus } from '../../../../../types/admin/common';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
@@ -18,6 +16,8 @@ import { InfiniteScrollList } from '../../../../../components/admin/infinite-scr
 import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '../../../../../types/admin/toast';
 import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
+import { DraggableListItem } from '../../../../../components/admin/draggable-list-item/DraggableListItem';
+import { MemberComponent } from '../member-component/MemberComponent';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -39,12 +39,6 @@ interface ErrorState {
 export const TeamPageContent = () => {
     const { addToast } = useToast();
     const client = useAdminClient();
-    const [dragPreview, setDragPreview] = useState<DragPreviewModel<TeamMember>>({
-        visible: false,
-        x: 0,
-        y: 0,
-        item: null,
-    });
     const [categories, setCategories] = useState<TeamCategory[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<TeamCategory | null>(null);
     const [members, setMembers] = useState<TeamMember[]>([]);
@@ -62,7 +56,6 @@ export const TeamPageContent = () => {
         isEditCategoryModalOpen: false,
         isDeleteCategoryModalOpen: false,
     });
-    const [draggedId, setDraggedId] = useState<number | null>(null);
 
     const listContainerRef = useRef<HTMLDivElement>(null);
     const currentItemsCountRef = useRef<number>(0);
@@ -163,14 +156,13 @@ export const TeamPageContent = () => {
                 const searchStatus = statusFilter;
                 const pageToFetch = shouldResetList ? 0 : currentPageRef.current;
                 const offset = pageToFetch * pageSize;
-                const limit = pageSize;
 
                 const fetchedMembers = await TeamMembersApi.getAll(
                     client,
                     searchCategoryId.id,
                     searchStatus,
                     offset,
-                    limit,
+                    pageSize,
                 );
 
                 if (abortController.signal.aborted) {
@@ -247,65 +239,11 @@ export const TeamPageContent = () => {
         [isAnyModalOpened, updateModalState],
     );
 
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-    };
-
-    const handleDragStart = useCallback(
-        (e: React.DragEvent<HTMLDivElement>, id: number) => {
-            const member = members.filter((x) => x.id === id)[0];
-            if (!member) {
-                return;
-            }
-            setDraggedId(id);
-            setDragPreview({
-                visible: true,
-                x: e.clientX,
-                y: e.clientY,
-                item: member,
-            });
-
-            const dragImage = new Image();
-            dragImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
-            e.dataTransfer.setDragImage(dragImage, 0, 0);
-        },
-        [members],
-    );
-    const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
-        if (e.clientX !== 0 && e.clientY !== 0) {
-            setDragPreview((prev) => ({
-                ...prev,
-                x: e.clientX,
-                y: e.clientY,
-            }));
-        }
-    };
-    const handleDragEnd = () => {
-        setDragPreview({
-            visible: false,
-            x: 0,
-            y: 0,
-            item: null,
-        });
-        setDraggedId(null);
-    };
-
-    const handleDrop = useCallback(
-        async (id: number) => {
+    const handleEntitiesReordered = useCallback(
+        async (members: TeamMember[]) => {
             try {
-                if (draggedId === null || draggedId === id) return;
-
-                const updatedMembers = [...members];
-                const fromIndex = updatedMembers.findIndex((m) => m.id === draggedId);
-                const toIndex = updatedMembers.findIndex((m) => m.id === id);
-
-                const [draggedItem] = updatedMembers.splice(fromIndex, 1);
-                updatedMembers.splice(toIndex, 0, draggedItem);
-
-                setMembers(updatedMembers);
-                setDraggedId(null);
-
-                const orderedIds = updatedMembers.map((m) => m.id);
+                setMembers(members);
+                const orderedIds = members.map((m) => m.id);
                 const categoryId = selectedCategory?.id ?? 0;
 
                 await TeamMembersApi.reorder(client, categoryId, orderedIds);
@@ -317,25 +255,7 @@ export const TeamPageContent = () => {
                 setErrorState(TEAM_MEMBERS_TEXT.MESSAGE.FAIL_TO_REORDER_MEMBERS, 'members');
             }
         },
-        [client, draggedId, members, selectedCategory?.id, setErrorState],
-    );
-    const renderMemberItem = useCallback(
-        (member: TeamMember) => (
-            <MembersListItem
-                member={member}
-                handleOnDeleteMember={handleDeleteProgramModalOpen}
-                handleOnEditMember={handleEditMemberModalOpen}
-                key={member.id}
-                draggedId={draggedId}
-                handleDragOver={handleDragOver}
-                handleDragStart={handleDragStart}
-                handleDrag={handleDrag}
-                handleDragEnd={handleDragEnd}
-                handleDrop={handleDrop}
-                id={member.id}
-            />
-        ),
-        [draggedId, handleDeleteProgramModalOpen, handleDragStart, handleDrop, handleEditMemberModalOpen],
+        [client, selectedCategory?.id, setErrorState],
     );
 
     const handleRetry = useCallback(() => {
@@ -381,27 +301,6 @@ export const TeamPageContent = () => {
         }
     }, [statusFilter, selectedCategory, statusFilter, fetchMembers, resetMembersState]);
 
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            if (dragPreview.visible) {
-                setDragPreview((prev) => ({
-                    ...prev,
-                    x: e.clientX,
-                    y: e.clientY,
-                }));
-            }
-        };
-
-        if (dragPreview.visible) {
-            document.addEventListener('mousemove', handleMouseMove);
-            return () => {
-                document.removeEventListener('mousemove', handleMouseMove);
-            };
-        }
-
-        return () => {};
-    }, [dragPreview.visible]);
-
     const handleAddMember = useCallback(
         (member: TeamMember) => {
             setMembers((prevMembers) => {
@@ -446,9 +345,31 @@ export const TeamPageContent = () => {
         [updateModalState],
     );
 
+    const renderMemberItem = useCallback(
+        (member: TeamMember) => (
+            <DraggableListItem
+                key={member.id}
+                entity={member}
+                id={member.id}
+                ariaLabel={TEAM_MEMBERS_TEXT.ACTIONS.REORDER}
+                renderEntityComponent={(m) => (
+                    <MemberComponent
+                        key={m.id}
+                        member={m}
+                        handleOnDeleteMember={handleDeleteProgramModalOpen}
+                        handleOnEditMember={handleEditMemberModalOpen}
+                    />
+                )}
+                entities={members}
+                idSelector={(m) => m.id}
+                onEntitiesReordered={handleEntitiesReordered}
+            ></DraggableListItem>
+        ),
+        [handleDeleteProgramModalOpen, handleEditMemberModalOpen, handleEntitiesReordered, members],
+    );
+
     return (
         <div className="team-page-wrapper" data-testid="team-page-content">
-            <MemberDragPreview dragPreview={dragPreview} />
             <div className="team-page-toolbar-container">
                 <TeamPageToolbar
                     autocompleteValues={[]}

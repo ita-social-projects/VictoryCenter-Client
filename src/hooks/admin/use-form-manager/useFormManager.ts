@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { VisibilityStatus } from '../../../types/admin/common';
 
 export function useFormManager<TFormValues, TFormErrors extends Record<string, unknown>>({
@@ -19,7 +19,7 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
     const [formState, setFormState] = useState<TFormValues>(defaultFormState);
     const [errors, setErrors] = useState<TFormErrors>({} as TFormErrors);
     const [initialFormState, setInitialFormState] = useState<TFormValues>(defaultFormState);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const isSubmittingRef = useRef(false);
 
     const reset = useCallback(
         (data?: TFormValues | null) => {
@@ -37,14 +37,14 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
 
     const isValid = useCallback(
         (isPublishing = false) => {
-            const formErrors = validateForm(formState, isPublishing);
+            const formErrors = validateForm(formState, isPublishing) || {};
             return !Object.values(formErrors).some((e) => e !== undefined);
         },
         [formState, validateForm],
     );
 
     useEffect(() => {
-        const formErrors = validateForm(formState, false);
+        const formErrors = validateForm(formState, false) || {};
         const valid = !Object.values(formErrors).some((e) => e !== undefined);
         onValidationChange?.(valid);
     }, [formState, validateForm, onValidationChange]);
@@ -55,19 +55,19 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
 
     const submit = useCallback(
         async (status: VisibilityStatus) => {
-            if (isSubmitting) return;
-            setIsSubmitting(true);
+            if (isSubmittingRef.current) return;
+            isSubmittingRef.current = true;
             const isPublishing = status === VisibilityStatus.Published;
             try {
-                const formErrors = validateForm(formState, isPublishing);
+                const formErrors = validateForm(formState, isPublishing) || {};
                 setErrors(formErrors);
                 if (Object.values(formErrors).some((e) => e !== undefined)) return;
                 await onSubmit(formState, status);
             } finally {
-                setIsSubmitting(false);
+                isSubmittingRef.current = false;
             }
         },
-        [formState, onSubmit, validateForm, isSubmitting],
+        [formState, onSubmit, validateForm],
     );
 
     useImperativeHandle(
@@ -85,7 +85,7 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
         setFormState,
         errors,
         setErrors,
-        isSubmitting,
+        isSubmitting: isSubmittingRef.current,
         reset,
         isDirty,
         isValid,

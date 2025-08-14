@@ -1,5 +1,5 @@
 import DragIcon from '../../../assets/icons/dragger.svg';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import './DraggableListItem.scss';
 import { DragPreviewModel } from '../../../types/admin/common';
 import { DragPreview } from '../drag-preview/DragPreview';

@@ -14,7 +14,7 @@ describe('useFormManager', () => {
     let onValidationChange: jest.Mock<void, [boolean]>;
 
     beforeEach(() => {
-        validateForm = jest.fn((values: FormValues, isPublishing: boolean) => {
+        validateForm = jest.fn((values: FormValues, _: boolean) => {
             const errors: FormErrors = {};
             if (!values.name) errors.name = 'Required';
             if (values.age < 0) errors.age = 'Invalid';

@@ -175,8 +175,6 @@ const mockNewMember: TeamMember = {
     image: null,
 };
 
-const mockMember = mockMembers[0];
-
 describe('TeamPageContent', () => {
     const renderTeamPageContent = () => render(<TeamPageContent />);
 
@@ -187,35 +185,19 @@ describe('TeamPageContent', () => {
     const getMemberItems = () => screen.getAllByTestId('member-item');
     const getEmptyState = () => screen.getByTestId('empty-state');
     const getAddMemberButton = () => screen.getByText('Add Member');
-    const getEditButtons = () => screen.getAllByText('Edit');
-    const getDeleteButtons = () => screen.getAllByText('Delete');
     const getAddMemberModal = () => screen.queryByTestId('add-member-modal');
-    const getEditMemberModal = () => screen.queryByTestId('edit-member-modal');
-    const getDeleteMemberModal = () => screen.queryByTestId('delete-member-modal');
     const getCategoryButton = (id: number) => screen.getByTestId(`category-${id}`);
     const getFilterPublishedButton = () => screen.getByText('Filter Published');
     const getSearchInput = () => screen.getByTestId('search-input');
     const getTeamErrorContainer = () => screen.getByTestId('team-error-container');
     const getTryAgainButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN);
     const getConfirmAddButton = () => screen.getByTestId('confirm-add');
-    const getConfirmEditButton = () => screen.getByTestId('confirm-edit');
-    const getConfirmDeleteButton = () => screen.getByTestId('confirm-delete');
-    const getCloseAddButton = () => screen.getByTestId('close-add');
-    const getCloseEditButton = () => screen.getByTestId('close-edit');
-    const getCloseDeleteButton = () => screen.getByTestId('close-delete');
 
     const clickAddMemberButton = () => fireEvent.click(getAddMemberButton());
-    const clickFirstEditButton = () => fireEvent.click(getEditButtons()[0]);
-    const clickFirstDeleteButton = () => fireEvent.click(getDeleteButtons()[0]);
     const clickCategoryButton = (id: number) => fireEvent.click(getCategoryButton(id));
     const clickFilterPublishedButton = () => fireEvent.click(getFilterPublishedButton());
     const clickTryAgainButton = () => fireEvent.click(getTryAgainButton());
     const clickConfirmAddButton = () => fireEvent.click(getConfirmAddButton());
-    const clickConfirmEditButton = () => fireEvent.click(getConfirmEditButton());
-    const clickConfirmDeleteButton = () => fireEvent.click(getConfirmDeleteButton());
-    const clickCloseAddButton = () => fireEvent.click(getCloseAddButton());
-    const clickCloseEditButton = () => fireEvent.click(getCloseEditButton());
-    const clickCloseDeleteButton = () => fireEvent.click(getCloseDeleteButton());
     const typeInSearchInput = (value: string) => fireEvent.change(getSearchInput(), { target: { value } });
 
     const expectMainComponentsToBeRendered = () => {
@@ -223,16 +205,6 @@ describe('TeamPageContent', () => {
         expect(getTeamToolbar()).toBeInTheDocument();
         expect(getCategoryBar()).toBeInTheDocument();
         expect(getInfiniteScrollList()).toBeInTheDocument();
-    };
-
-    const expectModalToBeClosed = (modal: HTMLElement | null) => {
-        expect(modal).not.toBeInTheDocument();
-    };
-
-    const expectModalToBeOpen = (modal: HTMLElement | null, title: string, content: string) => {
-        expect(modal).toBeInTheDocument();
-        expect(screen.getByText(title)).toBeInTheDocument();
-        expect(screen.getByText(content)).toBeInTheDocument();
     };
 
     const expectEmptyStateToBeShown = () => {
@@ -299,38 +271,6 @@ describe('TeamPageContent', () => {
                 expectEmptyStateToBeShown();
             });
         });
-    });
-
-    describe('Member Modal interactions', () => {
-        const modalTestCases = [
-            {
-                modalType: 'Add Member',
-                triggerAction: () => clickAddMemberButton(),
-                getModal: () => getAddMemberModal(),
-                closeAction: () => clickCloseAddButton(),
-                confirmAction: () => clickConfirmAddButton(),
-                expectedTitle: 'Add Member Modal',
-                expectedContent: 'Adding new member',
-            },
-            {
-                modalType: 'Edit Member',
-                triggerAction: () => clickFirstEditButton(),
-                getModal: () => getEditMemberModal(),
-                closeAction: () => clickCloseEditButton(),
-                confirmAction: () => clickConfirmEditButton(),
-                expectedTitle: 'Edit Member Modal',
-                expectedContent: `Editing: ${mockMember.fullName}`,
-            },
-            {
-                modalType: 'Delete Member',
-                triggerAction: () => clickFirstDeleteButton(),
-                getModal: () => getDeleteMemberModal(),
-                closeAction: () => clickCloseDeleteButton(),
-                confirmAction: () => clickConfirmDeleteButton(),
-                expectedTitle: 'Delete Member Modal',
-                expectedContent: `Deleting: ${mockMember.fullName}`,
-            },
-        ];
     });
 
     describe('Category selection and filtering', () => {

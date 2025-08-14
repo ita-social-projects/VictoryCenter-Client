@@ -3,8 +3,8 @@ import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/admin/button/Button';
 import { HintBox } from '../../../../../components/admin/hint-box/HintBox';
 import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
-import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
+import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-category-schema/program-category-schema';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
@@ -285,27 +285,23 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                             </div>
                         )}
 
-                        <div className="form-group form-group-name">
-                            <InputLabel
-                                htmlFor={getFieldId('name')}
-                                isRequired={mode === 'add'}
-                                text={
-                                    mode === 'add'
-                                        ? PROGRAM_CATEGORY_TEXT.FORM.LABEL.NAME
-                                        : PROGRAM_CATEGORY_TEXT.FORM.LABEL.EDIT_NAME
-                                }
-                            />
-                            <InputWithCharacterLimit
-                                value={formState.name}
-                                onChange={handleNameChange}
-                                onBlur={handleNameBlur}
-                                id={getFieldId('name')}
-                                name="name"
-                                maxLength={PROGRAM_CATEGORY_VALIDATION.name.max}
-                                disabled={isSubmitting}
-                            />
-                            {errors.name && <span className="error">{errors.name}</span>}
-                        </div>
+                        <InputWithCharacterLimitGroup
+                            isRequired={true}
+                            label={
+                                mode === 'add'
+                                    ? PROGRAM_CATEGORY_TEXT.FORM.LABEL.NAME
+                                    : PROGRAM_CATEGORY_TEXT.FORM.LABEL.EDIT_NAME
+                            }
+                            error={errors.name}
+                            value={formState.name}
+                            onChange={handleNameChange}
+                            onBlur={handleNameBlur}
+                            name={'name'}
+                            type={'text'}
+                            id={getFieldId('name')}
+                            maxLength={PROGRAM_CATEGORY_VALIDATION.name.max}
+                            disabled={isSubmitting}
+                        />
 
                         {isDuplicateName && (
                             <HintBox

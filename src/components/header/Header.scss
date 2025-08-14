@@ -99,43 +99,43 @@ $mulish-font-family: 'Mulish', sans-serif;
     }
 
     .mobileMenu {
-    display: flex;
-    position: absolute;
-    top: 4rem;
-    right: 0;
-    background-color: #fff;
-    width: 12rem;
-    flex-direction: column;
-    z-index: 999;
-
-    a {
-        font-weight: 600;
-        text-decoration: none;
-        padding: 1rem 1rem;
-        color: #000;
-        position: relative;
-
-        &::after{
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            height: 1px;
-            background-color: #E7EAEE;
-        }
-
-        &:last-child::after {
-            content: none;
-        }
-    }
-
-    .mobileButtons {
         display: flex;
+        position: absolute;
+        top: 4rem;
+        right: 0;
+        background-color: #fff;
+        width: 12rem;
         flex-direction: column;
-        gap: 0.5rem;
+        z-index: 999;
+
+        a {
+            font-weight: 600;
+            text-decoration: none;
+            padding: 1rem 1rem;
+            color: #000;
+            position: relative;
+
+            &::after {
+                content: '';
+                position: absolute;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                height: 1px;
+                background-color: #e7eaee;
+            }
+
+            &:last-child::after {
+                content: none;
+            }
+        }
+
+        .mobileButtons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
     }
-}
 
     .burgerMenuIcon {
         display: block;
@@ -143,11 +143,11 @@ $mulish-font-family: 'Mulish', sans-serif;
 }
 
 @media (max-width: 568px) {
-    .headerBlock{
-        .buttonContainer{
+    .headerBlock {
+        .buttonContainer {
             .contactUsButton {
                 display: none;
-            } 
+            }
         }
     }
 }

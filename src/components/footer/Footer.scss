@@ -155,7 +155,9 @@
         margin: 0;
         font-size: 12rem;
         font-weight: 900;
-        animation: scroll-left 30s linear infinite, color-change 15s ease-in-out infinite;
+        animation:
+            scroll-left 30s linear infinite,
+            color-change 15s ease-in-out infinite;
         padding: 0;
     }
 
@@ -202,8 +204,7 @@
             grid-template-columns: 1fr 1fr 1fr;
             grid-template-rows: auto auto;
             gap: 2rem;
-            grid-template-areas:
-                "email email email" "menu about hippotherapy";
+            grid-template-areas: 'email email email' 'menu about hippotherapy';
 
             .email_field {
                 grid-area: email;
@@ -339,8 +340,7 @@
             grid-template-columns: 1fr 1fr;
             grid-template-rows: auto auto auto;
             gap: 2rem;
-            grid-template-areas:
-                "email email" "menu about" "hippotherapy hippotherapy";
+            grid-template-areas: 'email email' 'menu about' 'hippotherapy hippotherapy';
 
             .email_field {
                 grid-area: email;
@@ -492,8 +492,7 @@
             display: grid;
             grid-template-columns: 1fr;
             grid-template-rows: auto auto auto auto;
-            grid-template-areas:
-                "email" "menu" "about" "hippotherapy";
+            grid-template-areas: 'email' 'menu' 'about' 'hippotherapy';
 
             .email_field {
                 grid-area: email;

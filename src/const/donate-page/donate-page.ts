@@ -8,7 +8,7 @@ export const DONATE_SECTION = {
 };
 
 export const CURRENCY_TABS = {
-    UAH: 'Гривні / UAH',
+    UAH: 'Гривня / UAH',
     USD: 'Долар / USD',
     EUR: 'Євро / EUR',
 };

@@ -6,9 +6,9 @@ describe('Tabs component', () => {
     const mockSetActiveTab = jest.fn();
 
     const defaultTabs = [
-        { id: 1, label: 'Tab 1', disabled: false },
+        { id: 1, label: 'Tab 1' },
         { id: 2, label: 'Tab 2', disabled: true },
-        { id: 3, label: 'Tab 3', disabled: false },
+        { id: 3, label: 'Tab 3' },
     ];
 
     const renderTabs = (activeTab = 1, tabs = defaultTabs) => {

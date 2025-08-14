@@ -1,0 +1,41 @@
+@use '../../../assets/sass/variables/colors';
+
+.drag-preview {
+  position: fixed;
+  z-index: 12;
+  pointer-events: none;
+  background-color: white;
+  border: 2px solid colors.$blue-50;
+  border-radius: 8px;
+  padding: 0.625rem;
+  box-shadow: 0 4px 12px rgba(black, 0.15);
+  opacity: 0.9;
+  transition: none;
+
+  &:focus-within {
+    cursor: grabbing;
+  }
+
+  &:hover {
+    cursor: grabbing;
+  }
+
+  .dragger {
+    background-color: colors.$blue-50;
+  }
+}
+
+.drag-preview-wrapper {
+    margin-left: 1px;
+    padding: 0;
+    border: none;
+    width: 100%;
+    min-width: fit-content;
+    justify-content: space-between;
+    display: flex;
+    height: 7.5rem;
+    align-items: center;
+    box-sizing: border-box;
+    background-color: white;
+    box-shadow: 0 0 4px rgba(black, 0.15);
+}

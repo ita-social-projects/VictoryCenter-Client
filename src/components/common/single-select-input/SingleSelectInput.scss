@@ -1,0 +1,101 @@
+@import "src/assets/sass/variables/colors";
+
+.singleselect {
+  width: 100%;
+  position: relative;
+  border: 1px solid #0f2957;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(10, 13, 18, 0.05);
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
+
+  &-selected {
+    border-color: #a4a49b;
+  }
+
+
+  .select-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    width: 100%;
+    padding: 10px 40px 10px 12px;
+    font-size: 16px;
+    outline: none;
+    appearance: none;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+
+    &-disabled {
+      background: #d2d2c7;
+      cursor: not-allowed;
+    }
+  }
+
+  &-options {
+    overflow: hidden;
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border: 1px solid #a4a49b;
+    border-radius: 8px;
+    z-index: 10;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+
+    .option {
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      color: #414651;
+      width: 100%;
+      text-align: start;
+      font-size: 16px;
+      outline: none;
+      border: none;
+      background: white;
+
+      &:hover,
+      &:focus {
+        background-color: #f2f2f2;
+        outline: none;
+      }
+
+      &-selected {
+        background-color: #e6e6e6;
+      }
+    }
+  }
+
+  .option-value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90%;
+    color: #414651;
+
+
+    &-placeholder {
+      color: #a4a49b;
+    }
+  }
+
+  .placeholder-arrow {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .icon-img {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}

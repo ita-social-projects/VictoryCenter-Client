@@ -1,345 +1,91 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { MemberComponent, MemberComponentProps } from './MemberComponent';
 import '@testing-library/jest-dom';
-import { MemberComponent } from './MemberComponent';
-import { TeamMember } from '../../../../../types/admin/team-members';
-import { Image } from '../../../../../types/common/image';
+import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { VisibilityStatus } from '../../../../../types/admin/common';
+import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 
-const mockImage: Image = {
-    id: 1,
-    url: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y4nYFMAAAAASUVORK5CYII=',
-    mimeType: 'image/jpeg',
-    size: 0,
-};
-
-const mockMemberDraft: TeamMember = {
-    id: 1,
-    fullName: 'John Doe',
-    description: 'Software Engineer',
-    img: mockImage,
-    status: 'Чернетка',
-    category: {
-        id: 1,
-        name: 'Основна команда',
-        description: 'Test',
-    },
-};
-
-const mockMemberPublished: TeamMember = {
-    id: 2,
-    fullName: 'Jane Smith',
-    description: 'Product Manager',
-    img: mockImage,
-    status: 'Опубліковано',
-    category: {
-        id: 1,
-        name: 'Наглядова рада',
-        description: 'Test',
-    },
-};
-
-const mockHandleOnDeleteMember = jest.fn();
-const mockHandleOnEditMember = jest.fn();
+jest.mock('../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64', () => ({
+    mapImageToBase64: jest.fn(),
+}));
 
 jest.mock('../../../../../assets/icons/blank-user.svg', () => 'blank-user.svg');
 
+jest.mock('../../../../../components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
+    VisibilityStatusLabel: ({ status }: { status: VisibilityStatus }) => (
+        <div data-testid="visibility-label">{`Status: ${status}`}</div>
+    ),
+}));
+
+const baseMember = {
+    id: 1,
+    image: { id: 10, base64: 'base64string', mimeType: 'image/png', size: 1234 },
+    fullName: 'John Doe',
+    description: 'Frontend Developer',
+    status: VisibilityStatus.Published,
+    categoryId: 5,
+};
+
 describe('MemberComponent', () => {
+    let handleOnEditMember: jest.Mock;
+    let handleOnDeleteMember: jest.Mock;
+
     beforeEach(() => {
         jest.clearAllMocks();
+        handleOnEditMember = jest.fn();
+        handleOnDeleteMember = jest.fn();
     });
 
-    describe('Rendering', () => {
-        test('renders member component with all required elements', () => {
-            render(
-                <MemberComponent
-                    member={mockMemberDraft}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
+    const renderComponent = (override: Partial<MemberComponentProps['member']> = {}) =>
+        render(
+            <MemberComponent
+                member={{ ...baseMember, ...override }}
+                handleOnEditMember={handleOnEditMember}
+                handleOnDeleteMember={handleOnDeleteMember}
+            />,
+        );
 
-            expect(screen.getByRole('img')).toBeInTheDocument();
-            expect(screen.getByText('John Doe')).toBeInTheDocument();
-            expect(screen.getByText('Software Engineer')).toBeInTheDocument();
-            expect(screen.getByText('Чернетка')).toBeInTheDocument();
-        });
+    it('renders with base64 image from mapImageToBase64', () => {
+        (mapImageToBase64 as jest.Mock).mockReturnValue('data:image/png;base64,abc123');
 
-        test('renders member image with correct src and alt attributes', () => {
-            render(
-                <MemberComponent
-                    member={mockMemberDraft}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
+        renderComponent();
 
-            const image = screen.getByRole('img');
-            expect(image).toHaveAttribute('src', `data:${mockImage.mimeType};base64,${mockImage.url}`);
-            expect(image).toHaveAttribute('alt', 'John Doe-img');
-        });
+        const img = screen.getByRole('img');
+        expect(img).toHaveAttribute('src', 'data:image/png;base64,abc123');
+        expect(img).toHaveAttribute('alt', `${TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}-John Doe`);
 
-        test('renders member fullName correctly', () => {
-            render(
-                <MemberComponent
-                    member={mockMemberPublished}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
+        expect(screen.getByText('John Doe')).toBeInTheDocument();
+        expect(screen.getByText('Frontend Developer')).toBeInTheDocument();
 
-            expect(screen.getByText('Jane Smith')).toBeInTheDocument();
-        });
-
-        test('renders member description correctly', () => {
-            render(
-                <MemberComponent
-                    member={mockMemberPublished}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
-
-            expect(screen.getByText('Product Manager')).toBeInTheDocument();
-        });
+        // VisibilityStatusLabel mock should render with status
+        expect(screen.getByTestId('visibility-label')).toHaveTextContent(`Status: ${VisibilityStatus.Published}`);
     });
 
-    describe('Status styling', () => {
-        test('applies draft status class when status is "Чернетка"', () => {
-            render(
-                <MemberComponent
-                    member={mockMemberDraft}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
+    it('falls back to BlankUserImage when mapImageToBase64 returns null', () => {
+        (mapImageToBase64 as jest.Mock).mockReturnValue(null);
 
-            const statusElement = screen.getByText('Чернетка').closest('div');
-            expect(statusElement).toHaveClass('members-status');
-            expect(statusElement).toHaveClass('members-status-draft');
-            expect(statusElement).not.toHaveClass('members-status-published');
-        });
+        renderComponent({ image: null });
 
-        test('applies published status class when status is not "Чернетка"', () => {
-            render(
-                <MemberComponent
-                    member={mockMemberPublished}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
-
-            const statusElement = screen.getByText('Опубліковано').closest('div');
-            expect(statusElement).toHaveClass('members-status');
-            expect(statusElement).toHaveClass('members-status-published');
-            expect(statusElement).not.toHaveClass('members-status-draft');
-        });
-
-        test('renders status indicator bullet point', () => {
-            render(
-                <MemberComponent
-                    member={mockMemberDraft}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
-
-            expect(screen.getByText('•')).toBeInTheDocument();
-        });
+        const img = screen.getByRole('img');
+        expect(img).toHaveAttribute('src', 'blank-user.svg');
     });
 
-    describe('Event handlers', () => {
-        test('calls handleOnEditMember with correct id when edit button is clicked', () => {
-            const { container } = render(
-                <MemberComponent
-                    member={mockMemberDraft}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
+    it('calls handleOnEditMember when edit button clicked', () => {
+        (mapImageToBase64 as jest.Mock).mockReturnValue('img123');
 
-            const editButton = container.querySelector('.members-actions-edit');
-            if (!editButton) throw new Error();
-            fireEvent.click(editButton);
-
-            expect(mockHandleOnEditMember).toHaveBeenCalledTimes(1);
-            expect(mockHandleOnEditMember).toHaveBeenCalledWith(1);
-        });
-
-        test('calls handleOnDeleteMember with correct fullName when delete button is clicked', () => {
-            const { container } = render(
-                <MemberComponent
-                    member={mockMemberPublished}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
-
-            const deleteButton = container.querySelector('.members-actions-delete');
-            if (!deleteButton) throw new Error();
-            fireEvent.click(deleteButton);
-
-            expect(mockHandleOnDeleteMember).toHaveBeenCalledTimes(1);
-            expect(mockHandleOnDeleteMember).toHaveBeenCalledWith('Jane Smith');
-        });
-
-        test('does not call handlers when component is just rendered', () => {
-            render(
-                <MemberComponent
-                    member={mockMemberDraft}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
-
-            expect(mockHandleOnEditMember).not.toHaveBeenCalled();
-            expect(mockHandleOnDeleteMember).not.toHaveBeenCalled();
-        });
+        renderComponent();
+        const editBtn = screen.getByRole('button', { name: TEAM_MEMBERS_TEXT.ACTIONS.EDIT }); // no visible text, so fallback query
+        fireEvent.click(editBtn); // first button in DOM is edit
+        expect(handleOnEditMember).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
     });
 
-    describe('CSS Classes', () => {
-        test('applies correct CSS classes to container elements', () => {
-            const { container } = render(
-                <MemberComponent
-                    member={mockMemberDraft}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
+    it('calls handleOnDeleteMember when delete button clicked', () => {
+        (mapImageToBase64 as jest.Mock).mockReturnValue('img123');
 
-            expect(container.querySelector('.members-item')).toBeInTheDocument();
-            expect(container.querySelector('.members-profile')).toBeInTheDocument();
-            expect(container.querySelector('.members-position')).toBeInTheDocument();
-            expect(container.querySelector('.members-controls')).toBeInTheDocument();
-            expect(container.querySelector('.members-actions')).toBeInTheDocument();
-            expect(container.querySelector('.members-actions-edit')).toBeInTheDocument();
-            expect(container.querySelector('.members-actions-delete')).toBeInTheDocument();
-        });
-    });
-
-    describe('Edge cases', () => {
-        test('handles empty string values gracefully', () => {
-            const emptyMember: TeamMember = {
-                id: 3,
-                fullName: '',
-                description: '',
-                img: null,
-                status: 'Чернетка',
-                category: {
-                    id: 1,
-                    name: 'Радники',
-                    description: 'Test',
-                },
-            };
-
-            render(
-                <MemberComponent
-                    member={emptyMember}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
-
-            const image = screen.getByRole('img');
-            const srcAttribute = image.getAttribute('src');
-            expect(srcAttribute).toBe('blank-user.svg');
-            expect(image).toHaveAttribute('alt', '-img');
-        });
-
-        test('handles special characters in member data', () => {
-            const specialMember: TeamMember = {
-                id: 4,
-                fullName: 'José María Ñoño',
-                description: 'Designer & Developer',
-                img: mockImage,
-                status: 'Чернетка',
-                category: {
-                    id: 1,
-                    name: 'Основна команда',
-                    description: 'Test',
-                },
-            };
-
-            render(
-                <MemberComponent
-                    member={specialMember}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
-
-            expect(screen.getByText('José María Ñoño')).toBeInTheDocument();
-            expect(screen.getByText('Designer & Developer')).toBeInTheDocument();
-        });
-
-        test('handles different status values correctly', () => {
-            const customStatusMember: TeamMember = {
-                id: 5,
-                fullName: 'Test User',
-                description: 'Tester',
-                img: mockImage,
-                status: 'Custom Status',
-                category: {
-                    id: 1,
-                    name: 'Наглядова рада',
-                    description: 'Test',
-                },
-            };
-
-            render(
-                <MemberComponent
-                    member={customStatusMember}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
-
-            const statusElement = screen.getByText('Custom Status').closest('div');
-            expect(statusElement).toHaveClass('members-status-published');
-            expect(statusElement).not.toHaveClass('members-status-draft');
-        });
-    });
-
-    describe('Props validation', () => {
-        test('component receives and uses all required props', () => {
-            const testMember: TeamMember = {
-                id: 6,
-                fullName: 'Props Test',
-                description: 'Testing props',
-                img: mockImage,
-                status: 'Чернетка',
-                category: {
-                    id: 1,
-                    name: 'Радники',
-                    description: 'Test',
-                },
-            };
-
-            const { container } = render(
-                <MemberComponent
-                    member={testMember}
-                    handleOnDeleteMember={mockHandleOnDeleteMember}
-                    handleOnEditMember={mockHandleOnEditMember}
-                />,
-            );
-
-            expect(screen.getByText('Props Test')).toBeInTheDocument();
-            expect(screen.getByText('Testing props')).toBeInTheDocument();
-            expect(screen.getByRole('img')).toHaveAttribute(
-                'src',
-                `data:${mockImage.mimeType};base64,${mockImage.url}`,
-            );
-            expect(screen.getByText('Чернетка')).toBeInTheDocument();
-
-            const deleteButton = container.querySelector('.members-actions-delete');
-            const editButton = container.querySelector('.members-actions-edit');
-
-            if (!deleteButton || !editButton) throw new Error();
-
-            fireEvent.click(editButton);
-            fireEvent.click(deleteButton);
-
-            expect(mockHandleOnEditMember).toHaveBeenCalledWith(6);
-            expect(mockHandleOnDeleteMember).toHaveBeenCalledWith('Props Test');
-        });
+        renderComponent();
+        const deleteBtn = screen.getByRole('button', { name: TEAM_MEMBERS_TEXT.ACTIONS.DELETE });
+        fireEvent.click(deleteBtn);
+        expect(handleOnDeleteMember).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
     });
 });

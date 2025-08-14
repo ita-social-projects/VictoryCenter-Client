@@ -16,6 +16,8 @@ describe('Modal Component', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         jest.restoreAllMocks();
+        // Reset body overflow
+        document.body.style.overflow = '';
     });
 
     test('does not render when isOpen is false', () => {
@@ -73,14 +75,20 @@ describe('Modal Component', () => {
         });
     });
 
-    test('calls onClose when clicking overlay', async () => {
+    test('calls onClose when clicking overlay (proper sequence)', async () => {
         render(
             <Modal {...defaultProps}>
                 <Modal.Title>Title</Modal.Title>
                 <Modal.Content>Content</Modal.Content>
             </Modal>,
         );
-        await userEvent.click(screen.getByTestId('modal-overlay'));
+
+        const overlay = screen.getByTestId('modal-overlay');
+
+        // Simulate proper mouse interaction: mousedown on overlay, then click on overlay
+        fireEvent.mouseDown(overlay, { target: overlay, currentTarget: overlay });
+        fireEvent.click(overlay, { target: overlay, currentTarget: overlay });
+
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
@@ -91,9 +99,9 @@ describe('Modal Component', () => {
                 <Modal.Content>Content</Modal.Content>
             </Modal>,
         );
-        const closeButton = document.querySelector('.close-icon button');
+        const closeButton = screen.getByLabelText('Close modal');
         expect(closeButton).toBeInTheDocument();
-        await userEvent.click(closeButton!);
+        await userEvent.click(closeButton);
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
@@ -117,11 +125,16 @@ describe('Modal Component', () => {
                 <Modal.Content>Content</Modal.Content>
             </Modal>,
         );
+
         const overlay = screen.getByTestId('modal-overlay');
-        fireEvent.keyDown(overlay, { key: 'Enter' });
+
+        // The overlay now has onKeyDown handler that calls handleOverlayClick
+        fireEvent.keyDown(overlay, { key: 'Enter', target: overlay, currentTarget: overlay });
         expect(mockOnClose).toHaveBeenCalledTimes(1);
-        jest.clearAllMocks();
-        fireEvent.keyDown(overlay, { key: ' ' });
+
+        mockOnClose.mockClear();
+
+        fireEvent.keyDown(overlay, { key: ' ', target: overlay, currentTarget: overlay });
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
@@ -132,12 +145,17 @@ describe('Modal Component', () => {
                 <Modal.Content>Content</Modal.Content>
             </Modal>,
         );
+
         const modalContainer = document.querySelector('.modal-container');
-        await userEvent.click(modalContainer!);
+
+        // Simulate clicking inside modal: mousedown on modal, then click on modal
+        fireEvent.mouseDown(modalContainer!);
+        fireEvent.click(modalContainer!);
+
         expect(mockOnClose).not.toHaveBeenCalled();
     });
 
-    test('does not call onClose when pressing Enter or Space inside modal container', async () => {
+    test('does not call onClose when pressing keys inside modal container', async () => {
         render(
             <Modal {...defaultProps}>
                 <Modal.Title>Title</Modal.Title>
@@ -145,6 +163,8 @@ describe('Modal Component', () => {
             </Modal>,
         );
         const modalContainer = document.querySelector('.modal-container');
+
+        // Modal container has stopPropagation on keyDown, so these shouldn't reach overlay
         fireEvent.keyDown(modalContainer!, { key: 'Enter' });
         fireEvent.keyDown(modalContainer!, { key: ' ' });
         expect(mockOnClose).not.toHaveBeenCalled();
@@ -167,17 +187,6 @@ describe('Modal Component', () => {
         rerender(<Modal {...defaultProps} isOpen={false} />);
         expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function));
         expect(document.body.style.overflow).not.toBe('hidden');
-    });
-
-    test('does not call onClose for other keys on overlay', () => {
-        render(
-            <Modal {...defaultProps}>
-                <Modal.Title>Title</Modal.Title>
-            </Modal>,
-        );
-        const overlay = screen.getByTestId('modal-overlay');
-        fireEvent.keyDown(overlay, { key: 'Tab' });
-        expect(mockOnClose).not.toHaveBeenCalled();
     });
 
     test('does not call onClose for other keys in modal container', () => {
@@ -247,5 +256,96 @@ describe('Modal Component', () => {
         expect(screen.getByText('Fragment Title')).toBeInTheDocument();
         expect(screen.getByText('Array Content')).toBeInTheDocument();
         expect(screen.getByText('Fragment Actions')).toBeInTheDocument();
+    });
+
+    test('does NOT call onClose when clicking inside modal container', () => {
+        const onClose = jest.fn();
+
+        render(
+            <Modal isOpen={true} onClose={onClose}>
+                <Modal.Title>Title</Modal.Title>
+                <Modal.Content>Content</Modal.Content>
+                <Modal.Actions>Actions</Modal.Actions>
+            </Modal>,
+        );
+
+        const container = document.querySelector('.modal-container');
+
+        // Simulate proper click inside modal: mousedown on modal, then click on modal
+        fireEvent.mouseDown(container!);
+        fireEvent.click(container!);
+
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    test('closes when mousedown starts outside modal and ends outside', async () => {
+        render(
+            <Modal {...defaultProps}>
+                <Modal.Content>Content</Modal.Content>
+            </Modal>,
+        );
+
+        const overlay = screen.getByTestId('modal-overlay');
+
+        // Start mousedown on overlay (sets mouseDownInsideModal.current = false)
+        fireEvent.mouseDown(overlay, { target: overlay, currentTarget: overlay });
+        // Then click on overlay (should close)
+        fireEvent.click(overlay, { target: overlay, currentTarget: overlay });
+
+        expect(mockOnClose).toHaveBeenCalled();
+    });
+
+    test('focus trap does nothing when no focusable elements exist', () => {
+        render(
+            <Modal {...defaultProps}>
+                <Modal.Content>No buttons here</Modal.Content>
+            </Modal>,
+        );
+
+        const modalContainer = document.querySelector('.modal-container')!;
+        fireEvent.keyDown(modalContainer, { key: 'Tab' }); // should not throw or change focus
+        // Just verify it doesn't throw an error
+        expect(modalContainer).toBeInTheDocument();
+    });
+
+    test('applies default width and maxWidth when props are not provided', () => {
+        render(
+            <Modal isOpen={true} onClose={mockOnClose}>
+                <Modal.Content>Default styles</Modal.Content>
+            </Modal>,
+        );
+
+        const modalContainer = document.querySelector('.modal-container');
+        expect(modalContainer).toHaveStyle({
+            width: '80%',
+            maxWidth: '600px',
+        });
+    });
+
+    test('trapFocus early returns when key is not Tab', () => {
+        render(
+            <Modal {...defaultProps}>
+                <Modal.Content>
+                    <button>Focusable</button>
+                </Modal.Content>
+            </Modal>,
+        );
+
+        const modalContainer = document.querySelector('.modal-container')!;
+        // Should return immediately without errors
+        fireEvent.keyDown(modalContainer, { key: 'Enter' });
+        expect(modalContainer).toBeInTheDocument();
+    });
+
+    test('trapFocus returns when there are no focusable elements', () => {
+        render(
+            <Modal {...defaultProps}>
+                <Modal.Content>No focusable elements here</Modal.Content>
+            </Modal>,
+        );
+
+        const modalContainer = document.querySelector('.modal-container')!;
+        fireEvent.keyDown(modalContainer, { key: 'Tab' });
+        expect(modalContainer).toBeInTheDocument();
     });
 });

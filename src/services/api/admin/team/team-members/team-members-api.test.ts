@@ -163,7 +163,10 @@ describe('TeamMembersApi', () => {
             const result = await TeamMembersApi.updateMember(mockClient, 1, memberData);
 
             expect(ImageApi.delete).toHaveBeenCalledWith(mockClient, 20);
-            expect(mockClient.put).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}/1`, expect.objectContaining({ imageId: null }));
+            expect(mockClient.put).toHaveBeenCalledWith(
+                `${API_ROUTES.TEAM.BASE}/1`,
+                expect.objectContaining({ imageId: null }),
+            );
             expect(result.image).toBeNull();
         });
 

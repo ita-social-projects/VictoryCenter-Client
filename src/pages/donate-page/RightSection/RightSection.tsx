@@ -25,7 +25,7 @@ export const RightSection = () => {
     return (
         <div className="rightSection">
             <div className="locationToggleContainer">
-                <label className="switch">
+                <div className="switch">
                     <Tabs
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}
@@ -35,7 +35,7 @@ export const RightSection = () => {
                             { id: Currency.EUR, label: CURRENCY_TABS.EUR },
                         ]}
                     ></Tabs>
-                </label>
+                </div>
             </div>
             <div className="donatePaymentDetails">
                 {paymentDetails()}

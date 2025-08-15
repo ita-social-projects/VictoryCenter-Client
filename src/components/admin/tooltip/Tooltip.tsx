@@ -15,12 +15,12 @@ interface TooltipBaseProps {
     allowClickThrough?: boolean;
 }
 
-interface TooltipWithoutPortal extends TooltipBaseProps {
+export interface TooltipWithoutPortal extends TooltipBaseProps {
     isRenderInPortal?: false;
     portalPositioner?: never;
 }
 
-interface TooltipWithPortal extends TooltipBaseProps {
+export interface TooltipWithPortal extends TooltipBaseProps {
     isRenderInPortal: true;
     portalPositioner: Element;
 }
@@ -70,9 +70,6 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
                 setTooltipPosition({ top, left });
             } else {
                 const parentElement = tooltipElement.parentElement as HTMLElement;
-
-                console.log('Parent element: ', parentElement);
-
                 if (!parentElement) return;
 
                 const parentWidth = parentElement.offsetWidth;

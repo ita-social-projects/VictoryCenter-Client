@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import './ImageInput.scss';
 import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { getImageSrc } from '../../../utils/functions/map-image-to-base-64/getImageSrc'
 
 interface imageInputProps {
     value: ImageValues | Image | null;
@@ -97,19 +98,6 @@ export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false
         if (inputRef.current) inputRef.current.value = '';
     };
 
-    const getImageSrc = (img: Image | ImageValues | null) => {
-        if (!img) return undefined;
-
-        if ('url' in img) {
-            return img.url;
-        }
-
-        if ('base64' in img) {
-            return `data:${img.mimeType};base64,${img.base64}`;
-        }
-
-        return undefined;
-    };
 
     return (
         <div

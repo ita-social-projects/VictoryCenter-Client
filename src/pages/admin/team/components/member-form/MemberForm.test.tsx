@@ -5,7 +5,6 @@ import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../const/
 import { TeamCategory } from '../../../../../types/admin/team-members';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 
-// Mock SingleSelectInput to a native select for deterministic interaction
 jest.mock('../../../../../components/common/single-select-input/SingleSelectInput', () => ({
     SingleSelectInput: ({ options, value, onChange, placeholder, getOptionId, getOptionName, disabled }: any) => {
         return (
@@ -32,9 +31,8 @@ jest.mock('../../../../../components/common/single-select-input/SingleSelectInpu
     },
 }));
 
-// Mock PhotoInput to a simple button that injects an image value
-jest.mock('../../../../../components/admin/photo-input/PhotoInput', () => ({
-    PhotoInput: ({ onChange, disabled }: any) => (
+jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
+    ImageInput: ({ onChange, disabled }: any) => (
         <div>
             <button
                 type="button"

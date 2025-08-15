@@ -1,4 +1,4 @@
-import { AxiosInstance } from 'axios';
+import {AxiosInstance} from 'axios';
 import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/common';
 import { TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../types/admin/team-members';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
@@ -50,7 +50,7 @@ export const TeamMembersApi = {
         let imageIdToDelete: number | null = null;
         let finalImageId = member.imageId;
 
-        if (member.image && typeof member.image !== 'string') {
+        if (member.image && 'base64' in member.image) {
             if (member.imageId) {
                 const imageResult = await ImageApi.put(client, member.image, member.imageId);
                 finalImageId = imageResult.id;
@@ -63,7 +63,7 @@ export const TeamMembersApi = {
             finalImageId = null;
         }
 
-        const response = await client.put(`/TeamMembers/${id}`, {
+        const response = await client.put<TeamMember>(`/TeamMembers/${id}`, {
             fullName: member.fullName,
             categoryId: member.categoryId,
             status: member.status,
@@ -76,16 +76,16 @@ export const TeamMembersApi = {
             await ImageApi.delete(client, imageIdToDelete);
         }
 
-        return response.data as TeamMember;
+        return response.data;
     },
 
     postMember: async (client: AxiosInstance, member: TeamMemberCreateUpdateRequest): Promise<TeamMember> => {
         let imageId: number | null = null;
-        if (member.image) {
+        if (member.image && 'base64' in member.image) {
             const imageResult = await ImageApi.post(client, member.image);
             imageId = imageResult.id;
         }
-        const response = await client.post(`/TeamMembers`, {
+        const response = await client.post<TeamMember>(`/TeamMembers`, {
             fullName: member.fullName,
             categoryId: member.categoryId,
             status: member.status,
@@ -94,6 +94,6 @@ export const TeamMembersApi = {
             imageId: imageId,
         });
 
-        return response.data as TeamMember;
-    },
+        return response.data;
+    }
 };

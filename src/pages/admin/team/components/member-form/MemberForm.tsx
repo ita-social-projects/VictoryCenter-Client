@@ -2,20 +2,20 @@ import React, { forwardRef, useCallback, useMemo } from 'react';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TeamCategory } from '../../../../../types/admin/team-members';
 import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/team-member-schema/team-member-schema';
-import { ImageValues } from '../../../../../types/common/image';
+import { ImageValues, Image } from '../../../../../types/common/image';
 import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
 import { SingleSelectInput } from '../../../../../components/common/single-select-input/SingleSelectInput';
 import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';
+import { ImageInput } from '../../../../../components/admin/image-input/ImageInput';
 import './MemberForm.scss';
 import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
 export interface TeamMemberFormValues {
     categoryId: number | null;
     fullName: string;
     description: string;
-    image: ImageValues | null;
+    image: ImageValues| Image | null;
     imageId: number | null;
 }
 
@@ -104,7 +104,7 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
         }, [formState.description, setErrors]);
 
         const handleImgChange = useCallback(
-            (file: ImageValues | null) => {
+            (file: ImageValues | Image | null) => {
                 setFormState((prev) => ({ ...prev, image: file }));
                 setErrors((prev) => ({
                     ...prev,
@@ -178,7 +178,7 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                 </div>
                 <div className="form-group">
                     <InputLabel htmlFor={'image'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO} />
-                    <PhotoInput
+                    <ImageInput
                         value={formState.image}
                         onChange={handleImgChange}
                         id="image"

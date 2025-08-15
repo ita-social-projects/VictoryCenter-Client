@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { TEAM_MEMBER_VALIDATION } from '../../../const/admin/team';
-import { ImageValues } from '../../../types/common/image';
+import {Image, ImageValues} from '../../../types/common/image';
 
 export interface TeamMemberValidationContext {
     isPublishing: boolean;
@@ -90,7 +90,7 @@ export const TEAM_MEMBER_VALIDATION_FUNCTIONS = {
         }
     },
 
-    validateImage: (value: ImageValues | string | null, isPublishing: boolean): string | undefined => {
+    validateImage: (value: ImageValues | Image | null, isPublishing: boolean): string | undefined => {
         const context: TeamMemberValidationContext = { isPublishing };
         try {
             teamMemberValidationSchema.validateSyncAt('image', { image: value }, { context });

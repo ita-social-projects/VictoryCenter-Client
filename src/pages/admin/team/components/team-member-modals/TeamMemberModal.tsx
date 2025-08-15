@@ -93,12 +93,18 @@ export const TeamMemberModal = ({
     const initialData = useMemo<TeamMemberFormValues | null>(() => {
         if (!isEditMode || !memberToEdit) return null;
 
+        let imageId: number | null = null;
+
+        if (memberToEdit.image && "id" in memberToEdit.image) {
+            imageId = Number(memberToEdit.image.id);
+        }
+
         return {
             fullName: memberToEdit.fullName,
             description: memberToEdit.description,
             categoryId: memberToEdit.categoryId,
             image: memberToEdit.image,
-            imageId: memberToEdit.image?.id ?? null,
+            imageId: imageId ?? null,
         };
     }, [memberToEdit, isEditMode]);
 

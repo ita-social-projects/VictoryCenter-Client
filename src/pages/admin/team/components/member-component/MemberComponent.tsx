@@ -4,7 +4,6 @@ import './MemberComponent.scss';
 import BlankUserImage from '../../../../../assets/icons/blank-user.svg';
 import { TeamMember } from '../../../../../types/admin/team-members';
 import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
-import { getImageSrc } from "../../../../../utils/functions/map-image-to-base-64/getImageSrc";
 
 export interface MemberComponentProps {
     member: TeamMember;
@@ -25,7 +24,7 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
         <div className="members-item">
             <div className="members-profile">
                 <img
-                    src={getImageSrc(member.image) || BlankUserImage}
+                    src={member.image && "url" in member.image ? member.image.url : BlankUserImage}
                     alt={`${TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}-${member.fullName}`}
                 />
                 <p>{member.fullName}</p>

@@ -5,7 +5,6 @@ import classNames from 'classnames';
 import './ImageInput.scss';
 import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { getImageSrc } from '../../../utils/functions/map-image-to-base-64/getImageSrc'
 
 interface imageInputProps {
     value: ImageValues | Image | null;
@@ -164,6 +163,23 @@ export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false
     );
 };
 
+
+
+const getImageSrc = (img: Image | ImageValues | null) => {
+    if (!img) return undefined;
+
+    if ('url' in img && img.url) {
+        // Створюємо "cache buster" на основі поточної дати в мілісекундах
+        const cacheBuster = `?t=${new Date().getTime()}`;
+        return `${img.url}${cacheBuster}`;
+    }
+
+    if ('base64' in img) {
+        return `data:${img.mimeType};base64,${img.base64}`;
+    }
+
+    return undefined;
+};
 export function convertFileToBase64(file: File): Promise<ImageValues> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();

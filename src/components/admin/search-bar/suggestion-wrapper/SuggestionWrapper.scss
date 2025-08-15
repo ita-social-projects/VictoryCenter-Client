@@ -1,15 +1,16 @@
-﻿.suggestion-wrapper {
+﻿@use '../../../../assets/sass/variables/colors';
+
+.suggestion-wrapper {
+    display: flex;
     position: relative;
+    align-items: center;
+    min-height: 2.5rem;
+    max-height: 6.25rem;
+    padding: 0.5rem 1rem;
     overflow: visible;
     cursor: pointer;
-    min-height: 40px;
-    max-height: 100px;
-    padding: 8px 16px;
-    display: flex;
-    align-items: center;
 
-    &-active,
-    &:hover {
-        background: #e7eaee;
+    &--active {
+        background: colors.$blue-50;
     }
 }

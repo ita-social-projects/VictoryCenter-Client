@@ -73,11 +73,11 @@ export const MultiSelectInput = <T,>({
 
     useOnClickOutside({
         ignoreClickRefs: [multiselectContainerRef],
-        onClickOutside: () => {
+        onOutsideClick: () => {
             setIsOpen(false);
             onBlur?.();
         },
-        enabled: isOpen,
+        enabledWhen: isOpen,
     });
 
     const displayLabel = useMemo(() => {

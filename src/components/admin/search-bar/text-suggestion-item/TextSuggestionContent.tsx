@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import './TextSuggestionContent.scss';
 
-export interface TextSuggestionItemProps {
+export interface TextSuggestionContentProps {
     label: string;
     isHovered: boolean;
     onShowTooltip: (content: React.ReactNode) => void;
 }
 
-export const TextSuggestionContent = ({ label, isHovered, onShowTooltip }: TextSuggestionItemProps) => {
+export const TextSuggestionContent = React.memo(({ label, isHovered, onShowTooltip }: TextSuggestionContentProps) => {
     const textRef = useRef<HTMLSpanElement>(null);
 
     const checkOverflow = useCallback(() => {
@@ -19,7 +19,7 @@ export const TextSuggestionContent = ({ label, isHovered, onShowTooltip }: TextS
     useEffect(() => {
         const showTooltipIfNeeded = () => {
             if (checkOverflow()) {
-                onShowTooltip(<div className="text-suggestion-content-tooltip">{label}</div>);
+                onShowTooltip(<div className="text-suggestion-content__tooltip">{label}</div>);
             }
         };
 
@@ -46,4 +46,4 @@ export const TextSuggestionContent = ({ label, isHovered, onShowTooltip }: TextS
             {label}
         </span>
     );
-};
+});

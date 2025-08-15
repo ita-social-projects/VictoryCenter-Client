@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { TextSuggestionContent } from '../text-suggestion-item/TextSuggestionContent';
+import { TextSuggestionContent } from '../text-suggestion-content/TextSuggestionContent';
 import classNames from 'classnames';
 import './SuggestionWrapper.scss';
 

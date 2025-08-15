@@ -28,7 +28,7 @@ export const ButtonTooltip = ({ children, position = 'bottom' }: ButtonTooltipPr
     useOnClickOutside({
         ignoreClickRefs: [wrapperRef],
         onOutsideClick: closeTooltip,
-        enabledWhen: isVisible,
+        enableWhen: isVisible,
     });
 
     return (

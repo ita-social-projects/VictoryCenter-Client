@@ -2,36 +2,38 @@ import React, { useEffect } from 'react';
 
 export interface UseOnClickOutsideProps<T extends HTMLElement> {
     ignoreClickRefs: React.RefObject<T | null>[];
-    onClickOutside: (event: Event) => void;
-    enabled?: boolean;
+    onOutsideClick: (event: Event) => void;
+    enableWhen?: boolean;
 }
 
 export const useOnClickOutside = <T extends HTMLElement = HTMLElement>({
     ignoreClickRefs,
-    onClickOutside,
-    enabled = true,
+    onOutsideClick,
+    enableWhen = true,
 }: UseOnClickOutsideProps<T>): void => {
     useEffect(() => {
-        if (!enabled) {
+        if (!enableWhen) {
             return;
         }
 
-        const listener = (event: Event) => {
+        const handleClickOutside = (event: Event) => {
             const isClickInside = ignoreClickRefs.some((ref) => ref.current?.contains(event.target as Node));
 
             if (isClickInside) {
                 return;
             }
 
-            onClickOutside(event);
+            onOutsideClick(event);
         };
 
-        document.addEventListener('mousedown', listener);
-        document.addEventListener('touchstart', listener);
+        // Listen for both mousedown (desktop) and touchstart (mobile) events
+        // to ensure the hook works across all devices.
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('touchstart', handleClickOutside);
 
         return () => {
-            document.removeEventListener('mousedown', listener);
-            document.removeEventListener('touchstart', listener);
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleClickOutside);
         };
-    }, [ignoreClickRefs, onClickOutside]);
+    }, [ignoreClickRefs, onOutsideClick]);
 };

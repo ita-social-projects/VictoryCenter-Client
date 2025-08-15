@@ -174,8 +174,7 @@ describe('Tooltip - Portal Rendering', () => {
     const expectPortalTooltipInBody = () => expect(document.body).toContainElement(getPortalTooltip());
     const expectPortalTooltipToHaveStyle = (property: string, value: string) =>
         expect(getPortalTooltip()).toHaveStyle(`${property}: ${value}`);
-    const expectPortalTooltipToHaveClass = (className: string) =>
-        expect(getPortalTooltip()).toHaveClass(className);
+    const expectPortalTooltipToHaveClass = (className: string) => expect(getPortalTooltip()).toHaveClass(className);
 
     it('renders tooltip in portal', () => {
         renderPortalTooltip();

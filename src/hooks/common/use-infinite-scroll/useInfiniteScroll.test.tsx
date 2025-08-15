@@ -1,6 +1,6 @@
 ﻿import { renderHook, act } from '@testing-library/react';
 import { useInfiniteScroll, UseInfiniteScrollProps } from './useInfiniteScroll';
-import React from "react";
+import React from 'react';
 
 describe('useInfiniteScroll', () => {
     const createScrollEvent = (overrides: Partial<HTMLDivElement>): React.UIEvent<HTMLDivElement> =>
@@ -29,7 +29,7 @@ describe('useInfiniteScroll', () => {
     it('does not call onReachBottom when disabled', () => {
         const onReachBottom = jest.fn();
         const { result } = renderHook((props: UseInfiniteScrollProps) => useInfiniteScroll(props), {
-            initialProps: { onReachBottom, disabledWhen: true } as UseInfiniteScrollProps,
+            initialProps: { onReachBottom, disableWhen: true } as UseInfiniteScrollProps,
         });
 
         act(() => {

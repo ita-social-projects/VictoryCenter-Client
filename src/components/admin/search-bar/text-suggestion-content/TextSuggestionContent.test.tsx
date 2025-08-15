@@ -87,18 +87,14 @@ describe('TextSuggestionContent', () => {
 
         const { rerender } = renderTextSuggestionContent({
             isHovered: false,
-            onShowTooltip
+            onShowTooltip,
         });
 
         const textSpan = getTextSpan();
         mockOverflow(textSpan, true);
 
         // Re-render with isHovered: true to trigger useEffect
-        rerender(<TextSuggestionContent
-            label="Test suggestion text"
-            isHovered={true}
-            onShowTooltip={onShowTooltip}
-        />);
+        rerender(<TextSuggestionContent label="Test suggestion text" isHovered={true} onShowTooltip={onShowTooltip} />);
 
         expect(onShowTooltip).toHaveBeenCalledTimes(1);
         const callArg = onShowTooltip.mock.calls[0][0];
@@ -127,17 +123,13 @@ describe('TextSuggestionContent', () => {
         const { rerender } = renderTextSuggestionContent({
             isHovered: false,
             onShowTooltip,
-            label: 'First label'
+            label: 'First label',
         });
 
         const textSpan = screen.getByText('First label');
         mockOverflow(textSpan, true);
 
-        rerender(<TextSuggestionContent
-            isHovered={true}
-            onShowTooltip={onShowTooltip}
-            label="Second label"
-        />);
+        rerender(<TextSuggestionContent isHovered={true} onShowTooltip={onShowTooltip} label="Second label" />);
 
         expect(onShowTooltip).toHaveBeenCalledTimes(1);
         const callArg = onShowTooltip.mock.calls[0][0];

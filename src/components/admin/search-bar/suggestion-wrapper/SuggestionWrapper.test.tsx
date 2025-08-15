@@ -44,14 +44,11 @@ describe('SuggestionWrapper', () => {
     const leaveSuggestion = () => fireEvent.mouseLeave(getSuggestionItem());
 
     // Assertion helpers
-    const expectSuggestionToHaveClass = (className: string) =>
-        expect(getSuggestionItem()).toHaveClass(className);
+    const expectSuggestionToHaveClass = (className: string) => expect(getSuggestionItem()).toHaveClass(className);
     const expectSuggestionNotToHaveClass = (className: string) =>
         expect(getSuggestionItem()).not.toHaveClass(className);
-    const expectCallbackToBeCalled = (callback: jest.Mock) =>
-        expect(callback).toHaveBeenCalledTimes(1);
-    const expectCallbackNotToBeCalled = (callback: jest.Mock) =>
-        expect(callback).not.toHaveBeenCalled();
+    const expectCallbackToBeCalled = (callback: jest.Mock) => expect(callback).toHaveBeenCalledTimes(1);
+    const expectCallbackNotToBeCalled = (callback: jest.Mock) => expect(callback).not.toHaveBeenCalled();
 
     it('renders list item with default content', () => {
         renderSuggestionWrapper();
@@ -130,17 +127,12 @@ describe('SuggestionWrapper', () => {
         renderSuggestionWrapper({ onShowTooltip });
 
         setTimeout(() => {
-            expect(onShowTooltip).toHaveBeenCalledWith(
-                expect.any(HTMLElement),
-                mockContent
-            );
+            expect(onShowTooltip).toHaveBeenCalledWith(expect.any(HTMLElement), mockContent);
         }, 10);
     });
 
     it('renders custom content when renderContent is provided', () => {
-        const customRenderContent = jest.fn().mockReturnValue(
-            <div data-testid="custom-content">Custom Content</div>
-        );
+        const customRenderContent = jest.fn().mockReturnValue(<div data-testid="custom-content">Custom Content</div>);
 
         renderSuggestionWrapper({ renderContent: customRenderContent });
 
@@ -158,7 +150,7 @@ describe('SuggestionWrapper', () => {
 
         renderSuggestionWrapper({
             renderContent: customRenderContent,
-            isActive: true
+            isActive: true,
         });
 
         hoverSuggestion();

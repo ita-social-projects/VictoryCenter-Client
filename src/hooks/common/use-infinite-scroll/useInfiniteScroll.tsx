@@ -4,13 +4,13 @@ export const DEFAULT_BOTTOM_REACH_THRESHOLD_IN_PIXELS = 5;
 
 export interface UseInfiniteScrollProps {
     onReachBottom: () => void;
-    disabledWhen?: boolean;
+    disableWhen?: boolean;
     bottomReachThresholdInPixels?: number;
 }
 
 export const useInfiniteScroll = ({
     onReachBottom,
-    disabledWhen = false,
+    disableWhen = false,
     bottomReachThresholdInPixels = DEFAULT_BOTTOM_REACH_THRESHOLD_IN_PIXELS,
 }: UseInfiniteScrollProps) => {
     return useCallback(
@@ -19,10 +19,10 @@ export const useInfiniteScroll = ({
             const isAtBottom =
                 target.scrollHeight - target.scrollTop - target.clientHeight <= bottomReachThresholdInPixels;
 
-            if (isAtBottom && !disabledWhen) {
+            if (isAtBottom && !disableWhen) {
                 onReachBottom();
             }
         },
-        [onReachBottom, disabledWhen, bottomReachThresholdInPixels],
+        [onReachBottom, disableWhen, bottomReachThresholdInPixels],
     );
 };

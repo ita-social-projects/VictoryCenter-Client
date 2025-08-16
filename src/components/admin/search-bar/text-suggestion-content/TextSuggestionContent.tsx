@@ -1,45 +1,29 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useMemo } from 'react';
+import { useObserveElementSize } from '../../../../hooks/common/use-observe-element-size/useObserveElementSize';
 import './TextSuggestionContent.scss';
 
 export interface TextSuggestionContentProps {
     label: string;
     isHovered: boolean;
-    onShowTooltip: (content: React.ReactNode) => void;
+    onShowTooltip: (content: React.ReactNode | null) => void;
 }
 
 export const TextSuggestionContent = React.memo(({ label, isHovered, onShowTooltip }: TextSuggestionContentProps) => {
     const textRef = useRef<HTMLSpanElement>(null);
 
-    const checkOverflow = useCallback(() => {
+    const tooltipContent = useMemo(() => <div className="text-suggestion-content__tooltip">{label}</div>, [label]);
+
+    const showTooltipIfNeeded = useCallback(() => {
         const element = textRef.current;
-        if (!element) return false;
-        return element.scrollWidth > element.clientWidth;
-    }, []);
+        const isLabelOverflowing = element && element.scrollWidth > element.clientWidth;
+        onShowTooltip(isLabelOverflowing ? tooltipContent : null);
+    }, [onShowTooltip, tooltipContent]);
 
-    useEffect(() => {
-        const showTooltipIfNeeded = () => {
-            if (checkOverflow()) {
-                onShowTooltip(<div className="text-suggestion-content__tooltip">{label}</div>);
-            }
-        };
-
-        if (isHovered) {
-            showTooltipIfNeeded();
-        }
-
-        const element = textRef.current;
-        if (!element) return;
-
-        const resizeObserver = new ResizeObserver(() => {
-            if (isHovered) {
-                showTooltipIfNeeded();
-            }
-        });
-
-        resizeObserver.observe(element);
-
-        return () => resizeObserver.disconnect();
-    }, [isHovered, label, checkOverflow, onShowTooltip]);
+    useObserveElementSize({
+        observableElement: textRef,
+        onSizeChanged: showTooltipIfNeeded,
+        disableWhen: !isHovered,
+    });
 
     return (
         <span ref={textRef} className="text-suggestion-content">

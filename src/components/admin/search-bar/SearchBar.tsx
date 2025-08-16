@@ -1,14 +1,17 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
 import SearchIcon from '../../../assets/icons/la_search.svg';
 import ClearIcon from '../../../assets/icons/remove-query.svg';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/useOnClickOutside';
-import { useInfiniteScroll } from '../../../hooks/common/use-infinite-scroll/useInfiniteScroll';
-import { useDebouncedValueCallback } from '../../../hooks/common/use-debounced-value/useDebouncedValueCallback';
+import { useScrollHandler } from '../../../hooks/common/use-scroll-handler/useScrollHandler';
+import { useDebouncedValueCallback } from '../../../hooks/common/use-debounced-value-callback/useDebouncedValueCallback';
+import { useObserveElementSize } from '../../../hooks/common/use-observe-element-size/useObserveElementSize';
 import { SuggestionWrapper, SuggestionContentRenderProps } from './suggestion-wrapper/SuggestionWrapper';
 import { InlineLoader } from '../../common/inline-loader/InlineLoader';
 import { Tooltip } from '../tooltip/Tooltip';
 import './SearchBar.scss';
+
+export const TOOLTIP_WIDTH_MULTIPLY = 1.5;
 
 export interface SearchBarProps<T> {
     suggestions: T[];
@@ -24,6 +27,12 @@ export interface SearchBarProps<T> {
     searchDelayMs?: number;
     minCharactersToSearch?: number;
     notFoundMessage?: string;
+}
+
+export interface TooltipState {
+    isVisible: boolean;
+    positioner: Element | null;
+    content: React.ReactNode | null;
 }
 
 export const SearchBar = <T,>({
@@ -44,24 +53,20 @@ export const SearchBar = <T,>({
     const [searchQuery, setSearchQuery] = useState('');
     const [activeIndex, setActiveIndex] = useState<number>(-1);
     const [isDropdownVisible, setDropdownVisible] = useState(false);
-
-    const [tooltip, setTooltip] = useState<{
-        isVisible: boolean;
-        positioner: Element | null;
-        content: React.ReactNode;
-    }>({
+    const [suggestionsMaxHeight, setSuggestionsMaxHeight] = useState<number | undefined>(undefined);
+    const [tooltipState, setTooltipState] = useState<TooltipState>({
         isVisible: false,
         positioner: null,
-        content: '',
+        content: null,
     });
 
-    const tooltipRef = useRef(null);
     const searchContainerRef = useRef<HTMLDivElement>(null);
     const suggestionsListRef = useRef<HTMLUListElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const tooltipRef = useRef(null);
 
     const handleTooltipShow = useCallback((element: Element, content: React.ReactNode) => {
-        setTooltip({
+        setTooltipState({
             isVisible: true,
             content: content,
             positioner: element,
@@ -69,7 +74,7 @@ export const SearchBar = <T,>({
     }, []);
 
     const hideTooltip = useCallback(() => {
-        setTooltip((prev) => ({ ...prev, isVisible: false }));
+        setTooltipState((prev) => ({ ...prev, isVisible: false }));
     }, []);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,11 +95,17 @@ export const SearchBar = <T,>({
         [getSuggestionLabel, onSuggestionSelect, hideTooltip],
     );
 
+    const handleClickOutside = useCallback(() => {
+        setDropdownVisible(false);
+        setTooltipState((prev) => ({ ...prev, isVisible: false }));
+    }, []);
+
     const handleClear = () => {
         setSearchQuery('');
         onSearch('');
         hideTooltip();
         setDropdownVisible(false);
+        setActiveIndex(-1);
         inputRef.current?.focus();
     };
 
@@ -125,25 +136,52 @@ export const SearchBar = <T,>({
         }
     }, [activeIndex]);
 
+    useLayoutEffect(() => {
+        if (isDropdownVisible && suggestionsListRef.current && suggestions.length > 0) {
+            const listItems = Array.from(suggestionsListRef.current.children) as HTMLLIElement[];
+
+            if (listItems.length < 5) {
+                setSuggestionsMaxHeight(undefined);
+                return;
+            }
+
+            // Беремо перші 5 елементів
+            const itemsToMeasure = listItems.slice(0, 5);
+
+            // Розраховуємо висоту: сума перших 4-х + половина 5-го
+            let calculatedHeight = 0;
+            itemsToMeasure.forEach((item, index) => {
+                if (index < 4) {
+                    calculatedHeight += item.offsetHeight; // Повна висота перших 4
+                } else if (index === 4) {
+                    calculatedHeight += item.offsetHeight / 2; // Половина висоти п'ятого
+                }
+            });
+
+            setSuggestionsMaxHeight(calculatedHeight);
+        }
+    }, [suggestions, isDropdownVisible]);
+
     useDebouncedValueCallback({
         value: searchQuery,
         delay: searchDelayMs,
         disableWhen: searchQuery.length < minCharactersToSearch,
-        callback: () => onSearch(searchQuery),
+        callback: onSearch,
     });
 
     useOnClickOutside({
         ignoreClickRefs: [searchContainerRef],
+        onOutsideClick: handleClickOutside,
         enableWhen: isDropdownVisible,
-        onOutsideClick: () => {
-            setDropdownVisible(false);
-            setTooltip((prev) => ({ ...prev, isVisible: false }));
-        },
     });
 
-    const handleScroll = useInfiniteScroll({
+    const { handleScroll: handleSuggestionsScroll } = useScrollHandler({
         onReachBottom: onLoadMore,
         disableWhen: isLoading || !hasMore,
+    });
+
+    const { width: tooltipWidth } = useObserveElementSize({
+        observableElement: searchContainerRef,
     });
 
     return (
@@ -174,7 +212,11 @@ export const SearchBar = <T,>({
                 </div>
 
                 {isDropdownVisible && (
-                    <div className="search-bar__suggestions" onScroll={handleScroll}>
+                    <div
+                        className="search-bar__suggestions"
+                        onScroll={handleSuggestionsScroll}
+                        style={{ maxHeight: suggestionsMaxHeight ? `${suggestionsMaxHeight}px` : 'none' }}
+                    >
                         <ul
                             className="search-bar__suggestions-list"
                             ref={suggestionsListRef}
@@ -205,16 +247,16 @@ export const SearchBar = <T,>({
                 )}
             </div>
 
-            {tooltip.positioner && tooltip.isVisible && (
+            {tooltipState.positioner && tooltipState.isVisible && tooltipState.content && (
                 <Tooltip
                     ref={tooltipRef}
                     position="bottom"
                     isRenderInPortal={true}
                     allowClickThrough={true}
-                    portalPositioner={tooltip.positioner}
-                    customMaxWidthInPixels={400}
+                    portalPositioner={tooltipState.positioner}
+                    customMaxWidthInPixels={tooltipWidth * TOOLTIP_WIDTH_MULTIPLY}
                 >
-                    {tooltip.content}
+                    {tooltipState.content}
                 </Tooltip>
             )}
         </div>

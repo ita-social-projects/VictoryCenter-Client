@@ -20,9 +20,10 @@ const createMockElement = (): HTMLElement => {
     return element;
 };
 
-const createMockEvent = (target: HTMLElement): Event => ({
-  target,
-} as unknown as Event);
+const createMockEvent = (target: HTMLElement): Event =>
+    ({
+        target,
+    }) as unknown as Event;
 
 const setupHook = (ignoreClickRefs: any[], onOutsideClick = jest.fn(), enableWhen = true) => {
     return renderHook(() =>

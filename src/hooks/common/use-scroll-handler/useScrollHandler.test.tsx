@@ -1,5 +1,5 @@
 ﻿import { renderHook, act } from '@testing-library/react';
-import { useInfiniteScroll, UseInfiniteScrollProps } from './useInfiniteScroll';
+import { useScrollHandler, UseScrollHandlerProps } from './useScrollHandler';
 import React from 'react';
 
 describe('useInfiniteScroll', () => {
@@ -15,12 +15,12 @@ describe('useInfiniteScroll', () => {
 
     it('calls onReachBottom when scrolled to bottom', () => {
         const onReachBottom = jest.fn();
-        const { result } = renderHook((props: UseInfiniteScrollProps) => useInfiniteScroll(props), {
-            initialProps: { onReachBottom } as UseInfiniteScrollProps,
+        const { result } = renderHook((props: UseScrollHandlerProps) => useScrollHandler(props), {
+            initialProps: { onReachBottom } as UseScrollHandlerProps,
         });
 
         act(() => {
-            result.current(createScrollEvent({ scrollTop: 45 }));
+            result.current.handleScroll(createScrollEvent({ scrollTop: 45 }));
         });
 
         expect(onReachBottom).toHaveBeenCalledTimes(1);
@@ -28,12 +28,12 @@ describe('useInfiniteScroll', () => {
 
     it('does not call onReachBottom when disabled', () => {
         const onReachBottom = jest.fn();
-        const { result } = renderHook((props: UseInfiniteScrollProps) => useInfiniteScroll(props), {
-            initialProps: { onReachBottom, disableWhen: true } as UseInfiniteScrollProps,
+        const { result } = renderHook((props: UseScrollHandlerProps) => useScrollHandler(props), {
+            initialProps: { onReachBottom, disableWhen: true } as UseScrollHandlerProps,
         });
 
         act(() => {
-            result.current(createScrollEvent({ scrollTop: 45 }));
+            result.current.handleScroll(createScrollEvent({ scrollTop: 45 }));
         });
 
         expect(onReachBottom).not.toHaveBeenCalled();

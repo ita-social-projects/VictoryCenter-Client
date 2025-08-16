@@ -2,18 +2,18 @@
 
 export const DEFAULT_BOTTOM_REACH_THRESHOLD_IN_PIXELS = 5;
 
-export interface UseInfiniteScrollProps {
+export interface UseScrollHandlerProps {
     onReachBottom: () => void;
     disableWhen?: boolean;
     bottomReachThresholdInPixels?: number;
 }
 
-export const useInfiniteScroll = ({
+export const useScrollHandler = ({
     onReachBottom,
     disableWhen = false,
     bottomReachThresholdInPixels = DEFAULT_BOTTOM_REACH_THRESHOLD_IN_PIXELS,
-}: UseInfiniteScrollProps) => {
-    return useCallback(
+}: UseScrollHandlerProps) => {
+    const handleScroll = useCallback(
         (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
             const target = event.currentTarget;
             const isAtBottom =
@@ -25,4 +25,6 @@ export const useInfiniteScroll = ({
         },
         [onReachBottom, disableWhen, bottomReachThresholdInPixels],
     );
+
+    return { handleScroll };
 };

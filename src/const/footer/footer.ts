@@ -24,6 +24,6 @@ export const SIGN_UP = 'Підписатися';
 
 export const EMAIL = 'victorycenter@gmail.com';
 export const PHONE = '+380 50 334 4448';
-export const FACEBOOK = 'some_facebook';
-export const INSTAGRAM = 'some_instagram';
-export const TELEGRAM = 'some_telegram';
+export const FACEBOOK = 'https://www.facebook.com/victorycenterua';
+export const INSTAGRAM = 'https://www.instagram.com/victorycenterua';
+export const TELEGRAM = 'https://t.me/victorycenterua';

@@ -32,7 +32,7 @@ import {
 } from '../../const/footer/footer';
 
 const {
-    userPageRoutes: { teamPageRoute, page2Route },
+    userPageRoutes: { teamPageRoute, page2Route, aboutUsRoute, programPage },
 } = routes;
 
 export const Footer = () => {
@@ -45,6 +45,18 @@ export const Footer = () => {
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
     };
+    const handleFacebookClick = () => {
+        window.open(FACEBOOK, '_blank', 'noopener,noreferrer');
+    };
+
+    const handleTelegramClick = () => {
+        window.open(TELEGRAM, '_blank', 'noopener,noreferrer');
+    };
+
+    const handleInstagramClick = () => {
+        window.open(INSTAGRAM, '_blank', 'noopener,noreferrer');
+    };
+
     return (
         <div className="footer-content">
             <div className="main-block">
@@ -82,13 +94,11 @@ export const Footer = () => {
 
                 <div className="about_us">
                     <span className="title">{ABOUT_US}</span>
-                    <Link to={teamPageRoute}>{ABOUT_US}</Link>
+                    <Link to={aboutUsRoute}>{ABOUT_US}</Link>
                     <Link to={page2Route} className="disable">
                         {OUR_HISTORY}
                     </Link>
-                    <Link to={page2Route} className="disable">
-                        {OUR_TEAM}
-                    </Link>
+                    <Link to={teamPageRoute}>{OUR_TEAM}</Link>
                     <Link to={page2Route} className="disable">
                         {PARTNERS}
                     </Link>
@@ -102,7 +112,7 @@ export const Footer = () => {
                     <Link to={teamPageRoute} className="disable">
                         {WHAT_IS_HIPPOTHERAPY}
                     </Link>
-                    <Link to={teamPageRoute}>{PROGRAMS}</Link>
+                    <Link to={programPage}>{PROGRAMS}</Link>
                     <Link to={teamPageRoute} className="disable">
                         {PROGRAMS_SESSIONS}
                     </Link>
@@ -119,13 +129,13 @@ export const Footer = () => {
                     </button>
                 </div>
                 <div className="social_media">
-                    <button className="contact-item" onClick={() => copyToClipboard(FACEBOOK)}>
+                    <button className="contact-item" onClick={handleFacebookClick}>
                         Facebook
                     </button>
-                    <button className="contact-item" onClick={() => copyToClipboard(TELEGRAM)}>
+                    <button className="contact-item" onClick={handleTelegramClick}>
                         Telegram
                     </button>
-                    <button className="contact-item" onClick={() => copyToClipboard(INSTAGRAM)}>
+                    <button className="contact-item" onClick={handleInstagramClick}>
                         Instagram
                     </button>
                 </div>

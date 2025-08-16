@@ -597,13 +597,13 @@ export const MembersList = ({
                     <Modal.Actions>
                         <Button
                             buttonStyle={'secondary'}
-                            form="edit-member-modal"
+                            formId="edit-member-modal"
                             type="submit"
                             onClick={() => setIsDraftMode(true)}
                         >
                             {TEAM_SAVE_AS_DRAFT}
                         </Button>
-                        <Button form="edit-member-modal" type="submit" buttonStyle={'primary'}>
+                        <Button formId="edit-member-modal" type="submit" buttonStyle={'primary'}>
                             {TEAM_PUBLISH}
                         </Button>
                     </Modal.Actions>

@@ -1,0 +1,30 @@
+.category-bar {
+    min-height: 60px;
+    display: flex;
+    border-bottom: 1px solid #a4a49b;
+    font-size: 24px;
+    font-weight: 600;
+    background: #f8f8f8;
+    box-shadow: 0 0 4px rgba(128, 128, 128, 0.22);
+
+    &-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        border: none;
+        background: transparent;
+        font-size: 24px;
+        text-align: center;
+        transition: background-color 0.2s;
+
+        &-selected {
+            border-bottom: 1px solid #041128;
+        }
+
+        &:hover {
+            cursor: pointer;
+            background-color: rgba(128, 128, 128, 0.15);
+        }
+    }
+}

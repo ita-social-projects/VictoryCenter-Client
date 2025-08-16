@@ -1,0 +1,59 @@
+.context-menu-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    cursor: pointer;
+
+    &-active {
+        border-bottom-color: #041128;
+    }
+
+    &-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    &-options {
+        position: absolute;
+        top: calc(100% + 2px);
+        left: 0;
+        display: none;
+        z-index: 10;
+        width: 180px;
+        border: 1px solid #061125;
+        background: #ffffff;
+        box-shadow: 0 2px 8px -4px #00000029;
+
+        &-visible {
+            display: block;
+        }
+    }
+
+    &-option {
+        display: block;
+        width: 100%;
+        height: 40px;
+        padding: 8px;
+        border: none;
+        text-align: left;
+        color: #061125;
+        background: transparent;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 24px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #e7eaee;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    }
+}

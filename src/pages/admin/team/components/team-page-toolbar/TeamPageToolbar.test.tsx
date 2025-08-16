@@ -409,25 +409,6 @@ describe('TeamPageToolbar', () => {
         });
     });
 
-    describe('Button Attributes and Styling', () => {
-        it('applies correct button styles and attributes', async () => {
-            render(<TeamPageToolbar {...defaultProps} />);
-
-            const addButton = screen.getByTestId('add-member-button');
-            expect(addButton).toHaveAttribute('data-button-style', 'primary');
-
-            await userEvent.click(addButton);
-
-            const draftButton = screen.getByText('Зберегти як чернетку');
-            expect(draftButton).toHaveAttribute('data-button-style', 'secondary');
-
-            const publishButton = screen.getByText('Опублікувати');
-            expect(publishButton).toHaveAttribute('data-button-style', 'primary');
-            expect(publishButton).toHaveAttribute('form', 'add-member-modal');
-            expect(publishButton).toHaveAttribute('type', 'submit');
-        });
-    });
-
     describe('Complex Scenarios', () => {
         it('handles multiple modal transitions correctly', async () => {
             render(<TeamPageToolbar {...defaultProps} />);

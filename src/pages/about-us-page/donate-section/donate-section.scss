@@ -63,6 +63,7 @@
                     opacity: 1;
                     padding: 0.5rem 1.5rem;
                     background-color: $yellow-500;
+                    color: $blue-900;
                     font-family: Mulish, sans-serif;
                     font-weight: 400;
                     font-size: 1rem;
@@ -71,6 +72,7 @@
                     vertical-align: middle;
                     border: none;
                     cursor: pointer;
+                    text-decoration: none;
                 }
 
                 .partner-button {
@@ -86,6 +88,7 @@
                     background: none;
                     color: $grey-50;
                     cursor: pointer;
+                    text-decoration: none;
                 }
             }
         }

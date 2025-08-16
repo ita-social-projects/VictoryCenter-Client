@@ -17,7 +17,7 @@ interface PhotoInputProps {
     name?: string;
 }
 
-const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: PhotoInputProps) => {
+export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: PhotoInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -135,7 +135,7 @@ const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: Pho
                 <div className="photo-preview">
                     <img
                         src={mapImageToBase64(previewImage) ?? undefined}
-                        alt="Preview"
+                        alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
                         className="preview-image"
                         data-testid="preview-image"
                     />
@@ -185,5 +185,3 @@ export function convertFileToBase64(file: File): Promise<ImageValues> {
         reader.readAsDataURL(file);
     });
 }
-
-export default PhotoInput;

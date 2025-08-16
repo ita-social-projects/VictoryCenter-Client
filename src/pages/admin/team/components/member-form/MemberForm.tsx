@@ -10,7 +10,7 @@ import {
     TEAM_LABEL_DESCRIPTION,
 } from '../../../../../const/team';
 import { ImageValues } from '../../../../../types/Image';
-import PhotoInput from '../../../../../components/common/photo-input/PhotoInput';
+import { PhotoInput } from '../../../../../components/common/photo-input/PhotoInput';
 import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
 import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
 import ArrowUp from '../../../../../assets/icons/chevron-up.svg';

@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
 import { adminRoutes } from '../../../const/routers/routes';
 import Logo from '../../../assets/icons/logo.svg';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 export const AdminNavigation = () => {
     return (
@@ -22,7 +23,19 @@ export const AdminNavigation = () => {
                             })
                         }
                     >
-                        Команда
+                        {COMMON_TEXT_ADMIN.TAB.TEAM_MEMBERS}
+                    </NavLink>
+
+                    <NavLink
+                        to={adminRoutes.programsPageRoute}
+                        end
+                        className={({ isActive }) =>
+                            classNames('admin-page-link', {
+                                'admin-pages-selected': isActive,
+                            })
+                        }
+                    >
+                        {COMMON_TEXT_ADMIN.TAB.PROGRAMS}
                     </NavLink>
                 </nav>
             </div>

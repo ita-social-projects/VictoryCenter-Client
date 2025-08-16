@@ -2,9 +2,9 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TeamPageContent } from './TeamPageContent';
-import { AdminContext } from '../../../../../context/admin-context-provider/AdminContextProvider';
-import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi';
 import { MemberFormValues } from '../member-form/MemberForm';
+import { AdminContext } from '../../../../../contexts/admin/admin-context-provider/AdminContextProvider';
+import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
 
 // Mock the AdminContext
 const mockAdminContext = {
@@ -33,15 +33,12 @@ const mockAdminContext = {
 };
 
 // Mock the TeamMembersApi
-jest.mock(
-    '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi',
-    () => ({
-        TeamMembersApi: {
-            postPublished: jest.fn(),
-            postDraft: jest.fn(),
-        },
-    }),
-);
+jest.mock('../../../../../services/api/admin/team/team-members/team-members-api.ts', () => ({
+    TeamMembersApi: {
+        postPublished: jest.fn(),
+        postDraft: jest.fn(),
+    },
+}));
 
 // Mock the TeamPageToolbar component
 jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({

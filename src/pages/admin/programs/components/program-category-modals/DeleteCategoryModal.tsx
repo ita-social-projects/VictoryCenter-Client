@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
-import { Button } from '../../../../../components/common/button/Button';
-import { HintBox } from '../../../../../components/common/hint-box/HintBox';
-import { InputLabel } from '../../../../../components/common/input-label/InputLabel';
-import { ProgramCategory } from '../../../../../types/admin/Programs';
+import { Button } from '../../../../../components/admin/button/Button';
+import { HintBox } from '../../../../../components/admin/hint-box/HintBox';
+import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
-import './program-category-modal.scss';
+import './ProgramCategoryModal.scss';
+import { ProgramCategory } from '../../../../../types/admin/programs';
 
 interface DeleteCategoryModalProps {
     isOpen: boolean;

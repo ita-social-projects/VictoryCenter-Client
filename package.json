@@ -6,8 +6,11 @@
         "node": ">=20"
     },
     "dependencies": {
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.1",
         "@fontsource/mulish": "^5.2.5",
         "@hookform/resolvers": "^5.1.1",
+        "@mui/material": "^7.2.0",
         "@testing-library/dom": "^10.4.0",
         "@testing-library/jest-dom": "^6.6.3",
         "@testing-library/react": "^16.3.0",

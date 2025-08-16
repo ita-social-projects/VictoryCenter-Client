@@ -14,13 +14,16 @@ import {
 import { teamPageDataFetch } from '../../../services/api/public/team/team-api';
 import { TeamItem } from '../../../types/public/team-page';
 import { TeamMemberCard } from './team-member-card/TeamMemberCard';
+import { LinearProgress } from '@mui/material';
 
 export const TeamPage: React.FC = () => {
     const [teamData, setTeamData] = useState<TeamItem[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchData = async () => {
+            setLoading(true);
             try {
                 const response = await teamPageDataFetch();
                 const { teamData } = response;
@@ -29,9 +32,10 @@ export const TeamPage: React.FC = () => {
             } catch {
                 setError(DOWNLOAD_ERROR);
                 setTeamData([]);
+            } finally {
+                setLoading(false);
             }
         };
-
         fetchData();
     }, []);
 
@@ -43,24 +47,28 @@ export const TeamPage: React.FC = () => {
                 </div>
             )}
 
-            {teamData.map((team, index) => (
-                <div
-                    key={index}
-                    className={classNames('team-section', { 'last-section': index === teamData.length - 1 })}
-                >
-                    <div className="team_info">
-                        <div className="members-grid">
-                            <div className="team_description">
-                                <h2>{team.title}</h2>
-                                <p>{team.description}</p>
+            {loading ? (
+                <LinearProgress className="loader" />
+            ) : (
+                teamData.map((team, index) => (
+                    <div
+                        key={index}
+                        className={classNames('team-section', { 'last-section': index === teamData.length - 1 })}
+                    >
+                        <div className="team_info">
+                            <div className="members-grid">
+                                <div className="team_description">
+                                    <h2>{team.title}</h2>
+                                    <p>{team.description}</p>
+                                </div>
                             </div>
                             {team.members.map((member) => (
                                 <TeamMemberCard key={member.id} member={member} />
                             ))}
                         </div>
                     </div>
-                </div>
-            ))}
+                ))
+            )}
 
             <div className="video-background-container">
                 <video autoPlay muted loop playsInline className="background-video">

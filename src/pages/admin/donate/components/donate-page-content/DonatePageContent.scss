@@ -1,0 +1,62 @@
+@use '../../../../../assets/sass/variables/colors';
+
+.donate-page {
+    &-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 3.375rem;
+        height: 100vh;
+        width: 100%;
+        padding: 3.375rem;
+        box-sizing: border-box;
+        overflow-y: auto;
+    }
+
+    &-credits {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+
+        &-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 24px;
+            width: 100%;
+            position: relative;
+            overflow: visible;
+            height: auto;
+        }
+
+        &-not-found {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+
+            img {
+                width: 14.375rem;
+                height: 14.375rem;
+            }
+
+            p {
+                width: 470px;
+                font-size: 40px;
+                font-weight: 600;
+                color: colors.$blue-900;
+            }
+        }
+
+        &-btn {
+            &-add {
+                width: 427px;
+                height: 40px;
+            }
+        }
+    }
+}

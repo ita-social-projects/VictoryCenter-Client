@@ -1,0 +1,125 @@
+@use '../../../../../../assets/sass/variables/colors.scss';
+
+.form {
+    &-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        width: 100%;
+        background: colors.$grey-50;
+        border-radius: 8px;
+        border: 1px solid colors.$grey-700;
+        padding: 40px 30px;
+        box-sizing: border-box;
+        position: relative;
+        height: auto; 
+    
+        button {
+            height: 2.5rem;
+        }
+    }
+
+    &-header {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+
+        .status-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 1.875rem;
+        }
+
+        .status {
+            width: 153px;
+            height: 32px;
+            background-color: colors.$grey-100;
+        }
+
+        .edit-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            background: url('../../../../../../assets/icons/edit-filled.svg');
+        }
+        .close-icon {
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+            margin-bottom: 0.5rem;
+
+            button {
+                width: 1.5rem;
+                height: 1.5rem;
+                cursor: pointer;
+                transition: opacity 0.2s ease;
+                border: none;
+                background: url('../../../../../../assets/icons/close-icon.svg') no-repeat;
+
+                &:hover {
+                    opacity: 0.7;
+                }
+            }
+        }
+
+        &-text {
+            display: block;
+            width: 100%;
+            font-size: 2rem;
+            font-weight: 400;
+            text-align: center;
+            line-height: 1.2;
+
+            @media (max-width: 768px) {
+                font-size: 1.5rem;
+            }
+
+            @media (max-width: 480px) {
+                font-size: 1.25rem;
+            }
+        }
+    }
+
+    &-body {
+        display: flex;
+        flex-direction: column;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        gap: 1rem;
+    }
+
+    &-footer {
+        display: flex;
+        flex-direction: column;
+        gap: 1.875rem;
+        flex-wrap: wrap;
+
+        @media (max-width: 400px) {
+            align-items: stretch;
+        }
+
+        justify-content: space-between;
+        width: 100%;
+        
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            button {
+                width: 45%;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .form {
+        &-overlay {
+            padding: 0.5rem;
+        }
+
+        &-container {
+            padding: 1rem;
+            border-radius: 4px;
+        }
+    }
+}

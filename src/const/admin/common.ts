@@ -2,6 +2,7 @@ export const COMMON_TEXT_ADMIN = {
     TAB: {
         TEAM_MEMBERS: 'Команда',
         PROGRAMS: 'Програми',
+        DONATE: 'Донати',
     },
 
     ALT: {
@@ -39,6 +40,16 @@ export const COMMON_TEXT_ADMIN = {
 
     LIST: {
         NOT_FOUND: 'Нічого не знайдено',
+    },
+
+    DONATE: {
+        BANK_DETAILS: {
+            NOT_FOUND: 'Ще не має реквізитів',
+            ADD_NEW: 'Додати реквізити',
+        },
+        SUPPORT_OPTIONS: {
+            NOT_FOUND: 'Ще не має варіантів підтримки',
+        },
     },
 
     FILTER: {

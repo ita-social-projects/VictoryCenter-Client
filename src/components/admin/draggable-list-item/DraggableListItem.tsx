@@ -1,5 +1,5 @@
 import DragIcon from '../../../assets/icons/dragger.svg';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import './DraggableListItem.scss';
 import { DragPreviewModel } from '../../../types/admin/common';
 import { DragPreview } from '../drag-preview/DragPreview';
@@ -37,8 +37,9 @@ export const DraggableListItem = <TEntity,>({
         (e: React.DragEvent<HTMLDivElement>, id: number | string) => {
             e.preventDefault();
 
-            const draggedId = parseInt(e.dataTransfer.getData('text/plain'), 10);
-            if (isNaN(draggedId) || draggedId === id) return;
+            const draggedIdStr = e.dataTransfer.getData('text/plain');
+            const draggedId = isNaN(Number(draggedIdStr)) ? draggedIdStr : Number(draggedIdStr);
+            if (draggedId === id) return;
 
             const updatedEntities = [...entities];
             const fromIndex = updatedEntities.findIndex((m) => idSelector(m) === draggedId);
@@ -97,7 +98,6 @@ export const DraggableListItem = <TEntity,>({
             <DragPreview
                 entity={entity}
                 dragPreview={dragPreview}
-                keySelector={idSelector}
                 renderEntityComponent={renderEntityComponent}
                 dragAltText={ariaLabel}
             ></DragPreview>

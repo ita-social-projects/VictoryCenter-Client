@@ -133,7 +133,12 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
         }, [formState.categoryId, setErrors]);
 
         return (
-            <form className="team-member-form-main" data-testid="test-form" noValidate>
+            <form
+                onSubmit={(e) => e.preventDefault()}
+                className="team-member-form-main"
+                data-testid="test-form"
+                noValidate
+            >
                 <div className="form-group">
                     <InputLabel htmlFor={'category'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.CATEGORY} isRequired />
                     <SingleSelectInput

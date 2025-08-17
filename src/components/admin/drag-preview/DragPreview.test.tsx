@@ -20,7 +20,6 @@ describe('DragPreview', () => {
             x: 100,
             y: 200,
         },
-        keySelector: (entity) => entity.id,
         renderEntityComponent: (entity) => <span>{entity.name}</span>,
         dragAltText: 'Drag me',
     };
@@ -47,7 +46,7 @@ describe('DragPreview', () => {
 
     it('should apply correct position styles', () => {
         render(<DragPreview {...defaultProps} />);
-        const preview = screen.getByRole('img').closest('.drag-preview') as HTMLElement;
+        const preview = screen.getByRole('img', { hidden: true }).closest('.drag-preview') as HTMLElement;
         expect(preview).toHaveStyle({ left: `${100 - 45}px`, top: `${200 - 55}px` });
     });
 
@@ -67,7 +66,7 @@ describe('DragPreview', () => {
 
     it('should render image with provided alt text', () => {
         render(<DragPreview {...defaultProps} />);
-        const img = screen.getByRole('img', { name: /drag me/i });
+        const img = screen.getByRole('img', { name: /drag me/i, hidden: true });
         expect(img).toHaveAttribute('src', 'mock-drag-icon.svg');
     });
 });

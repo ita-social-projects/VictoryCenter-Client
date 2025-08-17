@@ -243,7 +243,7 @@ describe('TeamMembersApi', () => {
 
             expect(ImageApi.post).toHaveBeenCalledWith(mockClient, mockImageValue);
             expect(mockClient.post).toHaveBeenCalledWith(
-                `/${API_ROUTES.TEAM.BASE}`,
+                `${API_ROUTES.TEAM.BASE}`,
                 expect.objectContaining({ imageId: mockImageResponse.id }),
             );
             expect(result.id).toBe(2);
@@ -275,7 +275,7 @@ describe('TeamMembersApi', () => {
 
             expect(ImageApi.post).not.toHaveBeenCalled();
             expect(mockClient.post).toHaveBeenCalledWith(
-                `/${API_ROUTES.TEAM.BASE}`,
+                `${API_ROUTES.TEAM.BASE}`,
                 expect.objectContaining({ imageId: null }),
             );
             expect(result.id).toBe(3);

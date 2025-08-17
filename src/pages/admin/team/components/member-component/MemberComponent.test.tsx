@@ -4,11 +4,6 @@ import { MemberComponent, MemberComponentProps } from './MemberComponent';
 import '@testing-library/jest-dom';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
-
-jest.mock('../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64', () => ({
-    mapImageToBase64: jest.fn(),
-}));
 
 jest.mock('../../../../../assets/icons/blank-user.svg', () => 'blank-user.svg');
 
@@ -49,7 +44,7 @@ describe('MemberComponent', () => {
             />,
         );
 
-    it('renders with base64 image from mapImageToBase64', () => {
+    it('renders valid data', () => {
         renderComponent({
             image: { id: 10, url: 'https://superSecretStorage.com/image.png', mimeType: 'image/png', size: 1234 },
         });
@@ -65,7 +60,7 @@ describe('MemberComponent', () => {
         expect(screen.getByTestId('visibility-label')).toHaveTextContent(`Status: ${VisibilityStatus.Published}`);
     });
 
-    it('falls back to BlankUserImage when mapImageToBase64 returns null', () => {
+    it('falls back to BlankUserImage when image value is null', () => {
         renderComponent({ image: null });
 
         const img = screen.getByRole('img');
@@ -73,7 +68,6 @@ describe('MemberComponent', () => {
     });
 
     it('calls handleOnEditMember when edit button clicked', () => {
-        (mapImageToBase64 as jest.Mock).mockReturnValue('img123');
 
         renderComponent();
         const editBtn = screen.getByRole('button', { name: TEAM_MEMBERS_TEXT.ACTIONS.EDIT }); // no visible text, so fallback query
@@ -82,7 +76,6 @@ describe('MemberComponent', () => {
     });
 
     it('calls handleOnDeleteMember when delete button clicked', () => {
-        (mapImageToBase64 as jest.Mock).mockReturnValue('img123');
 
         renderComponent();
         const deleteBtn = screen.getByRole('button', { name: TEAM_MEMBERS_TEXT.ACTIONS.DELETE });

@@ -20,12 +20,14 @@ jest.mock('../../../../../components/admin/visibility-status-label/VisibilitySta
 
 const baseMember = {
     id: 1,
-    image: { id: 10, base64: 'base64string', mimeType: 'image/png', size: 1234 },
+    image: { id: 10, url: 'base64string', mimeType: 'image/png', size: 1234 },
     fullName: 'John Doe',
     description: 'Frontend Developer',
     status: VisibilityStatus.Published,
     categoryId: 5,
 };
+
+const mockDate: number = 1699;
 
 describe('MemberComponent', () => {
     let handleOnEditMember: jest.Mock;
@@ -35,6 +37,7 @@ describe('MemberComponent', () => {
         jest.clearAllMocks();
         handleOnEditMember = jest.fn();
         handleOnDeleteMember = jest.fn();
+        jest.spyOn(Date, 'now').mockImplementation(() => mockDate);
     });
 
     const renderComponent = (override: Partial<MemberComponentProps['member']> = {}) =>
@@ -47,12 +50,12 @@ describe('MemberComponent', () => {
         );
 
     it('renders with base64 image from mapImageToBase64', () => {
-        (mapImageToBase64 as jest.Mock).mockReturnValue('data:image/png;base64,abc123');
-
-        renderComponent();
+        renderComponent({
+            image: { id: 10, url: 'https://superSecretStorage.com/image.png', mimeType: 'image/png', size: 1234 },
+        });
 
         const img = screen.getByRole('img');
-        expect(img).toHaveAttribute('src', 'data:image/png;base64,abc123');
+        expect(img).toHaveAttribute('src', 'https://superSecretStorage.com/image.png?cb=1699');
         expect(img).toHaveAttribute('alt', `${TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}-John Doe`);
 
         expect(screen.getByText('John Doe')).toBeInTheDocument();
@@ -63,8 +66,6 @@ describe('MemberComponent', () => {
     });
 
     it('falls back to BlankUserImage when mapImageToBase64 returns null', () => {
-        (mapImageToBase64 as jest.Mock).mockReturnValue(null);
-
         renderComponent({ image: null });
 
         const img = screen.getByRole('img');

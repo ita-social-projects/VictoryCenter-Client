@@ -15,7 +15,7 @@ describe('teamMemberValidationSchema', () => {
     const invalidCategory = null;
 
     const validImageObj = { base64: 'abc', mimeType: 'image/png', size: 1000 };
-    const validImageString = 'data:image/png;base64,abcd';
+    const validImageValue = { url: 'http://localhost:8080', mimeType: 'image/png', id: 1000 };
     const invalidImageLargeSize = { ...validImageObj, size: TEAM_MEMBER_VALIDATION.img.maxSizeBytes + 100 };
     const invalidImageBadFormat = { ...validImageObj, mimeType: 'application/pdf' };
 
@@ -115,7 +115,7 @@ describe('teamMemberValidationSchema', () => {
         });
 
         it('accepts valid image string', () => {
-            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(validImageString, true)).toBeUndefined();
+            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(validImageValue, true)).toBeUndefined();
         });
 
         it('rejects image larger than max size', () => {

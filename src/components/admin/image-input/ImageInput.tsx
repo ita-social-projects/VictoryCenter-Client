@@ -97,7 +97,6 @@ export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false
         if (inputRef.current) inputRef.current.value = '';
     };
 
-
     return (
         <div
             className={classNames('image-input-wrapper', {
@@ -163,15 +162,11 @@ export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false
     );
 };
 
-
-
 const getImageSrc = (img: Image | ImageValues | null) => {
     if (!img) return undefined;
 
     if ('url' in img && img.url) {
-        // Створюємо "cache buster" на основі поточної дати в мілісекундах
-        const cacheBuster = `?t=${new Date().getTime()}`;
-        return `${img.url}${cacheBuster}`;
+        return `${img.url}?cb=${Date.now()}`;
     }
 
     if ('base64' in img) {

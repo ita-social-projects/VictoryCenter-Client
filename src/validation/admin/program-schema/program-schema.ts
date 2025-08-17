@@ -49,9 +49,8 @@ export const programValidationSchema = Yup.object({
         .test('fileFormat', PROGRAM_VALIDATION.img.getFormatError(), (value) => {
             if (!value) return true;
 
-            // Якщо це Image (з бекенду)
             if ('url' in value && 'mimeType' in value) {
-                return PROGRAM_VALIDATION.img.allowedFormats.includes(value.mimeType);
+                return true;
             }
 
             // Якщо це ImageValues (base64 з фронту)
@@ -63,6 +62,7 @@ export const programValidationSchema = Yup.object({
         })
         .test('fileSize', PROGRAM_VALIDATION.img.getSizeError(), (value) => {
             if (value === null) return true;
+            if ('url' in value) return true;
             if ('base64' in value && 'size' in value) {
                 return value.size <= PROGRAM_VALIDATION.img.maxSizeBytes;
             }

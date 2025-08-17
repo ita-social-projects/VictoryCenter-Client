@@ -15,7 +15,7 @@ export interface TeamMemberFormValues {
     categoryId: number | null;
     fullName: string;
     description: string;
-    image: ImageValues| Image | null;
+    image: ImageValues | Image | null;
     imageId: number | null;
 }
 

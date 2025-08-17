@@ -95,7 +95,7 @@ export const TeamMemberModal = ({
 
         let imageId: number | null = null;
 
-        if (memberToEdit.image && "id" in memberToEdit.image) {
+        if (memberToEdit.image && 'id' in memberToEdit.image) {
             imageId = Number(memberToEdit.image.id);
         }
 

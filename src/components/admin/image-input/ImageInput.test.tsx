@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import {convertFileToBase64, ImageInput} from './ImageInput';
+import { convertFileToBase64, ImageInput } from './ImageInput';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import {Image, ImageValues} from '../../../types/common/image';
+import { Image, ImageValues } from '../../../types/common/image';
 
 const createImageFile = () => new File(['dummy content'], 'example.png', { type: 'image/png' });
 const MockImageValue: ImageValues = {
@@ -11,12 +11,13 @@ const MockImageValue: ImageValues = {
     size: 0,
 };
 
-const MockImage : Image = {
+const MockImage: Image = {
     id: 1,
     url: 'https://fastly.picsum.images/id/127/800/600.jpg?hmac=dEtPV01KgGCkVNl7r2XZX0hwXkWeQvsf7jsdrZtmwnc',
-    mimeType: "image/png"
+    mimeType: 'image/png',
+};
 
-}
+const mockDate: number = 1699;
 
 describe('ImageInput', () => {
     let onChangeMock: jest.Mock;
@@ -25,6 +26,9 @@ describe('ImageInput', () => {
         onChangeMock = jest.fn();
         global.URL.createObjectURL = jest.fn(() => 'mock-preview-url');
         global.URL.revokeObjectURL = jest.fn();
+
+        jest.spyOn(Date, 'now').mockImplementation(() => mockDate);
+
         jest.clearAllMocks();
     });
 
@@ -45,7 +49,7 @@ describe('ImageInput', () => {
         render(<ImageInput value={MockImage} onChange={onChangeMock} />);
         const previewImage = screen.getByTestId('preview-image');
         expect(previewImage).toBeInTheDocument();
-        expect(previewImage).toHaveAttribute('src', MockImage.url);
+        expect(previewImage).toHaveAttribute('src', `${MockImage.url}?cb=${mockDate}`);
     });
 
     it('calls onChange when file is selected via input', async () => {
@@ -356,14 +360,12 @@ describe('ImageInput', () => {
         expect(wrapper.getAttribute('tabIndex')).toBe('0');
     });
 
-
     it('should update the preview when the value prop changes to a new image', () => {
         const { rerender } = render(<ImageInput value={MockImage} onChange={onChangeMock} />);
 
         const preview = screen.getByTestId('preview-image') as HTMLImageElement;
-        expect(preview.src).toBe(MockImage.url);
+        expect(preview.src).toBe(`${MockImage.url}?cb=${mockDate}`);
 
-        // Rerender with a new image
         rerender(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
 
         expect(preview.src).toBe(`data:${MockImageValue.mimeType};base64,${MockImageValue.base64}`);

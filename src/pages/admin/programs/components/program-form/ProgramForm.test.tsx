@@ -68,7 +68,6 @@ describe('ProgramForm', () => {
         id: 1,
         url: 'http://localhost:8080',
         mimeType: 'image/jpg',
-
     };
 
     const mockInitialData: ProgramFormValues = {
@@ -76,7 +75,7 @@ describe('ProgramForm', () => {
         description: 'Існуючий опис',
         categories: [mockCategories[0]],
         img: mockFile,
-        imgId: 1
+        imgId: 1,
     };
 
     const formRef = createRef<ProgramFormRef>();

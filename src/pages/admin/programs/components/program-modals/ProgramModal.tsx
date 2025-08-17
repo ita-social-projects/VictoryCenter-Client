@@ -9,6 +9,7 @@ import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import './ProgramModal.scss';
+import { Image } from '../../../../../types/common/image';
 
 interface BaseProps {
     isOpen: boolean;
@@ -52,6 +53,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
             description: program.description,
             categories: program.categories,
             img: program.img,
+            imgId: program.img?.id ?? null,
         };
     }, [program, isEditMode]);
 
@@ -102,12 +104,18 @@ export const ProgramModal = (props: ProgramModalProps) => {
         try {
             const status: VisibilityStatus =
                 pendingAction === 'publish' ? VisibilityStatus.Published : VisibilityStatus.Draft;
+
+            let img: Image | null = null;
+            if (pendingFormData.img && 'id' in pendingFormData.img) {
+                img = pendingFormData.img; // тільки якщо це Image
+            }
+
             const programData: ProgramCreateUpdate = {
                 id: isEditMode && program ? program.id : null,
                 name: pendingFormData.name,
                 description: pendingFormData.description,
                 categoryIds: pendingFormData.categories.map((cat) => cat.id),
-                img: pendingFormData.img,
+                img: img,
                 status: status,
             };
 

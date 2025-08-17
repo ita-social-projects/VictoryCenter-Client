@@ -1,4 +1,4 @@
-import {AxiosInstance} from 'axios';
+import { AxiosInstance } from 'axios';
 import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/common';
 import { TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../types/admin/team-members';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
@@ -95,5 +95,5 @@ export const TeamMembersApi = {
         });
 
         return response.data;
-    }
+    },
 };

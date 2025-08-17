@@ -24,7 +24,9 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
         <div className="members-item">
             <div className="members-profile">
                 <img
-                    src={member.image && "url" in member.image ? member.image.url : BlankUserImage}
+                    src={
+                        member.image && 'url' in member.image ? `${member.image.url}?cb=${Date.now()}` : BlankUserImage
+                    }
                     alt={`${TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}-${member.fullName}`}
                 />
                 <p>{member.fullName}</p>

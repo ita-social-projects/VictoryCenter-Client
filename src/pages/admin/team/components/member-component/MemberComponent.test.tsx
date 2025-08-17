@@ -22,8 +22,6 @@ const baseMember = {
     categoryId: 5,
 };
 
-const mockDate: number = 1699;
-
 describe('MemberComponent', () => {
     let handleOnEditMember: jest.Mock;
     let handleOnDeleteMember: jest.Mock;
@@ -32,7 +30,6 @@ describe('MemberComponent', () => {
         jest.clearAllMocks();
         handleOnEditMember = jest.fn();
         handleOnDeleteMember = jest.fn();
-        jest.spyOn(Date, 'now').mockImplementation(() => mockDate);
     });
 
     const renderComponent = (override: Partial<MemberComponentProps['member']> = {}) =>
@@ -50,7 +47,7 @@ describe('MemberComponent', () => {
         });
 
         const img = screen.getByRole('img');
-        expect(img).toHaveAttribute('src', 'https://superSecretStorage.com/image.png?cb=1699');
+        expect(img).toHaveAttribute('src', 'https://superSecretStorage.com/image.png');
         expect(img).toHaveAttribute('alt', `${TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}-John Doe`);
 
         expect(screen.getByText('John Doe')).toBeInTheDocument();

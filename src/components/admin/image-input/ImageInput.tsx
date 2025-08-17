@@ -166,7 +166,7 @@ const getImageSrc = (img: Image | ImageValues | null) => {
     if (!img) return undefined;
 
     if ('url' in img && img.url) {
-        return `${img.url}?cb=${Date.now()}`;
+        return img.url;
     }
 
     if ('base64' in img) {

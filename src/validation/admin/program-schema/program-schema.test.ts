@@ -13,7 +13,7 @@ const createMockFile = (type = 'image/jpeg', size = 1024) => {
 
 const mockImage: Image = {
     id: 1,
-    url: 'http://imagepath.com',
+    url: 'https://imagepath.com',
     mimeType: 'image/png',
 };
 

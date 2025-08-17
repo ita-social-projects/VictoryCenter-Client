@@ -17,8 +17,6 @@ const MockImage: Image = {
     mimeType: 'image/png',
 };
 
-const mockDate: number = 1699;
-
 describe('ImageInput', () => {
     let onChangeMock: jest.Mock;
 
@@ -26,8 +24,6 @@ describe('ImageInput', () => {
         onChangeMock = jest.fn();
         global.URL.createObjectURL = jest.fn(() => 'mock-preview-url');
         global.URL.revokeObjectURL = jest.fn();
-
-        jest.spyOn(Date, 'now').mockImplementation(() => mockDate);
 
         jest.clearAllMocks();
     });
@@ -49,7 +45,7 @@ describe('ImageInput', () => {
         render(<ImageInput value={MockImage} onChange={onChangeMock} />);
         const previewImage = screen.getByTestId('preview-image');
         expect(previewImage).toBeInTheDocument();
-        expect(previewImage).toHaveAttribute('src', `${MockImage.url}?cb=${mockDate}`);
+        expect(previewImage).toHaveAttribute('src', MockImage.url);
     });
 
     it('calls onChange when file is selected via input', async () => {
@@ -364,7 +360,7 @@ describe('ImageInput', () => {
         const { rerender } = render(<ImageInput value={MockImage} onChange={onChangeMock} />);
 
         const preview = screen.getByTestId('preview-image') as HTMLImageElement;
-        expect(preview.src).toBe(`${MockImage.url}?cb=${mockDate}`);
+        expect(preview.src).toBe(MockImage.url);
 
         rerender(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
 

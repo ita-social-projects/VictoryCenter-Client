@@ -12,7 +12,7 @@ const mockClient = {
 
 const mockImage: Image = {
     id: 1,
-    url: 'http://localhost:8080',
+    url: 'https://localhost:8080',
     mimeType: 'image/png',
 };
 const imageValue: ImageValues = {

@@ -66,7 +66,7 @@ describe('ProgramForm', () => {
 
     const mockFile: Image = {
         id: 1,
-        url: 'http://localhost:8080',
+        url: 'https://localhost:8080',
         mimeType: 'image/jpg',
     };
 

@@ -15,7 +15,7 @@ describe('teamMemberValidationSchema', () => {
     const invalidCategory = null;
 
     const validImageObj = { base64: 'abc', mimeType: 'image/png', size: 1000 };
-    const validImageValue = { url: 'http://localhost:8080', mimeType: 'image/png', id: 1000 };
+    const validImageValue = { url: 'https://localhost:8080', mimeType: 'image/png', id: 1000 };
     const invalidImageLargeSize = { ...validImageObj, size: TEAM_MEMBER_VALIDATION.img.maxSizeBytes + 100 };
     const invalidImageBadFormat = { ...validImageObj, mimeType: 'application/pdf' };
 

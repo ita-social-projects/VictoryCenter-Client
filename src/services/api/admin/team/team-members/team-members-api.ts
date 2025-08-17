@@ -85,7 +85,7 @@ export const TeamMembersApi = {
             const imageResult = await ImageApi.post(client, member.image);
             imageId = imageResult.id;
         }
-        const response = await client.post<TeamMember>(`/TeamMembers`, {
+        const response = await client.post<TeamMember>(`${API_ROUTES.TEAM.BASE}`, {
             fullName: member.fullName,
             categoryId: member.categoryId,
             status: member.status,

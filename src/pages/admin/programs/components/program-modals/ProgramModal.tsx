@@ -186,7 +186,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                         ref={formRef}
                         key={getFormKey()}
                         initialData={initialData}
-                        formDisabled={isSubmitting}
+                        isFormDisabled={isSubmitting}
                         onSubmit={handleFormSubmit}
                         categories={categories}
                         onValidationChange={handleFormValidationChange}

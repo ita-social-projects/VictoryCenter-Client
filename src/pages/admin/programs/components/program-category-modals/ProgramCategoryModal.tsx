@@ -5,12 +5,12 @@ import { HintBox } from '../../../../../components/admin/hint-box/HintBox';
 import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
 import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/admin/programs';
 import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-category-schema/program-category-schema';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './ProgramCategoryModal.scss';
-import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/admin/programs';
 
 interface ProgramCategoryFormValues {
     name: string;

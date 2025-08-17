@@ -1,6 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramCategoryModal } from './ProgramCategoryModal';
-import { InputLabelProps } from '../../../../../components/admin/input-label/InputLabel';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
@@ -16,10 +15,24 @@ const mockOnClose = jest.fn();
 const mockOnAddCategory = jest.fn();
 const mockOnEditCategory = jest.fn();
 
-jest.mock('../../../../../components/admin/input-label/InputLabel', () => ({
-    InputLabel: ({ htmlFor, text, isRequired }: InputLabelProps) => (
-        <div data-testid="input-label-mock">
-            Label: {text} {isRequired && '*'} (for: {htmlFor})
+jest.mock('../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
+    InputWithCharacterLimitGroup: (props: any) => (
+        <div data-testid={`input-group-${props.id}`}>
+            <label htmlFor={props.id}>
+                {props.label} {props.isRequired && '*'}
+            </label>
+            <input
+                id={props.id}
+                name={props.name}
+                value={props.value}
+                onChange={props.onChange}
+                onBlur={props.onBlur}
+                disabled={props.disabled}
+                maxLength={props.maxLength}
+                type={props.type}
+                data-testid="category-name-input"
+            />
+            {props.error && <div data-testid={`error-${props.id}`}>{props.error}</div>}
         </div>
     ),
 }));
@@ -52,18 +65,6 @@ jest.mock('../../../../../components/admin/button/Button', () => ({
 
 jest.mock('../../../../../components/admin/hint-box/HintBox', () => ({
     HintBox: ({ title }: any) => <div data-testid="hint-box">{title}</div>,
-}));
-
-jest.mock('../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
-    InputWithCharacterLimit: ({ onChange, onBlur, value, disabled }: any) => (
-        <input
-            data-testid="category-name-input"
-            onChange={onChange}
-            onBlur={onBlur}
-            value={value || ''}
-            disabled={disabled}
-        />
-    ),
 }));
 
 jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
@@ -167,21 +168,14 @@ describe('ProgramCategoryModal', () => {
             it.each([
                 { value: '', error: PROGRAM_CATEGORY_VALIDATION.name.getRequiredError(), description: 'empty name' },
                 { value: 'A', error: PROGRAM_CATEGORY_VALIDATION.name.getMinError(), description: 'short name' },
-                {
-                    value: 'Existing Category',
-                    error: PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError(),
-                    description: 'duplicate name',
-                },
             ])('should show validation error for $description', async ({ value, error }) => {
                 renderModal(addModeProps);
 
                 changeNameInput(value);
-                if (value !== 'Existing Category') {
-                    blurNameInput();
-                }
+                blurNameInput();
 
                 await waitFor(() => {
-                    expect(screen.getByText(error)).toBeInTheDocument();
+                    expect(screen.getByTestId('error-add-category-name')).toHaveTextContent(error);
                 });
             });
 
@@ -189,6 +183,20 @@ describe('ProgramCategoryModal', () => {
                 renderModal(addModeProps);
 
                 changeNameInput('EXISTING CATEGORY');
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('hint-box')).toBeInTheDocument();
+                    expect(
+                        screen.getByText(PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError()),
+                    ).toBeInTheDocument();
+                });
+            });
+
+            it('should show duplicate name error via group validation for existing category', async () => {
+                renderModal(addModeProps);
+
+                changeNameInput('Existing Category');
+                blurNameInput();
 
                 await waitFor(() => {
                     expect(screen.getByTestId('hint-box')).toBeInTheDocument();
@@ -529,7 +537,7 @@ describe('ProgramCategoryModal', () => {
                 blurNameInput();
 
                 await waitFor(() => {
-                    expect(screen.getByText(error)).toBeInTheDocument();
+                    expect(screen.getByTestId('error-edit-category-name')).toHaveTextContent(error);
                 });
             });
         });

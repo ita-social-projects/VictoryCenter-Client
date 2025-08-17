@@ -68,7 +68,6 @@ describe('MemberComponent', () => {
     });
 
     it('calls handleOnEditMember when edit button clicked', () => {
-
         renderComponent();
         const editBtn = screen.getByRole('button', { name: TEAM_MEMBERS_TEXT.ACTIONS.EDIT }); // no visible text, so fallback query
         fireEvent.click(editBtn); // first button in DOM is edit
@@ -76,7 +75,6 @@ describe('MemberComponent', () => {
     });
 
     it('calls handleOnDeleteMember when delete button clicked', () => {
-
         renderComponent();
         const deleteBtn = screen.getByRole('button', { name: TEAM_MEMBERS_TEXT.ACTIONS.DELETE });
         fireEvent.click(deleteBtn);

@@ -6,6 +6,7 @@ import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/us
 import { useScrollHandler } from '../../../hooks/common/use-scroll-handler/useScrollHandler';
 import { useDebouncedValueCallback } from '../../../hooks/common/use-debounced-value-callback/useDebouncedValueCallback';
 import { useObserveElementSize } from '../../../hooks/common/use-observe-element-size/useObserveElementSize';
+import { useCalculateContainerSizeBasedOnChildren } from '../../../hooks/common/use-calculate-container-size-based-on-children/useCalculateContainerSizeBasedOnChildren';
 import { SuggestionWrapper, SuggestionContentRenderProps } from './suggestion-wrapper/SuggestionWrapper';
 import { InlineLoader } from '../../common/inline-loader/InlineLoader';
 import { Tooltip } from '../tooltip/Tooltip';
@@ -53,7 +54,6 @@ export const SearchBar = <T,>({
     const [searchQuery, setSearchQuery] = useState('');
     const [activeIndex, setActiveIndex] = useState<number>(-1);
     const [isDropdownVisible, setDropdownVisible] = useState(false);
-    const [suggestionsMaxHeight, setSuggestionsMaxHeight] = useState<number | undefined>(undefined);
     const [tooltipState, setTooltipState] = useState<TooltipState>({
         isVisible: false,
         positioner: null,
@@ -136,32 +136,6 @@ export const SearchBar = <T,>({
         }
     }, [activeIndex]);
 
-    useLayoutEffect(() => {
-        if (isDropdownVisible && suggestionsListRef.current && suggestions.length > 0) {
-            const listItems = Array.from(suggestionsListRef.current.children) as HTMLLIElement[];
-
-            if (listItems.length < 5) {
-                setSuggestionsMaxHeight(undefined);
-                return;
-            }
-
-            // Беремо перші 5 елементів
-            const itemsToMeasure = listItems.slice(0, 5);
-
-            // Розраховуємо висоту: сума перших 4-х + половина 5-го
-            let calculatedHeight = 0;
-            itemsToMeasure.forEach((item, index) => {
-                if (index < 4) {
-                    calculatedHeight += item.offsetHeight; // Повна висота перших 4
-                } else if (index === 4) {
-                    calculatedHeight += item.offsetHeight / 2; // Половина висоти п'ятого
-                }
-            });
-
-            setSuggestionsMaxHeight(calculatedHeight);
-        }
-    }, [suggestions, isDropdownVisible]);
-
     useDebouncedValueCallback({
         value: searchQuery,
         delay: searchDelayMs,
@@ -180,8 +154,17 @@ export const SearchBar = <T,>({
         disableWhen: isLoading || !hasMore,
     });
 
-    const { width: tooltipWidth } = useObserveElementSize({
+    const { width: tooltipMaxWidth } = useObserveElementSize({
         observableElement: searchContainerRef,
+    });
+
+    const { calculatedSize: dropdownMaxHeight } = useCalculateContainerSizeBasedOnChildren({
+        containerRef: suggestionsListRef,
+        targetVisibleElementsCount: 4.5,
+        calculationStrategy: 'basedOnFirstElement',
+        measurementAxis: 'height',
+        dependencies: [suggestions],
+        disableAfterFirstSuccess: true,
     });
 
     return (
@@ -215,7 +198,7 @@ export const SearchBar = <T,>({
                     <div
                         className="search-bar__suggestions"
                         onScroll={handleSuggestionsScroll}
-                        style={{ maxHeight: suggestionsMaxHeight ? `${suggestionsMaxHeight}px` : 'none' }}
+                        style={{ maxHeight: dropdownMaxHeight ? `${dropdownMaxHeight}px` : 'none' }}
                     >
                         <ul
                             className="search-bar__suggestions-list"
@@ -254,7 +237,7 @@ export const SearchBar = <T,>({
                     isRenderInPortal={true}
                     allowClickThrough={true}
                     portalPositioner={tooltipState.positioner}
-                    customMaxWidthInPixels={tooltipWidth * TOOLTIP_WIDTH_MULTIPLY}
+                    customMaxWidthInPixels={tooltipMaxWidth * TOOLTIP_WIDTH_MULTIPLY}
                 >
                     {tooltipState.content}
                 </Tooltip>

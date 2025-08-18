@@ -1,6 +1,5 @@
 import { AxiosInstance } from 'axios';
 import { PublishedFaqQuestion } from '../../../../types/public/faq-section';
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import { FaqApi } from './faq-api';
 
 const mock_answer =
@@ -29,8 +28,7 @@ describe('FaqApi', () => {
         ];
         client.get.mockResolvedValue({ data } as any);
 
-        const result = await FaqApi.getBySlug(client as unknown as AxiosInstance, slug);
-        expect(result).toEqual(data);
+        await expect(FaqApi.getBySlug(client as unknown as AxiosInstance, slug)).resolves.toEqual(data);
     });
 
     it('should throw an error when rejected', async () => {

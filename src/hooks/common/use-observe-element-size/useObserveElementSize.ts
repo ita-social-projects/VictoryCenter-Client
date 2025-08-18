@@ -1,4 +1,4 @@
-﻿import { useState, useLayoutEffect, RefObject, useRef, useEffect, useCallback } from 'react';
+import { useState, useLayoutEffect, RefObject, useRef, useEffect } from 'react';
 
 export interface Size {
     width: number;

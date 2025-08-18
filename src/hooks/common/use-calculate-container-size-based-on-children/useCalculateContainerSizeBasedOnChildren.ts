@@ -4,7 +4,7 @@ export type MeasurementAxis = 'height' | 'width';
 export type CalculationStrategy = 'basedOnFirstElement' | 'sumOfElements';
 
 export interface useCalculateContainerSizeBasedOnChildrenProps {
-    containerRef: RefObject<HTMLElement | null>;
+    elementsContainerRef: RefObject<HTMLElement | null>;
     targetVisibleElementsCount: number;
     measurementAxis: MeasurementAxis;
     calculationStrategy: CalculationStrategy;
@@ -18,7 +18,7 @@ export interface useCalculateContainerSizeBasedOnChildrenResult {
 }
 
 export const useCalculateContainerSizeBasedOnChildren = ({
-    containerRef,
+    elementsContainerRef,
     targetVisibleElementsCount,
     measurementAxis,
     calculationStrategy,
@@ -34,7 +34,7 @@ export const useCalculateContainerSizeBasedOnChildren = ({
             return;
         }
 
-        const containerEl = containerRef.current;
+        const containerEl = elementsContainerRef.current;
 
         if (disableWhen || !containerEl || containerEl.children.length === 0) {
             if (disableWhen) {
@@ -83,7 +83,7 @@ export const useCalculateContainerSizeBasedOnChildren = ({
         calculationStrategy,
         disableAfterFirstSuccess,
         hasCalculated,
-        containerRef,
+        elementsContainerRef,
         ...dependencies,
     ]);
 

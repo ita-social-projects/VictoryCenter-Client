@@ -1,5 +1,8 @@
 ﻿import { renderHook } from '@testing-library/react';
-import { useCalculateContainerSizeBasedOnChildren } from './useCalculateContainerSizeBasedOnChildren';
+import {
+    useCalculateContainerSizeBasedOnChildren,
+    useCalculateContainerSizeBasedOnChildrenProps,
+} from './useCalculateContainerSizeBasedOnChildren';
 
 const createMockElement = (size: number, axis: 'height' | 'width') => {
     const element = document.createElement('div');
@@ -19,8 +22,10 @@ const createContainerWithChildren = (sizes: number[], axis: 'height' | 'width') 
     return container;
 };
 
-const getHookProps = (overrides = {}) => ({
-    containerRef: { current: null },
+const getHookProps = (
+    overrides: Partial<useCalculateContainerSizeBasedOnChildrenProps> = {},
+): useCalculateContainerSizeBasedOnChildrenProps => ({
+    elementsContainerRef: { current: null },
     targetVisibleElementsCount: 2,
     measurementAxis: 'height' as const,
     calculationStrategy: 'basedOnFirstElement' as const,
@@ -38,7 +43,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
     it('returns undefined when container has no children', () => {
         const container = document.createElement('div');
         const { result } = renderHook(() =>
-            useCalculateContainerSizeBasedOnChildren(getHookProps({ containerRef: { current: container } })),
+            useCalculateContainerSizeBasedOnChildren(getHookProps({ elementsContainerRef: { current: container } })),
         );
 
         expect(result.current.calculatedSize).toBeUndefined();
@@ -49,8 +54,8 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
         const { result } = renderHook(() =>
             useCalculateContainerSizeBasedOnChildren(
                 getHookProps({
-                    containerRef: { current: container },
-                    isDisabled: true,
+                    elementsContainerRef: { current: container },
+                    disableWhen: true,
                 }),
             ),
         );
@@ -63,7 +68,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
         const { result } = renderHook(() =>
             useCalculateContainerSizeBasedOnChildren(
                 getHookProps({
-                    containerRef: { current: container },
+                    elementsContainerRef: { current: container },
                     targetVisibleElementsCount: 2.5,
                 }),
             ),
@@ -77,7 +82,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
         const { result } = renderHook(() =>
             useCalculateContainerSizeBasedOnChildren(
                 getHookProps({
-                    containerRef: { current: container },
+                    elementsContainerRef: { current: container },
                     measurementAxis: 'width',
                     targetVisibleElementsCount: 3,
                 }),
@@ -92,7 +97,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
         const { result } = renderHook(() =>
             useCalculateContainerSizeBasedOnChildren(
                 getHookProps({
-                    containerRef: { current: container },
+                    elementsContainerRef: { current: container },
                     calculationStrategy: 'sumOfElements',
                     targetVisibleElementsCount: 2,
                 }),
@@ -107,7 +112,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
         const { result } = renderHook(() =>
             useCalculateContainerSizeBasedOnChildren(
                 getHookProps({
-                    containerRef: { current: container },
+                    elementsContainerRef: { current: container },
                     calculationStrategy: 'sumOfElements',
                     targetVisibleElementsCount: 2.5,
                 }),
@@ -122,7 +127,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
         const { result } = renderHook(() =>
             useCalculateContainerSizeBasedOnChildren(
                 getHookProps({
-                    containerRef: { current: container },
+                    elementsContainerRef: { current: container },
                     calculationStrategy: 'sumOfElements',
                     targetVisibleElementsCount: 2,
                 }),
@@ -139,7 +144,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
         const { result, rerender } = renderHook(() =>
             useCalculateContainerSizeBasedOnChildren(
                 getHookProps({
-                    containerRef: { current: container },
+                    elementsContainerRef: { current: container },
                     dependencies: [dependency],
                 }),
             ),
@@ -157,16 +162,14 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
     it('disables calculation after first success when flag is set', () => {
         const container = createContainerWithChildren([100], 'height');
 
-        const { result, rerender } = renderHook(
-            ({ targetCount }) =>
-                useCalculateContainerSizeBasedOnChildren(
-                    getHookProps({
-                        containerRef: { current: container },
-                        targetVisibleElementsCount: targetCount,
-                        disableAfterFirstSuccess: true,
-                    }),
-                ),
-            { initialProps: { targetCount: 2 } },
+        const { result, rerender } = renderHook(() =>
+            useCalculateContainerSizeBasedOnChildren(
+                getHookProps({
+                    elementsContainerRef: { current: container },
+                    targetVisibleElementsCount: 2,
+                    disableAfterFirstSuccess: true,
+                }),
+            ),
         );
 
         expect(result.current.calculatedSize).toBe(200);
@@ -180,25 +183,23 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
     it('resets calculation state when disabled', () => {
         const container = createContainerWithChildren([100], 'height');
 
-        const { result, rerender } = renderHook(
-            ({ disabled }) =>
-                useCalculateContainerSizeBasedOnChildren(
-                    getHookProps({
-                        containerRef: { current: container },
-                        isDisabled: disabled,
-                    }),
-                ),
-            { initialProps: { disabled: false } },
+        const { result, rerender } = renderHook(() =>
+            useCalculateContainerSizeBasedOnChildren(
+                getHookProps({
+                    elementsContainerRef: { current: container },
+                    disableWhen: false,
+                }),
+            ),
         );
 
         expect(result.current.calculatedSize).toBe(200);
 
         // Disable hook
-        rerender({ disabled: true });
+        rerender({ disableWhen: true } as Partial<useCalculateContainerSizeBasedOnChildrenProps>);
         expect(result.current.calculatedSize).toBeUndefined();
 
         // Re-enable hook - should calculate again
-        rerender({ disabled: false });
+        rerender({ disableWhen: false } as Partial<useCalculateContainerSizeBasedOnChildrenProps>);
         expect(result.current.calculatedSize).toBe(200);
     });
 
@@ -207,7 +208,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
         const { result } = renderHook(() =>
             useCalculateContainerSizeBasedOnChildren(
                 getHookProps({
-                    containerRef: { current: container },
+                    elementsContainerRef: { current: container },
                 }),
             ),
         );

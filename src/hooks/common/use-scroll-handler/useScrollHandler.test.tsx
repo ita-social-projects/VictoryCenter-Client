@@ -1,4 +1,4 @@
-﻿import { renderHook, act } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useScrollHandler, UseScrollHandlerProps } from './useScrollHandler';
 import React from 'react';
 

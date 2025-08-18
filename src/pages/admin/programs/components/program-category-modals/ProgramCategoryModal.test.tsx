@@ -15,27 +15,30 @@ const mockOnClose = jest.fn();
 const mockOnAddCategory = jest.fn();
 const mockOnEditCategory = jest.fn();
 
-jest.mock('../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: (props: any) => (
-        <div data-testid={`input-group-${props.id}`}>
-            <label htmlFor={props.id}>
-                {props.label} {props.isRequired && '*'}
-            </label>
-            <input
-                id={props.id}
-                name={props.name}
-                value={props.value}
-                onChange={props.onChange}
-                onBlur={props.onBlur}
-                disabled={props.disabled}
-                maxLength={props.maxLength}
-                type={props.type}
-                data-testid="category-name-input"
-            />
-            {props.error && <div data-testid={`error-${props.id}`}>{props.error}</div>}
-        </div>
-    ),
-}));
+jest.mock(
+    '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
+    () => ({
+        InputWithCharacterLimitGroup: (props: any) => (
+            <div data-testid={`input-group-${props.id}`}>
+                <label htmlFor={props.id}>
+                    {props.label} {props.isRequired && '*'}
+                </label>
+                <input
+                    id={props.id}
+                    name={props.name}
+                    value={props.value}
+                    onChange={props.onChange}
+                    onBlur={props.onBlur}
+                    disabled={props.disabled}
+                    maxLength={props.maxLength}
+                    type={props.type}
+                    data-testid="category-name-input"
+                />
+                {props.error && <div data-testid={`error-${props.id}`}>{props.error}</div>}
+            </div>
+        ),
+    }),
+);
 
 jest.mock('../../../../../components/common/modal/Modal', () => {
     const MockModal = ({ isOpen, children, onClose }: any) =>

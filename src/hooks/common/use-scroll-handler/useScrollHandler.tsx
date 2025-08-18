@@ -1,4 +1,4 @@
-﻿import React, { useCallback } from 'react';
+import React, { useCallback } from 'react';
 
 export const DEFAULT_BOTTOM_REACH_THRESHOLD_IN_PIXELS = 5;
 

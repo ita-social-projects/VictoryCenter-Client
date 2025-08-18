@@ -1,4 +1,4 @@
-﻿import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { SuggestionWrapper, SuggestionWrapperProps } from './SuggestionWrapper';
 
 // Mock TextSuggestionContent
@@ -48,7 +48,6 @@ describe('SuggestionWrapper', () => {
     const expectSuggestionNotToHaveClass = (className: string) =>
         expect(getSuggestionItem()).not.toHaveClass(className);
     const expectCallbackToBeCalled = (callback: jest.Mock) => expect(callback).toHaveBeenCalledTimes(1);
-    const expectCallbackNotToBeCalled = (callback: jest.Mock) => expect(callback).not.toHaveBeenCalled();
 
     it('renders list item with default content', () => {
         renderSuggestionWrapper();

@@ -24,6 +24,7 @@ export const TeamPage: React.FC = () => {
     useEffect(() => {
         setLoading(true);
         const fetchData = async () => {
+            setLoading(true);
             try {
                 const response = await teamPageDataFetch();
                 const { teamData } = response;
@@ -38,7 +39,6 @@ export const TeamPage: React.FC = () => {
                 setLoading(false);
             }
         };
-
         fetchData();
     }, []);
 

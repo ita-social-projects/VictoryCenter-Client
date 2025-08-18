@@ -169,7 +169,7 @@ victory-center-client
 │   │   │   ├───program-category-schema
 │   │   │   └───program-schema
 │   │   └───public
-│   ├──index.jsx                           # Entry point (ReactDOM.createRoot)
+│   ├──index.tsx                           # Entry point (ReactDOM.createRoot)
 │   ├──index.css                           # Global styles (normalizer)
 │   ├──react-app-env.d.ts
 │   ├──reportWebVitals.ts

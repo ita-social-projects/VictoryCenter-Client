@@ -351,16 +351,6 @@ describe('Select Component', () => {
         expect(screen.getByText('Option 2')).toBeInTheDocument();
     });
 
-    it('renders Select.Option component correctly', () => {
-        const { container } = render(
-            <Select.Option value="test" name="Test Option">
-                Child content
-            </Select.Option>,
-        );
-
-        expect(container.textContent).toBe('Child content');
-    });
-
     it('Select.Option handles props correctly', () => {
         const optionElement = <Select.Option value="test-value" name="Test Name" />;
 

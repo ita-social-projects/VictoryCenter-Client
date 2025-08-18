@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import SearchIcon from '../../../assets/icons/la_search.svg';
 import ClearIcon from '../../../assets/icons/remove-query.svg';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
@@ -27,6 +27,7 @@ export interface SearchBarProps<T> {
     placeholder?: string;
     searchDelayMs?: number;
     minCharactersToSearch?: number;
+    onClear?: () => void;
     notFoundMessage?: string;
 }
 
@@ -46,6 +47,7 @@ export const SearchBar = <T,>({
     isLoading,
     hasMore,
     onSearch,
+    onClear,
     placeholder = undefined,
     notFoundMessage = undefined,
     searchDelayMs = 300,
@@ -66,11 +68,18 @@ export const SearchBar = <T,>({
     const tooltipRef = useRef(null);
 
     const handleTooltipShow = useCallback((element: Element, content: React.ReactNode) => {
-        setTooltipState({
-            isVisible: true,
-            content: content,
-            positioner: element,
-        });
+        // Use setTimeout to defer state update and avoid "Cannot update component while rendering" error.
+        // This occurs when ResizeObserver synchronously triggers (inside of suggestion content) during first hover, causing setState
+        // to be called while the TextSuggestionContent component is still in the rendering phase.
+        setTimeout(() => {
+            if (content) {
+                setTooltipState({
+                    isVisible: true,
+                    content: content,
+                    positioner: element,
+                });
+            }
+        }, 0);
     }, []);
 
     const hideTooltip = useCallback(() => {
@@ -106,7 +115,9 @@ export const SearchBar = <T,>({
         hideTooltip();
         setDropdownVisible(false);
         setActiveIndex(-1);
-        inputRef.current?.focus();
+        //inputRef.current?.focus();
+        onClear?.();
+        setTimeout(() => inputRef.current?.focus(), 0);
     };
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -159,7 +170,7 @@ export const SearchBar = <T,>({
     });
 
     const { calculatedSize: dropdownMaxHeight } = useCalculateContainerSizeBasedOnChildren({
-        containerRef: suggestionsListRef,
+        elementsContainerRef: suggestionsListRef,
         targetVisibleElementsCount: 4.5,
         calculationStrategy: 'basedOnFirstElement',
         measurementAxis: 'height',
@@ -220,12 +231,12 @@ export const SearchBar = <T,>({
                                       />
                                   ))
                                 : !isLoading && <li className="search-bar__not-found">{notFoundMessage}</li>}
-                            {isLoading && (
-                                <li className="search-bar__loader-container">
-                                    <InlineLoader />
-                                </li>
-                            )}
                         </ul>
+                        {isLoading && (
+                            <div className="search-bar__loader-container">
+                                <InlineLoader />
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

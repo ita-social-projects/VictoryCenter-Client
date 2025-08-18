@@ -1,3 +1,4 @@
+import { IdentityEntity } from '../common/entity';
 import { VisibilityStatus } from './common';
 import { Image } from '../common/image';
 
@@ -7,13 +8,17 @@ export interface ProgramCategory {
     programsCount: number;
 }
 
-export interface Program {
-    id: number;
+export interface Program extends IdentityEntity<number> {
     name: string;
     description: string;
     categories: ProgramCategory[];
     status: VisibilityStatus;
     img: Image | null;
+}
+
+export interface ProgramSuggestion extends IdentityEntity<number> {
+    name: string;
+    categories: string[];
 }
 
 export interface ProgramCreateUpdate {

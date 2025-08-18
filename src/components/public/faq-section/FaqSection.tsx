@@ -5,6 +5,7 @@ import { FaqApi } from '../../../services/api/public/faq/faq-api';
 import { PublishedFaqQuestion } from '../../../types/public/faq-section';
 import { FaqCard } from './faq-card/FaqCard';
 import './FaqSection.scss';
+import { getBySlug } from '../../../utils/mock-data/public/faq-section';
 
 interface FaqSectionProps {
     slug: string;
@@ -16,7 +17,9 @@ export const FaqSection = ({ slug }: FaqSectionProps) => {
     useEffect(() => {
         (async () => {
             try {
-                const response = await FaqApi.getBySlug(axiosInstance, slug);
+                // TODO: uncomment when faq integration is implmented
+                // const response = await FaqApi.getBySlug(axiosInstance, slug);
+                const response = getBySlug(slug);
                 setQuestions(response);
             } catch {
                 setQuestions([]);

@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { COMMON_QUESTIONS } from '../../../const/public/programs-page';
-import { axiosInstance } from '../../../services/api/axios';
-import { FaqApi } from '../../../services/api/public/faq/faq-api';
 import { PublishedFaqQuestion } from '../../../types/public/faq-section';
 import { FaqCard } from './faq-card/FaqCard';
 import './FaqSection.scss';

@@ -26,11 +26,11 @@ describe('test question card component', () => {
     });
     test('should have correct classes', () => {
         const { container } = render(<FaqCard faq={mockQuestion} />);
-        expect(container.querySelector('.faq-question')).toBeInTheDocument();
+        expect(container.querySelector('.question-block')).toBeInTheDocument();
         expect(container.querySelector('.button-icons')).toBeInTheDocument();
         expect(container.querySelector('.faq-open')).toBeInTheDocument();
         expect(container.querySelector('.faq-close')).toBeInTheDocument();
-        expect(container.querySelector('.faq-answer')).toBeInTheDocument();
+        expect(container.querySelector('.answer-block')).toBeInTheDocument();
     });
     test('should change icons on mouse enter and revert on mouse leave', () => {
         render(<FaqCard faq={mockQuestion} />);
@@ -40,17 +40,17 @@ describe('test question card component', () => {
         const openIcon = document.querySelector('.faq-open') as HTMLImageElement;
         const closeIcon = document.querySelector('.faq-close') as HTMLImageElement;
 
-        expect(openIcon.src).toContain('arrowDown.svg');
-        expect(closeIcon.src).toContain('Cross.svg');
+        expect(openIcon.src).toContain('arrow-down-right.svg');
+        expect(closeIcon.src).toContain('cross.svg');
 
         fireEvent.mouseEnter(detailsElement!);
 
-        expect(openIcon.src).toContain('arrowDownBlue.svg');
-        expect(closeIcon.src).toContain('crossBlue.svg');
+        expect(openIcon.src).toContain('arrow-down-right-blue.svg');
+        expect(closeIcon.src).toContain('cross-blue.svg');
 
         fireEvent.mouseLeave(detailsElement!);
 
-        expect(openIcon.src).toContain('arrowDown.svg');
-        expect(closeIcon.src).toContain('Cross.svg');
+        expect(openIcon.src).toContain('arrow-down-right.svg');
+        expect(closeIcon.src).toContain('cross.svg');
     });
 });

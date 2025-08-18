@@ -22,6 +22,7 @@ export const TeamPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
+        setLoading(true);
         const fetchData = async () => {
             setLoading(true);
             try {
@@ -29,9 +30,11 @@ export const TeamPage: React.FC = () => {
                 const { teamData } = response;
                 setTeamData(teamData);
                 setError(null);
+                setLoading(false);
             } catch {
                 setError(DOWNLOAD_ERROR);
                 setTeamData([]);
+                setLoading(false);
             } finally {
                 setLoading(false);
             }
@@ -48,7 +51,7 @@ export const TeamPage: React.FC = () => {
             )}
 
             {loading ? (
-                <LinearProgress className="loader" />
+                <LinearProgress className="linear-loader" />
             ) : (
                 teamData.map((team, index) => (
                     <div
@@ -61,10 +64,10 @@ export const TeamPage: React.FC = () => {
                                     <h2>{team.title}</h2>
                                     <p>{team.description}</p>
                                 </div>
+                                {team.members.map((member) => (
+                                    <TeamMemberCard key={member.id} member={member} />
+                                ))}
                             </div>
-                            {team.members.map((member) => (
-                                <TeamMemberCard key={member.id} member={member} />
-                            ))}
                         </div>
                     </div>
                 ))

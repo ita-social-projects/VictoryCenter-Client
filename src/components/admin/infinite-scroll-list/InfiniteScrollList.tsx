@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import ArrowUpIcon from '../../../assets/icons/arrow-up.svg';
-import NotFoundIcon from '../../../assets/icons/not-found.svg';
+import { ReactComponent as ArrowUpIcon } from '../../../assets/icons/arrow-up.svg';
+import { ReactComponent as NotFoundIcon } from '../../../assets/icons/not-found.svg';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './InfiniteScrollList.scss';
 import { InlineLoader } from '../../common/inline-loader/InlineLoader';
@@ -70,7 +70,7 @@ export const InfiniteScrollList = <T,>({
     } else if (!isLoading) {
         content = (
             <div className="infinite-scroll-list-not-found" data-testid="infinite-scroll-list-not-found">
-                <img src={NotFoundIcon} alt={COMMON_TEXT_ADMIN.ALT.NOT_FOUND} />
+                <NotFoundIcon className="not-found-icon" role="img" aria-label={COMMON_TEXT_ADMIN.ALT.NOT_FOUND} />
                 <p>{emptyStateMessage}</p>
             </div>
         );
@@ -95,7 +95,7 @@ export const InfiniteScrollList = <T,>({
             </div>
             {isMoveToTopVisible && (
                 <button onClick={moveToTop} className="infinite-scroll-list-to-top">
-                    <img src={ArrowUpIcon} alt={COMMON_TEXT_ADMIN.ALT.SCROLL_TO_TOP} />
+                    <ArrowUpIcon role="img" aria-label={COMMON_TEXT_ADMIN.ALT.SCROLL_TO_TOP} />
                 </button>
             )}
         </div>

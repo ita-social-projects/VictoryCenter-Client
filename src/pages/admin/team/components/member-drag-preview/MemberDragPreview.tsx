@@ -1,4 +1,4 @@
-import DragIcon from '../../../../../assets/icons/dragger.svg';
+import { ReactComponent as DragIcon } from '../../../../../assets/icons/dragger.svg';
 import { DragPreviewModel } from '../../../../../types/admin/common';
 import { MemberComponent } from '../member-component/MemberComponent';
 import './MemberDragPreview.scss';
@@ -20,7 +20,7 @@ export const MemberDragPreview = ({ dragPreview }: MemberDragPreviewProps) => {
         >
             <div key={dragPreview.item.fullName} className="members-wrapper">
                 <div className="members-dragger">
-                    <img src={DragIcon} alt="dragger" />
+                    <DragIcon aria-hidden={true} />
                 </div>
                 <MemberComponent
                     member={dragPreview.item}

@@ -6,9 +6,16 @@ import { AdminContext } from '../../../../../contexts/admin/admin-context-provid
 import axios from 'axios';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 
-jest.mock('../../../../../assets/icons/cloud-download.svg', () => 'cloud-download.svg');
-jest.mock('../../../../../assets/icons/chevron-up.svg', () => 'chevron-up.svg');
-jest.mock('../../../../../assets/icons/chevron-down.svg', () => 'chevron-down.svg');
+jest.mock('../../../../../components/admin/photo-input/PhotoInput', () => ({
+    PhotoInput: () => <div data-testid="photo-input"></div>,
+}));
+
+jest.mock('../../../../../assets/icons/chevron-up.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-up-icon" />,
+}));
+jest.mock('../../../../../assets/icons/chevron-down.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-down-icon" />,
+}));
 
 const mockAdminContext = {
     client: axios.create(),
@@ -51,7 +58,7 @@ describe('MemberForm', () => {
         });
         expect(screen.getByLabelText(/Ім'я та Прізвище/)).toBeInTheDocument();
         expect(screen.getByLabelText(/Опис/)).toBeInTheDocument();
-        expect(screen.getByText(/Перетягніть файл сюди або натисніть для завантаження/)).toBeInTheDocument();
+        expect(screen.getByTestId('photo-input')).toBeInTheDocument();
     });
 
     it('initializes with existingMemberFormValues', async () => {
@@ -420,7 +427,7 @@ describe('MemberForm', () => {
 
             // PhotoInput is rendered as a separate component
             // The actual file handling is tested in PhotoInput component tests
-            expect(screen.getByText(/Перетягніть файл сюди або натисніть для завантаження/)).toBeInTheDocument();
+            expect(screen.getByTestId('photo-input')).toBeInTheDocument();
         });
     });
 });

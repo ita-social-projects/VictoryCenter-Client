@@ -4,8 +4,12 @@ import { InfiniteScrollList, InfiniteScrollListProps } from './InfiniteScrollLis
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 jest.mock('../../../assets/icons/load.svg', () => 'LoaderIcon');
-jest.mock('../../../assets/icons/arrow-up.svg', () => 'ArrowUpIcon');
-jest.mock('../../../assets/icons/not-found.svg', () => 'NotFoundIcon');
+jest.mock('../../../assets/icons/not-found.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="not-found-icon" />,
+}));
+jest.mock('../../../assets/icons/arrow-up.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-up-icon" />,
+}));
 
 jest.mock('../../common/inline-loader/InlineLoader', () => ({
     InlineLoader: () => <img alt="loader-icon" data-testid="loader-icon" />,
@@ -47,9 +51,9 @@ describe('InfiniteScrollList', () => {
 
     const getScrollContainer = () => screen.getByTestId('infinite-scroll-list');
     const getLoader = () => screen.queryByAltText('loader-icon');
-    const getMoveToTopButton = () => screen.queryByAltText(COMMON_TEXT_ADMIN.ALT.SCROLL_TO_TOP);
+    const getMoveToTopButton = () => screen.queryByLabelText(COMMON_TEXT_ADMIN.ALT.SCROLL_TO_TOP);
     const getEmptyState = () => screen.queryByTestId('infinite-scroll-list-not-found');
-    const getNotFoundIcon = () => screen.getByAltText(COMMON_TEXT_ADMIN.ALT.NOT_FOUND);
+    const getNotFoundIcon = () => screen.queryByLabelText(COMMON_TEXT_ADMIN.ALT.NOT_FOUND);
 
     beforeEach(() => {
         jest.clearAllMocks();

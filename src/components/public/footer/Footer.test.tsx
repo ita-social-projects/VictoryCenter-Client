@@ -26,6 +26,18 @@ import { PUBLIC_ROUTES } from '../../../const/public/routes';
 
 jest.mock('./Footer.scss', () => ({}));
 
+jest.mock('../../../assets/icons/arrow-up-right.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-icon" />,
+}));
+
+jest.mock('../../../assets/icons/phone.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="phone-icon" />,
+}));
+
+jest.mock('../../../assets/icons/mail.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="mail-icon" />,
+}));
+
 global.open = jest.fn();
 
 // Mock clipboard API

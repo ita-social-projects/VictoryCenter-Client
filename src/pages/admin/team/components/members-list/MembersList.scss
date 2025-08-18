@@ -63,7 +63,9 @@
             justify-content: center;
             align-items: center;
 
-            img {
+            .loader-icon {
+					 width: 3rem;
+					 height: 3rem;
                 animation: rotate infinite 1s;
             }
         }
@@ -141,7 +143,7 @@
                     -moz-appearance: none;
                 }
 
-                .icon-img {
+                .arrow-icon {
                     position: absolute;
                     height: 1.5rem;
                     right: 1rem;

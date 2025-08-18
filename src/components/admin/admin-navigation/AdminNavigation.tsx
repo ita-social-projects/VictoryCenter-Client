@@ -1,16 +1,14 @@
 import './AdminNavigation.scss';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
-import Logo from '../../../assets/icons/logo-with-text.svg';
+import { ReactComponent as Logo } from '../../../assets/icons/logo-with-text.svg';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ADMIN_ROUTES } from '../../../const/admin/routes';
 
 export const AdminNavigation = () => {
     return (
         <>
-            <div className="admin-logo">
-                <img src={Logo} alt="Logo" />
-            </div>
+            <Logo className="admin-logo" />
             <div className="admin-pages">
                 <nav>
                     <NavLink

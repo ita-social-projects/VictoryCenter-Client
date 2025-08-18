@@ -1,6 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { DonatePage } from './DonatePage';
 
+jest.mock('./right-section/RightSection', () => ({
+    RightSection: () => <div data-testid="right-section"></div>,
+}));
+
 describe('DonatePage', () => {
     it('renders DonatePageIntro, DonateSection, and RightSection', () => {
         render(<DonatePage />);
@@ -12,23 +16,9 @@ describe('DonatePage', () => {
         expect(screen.getByTestId('donate-section-form')).toBeInTheDocument();
 
         expect(screen.getByText('Разовий донат')).toBeInTheDocument();
+        expect(screen.getByText(/Підписка/i)).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Донатити/i })).toBeInTheDocument();
 
-        expect(screen.getByRole('checkbox')).toBeInTheDocument();
-    });
-
-    it('renders all main sections with correct content', () => {
-        render(<DonatePage />);
-
-        expect(screen.getByText(/МИ ВДЯЧНІ/i)).toBeInTheDocument();
-        expect(screen.getByText(/ЗА КОЖЕН ДОНАТ/i)).toBeInTheDocument();
-
-        expect(screen.getByText(/Разовий донат/i)).toBeInTheDocument();
-        expect(screen.getByText(/Підписка/i)).toBeInTheDocument();
-
-        expect(screen.getByText(/Реквізити для донатів в Україні/i)).toBeInTheDocument();
-        expect(screen.getByText(/Я в Україні/i)).toBeInTheDocument();
-
-        expect(screen.getByText(/Інші варіанти підтримки/i)).toBeInTheDocument();
+        expect(screen.getByTestId('right-section')).toBeInTheDocument();
     });
 });

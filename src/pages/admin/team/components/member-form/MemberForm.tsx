@@ -5,8 +5,8 @@ import { MAX_FULLNAME_LENGTH, MAX_DESCRIPTION_LENGTH } from '../../../../../cons
 import { ImageValues } from '../../../../../types/common/image';
 import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import ArrowUp from '../../../../../assets/icons/chevron-up.svg';
-import ArrowDown from '../../../../../assets/icons/chevron-down.svg';
+import { ReactComponent as ArrowUp } from '../../../../../assets/icons/chevron-up.svg';
+import { ReactComponent as ArrowDown } from '../../../../../assets/icons/chevron-down.svg';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 import { useCreateMemberForm } from '../../../../../hooks/admin/use-create-member-form/useCreateMemberForm';
@@ -159,7 +159,11 @@ export const MemberForm = ({
                             </option>
                         ))}
                     </select>
-                    <img src={isOpen ? ArrowUp : ArrowDown} className="icon-img" alt="arrow-down" />
+                    {isOpen ? (
+                        <ArrowUp aria-hidden={true} className="arrow-icon" />
+                    ) : (
+                        <ArrowDown aria-hidden={true} className="arrow-icon" />
+                    )}
                     {errors.category && <p className="error">{errors.category.message}</p>}
                 </div>
 

@@ -1,4 +1,4 @@
-import InfoIcon from '../../../assets/icons/info.svg';
+import { ReactComponent as InfoIcon } from '../../../assets/icons/info.svg';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './HintBox.scss';
 
@@ -11,7 +11,7 @@ export const HintBox = ({ title, text }: HintBoxProps) => {
     return (
         <div className="hint-box">
             <div className="hint-box-title">
-                <img src={InfoIcon} alt={COMMON_TEXT_ADMIN.ALT.HINT} />
+                <InfoIcon className="info-icon" role="img" aria-label={COMMON_TEXT_ADMIN.ALT.HINT} />
                 <span>{title}</span>
             </div>
             {text && <span>{text}</span>}

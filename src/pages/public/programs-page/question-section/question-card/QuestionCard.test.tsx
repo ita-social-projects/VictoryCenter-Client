@@ -2,6 +2,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { QuestionCard } from './QuestionCard';
 import { Question } from '../../../../../types/public/programs-page';
 
+jest.mock('../../../../../assets/icons/arrow-down-right.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="black-arrow-icon" />,
+}));
+
+jest.mock('../../../../../assets/icons/cross.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="black-cross-icon" />,
+}));
+
 describe('test question card component', () => {
     const mockQuestion: Question = {
         question: 'Як долучитись до програми?',
@@ -30,26 +38,5 @@ describe('test question card component', () => {
         expect(container.querySelector('.faq-open')).toBeInTheDocument();
         expect(container.querySelector('.faq-close')).toBeInTheDocument();
         expect(container.querySelector('.faq-answer')).toBeInTheDocument();
-    });
-    test('should change icons on mouse enter and revert on mouse leave', () => {
-        render(<QuestionCard questionCard={mockQuestion} />);
-        const detailsElement = screen.getByText(mockQuestion.question).closest('details');
-        expect(detailsElement).toBeInTheDocument();
-
-        const openIcon = document.querySelector('.faq-open') as HTMLImageElement;
-        const closeIcon = document.querySelector('.faq-close') as HTMLImageElement;
-
-        expect(openIcon.src).toContain('arrow-down-right.svg');
-        expect(closeIcon.src).toContain('cross.svg');
-
-        fireEvent.mouseEnter(detailsElement!);
-
-        expect(openIcon.src).toContain('arrow-down-right-blue.svg');
-        expect(closeIcon.src).toContain('cross-blue.svg');
-
-        fireEvent.mouseLeave(detailsElement!);
-
-        expect(openIcon.src).toContain('arrow-down-right.svg');
-        expect(closeIcon.src).toContain('cross.svg');
     });
 });

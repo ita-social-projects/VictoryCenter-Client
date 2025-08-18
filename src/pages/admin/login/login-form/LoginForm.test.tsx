@@ -2,9 +2,20 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import * as AdminContext from '../../../../contexts/admin/admin-context-provider/AdminContextProvider';
 import { LoginForm } from './LoginForm';
-import Logo from '../../../../assets/icons/logo-with-text.svg';
 import { MemoryRouter } from 'react-router';
 import { LOGIN_CONST } from '../../../../const/admin/login';
+
+jest.mock('../../../../assets/icons/logo-with-text.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="logo-icon" />,
+}));
+
+jest.mock('../../../../assets/icons/eye-opened.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="eye-opened-icon" />,
+}));
+
+jest.mock('../../../../assets/icons/eye-closed.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="eye-closed-icon" />,
+}));
 
 describe('<LoginForm />', () => {
     let loginMock: jest.Mock<Promise<void>, [creds: any]>;
@@ -32,9 +43,8 @@ describe('<LoginForm />', () => {
             </MemoryRouter>,
         );
 
-        const logo = screen.getByAltText(LOGIN_CONST.FORM.LOGO_ALT) as HTMLImageElement;
+        const logo = screen.getByLabelText(LOGIN_CONST.FORM.LOGO_ALT) as HTMLImageElement;
         expect(logo).toBeInTheDocument();
-        expect(logo.src).toContain(Logo);
 
         expect(screen.getByText(LOGIN_CONST.FORM.TITLE)).toBeInTheDocument();
 

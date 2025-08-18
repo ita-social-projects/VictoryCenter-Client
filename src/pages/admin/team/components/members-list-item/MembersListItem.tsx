@@ -1,5 +1,5 @@
 import { TeamMember } from '../../../../../types/admin/team-members';
-import DragIcon from '../../../../../assets/icons/dragger.svg';
+import { ReactComponent as DragIcon } from '../../../../../assets/icons/dragger.svg';
 import React from 'react';
 import { MemberComponent } from '../member-component/MemberComponent';
 import './MembersListItem.scss';
@@ -47,7 +47,7 @@ export const MembersListItem = ({
                 aria-label="Drag member"
                 tabIndex={0}
             >
-                <img src={DragIcon} alt="Drag Handle" />
+                <DragIcon aria-hidden={true} />
             </div>
 
             <MemberComponent

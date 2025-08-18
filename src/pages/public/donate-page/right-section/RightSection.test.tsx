@@ -1,6 +1,11 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { RightSection } from './RightSection';
 import { IN_UKRAINE_LABEL, NOT_IN_UKRAINE_LABEL } from '../../../../const/public/donate-page';
+
+jest.mock('./alternative-support-ways/AlternativeSupportWays', () => ({
+    AlternativeSupportWays: () => <div data-testid="alternative-support-ways"></div>,
+}));
 
 describe('RightSection', () => {
     it('renders location toggle and payment details', () => {
@@ -10,7 +15,7 @@ describe('RightSection', () => {
 
         expect(screen.getByText(IN_UKRAINE_LABEL)).toBeInTheDocument();
 
-        expect(screen.getByText(/Інші варіанти підтримки/i)).toBeInTheDocument();
+        expect(screen.getByTestId('alternative-support-ways')).toBeInTheDocument();
     });
 
     it('toggles between Ukraine and Abroad payment details', () => {

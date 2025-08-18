@@ -3,7 +3,9 @@ import { render, fireEvent } from '@testing-library/react';
 import { MembersListItem } from './MembersListItem';
 import { TeamMember } from '../../../../../types/admin/team-members';
 
-jest.mock('../../../../../assets/icons/dragger.svg', () => 'drag-icon.svg');
+jest.mock('../../../../../assets/icons/dragger.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="dragger-icon" />,
+}));
 
 const mockMember: TeamMember = {
     id: 1,
@@ -43,11 +45,11 @@ describe('MembersListItem', () => {
     };
 
     it('renders member details correctly', () => {
-        const { getByText, getByAltText } = setup();
+        const { getByText, getByAltText, getByTestId } = setup();
         expect(getByText('John Doe')).toBeInTheDocument();
         expect(getByText('Senior Developer')).toBeInTheDocument();
         expect(getByText('Чернетка')).toBeInTheDocument();
-        expect(getByAltText('Drag Handle')).toBeInTheDocument();
+        expect(getByTestId('dragger-icon')).toBeInTheDocument();
         expect(getByAltText('John Doe-img')).toBeInTheDocument();
     });
 

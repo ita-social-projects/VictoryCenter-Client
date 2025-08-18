@@ -3,10 +3,10 @@ import { TeamCategory } from '../../../../../types/admin/team-members';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { MemberDragPreview } from '../member-drag-preview/MemberDragPreview';
 import { MembersListItem } from '../members-list-item/MembersListItem';
-import NotFoundIcon from '../../../../../assets/icons/not-found.svg';
+import { ReactComponent as NotFoundIcon } from '../../../../../assets/icons/not-found.svg';
 import { Button } from '../../../../../components/admin/button/Button';
-import LoaderIcon from '../../../../../assets/icons/load.svg';
-import ArrowUpIcon from '../../../../../assets/icons/arrow-up.svg';
+import { ReactComponent as LoaderIcon } from '../../../../../assets/icons/load.svg';
+import { ReactComponent as ArrowUpIcon } from '../../../../../assets/icons/arrow-up.svg';
 import { mapStatusFilterToStatus, StatusFilter } from '../../../../../types/admin/common';
 import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
 import './MembersList.scss';
@@ -506,7 +506,7 @@ export const MembersList = ({
     } else if (!isMembersLoading) {
         content = (
             <div className="members-not-found" data-testid="members-not-found">
-                <img src={NotFoundIcon} alt="members-not-found" data-testid="members-not-found-icon" />
+                <NotFoundIcon aria-hidden={true} />
                 <p>{COMMON_TEXT_ADMIN.LIST.NOT_FOUND}</p>
             </div>
         );
@@ -539,14 +539,14 @@ export const MembersList = ({
                     {content}
                     {isMembersLoading ? (
                         <div className="members-list-loader" data-testid="members-list-loader">
-                            <img src={LoaderIcon} alt="loader-icon" data-testid="members-list-loader-icon" />
+                            <LoaderIcon className="loader-icon" aria-hidden={true} />
                         </div>
                     ) : (
                         <></>
                     )}
                     {isMoveToTopVisible ? (
                         <button onClick={moveToTop} className="members-list-list-to-top">
-                            <img src={ArrowUpIcon} alt="arrow-up-icon" data-testid="members-list-list-to-top" />
+                            <ArrowUpIcon aria-hidden={true} />
                         </button>
                     ) : (
                         <></>

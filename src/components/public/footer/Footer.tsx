@@ -1,9 +1,9 @@
 import './Footer.scss';
 import { useState } from 'react';
 import { Link } from 'react-router';
-import arrowIcon from '../../../assets/icons/arrow-up-right.svg';
-import phoneIcon from '../../../assets/icons/phone.svg';
-import mailIcon from '../../../assets/icons/mail.svg';
+import { ReactComponent as ArrowUpIcon } from '../../../assets/icons/arrow-up-right.svg';
+import { ReactComponent as PhoneIcon } from '../../../assets/icons/phone.svg';
+import { ReactComponent as MailIcon } from '../../../assets/icons/mail.svg';
 import {
     ABOUT_US,
     HIPPOTHERAPY,
@@ -67,7 +67,7 @@ export const Footer = () => {
                             required
                         />
                         <button onClick={handleClick} className="subscribe-btn" aria-label={SIGN_UP}>
-                            <img src={arrowIcon} alt={SIGN_UP} />
+                            <ArrowUpIcon role="img" aria-label={SIGN_UP} className="arrow-up-icon" />
                         </button>
                     </div>
                 </div>
@@ -118,10 +118,10 @@ export const Footer = () => {
             <div className="contact-block">
                 <div className="main_contacts">
                     <button className="contact-item" onClick={() => copyToClipboard(EMAIL)}>
-                        <img src={mailIcon} alt="mail" /> {EMAIL}
+                        <MailIcon aria-hidden={true} /> {EMAIL}
                     </button>
                     <button className="contact-item" onClick={() => copyToClipboard(PHONE)}>
-                        <img src={phoneIcon} alt="phone" /> {PHONE}
+                        <PhoneIcon aria-hidden={true} /> {PHONE}
                     </button>
                 </div>
                 <div className="social_media">

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useId } from 'react';
-import InfoIcon from '../../../assets/icons/info.svg';
+import { ReactComponent as InfoIcon } from '../../../assets/icons/info.svg';
 import classNames from 'classnames';
 import './ButtonTooltip.scss';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
@@ -85,10 +85,10 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
             aria-label="Show additional information"
             aria-describedby={isVisible ? tooltipId : undefined}
         >
-            <img
+            <InfoIcon
                 className="button-tooltip-icon"
-                src={InfoIcon}
-                alt={isVisible ? COMMON_TEXT_ADMIN.ALT.HIDE_TOOLTIP : COMMON_TEXT_ADMIN.ALT.SHOW_TOOLTIP}
+                role="img"
+                aria-label={isVisible ? COMMON_TEXT_ADMIN.ALT.HIDE_TOOLTIP : COMMON_TEXT_ADMIN.ALT.SHOW_TOOLTIP}
             />
 
             {isVisible && (

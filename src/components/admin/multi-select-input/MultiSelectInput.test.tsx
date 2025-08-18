@@ -3,10 +3,21 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MultiSelectInput, MultiselectProps } from './MultiSelectInput';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
-jest.mock('../../../assets/icons/chevron-checked.svg', () => 'chevron-checked.svg');
-jest.mock('../../../assets/icons/chevron-unchecked.svg', () => 'chevron-unchecked.svg');
-jest.mock('../../../assets/icons/chevron-down.svg', () => 'chevron-down.svg');
-jest.mock('../../../assets/icons/chevron-up.svg', () => 'chevron-up.svg');
+jest.mock('../../../assets/icons/chevron-checked.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-checked-icon" />,
+}));
+
+jest.mock('../../../assets/icons/chevron-unchecked.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-unchecked-icon" />,
+}));
+
+jest.mock('../../../assets/icons/chevron-down.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-down-icon" />,
+}));
+
+jest.mock('../../../assets/icons/chevron-up.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-up-icon" />,
+}));
 
 interface TestOption {
     id: number;
@@ -62,13 +73,13 @@ describe('Multiselect Component', () => {
         render(<MultiSelectInput {...defaultProps} />);
 
         // Initially closed - should show down arrow
-        expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST)).toBeInTheDocument();
+        expect(screen.getByLabelText(COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST)).toBeInTheDocument();
 
         // Open dropdown
         fireEvent.click(screen.getByText('Select options...'));
 
         // Should show up arrow when open
-        expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST)).toBeInTheDocument();
+        expect(screen.getByLabelText(COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST)).toBeInTheDocument();
     });
 
     it('opens dropdown when placeholder is clicked', () => {
@@ -160,10 +171,10 @@ describe('Multiselect Component', () => {
         fireEvent.click(screen.getByText('Option 1'));
 
         // First option should be selected
-        expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.OPTION_SELECTED)).toBeInTheDocument();
+        expect(screen.getByLabelText(COMMON_TEXT_ADMIN.ALT.OPTION_SELECTED)).toBeInTheDocument();
 
         // Other options should not be selected
-        expect(screen.getAllByAltText(COMMON_TEXT_ADMIN.ALT.OPTION_NOT_SELECTED)).toHaveLength(3);
+        expect(screen.getAllByLabelText(COMMON_TEXT_ADMIN.ALT.OPTION_NOT_SELECTED)).toHaveLength(3);
     });
 
     it('closes dropdown when clicking outside', async () => {

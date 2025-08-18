@@ -1,7 +1,7 @@
 import './AlternativeSupportWays.scss';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
-import ArrowUpRight from '../../../../../assets/icons/arrow-up-right.svg';
-import ShareForwardArrow from '../../../../../assets/icons/forward.svg';
+import { ReactComponent as ArrowUpRight } from '../../../../../assets/icons/arrow-up-right.svg';
+import { ReactComponent as ShareForwardArrow } from '../../../../../assets/icons/forward.svg';
 import { ALTERNATIVE_SUPPORT_WAYS } from '../../../../../const/public/donate-page';
 
 export const AlternativeSupportWays = () => {
@@ -27,10 +27,10 @@ export const AlternativeSupportWays = () => {
             <div className="buttonsContainer">
                 <button className="downloadPaymentDetailsButton">
                     {ALTERNATIVE_SUPPORT_WAYS.DOWNLOAD_PAYMENT_DETAILS_BUTTON_LABEL}
-                    <img src={ArrowUpRight} alt="arrow-up-right" />
+                    <ArrowUpRight aria-hidden={true} />
                 </button>
                 <button className="shareButton">
-                    <img src={ShareForwardArrow} alt="share-forward-arrow" />
+                    <ShareForwardArrow aria-hidden={true} />
                 </button>
             </div>
         </div>

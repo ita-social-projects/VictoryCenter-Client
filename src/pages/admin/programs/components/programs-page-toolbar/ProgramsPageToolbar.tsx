@@ -4,7 +4,7 @@ import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar'
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import PlusIcon from '../../../../../assets/icons/plus.svg';
+import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
 import './ProgramsPageToolbar.scss';
 
 export interface ProgramPageToolbarProps {
@@ -49,7 +49,7 @@ export const ProgramsPageToolbar = ({
                         />
                     </Select>
                     <Button onClick={onAddProgram} buttonStyle="primary" data-testid="add-program-button">
-                        {PROGRAMS_TEXT.BUTTON.ADD_PROGRAM} <img src={PlusIcon} alt="plus" />
+                        {PROGRAMS_TEXT.BUTTON.ADD_PROGRAM} <PlusIcon aria-hidden={true} />
                     </Button>
                 </div>
             </div>

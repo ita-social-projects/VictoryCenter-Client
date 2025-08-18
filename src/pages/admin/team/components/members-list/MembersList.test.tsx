@@ -152,9 +152,15 @@ jest.mock('../../../../../components/admin/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../assets/icons/not-found.svg', () => 'not-found-icon');
-jest.mock('../../../../../assets/icons/load.svg', () => 'loader-icon');
-jest.mock('../../../../../assets/icons/arrow-up.svg', () => 'arrow-up-icon');
+jest.mock('../../../../../assets/icons/not-found.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="members-not-found-icon" />,
+}));
+jest.mock('../../../../../assets/icons/load.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="members-list-loader-icon" />,
+}));
+jest.mock('../../../../../assets/icons/arrow-up.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="members-list-list-to-top" />,
+}));
 
 const localStorageMock = (() => {
     let store: { [key: string]: string } = {};
@@ -278,7 +284,7 @@ describe('MembersList', () => {
         await waitFor(
             () => {
                 expect(screen.getByText('Нічого не знайдено')).toBeInTheDocument();
-                expect(screen.getByTestId('members-not-found-icon')).toHaveAttribute('src', 'not-found-icon');
+                expect(screen.getByTestId('members-not-found-icon')).toBeInTheDocument();
             },
             { timeout: 3000 },
         );
@@ -298,8 +304,6 @@ describe('MembersList', () => {
         await waitFor(() => {
             expect(screen.getByTestId('members-list-loader-icon')).toBeInTheDocument();
         });
-
-        expect(screen.getByTestId('members-list-loader-icon')).toHaveAttribute('src', 'loader-icon');
 
         await waitFor(
             () => {

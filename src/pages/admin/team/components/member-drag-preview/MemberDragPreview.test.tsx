@@ -6,7 +6,10 @@ import { DragPreviewModel } from '../../../../../types/admin/common';
 import { Image } from '../../../../../types/common/image';
 import { TeamMember } from '../../../../../types/admin/team-members';
 
-jest.mock('../../../../../assets/icons/dragger.svg', () => 'mock-dragger-icon');
+jest.mock('../../../../../assets/icons/dragger.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="dragger-icon" />,
+}));
+
 jest.mock('../member-component/MemberComponent', () => ({
     MemberComponent: ({
         member,
@@ -85,9 +88,9 @@ describe('MemberDragPreview', () => {
         test('renders dragger icon', () => {
             render(<MemberDragPreview dragPreview={mockDragPreview} />);
 
-            const dragIcon = screen.getByAltText('dragger');
+            const dragIcon = screen.getByTestId('dragger-icon');
             expect(dragIcon).toBeInTheDocument();
-            expect(dragIcon).toHaveAttribute('src', 'mock-dragger-icon');
+            expect(dragIcon).toHaveAttribute('aria-hidden', 'true');
         });
 
         test('renders members wrapper with correct class', () => {

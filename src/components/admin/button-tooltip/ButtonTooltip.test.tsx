@@ -2,7 +2,9 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ButtonTooltip } from './ButtonTooltip';
 
-jest.mock('../../../assets/icons/info.svg', () => 'info-icon.svg');
+jest.mock('../../../assets/icons/info.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="info-icon" />,
+}));
 
 describe('ButtonTooltip', () => {
     const defaultProps = {
@@ -16,9 +18,8 @@ describe('ButtonTooltip', () => {
     it('renders the component with default props', () => {
         render(<ButtonTooltip {...defaultProps} />);
 
-        const icon = screen.getByRole('img');
+        const icon = screen.getByTestId('info-icon');
         expect(icon).toBeInTheDocument();
-        expect(icon).toHaveAttribute('src', 'info-icon.svg');
         expect(screen.queryByText('Tooltip content')).not.toBeInTheDocument();
     });
 

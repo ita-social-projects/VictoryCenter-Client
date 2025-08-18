@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import CheckedBox from '../../../assets/icons/chevron-checked.svg';
-import UncheckedBox from '../../../assets/icons/chevron-unchecked.svg';
-import ArrowDown from '../../../assets/icons/chevron-down.svg';
-import ArrowUp from '../../../assets/icons/chevron-up.svg';
+import { ReactComponent as CheckedBox } from '../../../assets/icons/chevron-checked.svg';
+import { ReactComponent as UncheckedBox } from '../../../assets/icons/chevron-unchecked.svg';
+import { ReactComponent as ArrowDown } from '../../../assets/icons/chevron-down.svg';
+import { ReactComponent as ArrowUp } from '../../../assets/icons/chevron-up.svg';
 import classNames from 'classnames';
 import './MultiSelectInput.scss';
 
@@ -110,14 +110,11 @@ export const MultiSelectInput = <T extends Record<string, any>>({
                 >
                     <div className="placeholder-content">{displayLabel}</div>
                     <div className="placeholder-chevron">
-                        <img
-                            src={isOpen ? ArrowUp : ArrowDown}
-                            alt={
-                                isOpen
-                                    ? COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST
-                                    : COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST
-                            }
-                        />
+                        {isOpen ? (
+                            <ArrowUp role="img" aria-label={COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST} />
+                        ) : (
+                            <ArrowDown role="img" aria-label={COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST} />
+                        )}
                     </div>
                 </div>
             </button>
@@ -138,14 +135,14 @@ export const MultiSelectInput = <T extends Record<string, any>>({
                                 tabIndex={0}
                             >
                                 <div className="checkbox">
-                                    <img
-                                        src={selected ? CheckedBox : UncheckedBox}
-                                        alt={
-                                            selected
-                                                ? COMMON_TEXT_ADMIN.ALT.OPTION_SELECTED
-                                                : COMMON_TEXT_ADMIN.ALT.OPTION_NOT_SELECTED
-                                        }
-                                    />
+                                    {selected ? (
+                                        <CheckedBox role="img" aria-label={COMMON_TEXT_ADMIN.ALT.OPTION_SELECTED} />
+                                    ) : (
+                                        <UncheckedBox
+                                            role="img"
+                                            aria-label={COMMON_TEXT_ADMIN.ALT.OPTION_NOT_SELECTED}
+                                        />
+                                    )}
                                 </div>
                                 <span className="option-content">{getOptionName(option)}</span>
                             </div>

@@ -6,7 +6,9 @@ import { MemberFormValues } from '../member-form/MemberForm';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
 // Mock the plus icon
-jest.mock('../../../../../assets/icons/plus.svg', () => 'plus-icon.svg');
+jest.mock('../../../../../assets/icons/plus.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="plus-icon" />,
+}));
 
 // Mock the Modal component
 jest.mock('../../../../../components/common/modal/Modal', () => {

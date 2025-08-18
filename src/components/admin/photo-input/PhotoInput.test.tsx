@@ -4,6 +4,14 @@ import { PhotoInput } from './PhotoInput';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ImageValues } from '../../../types/common/image';
 
+jest.mock('../../../assets/icons/delete.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="delete-icon" />,
+}));
+
+jest.mock('../../../assets/icons/cloud-download.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="upload-icon" />,
+}));
+
 const createImageFile = () => new File(['dummy content'], 'example.png', { type: 'image/png' });
 const MockImageValue: ImageValues = {
     base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAocB9eQ6vqoAAAAASUVORK5CYII=',
@@ -24,7 +32,7 @@ describe('PhotoInput', () => {
     it('renders placeholder when no image is selected', () => {
         render(<PhotoInput value={null} onChange={onChangeMock} />);
         expect(screen.getByText(COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER)).toBeInTheDocument();
-        expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.UPLOAD)).toBeInTheDocument();
+        expect(screen.getByLabelText(COMMON_TEXT_ADMIN.ALT.UPLOAD)).toBeInTheDocument();
     });
 
     it('renders image preview when ImageValue is provided', () => {

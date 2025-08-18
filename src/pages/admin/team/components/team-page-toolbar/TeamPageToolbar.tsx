@@ -1,4 +1,4 @@
-import PlusIcon from '../../../../../assets/icons/plus.svg';
+import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
 import { useState, useCallback } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/admin/button/Button';
@@ -273,7 +273,7 @@ export const TeamPageToolbar = ({
                         />
                     </Select>
                     <Button onClick={handleOpenAddMember} buttonStyle="primary" data-testid="add-member-button">
-                        {TEAM_MEMBERS_TEXT.BUTTON.ADD_MEMBER} <img src={PlusIcon} alt="plus" />
+                        {TEAM_MEMBERS_TEXT.BUTTON.ADD_MEMBER} <PlusIcon aria-hidden={true} />
                     </Button>
                 </div>
             </div>

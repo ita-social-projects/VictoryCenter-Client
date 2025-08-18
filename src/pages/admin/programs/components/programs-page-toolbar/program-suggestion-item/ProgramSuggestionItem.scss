@@ -1,0 +1,47 @@
+.program-suggestion-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    overflow: hidden;
+    padding: 0.25rem 0.5rem;
+}
+
+.program-suggestion-item__name,
+.program-suggestion-item__categories {
+    display: block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.program-suggestion-item__name {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.program-suggestion-item__categories {
+    font-size: 0.875rem;
+    margin-top: 0.125rem;
+    color: #666;
+}
+
+.program-suggestion-item-tooltip__name,
+.program-suggestion-item-tooltip__categories {
+    display: block;
+    width: 100%;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.program-suggestion-item-tooltip__name {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.program-suggestion-item-tooltip__categories {
+    font-size: 0.875rem;
+    margin-top: 0.125rem;
+    color: #666;
+}

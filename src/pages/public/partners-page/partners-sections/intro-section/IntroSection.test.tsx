@@ -3,9 +3,9 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { IntroSection } from './IntroSection';
 
-jest.mock('../../../../assets/partners-page-images/horses.png', () => 'mocked-horses-image');
+jest.mock('../../../../../assets/partners-page-images/horses.png', () => 'mocked-horses-image');
 
-jest.mock('../../../../const/partners-page/partners-page', () => ({
+jest.mock('../../../../../const/partners-page/partners-page', () => ({
     PARTNERS_PAGE_SUBTITLE: 'Mocked subtitle text',
     PARTNERS_PAGE_TITLE: {
         FIRST_LINE: {

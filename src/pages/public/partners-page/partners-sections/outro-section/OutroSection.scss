@@ -1,4 +1,6 @@
-@import '../../../../assets/sass/variables/colors.scss';
+@use '../../../assets/sass/variables/fonts';
+@use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/mixins/utilits.mixins';
 
 .video-background-container {
   margin: 0;
@@ -36,7 +38,7 @@
 
 
   .video-text-partners {
-    font-family: Mulish, sans-serif;
+    font-family: fonts.$mulish-regular-font;
     font-weight: 600;
     font-size: 4rem;
     line-height: 4.5rem;
@@ -88,7 +90,7 @@
       height: 2.5rem;
       padding: 0.5rem 1.5rem;
       border: 1px solid $grey-50;
-      font-family: Mulish, sans-serif;
+      font-family: fonts.$mulish-regular-font;
       font-weight: 400;
       font-size: 1rem;
       line-height: 1.5rem;

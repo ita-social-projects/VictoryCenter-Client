@@ -1,3 +1,7 @@
+@use '../../../assets/sass/variables/fonts';
+@use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/mixins/utilits.mixins';
+
 .partners-intro-block {
     position: relative;
     width: 100%;
@@ -30,7 +34,7 @@
 }
 
 .main-title {
-    font-family: 'Mulish', sans-serif;
+    font-family: fonts.$mulish-regular-font;
     font-weight: 500;
     font-size: 6rem;
     line-height: 6.5rem;
@@ -55,7 +59,7 @@
 }
 
 .subtitle {
-    font-family: 'Mulish', sans-serif;
+    font-family: fonts.$mulish-regular-font;
     font-weight: 500;
     font-size: 1.5rem;
     line-height: 2rem;

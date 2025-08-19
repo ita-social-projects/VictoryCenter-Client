@@ -24,6 +24,8 @@
         overflow-y: auto;
         box-sizing: border-box;
         position: relative;
+        width: 80%;
+        max-width: 37.5rem;
     }
 
     &-header {

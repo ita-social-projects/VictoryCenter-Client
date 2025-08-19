@@ -45,7 +45,6 @@ export const SearchBar = ({ onChange, autocompleteValues, placeholder }: SearchB
     }, []);
 
     const handleRemoveQueryIconClick = useCallback(() => {
-        setValue('');
         handleOnChange('');
     }, [handleOnChange]);
 
@@ -62,13 +61,14 @@ export const SearchBar = ({ onChange, autocompleteValues, placeholder }: SearchB
                 className={classNames({ ...buttonClasses, 'search-bar-search-icon': true })}
                 data-testid="search-icon"
             />
-            <button
-                type="button"
-                aria-label="clear search"
-                onClick={handleRemoveQueryIconClick}
-                className={classNames({ ...buttonClasses, 'search-bar-remove-query-icon': true })}
-                data-testid="remove-query-icon"
-            />
+            {value.length > 0 && (
+                <button
+                    type="button"
+                    onClick={handleRemoveQueryIconClick}
+                    className={classNames({ ...buttonClasses, 'search-bar-remove-query-icon': true })}
+                    data-testid="remove-query-icon"
+                />
+            )}
             <input
                 ref={inputRef}
                 value={value}

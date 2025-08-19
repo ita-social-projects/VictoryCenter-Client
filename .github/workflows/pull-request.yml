@@ -109,7 +109,7 @@ jobs:
         INITIAL_ADMIN_PASSWORD: ${{ secrets.INITIAL_ADMIN_PASSWORD }}
         JWTOPTIONS_SECRETKEY: ${{ secrets.JWTOPTIONS_SECRETKEY }}
         JWTOPTIONS_REFRESH_TOKEN_SECRETKEY: ${{ secrets.JWTOPTIONS_REFRESH_TOKEN_SECRETKEY }}
-        DOCKER_TAG_BACKEND: ${{ steps.backend_tag.outputs.frontend_tag }}
+        DOCKER_TAG_BACKEND: ${{ steps.backend_tag.outputs.backend_tag }}
         DOCKER_TAG_FRONTEND: ${{ env.DOCKER_TAG_FRONTEND }}
         DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
         WAY4PAY_MERCHANT_LOGIN: ${{ secrets.WAY4PAY_MERCHANT_LOGIN }}

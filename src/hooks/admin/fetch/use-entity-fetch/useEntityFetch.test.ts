@@ -96,7 +96,7 @@ describe('useEntityFetch', () => {
     });
 
     it('should ignore AbortError', async () => {
-        const fetchHandler = createFailFetch({ name: 'AbortError' });
+        const fetchHandler = createFailFetch({ name: 'AbortError', message: 'Aborted' });
         const { result } = renderHook(() => useEntityFetch(createProps(1, fetchHandler)));
 
         act(() => result.current.actions.refetch());

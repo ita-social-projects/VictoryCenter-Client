@@ -84,6 +84,7 @@ export const TeamPage: React.FC = () => {
                     <p className="video-text">{VIDEO_TEXT_STRING3}</p>
                     <p className="video-text">{VIDEO_TEXT_STRING4}</p>
                     <p className="video-text">{VIDEO_TEXT_STRING5}</p>
+
                     <p className="author">{VIDEO_TEXT_AUTHOR}</p>
                 </div>
             </div>

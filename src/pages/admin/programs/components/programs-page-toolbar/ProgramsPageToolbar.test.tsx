@@ -5,29 +5,21 @@ import { ProgramsPageToolbar } from './ProgramsPageToolbar';
 import { ProgramSuggestion } from '../../../../../types/admin/programs';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { ButtonProps } from '../../../../../components/admin/button/Button';
+import { SelectOptionProps, SelectProps } from '../../../../../components/admin/select/Select';
+import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
 
-// Mock dependencies
 jest.mock('../../../../../components/admin/button/Button', () => ({
-    Button: ({ children, onClick, buttonStyle, ...props }: any) => (
-        <button onClick={onClick} {...props}>
+    Button: ({ children, onClick, type, formId }: ButtonProps) => (
+        <button onClick={onClick} type={type} form={formId}>
             {children}
         </button>
     ),
 }));
 
 jest.mock('../../../../../components/admin/select/Select', () => ({
-    Select: ({ children, onValueChange, value, ...props }: any) => (
-        <div {...props}>
-            <select onChange={(e) => onValueChange(e.target.value || undefined)} value={value || ''}>
-                {children}
-            </select>
-        </div>
-    ),
-}));
-
-jest.mock('../../../../../components/admin/select/Select', () => ({
     Select: Object.assign(
-        ({ children, onValueChange, value, ...props }: any) => (
+        ({ children, onValueChange, value, ...props }: SelectProps<any>) => (
             <div {...props}>
                 <select onChange={(e) => onValueChange(e.target.value || undefined)} value={value || ''}>
                     {children}
@@ -35,13 +27,19 @@ jest.mock('../../../../../components/admin/select/Select', () => ({
             </div>
         ),
         {
-            Option: ({ children, value, name }: any) => <option value={value}>{name}</option>,
+            Option: ({ value, name }: SelectOptionProps<any>) => <option value={value}>{name}</option>,
         },
     ),
 }));
 
 jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
-    SearchBar: ({ onSearch, onClear, onSuggestionSelect, suggestions, placeholder, ...props }: any) => (
+    SearchBar: ({
+        onSearch,
+        onClear,
+        onSuggestionSelect,
+        suggestions,
+        placeholder,
+    }: SearchBarProps<ProgramSuggestion>) => (
         <div>
             <input placeholder={placeholder} onChange={(e) => onSearch?.(e.target.value)} data-testid="search-input" />
             <button onClick={onClear} data-testid="clear-button">
@@ -122,17 +120,16 @@ describe('ProgramsPageToolbar', () => {
     it('should render add program button', () => {
         render(<ProgramsPageToolbar {...createProps()} />);
 
-        const button = screen.getByTestId('add-program-button');
+        const button = screen.getByText(PROGRAMS_TEXT.BUTTON.ADD_PROGRAM);
         expect(button).toBeInTheDocument();
-        expect(button).toHaveTextContent('Додати програму');
     });
 
     it('should call onAddProgram when add button clicked', async () => {
         const onAddProgram = jest.fn();
         render(<ProgramsPageToolbar {...createProps({ onAddProgram })} />);
 
-        const button = screen.getByTestId('add-program-button');
-        await userEvent.click(button);
+        const button = screen.getByText(PROGRAMS_TEXT.BUTTON.ADD_PROGRAM);
+        userEvent.click(button);
 
         expect(onAddProgram).toHaveBeenCalledTimes(1);
     });
@@ -141,7 +138,7 @@ describe('ProgramsPageToolbar', () => {
         render(<ProgramsPageToolbar {...createProps()} />);
 
         const searchInput = screen.getByTestId('search-input');
-        await userEvent.type(searchInput, 'test program');
+        userEvent.type(searchInput, 'test program');
 
         // Check that useEntitiesPaginationFetch was called with correct dependencies
         expect(mockUseEntitiesPaginationFetch).toHaveBeenCalledWith(

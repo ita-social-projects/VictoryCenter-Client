@@ -20,7 +20,7 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({ isAddModalOpen: true });
+            result.current.openModalActions.openAddItemModal();
         });
 
         expect(result.current.modalState.isAddModalOpen).toBe(true);
@@ -42,7 +42,7 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({ isEditCategoryModalOpen: true });
+            result.current.openModalActions.openEditCategoryModal();
         });
 
         act(() => {
@@ -57,7 +57,7 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({ isAddModalOpen: true });
+            result.current.openModalActions.openAddItemModal();
         });
 
         act(() => {
@@ -85,7 +85,7 @@ describe('useModalsState', () => {
         const testItem = 'test-item';
 
         act(() => {
-            result.current.updateModalState({ isAddModalOpen: true });
+            result.current.openModalActions.openAddItemModal();
         });
 
         act(() => {
@@ -100,7 +100,7 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({ itemToEdit: 'test-item' });
+            result.current.openModalActions.openEditItemModal('test-item');
         });
 
         act(() => {
@@ -128,7 +128,7 @@ describe('useModalsState', () => {
         const testItem = 'test-item';
 
         act(() => {
-            result.current.updateModalState({ isAddCategoryModalOpen: true });
+            result.current.openModalActions.openAddCategoryModal();
         });
 
         act(() => {
@@ -143,7 +143,7 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({ itemToDelete: 'test-item' });
+            result.current.openModalActions.openDeleteItemModal('test-item');
         });
 
         act(() => {
@@ -169,7 +169,7 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({ itemToEdit: 'test-item' });
+            result.current.openModalActions.openEditItemModal('test-item');
         });
 
         act(() => {
@@ -184,7 +184,7 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({ isAddCategoryModalOpen: true });
+            result.current.openModalActions.openAddCategoryModal();
         });
 
         act(() => {
@@ -210,7 +210,7 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({ isDeleteCategoryModalOpen: true });
+            result.current.openModalActions.openDeleteCategoryModal();
         });
 
         act(() => {
@@ -225,7 +225,7 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({ isEditCategoryModalOpen: true });
+            result.current.openModalActions.openEditCategoryModal();
         });
 
         act(() => {
@@ -251,7 +251,7 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({ isAddModalOpen: true });
+            result.current.openModalActions.openAddItemModal();
         });
 
         act(() => {
@@ -266,7 +266,7 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({ isDeleteCategoryModalOpen: true });
+            result.current.openModalActions.openDeleteCategoryModal();
         });
 
         act(() => {
@@ -281,7 +281,7 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({ isAddModalOpen: true });
+            result.current.openModalActions.openAddItemModal();
         });
 
         expect(result.current.isAnyModalOpened).toBe(true);
@@ -291,7 +291,7 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({ itemToEdit: 'test-item' });
+            result.current.openModalActions.openEditItemModal('test');
         });
 
         expect(result.current.isAnyModalOpened).toBe(true);
@@ -301,17 +301,13 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({
-                isAddModalOpen: true,
-                itemToEdit: 'test',
-            });
+            result.current.openModalActions.openAddItemModal();
         });
 
+        expect(result.current.isAnyModalOpened).toBe(true);
+
         act(() => {
-            result.current.updateModalState({
-                isAddModalOpen: false,
-                itemToEdit: null,
-            });
+            result.current.closeModalActions.closeAddItemModal();
         });
 
         expect(result.current.isAnyModalOpened).toBe(false);
@@ -321,16 +317,16 @@ describe('useModalsState', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
         act(() => {
-            result.current.updateModalState({
-                isAddModalOpen: true,
-                itemToEdit: 'test-item',
-                isAddCategoryModalOpen: true,
-            });
+            result.current.openModalActions.openEditItemModal('test-item');
         });
 
-        expect(result.current.modalState.isAddModalOpen).toBe(true);
+        act(() => {
+            result.current.openModalActions.openAddCategoryModal();
+        })
+
+        expect(result.current.modalState.isAddModalOpen).toBe(false);
         expect(result.current.modalState.itemToEdit).toBe('test-item');
-        expect(result.current.modalState.isAddCategoryModalOpen).toBe(true);
+        expect(result.current.modalState.isAddCategoryModalOpen).toBe(false);
         expect(result.current.isAnyModalOpened).toBe(true);
     });
 
@@ -368,7 +364,7 @@ describe('useModalsState', () => {
         const initialOpenActions = result.current.openModalActions;
 
         act(() => {
-            result.current.updateModalState({ isAddModalOpen: true });
+            result.current.openModalActions.openAddItemModal();
         });
 
         expect(result.current.openModalActions).not.toBe(initialOpenActions);

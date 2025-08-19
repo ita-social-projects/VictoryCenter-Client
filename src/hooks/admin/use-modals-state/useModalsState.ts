@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 
-export interface BaseModalState<T> {
+export interface BaseModalState<TEntity> {
     isAddModalOpen: boolean;
-    itemToDelete: T | null;
-    itemToEdit: T | null;
+    itemToDelete: TEntity | null;
+    itemToEdit: TEntity | null;
     isAddCategoryModalOpen: boolean;
     isEditCategoryModalOpen: boolean;
     isDeleteCategoryModalOpen: boolean;
@@ -18,25 +18,24 @@ export interface BaseCloseModalActions {
     closeDeleteCategoryModal: () => void;
 }
 
-export interface BaseOpenModalActions<T> {
+export interface BaseOpenModalActions<TEntity> {
     openAddItemModal: () => void;
-    openEditItemModal: (item: T) => void;
-    openDeleteItemModal: (item: T) => void;
+    openEditItemModal: (item: TEntity) => void;
+    openDeleteItemModal: (item: TEntity) => void;
     openAddCategoryModal: () => void;
     openEditCategoryModal: () => void;
     openDeleteCategoryModal: () => void;
 }
 
-export interface UseModalsStateResult<T> {
-    modalState: BaseModalState<T>;
-    openModalActions: BaseOpenModalActions<T>;
+export interface UseModalsStateResult<TEntity> {
+    modalState: BaseModalState<TEntity>;
+    openModalActions: BaseOpenModalActions<TEntity>;
     closeModalActions: BaseCloseModalActions;
-    updateModalState: (updates: Partial<BaseModalState<T>>) => void;
     isAnyModalOpened: boolean;
 }
 
-export const useModalsState = <T>(): UseModalsStateResult<T> => {
-    const [modalState, setModalState] = useState<BaseModalState<T>>({
+export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
+    const [modalState, setModalState] = useState<BaseModalState<TEntity>>({
         isAddModalOpen: false,
         itemToDelete: null,
         itemToEdit: null,
@@ -49,7 +48,7 @@ export const useModalsState = <T>(): UseModalsStateResult<T> => {
         return Object.values(modalState).some((value) => (typeof value === 'boolean' ? value : value !== null));
     }, [modalState]);
 
-    const updateModalState = useCallback((updates: Partial<BaseModalState<T>>) => {
+    const updateModalState = useCallback((updates: Partial<BaseModalState<TEntity>>) => {
         setModalState((prev) => ({ ...prev, ...updates }));
     }, []);
 
@@ -65,19 +64,19 @@ export const useModalsState = <T>(): UseModalsStateResult<T> => {
         [updateModalState],
     );
 
-    const openModalActions: BaseOpenModalActions<T> = useMemo(
+    const openModalActions: BaseOpenModalActions<TEntity> = useMemo(
         () => ({
             openAddItemModal: () => {
                 if (!isAnyModalOpened) {
                     updateModalState({ isAddModalOpen: true });
                 }
             },
-            openEditItemModal: (item: T) => {
+            openEditItemModal: (item: TEntity) => {
                 if (!isAnyModalOpened) {
                     updateModalState({ itemToEdit: item });
                 }
             },
-            openDeleteItemModal: (item: T) => {
+            openDeleteItemModal: (item: TEntity) => {
                 if (!isAnyModalOpened) {
                     updateModalState({ itemToDelete: item });
                 }
@@ -104,7 +103,6 @@ export const useModalsState = <T>(): UseModalsStateResult<T> => {
     return {
         modalState,
         isAnyModalOpened,
-        updateModalState,
         closeModalActions,
         openModalActions,
     };

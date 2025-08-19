@@ -1,19 +1,19 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SuggestionWrapper, SuggestionWrapperProps } from './SuggestionWrapper';
-
-// Mock TextSuggestionContent
-jest.mock('../text-suggestion-content/TextSuggestionContent', () => ({
-    TextSuggestionContent: ({ label, isHovered, onShowTooltip }: any) => (
-        <div data-testid="text-suggestion-content" data-hovered={isHovered}>
-            {label}
-        </div>
-    ),
-}));
+import { TextSuggestionContentProps } from '../text-suggestion-content/TextSuggestionContent';
 
 interface TestItem {
     id: number;
     name: string;
 }
+
+jest.mock('../text-suggestion-content/TextSuggestionContent', () => ({
+    TextSuggestionContent: ({ label, isHovered }: TextSuggestionContentProps) => (
+        <div data-testid="text-suggestion-content" data-hovered={isHovered}>
+            {label}
+        </div>
+    ),
+}));
 
 describe('SuggestionWrapper', () => {
     const testItem: TestItem = { id: 1, name: 'Test Item' };

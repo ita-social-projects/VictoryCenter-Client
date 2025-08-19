@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { SearchBar, SearchBarProps } from './SearchBar';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
@@ -98,7 +98,6 @@ describe('SearchBar', () => {
 
     // Action helpers
     const typeInInput = (value: string) => fireEvent.change(getInput(), { target: { value } });
-    const focusInput = () => fireEvent.focus(getInput());
     const clickClearButton = () => fireEvent.click(getClearButton());
     const pressKey = (key: string) => fireEvent.keyDown(getInput(), { key });
     const clickSuggestion = (name: string) => {
@@ -209,17 +208,16 @@ describe('SearchBar', () => {
     });
 
     describe('Keyboard navigation', () => {
-        beforeEach(() => {
+        it('navigates down with arrow key', () => {
             renderSearchBar();
             typeInInput('a');
-        });
-
-        it('navigates down with arrow key', () => {
             pressKey('ArrowDown');
             expectSuggestionToBeActive('Apple');
         });
 
         it('navigates up with arrow key', () => {
+            renderSearchBar();
+            typeInInput('a');
             pressKey('ArrowDown');
             pressKey('ArrowDown');
             pressKey('ArrowUp');
@@ -227,23 +225,31 @@ describe('SearchBar', () => {
         });
 
         it('selects suggestion with Enter key', () => {
+            renderSearchBar();
+            typeInInput('a');
             pressKey('ArrowDown');
             pressKey('Enter');
             expect(defaultProps.onSuggestionSelect).toHaveBeenCalledWith(mockSuggestions[0]);
         });
 
         it('selects suggestion with Space key', () => {
+            renderSearchBar();
+            typeInInput('a');
             pressKey('ArrowDown');
             pressKey(' ');
             expect(defaultProps.onSuggestionSelect).toHaveBeenCalledWith(mockSuggestions[0]);
         });
 
         it('closes dropdown with Escape key', () => {
+            renderSearchBar();
+            typeInInput('a');
             pressKey('Escape');
             expectDropdownToBeHidden();
         });
 
         it('closes dropdown with Tab key', () => {
+            renderSearchBar();
+            typeInInput('a');
             pressKey('Tab');
             expectDropdownToBeHidden();
         });

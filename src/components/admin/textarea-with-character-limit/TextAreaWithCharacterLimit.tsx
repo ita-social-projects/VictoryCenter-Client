@@ -66,7 +66,7 @@ export const TextAreaWithCharacterLimit = ({
                     aria-invalid={currentLength > maxLength}
                 />
             </div>
-            <output className="char-limit-textarea__counter" id={countId} aria-live="polite" role="status">
+            <output className="char-limit-textarea__counter" id={countId} aria-live="polite">
                 {currentLength}/{maxLength}
             </output>
         </div>

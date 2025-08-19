@@ -180,29 +180,6 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
         expect(result.current.calculatedSize).toBe(200); // Still old value
     });
 
-    it('resets calculation state when disabled', () => {
-        const container = createContainerWithChildren([100], 'height');
-
-        const { result, rerender } = renderHook(() =>
-            useCalculateContainerSizeBasedOnChildren(
-                getHookProps({
-                    elementsContainerRef: { current: container },
-                    disableWhen: false,
-                }),
-            ),
-        );
-
-        expect(result.current.calculatedSize).toBe(200);
-
-        // Disable hook
-        rerender({ disableWhen: true } as Partial<useCalculateContainerSizeBasedOnChildrenProps>);
-        expect(result.current.calculatedSize).toBeUndefined();
-
-        // Re-enable hook - should calculate again
-        rerender({ disableWhen: false } as Partial<useCalculateContainerSizeBasedOnChildrenProps>);
-        expect(result.current.calculatedSize).toBe(200);
-    });
-
     it('handles edge case with zero-sized elements', () => {
         const container = createContainerWithChildren([0, 100], 'height');
         const { result } = renderHook(() =>

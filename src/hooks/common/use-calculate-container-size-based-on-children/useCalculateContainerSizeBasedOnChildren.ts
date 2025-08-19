@@ -29,63 +29,65 @@ export const useCalculateContainerSizeBasedOnChildren = ({
     const [calculatedSize, setCalculatedSize] = useState<number | undefined>(undefined);
     const [hasCalculated, setHasCalculated] = useState(false);
 
-    useLayoutEffect(() => {
-        if (disableAfterFirstSuccess && hasCalculated) {
-            return;
-        }
-
-        const containerEl = elementsContainerRef.current;
-
-        if (disableWhen || !containerEl || containerEl.children.length === 0) {
-            if (disableWhen) {
-                setHasCalculated(false);
+    useLayoutEffect(
+        () => {
+            if (disableAfterFirstSuccess && hasCalculated) {
+                return;
             }
-            setCalculatedSize(undefined);
-            return;
-        }
 
-        const dimension: 'offsetHeight' | 'offsetWidth' = measurementAxis === 'height' ? 'offsetHeight' : 'offsetWidth';
-        let finalSize: number | undefined;
+            const containerEl = elementsContainerRef.current;
 
-        if (calculationStrategy === 'basedOnFirstElement') {
-            const firstElement = containerEl.children[0] as HTMLElement;
-            const firstElementSize = firstElement?.[dimension] ?? 0;
-            finalSize = firstElementSize * targetVisibleElementsCount;
-        } else if (calculationStrategy === 'sumOfElements') {
-            const childElements = Array.from(containerEl.children) as HTMLElement[];
-            const wholeElementsCount = Math.floor(targetVisibleElementsCount);
-
-            if (childElements.length < wholeElementsCount) {
+            if (disableWhen || !containerEl || containerEl.children.length === 0) {
+                if (disableWhen) {
+                    setHasCalculated(false);
+                }
                 setCalculatedSize(undefined);
                 return;
             }
 
-            const fractionalPart = targetVisibleElementsCount % 1;
-            const elementsToMeasure = childElements.slice(0, wholeElementsCount + (fractionalPart > 0 ? 1 : 0));
+            const dimension: 'offsetHeight' | 'offsetWidth' =
+                measurementAxis === 'height' ? 'offsetHeight' : 'offsetWidth';
+            let finalSize: number | undefined;
 
-            finalSize = elementsToMeasure.reduce((accumulator, element, index) => {
-                if (index < wholeElementsCount) {
-                    return accumulator + element[dimension];
+            if (calculationStrategy === 'basedOnFirstElement') {
+                const firstElement = containerEl.children[0] as HTMLElement;
+                const firstElementSize = firstElement?.[dimension] ?? 0;
+                finalSize = firstElementSize * targetVisibleElementsCount;
+            } else if (calculationStrategy === 'sumOfElements') {
+                const childElements = Array.from(containerEl.children) as HTMLElement[];
+                const wholeElementsCount = Math.floor(targetVisibleElementsCount);
+
+                if (childElements.length < wholeElementsCount) {
+                    setCalculatedSize(undefined);
+                    return;
                 }
-                return accumulator + element[dimension] * fractionalPart;
-            }, 0);
-        }
 
-        setCalculatedSize(finalSize);
+                const fractionalPart = targetVisibleElementsCount % 1;
+                const elementsToMeasure = childElements.slice(0, wholeElementsCount + (fractionalPart > 0 ? 1 : 0));
 
-        if (finalSize !== undefined && disableAfterFirstSuccess) {
-            setHasCalculated(true);
-        }
-    }, [
-        disableWhen,
-        targetVisibleElementsCount,
-        measurementAxis,
-        calculationStrategy,
-        disableAfterFirstSuccess,
-        hasCalculated,
-        elementsContainerRef,
-        ...dependencies,
-    ]);
+                finalSize = elementsToMeasure.reduce((accumulator, element, index) => {
+                    if (index < wholeElementsCount) {
+                        return accumulator + element[dimension];
+                    }
+                    return accumulator + element[dimension] * fractionalPart;
+                }, 0);
+            }
+
+            setCalculatedSize(finalSize);
+
+            if (finalSize !== undefined && disableAfterFirstSuccess) {
+                setHasCalculated(true);
+            }
+        }, [
+            disableWhen,
+            targetVisibleElementsCount,
+            measurementAxis,
+            calculationStrategy,
+            disableAfterFirstSuccess,
+            hasCalculated,
+            elementsContainerRef,
+            ...dependencies,
+        ]);
 
     return { calculatedSize };
 };

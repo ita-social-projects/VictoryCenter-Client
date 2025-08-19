@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { RequestOptions } from '../../../../types/common/api';
 import { IdentityEntity } from '../../../../types/common/entity';
 import axios from 'axios';
@@ -82,14 +82,19 @@ export const useEntityFetch = <TEntity extends IdentityEntity<TIdValue>, TIdValu
         return () => abortControllerRef.current?.abort();
     }, []);
 
+    const actions = useMemo(
+        () => ({
+            refetch,
+            updateEntity,
+            resetEntity,
+        }),
+        [refetch, updateEntity, resetEntity],
+    );
+
     return {
         entity: entity,
         isLoading: isLoading,
         error: error,
-        actions: {
-            refetch: refetch,
-            updateEntity: updateEntity,
-            resetEntity: resetEntity,
-        },
+        actions: actions,
     };
 };

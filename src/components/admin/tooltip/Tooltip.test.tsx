@@ -1,4 +1,4 @@
-﻿import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { createRef } from 'react';
 import { Tooltip, TooltipWithoutPortal, TooltipWithPortal } from './Tooltip';
 

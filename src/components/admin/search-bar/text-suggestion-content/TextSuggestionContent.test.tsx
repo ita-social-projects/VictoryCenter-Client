@@ -54,16 +54,6 @@ describe('TextSuggestionContent', () => {
         expect(mockUseObserveElementSize).toHaveBeenCalledWith(expectedParams);
     };
 
-    const expectTooltipNotToBeCalled = () => {
-        expect(defaultProps.onShowTooltip).not.toHaveBeenCalled();
-    };
-
-    const expectTooltipToBeCalledWithContent = (label: string) => {
-        expect(defaultProps.onShowTooltip).toHaveBeenCalledWith(
-            <div className="text-suggestion-content__tooltip">{label}</div>,
-        );
-    };
-
     it('renders text with correct label and class', () => {
         renderTextSuggestionContent();
 

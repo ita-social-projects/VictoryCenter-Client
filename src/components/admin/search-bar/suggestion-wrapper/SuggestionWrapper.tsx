@@ -63,7 +63,7 @@ export const SuggestionWrapper = <T,>({
         ) : (
             <TextSuggestionContent label={getItemLabel(item)} isHovered={isHovered} onShowTooltip={handleShowTooltip} />
         );
-    }, [renderContent, getItemLabel, item, isHovered, handleShowTooltip]);
+    }, [renderContent, getItemLabel, item, isHovered, isActive, handleShowTooltip]);
 
     return (
         <li

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect, Dispatch, SetStateAction } from 'react';
+import { useState, useCallback, useRef, useEffect, Dispatch, SetStateAction, useMemo } from 'react';
 import { useIdentityEntitiesCrud } from '../../../common/use-identity-entities-crud/useIdentityEntitiesCrud';
 import { RequestOptions } from '../../../../types/common/api';
 import { IdentityEntity } from '../../../../types/common/entity';
@@ -51,7 +51,7 @@ export const useEntitiesFetch = <TEntity extends IdentityEntity<TIdValue>, TIdVa
     const resetList = useCallback(() => {
         entityActions.set([]);
         setError(null);
-    }, [entityActions.set]);
+    }, [entityActions]);
 
     const fetchEntities = useCallback(async () => {
         abortControllerRef.current?.abort();
@@ -79,7 +79,7 @@ export const useEntitiesFetch = <TEntity extends IdentityEntity<TIdValue>, TIdVa
                 setIsLoading(false);
             }
         }
-    }, [fetchEntitiesHandler, entityActions.set]);
+    }, [fetchEntitiesHandler, entityActions]);
 
     const refetch = useCallback(() => {
         fetchEntities();
@@ -109,17 +109,22 @@ export const useEntitiesFetch = <TEntity extends IdentityEntity<TIdValue>, TIdVa
         return () => abortControllerRef.current?.abort();
     }, []);
 
-    return {
-        entities: entities,
-        isLoading: isLoading,
-        error: error,
-        actions: {
+    const actions = useMemo<EntitiesActions<TEntity, TIdValue>>(
+        () => ({
             refetch: refetch,
             addEntity: entityActions.add,
             updateEntity: entityActions.update,
             removeEntity: entityActions.remove,
             setEntities: entityActions.set,
             resetList: resetList,
-        },
+        }),
+        [entityActions, refetch, resetList],
+    );
+
+    return {
+        entities: entities,
+        isLoading: isLoading,
+        error: error,
+        actions: actions,
     };
 };

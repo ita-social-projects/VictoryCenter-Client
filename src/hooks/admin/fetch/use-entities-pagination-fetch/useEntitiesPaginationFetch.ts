@@ -69,7 +69,7 @@ export const useEntitiesPaginationFetch = <TEntity extends IdentityEntity<TIdVal
         setHasMore(true);
         setError(null);
         currentPageRef.current = 0;
-    }, [entityActions.set]);
+    }, [entityActions]);
 
     const fetchEntities = useCallback(
         async (isReset: boolean) => {
@@ -117,7 +117,7 @@ export const useEntitiesPaginationFetch = <TEntity extends IdentityEntity<TIdVal
                 }
             }
         },
-        [pageSize, fetchEntitiesHandler, entityActions.set],
+        [pageSize, fetchEntitiesHandler, entityActions],
     );
 
     const fetchMore = useCallback(() => {

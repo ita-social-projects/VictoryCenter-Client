@@ -91,7 +91,7 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
 
                 setTooltipPosition({ top, left });
             }
-        }, [position, offsetInPixels, isCentered, isRenderInPortal, portalPositioner]);
+        }, [ref, position, offsetInPixels, isCentered, isRenderInPortal, portalPositioner]);
 
         useLayoutEffect(() => {
             calculatePosition();

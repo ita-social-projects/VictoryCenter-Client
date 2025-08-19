@@ -109,9 +109,9 @@ export const Select = <TValue,>({
     );
 };
 
-interface SelectOptionProps<TValue> {
+export interface SelectOptionProps<TValue> {
     value: TValue;
     name: string;
 }
 
-Select.Option = <TValue,>({ value, name }: SelectOptionProps<TValue>) => null;
+Select.Option = <TValue,>(_props: SelectOptionProps<TValue>) => null;

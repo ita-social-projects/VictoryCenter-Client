@@ -97,7 +97,7 @@ describe('useEntitiesFetch', () => {
 
     it('should ignore axios canceled error', async () => {
         mockedAxios.isCancel.mockReturnValue(true);
-        const fetchHandler = jest.fn().mockRejectedValue({ message: 'Canceled' });
+        const fetchHandler = jest.fn().mockRejectedValue({ name: 'Cancel error',  message: 'Canceled' });
         const { result } = renderHook(() => useEntitiesFetch(createProps(fetchHandler, false)));
 
         act(() => result.current.actions.refetch());
@@ -108,7 +108,7 @@ describe('useEntitiesFetch', () => {
     });
 
     it('should ignore AbortError', async () => {
-        const fetchHandler = jest.fn().mockRejectedValue({ name: 'AbortError' });
+        const fetchHandler = jest.fn().mockRejectedValue({ name: 'AbortError', message: 'Aborted' });
         const { result } = renderHook(() => useEntitiesFetch(createProps(fetchHandler, false)));
 
         act(() => result.current.actions.refetch());

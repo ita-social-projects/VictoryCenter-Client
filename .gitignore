@@ -14,6 +14,8 @@
 # production
 /build
 
+.vs/
+
 # misc
 .DS_Store
 .env.local
@@ -29,6 +31,6 @@ yarn-error.log*
 
 /.idea
 .idea/workspace.xml
-
+.vs/
 *.css
 *.map

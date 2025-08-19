@@ -6,7 +6,7 @@ import { PARTNERS_PAGE_SUBTITLE, PARTNERS_PAGE_TITLE } from '../../../../const/p
 export const IntroSection: React.FC = () => {
     return (
         <div className="partners-intro-block">
-            <img src={background} className="background-img" alt="Horses" />
+            <img src={background} className="background-img-partners" alt="Horses" />
             <div className="content-overlay">
                 <h1 className="main-title">
                     <div className="title-line">

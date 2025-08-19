@@ -1,4 +1,4 @@
-@import '../../../../assets/sass/variables/_variables.colors.scss';
+@import '../../../../assets/sass/variables/colors.scss';
 
 .video-background-container {
   margin: 0;
@@ -23,22 +23,19 @@
   z-index: -1;
 }
 
-.quote-overlay {
+.quote-overlay-partners {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   z-index: 1;
+  height: 100%;
   width: 100%;
-  padding: 4rem 15rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
+  padding: 2rem;
 
 
-  .video-text {
+  .video-text-partners {
     font-family: Mulish, sans-serif;
     font-weight: 600;
     font-size: 4rem;
@@ -46,17 +43,16 @@
     letter-spacing: 0;
     text-align: center;
     text-transform: uppercase;
-    color: $main-white;
+    color: white;
   }
 
   .video-description {
     font-weight: 350;
     font-size: 1rem;
     line-height: 1.5;
-    margin-top: 19rem;
     max-width: 600px;
     text-align: center;
-    color: $main-white;
+    color: white;
     margin-bottom: 1rem;
   }
 
@@ -83,7 +79,7 @@
       text-decoration: none;
 
       &:hover {
-        color: $main-white;
+        color: white;
         background-color: $blue-900;
       }
     }
@@ -123,10 +119,10 @@
     min-height: 100vh;
   }
 
-  .quote-overlay {
+  .quote-overlay-partners {
     padding: 2rem 1rem;
 
-    .video-text {
+    .video-text-partners {
       font-size: 2.5rem;
       line-height: 2.8rem;
       margin-bottom: 1.5rem;
@@ -153,10 +149,10 @@
 @media (max-width: 480px) {
 
 
-  .quote-overlay {
+  .quote-overlay-partners {
     padding: 1.5rem 1rem;
 
-    .video-text {
+    .video-text-partners {
       font-size: 2rem;
       line-height: 2.2rem;
     }

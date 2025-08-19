@@ -1,5 +1,5 @@
 import React from 'react';
-import './partner-section.scss';
+import './PartnerSection.scss';
 
 interface Partner {
     id: number;

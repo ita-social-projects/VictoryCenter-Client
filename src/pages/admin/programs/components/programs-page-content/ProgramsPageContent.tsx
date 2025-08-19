@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Program, ProgramCategory } from '../../../../../types/admin/programs';
-import { VisibilityStatus } from '../../../../../types/admin/common';
+import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/common';
 import { ProgramsPageToolbar } from '../programs-page-toolbar/ProgramsPageToolbar';
 import { DeleteProgramModal } from '../program-modals/DeleteProgramModal';
 import { InfiniteScrollList } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
@@ -9,25 +9,21 @@ import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/
 import { DeleteCategoryModal } from '../program-category-modals/DeleteCategoryModal';
 import { ProgramCategoryModal } from '../program-category-modals/ProgramCategoryModal';
 import { ProgramListItem } from '../program-list-item/ProgramListItem';
+import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
+import {
+    PaginationRequestParams,
+    useEntitiesPaginationFetch,
+} from '../../../../../hooks/admin/fetch/use-entities-pagination-fetch/useEntitiesPaginationFetch';
+import { useEntitiesFetch } from '../../../../../hooks/admin/fetch/use-entities-fetch/useEntitiesFetch';
+import { useEntityFetch } from '../../../../../hooks/admin/fetch/use-entity-fetch/useEntityFetch';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import axios from 'axios';
+import { RequestOptions } from '../../../../../types/common/api';
 import './ProgramsPageContent.scss';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
-
-type ContextMenuAction = 'add' | 'edit' | 'delete';
-
-interface ModalState {
-    isAddProgramModalOpen: boolean;
-    programToDelete: Program | null;
-    programToEdit: Program | null;
-    isAddCategoryModalOpen: boolean;
-    isEditCategoryModalOpen: boolean;
-    isDeleteCategoryModalOpen: boolean;
-}
 
 interface ErrorState {
     message: string | null;
@@ -35,48 +31,87 @@ interface ErrorState {
 }
 
 export const ProgramsPageContent = () => {
-    const [categories, setCategories] = useState<ProgramCategory[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<ProgramCategory | null>(null);
-    const [programs, setPrograms] = useState<Program[]>([]);
     const [pageSize, setPageSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
-    const [hasMore, setHasMore] = useState(true);
-    const [isProgramsLoading, setIsProgramsLoading] = useState(false);
-    const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
+    const [searchProgramId, setSearchProgramId] = useState<number | undefined>();
+    const [isSearchResultView, setIsSearchResultView] = useState(false);
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
-    const [modalState, setModalState] = useState<ModalState>({
-        isAddProgramModalOpen: false,
-        programToDelete: null,
-        programToEdit: null,
-        isAddCategoryModalOpen: false,
-        isEditCategoryModalOpen: false,
-        isDeleteCategoryModalOpen: false,
-    });
 
     const listContainerRef = useRef<HTMLDivElement>(null);
-    const currentItemsCountRef = useRef<number>(0);
-    const totalItemsCountRef = useRef<number | null>(null);
-    const selectedCategoryRef = useRef<ProgramCategory | null>(null);
-    const currentPageRef = useRef<number>(1);
-    const hasMoreRef = useRef<boolean>(true);
-    const isProgramsLoadingRef = useRef(false);
-    const isCategoriesLoadingRef = useRef(false);
-    // Cancellation of previous unfinished requests
-    const abortControllerRef = useRef<AbortController | null>(null);
 
-    const isAnyModalOpened = useMemo(() => {
-        return Object.values(modalState).some((value) => (typeof value === 'boolean' ? value : value !== null));
-    }, [modalState]);
+    const { modalState, isAnyModalOpened, openModalActions, closeModalActions } = useModalsState<Program>();
 
-    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
-        () => [
-            { id: 'add', name: PROGRAM_CATEGORY_TEXT.BUTTON.ADD_CATEGORY },
-            { id: 'edit', name: PROGRAM_CATEGORY_TEXT.BUTTON.EDIT_CATEGORY },
-            { id: 'delete', name: PROGRAM_CATEGORY_TEXT.BUTTON.DELETE_CATEGORY },
-        ],
+    // Fetch functions
+    const getProgramCategories = useCallback(async (options: RequestOptions) => {
+        return ProgramsApi.fetchProgramCategories();
+    }, []);
+
+    const getFilteredPrograms = useCallback(
+        async (params: PaginationRequestParams): Promise<PaginationResult<Program>> => {
+            if (!selectedCategory) {
+                return { items: [], totalItemsCount: 0 };
+            }
+
+            return ProgramsApi.fetchPrograms(
+                selectedCategory.id,
+                params.offset,
+                params.limit,
+                statusFilter,
+                params.requestOptions,
+            );
+        },
+        [selectedCategory, statusFilter],
+    );
+
+    const getProgramById = useCallback(
+        async (entityId: number, apiOptions: RequestOptions): Promise<Program | null> => {
+            return ProgramsApi.fetchProgramById(entityId, apiOptions);
+        },
         [],
     );
 
+    // Data fetching hooks
+    const customAddProgramHandler = useCallback((prev: Program[], newProgram: Program): Program[] => {
+        return [newProgram, ...prev];
+    }, []);
+
+    const {
+        entities: categories,
+        error: categoriesFetchError,
+        isLoading: isCategoriesLoading,
+        actions: categoriesActions,
+    } = useEntitiesFetch<ProgramCategory>({
+        fetchEntitiesHandler: getProgramCategories,
+        autoFetchDependencies: [],
+        autoFetchDisabled: true,
+    });
+
+    const {
+        entities: programs,
+        isLoading: isProgramsLoading,
+        hasMore: isHasMorePrograms,
+        error: programsFetchError,
+        actions: programsActions,
+    } = useEntitiesPaginationFetch<Program>({
+        fetchEntitiesHandler: getFilteredPrograms,
+        autoFetchDependencies: [selectedCategory, statusFilter],
+        autoFetchDisabled: isSearchResultView,
+        pageSize: pageSize,
+        customAddEntityHandler: customAddProgramHandler,
+    });
+
+    const {
+        entity: searchedProgram,
+        isLoading: isSearchProgramLoading,
+        error: searchProgramError,
+        actions: searchProgramActions,
+    } = useEntityFetch<Program, number>({
+        fetchEntityHandler: getProgramById,
+        entityId: searchProgramId,
+    });
+
+    // Errors handling
     const setErrorState = useCallback((message: string, type: 'categories' | 'programs') => {
         setError({ message, type });
     }, []);
@@ -85,21 +120,63 @@ export const ProgramsPageContent = () => {
         setError({ message: null, type: null });
     }, []);
 
-    const updateModalState = useCallback((updates: Partial<ModalState>) => {
-        setModalState((prev) => ({ ...prev, ...updates }));
+    const handleRetry = useCallback(() => {
+        clearError();
+
+        if (error.type === 'categories') {
+            categoriesActions.refetch();
+        } else if (error.type === 'programs') {
+            if (isSearchResultView) {
+                searchProgramActions.refetch();
+            } else {
+                programsActions.fetchFromStart();
+            }
+        }
+    }, [error.type, isSearchResultView, categoriesActions, programsActions, searchProgramActions]);
+
+    useEffect(() => {
+        if (categoriesFetchError) {
+            setErrorState(PROGRAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
+        }
+    }, [categoriesFetchError]);
+
+    useEffect(() => {
+        if (programsFetchError) {
+            setErrorState(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAMS, 'programs');
+        }
+    }, [programsFetchError]);
+
+    useEffect(() => {
+        if (searchProgramError) {
+            setErrorState(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAM, 'programs');
+        }
+    }, [searchProgramError]);
+
+    // Init + Auto-selection
+    useEffect(() => {
+        categoriesActions.refetch();
     }, []);
 
-    const resetProgramsState = useCallback(() => {
-        setPrograms([]);
-        setHasMore(true);
-        clearError();
-        currentPageRef.current = 1;
-        currentItemsCountRef.current = 0;
-        totalItemsCountRef.current = null;
-        isProgramsLoadingRef.current = false;
-        hasMoreRef.current = true;
-    }, [clearError]);
+    useEffect(() => {
+        if (!selectedCategory && categories.length > 0) {
+            setSelectedCategory(categories[0]);
+        }
+    }, [categories, selectedCategory]);
 
+    useEffect(() => {
+        if (selectedCategory) {
+            clearError();
+        }
+    }, [selectedCategory, statusFilter]);
+
+    useEffect(() => {
+        if (searchProgramId !== undefined) {
+            clearError();
+            searchProgramActions.refetch();
+        }
+    }, [searchProgramId]);
+
+    // Resize handling
     const updatePageSize = () => {
         if (listContainerRef.current) {
             const calculatedPageSize =
@@ -108,111 +185,6 @@ export const ProgramsPageContent = () => {
         }
     };
 
-    const fetchCategories = useCallback(async () => {
-        if (isCategoriesLoadingRef.current) {
-            return;
-        }
-
-        try {
-            isCategoriesLoadingRef.current = true;
-            setIsCategoriesLoading(true);
-            clearError();
-
-            const fetchedCategories = await ProgramsApi.fetchProgramCategories();
-            setCategories(fetchedCategories);
-
-            if (fetchedCategories.length > 0) {
-                setSelectedCategory((prevSelected) => prevSelected ?? fetchedCategories[0]);
-            }
-        } catch (error) {
-            setErrorState(PROGRAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
-        } finally {
-            isCategoriesLoadingRef.current = false;
-            setIsCategoriesLoading(false);
-        }
-    }, [clearError, setErrorState]);
-
-    const fetchPrograms = useCallback(
-        async (shouldResetList: boolean = false) => {
-            if (
-                isProgramsLoadingRef.current ||
-                !selectedCategoryRef.current ||
-                !hasMoreRef.current ||
-                abortControllerRef.current?.signal.aborted
-            ) {
-                return;
-            }
-
-            // Cancel previous request
-            abortControllerRef.current?.abort();
-
-            const abortController = new AbortController();
-            abortControllerRef.current = abortController;
-
-            try {
-                isProgramsLoadingRef.current = true;
-                setIsProgramsLoading(true);
-                clearError();
-
-                const searchCategoryId = selectedCategoryRef.current;
-                const searchStatus = statusFilter;
-                const pageToFetch = shouldResetList ? 0 : currentPageRef.current;
-                const offset = pageToFetch * pageSize;
-                const limit = pageSize;
-
-                const fetchResult = await ProgramsApi.fetchPrograms(searchCategoryId.id, offset, limit, searchStatus, {
-                    cancellationSignal: abortController.signal,
-                });
-
-                if (abortController.signal.aborted) {
-                    return;
-                }
-
-                const { items: fetchedPrograms, totalItemsCount: fetchedTotalItemsCount } = fetchResult;
-
-                setPrograms((prev) => {
-                    if (shouldResetList) {
-                        return [...fetchedPrograms];
-                    } else {
-                        // Prevent duplicate programs when appending new items to existing list
-                        const existingIds = new Set(prev.map((p) => p.id));
-                        const uniqueFetchedPrograms = fetchedPrograms.filter((p) => !existingIds.has(p.id));
-                        return [...prev, ...uniqueFetchedPrograms];
-                    }
-                });
-
-                currentPageRef.current = pageToFetch + 1;
-
-                if (shouldResetList) {
-                    currentItemsCountRef.current = fetchedPrograms.length;
-                } else {
-                    currentItemsCountRef.current += fetchedPrograms.length;
-                }
-
-                totalItemsCountRef.current = fetchedTotalItemsCount;
-                setHasMore(currentItemsCountRef.current < fetchedTotalItemsCount);
-            } catch (error: any) {
-                if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
-                    return;
-                }
-
-                setErrorState(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAMS, 'programs');
-            } finally {
-                // Only update loading state if this request wasn't aborted
-                if (!abortController.signal.aborted) {
-                    isProgramsLoadingRef.current = false;
-                    setIsProgramsLoading(false);
-                }
-
-                if (abortControllerRef.current === abortController) {
-                    abortControllerRef.current = null;
-                }
-            }
-        },
-        [pageSize, statusFilter, clearError, setErrorState],
-    );
-
-    // Resize handling
     useEffect(() => {
         window.addEventListener('resize', updatePageSize);
         return () => window.removeEventListener('resize', updatePageSize);
@@ -222,85 +194,37 @@ export const ProgramsPageContent = () => {
         updatePageSize();
     }, [listContainerRef]);
 
-    // Sync refs with state for use in async functions and callbacks
-    useEffect(() => {
-        hasMoreRef.current = hasMore;
-        selectedCategoryRef.current = selectedCategory;
-        isProgramsLoadingRef.current = isProgramsLoading;
-    }, [selectedCategory, hasMore, isProgramsLoading]);
-
-    // Initialize categories on mount
-    useEffect(() => {
-        fetchCategories();
-    }, [fetchCategories]);
-
-    // Clear errors, reset and fetch programs when category or filter changes
-    useEffect(() => {
-        if (!selectedCategory) return;
-
-        resetProgramsState();
-        fetchPrograms(true);
-    }, [pageSize, selectedCategory, statusFilter, resetProgramsState, fetchPrograms]);
-
-    // Cleanup on unmount
-    useEffect(() => {
-        return () => {
-            abortControllerRef.current?.abort();
-        };
-    }, []);
-
     // Toolbar handlers
-    const handleSearchQueryByName = useCallback((_: string) => {
-        // TODO: Finish search by name
-    }, []);
-
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
         setStatusFilter(status);
+        setIsSearchResultView(false);
+        setSearchProgramId(undefined);
+    }, []);
+
+    const handleProgramSelect = useCallback((programId: number) => {
+        setIsSearchResultView(true);
+        setSearchProgramId(programId);
+    }, []);
+
+    const handleSearchClear = useCallback(() => {
+        setIsSearchResultView(false);
+        setSearchProgramId(undefined);
     }, []);
 
     // Program handlers
-    const handleAddProgramModalOpen = useCallback(() => {
-        if (isAnyModalOpened) return;
-        updateModalState({ isAddProgramModalOpen: true });
-    }, [updateModalState, isAnyModalOpened]);
-
-    const handleEditProgramModelOpen = useCallback(
-        (program: Program) => {
-            if (isAnyModalOpened) return;
-            updateModalState({ programToEdit: program });
-        },
-        [updateModalState, isAnyModalOpened],
-    );
-
-    const handleDeleteProgramModalOpen = useCallback(
-        (program: Program) => {
-            if (isAnyModalOpened) return;
-            updateModalState({ programToDelete: program });
-        },
-        [updateModalState, isAnyModalOpened],
-    );
-
     const handleAddProgram = useCallback(
         (addedProgram: Program) => {
-            setPrograms((prevPrograms) => {
-                currentItemsCountRef.current += 1;
-                if (totalItemsCountRef.current !== null) {
-                    totalItemsCountRef.current += 1;
-                }
-                return [addedProgram, ...prevPrograms];
-            });
-
             // Update program counters in categories
             const addedCategoryIds = new Set(addedProgram.categories.map((c) => c.id));
-            setCategories((prevCategories) =>
+            categoriesActions.setEntities((prevCategories) =>
                 prevCategories.map((cat) =>
                     addedCategoryIds.has(cat.id) ? { ...cat, programsCount: cat.programsCount + 1 } : cat,
                 ),
             );
 
-            updateModalState({ isAddProgramModalOpen: false });
+            programsActions.addEntity(addedProgram);
         },
-        [updateModalState],
+        [closeModalActions],
     );
 
     const handleEditProgram = useCallback(
@@ -313,7 +237,7 @@ export const ProgramsPageContent = () => {
             const updatedCategoryIds = new Set(updatedProgram.categories.map((c) => c.id));
 
             // Update program counters in categories
-            setCategories((prevCategories) =>
+            categoriesActions.setEntities((prevCategories) =>
                 prevCategories.map((category) => {
                     const wasInCategory = originalCategoryIds.has(category.id);
                     const isInCategory = updatedCategoryIds.has(category.id);
@@ -331,49 +255,23 @@ export const ProgramsPageContent = () => {
             );
 
             // Apply edited program to list
-            setPrograms((prevPrograms) => {
-                // Check if updated program still belongs to selected category
-                const belongsToSelectedCategory =
-                    selectedCategory && updatedProgram.categories.some((cat) => cat.id === selectedCategory.id);
+            const belongsToSelectedCategory =
+                selectedCategory && updatedProgram.categories.some((cat) => cat.id === selectedCategory.id);
 
-                if (!belongsToSelectedCategory) {
-                    // Remove program from list if it no longer belongs to selected category
-                    const filtered = prevPrograms.filter((p) => p.id !== updatedProgram.id);
-
-                    // Update counters
-                    currentItemsCountRef.current = Math.max(0, currentItemsCountRef.current - 1);
-                    if (totalItemsCountRef.current !== null) {
-                        totalItemsCountRef.current = Math.max(0, totalItemsCountRef.current - 1);
-                    }
-
-                    return filtered;
-                }
-
-                // Update program in list if it still belongs to selected category
-                return prevPrograms.map((p) => (p.id === updatedProgram.id ? updatedProgram : p));
-            });
-
-            updateModalState({ programToEdit: null });
+            if (belongsToSelectedCategory) {
+                programsActions.updateEntity(updatedProgram);
+            } else {
+                programsActions.removeEntity(updatedProgram.id);
+            }
         },
-        [selectedCategory, programs, updateModalState],
+        [selectedCategory, programs, closeModalActions],
     );
 
     const handleDeleteProgram = useCallback(
         (program: Program) => {
-            setPrograms((prevPrograms) => {
-                const filtered = prevPrograms.filter((p) => p.id !== program.id);
-
-                currentItemsCountRef.current = Math.max(0, currentItemsCountRef.current - 1);
-                if (totalItemsCountRef.current !== null) {
-                    totalItemsCountRef.current = Math.max(0, totalItemsCountRef.current - 1);
-                }
-
-                return filtered;
-            });
-
             // Update program counters in categories
             const deletedFromCategoryIds = new Set(program.categories.map((c) => c.id));
-            setCategories((prevCategories) =>
+            categoriesActions.setEntities((prevCategories) =>
                 prevCategories.map((cat) =>
                     deletedFromCategoryIds.has(cat.id)
                         ? { ...cat, programsCount: Math.max(0, cat.programsCount - 1) }
@@ -381,9 +279,17 @@ export const ProgramsPageContent = () => {
                 ),
             );
 
-            updateModalState({ programToDelete: null });
+            programsActions.removeEntity(program.id);
+
+            if (isSearchResultView) {
+                console.log('searchedProgram?.id : ', searchedProgram?.id );
+                if (searchedProgram?.id === program.id) {
+                    setSearchProgramId(undefined);
+                    setIsSearchResultView(false);
+                }
+            }
         },
-        [updateModalState],
+        [closeModalActions],
     );
 
     // Category handlers
@@ -393,111 +299,87 @@ export const ProgramsPageContent = () => {
 
     const handleAddCategory = useCallback(
         (newCategory: ProgramCategory) => {
-            setCategories((prev) => [...prev, newCategory]);
-            setSelectedCategory(newCategory);
-            updateModalState({ isAddCategoryModalOpen: false });
+            categoriesActions.addEntity(newCategory);
         },
-        [updateModalState],
+        [categoriesActions.addEntity],
     );
 
     const handleEditCategory = useCallback(
         (updatedCategory: ProgramCategory) => {
-            setCategories((prev) => prev.map((cat) => (cat.id === updatedCategory.id ? updatedCategory : cat)));
-            updateModalState({ isEditCategoryModalOpen: false });
+            categoriesActions.updateEntity(updatedCategory);
         },
-        [updateModalState],
+        [categoriesActions.updateEntity],
     );
 
     const handleDeleteCategory = useCallback(
-        (categoryId: number) => {
-            setCategories((prev) => {
-                const filtered = prev.filter((category) => category.id !== categoryId);
+        (categoryIdToDelete: number) => {
+            categoriesActions.setEntities((prev) => {
+                const filtered = prev.filter((category) => category.id !== categoryIdToDelete);
 
-                if (selectedCategory?.id === categoryId && filtered.length > 0) {
+                if (selectedCategory?.id === categoryIdToDelete && filtered.length > 0) {
                     if (filtered.length > 0) {
                         // Look for first available category
-                        const currentCategoryIndex = prev.findIndex((category) => category.id === categoryId);
+                        const currentCategoryIndex = prev.findIndex((category) => category.id === categoryIdToDelete);
                         const nextCategory = filtered[Math.min(currentCategoryIndex, filtered.length - 1)];
-                        selectedCategoryRef.current = nextCategory;
                         setSelectedCategory(nextCategory);
                     } else {
-                        selectedCategoryRef.current = null;
                         setSelectedCategory(null);
                     }
                 }
 
                 return filtered;
             });
-            updateModalState({ isDeleteCategoryModalOpen: false });
         },
-        [selectedCategory, updateModalState],
+        [selectedCategory],
     );
-
-    // Retry function for error recovery
-    const handleRetry = useCallback(() => {
-        if (error.type === 'programs') {
-            clearError();
-            fetchPrograms(true);
-        } else if (error.type === 'categories') {
-            clearError();
-            fetchCategories();
-        }
-    }, [error.type, fetchPrograms, fetchCategories, clearError]);
 
     // Context menu handlers
-    const onContextMenuOptionSelected = useCallback(
-        (id: string) => {
-            if (isAnyModalOpened) return;
-
-            const action = id as ContextMenuAction;
-            switch (action) {
-                case 'add':
-                    updateModalState({ isAddCategoryModalOpen: true });
-                    break;
-                case 'edit':
-                    updateModalState({ isEditCategoryModalOpen: true });
-                    break;
-                case 'delete':
-                    updateModalState({ isDeleteCategoryModalOpen: true });
-                    break;
-                default:
-                    break;
-            }
-        },
-        [isAnyModalOpened, updateModalState],
+    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
+        () => [
+            { id: 'add', name: PROGRAM_CATEGORY_TEXT.BUTTON.ADD_CATEGORY },
+            { id: 'edit', name: PROGRAM_CATEGORY_TEXT.BUTTON.EDIT_CATEGORY },
+            { id: 'delete', name: PROGRAM_CATEGORY_TEXT.BUTTON.DELETE_CATEGORY },
+        ],
+        [],
     );
 
+    const onContextMenuOptionSelected = useCallback(
+        (id: string) => {
+            if (isAnyModalOpened){
+                return;
+            } else if (id === 'add') {
+                openModalActions.openAddCategoryModal();
+            } else if (id === 'edit') {
+                openModalActions.openEditCategoryModal();
+            } else if (id === 'delete') {
+                openModalActions.openDeleteCategoryModal();
+            }
+        },
+        [isAnyModalOpened, openModalActions],
+    );
+
+    // Render helpers
     const renderProgramItem = useCallback(
         (program: Program) => (
             <ProgramListItem
                 key={program.id}
                 program={program}
-                handleOnEditProgram={handleEditProgramModelOpen}
-                handleOnDeleteProgram={handleDeleteProgramModalOpen}
+                handleOnEditProgram={openModalActions.openEditItemModal}
+                handleOnDeleteProgram={openModalActions.openDeleteItemModal}
             />
         ),
-        [handleEditProgramModelOpen, handleDeleteProgramModalOpen],
-    );
-
-    const closeModalActions = useMemo(
-        () => ({
-            addProgram: () => updateModalState({ isAddProgramModalOpen: false }),
-            editProgram: () => updateModalState({ programToEdit: null }),
-            deleteProgram: () => updateModalState({ programToDelete: null }),
-            addCategory: () => updateModalState({ isAddCategoryModalOpen: false }),
-            editCategory: () => updateModalState({ isEditCategoryModalOpen: false }),
-            deleteCategory: () => updateModalState({ isDeleteCategoryModalOpen: false }),
-        }),
-        [updateModalState],
+        [openModalActions],
     );
 
     return (
         <div className="programs-page-wrapper" data-testid="programs-page-content">
             <div className="programs-page-toolbar-container">
                 <ProgramsPageToolbar
-                    onSearchQueryChange={handleSearchQueryByName}
+                    onProgramSelect={handleProgramSelect}
+                    onSearchClear={handleSearchClear}
+                    statusFilterValue={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddProgram={handleAddProgramModalOpen}
+                    onAddProgram={openModalActions.openAddItemModal}
                 />
             </div>
 
@@ -523,11 +405,11 @@ export const ProgramsPageContent = () => {
                 )}
 
                 <InfiniteScrollList<Program>
-                    items={programs}
+                    items={isSearchResultView && searchedProgram ? [searchedProgram] : programs}
                     renderItem={renderProgramItem}
-                    onLoadMore={fetchPrograms}
-                    hasMore={hasMore}
-                    isLoading={isProgramsLoading || isCategoriesLoading}
+                    onLoadMore={programsActions.fetchMore}
+                    hasMore={isSearchResultView ? false : isHasMorePrograms}
+                    isLoading={isProgramsLoading || isCategoriesLoading || isSearchProgramLoading}
                     emptyStateMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
                 />
             </div>
@@ -535,25 +417,25 @@ export const ProgramsPageContent = () => {
             {/* Program Modals */}
             <ProgramModal
                 mode="add"
-                isOpen={modalState.isAddProgramModalOpen}
-                onClose={closeModalActions.addProgram}
+                isOpen={modalState.isAddModalOpen}
+                onClose={closeModalActions.closeAddItemModal}
                 onAddProgram={handleAddProgram}
                 categories={categories}
             />
 
             <ProgramModal
                 mode="edit"
-                isOpen={!!modalState.programToEdit}
-                onClose={closeModalActions.editProgram}
-                programToEdit={modalState.programToEdit!}
+                isOpen={!!modalState.itemToEdit}
+                onClose={closeModalActions.closeEditItemModal}
+                programToEdit={modalState.itemToEdit!}
                 onEditProgram={handleEditProgram}
                 categories={categories}
             />
 
             <DeleteProgramModal
-                isOpen={!!modalState.programToDelete}
-                onClose={closeModalActions.deleteProgram}
-                programToDelete={modalState.programToDelete}
+                isOpen={!!modalState.itemToDelete}
+                onClose={closeModalActions.closeDeleteItemModal}
+                programToDelete={modalState.itemToDelete!}
                 onDeleteProgram={handleDeleteProgram}
             />
 
@@ -561,7 +443,7 @@ export const ProgramsPageContent = () => {
             <ProgramCategoryModal
                 mode="add"
                 isOpen={modalState.isAddCategoryModalOpen}
-                onClose={closeModalActions.addCategory}
+                onClose={closeModalActions.closeAddCategoryModal}
                 categories={categories}
                 onAddCategory={handleAddCategory}
             />
@@ -569,14 +451,14 @@ export const ProgramsPageContent = () => {
             <ProgramCategoryModal
                 mode="edit"
                 isOpen={modalState.isEditCategoryModalOpen}
-                onClose={closeModalActions.editCategory}
+                onClose={closeModalActions.closeEditCategoryModal}
                 categories={categories}
                 onEditCategory={handleEditCategory}
             />
 
             <DeleteCategoryModal
                 isOpen={modalState.isDeleteCategoryModalOpen}
-                onClose={closeModalActions.deleteCategory}
+                onClose={closeModalActions.closeDeleteCategoryModal}
                 onDeleteCategory={handleDeleteCategory}
                 categories={categories}
             />

@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { SuggestionWrapper, SuggestionWrapperProps } from './SuggestionWrapper';
 
 // Mock TextSuggestionContent
-jest.mock('../text-suggestion-item/TextSuggestionContent', () => ({
+jest.mock('../text-suggestion-content/TextSuggestionContent', () => ({
     TextSuggestionContent: ({ label, isHovered, onShowTooltip }: any) => (
         <div data-testid="text-suggestion-content" data-hovered={isHovered}>
             {label}
@@ -115,7 +115,7 @@ describe('SuggestionWrapper', () => {
         const mockContent = <div>Tooltip content</div>;
 
         // Mock TextSuggestionContent to call onShowTooltip
-        jest.doMock('../text-suggestion-item/TextSuggestionContent', () => ({
+        jest.doMock('../text-suggestion-content/TextSuggestionContent', () => ({
             TextSuggestionContent: ({ onShowTooltip }: any) => {
                 // Simulate calling onShowTooltip
                 setTimeout(() => onShowTooltip(mockContent), 0);

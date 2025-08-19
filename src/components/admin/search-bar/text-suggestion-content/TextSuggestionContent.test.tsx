@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import { TextSuggestionContent, TextSuggestionContentProps } from './TextSuggestionContent';
 import { useObserveElementSize } from '../../../../hooks/common/use-observe-element-size/useObserveElementSize';
 
-// Mock the hook
 jest.mock('../../../../hooks/common/use-observe-element-size/useObserveElementSize');
 const mockUseObserveElementSize = useObserveElementSize as jest.MockedFunction<typeof useObserveElementSize>;
 
@@ -102,13 +101,21 @@ describe('TextSuggestionContent', () => {
         renderTextSuggestionContent({ onShowTooltip });
 
         const textSpan = getTextSpan();
+
         simulateOverflowingText(textSpan);
 
-        // Get the onSizeChanged callback and call it with mock size
         const hookCall = mockUseObserveElementSize.mock.calls[0][0];
         hookCall.onSizeChanged?.({ width: 100, height: 20 });
 
-        expectTooltipToBeCalledWithContent(defaultProps.label);
+        expect(onShowTooltip).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'div',
+                props: {
+                    className: 'text-suggestion-content__tooltip',
+                    children: defaultProps.label,
+                },
+            }),
+        );
     });
 
     it('does not show tooltip when text is not overflowing', () => {
@@ -116,13 +123,13 @@ describe('TextSuggestionContent', () => {
         renderTextSuggestionContent({ onShowTooltip });
 
         const textSpan = getTextSpan();
+
         simulateNonOverflowingText(textSpan);
 
-        // Get the onSizeChanged callback and call it with mock size
         const hookCall = mockUseObserveElementSize.mock.calls[0][0];
         hookCall.onSizeChanged?.({ width: 200, height: 20 });
 
-        expect(onShowTooltip).not.toHaveBeenCalled();
+        expect(onShowTooltip).toHaveBeenCalledWith(null);
     });
 
     it('creates tooltip content with custom label', () => {
@@ -131,12 +138,20 @@ describe('TextSuggestionContent', () => {
         renderTextSuggestionContent({ label: customLabel, onShowTooltip });
 
         const textSpan = screen.getByText(customLabel);
+
         simulateOverflowingText(textSpan);
 
-        // Get the onSizeChanged callback and call it with mock size
         const hookCall = mockUseObserveElementSize.mock.calls[0][0];
         hookCall.onSizeChanged?.({ width: 100, height: 20 });
 
-        expectTooltipToBeCalledWithContent(customLabel);
+        expect(onShowTooltip).toHaveBeenCalledWith(
+            expect.objectContaining({
+                type: 'div',
+                props: {
+                    className: 'text-suggestion-content__tooltip',
+                    children: customLabel,
+                },
+            }),
+        );
     });
 });

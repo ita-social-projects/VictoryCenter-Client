@@ -1,3 +1,5 @@
+@use '../../../../../../assets/sass/variables/colors';
+
 .program-suggestion-item {
     display: flex;
     flex-direction: column;
@@ -24,7 +26,7 @@
 .program-suggestion-item__categories {
     font-size: 0.875rem;
     margin-top: 0.125rem;
-    color: #666;
+    color: colors.$grey-900;
 }
 
 .program-suggestion-item-tooltip__name,
@@ -43,5 +45,5 @@
 .program-suggestion-item-tooltip__categories {
     font-size: 0.875rem;
     margin-top: 0.125rem;
-    color: #666;
+    color: colors.$grey-900;
 }

@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Modal } from '../../../../../components/common/modal/Modal';
-import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../program-form/ProgramForm';
-import { Program, ProgramCategory, ProgramCreateUpdate } from '../../../../../types/admin/programs';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { Button } from '../../../../../components/admin/button/Button';
-import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
-import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
-import './ProgramModal.scss';
+import { Modal } from '../../../../../../components/common/modal/Modal';
+import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
+import { Button } from '../../../../../../components/admin/button/Button';
+import { ConfirmationModal } from '../../../../../../components/admin/confirmation-modal/ConfirmationModal';
+import { Program, ProgramCategory, ProgramCreateUpdate } from '../../../../../../types/admin/programs';
+import { VisibilityStatus } from '../../../../../../types/admin/common';
+import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
+import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
+import '../ProgramModal.scss';
 
 interface BaseProps {
     isOpen: boolean;

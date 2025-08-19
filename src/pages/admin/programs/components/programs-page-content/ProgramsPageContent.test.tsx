@@ -1,10 +1,10 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { ProgramsPageContent } from './ProgramsPageContent';
 import { Program, ProgramCategory } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
-import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
+import { PROGRAM_CATEGORY_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
@@ -40,115 +40,135 @@ jest.mock('../programs-page-toolbar/ProgramsPageToolbar', () => ({
     },
 }));
 
-jest.mock('../program-modals/ProgramModal', () => ({
-    ProgramModal: (props: any) => {
-        if (!props.isOpen) return null;
-
-        const isAddMode = props.mode === 'add';
-        const isEditMode = props.mode === 'edit';
+// Mock ProgramsPageModals component
+jest.mock('../programs-page-modals/ProgramsPageModals', () => ({
+    ProgramsPageModals: (props: any) => {
+        const { modalState, closeModalActions } = props.modalsStateControl;
 
         return (
-            <div data-testid={isAddMode ? 'add-program-modal' : 'edit-program-modal'}>
-                <h2>{isAddMode ? 'Add Program Modal' : 'Edit Program Modal'}</h2>
-                {isEditMode && props.programToEdit && <p>Editing: {props.programToEdit.name}</p>}
-                {isAddMode && <p>Adding new program</p>}
-                <button
-                    data-testid={isAddMode ? 'confirm-add' : 'confirm-edit'}
-                    onClick={() => {
-                        if (isAddMode && props.onAddProgram) {
-                            props.onAddProgram(mockNewProgram);
-                        } else if (isEditMode && props.onEditProgram && props.programToEdit) {
-                            props.onEditProgram({ ...props.programToEdit, name: 'Updated Program' });
-                        }
-                        props.onClose();
-                    }}
-                >
-                    {isAddMode ? 'Confirm Add' : 'Confirm Edit'}
-                </button>
-                <button data-testid={isAddMode ? 'close-add' : 'close-edit'} onClick={props.onClose}>
-                    {isAddMode ? 'Close Add' : 'Close Edit'}
-                </button>
+            <div data-testid="programs-page-modals">
+                {/* Program Modals */}
+                {modalState.isAddModalOpen && (
+                    <div data-testid="add-program-modal">
+                        <h2>Add Program Modal</h2>
+                        <p>Adding new program</p>
+                        <button
+                            data-testid="confirm-add"
+                            onClick={() => {
+                                props.onAddProgram(mockNewProgram);
+                                closeModalActions.closeAddItemModal();
+                            }}
+                        >
+                            Confirm Add
+                        </button>
+                        <button data-testid="close-add" onClick={closeModalActions.closeAddItemModal}>
+                            Close Add
+                        </button>
+                    </div>
+                )}
+
+                {!!modalState.itemToEdit && (
+                    <div data-testid="edit-program-modal">
+                        <h2>Edit Program Modal</h2>
+                        <p>Editing: {modalState.itemToEdit.name}</p>
+                        <button
+                            data-testid="confirm-edit"
+                            onClick={() => {
+                                props.onEditProgram({ ...modalState.itemToEdit, name: 'Updated Program' });
+                                closeModalActions.closeEditItemModal();
+                            }}
+                        >
+                            Confirm Edit
+                        </button>
+                        <button data-testid="close-edit" onClick={closeModalActions.closeEditItemModal}>
+                            Close Edit
+                        </button>
+                    </div>
+                )}
+
+                {!!modalState.itemToDelete && (
+                    <div data-testid="delete-program-modal">
+                        <h2>Delete Program Modal</h2>
+                        <p>Deleting: {modalState.itemToDelete.name}</p>
+                        <button
+                            data-testid="confirm-delete"
+                            onClick={() => {
+                                props.onDeleteProgram(modalState.itemToDelete);
+                                closeModalActions.closeDeleteItemModal();
+                            }}
+                        >
+                            Confirm Delete
+                        </button>
+                        <button data-testid="close-delete" onClick={closeModalActions.closeDeleteItemModal}>
+                            Close Delete
+                        </button>
+                    </div>
+                )}
+
+                {/* Category Modals */}
+                {modalState.isAddCategoryModalOpen && (
+                    <div data-testid="add-category-modal">
+                        <h2>Add Category Modal</h2>
+                        <p>Adding new category</p>
+                        <button
+                            data-testid="confirm-add-category"
+                            onClick={() => {
+                                const newCategory = { id: 999, name: 'New Category', programsCount: 0 };
+                                props.onAddCategory(newCategory);
+                                closeModalActions.closeAddCategoryModal();
+                            }}
+                        >
+                            Confirm Add Category
+                        </button>
+                        <button data-testid="close-add-category" onClick={closeModalActions.closeAddCategoryModal}>
+                            Close Add Category
+                        </button>
+                    </div>
+                )}
+
+                {modalState.isEditCategoryModalOpen && (
+                    <div data-testid="edit-category-modal">
+                        <h2>Edit Category Modal</h2>
+                        <p>Editing category</p>
+                        <button
+                            data-testid="confirm-edit-category"
+                            onClick={() => {
+                                props.onEditCategory({ id: 1, name: 'Updated Category', programsCount: 0 });
+                                closeModalActions.closeEditCategoryModal();
+                            }}
+                        >
+                            Confirm Edit Category
+                        </button>
+                        <button data-testid="close-edit-category" onClick={closeModalActions.closeEditCategoryModal}>
+                            Close Edit Category
+                        </button>
+                    </div>
+                )}
+
+                {modalState.isDeleteCategoryModalOpen && (
+                    <div data-testid="delete-category-modal">
+                        <h2>Delete Category Modal</h2>
+                        <p>Deleting category</p>
+                        <button
+                            data-testid="confirm-delete-category"
+                            onClick={() => {
+                                props.onDeleteCategory(1); // Mock deleting category with id 1
+                                closeModalActions.closeDeleteCategoryModal();
+                            }}
+                        >
+                            Confirm Delete Category
+                        </button>
+                        <button
+                            data-testid="close-delete-category"
+                            onClick={closeModalActions.closeDeleteCategoryModal}
+                        >
+                            Close Delete Category
+                        </button>
+                    </div>
+                )}
             </div>
         );
     },
-}));
-
-jest.mock('../program-modals/DeleteProgramModal', () => ({
-    DeleteProgramModal: (props: any) =>
-        props.isOpen ? (
-            <div data-testid="delete-program-modal">
-                <h2>Delete Program Modal</h2>
-                <p>Deleting: {props.programToDelete?.name}</p>
-                <button
-                    data-testid="confirm-delete"
-                    onClick={() => {
-                        props.onDeleteProgram(props.programToDelete);
-                        props.onClose();
-                    }}
-                >
-                    Confirm Delete
-                </button>
-                <button data-testid="close-delete" onClick={props.onClose}>
-                    Close Delete
-                </button>
-            </div>
-        ) : null,
-}));
-
-jest.mock('../program-category-modals/ProgramCategoryModal', () => ({
-    ProgramCategoryModal: (props: any) => {
-        if (!props.isOpen) return null;
-
-        const isAddMode = props.mode === 'add';
-        const isEditMode = props.mode === 'edit';
-
-        return (
-            <div data-testid={isAddMode ? 'add-category-modal' : 'edit-category-modal'}>
-                <h2>{isAddMode ? 'Add Category Modal' : 'Edit Category Modal'}</h2>
-                {isAddMode && <p>Adding new category</p>}
-                {isEditMode && <p>Editing category</p>}
-                <button
-                    data-testid={isAddMode ? 'confirm-add-category' : 'confirm-edit-category'}
-                    onClick={() => {
-                        const newCategory = { id: 999, name: 'New Category', programsCount: 0 };
-                        if (isAddMode && props.onAddCategory) {
-                            props.onAddCategory(newCategory);
-                        } else if (isEditMode && props.onEditCategory) {
-                            props.onEditCategory({ id: 1, name: 'Updated Category', programsCount: 0 });
-                        }
-                        props.onClose();
-                    }}
-                >
-                    {isAddMode ? 'Confirm Add Category' : 'Confirm Edit Category'}
-                </button>
-                <button data-testid={isAddMode ? 'close-add-category' : 'close-edit-category'} onClick={props.onClose}>
-                    {isAddMode ? 'Close Add Category' : 'Close Edit Category'}
-                </button>
-            </div>
-        );
-    },
-}));
-
-jest.mock('../program-category-modals/DeleteCategoryModal', () => ({
-    DeleteCategoryModal: (props: any) =>
-        props.isOpen ? (
-            <div data-testid="delete-category-modal">
-                <h2>Delete Category Modal</h2>
-                <p>Deleting category</p>
-                <button
-                    data-testid="confirm-delete-category"
-                    onClick={() => {
-                        props.onDeleteCategory(1); // Mock deleting category with id 1
-                        props.onClose();
-                    }}
-                >
-                    Confirm Delete Category
-                </button>
-                <button data-testid="close-delete-category" onClick={props.onClose}>
-                    Close Delete Category
-                </button>
-            </div>
-        ) : null,
 }));
 
 jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
@@ -298,8 +318,6 @@ describe('ProgramsPageContent', () => {
     const getProgramItems = () => screen.getAllByTestId('program-item');
     const getEmptyState = () => screen.getByTestId('empty-state');
     const getAddProgramButton = () => screen.getByText('Add Program');
-    const getEditButtons = () => screen.getAllByText('Edit');
-    const getDeleteButtons = () => screen.getAllByText('Delete');
     const getAddProgramModal = () => screen.queryByTestId('add-program-modal');
     const getEditProgramModal = () => screen.queryByTestId('edit-program-modal');
     const getDeleteProgramModal = () => screen.queryByTestId('delete-program-modal');
@@ -318,16 +336,7 @@ describe('ProgramsPageContent', () => {
     const getConfirmAddButton = () => screen.getByTestId('confirm-add');
     const getConfirmEditButton = () => screen.getByTestId('confirm-edit');
     const getConfirmDeleteButton = () => screen.getByTestId('confirm-delete');
-    const getConfirmAddCategoryButton = () => screen.getByTestId('confirm-add-category');
-    const getConfirmEditCategoryButton = () => screen.getByTestId('confirm-edit-category');
-    const getConfirmDeleteCategoryButton = () => screen.getByTestId('confirm-delete-category');
-    const getCloseAddButton = () => screen.getByTestId('close-add');
-    const getCloseEditButton = () => screen.getByTestId('close-edit');
-    const getCloseDeleteButton = () => screen.getByTestId('close-delete');
-
     const clickAddProgramButton = () => fireEvent.click(getAddProgramButton());
-    const clickFirstEditButton = () => fireEvent.click(getEditButtons()[0]);
-    const clickFirstDeleteButton = () => fireEvent.click(getDeleteButtons()[0]);
     const clickContextMenuAddButton = () => fireEvent.click(getContextMenuAddButton());
     const clickContextMenuEditButton = () => fireEvent.click(getContextMenuEditButton());
     const clickContextMenuDeleteButton = () => fireEvent.click(getContextMenuDeleteButton());
@@ -339,12 +348,6 @@ describe('ProgramsPageContent', () => {
     const clickConfirmAddButton = () => fireEvent.click(getConfirmAddButton());
     const clickConfirmEditButton = () => fireEvent.click(getConfirmEditButton());
     const clickConfirmDeleteButton = () => fireEvent.click(getConfirmDeleteButton());
-    const clickConfirmAddCategoryButton = () => fireEvent.click(getConfirmAddCategoryButton());
-    const clickConfirmEditCategoryButton = () => fireEvent.click(getConfirmEditCategoryButton());
-    const clickConfirmDeleteCategoryButton = () => fireEvent.click(getConfirmDeleteCategoryButton());
-    const clickCloseAddButton = () => fireEvent.click(getCloseAddButton());
-    const clickCloseEditButton = () => fireEvent.click(getCloseEditButton());
-    const clickCloseDeleteButton = () => fireEvent.click(getCloseDeleteButton());
 
     const expectMainComponentsToBeRendered = () => {
         expect(getProgramsPageContent()).toBeInTheDocument();
@@ -362,10 +365,6 @@ describe('ProgramsPageContent', () => {
         expect(modal).toBeInTheDocument();
         expect(screen.getByText(title)).toBeInTheDocument();
         expect(screen.getByText(content)).toBeInTheDocument();
-    };
-
-    const expectModalToBeClosed = (modal: HTMLElement | null) => {
-        expect(modal).not.toBeInTheDocument();
     };
 
     const expectErrorToBeDisplayed = (errorMessage: string) => {
@@ -552,6 +551,44 @@ describe('ProgramsPageContent', () => {
 
             renderProgramsPageContent();
             expectModalToBeOpen(getAddCategoryModal(), 'Add Category Modal', 'Adding new category');
+        });
+
+        it('should handle edit category modal when open', () => {
+            mockUseModalsState.useModalsState.mockReturnValue({
+                modalState: {
+                    isAddModalOpen: false,
+                    isAddCategoryModalOpen: false,
+                    isEditCategoryModalOpen: true,
+                    isDeleteCategoryModalOpen: false,
+                    itemToEdit: null,
+                    itemToDelete: null,
+                },
+                isAnyModalOpened: true,
+                openModalActions: mockModalsActions,
+                closeModalActions: mockModalsActions,
+            });
+
+            renderProgramsPageContent();
+            expectModalToBeOpen(getEditCategoryModal(), 'Edit Category Modal', 'Editing category');
+        });
+
+        it('should handle delete category modal when open', () => {
+            mockUseModalsState.useModalsState.mockReturnValue({
+                modalState: {
+                    isAddModalOpen: false,
+                    isAddCategoryModalOpen: false,
+                    isEditCategoryModalOpen: false,
+                    isDeleteCategoryModalOpen: true,
+                    itemToEdit: null,
+                    itemToDelete: null,
+                },
+                isAnyModalOpened: true,
+                openModalActions: mockModalsActions,
+                closeModalActions: mockModalsActions,
+            });
+
+            renderProgramsPageContent();
+            expectModalToBeOpen(getDeleteCategoryModal(), 'Delete Category Modal', 'Deleting category');
         });
     });
 

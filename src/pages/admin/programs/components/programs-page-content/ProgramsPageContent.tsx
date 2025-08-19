@@ -2,12 +2,9 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Program, ProgramCategory } from '../../../../../types/admin/programs';
 import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/common';
 import { ProgramsPageToolbar } from '../programs-page-toolbar/ProgramsPageToolbar';
-import { DeleteProgramModal } from '../program-modals/DeleteProgramModal';
+import { ProgramsPageModals } from '../programs-page-modals/ProgramsPageModals';
 import { InfiniteScrollList } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
-import { ProgramModal } from '../program-modals/ProgramModal';
 import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/category-bar/CategoryBar';
-import { DeleteCategoryModal } from '../program-category-modals/DeleteCategoryModal';
-import { ProgramCategoryModal } from '../program-category-modals/ProgramCategoryModal';
 import { ProgramListItem } from '../program-list-item/ProgramListItem';
 import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
 import {
@@ -37,14 +34,13 @@ export const ProgramsPageContent = () => {
     const [searchProgramId, setSearchProgramId] = useState<number | undefined>();
     const [isSearchResultView, setIsSearchResultView] = useState(false);
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
-
     const listContainerRef = useRef<HTMLDivElement>(null);
-
-    const { modalState, isAnyModalOpened, openModalActions, closeModalActions } = useModalsState<Program>();
+    const modalsStateControl = useModalsState<Program>();
+    const openModalActions = modalsStateControl.openModalActions;
 
     // Fetch functions
     const getProgramCategories = useCallback(async (options: RequestOptions) => {
-        return ProgramsApi.fetchProgramCategories();
+        return ProgramsApi.fetchProgramCategories(options);
     }, []);
 
     const getFilteredPrograms = useCallback(
@@ -112,13 +108,11 @@ export const ProgramsPageContent = () => {
     });
 
     // Errors handling
-    const setErrorState = useCallback((message: string, type: 'categories' | 'programs') => {
-        setError({ message, type });
-    }, []);
-
-    const clearError = useCallback(() => {
-        setError({ message: null, type: null });
-    }, []);
+    const setErrorState = useCallback(
+        (message: string, type: 'categories' | 'programs') => setError({ message, type }),
+        [],
+    );
+    const clearError = useCallback(() => setError({ message: null, type: null }), []);
 
     const handleRetry = useCallback(() => {
         clearError();
@@ -132,25 +126,25 @@ export const ProgramsPageContent = () => {
                 programsActions.fetchFromStart();
             }
         }
-    }, [error.type, isSearchResultView, categoriesActions, programsActions, searchProgramActions]);
+    }, [clearError, isSearchResultView, error.type, categoriesActions, searchProgramActions, programsActions]);
 
     useEffect(() => {
         if (categoriesFetchError) {
             setErrorState(PROGRAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
         }
-    }, [categoriesFetchError]);
+    }, [categoriesFetchError, setErrorState]);
 
     useEffect(() => {
         if (programsFetchError) {
             setErrorState(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAMS, 'programs');
         }
-    }, [programsFetchError]);
+    }, [programsFetchError, setErrorState]);
 
     useEffect(() => {
         if (searchProgramError) {
             setErrorState(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAM, 'programs');
         }
-    }, [searchProgramError]);
+    }, [searchProgramError, setErrorState]);
 
     // Init + Auto-selection
     useEffect(() => {
@@ -167,14 +161,14 @@ export const ProgramsPageContent = () => {
         if (selectedCategory) {
             clearError();
         }
-    }, [selectedCategory, statusFilter]);
+    }, [selectedCategory, statusFilter, clearError]);
 
     useEffect(() => {
         if (searchProgramId !== undefined) {
             clearError();
             searchProgramActions.refetch();
         }
-    }, [searchProgramId]);
+    }, [searchProgramId, searchProgramActions, clearError]);
 
     // Resize handling
     const updatePageSize = () => {
@@ -195,21 +189,30 @@ export const ProgramsPageContent = () => {
     }, [listContainerRef]);
 
     // Toolbar handlers
-    const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
-        setStatusFilter(status);
-        setIsSearchResultView(false);
-        setSearchProgramId(undefined);
-    }, []);
+    const onStatusFilterChange = useCallback(
+        (status: VisibilityStatus | undefined) => {
+            setStatusFilter(status);
+            setIsSearchResultView(false);
+            setSearchProgramId(undefined);
+            searchProgramActions.resetEntity();
+        },
+        [searchProgramActions],
+    );
 
-    const handleProgramSelect = useCallback((programId: number) => {
-        setIsSearchResultView(true);
-        setSearchProgramId(programId);
-    }, []);
+    const handleProgramSuggestionSelect = useCallback(
+        (programId: number) => {
+            setIsSearchResultView(true);
+            setSearchProgramId(programId);
+            programsActions.resetList();
+        },
+        [programsActions],
+    );
 
     const handleSearchClear = useCallback(() => {
         setIsSearchResultView(false);
         setSearchProgramId(undefined);
-    }, []);
+        searchProgramActions.resetEntity();
+    }, [searchProgramActions]);
 
     // Program handlers
     const handleAddProgram = useCallback(
@@ -224,7 +227,7 @@ export const ProgramsPageContent = () => {
 
             programsActions.addEntity(addedProgram);
         },
-        [closeModalActions],
+        [categoriesActions, programsActions],
     );
 
     const handleEditProgram = useCallback(
@@ -264,7 +267,7 @@ export const ProgramsPageContent = () => {
                 programsActions.removeEntity(updatedProgram.id);
             }
         },
-        [selectedCategory, programs, closeModalActions],
+        [categoriesActions, programsActions, selectedCategory, programs],
     );
 
     const handleDeleteProgram = useCallback(
@@ -281,34 +284,33 @@ export const ProgramsPageContent = () => {
 
             programsActions.removeEntity(program.id);
 
-            if (isSearchResultView) {
-                console.log('searchedProgram?.id : ', searchedProgram?.id );
-                if (searchedProgram?.id === program.id) {
-                    setSearchProgramId(undefined);
-                    setIsSearchResultView(false);
-                }
+            if (isSearchResultView && searchedProgram?.id === program.id) {
+                setSearchProgramId(undefined);
+                setIsSearchResultView(false);
             }
         },
-        [closeModalActions],
+        [categoriesActions, programsActions, isSearchResultView, searchedProgram],
     );
 
     // Category handlers
     const handleCategorySelect = useCallback((category: ProgramCategory) => {
         setSelectedCategory(category);
+        setSearchProgramId(undefined);
+        setIsSearchResultView(false);
     }, []);
 
     const handleAddCategory = useCallback(
         (newCategory: ProgramCategory) => {
             categoriesActions.addEntity(newCategory);
         },
-        [categoriesActions.addEntity],
+        [categoriesActions],
     );
 
     const handleEditCategory = useCallback(
         (updatedCategory: ProgramCategory) => {
             categoriesActions.updateEntity(updatedCategory);
         },
-        [categoriesActions.updateEntity],
+        [categoriesActions],
     );
 
     const handleDeleteCategory = useCallback(
@@ -330,7 +332,7 @@ export const ProgramsPageContent = () => {
                 return filtered;
             });
         },
-        [selectedCategory],
+        [categoriesActions, selectedCategory],
     );
 
     // Context menu handlers
@@ -345,9 +347,7 @@ export const ProgramsPageContent = () => {
 
     const onContextMenuOptionSelected = useCallback(
         (id: string) => {
-            if (isAnyModalOpened){
-                return;
-            } else if (id === 'add') {
+            if (id === 'add') {
                 openModalActions.openAddCategoryModal();
             } else if (id === 'edit') {
                 openModalActions.openEditCategoryModal();
@@ -355,7 +355,7 @@ export const ProgramsPageContent = () => {
                 openModalActions.openDeleteCategoryModal();
             }
         },
-        [isAnyModalOpened, openModalActions],
+        [openModalActions],
     );
 
     // Render helpers
@@ -375,7 +375,7 @@ export const ProgramsPageContent = () => {
         <div className="programs-page-wrapper" data-testid="programs-page-content">
             <div className="programs-page-toolbar-container">
                 <ProgramsPageToolbar
-                    onProgramSelect={handleProgramSelect}
+                    onProgramSelect={handleProgramSuggestionSelect}
                     onSearchClear={handleSearchClear}
                     statusFilterValue={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
@@ -414,53 +414,15 @@ export const ProgramsPageContent = () => {
                 />
             </div>
 
-            {/* Program Modals */}
-            <ProgramModal
-                mode="add"
-                isOpen={modalState.isAddModalOpen}
-                onClose={closeModalActions.closeAddItemModal}
+            <ProgramsPageModals
+                modalsStateControl={modalsStateControl}
+                categories={categories}
                 onAddProgram={handleAddProgram}
-                categories={categories}
-            />
-
-            <ProgramModal
-                mode="edit"
-                isOpen={!!modalState.itemToEdit}
-                onClose={closeModalActions.closeEditItemModal}
-                programToEdit={modalState.itemToEdit!}
                 onEditProgram={handleEditProgram}
-                categories={categories}
-            />
-
-            <DeleteProgramModal
-                isOpen={!!modalState.itemToDelete}
-                onClose={closeModalActions.closeDeleteItemModal}
-                programToDelete={modalState.itemToDelete!}
                 onDeleteProgram={handleDeleteProgram}
-            />
-
-            {/* Category Modals */}
-            <ProgramCategoryModal
-                mode="add"
-                isOpen={modalState.isAddCategoryModalOpen}
-                onClose={closeModalActions.closeAddCategoryModal}
-                categories={categories}
                 onAddCategory={handleAddCategory}
-            />
-
-            <ProgramCategoryModal
-                mode="edit"
-                isOpen={modalState.isEditCategoryModalOpen}
-                onClose={closeModalActions.closeEditCategoryModal}
-                categories={categories}
                 onEditCategory={handleEditCategory}
-            />
-
-            <DeleteCategoryModal
-                isOpen={modalState.isDeleteCategoryModalOpen}
-                onClose={closeModalActions.closeDeleteCategoryModal}
                 onDeleteCategory={handleDeleteCategory}
-                categories={categories}
             />
         </div>
     );

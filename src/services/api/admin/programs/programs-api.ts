@@ -1,4 +1,5 @@
 import { VisibilityStatus, PaginationResult } from '../../../../types/admin/common';
+import { RequestOptions } from '../../../../types/common/api';
 import {
     ProgramCategory,
     ProgramCreateUpdate,
@@ -7,7 +8,6 @@ import {
     Program,
 } from '../../../../types/admin/programs';
 import { mockPrograms, mockCategories } from '../../../../utils/mock-data/admin/programs';
-import { RequestOptions } from '../../../../types/common/api';
 
 // !!!
 // Delete after actual integration with backend
@@ -59,18 +59,6 @@ const simulateAsyncOperation = (delay: number, signal?: AbortSignal): Promise<vo
 // !!!
 
 export const ProgramsApi = {
-    fetchProgramCategories: async (options?: RequestOptions): Promise<ProgramCategory[]> => {
-        await new Promise((resolve) => setTimeout(resolve, mockDelay));
-        if (throwErrorsInApi) throw new Error('Error fetching program categories');
-        return [...mockCategories];
-    },
-
-    fetchProgramById: async (id: number, options?: RequestOptions): Promise<Program | null> => {
-        await simulateAsyncOperation(mockDelay, options?.cancellationSignal);
-        if (throwErrorsInApi) throw new Error('Error fetching program');
-        return mockPrograms.find((program) => program.id === id) ?? null;
-    },
-
     fetchPrograms: async (
         categoryId: number,
         offset: number,
@@ -94,6 +82,51 @@ export const ProgramsApi = {
             items: filtered.slice(start, end),
             totalItemsCount: filtered.length,
         };
+    },
+
+    fetchProgramSuggestions: async (
+        searchTerm: string,
+        offset: number,
+        limit: number,
+        options?: RequestOptions,
+    ): Promise<PaginationResult<ProgramSuggestion>> => {
+        await simulateAsyncOperation(mockDelay, options?.cancellationSignal);
+        if (throwErrorsInApi) throw new Error('Error fetching program suggestions');
+
+        const filtered = mockPrograms.filter((program) => {
+            const nameMatches = program.name.toLowerCase().includes(searchTerm.toLowerCase());
+            const categoryMatches = program.categories.some((cat) =>
+                cat.name.toLowerCase().includes(searchTerm.toLowerCase()),
+            );
+            return nameMatches || categoryMatches;
+        });
+
+        const sorted = filtered.sort((a, b) => {
+            const aNameMatch = a.name.toLowerCase().includes(searchTerm.toLowerCase());
+            const bNameMatch = b.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+            if (aNameMatch && !bNameMatch) return -1;
+            if (!aNameMatch && bNameMatch) return 1;
+
+            return a.name.localeCompare(b.name);
+        });
+
+        const start = offset;
+        const end = offset + limit;
+        const paginatedItems = sorted.slice(start, end);
+
+        const suggestions = paginatedItems.map(convertProgramToSuggestion);
+
+        return {
+            items: suggestions,
+            totalItemsCount: filtered.length,
+        };
+    },
+
+    fetchProgramById: async (id: number, options?: RequestOptions): Promise<Program | null> => {
+        await simulateAsyncOperation(mockDelay, options?.cancellationSignal);
+        if (throwErrorsInApi) throw new Error('Error fetching program');
+        return mockPrograms.find((program) => program.id === id) ?? null;
     },
 
     addProgram: async (program: ProgramCreateUpdate): Promise<Program> => {
@@ -145,43 +178,10 @@ export const ProgramsApi = {
         mockPrograms.splice(index, 1);
     },
 
-    fetchProgramSuggestions: async (
-        searchTerm: string,
-        offset: number,
-        limit: number,
-        options?: RequestOptions,
-    ): Promise<PaginationResult<ProgramSuggestion>> => {
+    fetchProgramCategories: async (options?: RequestOptions): Promise<ProgramCategory[]> => {
         await simulateAsyncOperation(mockDelay, options?.cancellationSignal);
-        if (throwErrorsInApi) throw new Error('Error fetching program suggestions');
-
-        const filtered = mockPrograms.filter((program) => {
-            const nameMatches = program.name.toLowerCase().includes(searchTerm.toLowerCase());
-            const categoryMatches = program.categories.some((cat) =>
-                cat.name.toLowerCase().includes(searchTerm.toLowerCase()),
-            );
-            return nameMatches || categoryMatches;
-        });
-
-        const sorted = filtered.sort((a, b) => {
-            const aNameMatch = a.name.toLowerCase().includes(searchTerm.toLowerCase());
-            const bNameMatch = b.name.toLowerCase().includes(searchTerm.toLowerCase());
-
-            if (aNameMatch && !bNameMatch) return -1;
-            if (!aNameMatch && bNameMatch) return 1;
-
-            return a.name.localeCompare(b.name);
-        });
-
-        const start = offset;
-        const end = offset + limit;
-        const paginatedItems = sorted.slice(start, end);
-
-        const suggestions = paginatedItems.map(convertProgramToSuggestion);
-
-        return {
-            items: suggestions,
-            totalItemsCount: filtered.length,
-        };
+        if (throwErrorsInApi) throw new Error('Error fetching program categories');
+        return [...mockCategories];
     },
 
     addProgramCategory: async (category: ProgramCategoryCreateUpdate): Promise<ProgramCategory> => {

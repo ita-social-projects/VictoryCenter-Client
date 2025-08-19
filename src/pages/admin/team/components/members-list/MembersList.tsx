@@ -1,32 +1,23 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { TeamCategory } from '../../../../../types/admin/TeamMembers';
+import { TeamCategory } from '../../../../../types/admin/team-members';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { MemberDragPreview } from '../member-drag-preview/MemberDragPreview';
 import { MembersListItem } from '../members-list-item/MembersListItem';
 import NotFoundIcon from '../../../../../assets/icons/not-found.svg';
-import { Button } from '../../../../../components/common/button/Button';
+import { Button } from '../../../../../components/admin/button/Button';
 import LoaderIcon from '../../../../../assets/icons/load.svg';
 import ArrowUpIcon from '../../../../../assets/icons/arrow-up.svg';
-import { mapStatusFilterToStatus, StatusFilter } from '../../../../../types/Common';
+import { mapStatusFilterToStatus, StatusFilter } from '../../../../../types/admin/common';
 import { MemberForm, MemberFormValues } from '../member-form/MemberForm';
-import './members-list.scss';
-import { TeamMembersApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamMembersApi/TeamMembersApi';
-import { useAdminClient } from '../../../../../utils/hooks/use-admin-client/useAdminClient';
-import {
-    TEAM_DELETE_MEMBER,
-    TEAM_EDIT_MEMBER,
-    TEAM_SAVE_AS_DRAFT,
-    TEAM_PUBLISH,
-    TEAM_PUBLISH_NEW_MEMBER,
-    TEAM_CONFIRM,
-    TEAM_CANCEL,
-    TEAM_CHANGES_LOST,
-    TEAM_NOT_FOUND,
-} from '../../../../../const/team';
+import './MembersList.scss';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import classNames from 'classnames';
-import { DragPreviewModel } from '../../../../../types/admin/Common';
-import { TeamMember } from '../../../../../types/admin/TeamMembers';
-import { TeamCategoriesApi } from '../../../../../services/data-fetch/admin-page-data-fetch/team-page-data-fetch/TeamCategoriesApi/TeamCategoriesApi';
+import { DragPreviewModel } from '../../../../../types/admin/common';
+import { TeamMember } from '../../../../../types/admin/team-members';
+import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
+import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
 
 export type MembersListProps = {
     searchByNameQuery: string | null;
@@ -67,7 +58,7 @@ export const MembersList = ({
         visible: false,
         x: 0,
         y: 0,
-        member: null,
+        item: null,
     });
     const memberListRef = useRef<HTMLDivElement>(null);
     const [isMembersLoading, setIsMembersLoading] = useState(false);
@@ -249,7 +240,7 @@ export const MembersList = ({
             visible: true,
             x: e.clientX,
             y: e.clientY,
-            member: members[index],
+            item: members[index],
         });
 
         const dragImage = new Image();
@@ -272,7 +263,7 @@ export const MembersList = ({
             visible: false,
             x: 0,
             y: 0,
-            member: null,
+            item: null,
         });
         setDraggedIndex(null);
     };
@@ -516,7 +507,7 @@ export const MembersList = ({
         content = (
             <div className="members-not-found" data-testid="members-not-found">
                 <img src={NotFoundIcon} alt="members-not-found" data-testid="members-not-found-icon" />
-                <p>{TEAM_NOT_FOUND}</p>
+                <p>{COMMON_TEXT_ADMIN.LIST.NOT_FOUND}</p>
             </div>
         );
     } else {
@@ -525,7 +516,7 @@ export const MembersList = ({
 
     return (
         <>
-            {dragPreview?.visible && dragPreview?.member ? <MemberDragPreview dragPreview={dragPreview} /> : <></>}
+            {dragPreview?.visible && dragPreview?.item ? <MemberDragPreview dragPreview={dragPreview} /> : <></>}
             <div className="members">
                 <div
                     data-testid="members-categories"
@@ -564,7 +555,7 @@ export const MembersList = ({
             </div>
             <Modal onClose={() => setIsDeleteTeamMemberModalOpen(false)} isOpen={isDeleteTeamMemberModalOpen}>
                 <Modal.Title>
-                    <div className="members-delete-modal-header">{TEAM_DELETE_MEMBER}</div>
+                    <div className="members-delete-modal-header">{TEAM_MEMBERS_TEXT.FORM.TITLE.DELETE_MEMBER}</div>
                 </Modal.Title>
                 <Modal.Content>
                     <></>
@@ -572,17 +563,17 @@ export const MembersList = ({
                 <Modal.Actions>
                     <div className="members-delete-modal-actions">
                         <Button buttonStyle={'secondary'} onClick={() => setIsDeleteTeamMemberModalOpen(false)}>
-                            {TEAM_CANCEL}
+                            {COMMON_TEXT_ADMIN.BUTTON.NO}
                         </Button>
                         <Button buttonStyle={'primary'} onClick={handleDeleteMember}>
-                            {TEAM_CONFIRM}
+                            {COMMON_TEXT_ADMIN.BUTTON.YES}
                         </Button>
                     </div>
                 </Modal.Actions>
             </Modal>
             {isEditMemberModalOpen && (
                 <Modal onClose={handleEditMemberOnClose} isOpen={isEditMemberModalOpen}>
-                    <Modal.Title>{TEAM_EDIT_MEMBER}</Modal.Title>
+                    <Modal.Title>{TEAM_MEMBERS_TEXT.FORM.TITLE.EDIT_MEMBER}</Modal.Title>
                     <Modal.Content>
                         <MemberForm
                             onValuesChange={(mfv) => setMemberToEdit(mfv)}
@@ -601,10 +592,10 @@ export const MembersList = ({
                             type="submit"
                             onClick={() => setIsDraftMode(true)}
                         >
-                            {TEAM_SAVE_AS_DRAFT}
+                            {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
                         </Button>
                         <Button formId="edit-member-modal" type="submit" buttonStyle={'primary'}>
-                            {TEAM_PUBLISH}
+                            {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                         </Button>
                     </Modal.Actions>
                 </Modal>
@@ -613,31 +604,31 @@ export const MembersList = ({
                 isOpen={isConfirmPublishNewMemberModalOpen}
                 onClose={() => setIsConfirmPublishNewMemberModalOpen(false)}
             >
-                <Modal.Title>{TEAM_PUBLISH_NEW_MEMBER}</Modal.Title>
+                <Modal.Title>{TEAM_MEMBERS_TEXT.QUESTION.PUBLISH_MEMBER}</Modal.Title>
                 <Modal.Content>
                     <></>
                 </Modal.Content>
                 <Modal.Actions>
                     <Button onClick={handleCancelPublish} buttonStyle={'secondary'}>
-                        {TEAM_CANCEL}
+                        {COMMON_TEXT_ADMIN.BUTTON.NO}
                     </Button>
                     <Button onClick={handleConfirmPublish} buttonStyle={'primary'}>
-                        {TEAM_CONFIRM}
+                        {COMMON_TEXT_ADMIN.BUTTON.YES}
                     </Button>
                 </Modal.Actions>
             </Modal>
 
             <Modal isOpen={isConfirmCloseModalOpen} onClose={() => setIsConfirmCloseModalOpen(false)}>
-                <Modal.Title>{TEAM_CHANGES_LOST}</Modal.Title>
+                <Modal.Title>{COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}</Modal.Title>
                 <Modal.Content>
                     <></>
                 </Modal.Content>
                 <Modal.Actions>
                     <Button onClick={() => setIsConfirmCloseModalOpen(false)} buttonStyle={'secondary'}>
-                        {TEAM_CANCEL}
+                        {COMMON_TEXT_ADMIN.BUTTON.NO}
                     </Button>
                     <Button buttonStyle={'primary'} onClick={handleConfirmClose}>
-                        {TEAM_CONFIRM}
+                        {COMMON_TEXT_ADMIN.BUTTON.YES}
                     </Button>
                 </Modal.Actions>
             </Modal>

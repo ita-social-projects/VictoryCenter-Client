@@ -1,0 +1,65 @@
+@use '../../../assets/sass/variables/colors';
+
+.btn {
+    &-primary {
+        padding: 0.5rem 1.5rem;
+        gap: 0.5rem;
+        color: white;
+        background-color: colors.$blue-500;
+        outline: none;
+        border: none;
+        transition: background-color 0.2s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+
+        &:active {
+            background-color: colors.$blue-900;
+            cursor: pointer;
+        }
+
+        &:disabled {
+            background-color: colors.$grey-600;
+            cursor: not-allowed;
+        }
+
+        &-disabled {
+            cursor: not-allowed;
+            background-color: colors.$grey-600;
+        }
+    }
+
+    &-secondary {
+        padding: 0.5rem 1.5rem;
+        gap: 0.5rem;
+        border: 1px solid colors.$blue-500;
+        color: colors.$blue-500;
+        background-color: white;
+        outline: none;
+        transition:
+            background-color 0.2s,
+            border-color 0.2s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+
+        &:active {
+            background-color: colors.$blue-50;
+            cursor: pointer;
+        }
+
+        &:disabled {
+            border-color: colors.$grey-600;
+            color: colors.$grey-700;
+            background-color: white;
+            cursor: not-allowed;
+        }
+
+        &-disabled {
+            cursor: not-allowed;
+            border: 1px solid colors.$grey-600;
+        }
+    }
+}

@@ -29,6 +29,6 @@ yarn-error.log*
 
 /.idea
 .idea/workspace.xml
-
+.vs/
 *.css
 *.map

@@ -4,9 +4,9 @@ import '@testing-library/jest-dom';
 import { OutroSection } from './OutroSection';
 import { OUTRO } from '../../../../../const/partners-page/partners-page';
 
-jest.mock('../../../../assets/partners-page-images/outro.mp4', () => 'mocked-outro-video');
+jest.mock('../../../../../assets/partners-page-images/outro.mp4', () => 'mocked-outro-video');
 
-jest.mock('../../../../const/partners-page/partners-page', () => ({
+jest.mock('../../../../../const/partners-page/partners-page', () => ({
     OUTRO: {
         TITLE: {
             FIRST_LINE: 'Mocked Title',

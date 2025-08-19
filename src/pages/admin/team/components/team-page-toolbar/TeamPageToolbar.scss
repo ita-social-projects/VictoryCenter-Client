@@ -1,17 +1,17 @@
 .toolbar {
-  display: flex;
-  justify-content: space-between;
-
-  &-actions {
     display: flex;
     justify-content: space-between;
-    gap: 1.25rem;
-  }
+
+    &-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 1.25rem;
+    }
 }
 
 @media (max-width: 1400px) {
-  .toolbar {
-    flex-wrap: wrap;
-    gap: 0.938rem;
-  }
+    .toolbar {
+        flex-wrap: wrap;
+        gap: 0.938rem;
+    }
 }

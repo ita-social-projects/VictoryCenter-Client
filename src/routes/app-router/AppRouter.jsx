@@ -15,7 +15,7 @@ import { DonatePage } from '../../pages/public/donate-page/DonatePage';
 import { LoginPage } from '../../pages/admin/login/LoginPage';
 import { AdminHomePage } from '../../pages/admin/home/AdminHomePage';
 import { TeamPage } from '../../pages/public/team-page/TeamPage';
-import { PartnersPage } from '../../pages/partners-page/PartnersPage';
+import { PartnersPage } from '../../pages/public/partners-page/PartnersPage';
 
 export const AppRouter = () => (
     <BrowserRouter>

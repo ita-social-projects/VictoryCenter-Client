@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
-import { DeleteTeamMemberModal } from '../team-member-modals/DeleteTeamMemberModal';
-import { TeamMemberModal } from '../team-member-modals/TeamMemberModal';
+import { DeleteTeamMemberModal } from '../team-member-modals/delete-team-member-modal/DeleteTeamMemberModal';
+import { TeamMemberModal } from '../team-member-modals/team-member-modal/TeamMemberModal';
 import { TEAM_CATEGORY_TEXT, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import axios from 'axios';
@@ -304,7 +304,10 @@ export const TeamPageContent = () => {
     const handleAddMember = useCallback(
         (member: TeamMember) => {
             setMembers((prevMembers) => {
-                if (prevMembers.length < pageSize * currentPageRef.current) {
+                if (
+                    prevMembers.length < pageSize * currentPageRef.current &&
+                    selectedCategory?.id === member.categoryId
+                ) {
                     return [...prevMembers, member];
                 } else {
                     setHasMore(true);
@@ -320,7 +323,7 @@ export const TeamPageContent = () => {
                 addToast(TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER, ToastType.Info);
             }
         },
-        [updateModalState, pageSize, addToast],
+        [updateModalState, pageSize, selectedCategory?.id, addToast],
     );
 
     const handleEditMember = useCallback(

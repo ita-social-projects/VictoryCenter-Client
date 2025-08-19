@@ -1,4 +1,3 @@
-import React from 'react';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import './MemberComponent.scss';
 import BlankUserImage from '../../../../../assets/icons/blank-user.svg';

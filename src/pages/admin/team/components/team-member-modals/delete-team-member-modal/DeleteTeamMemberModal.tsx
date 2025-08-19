@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Modal } from '../../../../../components/common/modal/Modal';
-import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import './TeamMemberModal.scss';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { TeamMember } from '../../../../../types/admin/team-members';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
-import { Button } from '../../../../../components/admin/button/Button';
+import { Modal } from '../../../../../../components/common/modal/Modal';
+import { TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
+import '../TeamMemberModal.scss';
+import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
+import { TeamMember } from '../../../../../../types/admin/team-members';
+import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { TeamMembersApi } from '../../../../../../services/api/admin/team/team-members/team-members-api';
+import { Button } from '../../../../../../components/admin/button/Button';
 
 interface DeleteTeamMemberModalProps {
     isOpen: boolean;

@@ -1,6 +1,6 @@
 import React from 'react';
-import { IntroSection } from './partners-page/intro-section/IntroSection';
-import { OutroSection } from './partners-page/outro-section/OutroSection';
+import { IntroSection } from './partners-sections/intro-section/IntroSection';
+import { OutroSection } from './partners-sections/outro-section/OutroSection';
 import { PartnerSection } from '../../components/partners/PartnerSection';
 import {
     PARTNER_FIRST_SECTION,

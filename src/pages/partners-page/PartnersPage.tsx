@@ -1,19 +1,46 @@
 import React from 'react';
-import { IntroSection } from './partners-page/intro-section/introSection';
-import { PartnersFirstSection } from './partners-page/partners-content/partnersFirstSection';
-import { PartnersSecondSectionContent } from './partners-page/partners-second-section/partnersSecondSection';
-import { PartnersThirdSection } from './partners-page/partners-third-section/partnersThirdSection';
-import { PartnersFourthSectionContent } from './partners-page/partners-fouth-section/partnersFourthSection';
-import { OutroSection } from './partners-page/outro-section/outroSection';
+import { IntroSection } from './partners-page/intro-section/IntroSection';
+import { OutroSection } from './partners-page/outro-section/OutroSection';
+import { PartnerSection } from '../../components/partners/PartnerSection';
+import {
+    PARTNER_FIRST_SECTION,
+    PARTNER_FOURTH_SECTION,
+    PARTNER_SECOND_SECTION,
+    PARTNER_THIRD_SECTION,
+    PARTNERS_FIRST_SECTION_DESCRIPTION,
+    PARTNERS_FIRST_SECTION_TITLE,
+    PARTNERS_FOURTH_SECTION_DESCRIPTION,
+    PARTNERS_FOURTH_SECTION_TITLE,
+    PARTNERS_SECOND_SECTION_DESCRIPTION,
+    PARTNERS_SECOND_SECTION_TITLE,
+    PARTNERS_THIRD_SECTION_DESCRIPTION,
+    PARTNERS_THIRD_SECTION_TITLE,
+} from '../../const/partners-page/partners-page';
 
-export const PartnersPage: React.FC = () => {
+export const PartnersPage = () => {
     return (
         <>
             <IntroSection />
-            <PartnersFirstSection />
-            <PartnersSecondSectionContent />
-            <PartnersThirdSection />
-            <PartnersFourthSectionContent />
+            <PartnerSection
+                title={PARTNERS_FIRST_SECTION_TITLE}
+                description={PARTNERS_FIRST_SECTION_DESCRIPTION}
+                partners={PARTNER_FIRST_SECTION}
+            />
+            <PartnerSection
+                title={PARTNERS_SECOND_SECTION_TITLE}
+                description={PARTNERS_SECOND_SECTION_DESCRIPTION}
+                partners={PARTNER_SECOND_SECTION}
+            />
+            <PartnerSection
+                title={PARTNERS_THIRD_SECTION_TITLE}
+                description={PARTNERS_THIRD_SECTION_DESCRIPTION}
+                partners={PARTNER_THIRD_SECTION}
+            />
+            <PartnerSection
+                title={PARTNERS_FOURTH_SECTION_TITLE}
+                description={PARTNERS_FOURTH_SECTION_DESCRIPTION}
+                partners={PARTNER_FOURTH_SECTION}
+            />
             <OutroSection />
         </>
     );

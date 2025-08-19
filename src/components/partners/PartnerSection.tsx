@@ -19,7 +19,7 @@ interface PartnerSectionProps {
     partners: Partner[];
 }
 
-export const PartnerSection: React.FC<PartnerSectionProps> = ({ title, description, partners }) => {
+export const PartnerSection = ({ title, description, partners }: PartnerSectionProps) => {
     return (
         <section className="partners-content-section">
             <div className="container">

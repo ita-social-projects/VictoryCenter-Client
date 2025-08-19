@@ -1,9 +1,9 @@
 import React from 'react';
-import './outro-section.scss';
+import './OutroSection.scss';
 import outro from '../../../../assets/partners-page-images/outro.mp4';
 import { OUTRO } from '../../../../const/partners-page/partners-page';
 
-export const OutroSection: React.FC = () => {
+export const OutroSection = () => {
     return (
         <div className="video-background-container">
             <video autoPlay muted loop playsInline className="background-video">

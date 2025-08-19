@@ -1,9 +1,9 @@
 import React from 'react';
-import './intro-section.scss';
+import './IntroSection.scss';
 import background from '../../../../assets/partners-page-images/horses.png';
 import { PARTNERS_PAGE_SUBTITLE, PARTNERS_PAGE_TITLE } from '../../../../const/partners-page/partners-page';
 
-export const IntroSection: React.FC = () => {
+export const IntroSection = () => {
     return (
         <div className="partners-intro-block">
             <img src={background} className="background-img-partners" alt="Horses" />

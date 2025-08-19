@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { IntroSection } from './introSection';
+import { IntroSection } from './IntroSection';
 
 jest.mock('../../../../assets/partners-page-images/horses.png', () => 'mocked-horses-image');
 

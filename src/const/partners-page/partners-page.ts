@@ -233,30 +233,24 @@ export const PARTNER_FOURTH_SECTION = [
     },
     {
         id: 6,
-        name: 'Проєкт “Жива”',
-        logo: liveLogo,
-        description: 'Проєкт “Жива”',
-    },
-    {
-        id: 7,
         name: 'ACA BUREAU',
         logo: acaBureauLogo,
         description: 'ACA BUREAU',
     },
     {
-        id: 8,
+        id: 7,
         name: 'Art.Navigator.Academy',
         logo: artNavigatorLogo,
         description: 'Art.Navigator.Academy',
     },
     {
-        id: 9,
+        id: 8,
         name: 'ТОВ “Карпатська енергія”',
         logo: carpathianEnergyLogo,
         description: 'ТОВ “Карпатська енергія”',
     },
     {
-        id: 10,
+        id: 9,
         name: 'Факультет Психології КНУ ім. Т. Шевченка',
         logo: psychologyFacultyLogo,
         description: 'Факультет Психології КНУ ім. Т. Шевченка',

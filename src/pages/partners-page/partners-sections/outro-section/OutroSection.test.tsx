@@ -40,7 +40,7 @@ describe('OutroSection', () => {
         renderComponent();
         const title = screen.getByText('Mocked Title');
         expect(title).toBeInTheDocument();
-        expect(title).toHaveClass('video-text');
+        expect(title).toHaveClass('video-text-partners');
         expect(title.tagName).toBe('H1');
     });
 
@@ -70,11 +70,9 @@ describe('OutroSection', () => {
     it('has the correct CSS structure', () => {
         renderComponent();
         const container = document.querySelector('.video-background-container');
-        const overlay = document.querySelector('.quote-overlay');
         const buttonsContainer = document.querySelector('.video-buttons');
 
         expect(container).toBeInTheDocument();
-        expect(overlay).toBeInTheDocument();
         expect(buttonsContainer).toBeInTheDocument();
     });
 

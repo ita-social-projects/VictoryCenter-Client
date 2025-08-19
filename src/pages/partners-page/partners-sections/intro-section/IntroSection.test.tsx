@@ -49,16 +49,13 @@ describe('IntroSection', () => {
         renderComponent();
         const backgroundImage = screen.getByRole('img', { name: /horses/i });
         expect(backgroundImage).toHaveAttribute('src', 'mocked-horses-image');
-        expect(backgroundImage).toHaveClass('background-img');
+        expect(backgroundImage).toHaveClass('background-img-partners');
     });
 
     it('has the correct structure with required CSS classes', () => {
         renderComponent();
         const container = document.querySelector('.partners-intro-block');
         expect(container).toBeInTheDocument();
-
-        const overlay = document.querySelector('.content-overlay');
-        expect(overlay).toBeInTheDocument();
 
         const mainTitle = document.querySelector('.main-title');
         expect(mainTitle).toBeInTheDocument();

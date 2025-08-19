@@ -1,0 +1,21 @@
+@use '../../../../../assets/sass/variables/colors';
+
+.team-member-form-main {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  .form-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .error {
+    color: colors.$error;
+    font-weight: 400;
+    font-size: 0.875rem;
+    line-height: 20px;
+  }
+}

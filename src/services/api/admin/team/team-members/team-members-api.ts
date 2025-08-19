@@ -1,10 +1,8 @@
-import { MemberFormValues } from '../../../../../pages/admin/team/components/member-form/MemberForm';
 import { AxiosInstance } from 'axios';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/common';
+import { TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../types/admin/team-members';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { VisibilityStatus } from '../../../../../types/admin/common';
 import { ImageApi } from '../../image/image-api';
-import { TeamMember, TeamMemberDto } from '../../../../../types/admin/team-members';
 
 export const TeamMembersApi = {
     getAll: async (
@@ -13,7 +11,7 @@ export const TeamMembersApi = {
         status?: VisibilityStatus | null,
         offset?: number,
         limit?: number,
-    ): Promise<TeamMember[]> => {
+    ): Promise<PaginationResult<TeamMember>> => {
         const params: Record<string, any> = {};
 
         if (categoryId !== undefined && categoryId !== null) {
@@ -29,24 +27,8 @@ export const TeamMembersApi = {
             params.limit = Math.floor(limit);
         }
 
-        const response = await client.get<TeamMemberDto[]>(API_ROUTES.TEAM.BASE, { params });
-        return response.data.map(mapTeamMemberDtoToTeamMember);
-    },
-
-    updateDraft: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
-        await TeamMembersApi.updateMember(client, id, member, VisibilityStatus.Draft);
-    },
-
-    updatePublish: async (client: AxiosInstance, id: number, member: MemberFormValues) => {
-        await TeamMembersApi.updateMember(client, id, member, VisibilityStatus.Published);
-    },
-
-    postDraft: async (client: AxiosInstance, member: MemberFormValues) => {
-        await TeamMembersApi.postMember(client, member, VisibilityStatus.Draft);
-    },
-
-    postPublished: async (client: AxiosInstance, member: MemberFormValues) => {
-        await TeamMembersApi.postMember(client, member, VisibilityStatus.Published);
+        const response = await client.get<PaginationResult<TeamMember>>(`${API_ROUTES.TEAM.BASE}`, { params });
+        return response.data;
     },
 
     delete: async (client: AxiosInstance, id: number) => {
@@ -60,7 +42,11 @@ export const TeamMembersApi = {
         });
     },
 
-    updateMember: async (client: AxiosInstance, id: number, member: MemberFormValues, status: VisibilityStatus) => {
+    updateMember: async (
+        client: AxiosInstance,
+        id: number,
+        member: TeamMemberCreateUpdateRequest,
+    ): Promise<TeamMember> => {
         let imageIdToDelete: number | null = null;
         let finalImageId = member.imageId;
 
@@ -77,10 +63,10 @@ export const TeamMembersApi = {
             finalImageId = null;
         }
 
-        await client.put(`${API_ROUTES.TEAM.BASE}/${id}`, {
+        const response = await client.put(`${API_ROUTES.TEAM.BASE}/${id}`, {
             fullName: member.fullName,
-            categoryId: member.category.id,
-            status: status,
+            categoryId: member.categoryId,
+            status: member.status,
             description: member.description,
             email: '',
             imageId: finalImageId,
@@ -89,30 +75,25 @@ export const TeamMembersApi = {
         if (imageIdToDelete && imageIdToDelete !== finalImageId) {
             await ImageApi.delete(client, imageIdToDelete);
         }
+
+        return response.data as TeamMember;
     },
 
-    postMember: async (client: AxiosInstance, member: MemberFormValues, status: VisibilityStatus) => {
+    postMember: async (client: AxiosInstance, member: TeamMemberCreateUpdateRequest): Promise<TeamMember> => {
         let imageId: number | null = null;
         if (member.image) {
             const imageResult = await ImageApi.post(client, member.image);
             imageId = imageResult.id;
         }
-        await client.post(API_ROUTES.TEAM.BASE, {
+        const response = await client.post(`${API_ROUTES.TEAM.BASE}`, {
             fullName: member.fullName,
-            categoryId: member.category.id,
-            status: status,
+            categoryId: member.categoryId,
+            status: member.status,
             description: member.description,
             email: '', // TODO: implement email post
             imageId: imageId,
         });
+
+        return response.data as TeamMember;
     },
 };
-
-export const mapTeamMemberDtoToTeamMember = (dto: TeamMemberDto): TeamMember => ({
-    id: dto.id,
-    img: dto.image,
-    fullName: dto.fullName,
-    description: dto.description,
-    status: dto.status === VisibilityStatus.Draft ? COMMON_TEXT_ADMIN.STATUS.DRAFT : COMMON_TEXT_ADMIN.STATUS.PUBLISHED,
-    category: dto.category,
-});

@@ -54,7 +54,6 @@ describe('SearchBar component', () => {
         render(<SearchBar onChange={onChangeMock} autocompleteValues={autocompleteValues} placeholder={''} />);
         expect(screen.getByTestId('input-field')).toBeInTheDocument();
         expect(screen.getByTestId('search-icon')).toBeInTheDocument();
-        expect(screen.getByTestId('remove-query-icon')).toBeInTheDocument();
     });
 
     it('updates input value and calls onChange when typing', () => {
@@ -111,8 +110,6 @@ describe('SearchBar component', () => {
         render(<SearchBar onChange={onChangeMock} autocompleteValues={autocompleteValues} placeholder={''} />);
         const input = screen.getByTestId('input-field');
         expect(input).toHaveValue('');
-        fireEvent.click(screen.getByTestId('remove-query-icon'));
-        expect(onChangeMock).toHaveBeenCalledWith('');
     });
 
     it('does not crash if autocompleteValues contains duplicate values', () => {

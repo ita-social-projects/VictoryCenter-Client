@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import ArrowUpIcon from '../../../assets/icons/arrow-up.svg';
+import ArrowUpIcon from '../../../assets/icons/arrow-up-white.svg';
 import NotFoundIcon from '../../../assets/icons/not-found.svg';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './InfiniteScrollList.scss';

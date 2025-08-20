@@ -1,7 +1,7 @@
 import React from 'react';
 import './OutroSection.scss';
 import outro from '../../../../../assets/partners-page-images/outro.mp4';
-import { OUTRO } from '../../../../../const/public/partners-page';
+import { OUTRO } from '../../../../../const/partners-page/partners-page';
 
 export const OutroSection = () => {
     return (

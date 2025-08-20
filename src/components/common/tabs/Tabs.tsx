@@ -1,4 +1,5 @@
 import { TabProps } from '../../../types/public/donate-page';
+import { NOT_AVAIBLE, CHECK_LATER } from '../../../const/public/tabs';
 import './Tabs.scss';
 
 export const Tabs = ({ tabs, activeTab, setActiveTab }: TabProps) => {
@@ -14,8 +15,8 @@ export const Tabs = ({ tabs, activeTab, setActiveTab }: TabProps) => {
                         </button>
                         <span className="tooltip-text">
                             <div className="text-center">
-                                <p className="font-semibold">Not yet available.</p>
-                                <p>Please check back later!</p>
+                                <p className="font-semibold">{NOT_AVAIBLE}</p>
+                                <p>{CHECK_LATER}</p>
                             </div>
                         </span>
                     </div>

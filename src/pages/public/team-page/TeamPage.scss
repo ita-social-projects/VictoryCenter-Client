@@ -10,6 +10,13 @@
     justify-content: center;
     margin: 8rem auto auto;
 
+    .team-loader{
+        width: 70%;
+        margin-bottom: 4rem;
+        position: relative;
+        z-index: 10;
+    }
+
     h2 {
         color: colors.$blue-900;
         font-size: 2.5rem;

@@ -5,11 +5,9 @@ interface ModalProps {
     children?: ReactNode;
     isOpen: boolean;
     onClose: () => void;
-    width?: string | number;
-    maxWidth?: string;
 }
 
-export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '600px' }: ModalProps) => {
+export const Modal = ({ children, isOpen, onClose }: ModalProps) => {
     const mouseDownInsideModal = useRef(false);
     const modalRef = useRef<HTMLDivElement>(null);
     const titleId = useId();
@@ -92,11 +90,6 @@ export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '60
 
     if (!isOpen) return null;
 
-    const modalStyle = {
-        width: typeof width === 'number' ? `${width}px` : width,
-        maxWidth,
-    };
-
     const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => {
         if (e.target === e.currentTarget && !mouseDownInsideModal.current) {
             onClose();
@@ -129,7 +122,6 @@ export const Modal = ({ children, isOpen, onClose, width = '80%', maxWidth = '60
                 role="button"
                 aria-labelledby={titleId}
                 className="modal-container"
-                style={modalStyle}
                 onMouseDown={handleOnMouseDownModal}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}

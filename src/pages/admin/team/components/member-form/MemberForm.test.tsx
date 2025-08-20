@@ -5,6 +5,7 @@ import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../const/
 import { TeamCategory } from '../../../../../types/admin/team-members';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 
+// Mock SingleSelectInput to a native select for deterministic interaction
 jest.mock('../../../../../components/common/single-select-input/SingleSelectInput', () => ({
     SingleSelectInput: ({ options, value, onChange, placeholder, getOptionId, getOptionName, disabled }: any) => {
         return (

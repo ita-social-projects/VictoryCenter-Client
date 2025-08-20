@@ -4,6 +4,10 @@ export const PUBLIC_ROUTES = {
         PATH: 'team',
         FULL: '/team',
     },
+    PARTNERS: {
+        PATH: 'partners-page',
+        FULL: '/partners-page',
+    },
     ABOUT_US: {
         PATH: 'about-us',
         FULL: '/about-us',

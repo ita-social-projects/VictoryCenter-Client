@@ -63,7 +63,7 @@ export const TeamMembersApi = {
             finalImageId = null;
         }
 
-        const response = await client.put<TeamMember>(`${API_ROUTES.TEAM.BASE}/${id}`, {
+        const response = await client.put(`${API_ROUTES.TEAM.BASE}/${id}`, {
             fullName: member.fullName,
             categoryId: member.categoryId,
             status: member.status,
@@ -76,7 +76,7 @@ export const TeamMembersApi = {
             await ImageApi.delete(client, imageIdToDelete);
         }
 
-        return response.data;
+        return response.data as TeamMember;
     },
 
     postMember: async (client: AxiosInstance, member: TeamMemberCreateUpdateRequest): Promise<TeamMember> => {
@@ -85,7 +85,7 @@ export const TeamMembersApi = {
             const imageResult = await ImageApi.post(client, member.image);
             imageId = imageResult.id;
         }
-        const response = await client.post<TeamMember>(`${API_ROUTES.TEAM.BASE}`, {
+        const response = await client.post(`${API_ROUTES.TEAM.BASE}`, {
             fullName: member.fullName,
             categoryId: member.categoryId,
             status: member.status,
@@ -94,6 +94,6 @@ export const TeamMembersApi = {
             imageId: imageId,
         });
 
-        return response.data;
+        return response.data as TeamMember;
     },
 };

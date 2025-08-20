@@ -9,7 +9,7 @@ export const TEAM_MEMBERS_TEXT = {
     MESSAGE: {
         FAIL_TO_FETCH_MEMBERS: 'Виникла помилка, не вдалось завантажити учасників команди',
         FAIL_TO_REORDER_MEMBERS: 'Виникла помилка, не вдалось змінити пріоритет учасників команди',
-        DONT_FORGET_TO_ORDER: 'Не забудь встановити порядок відображення',
+        DONT_FORGET_TO_ORDER: 'Hе забудьте налаштувати порядок відображення члена команди на сайті',
     },
 
     QUESTION: {

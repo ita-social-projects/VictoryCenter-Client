@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { DONATE_SECTION } from '../../../../const/public/donate-page';
 import { DonateTab, Currency, PaymentSystem } from '../../../../types/public/donate-page';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
+import { getEnvVariable } from '../../../../utils/functions/get-env-variable/get-env-variable';
 
 export const DonateSection = () => {
     const [activeTab, setActiveTab] = useState<DonateTab>(DonateTab.oneTime);
@@ -47,7 +48,7 @@ export const DonateSection = () => {
     return (
         <form
             className="donateSection"
-            action={API_ROUTES.PAYMENTS.DONATE}
+            action={`${getEnvVariable('REACT_APP_BACKEND_URL')}/${API_ROUTES.PAYMENTS.DONATE}`}
             method="post"
             onSubmit={handleSubmit}
             data-testid="donate-section-form"

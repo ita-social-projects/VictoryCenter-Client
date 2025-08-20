@@ -23,6 +23,7 @@ export const DraggableListItem = <TEntity,>({
     idSelector,
     onEntitiesReordered,
 }: DraggableListItemProps<TEntity>) => {
+    const emptyDragImage = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
     const [dragPreview, setDragPreview] = useState<DragPreviewModel<TEntity>>({
         visible: false,
         x: 0,
@@ -77,7 +78,7 @@ export const DraggableListItem = <TEntity,>({
             });
 
             const dragImage = new Image();
-            dragImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=';
+            dragImage.src = emptyDragImage;
             e.dataTransfer.setDragImage(dragImage, 0, 0);
         },
         [entities, idSelector],

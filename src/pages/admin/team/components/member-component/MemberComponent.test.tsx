@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemberComponent, MemberComponentProps } from './MemberComponent';
 import '@testing-library/jest-dom';
-import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { VisibilityStatus } from '../../../../../types/admin/common';
+import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 
 jest.mock('../../../../../assets/icons/blank-user.svg', () => 'blank-user.svg');
 

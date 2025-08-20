@@ -5,13 +5,13 @@
     &-actions {
         display: flex;
         justify-content: space-between;
-        gap: 20px;
+        gap: 1.25rem;
     }
 }
 
 @media (max-width: 1400px) {
     .toolbar {
         flex-wrap: wrap;
-        gap: 15px;
+        gap: 0.938rem;
     }
 }

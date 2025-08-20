@@ -47,34 +47,6 @@ describe('Modal Component', () => {
         expect(document.querySelector('.modal-container')).toBeInTheDocument();
     });
 
-    test('applies correct styles based on width and maxWidth props', () => {
-        render(
-            <Modal {...defaultProps} width="500px" maxWidth="800px">
-                <Modal.Title>Title</Modal.Title>
-                <Modal.Content>Content</Modal.Content>
-            </Modal>,
-        );
-        const modalContainer = document.querySelector('.modal-container');
-        expect(modalContainer).toHaveStyle({
-            width: '500px',
-            maxWidth: '800px',
-        });
-    });
-
-    test('applies numeric width prop correctly', () => {
-        render(
-            <Modal {...defaultProps} width={400}>
-                <Modal.Title>Title</Modal.Title>
-                <Modal.Content>Content</Modal.Content>
-            </Modal>,
-        );
-        const modalContainer = document.querySelector('.modal-container');
-        expect(modalContainer).toHaveStyle({
-            width: '400px',
-            maxWidth: '600px',
-        });
-    });
-
     test('calls onClose when clicking overlay (proper sequence)', async () => {
         render(
             <Modal {...defaultProps}>
@@ -306,20 +278,6 @@ describe('Modal Component', () => {
         fireEvent.keyDown(modalContainer, { key: 'Tab' }); // should not throw or change focus
         // Just verify it doesn't throw an error
         expect(modalContainer).toBeInTheDocument();
-    });
-
-    test('applies default width and maxWidth when props are not provided', () => {
-        render(
-            <Modal isOpen={true} onClose={mockOnClose}>
-                <Modal.Content>Default styles</Modal.Content>
-            </Modal>,
-        );
-
-        const modalContainer = document.querySelector('.modal-container');
-        expect(modalContainer).toHaveStyle({
-            width: '80%',
-            maxWidth: '600px',
-        });
     });
 
     test('trapFocus early returns when key is not Tab', () => {

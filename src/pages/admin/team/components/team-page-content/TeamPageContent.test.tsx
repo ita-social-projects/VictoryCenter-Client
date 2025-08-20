@@ -43,7 +43,7 @@ jest.mock('../../../../../contexts/admin/toast-context-provider/ToastContextProv
     }),
 }));
 
-jest.mock('../team-member-modals/TeamMemberModal', () => ({
+jest.mock('../team-member-modals/team-member-modal/TeamMemberModal', () => ({
     TeamMemberModal: (props: any) => {
         if (!props.isOpen) return null;
 
@@ -76,7 +76,7 @@ jest.mock('../team-member-modals/TeamMemberModal', () => ({
     },
 }));
 
-jest.mock('../team-member-modals/DeleteTeamMemberModal', () => ({
+jest.mock('../team-member-modals/delete-team-member-modal/DeleteTeamMemberModal', () => ({
     DeleteTeamMemberModal: (props: any) =>
         props.isOpen ? (
             <div data-testid="delete-member-modal">

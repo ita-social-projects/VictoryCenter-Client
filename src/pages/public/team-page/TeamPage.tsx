@@ -30,11 +30,9 @@ export const TeamPage: React.FC = () => {
                 const { teamData } = response;
                 setTeamData(teamData);
                 setError(null);
-                setLoading(false);
             } catch {
                 setError(DOWNLOAD_ERROR);
                 setTeamData([]);
-                setLoading(false);
             } finally {
                 setLoading(false);
             }
@@ -51,7 +49,9 @@ export const TeamPage: React.FC = () => {
             )}
 
             {loading ? (
-                <LinearProgress className="linear-loader" />
+                <div className="team-loader">
+                    <LinearProgress />
+                </div>
             ) : (
                 teamData.map((team, index) => (
                     <div

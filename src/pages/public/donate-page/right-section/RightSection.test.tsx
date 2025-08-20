@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { RightSection } from './RightSection';
 import '@testing-library/jest-dom';
 
-jest.mock('./Ukraine-payment-details/UkrainePaymentDetails', () => ({
+jest.mock('./ukraine-payment-details/UkrainePaymentDetails.tsx', () => ({
     UkrainePaymentDetails: () => <div data-testid="ukraine-payment">Ukraine Payment Details</div>,
 }));
 

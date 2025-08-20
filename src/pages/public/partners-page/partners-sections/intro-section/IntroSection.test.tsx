@@ -5,7 +5,7 @@ import { IntroSection } from './IntroSection';
 
 jest.mock('../../../../../assets/partners-page-images/horses.png', () => 'mocked-horses-image');
 
-jest.mock('../../../../../const/partners-page/partners-page', () => ({
+jest.mock('../../../../../const/public/partners-page.ts', () => ({
     PARTNERS_PAGE_SUBTITLE: 'Mocked subtitle text',
     PARTNERS_PAGE_TITLE: {
         FIRST_LINE: {

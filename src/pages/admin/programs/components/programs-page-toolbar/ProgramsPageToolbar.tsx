@@ -3,13 +3,13 @@ import PlusIcon from '../../../../../assets/icons/plus.svg';
 import { Button } from '../../../../../components/admin/button/Button';
 import { Select } from '../../../../../components/admin/select/Select';
 import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
+import { ProgramSuggestionItem } from './program-suggestion-item/ProgramSuggestionItem';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { ProgramSuggestion } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { SuggestionContentRenderProps } from '../../../../../components/admin/search-bar/suggestion-wrapper/SuggestionWrapper';
-import { ProgramSuggestionItem } from './program-suggestion-item/ProgramSuggestionItem';
 import {
     PaginationRequestParams,
     useEntitiesPaginationFetch,
@@ -61,12 +61,26 @@ export const ProgramsPageToolbar = ({
         pageSize: SUGGESTIONS_PAGE_SIZE,
     });
 
-    const onSuggestionSelected = useCallback(
-        (suggestion: ProgramSuggestion) => onProgramSelect?.(suggestion.id),
-        [onProgramSelect],
+    const onSearch = useCallback(
+        (query: string) => {
+            setCurrentSearchTerm(query);
+        },
+        [suggestionsActions],
     );
 
-    const onSearch = useCallback((query: string) => setCurrentSearchTerm(query), []);
+    const onSuggestionSelected = useCallback(
+        (suggestion: ProgramSuggestion) => {
+            onProgramSelect?.(suggestion.id);
+            suggestionsActions.resetList();
+            setCurrentSearchTerm('');
+        },
+        [onProgramSelect, suggestionsActions],
+    );
+
+    const handleSearchClear = useCallback(() => {
+        suggestionsActions.resetList();
+        onSearchClear?.();
+    }, [onSearchClear, suggestionsActions]);
 
     const renderSuggestionContent = useCallback(
         (props: SuggestionContentRenderProps<ProgramSuggestion>) => (
@@ -92,8 +106,8 @@ export const ProgramsPageToolbar = ({
                         onLoadMore={suggestionsActions.fetchMore}
                         hasMore={isSuggestionsHasMore}
                         isLoading={isSuggestionsLoading}
-                        onSearch={onSearch}
-                        onClear={onSearchClear}
+                        onQueryChange={onSearch}
+                        onClear={handleSearchClear}
                         placeholder={PROGRAMS_TEXT.PLACEHOLDER.SEARCH_PROGRAMS}
                         notFoundMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
                         minCharactersToSearch={MIN_CHARACTERS_TO_SEARCH}

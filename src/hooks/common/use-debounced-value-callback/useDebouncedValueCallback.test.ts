@@ -4,7 +4,7 @@ import { useDebouncedValueCallback, UseDebouncedValueCallbackProps } from './use
 jest.useFakeTimers();
 
 describe('useDebouncedValueCallback', () => {
-    const setup = <T,>(props: UseDebouncedValueCallbackProps<T>) =>
+    const setup = <T>(props: UseDebouncedValueCallbackProps<T>) =>
         renderHook((p: UseDebouncedValueCallbackProps<T>) => useDebouncedValueCallback(p), {
             initialProps: props,
         });

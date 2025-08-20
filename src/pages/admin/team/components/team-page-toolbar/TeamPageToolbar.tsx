@@ -22,9 +22,15 @@ export const TeamPageToolbar = ({
     return (
         <div className="toolbar" data-testid="team-page-toolbar">
             <div>
-                <SearchBar
-                    onChange={onSearchQueryChange}
-                    autocompleteValues={autocompleteValues}
+                <SearchBar<string>
+                    getSuggestionKey={(suggestion) => suggestion}
+                    hasMore={false}
+                    suggestions={[]}
+                    onLoadMore={() => {}}
+                    onQueryChange={onSearchQueryChange}
+                    isLoading={false}
+                    getSuggestionLabel={(suggestion) => suggestion}
+                    onSuggestionSelect={(_) => {}}
                     placeholder={TEAM_MEMBERS_TEXT.SEARCH.INPUT_FULLNAME}
                 />
             </div>

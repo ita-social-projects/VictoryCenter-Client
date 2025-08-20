@@ -52,7 +52,7 @@ describe('SearchBar', () => {
 
     const defaultProps: SearchBarProps<TestItem> = {
         suggestions: mockSuggestions,
-        onSearch: jest.fn(),
+        onQueryChange: jest.fn(),
         onSuggestionSelect: jest.fn(),
         getSuggestionKey: (item) => item.id,
         getSuggestionLabel: (item) => item.name,
@@ -195,7 +195,7 @@ describe('SearchBar', () => {
             typeInInput('test');
             clickClearButton();
             expectInputValue('');
-            expect(defaultProps.onSearch).toHaveBeenCalledWith('');
+            expect(defaultProps.onQueryChange).toHaveBeenCalledWith('');
         });
 
         it('calls onClear when clear button is clicked', () => {

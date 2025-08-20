@@ -16,7 +16,7 @@ export const TOOLTIP_WIDTH_MULTIPLY = 1.5;
 
 export interface SearchBarProps<T> {
     suggestions: T[];
-    onSearch: (query: string) => void;
+    onQueryChange: (query: string) => void;
     onSuggestionSelect: (item: T) => void;
     getSuggestionKey: (item: T) => string | number;
     getSuggestionLabel: (item: T) => string;
@@ -46,7 +46,7 @@ export const SearchBar = <T,>({
     onLoadMore,
     isLoading,
     hasMore,
-    onSearch,
+    onQueryChange,
     onClear,
     placeholder = undefined,
     notFoundMessage = undefined,
@@ -54,6 +54,7 @@ export const SearchBar = <T,>({
     minCharactersToSearch = 1,
 }: SearchBarProps<T>) => {
     const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedValue, setDebouncedValue] = useState('');
     const [activeIndex, setActiveIndex] = useState<number>(-1);
     const [isDropdownVisible, setDropdownVisible] = useState(false);
     const [tooltipState, setTooltipState] = useState<TooltipState>({
@@ -68,7 +69,7 @@ export const SearchBar = <T,>({
     const tooltipRef = useRef(null);
 
     const handleTooltipShow = useCallback((element: Element, content: React.ReactNode) => {
-        // Use setTimeout to defer state update and avoid "Cannot update component while rendering" error.
+        // Use setTimeout to defer state update and avoid "Cannot update component while rendering" error
         // This occurs when ResizeObserver synchronously triggers (inside of suggestion content) during first hover, causing setState
         // to be called while the TextSuggestionContent component is still in the rendering phase.
         setTimeout(() => {
@@ -83,19 +84,21 @@ export const SearchBar = <T,>({
     }, []);
 
     const hideTooltip = useCallback(() => {
-        setTooltipState((prev) => ({ ...prev, isVisible: false }));
+        setTooltipState({ content: null, positioner: null, isVisible: false });
     }, []);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newQuery = event.target.value;
         setSearchQuery(newQuery);
+        setDebouncedValue(newQuery);
         setActiveIndex(-1);
         setDropdownVisible(newQuery.length >= minCharactersToSearch);
     };
 
     const handleItemSelect = useCallback(
         (item: T) => {
-            setSearchQuery(getSuggestionLabel(item));
+            const label = getSuggestionLabel(item);
+            setSearchQuery(label);
             onSuggestionSelect(item);
             hideTooltip();
             setDropdownVisible(false);
@@ -106,16 +109,17 @@ export const SearchBar = <T,>({
 
     const handleClickOutside = useCallback(() => {
         setDropdownVisible(false);
+        setActiveIndex(-1);
         setTooltipState((prev) => ({ ...prev, isVisible: false }));
     }, []);
 
     const handleClear = () => {
         setSearchQuery('');
-        onSearch('');
-        hideTooltip();
+        setDebouncedValue('');
         setDropdownVisible(false);
         setActiveIndex(-1);
-        //inputRef.current?.focus();
+        hideTooltip();
+        onQueryChange('');
         onClear?.();
         setTimeout(() => inputRef.current?.focus(), 0);
     };
@@ -147,11 +151,18 @@ export const SearchBar = <T,>({
         }
     }, [activeIndex]);
 
+    const onDebouncedCallback = useCallback(
+        (query: string) => {
+            onQueryChange(query);
+        },
+        [onQueryChange],
+    );
+
     useDebouncedValueCallback({
-        value: searchQuery,
+        value: debouncedValue,
         delay: searchDelayMs,
-        disableWhen: searchQuery.length < minCharactersToSearch,
-        callback: onSearch,
+        disableWhen: debouncedValue.length < minCharactersToSearch,
+        callback: onDebouncedCallback,
     });
 
     useOnClickOutside({
@@ -178,6 +189,11 @@ export const SearchBar = <T,>({
         disableAfterFirstSuccess: true,
     });
 
+    const isShowClearButton = searchQuery.length > 0;
+    const isShowNotFoundMessage =
+        !isLoading && suggestions.length === 0 && debouncedValue.length >= minCharactersToSearch;
+    const isShowTooltip = !!tooltipState.positioner && tooltipState.isVisible && !!tooltipState.content;
+
     return (
         <div className="search-bar" ref={searchContainerRef}>
             <div className="search-bar__wrapper">
@@ -194,7 +210,7 @@ export const SearchBar = <T,>({
                         placeholder={placeholder ?? COMMON_TEXT_ADMIN.FILTER.SEARCH_BY_NAME}
                         autoComplete="off"
                     />
-                    {searchQuery.length > 0 && (
+                    {isShowClearButton && (
                         <button
                             className="search-bar__icon search-bar__icon--clear"
                             onClick={handleClear}
@@ -216,22 +232,21 @@ export const SearchBar = <T,>({
                             ref={suggestionsListRef}
                             onMouseLeave={hideTooltip}
                         >
-                            {suggestions.length > 0
-                                ? suggestions.map((item, index) => (
-                                      <SuggestionWrapper
-                                          key={getSuggestionKey(item)}
-                                          item={item}
-                                          isActive={index === activeIndex}
-                                          onSelect={() => handleItemSelect(item)}
-                                          onHover={() => setActiveIndex(index)}
-                                          onShowTooltip={handleTooltipShow}
-                                          onHideTooltip={hideTooltip}
-                                          renderContent={renderSuggestionItem}
-                                          getItemLabel={getSuggestionLabel}
-                                      />
-                                  ))
-                                : !isLoading && <li className="search-bar__not-found">{notFoundMessage}</li>}
+                            {suggestions.map((item, index) => (
+                                <SuggestionWrapper
+                                    key={getSuggestionKey(item)}
+                                    item={item}
+                                    isActive={index === activeIndex}
+                                    onSelect={() => handleItemSelect(item)}
+                                    onHover={() => setActiveIndex(index)}
+                                    onShowTooltip={handleTooltipShow}
+                                    onHideTooltip={hideTooltip}
+                                    renderContent={renderSuggestionItem}
+                                    getItemLabel={getSuggestionLabel}
+                                />
+                            ))}
                         </ul>
+                        {isShowNotFoundMessage && <div className="search-bar__not-found">{notFoundMessage}</div>}
                         {isLoading && (
                             <div className="search-bar__loader-container">
                                 <InlineLoader />
@@ -241,13 +256,13 @@ export const SearchBar = <T,>({
                 )}
             </div>
 
-            {tooltipState.positioner && tooltipState.isVisible && tooltipState.content && (
+            {isShowTooltip && (
                 <Tooltip
                     ref={tooltipRef}
                     position="bottom"
                     isRenderInPortal={true}
                     allowClickThrough={true}
-                    portalPositioner={tooltipState.positioner}
+                    portalPositioner={tooltipState.positioner!}
                     customMaxWidthInPixels={tooltipMaxWidth * TOOLTIP_WIDTH_MULTIPLY}
                 >
                     {tooltipState.content}

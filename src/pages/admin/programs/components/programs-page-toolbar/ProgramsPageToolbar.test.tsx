@@ -34,14 +34,18 @@ jest.mock('../../../../../components/admin/select/Select', () => ({
 
 jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
     SearchBar: ({
-        onSearch,
+        onQueryChange,
         onClear,
         onSuggestionSelect,
         suggestions,
         placeholder,
     }: SearchBarProps<ProgramSuggestion>) => (
         <div>
-            <input placeholder={placeholder} onChange={(e) => onSearch?.(e.target.value)} data-testid="search-input" />
+            <input
+                placeholder={placeholder}
+                onChange={(e) => onQueryChange?.(e.target.value)}
+                data-testid="search-input"
+            />
             <button onClick={onClear} data-testid="clear-button">
                 Clear
             </button>

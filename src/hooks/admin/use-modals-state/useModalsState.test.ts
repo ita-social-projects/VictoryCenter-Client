@@ -322,7 +322,7 @@ describe('useModalsState', () => {
 
         act(() => {
             result.current.openModalActions.openAddCategoryModal();
-        })
+        });
 
         expect(result.current.modalState.isAddModalOpen).toBe(false);
         expect(result.current.modalState.itemToEdit).toBe('test-item');

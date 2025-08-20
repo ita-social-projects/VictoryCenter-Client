@@ -97,7 +97,7 @@ describe('useEntitiesFetch', () => {
 
     it('should ignore axios canceled error', async () => {
         mockedAxios.isCancel.mockReturnValue(true);
-        const fetchHandler = jest.fn().mockRejectedValue({ name: 'Cancel error',  message: 'Canceled' });
+        const fetchHandler = jest.fn().mockRejectedValue({ name: 'Cancel error', message: 'Canceled' });
         const { result } = renderHook(() => useEntitiesFetch(createProps(fetchHandler, false)));
 
         act(() => result.current.actions.refetch());

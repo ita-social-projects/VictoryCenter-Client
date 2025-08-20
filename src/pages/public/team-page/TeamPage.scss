@@ -1,0 +1,294 @@
+@use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/fonts';
+
+.team-page-container {
+    width: 100%;
+    font-family: fonts.$mulish-regular-font;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 8rem auto auto;
+
+    .team-loader {
+        width: 70%;
+        margin-bottom: 4rem;
+        position: relative;
+        z-index: 10;
+    }
+
+    h2 {
+        color: colors.$blue-900;
+        font-size: 2.5rem;
+        line-height: 3rem;
+        letter-spacing: -0.05rem;
+    }
+
+    p {
+        color: colors.$blue-900;
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+        letter-spacing: -0.025rem;
+    }
+
+    .team-section {
+        border-bottom: 2px solid colors.$grey-400;
+        margin-bottom: 3rem;
+        padding: 0 3.5rem 5rem;
+
+        &.last-section {
+            border-bottom: none;
+            padding-bottom: 8rem;
+            margin-bottom: 0;
+        }
+    }
+
+    .team_info {
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .team_description {
+        float: left;
+        margin-right: 4.5rem;
+        width: 83%;
+        grid-column: span 2;
+
+        h2 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            padding-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        p {
+            font-size: 1.25rem;
+            font-weight: 500;
+            width: 28rem;
+        }
+    }
+
+    .team-member {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        img {
+            width: 100%;
+            display: block;
+            aspect-ratio: 3 / 4;
+            object-fit: cover;
+        }
+
+        .member-name {
+            font-size: 1.125rem;
+            font-weight: 700;
+            letter-spacing: -0.0225rem;
+        }
+
+        .member-role {
+            font-size: 1rem;
+            font-weight: 400;
+            color: colors.$grey-800;
+            margin-top: 0;
+        }
+    }
+
+    .members-grid {
+        overflow: hidden;
+
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+        gap: 1.5rem 1rem;
+    }
+
+    .video-background-container {
+        margin: 0;
+        padding: 0;
+        position: relative;
+        width: 100%;
+        height: 70vh;
+        overflow: hidden;
+        background: rgba(black, 0.5);
+    }
+
+    .background-video {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        min-width: 100vw;
+        min-height: 100%;
+        width: auto;
+        height: auto;
+        transform: translate(-50%, -50%);
+        object-fit: cover;
+        z-index: -1;
+    }
+
+    .quote-overlay {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+        max-width: 70%;
+        color: white;
+        font-weight: 600;
+        padding: 5rem 0;
+        justify-content: center;
+
+        p {
+            color: white;
+            display: inline-block;
+        }
+    }
+
+    .author {
+        margin-top: 2.5rem;
+        font-weight: 700;
+    }
+}
+
+@media (max-width: 912px) {
+    .team-page-container {
+        margin-top: 6.5rem;
+
+        .team_description {
+            margin: 0;
+            float: none;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 1rem;
+            flex: 1 0 0;
+            padding-right: 0.5rem;
+
+            h2 {
+                width: 100%;
+                padding-bottom: 0;
+            }
+
+            p {
+                width: 100%;
+            }
+        }
+
+        .members-grid {
+            grid-template-columns: repeat(2, minmax(13rem, 1fr));
+            gap: 3rem 1rem;
+        }
+
+        .team-member {
+            .member-name {
+                font-size: 1.125rem;
+                line-height: 1.75rem;
+                letter-spacing: -0.0225rem;
+            }
+
+            .member-role {
+                font-size: 1.125rem;
+                line-height: 1.75rem;
+                letter-spacing: -0.0225rem;
+            }
+        }
+
+        .team-section.last-section {
+            padding-bottom: 5.62rem;
+        }
+
+        .quote-overlay {
+            transform: none;
+            top: 0;
+            left: 0;
+            padding: 8.75rem 8.75rem;
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+
+            .video-text {
+                font-size: 1.25rem;
+                line-height: 1.75rem;
+                letter-spacing: -0.025rem;
+            }
+
+            .author {
+                font-size: 1.25rem;
+                line-height: 1.75rem;
+                letter-spacing: -0.025rem;
+                margin-top: 1.5rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .team-page-container {
+        .team_description {
+            h2 {
+                font-size: 2rem;
+                line-height: 2.5rem;
+                letter-spacing: -0.04rem;
+            }
+
+            p {
+                font-size: 1.125rem;
+                line-height: 1.75rem;
+                letter-spacing: -0.0225rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 568px) {
+    .team-page-container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        align-content: flex-start;
+        margin: 8rem 0 0;
+        width: 100%;
+
+        .team_description {
+            padding-right: 0;
+        }
+
+        .members-grid {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 3rem;
+            padding: 0 1rem;
+        }
+
+        .team-section {
+            padding: 0;
+
+            &.last-section {
+                padding-bottom: 4.5rem;
+            }
+        }
+
+        .quote-overlay {
+            padding: 4.5rem 4.5rem;
+
+            .video-text {
+                font-size: 1rem;
+                line-height: 1.5rem;
+                letter-spacing: -0.02rem;
+            }
+
+            .author {
+                margin-top: 2rem;
+            }
+
+            p:nth-of-type(2) {
+                display: block;
+                margin-bottom: 1.5rem;
+            }
+        }
+    }
+}

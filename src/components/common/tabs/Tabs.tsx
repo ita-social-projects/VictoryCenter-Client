@@ -1,4 +1,4 @@
-import { TabProps } from '../../../types/public/donate-page/DonateTab';
+import { TabProps } from '../../../types/public/donate-page';
 import './Tabs.scss';
 
 export const Tabs = ({ tabs, activeTab, setActiveTab }: TabProps) => {

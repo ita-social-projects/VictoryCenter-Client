@@ -1,11 +1,11 @@
-import { Button } from '../../../../../components/common/button/Button';
-import { Select } from '../../../../../components/common/select/Select';
-import { Input } from '../../../../../components/common/input/Input';
+import { Button } from '../../../../../components/admin/button/Button';
+import { Select } from '../../../../../components/admin/select/Select';
+import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 import PlusIcon from '../../../../../assets/icons/plus.svg';
-import './program-page-toolbar.scss';
+import './ProgramsPageToolbar.scss';
 
 export interface ProgramPageToolbarProps {
     onSearchQueryChange: (query: string) => void;
@@ -22,7 +22,7 @@ export const ProgramsPageToolbar = ({
         <>
             <div className="programs-toolbar">
                 <div className="programs-toolbar-search">
-                    <Input
+                    <SearchBar
                         onChange={(e) => {
                             onSearchQueryChange(e);
                         }}

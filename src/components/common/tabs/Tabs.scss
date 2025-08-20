@@ -1,4 +1,5 @@
-@import '../../../assets/sass/variables/variables.fonts';
+@use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/fonts';
 
 .tabsContainer {
     display: flex;
@@ -10,24 +11,24 @@
 
     .tab {
         background-color: transparent;
-        font-family: $mulish-regular-font;
+        font-family: fonts.$mulish-regular-font;
         font-size: 1.125rem;
         font-weight: 600;
-        color: #939699;
+        color: colors.$tab-color;
         min-width: 12rem;
         min-height: 2.68rem;
         border: none;
         cursor: pointer;
-        border-bottom: 0.125rem solid #d2d2c7;
+        border-bottom: 0.125rem solid colors.$grey-600;
     }
 
     .tab:hover {
-        border-bottom: 0.125rem solid #61615c;
-        color: #61615c;
+        border-bottom: 0.125rem solid colors.$grey-900;
+        color: colors.$grey-900;
     }
 
     .tab.active {
-        border-bottom: 0.125rem solid #58b1da;
-        color: #1f1919;
+        border-bottom: 0.125rem solid colors.$light-blue-500;
+        color: black;
     }
 }

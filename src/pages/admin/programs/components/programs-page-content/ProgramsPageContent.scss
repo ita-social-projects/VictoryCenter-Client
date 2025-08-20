@@ -1,0 +1,59 @@
+﻿@use '../../../../../assets/sass/variables/colors';
+
+.programs-page {
+    &-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 3.375rem;
+        height: 100vh;
+        width: 100%;
+        padding: 3.375rem;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    &-toolbar-container {
+        flex-shrink: 0;
+    }
+
+    &-list-container {
+        flex-grow: 1;
+        min-height: 0;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    &-error-container {
+        flex-shrink: 0;
+        padding: 1rem;
+        text-align: center;
+        width: 100%;
+        display: flex;
+        gap: 0.5rem;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        color: colors.$error;
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 20px;
+        margin-top: 0.625rem;
+        margin-bottom: 0.625rem;
+
+        .retry-link {
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 16px;
+            color: colors.$blue-900;
+            text-decoration: underline;
+            text-decoration-color: colors.$blue-900;
+            cursor: pointer;
+
+            &:hover {
+                font-weight: 600;
+            }
+        }
+    }
+}

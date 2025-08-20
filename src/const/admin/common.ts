@@ -43,9 +43,13 @@ export const COMMON_TEXT_ADMIN = {
     FILTER: {
         SEARCH_BY_NAME: 'Пошук за назвою',
         STATUS: {
-            ALL: 'Всі записи',
+            ALL: 'Усі',
             PUBLISHED: 'Опубліковано',
             DRAFT: 'Чернетка',
+        },
+        CATEGORY: {
+            CATEGORY_LABEL: 'Категорія',
+            SELECT_CATEGORY: 'Виберіть категорію',
         },
     },
 
@@ -62,7 +66,7 @@ export const COMMON_TEXT_ADMIN = {
         SAVE: 'Зберегти',
         DELETE: 'Видалити',
         CANCEL: 'Відмінити',
-        SAVE_AS_DRAFTED: 'Зберегти як чернетку',
+        SAVE_AS_DRAFT: 'Зберегти як чернетку',
         SAVE_AS_PUBLISHED: 'Опублікувати',
         TRY_AGAIN: 'Спробувати ще раз',
     },

@@ -1,14 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../program-form/ProgramForm';
-import { Program, ProgramCategory, ProgramCreateUpdate } from '../../../../../types/admin/Programs';
-import { VisibilityStatus } from '../../../../../types/admin/Common';
-import { Button } from '../../../../../components/common/button/Button';
-import { QuestionModal } from '../../../../../components/common/question-modal/QuestionModal';
+import { Program, ProgramCategory, ProgramCreateUpdate } from '../../../../../types/admin/programs';
+import { VisibilityStatus } from '../../../../../types/admin/common';
+import { Button } from '../../../../../components/admin/button/Button';
+import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
-import './program-modal.scss';
+import './ProgramModal.scss';
 
 interface BaseProps {
     isOpen: boolean;
@@ -196,7 +196,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
 
                 <Modal.Actions>
                     <Button buttonStyle="secondary" onClick={handleDraftSubmit} disabled={isSubmitting || !isFormValid}>
-                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFTED}
+                        {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
                     </Button>
                     <Button buttonStyle="primary" onClick={handlePublishSubmit} disabled={isSubmitting || !isFormValid}>
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
@@ -204,7 +204,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 </Modal.Actions>
             </Modal>
 
-            <QuestionModal
+            <ConfirmationModal
                 isOpen={showFormConfirmModal}
                 isButtonsDisabled={isSubmitting}
                 title={getFormConfirmTitle()}
@@ -215,7 +215,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
 
-            <QuestionModal
+            <ConfirmationModal
                 isOpen={showCloseConfirmModal}
                 isButtonsDisabled={false}
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}

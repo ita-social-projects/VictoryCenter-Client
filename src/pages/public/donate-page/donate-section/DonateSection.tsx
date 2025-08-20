@@ -1,10 +1,9 @@
 import './DonateSection.scss';
 import React, { useState } from 'react';
 import { DONATE_SECTION, DONATION_SIZE } from '../../../../const/public/donate-page';
-import { DonateTab, PaymentSystem } from '../../../../types/public/donate-page';
+import { DonateTab, PaymentSystem, Currency, currencyToString } from '../../../../types/public/donate-page';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import { getEnvVariable } from '../../../../utils/functions/get-env-variable/get-env-variable';
-import { Currency, currencyToString } from '../../../../types/public/donate-page';
 import { Tabs } from '../../../../components/common/tabs/Tabs';
 
 export const DonateSection = () => {

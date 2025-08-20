@@ -1,164 +1,184 @@
-import React from 'react';
+import React, { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
-import { ProgramSuggestionItem } from './ProgramSuggestionItem';
+import { ProgramSuggestionItem, ProgramSuggestionItemProps } from './ProgramSuggestionItem';
+import { SuggestionContentRef } from '../../../../../../components/admin/search-bar/suggestion-wrapper/SuggestionWrapper';
 import { ProgramSuggestion } from '../../../../../../types/admin/programs';
 
-jest.mock('../../../../../../hooks/common/use-observe-element-size/useObserveElementSize');
+const defaultProps: ProgramSuggestionItemProps = {
+    item: {
+        id: 1,
+        name: 'Test Program',
+        categories: ['Category 1', 'Category 2'],
+    } as ProgramSuggestion,
+};
 
-const mockUseObserveElementSize =
-    require('../../../../../../hooks/common/use-observe-element-size/useObserveElementSize').useObserveElementSize;
+const renderComponent = (props: Partial<ProgramSuggestionItemProps> = {}) => {
+    const finalProps: ProgramSuggestionItemProps = { ...defaultProps, ...props };
+    const ref = createRef<SuggestionContentRef>();
 
-// Helper functions
-const createSuggestion = (name: string, categories: string[]): ProgramSuggestion => ({
-    id: 1,
-    name,
-    categories,
-});
+    const renderResult = render(<ProgramSuggestionItem {...finalProps} ref={ref} />);
 
-const createProps = (
-    item: ProgramSuggestion = createSuggestion('Test Program', ['Category 1']),
-    isHovered = false,
-    onShowTooltip = jest.fn(),
-) => ({
-    item,
-    isHovered,
-    onShowTooltip,
-});
-
-const mockElement = (scrollWidth: number, clientWidth: number) => ({
-    scrollWidth,
-    clientWidth,
-});
+    return { ref, ...renderResult };
+};
 
 describe('ProgramSuggestionItem', () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-        mockUseObserveElementSize.mockReturnValue({ width: 100, height: 50 });
+    it('should render program name correctly', () => {
+        const testName: string = 'My Test Program';
+        const testItem: ProgramSuggestion = {
+            ...defaultProps.item,
+            name: testName,
+        };
+        renderComponent({ item: testItem });
+
+        expect(screen.getByText(testName)).toBeInTheDocument();
     });
 
-    it('should render program name and categories', () => {
-        const suggestion = createSuggestion('Test Program', ['Category 1', 'Category 2']);
-        render(<ProgramSuggestionItem {...createProps(suggestion)} />);
+    it('should render categories as comma-separated text', () => {
+        const testCategories: string[] = ['Sports', 'Health', 'Education'];
+        const testItem: ProgramSuggestion = {
+            ...defaultProps.item,
+            categories: testCategories,
+        };
+        renderComponent({ item: testItem });
 
-        expect(screen.getByText('Test Program')).toBeInTheDocument();
-        expect(screen.getByText('Category 1, Category 2')).toBeInTheDocument();
+        expect(screen.getByText('Sports, Health, Education')).toBeInTheDocument();
     });
 
-    it('should render with correct CSS classes', () => {
-        render(<ProgramSuggestionItem {...createProps()} />);
+    it('should render empty categories correctly', () => {
+        const testItem: ProgramSuggestion = {
+            ...defaultProps.item,
+            categories: [],
+        };
+        renderComponent({ item: testItem });
 
-        expect(screen.getByText('Test Program')).toHaveClass('program-suggestion-item__name');
-        expect(screen.getByText('Category 1')).toHaveClass('program-suggestion-item__categories');
-        expect(screen.getByText('Test Program').closest('div')).toHaveClass('program-suggestion-item');
-    });
-
-    it('should join categories with comma and space', () => {
-        const suggestion = createSuggestion('Program', ['Cat A', 'Cat B', 'Cat C']);
-        render(<ProgramSuggestionItem {...createProps(suggestion)} />);
-
-        expect(screen.getByText('Cat A, Cat B, Cat C')).toBeInTheDocument();
-    });
-
-    it('should render empty categories when no categories provided', () => {
-        const suggestion = createSuggestion('Program', []);
-        render(<ProgramSuggestionItem {...createProps(suggestion)} />);
-
-        const categoriesElement = screen
-            .getByText('Program')
-            .parentElement?.querySelector('.program-suggestion-item__categories');
+        const categoriesElement: HTMLElement = screen.getByText(defaultProps.item.name)
+            .nextElementSibling as HTMLElement;
+        expect(categoriesElement).toHaveClass('program-suggestion-item__categories');
         expect(categoriesElement).toHaveTextContent('');
     });
 
-    it('should call useObserveElementSize with correct props when not hovered', () => {
-        render(<ProgramSuggestionItem {...createProps(createSuggestion('Test', []), false)} />);
+    it('should return null for tooltip when neither name nor categories overflow', () => {
+        const { ref } = renderComponent();
+        const nameElement: HTMLElement = screen.getByText(defaultProps.item.name);
+        const categoriesElement: HTMLElement = screen.getByText('Category 1, Category 2');
 
-        expect(mockUseObserveElementSize).toHaveBeenCalledWith({
-            observableElement: expect.any(Object),
-            onSizeChanged: expect.any(Function),
-            disableWhen: true,
-        });
+        Object.defineProperty(nameElement, 'scrollWidth', { value: 100 });
+        Object.defineProperty(nameElement, 'clientWidth', { value: 100 });
+        Object.defineProperty(categoriesElement, 'scrollWidth', { value: 100 });
+        Object.defineProperty(categoriesElement, 'clientWidth', { value: 100 });
+
+        const tooltipContent = ref.current?.getTooltipContent();
+
+        expect(tooltipContent).toBeNull();
     });
 
-    it('should call useObserveElementSize with correct props when hovered', () => {
-        render(<ProgramSuggestionItem {...createProps(createSuggestion('Test', []), true)} />);
+    it('should return tooltip content when name overflows', () => {
+        const testName: string = 'This is a very long program name that will definitely overflow';
+        const testItem: ProgramSuggestion = {
+            ...defaultProps.item,
+            name: testName,
+        };
+        const { ref } = renderComponent({ item: testItem });
 
-        expect(mockUseObserveElementSize).toHaveBeenCalledWith({
-            observableElement: expect.any(Object),
-            onSizeChanged: expect.any(Function),
-            disableWhen: false,
-        });
+        const nameElement: HTMLElement = screen.getByText(testName);
+        const categoriesElement: HTMLElement = screen.getByText('Category 1, Category 2');
+
+        Object.defineProperty(nameElement, 'scrollWidth', { value: 200 });
+        Object.defineProperty(nameElement, 'clientWidth', { value: 100 });
+        Object.defineProperty(categoriesElement, 'scrollWidth', { value: 100 });
+        Object.defineProperty(categoriesElement, 'clientWidth', { value: 100 });
+
+        const tooltipContent = ref.current?.getTooltipContent() as React.ReactElement | null;
+
+        expect(tooltipContent).not.toBeNull();
+        expect(React.isValidElement(tooltipContent)).toBe(true);
+        // @ts-ignore
+        expect(tooltipContent?.props.className).toBe('program-suggestion-item-tooltip');
     });
 
-    it('should show tooltip when name element is overflowing', () => {
-        const onShowTooltip = jest.fn();
+    it('should return tooltip content when categories overflow', () => {
+        const testCategories: string[] = [
+            'Very Long Category Name 1',
+            'Very Long Category Name 2',
+            'Very Long Category Name 3',
+        ];
+        const testItem: ProgramSuggestion = {
+            ...defaultProps.item,
+            categories: testCategories,
+        };
+        const { ref } = renderComponent({ item: testItem });
 
-        // Mock refs to simulate overflow
-        jest.spyOn(React, 'useRef')
-            .mockReturnValueOnce({ current: mockElement(200, 100) }) // nameRef - overflowing
-            .mockReturnValueOnce({ current: mockElement(50, 100) }) // categoriesRef - not overflowing
-            .mockReturnValueOnce({ current: document.createElement('div') }); // containerRef
-
-        render(
-            <ProgramSuggestionItem
-                {...createProps(createSuggestion('Long Program Name', ['Cat']), true, onShowTooltip)}
-            />,
+        const nameElement: HTMLElement = screen.getByText(defaultProps.item.name);
+        const categoriesElement: HTMLElement = screen.getByText(
+            'Very Long Category Name 1, Very Long Category Name 2, Very Long Category Name 3',
         );
 
-        // Get the onSizeChanged callback and call it
-        const onSizeChangedCallback = mockUseObserveElementSize.mock.calls[0][0].onSizeChanged;
-        onSizeChangedCallback({ width: 100, height: 50 });
+        Object.defineProperty(nameElement, 'scrollWidth', { value: 100 });
+        Object.defineProperty(nameElement, 'clientWidth', { value: 100 });
+        Object.defineProperty(categoriesElement, 'scrollWidth', { value: 300 });
+        Object.defineProperty(categoriesElement, 'clientWidth', { value: 150 });
 
-        expect(onShowTooltip).toHaveBeenCalledWith(expect.any(Object));
+        const tooltipContent = ref.current?.getTooltipContent() as React.ReactElement | null;
+
+        expect(tooltipContent).not.toBeNull();
+        expect(React.isValidElement(tooltipContent)).toBe(true);
     });
 
-    it('should show tooltip when categories element is overflowing', () => {
-        const onShowTooltip = jest.fn();
+    it('should include correct content in tooltip', () => {
+        const testName: string = 'Overflow Program';
+        const testCategories: string[] = ['Test Category'];
+        const testItem: ProgramSuggestion = {
+            ...defaultProps.item,
+            name: testName,
+            categories: testCategories,
+        };
+        const { ref } = renderComponent({ item: testItem });
 
-        jest.spyOn(React, 'useRef')
-            .mockReturnValueOnce({ current: mockElement(50, 100) }) // nameRef - not overflowing
-            .mockReturnValueOnce({ current: mockElement(200, 100) }) // categoriesRef - overflowing
-            .mockReturnValueOnce({ current: document.createElement('div') });
+        const nameElement: HTMLElement = screen.getByText(testName);
+        Object.defineProperty(nameElement, 'scrollWidth', { value: 200 });
+        Object.defineProperty(nameElement, 'clientWidth', { value: 100 });
 
-        render(
-            <ProgramSuggestionItem
-                {...createProps(createSuggestion('Name', ['Very Long Category Name']), true, onShowTooltip)}
-            />,
-        );
+        const tooltipContent = ref.current?.getTooltipContent() as React.ReactElement | null;
 
-        const onSizeChangedCallback = mockUseObserveElementSize.mock.calls[0][0].onSizeChanged;
-        onSizeChangedCallback({ width: 100, height: 50 });
+        // @ts-ignore
+        const nameDiv = tooltipContent?.props.children[0];
+        // @ts-ignore
+        const categoriesDiv = tooltipContent?.props.children[1];
 
-        expect(onShowTooltip).toHaveBeenCalledWith(expect.any(Object));
+        expect(nameDiv.props.children).toBe(testName);
+        expect(categoriesDiv.props.children).toBe('Test Category');
+        expect(nameDiv.props.className).toBe('program-suggestion-item-tooltip__name');
+        expect(categoriesDiv.props.className).toBe('program-suggestion-item-tooltip__categories');
     });
 
-    it('should not show tooltip when no elements are overflowing', () => {
-        const onShowTooltip = jest.fn();
+    it('should update tooltip when item changes', () => {
+        const initialItem: ProgramSuggestion = {
+            ...defaultProps.item,
+            name: 'Initial Name',
+            categories: ['Initial Category'],
+        };
+        const { ref, rerender } = renderComponent({ item: initialItem });
 
-        jest.spyOn(React, 'useRef')
-            .mockReturnValueOnce({ current: mockElement(50, 100) }) // nameRef - not overflowing
-            .mockReturnValueOnce({ current: mockElement(50, 100) }) // categoriesRef - not overflowing
-            .mockReturnValueOnce({ current: document.createElement('div') });
+        const updatedItem: ProgramSuggestion = {
+            ...defaultProps.item,
+            name: 'Updated Name',
+            categories: ['Updated Category'],
+        };
 
-        render(<ProgramSuggestionItem {...createProps(createSuggestion('Short', ['Cat']), true, onShowTooltip)} />);
+        rerender(<ProgramSuggestionItem item={updatedItem} ref={ref} />);
 
-        const onSizeChangedCallback = mockUseObserveElementSize.mock.calls[0][0].onSizeChanged;
-        onSizeChangedCallback({ width: 100, height: 50 });
+        const nameElement: HTMLElement = screen.getByText('Updated Name');
+        Object.defineProperty(nameElement, 'scrollWidth', { value: 200 });
+        Object.defineProperty(nameElement, 'clientWidth', { value: 100 });
 
-        expect(onShowTooltip).toHaveBeenCalledWith(null);
-    });
+        const tooltipContent = ref.current?.getTooltipContent() as React.ReactElement | null;
 
-    it('should call onShowTooltip when size changes', () => {
-        const onShowTooltip = jest.fn();
+        // @ts-ignore
+        const nameDiv = tooltipContent?.props.children[0];
+        // @ts-ignore
+        const categoriesDiv = tooltipContent?.props.children[1];
 
-        render(
-            <ProgramSuggestionItem
-                {...createProps(createSuggestion('Program Name', ['Cat 1']), true, onShowTooltip)}
-            />,
-        );
-
-        const onSizeChangedCallback = mockUseObserveElementSize.mock.calls[0][0].onSizeChanged;
-        onSizeChangedCallback({ width: 100, height: 50 });
-
-        expect(onShowTooltip).toHaveBeenCalledTimes(1);
+        expect(nameDiv.props.children).toBe('Updated Name');
+        expect(categoriesDiv.props.children).toBe('Updated Category');
     });
 });

@@ -12,7 +12,6 @@ describe('Tooltip - Absolute Positioning', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        // Mock getBoundingClientRect for consistent testing
         Element.prototype.getBoundingClientRect = jest.fn(() => ({
             width: 100,
             height: 30,
@@ -121,6 +120,22 @@ describe('Tooltip - Absolute Positioning', () => {
         const { ref } = renderTooltipWithRef();
         expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
+
+    it('calculates top position correctly when position is "top"', () => {
+        const tooltipHeight = 30;
+        const offset = 8;
+
+        const heightSpy = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(tooltipHeight);
+        const widthSpy = jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(100);
+
+        renderTooltipWithRef({ position: 'top' });
+
+        const expectedTop = -tooltipHeight - offset;
+        expectTooltipToHaveStyle('top', `${expectedTop}px`);
+
+        heightSpy.mockRestore();
+        widthSpy.mockRestore();
+    });
 });
 
 describe('Tooltip - Portal Rendering', () => {
@@ -175,6 +190,23 @@ describe('Tooltip - Portal Rendering', () => {
     const expectPortalTooltipToHaveStyle = (property: string, value: string) =>
         expect(getPortalTooltip()).toHaveStyle(`${property}: ${value}`);
     const expectPortalTooltipToHaveClass = (className: string) => expect(getPortalTooltip()).toHaveClass(className);
+
+    it('calculates top position correctly when position is "top" in portal', () => {
+        const tooltipHeight = 50;
+        const offset = 8;
+        const positionerTop = 200;
+
+        const heightSpy = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(tooltipHeight);
+        const widthSpy = jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(100);
+
+        renderPortalTooltipWithRef({ position: 'top' });
+
+        const expectedTop = positionerTop - tooltipHeight - offset;
+        expectPortalTooltipToHaveStyle('top', `${expectedTop}px`);
+
+        heightSpy.mockRestore();
+        widthSpy.mockRestore();
+    });
 
     it('renders tooltip in portal', () => {
         renderPortalTooltip();

@@ -2,14 +2,19 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import SearchIcon from '../../../assets/icons/la_search.svg';
 import ClearIcon from '../../../assets/icons/remove-query.svg';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { Tooltip } from '../tooltip/Tooltip';
+import { InlineLoader } from '../../common/inline-loader/InlineLoader';
 import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/useOnClickOutside';
 import { useScrollHandler } from '../../../hooks/common/use-scroll-handler/useScrollHandler';
 import { useDebouncedValueCallback } from '../../../hooks/common/use-debounced-value-callback/useDebouncedValueCallback';
 import { useObserveElementSize } from '../../../hooks/common/use-observe-element-size/useObserveElementSize';
 import { useCalculateContainerSizeBasedOnChildren } from '../../../hooks/common/use-calculate-container-size-based-on-children/useCalculateContainerSizeBasedOnChildren';
-import { SuggestionWrapper, SuggestionContentRenderProps } from './suggestion-wrapper/SuggestionWrapper';
-import { InlineLoader } from '../../common/inline-loader/InlineLoader';
-import { Tooltip } from '../tooltip/Tooltip';
+import {
+    SuggestionWrapper,
+    SuggestionContentRenderProps,
+    SuggestionWrapperRef,
+    SuggestionContentRef,
+} from './suggestion-wrapper/SuggestionWrapper';
 import './SearchBar.scss';
 
 export const TOOLTIP_WIDTH_MULTIPLY = 1.5;
@@ -20,7 +25,9 @@ export interface SearchBarProps<T> {
     onSuggestionSelect: (item: T) => void;
     getSuggestionKey: (item: T) => string | number;
     getSuggestionLabel: (item: T) => string;
-    renderSuggestionItem?: (props: SuggestionContentRenderProps<T>) => React.ReactNode;
+    renderSuggestionComponent?: React.ForwardRefExoticComponent<
+        SuggestionContentRenderProps<T> & React.RefAttributes<SuggestionContentRef>
+    >;
     onLoadMore: () => void;
     isLoading: boolean;
     hasMore: boolean;
@@ -42,7 +49,7 @@ export const SearchBar = <T,>({
     onSuggestionSelect,
     getSuggestionKey,
     getSuggestionLabel,
-    renderSuggestionItem,
+    renderSuggestionComponent,
     onLoadMore,
     isLoading,
     hasMore,
@@ -66,22 +73,8 @@ export const SearchBar = <T,>({
     const searchContainerRef = useRef<HTMLDivElement>(null);
     const suggestionsListRef = useRef<HTMLUListElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const suggestionRefs = useRef<Map<string | number, React.RefObject<SuggestionWrapperRef | null>>>(new Map());
     const tooltipRef = useRef(null);
-
-    const handleTooltipShow = useCallback((element: Element, content: React.ReactNode) => {
-        // Use setTimeout to defer state update and avoid "Cannot update component while rendering" error
-        // This occurs when ResizeObserver synchronously triggers (inside of suggestion content) during first hover, causing setState
-        // to be called while the TextSuggestionContent component is still in the rendering phase.
-        setTimeout(() => {
-            if (content) {
-                setTooltipState({
-                    isVisible: true,
-                    content: content,
-                    positioner: element,
-                });
-            }
-        }, 0);
-    }, []);
 
     const hideTooltip = useCallback(() => {
         setTooltipState({ content: null, positioner: null, isVisible: false });
@@ -94,6 +87,28 @@ export const SearchBar = <T,>({
         setActiveIndex(-1);
         setDropdownVisible(newQuery.length >= minCharactersToSearch);
     };
+
+    const handleItemHover = useCallback(
+        (key: string | number, element: HTMLElement) => {
+            const suggestionRef = suggestionRefs.current.get(key);
+            if (!suggestionRef || !suggestionRef.current) {
+                return;
+            }
+
+            const tooltipContent = suggestionRef.current.getTooltipContent();
+
+            if (tooltipContent) {
+                setTooltipState({
+                    isVisible: true,
+                    content: tooltipContent,
+                    positioner: element,
+                });
+            } else {
+                hideTooltip();
+            }
+        },
+        [hideTooltip],
+    );
 
     const handleItemSelect = useCallback(
         (item: T) => {
@@ -151,6 +166,12 @@ export const SearchBar = <T,>({
         }
     }, [activeIndex]);
 
+    useEffect(() => {
+        if (tooltipState.positioner && !document.body.contains(tooltipState.positioner)) {
+            hideTooltip();
+        }
+    }, [suggestions, tooltipState.positioner, hideTooltip]);
+
     const onDebouncedCallback = useCallback(
         (query: string) => {
             onQueryChange(query);
@@ -187,6 +208,12 @@ export const SearchBar = <T,>({
         measurementAxis: 'height',
         dependencies: [suggestions],
         disableAfterFirstSuccess: true,
+    });
+
+    suggestionRefs.current.clear();
+    suggestions.forEach((item) => {
+        const key = getSuggestionKey(item);
+        suggestionRefs.current.set(key, React.createRef<SuggestionWrapperRef>());
     });
 
     const isShowClearButton = searchQuery.length > 0;
@@ -232,19 +259,24 @@ export const SearchBar = <T,>({
                             ref={suggestionsListRef}
                             onMouseLeave={hideTooltip}
                         >
-                            {suggestions.map((item, index) => (
-                                <SuggestionWrapper
-                                    key={getSuggestionKey(item)}
-                                    item={item}
-                                    isActive={index === activeIndex}
-                                    onSelect={() => handleItemSelect(item)}
-                                    onHover={() => setActiveIndex(index)}
-                                    onShowTooltip={handleTooltipShow}
-                                    onHideTooltip={hideTooltip}
-                                    renderContent={renderSuggestionItem}
-                                    getItemLabel={getSuggestionLabel}
-                                />
-                            ))}
+                            {suggestions.map((item, index) => {
+                                const key = getSuggestionKey(item);
+                                return (
+                                    <SuggestionWrapper<T>
+                                        ref={suggestionRefs.current.get(key)}
+                                        key={key}
+                                        item={item}
+                                        isActive={index === activeIndex}
+                                        onSelect={() => handleItemSelect(item)}
+                                        onHover={(element) => {
+                                            setActiveIndex(index);
+                                            handleItemHover(key, element);
+                                        }}
+                                        renderContent={renderSuggestionComponent}
+                                        getItemLabel={getSuggestionLabel}
+                                    />
+                                );
+                            })}
                         </ul>
                         {isShowNotFoundMessage && <div className="search-bar__not-found">{notFoundMessage}</div>}
                         {isLoading && (

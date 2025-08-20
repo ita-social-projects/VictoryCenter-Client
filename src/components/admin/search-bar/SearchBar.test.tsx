@@ -2,8 +2,14 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SearchBar, SearchBarProps } from './SearchBar';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { SuggestionWrapperProps } from './suggestion-wrapper/SuggestionWrapper';
+import { TooltipProps } from '../tooltip/Tooltip';
 
-// Mock all hooks
+interface TestItem {
+    id: number;
+    name: string;
+}
+
 jest.mock('../../../hooks/common/use-on-click-outside/useOnClickOutside');
 jest.mock('../../../hooks/common/use-scroll-handler/useScrollHandler');
 jest.mock('../../../hooks/common/use-debounced-value-callback/useDebouncedValueCallback');
@@ -12,13 +18,13 @@ jest.mock(
     '../../../hooks/common/use-calculate-container-size-based-on-children/useCalculateContainerSizeBasedOnChildren',
 );
 
-// Mock components
+// @ts-ignore
 jest.mock('./suggestion-wrapper/SuggestionWrapper', () => ({
-    SuggestionWrapper: ({ item, onSelect, onHover, getItemLabel, isActive }: any) => (
+    SuggestionWrapper: ({ item, onSelect, onHover, getItemLabel, isActive }: SuggestionWrapperProps<TestItem>) => (
         <li
             className={`suggestion-item ${isActive ? 'active' : ''}`}
             onClick={onSelect}
-            onMouseEnter={onHover}
+            onMouseEnter={() => onHover}
             data-testid={`suggestion-${getItemLabel(item)}`}
         >
             {getItemLabel(item)}
@@ -31,17 +37,12 @@ jest.mock('../../common/inline-loader/InlineLoader', () => ({
 }));
 
 jest.mock('../tooltip/Tooltip', () => ({
-    Tooltip: ({ children }: any) => <div data-testid="tooltip">{children}</div>,
+    Tooltip: ({ children }: Partial<TooltipProps>) => <div data-testid="tooltip">{children}</div>,
 }));
 
 // Mock assets
 jest.mock('../../../assets/icons/la_search.svg', () => 'search-icon');
 jest.mock('../../../assets/icons/remove-query.svg', () => 'clear-icon');
-
-interface TestItem {
-    id: number;
-    name: string;
-}
 
 describe('SearchBar', () => {
     const mockSuggestions: TestItem[] = [
@@ -68,7 +69,6 @@ describe('SearchBar', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        // Setup hook mocks
         require('../../../hooks/common/use-scroll-handler/useScrollHandler').useScrollHandler.mockReturnValue({
             handleScroll: jest.fn(),
         });

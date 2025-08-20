@@ -1,73 +1,73 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { TextSuggestionContent } from '../text-suggestion-content/TextSuggestionContent';
 import classNames from 'classnames';
 import './SuggestionWrapper.scss';
+
+export interface SuggestionContentRef {
+    getTooltipContent: () => React.ReactNode | null;
+}
 
 export interface SuggestionContentRenderProps<T> {
     item: T;
     isSuggestionActive: boolean;
     isSuggestionHovered: boolean;
-    onShowTooltip: (content: React.ReactNode) => void;
 }
+
+export type SuggestionWrapperRef = SuggestionContentRef;
 
 export interface SuggestionWrapperProps<T> {
     item: T;
     isActive: boolean;
     onSelect: () => void;
-    onHover: () => void;
+    onHover: (element: HTMLLIElement) => void;
     getItemLabel: (item: T) => string;
-    renderContent?: (props: SuggestionContentRenderProps<T>) => React.ReactNode;
-    onShowTooltip?: (element: HTMLElement, content: React.ReactNode) => void;
-    onHideTooltip?: () => void;
+    renderContent?: React.ForwardRefExoticComponent<
+        SuggestionContentRenderProps<T> & React.RefAttributes<SuggestionContentRef>
+    >;
+    onMouseLeave?: () => void;
 }
 
-export const SuggestionWrapper = <T,>({
-    item,
-    isActive,
-    onSelect,
-    onHover,
-    onShowTooltip,
-    onHideTooltip,
-    renderContent,
-    getItemLabel,
-}: SuggestionWrapperProps<T>) => {
+function SuggestionWrapperInner<T>(
+    {
+        item,
+        isActive,
+        onSelect,
+        onHover,
+        onMouseLeave,
+        renderContent: RenderContentComponent,
+        getItemLabel,
+    }: SuggestionWrapperProps<T>,
+    ref: React.Ref<SuggestionWrapperRef>,
+) {
     const [isHovered, setIsHovered] = useState(false);
-    const LIRef = useRef<HTMLLIElement>(null);
+    const liRef = useRef<HTMLLIElement>(null);
+    const contentRef = useRef<SuggestionContentRef>(null);
 
-    const handleMouseEnter = useCallback(() => {
+    useImperativeHandle(ref, () => ({
+        getTooltipContent: () => contentRef.current?.getTooltipContent() ?? null,
+    }));
+
+    const handleMouseEnter = () => {
         setIsHovered(true);
-        onHover?.();
-    }, [onHover]);
+        if (liRef.current) {
+            onHover?.(liRef.current);
+        }
+    };
 
-    const handleMouseLeave = useCallback(() => {
+    const handleMouseLeave = () => {
         setIsHovered(false);
-        onHideTooltip?.();
-    }, [onHideTooltip]);
+        onMouseLeave?.();
+    };
 
-    const handleShowTooltip = useCallback(
-        (content: React.ReactNode) => {
-            if (!LIRef.current) return;
-            onShowTooltip?.(LIRef.current, content);
-        },
-        [onShowTooltip],
-    );
-
-    const content = useMemo(() => {
-        return renderContent ? (
-            renderContent({
-                item: item,
-                isSuggestionActive: isActive,
-                isSuggestionHovered: isHovered,
-                onShowTooltip: handleShowTooltip,
-            } as SuggestionContentRenderProps<T>)
-        ) : (
-            <TextSuggestionContent label={getItemLabel(item)} isHovered={isHovered} onShowTooltip={handleShowTooltip} />
-        );
-    }, [renderContent, getItemLabel, item, isHovered, isActive, handleShowTooltip]);
+    const contentProps: SuggestionContentRenderProps<T> = {
+        item,
+        isSuggestionActive: isActive,
+        isSuggestionHovered: isHovered,
+    };
 
     return (
         <li
-            ref={LIRef}
+            ref={liRef}
             className={classNames('suggestion-wrapper', {
                 'suggestion-wrapper--active': isActive || isHovered,
             })}
@@ -75,7 +75,17 @@ export const SuggestionWrapper = <T,>({
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
-            {content}
+            {RenderContentComponent ? (
+                <RenderContentComponent {...contentProps} ref={contentRef} />
+            ) : (
+                <TextSuggestionContent label={getItemLabel(item)} ref={contentRef} />
+            )}
         </li>
     );
-};
+}
+
+export const SuggestionWrapper = forwardRef(SuggestionWrapperInner) as <T>(
+    props: SuggestionWrapperProps<T> & {
+        ref?: React.Ref<SuggestionWrapperRef>;
+    },
+) => React.ReactElement;

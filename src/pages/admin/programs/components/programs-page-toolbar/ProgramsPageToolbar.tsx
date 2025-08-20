@@ -82,17 +82,6 @@ export const ProgramsPageToolbar = ({
         onSearchClear?.();
     }, [onSearchClear, suggestionsActions]);
 
-    const renderSuggestionContent = useCallback(
-        (props: SuggestionContentRenderProps<ProgramSuggestion>) => (
-            <ProgramSuggestionItem
-                item={props.item}
-                isHovered={props.isSuggestionHovered}
-                onShowTooltip={props.onShowTooltip}
-            />
-        ),
-        [],
-    );
-
     return (
         <>
             <div className="programs-toolbar">
@@ -102,7 +91,7 @@ export const ProgramsPageToolbar = ({
                         onSuggestionSelect={onSuggestionSelected}
                         getSuggestionKey={(suggestion) => suggestion.id}
                         getSuggestionLabel={(suggestion) => suggestion.name}
-                        renderSuggestionItem={renderSuggestionContent}
+                        renderSuggestionComponent={ProgramSuggestionItem}
                         onLoadMore={suggestionsActions.fetchMore}
                         hasMore={isSuggestionsHasMore}
                         isLoading={isSuggestionsLoading}

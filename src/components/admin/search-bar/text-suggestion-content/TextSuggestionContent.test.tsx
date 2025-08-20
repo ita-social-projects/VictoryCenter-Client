@@ -1,147 +1,57 @@
-import React from 'react';
+import React, { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { TextSuggestionContent, TextSuggestionContentProps } from './TextSuggestionContent';
-import { useObserveElementSize } from '../../../../hooks/common/use-observe-element-size/useObserveElementSize';
+import { SuggestionContentRef } from '../suggestion-wrapper/SuggestionWrapper';
 
-jest.mock('../../../../hooks/common/use-observe-element-size/useObserveElementSize');
-const mockUseObserveElementSize = useObserveElementSize as jest.MockedFunction<typeof useObserveElementSize>;
+const defaultProps: TextSuggestionContentProps = {
+    label: 'Default Label',
+};
+
+const renderComponent = (props: Partial<TextSuggestionContentProps> = {}) => {
+    const finalProps: TextSuggestionContentProps = { ...defaultProps, ...props };
+    const ref = createRef<SuggestionContentRef>();
+
+    const renderResult = render(<TextSuggestionContent {...finalProps} ref={ref} />);
+
+    return { ref, ...renderResult };
+};
 
 describe('TextSuggestionContent', () => {
-    const defaultProps: TextSuggestionContentProps = {
-        label: 'Test label',
-        isHovered: false,
-        onShowTooltip: jest.fn(),
-    };
+    it('should render the label correctly', () => {
+        const testLabel: string = 'My Test Label';
+        renderComponent({ label: testLabel });
 
-    beforeEach(() => {
-        jest.clearAllMocks();
+        expect(screen.getByText(testLabel)).toBeInTheDocument();
     });
 
-    // Render helpers
-    const renderTextSuggestionContent = (overrideProps: Partial<TextSuggestionContentProps> = {}) =>
-        render(<TextSuggestionContent {...defaultProps} {...overrideProps} />);
+    it('should return null for tooltip when content does not overflow', () => {
+        const { ref } = renderComponent();
+        const element: HTMLElement = screen.getByText(defaultProps.label);
 
-    // Element getters
-    const getTextSpan = () => screen.getByText(defaultProps.label);
+        Object.defineProperty(element, 'scrollWidth', { value: 100 });
+        Object.defineProperty(element, 'clientWidth', { value: 100 });
 
-    // Mock helpers
-    const mockScrollWidth = (element: HTMLElement, scrollWidth: number) => {
-        Object.defineProperty(element, 'scrollWidth', {
-            configurable: true,
-            value: scrollWidth,
-        });
-    };
+        const tooltipContent = ref.current?.getTooltipContent();
 
-    const mockClientWidth = (element: HTMLElement, clientWidth: number) => {
-        Object.defineProperty(element, 'clientWidth', {
-            configurable: true,
-            value: clientWidth,
-        });
-    };
-
-    const simulateOverflowingText = (element: HTMLElement) => {
-        mockScrollWidth(element, 200);
-        mockClientWidth(element, 100);
-    };
-
-    const simulateNonOverflowingText = (element: HTMLElement) => {
-        mockScrollWidth(element, 100);
-        mockClientWidth(element, 200);
-    };
-
-    // Assertion helpers
-    const expectHookToBeCalledWith = (expectedParams: any) => {
-        expect(mockUseObserveElementSize).toHaveBeenCalledWith(expectedParams);
-    };
-
-    it('renders text with correct label and class', () => {
-        renderTextSuggestionContent();
-
-        const textSpan = getTextSpan();
-        expect(textSpan).toBeInTheDocument();
-        expect(textSpan).toHaveClass('text-suggestion-content');
+        expect(tooltipContent).toBeNull();
     });
 
-    it('calls hook with correct parameters when not hovered', () => {
-        renderTextSuggestionContent({ isHovered: false });
+    it('should return tooltip content when content overflows', () => {
+        const testLabel: string = 'This is a very long label that will definitely overflow';
+        const { ref } = renderComponent({ label: testLabel });
+        const element: HTMLElement = screen.getByText(testLabel);
 
-        expectHookToBeCalledWith(
-            expect.objectContaining({
-                observableElement: expect.any(Object),
-                onSizeChanged: expect.any(Function),
-                disableWhen: true,
-            }),
-        );
-    });
+        Object.defineProperty(element, 'scrollWidth', { value: 200 });
+        Object.defineProperty(element, 'clientWidth', { value: 100 });
 
-    it('calls hook with correct parameters when hovered', () => {
-        renderTextSuggestionContent({ isHovered: true });
+        const tooltipContent = ref.current?.getTooltipContent() as React.ReactElement | null;
 
-        expectHookToBeCalledWith(
-            expect.objectContaining({
-                observableElement: expect.any(Object),
-                onSizeChanged: expect.any(Function),
-                disableWhen: false,
-            }),
-        );
-    });
+        expect(tooltipContent).not.toBeNull();
+        expect(React.isValidElement(tooltipContent)).toBe(true);
 
-    it('shows tooltip when text is overflowing', () => {
-        const onShowTooltip = jest.fn();
-        renderTextSuggestionContent({ onShowTooltip });
-
-        const textSpan = getTextSpan();
-
-        simulateOverflowingText(textSpan);
-
-        const hookCall = mockUseObserveElementSize.mock.calls[0][0];
-        hookCall.onSizeChanged?.({ width: 100, height: 20 });
-
-        expect(onShowTooltip).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: 'div',
-                props: {
-                    className: 'text-suggestion-content__tooltip',
-                    children: defaultProps.label,
-                },
-            }),
-        );
-    });
-
-    it('does not show tooltip when text is not overflowing', () => {
-        const onShowTooltip = jest.fn();
-        renderTextSuggestionContent({ onShowTooltip });
-
-        const textSpan = getTextSpan();
-
-        simulateNonOverflowingText(textSpan);
-
-        const hookCall = mockUseObserveElementSize.mock.calls[0][0];
-        hookCall.onSizeChanged?.({ width: 200, height: 20 });
-
-        expect(onShowTooltip).toHaveBeenCalledWith(null);
-    });
-
-    it('creates tooltip content with custom label', () => {
-        const customLabel = 'Custom tooltip text';
-        const onShowTooltip = jest.fn();
-        renderTextSuggestionContent({ label: customLabel, onShowTooltip });
-
-        const textSpan = screen.getByText(customLabel);
-
-        simulateOverflowingText(textSpan);
-
-        const hookCall = mockUseObserveElementSize.mock.calls[0][0];
-        hookCall.onSizeChanged?.({ width: 100, height: 20 });
-
-        expect(onShowTooltip).toHaveBeenCalledWith(
-            expect.objectContaining({
-                type: 'div',
-                props: {
-                    className: 'text-suggestion-content__tooltip',
-                    children: customLabel,
-                },
-            }),
-        );
+        // @ts-ignore
+        expect(tooltipContent?.props.className).toBe('text-suggestion-content__tooltip');
+        // @ts-ignore
+        expect(tooltipContent?.props.children).toBe(testLabel);
     });
 });

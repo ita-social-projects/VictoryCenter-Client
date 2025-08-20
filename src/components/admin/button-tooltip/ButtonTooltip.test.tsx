@@ -2,12 +2,13 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ButtonTooltip, ButtonTooltipProps } from './ButtonTooltip';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { TooltipProps } from '../tooltip/Tooltip';
 
 jest.mock('../../../assets/icons/info.svg', () => 'info-icon.svg');
 jest.mock('../tooltip/Tooltip', () => {
     const React = require('react');
     return {
-        Tooltip: React.forwardRef(({ id, Children, position }: any, ref: any) => (
+        Tooltip: React.forwardRef(({ id, children, position }: Partial<TooltipProps>, ref: any) => (
             <div
                 ref={ref}
                 data-testid="tooltip-popup"
@@ -15,7 +16,7 @@ jest.mock('../tooltip/Tooltip', () => {
                 role="tooltip"
                 className={`button-tooltip-popup button-tooltip-popup--${position}`}
             >
-                {Children}
+                {children}
             </div>
         )),
     };

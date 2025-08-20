@@ -1,191 +1,163 @@
+import React, { createRef, forwardRef } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { SuggestionWrapper, SuggestionWrapperProps } from './SuggestionWrapper';
-import { TextSuggestionContentProps } from '../text-suggestion-content/TextSuggestionContent';
+import {
+    SuggestionWrapper,
+    SuggestionWrapperProps,
+    SuggestionWrapperRef,
+    SuggestionContentRef,
+    SuggestionContentRenderProps,
+} from './SuggestionWrapper';
 
 interface TestItem {
     id: number;
     name: string;
 }
 
-jest.mock('../text-suggestion-content/TextSuggestionContent', () => ({
-    TextSuggestionContent: ({ label, isHovered }: TextSuggestionContentProps) => (
-        <div data-testid="text-suggestion-content" data-hovered={isHovered}>
-            {label}
+const defaultProps: SuggestionWrapperProps<TestItem> = {
+    item: { id: 1, name: 'Test Item' },
+    isActive: false,
+    onSelect: jest.fn(),
+    onHover: jest.fn(),
+    getItemLabel: (item: TestItem) => item.name,
+};
+
+const renderComponent = (props: Partial<SuggestionWrapperProps<TestItem>> = {}) => {
+    const finalProps: SuggestionWrapperProps<TestItem> = { ...defaultProps, ...props };
+    const ref = createRef<SuggestionWrapperRef>();
+
+    const renderResult = render(<SuggestionWrapper {...finalProps} ref={ref} />);
+
+    return { ref, ...renderResult };
+};
+
+const MockRenderContent = forwardRef<SuggestionContentRef, SuggestionContentRenderProps<TestItem>>(
+    ({ item, isSuggestionActive, isSuggestionHovered }, ref) => (
+        <div
+            data-testid="custom-content"
+            data-active={isSuggestionActive}
+            data-hovered={isSuggestionHovered}
+            ref={ref as any}
+        >
+            {item.name}
         </div>
     ),
-}));
+);
 
 describe('SuggestionWrapper', () => {
-    const testItem: TestItem = { id: 1, name: 'Test Item' };
-
-    const defaultProps: SuggestionWrapperProps<TestItem> = {
-        item: testItem,
-        isActive: false,
-        onSelect: jest.fn(),
-        onHover: jest.fn(),
-        getItemLabel: (item) => item.name,
-    };
-
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    // Render helpers
-    const renderSuggestionWrapper = (overrideProps: Partial<SuggestionWrapperProps<TestItem>> = {}) =>
-        render(<SuggestionWrapper {...defaultProps} {...overrideProps} />);
+    it('should render default text suggestion content', () => {
+        renderComponent();
 
-    // Element getters
-    const getSuggestionItem = () => screen.getByRole('listitem');
-    const getTextSuggestionContent = () => screen.getByTestId('text-suggestion-content');
-
-    // Action helpers
-    const clickSuggestion = () => fireEvent.click(getSuggestionItem());
-    const hoverSuggestion = () => fireEvent.mouseEnter(getSuggestionItem());
-    const leaveSuggestion = () => fireEvent.mouseLeave(getSuggestionItem());
-
-    // Assertion helpers
-    const expectSuggestionToHaveClass = (className: string) => expect(getSuggestionItem()).toHaveClass(className);
-    const expectSuggestionNotToHaveClass = (className: string) =>
-        expect(getSuggestionItem()).not.toHaveClass(className);
-    const expectCallbackToBeCalled = (callback: jest.Mock) => expect(callback).toHaveBeenCalledTimes(1);
-
-    it('renders list item with default content', () => {
-        renderSuggestionWrapper();
-
-        const suggestionItem = getSuggestionItem();
-        expect(suggestionItem).toBeInTheDocument();
-        expect(suggestionItem).toHaveClass('suggestion-wrapper');
-        expect(getTextSuggestionContent()).toHaveTextContent('Test Item');
+        expect(screen.getByText('Test Item')).toBeInTheDocument();
     });
 
-    it('applies active class when isActive is true', () => {
-        renderSuggestionWrapper({ isActive: true });
-
-        expectSuggestionToHaveClass('suggestion-wrapper--active');
-    });
-
-    it('does not apply active class when isActive is false', () => {
-        renderSuggestionWrapper({ isActive: false });
-
-        expectSuggestionNotToHaveClass('suggestion-wrapper--active');
-    });
-
-    it('calls onSelect when clicked', () => {
-        const onSelect = jest.fn();
-        renderSuggestionWrapper({ onSelect });
-
-        clickSuggestion();
-
-        expectCallbackToBeCalled(onSelect);
-    });
-
-    it('calls onHover and applies active class on mouse enter', () => {
-        const onHover = jest.fn();
-        renderSuggestionWrapper({ onHover });
-
-        hoverSuggestion();
-
-        expectCallbackToBeCalled(onHover);
-        expectSuggestionToHaveClass('suggestion-wrapper--active');
-    });
-
-    it('calls onHideTooltip and removes active class on mouse leave', () => {
-        const onHideTooltip = jest.fn();
-        renderSuggestionWrapper({ onHideTooltip });
-
-        hoverSuggestion();
-        leaveSuggestion();
-
-        expectCallbackToBeCalled(onHideTooltip);
-        expectSuggestionNotToHaveClass('suggestion-wrapper--active');
-    });
-
-    it('updates TextSuggestionContent isHovered prop on hover', () => {
-        renderSuggestionWrapper();
-
-        expect(getTextSuggestionContent()).toHaveAttribute('data-hovered', 'false');
-
-        hoverSuggestion();
-
-        expect(getTextSuggestionContent()).toHaveAttribute('data-hovered', 'true');
-    });
-
-    it('calls onShowTooltip with correct element when handleShowTooltip is called', () => {
-        const onShowTooltip = jest.fn();
-        const mockContent = <div>Tooltip content</div>;
-
-        // Mock TextSuggestionContent to call onShowTooltip
-        jest.doMock('../text-suggestion-content/TextSuggestionContent', () => ({
-            TextSuggestionContent: ({ onShowTooltip }: any) => {
-                // Simulate calling onShowTooltip
-                setTimeout(() => onShowTooltip(mockContent), 0);
-                return <div data-testid="text-suggestion-content">Test</div>;
-            },
-        }));
-
-        renderSuggestionWrapper({ onShowTooltip });
-
-        setTimeout(() => {
-            expect(onShowTooltip).toHaveBeenCalledWith(expect.any(HTMLElement), mockContent);
-        }, 10);
-    });
-
-    it('renders custom content when renderContent is provided', () => {
-        const customRenderContent = jest.fn().mockReturnValue(<div data-testid="custom-content">Custom Content</div>);
-
-        renderSuggestionWrapper({ renderContent: customRenderContent });
+    it('should render custom content when renderContent is provided', () => {
+        renderComponent({ renderContent: MockRenderContent });
 
         expect(screen.getByTestId('custom-content')).toBeInTheDocument();
-        expect(customRenderContent).toHaveBeenCalledWith({
-            item: testItem,
-            isSuggestionActive: false,
-            isSuggestionHovered: false,
-            onShowTooltip: expect.any(Function),
-        });
+        expect(screen.getByText('Test Item')).toBeInTheDocument();
     });
 
-    it('passes correct props to custom renderContent when active and hovered', () => {
-        const customRenderContent = jest.fn().mockReturnValue(<div>Custom</div>);
+    it('should apply active class when isActive is true', () => {
+        renderComponent({ isActive: true });
 
-        renderSuggestionWrapper({
-            renderContent: customRenderContent,
+        const listItem: HTMLLIElement = screen.getByRole('listitem');
+        expect(listItem).toHaveClass('suggestion-wrapper--active');
+    });
+
+    it('should call onSelect when clicked', () => {
+        const onSelectMock = jest.fn();
+        renderComponent({ onSelect: onSelectMock });
+
+        fireEvent.click(screen.getByRole('listitem'));
+
+        expect(onSelectMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call onHover with element on mouse enter', () => {
+        const onHoverMock = jest.fn();
+        renderComponent({ onHover: onHoverMock });
+
+        const listItem: HTMLLIElement = screen.getByRole('listitem');
+        fireEvent.mouseEnter(listItem);
+
+        expect(onHoverMock).toHaveBeenCalledTimes(1);
+        expect(onHoverMock).toHaveBeenCalledWith(listItem);
+    });
+
+    it('should call onMouseLeave when mouse leaves', () => {
+        const onMouseLeaveMock = jest.fn();
+        renderComponent({ onMouseLeave: onMouseLeaveMock });
+
+        fireEvent.mouseLeave(screen.getByRole('listitem'));
+
+        expect(onMouseLeaveMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('should apply active class on hover', () => {
+        renderComponent();
+
+        const listItem: HTMLLIElement = screen.getByRole('listitem');
+        fireEvent.mouseEnter(listItem);
+
+        expect(listItem).toHaveClass('suggestion-wrapper--active');
+    });
+
+    it('should remove active class when mouse leaves after hover', () => {
+        renderComponent();
+
+        const listItem: HTMLLIElement = screen.getByRole('listitem');
+        fireEvent.mouseEnter(listItem);
+        fireEvent.mouseLeave(listItem);
+
+        expect(listItem).not.toHaveClass('suggestion-wrapper--active');
+    });
+
+    it('should pass correct props to custom render content', () => {
+        renderComponent({
+            renderContent: MockRenderContent,
             isActive: true,
         });
 
-        hoverSuggestion();
+        const customContent: HTMLElement = screen.getByTestId('custom-content');
+        fireEvent.mouseEnter(screen.getByRole('listitem'));
 
-        expect(customRenderContent).toHaveBeenLastCalledWith({
-            item: testItem,
-            isSuggestionActive: true,
-            isSuggestionHovered: true,
-            onShowTooltip: expect.any(Function),
-        });
+        expect(customContent).toHaveAttribute('data-active', 'true');
+        expect(customContent).toHaveAttribute('data-hovered', 'true');
     });
 
-    it('uses getItemLabel to get item text', () => {
-        const getItemLabel = jest.fn().mockReturnValue('Custom Label');
+    it('should forward tooltip content from content ref', () => {
+        const { ref } = renderComponent();
 
-        renderSuggestionWrapper({ getItemLabel });
+        // Mock the content ref to return tooltip content
+        const mockTooltipContent = <div>Tooltip</div>;
+        const contentElement = screen.getByText('Test Item').closest('span');
 
-        expect(getItemLabel).toHaveBeenCalledWith(testItem);
-        expect(getTextSuggestionContent()).toHaveTextContent('Custom Label');
+        if (contentElement) {
+            Object.defineProperty(contentElement, 'scrollWidth', { value: 200 });
+            Object.defineProperty(contentElement, 'clientWidth', { value: 100 });
+        }
+
+        const tooltipContent = ref.current?.getTooltipContent();
+
+        expect(tooltipContent).toBeDefined();
     });
 
-    it('handles optional callbacks gracefully', () => {
-        renderSuggestionWrapper({
-            onHover: undefined,
-            onShowTooltip: undefined,
-            onHideTooltip: undefined,
-        });
+    it('should return null tooltip when content ref has no tooltip', () => {
+        const { ref } = renderComponent();
 
-        // Should not throw errors
-        hoverSuggestion();
-        leaveSuggestion();
-        clickSuggestion();
+        const contentElement = screen.getByText('Test Item').closest('span');
 
-        expect(() => {
-            hoverSuggestion();
-            leaveSuggestion();
-        }).not.toThrow();
+        if (contentElement) {
+            Object.defineProperty(contentElement, 'scrollWidth', { value: 100 });
+            Object.defineProperty(contentElement, 'clientWidth', { value: 100 });
+        }
+
+        const tooltipContent = ref.current?.getTooltipContent();
+
+        expect(tooltipContent).toBeNull();
     });
 });

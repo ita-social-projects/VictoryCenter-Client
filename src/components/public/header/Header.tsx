@@ -17,6 +17,7 @@ import {
     WHO_WE_ARE,
 } from '../../../const/public/header';
 import { DropdownMenu } from '../dropdown-menu/DropdownMenu';
+import { ReactComponent as BurgerIcon } from '../../../assets/icons/burger.svg';
 
 export const Header = () => {
     const dropdownMenuLinks = [
@@ -67,7 +68,7 @@ export const Header = () => {
                     {DONATE}
                 </Link>
                 <button onClick={toggleMenu} className="burgerMenuIcon">
-                    ☰
+                    <BurgerIcon />
                 </button>
             </div>
             {isMenuOpen && (

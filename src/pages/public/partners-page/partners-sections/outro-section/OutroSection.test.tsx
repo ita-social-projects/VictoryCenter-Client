@@ -2,11 +2,10 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { OutroSection } from './OutroSection';
-import { OUTRO } from '../../../../../const/partners-page/partners-page';
 
 jest.mock('../../../../../assets/partners-page-images/outro.mp4', () => 'mocked-outro-video');
 
-jest.mock('../../../../../const/partners-page/partners-page', () => ({
+jest.mock('../../../../../const/public/partners-page', () => ({
     OUTRO: {
         TITLE: {
             FIRST_LINE: 'Mocked Title',
@@ -16,6 +15,8 @@ jest.mock('../../../../../const/partners-page/partners-page', () => ({
         BUTTON_SUPPORT_TEXT: 'Support Us',
     },
 }));
+
+const { OUTRO } = require('../../../../../const/public/partners-page');
 
 const renderComponent = () => {
     return render(<OutroSection />);

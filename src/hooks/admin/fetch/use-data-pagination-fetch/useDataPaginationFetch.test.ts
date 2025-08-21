@@ -262,14 +262,12 @@ describe('useDataPaginationFetch', () => {
             autoFetchDependencies: ['dep1'],
         });
 
-        await act(async () => {
-            rerender({
-                fetchHandler: mockFetchHandler,
-                autoFetchDisabled: true,
-                autoFetchDependencies: ['dep2'],
-                initialData: [],
-                pageSize: 10,
-            });
+        rerender({
+            fetchHandler: mockFetchHandler,
+            autoFetchDisabled: true,
+            autoFetchDependencies: ['dep2'],
+            initialData: [],
+            pageSize: 10,
         });
 
         expect(mockFetchHandler).not.toHaveBeenCalled();

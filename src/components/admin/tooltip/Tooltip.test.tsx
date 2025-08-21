@@ -49,7 +49,7 @@ describe('Tooltip - Absolute Positioning', () => {
     const getTooltip = () => screen.getByRole('tooltip');
 
     // Action helpers
-    const clickTooltip = () => fireEvent.click(getTooltip());
+    const clickTooltip = () => fireEvent.mouseDown(getTooltip());
     const stopPropagationSpy = () => jest.spyOn(Event.prototype, 'stopPropagation');
 
     // Assertion helpers

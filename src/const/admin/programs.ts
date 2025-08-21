@@ -9,7 +9,7 @@ export const PROGRAMS_TEXT = {
     MESSAGE: {
         FAIL_TO_FETCH_PROGRAMS: 'Виникла помилка, не вдалось завантажити програми',
         FAIL_TO_FETCH_PROGRAM: 'Не вдалося знайти вибрану програму',
-        FETCHED_PROGRAM_DOES_NOT_HAVE_CATEGORIES: 'У вибраної програми відсутні категорії',
+        SELECTED_PROGRAM_HAS_NO_CATEGORIES: 'У вибраної програми відсутні категорії',
     },
 
     QUESTION: {

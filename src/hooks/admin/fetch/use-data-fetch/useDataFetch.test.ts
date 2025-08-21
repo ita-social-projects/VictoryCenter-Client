@@ -40,27 +40,6 @@ describe('useDataFetch', () => {
         expect(result.current.error).toBeNull();
     });
 
-    it('should auto fetch on mount when not disabled', async () => {
-        const entities = createEntities(2);
-        const fetchHandler = createSuccessFetch(entities);
-        const initialData: TestEntity[] = [];
-
-        const { result } = renderHook(() =>
-            useDataFetch({
-                initialData,
-                fetchHandler,
-                autoFetchDisabled: false,
-            }),
-        );
-
-        await waitFor(() => expect(fetchHandler).toHaveBeenCalledTimes(1));
-        expect(fetchHandler).toHaveBeenCalledWith({
-            cancellationSignal: expect.any(AbortSignal),
-        });
-
-        await waitFor(() => expect(result.current.data).toEqual(entities));
-    });
-
     it('should not auto fetch when disabled', async () => {
         const fetchHandler = createSuccessFetch([]);
         const initialData: TestEntity[] = [];
@@ -180,11 +159,11 @@ describe('useDataFetch', () => {
         );
 
         // Initial auto fetch
-        await waitFor(() => expect(fetchHandler).toHaveBeenCalledTimes(1));
+        await waitFor(() => expect(fetchHandler).toHaveBeenCalledTimes(0));
 
         rerender({ deps: 'changed' });
 
-        await waitFor(() => expect(fetchHandler).toHaveBeenCalledTimes(2));
+        await waitFor(() => expect(fetchHandler).toHaveBeenCalledTimes(1));
     });
 
     it('should not refetch when autoFetch disabled and dependencies change', async () => {

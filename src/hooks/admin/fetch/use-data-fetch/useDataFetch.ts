@@ -29,7 +29,7 @@ export const useDataFetch = <TResult>({
     const abortControllerRef = useRef<AbortController | null>(null);
     const isInitialMountRef = useRef(true);
 
-    const fetchEntities = useCallback(async () => {
+    const fetchData = useCallback(async () => {
         abortControllerRef.current?.abort();
         const newAbortController = new AbortController();
         abortControllerRef.current = newAbortController;
@@ -57,10 +57,6 @@ export const useDataFetch = <TResult>({
         }
     }, [fetchHandler]);
 
-    const refetch = useCallback(() => {
-        fetchEntities();
-    }, [fetchEntities]);
-
     useEffect(() => {
         if (isInitialMountRef.current) {
             isInitialMountRef.current = false;
@@ -71,14 +67,9 @@ export const useDataFetch = <TResult>({
             return;
         }
 
-        refetch();
-    }, [autoFetchDisabled, refetch, ...autoFetchDependencies]);
-
-    useEffect(() => {
-        if (!autoFetchDisabled) {
-            fetchEntities();
-        }
-    }, [autoFetchDisabled, fetchEntities]);
+        fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [autoFetchDisabled, fetchData, ...autoFetchDependencies]);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -89,7 +80,7 @@ export const useDataFetch = <TResult>({
         data: fetchedData,
         isLoading: isLoading,
         error: error,
-        refetch: refetch,
+        refetch: fetchData,
         setData: setFetchedData,
     };
 };

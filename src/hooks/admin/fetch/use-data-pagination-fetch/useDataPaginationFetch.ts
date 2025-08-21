@@ -25,6 +25,7 @@ export interface useDataPaginationFetchProps<TResult> {
     fetchHandler: (paginationParams: PaginationRequestParams) => Promise<PaginationResult<TResult>>;
     autoFetchDependencies?: any[];
     autoFetchDisabled?: boolean;
+    /** Optional function to extract unique ID from items to prevent duplicates during pagination */
     getUniqueId?: (item: TResult) => string | number;
     pageSize?: number;
 }
@@ -32,6 +33,7 @@ export interface useDataPaginationFetchProps<TResult> {
 export const useDataPaginationFetch = <TResult>({
     initialData = [],
     fetchHandler,
+    /** Optional function to extract unique ID from items to prevent duplicates during pagination */
     getUniqueId,
     autoFetchDependencies = [],
     autoFetchDisabled = false,
@@ -54,7 +56,7 @@ export const useDataPaginationFetch = <TResult>({
         totalItemsCountRef.current = null;
     }, []);
 
-    const fetchEntities = useCallback(
+    const fetchData = useCallback(
         async (isReset: boolean) => {
             abortControllerRef.current?.abort();
             const newAbortController = new AbortController();
@@ -119,12 +121,12 @@ export const useDataPaginationFetch = <TResult>({
         if (isLoading || !hasMore) {
             return;
         }
-        fetchEntities(false);
-    }, [isLoading, hasMore, fetchEntities]);
+        fetchData(false);
+    }, [isLoading, hasMore, fetchData]);
 
     const fetchFromStart = useCallback(() => {
-        fetchEntities(true);
-    }, [fetchEntities]);
+        fetchData(true);
+    }, [fetchData]);
 
     useEffect(() => {
         if (isInitialMountRef.current) {

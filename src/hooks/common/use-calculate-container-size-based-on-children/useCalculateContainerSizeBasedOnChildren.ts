@@ -84,6 +84,7 @@ export const useCalculateContainerSizeBasedOnChildren = ({
         disableAfterFirstSuccess,
         hasCalculated,
         elementsContainerRef,
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         ...dependencies,
     ]);
 

@@ -171,8 +171,7 @@ export const ProgramsPageContent = () => {
         if (selectedCategory) {
             clearError();
         }
-        fetchProgramsFromStart();
-    }, [selectedCategory, statusFilter, clearError, fetchProgramsFromStart]);
+    }, [selectedCategory, statusFilter, clearError]);
 
     // Resize handling
     const updatePageSize = () => {

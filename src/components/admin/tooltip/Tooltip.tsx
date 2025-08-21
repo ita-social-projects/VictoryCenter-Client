@@ -115,7 +115,7 @@ export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
                 id={id}
                 ref={ref}
                 role="tooltip"
-                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
                 className={classNames('tooltip-popup', `tooltip-popup--${position}`)}
                 style={{
                     top: `${tooltipPosition.top}px`,

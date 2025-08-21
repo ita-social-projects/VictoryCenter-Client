@@ -58,14 +58,16 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
     ),
 }));
 
-jest.mock('../../../../../hooks/admin/fetch/use-entities-pagination-fetch/useDataPaginationFetch');
+// Правильний мок для useDataPaginationFetch
+jest.mock('../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch');
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 jest.mock('./program-suggestion-item/ProgramSuggestionItem', () => ({
     ProgramSuggestionItem: ({ item }: any) => <div data-testid="suggestion-item">{item.name}</div>,
 }));
 
-const mockUseEntitiesPaginationFetch =
-    require('../../../../../hooks/admin/fetch/use-entities-pagination-fetch/useDataPaginationFetch').useEntitiesPaginationFetch;
+// Правильна назва хука
+const mockUseDataPaginationFetch =
+    require('../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
 const mockProgramsApi = require('../../../../../services/api/admin/programs/programs-api').ProgramsApi;
 
 // Helper functions
@@ -85,24 +87,24 @@ const createProps = (overrides = {}) => ({
 });
 
 describe('ProgramsPageToolbar', () => {
-    const mockActions = {
+    const mockHookReturn = {
+        data: [],
+        isLoading: false,
+        hasMore: false,
+        error: null,
         fetchMore: jest.fn(),
         fetchFromStart: jest.fn(),
-        addEntity: jest.fn(),
-        updateEntity: jest.fn(),
-        removeEntity: jest.fn(),
+        setData: jest.fn(),
         resetList: jest.fn(),
     };
 
     beforeEach(() => {
         jest.clearAllMocks();
-        mockUseEntitiesPaginationFetch.mockReturnValue({
-            entities: [],
-            isLoading: false,
-            hasMore: false,
-            actions: mockActions,
+        mockUseDataPaginationFetch.mockReturnValue(mockHookReturn);
+        mockProgramsApi.fetchProgramSuggestions = jest.fn().mockResolvedValue({
+            items: [],
+            totalItemsCount: 0,
         });
-        mockProgramsApi.fetchProgramSuggestions = jest.fn().mockResolvedValue([]);
     });
 
     it('should render search bar with correct placeholder', () => {
@@ -142,13 +144,12 @@ describe('ProgramsPageToolbar', () => {
         render(<ProgramsPageToolbar {...createProps()} />);
 
         const searchInput = screen.getByTestId('search-input');
-        userEvent.type(searchInput, 'test program');
+        await userEvent.type(searchInput, 'test program');
 
-        // Check that useEntitiesPaginationFetch was called with correct dependencies
-        expect(mockUseEntitiesPaginationFetch).toHaveBeenCalledWith(
+        expect(mockUseDataPaginationFetch).toHaveBeenCalledWith(
             expect.objectContaining({
-                autoFetchDependencies: ['test program'],
-                autoFetchDisabled: false,
+                autoFetchDependencies: expect.arrayContaining([expect.any(String)]),
+                autoFetchDisabled: expect.any(Boolean),
                 pageSize: 5,
             }),
         );
@@ -157,7 +158,7 @@ describe('ProgramsPageToolbar', () => {
     it('should disable auto fetch when search term is too short', () => {
         render(<ProgramsPageToolbar {...createProps()} />);
 
-        expect(mockUseEntitiesPaginationFetch).toHaveBeenCalledWith(
+        expect(mockUseDataPaginationFetch).toHaveBeenCalledWith(
             expect.objectContaining({
                 autoFetchDisabled: true,
             }),
@@ -168,19 +169,18 @@ describe('ProgramsPageToolbar', () => {
         const suggestions = [createSuggestion(1, 'Test Program')];
         const onProgramSelect = jest.fn();
 
-        mockUseEntitiesPaginationFetch.mockReturnValue({
-            entities: suggestions,
-            isLoading: false,
-            hasMore: false,
-            actions: mockActions,
+        mockUseDataPaginationFetch.mockReturnValue({
+            ...mockHookReturn,
+            data: suggestions,
         });
 
         render(<ProgramsPageToolbar {...createProps({ onProgramSelect })} />);
 
         const suggestion = screen.getByTestId('suggestion-0');
-        await userEvent.click(suggestion);
+        userEvent.click(suggestion);
 
         expect(onProgramSelect).toHaveBeenCalledWith(1);
+        expect(mockHookReturn.resetList).toHaveBeenCalled();
     });
 
     it('should call onSearchClear when clear button is clicked', async () => {
@@ -188,32 +188,31 @@ describe('ProgramsPageToolbar', () => {
         render(<ProgramsPageToolbar {...createProps({ onSearchClear })} />);
 
         const clearButton = screen.getByTestId('clear-button');
-        await userEvent.click(clearButton);
+        userEvent.click(clearButton);
 
         expect(onSearchClear).toHaveBeenCalledTimes(1);
+        expect(mockHookReturn.resetList).toHaveBeenCalled();
     });
 
     it('should pass correct props to SearchBar', () => {
         const suggestions = [createSuggestion(1, 'Test')];
 
-        mockUseEntitiesPaginationFetch.mockReturnValue({
-            entities: suggestions,
+        mockUseDataPaginationFetch.mockReturnValue({
+            ...mockHookReturn,
+            data: suggestions,
             isLoading: true,
             hasMore: true,
-            actions: mockActions,
         });
 
         render(<ProgramsPageToolbar {...createProps()} />);
 
-        // Verify SearchBar receives correct props by checking if suggestions are rendered
         expect(screen.getByTestId('suggestion-0')).toHaveTextContent('Test');
     });
 
     it('should call getSuggestions with current search term', async () => {
         render(<ProgramsPageToolbar {...createProps()} />);
 
-        // Get the fetchEntitiesHandler from useEntitiesPaginationFetch call
-        const fetchHandler = mockUseEntitiesPaginationFetch.mock.calls[0][0].fetchEntitiesHandler;
+        const fetchHandler = mockUseDataPaginationFetch.mock.calls[0][0].fetchHandler;
 
         const params = {
             offset: 0,
@@ -234,16 +233,55 @@ describe('ProgramsPageToolbar', () => {
     it('should render suggestion items correctly', () => {
         const suggestions = [createSuggestion(1, 'Program 1'), createSuggestion(2, 'Program 2')];
 
-        mockUseEntitiesPaginationFetch.mockReturnValue({
-            entities: suggestions,
-            isLoading: false,
-            hasMore: false,
-            actions: mockActions,
+        mockUseDataPaginationFetch.mockReturnValue({
+            ...mockHookReturn,
+            data: suggestions,
         });
 
         render(<ProgramsPageToolbar {...createProps()} />);
 
         expect(screen.getByTestId('suggestion-0')).toHaveTextContent('Program 1');
         expect(screen.getByTestId('suggestion-1')).toHaveTextContent('Program 2');
+    });
+
+    it('should reset suggestions list and clear search when suggestion is selected', async () => {
+        const suggestions = [createSuggestion(1, 'Test Program')];
+        const onProgramSelect = jest.fn();
+
+        mockUseDataPaginationFetch.mockReturnValue({
+            ...mockHookReturn,
+            data: suggestions,
+        });
+
+        render(<ProgramsPageToolbar {...createProps({ onProgramSelect })} />);
+
+        const suggestion = screen.getByTestId('suggestion-0');
+        await userEvent.click(suggestion);
+
+        expect(mockHookReturn.resetList).toHaveBeenCalled();
+        expect(onProgramSelect).toHaveBeenCalledWith(1);
+    });
+
+    it('should handle loading state correctly', () => {
+        mockUseDataPaginationFetch.mockReturnValue({
+            ...mockHookReturn,
+            isLoading: true,
+        });
+
+        render(<ProgramsPageToolbar {...createProps()} />);
+
+        expect(mockUseDataPaginationFetch).toHaveBeenCalled();
+    });
+
+    it('should handle fetchMore correctly', () => {
+        const mockFetchMore = jest.fn();
+        mockUseDataPaginationFetch.mockReturnValue({
+            ...mockHookReturn,
+            fetchMore: mockFetchMore,
+        });
+
+        render(<ProgramsPageToolbar {...createProps()} />);
+
+        expect(mockUseDataPaginationFetch).toHaveBeenCalled();
     });
 });

@@ -86,7 +86,8 @@
     cursor: pointer;
     background: none;
     border: none;
-    color: #000;
+    align-self: center;
+    color: black;
 }
 
 .mobileMenu {
@@ -138,7 +139,7 @@
     }
 
     .burgerMenuIcon {
-        display: block;
+        display: flex;
     }
 }
 

@@ -1,28 +1,44 @@
 import { useState } from 'react';
 import './RightSection.scss';
-import { UkrainePaymentDetails } from './ukraine-payment-details/UkrainePaymentDetails';
+
 import { AbroadPaymentDetails } from './abroad-payment-details/AbroadPaymentDetails';
 import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSupportWays';
-import { IN_UKRAINE_LABEL, NOT_IN_UKRAINE_LABEL } from '../../../../const/public/donate-page';
+import { Tabs } from '../../../../components/common/tabs/Tabs';
+import { UkrainePaymentDetails } from './ukraine-payment-details/UkrainePaymentDetails';
+import { Currency } from '../../../../types/public/donate-page';
+import { CURRENCY_TABS } from '../../../../const/public/donate-page';
 
 export const RightSection = () => {
-    const [isAbroad, setIsAbroad] = useState(false);
+    const [activeTab, setActiveTab] = useState<Currency>(Currency.UAH);
 
-    const handleOnChange = () => {
-        setIsAbroad(!isAbroad);
+    const paymentDetails = () => {
+        switch (activeTab) {
+            case Currency.UAH:
+                return <UkrainePaymentDetails />;
+            case Currency.USD:
+                return <AbroadPaymentDetails currency={activeTab} />;
+            case Currency.EUR:
+                return <AbroadPaymentDetails currency={activeTab} />;
+        }
     };
 
     return (
         <div className="rightSection">
             <div className="locationToggleContainer">
-                <label className="switch">
-                    <input type="checkbox" checked={isAbroad} onChange={handleOnChange} />
-                    <span className="slider round"></span>
-                </label>
-                <span className="toggleLabel">{isAbroad ? NOT_IN_UKRAINE_LABEL : IN_UKRAINE_LABEL}</span>
+                <div className="switch">
+                    <Tabs
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                        tabs={[
+                            { id: Currency.UAH, label: CURRENCY_TABS.UAH },
+                            { id: Currency.USD, label: CURRENCY_TABS.USD },
+                            { id: Currency.EUR, label: CURRENCY_TABS.EUR },
+                        ]}
+                    ></Tabs>
+                </div>
             </div>
             <div className="donatePaymentDetails">
-                {isAbroad ? <AbroadPaymentDetails /> : <UkrainePaymentDetails />}
+                {paymentDetails()}
                 <AlternativeSupportWays />
             </div>
         </div>

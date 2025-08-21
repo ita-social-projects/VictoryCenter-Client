@@ -9,6 +9,9 @@ jest.mock('./Header.scss', () => ({}));
 jest.mock('../../../assets/icons/logo-with-text.svg', () => ({
     ReactComponent: () => <div data-testid="logo" />,
 }));
+jest.mock('../../../assets/icons/burger.svg', () => ({
+    ReactComponent: () => <div data-testid="burger-icon" />,
+}));
 
 describe('Header', () => {
     beforeEach(() => {

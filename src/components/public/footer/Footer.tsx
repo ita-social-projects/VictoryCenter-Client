@@ -95,9 +95,7 @@ export const Footer = () => {
                         {OUR_HISTORY}
                     </Link>
                     <Link to={PUBLIC_ROUTES.TEAM.FULL}>{OUR_TEAM}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {PARTNERS}
-                    </Link>
+                    <Link to={PUBLIC_ROUTES.PARTNERS.FULL}>{PARTNERS}</Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {EVENTS_AND_NEWS}
                     </Link>

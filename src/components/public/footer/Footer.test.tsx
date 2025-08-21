@@ -83,7 +83,7 @@ describe('Footer', () => {
         expect(screen.getByRole('link', { name: ABOUT_US })).toHaveAttribute('href', PUBLIC_ROUTES.ABOUT_US.FULL);
         expect(screen.getByRole('link', { name: OUR_HISTORY })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
         expect(screen.getByRole('link', { name: OUR_TEAM })).toHaveAttribute('href', PUBLIC_ROUTES.TEAM.FULL);
-        expect(screen.getByRole('link', { name: PARTNERS })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
+        expect(screen.getByRole('link', { name: PARTNERS })).toHaveAttribute('href', PUBLIC_ROUTES.PARTNERS.FULL);
         expect(screen.getByRole('link', { name: EVENTS_AND_NEWS })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
     });
 

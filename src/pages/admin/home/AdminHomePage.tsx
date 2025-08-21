@@ -1,4 +1,4 @@
-﻿import './AdminHomePage.scss';
+import './AdminHomePage.scss';
 import ArrowIcon from '../../../assets/icons/arrow-left-white.svg';
 import { MAIN_TEXT, SUB_TEXT, HINT_TEXT } from '../../../const/admin/home';
 

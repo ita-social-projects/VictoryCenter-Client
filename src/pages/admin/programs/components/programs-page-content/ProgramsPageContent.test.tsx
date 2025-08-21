@@ -6,6 +6,10 @@ import { VisibilityStatus } from '../../../../../types/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { EntitiesPaginationActions } from '../../../../../hooks/admin/fetch/use-entities-pagination-fetch/useEntitiesPaginationFetch';
+import { EntitiesActions } from '../../../../../hooks/admin/fetch/use-entities-fetch/useEntitiesFetch';
+import { EntityFetchActions } from '../../../../../hooks/admin/fetch/use-entity-fetch/useEntityFetch';
+import {BaseCloseModalActions, BaseOpenModalActions} from "../../../../../hooks/admin/use-modals-state/useModalsState";
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 const mockProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
@@ -40,7 +44,6 @@ jest.mock('../programs-page-toolbar/ProgramsPageToolbar', () => ({
     },
 }));
 
-// Mock ProgramsPageModals component
 jest.mock('../programs-page-modals/ProgramsPageModals', () => ({
     ProgramsPageModals: (props: any) => {
         const { modalState, closeModalActions } = props.modalsStateControl;
@@ -271,8 +274,7 @@ const mockNewProgram: Program = {
 
 const mockProgram = mockPrograms[0];
 
-// Mock hook return values
-const mockModalsActions = {
+const mockModalsActions: BaseOpenModalActions<any> & BaseCloseModalActions = {
     openAddItemModal: jest.fn(),
     openEditItemModal: jest.fn(),
     openDeleteItemModal: jest.fn(),
@@ -287,25 +289,28 @@ const mockModalsActions = {
     closeDeleteCategoryModal: jest.fn(),
 };
 
-const mockCategoriesActions = {
+const mockCategoriesActions: EntitiesActions<any, number> = {
     setEntities: jest.fn(),
     addEntity: jest.fn(),
     updateEntity: jest.fn(),
     removeEntity: jest.fn(),
     refetch: jest.fn(),
+    resetList: jest.fn(),
 };
 
-const mockProgramsActions = {
+const mockProgramsActions: EntitiesPaginationActions<any> = {
     fetchFromStart: jest.fn(),
     fetchMore: jest.fn(),
     addEntity: jest.fn(),
     updateEntity: jest.fn(),
     removeEntity: jest.fn(),
-    setEntities: jest.fn(),
+    resetList: jest.fn(),
 };
 
-const mockSearchProgramActions = {
+const mockSearchProgramActions: EntityFetchActions<any, number> = {
     refetch: jest.fn(),
+    updateEntity: jest.fn(),
+    resetEntity: jest.fn(),
 };
 
 describe('ProgramsPageContent', () => {
@@ -593,6 +598,29 @@ describe('ProgramsPageContent', () => {
     });
 
     describe('Search functionality', () => {
+        beforeEach(() => {
+            mockUseEntityFetch.useEntityFetch.mockReturnValue({
+                entity: mockProgram,
+                isLoading: false,
+                error: null,
+                actions: mockSearchProgramActions,
+            });
+
+            mockUseEntitiesPaginationFetch.useEntitiesPaginationFetch.mockReturnValue({
+                entities: [],
+                error: null,
+                isLoading: false,
+                actions: mockProgramsActions,
+            });
+
+            mockUseEntitiesFetch.useEntitiesFetch.mockReturnValue({
+                entities: [],
+                error: null,
+                isLoading: false,
+                actions: mockCategoriesActions,
+            });
+        });
+
         it('should handle program selection for search', () => {
             renderProgramsPageContent();
             clickSelectProgramButton();
@@ -609,14 +637,6 @@ describe('ProgramsPageContent', () => {
         });
 
         it('should show searched program when available', () => {
-            // Mock useEntityFetch to return a searched program
-            mockUseEntityFetch.useEntityFetch.mockReturnValue({
-                entity: mockProgram,
-                isLoading: false,
-                error: null,
-                actions: mockSearchProgramActions,
-            });
-
             // Render component and trigger search state by clicking select program
             renderProgramsPageContent();
             clickSelectProgramButton();

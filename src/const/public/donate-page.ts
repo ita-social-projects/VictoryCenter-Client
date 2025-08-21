@@ -1,5 +1,11 @@
 export const PAGE_TITLE = 'МИ ВДЯЧНІ | ЗА КОЖЕН ДОНАТ';
 
+export const DONATION_SIZE = {
+    10: '+10 ',
+    50: '+50 ',
+    100: '+100 ',
+};
+
 export const DONATE_SECTION = {
     ONE_TIME_DONATE: 'Разовий донат',
     SUBSCRIPTION: 'Підписка',
@@ -7,8 +13,11 @@ export const DONATE_SECTION = {
     SUBSCRIPTION_BUTTON_LABEL: 'Донатити щомісячно',
 };
 
-export const IN_UKRAINE_LABEL = 'Я в Україні';
-export const NOT_IN_UKRAINE_LABEL = 'Я не в Україні';
+export const CURRENCY_TABS = {
+    UAH: 'Гривня / UAH',
+    USD: 'Долар / USD',
+    EUR: 'Євро / EUR',
+};
 
 export const UKRAINE_PAYMENT_DETAILS = {
     UKRAINE_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в Україні',
@@ -79,4 +88,110 @@ export const ALTERNATIVE_SUPPORT_WAYS = {
     MONOBANK_JAR_LABEL: 'Monobank баночка',
     MONOBANK_JAR_LINK_LABEL: 'https://send.monobank.ua/jar/2JGG2F8rHQ',
     DOWNLOAD_PAYMENT_DETAILS_BUTTON_LABEL: 'Завантажити реквізити PDF',
+};
+
+export const CORRESPONDENT_BANKS = {
+    USD: [
+        {
+            title: ABROAD_PAYMENT_DETAILS.JP_MORGAN_CHASE_BANK_USA_LABEL,
+            fields: [
+                {
+                    label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.SWIFT_JP_MORGAN_CODE_USA_LABEL,
+                },
+                {
+                    label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.ACCOUNT_JP_MORGAN_CODE_USA_LABEL,
+                },
+            ],
+        },
+        {
+            title: ABROAD_PAYMENT_DETAILS.BANK_OF_NEW_YORK_MELLON_USA_LABEL,
+            fields: [
+                {
+                    label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.SWIFT_BANK_OF_NEW_YORK_MELLON_USA_CODE_LABEL,
+                },
+                {
+                    label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.ACCOUNT_BANK_OF_NEW_YORK_MELLON_USA_CODE_LABEL,
+                },
+            ],
+        },
+        {
+            title: ABROAD_PAYMENT_DETAILS.CITY_BANK_USA_LABEL,
+            fields: [
+                {
+                    label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.SWIFT_CITY_BANK_USA_CODE_LABEL,
+                },
+                {
+                    label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.ACCOUNT_CITY_BANK_USA_CODE_LABEL,
+                },
+            ],
+        },
+    ],
+    EUR: [
+        {
+            title: ABROAD_PAYMENT_DETAILS.COMMERZBANK_AG_GERMANY_LABEL,
+            fields: [
+                {
+                    label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.SWIFT_COMMERZBANK_AG_GERMANY_CODE_LABEL,
+                },
+                {
+                    label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.ACCOUNT_COMMERZBANK_AG_GERMANY_CODE_LABEL,
+                },
+            ],
+        },
+        {
+            title: ABROAD_PAYMENT_DETAILS.JP_MORGAN_AG_GERMANY_LABEL,
+            fields: [
+                {
+                    label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.SWIFT_JP_MORGAN_AG_GERMANY_CODE_LABEL,
+                },
+                {
+                    label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.ACCOUNT_JP_MORGAN_AG_GERMANY_CODE_LABEL,
+                },
+            ],
+        },
+        {
+            title: ABROAD_PAYMENT_DETAILS.BANK_OF_NEW_YORK_MELLON_FRANKFURT_LABEL,
+            fields: [
+                {
+                    label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.SWIFT_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL,
+                },
+                {
+                    label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.ACCOUNT_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL,
+                },
+                {
+                    label: ABROAD_PAYMENT_DETAILS.IBAN_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.IBAN_BANK_OF_NEW_YORK_MELLON_FRANKFURT_CODE_LABEL,
+                },
+            ],
+        },
+        {
+            title: ABROAD_PAYMENT_DETAILS.CITY_BANK_IRELAND_LABEL,
+            fields: [
+                {
+                    label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.SWIFT_CITY_BANK_IRELAND_CODE_LABEL,
+                },
+                {
+                    label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.ACCOUNT_CITY_BANK_IRELAND_CODE_LABEL,
+                },
+                {
+                    label: ABROAD_PAYMENT_DETAILS.IBAN_LABEL,
+                    value: ABROAD_PAYMENT_DETAILS.IBAN_CITY_BANK_IRELAND_CODE_LABEL,
+                },
+            ],
+        },
+    ],
 };

@@ -7,7 +7,9 @@ import { VisibilityStatusLabelProps } from '../../../../../components/admin/visi
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { Program } from '../../../../../types/admin/programs';
 
-jest.mock('../../../../../assets/icons/blank-image.svg', () => 'blank-image.svg');
+jest.mock('../../../../../assets/icons/blank-image.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="program-blank-image" />,
+}));
 
 jest.mock('../../../../../components/admin/button-tooltip/ButtonTooltip', () => ({
     ButtonTooltip: ({ children, position }: { children: React.ReactNode; position: string }) => {
@@ -55,7 +57,7 @@ describe('ProgramListItem', () => {
 
     const getProgramName = () => screen.getByText('Test Program');
     const getProgramDescription = () => screen.getByText('Test program description');
-    const getProgramImage = () => screen.getByAltText('Test Program-img');
+    const getProgramImage = () => screen.getByTestId('program-blank-image');
     const getStatusComponent = () => screen.getByTestId('status');
     const getTooltipButton = () => screen.getByTestId('tooltip-button');
 
@@ -98,8 +100,7 @@ describe('ProgramListItem', () => {
         const programWithoutImage = { ...mockProgram, img: null };
         renderProgramListItem({ program: programWithoutImage });
 
-        const image = getProgramImage();
-        expect(image).toHaveAttribute('src', 'blank-image.svg');
+        expect(getProgramImage()).toBeInTheDocument();
     });
 
     it('renders status component with correct status', () => {

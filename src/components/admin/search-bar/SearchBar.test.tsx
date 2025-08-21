@@ -1,8 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SearchBar } from './SearchBar';
 
-jest.mock('../../../assets/icons/la_search.svg', () => 'search-icon.svg');
-jest.mock('../../../assets/icons/remove-query.svg', () => 'remove-icon.svg');
 jest.mock('../select/Select', () => {
     const mockReact = require('react');
     return {

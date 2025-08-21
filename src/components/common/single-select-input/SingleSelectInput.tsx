@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import ArrowDown from '../../../assets/icons/chevron-down.svg';
-import ArrowUp from '../../../assets/icons/chevron-up.svg';
+import { ReactComponent as ArrowDown } from '../../../assets/icons/chevron-down.svg';
+import { ReactComponent as ArrowUp } from '../../../assets/icons/chevron-up.svg';
 import classNames from 'classnames';
 import './SingleSelectInput.scss';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
@@ -92,15 +92,11 @@ export const SingleSelectInput = <T extends Record<string, any>>({
                     {displayLabel}
                 </div>
                 <div className="placeholder-arrow">
-                    <img
-                        src={isOpen ? ArrowUp : ArrowDown}
-                        className="icon-img"
-                        alt={
-                            isOpen
-                                ? COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST
-                                : COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST
-                        }
-                    />
+                    {isOpen ? (
+                        <ArrowUp className="icon-img" aria-label={COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST} />
+                    ) : (
+                        <ArrowDown className="icon-img" aria-label={COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST} />
+                    )}
                 </div>
             </button>
 

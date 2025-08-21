@@ -2,6 +2,10 @@ import { render } from '@testing-library/react';
 import { NotFoundMessage } from './NotFoundMessage';
 import { MemoryRouter } from 'react-router';
 
+jest.mock('../../../../assets/icons/arrow-up-right.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} />,
+}));
+
 describe('NotFoundMessage', () => {
     it('renders the component', () => {
         const { container } = render(

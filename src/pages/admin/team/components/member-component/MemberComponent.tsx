@@ -1,6 +1,6 @@
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import './MemberComponent.scss';
-import BlankUserImage from '../../../../../assets/icons/blank-user.svg';
+import { ReactComponent as BlankUserImage } from '../../../../../assets/icons/blank-user.svg';
 import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 import { TeamMember } from '../../../../../types/admin/team-members';
 import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
@@ -12,6 +12,9 @@ export interface MemberComponentProps {
 }
 
 export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMember }: MemberComponentProps) => {
+    const memberImage = mapImageToBase64(member.image);
+    const isMemberImageValid = !!memberImage;
+
     const handleEditMember = () => {
         handleOnEditMember(member);
     };
@@ -23,10 +26,18 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
     return (
         <div className="members-item">
             <div className="members-profile">
-                <img
-                    src={mapImageToBase64(member.image) || BlankUserImage}
-                    alt={`${TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}-${member.fullName}`}
-                />
+                {isMemberImageValid ? (
+                    <img
+                        src={memberImage}
+                        alt={`${TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}-${member.fullName}`}
+                        className=""
+                    />
+                ) : (
+                    <BlankUserImage
+                        aria-label={`${TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}-${member.fullName}`}
+                        className="member-image"
+                    />
+                )}
                 <p>{member.fullName}</p>
             </div>
             <div className="members-position">

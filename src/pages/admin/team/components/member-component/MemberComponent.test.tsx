@@ -10,7 +10,9 @@ jest.mock('../../../../../utils/functions/map-image-to-base-64/map-image-to-base
     mapImageToBase64: jest.fn(),
 }));
 
-jest.mock('../../../../../assets/icons/blank-user.svg', () => 'blank-user.svg');
+jest.mock('../../../../../assets/icons/blank-user.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="blank-user-image" />,
+}));
 
 jest.mock('../../../../../components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
     VisibilityStatusLabel: ({ status }: { status: VisibilityStatus }) => (
@@ -67,8 +69,7 @@ describe('MemberComponent', () => {
 
         renderComponent({ image: null });
 
-        const img = screen.getByRole('img');
-        expect(img).toHaveAttribute('src', 'blank-user.svg');
+        expect(screen.getByTestId('blank-user-image')).toBeInTheDocument();
     });
 
     it('calls handleOnEditMember when edit button clicked', () => {

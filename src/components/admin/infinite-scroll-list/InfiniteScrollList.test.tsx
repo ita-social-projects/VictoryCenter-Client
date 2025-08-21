@@ -3,7 +3,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { InfiniteScrollList, InfiniteScrollListProps } from './InfiniteScrollList';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
-jest.mock('../../../assets/icons/load.svg', () => 'LoaderIcon');
 jest.mock('../../../assets/icons/not-found.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="not-found-icon" />,
 }));

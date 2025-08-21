@@ -43,8 +43,7 @@ describe('<LoginForm />', () => {
             </MemoryRouter>,
         );
 
-        const logo = screen.getByLabelText(LOGIN_CONST.FORM.LOGO_ALT) as HTMLImageElement;
-        expect(logo).toBeInTheDocument();
+        expect(screen.getByTestId('logo-icon')).toBeInTheDocument();
 
         expect(screen.getByText(LOGIN_CONST.FORM.TITLE)).toBeInTheDocument();
 

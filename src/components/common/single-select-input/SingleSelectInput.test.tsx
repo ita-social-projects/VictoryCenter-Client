@@ -4,6 +4,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SingleSelectInput } from './SingleSelectInput';
 
+jest.mock('../../../assets/icons/chevron-down.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-down-icon" />,
+}));
+
+jest.mock('../../../assets/icons/chevron-up.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-up-icon" />,
+}));
+
 interface Option {
     id: number;
     name: string;

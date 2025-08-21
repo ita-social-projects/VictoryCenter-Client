@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useMemo } from 'react';
 import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-schema';
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
@@ -9,6 +9,7 @@ import { Image, ImageValues, ImageValuesToImage, ImageToImageValue } from '../..
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import './ProgramForm.scss';
+import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
 
 export interface ProgramFormValues {
     name: string;
@@ -22,6 +23,7 @@ export interface ProgramFormErrors {
     categories?: string;
     description?: string;
     img?: string;
+    [key: string]: string | undefined;
 }
 
 export interface ProgramFormRef {
@@ -47,10 +49,6 @@ const validateForm = (formState: ProgramFormValues, isPublishing: boolean): Prog
     };
 };
 
-const hasErrors = (errors: ProgramFormErrors): boolean => {
-    return Object.values(errors).some((error) => error !== undefined);
-};
-
 export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
     ({ initialData = null, onSubmit, isFormDisabled, categories = [], onValidationChange }: ProgramFormProps, ref) => {
         const defaultFormState = useMemo<ProgramFormValues>(
@@ -63,115 +61,69 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [],
         );
 
-        const [formState, setFormState] = useState<ProgramFormValues>(defaultFormState);
-        const [errors, setErrors] = useState<ProgramFormErrors>({});
-        const [initialFormState, setInitialFormState] = useState<ProgramFormValues>(defaultFormState);
-        const [isSubmitting, setIsSubmitting] = useState(false);
-
-        const reset = useCallback(
-            (data: ProgramFormValues | null) => {
-                const newState = data || defaultFormState;
-                setFormState(newState);
-                setInitialFormState(newState);
-                setErrors({});
-            },
-            [defaultFormState],
-        );
-
-        const isDirty = useCallback(() => {
-            return JSON.stringify(formState) !== JSON.stringify(initialFormState);
-        }, [formState, initialFormState]);
-
-        const isValid = useCallback(
-            (isPublishing: boolean = false) => {
-                const formErrors = validateForm(formState, isPublishing);
-                return !hasErrors(formErrors);
-            },
-            [formState],
-        );
-
-        useEffect(() => {
-            const formErrors = validateForm(formState, false);
-            const isFormValid = !hasErrors(formErrors);
-
-            if (onValidationChange) {
-                onValidationChange(isFormValid);
-            }
-        }, [formState, onValidationChange]);
-
-        useEffect(() => {
-            reset(initialData);
-        }, [initialData, reset]);
+        const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
+            ProgramFormValues,
+            ProgramFormErrors
+        >({
+            defaultFormState,
+            initialData,
+            validateForm,
+            onSubmit,
+            onValidationChange,
+            ref,
+        });
 
         // Name handlers
-        const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-            const value = e.target.value;
-            setFormState((prev) => ({ ...prev, name: value }));
-        }, []);
+        const handleNameChange = useCallback(
+            (e: React.ChangeEvent<HTMLInputElement>) => {
+                const value = e.target.value;
+                setFormState((prev) => ({ ...prev, name: value }));
+            },
+            [setFormState],
+        );
 
         const handleNameBlur = useCallback(() => {
             const error = PROGRAM_VALIDATION_FUNCTIONS.validateName(formState.name, false);
             setErrors((prev) => ({ ...prev, name: error }));
-        }, [formState.name]);
+        }, [formState.name, setErrors]);
 
         // Categories handlers
-        const handleCategoriesChange = useCallback((selectedCategories: ProgramCategory[]) => {
-            setFormState((prev) => ({ ...prev, categories: selectedCategories }));
-        }, []);
+        const handleCategoriesChange = useCallback(
+            (selectedCategories: ProgramCategory[]) => {
+                setFormState((prev) => ({ ...prev, categories: selectedCategories }));
+            },
+            [setFormState],
+        );
 
         const handleCategoriesBlur = useCallback(() => {
             const error = PROGRAM_VALIDATION_FUNCTIONS.validateCategories(formState.categories, false);
             setErrors((prev) => ({ ...prev, categories: error }));
-        }, [formState.categories]);
+        }, [formState.categories, setErrors]);
 
         // Description handlers
-        const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value;
-            setFormState((prev) => ({ ...prev, description: value }));
-        }, []);
+        const handleDescriptionChange = useCallback(
+            (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                const value = e.target.value;
+                setFormState((prev) => ({ ...prev, description: value }));
+            },
+            [setFormState],
+        );
 
         const handleDescriptionBlur = useCallback(() => {
             const error = PROGRAM_VALIDATION_FUNCTIONS.validateDescription(formState.description, false);
             setErrors((prev) => ({ ...prev, description: error }));
-        }, [formState.description]);
+        }, [formState.description, setErrors]);
 
         // Image handlers
-        const handleImgChange = useCallback((file: ImageValues | null) => {
-            const image = ImageValuesToImage(file);
-            setFormState((prev) => ({ ...prev, img: image }));
-            const error = PROGRAM_VALIDATION_FUNCTIONS.validateImg(image, false);
-            setErrors((prev) => ({ ...prev, img: error }));
-        }, []);
-
-        // Submit function
-        const submit = useCallback(
-            async (status: VisibilityStatus) => {
-                if (isSubmitting) return;
-
-                setIsSubmitting(true);
-                const isPublishing = status === VisibilityStatus.Published;
-
-                try {
-                    const formErrors = validateForm(formState, isPublishing);
-                    setErrors(formErrors);
-
-                    if (hasErrors(formErrors)) {
-                        return;
-                    }
-
-                    await onSubmit(formState, status);
-                } finally {
-                    setIsSubmitting(false);
-                }
+        const handleImgChange = useCallback(
+            (file: ImageValues | null) => {
+                const image = ImageValuesToImage(file);
+                setFormState((prev) => ({ ...prev, img: image }));
+                const error = PROGRAM_VALIDATION_FUNCTIONS.validateImg(image, false);
+                setErrors((prev) => ({ ...prev, img: error }));
             },
-            [formState, onSubmit, isSubmitting],
+            [setErrors, setFormState],
         );
-
-        useImperativeHandle(ref, () => ({
-            submit,
-            isDirty,
-            isValid,
-        }));
 
         return (
             <form className="program-form-main" data-testid="test-form" noValidate>

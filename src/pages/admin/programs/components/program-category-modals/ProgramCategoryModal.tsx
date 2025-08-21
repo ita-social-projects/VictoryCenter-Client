@@ -11,6 +11,7 @@ import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './ProgramCategoryModal.scss';
+import { SingleSelectInput } from '../../../../../components/common/single-select-input/SingleSelectInput';
 
 interface ProgramCategoryFormValues {
     name: string;
@@ -177,9 +178,8 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
     }, [onClose]);
 
     const handleCategoryChange = useCallback(
-        (e: React.ChangeEvent<HTMLSelectElement>) => {
-            const selectedId = parseInt(e.target.value);
-            const selected = categories.find((cat) => cat.id === selectedId);
+        (category: ProgramCategory) => {
+            const selected = categories.find((cat) => cat.id === category.id);
             if (selected) {
                 selectedCategoryRef.current = selected;
                 reset({ name: selected.name });
@@ -269,19 +269,15 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                                     text={PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
                                     isRequired
                                 />
-                                <select
-                                    id={getFieldId('select')}
-                                    data-testid="category-select"
-                                    onChange={handleCategoryChange}
+                                <SingleSelectInput
+                                    options={categories}
+                                    getOptionId={(c) => c.id}
+                                    getOptionName={(c) => c.name}
                                     disabled={isSubmitting}
-                                    value={selectedCategoryRef.current?.id || ''}
-                                >
-                                    {categories.map((category) => (
-                                        <option key={category.id} value={category.id}>
-                                            {category.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                    onChange={handleCategoryChange}
+                                    placeholder={''}
+                                    value={selectedCategoryRef.current || undefined}
+                                />
                             </div>
                         )}
 

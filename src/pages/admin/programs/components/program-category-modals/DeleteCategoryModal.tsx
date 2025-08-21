@@ -8,6 +8,7 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import './ProgramCategoryModal.scss';
 import { ProgramCategory } from '../../../../../types/admin/programs';
+import { SingleSelectInput } from '../../../../../components/common/single-select-input/SingleSelectInput';
 
 interface DeleteCategoryModalProps {
     isOpen: boolean;
@@ -61,9 +62,8 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
         }
     }, [isOpen]);
 
-    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedId = parseInt(e.target.value);
-        setCategoryId(selectedId);
+    const handleCategoryChange = (category: ProgramCategory) => {
+        setCategoryId(category.id);
     };
 
     return (
@@ -77,18 +77,15 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
                             isRequired={true}
                             text={PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
                         />
-                        <select
-                            id="delete-category-select"
+                        <SingleSelectInput
+                            options={categories}
+                            getOptionId={(c) => c.id}
+                            getOptionName={(c) => c.name}
+                            placeholder={''}
                             onChange={handleCategoryChange}
                             disabled={isSubmitting}
-                            value={categoryId}
-                        >
-                            {categories.map((category) => (
-                                <option key={category.id} value={category.id}>
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
+                            value={selectedCategory}
+                        />
                     </div>
                     {selectedCategory && selectedCategory.programsCount > 0 && (
                         <HintBox

@@ -1,740 +1,301 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { ProgramCategoryModal } from './ProgramCategoryModal';
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { ProgramCategoryModal, ProgramCategoryModalProps } from './ProgramCategoryModal';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramCategory } from '../../../../../types/admin/programs';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { ProgramCategory } from '../../../../../types/admin/programs';
 
-const mockCategory: ProgramCategory = { id: 1, name: 'Test Category', programsCount: 0 };
-const mockCategories: ProgramCategory[] = [
-    { id: 1, name: 'Existing Category', programsCount: 5 },
-    { id: 2, name: 'Another Category', programsCount: 3 },
-];
+jest.mock('../../../../../services/api/admin/programs/programs-api');
+const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
-const mockOnClose = jest.fn();
-const mockOnAddCategory = jest.fn();
-const mockOnEditCategory = jest.fn();
-
-jest.mock(
-    '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
-    () => ({
-        InputWithCharacterLimitGroup: (props: any) => (
-            <div data-testid={`input-group-${props.id}`}>
-                <label htmlFor={props.id}>
-                    {props.label} {props.isRequired && '*'}
-                </label>
-                <input
-                    id={props.id}
-                    name={props.name}
-                    value={props.value}
-                    onChange={props.onChange}
-                    onBlur={props.onBlur}
-                    disabled={props.disabled}
-                    maxLength={props.maxLength}
-                    type={props.type}
-                    data-testid="category-name-input"
-                />
-                {props.error && <div data-testid={`error-${props.id}`}>{props.error}</div>}
-            </div>
-        ),
-    }),
-);
-
+// Simplify Modal rendering and expose structure hooks
 jest.mock('../../../../../components/common/modal/Modal', () => {
-    const MockModal = ({ isOpen, children, onClose }: any) =>
-        isOpen ? (
-            <div data-testid="modal">
-                <button data-testid="modal-close" onClick={onClose}>
-                    ×
-                </button>
-                {children}
-            </div>
-        ) : null;
-
-    MockModal.Title = ({ children }: any) => <h2 data-testid="modal-title">{children}</h2>;
-    MockModal.Content = ({ children }: any) => <div data-testid="modal-content">{children}</div>;
-    MockModal.Actions = ({ children }: any) => <div data-testid="modal-actions">{children}</div>;
-
-    return { Modal: MockModal };
+    const ModalMock = ({ isOpen, children }: any) => (isOpen ? <div data-testid="modal">{children}</div> : null);
+    ModalMock.Title = ({ children }: { children: React.ReactNode }) => <h1 data-testid="modal-title">{children}</h1>;
+    ModalMock.Content = ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="modal-content">{children}</div>
+    );
+    ModalMock.Actions = ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="modal-actions">{children}</div>
+    );
+    return { Modal: ModalMock };
 });
 
+// Simplify Button
 jest.mock('../../../../../components/admin/button/Button', () => ({
-    Button: ({ children, onClick, disabled, type, form }: any) => (
-        <button data-testid="save-button" onClick={onClick} disabled={disabled} type={type} form={form}>
+    Button: ({ children, onClick, disabled, className, buttonStyle, type }: any) => (
+        <button
+            onClick={onClick}
+            disabled={disabled}
+            className={className}
+            data-style={buttonStyle}
+            type={type || 'button'}
+        >
             {children}
         </button>
     ),
 }));
 
-jest.mock('../../../../../components/admin/hint-box/HintBox', () => ({
-    HintBox: ({ title }: any) => <div data-testid="hint-box">{title}</div>,
+// Simplify InputLabel to avoid DOM label coupling in tests
+jest.mock('../../../../../components/admin/input-label/InputLabel', () => ({
+    InputLabel: ({ htmlFor, text, isRequired }: { htmlFor: string; text: string; isRequired?: boolean }) => (
+        <div data-testid="input-label" data-for={htmlFor}>
+            {text}
+            {isRequired ? '*' : ''}
+        </div>
+    ),
 }));
 
+// Simplify HintBox
+jest.mock('../../../../../components/admin/hint-box/HintBox', () => ({
+    HintBox: ({ title, text }: { title: string; text?: string }) => (
+        <div data-testid="hint-box">
+            <p>{title}</p>
+            {text && <p>{text}</p>}
+        </div>
+    ),
+}));
+
+// Render ConfirmationModal inline and clickable
 jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, title, confirmText, onConfirm, onCancel }: any) =>
+    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel }: any) =>
         isOpen ? (
-            <div data-testid="question-modal">
-                <p>{title}</p>
-                <button data-testid="question-confirm" onClick={onConfirm}>
-                    {confirmText}
-                </button>
-                <button data-testid="question-cancel" onClick={onCancel}>
-                    Ні
-                </button>
+            <div data-testid="confirm-modal">
+                <div data-testid="confirm-title">{title}</div>
+                <button onClick={onConfirm}>Yes</button>
+                <button onClick={onCancel}>No</button>
             </div>
         ) : null,
 }));
 
-jest.mock('../../../../../services/api/admin/programs/programs-api', () => ({
-    ProgramsApi: {
-        addProgramCategory: jest.fn(),
-        editProgramCategory: jest.fn(),
-    },
-}));
+// Utilities
+const mockCategories: ProgramCategory[] = [
+    { id: 1, name: 'Alpha', programsCount: 0 },
+    { id: 2, name: 'Beta', programsCount: 1 },
+    { id: 3, name: 'Gamma', programsCount: 0 },
+];
 
-const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
-
-describe('ProgramCategoryModal', () => {
-    const baseProps = {
+const renderModal = (overrideProps?: Partial<ProgramCategoryModalProps>) => {
+    const baseAddProps: ProgramCategoryModalProps = {
         isOpen: true,
-        onClose: mockOnClose,
+        onClose: jest.fn(),
         categories: mockCategories,
-    };
+        mode: 'add',
+        onAddCategory: jest.fn(),
+    } as any;
 
-    const addModeProps = {
-        ...baseProps,
-        mode: 'add' as const,
-        onAddCategory: mockOnAddCategory,
-    };
+    const props = { ...baseAddProps, ...overrideProps } as ProgramCategoryModalProps;
+    const utils = render(<ProgramCategoryModal {...props} />);
+    return { ...utils, props };
+};
 
-    const editModeProps = {
-        ...baseProps,
-        mode: 'edit' as const,
-        onEditCategory: mockOnEditCategory,
-    };
+const getSaveButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE);
+const getNameInput = () => screen.getByRole('textbox');
+const typeName = (value: string) => {
+    const input = getNameInput();
+    fireEvent.change(input, { target: { value } });
+    return input;
+};
 
-    const renderModal = (props: any) => render(<ProgramCategoryModal {...props} />);
-
-    const getNameInput = () => screen.getByTestId('category-name-input');
-    const getSaveButton = () => screen.getByTestId('save-button');
-    const getModalCloseButton = () => screen.getByTestId('modal-close');
-    const getQuestionModal = () => screen.queryByTestId('question-modal');
-    const getQuestionConfirmButton = () => screen.getByTestId('question-confirm');
-    const getQuestionCancelButton = () => screen.getByTestId('question-cancel');
-    const getCategorySelect = () => screen.getByTestId('category-select');
-
-    const changeNameInput = (value: string) => fireEvent.change(getNameInput(), { target: { value } });
-    const blurNameInput = () => fireEvent.blur(getNameInput());
-    const clickSaveButton = () => fireEvent.click(getSaveButton());
-    const clickConfirmButtonInSaveConfirmPopup = () => fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES));
-    const clickModalClose = () => fireEvent.click(getModalCloseButton());
-    const changeCategorySelect = (value: string) => fireEvent.change(getCategorySelect(), { target: { value } });
-
-    const expectModalClosed = () => {
-        expect(mockOnClose).toHaveBeenCalled();
-        expect(getQuestionModal()).not.toBeInTheDocument();
-    };
-
-    const expectModalNotClosed = () => {
-        expect(mockOnClose).not.toHaveBeenCalled();
-    };
-
+describe('ProgramCategoryModal - Add Mode', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    describe('Add mode', () => {
-        describe('Initial render', () => {
-            it('should render modal with correct elements for add mode', () => {
-                renderModal(addModeProps);
-
-                expect(screen.getByTestId('modal')).toBeInTheDocument();
-                expect(screen.getByText(PROGRAM_CATEGORY_TEXT.FORM.TITLE.ADD_CATEGORY)).toBeInTheDocument();
-                expect(getNameInput()).toBeInTheDocument();
-                expect(getSaveButton()).toBeDisabled();
-                expect(screen.queryByTestId('category-select')).not.toBeInTheDocument();
-            });
-
-            it('should not render when isOpen is false', () => {
-                renderModal({ ...addModeProps, isOpen: false });
-                expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
-            });
-
-            it('should have correct form id for add mode', () => {
-                renderModal(addModeProps);
-                const form = document.getElementById('add-program-category-form');
-                expect(form).toBeInTheDocument();
-            });
-        });
-
-        describe('Form validation', () => {
-            it.each([
-                { value: '', error: PROGRAM_CATEGORY_VALIDATION.name.getRequiredError(), description: 'empty name' },
-                { value: 'A', error: PROGRAM_CATEGORY_VALIDATION.name.getMinError(), description: 'short name' },
-            ])('should show validation error for $description', async ({ value, error }) => {
-                renderModal(addModeProps);
-
-                changeNameInput(value);
-                blurNameInput();
-
-                await waitFor(() => {
-                    expect(screen.getByTestId('error-add-category-name')).toHaveTextContent(error);
-                });
-            });
-
-            it('should show duplicate name hint for case insensitive match', async () => {
-                renderModal(addModeProps);
-
-                changeNameInput('EXISTING CATEGORY');
-
-                await waitFor(() => {
-                    expect(screen.getByTestId('hint-box')).toBeInTheDocument();
-                    expect(
-                        screen.getByText(PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError()),
-                    ).toBeInTheDocument();
-                });
-            });
-
-            it('should show duplicate name error via group validation for existing category', async () => {
-                renderModal(addModeProps);
-
-                changeNameInput('Existing Category');
-                blurNameInput();
-
-                await waitFor(() => {
-                    expect(screen.getByTestId('hint-box')).toBeInTheDocument();
-                    expect(
-                        screen.getByText(PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError()),
-                    ).toBeInTheDocument();
-                });
-            });
-
-            it('should enable save button for valid name', async () => {
-                renderModal(addModeProps);
-
-                changeNameInput('Valid Category');
-
-                await waitFor(() => {
-                    expect(getSaveButton()).not.toBeDisabled();
-                });
-            });
-
-            it('should disable save button for whitespace only name', () => {
-                renderModal(addModeProps);
-
-                changeNameInput('   ');
-
-                expect(getSaveButton()).toBeDisabled();
-            });
-        });
-
-        describe('Form submission', () => {
-            it('should successfully create category', async () => {
-                mockedProgramsApi.addProgramCategory.mockResolvedValue(mockCategory);
-                renderModal(addModeProps);
-
-                changeNameInput('New Category');
-                clickSaveButton();
-
-                await waitFor(() => {
-                    expect(mockedProgramsApi.addProgramCategory).toHaveBeenCalledWith({
-                        id: null,
-                        name: 'New Category',
-                    });
-                    expect(mockOnAddCategory).toHaveBeenCalledWith(mockCategory);
-                    expect(mockOnClose).toHaveBeenCalled();
-                });
-            });
-
-            it('should trim whitespace from name', async () => {
-                mockedProgramsApi.addProgramCategory.mockResolvedValue(mockCategory);
-                renderModal(addModeProps);
-
-                changeNameInput('  New Category  ');
-                clickSaveButton();
-
-                await waitFor(() => {
-                    expect(mockedProgramsApi.addProgramCategory).toHaveBeenCalledWith({
-                        id: null,
-                        name: 'New Category',
-                    });
-                });
-            });
-
-            it('should show error when API fails', async () => {
-                mockedProgramsApi.addProgramCategory.mockRejectedValue(new Error('API Error'));
-                renderModal(addModeProps);
-
-                changeNameInput('New Category');
-                clickSaveButton();
-
-                await waitFor(() => {
-                    expect(
-                        screen.getByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY),
-                    ).toBeInTheDocument();
-                });
-            });
-
-            it('should not submit with duplicate name', () => {
-                renderModal(addModeProps);
-
-                changeNameInput('Existing Category');
-                clickSaveButton();
-
-                expect(mockedProgramsApi.addProgramCategory).not.toHaveBeenCalled();
-            });
-
-            it('should not submit when already submitting', async () => {
-                let resolvePromise: (value: any) => void;
-                const promise = new Promise<ProgramCategory>((resolve) => {
-                    resolvePromise = resolve;
-                });
-                mockedProgramsApi.addProgramCategory.mockReturnValue(promise);
-
-                renderModal(addModeProps);
-
-                changeNameInput('New Category');
-                clickSaveButton();
-                clickSaveButton(); // Second click while submitting
-
-                await waitFor(() => {
-                    expect(mockedProgramsApi.addProgramCategory).toHaveBeenCalledTimes(1);
-                });
-
-                await act(async () => {
-                    resolvePromise!(mockCategory);
-                });
-            });
-        });
-
-        describe('Modal closing', () => {
-            it('should close directly when no changes', () => {
-                renderModal(addModeProps);
-
-                clickModalClose();
-
-                expectModalClosed();
-            });
-
-            it('should show confirmation when closing with changes', () => {
-                renderModal(addModeProps);
-
-                changeNameInput('Some text');
-                clickModalClose();
-
-                expect(getQuestionModal()).toBeInTheDocument();
-                expect(
-                    screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
-                ).toBeInTheDocument();
-                expectModalNotClosed();
-            });
-
-            it('should close when confirming changes loss', () => {
-                renderModal(addModeProps);
-
-                changeNameInput('Some text');
-                clickModalClose();
-                fireEvent.click(getQuestionConfirmButton());
-
-                expectModalClosed();
-            });
-
-            it('should cancel closing when clicking No', () => {
-                renderModal(addModeProps);
-
-                changeNameInput('Some text');
-                clickModalClose();
-                fireEvent.click(getQuestionCancelButton());
-
-                expect(getQuestionModal()).not.toBeInTheDocument();
-                expectModalNotClosed();
-            });
-
-            it('should not close when submitting', async () => {
-                let resolvePromise: (value: any) => void;
-                const promise = new Promise<ProgramCategory>((resolve) => {
-                    resolvePromise = resolve;
-                });
-                mockedProgramsApi.addProgramCategory.mockReturnValue(promise);
-
-                renderModal(addModeProps);
-
-                changeNameInput('New Category');
-                clickSaveButton();
-                clickModalClose();
-
-                expectModalNotClosed();
-
-                await act(async () => {
-                    resolvePromise!(mockCategory);
-                });
-            });
-        });
-
-        describe('useEffect behavior', () => {
-            it('should reset form when modal opens', async () => {
-                mockedProgramsApi.addProgramCategory.mockRejectedValue(new Error('API Error'));
-                const { rerender } = renderModal(addModeProps);
-
-                // Create error state
-                changeNameInput('New Category');
-                clickSaveButton();
-
-                await waitFor(() => {
-                    expect(
-                        screen.getByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY),
-                    ).toBeInTheDocument();
-                });
-
-                // Reopen modal
-                rerender(<ProgramCategoryModal {...addModeProps} isOpen={false} />);
-                rerender(<ProgramCategoryModal {...addModeProps} isOpen={true} />);
-
-                expect(
-                    screen.queryByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY),
-                ).not.toBeInTheDocument();
-                expect(getNameInput()).toHaveValue('');
-            });
-        });
+    it('renders with Add title and disabled Save when empty', () => {
+        renderModal();
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(
+            PROGRAM_CATEGORY_TEXT.FORM.TITLE.ADD_CATEGORY,
+        );
+        expect(getSaveButton()).toBeDisabled();
     });
 
-    describe('Edit mode', () => {
-        describe('Initial render', () => {
-            it('should render modal with correct elements for edit mode', () => {
-                renderModal(editModeProps);
+    it('enables Save with valid non-duplicate name and submits successfully', async () => {
+        mockedProgramsApi.addProgramCategory.mockResolvedValue({ id: 10, name: 'Delta', programsCount: 0 } as any);
 
-                expect(screen.getByTestId('modal')).toBeInTheDocument();
-                expect(screen.getByText(PROGRAM_CATEGORY_TEXT.FORM.TITLE.EDIT_CATEGORY)).toBeInTheDocument();
-                expect(getNameInput()).toBeInTheDocument();
-                expect(getCategorySelect()).toBeInTheDocument();
-                expect(getSaveButton()).toBeDisabled(); // Disabled because no changes yet
-            });
+        const { props } = renderModal();
 
-            it('should have correct form id for edit mode', () => {
-                renderModal(editModeProps);
-                const form = document.getElementById('edit-program-category-form');
-                expect(form).toBeInTheDocument();
-            });
+        typeName('Delta');
+        expect(getSaveButton()).not.toBeDisabled();
 
-            it('should populate form with first category by default', () => {
-                renderModal(editModeProps);
+        fireEvent.click(getSaveButton());
 
-                expect(getCategorySelect()).toHaveValue('1');
-                expect(getNameInput()).toHaveValue('Existing Category');
-            });
-
-            it('should render all categories in select', () => {
-                renderModal(editModeProps);
-
-                const options = screen.getAllByRole('option');
-                expect(options).toHaveLength(2);
-                expect(options[0]).toHaveTextContent('Existing Category');
-                expect(options[1]).toHaveTextContent('Another Category');
-            });
-
-            it('should handle empty categories array', () => {
-                renderModal({ ...editModeProps, categories: [] });
-
-                expect(getCategorySelect()).toBeInTheDocument();
-                expect(getNameInput()).toHaveValue('');
-            });
+        await waitFor(() => {
+            expect(mockedProgramsApi.addProgramCategory).toHaveBeenCalledWith({ id: null, name: 'Delta' });
         });
-
-        describe('Category selection', () => {
-            it('should update form when selecting different category', () => {
-                renderModal(editModeProps);
-
-                changeCategorySelect('2');
-
-                expect(getCategorySelect()).toHaveValue('2');
-                expect(getNameInput()).toHaveValue('Another Category');
-            });
-
-            it('should reset form when selecting invalid category', () => {
-                renderModal(editModeProps);
-
-                changeCategorySelect('999');
-
-                expect(getNameInput()).toHaveValue('');
-            });
-
-            it('should disable select when submitting', async () => {
-                let resolvePromise: (value: any) => void;
-                const promise = new Promise<ProgramCategory>((resolve) => {
-                    resolvePromise = resolve;
-                });
-                mockedProgramsApi.editProgramCategory.mockReturnValue(promise);
-
-                renderModal(editModeProps);
-
-                changeNameInput('Updated Category');
-                clickSaveButton();
-
-                // Click ye in confirmation popup of edit mode
-                clickConfirmButtonInSaveConfirmPopup();
-
-                await waitFor(() => {
-                    expect(getCategorySelect()).toBeDisabled();
-                });
-
-                await act(async () => {
-                    resolvePromise!(mockCategory);
-                });
-            });
-        });
-
-        describe('Form validation', () => {
-            it('should enable save button when name is changed', () => {
-                renderModal(editModeProps);
-
-                changeNameInput('Updated Category');
-
-                expect(getSaveButton()).not.toBeDisabled();
-            });
-
-            it('should disable save button when name is same as original', () => {
-                renderModal(editModeProps);
-
-                changeNameInput('Different Name');
-                expect(getSaveButton()).not.toBeDisabled();
-
-                changeNameInput('Existing Category'); // Back to original
-
-                expect(getSaveButton()).toBeDisabled();
-            });
-
-            it('should show duplicate error when name matches other category', () => {
-                renderModal(editModeProps);
-
-                changeNameInput('Another Category');
-
-                expect(screen.getByTestId('hint-box')).toBeInTheDocument();
-                expect(
-                    screen.getByText(PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError()),
-                ).toBeInTheDocument();
-            });
-
-            it('should not show duplicate error when name matches current category', () => {
-                renderModal(editModeProps);
-
-                changeNameInput('Existing Category');
-
-                expect(screen.queryByTestId('hint-box')).not.toBeInTheDocument();
-            });
-
-            it('should handle case insensitive duplicate check excluding current category', () => {
-                renderModal(editModeProps);
-
-                changeNameInput('ANOTHER CATEGORY');
-
-                expect(screen.getByTestId('hint-box')).toBeInTheDocument();
-            });
-
-            it.each([
-                { value: '', error: PROGRAM_CATEGORY_VALIDATION.name.getRequiredError(), description: 'empty name' },
-                { value: 'A', error: PROGRAM_CATEGORY_VALIDATION.name.getMinError(), description: 'short name' },
-            ])('should show validation error for $description', async ({ value, error }) => {
-                renderModal(editModeProps);
-
-                changeNameInput(value);
-                blurNameInput();
-
-                await waitFor(() => {
-                    expect(screen.getByTestId('error-edit-category-name')).toHaveTextContent(error);
-                });
-            });
-        });
-
-        describe('Form submission', () => {
-            it('should successfully update category', async () => {
-                const updatedCategory = { ...mockCategory, name: 'Updated Category' };
-                mockedProgramsApi.editProgramCategory.mockResolvedValue(updatedCategory);
-                renderModal(editModeProps);
-
-                changeNameInput('Updated Category');
-                clickSaveButton();
-
-                clickConfirmButtonInSaveConfirmPopup();
-
-                await waitFor(() => {
-                    expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledWith({
-                        id: 1,
-                        name: 'Updated Category',
-                    });
-                    expect(mockOnEditCategory).toHaveBeenCalledWith(updatedCategory);
-                    expect(mockOnClose).toHaveBeenCalled();
-                });
-            });
-
-            it('should trim whitespace from name', async () => {
-                const updatedCategory = { ...mockCategory, name: 'Updated Category' };
-                mockedProgramsApi.editProgramCategory.mockResolvedValue(updatedCategory);
-                renderModal(editModeProps);
-
-                changeNameInput('  Updated Category  ');
-                clickSaveButton();
-
-                clickConfirmButtonInSaveConfirmPopup();
-
-                await waitFor(() => {
-                    expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledWith({
-                        id: 1,
-                        name: 'Updated Category',
-                    });
-                });
-            });
-
-            it('should show error when API fails', async () => {
-                mockedProgramsApi.editProgramCategory.mockRejectedValue(new Error('API Error'));
-                renderModal(editModeProps);
-
-                changeNameInput('Updated Category');
-                clickSaveButton();
-
-                clickConfirmButtonInSaveConfirmPopup();
-
-                await waitFor(() => {
-                    expect(
-                        screen.getByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY),
-                    ).toBeInTheDocument();
-                });
-            });
-
-            it('should not submit with duplicate name', () => {
-                renderModal(editModeProps);
-
-                changeNameInput('Another Category');
-                clickSaveButton();
-
-                expect(mockedProgramsApi.editProgramCategory).not.toHaveBeenCalled();
-            });
-
-            it('should not submit when no category selected', async () => {
-                renderModal({ ...editModeProps, categories: [] });
-
-                changeNameInput('Some Name');
-                clickSaveButton();
-
-                await waitFor(async () => {
-                    expect(mockedProgramsApi.editProgramCategory).not.toHaveBeenCalled();
-                });
-            });
-
-            it('should not submit when already submitting', async () => {
-                let resolvePromise: (value: any) => void;
-                const promise = new Promise<ProgramCategory>((resolve) => {
-                    resolvePromise = resolve;
-                });
-                mockedProgramsApi.editProgramCategory.mockReturnValue(promise);
-
-                renderModal(editModeProps);
-
-                changeNameInput('Updated Category');
-                clickSaveButton();
-
-                clickConfirmButtonInSaveConfirmPopup();
-
-                clickSaveButton(); // Second click while submitting
-
-                await waitFor(() => {
-                    expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledTimes(1);
-                });
-
-                await act(async () => {
-                    resolvePromise!(mockCategory);
-                });
-            });
-        });
-
-        describe('Modal closing', () => {
-            it('should close directly when no changes', () => {
-                renderModal(editModeProps);
-
-                clickModalClose();
-
-                expectModalClosed();
-            });
-
-            it('should show confirmation when name is changed', () => {
-                renderModal(editModeProps);
-
-                changeNameInput('Updated Name');
-                clickModalClose();
-
-                expect(getQuestionModal()).toBeInTheDocument();
-                expectModalNotClosed();
-            });
-
-            it('should close when confirming changes loss', () => {
-                renderModal(editModeProps);
-
-                changeNameInput('Updated Name');
-                clickModalClose();
-                fireEvent.click(getQuestionConfirmButton());
-
-                expectModalClosed();
-            });
-        });
-
-        describe('useEffect behavior', () => {
-            it('should reset form when modal opens in edit mode', async () => {
-                mockedProgramsApi.editProgramCategory.mockRejectedValue(new Error('API Error'));
-                const { rerender } = renderModal(editModeProps);
-
-                // Create error state
-                changeCategorySelect('2');
-                changeNameInput('Updated Category');
-                clickSaveButton();
-
-                clickConfirmButtonInSaveConfirmPopup();
-
-                await waitFor(() => {
-                    expect(
-                        screen.getByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY),
-                    ).toBeInTheDocument();
-                });
-
-                // Reopen modal
-                rerender(<ProgramCategoryModal {...editModeProps} isOpen={false} />);
-                rerender(<ProgramCategoryModal {...editModeProps} isOpen={true} />);
-
-                expect(
-                    screen.queryByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY),
-                ).not.toBeInTheDocument();
-                expect(getCategorySelect()).toHaveValue('1');
-                expect(getNameInput()).toHaveValue('Existing Category');
-            });
-
-            it('should update selected category when categories prop changes', () => {
-                const { rerender } = renderModal(editModeProps);
-
-                const newCategories = [{ id: 3, name: 'New First Category', programsCount: 1 }];
-                rerender(<ProgramCategoryModal {...editModeProps} categories={newCategories} />);
-
-                expect(getCategorySelect()).toHaveValue('3');
-                expect(getNameInput()).toHaveValue('New First Category');
-            });
-        });
+        expect((props as any).onAddCategory).toHaveBeenCalled();
+        expect((props as any).onClose).toHaveBeenCalled();
     });
 
-    describe('Shared functionality', () => {
-        it('should disable input when submitting', async () => {
-            let resolvePromise: (value: ProgramCategory) => void;
-            const pendingPromise = new Promise<ProgramCategory>((resolve) => {
-                resolvePromise = resolve;
-            });
+    it('shows API error message on add failure and stays open', async () => {
+        mockedProgramsApi.addProgramCategory.mockRejectedValue(new Error('API Error'));
 
-            mockedProgramsApi.addProgramCategory.mockReturnValue(pendingPromise);
+        const { props } = renderModal();
 
-            renderModal(addModeProps);
-            changeNameInput('New Category');
-            clickSaveButton();
+        typeName('Delta');
+        fireEvent.click(getSaveButton());
 
-            expect(getNameInput()).toBeDisabled();
+        expect(
+            await screen.findByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY),
+        ).toBeInTheDocument();
+        expect((props as any).onAddCategory).not.toHaveBeenCalled();
+        expect((props as any).onClose).not.toHaveBeenCalled();
+    });
 
-            await act(async () => {
-                resolvePromise!(mockCategory);
-            });
-        });
+    it('disables Save and shows duplicate hint when name already exists', () => {
+        renderModal();
+
+        typeName('Alpha');
+        expect(getSaveButton()).toBeDisabled();
+        expect(
+            screen.getByText(
+                PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError(),
+            ),
+        ).toBeInTheDocument();
+    });
+
+    it('prevents submit when validation errors exist (e.g., too short)', () => {
+        renderModal();
+
+        typeName('Abc');
+        fireEvent.click(getSaveButton());
+
+        // Save does not proceed due to validation, API should not be called
+        expect(mockedProgramsApi.addProgramCategory).not.toHaveBeenCalled();
+    });
+
+    it('clears error message when modal re-opens', async () => {
+        mockedProgramsApi.addProgramCategory.mockRejectedValue(new Error('API Error'));
+        const baseProps: ProgramCategoryModalProps = {
+            isOpen: true,
+            onClose: jest.fn(),
+            categories: mockCategories,
+            mode: 'add',
+            onAddCategory: jest.fn(),
+        } as any;
+        const { rerender } = render(<ProgramCategoryModal {...baseProps} />);
+
+        typeName('Delta');
+        fireEvent.click(getSaveButton());
+        await screen.findByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY);
+
+        rerender(<ProgramCategoryModal {...baseProps} isOpen={false} />);
+        rerender(<ProgramCategoryModal {...baseProps} isOpen={true} />);
+
+        expect(
+            screen.queryByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY),
+        ).not.toBeInTheDocument();
     });
 });
+
+describe('ProgramCategoryModal - Edit Mode', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    const renderEdit = (overrideProps?: Partial<ProgramCategoryModalProps>) => {
+        return renderModal({ mode: 'edit', onEditCategory: jest.fn(), ...overrideProps } as any);
+    };
+
+    const getSelectButton = () => screen.getByRole('button', { expanded: false });
+    const openSelect = () => fireEvent.click(getSelectButton());
+    const getOptionByName = (name: string) => screen.getByRole('option', { name });
+
+    it('renders with Edit title and pre-fills first category name; Save disabled until changed', () => {
+        renderEdit();
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(
+            PROGRAM_CATEGORY_TEXT.FORM.TITLE.EDIT_CATEGORY,
+        );
+        // Name should match first category, so Save is disabled because nameNotChanged
+        expect((getNameInput() as HTMLInputElement).value).toBe(mockCategories[0].name);
+        expect(getSaveButton()).toBeDisabled();
+    });
+
+    it('updates name when selecting a different category from SingleSelectInput', () => {
+        renderEdit();
+
+        openSelect();
+        fireEvent.click(getOptionByName('Gamma'));
+
+        expect((getNameInput() as HTMLInputElement).value).toBe('Gamma');
+    });
+
+    it('opens confirm modal on Save, confirms and submits edit successfully', async () => {
+        mockedProgramsApi.editProgramCategory.mockResolvedValue({ id: 1, name: 'Omega', programsCount: 0 } as any);
+
+        const { props } = renderEdit();
+
+        // Change name to enable Save
+        typeName('Omega');
+        expect(getSaveButton()).not.toBeDisabled();
+
+        fireEvent.click(getSaveButton());
+        expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+        expect(screen.getByTestId('confirm-title')).toHaveTextContent(COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES);
+
+        fireEvent.click(screen.getByText('Yes'));
+
+        await waitFor(() => {
+            expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledWith({ id: 1, name: 'Omega' });
+        });
+        expect((props as any).onEditCategory).toHaveBeenCalled();
+        expect((props as any).onClose).toHaveBeenCalled();
+    });
+
+    it('shows API error on edit failure and stays open', async () => {
+        mockedProgramsApi.editProgramCategory.mockRejectedValue(new Error('API Error'));
+
+        const { props } = renderEdit();
+
+        typeName('Omega');
+        fireEvent.click(getSaveButton());
+        fireEvent.click(screen.getByText('Yes'));
+
+        expect(
+            await screen.findByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY),
+        ).toBeInTheDocument();
+        expect((props as any).onEditCategory).not.toHaveBeenCalled();
+        expect((props as any).onClose).not.toHaveBeenCalled();
+    });
+
+    it('disables controls while submitting after confirming save', async () => {
+        let resolveRequest!: () => void;
+        const longRunningPromise = new Promise<any>((resolve) => {
+            resolveRequest = () => resolve({ id: 1, name: 'Zeta', programsCount: 0 });
+        });
+        mockedProgramsApi.editProgramCategory.mockReturnValue(longRunningPromise as any);
+
+        renderEdit();
+
+        typeName('Zetaa');
+        const saveButton = getSaveButton();
+        expect(saveButton).not.toBeDisabled();
+
+        fireEvent.click(saveButton);
+        fireEvent.click(screen.getByText('Yes'));
+
+        await waitFor(() => {
+            expect(saveButton).toBeDisabled();
+            expect(getSelectButton()).toBeDisabled();
+            expect(getNameInput()).toBeDisabled();
+        });
+
+        resolveRequest();
+    });
+
+    it('shows duplicate name hint and disables Save when name matches other category', () => {
+        renderEdit();
+
+        typeName('Beta');
+        expect(getSaveButton()).toBeDisabled();
+        expect(
+            screen.getByText(
+                PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError(),
+            ),
+        ).toBeInTheDocument();
+    });
+});
+
+

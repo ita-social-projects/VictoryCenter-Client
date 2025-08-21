@@ -1,12 +1,24 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TeamPageToolbar } from './TeamPageToolbar';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { VisibilityStatus } from '../../../../../types/admin/common';
+
+// Local mock for ResizeObserver used by hooks inside TeamPageToolbar
+beforeAll(() => {
+    class MockResizeObserver {
+        observe = jest.fn();
+        unobserve = jest.fn();
+        disconnect = jest.fn();
+    }
+    (window as any).ResizeObserver = MockResizeObserver as any;
+    (global as any).ResizeObserver = MockResizeObserver as any;
+});
 describe('TeamPageToolbar', () => {
     it('calls onSearchQueryChange when typing into input', () => {
+        jest.useFakeTimers();
         const onSearchQueryChange = jest.fn();
         render(
             <TeamPageToolbar
@@ -18,7 +30,11 @@ describe('TeamPageToolbar', () => {
 
         const input = screen.getByPlaceholderText(TEAM_MEMBERS_TEXT.SEARCH.INPUT_FULLNAME);
         fireEvent.change(input, { target: { value: 'Jo' } });
+        act(() => {
+            jest.advanceTimersByTime(300);
+        });
         expect(onSearchQueryChange).toHaveBeenLastCalledWith('Jo');
+        jest.useRealTimers();
     });
 
     it('changes status filter to All, Published, Draft by interacting with select', () => {
@@ -31,10 +47,8 @@ describe('TeamPageToolbar', () => {
             />,
         );
 
-        // There are two elements with role toolbar (autocomplete select and status select).
-        // The status select lives within the actions container (second one typically).
-        const toolbars = screen.getAllByRole('toolbar');
-        const statusSelect = toolbars[1];
+        // Select root has role="toolbar"
+        const statusSelect = screen.getByRole('toolbar');
 
         // Open select
         fireEvent.click(statusSelect);

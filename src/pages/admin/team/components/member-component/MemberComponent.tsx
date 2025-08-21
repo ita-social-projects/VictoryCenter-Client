@@ -30,7 +30,7 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
                     <img
                         src={memberImage}
                         alt={`${TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}-${member.fullName}`}
-                        className=""
+                        className="member-image"
                     />
                 ) : (
                     <BlankUserImage

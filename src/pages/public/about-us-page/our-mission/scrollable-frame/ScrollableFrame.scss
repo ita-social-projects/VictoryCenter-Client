@@ -43,17 +43,17 @@
                 width: 1.5rem;
                 height: 1.5rem;
 
-					 path {
-						stroke: colors.$grey-50;
-					 }
+                path {
+                    stroke: colors.$grey-50;
+                }
             }
 
             &:hover {
                 background-color: colors.$yellow-500;
 
-					 .arrow-icon path {
-						stroke: colors.$blue-900;
-					 }
+                .arrow-icon path {
+                    stroke: colors.$blue-900;
+                }
 
                 transition: all 0.8s ease;
             }

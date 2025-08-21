@@ -27,10 +27,10 @@ export const AlternativeSupportWays = () => {
             <div className="buttonsContainer">
                 <button className="downloadPaymentDetailsButton">
                     {ALTERNATIVE_SUPPORT_WAYS.DOWNLOAD_PAYMENT_DETAILS_BUTTON_LABEL}
-                    <ArrowUpRight aria-hidden={true} />
+                    <ArrowUpRight />
                 </button>
                 <button className="shareButton">
-                    <ShareForwardArrow aria-hidden={true} />
+                    <ShareForwardArrow />
                 </button>
             </div>
         </div>

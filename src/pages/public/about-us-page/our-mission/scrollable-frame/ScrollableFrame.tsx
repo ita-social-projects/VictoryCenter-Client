@@ -62,10 +62,10 @@ export const ScrollableFrame = () => {
 
             <div className="button-container">
                 <button onClick={handlePrev} className="arrow-button">
-                    <ArrowLeft className="arrow-icon" aria-hidden={true} />
+                    <ArrowLeft className="arrow-icon" />
                 </button>
                 <button onClick={handleNext} className="arrow-button">
-                    <ArrowRight className="arrow-icon" aria-hidden={true} />
+                    <ArrowRight className="arrow-icon" />
                 </button>
             </div>
 

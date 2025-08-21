@@ -71,9 +71,9 @@ export const Select = <TValue,>({
                 {selectedName ?? placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT}
             </span>
             {isOpen ? (
-                <ArrowUp role="img" aria-label={COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST} />
+                <ArrowUp aria-label={COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST} />
             ) : (
-                <ArrowDown role="img" aria-label={COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST} />
+                <ArrowDown aria-label={COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST} />
             )}
             {isOpen && (
                 <div className={'select-options'}>

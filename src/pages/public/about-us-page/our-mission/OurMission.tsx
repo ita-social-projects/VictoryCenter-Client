@@ -15,7 +15,7 @@ export const OurMission = () => {
                     <NavLink to={PUBLIC_ROUTES.PROGRAMS.FULL} className="link-to-programs">
                         <div className="link-block">
                             <span className="link-title">{ABOUT_US_DATA.GO_TO_PROGRAMS}</span>
-                            <ArrowIcon className="arrow-icon" aria-hidden={true} />
+                            <ArrowIcon className="arrow-icon" />
                         </div>
                     </NavLink>
                 </div>

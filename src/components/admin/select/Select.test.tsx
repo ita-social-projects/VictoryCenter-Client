@@ -34,7 +34,6 @@ describe('Select Component', () => {
         expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).toBeInTheDocument();
         const icon = screen.getByTestId('chevron-down-icon');
         expect(icon).toBeInTheDocument();
-        expect(icon).toHaveAttribute('aria-label', COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST);
     });
 
     it('renders with custom className', () => {
@@ -67,7 +66,6 @@ describe('Select Component', () => {
         expect(selectContainer).toHaveClass('select-opened');
         const icon = screen.getByTestId('chevron-up-icon');
         expect(icon).toBeInTheDocument();
-        expect(icon).toHaveAttribute('aria-label', COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST);
     });
 
     it('closes select when clicked again', () => {

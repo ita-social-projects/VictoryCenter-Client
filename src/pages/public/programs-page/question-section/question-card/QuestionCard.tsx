@@ -13,8 +13,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({ questionCard }) => {
             <summary className="faq-question">
                 <p>{questionCard.question}</p>
                 <div className="button-icons">
-                    <OpenIcon aria-hidden={true} className="faq-open" />
-                    <CloseIcon aria-hidden={true} className="faq-close" />
+                    <OpenIcon className="faq-open" />
+                    <CloseIcon className="faq-close" />
                 </div>
             </summary>
             <div className="faq-answer">{questionCard.answer}</div>

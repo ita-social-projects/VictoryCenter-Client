@@ -2,118 +2,118 @@
 @use '../../../../../assets/sass/variables/fonts';
 
 .card-block {
-	height: 70vh;
-	overflow: hidden;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: center;
-	background-color: colors.$grey-50;
+    height: 70vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: colors.$grey-50;
 
-	.card-img {
-		width: 100%;
-		height: 85%;
-		object-fit: cover;
-		object-position: top;
-		transition: height 0.5s ease;
-	}
+    .card-img {
+        width: 100%;
+        height: 85%;
+        object-fit: cover;
+        object-position: top;
+        transition: height 0.5s ease;
+    }
 
-	.card-content {
-		width: 100%;
-		height: 15%;
-		display: flex;
-		flex-direction: column;
-		justify-content: flex-start;
-		gap: 10vh;
-		align-items: center;
-		padding: 0.5rem;
-		box-sizing: border-box;
-		transition: height 0.5s ease;
+    .card-content {
+        width: 100%;
+        height: 15%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 10vh;
+        align-items: center;
+        padding: 0.5rem;
+        box-sizing: border-box;
+        transition: height 0.5s ease;
 
-		.subtitle-info {
-			width: 100%;
-			display: flex;
-			align-items: center;
-			justify-content: flex-start;
+        .subtitle-info {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
 
-			.subtitle-content {
-				width: 100%;
-				display: flex;
-				align-items: flex-start;
-				justify-content: space-between;
+            .subtitle-content {
+                width: 100%;
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
 
-				.subtitle-link {
-					width: 100%;
+                .subtitle-link {
+                    width: 100%;
 
-					.program-subtitle {
-						color: colors.$grey-900;
-						margin: 0;
-						font-family: fonts.$mulish-regular-font;
-						font-weight: 400;
-						font-size: 1.125rem;
-						line-height: 1.75rem;
-						letter-spacing: -0.02em;
-						vertical-align: middle;
-					}
+                    .program-subtitle {
+                        color: colors.$grey-900;
+                        margin: 0;
+                        font-family: fonts.$mulish-regular-font;
+                        font-weight: 400;
+                        font-size: 1.125rem;
+                        line-height: 1.75rem;
+                        letter-spacing: -0.02em;
+                        vertical-align: middle;
+                    }
 
-					.program-title {
-						margin: 0;
-						font-family: fonts.$mulish-regular-font;
-						font-weight: 500;
-						font-size: 1.125rem;
-						line-height: 1.75rem;
-						letter-spacing: -0.02em;
-						vertical-align: middle;
-					}
-				}
+                    .program-title {
+                        margin: 0;
+                        font-family: fonts.$mulish-regular-font;
+                        font-weight: 500;
+                        font-size: 1.125rem;
+                        line-height: 1.75rem;
+                        letter-spacing: -0.02em;
+                        vertical-align: middle;
+                    }
+                }
 
-				.arrow-container {
-					position: relative;
-					height: 3.05rem;
-					width: 3rem;
-					display: flex;
-					justify-content: center;
-					align-items: center;
+                .arrow-container {
+                    position: relative;
+                    height: 3.05rem;
+                    width: 3rem;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
 
-					.arrow-icon {
-						position: absolute;
-						height: 1.5rem;
-						width: 1.5rem;
-						top: 50%;
-						left: 50%;
-						transform: translate(-50%, -50%);
-						transition: all 0.3s ease;
-					}
-				}
-			}
-		}
+                    .arrow-icon {
+                        position: absolute;
+                        height: 1.5rem;
+                        width: 1.5rem;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        transition: all 0.3s ease;
+                    }
+                }
+            }
+        }
 
-		.program-description {
-			font-family: fonts.$mulish-regular-font;
-			font-weight: 400;
-			font-size: 1rem;
-			line-height: 1.5rem;
-			vertical-align: middle;
-		}
-	}	
+        .program-description {
+            font-family: fonts.$mulish-regular-font;
+            font-weight: 400;
+            font-size: 1rem;
+            line-height: 1.5rem;
+            vertical-align: middle;
+        }
+    }
 
-	&:hover {
-		.arrow-icon {
-			transform: translate(0, 0);
-			height: 3rem !important;
-			width: 3rem !important;
+    &:hover {
+        .arrow-icon {
+            transform: translate(0, 0);
+            height: 3rem !important;
+            width: 3rem !important;
 
-			path {
-				stroke: colors.$yellow-600;
-			}
-		}
+            path {
+                stroke: colors.$yellow-600;
+            }
+        }
 
-		.card-img {
-			height: 55%;
-		}
+        .card-img {
+            height: 55%;
+        }
 
-		.card-content {
-			height: 45%;
-		}
-	}
+        .card-content {
+            height: 45%;
+        }
+    }
 }

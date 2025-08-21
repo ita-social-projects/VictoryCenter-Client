@@ -36,7 +36,7 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
     return (
         <form onSubmit={handleSubmit} className="login-form" spellCheck={false}>
             <NavLink to={PUBLIC_ROUTES.ROOT}>
-                <Logo role="img" aria-label={LOGIN_CONST.FORM.LOGO_ALT} />
+                <Logo aria-label={LOGIN_CONST.FORM.LOGO_ALT} />
             </NavLink>
             <h2 className="login-form-title">{LOGIN_CONST.FORM.TITLE}</h2>
             <div className="login-form-group">
@@ -65,9 +65,9 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
                     />
                     <button type="button" className="visibility-toggle" onClick={handleVisibilityChange}>
                         {isPasswordVisible ? (
-                            <EyeOpened role="img" aria-label={LOGIN_CONST.FORM.SHOWED_PASSWORD_ALT} />
+                            <EyeOpened aria-label={LOGIN_CONST.FORM.SHOWED_PASSWORD_ALT} />
                         ) : (
-                            <EyeClosed role="img" aria-label={LOGIN_CONST.FORM.HIDDEN_PASSWORD_ALT} />
+                            <EyeClosed aria-label={LOGIN_CONST.FORM.HIDDEN_PASSWORD_ALT} />
                         )}
                     </button>
                 </div>

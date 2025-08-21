@@ -23,7 +23,7 @@ export const Header = () => {
         <div className="headerBlock">
             <div className="logoContainer">
                 <Link to="/">
-                    <VictoryCenterLogo className="logo" aria-hidden={true} />
+                    <VictoryCenterLogo className="logo" />
                 </Link>
             </div>
 

@@ -149,13 +149,13 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
                                 handleRemove();
                             }}
                         >
-                            <DeleteIcon className="delete-icon" role="img" aria-label={COMMON_TEXT_ADMIN.ALT.DELETE} />
+                            <DeleteIcon className="delete-icon" aria-label={COMMON_TEXT_ADMIN.ALT.DELETE} />
                         </button>
                     )}
                 </div>
             ) : (
                 <div className="photo-placeholder">
-                    <UploadIcon className="placeholder-icon" role="img" aria-label={COMMON_TEXT_ADMIN.ALT.UPLOAD} />
+                    <UploadIcon className="placeholder-icon" aria-label={COMMON_TEXT_ADMIN.ALT.UPLOAD} />
                     <span>{COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER}</span>
                 </div>
             )}

@@ -87,7 +87,6 @@ export const ButtonTooltip = ({ children, position = 'bottom', offset = 8 }: But
         >
             <InfoIcon
                 className="button-tooltip-icon"
-                role="img"
                 aria-label={isVisible ? COMMON_TEXT_ADMIN.ALT.HIDE_TOOLTIP : COMMON_TEXT_ADMIN.ALT.SHOW_TOOLTIP}
             />
 

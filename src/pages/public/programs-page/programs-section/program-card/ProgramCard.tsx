@@ -18,7 +18,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
                             <h2 className="program-title">{program.title}</h2>
                         </div>
                         <div className="arrow-container">
-                            <ArrowIcon className="arrow-icon" aria-hidden={true} />
+                            <ArrowIcon className="arrow-icon" />
                         </div>
                     </div>
                 </div>

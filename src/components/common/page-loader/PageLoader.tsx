@@ -5,7 +5,7 @@ import './PageLoader.scss';
 export const PageLoader = () => {
     return (
         <div className="full-page-loader">
-            <LoaderIcon className="loader-icon" aria-label={LOADER_TEXT.ICON_ALT} role="img" />
+            <LoaderIcon className="loader-icon" aria-label={LOADER_TEXT.ICON_ALT} />
         </div>
     );
 };

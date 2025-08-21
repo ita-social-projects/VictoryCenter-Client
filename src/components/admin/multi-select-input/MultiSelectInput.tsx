@@ -111,9 +111,9 @@ export const MultiSelectInput = <T extends Record<string, any>>({
                     <div className="placeholder-content">{displayLabel}</div>
                     <div className="placeholder-chevron">
                         {isOpen ? (
-                            <ArrowUp role="img" aria-label={COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST} />
+                            <ArrowUp aria-label={COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST} />
                         ) : (
-                            <ArrowDown role="img" aria-label={COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST} />
+                            <ArrowDown aria-label={COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST} />
                         )}
                     </div>
                 </div>
@@ -136,12 +136,9 @@ export const MultiSelectInput = <T extends Record<string, any>>({
                             >
                                 <div className="checkbox">
                                     {selected ? (
-                                        <CheckedBox role="img" aria-label={COMMON_TEXT_ADMIN.ALT.OPTION_SELECTED} />
+                                        <CheckedBox aria-label={COMMON_TEXT_ADMIN.ALT.OPTION_SELECTED} />
                                     ) : (
-                                        <UncheckedBox
-                                            role="img"
-                                            aria-label={COMMON_TEXT_ADMIN.ALT.OPTION_NOT_SELECTED}
-                                        />
+                                        <UncheckedBox aria-label={COMMON_TEXT_ADMIN.ALT.OPTION_NOT_SELECTED} />
                                     )}
                                 </div>
                                 <span className="option-content">{getOptionName(option)}</span>

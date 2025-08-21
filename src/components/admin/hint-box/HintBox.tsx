@@ -11,7 +11,7 @@ export const HintBox = ({ title, text }: HintBoxProps) => {
     return (
         <div className="hint-box">
             <div className="hint-box-title">
-                <InfoIcon className="info-icon" role="img" aria-label={COMMON_TEXT_ADMIN.ALT.HINT} />
+                <InfoIcon className="info-icon" aria-label={COMMON_TEXT_ADMIN.ALT.HINT} />
                 <span>{title}</span>
             </div>
             {text && <span>{text}</span>}

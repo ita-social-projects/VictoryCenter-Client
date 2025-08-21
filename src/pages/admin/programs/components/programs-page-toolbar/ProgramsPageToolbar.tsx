@@ -49,7 +49,7 @@ export const ProgramsPageToolbar = ({
                         />
                     </Select>
                     <Button onClick={onAddProgram} buttonStyle="primary" data-testid="add-program-button">
-                        {PROGRAMS_TEXT.BUTTON.ADD_PROGRAM} <PlusIcon aria-hidden={true} />
+                        {PROGRAMS_TEXT.BUTTON.ADD_PROGRAM} <PlusIcon />
                     </Button>
                 </div>
             </div>

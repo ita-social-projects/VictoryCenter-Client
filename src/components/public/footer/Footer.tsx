@@ -67,7 +67,7 @@ export const Footer = () => {
                             required
                         />
                         <button onClick={handleClick} className="subscribe-btn" aria-label={SIGN_UP}>
-                            <ArrowUpIcon role="img" aria-label={SIGN_UP} className="arrow-up-icon" />
+                            <ArrowUpIcon aria-label={SIGN_UP} className="arrow-up-icon" />
                         </button>
                     </div>
                 </div>
@@ -116,10 +116,10 @@ export const Footer = () => {
             <div className="contact-block">
                 <div className="main_contacts">
                     <button className="contact-item" onClick={() => copyToClipboard(EMAIL)}>
-                        <MailIcon aria-hidden={true} /> {EMAIL}
+                        <MailIcon /> {EMAIL}
                     </button>
                     <button className="contact-item" onClick={() => copyToClipboard(PHONE)}>
-                        <PhoneIcon aria-hidden={true} /> {PHONE}
+                        <PhoneIcon /> {PHONE}
                     </button>
                 </div>
                 <div className="social_media">

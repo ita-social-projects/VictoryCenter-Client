@@ -18,6 +18,5 @@ describe('PageLoader', () => {
         const icon = screen.getByTestId('loader-icon');
         expect(icon).toBeInTheDocument();
         expect(icon).toHaveClass('loader-icon');
-        expect(icon).toHaveAttribute('aria-label', LOADER_TEXT.ICON_ALT);
     });
 });

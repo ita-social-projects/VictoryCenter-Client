@@ -96,7 +96,7 @@ export const useEntitiesFetch = <TEntity extends IdentityEntity<TIdValue>, TIdVa
         }
 
         refetch();
-    }, [...autoFetchDependencies, autoFetchDisabled, refetch]);
+    }, [autoFetchDisabled, refetch, ...autoFetchDependencies]);
 
     useEffect(() => {
         if (!autoFetchDisabled) {

@@ -6,8 +6,6 @@ import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 describe('TeamPageToolbar', () => {
-    const autocompleteValues = ['John', 'Jane'];
-
     it('calls onSearchQueryChange when typing into input', () => {
         const onSearchQueryChange = jest.fn();
         render(
@@ -15,7 +13,6 @@ describe('TeamPageToolbar', () => {
                 onSearchQueryChange={onSearchQueryChange}
                 onStatusFilterChange={jest.fn()}
                 onAddMember={jest.fn()}
-                autocompleteValues={autocompleteValues}
             />,
         );
 
@@ -31,7 +28,6 @@ describe('TeamPageToolbar', () => {
                 onSearchQueryChange={jest.fn()}
                 onStatusFilterChange={onStatusFilterChange}
                 onAddMember={jest.fn()}
-                autocompleteValues={autocompleteValues}
             />,
         );
 
@@ -65,7 +61,6 @@ describe('TeamPageToolbar', () => {
                 onSearchQueryChange={jest.fn()}
                 onStatusFilterChange={jest.fn()}
                 onAddMember={onAddMember}
-                autocompleteValues={autocompleteValues}
             />,
         );
 

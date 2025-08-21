@@ -3,9 +3,29 @@ import './Header.scss';
 import { Link } from 'react-router';
 import { ReactComponent as VictoryCenterLogo } from '../../../assets/icons/logo-with-text.svg';
 import { PUBLIC_ROUTES } from '../../../const/public/routes';
-import { ABOUT_US, CONTACT_US, DONATE, HOW_TO_SUPPORT, PROGRAMS, REPORTING } from '../../../const/public/header';
+import {
+    ABOUT_US,
+    CONTACT_US,
+    DONATE,
+    HISTORY,
+    HOW_TO_SUPPORT,
+    EVENTS_AND_NEWS,
+    PARTNERS,
+    PROGRAMS,
+    REPORTING,
+    TEAM,
+    WHO_WE_ARE,
+} from '../../../const/public/header';
+import { DropdownMenu } from '../dropdown-menu/DropdownMenu';
 
 export const Header = () => {
+    const dropdownMenuLinks = [
+        { text: WHO_WE_ARE, navigateTo: PUBLIC_ROUTES.ABOUT_US.FULL, isDisabled: false },
+        { text: HISTORY, navigateTo: '', isDisabled: true },
+        { text: TEAM, navigateTo: PUBLIC_ROUTES.TEAM.FULL, isDisabled: false },
+        { text: PARTNERS, navigateTo: PUBLIC_ROUTES.PARTNERS.FULL, isDisabled: false },
+        { text: EVENTS_AND_NEWS, navigateTo: '', isDisabled: true },
+    ];
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
     const toggleMenu = () => {
@@ -28,7 +48,7 @@ export const Header = () => {
 
             <div className="linkContainer">
                 <nav>
-                    <Link to={PUBLIC_ROUTES.ABOUT_US.FULL}>{ABOUT_US}</Link>
+                    <DropdownMenu mainText={ABOUT_US} links={dropdownMenuLinks}></DropdownMenu>
                     <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{PROGRAMS}</Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {REPORTING}

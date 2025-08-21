@@ -8,11 +8,18 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    opacity: 0.67;
     gap: 1rem;
-    background:
-        linear-gradient(0deg, rgba(15, 6, 0, 0.48) 0%, rgba(15, 6, 0, 0.48) 100%),
-        url('../../../assets/images/admin/home/home-background.jpg') lightgray 50% / cover no-repeat;
+    background: linear-gradient(0deg, rgba(15, 6, 0, 0.48) 0%, rgba(15, 6, 0, 0.48) 100%), url('../../../assets/images/admin/home/home-background.jpg') lightgray 50% / cover no-repeat;
+    position: relative;
+    z-index: 1;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(255,255,255,0.34);
+        z-index: -1;
+    }
 
     .admin-page-main-text {
         text-align: center;
@@ -58,3 +65,4 @@
         }
     }
 }
+

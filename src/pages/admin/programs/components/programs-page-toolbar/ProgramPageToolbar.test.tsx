@@ -48,7 +48,7 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
 }));
 
 jest.mock('../../../../../assets/icons/plus.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="plus-icon" />,
+    ReactComponent: (props: any) => <svg {...props} />,
 }));
 
 describe('ProgramsPageToolbar', () => {

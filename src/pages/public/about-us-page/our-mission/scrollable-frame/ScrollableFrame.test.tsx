@@ -4,10 +4,10 @@ import * as dataFetch from '../../../../../services/api/public/programs/programs
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../../const/public/programs-page';
 
 jest.mock('../../../../../assets/icons/arrow-left.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-left-black-icon" />,
+    ReactComponent: (props: any) => <svg {...props} />,
 }));
 jest.mock('../../../../../assets/icons/arrow-right.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-right-black-icon" />,
+    ReactComponent: (props: any) => <svg {...props} />,
 }));
 
 jest.mock('../../../programs-page/programs-section/program-card/ProgramCard', () => ({

@@ -11,7 +11,7 @@ jest.mock('../../../assets/icons/arrow-up.svg', () => ({
 }));
 
 jest.mock('../../common/inline-loader/InlineLoader', () => ({
-    InlineLoader: () => <img alt="loader-icon" data-testid="loader-icon" />,
+    InlineLoader: (props: any) => <svg {...props} data-testid="loader-icon" />,
 }));
 
 interface MockItem {
@@ -49,10 +49,10 @@ describe('InfiniteScrollList', () => {
     };
 
     const getScrollContainer = () => screen.getByTestId('infinite-scroll-list');
-    const getLoader = () => screen.queryByAltText('loader-icon');
-    const getMoveToTopButton = () => screen.queryByLabelText(COMMON_TEXT_ADMIN.ALT.SCROLL_TO_TOP);
+    const getLoader = () => screen.queryByTestId('loader-icon');
+    const getMoveToTopButton = () => screen.queryByTestId('arrow-up-icon');
     const getEmptyState = () => screen.queryByTestId('infinite-scroll-list-not-found');
-    const getNotFoundIcon = () => screen.queryByLabelText(COMMON_TEXT_ADMIN.ALT.NOT_FOUND);
+    const getNotFoundIcon = () => screen.queryByTestId('not-found-icon');
 
     beforeEach(() => {
         jest.clearAllMocks();

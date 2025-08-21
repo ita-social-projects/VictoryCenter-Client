@@ -3,11 +3,11 @@ import { QuestionCard } from './QuestionCard';
 import { Question } from '../../../../../types/public/programs-page';
 
 jest.mock('../../../../../assets/icons/arrow-down-right.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="black-arrow-icon" />,
+    ReactComponent: (props: any) => <svg {...props} />,
 }));
 
 jest.mock('../../../../../assets/icons/cross.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="black-cross-icon" />,
+    ReactComponent: (props: any) => <svg {...props} />,
 }));
 
 describe('test question card component', () => {

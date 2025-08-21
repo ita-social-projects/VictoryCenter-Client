@@ -73,13 +73,13 @@ describe('Multiselect Component', () => {
         render(<MultiSelectInput {...defaultProps} />);
 
         // Initially closed - should show down arrow
-        expect(screen.getByLabelText(COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST)).toBeInTheDocument();
+        expect(screen.getByTestId('chevron-down-icon')).toBeInTheDocument();
 
         // Open dropdown
         fireEvent.click(screen.getByText('Select options...'));
 
         // Should show up arrow when open
-        expect(screen.getByLabelText(COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST)).toBeInTheDocument();
+        expect(screen.getByTestId('chevron-up-icon')).toBeInTheDocument();
     });
 
     it('opens dropdown when placeholder is clicked', () => {
@@ -171,10 +171,10 @@ describe('Multiselect Component', () => {
         fireEvent.click(screen.getByText('Option 1'));
 
         // First option should be selected
-        expect(screen.getByLabelText(COMMON_TEXT_ADMIN.ALT.OPTION_SELECTED)).toBeInTheDocument();
+        expect(screen.getByTestId('chevron-checked-icon')).toBeInTheDocument();
 
         // Other options should not be selected
-        expect(screen.getAllByLabelText(COMMON_TEXT_ADMIN.ALT.OPTION_NOT_SELECTED)).toHaveLength(3);
+        expect(screen.getAllByTestId('chevron-unchecked-icon')).toHaveLength(3);
     });
 
     it('closes dropdown when clicking outside', async () => {

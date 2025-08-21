@@ -5,11 +5,11 @@ import userEvent from '@testing-library/user-event';
 import { SingleSelectInput } from './SingleSelectInput';
 
 jest.mock('../../../assets/icons/chevron-down.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-down-icon" />,
+    ReactComponent: (props: any) => <svg {...props} />,
 }));
 
 jest.mock('../../../assets/icons/chevron-up.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-up-icon" />,
+    ReactComponent: (props: any) => <svg {...props} />,
 }));
 
 interface Option {

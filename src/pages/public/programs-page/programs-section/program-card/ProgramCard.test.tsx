@@ -3,7 +3,7 @@ import { ProgramCard } from './ProgramCard';
 import { PublishedProgram } from '../../../../../types/public/programs-page';
 
 jest.mock('../../../../../assets/icons/arrow-up-right.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="black-arrow-up-right" />,
+    ReactComponent: (props: any) => <svg {...props} />,
 }));
 
 describe('test program-card component', () => {

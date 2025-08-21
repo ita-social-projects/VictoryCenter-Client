@@ -106,9 +106,7 @@ describe('ProgramCategoryModal - Add Mode', () => {
 
     it('renders with Add title and disabled Save when empty', () => {
         renderModal();
-        expect(screen.getByTestId('modal-title')).toHaveTextContent(
-            PROGRAM_CATEGORY_TEXT.FORM.TITLE.ADD_CATEGORY,
-        );
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(PROGRAM_CATEGORY_TEXT.FORM.TITLE.ADD_CATEGORY);
         expect(getSaveButton()).toBeDisabled();
     });
 
@@ -137,9 +135,7 @@ describe('ProgramCategoryModal - Add Mode', () => {
         typeName('Delta');
         fireEvent.click(getSaveButton());
 
-        expect(
-            await screen.findByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY),
-        ).toBeInTheDocument();
+        expect(await screen.findByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY)).toBeInTheDocument();
         expect((props as any).onAddCategory).not.toHaveBeenCalled();
         expect((props as any).onClose).not.toHaveBeenCalled();
     });
@@ -150,9 +146,7 @@ describe('ProgramCategoryModal - Add Mode', () => {
         typeName('Alpha');
         expect(getSaveButton()).toBeDisabled();
         expect(
-            screen.getByText(
-                PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError(),
-            ),
+            screen.getByText(PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError()),
         ).toBeInTheDocument();
     });
 
@@ -184,9 +178,7 @@ describe('ProgramCategoryModal - Add Mode', () => {
         rerender(<ProgramCategoryModal {...baseProps} isOpen={false} />);
         rerender(<ProgramCategoryModal {...baseProps} isOpen={true} />);
 
-        expect(
-            screen.queryByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY),
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY)).not.toBeInTheDocument();
     });
 });
 
@@ -205,9 +197,7 @@ describe('ProgramCategoryModal - Edit Mode', () => {
 
     it('renders with Edit title and pre-fills first category name; Save disabled until changed', () => {
         renderEdit();
-        expect(screen.getByTestId('modal-title')).toHaveTextContent(
-            PROGRAM_CATEGORY_TEXT.FORM.TITLE.EDIT_CATEGORY,
-        );
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(PROGRAM_CATEGORY_TEXT.FORM.TITLE.EDIT_CATEGORY);
         // Name should match first category, so Save is disabled because nameNotChanged
         expect((getNameInput() as HTMLInputElement).value).toBe(mockCategories[0].name);
         expect(getSaveButton()).toBeDisabled();
@@ -253,9 +243,7 @@ describe('ProgramCategoryModal - Edit Mode', () => {
         fireEvent.click(getSaveButton());
         fireEvent.click(screen.getByText('Yes'));
 
-        expect(
-            await screen.findByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY),
-        ).toBeInTheDocument();
+        expect(await screen.findByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY)).toBeInTheDocument();
         expect((props as any).onEditCategory).not.toHaveBeenCalled();
         expect((props as any).onClose).not.toHaveBeenCalled();
     });
@@ -291,11 +279,7 @@ describe('ProgramCategoryModal - Edit Mode', () => {
         typeName('Beta');
         expect(getSaveButton()).toBeDisabled();
         expect(
-            screen.getByText(
-                PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError(),
-            ),
+            screen.getByText(PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError()),
         ).toBeInTheDocument();
     });
 });
-
-

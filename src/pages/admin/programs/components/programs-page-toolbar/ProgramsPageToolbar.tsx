@@ -11,8 +11,9 @@ import { ProgramSuggestion } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import './ProgramsPageToolbar.scss';
 import {
-    PaginationRequestParams, useDataPaginationFetch
-} from "../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch";
+    PaginationRequestParams,
+    useDataPaginationFetch,
+} from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 
 const SUGGESTIONS_PAGE_SIZE = 5;
 const MIN_CHARACTERS_TO_SEARCH = 3;

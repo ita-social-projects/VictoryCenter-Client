@@ -12,11 +12,11 @@ import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { RequestOptions } from '../../../../../types/common/api';
 import './ProgramsPageContent.scss';
-import {useDataFetch} from "../../../../../hooks/admin/fetch/use-data-fetch/useDataFetch";
+import { useDataFetch } from '../../../../../hooks/admin/fetch/use-data-fetch/useDataFetch';
 import {
     PaginationRequestParams,
-    useDataPaginationFetch
-} from "../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch";
+    useDataPaginationFetch,
+} from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -219,17 +219,20 @@ export const ProgramsPageContent = () => {
     }, [updateSearchedProgram]);
 
     // Program handlers
-    const handleAddProgram = useCallback((addedProgram: Program) => {
-        // Update program counters in categories
-        const addedCategoryIds = new Set(addedProgram.categories.map((c) => c.id));
-        updateCategories((prevCategories) =>
-            prevCategories.map((cat) =>
-                addedCategoryIds.has(cat.id) ? { ...cat, programsCount: cat.programsCount + 1 } : cat,
-            ),
-        );
+    const handleAddProgram = useCallback(
+        (addedProgram: Program) => {
+            // Update program counters in categories
+            const addedCategoryIds = new Set(addedProgram.categories.map((c) => c.id));
+            updateCategories((prevCategories) =>
+                prevCategories.map((cat) =>
+                    addedCategoryIds.has(cat.id) ? { ...cat, programsCount: cat.programsCount + 1 } : cat,
+                ),
+            );
 
-        updatePrograms((prev) => [addedProgram, ...prev]);
-    }, [updatePrograms]);
+            updatePrograms((prev) => [addedProgram, ...prev]);
+        },
+        [updatePrograms],
+    );
 
     const handleEditProgram = useCallback(
         (updatedProgram: Program) => {

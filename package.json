@@ -88,8 +88,12 @@
             "^swiper/css$": "<rootDir>/src/__mocks__/styleMock.js",
             "^swiper/css/navigation$": "<rootDir>/src/__mocks__/styleMock.js",
             "^swiper/css/pagination$": "<rootDir>/src/__mocks__/styleMock.js",
-            "^swiper/css/scrollbar$": "<rootDir>/src/__mocks__/styleMock.js"
+            "^swiper/css/scrollbar$": "<rootDir>/src/__mocks__/styleMock.js",
+				"\\.svg$": "<rootDir>/src/__mocks__/svgrMock.js"
         },
+		  "transform": [
+				"^.+\\.svg$': 'jest-transformer-svgr"
+		  ],
         "transformIgnorePatterns": [
             "node_modules/(?!axios)/"
         ],

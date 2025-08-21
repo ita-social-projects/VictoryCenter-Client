@@ -1,0 +1,58 @@
+import { Button } from '../../../../../components/admin/button/Button';
+import { Select } from '../../../../../components/admin/select/Select';
+import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
+import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { VisibilityStatus } from '../../../../../types/admin/common';
+import PlusIcon from '../../../../../assets/icons/plus.svg';
+import './ProgramsPageToolbar.scss';
+
+export interface ProgramPageToolbarProps {
+    onSearchQueryChange: (query: string) => void;
+    onStatusFilterChange: (categoryFilter: VisibilityStatus | undefined) => void;
+    onAddProgram: () => void;
+}
+
+export const ProgramsPageToolbar = ({
+    onSearchQueryChange,
+    onStatusFilterChange,
+    onAddProgram,
+}: ProgramPageToolbarProps) => {
+    return (
+        <>
+            <div className="programs-toolbar">
+                <div className="programs-toolbar-search">
+                    <SearchBar
+                        onChange={(e) => {
+                            onSearchQueryChange(e);
+                        }}
+                        autocompleteValues={[]}
+                        data-testid="search-input"
+                        placeholder={COMMON_TEXT_ADMIN.FILTER.SEARCH_BY_NAME}
+                    />
+                </div>
+                <div className="programs-toolbar-actions">
+                    <Select<VisibilityStatus | undefined>
+                        onValueChange={onStatusFilterChange}
+                        data-testid="status-filter"
+                    >
+                        <Select.Option key={1} value={undefined} name={COMMON_TEXT_ADMIN.FILTER.STATUS.ALL} />
+                        <Select.Option<VisibilityStatus>
+                            key={2}
+                            value={VisibilityStatus.Published}
+                            name={COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED}
+                        />
+                        <Select.Option<VisibilityStatus>
+                            key={3}
+                            value={VisibilityStatus.Draft}
+                            name={COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT}
+                        />
+                    </Select>
+                    <Button onClick={onAddProgram} buttonStyle="primary" data-testid="add-program-button">
+                        {PROGRAMS_TEXT.BUTTON.ADD_PROGRAM} <img src={PlusIcon} alt="plus" />
+                    </Button>
+                </div>
+            </div>
+        </>
+    );
+};

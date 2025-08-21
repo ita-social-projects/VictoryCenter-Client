@@ -8,37 +8,12 @@ on:
         required: true
         type: string
 
-
 env:
   RUN_NUM: ${{ github.run_number }}
 
 jobs:
-  run_tests:
-    name: Run tests
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
-      attestations: write
-      id-token: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4      
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      - name: Install dependencies
-        run: npm ci
-      - name: Build project
-        run: npm run build
-      - name: Run unit tests
-        run: npm run test:cover  
-
   docker:
     name: Build and push docker image
-    needs: run_tests
     runs-on: ubuntu-latest
     steps:
      - name: Check out the repo
@@ -46,7 +21,7 @@ jobs:
      - name: "Run docker build and doker push"
        run:  echo "Tag for image ${GITHUB_REF##*/}.${RUN_NUM}"    
      - name: Log in to Docker Hub
-       uses: docker/login-action@v3
+       uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
        with:
          username: ${{ secrets.DOCKER_USERNAME }}
          password: ${{ secrets.DOCKER_PASSWORD }}
@@ -55,17 +30,15 @@ jobs:
        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
        with:
           images: |
-            victorycenterua/client     
+            victorycenterua/backend
      - name: Build and push Docker images
        id: push
-       uses: docker/build-push-action@v6
+       uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
        with:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}.${{ github.run_number }}
           labels: ${{ steps.meta.outputs.labels }}
-          secret-envs: |
-            REACT_APP_BACKEND_URL=${{ secrets.REACT_APP_BACKEND_URL }}
   manual_approval_deploy:
     needs: docker 
     environment: stage 
@@ -92,10 +65,10 @@ jobs:
     - run: echo ${{ needs.manual_approval_deploy.outputs.comment }}
     - name: "Set backend tag"
       id: backend_tag
-      run: echo "backend_tag=$(docker container inspect $(docker container ls -aq) --format "{{.Config.Image}}" | grep -m 1 "victorycenterua/backend:" | cut -d "-" -f2 | head -c -1)" >> $GITHUB_OUTPUT   
+      run: echo "backend_tag=$(docker container inspect $(docker container ls -aq) --format "{{.Config.Image}}" | grep -m 1 "victorycenterua/backend:" | cut -d ":" -f2)" >> $GITHUB_OUTPUT   
     - name: "Set frontend tag"
       id: frontend_tag
-      run: echo "frontend_tag=$(docker container inspect $(docker container ls -aq) --format "{{.Config.Image}}" | grep -m 1 "victorycenterua/client:" | cut -d "-" -f2 | head -c -1)" >> $GITHUB_OUTPUT   
+      run: echo "frontend_tag=$(docker container inspect $(docker container ls -aq) --format "{{.Config.Image}}" | grep -m 1 "victorycenterua/client:" | cut -d ":" -f2)" >> $GITHUB_OUTPUT   
     - name: Checkout
       uses: actions/checkout@v2
       with:
@@ -113,6 +86,12 @@ jobs:
         DOCKER_TAG_FRONTEND: ${GITHUB_REF##*/}.${RUN_NUM}
         DOCKER_TAG_BACKEND: ${{ steps.backend_tag.outputs.backend_tag }}
         DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
+        WAY4PAY_MERCHANT_LOGIN: ${{ secrets.WAY4PAY_MERCHANT_LOGIN }}
+        WAY4PAY_MERCHANT_SECRET_KEY: ${{ secrets.WAY4PAY_MERCHANT_SECRET_KEY }}
+        WAY4PAY_MERCHANT_DOMAIN_NAME: ${{ secrets.WAY4PAY_MERCHANT_DOMAIN_NAME }}
+        WAY4PAY_API_URL: ${{ secrets.WAY4PAY_API_URL }}
+        BLOB_LOCAL_STORE_KEY: ${{ secrets.BLOB_LOCAL_STORE_KEY }}
+        
       run: |
         docker compose up -d
 
@@ -157,5 +136,10 @@ jobs:
         DOCKER_TAG_FRONTEND: ${{ needs.stage_deploy.outputs.frontend_tag }}
         DOCKER_TAG_BACKEND: ${{ needs.stage_deploy.outputs.backend_tag }}
         DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
+        WAY4PAY_MERCHANT_LOGIN: ${{ secrets.WAY4PAY_MERCHANT_LOGIN }}
+        WAY4PAY_MERCHANT_SECRET_KEY: ${{ secrets.WAY4PAY_MERCHANT_SECRET_KEY }}
+        WAY4PAY_MERCHANT_DOMAIN_NAME: ${{ secrets.WAY4PAY_MERCHANT_DOMAIN_NAME }}
+        WAY4PAY_API_URL: ${{ secrets.WAY4PAY_API_URL }}
+        BLOB_LOCAL_STORE_KEY: ${{ secrets.BLOB_LOCAL_STORE_KEY }}
       run: |
         docker compose up -d

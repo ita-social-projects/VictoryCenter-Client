@@ -1,4 +1,4 @@
-import { getEnvVariable } from '../../utils/functions/getEnvVariable';
+import { getEnvVariable } from '../../utils/functions/get-env-variable/get-env-variable';
 
 export const API_ROUTES = {
     BASE: getEnvVariable('REACT_APP_BACKEND_URL'),

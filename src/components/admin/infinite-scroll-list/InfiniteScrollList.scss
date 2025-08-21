@@ -1,0 +1,86 @@
+@use '../../../assets/sass/variables/colors';
+
+.infinite-scroll-list-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.infinite-scroll-list {
+    position: relative;
+    display: flex;
+    gap: 0.5rem;
+    flex: 1;
+    flex-direction: column;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+
+    &-loader-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 1rem;
+
+        img {
+            width: 3rem;
+            height: 3rem;
+            animation: rotate 1s infinite;
+        }
+    }
+
+    &-to-top {
+        position: absolute;
+        right: 9.375rem;
+        bottom: 3.125rem;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3.75rem;
+        height: 3.75rem;
+        border: none;
+        border-radius: 50%;
+        background-color: colors.$blue-500;
+        box-shadow: 0 2px 8px rgba(colors.$blue-50, 0.149);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    &-not-found {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        height: 100%;
+        text-align: center;
+
+        img {
+            width: 14.375rem;
+            height: 14.375rem;
+        }
+
+        p {
+            font-size: 40px;
+            font-weight: 600;
+            color: colors.$blue-900;
+        }
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}

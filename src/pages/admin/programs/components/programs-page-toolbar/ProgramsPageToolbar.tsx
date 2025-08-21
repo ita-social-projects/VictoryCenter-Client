@@ -9,7 +9,6 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { ProgramSuggestion } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import { SuggestionContentRenderProps } from '../../../../../components/admin/search-bar/suggestion-wrapper/SuggestionWrapper';
 import {
     PaginationRequestParams,
     useEntitiesPaginationFetch,
@@ -61,12 +60,9 @@ export const ProgramsPageToolbar = ({
         pageSize: SUGGESTIONS_PAGE_SIZE,
     });
 
-    const onSearch = useCallback(
-        (query: string) => {
-            setCurrentSearchTerm(query);
-        },
-        [suggestionsActions],
-    );
+    const onSearch = useCallback((query: string) => {
+        setCurrentSearchTerm(query);
+    }, []);
 
     const onSuggestionSelected = useCallback(
         (suggestion: ProgramSuggestion) => {

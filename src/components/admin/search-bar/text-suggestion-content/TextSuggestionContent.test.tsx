@@ -11,9 +11,9 @@ const renderComponent = (props: Partial<TextSuggestionContentProps> = {}) => {
     const finalProps: TextSuggestionContentProps = { ...defaultProps, ...props };
     const ref = createRef<SuggestionContentRef>();
 
-    const renderResult = render(<TextSuggestionContent {...finalProps} ref={ref} />);
+    const view = render(<TextSuggestionContent {...finalProps} ref={ref} />);
 
-    return { ref, ...renderResult };
+    return { ref, ...view };
 };
 
 describe('TextSuggestionContent', () => {

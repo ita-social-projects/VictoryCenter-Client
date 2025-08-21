@@ -10,15 +10,9 @@ export interface TeamPageToolbarProps {
     onSearchQueryChange: (query: string) => void;
     onStatusFilterChange: (status: VisibilityStatus | undefined) => void;
     onAddMember: () => void;
-    autocompleteValues: string[];
 }
 
-export const TeamPageToolbar = ({
-    onSearchQueryChange,
-    onStatusFilterChange,
-    onAddMember,
-    autocompleteValues,
-}: TeamPageToolbarProps) => {
+export const TeamPageToolbar = ({ onSearchQueryChange, onStatusFilterChange, onAddMember }: TeamPageToolbarProps) => {
     return (
         <div className="toolbar" data-testid="team-page-toolbar">
             <div>

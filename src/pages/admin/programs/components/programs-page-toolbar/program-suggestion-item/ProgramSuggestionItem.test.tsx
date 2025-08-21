@@ -16,9 +16,9 @@ const renderComponent = (props: Partial<ProgramSuggestionItemProps> = {}) => {
     const finalProps: ProgramSuggestionItemProps = { ...defaultProps, ...props };
     const ref = createRef<SuggestionContentRef>();
 
-    const renderResult = render(<ProgramSuggestionItem {...finalProps} ref={ref} />);
+    const view = render(<ProgramSuggestionItem {...finalProps} ref={ref} />);
 
-    return { ref, ...renderResult };
+    return { ref, ...view };
 };
 
 describe('ProgramSuggestionItem', () => {

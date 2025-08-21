@@ -102,7 +102,7 @@ export const useEntitiesFetch = <TEntity extends IdentityEntity<TIdValue>, TIdVa
         if (!autoFetchDisabled) {
             fetchEntities();
         }
-    }, []);
+    }, [autoFetchDisabled, fetchEntities]);
 
     // Cleanup on unmount
     useEffect(() => {

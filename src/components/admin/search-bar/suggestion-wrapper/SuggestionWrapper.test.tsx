@@ -25,9 +25,9 @@ const renderComponent = (props: Partial<SuggestionWrapperProps<TestItem>> = {}) 
     const finalProps: SuggestionWrapperProps<TestItem> = { ...defaultProps, ...props };
     const ref = createRef<SuggestionWrapperRef>();
 
-    const renderResult = render(<SuggestionWrapper {...finalProps} ref={ref} />);
+    const view = render(<SuggestionWrapper {...finalProps} ref={ref} />);
 
-    return { ref, ...renderResult };
+    return { ref, ...view };
 };
 
 const MockRenderContent = forwardRef<SuggestionContentRef, SuggestionContentRenderProps<TestItem>>(
@@ -132,8 +132,6 @@ describe('SuggestionWrapper', () => {
     it('should forward tooltip content from content ref', () => {
         const { ref } = renderComponent();
 
-        // Mock the content ref to return tooltip content
-        const mockTooltipContent = <div>Tooltip</div>;
         const contentElement = screen.getByText('Test Item').closest('span');
 
         if (contentElement) {

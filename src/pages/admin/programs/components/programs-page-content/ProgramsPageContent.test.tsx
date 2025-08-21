@@ -3,18 +3,17 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ProgramsPageContent } from './ProgramsPageContent';
 import { Program, ProgramCategory } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { EntitiesPaginationActions } from '../../../../../hooks/admin/fetch/use-entities-pagination-fetch/useEntitiesPaginationFetch';
 import { EntitiesActions } from '../../../../../hooks/admin/fetch/use-entities-fetch/useEntitiesFetch';
 import { EntityFetchActions } from '../../../../../hooks/admin/fetch/use-entity-fetch/useEntityFetch';
-import {BaseCloseModalActions, BaseOpenModalActions} from "../../../../../hooks/admin/use-modals-state/useModalsState";
+import {
+    BaseCloseModalActions,
+    BaseOpenModalActions,
+} from '../../../../../hooks/admin/use-modals-state/useModalsState';
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
-const mockProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
-
-// Mock hooks
 jest.mock('../../../../../hooks/admin/use-modals-state/useModalsState');
 jest.mock('../../../../../hooks/admin/fetch/use-entities-pagination-fetch/useEntitiesPaginationFetch');
 jest.mock('../../../../../hooks/admin/fetch/use-entities-fetch/useEntitiesFetch');

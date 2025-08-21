@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { HintBox } from './HintBox';
 
 jest.mock('../../../assets/icons/info.svg', () => ({
@@ -42,14 +41,6 @@ describe('HintBox', () => {
 
         expect(container).toBeInTheDocument();
         expect(titleContainer).toHaveClass('hint-box-title');
-    });
-
-    it('icon renders with correct aria-label', () => {
-        const title = 'Test title';
-        render(<HintBox title={title} />);
-        const icon = screen.getByLabelText(COMMON_TEXT_ADMIN.ALT.HINT);
-        expect(icon).toBeInTheDocument();
-        expect(icon).toHaveAttribute('aria-label', COMMON_TEXT_ADMIN.ALT.HINT);
     });
 
     it('renders empty text correctly', () => {

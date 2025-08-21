@@ -48,6 +48,8 @@ describe('SuggestionWrapper', () => {
         jest.clearAllMocks();
     });
 
+    const getItem = () => screen.getByRole('button') as HTMLLIElement;
+
     it('should render default text suggestion content', () => {
         renderComponent();
 
@@ -64,7 +66,7 @@ describe('SuggestionWrapper', () => {
     it('should apply active class when isActive is true', () => {
         renderComponent({ isActive: true });
 
-        const listItem: HTMLLIElement = screen.getByRole('listitem');
+        const listItem: HTMLLIElement = getItem();
         expect(listItem).toHaveClass('suggestion-wrapper--active');
     });
 
@@ -72,7 +74,7 @@ describe('SuggestionWrapper', () => {
         const onSelectMock = jest.fn();
         renderComponent({ onSelect: onSelectMock });
 
-        fireEvent.click(screen.getByRole('listitem'));
+        fireEvent.click(getItem());
 
         expect(onSelectMock).toHaveBeenCalledTimes(1);
     });
@@ -81,7 +83,7 @@ describe('SuggestionWrapper', () => {
         const onHoverMock = jest.fn();
         renderComponent({ onHover: onHoverMock });
 
-        const listItem: HTMLLIElement = screen.getByRole('listitem');
+        const listItem: HTMLLIElement = getItem();
         fireEvent.mouseEnter(listItem);
 
         expect(onHoverMock).toHaveBeenCalledTimes(1);
@@ -92,7 +94,7 @@ describe('SuggestionWrapper', () => {
         const onMouseLeaveMock = jest.fn();
         renderComponent({ onMouseLeave: onMouseLeaveMock });
 
-        fireEvent.mouseLeave(screen.getByRole('listitem'));
+        fireEvent.mouseLeave(getItem());
 
         expect(onMouseLeaveMock).toHaveBeenCalledTimes(1);
     });
@@ -100,7 +102,7 @@ describe('SuggestionWrapper', () => {
     it('should apply active class on hover', () => {
         renderComponent();
 
-        const listItem: HTMLLIElement = screen.getByRole('listitem');
+        const listItem: HTMLLIElement = getItem();
         fireEvent.mouseEnter(listItem);
 
         expect(listItem).toHaveClass('suggestion-wrapper--active');
@@ -109,7 +111,7 @@ describe('SuggestionWrapper', () => {
     it('should remove active class when mouse leaves after hover', () => {
         renderComponent();
 
-        const listItem: HTMLLIElement = screen.getByRole('listitem');
+        const listItem: HTMLLIElement = getItem();
         fireEvent.mouseEnter(listItem);
         fireEvent.mouseLeave(listItem);
 
@@ -123,7 +125,7 @@ describe('SuggestionWrapper', () => {
         });
 
         const customContent: HTMLElement = screen.getByTestId('custom-content');
-        fireEvent.mouseEnter(screen.getByRole('listitem'));
+        fireEvent.mouseEnter(getItem());
 
         expect(customContent).toHaveAttribute('data-active', 'true');
         expect(customContent).toHaveAttribute('data-hovered', 'true');

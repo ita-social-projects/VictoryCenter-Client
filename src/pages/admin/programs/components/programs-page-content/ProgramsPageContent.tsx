@@ -231,7 +231,7 @@ export const ProgramsPageContent = () => {
 
             updatePrograms((prev) => [addedProgram, ...prev]);
         },
-        [updatePrograms],
+        [updatePrograms, updateCategories],
     );
 
     const handleEditProgram = useCallback(
@@ -307,7 +307,7 @@ export const ProgramsPageContent = () => {
                 updateSearchedProgram(null);
             }
         },
-        [updateCategories, updatePrograms, isSearchResultView, fetchedSearchProgram],
+        [updateCategories, updatePrograms, updateSearchedProgram, isSearchResultView, fetchedSearchProgram],
     );
 
     // Category handlers

@@ -59,6 +59,13 @@ function SuggestionWrapperInner<T>(
         onMouseLeave?.();
     };
 
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLLIElement>) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onSelect();
+        }
+    };
+
     const contentProps: SuggestionContentRenderProps<T> = {
         item,
         isSuggestionActive: isActive,
@@ -74,6 +81,9 @@ function SuggestionWrapperInner<T>(
             onClick={onSelect}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            role="button"
+            tabIndex={0}
+            onKeyDown={handleKeyDown}
         >
             {RenderContentComponent ? (
                 <RenderContentComponent {...contentProps} ref={contentRef} />

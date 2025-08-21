@@ -149,7 +149,7 @@ export const SearchBar = <T,>({
         } else if ((event.key === 'Enter' || event.key === ' ') && activeIndex >= 0) {
             event.preventDefault();
             handleItemSelect(suggestions[activeIndex]);
-        } else if (event.key === 'Escape' || event.key === 'Tab') {
+        } else if (event.key === 'Escape') {
             setDropdownVisible(false);
         }
     };

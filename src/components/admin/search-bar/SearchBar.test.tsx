@@ -21,9 +21,11 @@ jest.mock(
 // @ts-ignore
 jest.mock('./suggestion-wrapper/SuggestionWrapper', () => ({
     SuggestionWrapper: ({ item, onSelect, onHover, getItemLabel, isActive }: SuggestionWrapperProps<TestItem>) => (
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
         <li
             className={`suggestion-item ${isActive ? 'active' : ''}`}
             onClick={onSelect}
+            onKeyDown={(e) => e.key === 'Enter' && onSelect?.()}
             onMouseEnter={() => onHover}
             data-testid={`suggestion-${getItemLabel(item)}`}
         >
@@ -244,13 +246,6 @@ describe('SearchBar', () => {
             renderSearchBar();
             typeInInput('a');
             pressKey('Escape');
-            expectDropdownToBeHidden();
-        });
-
-        it('closes dropdown with Tab key', () => {
-            renderSearchBar();
-            typeInInput('a');
-            pressKey('Tab');
             expectDropdownToBeHidden();
         });
     });

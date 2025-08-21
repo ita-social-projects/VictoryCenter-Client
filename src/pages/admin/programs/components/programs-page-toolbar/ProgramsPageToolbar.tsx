@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PlusIcon from '../../../../../assets/icons/plus.svg';
 import { Button } from '../../../../../components/admin/button/Button';
 import { Select } from '../../../../../components/admin/select/Select';
@@ -9,11 +9,10 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { ProgramSuggestion } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import {
-    PaginationRequestParams,
-    useEntitiesPaginationFetch,
-} from '../../../../../hooks/admin/fetch/use-entities-pagination-fetch/useEntitiesPaginationFetch';
 import './ProgramsPageToolbar.scss';
+import {
+    PaginationRequestParams, useDataPaginationFetch
+} from "../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch";
 
 const SUGGESTIONS_PAGE_SIZE = 5;
 const MIN_CHARACTERS_TO_SEARCH = 3;
@@ -35,6 +34,7 @@ export const ProgramsPageToolbar = ({
     statusFilterValue,
 }: ProgramPageToolbarProps) => {
     const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
+    const [localSuggestions, setLocalSuggestions] = useState<ProgramSuggestion[]>([]);
 
     const getSuggestions = useCallback(
         async (params: PaginationRequestParams) => {
@@ -49,46 +49,59 @@ export const ProgramsPageToolbar = ({
     );
 
     const {
-        entities: suggestions,
+        data: fetchedSuggestions,
         isLoading: isSuggestionsLoading,
         hasMore: isSuggestionsHasMore,
-        actions: suggestionsActions,
-    } = useEntitiesPaginationFetch({
-        fetchEntitiesHandler: getSuggestions,
+        fetchMore: fetchMoreSuggestions,
+        resetList: resetSuggestionsList,
+    } = useDataPaginationFetch<ProgramSuggestion>({
+        initialData: [],
+        fetchHandler: getSuggestions,
         autoFetchDependencies: [currentSearchTerm],
         autoFetchDisabled: currentSearchTerm.length < MIN_CHARACTERS_TO_SEARCH,
         pageSize: SUGGESTIONS_PAGE_SIZE,
     });
 
+    // Sync fetched suggestions with local state
     const onSearch = useCallback((query: string) => {
         setCurrentSearchTerm(query);
+        if (query.length < MIN_CHARACTERS_TO_SEARCH) {
+            setLocalSuggestions([]);
+        }
     }, []);
+
+    useEffect(() => {
+        setLocalSuggestions(fetchedSuggestions);
+    }, [fetchedSuggestions]);
 
     const onSuggestionSelected = useCallback(
         (suggestion: ProgramSuggestion) => {
             onProgramSelect?.(suggestion.id);
-            suggestionsActions.resetList();
+            resetSuggestionsList();
+            setLocalSuggestions([]);
             setCurrentSearchTerm('');
         },
-        [onProgramSelect, suggestionsActions],
+        [onProgramSelect, resetSuggestionsList],
     );
 
     const handleSearchClear = useCallback(() => {
-        suggestionsActions.resetList();
+        resetSuggestionsList();
+        setLocalSuggestions([]);
+        setCurrentSearchTerm('');
         onSearchClear?.();
-    }, [onSearchClear, suggestionsActions]);
+    }, [onSearchClear, resetSuggestionsList]);
 
     return (
         <>
             <div className="programs-toolbar">
                 <div className="programs-toolbar-search">
                     <SearchBar<ProgramSuggestion>
-                        suggestions={suggestions}
+                        suggestions={localSuggestions}
                         onSuggestionSelect={onSuggestionSelected}
                         getSuggestionKey={(suggestion) => suggestion.id}
                         getSuggestionLabel={(suggestion) => suggestion.name}
                         renderSuggestionComponent={ProgramSuggestionItem}
-                        onLoadMore={suggestionsActions.fetchMore}
+                        onLoadMore={fetchMoreSuggestions}
                         hasMore={isSuggestionsHasMore}
                         isLoading={isSuggestionsLoading}
                         onQueryChange={onSearch}

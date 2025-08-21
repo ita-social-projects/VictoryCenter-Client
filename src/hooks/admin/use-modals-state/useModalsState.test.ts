@@ -16,17 +16,6 @@ describe('useModalsState', () => {
         expect(result.current.isAnyModalOpened).toBe(false);
     });
 
-    it('should update modal state via updateModalState', () => {
-        const { result } = renderHook(() => useModalsState<string>());
-
-        act(() => {
-            result.current.openModalActions.openAddItemModal();
-        });
-
-        expect(result.current.modalState.isAddModalOpen).toBe(true);
-        expect(result.current.isAnyModalOpened).toBe(true);
-    });
-
     it('should open add item modal when no other modals are open', () => {
         const { result } = renderHook(() => useModalsState<string>());
 

@@ -58,14 +58,14 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
     ),
 }));
 
-jest.mock('../../../../../hooks/admin/fetch/use-entities-pagination-fetch/useEntitiesPaginationFetch');
+jest.mock('../../../../../hooks/admin/fetch/use-entities-pagination-fetch/useDataPaginationFetch');
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 jest.mock('./program-suggestion-item/ProgramSuggestionItem', () => ({
     ProgramSuggestionItem: ({ item }: any) => <div data-testid="suggestion-item">{item.name}</div>,
 }));
 
 const mockUseEntitiesPaginationFetch =
-    require('../../../../../hooks/admin/fetch/use-entities-pagination-fetch/useEntitiesPaginationFetch').useEntitiesPaginationFetch;
+    require('../../../../../hooks/admin/fetch/use-entities-pagination-fetch/useDataPaginationFetch').useEntitiesPaginationFetch;
 const mockProgramsApi = require('../../../../../services/api/admin/programs/programs-api').ProgramsApi;
 
 // Helper functions

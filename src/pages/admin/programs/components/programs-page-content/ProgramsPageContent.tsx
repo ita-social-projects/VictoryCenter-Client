@@ -7,24 +7,23 @@ import { InfiniteScrollList } from '../../../../../components/admin/infinite-scr
 import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/category-bar/CategoryBar';
 import { ProgramListItem } from '../program-list-item/ProgramListItem';
 import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
-import {
-    PaginationRequestParams,
-    useEntitiesPaginationFetch,
-} from '../../../../../hooks/admin/fetch/use-entities-pagination-fetch/useEntitiesPaginationFetch';
-import { useEntitiesFetch } from '../../../../../hooks/admin/fetch/use-entities-fetch/useEntitiesFetch';
-import { useEntityFetch } from '../../../../../hooks/admin/fetch/use-entity-fetch/useEntityFetch';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { RequestOptions } from '../../../../../types/common/api';
 import './ProgramsPageContent.scss';
+import {useDataFetch} from "../../../../../hooks/admin/fetch/use-data-fetch/useDataFetch";
+import {
+    PaginationRequestParams,
+    useDataPaginationFetch
+} from "../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch";
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
 
 interface ErrorState {
     message: string | null;
-    type: 'categories' | 'programs' | null;
+    type: 'categories' | 'programs' | 'search' | null;
 }
 
 export const ProgramsPageContent = () => {
@@ -60,56 +59,67 @@ export const ProgramsPageContent = () => {
         [selectedCategory, statusFilter],
     );
 
-    const getProgramById = useCallback(
-        async (entityId: number, apiOptions: RequestOptions): Promise<Program | null> => {
-            return ProgramsApi.fetchProgramById(entityId, apiOptions);
+    const getSearchedProgram = useCallback(
+        async (options: RequestOptions): Promise<Program | null> => {
+            if (!searchProgramId) {
+                return null;
+            }
+
+            return ProgramsApi.fetchProgramById(searchProgramId, options);
         },
-        [],
+        [searchProgramId],
     );
 
-    // Data fetching hooks
-    const customAddProgramHandler = useCallback((prev: Program[], newProgram: Program): Program[] => {
-        return [newProgram, ...prev];
-    }, []);
+    const getProgramId = useCallback((program: Program) => program.id, []);
 
+    // Data fetching hooks
     const {
-        entities: categories,
-        error: categoriesFetchError,
+        data: categories,
+        error: categoriesError,
         isLoading: isCategoriesLoading,
-        actions: categoriesActions,
-    } = useEntitiesFetch<ProgramCategory>({
-        fetchEntitiesHandler: getProgramCategories,
+        setData: updateCategories,
+        refetch: refetchCategories,
+    } = useDataFetch<ProgramCategory[]>({
+        initialData: [],
+        fetchHandler: getProgramCategories,
         autoFetchDependencies: [],
-        autoFetchDisabled: true,
+        autoFetchDisabled: false,
     });
 
     const {
-        entities: programs,
+        data: fetchedPrograms,
         isLoading: isProgramsLoading,
         hasMore: isHasMorePrograms,
         error: programsFetchError,
-        actions: programsActions,
-    } = useEntitiesPaginationFetch<Program>({
-        fetchEntitiesHandler: getFilteredPrograms,
+        fetchMore: fetchMorePrograms,
+        fetchFromStart: fetchProgramsFromStart,
+        resetList: resetProgramsList,
+        setData: updatePrograms,
+    } = useDataPaginationFetch<Program>({
+        initialData: [],
+        getUniqueId: getProgramId,
+        fetchHandler: getFilteredPrograms,
         autoFetchDependencies: [selectedCategory, statusFilter],
         autoFetchDisabled: isSearchResultView,
         pageSize: pageSize,
-        customAddEntityHandler: customAddProgramHandler,
     });
 
     const {
-        entity: searchedProgram,
+        data: fetchedSearchProgram,
         isLoading: isSearchProgramLoading,
         error: searchProgramError,
-        actions: searchProgramActions,
-    } = useEntityFetch<Program, number>({
-        fetchEntityHandler: getProgramById,
-        entityId: searchProgramId,
+        setData: updateSearchedProgram,
+        refetch: refetchSearchProgram,
+    } = useDataFetch<Program | null>({
+        initialData: null,
+        fetchHandler: getSearchedProgram,
+        autoFetchDependencies: [searchProgramId],
+        autoFetchDisabled: !isSearchResultView || !searchProgramId,
     });
 
     // Errors handling
     const setErrorState = useCallback(
-        (message: string, type: 'categories' | 'programs') => setError({ message, type }),
+        (message: string, type: 'categories' | 'programs' | 'search') => setError({ message, type }),
         [],
     );
     const clearError = useCallback(() => setError({ message: null, type: null }), []);
@@ -118,21 +128,21 @@ export const ProgramsPageContent = () => {
         clearError();
 
         if (error.type === 'categories') {
-            categoriesActions.refetch();
+            refetchCategories();
         } else if (error.type === 'programs') {
             if (isSearchResultView) {
-                searchProgramActions.refetch();
+                refetchSearchProgram();
             } else {
-                programsActions.fetchFromStart();
+                fetchProgramsFromStart();
             }
         }
-    }, [clearError, isSearchResultView, error.type, categoriesActions, searchProgramActions, programsActions]);
+    }, [isSearchResultView, clearError, error.type, refetchCategories, refetchSearchProgram, fetchProgramsFromStart]);
 
     useEffect(() => {
-        if (categoriesFetchError) {
+        if (categoriesError) {
             setErrorState(PROGRAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
         }
-    }, [categoriesFetchError, setErrorState]);
+    }, [categoriesError, setErrorState]);
 
     useEffect(() => {
         if (programsFetchError) {
@@ -142,17 +152,17 @@ export const ProgramsPageContent = () => {
 
     useEffect(() => {
         if (searchProgramError) {
-            setErrorState(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAM, 'programs');
+            setErrorState(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAM, 'search');
         }
     }, [searchProgramError, setErrorState]);
 
     // Init + Auto-selection
     useEffect(() => {
-        categoriesActions.refetch();
-    }, []);
+        refetchCategories();
+    }, [refetchCategories]);
 
     useEffect(() => {
-        if (!selectedCategory && categories.length > 0) {
+        if (!selectedCategory && categories && categories.length > 0) {
             setSelectedCategory(categories[0]);
         }
     }, [categories, selectedCategory]);
@@ -161,14 +171,8 @@ export const ProgramsPageContent = () => {
         if (selectedCategory) {
             clearError();
         }
-    }, [selectedCategory, statusFilter, clearError]);
-
-    useEffect(() => {
-        if (searchProgramId !== undefined) {
-            clearError();
-            searchProgramActions.refetch();
-        }
-    }, [searchProgramId, searchProgramActions, clearError]);
+        fetchProgramsFromStart();
+    }, [selectedCategory, statusFilter, clearError, fetchProgramsFromStart]);
 
     // Resize handling
     const updatePageSize = () => {
@@ -186,7 +190,7 @@ export const ProgramsPageContent = () => {
 
     useEffect(() => {
         updatePageSize();
-    }, [listContainerRef]);
+    }, []);
 
     // Toolbar handlers
     const onStatusFilterChange = useCallback(
@@ -194,53 +198,50 @@ export const ProgramsPageContent = () => {
             setStatusFilter(status);
             setIsSearchResultView(false);
             setSearchProgramId(undefined);
-            searchProgramActions.resetEntity();
+            updateSearchedProgram(null);
         },
-        [searchProgramActions],
+        [updateSearchedProgram],
     );
 
     const handleProgramSuggestionSelect = useCallback(
         (programId: number) => {
             setIsSearchResultView(true);
             setSearchProgramId(programId);
-            programsActions.resetList();
+            resetProgramsList();
         },
-        [programsActions],
+        [resetProgramsList],
     );
 
     const handleSearchClear = useCallback(() => {
         setIsSearchResultView(false);
         setSearchProgramId(undefined);
-        searchProgramActions.resetEntity();
-    }, [searchProgramActions]);
+        updateSearchedProgram(null);
+    }, [updateSearchedProgram]);
 
     // Program handlers
-    const handleAddProgram = useCallback(
-        (addedProgram: Program) => {
-            // Update program counters in categories
-            const addedCategoryIds = new Set(addedProgram.categories.map((c) => c.id));
-            categoriesActions.setEntities((prevCategories) =>
-                prevCategories.map((cat) =>
-                    addedCategoryIds.has(cat.id) ? { ...cat, programsCount: cat.programsCount + 1 } : cat,
-                ),
-            );
+    const handleAddProgram = useCallback((addedProgram: Program) => {
+        // Update program counters in categories
+        const addedCategoryIds = new Set(addedProgram.categories.map((c) => c.id));
+        updateCategories((prevCategories) =>
+            prevCategories.map((cat) =>
+                addedCategoryIds.has(cat.id) ? { ...cat, programsCount: cat.programsCount + 1 } : cat,
+            ),
+        );
 
-            programsActions.addEntity(addedProgram);
-        },
-        [categoriesActions, programsActions],
-    );
+        updatePrograms((prev) => [addedProgram, ...prev]);
+    }, [updatePrograms]);
 
     const handleEditProgram = useCallback(
         (updatedProgram: Program) => {
             // Find original program
-            const originalProgram = programs.find((p) => p.id === updatedProgram.id);
+            const originalProgram = fetchedPrograms.find((p) => p.id === updatedProgram.id);
             if (!originalProgram) return;
 
             const originalCategoryIds = new Set(originalProgram.categories.map((c) => c.id));
             const updatedCategoryIds = new Set(updatedProgram.categories.map((c) => c.id));
 
             // Update program counters in categories
-            categoriesActions.setEntities((prevCategories) =>
+            updateCategories((prevCategories) =>
                 prevCategories.map((category) => {
                     const wasInCategory = originalCategoryIds.has(category.id);
                     const isInCategory = updatedCategoryIds.has(category.id);
@@ -252,29 +253,41 @@ export const ProgramsPageContent = () => {
                         return { ...category, programsCount: Math.max(0, category.programsCount - 1) };
                     }
 
-                    // If nothing changed
                     return category;
                 }),
             );
 
-            // Apply edited program to list
+            // Update program in local programs list
             const belongsToSelectedCategory =
                 selectedCategory && updatedProgram.categories.some((cat) => cat.id === selectedCategory.id);
 
             if (belongsToSelectedCategory) {
-                programsActions.updateEntity(updatedProgram);
+                updatePrograms((prev) => prev.map((p) => (p.id === updatedProgram.id ? updatedProgram : p)));
             } else {
-                programsActions.removeEntity(updatedProgram.id);
+                updatePrograms((prev) => prev.filter((p) => p.id !== updatedProgram.id));
+            }
+
+            // Update searched program if it's the same
+            if (isSearchResultView && fetchedSearchProgram?.id === updatedProgram.id) {
+                updateSearchedProgram(updatedProgram);
             }
         },
-        [categoriesActions, programsActions, selectedCategory, programs],
+        [
+            updateCategories,
+            updateSearchedProgram,
+            updatePrograms,
+            fetchedPrograms,
+            selectedCategory,
+            isSearchResultView,
+            fetchedSearchProgram,
+        ],
     );
 
     const handleDeleteProgram = useCallback(
         (program: Program) => {
             // Update program counters in categories
             const deletedFromCategoryIds = new Set(program.categories.map((c) => c.id));
-            categoriesActions.setEntities((prevCategories) =>
+            updateCategories((prevCategories) =>
                 prevCategories.map((cat) =>
                     deletedFromCategoryIds.has(cat.id)
                         ? { ...cat, programsCount: Math.max(0, cat.programsCount - 1) }
@@ -282,57 +295,60 @@ export const ProgramsPageContent = () => {
                 ),
             );
 
-            programsActions.removeEntity(program.id);
+            // Remove program from local programs list
+            updatePrograms((prev) => prev.filter((p) => p.id !== program.id));
 
-            if (isSearchResultView && searchedProgram?.id === program.id) {
+            if (isSearchResultView && fetchedSearchProgram?.id === program.id) {
                 setSearchProgramId(undefined);
                 setIsSearchResultView(false);
+                updateSearchedProgram(null);
             }
         },
-        [categoriesActions, programsActions, isSearchResultView, searchedProgram],
+        [updateCategories, updatePrograms, isSearchResultView, fetchedSearchProgram],
     );
 
     // Category handlers
-    const handleCategorySelect = useCallback((category: ProgramCategory) => {
-        setSelectedCategory(category);
-        setSearchProgramId(undefined);
-        setIsSearchResultView(false);
-    }, []);
+    const handleCategorySelect = useCallback(
+        (category: ProgramCategory) => {
+            setSelectedCategory(category);
+            setSearchProgramId(undefined);
+            setIsSearchResultView(false);
+            updateSearchedProgram(null);
+        },
+        [updateSearchedProgram],
+    );
 
     const handleAddCategory = useCallback(
         (newCategory: ProgramCategory) => {
-            categoriesActions.addEntity(newCategory);
+            updateCategories((prev) => [...prev, newCategory]);
         },
-        [categoriesActions],
+        [updateCategories],
     );
 
     const handleEditCategory = useCallback(
         (updatedCategory: ProgramCategory) => {
-            categoriesActions.updateEntity(updatedCategory);
+            updateCategories((prev) => prev.map((cat) => (cat.id === updatedCategory.id ? updatedCategory : cat)));
         },
-        [categoriesActions],
+        [updateCategories],
     );
 
     const handleDeleteCategory = useCallback(
         (categoryIdToDelete: number) => {
-            categoriesActions.setEntities((prev) => {
+            updateCategories((prev) => {
                 const filtered = prev.filter((category) => category.id !== categoryIdToDelete);
 
                 if (selectedCategory?.id === categoryIdToDelete && filtered.length > 0) {
-                    if (filtered.length > 0) {
-                        // Look for first available category
-                        const currentCategoryIndex = prev.findIndex((category) => category.id === categoryIdToDelete);
-                        const nextCategory = filtered[Math.min(currentCategoryIndex, filtered.length - 1)];
-                        setSelectedCategory(nextCategory);
-                    } else {
-                        setSelectedCategory(null);
-                    }
+                    const currentCategoryIndex = prev.findIndex((category) => category.id === categoryIdToDelete);
+                    const nextCategory = filtered[Math.min(currentCategoryIndex, filtered.length - 1)];
+                    setSelectedCategory(nextCategory);
+                } else if (filtered.length === 0) {
+                    setSelectedCategory(null);
                 }
 
                 return filtered;
             });
         },
-        [categoriesActions, selectedCategory],
+        [updateCategories, selectedCategory],
     );
 
     // Context menu handlers
@@ -371,6 +387,9 @@ export const ProgramsPageContent = () => {
         [openModalActions],
     );
 
+    // Get the items to display
+    const displayItems = isSearchResultView ? (fetchedSearchProgram ? [fetchedSearchProgram] : []) : fetchedPrograms;
+
     return (
         <div className="programs-page-wrapper" data-testid="programs-page-content">
             <div className="programs-page-toolbar-container">
@@ -405,9 +424,9 @@ export const ProgramsPageContent = () => {
                 )}
 
                 <InfiniteScrollList<Program>
-                    items={isSearchResultView && searchedProgram ? [searchedProgram] : programs}
+                    items={displayItems}
                     renderItem={renderProgramItem}
-                    onLoadMore={programsActions.fetchMore}
+                    onLoadMore={fetchMorePrograms}
                     hasMore={isSearchResultView ? false : isHasMorePrograms}
                     isLoading={isProgramsLoading || isCategoriesLoading || isSearchProgramLoading}
                     emptyStateMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}

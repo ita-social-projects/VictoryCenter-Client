@@ -2,13 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/admin/button/Button';
 import { HintBox } from '../../../../../components/admin/hint-box/HintBox';
-import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
+import { SingleSelectInputGroup } from '../../../../../components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
-import './ProgramCategoryModal.scss';
 import { ProgramCategory } from '../../../../../types/admin/programs';
-import { SingleSelectInput } from '../../../../../components/common/single-select-input/SingleSelectInput';
+import './ProgramCategoryModal.scss';
 
 interface DeleteCategoryModalProps {
     isOpen: boolean;
@@ -71,22 +70,18 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
             <Modal.Title>{PROGRAM_CATEGORY_TEXT.FORM.TITLE.DELETE_CATEGORY}</Modal.Title>
             <Modal.Content>
                 <div className="program-form-main">
-                    <div className="form-group">
-                        <InputLabel
-                            htmlFor={'delete-category-select'}
-                            isRequired={true}
-                            text={PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
-                        />
-                        <SingleSelectInput
-                            options={categories}
-                            getOptionId={(c) => c.id}
-                            getOptionName={(c) => c.name}
-                            placeholder={''}
-                            onChange={handleCategoryChange}
-                            disabled={isSubmitting}
-                            value={selectedCategory}
-                        />
-                    </div>
+                    <SingleSelectInputGroup
+                        id="delete-category-select"
+                        label={PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
+                        isRequired={true}
+                        options={categories}
+                        getOptionId={(c) => c.id}
+                        getOptionName={(c) => c.name}
+                        placeholder=""
+                        onChange={handleCategoryChange}
+                        disabled={isSubmitting}
+                        value={selectedCategory}
+                    />
                     {selectedCategory && selectedCategory.programsCount > 0 && (
                         <HintBox
                             title={PROGRAM_CATEGORY_VALIDATION.programsCount.getHasProgramsCountError(

@@ -2,16 +2,15 @@ import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/admin/button/Button';
 import { HintBox } from '../../../../../components/admin/hint-box/HintBox';
-import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
 import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { SingleSelectInputGroup } from '../../../../../components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
 import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/admin/programs';
 import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-category-schema/program-category-schema';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './ProgramCategoryModal.scss';
-import { SingleSelectInput } from '../../../../../components/common/single-select-input/SingleSelectInput';
 
 interface ProgramCategoryFormValues {
     name: string;
@@ -263,22 +262,18 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                 <Modal.Content>
                     <form onSubmit={(e) => e.preventDefault()} className="program-form-main" id={getFormId()}>
                         {mode === 'edit' && (
-                            <div className="form-group">
-                                <InputLabel
-                                    htmlFor={getFieldId('select')}
-                                    text={PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
-                                    isRequired
-                                />
-                                <SingleSelectInput
-                                    options={categories}
-                                    getOptionId={(c) => c.id}
-                                    getOptionName={(c) => c.name}
-                                    disabled={isSubmitting}
-                                    onChange={handleCategoryChange}
-                                    placeholder={''}
-                                    value={selectedCategoryRef.current || undefined}
-                                />
-                            </div>
+                            <SingleSelectInputGroup
+                                id={getFieldId('select')}
+                                label={PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
+                                isRequired={true}
+                                options={categories}
+                                getOptionId={(c) => c.id}
+                                getOptionName={(c) => c.name}
+                                disabled={isSubmitting}
+                                onChange={handleCategoryChange}
+                                placeholder={''}
+                                value={selectedCategoryRef.current || undefined}
+                            />
                         )}
 
                         <InputWithCharacterLimitGroup

@@ -99,7 +99,7 @@ export const ProgramsPageContent = () => {
         initialData: [],
         getUniqueId: getProgramId,
         fetchHandler: getFilteredPrograms,
-        autoFetchDependencies: [selectedCategory, statusFilter],
+        autoFetchDependencies: [selectedCategory?.id, statusFilter],
         autoFetchDisabled: isSearchResultView,
         pageSize: pageSize,
     });

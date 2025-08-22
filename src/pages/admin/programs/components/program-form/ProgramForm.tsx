@@ -5,11 +5,11 @@ import { InputWithCharacterLimitGroup } from '../../../../../components/admin/in
 import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { MultiSelectInputGroup } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
 import { PhotoInputGroup } from '../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup';
+import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
 import { Image, ImageValues, ImageValuesToImage, ImageToImageValue } from '../../../../../types/common/image';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import './ProgramForm.scss';
-import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
 
 export interface ProgramFormValues {
     name: string;

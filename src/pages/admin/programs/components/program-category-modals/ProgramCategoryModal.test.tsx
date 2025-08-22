@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramCategoryModal, ProgramCategoryModalProps } from './ProgramCategoryModal';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
@@ -270,7 +270,10 @@ describe('ProgramCategoryModal - Edit Mode', () => {
             expect(getNameInput()).toBeDisabled();
         });
 
-        resolveRequest();
+        await act(async () => {
+            resolveRequest();
+            await longRunningPromise;
+        });
     });
 
     it('shows duplicate name hint and disables Save when name matches other category', () => {

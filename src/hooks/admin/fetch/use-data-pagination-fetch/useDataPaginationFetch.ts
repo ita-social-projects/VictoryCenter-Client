@@ -140,7 +140,7 @@ export const useDataPaginationFetch = <TResult>({
 
         fetchFromStart();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [autoFetchDisabled, fetchFromStart, ...autoFetchDependencies]);
+    }, [autoFetchDisabled, fetchFromStart, pageSize, ...autoFetchDependencies]);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -149,12 +149,12 @@ export const useDataPaginationFetch = <TResult>({
 
     return {
         data: fetchedData,
-        isLoading,
-        hasMore,
-        error,
-        fetchMore,
-        fetchFromStart,
+        isLoading: isLoading,
+        hasMore: hasMore,
+        error: error,
+        fetchMore: fetchMore,
+        fetchFromStart: fetchFromStart,
+        resetList: resetList,
         setData: setFetchedData,
-        resetList,
     };
 };

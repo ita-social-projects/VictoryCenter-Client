@@ -10,11 +10,11 @@ import { useDebouncedValueCallback } from '../../../hooks/common/use-debounced-v
 import { useObserveElementSize } from '../../../hooks/common/use-observe-element-size/useObserveElementSize';
 import { useContainerSizeFromChildren } from '../../../hooks/common/use-container-size-from-children/useContainerSizeFromChildren';
 import {
-    SuggestionWrapper,
-    SuggestionContentRenderProps,
-    SuggestionWrapperRef,
-    SuggestionContentRef,
-} from './suggestion-wrapper/SuggestionWrapper';
+    SearchItemWrapper,
+    SearchItemContentRenderProps,
+    SearchItemWrapperRef,
+    SearchItemContentRef,
+} from './search-item-wrapper/SearchItemWrapper';
 import './SearchBar.scss';
 
 export const TOOLTIP_WIDTH_MULTIPLY = 1.5;
@@ -26,7 +26,7 @@ export interface SearchBarProps<T> {
     getSuggestionKey: (item: T) => string | number;
     getSuggestionLabel: (item: T) => string;
     renderSuggestionComponent?: React.ForwardRefExoticComponent<
-        SuggestionContentRenderProps<T> & React.RefAttributes<SuggestionContentRef>
+        SearchItemContentRenderProps<T> & React.RefAttributes<SearchItemContentRef>
     >;
     onLoadMore: () => void;
     isLoading: boolean;
@@ -73,7 +73,7 @@ export const SearchBar = <T,>({
     const searchContainerRef = useRef<HTMLDivElement>(null);
     const suggestionsListRef = useRef<HTMLUListElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const suggestionRefs = useRef<Map<string | number, React.RefObject<SuggestionWrapperRef | null>>>(new Map());
+    const suggestionRefs = useRef<Map<string | number, React.RefObject<SearchItemWrapperRef | null>>>(new Map());
     const tooltipRef = useRef(null);
 
     const hideTooltip = useCallback(() => {
@@ -181,7 +181,7 @@ export const SearchBar = <T,>({
 
     useDebouncedValueCallback({
         value: debouncedValue,
-        delay: searchDelayMs,
+        delayMs: searchDelayMs,
         isDisabled: debouncedValue.length < minCharactersToSearch,
         callback: onDebouncedCallback,
     });
@@ -213,7 +213,7 @@ export const SearchBar = <T,>({
     suggestionRefs.current.clear();
     suggestions.forEach((item) => {
         const key = getSuggestionKey(item);
-        suggestionRefs.current.set(key, React.createRef<SuggestionWrapperRef>());
+        suggestionRefs.current.set(key, React.createRef<SearchItemWrapperRef>());
     });
 
     const isShowClearButton = searchQuery.length > 0;
@@ -262,7 +262,7 @@ export const SearchBar = <T,>({
                             {suggestions.map((item, index) => {
                                 const key = getSuggestionKey(item);
                                 return (
-                                    <SuggestionWrapper<T>
+                                    <SearchItemWrapper<T>
                                         ref={suggestionRefs.current.get(key)}
                                         key={key}
                                         item={item}

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SearchBar, SearchBarProps } from './SearchBar';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { SuggestionWrapperProps } from './suggestion-wrapper/SuggestionWrapper';
+import { SearchItemWrapperProps } from './search-item-wrapper/SearchItemWrapper';
 import { TooltipProps } from '../tooltip/Tooltip';
 
 interface TestItem {
@@ -18,7 +18,7 @@ jest.mock('../../../hooks/common/use-container-size-from-children/useContainerSi
 
 // @ts-ignore
 jest.mock('./suggestion-wrapper/SuggestionWrapper', () => ({
-    SuggestionWrapper: ({ item, onSelect, onHover, getItemLabel, isActive }: SuggestionWrapperProps<TestItem>) => (
+    SuggestionWrapper: ({ item, onSelect, onHover, getItemLabel, isActive }: SearchItemWrapperProps<TestItem>) => (
         // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
         <li
             className={`suggestion-item ${isActive ? 'active' : ''}`}

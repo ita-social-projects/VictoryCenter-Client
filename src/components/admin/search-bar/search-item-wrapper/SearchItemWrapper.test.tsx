@@ -1,19 +1,19 @@
 import React, { createRef, forwardRef } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import {
-    SuggestionWrapper,
-    SuggestionWrapperProps,
-    SuggestionWrapperRef,
-    SuggestionContentRef,
-    SuggestionContentRenderProps,
-} from './SuggestionWrapper';
+    SearchItemWrapper,
+    SearchItemWrapperProps,
+    SearchItemWrapperRef,
+    SearchItemContentRef,
+    SearchItemContentRenderProps,
+} from './SearchItemWrapper';
 
 interface TestItem {
     id: number;
     name: string;
 }
 
-const defaultProps: SuggestionWrapperProps<TestItem> = {
+const defaultProps: SearchItemWrapperProps<TestItem> = {
     item: { id: 1, name: 'Test Item' },
     isActive: false,
     onSelect: jest.fn(),
@@ -21,16 +21,16 @@ const defaultProps: SuggestionWrapperProps<TestItem> = {
     getItemLabel: (item: TestItem) => item.name,
 };
 
-const renderComponent = (props: Partial<SuggestionWrapperProps<TestItem>> = {}) => {
-    const finalProps: SuggestionWrapperProps<TestItem> = { ...defaultProps, ...props };
-    const ref = createRef<SuggestionWrapperRef>();
+const renderComponent = (props: Partial<SearchItemWrapperProps<TestItem>> = {}) => {
+    const finalProps: SearchItemWrapperProps<TestItem> = { ...defaultProps, ...props };
+    const ref = createRef<SearchItemWrapperRef>();
 
-    const view = render(<SuggestionWrapper {...finalProps} ref={ref} />);
+    const view = render(<SearchItemWrapper {...finalProps} ref={ref} />);
 
     return { ref, ...view };
 };
 
-const MockRenderContent = forwardRef<SuggestionContentRef, SuggestionContentRenderProps<TestItem>>(
+const MockRenderContent = forwardRef<SearchItemContentRef, SearchItemContentRenderProps<TestItem>>(
     ({ item, isSuggestionActive, isSuggestionHovered }, ref) => (
         <div
             data-testid="custom-content"
@@ -67,7 +67,7 @@ describe('SuggestionWrapper', () => {
         renderComponent({ isActive: true });
 
         const listItem: HTMLLIElement = getItem();
-        expect(listItem).toHaveClass('suggestion-wrapper--active');
+        expect(listItem).toHaveClass('search-item-wrapper--active');
     });
 
     it('should call onSelect when clicked', () => {
@@ -105,7 +105,7 @@ describe('SuggestionWrapper', () => {
         const listItem: HTMLLIElement = getItem();
         fireEvent.mouseEnter(listItem);
 
-        expect(listItem).toHaveClass('suggestion-wrapper--active');
+        expect(listItem).toHaveClass('search-item-wrapper--active');
     });
 
     it('should remove active class when mouse leaves after hover', () => {
@@ -115,7 +115,7 @@ describe('SuggestionWrapper', () => {
         fireEvent.mouseEnter(listItem);
         fireEvent.mouseLeave(listItem);
 
-        expect(listItem).not.toHaveClass('suggestion-wrapper--active');
+        expect(listItem).not.toHaveClass('search-item-wrapper--active');
     });
 
     it('should pass correct props to custom render content', () => {

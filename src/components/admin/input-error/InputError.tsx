@@ -5,6 +5,5 @@ export interface InputErrorProps {
 }
 
 export const InputError = ({ error }: InputErrorProps) => {
-    if (!error) return null;
-    return <span className="input-error">{error}</span>;
+    return error ? <span className="input-error">{error}</span> : null;
 };

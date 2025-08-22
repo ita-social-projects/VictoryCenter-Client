@@ -1,10 +1,10 @@
 import React, { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
-import { ProgramSuggestionItem, ProgramSuggestionItemProps } from './ProgramSuggestionItem';
-import { SuggestionContentRef } from '../../../../../../components/admin/search-bar/suggestion-wrapper/SuggestionWrapper';
+import { ProgramSearchItem, ProgramSearchItemProps } from './ProgramSearchItem';
+import { SearchItemContentRef } from '../../../../../../components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
 import { ProgramSuggestion } from '../../../../../../types/admin/programs';
 
-const defaultProps: ProgramSuggestionItemProps = {
+const defaultProps: ProgramSearchItemProps = {
     item: {
         id: 1,
         name: 'Test Program',
@@ -12,11 +12,11 @@ const defaultProps: ProgramSuggestionItemProps = {
     } as ProgramSuggestion,
 };
 
-const renderComponent = (props: Partial<ProgramSuggestionItemProps> = {}) => {
-    const finalProps: ProgramSuggestionItemProps = { ...defaultProps, ...props };
-    const ref = createRef<SuggestionContentRef>();
+const renderComponent = (props: Partial<ProgramSearchItemProps> = {}) => {
+    const finalProps: ProgramSearchItemProps = { ...defaultProps, ...props };
+    const ref = createRef<SearchItemContentRef>();
 
-    const view = render(<ProgramSuggestionItem {...finalProps} ref={ref} />);
+    const view = render(<ProgramSearchItem {...finalProps} ref={ref} />);
 
     return { ref, ...view };
 };
@@ -53,7 +53,7 @@ describe('ProgramSuggestionItem', () => {
 
         const categoriesElement: HTMLElement = screen.getByText(defaultProps.item.name)
             .nextElementSibling as HTMLElement;
-        expect(categoriesElement).toHaveClass('program-suggestion-item__categories');
+        expect(categoriesElement).toHaveClass('program-search-item__categories');
         expect(categoriesElement).toHaveTextContent('');
     });
 
@@ -93,7 +93,7 @@ describe('ProgramSuggestionItem', () => {
         expect(tooltipContent).not.toBeNull();
         expect(React.isValidElement(tooltipContent)).toBe(true);
         // @ts-ignore
-        expect(tooltipContent?.props.className).toBe('program-suggestion-item-tooltip');
+        expect(tooltipContent?.props.className).toBe('program-search-item-tooltip');
     });
 
     it('should return tooltip content when categories overflow', () => {
@@ -147,8 +147,8 @@ describe('ProgramSuggestionItem', () => {
 
         expect(nameDiv.props.children).toBe(testName);
         expect(categoriesDiv.props.children).toBe('Test Category');
-        expect(nameDiv.props.className).toBe('program-suggestion-item-tooltip__name');
-        expect(categoriesDiv.props.className).toBe('program-suggestion-item-tooltip__categories');
+        expect(nameDiv.props.className).toBe('program-search-item-tooltip__name');
+        expect(categoriesDiv.props.className).toBe('program-search-item-tooltip__categories');
     });
 
     it('should update tooltip when item changes', () => {
@@ -165,7 +165,7 @@ describe('ProgramSuggestionItem', () => {
             categories: ['Updated Category'],
         };
 
-        rerender(<ProgramSuggestionItem item={updatedItem} ref={ref} />);
+        rerender(<ProgramSearchItem item={updatedItem} ref={ref} />);
 
         const nameElement: HTMLElement = screen.getByText('Updated Name');
         Object.defineProperty(nameElement, 'scrollWidth', { value: 200 });

@@ -2,14 +2,14 @@ import { useEffect } from 'react';
 
 export interface UseDebouncedValueCallbackProps<T> {
     value: T;
-    delay: number;
+    delayMs: number;
     callback: (value: T) => void;
     isDisabled?: boolean;
 }
 
 export const useDebouncedValueCallback = <T>({
     value,
-    delay,
+    delayMs,
     callback,
     isDisabled = false,
 }: UseDebouncedValueCallbackProps<T>): void => {
@@ -20,10 +20,10 @@ export const useDebouncedValueCallback = <T>({
 
         const handler = setTimeout(() => {
             callback(value);
-        }, delay);
+        }, delayMs);
 
         return () => {
             clearTimeout(handler);
         };
-    }, [value, delay, callback, isDisabled]);
+    }, [value, delayMs, callback, isDisabled]);
 };

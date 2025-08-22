@@ -1,12 +1,12 @@
 import React, { useRef, useMemo, useImperativeHandle, forwardRef } from 'react';
-import { SuggestionContentRef } from '../suggestion-wrapper/SuggestionWrapper';
-import './TextSuggestionContent.scss';
+import { SearchItemContentRef } from '../search-item-wrapper/SearchItemWrapper';
+import './TextSearchItem.scss';
 
-export interface TextSuggestionContentProps {
+export interface TextSearchItemProps {
     label: string;
 }
 
-export const TextSuggestionContent = forwardRef<SuggestionContentRef, TextSuggestionContentProps>(({ label }, ref) => {
+export const TextSearchItem = forwardRef<SearchItemContentRef, TextSearchItemProps>(({ label }, ref) => {
     const textRef = useRef<HTMLSpanElement>(null);
 
     const tooltipContent = useMemo(() => <div className="text-suggestion-content__tooltip">{label}</div>, [label]);

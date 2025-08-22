@@ -61,7 +61,7 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
 // Правильний мок для useDataPaginationFetch
 jest.mock('../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch');
 jest.mock('../../../../../services/api/admin/programs/programs-api');
-jest.mock('./program-suggestion-item/ProgramSuggestionItem', () => ({
+jest.mock('./program-suggestion-item/ProgramSearchItem', () => ({
     ProgramSuggestionItem: ({ item }: any) => <div data-testid="suggestion-item">{item.name}</div>,
 }));
 

@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 
-export const DEFAULT_BOTTOM_REACH_THRESHOLD_IN_PIXELS = 5;
+const DEFAULT_BOTTOM_REACH_THRESHOLD_IN_PIXELS = 5;
 
 export interface UseScrollHandlerProps {
     onReachBottom: () => void;

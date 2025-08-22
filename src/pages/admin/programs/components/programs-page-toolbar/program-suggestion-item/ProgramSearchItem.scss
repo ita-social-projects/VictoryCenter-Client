@@ -1,6 +1,6 @@
 @use '../../../../../../assets/sass/variables/colors';
 
-.program-suggestion-item {
+.program-search-item {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -9,8 +9,8 @@
     padding: 0.25rem 0.5rem;
 }
 
-.program-suggestion-item__name,
-.program-suggestion-item__categories {
+.program-search-item__name,
+.program-search-item__categories {
     display: block;
     width: 100%;
     white-space: nowrap;
@@ -18,31 +18,31 @@
     text-overflow: ellipsis;
 }
 
-.program-suggestion-item__name {
+.program-search-item__name {
     font-size: 1rem;
     font-weight: 500;
 }
 
-.program-suggestion-item__categories {
+.program-search-item__categories {
     font-size: 0.875rem;
     margin-top: 0.125rem;
     color: colors.$grey-900;
 }
 
-.program-suggestion-item-tooltip__name,
-.program-suggestion-item-tooltip__categories {
+.program-search-item-tooltip__name,
+.program-search-item-tooltip__categories {
     display: block;
     width: 100%;
     white-space: normal;
     word-wrap: break-word;
 }
 
-.program-suggestion-item-tooltip__name {
+.program-search-item-tooltip__name {
     font-size: 1rem;
     font-weight: 500;
 }
 
-.program-suggestion-item-tooltip__categories {
+.program-search-item-tooltip__categories {
     font-size: 0.875rem;
     margin-top: 0.125rem;
     color: colors.$grey-900;

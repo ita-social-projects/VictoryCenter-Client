@@ -1,13 +1,13 @@
 import React, { useRef, useMemo, useImperativeHandle, forwardRef } from 'react';
 import { ProgramSuggestion } from '../../../../../../types/admin/programs';
-import { SuggestionContentRef } from '../../../../../../components/admin/search-bar/suggestion-wrapper/SuggestionWrapper';
+import { SearchItemContentRef } from '../../../../../../components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
 import './ProgramSuggestionItem.scss';
 
-export interface ProgramSuggestionItemProps {
+export interface ProgramSearchItemProps {
     item: ProgramSuggestion;
 }
 
-export const ProgramSuggestionItem = forwardRef<SuggestionContentRef, ProgramSuggestionItemProps>(({ item }, ref) => {
+export const ProgramSearchItem = forwardRef<SearchItemContentRef, ProgramSearchItemProps>(({ item }, ref) => {
     const nameRef = useRef<HTMLSpanElement>(null);
     const categoriesRef = useRef<HTMLSpanElement>(null);
 
@@ -15,9 +15,9 @@ export const ProgramSuggestionItem = forwardRef<SuggestionContentRef, ProgramSug
 
     const tooltipContent = useMemo(
         () => (
-            <div className="program-suggestion-item-tooltip">
-                <div className="program-suggestion-item-tooltip__name">{item.name}</div>
-                <div className="program-suggestion-item-tooltip__categories">{categoriesText}</div>
+            <div className="program-search-item-tooltip">
+                <div className="program-search-item-tooltip__name">{item.name}</div>
+                <div className="program-search-item-tooltip__categories">{categoriesText}</div>
             </div>
         ),
         [item.name, categoriesText],
@@ -37,11 +37,11 @@ export const ProgramSuggestionItem = forwardRef<SuggestionContentRef, ProgramSug
     }));
 
     return (
-        <div className="program-suggestion-item">
-            <span ref={nameRef} className="program-suggestion-item__name">
+        <div className="program-search-item">
+            <span ref={nameRef} className="program-search-item__name">
                 {item.name}
             </span>
-            <span ref={categoriesRef} className="program-suggestion-item__categories">
+            <span ref={categoriesRef} className="program-search-item__categories">
                 {categoriesText}
             </span>
         </div>

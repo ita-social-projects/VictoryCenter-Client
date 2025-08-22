@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 import { useScrollHandler, UseScrollHandlerProps } from './useScrollHandler';
 import React from 'react';
 
-describe('useInfiniteScroll', () => {
+describe('useScrollHandler', () => {
     const createScrollEvent = (overrides: Partial<HTMLDivElement>): React.UIEvent<HTMLDivElement> =>
         ({
             currentTarget: {

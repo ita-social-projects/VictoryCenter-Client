@@ -1,12 +1,14 @@
+@use '../../../assets/sass/variables/colors';
+
 .search-bar {
     position: relative;
 
     &__wrapper {
         box-sizing: border-box;
         width: 100%;
-        height: 40px;
-        border: 0.5px solid #61615c;
-        background: #ffffff;
+        height: 2.5rem;
+        border: 0.5px solid colors.$grey-900;
+        background: white;
     }
 
     &__content {
@@ -14,16 +16,16 @@
         flex-direction: row;
         justify-content: start;
         align-items: center;
-        gap: 8px;
+        gap: 0.5rem;
         width: 100%;
         height: 100%;
-        padding: 12px 16px;
+        padding: 0.75rem 1rem;
     }
 
     &__icon {
         flex-shrink: 0;
-        width: 24px;
-        height: 24px;
+        width: 1.5rem;
+        height: 1.5rem;
         background: none;
         border: none;
 
@@ -38,16 +40,15 @@
         border: none;
         outline: none;
         background: transparent;
-
         font-size: 16px;
         font-weight: 400;
         font-style: normal;
-        line-height: 24px;
+        line-height: 1.5rem;
         letter-spacing: -2%;
-        color: #061125;
+        color: colors.$blue-900;
 
         &::placeholder {
-            color: #a4a49b;
+            color: colors.$grey-700;
             transition: color 0.3s;
         }
     }
@@ -58,11 +59,11 @@
         left: 0;
         right: 0;
         width: 100%;
-        max-height: 250px;
+        max-height: 15.625rem;
         overflow-y: auto;
-        border: 0.5px solid #61615c;
+        border: 0.5px solid colors.$grey-900;
         border-top: none;
-        background: #ffffff;
+        background: white;
         z-index: 10;
         scroll-behavior: smooth;
     }
@@ -82,7 +83,7 @@
         justify-content: center;
         align-items: center;
         width: 100%;
-        min-height: 50px;
+        min-height: 3.125rem;
 
         font-size: 20px;
         font-weight: 600;

@@ -3,21 +3,19 @@ import PlusIcon from '../../../../../assets/icons/plus.svg';
 import { Button } from '../../../../../components/admin/button/Button';
 import { Select } from '../../../../../components/admin/select/Select';
 import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
-import { ProgramSuggestionItem } from './program-suggestion-item/ProgramSuggestionItem';
+import { ProgramSearchItem } from './program-suggestion-item/ProgramSearchItem';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { ProgramSuggestion } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import './ProgramsPageToolbar.scss';
 import {
     PaginationRequestParams,
     useDataPaginationFetch,
 } from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
+import './ProgramsPageToolbar.scss';
 
 const SUGGESTIONS_PAGE_SIZE = 5;
-const MIN_CHARACTERS_TO_SEARCH = 3;
-const SEARCH_DELAY_MS = 100;
 
 export interface ProgramPageToolbarProps {
     statusFilterValue: VisibilityStatus | undefined;
@@ -59,14 +57,14 @@ export const ProgramsPageToolbar = ({
         initialData: [],
         fetchHandler: getSuggestions,
         autoFetchDependencies: [currentSearchTerm],
-        autoFetchDisabled: currentSearchTerm.length < MIN_CHARACTERS_TO_SEARCH,
+        autoFetchDisabled: currentSearchTerm.length < UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH,
         pageSize: SUGGESTIONS_PAGE_SIZE,
     });
 
     // Sync fetched suggestions with local state
     const onSearch = useCallback((query: string) => {
         setCurrentSearchTerm(query);
-        if (query.length < MIN_CHARACTERS_TO_SEARCH) {
+        if (query.length < UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH) {
             setLocalSuggestions([]);
         }
     }, []);
@@ -101,7 +99,7 @@ export const ProgramsPageToolbar = ({
                         onSuggestionSelect={onSuggestionSelected}
                         getSuggestionKey={(suggestion) => suggestion.id}
                         getSuggestionLabel={(suggestion) => suggestion.name}
-                        renderSuggestionComponent={ProgramSuggestionItem}
+                        renderSuggestionComponent={ProgramSearchItem}
                         onLoadMore={fetchMoreSuggestions}
                         hasMore={isSuggestionsHasMore}
                         isLoading={isSuggestionsLoading}
@@ -109,8 +107,8 @@ export const ProgramsPageToolbar = ({
                         onClear={handleSearchClear}
                         placeholder={PROGRAMS_TEXT.PLACEHOLDER.SEARCH_PROGRAMS}
                         notFoundMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
-                        minCharactersToSearch={MIN_CHARACTERS_TO_SEARCH}
-                        searchDelayMs={SEARCH_DELAY_MS}
+                        minCharactersToSearch={UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH}
+                        searchDelayMs={UI_CONFIG.SEARCH_BAR.SEARCH_DELAY_MS}
                     />
                 </div>
                 <div className="programs-toolbar-actions">

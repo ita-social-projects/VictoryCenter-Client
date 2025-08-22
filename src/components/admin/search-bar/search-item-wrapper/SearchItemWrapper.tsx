@@ -1,33 +1,33 @@
 import React, { useRef, useState, forwardRef, useImperativeHandle } from 'react';
-import { TextSuggestionContent } from '../text-suggestion-content/TextSuggestionContent';
+import { TextSearchItem } from '../text-suggestion-content/TextSearchItem';
 import classNames from 'classnames';
-import './SuggestionWrapper.scss';
+import './SearchItemWrapper.scss';
 
-export interface SuggestionContentRef {
+export interface SearchItemContentRef {
     getTooltipContent: () => React.ReactNode | null;
 }
 
-export interface SuggestionContentRenderProps<T> {
+export interface SearchItemContentRenderProps<T> {
     item: T;
     isSuggestionActive: boolean;
     isSuggestionHovered: boolean;
 }
 
-export type SuggestionWrapperRef = SuggestionContentRef;
+export type SearchItemWrapperRef = SearchItemContentRef;
 
-export interface SuggestionWrapperProps<T> {
+export interface SearchItemWrapperProps<T> {
     item: T;
     isActive: boolean;
     onSelect: () => void;
     onHover: (element: HTMLLIElement) => void;
     getItemLabel: (item: T) => string;
     renderContent?: React.ForwardRefExoticComponent<
-        SuggestionContentRenderProps<T> & React.RefAttributes<SuggestionContentRef>
+        SearchItemContentRenderProps<T> & React.RefAttributes<SearchItemContentRef>
     >;
     onMouseLeave?: () => void;
 }
 
-function SuggestionWrapperInner<T>(
+function SearchItemWrapperInner<T>(
     {
         item,
         isActive,
@@ -36,12 +36,12 @@ function SuggestionWrapperInner<T>(
         onMouseLeave,
         renderContent: RenderContentComponent,
         getItemLabel,
-    }: SuggestionWrapperProps<T>,
-    ref: React.Ref<SuggestionWrapperRef>,
+    }: SearchItemWrapperProps<T>,
+    ref: React.Ref<SearchItemWrapperRef>,
 ) {
     const [isHovered, setIsHovered] = useState(false);
     const liRef = useRef<HTMLLIElement>(null);
-    const contentRef = useRef<SuggestionContentRef>(null);
+    const contentRef = useRef<SearchItemContentRef>(null);
 
     useImperativeHandle(ref, () => ({
         getTooltipContent: () => contentRef.current?.getTooltipContent() ?? null,
@@ -66,7 +66,7 @@ function SuggestionWrapperInner<T>(
         }
     };
 
-    const contentProps: SuggestionContentRenderProps<T> = {
+    const contentProps: SearchItemContentRenderProps<T> = {
         item,
         isSuggestionActive: isActive,
         isSuggestionHovered: isHovered,
@@ -75,8 +75,8 @@ function SuggestionWrapperInner<T>(
     return (
         <li
             ref={liRef}
-            className={classNames('suggestion-wrapper', {
-                'suggestion-wrapper--active': isActive || isHovered,
+            className={classNames('search-item-wrapper', {
+                'search-item-wrapper--active': isActive || isHovered,
             })}
             onClick={onSelect}
             onMouseEnter={handleMouseEnter}
@@ -88,14 +88,14 @@ function SuggestionWrapperInner<T>(
             {RenderContentComponent ? (
                 <RenderContentComponent {...contentProps} ref={contentRef} />
             ) : (
-                <TextSuggestionContent label={getItemLabel(item)} ref={contentRef} />
+                <TextSearchItem label={getItemLabel(item)} ref={contentRef} />
             )}
         </li>
     );
 }
 
-export const SuggestionWrapper = forwardRef(SuggestionWrapperInner) as <T>(
-    props: SuggestionWrapperProps<T> & {
-        ref?: React.Ref<SuggestionWrapperRef>;
+export const SearchItemWrapper = forwardRef(SearchItemWrapperInner) as <T>(
+    props: SearchItemWrapperProps<T> & {
+        ref?: React.Ref<SearchItemWrapperRef>;
     },
 ) => React.ReactElement;

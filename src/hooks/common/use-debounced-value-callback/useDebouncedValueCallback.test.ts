@@ -11,7 +11,7 @@ describe('useDebouncedValueCallback', () => {
 
     it('calls callback after delay', () => {
         const callback = jest.fn();
-        setup({ value: 'hello', delay: 500, callback } as UseDebouncedValueCallbackProps<string>);
+        setup({ value: 'hello', delayMs: 500, callback } as UseDebouncedValueCallbackProps<string>);
 
         expect(callback).not.toHaveBeenCalled();
         jest.advanceTimersByTime(500);
@@ -20,7 +20,7 @@ describe('useDebouncedValueCallback', () => {
 
     it('does not call callback when disabled', () => {
         const callback = jest.fn();
-        setup({ value: 'test', delay: 300, callback, isDisabled: true } as UseDebouncedValueCallbackProps<string>);
+        setup({ value: 'test', delayMs: 300, callback, isDisabled: true } as UseDebouncedValueCallbackProps<string>);
 
         jest.advanceTimersByTime(300);
         expect(callback).not.toHaveBeenCalled();
@@ -28,9 +28,13 @@ describe('useDebouncedValueCallback', () => {
 
     it('clears previous timeout when value changes', () => {
         const callback = jest.fn();
-        const { rerender } = setup({ value: 'first', delay: 200, callback } as UseDebouncedValueCallbackProps<string>);
+        const { rerender } = setup({
+            value: 'first',
+            delayMs: 200,
+            callback,
+        } as UseDebouncedValueCallbackProps<string>);
 
-        rerender({ value: 'second', delay: 200, callback });
+        rerender({ value: 'second', delayMs: 200, callback } as UseDebouncedValueCallbackProps<string>);
         jest.advanceTimersByTime(200);
 
         expect(callback).toHaveBeenCalledTimes(1);

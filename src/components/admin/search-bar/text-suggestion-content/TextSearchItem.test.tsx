@@ -1,22 +1,22 @@
 import React, { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
-import { TextSuggestionContent, TextSuggestionContentProps } from './TextSuggestionContent';
-import { SuggestionContentRef } from '../suggestion-wrapper/SuggestionWrapper';
+import { TextSearchItem, TextSearchItemProps } from './TextSearchItem';
+import { SearchItemContentRef } from '../search-item-wrapper/SearchItemWrapper';
 
-const defaultProps: TextSuggestionContentProps = {
+const defaultProps: TextSearchItemProps = {
     label: 'Default Label',
 };
 
-const renderComponent = (props: Partial<TextSuggestionContentProps> = {}) => {
-    const finalProps: TextSuggestionContentProps = { ...defaultProps, ...props };
-    const ref = createRef<SuggestionContentRef>();
+const renderComponent = (props: Partial<TextSearchItemProps> = {}) => {
+    const finalProps: TextSearchItemProps = { ...defaultProps, ...props };
+    const ref = createRef<SearchItemContentRef>();
 
-    const view = render(<TextSuggestionContent {...finalProps} ref={ref} />);
+    const view = render(<TextSearchItem {...finalProps} ref={ref} />);
 
     return { ref, ...view };
 };
 
-describe('TextSuggestionContent', () => {
+describe('TextSearchItem', () => {
     it('should render the label correctly', () => {
         const testLabel: string = 'My Test Label';
         renderComponent({ label: testLabel });

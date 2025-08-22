@@ -14,9 +14,7 @@ jest.mock('../../../hooks/common/use-on-click-outside/useOnClickOutside');
 jest.mock('../../../hooks/common/use-scroll-handler/useScrollHandler');
 jest.mock('../../../hooks/common/use-debounced-value-callback/useDebouncedValueCallback');
 jest.mock('../../../hooks/common/use-observe-element-size/useObserveElementSize');
-jest.mock(
-    '../../../hooks/common/use-calculate-container-size-based-on-children/useCalculateContainerSizeBasedOnChildren',
-);
+jest.mock('../../../hooks/common/use-container-size-from-children/useContainerSizeFromChildren');
 
 // @ts-ignore
 jest.mock('./suggestion-wrapper/SuggestionWrapper', () => ({
@@ -79,7 +77,7 @@ describe('SearchBar', () => {
                 width: 300,
             },
         );
-        require('../../../hooks/common/use-calculate-container-size-based-on-children/useCalculateContainerSizeBasedOnChildren').useCalculateContainerSizeBasedOnChildren.mockReturnValue(
+        require('../../../hooks/common/use-container-size-from-children/useContainerSizeFromChildren').useContainerSizeFromChildren.mockReturnValue(
             {
                 calculatedSize: 200,
             },

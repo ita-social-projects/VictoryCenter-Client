@@ -20,7 +20,7 @@ describe('useDebouncedValueCallback', () => {
 
     it('does not call callback when disabled', () => {
         const callback = jest.fn();
-        setup({ value: 'test', delay: 300, callback, disableWhen: true } as UseDebouncedValueCallbackProps<string>);
+        setup({ value: 'test', delay: 300, callback, isDisabled: true } as UseDebouncedValueCallbackProps<string>);
 
         jest.advanceTimersByTime(300);
         expect(callback).not.toHaveBeenCalled();

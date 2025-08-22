@@ -64,41 +64,49 @@ export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
         [updateModalState],
     );
 
-    const openModalActions: BaseOpenModalActions<TEntity> = useMemo(
-        () => ({
+    const openModalActions: BaseOpenModalActions<TEntity> = useMemo(() => {
+        const isAnyModalOpenedInState = (state: BaseModalState<TEntity>) =>
+            Object.values(state).some((value) => (typeof value === 'boolean' ? value : value !== null));
+
+        return {
             openAddItemModal: () => {
-                if (!isAnyModalOpened) {
-                    updateModalState({ isAddModalOpen: true });
-                }
+                setModalState((prev) => {
+                    if (isAnyModalOpenedInState(prev)) return prev;
+                    return { ...prev, isAddModalOpen: true };
+                });
             },
             openEditItemModal: (item: TEntity) => {
-                if (!isAnyModalOpened) {
-                    updateModalState({ itemToEdit: item });
-                }
+                setModalState((prev) => {
+                    if (isAnyModalOpenedInState(prev)) return prev;
+                    return { ...prev, itemToEdit: item };
+                });
             },
             openDeleteItemModal: (item: TEntity) => {
-                if (!isAnyModalOpened) {
-                    updateModalState({ itemToDelete: item });
-                }
+                setModalState((prev) => {
+                    if (isAnyModalOpenedInState(prev)) return prev;
+                    return { ...prev, itemToDelete: item };
+                });
             },
             openAddCategoryModal: () => {
-                if (!isAnyModalOpened) {
-                    updateModalState({ isAddCategoryModalOpen: true });
-                }
+                setModalState((prev) => {
+                    if (isAnyModalOpenedInState(prev)) return prev;
+                    return { ...prev, isAddCategoryModalOpen: true };
+                });
             },
             openEditCategoryModal: () => {
-                if (!isAnyModalOpened) {
-                    updateModalState({ isEditCategoryModalOpen: true });
-                }
+                setModalState((prev) => {
+                    if (isAnyModalOpenedInState(prev)) return prev;
+                    return { ...prev, isEditCategoryModalOpen: true };
+                });
             },
             openDeleteCategoryModal: () => {
-                if (!isAnyModalOpened) {
-                    updateModalState({ isDeleteCategoryModalOpen: true });
-                }
+                setModalState((prev) => {
+                    if (isAnyModalOpenedInState(prev)) return prev;
+                    return { ...prev, isDeleteCategoryModalOpen: true };
+                });
             },
-        }),
-        [isAnyModalOpened, updateModalState],
-    );
+        };
+    }, []);
 
     return {
         modalState,

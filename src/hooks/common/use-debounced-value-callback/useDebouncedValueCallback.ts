@@ -4,17 +4,17 @@ export interface UseDebouncedValueCallbackProps<T> {
     value: T;
     delay: number;
     callback: (value: T) => void;
-    disableWhen?: boolean;
+    isDisabled?: boolean;
 }
 
 export const useDebouncedValueCallback = <T>({
     value,
     delay,
     callback,
-    disableWhen = false,
+    isDisabled = false,
 }: UseDebouncedValueCallbackProps<T>): void => {
     useEffect(() => {
-        if (disableWhen) {
+        if (isDisabled) {
             return;
         }
 
@@ -25,5 +25,5 @@ export const useDebouncedValueCallback = <T>({
         return () => {
             clearTimeout(handler);
         };
-    }, [value, delay, callback, disableWhen]);
+    }, [value, delay, callback, isDisabled]);
 };

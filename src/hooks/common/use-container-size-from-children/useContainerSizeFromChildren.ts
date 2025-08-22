@@ -1,50 +1,51 @@
 import { useState, useLayoutEffect, RefObject } from 'react';
 
-export type MeasurementAxis = 'height' | 'width';
-export type CalculationStrategy = 'basedOnFirstElement' | 'sumOfElements';
+export type Dimension = 'height' | 'width';
+export type Strategy = 'basedOnFirstElement' | 'sumOfElements';
 
-export interface useCalculateContainerSizeBasedOnChildrenProps {
+export interface UseContainerSizeFromChildrenProps {
     elementsContainerRef: RefObject<HTMLElement | null>;
     targetVisibleElementsCount: number;
-    measurementAxis: MeasurementAxis;
-    calculationStrategy: CalculationStrategy;
+    calculationDimension: Dimension;
+    calculationStrategy: Strategy;
     dependencies: unknown[];
-    disableAfterFirstSuccess?: boolean;
-    disableWhen?: boolean;
+    isDisabledAfterFirstSuccess?: boolean;
+    isDisabled?: boolean;
 }
 
-export interface useCalculateContainerSizeBasedOnChildrenResult {
+export interface UseContainerSizeFromChildrenResult {
     calculatedSize: number | undefined;
 }
 
-export const useCalculateContainerSizeBasedOnChildren = ({
+export const useContainerSizeFromChildren = ({
     elementsContainerRef,
     targetVisibleElementsCount,
-    measurementAxis,
+    calculationDimension,
     calculationStrategy,
-    disableWhen = false,
     dependencies = [],
-    disableAfterFirstSuccess = false,
-}: useCalculateContainerSizeBasedOnChildrenProps): useCalculateContainerSizeBasedOnChildrenResult => {
+    isDisabled = false,
+    isDisabledAfterFirstSuccess = false,
+}: UseContainerSizeFromChildrenProps): UseContainerSizeFromChildrenResult => {
     const [calculatedSize, setCalculatedSize] = useState<number | undefined>(undefined);
     const [hasCalculated, setHasCalculated] = useState(false);
 
     useLayoutEffect(() => {
-        if (disableAfterFirstSuccess && hasCalculated) {
+        if (isDisabledAfterFirstSuccess && hasCalculated) {
             return;
         }
 
         const containerEl = elementsContainerRef.current;
 
-        if (disableWhen || !containerEl || containerEl.children.length === 0) {
-            if (disableWhen) {
+        if (isDisabled || !containerEl || containerEl.children.length === 0) {
+            if (isDisabled) {
                 setHasCalculated(false);
             }
             setCalculatedSize(undefined);
             return;
         }
 
-        const dimension: 'offsetHeight' | 'offsetWidth' = measurementAxis === 'height' ? 'offsetHeight' : 'offsetWidth';
+        const dimension: 'offsetHeight' | 'offsetWidth' =
+            calculationDimension === 'height' ? 'offsetHeight' : 'offsetWidth';
         let finalSize: number | undefined;
 
         if (calculationStrategy === 'basedOnFirstElement') {
@@ -73,15 +74,15 @@ export const useCalculateContainerSizeBasedOnChildren = ({
 
         setCalculatedSize(finalSize);
 
-        if (finalSize !== undefined && disableAfterFirstSuccess) {
+        if (finalSize !== undefined && isDisabledAfterFirstSuccess) {
             setHasCalculated(true);
         }
     }, [
-        disableWhen,
+        isDisabled,
         targetVisibleElementsCount,
-        measurementAxis,
+        calculationDimension,
         calculationStrategy,
-        disableAfterFirstSuccess,
+        isDisabledAfterFirstSuccess,
         hasCalculated,
         elementsContainerRef,
         // eslint-disable-next-line react-hooks/exhaustive-deps

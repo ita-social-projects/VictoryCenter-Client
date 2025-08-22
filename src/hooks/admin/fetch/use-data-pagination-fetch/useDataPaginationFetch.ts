@@ -25,7 +25,7 @@ export interface useDataPaginationFetchProps<TResult> {
     fetchHandler: (paginationParams: PaginationRequestParams) => Promise<PaginationResult<TResult>>;
     autoFetchDependencies?: any[];
     autoFetchDisabled?: boolean;
-    /** Optional function to extract unique ID from items to prevent duplicates during pagination */
+    /** Optional function to extract unique ID from items to prevent duplicates during pagination fetch*/
     getUniqueId?: (item: TResult) => string | number;
     pageSize?: number;
 }
@@ -33,27 +33,25 @@ export interface useDataPaginationFetchProps<TResult> {
 export const useDataPaginationFetch = <TResult>({
     initialData = [],
     fetchHandler,
-    /** Optional function to extract unique ID from items to prevent duplicates during pagination */
+    /** Optional function to extract unique ID from items to prevent duplicates during pagination fetch*/
     getUniqueId,
     autoFetchDependencies = [],
     autoFetchDisabled = false,
     pageSize = 10,
 }: useDataPaginationFetchProps<TResult>): UseDataPaginationFetchResult<TResult> => {
-    const [fetchedData, setFetchedData] = useState<TResult[]>(initialData);
+    const [data, setData] = useState<TResult[]>(initialData);
     const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<any | null>(null);
     const currentPageRef = useRef(0);
     const abortControllerRef = useRef<AbortController | null>(null);
-    const totalItemsCountRef = useRef<number | null>(null);
     const isInitialMountRef = useRef(true);
 
     const resetList = useCallback(() => {
-        setFetchedData([]);
+        setData([]);
         setHasMore(true);
         setError(null);
         currentPageRef.current = 0;
-        totalItemsCountRef.current = null;
     }, []);
 
     const fetchData = useCallback(
@@ -65,7 +63,7 @@ export const useDataPaginationFetch = <TResult>({
             setIsLoading(true);
             setError(null);
             if (isReset) {
-                setFetchedData([]);
+                setData([]);
                 currentPageRef.current = 0;
             }
 
@@ -81,13 +79,11 @@ export const useDataPaginationFetch = <TResult>({
 
                 if (newAbortController.signal.aborted) return;
 
-                totalItemsCountRef.current = result.totalItemsCount;
-
                 const totalFetchedPages = pageToFetch + 1;
                 const maxPossibleItems = totalFetchedPages * pageSize;
                 const newHasMore = maxPossibleItems < result.totalItemsCount;
 
-                setFetchedData((prev) => {
+                setData((prev) => {
                     if (isReset) {
                         return result.items;
                     }
@@ -148,13 +144,13 @@ export const useDataPaginationFetch = <TResult>({
     }, []);
 
     return {
-        data: fetchedData,
-        isLoading: isLoading,
-        hasMore: hasMore,
-        error: error,
-        fetchMore: fetchMore,
-        fetchFromStart: fetchFromStart,
-        resetList: resetList,
-        setData: setFetchedData,
+        data,
+        isLoading,
+        hasMore,
+        error,
+        fetchMore,
+        fetchFromStart,
+        resetList,
+        setData,
     };
 };

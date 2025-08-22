@@ -346,16 +346,4 @@ describe('useModalsState', () => {
         expect(result.current.closeModalActions).toBe(initialCloseActions);
         expect(result.current.openModalActions).toBe(initialOpenActions);
     });
-
-    it('should update action references when modal state changes', () => {
-        const { result } = renderHook(() => useModalsState<string>());
-
-        const initialOpenActions = result.current.openModalActions;
-
-        act(() => {
-            result.current.openModalActions.openAddItemModal();
-        });
-
-        expect(result.current.openModalActions).not.toBe(initialOpenActions);
-    });
 });

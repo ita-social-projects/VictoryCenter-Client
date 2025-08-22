@@ -77,7 +77,7 @@ export const MultiSelectInput = <T,>({
             setIsOpen(false);
             onBlur?.();
         },
-        enableWhen: isOpen,
+        isEnabled: isOpen,
     });
 
     const displayLabel = useMemo(() => {

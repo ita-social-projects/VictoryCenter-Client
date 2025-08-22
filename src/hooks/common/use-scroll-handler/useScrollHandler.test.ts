@@ -29,7 +29,7 @@ describe('useInfiniteScroll', () => {
     it('does not call onReachBottom when disabled', () => {
         const onReachBottom = jest.fn();
         const { result } = renderHook((props: UseScrollHandlerProps) => useScrollHandler(props), {
-            initialProps: { onReachBottom, disableWhen: true } as UseScrollHandlerProps,
+            initialProps: { onReachBottom, isDisabled: true } as UseScrollHandlerProps,
         });
 
         act(() => {

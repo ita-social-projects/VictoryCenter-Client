@@ -30,7 +30,7 @@ const setupHook = (ignoreClickRefs: any[], onOutsideClick = jest.fn(), enableWhe
         useOnClickOutside({
             ignoreClickRefs,
             onOutsideClick,
-            enableWhen,
+            isEnabled: enableWhen,
         }),
     );
 };
@@ -172,7 +172,7 @@ describe('useOnClickOutside', () => {
                 useOnClickOutside({
                     ignoreClickRefs: [ref],
                     onOutsideClick: callback,
-                    enableWhen: enabled,
+                    isEnabled: enabled,
                 }),
             { initialProps: { enabled: true } },
         );

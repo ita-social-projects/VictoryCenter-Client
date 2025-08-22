@@ -1,8 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import {
-    useCalculateContainerSizeBasedOnChildren,
-    useCalculateContainerSizeBasedOnChildrenProps,
-} from './useCalculateContainerSizeBasedOnChildren';
+import { useContainerSizeFromChildren, UseContainerSizeFromChildrenProps } from './useContainerSizeFromChildren';
 
 const createMockElement = (size: number, axis: 'height' | 'width') => {
     const element = document.createElement('div');
@@ -23,11 +20,11 @@ const createContainerWithChildren = (sizes: number[], axis: 'height' | 'width') 
 };
 
 const getHookProps = (
-    overrides: Partial<useCalculateContainerSizeBasedOnChildrenProps> = {},
-): useCalculateContainerSizeBasedOnChildrenProps => ({
+    overrides: Partial<UseContainerSizeFromChildrenProps> = {},
+): UseContainerSizeFromChildrenProps => ({
     elementsContainerRef: { current: null },
     targetVisibleElementsCount: 2,
-    measurementAxis: 'height' as const,
+    calculationDimension: 'height' as const,
     calculationStrategy: 'basedOnFirstElement' as const,
     dependencies: [],
     ...overrides,
@@ -35,7 +32,7 @@ const getHookProps = (
 
 describe('useCalculateContainerSizeBasedOnChildren', () => {
     it('returns undefined when container ref is null', () => {
-        const { result } = renderHook(() => useCalculateContainerSizeBasedOnChildren(getHookProps()));
+        const { result } = renderHook(() => useContainerSizeFromChildren(getHookProps()));
 
         expect(result.current.calculatedSize).toBeUndefined();
     });
@@ -43,7 +40,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
     it('returns undefined when container has no children', () => {
         const container = document.createElement('div');
         const { result } = renderHook(() =>
-            useCalculateContainerSizeBasedOnChildren(getHookProps({ elementsContainerRef: { current: container } })),
+            useContainerSizeFromChildren(getHookProps({ elementsContainerRef: { current: container } })),
         );
 
         expect(result.current.calculatedSize).toBeUndefined();
@@ -52,10 +49,10 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
     it('returns undefined when hook is disabled', () => {
         const container = createContainerWithChildren([100, 200], 'height');
         const { result } = renderHook(() =>
-            useCalculateContainerSizeBasedOnChildren(
+            useContainerSizeFromChildren(
                 getHookProps({
                     elementsContainerRef: { current: container },
-                    disableWhen: true,
+                    isDisabled: true,
                 }),
             ),
         );
@@ -66,7 +63,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
     it('calculates size based on first element strategy with height', () => {
         const container = createContainerWithChildren([100, 200, 300], 'height');
         const { result } = renderHook(() =>
-            useCalculateContainerSizeBasedOnChildren(
+            useContainerSizeFromChildren(
                 getHookProps({
                     elementsContainerRef: { current: container },
                     targetVisibleElementsCount: 2.5,
@@ -80,10 +77,10 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
     it('calculates size based on first element strategy with width', () => {
         const container = createContainerWithChildren([50, 100], 'width');
         const { result } = renderHook(() =>
-            useCalculateContainerSizeBasedOnChildren(
+            useContainerSizeFromChildren(
                 getHookProps({
                     elementsContainerRef: { current: container },
-                    measurementAxis: 'width',
+                    calculationDimension: 'width',
                     targetVisibleElementsCount: 3,
                 }),
             ),
@@ -95,7 +92,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
     it('calculates size based on sum of elements strategy', () => {
         const container = createContainerWithChildren([100, 200, 300], 'height');
         const { result } = renderHook(() =>
-            useCalculateContainerSizeBasedOnChildren(
+            useContainerSizeFromChildren(
                 getHookProps({
                     elementsContainerRef: { current: container },
                     calculationStrategy: 'sumOfElements',
@@ -110,7 +107,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
     it('calculates size with fractional elements in sum strategy', () => {
         const container = createContainerWithChildren([100, 200, 300], 'height');
         const { result } = renderHook(() =>
-            useCalculateContainerSizeBasedOnChildren(
+            useContainerSizeFromChildren(
                 getHookProps({
                     elementsContainerRef: { current: container },
                     calculationStrategy: 'sumOfElements',
@@ -125,7 +122,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
     it('returns undefined when not enough children for sum strategy', () => {
         const container = createContainerWithChildren([100], 'height');
         const { result } = renderHook(() =>
-            useCalculateContainerSizeBasedOnChildren(
+            useContainerSizeFromChildren(
                 getHookProps({
                     elementsContainerRef: { current: container },
                     calculationStrategy: 'sumOfElements',
@@ -142,7 +139,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
         let dependency = 'initial';
 
         const { result, rerender } = renderHook(() =>
-            useCalculateContainerSizeBasedOnChildren(
+            useContainerSizeFromChildren(
                 getHookProps({
                     elementsContainerRef: { current: container },
                     dependencies: [dependency],
@@ -163,11 +160,11 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
         const container = createContainerWithChildren([100], 'height');
 
         const { result, rerender } = renderHook(() =>
-            useCalculateContainerSizeBasedOnChildren(
+            useContainerSizeFromChildren(
                 getHookProps({
                     elementsContainerRef: { current: container },
                     targetVisibleElementsCount: 2,
-                    disableAfterFirstSuccess: true,
+                    isDisabledAfterFirstSuccess: true,
                 }),
             ),
         );
@@ -183,7 +180,7 @@ describe('useCalculateContainerSizeBasedOnChildren', () => {
     it('handles edge case with zero-sized elements', () => {
         const container = createContainerWithChildren([0, 100], 'height');
         const { result } = renderHook(() =>
-            useCalculateContainerSizeBasedOnChildren(
+            useContainerSizeFromChildren(
                 getHookProps({
                     elementsContainerRef: { current: container },
                 }),

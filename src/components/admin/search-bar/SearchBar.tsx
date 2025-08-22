@@ -8,7 +8,7 @@ import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/us
 import { useScrollHandler } from '../../../hooks/common/use-scroll-handler/useScrollHandler';
 import { useDebouncedValueCallback } from '../../../hooks/common/use-debounced-value-callback/useDebouncedValueCallback';
 import { useObserveElementSize } from '../../../hooks/common/use-observe-element-size/useObserveElementSize';
-import { useCalculateContainerSizeBasedOnChildren } from '../../../hooks/common/use-calculate-container-size-based-on-children/useCalculateContainerSizeBasedOnChildren';
+import { useContainerSizeFromChildren } from '../../../hooks/common/use-container-size-from-children/useContainerSizeFromChildren';
 import {
     SuggestionWrapper,
     SuggestionContentRenderProps,
@@ -182,32 +182,32 @@ export const SearchBar = <T,>({
     useDebouncedValueCallback({
         value: debouncedValue,
         delay: searchDelayMs,
-        disableWhen: debouncedValue.length < minCharactersToSearch,
+        isDisabled: debouncedValue.length < minCharactersToSearch,
         callback: onDebouncedCallback,
     });
 
     useOnClickOutside({
         ignoreClickRefs: [searchContainerRef],
         onOutsideClick: handleClickOutside,
-        enableWhen: isDropdownVisible,
+        isEnabled: isDropdownVisible,
     });
 
     const { handleScroll: handleSuggestionsScroll } = useScrollHandler({
         onReachBottom: onLoadMore,
-        disableWhen: isLoading || !hasMore,
+        isDisabled: isLoading || !hasMore,
     });
 
     const { width: tooltipMaxWidth } = useObserveElementSize({
         observableElement: searchContainerRef,
     });
 
-    const { calculatedSize: dropdownMaxHeight } = useCalculateContainerSizeBasedOnChildren({
+    const { calculatedSize: dropdownMaxHeight } = useContainerSizeFromChildren({
         elementsContainerRef: suggestionsListRef,
         targetVisibleElementsCount: 4.5,
         calculationStrategy: 'basedOnFirstElement',
-        measurementAxis: 'height',
+        calculationDimension: 'height',
         dependencies: [suggestions],
-        disableAfterFirstSuccess: true,
+        isDisabledAfterFirstSuccess: true,
     });
 
     suggestionRefs.current.clear();

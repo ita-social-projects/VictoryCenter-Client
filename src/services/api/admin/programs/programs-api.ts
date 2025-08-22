@@ -15,7 +15,7 @@ import { mockPrograms, mockCategories } from '../../../../utils/mock-data/admin/
 // ============================================
 let mockProgramId = Math.max(...mockPrograms.map((p) => p.id), 0) + 1;
 let mockCategoryId = Math.max(...mockCategories.map((c) => c.id), 0) + 1;
-export let mockDelay = 2200;
+export let mockDelay = 0;
 export let throwErrorsInApi = false;
 
 // Helper function to convert Program to ProgramSuggestion

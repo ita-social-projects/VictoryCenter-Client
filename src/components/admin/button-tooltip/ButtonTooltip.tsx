@@ -13,7 +13,6 @@ export interface ButtonTooltipProps {
 export const ButtonTooltip = ({ children, position = 'bottom' }: ButtonTooltipProps) => {
     const [isVisible, setIsVisible] = useState(false);
     const wrapperRef = useRef<HTMLButtonElement>(null);
-    const tooltipRef = useRef<HTMLDivElement>(null);
     const tooltipId = useId();
 
     const toggleTooltip = (e: React.MouseEvent) => {
@@ -50,15 +49,15 @@ export const ButtonTooltip = ({ children, position = 'bottom' }: ButtonTooltipPr
 
             {isVisible && (
                 <Tooltip
-                    ref={tooltipRef}
                     id={tooltipId}
                     position={position}
                     offsetInPixels={8}
                     customMaxWidthInPixels={400}
                     allowClickThrough={true}
                     isCentered={true}
-                    children={children}
-                />
+                >
+                    {children}
+                </Tooltip>
             )}
         </button>
     );

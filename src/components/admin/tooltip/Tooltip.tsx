@@ -1,4 +1,4 @@
-import React, { useState, useCallback, forwardRef, useLayoutEffect } from 'react';
+import React, { useState, useCallback, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import classNames from 'classnames';
 import './Tooltip.scss';
@@ -27,112 +27,105 @@ export interface TooltipWithPortal extends TooltipBaseProps {
 
 export type TooltipProps = TooltipWithoutPortal | TooltipWithPortal;
 
-export const Tooltip = forwardRef<HTMLDivElement, TooltipProps>(
-    (
-        {
-            id,
-            children,
-            position = 'bottom',
-            offsetInPixels = 8,
-            customMaxWidthInPixels,
-            isCentered = false,
-            isRenderInPortal = false,
-            allowClickThrough = false,
-            portalPositioner,
-        },
-        ref,
-    ) => {
-        const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+export const Tooltip = ({
+    id,
+    children,
+    position = 'bottom',
+    offsetInPixels = 8,
+    customMaxWidthInPixels,
+    isCentered = false,
+    isRenderInPortal = false,
+    allowClickThrough = false,
+    portalPositioner,
+}: TooltipProps) => {
+    const tooltipRef = useRef<HTMLDivElement>(null);
+    const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
 
-        const calculatePosition = useCallback(() => {
-            const tooltipElement = (ref as React.RefObject<HTMLDivElement>)?.current;
-            if (!tooltipElement) return;
+    const calculatePosition = useCallback(() => {
+        const tooltipElement = tooltipRef.current;
+        if (!tooltipElement) return;
 
-            if (isRenderInPortal && portalPositioner) {
-                const positionerRect = portalPositioner.getBoundingClientRect();
-                const tooltipWidth = tooltipElement.offsetWidth;
-                const tooltipHeight = tooltipElement.offsetHeight;
+        if (isRenderInPortal && portalPositioner) {
+            const positionerRect = portalPositioner.getBoundingClientRect();
+            const tooltipWidth = tooltipElement.offsetWidth;
+            const tooltipHeight = tooltipElement.offsetHeight;
 
-                let top = 0;
-                let left = isCentered
-                    ? positionerRect.left + (positionerRect.width - tooltipWidth) / 2
-                    : positionerRect.left;
+            let top = 0;
+            let left = isCentered
+                ? positionerRect.left + (positionerRect.width - tooltipWidth) / 2
+                : positionerRect.left;
 
-                switch (position) {
-                    case 'top':
-                        top = positionerRect.top - tooltipHeight - offsetInPixels;
-                        break;
-                    case 'bottom':
-                        top = positionerRect.bottom + offsetInPixels;
-                        break;
-                }
-
-                setTooltipPosition({ top, left });
-            } else {
-                const parentElement = tooltipElement.parentElement as HTMLElement;
-                if (!parentElement) return;
-
-                const parentWidth = parentElement.offsetWidth;
-                const parentHeight = parentElement.offsetHeight;
-                const tooltipWidth = tooltipElement.offsetWidth;
-                const tooltipHeight = tooltipElement.offsetHeight;
-
-                let top = 0;
-                let left = isCentered ? (parentWidth - tooltipWidth) / 2 : 0;
-
-                switch (position) {
-                    case 'top':
-                        top = -tooltipHeight - offsetInPixels;
-                        break;
-                    case 'bottom':
-                        top = parentHeight + offsetInPixels;
-                        break;
-                }
-
-                setTooltipPosition({ top, left });
+            switch (position) {
+                case 'top':
+                    top = positionerRect.top - tooltipHeight - offsetInPixels;
+                    break;
+                case 'bottom':
+                    top = positionerRect.bottom + offsetInPixels;
+                    break;
             }
-        }, [ref, position, offsetInPixels, isCentered, isRenderInPortal, portalPositioner]);
 
-        useLayoutEffect(() => {
-            calculatePosition();
+            setTooltipPosition({ top, left });
+        } else {
+            const parentElement = tooltipElement.parentElement as HTMLElement;
+            if (!parentElement) return;
 
-            if (isRenderInPortal) {
-                const handleResize = () => calculatePosition();
-                const handleScroll = () => calculatePosition();
+            const parentWidth = parentElement.offsetWidth;
+            const parentHeight = parentElement.offsetHeight;
+            const tooltipWidth = tooltipElement.offsetWidth;
+            const tooltipHeight = tooltipElement.offsetHeight;
 
-                window.addEventListener('resize', handleResize);
-                window.addEventListener('scroll', handleScroll, true);
+            let top = 0;
+            let left = isCentered ? (parentWidth - tooltipWidth) / 2 : 0;
 
-                return () => {
-                    window.removeEventListener('resize', handleResize);
-                    window.removeEventListener('scroll', handleScroll, true);
-                };
+            switch (position) {
+                case 'top':
+                    top = -tooltipHeight - offsetInPixels;
+                    break;
+                case 'bottom':
+                    top = parentHeight + offsetInPixels;
+                    break;
             }
-        }, [calculatePosition, isRenderInPortal]);
 
-        const tooltipContent = (
-            <div
-                id={id}
-                ref={ref}
-                role="tooltip"
-                onMouseDown={(e) => e.stopPropagation()}
-                className={classNames('tooltip-popup', `tooltip-popup--${position}`)}
-                style={{
-                    top: `${tooltipPosition.top}px`,
-                    left: `${tooltipPosition.left}px`,
-                    maxWidth: customMaxWidthInPixels ? `${customMaxWidthInPixels}px` : undefined,
-                    position: isRenderInPortal ? 'fixed' : 'absolute',
-                    pointerEvents: allowClickThrough ? 'none' : 'auto',
-                }}
-            >
-                {children}
-            </div>
-        );
+            setTooltipPosition({ top, left });
+        }
+    }, [position, offsetInPixels, isCentered, isRenderInPortal, portalPositioner]);
+
+    useLayoutEffect(() => {
+        calculatePosition();
 
         if (isRenderInPortal) {
-            return createPortal(tooltipContent, document.body);
-        }
+            window.addEventListener('resize', calculatePosition);
+            window.addEventListener('scroll', calculatePosition, true);
 
-        return tooltipContent;
-    },
-);
+            return () => {
+                window.removeEventListener('resize', calculatePosition);
+                window.removeEventListener('scroll', calculatePosition, true);
+            };
+        }
+    }, [calculatePosition, isRenderInPortal]);
+
+    const tooltipContent = (
+        <div
+            id={id}
+            ref={tooltipRef}
+            role="tooltip"
+            onMouseDown={(e) => e.stopPropagation()}
+            className={classNames('tooltip-popup', `tooltip-popup--${position}`)}
+            style={{
+                top: `${tooltipPosition.top}px`,
+                left: `${tooltipPosition.left}px`,
+                maxWidth: customMaxWidthInPixels ? `${customMaxWidthInPixels}px` : undefined,
+                position: isRenderInPortal ? 'fixed' : 'absolute',
+                pointerEvents: allowClickThrough ? 'none' : 'auto',
+            }}
+        >
+            {children}
+        </div>
+    );
+
+    if (isRenderInPortal) {
+        return createPortal(tooltipContent, document.body);
+    }
+
+    return tooltipContent;
+};

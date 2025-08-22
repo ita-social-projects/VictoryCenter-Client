@@ -1,7 +1,7 @@
 import React, { useRef, useMemo, useImperativeHandle, forwardRef } from 'react';
 import { ProgramSuggestion } from '../../../../../../types/admin/programs';
 import { SearchItemContentRef } from '../../../../../../components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
-import './ProgramSuggestionItem.scss';
+import './ProgramSearchItem.scss';
 
 export interface ProgramSearchItemProps {
     item: ProgramSuggestion;

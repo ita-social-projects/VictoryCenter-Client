@@ -1,5 +1,5 @@
 import React, { useRef, useState, forwardRef, useImperativeHandle } from 'react';
-import { TextSearchItem } from '../text-suggestion-content/TextSearchItem';
+import { TextSearchItem } from '../text-search-item/TextSearchItem';
 import classNames from 'classnames';
 import './SearchItemWrapper.scss';
 

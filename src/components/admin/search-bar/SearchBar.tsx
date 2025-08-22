@@ -74,7 +74,6 @@ export const SearchBar = <T,>({
     const suggestionsListRef = useRef<HTMLUListElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const suggestionRefs = useRef<Map<string | number, React.RefObject<SearchItemWrapperRef | null>>>(new Map());
-    const tooltipRef = useRef(null);
 
     const hideTooltip = useCallback(() => {
         setTooltipState({ content: null, positioner: null, isVisible: false });
@@ -290,7 +289,6 @@ export const SearchBar = <T,>({
 
             {isShowTooltip && (
                 <Tooltip
-                    ref={tooltipRef}
                     position="bottom"
                     isRenderInPortal={true}
                     allowClickThrough={true}

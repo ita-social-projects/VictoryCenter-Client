@@ -1,5 +1,4 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { createRef } from 'react';
 import { Tooltip, TooltipWithoutPortal, TooltipWithPortal } from './Tooltip';
 
 describe('Tooltip - Absolute Positioning', () => {
@@ -33,16 +32,6 @@ describe('Tooltip - Absolute Positioning', () => {
             </div>
         );
         return render(<Container />);
-    };
-
-    const renderTooltipWithRef = (overrideProps: Partial<TooltipWithoutPortal> = {}) => {
-        const ref = createRef<HTMLDivElement>();
-        const Container = () => (
-            <div style={{ position: 'relative', width: '200px', height: '50px' }}>
-                <Tooltip ref={ref} {...defaultProps} {...overrideProps} />
-            </div>
-        );
-        return { ...render(<Container />), ref };
     };
 
     // Element getters
@@ -106,7 +95,7 @@ describe('Tooltip - Absolute Positioning', () => {
     });
 
     it('applies centered positioning when isCentered is true', () => {
-        renderTooltipWithRef({ isCentered: true });
+        renderTooltip({ isCentered: true });
         // Position calculation happens in useLayoutEffect, so we test the class is applied
         expectTooltipToHaveClass('tooltip-popup');
     });
@@ -116,11 +105,6 @@ describe('Tooltip - Absolute Positioning', () => {
         expectTooltipToHaveClass('tooltip-popup');
     });
 
-    it('forwards ref correctly', () => {
-        const { ref } = renderTooltipWithRef();
-        expect(ref.current).toBeInstanceOf(HTMLDivElement);
-    });
-
     it('calculates top position correctly when position is "top"', () => {
         const tooltipHeight = 30;
         const offset = 8;
@@ -128,7 +112,7 @@ describe('Tooltip - Absolute Positioning', () => {
         const heightSpy = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(tooltipHeight);
         const widthSpy = jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(100);
 
-        renderTooltipWithRef({ position: 'top' });
+        renderTooltip({ position: 'top' });
 
         const expectedTop = -tooltipHeight - offset;
         expectTooltipToHaveStyle('top', `${expectedTop}px`);
@@ -173,11 +157,6 @@ describe('Tooltip - Portal Rendering', () => {
     const renderPortalTooltip = (overrideProps: Partial<TooltipWithPortal> = {}) =>
         render(<Tooltip {...defaultPortalProps} {...overrideProps} />);
 
-    const renderPortalTooltipWithRef = (overrideProps: Partial<TooltipWithPortal> = {}) => {
-        const ref = createRef<HTMLDivElement>();
-        return { ...render(<Tooltip ref={ref} {...defaultPortalProps} {...overrideProps} />), ref };
-    };
-
     // Element getters
     const getPortalTooltip = () => screen.getByRole('tooltip');
 
@@ -199,7 +178,7 @@ describe('Tooltip - Portal Rendering', () => {
         const heightSpy = jest.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(tooltipHeight);
         const widthSpy = jest.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(100);
 
-        renderPortalTooltipWithRef({ position: 'top' });
+        renderPortalTooltip({ position: 'top' });
 
         const expectedTop = positionerTop - tooltipHeight - offset;
         expectPortalTooltipToHaveStyle('top', `${expectedTop}px`);
@@ -264,10 +243,5 @@ describe('Tooltip - Portal Rendering', () => {
     it('allows click through in portal when specified', () => {
         renderPortalTooltip({ allowClickThrough: true });
         expectPortalTooltipToHaveStyle('pointer-events', 'none');
-    });
-
-    it('forwards ref correctly in portal', () => {
-        const { ref } = renderPortalTooltipWithRef();
-        expect(ref.current).toBeInstanceOf(HTMLDivElement);
     });
 });

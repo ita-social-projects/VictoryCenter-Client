@@ -235,6 +235,11 @@ export const ProgramsPageContent = () => {
 
     const handleEditProgram = useCallback(
         (updatedProgram: Program) => {
+            // Update searched program if it's the same
+            if (isSearchResultView && fetchedSearchProgram?.id === updatedProgram.id) {
+                updateSearchedProgram(updatedProgram);
+            }
+
             // Find original program
             const originalProgram = fetchedPrograms.find((p) => p.id === updatedProgram.id);
             if (!originalProgram) return;
@@ -267,11 +272,6 @@ export const ProgramsPageContent = () => {
                 updatePrograms((prev) => prev.map((p) => (p.id === updatedProgram.id ? updatedProgram : p)));
             } else {
                 updatePrograms((prev) => prev.filter((p) => p.id !== updatedProgram.id));
-            }
-
-            // Update searched program if it's the same
-            if (isSearchResultView && fetchedSearchProgram?.id === updatedProgram.id) {
-                updateSearchedProgram(updatedProgram);
             }
         },
         [

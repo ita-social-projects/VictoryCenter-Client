@@ -36,6 +36,11 @@ export const MultiSelectInput = <T,>({
 
     const selectedIds = useMemo(() => new Set(value.map(getOptionId)), [value, getOptionId]);
 
+    const displayLabel = useMemo(() => {
+        if (value.length === 0) return placeholder;
+        return value.map(getOptionName).join(', ');
+    }, [value, getOptionName, placeholder]);
+
     const isSelected = useCallback(
         (option: T): boolean => {
             const optionId = getOptionId(option);
@@ -64,26 +69,26 @@ export const MultiSelectInput = <T,>({
         setIsOpen((prev) => !prev);
     }, [disabled]);
 
-    const handleOptionKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, option: T) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            toggleOption(option);
-        }
-    };
+    const handleOptionKeyDown = useCallback(
+        (e: React.KeyboardEvent<HTMLDivElement>, option: T) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleOption(option);
+            }
+        },
+        [toggleOption],
+    );
+
+    const handleOutsideClick = useCallback(() => {
+        setIsOpen(false);
+        onBlur?.();
+    }, [onBlur]);
 
     useOnClickOutside({
         ignoreClickRefs: [multiselectContainerRef],
-        onOutsideClick: () => {
-            setIsOpen(false);
-            onBlur?.();
-        },
-        isEnabled: isOpen,
+        onOutsideClick: handleOutsideClick,
+        isDisabled: !isOpen,
     });
-
-    const displayLabel = useMemo(() => {
-        if (value.length === 0) return placeholder;
-        return value.map(getOptionName).join(', ');
-    }, [value, getOptionName, placeholder]);
 
     return (
         <div className="multiselect" ref={multiselectContainerRef}>

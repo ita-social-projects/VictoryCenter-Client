@@ -60,7 +60,7 @@ function SearchItemWrapperInner<T>(
     };
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLLIElement>) => {
-        if (event.key === 'Enter' || event.key === ' ') {
+        if (event.key === 'Enter') {
             event.preventDefault();
             onSelect();
         }
@@ -79,6 +79,7 @@ function SearchItemWrapperInner<T>(
                 'search-item-wrapper--active': isActive || isHovered,
             })}
             onClick={onSelect}
+            onMouseDown={(e) => e.preventDefault()}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             role="button"

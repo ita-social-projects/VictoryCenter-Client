@@ -76,7 +76,7 @@ describe('useObserveElementSize', () => {
             { initialProps: { el: element } },
         );
 
-        rerender({ el: element });
+        rerender({ el: null! });
 
         expect(result.current).toEqual({ width: 0, height: 0 });
     });
@@ -96,5 +96,44 @@ describe('useObserveElementSize', () => {
         rerender({ disabled: true });
 
         expect(result.current).toEqual({ width: 0, height: 0 });
+    });
+
+    it('resets size to zero when element becomes disabled after having size', () => {
+        const element = document.createElement('div');
+        Object.defineProperty(element, 'offsetWidth', { value: 100, configurable: true });
+        Object.defineProperty(element, 'offsetHeight', { value: 200, configurable: true });
+
+        const { result, rerender } = renderHook(
+            ({ disabled }) =>
+                useObserveElementSize({
+                    observableElement: { current: element },
+                    isDisabled: disabled,
+                }),
+            { initialProps: { disabled: false } },
+        );
+
+        expect(result.current.width).toBeGreaterThan(0);
+
+        rerender({ disabled: true });
+
+        expect(result.current).toEqual({ width: 0, height: 0 });
+    });
+
+    it('calls onSizeChanged and returns new size when size changes', () => {
+        const onSizeChanged = jest.fn();
+        const element = document.createElement('div');
+
+        Object.defineProperty(element, 'offsetWidth', { value: 150, configurable: true });
+        Object.defineProperty(element, 'offsetHeight', { value: 250, configurable: true });
+
+        const { result } = renderHook(() =>
+            useObserveElementSize({
+                observableElement: { current: element },
+                onSizeChanged,
+            }),
+        );
+
+        expect(onSizeChanged).toHaveBeenCalledWith({ width: 150, height: 250 });
+        expect(result.current).toEqual({ width: 150, height: 250 });
     });
 });

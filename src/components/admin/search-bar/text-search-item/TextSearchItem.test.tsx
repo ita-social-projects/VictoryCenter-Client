@@ -28,8 +28,8 @@ describe('TextSearchItem', () => {
         const { ref } = renderComponent();
         const element: HTMLElement = screen.getByText(defaultProps.label);
 
-        Object.defineProperty(element, 'scrollWidth', { value: 100 });
-        Object.defineProperty(element, 'clientWidth', { value: 100 });
+        Object.defineProperty(element, 'scrollWidth', { configurable: true, get: () => 100 });
+        Object.defineProperty(element, 'clientWidth', { configurable: true, get: () => 100 });
 
         const tooltipContent = ref.current?.getTooltipContent();
 
@@ -41,8 +41,8 @@ describe('TextSearchItem', () => {
         const { ref } = renderComponent({ label: testLabel });
         const element: HTMLElement = screen.getByText(testLabel);
 
-        Object.defineProperty(element, 'scrollWidth', { value: 200 });
-        Object.defineProperty(element, 'clientWidth', { value: 100 });
+        Object.defineProperty(element, 'scrollWidth', { configurable: true, get: () => 200 });
+        Object.defineProperty(element, 'clientWidth', { configurable: true, get: () => 100 });
 
         const tooltipContent = ref.current?.getTooltipContent() as React.ReactElement | null;
 

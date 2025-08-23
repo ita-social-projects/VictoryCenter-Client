@@ -69,10 +69,6 @@ describe('ContextMenuButton', () => {
         // Test Enter key
         fireEvent.keyDown(contextMenuElement, { key: 'Enter' });
         expect(contextMenuElement).toHaveClass('context-menu-button-active');
-
-        // Test Space key
-        fireEvent.keyDown(contextMenuElement, { key: ' ' });
-        expect(contextMenuElement).not.toHaveClass('context-menu-button-active');
     });
 
     it('calls onOptionSelected and closes menu when option is clicked', () => {
@@ -163,5 +159,43 @@ describe('ContextMenuButton', () => {
         expect(screen.getByText('Custom Child Element')).toBeInTheDocument();
         expect(screen.getByText('Another non-option child')).toBeInTheDocument();
         expect(screen.getByText('Valid Option')).toBeInTheDocument();
+    });
+
+    it('does not close menu when clicking inside menu while open', async () => {
+        render(
+            <ContextMenuButton onOptionSelected={mockOnOptionSelected}>
+                <ContextMenuButton.Option value="option1">Option 1</ContextMenuButton.Option>
+            </ContextMenuButton>,
+        );
+
+        const contextMenuElement = screen.getByRole('menu');
+
+        // Open menu
+        fireEvent.click(contextMenuElement);
+        expect(contextMenuElement).toHaveClass('context-menu-button-active');
+
+        // Click inside menu (should NOT close)
+        fireEvent.mouseDown(contextMenuElement);
+
+        await waitFor(() => {
+            expect(contextMenuElement).toHaveClass('context-menu-button-active');
+        });
+    });
+
+    it('does not toggle menu when pressing key other than Enter', () => {
+        render(
+            <ContextMenuButton onOptionSelected={mockOnOptionSelected}>
+                <ContextMenuButton.Option value="option1">Option 1</ContextMenuButton.Option>
+            </ContextMenuButton>,
+        );
+
+        const contextMenuElement = screen.getByRole('menu');
+
+        // Test with different key (not Enter or Space)
+        fireEvent.keyDown(contextMenuElement, { key: 'Escape' });
+        expect(contextMenuElement).not.toHaveClass('context-menu-button-active');
+
+        fireEvent.keyDown(contextMenuElement, { key: 'Tab' });
+        expect(contextMenuElement).not.toHaveClass('context-menu-button-active');
     });
 });

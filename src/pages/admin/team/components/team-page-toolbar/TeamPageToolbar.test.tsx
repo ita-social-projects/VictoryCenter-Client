@@ -4,17 +4,13 @@ import { TeamPageToolbar } from './TeamPageToolbar';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import {SearchBarProps} from "../../../../../components/admin/search-bar/SearchBar";
-import {ProgramSearchItemData} from "../../../../../types/admin/programs";
+import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
+import { ProgramSearchItemData } from '../../../../../types/admin/programs';
 
 jest.mock('../../../../../assets/icons/plus.svg', () => 'mocked-plus-icon.svg');
 
 jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
-    SearchBar: ({
-        onQueryChange,
-        onClear,
-        placeholder,
-    }: SearchBarProps<ProgramSearchItemData>) => (
+    SearchBar: ({ onQueryChange, onClear, placeholder }: SearchBarProps<ProgramSearchItemData>) => (
         <div>
             <input
                 placeholder={placeholder}

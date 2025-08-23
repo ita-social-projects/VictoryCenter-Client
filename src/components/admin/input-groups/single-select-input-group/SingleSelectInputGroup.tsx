@@ -37,6 +37,7 @@ export const SingleSelectInputGroup = <T extends Record<string, any>>({
                 getOptionName={getOptionName}
                 placeholder={placeholder}
                 disabled={disabled}
+                id={id}
             />
             <InputError error={error} />
         </div>

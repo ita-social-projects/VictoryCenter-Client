@@ -1,8 +1,8 @@
 import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import DefaultIcon from '../../../assets/icons/menu.svg';
 import classNames from 'classnames';
 import './ContextMenuButton.scss';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 export type ContextMenuButtonProps = {
     children: React.ReactNode;
@@ -54,7 +54,7 @@ export const ContextMenuButton = ({ children, onOptionSelected, containerRef, cu
             tabIndex={0}
             onClick={handleToggle}
             onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+                if (e.key === 'Enter') {
                     e.preventDefault();
                     handleToggle();
                 }

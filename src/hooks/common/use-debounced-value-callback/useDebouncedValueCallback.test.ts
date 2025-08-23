@@ -1,7 +1,5 @@
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useDebouncedValueCallback, UseDebouncedValueCallbackProps } from './useDebouncedValueCallback';
-
-jest.useFakeTimers();
 
 describe('useDebouncedValueCallback', () => {
     const setup = <T>(props: UseDebouncedValueCallbackProps<T>) =>
@@ -9,8 +7,15 @@ describe('useDebouncedValueCallback', () => {
             initialProps: props,
         });
 
+    beforeEach(() => {
+        jest.useFakeTimers();
+    });
+
     afterEach(() => {
-        jest.clearAllTimers();
+        // Ensure no dangling timers and reset environment for the next test
+        jest.runOnlyPendingTimers();
+        jest.useRealTimers();
+        jest.clearAllMocks();
     });
 
     it('does not call callback on first render', () => {
@@ -18,7 +23,11 @@ describe('useDebouncedValueCallback', () => {
         setup({ value: 'hello', delayMs: 500, callback } as UseDebouncedValueCallbackProps<string>);
 
         expect(callback).not.toHaveBeenCalled();
-        jest.advanceTimersByTime(500);
+
+        act(() => {
+            jest.advanceTimersByTime(500);
+        });
+
         expect(callback).not.toHaveBeenCalled();
     });
 
@@ -33,7 +42,11 @@ describe('useDebouncedValueCallback', () => {
         rerender({ value: 'changed', delayMs: 500, callback } as UseDebouncedValueCallbackProps<string>);
 
         expect(callback).not.toHaveBeenCalled();
-        jest.advanceTimersByTime(500);
+
+        act(() => {
+            jest.advanceTimersByTime(500);
+        });
+
         expect(callback).toHaveBeenCalledWith('changed');
         expect(callback).toHaveBeenCalledTimes(1);
     });
@@ -53,7 +66,10 @@ describe('useDebouncedValueCallback', () => {
             isDisabled: true,
         } as UseDebouncedValueCallbackProps<string>);
 
-        jest.advanceTimersByTime(300);
+        act(() => {
+            jest.advanceTimersByTime(300);
+        });
+
         expect(callback).not.toHaveBeenCalled();
     });
 
@@ -67,12 +83,17 @@ describe('useDebouncedValueCallback', () => {
 
         rerender({ value: 'first', delayMs: 200, callback } as UseDebouncedValueCallbackProps<string>);
 
-        jest.advanceTimersByTime(100);
+        act(() => {
+            jest.advanceTimersByTime(100);
+        });
+
         expect(callback).not.toHaveBeenCalled();
 
         rerender({ value: 'second', delayMs: 200, callback } as UseDebouncedValueCallbackProps<string>);
 
-        jest.advanceTimersByTime(200);
+        act(() => {
+            jest.advanceTimersByTime(200);
+        });
 
         expect(callback).toHaveBeenCalledTimes(1);
         expect(callback).toHaveBeenCalledWith('second');

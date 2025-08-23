@@ -4,7 +4,15 @@ import { ButtonTooltip, ButtonTooltipProps } from './ButtonTooltip';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { TooltipProps } from '../tooltip/Tooltip';
 
-jest.mock('../../../assets/icons/info.svg', () => 'info-icon.svg');
+// Mock the SVG as a React component instead of a string
+jest.mock('../../../assets/icons/info.svg', () => ({
+    ReactComponent: ({ className, ...props }: any) => (
+        <svg className={className} data-testid="info-icon" {...props}>
+            <title>Info Icon</title>
+        </svg>
+    ),
+}));
+
 jest.mock('../tooltip/Tooltip', () => {
     const React = require('react');
     return {
@@ -31,7 +39,7 @@ describe('ButtonTooltip', () => {
         render(<ButtonTooltip {...defaultProps} {...overrideProps} />);
 
     const getButton = () => screen.getByRole('button', { name: /Show additional information/i });
-    const getIcon = () => screen.getByRole('img');
+    const getIcon = () => screen.getByTestId('info-icon');
     const getTooltip = () => screen.queryByTestId('tooltip-popup');
 
     const clickButton = () => fireEvent.click(getButton());
@@ -45,7 +53,8 @@ describe('ButtonTooltip', () => {
     it('renders with default props and hides tooltip by default', () => {
         renderButtonTooltip();
 
-        expect(getIcon()).toHaveAttribute('src', 'info-icon.svg');
+        expect(getIcon()).toBeInTheDocument();
+        expect(getIcon()).toHaveClass('button-tooltip-icon');
         expect(getTooltip()).not.toBeInTheDocument();
     });
 
@@ -105,13 +114,13 @@ describe('ButtonTooltip', () => {
         expect(button).toHaveAttribute('aria-describedby');
     });
 
-    it('changes alt text depending on tooltip visibility', () => {
+    it('changes aria-label depending on tooltip visibility', () => {
         renderButtonTooltip();
 
-        expect(getIcon()).toHaveAttribute('alt', COMMON_TEXT_ADMIN.ALT.SHOW_TOOLTIP);
+        expect(getIcon()).toHaveAttribute('aria-label', COMMON_TEXT_ADMIN.ALT.SHOW_TOOLTIP);
 
         clickButton();
-        expect(getIcon()).toHaveAttribute('alt', COMMON_TEXT_ADMIN.ALT.HIDE_TOOLTIP);
+        expect(getIcon()).toHaveAttribute('aria-label', COMMON_TEXT_ADMIN.ALT.HIDE_TOOLTIP);
     });
 
     it('handles button click and toggles tooltip', () => {

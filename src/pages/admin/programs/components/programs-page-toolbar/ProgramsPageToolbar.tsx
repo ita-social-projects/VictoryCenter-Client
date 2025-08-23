@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import PlusIcon from '../../../../../assets/icons/plus.svg';
+import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
 import { Button } from '../../../../../components/admin/button/Button';
 import { Select } from '../../../../../components/admin/select/Select';
 import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
@@ -7,7 +7,7 @@ import { ProgramSearchItem } from './program-suggestion-item/ProgramSearchItem';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
-import { ProgramSuggestion } from '../../../../../types/admin/programs';
+import { ProgramSearchItemData } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import {
     PaginationRequestParams,
@@ -33,11 +33,11 @@ export const ProgramsPageToolbar = ({
     statusFilterValue,
 }: ProgramPageToolbarProps) => {
     const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
-    const [localSuggestions, setLocalSuggestions] = useState<ProgramSuggestion[]>([]);
+    const [localSearchItems, setLocalSearchItems] = useState<ProgramSearchItemData[]>([]);
 
-    const getSuggestions = useCallback(
+    const getSearchItems = useCallback(
         async (params: PaginationRequestParams) => {
-            return ProgramsApi.fetchProgramSuggestions(
+            return ProgramsApi.fetchProgramSearchItems(
                 currentSearchTerm,
                 params.offset,
                 params.limit,
@@ -48,61 +48,60 @@ export const ProgramsPageToolbar = ({
     );
 
     const {
-        data: fetchedSuggestions,
-        isLoading: isSuggestionsLoading,
-        hasMore: isSuggestionsHasMore,
-        fetchMore: fetchMoreSuggestions,
-        resetList: resetSuggestionsList,
-    } = useDataPaginationFetch<ProgramSuggestion>({
+        data: fetchedSearchItems,
+        isLoading: isSearchItemsLoading,
+        hasMore: isHasMoreSearchItems,
+        fetchMore: fetchMoreSearchItems,
+        resetList: resetSearchItemsList,
+    } = useDataPaginationFetch<ProgramSearchItemData>({
         initialData: [],
-        fetchHandler: getSuggestions,
+        fetchHandler: getSearchItems,
         autoFetchDependencies: [currentSearchTerm],
         autoFetchDisabled: currentSearchTerm.length < UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH,
         pageSize: SUGGESTIONS_PAGE_SIZE,
     });
 
-    // Sync fetched suggestions with local state
     const onSearch = useCallback((query: string) => {
         setCurrentSearchTerm(query);
         if (query.length < UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH) {
-            setLocalSuggestions([]);
+            setLocalSearchItems([]);
         }
     }, []);
 
     useEffect(() => {
-        setLocalSuggestions(fetchedSuggestions);
-    }, [fetchedSuggestions]);
+        setLocalSearchItems(fetchedSearchItems);
+    }, [fetchedSearchItems]);
 
     const onSuggestionSelected = useCallback(
-        (suggestion: ProgramSuggestion) => {
+        (suggestion: ProgramSearchItemData) => {
             onProgramSelect?.(suggestion.id);
-            resetSuggestionsList();
-            setLocalSuggestions([]);
+            resetSearchItemsList();
+            setLocalSearchItems([]);
             setCurrentSearchTerm('');
         },
-        [onProgramSelect, resetSuggestionsList],
+        [onProgramSelect, resetSearchItemsList],
     );
 
     const handleSearchClear = useCallback(() => {
-        resetSuggestionsList();
-        setLocalSuggestions([]);
+        resetSearchItemsList();
+        setLocalSearchItems([]);
         setCurrentSearchTerm('');
         onSearchClear?.();
-    }, [onSearchClear, resetSuggestionsList]);
+    }, [onSearchClear, resetSearchItemsList]);
 
     return (
         <>
             <div className="programs-toolbar">
                 <div className="programs-toolbar-search">
-                    <SearchBar<ProgramSuggestion>
-                        suggestions={localSuggestions}
-                        onSuggestionSelect={onSuggestionSelected}
-                        getSuggestionKey={(suggestion) => suggestion.id}
-                        getSuggestionLabel={(suggestion) => suggestion.name}
-                        renderSuggestionComponent={ProgramSearchItem}
-                        onLoadMore={fetchMoreSuggestions}
-                        hasMore={isSuggestionsHasMore}
-                        isLoading={isSuggestionsLoading}
+                    <SearchBar<ProgramSearchItemData>
+                        searchItems={localSearchItems}
+                        onSearchItemSelect={onSuggestionSelected}
+                        getSearchItemKey={(suggestion) => suggestion.id}
+                        getSearchItemLabel={(suggestion) => suggestion.name}
+                        renderSearchItemComponent={ProgramSearchItem}
+                        onLoadMore={fetchMoreSearchItems}
+                        hasMore={isHasMoreSearchItems}
+                        isLoading={isSearchItemsLoading}
                         onQueryChange={onSearch}
                         onClear={handleSearchClear}
                         placeholder={PROGRAMS_TEXT.PLACEHOLDER.SEARCH_PROGRAMS}
@@ -130,7 +129,7 @@ export const ProgramsPageToolbar = ({
                         />
                     </Select>
                     <Button onClick={onAddProgram} buttonStyle="primary" data-testid="add-program-button">
-                        {PROGRAMS_TEXT.BUTTON.ADD_PROGRAM} <img src={PlusIcon} alt="plus" />
+                        {PROGRAMS_TEXT.BUTTON.ADD_PROGRAM} <PlusIcon />
                     </Button>
                 </div>
             </div>

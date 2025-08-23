@@ -1,10 +1,10 @@
 import React, { useRef, useMemo, useImperativeHandle, forwardRef } from 'react';
-import { ProgramSuggestion } from '../../../../../../types/admin/programs';
+import { ProgramSearchItemData } from '../../../../../../types/admin/programs';
 import { SearchItemContentRef } from '../../../../../../components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
 import './ProgramSearchItem.scss';
 
 export interface ProgramSearchItemProps {
-    item: ProgramSuggestion;
+    item: ProgramSearchItemData;
 }
 
 export const ProgramSearchItem = forwardRef<SearchItemContentRef, ProgramSearchItemProps>(({ item }, ref) => {

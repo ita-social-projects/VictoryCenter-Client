@@ -9,8 +9,8 @@ export interface SearchItemContentRef {
 
 export interface SearchItemContentRenderProps<T> {
     item: T;
-    isSuggestionActive: boolean;
-    isSuggestionHovered: boolean;
+    isSearchItemActive: boolean;
+    isSearchItemHovered: boolean;
 }
 
 export type SearchItemWrapperRef = SearchItemContentRef;
@@ -68,8 +68,8 @@ function SearchItemWrapperInner<T>(
 
     const contentProps: SearchItemContentRenderProps<T> = {
         item,
-        isSuggestionActive: isActive,
-        isSuggestionHovered: isHovered,
+        isSearchItemActive: isActive,
+        isSearchItemHovered: isHovered,
     };
 
     return (

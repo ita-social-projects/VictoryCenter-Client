@@ -2,14 +2,14 @@ import React, { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { ProgramSearchItem, ProgramSearchItemProps } from './ProgramSearchItem';
 import { SearchItemContentRef } from '../../../../../../components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
-import { ProgramSuggestion } from '../../../../../../types/admin/programs';
+import { ProgramSearchItemData } from '../../../../../../types/admin/programs';
 
 const defaultProps: ProgramSearchItemProps = {
     item: {
         id: 1,
         name: 'Test Program',
         categories: ['Category 1', 'Category 2'],
-    } as ProgramSuggestion,
+    } as ProgramSearchItemData,
 };
 
 const renderComponent = (props: Partial<ProgramSearchItemProps> = {}) => {
@@ -24,7 +24,7 @@ const renderComponent = (props: Partial<ProgramSearchItemProps> = {}) => {
 describe('ProgramSuggestionItem', () => {
     it('should render program name correctly', () => {
         const testName: string = 'My Test Program';
-        const testItem: ProgramSuggestion = {
+        const testItem: ProgramSearchItemData = {
             ...defaultProps.item,
             name: testName,
         };
@@ -35,7 +35,7 @@ describe('ProgramSuggestionItem', () => {
 
     it('should render categories as comma-separated text', () => {
         const testCategories: string[] = ['Sports', 'Health', 'Education'];
-        const testItem: ProgramSuggestion = {
+        const testItem: ProgramSearchItemData = {
             ...defaultProps.item,
             categories: testCategories,
         };
@@ -45,7 +45,7 @@ describe('ProgramSuggestionItem', () => {
     });
 
     it('should render empty categories correctly', () => {
-        const testItem: ProgramSuggestion = {
+        const testItem: ProgramSearchItemData = {
             ...defaultProps.item,
             categories: [],
         };
@@ -74,7 +74,7 @@ describe('ProgramSuggestionItem', () => {
 
     it('should return tooltip content when name overflows', () => {
         const testName: string = 'This is a very long program name that will definitely overflow';
-        const testItem: ProgramSuggestion = {
+        const testItem: ProgramSearchItemData = {
             ...defaultProps.item,
             name: testName,
         };
@@ -102,7 +102,7 @@ describe('ProgramSuggestionItem', () => {
             'Very Long Category Name 2',
             'Very Long Category Name 3',
         ];
-        const testItem: ProgramSuggestion = {
+        const testItem: ProgramSearchItemData = {
             ...defaultProps.item,
             categories: testCategories,
         };
@@ -127,7 +127,7 @@ describe('ProgramSuggestionItem', () => {
     it('should include correct content in tooltip', () => {
         const testName: string = 'Overflow Program';
         const testCategories: string[] = ['Test Category'];
-        const testItem: ProgramSuggestion = {
+        const testItem: ProgramSearchItemData = {
             ...defaultProps.item,
             name: testName,
             categories: testCategories,
@@ -152,14 +152,14 @@ describe('ProgramSuggestionItem', () => {
     });
 
     it('should update tooltip when item changes', () => {
-        const initialItem: ProgramSuggestion = {
+        const initialItem: ProgramSearchItemData = {
             ...defaultProps.item,
             name: 'Initial Name',
             categories: ['Initial Category'],
         };
         const { ref, rerender } = renderComponent({ item: initialItem });
 
-        const updatedItem: ProgramSuggestion = {
+        const updatedItem: ProgramSearchItemData = {
             ...defaultProps.item,
             name: 'Updated Name',
             categories: ['Updated Category'],

@@ -1,11 +1,12 @@
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '../../../../../const/admin/common';
 import { Select } from '../../../../../components/admin/select/Select';
 import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
 import { Button } from '../../../../../components/admin/button/Button';
 import PlusIcon from '../../../../../assets/icons/plus.svg';
 import './TeamPageToolbar.scss';
+
 export interface TeamPageToolbarProps {
     onSearchQueryChange: (query: string) => void;
     onStatusFilterChange: (status: VisibilityStatus | undefined) => void;
@@ -17,15 +18,18 @@ export const TeamPageToolbar = ({ onSearchQueryChange, onStatusFilterChange, onA
         <div className="toolbar" data-testid="team-page-toolbar">
             <div>
                 <SearchBar<string>
-                    getSuggestionKey={(suggestion) => suggestion}
+                    getSearchItemKey={(suggestion) => suggestion}
                     hasMore={false}
-                    suggestions={[]}
+                    searchItems={[]}
                     onLoadMore={() => {}}
                     onQueryChange={onSearchQueryChange}
                     isLoading={false}
-                    getSuggestionLabel={(suggestion) => suggestion}
-                    onSuggestionSelect={(_) => {}}
+                    getSearchItemLabel={(suggestion) => suggestion}
+                    onSearchItemSelect={(_) => {}}
                     placeholder={TEAM_MEMBERS_TEXT.SEARCH.INPUT_FULLNAME}
+                    notFoundMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
+                    minCharactersToSearch={UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH}
+                    searchDelayMs={UI_CONFIG.SEARCH_BAR.SEARCH_DELAY_MS}
                 />
             </div>
             <div className="toolbar-actions">

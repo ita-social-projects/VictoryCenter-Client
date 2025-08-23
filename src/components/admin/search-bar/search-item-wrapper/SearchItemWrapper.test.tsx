@@ -31,11 +31,11 @@ const renderComponent = (props: Partial<SearchItemWrapperProps<TestItem>> = {}) 
 };
 
 const MockRenderContent = forwardRef<SearchItemContentRef, SearchItemContentRenderProps<TestItem>>(
-    ({ item, isSuggestionActive, isSuggestionHovered }, ref) => (
+    ({ item, isSearchItemActive, isSearchItemHovered }, ref) => (
         <div
             data-testid="custom-content"
-            data-active={isSuggestionActive}
-            data-hovered={isSuggestionHovered}
+            data-active={isSearchItemActive}
+            data-hovered={isSearchItemHovered}
             ref={ref as any}
         >
             {item.name}

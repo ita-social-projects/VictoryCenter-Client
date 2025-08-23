@@ -16,7 +16,7 @@ export interface Program {
     img: Image | null;
 }
 
-export interface ProgramSuggestion {
+export interface ProgramSearchItemData {
     id: number;
     name: string;
     categories: string[];

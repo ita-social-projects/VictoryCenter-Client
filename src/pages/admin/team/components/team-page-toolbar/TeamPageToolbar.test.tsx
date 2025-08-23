@@ -1,10 +1,32 @@
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import { TeamPageToolbar } from './TeamPageToolbar';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { VisibilityStatus } from '../../../../../types/admin/common';
+import {SearchBarProps} from "../../../../../components/admin/search-bar/SearchBar";
+import {ProgramSearchItemData} from "../../../../../types/admin/programs";
+
+jest.mock('../../../../../assets/icons/plus.svg', () => 'mocked-plus-icon.svg');
+
+jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
+    SearchBar: ({
+        onQueryChange,
+        onClear,
+        placeholder,
+    }: SearchBarProps<ProgramSearchItemData>) => (
+        <div>
+            <input
+                placeholder={placeholder}
+                onChange={(e) => onQueryChange?.(e.target.value)}
+                data-testid="search-input"
+            />
+            <button onClick={onClear} data-testid="clear-button">
+                Clear
+            </button>
+        </div>
+    ),
+}));
 
 // Local mock for ResizeObserver used by hooks inside TeamPageToolbar
 beforeAll(() => {

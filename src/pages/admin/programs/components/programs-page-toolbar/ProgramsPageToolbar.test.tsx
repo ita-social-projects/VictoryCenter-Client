@@ -2,12 +2,16 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ProgramsPageToolbar } from './ProgramsPageToolbar';
-import { ProgramSuggestion } from '../../../../../types/admin/programs';
+import { ProgramSearchItemData } from '../../../../../types/admin/programs';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonProps } from '../../../../../components/admin/button/Button';
 import { SelectOptionProps, SelectProps } from '../../../../../components/admin/select/Select';
 import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
+
+jest.mock('../../../../../assets/icons/plus.svg', () => ({
+    ReactComponent: ({ ...props }: any) => <svg {...props} data-testid="plus-icon" />,
+}));
 
 jest.mock('../../../../../components/admin/button/Button', () => ({
     Button: ({ children, onClick, type, formId }: ButtonProps) => (
@@ -36,10 +40,10 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
     SearchBar: ({
         onQueryChange,
         onClear,
-        onSuggestionSelect,
-        suggestions,
+        onSearchItemSelect,
+        searchItems,
         placeholder,
-    }: SearchBarProps<ProgramSuggestion>) => (
+    }: SearchBarProps<ProgramSearchItemData>) => (
         <div>
             <input
                 placeholder={placeholder}
@@ -49,8 +53,20 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
             <button onClick={onClear} data-testid="clear-button">
                 Clear
             </button>
-            {suggestions.map((suggestion: any, index: number) => (
-                <div key={index} onClick={() => onSuggestionSelect(suggestion)} data-testid={`suggestion-${index}`}>
+            {searchItems.map((suggestion: any, index: number) => (
+                <div
+                    key={index}
+                    onClick={() => onSearchItemSelect(suggestion)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            onSearchItemSelect(suggestion);
+                        }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    data-testid={`suggestion-${index}`}
+                >
                     {suggestion.name}
                 </div>
             ))}
@@ -58,20 +74,18 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
     ),
 }));
 
-// Правильний мок для useDataPaginationFetch
 jest.mock('../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch');
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 jest.mock('./program-suggestion-item/ProgramSearchItem', () => ({
     ProgramSuggestionItem: ({ item }: any) => <div data-testid="suggestion-item">{item.name}</div>,
 }));
 
-// Правильна назва хука
 const mockUseDataPaginationFetch =
     require('../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
 const mockProgramsApi = require('../../../../../services/api/admin/programs/programs-api').ProgramsApi;
 
 // Helper functions
-const createSuggestion = (id: number, name: string): ProgramSuggestion => ({
+const createSuggestion = (id: number, name: string): ProgramSearchItemData => ({
     id,
     name,
     categories: ['Category'],
@@ -144,7 +158,7 @@ describe('ProgramsPageToolbar', () => {
         render(<ProgramsPageToolbar {...createProps()} />);
 
         const searchInput = screen.getByTestId('search-input');
-        await userEvent.type(searchInput, 'test program');
+        userEvent.type(searchInput, 'test program');
 
         expect(mockUseDataPaginationFetch).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -222,7 +236,7 @@ describe('ProgramsPageToolbar', () => {
 
         await fetchHandler(params);
 
-        expect(mockProgramsApi.fetchProgramSuggestions).toHaveBeenCalledWith(
+        expect(mockProgramsApi.fetchProgramSearchItems).toHaveBeenCalledWith(
             '',
             params.offset,
             params.limit,

@@ -9,35 +9,73 @@ describe('useDebouncedValueCallback', () => {
             initialProps: props,
         });
 
-    it('calls callback after delay', () => {
+    afterEach(() => {
+        jest.clearAllTimers();
+    });
+
+    it('does not call callback on first render', () => {
         const callback = jest.fn();
         setup({ value: 'hello', delayMs: 500, callback } as UseDebouncedValueCallbackProps<string>);
 
         expect(callback).not.toHaveBeenCalled();
         jest.advanceTimersByTime(500);
-        expect(callback).toHaveBeenCalledWith('hello');
+        expect(callback).not.toHaveBeenCalled();
+    });
+
+    it('calls callback after delay when value changes', () => {
+        const callback = jest.fn();
+        const { rerender } = setup({
+            value: 'initial',
+            delayMs: 500,
+            callback,
+        } as UseDebouncedValueCallbackProps<string>);
+
+        rerender({ value: 'changed', delayMs: 500, callback } as UseDebouncedValueCallbackProps<string>);
+
+        expect(callback).not.toHaveBeenCalled();
+        jest.advanceTimersByTime(500);
+        expect(callback).toHaveBeenCalledWith('changed');
+        expect(callback).toHaveBeenCalledTimes(1);
     });
 
     it('does not call callback when disabled', () => {
         const callback = jest.fn();
-        setup({ value: 'test', delayMs: 300, callback, isDisabled: true } as UseDebouncedValueCallbackProps<string>);
+        const { rerender } = setup({
+            value: 'initial',
+            delayMs: 300,
+            callback,
+        } as UseDebouncedValueCallbackProps<string>);
+
+        rerender({
+            value: 'test',
+            delayMs: 300,
+            callback,
+            isDisabled: true,
+        } as UseDebouncedValueCallbackProps<string>);
 
         jest.advanceTimersByTime(300);
         expect(callback).not.toHaveBeenCalled();
     });
 
-    it('clears previous timeout when value changes', () => {
+    it('clears previous timeout when value changes quickly', () => {
         const callback = jest.fn();
         const { rerender } = setup({
-            value: 'first',
+            value: 'initial',
             delayMs: 200,
             callback,
         } as UseDebouncedValueCallbackProps<string>);
 
+        rerender({ value: 'first', delayMs: 200, callback } as UseDebouncedValueCallbackProps<string>);
+
+        jest.advanceTimersByTime(100);
+        expect(callback).not.toHaveBeenCalled();
+
         rerender({ value: 'second', delayMs: 200, callback } as UseDebouncedValueCallbackProps<string>);
+
         jest.advanceTimersByTime(200);
 
         expect(callback).toHaveBeenCalledTimes(1);
         expect(callback).toHaveBeenCalledWith('second');
+        expect(callback).not.toHaveBeenCalledWith('first');
     });
 });

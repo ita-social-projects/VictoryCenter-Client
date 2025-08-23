@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import SearchIcon from '../../../assets/icons/la_search.svg';
-import ClearIcon from '../../../assets/icons/remove-query.svg';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { ReactComponent as SearchIcon } from '../../../assets/icons/la_search.svg';
+import { ReactComponent as ClearIcon } from '../../../assets/icons/remove-query.svg';
 import { Tooltip } from '../tooltip/Tooltip';
 import { InlineLoader } from '../../common/inline-loader/InlineLoader';
 import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/useOnClickOutside';
@@ -20,12 +19,12 @@ import './SearchBar.scss';
 export const TOOLTIP_WIDTH_MULTIPLY = 1.5;
 
 export interface SearchBarProps<T> {
-    suggestions: T[];
+    searchItems: T[];
     onQueryChange: (query: string) => void;
-    onSuggestionSelect: (item: T) => void;
-    getSuggestionKey: (item: T) => string | number;
-    getSuggestionLabel: (item: T) => string;
-    renderSuggestionComponent?: React.ForwardRefExoticComponent<
+    onSearchItemSelect: (item: T) => void;
+    getSearchItemKey: (item: T) => string | number;
+    getSearchItemLabel: (item: T) => string;
+    renderSearchItemComponent?: React.ForwardRefExoticComponent<
         SearchItemContentRenderProps<T> & React.RefAttributes<SearchItemContentRef>
     >;
     onLoadMore: () => void;
@@ -45,18 +44,18 @@ export interface TooltipState {
 }
 
 export const SearchBar = <T,>({
-    suggestions,
-    onSuggestionSelect,
-    getSuggestionKey,
-    getSuggestionLabel,
-    renderSuggestionComponent,
+    searchItems,
+    onSearchItemSelect,
+    getSearchItemKey,
+    getSearchItemLabel,
+    renderSearchItemComponent,
     onLoadMore,
     isLoading,
     hasMore,
     onQueryChange,
     onClear,
-    placeholder = undefined,
-    notFoundMessage = undefined,
+    placeholder = 'Search...',
+    notFoundMessage = 'Nothing found',
     searchDelayMs = 300,
     minCharactersToSearch = 1,
 }: SearchBarProps<T>) => {
@@ -111,14 +110,14 @@ export const SearchBar = <T,>({
 
     const handleItemSelect = useCallback(
         (item: T) => {
-            const label = getSuggestionLabel(item);
+            const label = getSearchItemLabel(item);
             setSearchQuery(label);
-            onSuggestionSelect(item);
+            onSearchItemSelect(item);
             hideTooltip();
             setDropdownVisible(false);
             setActiveIndex(-1);
         },
-        [getSuggestionLabel, onSuggestionSelect, hideTooltip],
+        [getSearchItemLabel, onSearchItemSelect, hideTooltip],
     );
 
     const handleClickOutside = useCallback(() => {
@@ -141,13 +140,13 @@ export const SearchBar = <T,>({
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'ArrowDown') {
             event.preventDefault();
-            setActiveIndex((prevIndex) => (prevIndex < suggestions.length - 1 ? prevIndex + 1 : prevIndex));
+            setActiveIndex((prevIndex) => (prevIndex < searchItems.length - 1 ? prevIndex + 1 : prevIndex));
         } else if (event.key === 'ArrowUp') {
             event.preventDefault();
             setActiveIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : 0));
-        } else if ((event.key === 'Enter' || event.key === ' ') && activeIndex >= 0) {
+        } else if (event.key === 'Enter' && activeIndex >= 0) {
             event.preventDefault();
-            handleItemSelect(suggestions[activeIndex]);
+            handleItemSelect(searchItems[activeIndex]);
         } else if (event.key === 'Escape') {
             setDropdownVisible(false);
         }
@@ -169,7 +168,7 @@ export const SearchBar = <T,>({
         if (tooltipState.positioner && !document.body.contains(tooltipState.positioner)) {
             hideTooltip();
         }
-    }, [suggestions, tooltipState.positioner, hideTooltip]);
+    }, [searchItems, tooltipState.positioner, hideTooltip]);
 
     const onDebouncedCallback = useCallback(
         (query: string) => {
@@ -181,14 +180,14 @@ export const SearchBar = <T,>({
     useDebouncedValueCallback({
         value: debouncedValue,
         delayMs: searchDelayMs,
-        isDisabled: debouncedValue.length < minCharactersToSearch,
         callback: onDebouncedCallback,
+        isDisabled: debouncedValue.length < minCharactersToSearch,
     });
 
     useOnClickOutside({
         ignoreClickRefs: [searchContainerRef],
         onOutsideClick: handleClickOutside,
-        isEnabled: isDropdownVisible,
+        isDisabled: !isDropdownVisible,
     });
 
     const { handleScroll: handleSuggestionsScroll } = useScrollHandler({
@@ -205,26 +204,26 @@ export const SearchBar = <T,>({
         targetVisibleElementsCount: 4.5,
         calculationStrategy: 'basedOnFirstElement',
         calculationDimension: 'height',
-        dependencies: [suggestions],
+        dependencies: [searchItems],
         isDisabledAfterFirstSuccess: true,
     });
 
     suggestionRefs.current.clear();
-    suggestions.forEach((item) => {
-        const key = getSuggestionKey(item);
+    searchItems.forEach((item) => {
+        const key = getSearchItemKey(item);
         suggestionRefs.current.set(key, React.createRef<SearchItemWrapperRef>());
     });
 
     const isShowClearButton = searchQuery.length > 0;
     const isShowNotFoundMessage =
-        !isLoading && suggestions.length === 0 && debouncedValue.length >= minCharactersToSearch;
+        !isLoading && searchItems.length === 0 && debouncedValue.length >= minCharactersToSearch;
     const isShowTooltip = !!tooltipState.positioner && tooltipState.isVisible && !!tooltipState.content;
 
     return (
         <div className="search-bar" ref={searchContainerRef}>
             <div className="search-bar__wrapper">
                 <div className="search-bar__content">
-                    <img src={SearchIcon} className="search-bar__icon" alt="search-icon" />
+                    <SearchIcon className="search-bar__icon" />
                     <input
                         ref={inputRef}
                         type="text"
@@ -233,7 +232,7 @@ export const SearchBar = <T,>({
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
                         onFocus={() => setDropdownVisible(searchQuery.length >= minCharactersToSearch)}
-                        placeholder={placeholder ?? COMMON_TEXT_ADMIN.FILTER.SEARCH_BY_NAME}
+                        placeholder={placeholder}
                         autoComplete="off"
                     />
                     {isShowClearButton && (
@@ -242,7 +241,7 @@ export const SearchBar = <T,>({
                             onClick={handleClear}
                             type="button"
                         >
-                            <img src={ClearIcon} className="search-bar__icon" alt="clear-icon" />
+                            <ClearIcon className="search-bar__icon" />
                         </button>
                     )}
                 </div>
@@ -258,8 +257,8 @@ export const SearchBar = <T,>({
                             ref={suggestionsListRef}
                             onMouseLeave={hideTooltip}
                         >
-                            {suggestions.map((item, index) => {
-                                const key = getSuggestionKey(item);
+                            {searchItems.map((item, index) => {
+                                const key = getSearchItemKey(item);
                                 return (
                                     <SearchItemWrapper<T>
                                         ref={suggestionRefs.current.get(key)}
@@ -271,8 +270,8 @@ export const SearchBar = <T,>({
                                             setActiveIndex(index);
                                             handleItemHover(key, element);
                                         }}
-                                        renderContent={renderSuggestionComponent}
-                                        getItemLabel={getSuggestionLabel}
+                                        renderContent={renderSearchItemComponent}
+                                        getItemLabel={getSearchItemLabel}
                                     />
                                 );
                             })}

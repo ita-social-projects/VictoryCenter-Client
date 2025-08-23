@@ -4,7 +4,7 @@ import {
     ProgramCategory,
     ProgramCreateUpdate,
     ProgramCategoryCreateUpdate,
-    ProgramSuggestion,
+    ProgramSearchItemData,
     Program,
 } from '../../../../types/admin/programs';
 import { mockPrograms, mockCategories } from '../../../../utils/mock-data/admin/programs';
@@ -19,7 +19,7 @@ export let mockDelay = 0;
 export let throwErrorsInApi = false;
 
 // Helper function to convert Program to ProgramSuggestion
-const convertProgramToSuggestion = (program: Program): ProgramSuggestion => {
+const convertProgramToSuggestion = (program: Program): ProgramSearchItemData => {
     return {
         id: program.id,
         name: program.name,
@@ -84,12 +84,12 @@ export const ProgramsApi = {
         };
     },
 
-    fetchProgramSuggestions: async (
+    fetchProgramSearchItems: async (
         searchTerm: string,
         offset: number,
         limit: number,
         options?: RequestOptions,
-    ): Promise<PaginationResult<ProgramSuggestion>> => {
+    ): Promise<PaginationResult<ProgramSearchItemData>> => {
         await simulateAsyncOperation(mockDelay, options?.cancellationSignal);
         if (throwErrorsInApi) throw new Error('Error fetching program suggestions');
 

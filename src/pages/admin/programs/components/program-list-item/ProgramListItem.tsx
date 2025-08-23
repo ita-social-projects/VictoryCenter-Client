@@ -3,7 +3,7 @@ import { VisibilityStatusLabel } from '../../../../../components/admin/visibilit
 import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 import { Program } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import BlankImage from '../../../../../assets/icons/blank-image.svg';
+import { ReactComponent as BlankImage } from '../../../../../assets/icons/blank-image.svg';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './ProgramListItem.scss';
 
@@ -18,7 +18,11 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
         <div className="program-item">
             <div className="program-info">
                 <div className="program-info-identity">
-                    <img src={mapImageToBase64(program.img) || BlankImage} alt={`${program.name}-img`} />
+                    {program.img ? (
+                        <img src={mapImageToBase64(program.img) || ''} alt={`${program.name}-img`} />
+                    ) : (
+                        <BlankImage className="program-info-identity-blank-image" />
+                    )}
                     <p>{program.name}</p>
                 </div>
                 <div className="program-info-description">

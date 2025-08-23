@@ -50,7 +50,7 @@ describe('TextSearchItem', () => {
         expect(React.isValidElement(tooltipContent)).toBe(true);
 
         // @ts-ignore
-        expect(tooltipContent?.props.className).toBe('text-suggestion-content__tooltip');
+        expect(tooltipContent?.props.className).toBe('text-search-item-content__tooltip');
         // @ts-ignore
         expect(tooltipContent?.props.children).toBe(testLabel);
     });

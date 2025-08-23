@@ -8,13 +8,13 @@ export interface Size {
 export interface useObserveElementSizeProps {
     observableElement: RefObject<HTMLElement | null>;
     onSizeChanged?: (size: Size) => void;
-    disableWhen?: boolean;
+    isDisabled?: boolean;
 }
 
 export const useObserveElementSize = ({
     observableElement,
     onSizeChanged,
-    disableWhen = false,
+    isDisabled = false,
 }: useObserveElementSizeProps): Size => {
     const [size, setSize] = useState<Size>({
         width: 0,
@@ -31,7 +31,7 @@ export const useObserveElementSize = ({
     useLayoutEffect(() => {
         const element = observableElement.current;
 
-        if (disableWhen || !element) {
+        if (isDisabled || !element) {
             setSize((currentSize) => {
                 if (currentSize.width !== 0 || currentSize.height !== 0) {
                     return { width: 0, height: 0 };
@@ -63,7 +63,7 @@ export const useObserveElementSize = ({
         return () => {
             observer.disconnect();
         };
-    }, [observableElement, disableWhen]);
+    }, [observableElement, isDisabled]);
 
     return size;
 };

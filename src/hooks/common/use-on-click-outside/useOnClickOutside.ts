@@ -3,16 +3,16 @@ import React, { useEffect } from 'react';
 export interface UseOnClickOutsideProps<T extends HTMLElement> {
     ignoreClickRefs: React.RefObject<T | null>[];
     onOutsideClick: (event: Event) => void;
-    isEnabled?: boolean;
+    isDisabled?: boolean;
 }
 
 export const useOnClickOutside = <T extends HTMLElement = HTMLElement>({
     ignoreClickRefs,
     onOutsideClick,
-    isEnabled = true,
+    isDisabled = false,
 }: UseOnClickOutsideProps<T>): void => {
     useEffect(() => {
-        if (!isEnabled) {
+        if (isDisabled) {
             return;
         }
 
@@ -35,5 +35,5 @@ export const useOnClickOutside = <T extends HTMLElement = HTMLElement>({
             document.removeEventListener('mousedown', handleClickOutside);
             document.removeEventListener('touchstart', handleClickOutside);
         };
-    }, [isEnabled, ignoreClickRefs, onOutsideClick]);
+    }, [isDisabled, ignoreClickRefs, onOutsideClick]);
 };

@@ -30,7 +30,7 @@ describe('useObserveElementSize', () => {
         const { result } = renderHook(() =>
             useObserveElementSize({
                 observableElement: { current: element },
-                disableWhen: true,
+                isDisabled: true,
             }),
         );
 
@@ -61,7 +61,7 @@ describe('useObserveElementSize', () => {
         renderHook(() =>
             useObserveElementSize({
                 observableElement: { current: element },
-                disableWhen: true,
+                isDisabled: true,
             }),
         );
 
@@ -88,7 +88,7 @@ describe('useObserveElementSize', () => {
             ({ disabled }) =>
                 useObserveElementSize({
                     observableElement: { current: element },
-                    disableWhen: disabled,
+                    isDisabled: disabled,
                 }),
             { initialProps: { disabled: false } },
         );

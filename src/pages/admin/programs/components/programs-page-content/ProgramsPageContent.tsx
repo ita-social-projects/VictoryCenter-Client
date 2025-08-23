@@ -11,12 +11,12 @@ import { ProgramsApi } from '../../../../../services/api/admin/programs/programs
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { RequestOptions } from '../../../../../types/common/api';
-import './ProgramsPageContent.scss';
 import { useDataFetch } from '../../../../../hooks/admin/fetch/use-data-fetch/useDataFetch';
 import {
     PaginationRequestParams,
     useDataPaginationFetch,
 } from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
+import './ProgramsPageContent.scss';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;

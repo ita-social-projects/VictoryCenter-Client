@@ -6,6 +6,7 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { VisibilityStatusLabelProps } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { Program } from '../../../../../types/admin/programs';
+import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 
 jest.mock('../../../../../assets/icons/blank-image.svg', () => ({
     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="blank-image" className={className} />,
@@ -30,11 +31,11 @@ jest.mock('../../../../../components/admin/visibility-status-label/VisibilitySta
     };
 });
 
-jest.mock('../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64', () => ({
-    mapImageToBase64: jest.fn((img: any) => (img ? 'data:image/png;base64,test' : null)),
-}));
+jest.mock('../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64');
 
 describe('ProgramListItem', () => {
+    const mockMapImageToBase64 = mapImageToBase64 as jest.MockedFunction<typeof mapImageToBase64>;
+
     const mockProgram: Program = {
         id: 1,
         name: 'Test Program',
@@ -91,6 +92,7 @@ describe('ProgramListItem', () => {
 
     afterEach(() => {
         jest.clearAllMocks();
+        mockMapImageToBase64.mockClear();
     });
 
     it('renders program information correctly', () => {
@@ -166,12 +168,68 @@ describe('ProgramListItem', () => {
         expect(getProgramActionsButtons()).toBeInTheDocument();
     });
 
-    it('displays image when program has an image', () => {
-        const programWithImage = { ...mockProgram, img: null };
+    it('displays image when program has an image and mapImageToBase64 returns a string', () => {
+        mockMapImageToBase64.mockReturnValue('data:image/png;base64,test');
+
+        const programWithImage: Program = {
+            ...mockProgram,
+            img: {
+                id: 1,
+                base64: 'test-base64',
+                mimeType: 'image/png',
+                size: 1000,
+            },
+        };
+
         renderProgramListItem({ program: programWithImage });
 
-        expect(getBlankImage()).toBeInTheDocument();
-        expect(getBlankImage()).toHaveClass('program-info-identity-blank-image');
-        expect(getProgramImage()).not.toBeInTheDocument();
+        const imgElement = getProgramImage();
+        expect(imgElement).toBeInTheDocument();
+        expect(imgElement).toHaveAttribute('alt', 'Test Program-img');
+        expect(imgElement).toHaveAttribute('src', 'data:image/png;base64,test');
+        expect(screen.queryByTestId('blank-image')).not.toBeInTheDocument();
+    });
+
+    it('displays image with empty src when program has image but mapImageToBase64 returns null', () => {
+        mockMapImageToBase64.mockReturnValue(null);
+
+        const programWithImage: Program = {
+            ...mockProgram,
+            img: {
+                id: 1,
+                base64: 'test-base64',
+                mimeType: 'image/png',
+                size: 1000,
+            },
+        };
+
+        renderProgramListItem({ program: programWithImage });
+
+        const imgElement = getProgramImage();
+        expect(imgElement).toBeInTheDocument();
+        expect(imgElement).toHaveAttribute('alt', 'Test Program-img');
+        expect(imgElement).not.toHaveAttribute('src');
+        expect(screen.queryByTestId('blank-image')).not.toBeInTheDocument();
+    });
+
+    it('uses fallback empty string when mapImageToBase64 returns null due to || operator', () => {
+        mockMapImageToBase64.mockReturnValue(null);
+
+        const programWithImage: Program = {
+            ...mockProgram,
+            img: {
+                id: 1,
+                base64: 'test-base64',
+                mimeType: 'image/png',
+                size: 1000,
+            },
+        };
+
+        renderProgramListItem({ program: programWithImage });
+
+        const imgElement = getProgramImage();
+        expect(imgElement).toBeInTheDocument();
+        expect(imgElement).not.toHaveAttribute('src');
+        expect(mockMapImageToBase64).toHaveBeenCalledWith(programWithImage.img);
     });
 });

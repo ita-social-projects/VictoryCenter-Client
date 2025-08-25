@@ -228,9 +228,15 @@ export const ProgramsPageContent = () => {
                 ),
             );
 
-            updatePrograms((prev) => [addedProgram, ...prev]);
+            const belongsToSelectedCategory = selectedCategory
+                ? addedProgram.categories.some((c) => c.id === selectedCategory.id)
+                : false;
+            const statusMatches = statusFilter === undefined || addedProgram.status === statusFilter;
+            if (belongsToSelectedCategory && statusMatches) {
+                updatePrograms((prev) => [addedProgram, ...prev]);
+            }
         },
-        [updatePrograms, updateCategories],
+        [updatePrograms, updateCategories, selectedCategory, statusFilter],
     );
 
     const handleEditProgram = useCallback(
@@ -266,9 +272,10 @@ export const ProgramsPageContent = () => {
 
             // Update program in local programs list
             const belongsToSelectedCategory =
-                selectedCategory && updatedProgram.categories.some((cat) => cat.id === selectedCategory.id);
+                !!selectedCategory && updatedProgram.categories.some((cat) => cat.id === selectedCategory.id);
+            const statusMatches = statusFilter === undefined || updatedProgram.status === statusFilter;
 
-            if (belongsToSelectedCategory) {
+            if (belongsToSelectedCategory && statusMatches) {
                 updatePrograms((prev) => prev.map((p) => (p.id === updatedProgram.id ? updatedProgram : p)));
             } else {
                 updatePrograms((prev) => prev.filter((p) => p.id !== updatedProgram.id));
@@ -282,6 +289,7 @@ export const ProgramsPageContent = () => {
             selectedCategory,
             isSearchResultView,
             fetchedSearchProgram,
+            statusFilter,
         ],
     );
 

@@ -19,7 +19,7 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
             <div className="program-info">
                 <div className="program-info-identity">
                     {program.img ? (
-                        <img src={mapImageToBase64(program.img) || ''} alt={`${program.name}-img`} />
+                        <img src={mapImageToBase64(program.img) || undefined} alt={`${program.name}-img`} />
                     ) : (
                         <BlankImage className="program-info-identity-blank-image" />
                     )}

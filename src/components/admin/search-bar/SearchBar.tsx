@@ -138,17 +138,27 @@ export const SearchBar = <T,>({
     };
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (searchItems.length === 0) {
+            return;
+        }
+
         if (event.key === 'ArrowDown') {
             event.preventDefault();
-            setActiveIndex((prevIndex) => (prevIndex < searchItems.length - 1 ? prevIndex + 1 : prevIndex));
+            setActiveIndex((prevIndex) => {
+                const maxIndex = searchItems.length - 1;
+                return prevIndex < maxIndex ? prevIndex + 1 : prevIndex;
+            });
         } else if (event.key === 'ArrowUp') {
             event.preventDefault();
-            setActiveIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : 0));
-        } else if (event.key === 'Enter' && activeIndex >= 0) {
+            setActiveIndex((prevIndex) => {
+                return prevIndex > 0 ? prevIndex - 1 : 0;
+            });
+        } else if (event.key === 'Enter' && activeIndex >= 0 && activeIndex < searchItems.length) {
             event.preventDefault();
             handleItemSelect(searchItems[activeIndex]);
         } else if (event.key === 'Escape') {
             setDropdownVisible(false);
+            setActiveIndex(-1);
         }
     };
 
@@ -170,17 +180,10 @@ export const SearchBar = <T,>({
         }
     }, [searchItems, tooltipState.positioner, hideTooltip]);
 
-    const onDebouncedCallback = useCallback(
-        (query: string) => {
-            onQueryChange(query);
-        },
-        [onQueryChange],
-    );
-
     useDebouncedValueCallback({
         value: debouncedValue,
         delayMs: searchDelayMs,
-        callback: onDebouncedCallback,
+        callback: onQueryChange,
         isDisabled: debouncedValue.length < minCharactersToSearch,
     });
 

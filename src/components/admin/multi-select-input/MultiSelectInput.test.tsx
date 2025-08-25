@@ -306,11 +306,23 @@ describe('Multiselect Component', () => {
             expectOnChangeToBeCalledWith([mockOptions[0]]);
         });
 
+        it('handles Escape key on options - closes dropdown and calls onBlur', () => {
+            renderMultiSelectInput(createPropsWithCallbacks());
+            openDropdown();
+            expectDropdownToBeOpen();
+
+            pressKeyOnOption(mockOptions[0], 'Escape');
+
+            expectDropdownToBeClosed();
+            expectOnBlurToBeCalled();
+            expectOnChangeNotToBeCalled();
+        });
+
         it('does not trigger selection on other key events', () => {
             renderMultiSelectInput(createPropsWithCallbacks());
             openDropdown();
 
-            const nonTriggerKeys = ['Tab', 'Escape', 'ArrowDown', 'a'];
+            const nonTriggerKeys = ['Tab', 'ArrowDown', 'a'];
             nonTriggerKeys.forEach((key) => {
                 pressKeyOnOption(mockOptions[0], key);
             });
@@ -328,6 +340,14 @@ describe('Multiselect Component', () => {
             await waitFor(() => {
                 expectOnBlurToBeCalled();
             });
+        });
+
+        it('calls onBlur when Escape key is pressed', () => {
+            renderMultiSelectInput(createPropsWithCallbacks());
+            openDropdown();
+
+            pressKeyOnOption(mockOptions[0], 'Escape');
+            expectOnBlurToBeCalled();
         });
     });
 });

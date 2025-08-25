@@ -1,15 +1,16 @@
-import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import React, { RefObject, useCallback, useRef, useState } from 'react';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/useOnClickOutside';
 import DefaultIcon from '../../../assets/icons/menu.svg';
 import classNames from 'classnames';
 import './ContextMenuButton.scss';
 
-export type ContextMenuButtonProps = {
+export interface ContextMenuButtonProps {
     children: React.ReactNode;
     onOptionSelected: (value: string, data?: any) => void;
     containerRef?: RefObject<HTMLDivElement | null>;
     customIcon?: string;
-};
+}
 
 export const ContextMenuButton = ({ children, onOptionSelected, containerRef, customIcon }: ContextMenuButtonProps) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -27,21 +28,15 @@ export const ContextMenuButton = ({ children, onOptionSelected, containerRef, cu
         [onOptionSelected],
     );
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (isOpen && menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
-        };
+    const handleClickOutside = useCallback(() => {
+        setIsOpen(false);
+    }, []);
 
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isOpen]);
+    useOnClickOutside({
+        ignoreClickRefs: [menuRef],
+        onOutsideClick: handleClickOutside,
+        isDisabled: !isOpen,
+    });
 
     return (
         <div
@@ -85,14 +80,14 @@ export const ContextMenuButton = ({ children, onOptionSelected, containerRef, cu
     );
 };
 
-export type ContextMenuOptionProps = {
+export interface ContextMenuOptionProps {
     children: React.ReactNode;
     value: string;
     data?: any;
     onOptionClick?: (value: string, data?: any) => void;
     className?: string;
     disabled?: boolean;
-};
+}
 
 ContextMenuButton.Option = ({
     children,

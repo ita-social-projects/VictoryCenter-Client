@@ -74,9 +74,13 @@ export const MultiSelectInput = <T,>({
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 toggleOption(option);
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                setIsOpen(false);
+                onBlur?.();
             }
         },
-        [toggleOption],
+        [toggleOption, onBlur],
     );
 
     const handleOutsideClick = useCallback(() => {

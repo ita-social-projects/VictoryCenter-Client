@@ -17,13 +17,12 @@ jest.mock('../../../hooks/common/use-container-size-from-children/useContainerSi
 
 // @ts-ignore
 jest.mock('./search-item-wrapper/SearchItemWrapper', () => ({
-    SearchItemWrapper: ({ item, onSelect, onHover, getItemLabel, isActive }: SearchItemWrapperProps<TestItem>) => (
+    SearchItemWrapper: ({ item, onSelect, getItemLabel, isActive }: SearchItemWrapperProps<TestItem>) => (
         // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
         <li
             className={`suggestion-item ${isActive ? 'active' : ''}`}
             onClick={onSelect}
             onKeyDown={(e) => e.key === 'Enter' && onSelect?.()}
-            onMouseEnter={() => onHover}
             data-testid={`suggestion-${getItemLabel(item)}`}
         >
             {getItemLabel(item)}

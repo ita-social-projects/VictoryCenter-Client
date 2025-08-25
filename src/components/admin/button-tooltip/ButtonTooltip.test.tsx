@@ -16,17 +16,22 @@ jest.mock('../../../assets/icons/info.svg', () => ({
 jest.mock('../tooltip/Tooltip', () => {
     const React = require('react');
     return {
-        Tooltip: React.forwardRef(({ id, children, position }: Partial<TooltipProps>, ref: any) => (
-            <div
-                ref={ref}
-                data-testid="tooltip-popup"
-                id={id}
-                role="tooltip"
-                className={`button-tooltip-popup button-tooltip-popup--${position}`}
-            >
-                {children}
-            </div>
-        )),
+        Tooltip: React.forwardRef(
+            ({ id, children, position = 'bottom', allowClickThrough }: Partial<TooltipProps>, ref: any) => (
+                <div
+                    ref={ref}
+                    data-testid="tooltip-popup"
+                    id={id}
+                    role="tooltip"
+                    className={`button-tooltip-popup button-tooltip-popup--${position}`}
+                    onMouseDown={(e) => {
+                        if (allowClickThrough) e.stopPropagation();
+                    }}
+                >
+                    {children}
+                </div>
+            ),
+        ),
     };
 });
 

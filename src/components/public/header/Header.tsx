@@ -6,7 +6,7 @@ import { PUBLIC_ROUTES } from '../../../const/public/routes';
 // import { ABOUT_US, CONTACT_US, DONATE, HOW_TO_SUPPORT, PROGRAMS, REPORTING } from '../../../const/public/header';
 import { ReactComponent as BurgerIcon } from '../../../assets/icons/burger.svg';
 import { useTranslation } from 'react-i18next';
-import '../../../i18n';
+
 import { LanguageSwitcher } from '../language-switcher/LanguageSwitcher';
 
 export const Header = () => {

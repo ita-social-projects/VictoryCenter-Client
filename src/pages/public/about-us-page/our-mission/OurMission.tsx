@@ -5,7 +5,6 @@ import ArrowIcon from '../../../../assets/icons/arrow-up-right.svg';
 import { PUBLIC_ROUTES } from '../../../../const/public/routes';
 import { ScrollableFrame } from './scrollable-frame/ScrollableFrame';
 import { useTranslation } from 'react-i18next';
-import '../../../../i18n';
 
 export const OurMission = () => {
     const { t } = useTranslation('aboutUsPage');

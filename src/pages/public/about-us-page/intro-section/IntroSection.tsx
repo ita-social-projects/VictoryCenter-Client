@@ -2,10 +2,8 @@ import background from '../../../../assets/images/public/about-us-page/backgroun
 // import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import './IntroSection.scss';
 import { useTranslation } from 'react-i18next';
-import '../../../../i18n';
 
 export const AboutUsIntro = () => {
-
     const { t } = useTranslation('aboutUsPage');
 
     return (

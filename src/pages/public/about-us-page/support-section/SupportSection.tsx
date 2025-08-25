@@ -1,7 +1,6 @@
 import './SupportSection.scss';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import { useTranslation } from 'react-i18next';
-import '../../../../i18n';
 
 export const SupportSection = () => {
     const { t } = useTranslation('aboutUsPage');

@@ -1,17 +1,17 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DeleteProgramModal, DeleteProgramModalProps } from './DeleteProgramModal';
-import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
-import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { Program } from '../../../../../types/admin/programs';
-import { VisibilityStatus } from '../../../../../types/admin/common';
+import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
+import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
+import { Program } from '../../../../../../types/admin/programs';
+import { VisibilityStatus } from '../../../../../../types/admin/common';
 
-jest.mock('../../../../../services/api/admin/programs/programs-api');
+jest.mock('../../../../../../services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
-jest.mock('../../../../../components/common/modal/Modal', () => {
+jest.mock('../../../../../../components/common/modal/Modal', () => {
     const ModalMock = ({ isOpen, onClose, children, 'data-testid': dataTestId }: any) =>
         isOpen ? (
             <div data-testid={dataTestId}>
@@ -32,7 +32,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     };
 });
 
-jest.mock('../../../../../components/admin/button/Button', () => ({
+jest.mock('../../../../../../components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled }: any) => (
         <button onClick={onClick} disabled={disabled}>
             {children}
@@ -174,6 +174,30 @@ describe('DeleteProgramModal', () => {
 
             await waitFor(() => {
                 expectModalClosed();
+            });
+        });
+
+        it('should not close modal when submitting', async () => {
+            let resolveRequest!: () => void;
+            const longRunningPromise = new Promise<void>((resolve) => {
+                resolveRequest = resolve;
+            });
+            mockedProgramsApi.deleteProgram.mockReturnValue(longRunningPromise);
+
+            renderDeleteProgramModal();
+
+            clickDeleteButton();
+
+            await waitFor(() => {
+                expect(getDeleteButton()).toBeDisabled();
+            });
+
+            clickCancelButton();
+
+            expectModalNotClosed();
+
+            await act(async () => {
+                resolveRequest();
             });
         });
     });

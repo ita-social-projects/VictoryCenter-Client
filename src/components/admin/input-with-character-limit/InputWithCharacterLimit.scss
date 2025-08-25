@@ -1,6 +1,6 @@
 @use '../../../assets/sass/variables/colors';
 
-.input-line-wrapper {
+.char-limit-input {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -11,29 +11,28 @@
     box-shadow: 0 1px 2px 0 rgba(colors.$blue-900, 0.051);
     font-size: 16px;
 
-    &-focused {
+    &--focused {
         border-color: colors.$grey-700;
     }
 
-    &-disabled {
+    &--disabled {
         background-color: colors.$grey-600;
         border-color: colors.$grey-900;
     }
 
-    &-input {
+    &__field {
         flex: 1;
         padding: 0;
         border: none;
         outline: none;
         background: none;
-
-        color: colors.$grey-900;
+        color: colors.$blue-500;
         font-size: 16px;
         font-weight: 400;
         line-height: 24px;
     }
 
-    &-character-limit {
+    &__counter {
         white-space: nowrap;
         color: colors.$grey-900;
     }

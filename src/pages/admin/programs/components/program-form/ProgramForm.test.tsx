@@ -3,59 +3,107 @@ import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from './ProgramForm';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
-import { InputLabelProps } from '../../../../../components/admin/input-label/InputLabel';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { Image } from '../../../../../types/common/image';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 
-jest.mock('../../../../../components/admin/input-label/InputLabel', () => ({
-    InputLabel: ({ htmlFor, text, isRequired }: InputLabelProps) => (
-        <div data-testid="input-label-mock">
-            Label: {text} {isRequired && '*'} (for: {htmlFor})
+jest.mock(
+    '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
+    () => ({
+        InputWithCharacterLimitGroup: (props: any) => (
+            <div data-testid={`input-group-${props.id}`}>
+                <label htmlFor={props.id}>
+                    {props.label} {props.isRequired && '*'}
+                </label>
+                <input
+                    id={props.id}
+                    name={props.name}
+                    value={props.value}
+                    onChange={props.onChange}
+                    onBlur={props.onBlur}
+                    disabled={props.disabled}
+                    maxLength={props.maxLength}
+                    data-testid={`input-${props.name}`}
+                />
+                {props.error && <div data-testid={`error-${props.id}`}>{props.error}</div>}
+            </div>
+        ),
+    }),
+);
+
+jest.mock(
+    '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
+    () => ({
+        TextAreaWithCharacterLimitGroup: (props: any) => (
+            <div data-testid={`textarea-group-${props.id}`}>
+                <label htmlFor={props.id}>
+                    {props.label} {props.isRequired && '*'}
+                </label>
+                <textarea
+                    id={props.id}
+                    name={props.name}
+                    value={props.value}
+                    onChange={props.onChange}
+                    onBlur={props.onBlur}
+                    disabled={props.disabled}
+                    maxLength={props.maxLength}
+                    rows={props.rows}
+                    data-testid={`textarea-${props.name}`}
+                />
+                {props.error && <div data-testid={`error-${props.id}`}>{props.error}</div>}
+            </div>
+        ),
+    }),
+);
+
+jest.mock('../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup', () => ({
+    MultiSelectInputGroup: (props: any) => (
+        <div data-testid={`multiselect-group-${props.id}`}>
+            <label htmlFor={props.id}>
+                {props.label} {props.isRequired && '*'}
+            </label>
+            <select
+                multiple
+                id={props.id}
+                data-testid="categories-select"
+                value={props.value.map((v: any) => v.id)}
+                onChange={(e) => {
+                    const selectedIds = Array.from(e.target.selectedOptions, (option) => Number(option.value));
+                    const selectedOptions = props.options.filter((opt: any) => selectedIds.includes(opt.id));
+                    props.onChange(selectedOptions);
+                }}
+                onBlur={props.onBlur}
+                disabled={props.disabled}
+            >
+                <option value="">{props.placeholder}</option>
+                {props.options.map((opt: any) => (
+                    <option key={props.getOptionId(opt)} value={props.getOptionId(opt)}>
+                        {props.getOptionName(opt)}
+                    </option>
+                ))}
+            </select>
+            {props.error && <div data-testid={`error-${props.id}`}>{props.error}</div>}
         </div>
     ),
 }));
 
-jest.mock('../../../../../components/admin/multi-select-input/MultiSelectInput', () => ({
-    MultiSelectInput: (props: any) => (
-        <select
-            multiple
-            data-testid="categories-select"
-            value={props.value.map((v: any) => v.id)}
-            onChange={(e) => {
-                const selectedIds = Array.from(e.target.selectedOptions, (option) => Number(option.value));
-                const selectedOptions = props.options.filter((opt: any) => selectedIds.includes(opt.id));
-                props.onChange(selectedOptions);
-            }}
-            onBlur={props.onBlur}
-            disabled={props.disabled}
-        >
-            {props.options.map((opt: any) => (
-                <option key={opt.id} value={opt.id}>
-                    {opt.name}
-                </option>
-            ))}
-        </select>
+jest.mock('../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup', () => ({
+    PhotoInputGroup: (props: any) => (
+        <div data-testid={`photo-group-${props.id}`}>
+            <label htmlFor={props.id}>
+                {props.label} {props.isRequired && '*'}
+            </label>
+            <input
+                type="file"
+                id={props.id}
+                name={props.name}
+                data-testid="img-input"
+                onChange={(e) => props.onChange(e.target.files?.[0])}
+                disabled={props.disabled}
+            />
+            {props.error && <div data-testid={`error-${props.id}`}>{props.error}</div>}
+        </div>
     ),
-}));
-
-jest.mock('../../../../../components/admin/photo-input/PhotoInput', () => ({
-    PhotoInput: (props: any) => (
-        <input
-            type="file"
-            data-testid="img-input"
-            onChange={(e) => props.onChange(e.target.files?.[0])}
-            disabled={props.disabled}
-        />
-    ),
-}));
-
-jest.mock('../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
-    InputWithCharacterLimit: (props: any) => <input {...props} data-testid={`input-${props.name}`} />,
-}));
-
-jest.mock('../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
-    TextAreaWithCharacterLimit: (props: any) => <textarea {...props} data-testid={`textarea-${props.name}`} />,
 }));
 
 describe('ProgramForm', () => {
@@ -104,7 +152,7 @@ describe('ProgramForm', () => {
     });
 
     it('should disable all form fields if formDisabled is true', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} formDisabled={true} />);
+        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} isFormDisabled={true} />);
 
         await waitFor(() => {
             expect(screen.getByTestId('input-name')).toBeDisabled();
@@ -132,8 +180,10 @@ describe('ProgramForm', () => {
             formRef.current?.submit(VisibilityStatus.Draft);
         });
 
-        expect(await screen.findByText(PROGRAM_VALIDATION.name.getRequiredError())).toBeInTheDocument();
-        expect(await screen.findByText(PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError())).toBeInTheDocument();
+        expect(await screen.findByTestId('error-name')).toHaveTextContent(PROGRAM_VALIDATION.name.getRequiredError());
+        expect(await screen.findByTestId('error-categories')).toHaveTextContent(
+            PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError(),
+        );
         expect(mockOnSubmit).not.toHaveBeenCalled();
     });
 
@@ -144,12 +194,16 @@ describe('ProgramForm', () => {
             formRef.current?.submit(VisibilityStatus.Published);
         });
 
-        expect(await screen.findByText(PROGRAM_VALIDATION.name.getRequiredError())).toBeInTheDocument();
-        expect(await screen.findByText(PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError())).toBeInTheDocument();
-        expect(
-            await screen.findByText(PROGRAM_VALIDATION.description.getRequiredWhenPublishingError()),
-        ).toBeInTheDocument();
-        expect(await screen.findByText(PROGRAM_VALIDATION.img.getRequiredWhenPublishingError())).toBeInTheDocument();
+        expect(await screen.findByTestId('error-name')).toHaveTextContent(PROGRAM_VALIDATION.name.getRequiredError());
+        expect(await screen.findByTestId('error-categories')).toHaveTextContent(
+            PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError(),
+        );
+        expect(await screen.findByTestId('error-description')).toHaveTextContent(
+            PROGRAM_VALIDATION.description.getRequiredWhenPublishingError(),
+        );
+        expect(await screen.findByTestId('error-img')).toHaveTextContent(
+            PROGRAM_VALIDATION.img.getRequiredWhenPublishingError(),
+        );
         expect(mockOnSubmit).not.toHaveBeenCalled();
     });
 
@@ -160,7 +214,8 @@ describe('ProgramForm', () => {
         fireEvent.change(nameInput, { target: { value: 'a'.repeat(PROGRAM_VALIDATION.name.max + 1) } });
         fireEvent.blur(nameInput);
 
-        expect(await screen.findByText(PROGRAM_VALIDATION.name.getMaxError())).toBeInTheDocument();
+        // Змінив селектор помилки для групи компонентів
+        expect(await screen.findByTestId('error-name')).toHaveTextContent(PROGRAM_VALIDATION.name.getMaxError());
     });
 
     it('should show max length error for description', async () => {
@@ -170,7 +225,9 @@ describe('ProgramForm', () => {
         fireEvent.change(descriptionInput, { target: { value: 'a'.repeat(PROGRAM_VALIDATION.description.max + 1) } });
         fireEvent.blur(descriptionInput);
 
-        expect(await screen.findByText(PROGRAM_VALIDATION.description.getMaxError())).toBeInTheDocument();
+        expect(await screen.findByTestId('error-description')).toHaveTextContent(
+            PROGRAM_VALIDATION.description.getMaxError(),
+        );
     });
 
     it('should successfully submit valid data in "Draft" mode', async () => {

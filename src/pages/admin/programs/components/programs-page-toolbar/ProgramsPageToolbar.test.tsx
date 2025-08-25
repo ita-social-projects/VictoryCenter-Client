@@ -116,7 +116,7 @@ describe('ProgramsPageToolbar', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockUseDataPaginationFetch.mockReturnValue(mockHookReturn);
-        mockProgramsApi.fetchProgramSuggestions = jest.fn().mockResolvedValue({
+        mockProgramsApi.fetchProgramSearchItems = jest.fn().mockResolvedValue({
             items: [],
             totalItemsCount: 0,
         });

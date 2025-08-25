@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DeleteProgramModal, DeleteProgramModalProps } from './DeleteProgramModal';
 import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
@@ -174,6 +174,30 @@ describe('DeleteProgramModal', () => {
 
             await waitFor(() => {
                 expectModalClosed();
+            });
+        });
+
+        it('should not close modal when submitting', async () => {
+            let resolveRequest!: () => void;
+            const longRunningPromise = new Promise<void>((resolve) => {
+                resolveRequest = resolve;
+            });
+            mockedProgramsApi.deleteProgram.mockReturnValue(longRunningPromise);
+
+            renderDeleteProgramModal();
+
+            clickDeleteButton();
+
+            await waitFor(() => {
+                expect(getDeleteButton()).toBeDisabled();
+            });
+
+            clickCancelButton();
+
+            expectModalNotClosed();
+
+            await act(async () => {
+                resolveRequest();
             });
         });
     });

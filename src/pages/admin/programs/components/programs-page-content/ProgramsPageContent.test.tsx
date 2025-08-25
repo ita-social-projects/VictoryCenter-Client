@@ -423,4 +423,73 @@ describe('ProgramsPageContent', () => {
             expect(screen.getAllByTestId('program-item')).toHaveLength(2);
         });
     });
+
+    it('handles no selected category in getFilteredPrograms', async () => {
+        mockProgramsApi.fetchProgramCategories.mockResolvedValue([]);
+
+        render(<ProgramsPageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('empty')).toBeInTheDocument();
+        });
+    });
+
+    it('handles no searchProgramId in getSearchedProgram', async () => {
+        render(<ProgramsPageContent />);
+
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
+        });
+
+        fireEvent.click(screen.getByTestId('select-program'));
+
+        fireEvent.click(screen.getByTestId('clear-search'));
+
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
+        });
+    });
+
+    it('displays search program fetch error and retries with refetchSearchProgram', async () => {
+        render(<ProgramsPageContent />);
+
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-item')).toHaveLength(2);
+        });
+
+        mockProgramsApi.fetchProgramById.mockRejectedValue(new Error('Search failed'));
+
+        fireEvent.click(screen.getByTestId('select-program'));
+
+        await waitFor(() => {
+            expect(screen.getByText(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAM)).toBeInTheDocument();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN)).toBeInTheDocument();
+        });
+
+        mockProgramsApi.fetchProgramById.mockResolvedValue(mockPrograms[0]);
+
+        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN));
+
+        await waitFor(() => {
+            expect(mockProgramsApi.fetchProgramById).toHaveBeenCalledTimes(2);
+            expect(screen.getAllByTestId('program-item')).toHaveLength(1);
+        });
+    });
+
+    it('handles category selection change', async () => {
+        render(<ProgramsPageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-1')).toBeDisabled();
+            expect(screen.getByTestId('category-2')).not.toBeDisabled();
+        });
+
+        fireEvent.click(screen.getByTestId('category-2'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-1')).not.toBeDisabled();
+            expect(screen.getByTestId('category-2')).toBeDisabled();
+            expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledTimes(2);
+        });
+    });
 });

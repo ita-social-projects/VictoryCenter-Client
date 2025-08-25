@@ -7,6 +7,7 @@ import { InfiniteScrollList } from '../../../../../components/admin/infinite-scr
 import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/category-bar/CategoryBar';
 import { ProgramListItem } from '../program-list-item/ProgramListItem';
 import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
+import { useCategoriesCounter } from '../../../../../hooks/admin/use-categories-counter/useCategoriesCounter';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
@@ -36,6 +37,8 @@ export const ProgramsPageContent = () => {
     const listContainerRef = useRef<HTMLDivElement>(null);
     const modalsStateControl = useModalsState<Program>();
     const openModalActions = modalsStateControl.openModalActions;
+
+    const { incrementCategoriesCount, decrementCategoriesCount, updateCategoriesCount } = useCategoriesCounter();
 
     // Fetch functions
     const getProgramCategories = useCallback(async (options: RequestOptions) => {
@@ -130,11 +133,9 @@ export const ProgramsPageContent = () => {
         if (error.type === 'categories') {
             refetchCategories();
         } else if (error.type === 'programs') {
-            if (isSearchResultView) {
-                refetchSearchProgram();
-            } else {
-                fetchProgramsFromStart();
-            }
+            fetchProgramsFromStart();
+        } else if (error.type === 'search' && isSearchResultView) {
+            refetchSearchProgram();
         }
     }, [isSearchResultView, clearError, error.type, refetchCategories, refetchSearchProgram, fetchProgramsFromStart]);
 
@@ -221,12 +222,7 @@ export const ProgramsPageContent = () => {
     const handleAddProgram = useCallback(
         (addedProgram: Program) => {
             // Update program counters in categories
-            const addedCategoryIds = new Set(addedProgram.categories.map((c) => c.id));
-            updateCategories((prevCategories) =>
-                prevCategories.map((cat) =>
-                    addedCategoryIds.has(cat.id) ? { ...cat, programsCount: cat.programsCount + 1 } : cat,
-                ),
-            );
+            updateCategories((prevCategories) => incrementCategoriesCount(prevCategories, addedProgram));
 
             const belongsToSelectedCategory = selectedCategory
                 ? addedProgram.categories.some((c) => c.id === selectedCategory.id)
@@ -236,7 +232,7 @@ export const ProgramsPageContent = () => {
                 updatePrograms((prev) => [addedProgram, ...prev]);
             }
         },
-        [updatePrograms, updateCategories, selectedCategory, statusFilter],
+        [updatePrograms, updateCategories, incrementCategoriesCount, selectedCategory, statusFilter],
     );
 
     const handleEditProgram = useCallback(
@@ -247,27 +243,14 @@ export const ProgramsPageContent = () => {
             }
 
             // Find original program
-            const originalProgram = fetchedPrograms.find((p) => p.id === updatedProgram.id);
+            const originalProgram =
+                fetchedPrograms.find((p) => p.id === updatedProgram.id) ??
+                (isSearchResultView && fetchedSearchProgram?.id === updatedProgram.id ? fetchedSearchProgram : null);
             if (!originalProgram) return;
-
-            const originalCategoryIds = new Set(originalProgram.categories.map((c) => c.id));
-            const updatedCategoryIds = new Set(updatedProgram.categories.map((c) => c.id));
 
             // Update program counters in categories
             updateCategories((prevCategories) =>
-                prevCategories.map((category) => {
-                    const wasInCategory = originalCategoryIds.has(category.id);
-                    const isInCategory = updatedCategoryIds.has(category.id);
-
-                    if (!wasInCategory && isInCategory) {
-                        return { ...category, programsCount: category.programsCount + 1 };
-                    }
-                    if (wasInCategory && !isInCategory) {
-                        return { ...category, programsCount: Math.max(0, category.programsCount - 1) };
-                    }
-
-                    return category;
-                }),
+                updateCategoriesCount(prevCategories, originalProgram, updatedProgram),
             );
 
             // Update program in local programs list
@@ -285,6 +268,7 @@ export const ProgramsPageContent = () => {
             updateCategories,
             updateSearchedProgram,
             updatePrograms,
+            updateCategoriesCount,
             fetchedPrograms,
             selectedCategory,
             isSearchResultView,
@@ -296,14 +280,7 @@ export const ProgramsPageContent = () => {
     const handleDeleteProgram = useCallback(
         (program: Program) => {
             // Update program counters in categories
-            const deletedFromCategoryIds = new Set(program.categories.map((c) => c.id));
-            updateCategories((prevCategories) =>
-                prevCategories.map((cat) =>
-                    deletedFromCategoryIds.has(cat.id)
-                        ? { ...cat, programsCount: Math.max(0, cat.programsCount - 1) }
-                        : cat,
-                ),
-            );
+            updateCategories((prevCategories) => decrementCategoriesCount(prevCategories, program));
 
             // Remove program from local programs list
             updatePrograms((prev) => prev.filter((p) => p.id !== program.id));
@@ -314,7 +291,14 @@ export const ProgramsPageContent = () => {
                 updateSearchedProgram(null);
             }
         },
-        [updateCategories, updatePrograms, updateSearchedProgram, isSearchResultView, fetchedSearchProgram],
+        [
+            updateCategories,
+            updatePrograms,
+            updateSearchedProgram,
+            decrementCategoriesCount,
+            isSearchResultView,
+            fetchedSearchProgram,
+        ],
     );
 
     // Category handlers

@@ -206,4 +206,20 @@ describe('useOnClickOutside', () => {
         expect(callback).toHaveBeenNthCalledWith(1, mouseEvent);
         expect(callback).toHaveBeenNthCalledWith(2, touchEvent);
     });
+
+    it('uses default value for isDisabled when not provided', () => {
+        const element = createMockElement();
+        const ref = { current: element };
+        const callback = jest.fn();
+
+        renderHook(() =>
+            useOnClickOutside({
+                ignoreClickRefs: [ref],
+                onOutsideClick: callback,
+            }),
+        );
+
+        expect(addEventListenerSpy).toHaveBeenCalledWith('mousedown', expect.any(Function));
+        expect(addEventListenerSpy).toHaveBeenCalledWith('touchstart', expect.any(Function));
+    });
 });

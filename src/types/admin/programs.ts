@@ -16,6 +16,12 @@ export interface Program {
     img: Image | null;
 }
 
+export interface ProgramSearchItemData {
+    id: number;
+    name: string;
+    categories: string[];
+}
+
 export interface ProgramCreateUpdate {
     id: number | null;
     name: string;

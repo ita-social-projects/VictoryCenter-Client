@@ -1,0 +1,98 @@
+@use '../../../assets/sass/variables/colors';
+
+.singleselect {
+    width: 100%;
+    position: relative;
+    border: 1px solid colors.$blue-500;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(10, 13, 18, 0.05);
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.2s;
+
+    &-selected {
+        border-color: colors.$grey-700;
+    }
+
+    .select-input {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: white;
+        width: 100%;
+        padding: 0.625rem 2.5rem 0.625rem 0.75rem;
+        font-size: 16px;
+        outline: none;
+        appearance: none;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+
+        &-disabled {
+            background: colors.$grey-600;
+            cursor: not-allowed;
+        }
+    }
+
+    &-options {
+        overflow: hidden;
+        position: absolute;
+        top: calc(100% + 2px);
+        left: 0;
+        width: 100%;
+        background-color: white;
+        border: 1px solid colors.$grey-700;
+        border-radius: 8px;
+        z-index: 10;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+
+        .option {
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            width: 100%;
+            text-align: start;
+            font-size: 1rem;
+            outline: none;
+            border: none;
+            background: white;
+
+            &:hover,
+            &:focus {
+                background-color: white;
+                outline: none;
+            }
+
+            &-selected {
+                background-color: colors.$blue-50;
+            }
+        }
+    }
+
+    .option-value {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 90%;
+        color: colors.$blue-900;
+
+        &-placeholder {
+            color: colors.$grey-700;
+        }
+    }
+
+    .placeholder-arrow {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .icon-img {
+            width: 20px;
+            height: 20px;
+        }
+    }
+}

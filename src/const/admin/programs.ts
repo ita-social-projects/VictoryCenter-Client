@@ -2,9 +2,14 @@ export const PROGRAMS_TEXT = {
     BUTTON: {
         ADD_PROGRAM: 'Додати програму',
     },
+    PLACEHOLDER: {
+        SEARCH_PROGRAMS: 'Шукати програми...',
+    },
 
     MESSAGE: {
         FAIL_TO_FETCH_PROGRAMS: 'Виникла помилка, не вдалось завантажити програми',
+        FAIL_TO_FETCH_PROGRAM: 'Не вдалося знайти вибрану програму',
+        SELECTED_PROGRAM_HAS_NO_CATEGORIES: 'У вибраної програми відсутні категорії',
     },
 
     QUESTION: {

@@ -44,13 +44,13 @@ export const InputWithCharacterLimit = ({
 
     return (
         <div
-            className={classNames('input-line-wrapper', {
-                'input-line-wrapper-disabled': disabled,
-                'input-line-wrapper-focused': isFocused && !disabled,
+            className={classNames('char-limit-input', {
+                'char-limit-input--disabled': disabled,
+                'char-limit-input--focused': isFocused && !disabled,
             })}
         >
             <input
-                className="input-line-wrapper-input"
+                className="char-limit-input__field"
                 value={value}
                 onChange={onChange}
                 maxLength={maxLength}
@@ -64,7 +64,7 @@ export const InputWithCharacterLimit = ({
                 aria-describedby={countId}
                 aria-invalid={currentLength > maxLength}
             />
-            <output htmlFor={id} className="input-line-wrapper-character-limit" id={countId}>
+            <output htmlFor={id} className="char-limit-input__counter" id={countId}>
                 {currentLength}/{maxLength}
             </output>
         </div>

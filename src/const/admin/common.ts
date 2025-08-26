@@ -44,7 +44,7 @@ export const COMMON_TEXT_ADMIN = {
     FILTER: {
         SEARCH_BY_NAME: 'Пошук за назвою',
         STATUS: {
-            ALL: 'Всі записи',
+            ALL: 'Усі',
             PUBLISHED: 'Опубліковано',
             DRAFT: 'Чернетка',
         },
@@ -70,5 +70,12 @@ export const COMMON_TEXT_ADMIN = {
         SAVE_AS_DRAFT: 'Зберегти як чернетку',
         SAVE_AS_PUBLISHED: 'Опублікувати',
         TRY_AGAIN: 'Спробувати ще раз',
+    },
+};
+
+export const UI_CONFIG = {
+    SEARCH_BAR: {
+        MIN_CHARACTERS_FOR_SEARCH: 3,
+        SEARCH_DELAY_MS: 100,
     },
 };

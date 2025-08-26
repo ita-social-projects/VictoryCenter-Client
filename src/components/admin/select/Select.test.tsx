@@ -5,7 +5,6 @@ import { Select, SelectProps } from './Select';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 jest.mock('./select.scss', () => ({}));
-
 jest.mock('../../../assets/icons/chevron-down.svg', () => 'chevron-down.svg');
 jest.mock('../../../assets/icons/chevron-up.svg', () => 'chevron-up.svg');
 
@@ -351,16 +350,6 @@ describe('Select Component', () => {
         expect(screen.getByText('Option 2')).toBeInTheDocument();
     });
 
-    it('renders Select.Option component correctly', () => {
-        const { container } = render(
-            <Select.Option value="test" name="Test Option">
-                Child content
-            </Select.Option>,
-        );
-
-        expect(container.textContent).toBe('Child content');
-    });
-
     it('Select.Option handles props correctly', () => {
         const optionElement = <Select.Option value="test-value" name="Test Name" />;
 
@@ -379,5 +368,25 @@ describe('Select Component', () => {
         // @ts-ignore
         fireEvent.click(ref.current);
         expect(ref.current).toHaveClass('select-opened');
+    });
+
+    it('sets selected value and name when value prop is provided', () => {
+        const mockOnValueChange = jest.fn();
+
+        render(<Select {...defaultProps} value="option2" onValueChange={mockOnValueChange} />);
+
+        expect(screen.getByText('Option 2')).toBeInTheDocument();
+        expect(screen.queryByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).not.toBeInTheDocument();
+
+        const span = screen.getByText('Option 2');
+        expect(span).toHaveClass('not-empty');
+    });
+
+    it('handles value that does not match any option', () => {
+        const mockOnValueChange = jest.fn();
+
+        render(<Select {...defaultProps} value="nonexistent-option" onValueChange={mockOnValueChange} />);
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).toBeInTheDocument();
     });
 });

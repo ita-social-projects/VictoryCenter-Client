@@ -1,0 +1,14 @@
+.text-search-item-content {
+    width: 100%;
+    font-size: 14px;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &__tooltip {
+        display: inline-block;
+        white-space: normal;
+        word-break: break-word;
+    }
+}

@@ -158,13 +158,11 @@ export const AddBankDetailsForm = forwardRef<AddBankDetailsFormRef, AddBankDetai
         return (
             <form className="form-container" onClick={(e) => e.stopPropagation()}>
                 <div className="form-header">
-                    <div className="status-container">
-                        <VisibilityStatusLabel status={VisibilityStatus.Draft} />
-                        <div className="edit-icon"></div>
-                    </div>
-                    <div className="close-icon">
-                        <button onClick={onClose} />
-                    </div>
+                    <div className="edit-icon"></div>
+                    <button className="delete-btn" onClick={onClose}>
+                        <div>Видалити банк</div>
+                        <div className="delete-btn-icon"></div>
+                    </button>
                 </div>
                 <div className="form-body">
                     <Input
@@ -206,7 +204,6 @@ export const AddBankDetailsForm = forwardRef<AddBankDetailsFormRef, AddBankDetai
                     {errors.paymentPurpose && <span className="error">{errors.paymentPurpose}</span>}
                 </div>
                 <div className="form-footer">
-                    <Button buttonStyle="secondary">Додати нове поле</Button>
                     <div className="actions">
                         <Button onClick={onClose} buttonStyle="secondary">
                             Відмінити

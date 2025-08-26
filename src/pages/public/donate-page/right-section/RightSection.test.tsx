@@ -15,10 +15,6 @@ jest.mock('./alternative-support-ways/AlternativeSupportWays', () => ({
     AlternativeSupportWays: () => <div data-testid="alt-support">Alternative Support</div>,
 }));
 
-jest.mock('./alternative-support-ways/AlternativeSupportWays', () => ({
-    AlternativeSupportWays: () => <div data-testid="alternative-support-ways"></div>,
-}));
-
 describe('RightSection', () => {
     beforeEach(() => {
         jest.clearAllMocks();

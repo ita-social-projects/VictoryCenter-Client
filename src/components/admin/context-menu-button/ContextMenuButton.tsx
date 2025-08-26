@@ -2,16 +2,15 @@ import React, { RefObject, useCallback, useEffect, useRef, useState } from 'reac
 import { ReactComponent as MenuIcon } from '../../../assets/icons/menu.svg';
 import classNames from 'classnames';
 import './ContextMenuButton.scss';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 export type ContextMenuButtonProps = {
     children: React.ReactNode;
     onOptionSelected: (value: string, data?: any) => void;
     containerRef?: RefObject<HTMLDivElement | null>;
-    customIcon?: string;
+    CustomIcon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 };
 
-export const ContextMenuButton = ({ children, onOptionSelected, containerRef, customIcon }: ContextMenuButtonProps) => {
+export const ContextMenuButton = ({ children, onOptionSelected, containerRef, CustomIcon }: ContextMenuButtonProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -60,17 +59,10 @@ export const ContextMenuButton = ({ children, onOptionSelected, containerRef, cu
                 }
             }}
         >
-            {customIcon ? (
-                <img
-                    src={customIcon}
-                    alt={isOpen ? COMMON_TEXT_ADMIN.ALT.CLOSE_MENU : COMMON_TEXT_ADMIN.ALT.OPEN_MENU}
-                    className="context-menu-button-icon"
-                />
+            {CustomIcon ? (
+                <CustomIcon className="context-menu-button-icon" />
             ) : (
-                <MenuIcon
-                    aria-label={isOpen ? COMMON_TEXT_ADMIN.ALT.CLOSE_MENU : COMMON_TEXT_ADMIN.ALT.OPEN_MENU}
-                    className="context-menu-button-icon"
-                />
+                <MenuIcon className="context-menu-button-icon" />
             )}
 
             <div

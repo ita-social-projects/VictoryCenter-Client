@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ReactComponent as CheckedBox } from '../../../assets/icons/chevron-checked.svg';
 import { ReactComponent as UncheckedBox } from '../../../assets/icons/chevron-unchecked.svg';
 import { ReactComponent as ArrowDown } from '../../../assets/icons/chevron-down.svg';
@@ -109,13 +108,7 @@ export const MultiSelectInput = <T extends Record<string, any>>({
                     })}
                 >
                     <div className="placeholder-content">{displayLabel}</div>
-                    <div className="placeholder-chevron">
-                        {isOpen ? (
-                            <ArrowUp aria-label={COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST} />
-                        ) : (
-                            <ArrowDown aria-label={COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST} />
-                        )}
-                    </div>
+                    <div className="placeholder-chevron">{isOpen ? <ArrowUp /> : <ArrowDown />}</div>
                 </div>
             </button>
 
@@ -134,13 +127,7 @@ export const MultiSelectInput = <T extends Record<string, any>>({
                                 aria-selected={selected}
                                 tabIndex={0}
                             >
-                                <div className="checkbox">
-                                    {selected ? (
-                                        <CheckedBox aria-label={COMMON_TEXT_ADMIN.ALT.OPTION_SELECTED} />
-                                    ) : (
-                                        <UncheckedBox aria-label={COMMON_TEXT_ADMIN.ALT.OPTION_NOT_SELECTED} />
-                                    )}
-                                </div>
+                                <div className="checkbox">{selected ? <CheckedBox /> : <UncheckedBox />}</div>
                                 <span className="option-content">{getOptionName(option)}</span>
                             </div>
                         );

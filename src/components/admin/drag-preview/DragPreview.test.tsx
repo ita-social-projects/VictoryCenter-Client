@@ -23,7 +23,6 @@ describe('DragPreview', () => {
             y: 200,
         },
         renderEntityComponent: (entity) => <span>{entity.name}</span>,
-        ariaLabelText: 'Drag me',
     };
 
     it('should render nothing when dragPreview.visible is false', () => {

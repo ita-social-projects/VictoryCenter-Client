@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, getByTestId } from '@testing-library/react';
 import { ContextMenuButton } from './ContextMenuButton';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
@@ -29,15 +29,14 @@ describe('ContextMenuButton', () => {
     });
 
     it('renders with custom icon when provided', () => {
-        const customIcon = 'custom-icon.svg';
+        const customIcon = () => <svg data-testid="custom-icon" />;
         render(
-            <ContextMenuButton onOptionSelected={mockOnOptionSelected} customIcon={customIcon}>
+            <ContextMenuButton onOptionSelected={mockOnOptionSelected} CustomIcon={customIcon}>
                 <ContextMenuButton.Option value="option1">Option 1</ContextMenuButton.Option>
             </ContextMenuButton>,
         );
 
-        const iconElement = screen.getByAltText(COMMON_TEXT_ADMIN.ALT.OPEN_MENU)!;
-        expect(iconElement).toHaveAttribute('src', customIcon);
+        expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
     });
 
     it('toggles menu visibility when clicked', () => {

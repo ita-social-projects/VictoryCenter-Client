@@ -5,7 +5,7 @@ import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ImageValues } from '../../../types/common/image';
 
 jest.mock('../../../assets/icons/delete.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} />,
+    ReactComponent: (props: any) => <svg {...props} data-testid="delete-icon" />,
 }));
 
 jest.mock('../../../assets/icons/cloud-download.svg', () => ({
@@ -65,7 +65,7 @@ describe('PhotoInput', () => {
     it('calls onChange with null when remove button is clicked', () => {
         render(<PhotoInput value={MockImageValue} onChange={onChangeMock} />);
 
-        const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
+        const removeButton = screen.getByTestId('remove-photo-button');
         fireEvent.click(removeButton);
 
         expect(onChangeMock).toHaveBeenCalledWith(null);
@@ -310,7 +310,7 @@ describe('PhotoInput', () => {
     it('clears input value when removing file', () => {
         render(<PhotoInput value={MockImageValue} onChange={onChangeMock} />);
 
-        const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
+        const removeButton = screen.getByTestId('remove-photo-button');
         const fileInput = screen.getByTestId('photo-input-hidden') as HTMLInputElement;
 
         Object.defineProperty(fileInput, 'value', {

@@ -3,7 +3,6 @@ import { ReactComponent as ArrowDown } from '../../../assets/icons/chevron-down.
 import { ReactComponent as ArrowUp } from '../../../assets/icons/chevron-up.svg';
 import classNames from 'classnames';
 import './SingleSelectInput.scss';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 export interface SingleSelectInputProps<T extends Record<string, any>> {
     options: T[];
@@ -92,11 +91,7 @@ export const SingleSelectInput = <T extends Record<string, any>>({
                     {displayLabel}
                 </div>
                 <div className="placeholder-arrow">
-                    {isOpen ? (
-                        <ArrowUp className="icon-img" aria-label={COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST} />
-                    ) : (
-                        <ArrowDown className="icon-img" aria-label={COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST} />
-                    )}
+                    {isOpen ? <ArrowUp className="icon-img" /> : <ArrowDown className="icon-img" />}
                 </div>
             </button>
 

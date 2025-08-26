@@ -36,7 +36,7 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
     return (
         <form onSubmit={handleSubmit} className="login-form" spellCheck={false}>
             <NavLink to={PUBLIC_ROUTES.ROOT}>
-                <Logo aria-label={LOGIN_CONST.FORM.LOGO_ALT} />
+                <Logo />
             </NavLink>
             <h2 className="login-form-title">{LOGIN_CONST.FORM.TITLE}</h2>
             <div className="login-form-group">
@@ -63,12 +63,13 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
                         autoComplete="current-password"
                         required
                     />
-                    <button type="button" className="visibility-toggle" onClick={handleVisibilityChange}>
-                        {isPasswordVisible ? (
-                            <EyeOpened aria-label={LOGIN_CONST.FORM.SHOWED_PASSWORD_ALT} />
-                        ) : (
-                            <EyeClosed aria-label={LOGIN_CONST.FORM.HIDDEN_PASSWORD_ALT} />
-                        )}
+                    <button
+                        type="button"
+                        className="visibility-toggle"
+                        data-testid="visibility-toggle-button"
+                        onClick={handleVisibilityChange}
+                    >
+                        {isPasswordVisible ? <EyeOpened /> : <EyeClosed />}
                     </button>
                 </div>
             </div>

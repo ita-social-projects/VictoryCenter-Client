@@ -67,7 +67,7 @@ export const Footer = () => {
                             required
                         />
                         <button onClick={handleClick} className="subscribe-btn" aria-label={SIGN_UP}>
-                            <ArrowUpIcon aria-label={SIGN_UP} className="arrow-up-icon" />
+                            <ArrowUpIcon className="arrow-up-icon" />
                         </button>
                     </div>
                 </div>

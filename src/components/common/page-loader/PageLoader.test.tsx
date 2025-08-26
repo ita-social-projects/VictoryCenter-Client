@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import { PageLoader } from './PageLoader';
-import { LOADER_TEXT } from '../../../const/common/common';
 
 jest.mock('../../../assets/icons/load.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="loader-icon" />,

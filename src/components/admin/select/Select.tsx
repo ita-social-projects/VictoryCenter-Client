@@ -70,11 +70,7 @@ export const Select = <TValue,>({
             >
                 {selectedName ?? placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT}
             </span>
-            {isOpen ? (
-                <ArrowUp aria-label={COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST} />
-            ) : (
-                <ArrowDown aria-label={COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST} />
-            )}
+            {isOpen ? <ArrowUp /> : <ArrowDown />}
             {isOpen && (
                 <div className={'select-options'}>
                     {options.map((opt, index) => {

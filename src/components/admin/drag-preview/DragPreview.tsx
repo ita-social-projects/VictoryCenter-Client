@@ -6,14 +6,8 @@ export interface DragPreviewProps<TEntity> {
     entity: TEntity;
     dragPreview: DragPreviewModel<TEntity>;
     renderEntityComponent: (entity: TEntity) => React.ReactNode;
-    ariaLabelText: string;
 }
-export const DragPreview = <TEntity,>({
-    dragPreview,
-    entity,
-    renderEntityComponent,
-    ariaLabelText,
-}: DragPreviewProps<TEntity>) => {
+export const DragPreview = <TEntity,>({ dragPreview, entity, renderEntityComponent }: DragPreviewProps<TEntity>) => {
     if (!dragPreview.visible || !dragPreview.item) return <></>;
 
     return (
@@ -27,7 +21,7 @@ export const DragPreview = <TEntity,>({
         >
             <div className="drag-preview-wrapper">
                 <div className="dragger">
-                    <DragIcon aria-label={ariaLabelText} />
+                    <DragIcon />
                 </div>
                 {renderEntityComponent(entity)}
             </div>

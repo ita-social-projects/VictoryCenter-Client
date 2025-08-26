@@ -100,7 +100,6 @@ export const DraggableListItem = <TEntity,>({
                 entity={entity}
                 dragPreview={dragPreview}
                 renderEntityComponent={renderEntityComponent}
-                ariaLabelText={ariaLabel}
             ></DragPreview>
             <div
                 className={'draggable-item-wrapper'}
@@ -119,7 +118,7 @@ export const DraggableListItem = <TEntity,>({
                     aria-label={ariaLabel}
                     tabIndex={0}
                 >
-                    <DragIcon aria-label={ariaLabel} />
+                    <DragIcon />
                 </div>
                 {renderEntityComponent(entity)}
             </div>

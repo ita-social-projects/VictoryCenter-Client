@@ -33,10 +33,7 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
                         className="member-image"
                     />
                 ) : (
-                    <BlankUserImage
-                        aria-label={`${TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}-${member.fullName}`}
-                        className="member-image"
-                    />
+                    <BlankUserImage className="member-image" />
                 )}
                 <p>{member.fullName}</p>
             </div>

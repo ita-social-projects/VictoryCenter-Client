@@ -53,9 +53,7 @@ describe('<LoginForm />', () => {
         const passwordInput = screen.getByLabelText(LOGIN_CONST.FORM.PASSWORD_FIELD_LABEL) as HTMLInputElement;
         expect(passwordInput.value).toBe('');
         expect(passwordInput.type).toBe('password');
-        const toggleBtn = screen.getByRole('button', {
-            name: LOGIN_CONST.FORM.HIDDEN_PASSWORD_ALT,
-        });
+        const toggleBtn = screen.getByTestId('visibility-toggle-button');
         expect(toggleBtn).toBeInTheDocument();
 
         expect(screen.getByRole('button', { name: LOGIN_CONST.FORM.SUBMIT_BUTTON })).toBeInTheDocument();
@@ -90,17 +88,15 @@ describe('<LoginForm />', () => {
         );
 
         const passwordInput = screen.getByLabelText(LOGIN_CONST.FORM.PASSWORD_FIELD_LABEL) as HTMLInputElement;
-        const toggleBtn = screen.getByRole('button', {
-            name: LOGIN_CONST.FORM.HIDDEN_PASSWORD_ALT,
-        });
+        const toggleBtn = screen.getByTestId('visibility-toggle-button');
 
         fireEvent.click(toggleBtn);
         expect(passwordInput.type).toBe('text');
-        expect(screen.getByRole('button', { name: LOGIN_CONST.FORM.SHOWED_PASSWORD_ALT })).toBeInTheDocument();
+        expect(screen.getByTestId('eye-opened-icon')).toBeInTheDocument();
 
-        fireEvent.click(screen.getByRole('button', { name: LOGIN_CONST.FORM.SHOWED_PASSWORD_ALT }));
+        fireEvent.click(toggleBtn);
         expect(passwordInput.type).toBe('password');
-        expect(screen.getByRole('button', { name: LOGIN_CONST.FORM.HIDDEN_PASSWORD_ALT })).toBeInTheDocument();
+        expect(screen.getByTestId('eye-closed-icon')).toBeInTheDocument();
     });
 
     it('calls login with credentials on submit (success)', async () => {

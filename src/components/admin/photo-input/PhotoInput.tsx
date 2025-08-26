@@ -144,18 +144,19 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
                             type="button"
                             className="delete-button"
                             disabled={disabled}
+                            data-testid="remove-photo-button"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleRemove();
                             }}
                         >
-                            <DeleteIcon className="delete-icon" aria-label={COMMON_TEXT_ADMIN.ALT.DELETE} />
+                            <DeleteIcon className="delete-icon" />
                         </button>
                     )}
                 </div>
             ) : (
                 <div className="photo-placeholder">
-                    <UploadIcon className="placeholder-icon" aria-label={COMMON_TEXT_ADMIN.ALT.UPLOAD} />
+                    <UploadIcon className="placeholder-icon" />
                     <span>{COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER}</span>
                 </div>
             )}

@@ -63,7 +63,6 @@ describe('DeleteCategoryModal', () => {
 
     const getModal = () => screen.queryByTestId('modal');
     const getTitle = () => screen.queryByText(PROGRAM_CATEGORY_TEXT.FORM.TITLE.DELETE_CATEGORY);
-    const getCategorySelect = () => screen.getByRole('combobox');
     const getCancelButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
     const getDeleteButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.DELETE);
     const getHintBox = () => screen.queryByTestId('hint-box');
@@ -73,8 +72,14 @@ describe('DeleteCategoryModal', () => {
 
     const clickCancelButton = () => fireEvent.click(getCancelButton());
     const clickDeleteButton = () => fireEvent.click(getDeleteButton());
-    const changeCategorySelect = (categoryId: number) =>
-        fireEvent.change(getCategorySelect(), { target: { value: categoryId } });
+    const getCategorySelectButton = () => screen.getByRole('button', { expanded: false });
+    const openCategorySelect = () => fireEvent.click(getCategorySelectButton());
+    const getCategoryOption = (categoryId: number) =>
+        screen.getByRole('option', { name: mockCategories.find((c) => c.id === categoryId)!.name });
+    const changeCategorySelect = (categoryId: number) => {
+        openCategorySelect();
+        fireEvent.click(getCategoryOption(categoryId));
+    };
 
     const expectModalClosed = () => {
         expect(defaultProps.onClose).toHaveBeenCalled();
@@ -104,7 +109,7 @@ describe('DeleteCategoryModal', () => {
         renderDeleteCategoryModal();
 
         expect(getTitle()).toBeInTheDocument();
-        expect(getCategorySelect()).toBeInTheDocument();
+        expect(getCategorySelectButton()).toBeInTheDocument();
         expect(getCancelButton()).toBeInTheDocument();
         expect(getDeleteButton()).toBeInTheDocument();
     });
@@ -118,8 +123,7 @@ describe('DeleteCategoryModal', () => {
     it('should select the first category by default', () => {
         renderDeleteCategoryModal();
 
-        const select = getCategorySelect() as HTMLSelectElement;
-        expect(select.value).toBe(mockCategories[0].id.toString());
+        expect(screen.getByText(mockCategories[0].name)).toBeInTheDocument();
     });
 
     it('should call onClose when the cancel button is clicked', () => {
@@ -185,20 +189,19 @@ describe('DeleteCategoryModal', () => {
 
         renderDeleteCategoryModal();
 
-        const deleteButton = getDeleteButton() as HTMLButtonElement;
-        const cancelButton = getCancelButton() as HTMLButtonElement;
-        const select = getCategorySelect() as HTMLSelectElement;
+        const deleteButton = getDeleteButton();
+        const cancelButton = getCancelButton();
+        const selectButton = getCategorySelectButton();
 
         clickDeleteButton();
 
         await waitFor(() => {
             expect(deleteButton).toBeDisabled();
             expect(cancelButton).toBeDisabled();
-            expect(select).toBeDisabled();
+            expect(selectButton).toBeDisabled();
         });
 
         resolveRequest();
-
         await waitFor(() => {
             expectModalClosed();
         });

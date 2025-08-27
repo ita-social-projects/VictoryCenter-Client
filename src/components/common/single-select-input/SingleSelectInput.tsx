@@ -13,6 +13,7 @@ export interface SingleSelectInputProps<T extends Record<string, any>> {
     getOptionName: (value: T) => string;
     placeholder: string;
     disabled?: boolean;
+    id?: string;
 }
 
 export const SingleSelectInput = <T extends Record<string, any>>({
@@ -24,6 +25,7 @@ export const SingleSelectInput = <T extends Record<string, any>>({
     getOptionName,
     placeholder,
     disabled = false,
+    id,
 }: SingleSelectInputProps<T>) => {
     const [isOpen, setIsOpen] = useState(false);
     const selectRef = useRef<HTMLDivElement>(null);
@@ -81,6 +83,7 @@ export const SingleSelectInput = <T extends Record<string, any>>({
                 disabled={disabled}
                 aria-haspopup="listbox"
                 aria-expanded={isOpen}
+                id={id}
             >
                 <div
                     className={classNames(

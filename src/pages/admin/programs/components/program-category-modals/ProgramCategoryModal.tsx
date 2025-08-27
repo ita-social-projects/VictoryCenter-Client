@@ -2,15 +2,15 @@ import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/admin/button/Button';
 import { HintBox } from '../../../../../components/admin/hint-box/HintBox';
-import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
-import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
+import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { SingleSelectInputGroup } from '../../../../../components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
+import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/admin/programs';
 import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-category-schema/program-category-schema';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './ProgramCategoryModal.scss';
-import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/admin/programs';
 
 interface ProgramCategoryFormValues {
     name: string;
@@ -177,9 +177,8 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
     }, [onClose]);
 
     const handleCategoryChange = useCallback(
-        (e: React.ChangeEvent<HTMLSelectElement>) => {
-            const selectedId = parseInt(e.target.value);
-            const selected = categories.find((cat) => cat.id === selectedId);
+        (category: ProgramCategory) => {
+            const selected = categories.find((cat) => cat.id === category.id);
             if (selected) {
                 selectedCategoryRef.current = selected;
                 reset({ name: selected.name });
@@ -263,49 +262,37 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                 <Modal.Content>
                     <form onSubmit={(e) => e.preventDefault()} className="program-form-main" id={getFormId()}>
                         {mode === 'edit' && (
-                            <div className="form-group">
-                                <InputLabel
-                                    htmlFor={getFieldId('select')}
-                                    text={PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
-                                    isRequired
-                                />
-                                <select
-                                    id={getFieldId('select')}
-                                    data-testid="category-select"
-                                    onChange={handleCategoryChange}
-                                    disabled={isSubmitting}
-                                    value={selectedCategoryRef.current?.id || ''}
-                                >
-                                    {categories.map((category) => (
-                                        <option key={category.id} value={category.id}>
-                                            {category.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                            <SingleSelectInputGroup
+                                id={getFieldId('select')}
+                                label={PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
+                                isRequired={true}
+                                options={categories}
+                                getOptionId={(c) => c.id}
+                                getOptionName={(c) => c.name}
+                                disabled={isSubmitting}
+                                onChange={handleCategoryChange}
+                                placeholder={''}
+                                value={selectedCategoryRef.current || undefined}
+                            />
                         )}
 
-                        <div className="form-group form-group-name">
-                            <InputLabel
-                                htmlFor={getFieldId('name')}
-                                isRequired={mode === 'add'}
-                                text={
-                                    mode === 'add'
-                                        ? PROGRAM_CATEGORY_TEXT.FORM.LABEL.NAME
-                                        : PROGRAM_CATEGORY_TEXT.FORM.LABEL.EDIT_NAME
-                                }
-                            />
-                            <InputWithCharacterLimit
-                                value={formState.name}
-                                onChange={handleNameChange}
-                                onBlur={handleNameBlur}
-                                id={getFieldId('name')}
-                                name="name"
-                                maxLength={PROGRAM_CATEGORY_VALIDATION.name.max}
-                                disabled={isSubmitting}
-                            />
-                            {errors.name && <span className="error">{errors.name}</span>}
-                        </div>
+                        <InputWithCharacterLimitGroup
+                            isRequired={true}
+                            label={
+                                mode === 'add'
+                                    ? PROGRAM_CATEGORY_TEXT.FORM.LABEL.NAME
+                                    : PROGRAM_CATEGORY_TEXT.FORM.LABEL.EDIT_NAME
+                            }
+                            error={errors.name}
+                            value={formState.name}
+                            onChange={handleNameChange}
+                            onBlur={handleNameBlur}
+                            name={'name'}
+                            type={'text'}
+                            id={getFieldId('name')}
+                            maxLength={PROGRAM_CATEGORY_VALIDATION.name.max}
+                            disabled={isSubmitting}
+                        />
 
                         {isDuplicateName && (
                             <HintBox

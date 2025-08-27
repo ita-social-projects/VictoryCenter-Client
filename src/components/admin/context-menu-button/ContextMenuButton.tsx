@@ -1,14 +1,15 @@
-import React, { RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import React, { RefObject, useCallback, useRef, useState } from 'react';
+import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/useOnClickOutside';
 import { ReactComponent as MenuIcon } from '../../../assets/icons/menu.svg';
 import classNames from 'classnames';
 import './ContextMenuButton.scss';
 
-export type ContextMenuButtonProps = {
+export interface ContextMenuButtonProps {
     children: React.ReactNode;
     onOptionSelected: (value: string, data?: any) => void;
     containerRef?: RefObject<HTMLDivElement | null>;
     CustomIcon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-};
+}
 
 export const ContextMenuButton = ({ children, onOptionSelected, containerRef, CustomIcon }: ContextMenuButtonProps) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -26,21 +27,15 @@ export const ContextMenuButton = ({ children, onOptionSelected, containerRef, Cu
         [onOptionSelected],
     );
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (isOpen && menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
-        };
+    const handleClickOutside = useCallback(() => {
+        setIsOpen(false);
+    }, []);
 
-        if (isOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isOpen]);
+    useOnClickOutside({
+        ignoreClickRefs: [menuRef],
+        onOutsideClick: handleClickOutside,
+        isDisabled: !isOpen,
+    });
 
     return (
         <div
@@ -53,7 +48,7 @@ export const ContextMenuButton = ({ children, onOptionSelected, containerRef, Cu
             tabIndex={0}
             onClick={handleToggle}
             onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
+                if (e.key === 'Enter') {
                     e.preventDefault();
                     handleToggle();
                 }
@@ -84,14 +79,14 @@ export const ContextMenuButton = ({ children, onOptionSelected, containerRef, Cu
     );
 };
 
-export type ContextMenuOptionProps = {
+export interface ContextMenuOptionProps {
     children: React.ReactNode;
     value: string;
     data?: any;
     onOptionClick?: (value: string, data?: any) => void;
     className?: string;
     disabled?: boolean;
-};
+}
 
 ContextMenuButton.Option = ({
     children,

@@ -7,12 +7,11 @@ import { ImageValues } from '../../../types/common/image';
 import { mapImageToBase64 } from '../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
-interface PhotoInputProps {
+export interface PhotoInputProps {
     value: ImageValues | null;
     onChange: (image: ImageValues | null) => void;
     onBlur?: () => void;
     disabled?: boolean;
-    error?: boolean;
     id?: string;
     name?: string;
 }

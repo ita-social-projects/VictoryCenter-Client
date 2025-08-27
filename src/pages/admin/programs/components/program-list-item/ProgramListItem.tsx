@@ -1,11 +1,11 @@
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonTooltip } from '../../../../../components/admin/button-tooltip/ButtonTooltip';
-import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
-import { ReactComponent as BlankImage } from '../../../../../assets/icons/blank-image.svg';
-import './ProgramListItem.scss';
+import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 import { Program } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
+import { ReactComponent as BlankImage } from '../../../../../assets/icons/blank-image.svg';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import './ProgramListItem.scss';
 
 export interface ProgramListItemProps {
     program: Program;
@@ -14,17 +14,14 @@ export interface ProgramListItemProps {
 }
 
 export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditProgram }: ProgramListItemProps) => {
-    const programImage = mapImageToBase64(program.img);
-    const isImageValid = !!programImage;
-
     return (
         <div className="program-item">
             <div className="program-info">
                 <div className="program-info-identity">
-                    {isImageValid ? (
-                        <img src={programImage} alt={`${program.name}-img`} className="program-img" />
+                    {program.img ? (
+                        <img src={mapImageToBase64(program.img) || undefined} alt={`${program.name}-img`} />
                     ) : (
-                        <BlankImage className="program-img" />
+                        <BlankImage className="program-info-identity-blank-image" />
                     )}
                     <p>{program.name}</p>
                 </div>

@@ -1,8 +1,8 @@
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { Button } from '../../admin/button/Button';
+import { Button } from '../button/Button';
 import { Modal } from '../../common/modal/Modal';
 
-type ConfirmationModalProps = {
+export interface ConfirmationModalProps {
     isOpen: boolean;
     onClose: () => void;
     title: string;
@@ -12,7 +12,7 @@ type ConfirmationModalProps = {
     onConfirm: () => void;
     onCancel: () => void;
     isButtonsDisabled?: boolean;
-};
+}
 
 export const ConfirmationModal = ({
     isOpen,

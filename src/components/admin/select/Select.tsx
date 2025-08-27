@@ -1,4 +1,4 @@
-import React, { RefObject, useState } from 'react';
+import React, { RefObject, useState, useEffect } from 'react';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ReactComponent as ArrowDown } from '../../../assets/icons/chevron-down.svg';
 import { ReactComponent as ArrowUp } from '../../../assets/icons/chevron-up.svg';
@@ -8,6 +8,7 @@ import './Select.scss';
 export type SelectProps<TValue> = {
     children: React.ReactNode;
     onValueChange: (value: TValue) => void;
+    value?: TValue;
     selectContainerRef?: RefObject<HTMLDivElement | null>;
     placeholder?: string;
     className?: string;
@@ -17,15 +18,27 @@ export type SelectProps<TValue> = {
 export const Select = <TValue,>({
     children,
     onValueChange,
+    value,
     selectContainerRef,
     className,
     placeholder,
     isAutocomplete = false,
 }: SelectProps<TValue>) => {
-    const options = React.Children.toArray(children).filter((x) => React.isValidElement(x) && x.type === Select.Option);
+    const options = React.Children.toArray(children).filter((child) => {
+        return React.isValidElement(child) && child.type === Select.Option;
+    }) as React.ReactElement<SelectOptionProps<TValue>>[];
+
     const [isOpen, setIsOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState<TValue | null>(null);
     const [selectedName, setSelectedName] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (value !== undefined) {
+            const selectedOption = options.find((opt) => opt.props.value === value);
+            setSelectedValue(value);
+            setSelectedName(selectedOption ? selectedOption.props.name : null);
+        }
+    }, [value, options]);
 
     const handleOpenSelect = () => {
         setIsOpen(!isOpen);
@@ -74,15 +87,14 @@ export const Select = <TValue,>({
             {isOpen && (
                 <div className={'select-options'}>
                     {options.map((opt, index) => {
-                        if (!React.isValidElement(opt)) return null;
-                        const { name, value } = opt.props as { children: React.ReactNode; value: TValue; name: string };
+                        const { name, value: optValue } = opt.props;
                         return (
                             <button
                                 key={`${name}-${index}`}
                                 className={classNames({
-                                    'select-options-selected': !isAutocomplete && selectedValue === value,
+                                    'select-options-selected': !isAutocomplete && selectedValue === optValue,
                                 })}
-                                onClick={(e) => handleOptionClick(e, value, name)}
+                                onClick={(e) => handleOptionClick(e, optValue, name)}
                             >
                                 <span>{name}</span>
                             </button>
@@ -94,4 +106,9 @@ export const Select = <TValue,>({
     );
 };
 
-Select.Option = <TValue,>({ children }: { children?: React.ReactNode; value: TValue; name: string }) => <>{children}</>;
+export interface SelectOptionProps<TValue> {
+    value: TValue;
+    name: string;
+}
+
+Select.Option = <TValue,>(_props: SelectOptionProps<TValue>) => null;

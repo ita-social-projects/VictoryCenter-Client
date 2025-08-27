@@ -7,7 +7,7 @@ jest.mock('../../input-label/InputLabel', () => ({
 }));
 
 jest.mock('../../image-input/ImageInput', () => ({
-    PhotoInput: () => <input data-testid="mock-image-input" />,
+    ImageInput: () => <input data-testid="mock-image-input" />,
 }));
 
 jest.mock('../../input-error/InputError', () => ({

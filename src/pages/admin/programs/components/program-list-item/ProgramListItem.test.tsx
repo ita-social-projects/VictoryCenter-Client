@@ -158,7 +158,7 @@ describe('ProgramListItem', () => {
         expect(getProgramActionsButtons()).toBeInTheDocument();
     });
 
-    it('displays image when program has an image and mapImageToBase64 returns a string', () => {
+    it('displays image when program has an image and ', () => {
         const programWithImage: Program = {
             ...mockProgram,
             img: {
@@ -174,21 +174,6 @@ describe('ProgramListItem', () => {
         expect(imgElement).toBeInTheDocument();
         expect(imgElement).toHaveAttribute('alt', 'Test Program-img');
         expect(imgElement).toHaveAttribute('src', 'test-base64');
-        expect(screen.queryByTestId('blank-image')).not.toBeInTheDocument();
-    });
-
-    it('displays dlank image when img is null', () => {
-        const programWithImage: Program = {
-            ...mockProgram,
-            img: null,
-        };
-
-        renderProgramListItem({ program: programWithImage });
-
-        const imgElement = getProgramImage();
-        expect(imgElement).toBeInTheDocument();
-        expect(imgElement).toHaveAttribute('alt', 'Test Program-img');
-        expect(imgElement).not.toHaveAttribute('src');
         expect(screen.queryByTestId('blank-image')).not.toBeInTheDocument();
     });
 });

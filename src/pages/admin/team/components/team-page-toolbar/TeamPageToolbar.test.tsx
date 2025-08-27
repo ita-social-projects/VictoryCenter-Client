@@ -7,8 +7,6 @@ import { VisibilityStatus } from '../../../../../types/admin/common';
 import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
 import { ProgramSearchItemData } from '../../../../../types/admin/programs';
 
-jest.mock('../../../../../assets/icons/plus.svg', () => 'mocked-plus-icon.svg');
-
 jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
     SearchBar: ({ onQueryChange, onClear, placeholder }: SearchBarProps<ProgramSearchItemData>) => (
         <div>

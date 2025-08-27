@@ -1,0 +1,16 @@
+@use '../../../../assets/sass/variables/colors';
+
+.search-item-wrapper {
+    display: flex;
+    position: relative;
+    align-items: center;
+    min-height: 2.5rem;
+    max-height: 6.25rem;
+    padding: 0.5rem 1rem;
+    overflow: visible;
+    cursor: pointer;
+
+    &--active {
+        background: colors.$blue-50;
+    }
+}

@@ -7,7 +7,9 @@ import { VisibilityStatusLabelProps } from '../../../../../components/admin/visi
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { Program } from '../../../../../types/admin/programs';
 
-jest.mock('../../../../../assets/icons/blank-image.svg', () => 'blank-image.svg');
+jest.mock('../../../../../assets/icons/blank-image.svg', () => ({
+    ReactComponent: ({ className }: { className?: string }) => <svg data-testid="blank-image" className={className} />,
+}));
 
 jest.mock('../../../../../components/admin/button-tooltip/ButtonTooltip', () => ({
     ButtonTooltip: ({ children, position }: { children: React.ReactNode; position: string }) => {
@@ -55,7 +57,8 @@ describe('ProgramListItem', () => {
 
     const getProgramName = () => screen.getByText('Test Program');
     const getProgramDescription = () => screen.getByText('Test program description');
-    const getProgramImage = () => screen.getByAltText('Test Program-img');
+    const getProgramImage = () => screen.queryByAltText('Test Program-img');
+    const getBlankImage = () => screen.getByTestId('blank-image');
     const getStatusComponent = () => screen.getByTestId('status');
     const getTooltipButton = () => screen.getByTestId('tooltip-button');
 
@@ -82,24 +85,21 @@ describe('ProgramListItem', () => {
         expect(mockHandleOnDeleteProgram).toHaveBeenCalledWith(mockProgram);
     };
 
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
     it('renders program information correctly', () => {
         renderProgramListItem();
 
         expect(getProgramName()).toBeInTheDocument();
         expect(getProgramDescription()).toBeInTheDocument();
-        expect(getProgramImage()).toBeInTheDocument();
+        expect(getBlankImage()).toBeInTheDocument();
     });
 
     it('uses blank image when program image is not provided', () => {
         const programWithoutImage = { ...mockProgram, img: null };
         renderProgramListItem({ program: programWithoutImage });
 
-        const image = getProgramImage();
-        expect(image).toHaveAttribute('src', 'blank-image.svg');
+        expect(getBlankImage()).toBeInTheDocument();
+        expect(getBlankImage()).toHaveClass('program-info-identity-blank-image');
+        expect(getProgramImage()).not.toBeInTheDocument();
     });
 
     it('renders status component with correct status', () => {
@@ -121,7 +121,6 @@ describe('ProgramListItem', () => {
         const draftProgram: Program = { ...mockProgram, status: VisibilityStatus.Draft };
         renderProgramListItem({ program: draftProgram });
 
-        // Використання константи замість hardcoded text
         expect(getDraftedTooltipText()).toBeInTheDocument();
         expect(screen.getByText('Category 1')).toBeInTheDocument();
         expect(screen.getByText('Category 2')).toBeInTheDocument();
@@ -157,5 +156,39 @@ describe('ProgramListItem', () => {
         expect(getProgramInfo()).toBeInTheDocument();
         expect(getProgramActions()).toBeInTheDocument();
         expect(getProgramActionsButtons()).toBeInTheDocument();
+    });
+
+    it('displays image when program has an image and mapImageToBase64 returns a string', () => {
+        const programWithImage: Program = {
+            ...mockProgram,
+            img: {
+                id: 1,
+                url: 'test-base64',
+                mimeType: 'image/png',
+            },
+        };
+
+        renderProgramListItem({ program: programWithImage });
+
+        const imgElement = getProgramImage();
+        expect(imgElement).toBeInTheDocument();
+        expect(imgElement).toHaveAttribute('alt', 'Test Program-img');
+        expect(imgElement).toHaveAttribute('src', 'test-base64');
+        expect(screen.queryByTestId('blank-image')).not.toBeInTheDocument();
+    });
+
+    it('displays dlank image when img is null', () => {
+        const programWithImage: Program = {
+            ...mockProgram,
+            img: null,
+        };
+
+        renderProgramListItem({ program: programWithImage });
+
+        const imgElement = getProgramImage();
+        expect(imgElement).toBeInTheDocument();
+        expect(imgElement).toHaveAttribute('alt', 'Test Program-img');
+        expect(imgElement).not.toHaveAttribute('src');
+        expect(screen.queryByTestId('blank-image')).not.toBeInTheDocument();
     });
 });

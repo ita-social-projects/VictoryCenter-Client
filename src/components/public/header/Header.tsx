@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { ReactComponent as VictoryCenterLogo } from '../../../assets/icons/logo-with-text.svg';
 import { PUBLIC_ROUTES } from '../../../const/public/routes';
 import { ABOUT_US, CONTACT_US, DONATE, HOW_TO_SUPPORT, PROGRAMS, REPORTING } from '../../../const/public/header';
+import { ReactComponent as BurgerIcon } from '../../../assets/icons/burger.svg';
 
 export const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
@@ -47,7 +48,7 @@ export const Header = () => {
                     {DONATE}
                 </Link>
                 <button onClick={toggleMenu} className="burgerMenuIcon">
-                    ☰
+                    <BurgerIcon />
                 </button>
             </div>
             {isMenuOpen && (

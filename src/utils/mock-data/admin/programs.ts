@@ -15,11 +15,7 @@ export const mockPrograms: Program[] = [
         description: 'Зменшення рівня стресу, тривоги та ПТСР у ветеранів, розвиток внутрішньої сили та опори.',
         categories: [mockCategories[0]],
         status: VisibilityStatus.Published,
-        img: {
-            id: 1,
-            url: 'https://picsum.photos/600/600',
-            mimeType: 'image/png',
-        },
+        img: null,
     },
     {
         id: 2,
@@ -28,11 +24,7 @@ export const mockPrograms: Program[] = [
             'Покращення комунікаційних навичок, моторики та соціалізації для дітей з розладами спектру аутизму.',
         categories: [mockCategories[1], mockCategories[2]],
         status: VisibilityStatus.Draft,
-        img: {
-            id: 2,
-            url: 'https://picsum.photos/700/600',
-            mimeType: 'image/png',
-        },
+        img: null,
     },
     {
         id: 3,
@@ -41,11 +33,7 @@ export const mockPrograms: Program[] = [
             'Програма для військових з фізичними травмами: підтримка рухливості, баланс, м’язова стабільність.',
         categories: [mockCategories[0]],
         status: VisibilityStatus.Published,
-        img: {
-            id: 3,
-            url: 'https://picsum.photos/800/600',
-            mimeType: 'image/png',
-        },
+        img: null,
     },
     {
         id: 4,

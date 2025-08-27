@@ -6,17 +6,16 @@ import './ImageInput.scss';
 import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
-interface imageInputProps {
+export interface ImageInputProps {
     value: ImageValues | Image | null;
     onChange: (image: ImageValues | null) => void;
     onBlur?: () => void;
     disabled?: boolean;
-    error?: boolean;
     id?: string;
     name?: string;
 }
 
-export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false }: imageInputProps) => {
+export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false }: ImageInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);

@@ -1,10 +1,11 @@
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonTooltip } from '../../../../../components/admin/button-tooltip/ButtonTooltip';
 import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
-import BlankImage from '../../../../../assets/icons/blank-image.svg';
 import './ProgramListItem.scss';
 import { Program } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
+import { ReactComponent as BlankImage } from '../../../../../assets/icons/blank-image.svg';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import './ProgramListItem.scss';
 
 export interface ProgramListItemProps {
     program: Program;
@@ -17,7 +18,14 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
         <div className="program-item">
             <div className="program-info">
                 <div className="program-info-identity">
-                    <img src={program.img?.url || BlankImage} alt={`${program.name}-img`} />
+                    {program.img ? (
+                        <img
+                            src={program.img && 'url' in program.img ? program.img.url : undefined}
+                            alt={`${program.name}-img`}
+                        />
+                    ) : (
+                        <BlankImage className="program-info-identity-blank-image" />
+                    )}
                     <p>{program.name}</p>
                 </div>
                 <div className="program-info-description">

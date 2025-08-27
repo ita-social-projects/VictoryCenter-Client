@@ -1,18 +1,17 @@
 import './DonateSection.scss';
 import React, { useState } from 'react';
-import { DONATE_SECTION } from '../../../../const/public/donate-page';
-import { DonateTab, Currency, PaymentSystem } from '../../../../types/public/donate-page';
+import { DONATE_SECTION, DONATION_SIZE } from '../../../../const/public/donate-page';
+import { DonateTab, PaymentSystem, Currency, currencyToString } from '../../../../types/public/donate-page';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import { getEnvVariable } from '../../../../utils/functions/get-env-variable/get-env-variable';
+import { Tabs } from '../../../../components/common/tabs/Tabs';
 
 export const DonateSection = () => {
     const [activeTab, setActiveTab] = useState<DonateTab>(DonateTab.oneTime);
     const [donationAmount, setDonationAmount] = useState<number>(0);
     const [currency, setCurrency] = useState<Currency>(Currency.UAH);
 
-    const setDonateTabClass = (donateTabType: DonateTab): string => {
-        return activeTab === donateTabType ? 'donateTab active' : 'donateTab';
-    };
+    const currencyString = currencyToString(currency);
 
     const handleDonateAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let inputValue = e.target.value;
@@ -28,7 +27,7 @@ export const DonateSection = () => {
     };
 
     const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setCurrency(e.target.value as Currency);
+        setCurrency(Number(e.target.value) as Currency);
     };
 
     const handleSubmit: React.FormEventHandler<HTMLFormElement> | undefined = (e) => {
@@ -59,31 +58,14 @@ export const DonateSection = () => {
                 value={(activeTab === DonateTab.subscription).toString()}
             ></input>
             <input type="hidden" name="paymentSystem" value={PaymentSystem.WayForPay}></input>
-            <div className="donateTabsContainer">
-                <button
-                    className={setDonateTabClass(DonateTab.oneTime)}
-                    type="button"
-                    onClick={() => setActiveTab(DonateTab.oneTime)}
-                >
-                    {DONATE_SECTION.ONE_TIME_DONATE}
-                </button>
-                <div className="tooltip-container top">
-                    <button
-                        className={setDonateTabClass(DonateTab.subscription)}
-                        type="button"
-                        onClick={() => setActiveTab(DonateTab.subscription)}
-                        disabled
-                    >
-                        {DONATE_SECTION.SUBSCRIPTION}
-                    </button>
-                    <span className="tooltip-text">
-                        <div className="text-center">
-                            <p className="font-semibold">Subscription is not yet available.</p>
-                            <p>Please check back later!</p>
-                        </div>
-                    </span>
-                </div>
-            </div>
+            <Tabs
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                tabs={[
+                    { id: DonateTab.oneTime, label: DONATE_SECTION.ONE_TIME_DONATE },
+                    { id: DonateTab.subscription, label: DONATE_SECTION.SUBSCRIPTION, disabled: true },
+                ]}
+            ></Tabs>
             <div className="donateAmountSection">
                 <input
                     name="amount"
@@ -94,26 +76,26 @@ export const DonateSection = () => {
                 />
                 <div className="currencySelector">
                     <select name="currency" value={currency} onChange={handleCurrencyChange}>
-                        <option value={Currency.UAH}>{Currency[Currency.UAH]}</option>
-                        <option value={Currency.USD}>{Currency[Currency.USD]}</option>
-                        <option value={Currency.EUR}>{Currency[Currency.EUR]}</option>
+                        <option value={Currency.UAH}>{currencyToString(Currency.UAH)}</option>
+                        <option value={Currency.USD}>{currencyToString(Currency.USD)}</option>
+                        <option value={Currency.EUR}>{currencyToString(Currency.EUR)}</option>
                     </select>
                     <span className="arrowIcon">▼</span>
-                    <span className="currencyText">{currency}</span>
+                    <span className="currencyText">{currencyString}</span>
                 </div>
             </div>
             <div className="fastDonateOptionsSection">
                 <button className="donateFastOptionButton" onClick={() => handleQuickAmountChange(10)} type="button">
-                    <span className="donateFastValueText">+10 </span>
-                    {currency}
+                    <span className="donateFastValueText">{DONATION_SIZE[10]}</span>
+                    {currencyString}
                 </button>
                 <button className="donateFastOptionButton" onClick={() => handleQuickAmountChange(50)} type="button">
-                    <span className="donateFastValueText">+50 </span>
-                    {currency}
+                    <span className="donateFastValueText">{DONATION_SIZE[50]}</span>
+                    {currencyString}
                 </button>
                 <button className="donateFastOptionButton" onClick={() => handleQuickAmountChange(100)} type="button">
-                    <span className="donateFastValueText">+100 </span>
-                    {currency}
+                    <span className="donateFastValueText">{DONATION_SIZE[100]}</span>
+                    {currencyString}
                 </button>
             </div>
             <button className="donateButton" type="submit">

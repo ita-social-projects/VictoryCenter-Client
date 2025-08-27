@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 import './TextAreaWithCharacterLimit.scss';
 
-interface TextAreaWithCharacterLimitProps {
+export interface TextAreaWithCharacterLimitProps {
     value: string;
     onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
     onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
@@ -43,15 +43,15 @@ export const TextAreaWithCharacterLimit = ({
     const countId = `${id}-character-count`;
 
     return (
-        <div className="textarea-with-limit">
+        <div className="char-limit-textarea">
             <div
-                className={classNames('textarea-wrapper', {
-                    'textarea-wrapper-disabled': disabled,
-                    'textarea-wrapper-focused': isFocused && !disabled,
+                className={classNames('char-limit-textarea__wrapper', {
+                    'char-limit-textarea__wrapper--disabled': disabled,
+                    'char-limit-textarea__wrapper--focused': isFocused && !disabled,
                 })}
             >
                 <textarea
-                    className="textarea-input"
+                    className="char-limit-textarea__field"
                     value={value}
                     onChange={onChange}
                     onFocus={handleFocus}
@@ -66,8 +66,10 @@ export const TextAreaWithCharacterLimit = ({
                     aria-invalid={currentLength > maxLength}
                 />
             </div>
-            <div className="character-limit" id={countId} aria-live="polite" role="status">
-                {currentLength}/{maxLength}
+            <div className="char-limit-textarea__counter-container">
+                <output className="char-limit-textarea__counter" id={countId} aria-live="polite">
+                    {currentLength}/{maxLength}
+                </output>
             </div>
         </div>
     );

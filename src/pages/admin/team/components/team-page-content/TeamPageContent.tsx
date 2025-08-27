@@ -377,7 +377,6 @@ export const TeamPageContent = () => {
         <div className="team-page-wrapper" data-testid="team-page-content">
             <div className="team-page-toolbar-container">
                 <TeamPageToolbar
-                    autocompleteValues={[]}
                     onSearchQueryChange={handleSearchQueryByName}
                     onStatusFilterChange={onStatusFilterChange}
                     onAddMember={handleAddMemberModalOpen}

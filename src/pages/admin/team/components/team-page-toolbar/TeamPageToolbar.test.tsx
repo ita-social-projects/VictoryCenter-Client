@@ -1,27 +1,58 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { TeamPageToolbar } from './TeamPageToolbar';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-describe('TeamPageToolbar', () => {
-    const autocompleteValues = ['John', 'Jane'];
+import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
+import { ProgramSearchItemData } from '../../../../../types/admin/programs';
 
+jest.mock('../../../../../assets/icons/plus.svg', () => 'mocked-plus-icon.svg');
+
+jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
+    SearchBar: ({ onQueryChange, onClear, placeholder }: SearchBarProps<ProgramSearchItemData>) => (
+        <div>
+            <input
+                placeholder={placeholder}
+                onChange={(e) => onQueryChange?.(e.target.value)}
+                data-testid="search-input"
+            />
+            <button onClick={onClear} data-testid="clear-button">
+                Clear
+            </button>
+        </div>
+    ),
+}));
+
+// Local mock for ResizeObserver used by hooks inside TeamPageToolbar
+beforeAll(() => {
+    class MockResizeObserver {
+        observe = jest.fn();
+        unobserve = jest.fn();
+        disconnect = jest.fn();
+    }
+    (window as any).ResizeObserver = MockResizeObserver as any;
+    (global as any).ResizeObserver = MockResizeObserver as any;
+});
+describe('TeamPageToolbar', () => {
     it('calls onSearchQueryChange when typing into input', () => {
+        jest.useFakeTimers();
         const onSearchQueryChange = jest.fn();
         render(
             <TeamPageToolbar
                 onSearchQueryChange={onSearchQueryChange}
                 onStatusFilterChange={jest.fn()}
                 onAddMember={jest.fn()}
-                autocompleteValues={autocompleteValues}
             />,
         );
 
         const input = screen.getByPlaceholderText(TEAM_MEMBERS_TEXT.SEARCH.INPUT_FULLNAME);
         fireEvent.change(input, { target: { value: 'Jo' } });
+        act(() => {
+            jest.advanceTimersByTime(300);
+        });
         expect(onSearchQueryChange).toHaveBeenLastCalledWith('Jo');
+        jest.useRealTimers();
     });
 
     it('changes status filter to All, Published, Draft by interacting with select', () => {
@@ -31,14 +62,11 @@ describe('TeamPageToolbar', () => {
                 onSearchQueryChange={jest.fn()}
                 onStatusFilterChange={onStatusFilterChange}
                 onAddMember={jest.fn()}
-                autocompleteValues={autocompleteValues}
             />,
         );
 
-        // There are two elements with role toolbar (autocomplete select and status select).
-        // The status select lives within the actions container (second one typically).
-        const toolbars = screen.getAllByRole('toolbar');
-        const statusSelect = toolbars[1];
+        // Select root has role="toolbar"
+        const statusSelect = screen.getByRole('toolbar');
 
         // Open select
         fireEvent.click(statusSelect);
@@ -65,7 +93,6 @@ describe('TeamPageToolbar', () => {
                 onSearchQueryChange={jest.fn()}
                 onStatusFilterChange={jest.fn()}
                 onAddMember={onAddMember}
-                autocompleteValues={autocompleteValues}
             />,
         );
 

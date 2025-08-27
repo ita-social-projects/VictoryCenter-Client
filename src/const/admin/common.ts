@@ -71,3 +71,10 @@ export const COMMON_TEXT_ADMIN = {
         TRY_AGAIN: 'Спробувати ще раз',
     },
 };
+
+export const UI_CONFIG = {
+    SEARCH_BAR: {
+        MIN_CHARACTERS_FOR_SEARCH: 3,
+        SEARCH_DELAY_MS: 100,
+    },
+};

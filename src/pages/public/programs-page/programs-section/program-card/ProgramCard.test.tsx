@@ -2,10 +2,6 @@ import { render, screen } from '@testing-library/react';
 import { ProgramCard } from './ProgramCard';
 import { PublishedProgram } from '../../../../../types/public/programs-page';
 
-jest.mock('../../../../../assets/icons/arrow-up-right.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} />,
-}));
-
 describe('test program-card component', () => {
     const mockProgram: PublishedProgram = {
         image: 'https://via.placeholder.com/200x200?text=Ponys',

@@ -3,13 +3,6 @@ import { ScrollableFrame } from './ScrollableFrame';
 import * as dataFetch from '../../../../../services/api/public/programs/programs-api';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../../const/public/programs-page';
 
-jest.mock('../../../../../assets/icons/arrow-left.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} />,
-}));
-jest.mock('../../../../../assets/icons/arrow-right.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} />,
-}));
-
 jest.mock('../../../programs-page/programs-section/program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: { program: any }) => <div data-testid="program-card">{program.title}</div>,
 }));

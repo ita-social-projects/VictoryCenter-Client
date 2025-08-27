@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen, fireEvent, waitFor, getByTestId } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ContextMenuButton } from './ContextMenuButton';
 
 jest.mock('../../../assets/icons/menu.svg', () => ({

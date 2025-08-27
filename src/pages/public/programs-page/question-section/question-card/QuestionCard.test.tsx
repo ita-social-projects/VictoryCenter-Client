@@ -2,14 +2,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { QuestionCard } from './QuestionCard';
 import { Question } from '../../../../../types/public/programs-page';
 
-jest.mock('../../../../../assets/icons/arrow-down-right.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} />,
-}));
-
-jest.mock('../../../../../assets/icons/cross.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} />,
-}));
-
 describe('test question card component', () => {
     const mockQuestion: Question = {
         question: 'Як долучитись до програми?',

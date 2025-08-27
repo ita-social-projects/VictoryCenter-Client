@@ -4,10 +4,6 @@ import { PhotoInput } from './PhotoInput';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ImageValues } from '../../../types/common/image';
 
-jest.mock('../../../assets/icons/delete.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="delete-icon" />,
-}));
-
 jest.mock('../../../assets/icons/cloud-download.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="upload-icon" />,
 }));

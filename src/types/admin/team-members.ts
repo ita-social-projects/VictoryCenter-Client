@@ -25,7 +25,7 @@ export interface TeamMemberCreateUpdateRequest {
     id: number | null;
     fullName: string;
     description: string;
-    image: ImageValues | Image | null;
+    image: ImageValues | null;
     categoryId: number | null;
     status: VisibilityStatus;
     imageId: number | null;

@@ -50,7 +50,7 @@ export const TeamMembersApi = {
         let imageIdToDelete: number | null = null;
         let finalImageId = member.imageId;
 
-        if (member.image && 'base64' in member.image) {
+        if (member.image) {
             if (member.imageId) {
                 const imageResult = await ImageApi.put(client, member.image, member.imageId);
                 finalImageId = imageResult.id;
@@ -81,7 +81,7 @@ export const TeamMembersApi = {
 
     postMember: async (client: AxiosInstance, member: TeamMemberCreateUpdateRequest): Promise<TeamMember> => {
         let imageId: number | null = null;
-        if (member.image && 'base64' in member.image) {
+        if (member.image) {
             const imageResult = await ImageApi.post(client, member.image);
             imageId = imageResult.id;
         }

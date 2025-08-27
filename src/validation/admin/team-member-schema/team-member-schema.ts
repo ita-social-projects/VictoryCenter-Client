@@ -25,7 +25,7 @@ export const teamMemberValidationSchema = Yup.object({
 
     category: Yup.number().required(TEAM_MEMBER_VALIDATION.category.getRequiredError()),
 
-    image: Yup.mixed<ImageValues | string>()
+    image: Yup.mixed<ImageValues | Image>()
         .transform((value) => (value === null ? undefined : value))
         .when('$isPublishing', ([isPublishing], schema) =>
             isPublishing
@@ -42,15 +42,17 @@ export const teamMemberValidationSchema = Yup.object({
             if (value && typeof value === 'object' && 'id' in value && typeof value.id === 'number') {
                 return true;
             }
-            if (typeof value === 'string') return true;
-            if (value) {
+            if (value == null) return true;
+            if ('url' in value) return true;
+            if ('base64' in value) {
                 return value.size <= TEAM_MEMBER_VALIDATION.img.maxSizeBytes;
             }
             return true;
         })
         .test('fileType', TEAM_MEMBER_VALIDATION.img.getFormatError(), (value) => {
-            if (!value || typeof value === 'string') return true;
-            if ('mimeType' in value) {
+            if (value == null) return true;
+            if ('url' in value) return true;
+            if ('base64' in value) {
                 return TEAM_MEMBER_VALIDATION.img.allowedFormats.includes((value as any).mimeType);
             }
             return true;

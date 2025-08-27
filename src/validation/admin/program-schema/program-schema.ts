@@ -53,7 +53,6 @@ export const programValidationSchema = Yup.object({
                 return true;
             }
 
-            // Якщо це ImageValues (base64 з фронту)
             if ('base64' in value && 'mimeType' in value) {
                 return PROGRAM_VALIDATION.img.allowedFormats.includes(value.mimeType);
             }

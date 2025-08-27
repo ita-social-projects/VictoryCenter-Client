@@ -161,7 +161,7 @@ export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false
     );
 };
 
-const getImageSrc = (img: Image | ImageValues | null) => {
+export const getImageSrc = (img: Image | ImageValues | null) => {
     if (!img) return undefined;
 
     if ('url' in img && img.url) {

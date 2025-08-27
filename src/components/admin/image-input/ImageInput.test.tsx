@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { convertFileToBase64, ImageInput } from './ImageInput';
+import { convertFileToBase64, ImageInput, getImageSrc } from './ImageInput';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { Image, ImageValues } from '../../../types/common/image';
 
@@ -367,7 +367,6 @@ describe('ImageInput', () => {
         expect(preview.src).toBe(`data:${MockImageValue.mimeType};base64,${MockImageValue.base64}`);
     });
 
-    // You can place this in the same test file or a separate utility test file.
     describe('convertFileToBase64', () => {
         it('should resolve with base64 string, mimeType, and size for a valid file', async () => {
             const file = new File(['test'], 'image.png', { type: 'image/png' });
@@ -398,6 +397,59 @@ describe('ImageInput', () => {
 
             // Ensure the promise rejects with the mocked error
             await expect(convertFileToBase64(file)).rejects.toThrow('FileReader Error');
+        });
+
+        it('should reject the promise if the FileReader encounters an error', async () => {
+            const file = new File(['test'], 'image.png', { type: 'image/png' });
+            const mockError = new DOMException('FileReader Error');
+
+            // Mock the global FileReader to simulate an error
+            jest.spyOn(global, 'FileReader').mockImplementation(() => {
+                // Create a simple mock object that mimics FileReader's API
+                // This avoids the recursive call that was causing the stack overflow.
+                const mockReader = {
+                    onerror: null as ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null,
+                    readAsDataURL: jest.fn(function (this: any) {
+                        // When readAsDataURL is called, we immediately trigger the onerror handler
+                        // to simulate a failure.
+                        if (this.onerror) {
+                            this.onerror(mockError as any);
+                        }
+                    }),
+                };
+                return mockReader as any;
+            });
+
+            // We expect the promise to reject with the error we simulated.
+            await expect(convertFileToBase64(file)).rejects.toBe(mockError);
+        });
+    });
+
+    describe('getImageSrc', () => {
+        it('should return undefined when the input image is null', () => {
+            expect(getImageSrc(null)).toBeUndefined();
+        });
+
+        // This tests the condition `if ('url' in img && img.url)` where `img.url` is not truthy.
+        it('should return undefined for an Image object with an empty string URL', () => {
+            const mockImage = {
+                id: 1,
+                url: '', // Falsy URL
+                mimeType: 'image/png',
+            };
+            expect(getImageSrc(mockImage)).toBeUndefined();
+        });
+
+        // Test case 3: Input is an object that doesn't match expected shapes
+        // This handles the final `return undefined` statement. It simulates receiving an object
+        // that has neither a 'url' nor a 'base64' property.
+        it('should return undefined for an object that does not have a url or base64 property', () => {
+            const malformedImageObject = {
+                someOtherProp: 'value',
+            };
+            // The function expects an object of type Image or ImageValues, but we cast to 'any'
+            // to test this edge case where the object shape is incorrect.
+            expect(getImageSrc(malformedImageObject as any)).toBeUndefined();
         });
     });
 });

@@ -1,8 +1,14 @@
 import { AxiosInstance } from 'axios';
 import { PaginationResult, VisibilityStatus } from '../../../../types/admin/common';
-import { FaqCreateUpdate, FaqQuestion, FaqSearchItemData, VisitorPage } from '../../../../types/admin/faq';
+import { FaqCreateUpdate, FaqQuestion, FaqSearchItemData, ReorderFaq, VisitorPage } from '../../../../types/admin/faq';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import { RequestOptions } from '../../../../types/common/api';
+
+type FaqPayload = Omit<FaqCreateUpdate, 'id'>;
+const toPayload = (faq: FaqCreateUpdate): FaqPayload => {
+    const { questionText, answerText, status, pageIds } = faq;
+    return { questionText, answerText, status, pageIds };
+};
 
 export const FaqApi = {
     getAll: async (
@@ -33,12 +39,12 @@ export const FaqApi = {
 
     getById: async (client: AxiosInstance, id: number): Promise<FaqQuestion> => {
         const response = await client.get<FaqQuestion>(`${API_ROUTES.FAQ.BASE}/${id}`);
-        return response.data;
+        return response.data as FaqQuestion;
     },
 
     getPages: async (client: AxiosInstance): Promise<VisitorPage[]> => {
         const response = await client.get<VisitorPage[]>(API_ROUTES.FAQ.PAGES);
-        return response.data;
+        return response.data as VisitorPage[];
     },
 
     getSearchItems: async (
@@ -57,31 +63,18 @@ export const FaqApi = {
         await client.delete(`${API_ROUTES.FAQ.BASE}/${id}`);
     },
 
-    reorder: async (client: AxiosInstance, pageId: number, orderedIds: number[]) => {
-        await client.put(API_ROUTES.FAQ.REORDER, {
-            pageId,
-            orderedIds,
-        });
+    reorder: async (client: AxiosInstance, dto: ReorderFaq) => {
+        await client.put(API_ROUTES.FAQ.REORDER, dto);
     },
 
-    update: async (client: AxiosInstance, id: number, faq: FaqCreateUpdate): Promise<FaqQuestion> => {
-        const response = await client.put(`${API_ROUTES.FAQ.BASE}/${id}`, {
-            questionText: faq.questionText,
-            answerText: faq.answerText,
-            status: faq.status,
-            pageIds: faq.pageIds,
-        });
+    update: async (client: AxiosInstance, faq: FaqCreateUpdate): Promise<FaqQuestion> => {
+        const response = await client.put(`${API_ROUTES.FAQ.BASE}/${faq.id}`, toPayload(faq));
 
         return response.data as FaqQuestion;
     },
 
     post: async (client: AxiosInstance, faq: FaqCreateUpdate): Promise<FaqQuestion> => {
-        const response = await client.post(`${API_ROUTES.FAQ.BASE}`, {
-            questionText: faq.questionText,
-            answerText: faq.answerText,
-            status: faq.status,
-            pageIds: faq.pageIds,
-        });
+        const response = await client.post(`${API_ROUTES.FAQ.BASE}`, toPayload(faq));
 
         return response.data as FaqQuestion;
     },

@@ -195,9 +195,8 @@ export const FaqPanelContent = () => {
         [clearError, setErrorState, listSize, statusFilter, client],
     );
 
-    const handleSearchQueryByName = useCallback((_: string) => {
-        // Implement search functionality
-    }, []);
+    // Implement search functionality
+    // const handleSearchQueryByName = useCallback((_: string) => {}, []);
 
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
         setStatusFilter(status);
@@ -238,7 +237,7 @@ export const FaqPanelContent = () => {
                 const orderedIds = faqs.map((m) => m.id);
                 const pageId = selectedPage?.id ?? 0;
 
-                await FaqApi.reorder(client, pageId, orderedIds);
+                await FaqApi.reorder(client, { pageId, orderedIds });
             } catch (error: any) {
                 if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                     return;

@@ -7,8 +7,8 @@ import { VisibilityStatus } from '../../../../../../types/admin/common';
 import { FaqCreateUpdate, FaqQuestion, VisitorPage } from '../../../../../../types/admin/faq';
 import { FaqForm, FaqFormRef, FaqFormValues } from '../../faq-form/FaqForm';
 import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
-import axios from 'axios';
 import '../FaqModal.scss';
+import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 interface BaseProps {
     isOpen: boolean;
@@ -30,6 +30,7 @@ interface EditModalProps extends BaseProps {
 export type FaqModalProps = AddModalProps | EditModalProps;
 
 export const FaqModal = (props: FaqModalProps) => {
+    const client = useAdminClient();
     const { isOpen, onClose, mode, pages } = props;
     const isEditMode = mode === 'edit';
     const faq = isEditMode ? props.faqToEdit : undefined;
@@ -43,7 +44,7 @@ export const FaqModal = (props: FaqModalProps) => {
             entity: faq,
             onSuccess: onSuccess || (() => {}),
             apiCall: async (data: FaqCreateUpdate) => {
-                return isEditMode ? await FaqApi.update(axios, data.id!, data) : await FaqApi.post(axios, data);
+                return isEditMode ? await FaqApi.update(client, data) : await FaqApi.post(client, data);
             },
             getConfirmTitle: (
                 mode: 'add' | 'edit',
@@ -59,7 +60,7 @@ export const FaqModal = (props: FaqModalProps) => {
                         ? COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES
                         : FAQ_TEXT.QUESTION.PUBLISH_FAQ;
                 }
-                return pendingAction === 'draft' ? FAQ_TEXT.QUESTION.DELETE_DRAFT_FAQ : FAQ_TEXT.QUESTION.PUBLISH_FAQ;
+                return pendingAction === 'draft' ? FAQ_TEXT.QUESTION.DRAFT_FAQ : FAQ_TEXT.QUESTION.PUBLISH_FAQ;
             },
             getErrorMessage: (mode: 'add' | 'edit') => {
                 return mode === 'edit'
@@ -81,7 +82,7 @@ export const FaqModal = (props: FaqModalProps) => {
                 status: status,
             }),
         }),
-        [isEditMode, isOpen, mode, onClose, onSuccess, faq],
+        [isEditMode, isOpen, mode, onClose, onSuccess, faq, client],
     );
 
     const modalHookData = useGenericModal<FaqFormValues, FaqQuestion, FaqFormRef>(modalConfig);

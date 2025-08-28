@@ -21,7 +21,7 @@ export const FaqComponent = ({ faq, handleOnDeleteFaq, handleOnEditFaq }: FaqCom
     };
 
     return (
-        <div className="faq-item">
+        <div className="admin-page_faq-item">
             <div className="faq-info">
                 <div className="faq-info-question">
                     <p>{faq.questionText}</p>

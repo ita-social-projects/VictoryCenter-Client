@@ -17,7 +17,7 @@ export const FAQ_TEXT = {
 
     QUESTION: {
         PUBLISH_FAQ: 'Опублікувати нове питання?',
-        DRAFT_FAQ: 'Зберегти нову програму?',
+        DRAFT_FAQ: 'Зберегти нове питання?',
         DELETE_PUBLISHED_FAQ: 'Питання буде видалено з усіх сторінок сайту',
         DELETE_DRAFT_FAQ: 'Видалити питання?',
     },

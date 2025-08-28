@@ -26,7 +26,10 @@ export const teamMemberValidationSchema = Yup.object({
     category: Yup.number().required(TEAM_MEMBER_VALIDATION.category.getRequiredError()),
 
     image: Yup.mixed<ImageValues | Image>()
-        .transform((value) => (value === null ? undefined : value))
+        .transform((value) => {
+            if (value === null || typeof value === 'string') return undefined;
+            return value;
+            })
         .when('$isPublishing', ([isPublishing], schema) =>
             isPublishing
                 ? schema.test(

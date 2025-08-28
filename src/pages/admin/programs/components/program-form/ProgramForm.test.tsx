@@ -3,7 +3,6 @@ import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from './ProgramForm';
 import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
-import { InputLabelProps } from '../../../../../components/admin/input-label/InputLabel';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { Image } from '../../../../../types/common/image';
 import { VisibilityStatus } from '../../../../../types/admin/common';

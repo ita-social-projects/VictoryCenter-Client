@@ -17,7 +17,7 @@
         content: "";
         position: absolute;
         inset: 0;
-        background: rgba(255,255,255,0.34);
+        background: rgba(white,0.34);
         z-index: -1;
     }
 
@@ -59,7 +59,7 @@
             letter-spacing: -0.02rem;
         }
 
-        img {
+        .admin-page-action-hint-icon {
             width: 1.5rem;
             height: 1.5rem;
         }

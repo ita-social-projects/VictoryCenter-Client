@@ -3,8 +3,16 @@ export const FAQ_TEXT = {
         ADD_FAQ: 'Додати питання',
     },
 
+    PLACEHOLDER: {
+        SEARCH_FAQ: 'Введіть назву',
+    },
+
     MESSAGE: {
         FAIL_TO_FETCH_FAQ: 'Виникла помилка, не вдалось завантажити часті питання',
+        FAIL_TO_FETCH_PAGES: 'Виникла помилка, не вдалось завантажити сторінки',
+        FAIL_TO_FETCH_SEARCHED_PAGE: 'Не вдалося знайти вибране часте питання',
+        FAIL_TO_REORDER_FAQ: 'Виникла помилка, не вдалось змінити порядок питань',
+        DONT_FORGET_TO_ORDER: 'Hе забудьте налаштувати порядок відображення питань на сайті',
     },
 
     QUESTION: {
@@ -18,6 +26,7 @@ export const FAQ_TEXT = {
         TITLE: {
             ADD_FAQ: 'Додати питання',
             EDIT_FAQ: 'Редагування питання',
+            DELETE_FAQ: 'Видалити питання?',
         },
         MESSAGE: {
             FAIL_TO_CREATE_FAQ: 'Виникла помилка під час додавання питання',
@@ -30,6 +39,12 @@ export const FAQ_TEXT = {
             QUESTION: 'Питання',
             ANSWER: 'Відповідь',
         },
+    },
+
+    ACTIONS: {
+        REORDER: 'Змінити порядок елемента',
+        EDIT: 'Редагувати питання',
+        DELETE: 'Видалити питання',
     },
 };
 

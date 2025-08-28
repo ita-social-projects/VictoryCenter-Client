@@ -1,13 +1,13 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
-import { MultiSelectInput } from '../../../../../components/admin/multi-select-input/MultiSelectInput';
-import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
-import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import './FaqForm.scss';
+import { forwardRef, useCallback, useMemo } from 'react';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { VisitorPage } from '../../../../../types/admin/faq';
-import { FAQ_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/faq-schema/faq-schema';
+import './FaqForm.scss';
+import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
+import { MultiSelectInputGroup } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
 import { FAQ_TEXT, FAQ_VALIDATION } from '../../../../../const/admin/faq';
+import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { FAQ_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/faq-schema/faq-schema';
+import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 
 export interface FaqFormValues {
     question: string;
@@ -15,10 +15,11 @@ export interface FaqFormValues {
     pages: VisitorPage[];
 }
 
-export interface FormErrorState {
+export interface FaqFormErrors {
     question?: string;
     answer?: string;
-    pages?: string[];
+    pages?: string;
+    [key: string]: string | undefined;
 }
 
 export interface FaqFormRef {
@@ -30,24 +31,22 @@ export interface FaqFormRef {
 export interface FaqFormProps {
     onSubmit: (data: FaqFormValues, status: VisibilityStatus) => void;
     initialData?: FaqFormValues | null;
-    formDisabled?: boolean;
+    isFormDisabled?: boolean;
     pages?: VisitorPage[];
     onValidationChange?: (isValid: boolean) => void;
 }
 
-const validateForm = (formState: FaqFormValues): FormErrorState => {
+const validateForm = (formState: FaqFormValues, isPublishing: boolean): FaqFormErrors => {
     return {
-        question: FAQ_VALIDATION_FUNCTIONS.validateQuestion(formState.question),
-        answer: FAQ_VALIDATION_FUNCTIONS.validateAnswer(formState.answer),
+        // name: PROGRAM_VALIDATION_FUNCTIONS.validateName(formState.name, isPublishing),
+        // categories: PROGRAM_VALIDATION_FUNCTIONS.validateCategories(formState.categories, isPublishing),
+        // description: PROGRAM_VALIDATION_FUNCTIONS.validateDescription(formState.description, isPublishing),
+        // img: PROGRAM_VALIDATION_FUNCTIONS.validateImg(formState.img, isPublishing),
     };
 };
 
-const hasErrors = (errors: FormErrorState): boolean => {
-    return Object.values(errors).some((error) => error !== undefined);
-};
-
-export const ProgramForm = forwardRef<FaqFormRef, FaqFormProps>(
-    ({ initialData = null, onSubmit, formDisabled, pages = [], onValidationChange }: FaqFormProps, ref) => {
+export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
+    ({ initialData = null, onSubmit, isFormDisabled, pages = [], onValidationChange }: FaqFormProps, ref) => {
         const defaultFormState = useMemo<FaqFormValues>(
             () => ({
                 question: '',
@@ -57,152 +56,105 @@ export const ProgramForm = forwardRef<FaqFormRef, FaqFormProps>(
             [],
         );
 
-        const [formState, setFormState] = useState<FaqFormValues>(defaultFormState);
-        const [errors, setErrors] = useState<FormErrorState>({});
-        const [initialFormState, setInitialFormState] = useState<FaqFormValues>(defaultFormState);
-        const [isSubmitting, setIsSubmitting] = useState(false);
-
-        const reset = useCallback(
-            (data: FaqFormValues | null) => {
-                const newState = data || defaultFormState;
-                setFormState(newState);
-                setInitialFormState(newState);
-                setErrors({});
-            },
-            [defaultFormState],
-        );
-
-        const isDirty = useCallback(() => {
-            return JSON.stringify(formState) !== JSON.stringify(initialFormState);
-        }, [formState, initialFormState]);
-
-        const isValid = useCallback(() => {
-            const formErrors = validateForm(formState);
-            return !hasErrors(formErrors);
-        }, [formState]);
-
-        useEffect(() => {
-            const formErrors = validateForm(formState);
-            const isFormValid = !hasErrors(formErrors);
-
-            if (onValidationChange) {
-                onValidationChange(isFormValid);
-            }
-        }, [formState, onValidationChange]);
-
-        useEffect(() => {
-            reset(initialData);
-        }, [initialData, reset]);
+        const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
+            FaqFormValues,
+            FaqFormErrors
+        >({
+            defaultFormState,
+            initialData,
+            validateForm,
+            onSubmit,
+            onValidationChange,
+            ref,
+        });
 
         // Question handlers
-        const handleQuestionChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-            const value = e.target.value;
-            setFormState((prev) => ({ ...prev, question: value }));
-        }, []);
+        const handleQuestionChange = useCallback(
+            (e: React.ChangeEvent<HTMLInputElement>) => {
+                const value = e.target.value;
+                setFormState((prev) => ({ ...prev, question: value }));
+            },
+            [setFormState],
+        );
 
         const handleQuestionBlur = useCallback(() => {
             const error = FAQ_VALIDATION_FUNCTIONS.validateQuestion(formState.question);
             setErrors((prev) => ({ ...prev, question: error }));
-        }, [formState.question]);
+        }, [formState.question, setErrors]);
 
         // Answer handlers
-        const handleAnswerChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value;
-            setFormState((prev) => ({ ...prev, answer: value }));
-        }, []);
-
-        const handleAnswerBlur = useCallback(() => {
-            const error = FAQ_VALIDATION_FUNCTIONS.validateQuestion(formState.answer);
-            setErrors((prev) => ({ ...prev, answer: error }));
-        }, [formState.answer]);
-
-        // Pages handlers
-        const handlePagesChange = useCallback((selectedPages: VisitorPage[]) => {
-            setFormState((prev) => ({ ...prev, pages: selectedPages }));
-        }, []);
-
-        const handlePagesBlur = useCallback(() => {
-            //const error = FAQ_VALIDATION_FUNCTIONS.validateCategories(formState.categories, false);
-            setErrors((prev) => ({ ...prev }));
-        }, [formState.pages]);
-
-        // Submit function
-        const submit = useCallback(
-            async (status: VisibilityStatus) => {
-                if (isSubmitting) return;
-
-                setIsSubmitting(true);
-
-                try {
-                    const formErrors = validateForm(formState);
-                    setErrors(formErrors);
-
-                    if (hasErrors(formErrors)) {
-                        return;
-                    }
-
-                    await onSubmit(formState, status);
-                } finally {
-                    setIsSubmitting(false);
-                }
+        const handleAnswerChange = useCallback(
+            (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                const value = e.target.value;
+                setFormState((prev) => ({ ...prev, answer: value }));
             },
-            [formState, onSubmit, isSubmitting],
+            [setFormState],
         );
 
-        useImperativeHandle(ref, () => ({
-            submit,
-            isDirty,
-            isValid,
-        }));
+        const handleAnswerBlur = useCallback(() => {
+            const error = FAQ_VALIDATION_FUNCTIONS.validateAnswer(formState.answer);
+            setErrors((prev) => ({ ...prev, answer: error }));
+        }, [formState.answer, setErrors]);
+
+        // Pages handlers
+        const handlePagesChange = useCallback(
+            (selectedPages: VisitorPage[]) => {
+                setFormState((prev) => ({ ...prev, pages: selectedPages }));
+            },
+            [setFormState],
+        );
+
+        const handlePagesBlur = useCallback(() => {
+            //const error = PROGRAM_VALIDATION_FUNCTIONS.validateCategories(formState.categories, false);
+            const error = '';
+            setErrors((prev) => ({ ...prev, pages: error }));
+        }, [formState.pages, setErrors]);
 
         return (
             <form className="program-form-main" data-testid="test-form" noValidate>
-                {/* Categories Field */}
-                <div className="form-group">
-                    <InputLabel htmlFor={'pages'} text={FAQ_TEXT.FORM.LABEL.PAGE} isRequired />
-                    <MultiSelectInput
-                        value={formState.pages}
-                        onChange={handlePagesChange}
-                        onBlur={handlePagesBlur}
-                        options={pages}
-                        disabled={isSubmitting || formDisabled}
-                        placeholder={FAQ_TEXT.FORM.LABEL.SELECT_PAGE}
-                        getOptionId={(page: VisitorPage) => page.id}
-                        getOptionName={(page: VisitorPage) => page.title}
-                    />
-                    {errors.pages && <span className="error">{errors.pages}</span>}
-                </div>
+                {/* Pages Field */}
+                <MultiSelectInputGroup
+                    label={FAQ_TEXT.FORM.LABEL.PAGE}
+                    isRequired={true}
+                    id="pages"
+                    options={pages}
+                    value={formState.pages}
+                    onChange={handlePagesChange}
+                    onBlur={handlePagesBlur}
+                    disabled={isSubmitting || isFormDisabled}
+                    placeholder={FAQ_TEXT.FORM.LABEL.SELECT_PAGE}
+                    getOptionId={(page: VisitorPage) => page.id}
+                    getOptionName={(page: VisitorPage) => page.title}
+                    error={errors.categories}
+                />
 
-                {/* Name Field */}
-                <div className="form-group">
-                    <InputLabel htmlFor={'question'} text={FAQ_TEXT.FORM.LABEL.QUESTION} isRequired />
-                    <InputWithCharacterLimit
-                        value={formState.question}
-                        onChange={handleQuestionChange}
-                        onBlur={handleQuestionBlur}
-                        id="question"
-                        name="question"
-                        maxLength={FAQ_VALIDATION.question.max}
-                        disabled={isSubmitting || formDisabled}
-                    />
-                    {errors.question && <span className="error">{errors.question}</span>}
-                </div>
+                {/* Question Field */}
+                <InputWithCharacterLimitGroup
+                    label={FAQ_TEXT.FORM.LABEL.QUESTION}
+                    isRequired={true}
+                    id="question"
+                    name="question"
+                    value={formState.question}
+                    onChange={handleQuestionChange}
+                    onBlur={handleQuestionBlur}
+                    maxLength={FAQ_VALIDATION.question.max}
+                    disabled={isSubmitting || isFormDisabled}
+                    error={errors.question}
+                />
 
                 {/* Description Field */}
-                <div className="form-group">
-                    <InputLabel htmlFor={'answer'} text={FAQ_TEXT.FORM.LABEL.ANSWER} />
-                    <TextAreaWithCharacterLimit
-                        value={formState.answer}
-                        onChange={handleAnswerChange}
-                        onBlur={handleAnswerBlur}
-                        id="answer"
-                        name="answer"
-                        rows={8}
-                        disabled={isSubmitting || formDisabled}
-                        maxLength={FAQ_VALIDATION.answer.max}
-                    />
-                    {errors.answer && <span className="error">{errors.answer}</span>}
-                </div>
+                <TextAreaWithCharacterLimitGroup
+                    label={FAQ_TEXT.FORM.LABEL.ANSWER}
+                    id="answer"
+                    name="answer"
+                    value={formState.answer}
+                    onChange={handleAnswerChange}
+                    onBlur={handleAnswerBlur}
+                    rows={8}
+                    disabled={isSubmitting || isFormDisabled}
+                    maxLength={FAQ_VALIDATION.answer.max}
+                    error={errors.answer}
+                />
             </form>
         );
     },

@@ -17,7 +17,7 @@ export interface FaqQuestion {
     questionText: string;
     answerText: string;
     status: VisibilityStatus;
-    pageIds: number[];
+    pages: VisitorPage[];
 }
 
 export interface FaqCreateUpdate {
@@ -31,4 +31,10 @@ export interface FaqCreateUpdate {
 export interface ReorderFaq {
     pageId: number;
     orderedIds: number[];
+}
+
+export interface FaqSearchItemData {
+    id: number;
+    question: string;
+    pages: string[];
 }

@@ -3,7 +3,7 @@ import { mapLabelToStatus, VisibilityStatus } from '../../../types/admin/common'
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
 interface StatusFilterDropdownProps {
-    onStatusFilterChange: (categoryFilter: VisibilityStatus | undefined) => void;
+    onStatusFilterChange: (statusFilter: VisibilityStatus | undefined) => void;
 }
 
 export const StatusFilterDropdown = ({ onStatusFilterChange }: StatusFilterDropdownProps) => {

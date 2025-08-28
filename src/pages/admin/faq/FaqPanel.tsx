@@ -1,11 +1,5 @@
-import { FaqPanelToolbar } from './components/faq-panel-toolbar/FaqPanelToolbar';
+import { FaqPanelContent } from './components/faq-panel-content/FaqPanelContent';
 
 export const FaqPanel = () => {
-    return (
-        <>
-            <div className="programs-page-toolbar-container">
-                <FaqPanelToolbar onSearchQueryChange={(a) => {}} onStatusFilterChange={(a) => {}} onAddFaq={() => {}} />
-            </div>
-        </>
-    );
+    return <FaqPanelContent />;
 };

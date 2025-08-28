@@ -223,7 +223,7 @@ export const TeamPageContent = () => {
         updateModalState({ isAddMemberModalOpen: true });
     }, [updateModalState]);
 
-    const handleDeleteProgramModalOpen = useCallback(
+    const handleDeleteTeamMemberModalOpen = useCallback(
         (member: TeamMember) => {
             if (isAnyModalOpened) return;
             updateModalState({ memberToDelete: member });
@@ -359,7 +359,7 @@ export const TeamPageContent = () => {
                     <MemberComponent
                         key={m.id}
                         member={m}
-                        handleOnDeleteMember={handleDeleteProgramModalOpen}
+                        handleOnDeleteMember={handleDeleteTeamMemberModalOpen}
                         handleOnEditMember={handleEditMemberModalOpen}
                     />
                 )}
@@ -368,7 +368,7 @@ export const TeamPageContent = () => {
                 onEntitiesReordered={handleEntitiesReordered}
             ></DraggableListItem>
         ),
-        [handleDeleteProgramModalOpen, handleEditMemberModalOpen, handleEntitiesReordered, members],
+        [handleDeleteTeamMemberModalOpen, handleEditMemberModalOpen, handleEntitiesReordered, members],
     );
 
     return (

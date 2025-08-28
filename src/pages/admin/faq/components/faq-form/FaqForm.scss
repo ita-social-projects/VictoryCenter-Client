@@ -1,12 +1,12 @@
 @use '../../../../../assets/sass/variables/colors';
 
-.program-form-body {
+.faq-form-body {
     display: flex;
     flex-direction: column;
     gap: 1.75rem;
 }
 
-.program-form-header {
+.faq-form-header {
     color: colors.$blue-900;
     font-weight: 400;
     font-size: 32px;
@@ -15,7 +15,7 @@
     vertical-align: middle;
 }
 
-.program-form-main {
+.faq-form-main {
     display: flex;
     flex-direction: column;
     gap: 0.4375rem;
@@ -34,12 +34,5 @@
             border: 1px solid colors.$grey-900;
             box-shadow: 0 1px 2px 0 rgba(colors.$blue-900, 0.051);
         }
-    }
-
-    .error {
-        color: colors.$error;
-        font-weight: 400;
-        font-size: 14px;
-        line-height: 20px;
     }
 }

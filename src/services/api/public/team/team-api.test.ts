@@ -36,14 +36,14 @@ describe('fetchTeamPageData', () => {
                     title: 'Engineering',
                     description: 'Dev team',
                     members: [
-                        { id: 1, name: 'Alice', role: 'Frontend Dev', photo: default_team_member_photo },
-                        { id: 2, name: 'Bob', role: '', photo: default_team_member_photo },
+                        { id: 1, name: 'Alice', role: 'Frontend Dev', photo: null },
+                        { id: 2, name: 'Bob', role: '', photo: null },
                     ],
                 },
                 {
                     title: 'With no description',
                     description: '',
-                    members: [{ id: 3, name: 'John', role: 'Backend Dev', photo: default_team_member_photo }],
+                    members: [{ id: 3, name: 'John', role: 'Backend Dev', photo: null }],
                 },
             ],
         };
@@ -78,7 +78,7 @@ describe('fetchTeamPageData', () => {
                 {
                     title: 'Design',
                     description: 'Design team',
-                    members: [{ id: 5, name: 'John', role: 'Lead', photo: default_team_member_photo }],
+                    members: [{ id: 5, name: 'John', role: 'Lead', photo: null }],
                 },
             ],
         };

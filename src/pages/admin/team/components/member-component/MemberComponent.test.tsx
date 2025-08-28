@@ -72,6 +72,17 @@ describe('MemberComponent', () => {
         expect(screen.getByTestId('blank-user-image')).toBeInTheDocument();
     });
 
+    it('displays image with empty src when member has image but mapImageToBase64 returns null', () => {
+        (mapImageToBase64 as jest.Mock).mockReturnValue(null);
+
+        renderComponent();
+
+        const img = screen.getByRole('img');
+        expect(img).toBeInTheDocument();
+        expect(img).toHaveAttribute('alt', `${TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}-John Doe`);
+        expect(img).not.toHaveAttribute('src');
+    });
+
     it('calls handleOnEditMember when edit button clicked', () => {
         (mapImageToBase64 as jest.Mock).mockReturnValue('img123');
 

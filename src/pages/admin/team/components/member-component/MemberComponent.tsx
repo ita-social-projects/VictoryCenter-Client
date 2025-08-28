@@ -12,9 +12,6 @@ export interface MemberComponentProps {
 }
 
 export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMember }: MemberComponentProps) => {
-    const memberImage = mapImageToBase64(member.image);
-    const isMemberImageValid = !!memberImage;
-
     const handleEditMember = () => {
         handleOnEditMember(member);
     };
@@ -26,14 +23,13 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
     return (
         <div className="members-item">
             <div className="members-profile">
-                {isMemberImageValid ? (
+                {member.image ? (
                     <img
-                        src={memberImage}
+                        src={mapImageToBase64(member.image) ?? undefined}
                         alt={`${TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}-${member.fullName}`}
-                        className="member-image"
                     />
                 ) : (
-                    <BlankUserImage className="member-image" />
+                    <BlankUserImage className="member-icon" />
                 )}
                 <p>{member.fullName}</p>
             </div>

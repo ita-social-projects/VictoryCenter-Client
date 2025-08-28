@@ -52,6 +52,11 @@ describe('<AdminContextProvider />', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
+        Object.defineProperty(window, 'location', {
+            value: { pathname: '/admin' },
+            writable: true,
+        });
+
         loginRequestMock.mockResolvedValue('login_token');
         logoutRequestMock.mockResolvedValue(undefined);
         tokenRefreshMock.mockResolvedValue('initial_token');

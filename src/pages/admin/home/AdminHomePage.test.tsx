@@ -2,6 +2,10 @@ import { render } from '@testing-library/react';
 import { AdminHomePage } from './AdminHomePage';
 import { MemoryRouter } from 'react-router';
 
+jest.mock('../../../assets/icons/arrow-left-white.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="admin-page-action-hint-icon" />,
+}));
+
 describe('AdminHomePage', () => {
     it('renders the component', async () => {
         const { container } = render(

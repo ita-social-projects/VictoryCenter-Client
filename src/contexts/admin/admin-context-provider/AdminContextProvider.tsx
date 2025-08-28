@@ -56,11 +56,15 @@ export const AdminContextProvider = ({ children }: Props) => {
     // silent refresh on mount
     useOnMountUnsafe(() => {
         (async () => {
-            try {
-                await refreshAccessToken();
-            } catch {
-                logout();
-            } finally {
+            if (window.location.pathname.startsWith('/admin')) {
+                try {
+                    await refreshAccessToken();
+                } catch {
+                    logout();
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
                 setIsLoading(false);
             }
         })();

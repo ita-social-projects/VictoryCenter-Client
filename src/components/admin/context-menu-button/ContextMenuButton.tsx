@@ -7,11 +7,10 @@ import './ContextMenuButton.scss';
 export interface ContextMenuButtonProps {
     children: React.ReactNode;
     onOptionSelected: (value: string, data?: any) => void;
-    containerRef?: RefObject<HTMLDivElement | null>;
     CustomIcon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
-export const ContextMenuButton = ({ children, onOptionSelected, containerRef, CustomIcon }: ContextMenuButtonProps) => {
+export const ContextMenuButton = ({ children, onOptionSelected, CustomIcon }: ContextMenuButtonProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -40,7 +39,7 @@ export const ContextMenuButton = ({ children, onOptionSelected, containerRef, Cu
     return (
         <div
             role="menu"
-            ref={containerRef || menuRef}
+            ref={menuRef}
             data-testid="context-menu"
             className={classNames('context-menu-button', {
                 'context-menu-button-active': isOpen,

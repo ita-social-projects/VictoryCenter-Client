@@ -16,7 +16,7 @@ export const PublicLayout = ({ behavior = 'auto' }: { behavior?: 'auto' | 'smoot
     }, [pathname, behavior]);
 
     return (
-        <div className="public">
+        <div className="public-layout">
             <div className="header-container">
                 <Header />
             </div>

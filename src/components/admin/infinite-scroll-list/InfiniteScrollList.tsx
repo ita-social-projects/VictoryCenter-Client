@@ -94,7 +94,7 @@ export const InfiniteScrollList = <T,>({
             </div>
             {isMoveToTopVisible && (
                 <button onClick={moveToTop} className="infinite-scroll-list-to-top">
-                    <ArrowUpIcon />
+                    <ArrowUpIcon className="infinite-scroll-list-to-top-icon" />
                 </button>
             )}
         </div>

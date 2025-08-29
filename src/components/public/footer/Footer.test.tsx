@@ -24,6 +24,18 @@ import {
 import { REPORTING, HOW_TO_SUPPORT, ABOUT_US, PROGRAMS } from '../../../const/public/footer';
 import { PUBLIC_ROUTES } from '../../../const/public/routes';
 
+jest.mock('../../../assets/icons/arrow-up-right.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-icon" />,
+}));
+
+jest.mock('../../../assets/icons/phone.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="phone-icon" />,
+}));
+
+jest.mock('../../../assets/icons/mail.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="mail-icon" />,
+}));
+
 global.open = jest.fn();
 
 // Mock clipboard API
@@ -95,8 +107,11 @@ describe('Footer', () => {
         expect(screen.getByRole('button', { name: /instagram/i })).toBeInTheDocument();
     });
 
-    it('renders contact button with correct links', () => {
+    it('renders icons correctly', () => {
         render(<Footer />, { wrapper: MemoryRouter });
+        expect(screen.getByTestId('arrow-icon')).toBeInTheDocument();
+        expect(screen.getByTestId('mail-icon')).toBeInTheDocument();
+        expect(screen.getByTestId('phone-icon')).toBeInTheDocument();
     });
 
     it('copies email to clipboard on click', () => {

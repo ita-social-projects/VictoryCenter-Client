@@ -46,6 +46,10 @@
         &:hover {
             cursor: pointer;
         }
+
+		  &-icon path {
+			stroke: white;
+		  }
     }
 
     &-not-found {

@@ -1,7 +1,15 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { ScrollableFrame } from './ScrollableFrame';
 import * as dataFetch from '../../../../../services/api/public/programs/programs-api';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../../const/public/programs-page';
+
+jest.mock('../../../../../assets/icons/arrow-right.svg', () => ({
+    ReactComponent: (props: any) => <svg data-testid="arrow-right-icon" {...props} />,
+}));
+
+jest.mock('../../../../../assets/icons/arrow-left.svg', () => ({
+    ReactComponent: (props: any) => <svg data-testid="arrow-left-icon" {...props} />,
+}));
 
 jest.mock('../../../programs-page/programs-section/program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: { program: any }) => <div data-testid="program-card">{program.title}</div>,
@@ -74,5 +82,12 @@ describe('ScrollableFrame', () => {
         });
 
         expect(screen.queryAllByTestId('program-card').length).toBe(0);
+    });
+
+    it('should render buttons with correct icons', () => {
+        render(<ScrollableFrame />);
+
+        expect(screen.getByTestId('arrow-left-icon').closest('button')).toBeInTheDocument();
+        expect(screen.getByTestId('arrow-right-icon').closest('button')).toBeInTheDocument();
     });
 });

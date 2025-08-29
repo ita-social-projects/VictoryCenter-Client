@@ -10,6 +10,10 @@ import { ButtonProps } from '../../../../../components/admin/button/Button';
 import { SelectOptionProps, SelectProps } from '../../../../../components/admin/select/Select';
 import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
 
+jest.mock('../../../../../assets/icons/plus.svg', () => ({
+    ReactComponent: (props: any) => <svg data-testid="plus-icon" {...props} />,
+}));
+
 jest.mock('../../../../../components/admin/button/Button', () => ({
     Button: ({ children, onClick, type, formId }: ButtonProps) => (
         <button onClick={onClick} type={type} form={formId}>
@@ -134,11 +138,11 @@ describe('ProgramsPageToolbar', () => {
         expect(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT)).toBeInTheDocument();
     });
 
-    it('should render add program button', () => {
+    it('should render add program button with correct icon', () => {
         render(<ProgramsPageToolbar {...createProps()} />);
 
-        const button = screen.getByText(PROGRAMS_TEXT.BUTTON.ADD_PROGRAM);
-        expect(button).toBeInTheDocument();
+        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.ADD_PROGRAM)).toBeInTheDocument();
+        expect(screen.getByTestId('plus-icon')).toBeInTheDocument();
     });
 
     it('should call onAddProgram when add button clicked', async () => {

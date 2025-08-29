@@ -23,7 +23,7 @@ export enum VisibilityStatus {
     Published,
 }
 
-const VisibilityLabels = ['Опубліковано', 'Чернетка'] as const;
+const VisibilityLabels = [COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT, COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED] as const;
 
 export const mapStatusToLabel = (status: VisibilityStatus): string => {
     return VisibilityLabels[status];

@@ -77,8 +77,8 @@ export const FaqModal = (props: FaqModalProps) => {
                 faq?: FaqQuestion,
             ): FaqCreateUpdate => ({
                 id: mode === 'edit' && faq ? faq.id : null,
-                questionText: formData.question,
-                answerText: formData.answer,
+                questionText: formData.questionText,
+                answerText: formData.answerText,
                 pageIds: formData.pages.map((p) => p.id),
                 status: status,
             }),
@@ -92,8 +92,8 @@ export const FaqModal = (props: FaqModalProps) => {
         if (!isEditMode || !faq) return null;
 
         return {
-            question: faq.questionText,
-            answer: faq.answerText,
+            questionText: faq.questionText,
+            answerText: faq.answerText,
             pages: faq.pages,
         };
     }, [faq, isEditMode]);

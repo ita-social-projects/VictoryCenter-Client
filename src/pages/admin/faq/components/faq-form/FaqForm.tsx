@@ -10,14 +10,14 @@ import { FAQ_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/faq-sc
 import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 
 export interface FaqFormValues {
-    question: string;
-    answer: string;
+    questionText: string;
+    answerText: string;
     pages: VisitorPage[];
 }
 
 export interface FaqFormErrors {
-    question?: string;
-    answer?: string;
+    questionText?: string;
+    answerText?: string;
     pages?: string;
     [key: string]: string | undefined;
 }
@@ -36,12 +36,11 @@ export interface FaqFormProps {
     onValidationChange?: (isValid: boolean) => void;
 }
 
-const validateForm = (formState: FaqFormValues, isPublishing: boolean): FaqFormErrors => {
+const validateForm = (formState: FaqFormValues): FaqFormErrors => {
     return {
-        // name: PROGRAM_VALIDATION_FUNCTIONS.validateName(formState.name, isPublishing),
-        // categories: PROGRAM_VALIDATION_FUNCTIONS.validateCategories(formState.categories, isPublishing),
-        // description: PROGRAM_VALIDATION_FUNCTIONS.validateDescription(formState.description, isPublishing),
-        // img: PROGRAM_VALIDATION_FUNCTIONS.validateImg(formState.img, isPublishing),
+        questionText: FAQ_VALIDATION_FUNCTIONS.validateQuestion(formState.questionText),
+        answerText: FAQ_VALIDATION_FUNCTIONS.validateAnswer(formState.answerText),
+        pages: FAQ_VALIDATION_FUNCTIONS.validatePages(formState.pages),
     };
 };
 
@@ -49,8 +48,8 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
     ({ initialData = null, onSubmit, isFormDisabled, pages = [], onValidationChange }: FaqFormProps, ref) => {
         const defaultFormState = useMemo<FaqFormValues>(
             () => ({
-                question: '',
-                answer: '',
+                questionText: '',
+                answerText: '',
                 pages: [],
             }),
             [],
@@ -72,29 +71,29 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
         const handleQuestionChange = useCallback(
             (e: React.ChangeEvent<HTMLInputElement>) => {
                 const value = e.target.value;
-                setFormState((prev) => ({ ...prev, question: value }));
+                setFormState((prev) => ({ ...prev, questionText: value }));
             },
             [setFormState],
         );
 
         const handleQuestionBlur = useCallback(() => {
-            const error = FAQ_VALIDATION_FUNCTIONS.validateQuestion(formState.question);
-            setErrors((prev) => ({ ...prev, question: error }));
-        }, [formState.question, setErrors]);
+            const error = FAQ_VALIDATION_FUNCTIONS.validateQuestion(formState.questionText);
+            setErrors((prev) => ({ ...prev, questionText: error }));
+        }, [formState.questionText, setErrors]);
 
         // Answer handlers
         const handleAnswerChange = useCallback(
             (e: React.ChangeEvent<HTMLTextAreaElement>) => {
                 const value = e.target.value;
-                setFormState((prev) => ({ ...prev, answer: value }));
+                setFormState((prev) => ({ ...prev, answerText: value }));
             },
             [setFormState],
         );
 
         const handleAnswerBlur = useCallback(() => {
-            const error = FAQ_VALIDATION_FUNCTIONS.validateAnswer(formState.answer);
-            setErrors((prev) => ({ ...prev, answer: error }));
-        }, [formState.answer, setErrors]);
+            const error = FAQ_VALIDATION_FUNCTIONS.validateAnswer(formState.answerText);
+            setErrors((prev) => ({ ...prev, answerText: error }));
+        }, [formState.answerText, setErrors]);
 
         // Pages handlers
         const handlePagesChange = useCallback(
@@ -105,8 +104,7 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
         );
 
         const handlePagesBlur = useCallback(() => {
-            //const error = PROGRAM_VALIDATION_FUNCTIONS.validateCategories(formState.categories, false);
-            const error = '';
+            const error = FAQ_VALIDATION_FUNCTIONS.validatePages(formState.pages);
             setErrors((prev) => ({ ...prev, pages: error }));
         }, [formState.pages, setErrors]);
 
@@ -125,7 +123,7 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
                     placeholder={FAQ_TEXT.FORM.LABEL.SELECT_PAGE}
                     getOptionId={(page: VisitorPage) => page.id}
                     getOptionName={(page: VisitorPage) => page.title}
-                    error={errors.categories}
+                    error={errors.pages}
                 />
 
                 {/* Question Field */}
@@ -134,12 +132,12 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
                     isRequired={true}
                     id="question"
                     name="question"
-                    value={formState.question}
+                    value={formState.questionText}
                     onChange={handleQuestionChange}
                     onBlur={handleQuestionBlur}
                     maxLength={FAQ_VALIDATION.question.max}
                     disabled={isSubmitting || isFormDisabled}
-                    error={errors.question}
+                    error={errors.questionText}
                 />
 
                 {/* Description Field */}
@@ -147,13 +145,13 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
                     label={FAQ_TEXT.FORM.LABEL.ANSWER}
                     id="answer"
                     name="answer"
-                    value={formState.answer}
+                    value={formState.answerText}
                     onChange={handleAnswerChange}
                     onBlur={handleAnswerBlur}
                     rows={8}
                     disabled={isSubmitting || isFormDisabled}
                     maxLength={FAQ_VALIDATION.answer.max}
-                    error={errors.answer}
+                    error={errors.answerText}
                 />
             </form>
         );

@@ -17,34 +17,38 @@ export interface DropdownMenuProps {
 export const DropdownMenu = ({ links, mainText }: DropdownMenuProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    const handleDropdownClick = () => {
-        setIsOpen(!isOpen);
+    const handleOnMouseEnter = () => {
+        setIsOpen(true);
     };
 
     const handleLinkClick = () => {
         setIsOpen(!isOpen);
     };
+    const handleOnMouseLeave = () => {
+        setIsOpen(false);
+    };
+
     return (
-        <div className="dropdown">
-            <button className="dropdown-button" onClick={handleDropdownClick}>
-                {mainText} {isOpen ? <ArrowDown /> : <ArrowUp />}
+        <div className="dropdown" onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
+            <button className="dropdown-button">
+                {mainText} {isOpen ? <ArrowUp /> : <ArrowDown />}
             </button>
-            {isOpen ? (
+
+            {isOpen && (
                 <div className="dropdown-links">
                     {links.map((option, index) => (
-                        <div key={index} className="dropdown-link">
-                            <Link
-                                onClick={handleLinkClick}
-                                className={classNames({ disable: option.isDisabled })}
-                                to={option.navigateTo}
-                            >
-                                {option.text}
-                            </Link>
-                        </div>
+                        <Link
+                            onClick={handleLinkClick}
+                            key={index}
+                            className={classNames('dropdown-link', {
+                                disable: option.isDisabled,
+                            })}
+                            to={option.navigateTo}
+                        >
+                            {option.text}
+                        </Link>
                     ))}
                 </div>
-            ) : (
-                <></>
             )}
         </div>
     );

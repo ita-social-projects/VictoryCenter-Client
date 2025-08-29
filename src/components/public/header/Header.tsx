@@ -16,11 +16,11 @@ import {
     TEAM,
     WHO_WE_ARE,
 } from '../../../const/public/header';
-import { DropdownMenu } from '../dropdown-menu/DropdownMenu';
+import { DropdownLink, DropdownMenu } from '../dropdown-menu/DropdownMenu';
 import { ReactComponent as BurgerIcon } from '../../../assets/icons/burger.svg';
 
 export const Header = () => {
-    const dropdownMenuLinks = [
+    const dropdownMenuLinks: DropdownLink[] = [
         { text: WHO_WE_ARE, navigateTo: PUBLIC_ROUTES.ABOUT_US.FULL, isDisabled: false },
         { text: HISTORY, navigateTo: '', isDisabled: true },
         { text: TEAM, navigateTo: PUBLIC_ROUTES.TEAM.FULL, isDisabled: false },

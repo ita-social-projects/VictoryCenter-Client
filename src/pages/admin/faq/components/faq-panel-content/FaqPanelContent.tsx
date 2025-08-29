@@ -245,10 +245,10 @@ export const FaqPanelContent = () => {
     }, [listContainerRef]);
 
     useEffect(() => {
-        if (!isVisitorPagesLoading && !visitorPagesError && visitorPages.length > 0 && !selectedVisitorPage) {
+        if (!selectedVisitorPage && visitorPages && visitorPages.length > 0) {
             setSelectedVisitorPage(visitorPages[0]);
         }
-    }, [isVisitorPagesLoading, visitorPagesError, visitorPages, selectedVisitorPage]);
+    }, [visitorPages, selectedVisitorPage]);
 
     useEffect(() => {
         selectedVisitorPageRef.current = selectedVisitorPage;

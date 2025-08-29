@@ -63,4 +63,7 @@ export const FAQ_VALIDATION = {
         getMinError: () => `Не менше ${FAQ_VALIDATION.answer.min} символів`,
         getMaxError: () => `Не більше ${FAQ_VALIDATION.answer.max} символів`,
     },
+    pages: {
+        getAtLeastOneRequiredError: () => 'Потрібно обрати хоча б одну сторінку',
+    },
 };

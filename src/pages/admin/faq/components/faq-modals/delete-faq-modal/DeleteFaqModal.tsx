@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { FaqQuestion } from '../../../../../../types/admin/faq';
 import '../FaqModal.scss';
 import { FaqApi } from '../../../../../../services/api/admin/faq/faq-api';
-import axios from 'axios';
 import { FAQ_TEXT } from '../../../../../../const/admin/faq';
 import { Modal } from '../../../../../../components/common/modal/Modal';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { Button } from '../../../../../../components/admin/button/Button';
+import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 export interface DeleteFaqModalProps {
     isOpen: boolean;
@@ -16,6 +16,7 @@ export interface DeleteFaqModalProps {
 }
 
 export const DeleteFaqModal = ({ isOpen, onClose, onDeleteFaq, faqToDelete }: DeleteFaqModalProps) => {
+    const client = useAdminClient();
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
 
@@ -26,7 +27,7 @@ export const DeleteFaqModal = ({ isOpen, onClose, onDeleteFaq, faqToDelete }: De
             setIsSubmitting(true);
             setError('');
 
-            await FaqApi.delete(axios, faqToDelete.id);
+            await FaqApi.delete(client, faqToDelete.id);
             onDeleteFaq(faqToDelete);
             onClose();
         } catch {
@@ -43,7 +44,7 @@ export const DeleteFaqModal = ({ isOpen, onClose, onDeleteFaq, faqToDelete }: De
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={handleClose} data-testid="delete-program-modal">
+        <Modal isOpen={isOpen} onClose={handleClose} data-testid="delete-faq-modal">
             <Modal.Title>{FAQ_TEXT.FORM.TITLE.DELETE_FAQ}</Modal.Title>
             <Modal.Content>{error && <div className="error-container">{error}</div>}</Modal.Content>
             <Modal.Actions>

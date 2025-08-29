@@ -41,9 +41,9 @@ export const FaqComponent = ({ faq, handleOnDeleteFaq, handleOnEditFaq }: FaqCom
                                 ? COMMON_TEXT_ADMIN.TOOLTIP.PUBLISHED_IN
                                 : COMMON_TEXT_ADMIN.TOOLTIP.DRAFTED_IN}
                         </b>
-                        {/* {faq.pages.map((p) => (
+                        {faq.pages.map((p) => (
                             <span key={p.id}>{p.title}</span>
-                        ))} */}
+                        ))}
                     </div>
                 </ButtonTooltip>
                 <div className="faq-actions-buttons">

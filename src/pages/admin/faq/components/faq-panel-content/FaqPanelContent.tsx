@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
-import { FaqQuestion, VisitorPage } from '../../../../../types/admin/faq';
+import { FaqQuestion, mapFaqQuestionDtoToModel, VisitorPage } from '../../../../../types/admin/faq';
 import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { FaqApi } from '../../../../../services/api/admin/faq/faq-api';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import axios from 'axios';
 import { FAQ_TEXT } from '../../../../../const/admin/faq';
 import { ToastType } from '../../../../../types/admin/toast';
 import { DraggableListItem } from '../../../../../components/admin/draggable-list-item/DraggableListItem';
@@ -16,6 +15,8 @@ import { FaqModal } from '../faq-modals/faq-modal/FaqModal';
 import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
 import { DeleteFaqModal } from '../faq-modals/delete-faq-modal/DeleteFaqModal';
 import { FaqComponent } from '../faq-component/FaqComponent';
+import { useVisitorPages } from '../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider';
+import axios from 'axios';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -40,13 +41,12 @@ interface ErrorState {
 export const FaqPanelContent = () => {
     const { addToast } = useToast();
     const client = useAdminClient();
-    const [pages, setPages] = useState<VisitorPage[]>([]);
-    const [selectedPage, setSelectedPage] = useState<VisitorPage | null>(null);
+    const { pages: visitorPages, isLoading: isVisitorPagesLoading, error: visitorPagesError } = useVisitorPages();
+    const [selectedVisitorPage, setSelectedVisitorPage] = useState<VisitorPage | null>(null);
     const [faqs, setFaqs] = useState<FaqQuestion[]>([]);
     const [listSize, setListSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
     const [hasMore, setHasMore] = useState(true);
     const [isFaqsLoading, setIsFaqsLoading] = useState(false);
-    const [isPagesLoading, setIsPagesLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
     const [modalState, setModalState] = useState<ModalState>({
@@ -58,11 +58,10 @@ export const FaqPanelContent = () => {
     const listContainerRef = useRef<HTMLDivElement>(null);
     const currentItemsCountRef = useRef<number>(0);
     const totalItemsCountRef = useRef<number | null>(null);
-    const selectedPageRef = useRef<VisitorPage | null>(null);
-    const currentPageRef = useRef<number>(1);
+    const selectedVisitorPageRef = useRef<VisitorPage | null>(null);
+    const currentPaginationPageRef = useRef<number>(1);
     const hasMoreRef = useRef<boolean>(true);
     const isFaqsLoadingRef = useRef(false);
-    const isPagesLoadingRef = useRef(false);
     const abortControllerRef = useRef<AbortController | null>(null);
 
     const setErrorState = useCallback((message: string, type: ErrorType) => {
@@ -94,46 +93,18 @@ export const FaqPanelContent = () => {
         setFaqs([]);
         setHasMore(true);
         clearError();
-        currentPageRef.current = 1;
+        currentPaginationPageRef.current = 1;
         currentItemsCountRef.current = 0;
         totalItemsCountRef.current = null;
         isFaqsLoadingRef.current = false;
         hasMoreRef.current = true;
     }, [clearError]);
 
-    const fetchPages = useCallback(async () => {
-        if (isPagesLoadingRef.current) {
-            return;
-        }
-
-        try {
-            isPagesLoadingRef.current = true;
-            setIsPagesLoading(true);
-            clearError();
-
-            const fetchedPages = await FaqApi.getPages(client);
-            setPages(fetchedPages);
-
-            if (fetchedPages.length > 0) {
-                setSelectedPage((prevSelected) => prevSelected ?? fetchedPages[0]);
-            }
-        } catch (error: any) {
-            if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
-                return;
-            }
-
-            setErrorState(FAQ_TEXT.MESSAGE.FAIL_TO_FETCH_PAGES, ErrorType.Pages);
-        } finally {
-            isPagesLoadingRef.current = false;
-            setIsPagesLoading(false);
-        }
-    }, [clearError, setErrorState, client]);
-
     const fetchFaqs = useCallback(
         async (shouldResetList: boolean = false) => {
             if (
                 isFaqsLoadingRef.current ||
-                !selectedPageRef.current ||
+                !selectedVisitorPageRef.current ||
                 !hasMoreRef.current ||
                 abortControllerRef.current?.signal.aborted
             ) {
@@ -150,10 +121,10 @@ export const FaqPanelContent = () => {
                 setIsFaqsLoading(true);
                 clearError();
 
-                const searchPageId = selectedPageRef.current;
+                const searchPageId = selectedVisitorPageRef.current;
                 const searchStatus = statusFilter;
-                const pageToFetch = shouldResetList ? 0 : currentPageRef.current;
-                const offset = pageToFetch * listSize;
+                const paginationPageToFetch = shouldResetList ? 0 : currentPaginationPageRef.current;
+                const offset = paginationPageToFetch * listSize;
 
                 const fetchedFaqs = await FaqApi.getAll(client, searchPageId.id, searchStatus, offset, listSize);
 
@@ -161,22 +132,23 @@ export const FaqPanelContent = () => {
                     return;
                 }
 
+                const mappedFaqs = fetchedFaqs.items.map((item) => mapFaqQuestionDtoToModel(item, visitorPages));
                 setFaqs((prev) => {
                     if (shouldResetList) {
-                        return [...fetchedFaqs.items];
+                        return [...mappedFaqs];
                     } else {
                         const existingIds = new Set(prev.map((m) => m.id));
-                        const uniqueFetchedFaqs = fetchedFaqs.items.filter((m) => !existingIds.has(m.id));
-                        return [...prev, ...uniqueFetchedFaqs];
+                        const uniqueMappedFaqs = mappedFaqs.filter((m) => !existingIds.has(m.id));
+                        return [...prev, ...uniqueMappedFaqs];
                     }
                 });
 
-                currentPageRef.current = pageToFetch + 1;
+                currentPaginationPageRef.current = paginationPageToFetch + 1;
 
                 if (shouldResetList) {
-                    currentItemsCountRef.current = fetchedFaqs.items.length;
+                    currentItemsCountRef.current = mappedFaqs.length;
                 } else {
-                    currentItemsCountRef.current += fetchedFaqs.items.length;
+                    currentItemsCountRef.current += mappedFaqs.length;
                 }
 
                 setHasMore(currentItemsCountRef.current < fetchedFaqs.totalItemsCount);
@@ -192,7 +164,7 @@ export const FaqPanelContent = () => {
                 setIsFaqsLoading(false);
             }
         },
-        [clearError, setErrorState, listSize, statusFilter, client],
+        [clearError, setErrorState, listSize, statusFilter, client, visitorPages],
     );
 
     // Implement search functionality
@@ -204,7 +176,7 @@ export const FaqPanelContent = () => {
 
     const handlePageSelect = useCallback(
         (page: VisitorPage) => {
-            setSelectedPage(page);
+            setSelectedVisitorPage(page);
             resetFaqsState();
         },
         [resetFaqsState],
@@ -235,7 +207,7 @@ export const FaqPanelContent = () => {
             try {
                 setFaqs(faqs);
                 const orderedIds = faqs.map((m) => m.id);
-                const pageId = selectedPage?.id ?? 0;
+                const pageId = selectedVisitorPage?.id ?? 0;
 
                 await FaqApi.reorder(client, { pageId, orderedIds });
             } catch (error: any) {
@@ -246,58 +218,58 @@ export const FaqPanelContent = () => {
                 setErrorState(FAQ_TEXT.MESSAGE.FAIL_TO_REORDER_FAQ, ErrorType.Faq);
             }
         },
-        [client, selectedPage?.id, setErrorState],
+        [client, selectedVisitorPage?.id, setErrorState],
     );
 
     const handleRetry = useCallback(() => {
-        if (error.type === ErrorType.Pages) {
-            fetchPages();
-        } else if (error.type === ErrorType.Faq) {
+        if (error.type === ErrorType.Faq) {
             resetFaqsState();
         }
-    }, [error.type, fetchPages, resetFaqsState]);
+    }, [error.type, resetFaqsState]);
 
-    const updatePageSize = () => {
+    const updateListSize = () => {
         if (listContainerRef.current) {
-            const calculatedPageSize =
+            const calculatedListSize =
                 Math.floor(listContainerRef.current.clientHeight / LIST_ITEM_HEIGHT_IN_PIXELS) + 1;
-            setListSize(Math.max(calculatedPageSize, DEFAULT_LOAD_ITEMS_COUNT));
+            setListSize(Math.max(calculatedListSize, DEFAULT_LOAD_ITEMS_COUNT));
         }
     };
 
     useEffect(() => {
-        window.addEventListener('resize', updatePageSize);
-        return () => window.removeEventListener('resize', updatePageSize);
+        window.addEventListener('resize', updateListSize);
+        return () => window.removeEventListener('resize', updateListSize);
     }, []);
 
     useEffect(() => {
-        updatePageSize();
+        updateListSize();
     }, [listContainerRef]);
 
     useEffect(() => {
-        fetchPages();
-    }, [fetchPages]);
+        if (!isVisitorPagesLoading && !visitorPagesError && visitorPages.length > 0 && !selectedVisitorPage) {
+            setSelectedVisitorPage(visitorPages[0]);
+        }
+    }, [isVisitorPagesLoading, visitorPagesError, visitorPages, selectedVisitorPage]);
 
     useEffect(() => {
-        selectedPageRef.current = selectedPage;
-        if (selectedPage) {
+        selectedVisitorPageRef.current = selectedVisitorPage;
+        if (selectedVisitorPage) {
             resetFaqsState();
         }
-    }, [selectedPage, resetFaqsState]);
+    }, [selectedVisitorPage, resetFaqsState]);
 
     useEffect(() => {
-        if (selectedPage) {
+        if (selectedVisitorPage) {
             resetFaqsState();
             fetchFaqs(true);
         }
-    }, [statusFilter, selectedPage, statusFilter, fetchFaqs, resetFaqsState]);
+    }, [statusFilter, selectedVisitorPage, statusFilter, fetchFaqs, resetFaqsState]);
 
     const handleAddFaq = useCallback(
         (faq: FaqQuestion) => {
             setFaqs((prevFaqs) => {
                 if (
-                    prevFaqs.length < listSize * currentPageRef.current &&
-                    faq.pages.map((p) => p.id).includes(selectedPage?.id || -1)
+                    prevFaqs.length < listSize * currentPaginationPageRef.current &&
+                    faq.pages.map((p) => p.id).includes(selectedVisitorPage?.id || -1)
                 ) {
                     return [...prevFaqs, faq];
                 } else {
@@ -314,7 +286,7 @@ export const FaqPanelContent = () => {
                 addToast(FAQ_TEXT.MESSAGE.DONT_FORGET_TO_ORDER, ToastType.Info);
             }
         },
-        [updateModalState, listSize, selectedPage?.id, addToast],
+        [updateModalState, listSize, selectedVisitorPage?.id, addToast],
     );
 
     const handleEditFaq = useCallback(
@@ -361,8 +333,8 @@ export const FaqPanelContent = () => {
     );
 
     return (
-        <div className="team-page-wrapper" data-testid="team-page-content">
-            <div className="team-page-toolbar-container">
+        <div className="faq-panel-wrapper" data-testid="faq-panel-content">
+            <div className="faq-panel-toolbar-container">
                 <FaqPanelToolbar
                     onFaqSelect={() => {}}
                     onStatusFilterChange={onStatusFilterChange}
@@ -370,10 +342,10 @@ export const FaqPanelContent = () => {
                 />
             </div>
 
-            <div className="team-page-list-container" ref={listContainerRef}>
+            <div className="faq-panel-list-container" ref={listContainerRef}>
                 <CategoryBar<VisitorPage>
-                    categories={pages}
-                    selectedCategory={selectedPage}
+                    categories={visitorPages}
+                    selectedCategory={selectedVisitorPage}
                     onCategorySelect={handlePageSelect}
                     getCategoryDisplayName={(page) => page.title}
                     getCategoryKey={(page) => page.id}
@@ -381,7 +353,7 @@ export const FaqPanelContent = () => {
                 />
 
                 {error.message && (
-                    <div className="team-page-error-container" data-testid="team-error-container">
+                    <div className="faq-panel-error-container" data-testid="faq-error-container">
                         <span>{error.message}</span>
                         <button onClick={handleRetry} type="button" className="retry-link">
                             {COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN}
@@ -394,7 +366,7 @@ export const FaqPanelContent = () => {
                     renderItem={renderFaqItem}
                     onLoadMore={fetchFaqs}
                     hasMore={hasMore}
-                    isLoading={isFaqsLoading || isPagesLoading}
+                    isLoading={isFaqsLoading || isVisitorPagesLoading}
                     emptyStateMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
                 />
             </div>
@@ -404,7 +376,7 @@ export const FaqPanelContent = () => {
                 isOpen={modalState.isAddFaqModalOpen}
                 onClose={closeModalActions.addFaq}
                 onAddFaq={handleAddFaq}
-                pages={pages}
+                pages={visitorPages}
             />
 
             <FaqModal
@@ -413,7 +385,7 @@ export const FaqPanelContent = () => {
                 onClose={closeModalActions.editFaq}
                 faqToEdit={modalState.faqToEdit!}
                 onEditFaq={handleEditFaq}
-                pages={pages}
+                pages={visitorPages}
             />
 
             <DeleteFaqModal

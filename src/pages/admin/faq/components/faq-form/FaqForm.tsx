@@ -111,7 +111,7 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
         }, [formState.pages, setErrors]);
 
         return (
-            <form className="program-form-main" data-testid="test-form" noValidate>
+            <form className="faq-form-main" data-testid="test-form" noValidate>
                 {/* Pages Field */}
                 <MultiSelectInputGroup
                     label={FAQ_TEXT.FORM.LABEL.PAGE}

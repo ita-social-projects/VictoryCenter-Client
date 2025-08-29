@@ -4,7 +4,7 @@ import { FAQ_TEXT } from '../../../../../../const/admin/faq';
 import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
 import { FaqApi } from '../../../../../../services/api/admin/faq/faq-api';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
-import { FaqCreateUpdate, FaqQuestion, VisitorPage } from '../../../../../../types/admin/faq';
+import { FaqCreateUpdate, FaqQuestion, mapFaqQuestionDtoToModel, VisitorPage } from '../../../../../../types/admin/faq';
 import { FaqForm, FaqFormRef, FaqFormValues } from '../../faq-form/FaqForm';
 import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
 import '../FaqModal.scss';
@@ -44,7 +44,8 @@ export const FaqModal = (props: FaqModalProps) => {
             entity: faq,
             onSuccess: onSuccess || (() => {}),
             apiCall: async (data: FaqCreateUpdate) => {
-                return isEditMode ? await FaqApi.update(client, data) : await FaqApi.post(client, data);
+                const response = isEditMode ? await FaqApi.update(client, data) : await FaqApi.post(client, data);
+                return mapFaqQuestionDtoToModel(response, pages);
             },
             getConfirmTitle: (
                 mode: 'add' | 'edit',
@@ -82,7 +83,7 @@ export const FaqModal = (props: FaqModalProps) => {
                 status: status,
             }),
         }),
-        [isEditMode, isOpen, mode, onClose, onSuccess, faq, client],
+        [isEditMode, isOpen, mode, onClose, onSuccess, faq, client, pages],
     );
 
     const modalHookData = useGenericModal<FaqFormValues, FaqQuestion, FaqFormRef>(modalConfig);

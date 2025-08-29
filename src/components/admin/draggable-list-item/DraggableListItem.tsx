@@ -121,7 +121,7 @@ export const DraggableListItem = <TEntity,>({
                 >
                     <img src={DragIcon} alt={ariaLabel} />
                 </div>
-                {renderEntityComponent(entity)}
+                <div className="item-data">{renderEntityComponent(entity)}</div>
             </div>
         </>
     );

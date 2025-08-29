@@ -1,7 +1,6 @@
 @use '../../../assets/sass/variables/colors';
 
 .draggable-item-wrapper {
-    margin-left: 1px;
     padding: 0;
     border: none;
     width: 100%;
@@ -13,6 +12,15 @@
     box-sizing: border-box;
     background-color: white;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+    border-bottom: 0.3px solid rgba(colors.$blue-900, 0.35);
+
+    .item-data {
+        width: 100%;
+        height: 100%;
+        padding: 1.875rem;
+        background: colors.$grey-50;
+        box-shadow: 0 1px 2.8px 0 rgba(black, 0.15);
+    }
 }
 
 .dragger {

@@ -29,7 +29,7 @@ export const DragPreview = <TEntity,>({
                 <div className="dragger">
                     <img src={DragIcon} alt={dragAltText} />
                 </div>
-                {renderEntityComponent(entity)}
+                <div className="item-data">{renderEntityComponent(entity)}</div>
             </div>
         </div>
     );

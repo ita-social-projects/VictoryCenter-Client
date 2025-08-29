@@ -16,6 +16,7 @@ import { ToastContainer } from '../../../../../components/admin/toast/toast-cont
 import { DeleteFaqModal } from '../faq-modals/delete-faq-modal/DeleteFaqModal';
 import { FaqComponent } from '../faq-component/FaqComponent';
 import { useVisitorPages } from '../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider';
+import './FaqPanelContent.scss';
 import axios from 'axios';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;

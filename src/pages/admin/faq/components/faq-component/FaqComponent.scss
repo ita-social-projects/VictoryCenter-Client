@@ -6,12 +6,6 @@
     align-items: center;
     gap: 7.5rem;
 
-    height: 7.5rem;
-    padding: 1.875rem;
-    background: colors.$grey-50;
-    border-bottom: 0.3px solid rgba(colors.$blue-900, 0.35);
-    box-shadow: 0 1px 2.8px 0 rgba(black, 0.15);
-
     .faq-info {
         display: flex;
         flex: 1;
@@ -31,14 +25,6 @@
             font-weight: 400;
             line-height: 28px;
 
-            &-blank-image,
-            img {
-                width: 3.75rem;
-                height: 3.75rem;
-                border-radius: 50%;
-                flex-shrink: 0;
-            }
-
             p {
                 margin: 0;
                 display: -webkit-box;
@@ -51,7 +37,8 @@
             }
         }
 
-        &-answer {
+        &-answer,
+        &-question {
             flex: 4;
             display: flex;
             align-items: center;

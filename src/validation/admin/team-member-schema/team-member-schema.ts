@@ -29,7 +29,7 @@ export const teamMemberValidationSchema = Yup.object({
         .transform((value) => {
             if (value === null || typeof value === 'string') return undefined;
             return value;
-            })
+        })
         .when('$isPublishing', ([isPublishing], schema) =>
             isPublishing
                 ? schema.test(

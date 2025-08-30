@@ -15,7 +15,7 @@ import {
     PARTNERS_SECOND_SECTION_TITLE,
     PARTNERS_THIRD_SECTION_DESCRIPTION,
     PARTNERS_THIRD_SECTION_TITLE,
-} from '../../../const/partners-page/partners-page';
+} from '../../../const/public/partners-page';
 
 export const PartnersPage = () => {
     return (

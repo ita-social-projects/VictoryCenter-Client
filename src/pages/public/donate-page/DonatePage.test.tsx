@@ -13,8 +13,6 @@ describe('DonatePage', () => {
 
         expect(screen.getByText('Разовий донат')).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Донатити/i })).toBeInTheDocument();
-
-        expect(screen.getByRole('checkbox')).toBeInTheDocument();
     });
 
     it('renders all main sections with correct content', () => {
@@ -27,7 +25,6 @@ describe('DonatePage', () => {
         expect(screen.getByText(/Підписка/i)).toBeInTheDocument();
 
         expect(screen.getByText(/Реквізити для донатів в Україні/i)).toBeInTheDocument();
-        expect(screen.getByText(/Я в Україні/i)).toBeInTheDocument();
 
         expect(screen.getByText(/Інші варіанти підтримки/i)).toBeInTheDocument();
     });

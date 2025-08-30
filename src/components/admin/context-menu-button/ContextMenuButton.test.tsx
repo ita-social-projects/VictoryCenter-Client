@@ -33,7 +33,7 @@ describe('ContextMenuButton', () => {
         );
 
         const iconElement = screen.getByAltText(COMMON_TEXT_ADMIN.ALT.OPEN_MENU)!;
-        expect(iconElement).toHaveAttribute('src', customIcon);
+        expect(iconElement.getAttribute('src')).toContain('custom-icon.svg');
     });
 
     it('toggles menu visibility when clicked', () => {
@@ -57,7 +57,7 @@ describe('ContextMenuButton', () => {
         expect(contextMenuElement).not.toHaveClass('context-menu-button-active');
     });
 
-    it('handles keyboard navigation with Enter and Space keys', () => {
+    it('opens menu when Enter is pressed', () => {
         render(
             <ContextMenuButton onOptionSelected={mockOnOptionSelected}>
                 <ContextMenuButton.Option value="option1">Option 1</ContextMenuButton.Option>
@@ -69,13 +69,9 @@ describe('ContextMenuButton', () => {
         // Test Enter key
         fireEvent.keyDown(contextMenuElement, { key: 'Enter' });
         expect(contextMenuElement).toHaveClass('context-menu-button-active');
-
-        // Test Space key
-        fireEvent.keyDown(contextMenuElement, { key: ' ' });
-        expect(contextMenuElement).not.toHaveClass('context-menu-button-active');
     });
 
-    it('calls onOptionSelected and closes menu when option is clicked', () => {
+    it('calls onOptionSelected and closes menu when option is clicked', async () => {
         render(
             <ContextMenuButton onOptionSelected={mockOnOptionSelected}>
                 <ContextMenuButton.Option value="option1" data={{ id: 123 }}>
@@ -94,7 +90,11 @@ describe('ContextMenuButton', () => {
 
         expect(mockOnOptionSelected).toHaveBeenCalledWith('option1', { id: 123 });
         expect(mockOnOptionSelected).toHaveBeenCalledTimes(1);
-        expect(screen.getByRole('menu')).not.toHaveClass('context-menu-button-active');
+
+        // Після кліка меню має закритися (може потребувати наступного рендера)
+        await waitFor(() => {
+            expect(screen.getByRole('menu')).not.toHaveClass('context-menu-button-active');
+        });
     });
 
     it('closes menu when clicking outside', async () => {
@@ -134,8 +134,8 @@ describe('ContextMenuButton', () => {
         // Open menu
         fireEvent.click(screen.getByRole('menu'));
 
-        const disabledButton = screen.getByText('Disabled Option');
-        const enabledButton = screen.getByText('Enabled Option');
+        const disabledButton = screen.getByText('Disabled Option') as HTMLButtonElement;
+        const enabledButton = screen.getByText('Enabled Option') as HTMLButtonElement;
 
         expect(disabledButton).toBeDisabled();
         expect(enabledButton).not.toBeDisabled();
@@ -158,10 +158,47 @@ describe('ContextMenuButton', () => {
             </ContextMenuButton>,
         );
 
-        // Verify that non-ContextMenuButton.Option children are rendered without modification
         expect(screen.getByTestId('custom-child')).toBeInTheDocument();
         expect(screen.getByText('Custom Child Element')).toBeInTheDocument();
         expect(screen.getByText('Another non-option child')).toBeInTheDocument();
         expect(screen.getByText('Valid Option')).toBeInTheDocument();
+    });
+
+    it('does not close menu when clicking inside menu while open', async () => {
+        render(
+            <ContextMenuButton onOptionSelected={mockOnOptionSelected}>
+                <ContextMenuButton.Option value="option1">Option 1</ContextMenuButton.Option>
+            </ContextMenuButton>,
+        );
+
+        const contextMenuElement = screen.getByRole('menu');
+
+        // Open menu
+        fireEvent.click(contextMenuElement);
+        expect(contextMenuElement).toHaveClass('context-menu-button-active');
+
+        // Click inside menu (should NOT close)
+        fireEvent.mouseDown(contextMenuElement);
+
+        await waitFor(() => {
+            expect(contextMenuElement).toHaveClass('context-menu-button-active');
+        });
+    });
+
+    it('does not toggle menu when pressing key other than Enter', () => {
+        render(
+            <ContextMenuButton onOptionSelected={mockOnOptionSelected}>
+                <ContextMenuButton.Option value="option1">Option 1</ContextMenuButton.Option>
+            </ContextMenuButton>,
+        );
+
+        const contextMenuElement = screen.getByRole('menu');
+
+        // Test with different key (not Enter)
+        fireEvent.keyDown(contextMenuElement, { key: 'Escape' });
+        expect(contextMenuElement).not.toHaveClass('context-menu-button-active');
+
+        fireEvent.keyDown(contextMenuElement, { key: 'Tab' });
+        expect(contextMenuElement).not.toHaveClass('context-menu-button-active');
     });
 });

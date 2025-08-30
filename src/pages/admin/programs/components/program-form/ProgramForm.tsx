@@ -1,15 +1,15 @@
-import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useMemo } from 'react';
 import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-schema';
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { MultiSelectInput } from '../../../../../components/admin/multi-select-input/MultiSelectInput';
-import { PhotoInput } from '../../../../../components/admin/photo-input/PhotoInput';
-import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
-import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { MultiSelectInputGroup } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
+import { PhotoInputGroup } from '../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup';
+import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
 import { Image, ImageValues, ImageValuesToImage, ImageToImageValue } from '../../../../../types/common/image';
 import { ProgramCategory } from '../../../../../types/admin/programs';
-import './ProgramForm.scss';
 import { VisibilityStatus } from '../../../../../types/admin/common';
+import './ProgramForm.scss';
 
 export interface ProgramFormValues {
     name: string;
@@ -18,11 +18,12 @@ export interface ProgramFormValues {
     img: Image | null;
 }
 
-export interface FormErrorState {
+export interface ProgramFormErrors {
     name?: string;
     categories?: string;
     description?: string;
     img?: string;
+    [key: string]: string | undefined;
 }
 
 export interface ProgramFormRef {
@@ -34,12 +35,12 @@ export interface ProgramFormRef {
 export interface ProgramFormProps {
     onSubmit: (data: ProgramFormValues, status: VisibilityStatus) => void;
     initialData?: ProgramFormValues | null;
-    formDisabled?: boolean;
+    isFormDisabled?: boolean;
     categories?: ProgramCategory[];
     onValidationChange?: (isValid: boolean) => void;
 }
 
-const validateForm = (formState: ProgramFormValues, isPublishing: boolean): FormErrorState => {
+const validateForm = (formState: ProgramFormValues, isPublishing: boolean): ProgramFormErrors => {
     return {
         name: PROGRAM_VALIDATION_FUNCTIONS.validateName(formState.name, isPublishing),
         categories: PROGRAM_VALIDATION_FUNCTIONS.validateCategories(formState.categories, isPublishing),
@@ -48,12 +49,8 @@ const validateForm = (formState: ProgramFormValues, isPublishing: boolean): Form
     };
 };
 
-const hasErrors = (errors: FormErrorState): boolean => {
-    return Object.values(errors).some((error) => error !== undefined);
-};
-
 export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
-    ({ initialData = null, onSubmit, formDisabled, categories = [], onValidationChange }: ProgramFormProps, ref) => {
+    ({ initialData = null, onSubmit, isFormDisabled, categories = [], onValidationChange }: ProgramFormProps, ref) => {
         const defaultFormState = useMemo<ProgramFormValues>(
             () => ({
                 name: '',
@@ -64,177 +61,126 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [],
         );
 
-        const [formState, setFormState] = useState<ProgramFormValues>(defaultFormState);
-        const [errors, setErrors] = useState<FormErrorState>({});
-        const [initialFormState, setInitialFormState] = useState<ProgramFormValues>(defaultFormState);
-        const [isSubmitting, setIsSubmitting] = useState(false);
-
-        const reset = useCallback(
-            (data: ProgramFormValues | null) => {
-                const newState = data || defaultFormState;
-                setFormState(newState);
-                setInitialFormState(newState);
-                setErrors({});
-            },
-            [defaultFormState],
-        );
-
-        const isDirty = useCallback(() => {
-            return JSON.stringify(formState) !== JSON.stringify(initialFormState);
-        }, [formState, initialFormState]);
-
-        const isValid = useCallback(
-            (isPublishing: boolean = false) => {
-                const formErrors = validateForm(formState, isPublishing);
-                return !hasErrors(formErrors);
-            },
-            [formState],
-        );
-
-        useEffect(() => {
-            const formErrors = validateForm(formState, false);
-            const isFormValid = !hasErrors(formErrors);
-
-            if (onValidationChange) {
-                onValidationChange(isFormValid);
-            }
-        }, [formState, onValidationChange]);
-
-        useEffect(() => {
-            reset(initialData);
-        }, [initialData, reset]);
+        const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
+            ProgramFormValues,
+            ProgramFormErrors
+        >({
+            defaultFormState,
+            initialData,
+            validateForm,
+            onSubmit,
+            onValidationChange,
+            ref,
+        });
 
         // Name handlers
-        const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-            const value = e.target.value;
-            setFormState((prev) => ({ ...prev, name: value }));
-        }, []);
+        const handleNameChange = useCallback(
+            (e: React.ChangeEvent<HTMLInputElement>) => {
+                const value = e.target.value;
+                setFormState((prev) => ({ ...prev, name: value }));
+            },
+            [setFormState],
+        );
 
         const handleNameBlur = useCallback(() => {
             const error = PROGRAM_VALIDATION_FUNCTIONS.validateName(formState.name, false);
             setErrors((prev) => ({ ...prev, name: error }));
-        }, [formState.name]);
+        }, [formState.name, setErrors]);
 
         // Categories handlers
-        const handleCategoriesChange = useCallback((selectedCategories: ProgramCategory[]) => {
-            setFormState((prev) => ({ ...prev, categories: selectedCategories }));
-        }, []);
+        const handleCategoriesChange = useCallback(
+            (selectedCategories: ProgramCategory[]) => {
+                setFormState((prev) => ({ ...prev, categories: selectedCategories }));
+            },
+            [setFormState],
+        );
 
         const handleCategoriesBlur = useCallback(() => {
             const error = PROGRAM_VALIDATION_FUNCTIONS.validateCategories(formState.categories, false);
             setErrors((prev) => ({ ...prev, categories: error }));
-        }, [formState.categories]);
+        }, [formState.categories, setErrors]);
 
         // Description handlers
-        const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            const value = e.target.value;
-            setFormState((prev) => ({ ...prev, description: value }));
-        }, []);
+        const handleDescriptionChange = useCallback(
+            (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                const value = e.target.value;
+                setFormState((prev) => ({ ...prev, description: value }));
+            },
+            [setFormState],
+        );
 
         const handleDescriptionBlur = useCallback(() => {
             const error = PROGRAM_VALIDATION_FUNCTIONS.validateDescription(formState.description, false);
             setErrors((prev) => ({ ...prev, description: error }));
-        }, [formState.description]);
+        }, [formState.description, setErrors]);
 
         // Image handlers
-        const handleImgChange = useCallback((file: ImageValues | null) => {
-            const image = ImageValuesToImage(file);
-            setFormState((prev) => ({ ...prev, img: image }));
-            const error = PROGRAM_VALIDATION_FUNCTIONS.validateImg(image, false);
-            setErrors((prev) => ({ ...prev, img: error }));
-        }, []);
-
-        // Submit function
-        const submit = useCallback(
-            async (status: VisibilityStatus) => {
-                if (isSubmitting) return;
-
-                setIsSubmitting(true);
-                const isPublishing = status === VisibilityStatus.Published;
-
-                try {
-                    const formErrors = validateForm(formState, isPublishing);
-                    setErrors(formErrors);
-
-                    if (hasErrors(formErrors)) {
-                        return;
-                    }
-
-                    await onSubmit(formState, status);
-                } finally {
-                    setIsSubmitting(false);
-                }
+        const handleImgChange = useCallback(
+            (file: ImageValues | null) => {
+                const image = ImageValuesToImage(file);
+                setFormState((prev) => ({ ...prev, img: image }));
+                const error = PROGRAM_VALIDATION_FUNCTIONS.validateImg(image, false);
+                setErrors((prev) => ({ ...prev, img: error }));
             },
-            [formState, onSubmit, isSubmitting],
+            [setErrors, setFormState],
         );
-
-        useImperativeHandle(ref, () => ({
-            submit,
-            isDirty,
-            isValid,
-        }));
 
         return (
             <form className="program-form-main" data-testid="test-form" noValidate>
                 {/* Categories Field */}
-                <div className="form-group">
-                    <InputLabel htmlFor={'categories'} text={PROGRAMS_TEXT.FORM.LABEL.CATEGORY} isRequired />
-                    <MultiSelectInput
-                        value={formState.categories}
-                        onChange={handleCategoriesChange}
-                        onBlur={handleCategoriesBlur}
-                        options={categories}
-                        disabled={isSubmitting || formDisabled}
-                        placeholder={PROGRAMS_TEXT.FORM.LABEL.SELECT_CATEGORY}
-                        getOptionId={(cat: ProgramCategory) => cat.id}
-                        getOptionName={(cat: ProgramCategory) => cat.name}
-                    />
-                    {errors.categories && <span className="error">{errors.categories}</span>}
-                </div>
+                <MultiSelectInputGroup
+                    label={PROGRAMS_TEXT.FORM.LABEL.CATEGORY}
+                    isRequired={true}
+                    id="categories"
+                    options={categories}
+                    value={formState.categories}
+                    onChange={handleCategoriesChange}
+                    onBlur={handleCategoriesBlur}
+                    disabled={isSubmitting || isFormDisabled}
+                    placeholder={PROGRAMS_TEXT.FORM.LABEL.SELECT_CATEGORY}
+                    getOptionId={(category: ProgramCategory) => category.id}
+                    getOptionName={(category: ProgramCategory) => category.name}
+                    error={errors.categories}
+                />
 
                 {/* Name Field */}
-                <div className="form-group">
-                    <InputLabel htmlFor={'name'} text={PROGRAMS_TEXT.FORM.LABEL.NAME} isRequired />
-                    <InputWithCharacterLimit
-                        value={formState.name}
-                        onChange={handleNameChange}
-                        onBlur={handleNameBlur}
-                        id="name"
-                        name="name"
-                        maxLength={PROGRAM_VALIDATION.name.max}
-                        disabled={isSubmitting || formDisabled}
-                    />
-                    {errors.name && <span className="error">{errors.name}</span>}
-                </div>
+                <InputWithCharacterLimitGroup
+                    label={PROGRAMS_TEXT.FORM.LABEL.NAME}
+                    isRequired={true}
+                    id="name"
+                    name="name"
+                    value={formState.name}
+                    onChange={handleNameChange}
+                    onBlur={handleNameBlur}
+                    maxLength={PROGRAM_VALIDATION.name.max}
+                    disabled={isSubmitting || isFormDisabled}
+                    error={errors.name}
+                />
 
                 {/* Description Field */}
-                <div className="form-group">
-                    <InputLabel htmlFor={'description'} text={PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION} />
-                    <TextAreaWithCharacterLimit
-                        value={formState.description}
-                        onChange={handleDescriptionChange}
-                        onBlur={handleDescriptionBlur}
-                        id="description"
-                        name="description"
-                        rows={8}
-                        disabled={isSubmitting || formDisabled}
-                        maxLength={PROGRAM_VALIDATION.description.max}
-                    />
-                    {errors.description && <span className="error">{errors.description}</span>}
-                </div>
+                <TextAreaWithCharacterLimitGroup
+                    label={PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION}
+                    id="description"
+                    name="description"
+                    value={formState.description}
+                    onChange={handleDescriptionChange}
+                    onBlur={handleDescriptionBlur}
+                    rows={8}
+                    disabled={isSubmitting || isFormDisabled}
+                    maxLength={PROGRAM_VALIDATION.description.max}
+                    error={errors.description}
+                />
 
                 {/* Image Field */}
-                <div className="form-group">
-                    <InputLabel htmlFor={'img'} text={PROGRAMS_TEXT.FORM.LABEL.PHOTO} />
-                    <PhotoInput
-                        value={ImageToImageValue(formState.img)}
-                        onChange={handleImgChange}
-                        id="img"
-                        name="img"
-                        disabled={isSubmitting || formDisabled}
-                    />
-                    {errors.img && <span className="error">{errors.img}</span>}
-                </div>
+                <PhotoInputGroup
+                    label={PROGRAMS_TEXT.FORM.LABEL.PHOTO}
+                    id="img"
+                    name="img"
+                    value={ImageToImageValue(formState.img)}
+                    onChange={handleImgChange}
+                    disabled={isSubmitting || isFormDisabled}
+                    error={errors.img}
+                />
             </form>
         );
     },

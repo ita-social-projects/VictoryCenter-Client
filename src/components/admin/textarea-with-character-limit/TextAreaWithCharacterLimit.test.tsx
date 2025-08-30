@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { TextAreaWithCharacterLimit } from './TextAreaWithCharacterLimit';
+import { TextAreaWithCharacterLimit, TextAreaWithCharacterLimitProps } from './TextAreaWithCharacterLimit';
 
 describe('TextAreaWithCharacterLimit', () => {
-    const defaultProps = {
+    const defaultProps: TextAreaWithCharacterLimitProps = {
         value: '',
         onChange: jest.fn(),
         name: 'description',
@@ -15,71 +15,90 @@ describe('TextAreaWithCharacterLimit', () => {
         jest.clearAllMocks();
     });
 
-    it('renders textarea with initial value and character count', () => {
-        render(<TextAreaWithCharacterLimit {...defaultProps} value="test" />);
+    // Render helpers
+    const renderTextAreaWithCharacterLimit = (overrideProps: Partial<TextAreaWithCharacterLimitProps> = {}) =>
+        render(<TextAreaWithCharacterLimit {...defaultProps} {...overrideProps} />);
 
-        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+    // Element getters
+    const getTextArea = () => screen.getByRole('textbox') as HTMLTextAreaElement;
+    const getCharacterCounter = (current: number, max: number) => screen.getByText(`${current}/${max}`);
+    const getWrapper = () => getTextArea().parentElement!;
+
+    // Action helpers
+    const focusTextArea = () => fireEvent.focus(getTextArea());
+    const blurTextArea = () => fireEvent.blur(getTextArea());
+    const typeInTextArea = (value: string) => fireEvent.change(getTextArea(), { target: { value } });
+
+    // Assertion helpers
+    const expectWrapperToHaveClass = (className: string) => expect(getWrapper().className).toContain(className);
+    const expectWrapperNotToHaveClass = (className: string) => expect(getWrapper().className).not.toContain(className);
+    const expectTextAreaToHaveAttribute = (attribute: string, value: string | number) =>
+        expect(getTextArea()).toHaveAttribute(attribute, value.toString());
+
+    // Specific class assertion helpers
+    const expectWrapperToBeDisabled = () => expectWrapperToHaveClass('char-limit-textarea__wrapper--disabled');
+    const expectWrapperToBeFocused = () => expectWrapperToHaveClass('char-limit-textarea__wrapper--focused');
+    const expectWrapperNotToBeFocused = () => expectWrapperNotToHaveClass('char-limit-textarea__wrapper--focused');
+
+    it('renders textarea with initial value and character count', () => {
+        renderTextAreaWithCharacterLimit({ value: 'test' });
+
+        const textarea = getTextArea();
         expect(textarea).toBeInTheDocument();
         expect(textarea.value).toBe('test');
-        expect(screen.getByText('4/100')).toBeInTheDocument();
+        expect(getCharacterCounter(4, 100)).toBeInTheDocument();
     });
 
     it('calls onChange when typing', () => {
-        render(<TextAreaWithCharacterLimit {...defaultProps} />);
-
-        const textarea = screen.getByRole('textbox');
-        fireEvent.change(textarea, { target: { value: 'hello' } });
-
+        renderTextAreaWithCharacterLimit();
+        typeInTextArea('hello');
         expect(defaultProps.onChange).toHaveBeenCalledTimes(1);
     });
 
     it('shows character count correctly', () => {
-        render(<TextAreaWithCharacterLimit {...defaultProps} value="12345" />);
-        expect(screen.getByText('5/100')).toBeInTheDocument();
+        renderTextAreaWithCharacterLimit({ value: '12345' });
+        expect(getCharacterCounter(5, 100)).toBeInTheDocument();
     });
 
     it('calls onFocus and onBlur when appropriate', () => {
         const onFocus = jest.fn();
         const onBlur = jest.fn();
 
-        render(<TextAreaWithCharacterLimit {...defaultProps} onFocus={onFocus} onBlur={onBlur} />);
+        renderTextAreaWithCharacterLimit({ onFocus, onBlur });
 
-        const textarea = screen.getByRole('textbox');
-
-        fireEvent.focus(textarea);
+        focusTextArea();
         expect(onFocus).toHaveBeenCalledTimes(1);
 
-        fireEvent.blur(textarea);
+        blurTextArea();
         expect(onBlur).toHaveBeenCalledTimes(1);
     });
 
     it('adds focused class on focus and removes on blur', () => {
-        render(<TextAreaWithCharacterLimit {...defaultProps} />);
+        renderTextAreaWithCharacterLimit();
 
-        const wrapper = screen.getByRole('textbox').parentElement!;
-        expect(wrapper.className).not.toContain('textarea-wrapper-focused');
+        expectWrapperNotToBeFocused();
 
-        fireEvent.focus(screen.getByRole('textbox'));
-        expect(wrapper.className).toContain('textarea-wrapper-focused');
+        focusTextArea();
+        expectWrapperToBeFocused();
 
-        fireEvent.blur(screen.getByRole('textbox'));
-        expect(wrapper.className).not.toContain('textarea-wrapper-focused');
+        blurTextArea();
+        expectWrapperNotToBeFocused();
     });
 
     it('renders with disabled prop', () => {
-        render(<TextAreaWithCharacterLimit {...defaultProps} disabled />);
+        renderTextAreaWithCharacterLimit({ disabled: true });
 
-        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        const textarea = getTextArea();
         expect(textarea.disabled).toBe(true);
 
-        const wrapper = textarea.parentElement!;
-        expect(wrapper.className).toContain('disabled');
+        expectWrapperToBeDisabled();
     });
 
     it('respects maxLength and placeholder props', () => {
-        render(<TextAreaWithCharacterLimit {...defaultProps} maxLength={50} placeholder="Enter text" />);
+        renderTextAreaWithCharacterLimit({ maxLength: 50, placeholder: 'Enter text' });
 
         const textarea = screen.getByPlaceholderText('Enter text') as HTMLTextAreaElement;
         expect(textarea.maxLength).toBe(50);
+        expectTextAreaToHaveAttribute('placeholder', 'Enter text');
     });
 });

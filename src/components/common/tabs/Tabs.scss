@@ -1,0 +1,34 @@
+@use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/fonts';
+
+.tabsContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding-top: 1.5rem;
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+
+    .tab {
+        background-color: transparent;
+        font-family: fonts.$mulish-regular-font;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: colors.$tab-color;
+        min-width: 12rem;
+        min-height: 2.68rem;
+        border: none;
+        cursor: pointer;
+        border-bottom: 0.125rem solid colors.$grey-600;
+    }
+
+    .tab:hover {
+        border-bottom: 0.125rem solid colors.$grey-900;
+        color: colors.$grey-900;
+    }
+
+    .tab.active {
+        border-bottom: 0.125rem solid colors.$light-blue-500;
+        color: black;
+    }
+}

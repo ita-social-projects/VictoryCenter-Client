@@ -1,12 +1,13 @@
 import '@testing-library/jest-dom';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { useAdminContext, AdminContextProvider } from './AdminContextProvider';
-import { loginRequest, tokenRefreshRequest } from '../../../services/api/admin/login/login-api';
+import { loginRequest, tokenRefreshRequest, logoutRequest } from '../../../services/api/admin/login/login-api';
 import { isAccessTokenValid } from '../../../services/auth/auth-service/auth-service';
 import { CreateAdminClient } from '../../../services/auth/create-admin-client/create-admin-client';
 
 jest.mock('../../../services/api/admin/login/login-api', () => ({
     loginRequest: jest.fn(),
+    logoutRequest: jest.fn(),
     tokenRefreshRequest: jest.fn(),
 }));
 jest.mock('../../../services/auth/auth-service/auth-service', () => ({
@@ -20,6 +21,7 @@ jest.mock('../../../const/common/api-routes/main-api', () => ({
 }));
 
 const loginRequestMock = loginRequest as jest.Mock<Promise<string>, [any]>;
+const logoutRequestMock = logoutRequest as unknown as jest.Mock<Promise<void>, [string]>;
 const tokenRefreshMock = tokenRefreshRequest as jest.Mock<Promise<string>, []>;
 const isValidMock = isAccessTokenValid as jest.Mock<boolean, [string]>;
 const CreateAdminClientMock = CreateAdminClient as jest.Mock<any, any>;
@@ -50,14 +52,20 @@ describe('<AdminContextProvider />', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
+        Object.defineProperty(window, 'location', {
+            value: { pathname: '/admin' },
+            writable: true,
+        });
+
         loginRequestMock.mockResolvedValue('login_token');
+        logoutRequestMock.mockResolvedValue(undefined);
+        tokenRefreshMock.mockResolvedValue('initial_token');
+
         isValidMock.mockImplementation((t: string) => t === 'initial_token' || t === 'login_token');
         CreateAdminClientMock.mockReturnValue({ marker: 'FAKE_CLIENT' });
     });
 
     it('on silent-refresh on mount: loading toggles, auth=true, client.marker set', async () => {
-        tokenRefreshMock.mockResolvedValueOnce('initial_token');
-
         render(
             <AdminContextProvider>
                 <Consumer />
@@ -101,12 +109,12 @@ describe('<AdminContextProvider />', () => {
     });
 
     it('login() calls loginRequest and flips auth to true', async () => {
-        tokenRefreshMock.mockResolvedValueOnce('initial_token');
         render(
             <AdminContextProvider>
                 <Consumer />
             </AdminContextProvider>,
         );
+
         await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('false'));
 
         fireEvent.click(screen.getByTestId('login-btn'));
@@ -120,15 +128,20 @@ describe('<AdminContextProvider />', () => {
     });
 
     it('logout() resets auth to false', async () => {
-        tokenRefreshMock.mockResolvedValueOnce('initial_token');
         render(
             <AdminContextProvider>
                 <Consumer />
             </AdminContextProvider>,
         );
         await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('true'));
+
         fireEvent.click(screen.getByTestId('logout-btn'));
-        expect(screen.getByTestId('auth')).toHaveTextContent('false');
+
+        await waitFor(() => expect(logoutRequestMock).toHaveBeenCalledTimes(1));
+
+        isValidMock.mockImplementation(() => false);
+
+        await waitFor(() => expect(screen.getByTestId('auth')).toHaveTextContent('false'));
 
         const [, isAuthCheckerFail, getTokenFnFail] = CreateAdminClientMock.mock.calls[0];
         expect(getTokenFnFail()).toBe('');

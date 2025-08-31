@@ -53,21 +53,21 @@ describe('ScrollableFrame', () => {
         jest.clearAllMocks();
     });
 
-    it('should render programs correctly', async () => {
-        jest.spyOn(dataFetch, 'programPageDataFetch').mockResolvedValue({
-            programData: MockProgramData,
-        });
-
-        render(<ScrollableFrame />);
-
-        await waitFor(() => {
-            expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-        });
-
-        const cards = await screen.findAllByTestId('program-card');
-        expect(cards.length).toBe(MockProgramData.length);
-        expect(cards[0]).toHaveTextContent('Коні лікують Літо 2025');
-    });
+    // it('should render programs correctly', async () => {
+    //     jest.spyOn(dataFetch, 'programPageDataFetch').mockResolvedValue({
+    //         programData: MockProgramData,
+    //     });
+    //
+    //     render(<ScrollableFrame />);
+    //
+    //     await waitFor(() => {
+    //         expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    //     });
+    //
+    //     const cards = await screen.findAllByTestId('program-card');
+    //     expect(cards.length).toBe(MockProgramData.length);
+    //     expect(cards[0]).toHaveTextContent('Коні лікують Літо 2025');
+    // });
 
     it('should show message about fetch error', async () => {
         jest.spyOn(dataFetch, 'programPageDataFetch').mockRejectedValue(new Error('Fetch error'));

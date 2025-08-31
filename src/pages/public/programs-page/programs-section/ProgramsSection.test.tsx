@@ -1,89 +1,101 @@
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramsSection } from './ProgramsSection';
-import { render, screen, waitFor } from '@testing-library/react';
-import * as ProgramsPageFetchModule from '../../../../services/api/public/programs/programs-api';
-import { PublishedProgram } from '../../../../types/public/programs-page';
+import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
+import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
 
-const spyProgramsPageDataFetch = jest.spyOn(ProgramsPageFetchModule, 'programPageDataFetch');
-
-const mockPrograms: PublishedProgram[] = [
-    {
-        image: 'https://via.placeholder.com/200x200?text=Ponys',
-        title: 'titletest1',
-        subtitle: 'subtitletest1',
-        description: 'descriptiontest1',
-    },
-    {
-        image: 'https://via.placeholder.com/200x200?text=Ponys',
-        title: 'titletest2',
-        subtitle: 'subtitletest2',
-        description: 'descriptiontest2',
-    },
-    {
-        image: 'https://via.placeholder.com/200x200?text=Ponys',
-        title: 'titletest3',
-        subtitle: 'subtitletest3',
-        description: 'descriptiontest3',
-    },
-];
 jest.mock('./program-card/ProgramCard', () => ({
-    ProgramCard: ({ program }: { program: PublishedProgram }) => (
-        <div data-testid="test-card-content">
-            <img src={program.image} alt={program.title} />
-            <h2>{program.title}</h2>
-            <h4>{program.subtitle}</h4>
-            <p>{program.description}</p>
-        </div>
-    ),
+    ProgramCard: ({ program }: any) => <div data-testid="program-card">{program.name}</div>,
 }));
-describe('test program section', () => {
+
+jest.mock('../../../../services/api/public/programs/programs-api');
+
+describe('ProgramsSection', () => {
+    const mockPrograms = {
+        programsCategories: [
+            { id: 1, name: 'Category 1' },
+            { id: 2, name: 'Category 2' },
+        ],
+        programsData: [
+            {
+                id: 1,
+                image: null,
+                name: 'Program A',
+                description: 'Description A',
+                categories: [{ id: 1, name: 'Category 1' }],
+            },
+            {
+                id: 2,
+                image: null,
+                name: 'Program B',
+                description: 'Description B',
+                categories: [{ id: 2, name: 'Category 2' }],
+            },
+        ],
+    };
+
     afterEach(() => {
-        jest.resetAllMocks();
+        jest.clearAllMocks();
     });
-    test('should render correctly', async () => {
-        spyProgramsPageDataFetch.mockResolvedValue({ programData: mockPrograms });
+
+    it('renders loading state initially', async () => {
+        (programPageDataFetch as jest.Mock).mockImplementation(
+            () => new Promise(() => {}), // never resolves
+        );
+
         render(<ProgramsSection />);
-        expect(spyProgramsPageDataFetch).toHaveBeenCalledTimes(1);
 
-        await waitFor(() => {
-            expect(screen.getByText('titletest1')).toBeInTheDocument();
-            expect(screen.getByRole('heading', { name: 'subtitletest1' })).toBeInTheDocument();
-
-            expect(screen.getByText('titletest2')).toBeInTheDocument();
-            expect(screen.getByRole('heading', { name: 'subtitletest2' })).toBeInTheDocument();
-
-            expect(screen.getByText('titletest3')).toBeInTheDocument();
-            expect(screen.getByRole('heading', { name: 'subtitletest3' })).toBeInTheDocument();
-
-            expect(screen.getByAltText('titletest1')).toBeInTheDocument();
-            expect(screen.getByAltText('titletest1')).toHaveAttribute(
-                'src',
-                'https://via.placeholder.com/200x200?text=Ponys',
-            );
-
-            const cards = screen.queryAllByTestId('test-card-content');
-            expect(cards.length).toEqual(3);
-        });
+        expect(screen.getByRole('progressbar')).toBeInTheDocument();
     });
-    test('should render with no cards', async () => {
-        spyProgramsPageDataFetch.mockResolvedValue({ programData: [] });
-        render(<ProgramsSection />);
-        expect(spyProgramsPageDataFetch).toHaveBeenCalledTimes(1);
 
-        await waitFor(() => {
-            const cards = screen.queryAllByTestId('test-card-content');
-            expect(cards.length).toEqual(0);
-        });
+    it('renders programs after successful fetch', async () => {
+        (programPageDataFetch as jest.Mock).mockResolvedValue(mockPrograms);
+
+        render(<ProgramsSection />);
+
+        expect(await screen.findAllByTestId('program-card')).toHaveLength(2);
+        expect(screen.getByText('Program A')).toBeInTheDocument();
+        expect(screen.getByText('Program B')).toBeInTheDocument();
+
+        expect(screen.getByText('Category 1')).toBeInTheDocument();
+        expect(screen.getByText('Category 2')).toBeInTheDocument();
+        expect(screen.getByText('Усі')).toBeInTheDocument();
     });
-    test('should render without crashing', async () => {
-        spyProgramsPageDataFetch.mockRejectedValueOnce(new Error('Fetch failed'));
-        render(<ProgramsSection />);
-        expect(spyProgramsPageDataFetch).toHaveBeenCalledTimes(1);
 
-        await waitFor(() => {
-            const cards = screen.queryAllByTestId('test-card-content');
-            expect(cards.length).toEqual(0);
-            const errorMessage = document.querySelector('.error-message');
-            expect(errorMessage).toBeInTheDocument();
-        });
+    it('filters programs by category', async () => {
+        (programPageDataFetch as jest.Mock).mockResolvedValue(mockPrograms);
+
+        render(<ProgramsSection />);
+
+        await screen.findAllByTestId('program-card');
+
+        fireEvent.click(screen.getByText('Category 1'));
+
+        expect(screen.getByText('Program A')).toBeInTheDocument();
+        expect(screen.queryByText('Program B')).not.toBeInTheDocument();
+    });
+
+    it('resets filter when clicking "Усі"', async () => {
+        (programPageDataFetch as jest.Mock).mockResolvedValue(mockPrograms);
+
+        render(<ProgramsSection />);
+
+        await screen.findAllByTestId('program-card');
+
+        fireEvent.click(screen.getByText('Category 2'));
+        expect(screen.getByText('Program B')).toBeInTheDocument();
+        expect(screen.queryByText('Program A')).not.toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('Усі'));
+        expect(screen.getByText('Program A')).toBeInTheDocument();
+        expect(screen.getByText('Program B')).toBeInTheDocument();
+    });
+
+    it('renders error message when fetch fails', async () => {
+        (programPageDataFetch as jest.Mock).mockRejectedValue(new Error('Network error'));
+
+        render(<ProgramsSection />);
+
+        expect(await screen.findByRole('alert')).toHaveTextContent(FAILED_TO_LOAD_THE_PROGRAMS);
     });
 });

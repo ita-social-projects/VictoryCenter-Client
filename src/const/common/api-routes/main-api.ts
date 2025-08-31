@@ -18,4 +18,8 @@ export const API_ROUTES = {
     IMAGE: {
         BASE: 'Image',
     },
+    PROGRAMS: {
+        BASE: 'Programs',
+        PUBLISHED: 'Programs/published',
+    },
 };

@@ -69,7 +69,7 @@ export const InfiniteScrollList = <T,>({
     } else if (!isLoading) {
         content = (
             <div className="infinite-scroll-list-not-found" data-testid="infinite-scroll-list-not-found">
-                <NotFoundIcon className="not-found-icon" />
+                <NotFoundIcon className="infinite-scroll-list-not-found-icon" />
                 <p>{emptyStateMessage}</p>
             </div>
         );

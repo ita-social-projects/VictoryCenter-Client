@@ -7,10 +7,9 @@ import './ContextMenuButton.scss';
 export interface ContextMenuButtonProps {
     children: React.ReactNode;
     onOptionSelected: (value: string, data?: any) => void;
-    CustomIcon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
-export const ContextMenuButton = ({ children, onOptionSelected, CustomIcon }: ContextMenuButtonProps) => {
+export const ContextMenuButton = ({ children, onOptionSelected }: ContextMenuButtonProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -53,11 +52,7 @@ export const ContextMenuButton = ({ children, onOptionSelected, CustomIcon }: Co
                 }
             }}
         >
-            {CustomIcon ? (
-                <CustomIcon className="context-menu-button-icon" />
-            ) : (
-                <MenuIcon className="context-menu-button-icon" />
-            )}
+            <MenuIcon className="context-menu-button-icon" />
 
             <div
                 className={classNames('context-menu-button-options', {

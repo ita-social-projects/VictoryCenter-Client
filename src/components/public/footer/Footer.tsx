@@ -56,9 +56,9 @@ export const Footer = () => {
     return (
         <div className="footer-content">
             <div className="main-block">
-                <div className="email_field">
+                <div className="email-field">
                     <span className="title">{STAY_UP_TO_DATE_WITH_THE_NEWS}</span>
-                    <div className="input_block">
+                    <div className="input-block">
                         <input
                             type="email"
                             placeholder={ENTER_YOUR_EMAIL}
@@ -88,7 +88,7 @@ export const Footer = () => {
                     </Link>
                 </div>
 
-                <div className="about_us">
+                <div className="about-us">
                     <span className="title">{ABOUT_US}</span>
                     <Link to={PUBLIC_ROUTES.ABOUT_US.FULL}>{ABOUT_US}</Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
@@ -114,7 +114,7 @@ export const Footer = () => {
             </div>
 
             <div className="contact-block">
-                <div className="main_contacts">
+                <div className="main-contacts">
                     <button className="contact-item" onClick={() => copyToClipboard(EMAIL)}>
                         <MailIcon /> {EMAIL}
                     </button>
@@ -122,7 +122,7 @@ export const Footer = () => {
                         <PhoneIcon /> {PHONE}
                     </button>
                 </div>
-                <div className="social_media">
+                <div className="social-media">
                     <button className="contact-item" onClick={handleFacebookClick}>
                         Facebook
                     </button>

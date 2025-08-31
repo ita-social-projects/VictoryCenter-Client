@@ -11,7 +11,7 @@ jest.mock('../../../../../utils/functions/map-image-to-base-64/map-image-to-base
 }));
 
 jest.mock('../../../../../assets/icons/blank-user.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="blank-user-image" />,
+    ReactComponent: (props: any) => <svg {...props} data-testid="blank-user-icon" />,
 }));
 
 jest.mock('../../../../../components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
@@ -69,7 +69,7 @@ describe('MemberComponent', () => {
 
         renderComponent({ image: null });
 
-        expect(screen.getByTestId('blank-user-image')).toBeInTheDocument();
+        expect(screen.getByTestId('blank-user-icon')).toBeInTheDocument();
     });
 
     it('displays image with empty src when member has image but mapImageToBase64 returns null', () => {

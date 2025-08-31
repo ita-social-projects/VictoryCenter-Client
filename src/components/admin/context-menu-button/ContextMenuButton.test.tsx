@@ -27,17 +27,6 @@ describe('ContextMenuButton', () => {
         expect(screen.getByText('Option 2')).toBeInTheDocument();
     });
 
-    it('renders with custom icon when provided', () => {
-        const customIcon = () => <svg data-testid="custom-icon" />;
-        render(
-            <ContextMenuButton onOptionSelected={mockOnOptionSelected} CustomIcon={customIcon}>
-                <ContextMenuButton.Option value="option1">Option 1</ContextMenuButton.Option>
-            </ContextMenuButton>,
-        );
-
-        expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
-    });
-
     it('toggles menu visibility when clicked', () => {
         render(
             <ContextMenuButton onOptionSelected={mockOnOptionSelected}>

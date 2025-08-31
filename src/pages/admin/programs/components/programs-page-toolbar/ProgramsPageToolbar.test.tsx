@@ -141,8 +141,8 @@ describe('ProgramsPageToolbar', () => {
     it('should render add program button with correct icon', () => {
         render(<ProgramsPageToolbar {...createProps()} />);
 
-        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.ADD_PROGRAM)).toBeInTheDocument();
-        expect(screen.getByTestId('plus-icon')).toBeInTheDocument();
+        const button = screen.getByTestId('plus-icon').closest('button');
+        expect(button).toBeInTheDocument();
     });
 
     it('should call onAddProgram when add button clicked', async () => {

@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router';
 import { OurMission } from './OurMission';
 
 jest.mock('../../../../assets/icons/arrow-up-right.svg', () => ({
-    ReactComponent: (props: any) => <svg data-testid="plus-icon" {...props} />,
+    ReactComponent: (props: any) => <svg data-testid="arrow-icon" {...props} />,
 }));
 
 jest.mock('../../../../const/public/about-us-page', () => ({
@@ -54,7 +54,7 @@ describe('OurMission component', () => {
         const link = screen.getByRole('link', { name: /go to programs/i });
         expect(link).toBeInTheDocument();
         expect(link).toHaveAttribute('href', '/programs');
-        expect(screen.getByTestId('plus-icon')).toBeInTheDocument();
+        expect(screen.getByTestId('arrow-icon')).toBeInTheDocument();
     });
 
     it('should render the ScrollableFrame component', () => {

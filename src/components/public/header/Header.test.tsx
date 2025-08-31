@@ -55,4 +55,14 @@ describe('Header', () => {
         // eslint-disable-next-line no-console
         expect(console.log).toHaveBeenCalledWith('CONTACT USED!');
     });
+
+    it('renders burger menu correctly', () => {
+        render(<Header />, { wrapper: MemoryRouter });
+
+        const burgerMenuButton = screen.getByTestId('burger-icon').closest('button');
+
+        expect(document.querySelector('.mobile-menu')).not.toBeInTheDocument();
+        fireEvent.click(burgerMenuButton!);
+        expect(document.querySelector('.mobile-menu')).toBeInTheDocument();
+    });
 });

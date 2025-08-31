@@ -60,36 +60,6 @@
         width: 33%;
     }
 
-    &-status {
-        display: flex;
-        padding: 0.5rem 1rem;
-        gap: 0.5rem;
-        border-radius: 30px;
-        font-size: 18px;
-
-        &-draft {
-            color: colors.$grey-900;
-            background-color: white;
-            border: 1px solid colors.$grey-900;
-        }
-
-        &-published {
-            background-color: colors.$light-blue-50;
-            border: 1px solid colors.$blue-500;
-            color: colors.$blue-500;
-        }
-
-        img {
-            position: absolute;
-            width: 1.5rem;
-            height: 1.5rem;
-            right: 0.75rem;
-            top: 25%;
-            z-index: 1;
-            pointer-events: none;
-        }
-    }
-
     &-actions {
         width: 12.5rem;
         height: 1.5rem;
@@ -99,12 +69,6 @@
 
         button {
             border: none;
-        }
-
-        .member-image {
-            &:hover {
-                cursor: pointer;
-            }
         }
 
         &-edit {

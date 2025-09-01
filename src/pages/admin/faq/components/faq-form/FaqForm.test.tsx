@@ -1,7 +1,5 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { FaqForm } from './FaqForm';
-import { VisibilityStatus } from '../../../../../types/admin/common';
 
 jest.mock('../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup', () => ({
     MultiSelectInputGroup: (props: any) => {
@@ -101,15 +99,8 @@ describe('FaqForm', () => {
         fireEvent.blur(screen.getByTestId('answer-input'));
         fireEvent.blur(screen.getByTestId('pages-input'));
         // Error spans should be present if validation fails
-        expect(screen.queryByTestId('question-error')).toBeInTheDocument();
-        expect(screen.queryByTestId('answer-error')).toBeInTheDocument();
-        expect(screen.queryByTestId('pages-error')).toBeInTheDocument();
-    });
-
-    it('calls getOptionId and getOptionName for MultiSelectInputGroup', () => {
-        const pages = [{ id: 42, title: 'Test Page', slug: 'test' }];
-        render(<FaqForm onSubmit={jest.fn()} pages={pages} />);
-        // Find the MultiSelectInputGroup instance
-        const multiSelect = screen.getByTestId('multi-select-input-group');
+        expect(screen.getByTestId('question-error')).toBeInTheDocument();
+        expect(screen.getByTestId('answer-error')).toBeInTheDocument();
+        expect(screen.getByTestId('pages-error')).toBeInTheDocument();
     });
 });

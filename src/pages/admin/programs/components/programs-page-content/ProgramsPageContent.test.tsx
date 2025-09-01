@@ -6,7 +6,6 @@ import { VisibilityStatus } from '../../../../../types/admin/common';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
-import { PaginationRequestParams } from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 
 jest.mock('../../../../../services/api/admin/programs/programs-api', () => ({
     ProgramsApi: {

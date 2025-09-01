@@ -1,8 +1,6 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { FaqComponent } from './FaqComponent';
 import { FaqQuestion } from '../../../../../types/admin/faq';
-import { visibilityStatusToText } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { FAQ_TEXT } from '../../../../../const/admin/faq';
 

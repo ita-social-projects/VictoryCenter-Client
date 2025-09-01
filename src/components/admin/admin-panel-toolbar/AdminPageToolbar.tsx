@@ -90,7 +90,7 @@ export const AdminPanelToolbar = <T,>({
             setLocalSearchItems([]);
             setCurrentSearchTerm('');
         },
-        [onSuggestionSelect, resetSearchItemsList],
+        [onSuggestionSelect, resetSearchItemsList, getSearchItemKey],
     );
 
     const handleSearchClear = useCallback(() => {

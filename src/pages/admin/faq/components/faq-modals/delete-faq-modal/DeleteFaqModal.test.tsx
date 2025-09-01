@@ -2,8 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { DeleteFaqModal } from './DeleteFaqModal';
 
 jest.mock('../../../../../../components/common/modal/Modal', () => {
-    const Modal = ({ isOpen, onClose, children, ...rest }: any) =>
-        isOpen ? <div data-testid="delete-faq-modal">{children}</div> : null;
+    const Modal = ({ isOpen, children }: any) => (isOpen ? <div data-testid="delete-faq-modal">{children}</div> : null);
     Modal.Title = ({ children }: any) => <div>{children}</div>;
     Modal.Content = ({ children }: any) => <div>{children}</div>;
     Modal.Actions = ({ children }: any) => <div>{children}</div>;

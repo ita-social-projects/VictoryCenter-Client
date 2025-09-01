@@ -1,4 +1,4 @@
-import React from 'react';
+import { FaqPanel } from './FaqPanel';
 import { render, screen } from '@testing-library/react';
 
 jest.mock('./components/faq-panel-content/FaqPanelContent', () => ({
@@ -8,8 +8,6 @@ jest.mock('./components/faq-panel-content/FaqPanelContent', () => ({
 jest.mock('../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider', () => ({
     VisitorPagesProvider: ({ children }: any) => <div data-testid="visitor-pages-provider">{children}</div>,
 }));
-
-import { FaqPanel } from './FaqPanel';
 
 describe('FaqPanel', () => {
     it('should render FaqPanelContent inside VisitorPagesProvider', () => {

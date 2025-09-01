@@ -95,7 +95,7 @@ export const FaqPanelContent = () => {
         totalItemsCountRef.current = null;
         isFaqsLoadingRef.current = false;
         hasMoreRef.current = true;
-    }, []);
+    }, [setErrorState]);
 
     const fetchFaqs = useCallback(
         async (shouldResetList: boolean = false) => {

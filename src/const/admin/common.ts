@@ -70,6 +70,7 @@ export const COMMON_TEXT_ADMIN = {
         SAVE_AS_DRAFT: 'Зберегти як чернетку',
         SAVE_AS_PUBLISHED: 'Опублікувати',
         TRY_AGAIN: 'Спробувати ще раз',
+        EXIT: 'Вихід',
     },
 };
 

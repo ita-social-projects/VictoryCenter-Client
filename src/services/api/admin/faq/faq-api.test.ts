@@ -1,12 +1,6 @@
 import { FaqApi } from './faq-api';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
-import {
-    FaqCreateUpdate,
-    FaqQuestionDto,
-    FaqSearchItemData,
-    ReorderFaq,
-    VisitorPage,
-} from '../../../../types/admin/faq';
+import { FaqCreateUpdate, FaqQuestionDto, ReorderFaq, VisitorPage } from '../../../../types/admin/faq';
 import { PaginationResult, VisibilityStatus } from '../../../../types/admin/common';
 
 describe('FaqApi', () => {
@@ -80,7 +74,7 @@ describe('FaqApi', () => {
     });
 
     it('getSearchItems should return empty result', async () => {
-        const result = await FaqApi.getSearchItems('term', 0, 10);
+        const result = await FaqApi.getSearchItems('term', { offset: 0, limit: 10, requestOptions: {} });
         expect(result).toEqual({ items: [], totalItemsCount: 0 });
     });
 

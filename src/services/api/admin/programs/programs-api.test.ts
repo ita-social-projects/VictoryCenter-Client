@@ -45,7 +45,7 @@ describe('ProgramsApi', () => {
 
     describe('fetchPrograms', () => {
         it('should return paginated programs for category', async () => {
-            const promise = ProgramsApi.fetchPrograms(1, 1, 5);
+            const promise = ProgramsApi.fetchPrograms(1, { offset: 1, limit: 5 });
             jest.runAllTimers();
             const result = await promise;
 
@@ -55,7 +55,7 @@ describe('ProgramsApi', () => {
         });
 
         it('should filter by status when provided', async () => {
-            const promise = ProgramsApi.fetchPrograms(1, 1, 10, VisibilityStatus.Published);
+            const promise = ProgramsApi.fetchPrograms(1, { offset: 1, limit: 10 }, VisibilityStatus.Published);
             jest.runAllTimers();
             const result = await promise;
 
@@ -64,7 +64,7 @@ describe('ProgramsApi', () => {
 
         it('should handle pagination correctly', async () => {
             const pageSize = 2;
-            const promise = ProgramsApi.fetchPrograms(1, 1, pageSize);
+            const promise = ProgramsApi.fetchPrograms(1, { offset: 1, limit: pageSize });
             jest.runAllTimers();
             const result = await promise;
 
@@ -72,7 +72,7 @@ describe('ProgramsApi', () => {
         });
 
         it('should return empty array for non-existent category', async () => {
-            const promise = ProgramsApi.fetchPrograms(999, 1, 10);
+            const promise = ProgramsApi.fetchPrograms(999, { offset: 1, limit: 10 });
             jest.runAllTimers();
             const result = await promise;
 
@@ -81,7 +81,7 @@ describe('ProgramsApi', () => {
         });
 
         it('should handle second page correctly', async () => {
-            const promise = ProgramsApi.fetchPrograms(1, 2, 1);
+            const promise = ProgramsApi.fetchPrograms(1, { offset: 2, limit: 1 });
             jest.runAllTimers();
             const result = await promise;
 

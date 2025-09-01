@@ -29,7 +29,7 @@ export const FaqPanelToolbar = ({ onStatusFilterChange, onAddFaq, onFaqSelect }:
 
     const getSearchItems = useCallback(
         async (params: PaginationRequestParams) => {
-            return FaqApi.getSearchItems(currentSearchTerm, params.offset, params.limit, params.requestOptions);
+            return FaqApi.getSearchItems(currentSearchTerm, params);
         },
         [currentSearchTerm],
     );

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
-import { FaqQuestion, mapFaqQuestionDtoToModel, VisitorPage } from '../../../../../types/admin/faq';
+import { FaqQuestion, FaqSearchItemData, mapFaqQuestionDtoToModel, VisitorPage } from '../../../../../types/admin/faq';
 import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { FaqApi } from '../../../../../services/api/admin/faq/faq-api';
@@ -19,6 +19,8 @@ import { useVisitorPages } from '../../../../../contexts/admin/visitor-pages-pro
 import './FaqPanelContent.scss';
 import axios from 'axios';
 import { createPartialUpdater } from '../../../../../utils/functions/create-partial-updater/create-partial-updater';
+import { AdminPanelToolbar } from '../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar';
+import { FaqSearchItem } from '../faq-panel-toolbar/faq-search-item/FaqSearchItem';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -331,10 +333,17 @@ export const FaqPanelContent = () => {
     return (
         <div className="faq-panel-wrapper" data-testid="faq-panel-content">
             <div className="faq-panel-toolbar-container">
-                <FaqPanelToolbar
-                    onFaqSelect={() => {}}
+                <AdminPanelToolbar<FaqSearchItemData>
+                    getSearchItemKey={(item) => item.id}
+                    getSearchItemLabel={(item) => item.question}
+                    fetchSearchItems={FaqApi.getSearchItems}
+                    renderSearchItemComponent={FaqSearchItem}
+                    placeholder={FAQ_TEXT.PLACEHOLDER.SEARCH_FAQ}
+                    onSearchClear={() => {}}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddFaq={handleAddFaqModalOpen}
+                    onAddItem={handleAddFaqModalOpen}
+                    AddItemButtonText={FAQ_TEXT.BUTTON.ADD_FAQ}
+                    onSuggestionSelect={() => {}}
                 />
             </div>
 

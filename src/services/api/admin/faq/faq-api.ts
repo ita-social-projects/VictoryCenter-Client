@@ -9,6 +9,7 @@ import {
 } from '../../../../types/admin/faq';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import { RequestOptions } from '../../../../types/common/api';
+import { PaginationRequestParams } from '../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 
 type FaqPayload = Omit<FaqCreateUpdate, 'id'>;
 const toPayload = (faq: FaqCreateUpdate): FaqPayload => {
@@ -55,9 +56,7 @@ export const FaqApi = {
 
     getSearchItems: async (
         searchTerm: string,
-        offset: number,
-        limit: number,
-        options?: RequestOptions,
+        parameters: PaginationRequestParams,
     ): Promise<PaginationResult<FaqSearchItemData>> => {
         return {
             items: [],

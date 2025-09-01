@@ -51,13 +51,7 @@ export const ProgramsPageContent = () => {
                 return { items: [], totalItemsCount: 0 };
             }
 
-            return ProgramsApi.fetchPrograms(
-                selectedCategory.id,
-                params.offset,
-                params.limit,
-                statusFilter,
-                params.requestOptions,
-            );
+            return ProgramsApi.fetchPrograms(selectedCategory.id, params, statusFilter);
         },
         [selectedCategory, statusFilter],
     );

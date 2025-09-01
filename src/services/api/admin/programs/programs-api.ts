@@ -8,6 +8,7 @@ import {
     Program,
 } from '../../../../types/admin/programs';
 import { mockPrograms, mockCategories } from '../../../../utils/mock-data/admin/programs';
+import { PaginationRequestParams } from '../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 
 // !!!
 // Delete after actual integration with backend
@@ -61,12 +62,14 @@ const simulateAsyncOperation = (delay: number, signal?: AbortSignal): Promise<vo
 export const ProgramsApi = {
     fetchPrograms: async (
         categoryId: number,
-        offset: number,
-        limit: number,
+        paginationParams: PaginationRequestParams,
         status?: VisibilityStatus,
-        options?: RequestOptions,
     ): Promise<PaginationResult<Program>> => {
-        await simulateAsyncOperation(mockDelay, options?.cancellationSignal);
+        if (paginationParams.offset === undefined || paginationParams.limit === undefined) {
+            throw new Error('Invalid pagination parameters');
+        }
+
+        await simulateAsyncOperation(mockDelay, paginationParams.requestOptions?.cancellationSignal);
         if (throwErrorsInApi) throw new Error('Error fetching programs');
 
         const filtered = mockPrograms.filter((program) => {
@@ -75,8 +78,8 @@ export const ProgramsApi = {
             return inCategory && statusMatches;
         });
 
-        const start = offset;
-        const end = offset + limit;
+        const start = paginationParams.offset;
+        const end = start + paginationParams.limit;
 
         return {
             items: filtered.slice(start, end),
@@ -86,11 +89,13 @@ export const ProgramsApi = {
 
     fetchProgramSearchItems: async (
         searchTerm: string,
-        offset: number,
-        limit: number,
-        options?: RequestOptions,
+        paginationParams: PaginationRequestParams,
     ): Promise<PaginationResult<ProgramSearchItemData>> => {
-        await simulateAsyncOperation(mockDelay, options?.cancellationSignal);
+        if (paginationParams.offset === undefined || paginationParams.limit === undefined) {
+            throw new Error('Invalid pagination parameters');
+        }
+
+        await simulateAsyncOperation(mockDelay, paginationParams.requestOptions?.cancellationSignal);
         if (throwErrorsInApi) throw new Error('Error fetching program suggestions');
 
         const filtered = mockPrograms.filter((program) => {
@@ -111,8 +116,8 @@ export const ProgramsApi = {
             return a.name.localeCompare(b.name);
         });
 
-        const start = offset;
-        const end = offset + limit;
+        const start = paginationParams.offset;
+        const end = start + paginationParams.limit;
         const paginatedItems = sorted.slice(start, end);
 
         const suggestions = paginatedItems.map(convertProgramToSuggestion);

@@ -37,12 +37,7 @@ export const ProgramsPageToolbar = ({
 
     const getSearchItems = useCallback(
         async (params: PaginationRequestParams) => {
-            return ProgramsApi.fetchProgramSearchItems(
-                currentSearchTerm,
-                params.offset,
-                params.limit,
-                params.requestOptions,
-            );
+            return ProgramsApi.fetchProgramSearchItems(currentSearchTerm, params);
         },
         [currentSearchTerm],
     );

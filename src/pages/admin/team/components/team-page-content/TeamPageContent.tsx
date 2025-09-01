@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
 import { DeleteTeamMemberModal } from '../team-member-modals/delete-team-member-modal/DeleteTeamMemberModal';
 import { TeamMemberModal } from '../team-member-modals/team-member-modal/TeamMemberModal';
@@ -18,6 +18,7 @@ import { ToastType } from '../../../../../types/admin/toast';
 import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
 import { DraggableListItem } from '../../../../../components/admin/draggable-list-item/DraggableListItem';
 import { MemberComponent } from '../member-component/MemberComponent';
+import { createPartialUpdater } from '../../../../../utils/functions/create-partial-updater/create-partial-updater';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -75,9 +76,7 @@ export const TeamPageContent = () => {
         setError({ message: null, type: null });
     }, []);
 
-    const updateModalState = useCallback((updates: Partial<ModalState>) => {
-        setModalState((prev) => ({ ...prev, ...updates }));
-    }, []);
+    const updateModalState = useCallback(createPartialUpdater(setModalState), []);
 
     const isAnyModalOpened = useMemo(() => {
         return Object.values(modalState).some((value) => (typeof value === 'boolean' ? value : value !== null));

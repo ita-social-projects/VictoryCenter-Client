@@ -109,7 +109,7 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
         }, [formState.pages, setErrors]);
 
         return (
-            <form className="faq-form-main" data-testid="test-form" noValidate>
+            <form className="faq-form-main" data-testid="test-form" noValidate autoComplete="off">
                 {/* Pages Field */}
                 <MultiSelectInputGroup
                     label={FAQ_TEXT.FORM.LABEL.PAGE}
@@ -143,6 +143,7 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
                 {/* Description Field */}
                 <TextAreaWithCharacterLimitGroup
                     label={FAQ_TEXT.FORM.LABEL.ANSWER}
+                    isRequired={true}
                     id="answer"
                     name="answer"
                     value={formState.answerText}

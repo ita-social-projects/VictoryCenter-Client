@@ -18,6 +18,7 @@ import { FaqComponent } from '../faq-component/FaqComponent';
 import { useVisitorPages } from '../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider';
 import './FaqPanelContent.scss';
 import axios from 'axios';
+import { createPartialUpdater } from '../../../../../utils/functions/create-partial-updater/create-partial-updater';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -73,9 +74,7 @@ export const FaqPanelContent = () => {
         setError({ message: null, type: null });
     }, []);
 
-    const updateModalState = useCallback((updates: Partial<ModalState>) => {
-        setModalState((prev) => ({ ...prev, ...updates }));
-    }, []);
+    const updateModalState = useCallback(createPartialUpdater(setModalState), []);
 
     const isAnyModalOpened = useMemo(() => {
         return Object.values(modalState).some((value) => (typeof value === 'boolean' ? value : value !== null));

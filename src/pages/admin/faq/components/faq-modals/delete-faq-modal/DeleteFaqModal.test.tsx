@@ -1,14 +1,14 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { DeleteFaqModal } from './DeleteFaqModal';
 
-jest.mock('../../../../../../components/common/modal/Modal', () => ({
-    __esModule: true,
-    Modal: ({ isOpen, onClose, children, ...rest }: any) =>
-        isOpen ? <div data-testid="delete-faq-modal">{children}</div> : null,
-    default: ({ isOpen, onClose, children, ...rest }: any) =>
-        isOpen ? <div data-testid="delete-faq-modal">{children}</div> : null,
-}));
+jest.mock('../../../../../../components/common/modal/Modal', () => {
+    const Modal = ({ isOpen, onClose, children, ...rest }: any) =>
+        isOpen ? <div data-testid="delete-faq-modal">{children}</div> : null;
+    Modal.Title = ({ children }: any) => <div>{children}</div>;
+    Modal.Content = ({ children }: any) => <div>{children}</div>;
+    Modal.Actions = ({ children }: any) => <div>{children}</div>;
+    return { __esModule: true, Modal };
+});
 jest.mock('../../../../../../components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled }: any) => (
         <button onClick={onClick} disabled={disabled}>

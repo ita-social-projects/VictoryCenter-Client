@@ -8,7 +8,6 @@ import { VisibilityStatus } from '../../../../../types/admin/common';
 import { FAQ_TEXT } from '../../../../../const/admin/faq';
 import { ToastType } from '../../../../../types/admin/toast';
 import { DraggableListItem } from '../../../../../components/admin/draggable-list-item/DraggableListItem';
-import { FaqPanelToolbar } from '../faq-panel-toolbar/FaqPanelToolbar';
 import { InfiniteScrollList } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { FaqModal } from '../faq-modals/faq-modal/FaqModal';
@@ -20,7 +19,7 @@ import './FaqPanelContent.scss';
 import axios from 'axios';
 import { createPartialUpdater } from '../../../../../utils/functions/create-partial-updater/create-partial-updater';
 import { AdminPanelToolbar } from '../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar';
-import { FaqSearchItem } from '../faq-panel-toolbar/faq-search-item/FaqSearchItem';
+import { FaqSearchItem } from '../faq-search-item/FaqSearchItem';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramsPageContent } from './ProgramsPageContent';
@@ -7,6 +6,7 @@ import { VisibilityStatus } from '../../../../../types/admin/common';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
+import { PaginationRequestParams } from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 
 jest.mock('../../../../../services/api/admin/programs/programs-api', () => ({
     ProgramsApi: {
@@ -307,11 +307,9 @@ describe('ProgramsPageContent', () => {
 
         await waitFor(() => {
             expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
-                1, // categoryId
-                0, // offset
-                5, // limit
-                VisibilityStatus.Published, // status filter
-                expect.any(Object), // options
+                1,
+                expect.objectContaining({ offset: 0, limit: 5 }),
+                VisibilityStatus.Published,
             );
         });
     });

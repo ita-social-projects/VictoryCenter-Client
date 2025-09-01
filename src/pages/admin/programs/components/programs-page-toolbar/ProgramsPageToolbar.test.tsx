@@ -239,9 +239,7 @@ describe('ProgramsPageToolbar', () => {
 
         expect(mockProgramsApi.fetchProgramSearchItems).toHaveBeenCalledWith(
             '',
-            params.offset,
-            params.limit,
-            params.requestOptions,
+            expect.objectContaining({ offset: params.offset, limit: params.limit, requestOptions: params.requestOptions }),
         );
     });
 

@@ -26,16 +26,16 @@ export const FaqApi = {
     ): Promise<PaginationResult<FaqQuestionDto>> => {
         const params: Record<string, any> = {};
 
-        if (pageId !== undefined && pageId !== null) {
+        if (pageId !== undefined) {
             params.pageId = pageId;
         }
         if (status !== undefined) {
             params.status = status;
         }
-        if (offset !== undefined && offset !== null) {
+        if (offset !== undefined) {
             params.offset = offset;
         }
-        if (limit !== undefined && limit !== null) {
+        if (limit !== undefined) {
             params.limit = Math.floor(limit);
         }
 

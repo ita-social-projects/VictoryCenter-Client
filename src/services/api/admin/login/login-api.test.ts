@@ -1,8 +1,8 @@
 import { AxiosResponse } from 'axios';
-import { API_ROUTES } from '../../../../const/urls/main-api';
 import { Credentials, AuthResponse } from '../../../../types/admin/auth';
 import { AuthClient } from '../../../auth/auth-client';
 import { loginRequest, tokenRefreshRequest, logoutRequest } from './login-api';
+import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 
 jest.mock('../../../auth/auth-client', () => ({
     AuthClient: {

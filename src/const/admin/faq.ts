@@ -7,6 +7,11 @@ export const FAQ_TEXT = {
         SEARCH_FAQ: 'Введіть назву',
     },
 
+    TOOLTIP: {
+        PUBLISHED_IN: 'Опубліковано на:',
+        DRAFTED_IN: 'Збережено на:',
+    },
+
     MESSAGE: {
         FAIL_TO_FETCH_FAQ: 'Виникла помилка, не вдалось завантажити часті питання',
         FAIL_TO_FETCH_PAGES: 'Виникла помилка, не вдалось завантажити сторінки',
@@ -18,8 +23,8 @@ export const FAQ_TEXT = {
     QUESTION: {
         PUBLISH_FAQ: 'Опублікувати нове питання?',
         DRAFT_FAQ: 'Зберегти нове питання?',
-        DELETE_PUBLISHED_FAQ: 'Питання буде видалено з усіх сторінок сайту',
-        DELETE_DRAFT_FAQ: 'Видалити питання?',
+        DELETE_PUBLISHED_FAQ: 'Питання буде видалено з усіх сторінок сайту, бажаєте продовжити?',
+        DELETE_DRAFT_FAQ: 'Питання буде видалено з усіх сторінок сайту, бажаєте продовжити?',
     },
 
     FORM: {

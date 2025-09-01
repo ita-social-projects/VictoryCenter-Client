@@ -1,13 +1,12 @@
-import React from 'react';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import { TeamMemberModal } from './TeamMemberModal';
 import { AxiosInstance } from 'axios';
 import { TeamCategory, TeamMember } from '../../../../../../types/admin/team-members';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
 import { TeamMembersApi } from '../../../../../../services/api/admin/team/team-members/team-members-api';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { TeamMemberModal } from './TeamMemberModal';
 
 // Mock data-fetch API
 jest.mock('../../../../../../services/api/admin/team/team-members/team-members-api', () => ({
@@ -117,11 +116,77 @@ jest.mock('../../../../../../const/admin/team', () => ({
 
 jest.mock('../../../../../../const/admin/common', () => ({
     COMMON_TEXT_ADMIN: {
-        BUTTON: { SAVE_AS_DRAFT: 'Save Draft', SAVE_AS_PUBLISHED: 'Save Published', YES: 'Yes', NO: 'No' },
+        TAB: {
+            TEAM_MEMBERS: 'Команда',
+            PROGRAMS: 'Програми',
+            FAQ: 'Часті питання',
+        },
+
+        ALT: {
+            DELETE: 'Видалити',
+            UPLOAD: 'Завантажити',
+            SCROLL_TO_TOP: 'Прокрутити вгору',
+            NOT_FOUND: 'Не знайдено',
+            EXPAND_OPTIONS_LIST: 'Відкрити список опцій',
+            COLLAPSE_OPTIONS_LIST: 'Закрити список опцій',
+            OPTION_SELECTED: 'Опцію вибрано',
+            OPTION_NOT_SELECTED: 'Опцію не вибрано',
+            SHOW_TOOLTIP: 'Показати підказку',
+            HIDE_TOOLTIP: 'ховати підказку',
+            HINT: 'Підказка',
+            OPEN_MENU: 'Відкрити меню',
+            CLOSE_MENU: 'Закрити меню',
+            IMAGE_PREVIEW: "Прев'ю зображення",
+        },
+
+        INPUT: {
+            PHOTO_PLACEHOLDER: 'Перетягніть файл сюди або натисніть для завантаження',
+        },
+
+        STATUS: {
+            DEFAULT: 'Статус',
+            DRAFT: 'Чернетка',
+            PUBLISHED: 'Опубліковано',
+        },
+
+        TOOLTIP: {
+            PUBLISHED_IN: 'Опубліковано в:',
+            DRAFTED_IN: 'Збережено в:',
+        },
+
+        LIST: {
+            NOT_FOUND: 'Нічого не знайдено',
+        },
+
+        FILTER: {
+            SEARCH_BY_NAME: 'Пошук за назвою',
+            STATUS: {
+                ALL: 'Усі',
+                PUBLISHED: 'Опубліковано',
+                DRAFT: 'Чернетка',
+            },
+            CATEGORY: {
+                CATEGORY_LABEL: 'Категорія',
+                SELECT_CATEGORY: 'Виберіть категорію',
+            },
+        },
+
         QUESTION: {
             REMOVE_FROM_PUBLICATION: 'Remove?',
             SAVE_CHANGES: 'Save changes?',
             CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE: 'Lose changes?',
+        },
+
+        BUTTON: {
+            YES: 'Так',
+            NO: 'Ні',
+            SAVE: 'Зберегти',
+            DELETE: 'Видалити',
+            CANCEL: 'Відмінити',
+            SAVE_AS_DRAFT: 'Save Draft',
+            SAVE_AS_PUBLISHED: 'Save Published',
+            TRY_AGAIN: 'Спробувати ще раз',
+            EXIT: 'Вихід',
         },
     },
 }));

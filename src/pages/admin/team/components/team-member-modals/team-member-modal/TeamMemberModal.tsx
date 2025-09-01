@@ -1,14 +1,14 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { MemberForm, TeamMemberFormRef, TeamMemberFormValues } from '../../member-form/MemberForm';
 import { TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { TeamCategory, TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { VisibilityStatus } from '../../../../../../types/admin/common';
 import { TeamMembersApi } from '../../../../../../services/api/admin/team/team-members/team-members-api';
 import '../TeamMemberModal.scss';
 import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
 import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
+import { VisibilityStatus } from '../../../../../../types/admin/common';
 
 interface TeamMemberModalProps {
     mode: 'add' | 'edit';

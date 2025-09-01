@@ -76,33 +76,31 @@ export const FaqPanelToolbar = ({ onStatusFilterChange, onAddFaq, onFaqSelect }:
     }, [resetSearchItemsList]);
 
     return (
-        <>
-            <div className="faq-toolbar">
-                <div className="faq-toolbar-search">
-                    <SearchBar<FaqSearchItemData>
-                        searchItems={localSearchItems}
-                        onSearchItemSelect={onSuggestionSelected}
-                        getSearchItemKey={(suggestion) => suggestion.id}
-                        getSearchItemLabel={(suggestion) => suggestion.question}
-                        renderSearchItemComponent={FaqSearchItem}
-                        onLoadMore={fetchMoreSearchItems}
-                        hasMore={isHasMoreSearchItems}
-                        isLoading={isSearchItemsLoading}
-                        onQueryChange={onSearch}
-                        onClear={handleSearchClear}
-                        placeholder={FAQ_TEXT.PLACEHOLDER.SEARCH_FAQ}
-                        notFoundMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
-                        minCharactersToSearch={UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH}
-                        searchDelayMs={UI_CONFIG.SEARCH_BAR.SEARCH_DELAY_MS}
-                    />
-                </div>
-                <div className="faq-toolbar-actions">
-                    <StatusFilterDropdown onStatusFilterChange={onStatusFilterChange} />
-                    <Button onClick={onAddFaq} buttonStyle="primary" data-testid="add-faq-button">
-                        {FAQ_TEXT.BUTTON.ADD_FAQ} <PlusIcon />
-                    </Button>
-                </div>
+        <div className="faq-toolbar">
+            <div className="faq-toolbar-search">
+                <SearchBar<FaqSearchItemData>
+                    searchItems={localSearchItems}
+                    onSearchItemSelect={onSuggestionSelected}
+                    getSearchItemKey={(suggestion) => suggestion.id}
+                    getSearchItemLabel={(suggestion) => suggestion.question}
+                    renderSearchItemComponent={FaqSearchItem}
+                    onLoadMore={fetchMoreSearchItems}
+                    hasMore={isHasMoreSearchItems}
+                    isLoading={isSearchItemsLoading}
+                    onQueryChange={onSearch}
+                    onClear={handleSearchClear}
+                    placeholder={FAQ_TEXT.PLACEHOLDER.SEARCH_FAQ}
+                    notFoundMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
+                    minCharactersToSearch={UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH}
+                    searchDelayMs={UI_CONFIG.SEARCH_BAR.SEARCH_DELAY_MS}
+                />
             </div>
-        </>
+            <div className="faq-toolbar-actions">
+                <StatusFilterDropdown onStatusFilterChange={onStatusFilterChange} />
+                <Button onClick={onAddFaq} buttonStyle="primary" data-testid="add-faq-button">
+                    {FAQ_TEXT.BUTTON.ADD_FAQ} <PlusIcon />
+                </Button>
+            </div>
+        </div>
     );
 };

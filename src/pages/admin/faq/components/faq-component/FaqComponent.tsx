@@ -1,6 +1,6 @@
 import { ButtonTooltip } from '../../../../../components/admin/button-tooltip/ButtonTooltip';
 import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { FAQ_TEXT } from '../../../../../const/admin/faq';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { FaqQuestion } from '../../../../../types/admin/faq';
 import './FaqComponent.scss';
@@ -38,8 +38,8 @@ export const FaqComponent = ({ faq, handleOnDeleteFaq, handleOnEditFaq }: FaqCom
                     <div className="faq-actions-tooltip">
                         <b>
                             {faq.status === VisibilityStatus.Published
-                                ? COMMON_TEXT_ADMIN.TOOLTIP.PUBLISHED_IN
-                                : COMMON_TEXT_ADMIN.TOOLTIP.DRAFTED_IN}
+                                ? FAQ_TEXT.TOOLTIP.PUBLISHED_IN
+                                : FAQ_TEXT.TOOLTIP.DRAFTED_IN}
                         </b>
                         {faq.pages.map((p) => (
                             <span key={p.id}>{p.title}</span>

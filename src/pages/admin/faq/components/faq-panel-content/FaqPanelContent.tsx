@@ -66,12 +66,8 @@ export const FaqPanelContent = () => {
     const isFaqsLoadingRef = useRef(false);
     const abortControllerRef = useRef<AbortController | null>(null);
 
-    const setErrorState = useCallback((message: string, type: ErrorType) => {
+    const setErrorState = useCallback((message: string | null, type: ErrorType | null = null) => {
         setError({ message, type });
-    }, []);
-
-    const clearError = useCallback(() => {
-        setError({ message: null, type: null });
     }, []);
 
     const updateModalState = useCallback(createPartialUpdater(setModalState), []);
@@ -92,13 +88,13 @@ export const FaqPanelContent = () => {
     const resetFaqsState = useCallback(() => {
         setFaqs([]);
         setHasMore(true);
-        clearError();
+        setErrorState(null);
         currentPaginationPageRef.current = 1;
         currentItemsCountRef.current = 0;
         totalItemsCountRef.current = null;
         isFaqsLoadingRef.current = false;
         hasMoreRef.current = true;
-    }, [clearError]);
+    }, []);
 
     const fetchFaqs = useCallback(
         async (shouldResetList: boolean = false) => {
@@ -119,7 +115,7 @@ export const FaqPanelContent = () => {
             try {
                 isFaqsLoadingRef.current = true;
                 setIsFaqsLoading(true);
-                clearError();
+                setErrorState(null);
 
                 const searchPageId = selectedVisitorPageRef.current;
                 const searchStatus = statusFilter;
@@ -164,7 +160,7 @@ export const FaqPanelContent = () => {
                 setIsFaqsLoading(false);
             }
         },
-        [clearError, setErrorState, listSize, statusFilter, client, visitorPages],
+        [setErrorState, listSize, statusFilter, client, visitorPages],
     );
 
     // Implement search functionality

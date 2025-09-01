@@ -18,11 +18,8 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
         <div className="program-item">
             <div className="program-info">
                 <div className="program-info-identity">
-                    {program.img ? (
-                        <img
-                            src={program.img && 'url' in program.img ? program.img.url : undefined}
-                            alt={`${program.name}-img`}
-                        />
+                    {program.img && 'url' in program.img ? (
+                        <img src={program.img.url} alt={`${program.name}-img`} />
                     ) : (
                         <BlankImage className="program-info-identity-blank-image" />
                     )}

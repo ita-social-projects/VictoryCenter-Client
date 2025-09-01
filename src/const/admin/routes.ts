@@ -12,4 +12,8 @@ export const ADMIN_ROUTES = {
         PATH: 'programs',
         FULL: '/admin-panel/programs',
     },
+    WHO_WE_ARE: {
+        PATH: 'who-we-are',
+        FULL: '/admin-panel/who-we-are',
+    },
 };

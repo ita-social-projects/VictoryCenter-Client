@@ -18,19 +18,19 @@ describe('FaqApi', () => {
         ];
         mockClient.get.mockResolvedValueOnce({ data: mockQuestions });
 
-        const result = await FaqApi.getBySlug(mockClient, slug);
+        const result = FaqApi.getBySlug(mockClient, slug);
 
         expect(mockClient.get).toHaveBeenCalledWith(expect.stringContaining(slug));
-        expect(result).toEqual(mockQuestions);
+        expect(await result).toEqual(mockQuestions);
     });
 
     it('should handle empty response', async () => {
         const slug = 'empty-slug';
         mockClient.get.mockResolvedValueOnce({ data: [] });
 
-        const result = await FaqApi.getBySlug(mockClient, slug);
+        const result = FaqApi.getBySlug(mockClient, slug);
 
-        expect(result).toEqual([]);
+        expect(await result).toEqual([]);
     });
 
     it('should propagate errors from axios', async () => {

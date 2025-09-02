@@ -8,7 +8,6 @@ import {
     VisitorPage,
 } from '../../../../types/admin/faq';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
-import { RequestOptions } from '../../../../types/common/api';
 import { PaginationRequestParams } from '../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 
 type FaqPayload = Omit<FaqCreateUpdate, 'id'>;
@@ -54,9 +53,10 @@ export const FaqApi = {
         return response.data;
     },
 
+    // TODO: Implement when search functionality will be completed
     getSearchItems: async (
-        searchTerm: string,
-        parameters: PaginationRequestParams,
+        _searchTerm: string,
+        _parameters: PaginationRequestParams,
     ): Promise<PaginationResult<FaqSearchItemData>> => {
         return {
             items: [],

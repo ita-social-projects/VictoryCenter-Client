@@ -43,7 +43,12 @@ interface ErrorState {
 export const FaqPanelContent = () => {
     const { addToast } = useToast();
     const client = useAdminClient();
-    const { pages: visitorPages, isLoading: isVisitorPagesLoading, error: visitorPagesError } = useVisitorPages();
+    const {
+        pages: visitorPages,
+        isLoading: isVisitorPagesLoading,
+        error: visitorPagesError,
+        refetchPages,
+    } = useVisitorPages();
     const [selectedVisitorPage, setSelectedVisitorPage] = useState<VisitorPage | null>(null);
     const [faqs, setFaqs] = useState<FaqQuestion[]>([]);
     const [listSize, setListSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
@@ -51,6 +56,7 @@ export const FaqPanelContent = () => {
     const [isFaqsLoading, setIsFaqsLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
+
     const [modalState, setModalState] = useState<ModalState>({
         isAddFaqModalOpen: false,
         faqToDelete: null,
@@ -222,8 +228,10 @@ export const FaqPanelContent = () => {
     const handleRetry = useCallback(() => {
         if (error.type === ErrorType.Faq) {
             resetFaqsState();
+        } else if (error.type === ErrorType.Pages) {
+            refetchPages();
         }
-    }, [error.type, resetFaqsState]);
+    }, [error.type, resetFaqsState, refetchPages]);
 
     const updateListSize = () => {
         if (listContainerRef.current) {
@@ -232,6 +240,15 @@ export const FaqPanelContent = () => {
             setListSize(Math.max(calculatedListSize, DEFAULT_LOAD_ITEMS_COUNT));
         }
     };
+
+    useEffect(() => {
+        if (visitorPagesError) {
+            setError({
+                message: FAQ_TEXT.MESSAGE.FAIL_TO_FETCH_PAGES,
+                type: ErrorType.Pages,
+            });
+        }
+    }, [visitorPagesError]);
 
     useEffect(() => {
         window.addEventListener('resize', updateListSize);

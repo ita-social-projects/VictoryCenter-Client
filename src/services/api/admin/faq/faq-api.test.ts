@@ -60,9 +60,9 @@ describe('FaqApi', () => {
             pageIds: [1],
         } as any;
         mockClient.get.mockResolvedValueOnce({ data: mockFaq });
-        const result = await FaqApi.getById(mockClient, 1);
+        const result = FaqApi.getById(mockClient, 1);
         expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.FAQ.BASE}/1`);
-        expect(result).toEqual(mockFaq);
+        expect(await result).toEqual(mockFaq);
     });
 
     it('getPages should call GET and return data', async () => {

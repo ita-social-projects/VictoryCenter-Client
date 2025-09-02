@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { VisitorPage } from '../../../types/admin/faq';
 import { useOnMountUnsafe } from '../../../hooks/common/use-on-mount-unsafe/useOnMountUnsafe';
 import { FaqApi } from '../../../services/api/admin/faq/faq-api';
@@ -12,6 +12,7 @@ export interface VisitorPagesContextState {
     pages: VisitorPage[];
     isLoading: boolean;
     error: unknown | null;
+    refetchPages: () => Promise<void>;
 }
 
 const VisitorPagesContext = createContext<VisitorPagesContextState | undefined>(undefined);
@@ -22,22 +23,24 @@ export function VisitorPagesProvider({ children }: Props) {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<unknown | null>(null);
 
+    const refetchPages = useCallback(async () => {
+        try {
+            setError(null);
+            setIsLoading(true);
+            const pages = await FaqApi.getPages(client);
+            setPages(pages);
+        } catch (e: any) {
+            setError(e);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [client]);
+
     useOnMountUnsafe(() => {
-        (async () => {
-            try {
-                setError(null);
-                setIsLoading(true);
-                const pages = await FaqApi.getPages(client);
-                setPages(pages);
-            } catch (e: any) {
-                setError(e);
-            } finally {
-                setIsLoading(false);
-            }
-        })();
+        refetchPages();
     });
 
-    const value = useMemo(() => ({ pages, isLoading, error }), [pages, isLoading, error]);
+    const value = useMemo(() => ({ pages, isLoading, error, refetchPages }), [pages, isLoading, error, refetchPages]);
 
     return <VisitorPagesContext.Provider value={value}>{children}</VisitorPagesContext.Provider>;
 }

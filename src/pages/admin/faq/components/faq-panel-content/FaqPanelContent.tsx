@@ -17,7 +17,6 @@ import { FaqComponent } from '../faq-component/FaqComponent';
 import { useVisitorPages } from '../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider';
 import './FaqPanelContent.scss';
 import axios from 'axios';
-import { createPartialUpdater } from '../../../../../utils/functions/create-partial-updater/create-partial-updater';
 import { AdminPanelToolbar } from '../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { FaqSearchItem } from '../faq-search-item/FaqSearchItem';
 
@@ -70,12 +69,14 @@ export const FaqPanelContent = () => {
     const setErrorState = useCallback((message: string | null, type: ErrorType | null = null) => {
         setError({ message, type });
     }, []);
-
-    const updateModalState = useCallback(createPartialUpdater(setModalState), []);
-
+    
     const isAnyModalOpened = useMemo(() => {
         return Object.values(modalState).some((value) => (typeof value === 'boolean' ? value : value !== null));
     }, [modalState]);
+        
+    const updateModalState = useCallback((updates: Partial<ModalState>) => {
+        setModalState((prev) => ({ ...prev, ...updates }));
+    }, []);
 
     const closeModalActions = useMemo(
         () => ({

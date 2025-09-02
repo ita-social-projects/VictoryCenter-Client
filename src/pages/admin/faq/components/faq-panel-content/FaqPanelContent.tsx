@@ -69,11 +69,11 @@ export const FaqPanelContent = () => {
     const setErrorState = useCallback((message: string | null, type: ErrorType | null = null) => {
         setError({ message, type });
     }, []);
-    
+
     const isAnyModalOpened = useMemo(() => {
         return Object.values(modalState).some((value) => (typeof value === 'boolean' ? value : value !== null));
     }, [modalState]);
-        
+
     const updateModalState = useCallback((updates: Partial<ModalState>) => {
         setModalState((prev) => ({ ...prev, ...updates }));
     }, []);

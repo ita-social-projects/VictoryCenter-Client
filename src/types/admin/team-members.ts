@@ -3,7 +3,7 @@ import { VisibilityStatus } from './common';
 
 export type TeamMember = {
     id: number;
-    image: Image | null;
+    image: Image | ImageValues | null;
     fullName: string;
     description: string;
     status: VisibilityStatus;

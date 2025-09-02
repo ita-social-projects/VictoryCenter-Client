@@ -1,7 +1,7 @@
+import React from 'react';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import './MemberComponent.scss';
 import BlankUserImage from '../../../../../assets/icons/blank-user.svg';
-import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 import { TeamMember } from '../../../../../types/admin/team-members';
 import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
 
@@ -24,7 +24,7 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
         <div className="members-item">
             <div className="members-profile">
                 <img
-                    src={mapImageToBase64(member.image) || BlankUserImage}
+                    src={member.image && 'url' in member.image ? member.image.url : BlankUserImage}
                     alt={`${TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}-${member.fullName}`}
                 />
                 <p>{member.fullName}</p>

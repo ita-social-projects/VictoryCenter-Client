@@ -1,15 +1,20 @@
 import { programValidationSchema, ProgramValidationContext } from './program-schema';
 import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
-import { Image } from '../../../types/common/image';
+import { Image, ImageValues } from '../../../types/common/image';
 
 const createMockFile = (type = 'image/jpeg', size = 1024) => {
-    const image: Image = {
+    const image: ImageValues = {
         base64: 'fsdgdsgdsdgsdgsd',
         size: size,
-        id: 1,
         mimeType: type,
     };
     return image;
+};
+
+const mockImage: Image = {
+    id: 1,
+    url: 'https://imagepath.com',
+    mimeType: 'image/png',
 };
 
 const mockCategory = {
@@ -22,7 +27,7 @@ const getValidData = (overrides?: any) => ({
     name: 'Valid Program Name',
     categories: [mockCategory],
     description: 'This is a valid description with enough characters.',
-    img: 'existing-image.jpg',
+    img: createMockFile(),
     ...overrides,
 });
 
@@ -152,8 +157,12 @@ describe('Program Validation Schema', () => {
 
         const validImageCases: [string, any, ProgramValidationContext | undefined][] = [
             ['is null in draft mode', getValidData({ img: null }), { isPublishing: false }],
-            ['is a string path in publish mode', getValidData({ img: 'path/to/img.jpg' }), { isPublishing: true }],
-            ['is a valid File in publish mode', getValidData({ img: createMockFile() }), { isPublishing: true }],
+            ['is a valid Image type in publish mode', getValidData({ img: mockImage }), { isPublishing: true }],
+            [
+                'is a valid ImageValue type in publish mode',
+                getValidData({ img: createMockFile() }),
+                { isPublishing: true },
+            ],
         ];
 
         it.each(invalidImageCases)('should fail when image $description', async ({ data, expectedError, context }) => {

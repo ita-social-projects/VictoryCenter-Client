@@ -80,7 +80,7 @@ export const TeamMemberModal = ({
                 fullName: formData.fullName,
                 categoryId: formData.categoryId,
                 description: formData.description,
-                image: formData.image,
+                image: formData.image && 'base64' in formData.image ? formData.image : null,
                 status: status,
                 imageId: formData.imageId,
             }),
@@ -98,7 +98,7 @@ export const TeamMemberModal = ({
             description: memberToEdit.description,
             categoryId: memberToEdit.categoryId,
             image: memberToEdit.image,
-            imageId: memberToEdit.image?.id ?? null,
+            imageId: memberToEdit.image && 'id' in memberToEdit.image ? memberToEdit.image.id : null,
         };
     }, [memberToEdit, isEditMode]);
 

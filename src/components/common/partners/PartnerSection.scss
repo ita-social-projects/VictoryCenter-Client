@@ -15,11 +15,13 @@
     }
 
     .partners-header {
-        margin-bottom: 5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 2rem;
+        margin-bottom: 3.5rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+        column-gap: 4rem;
+        row-gap: 4rem;
+        align-items: start;
+        justify-items: start;
 
         .section-title {
             font-family: fonts.$mulish-regular-font;
@@ -27,31 +29,27 @@
             font-size: 2rem;
             line-height: 1.2;
             color: colors.$blue-900;
-            margin: 0;
-            flex: 1;
-            max-width: 35%;
+            grid-column: 1 / span 2;
         }
 
         .section-description {
             font-family: fonts.$mulish-regular-font;
             font-weight: 500;
-            font-size: 1.25rem;
-            line-height: 1.4;
+            font-size: 1rem;
+            line-height: 1.45;
             color: colors.$blue-900;
-            margin: 0;
-            flex: 1;
-            max-width: 35%;
             text-align: left;
+            grid-column: -3 / -1;
         }
     }
 
     .partners-logos {
-        display: flex;
-        justify-content: flex-start;
-        align-items: flex-start;
-        gap: 4rem;
-        flex-wrap: wrap;
-        overflow-x: auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fill , minmax(10rem, 1rem));
+        gap: 4rem 4rem;
+        justify-items: center;
+        align-items: start;
+        width: 100%;
     }
 
     .partner-item {
@@ -63,8 +61,8 @@
         gap: 1rem;
 
         .partner-logo {
-            width: 10rem;
-            height: 10rem;
+            width: 13rem;
+            height: 13rem;
             object-fit: contain;
             display: block;
             background-color: white;
@@ -105,36 +103,34 @@
         }
 
         .partners-header {
-            margin-bottom: 3rem;
-            flex-direction: column;
+            grid-template-columns: 1fr;
+            column-gap: 0;
+            row-gap: 1rem;
             text-align: center;
-            gap: 1rem;
+            justify-items: center;
 
             .section-title {
+                grid-column: 1;
                 font-size: 2rem;
                 line-height: 1.25;
-                max-width: none;
             }
 
             .section-description {
-                font-size: 1rem;
+                grid-column: 1;
+                font-size: 0.95rem;
                 line-height: 1.5;
-                max-width: none;
                 text-align: center;
             }
         }
 
         .partners-logos {
-            align-items: flex-start;
-            gap: 2.5rem;
-            flex-wrap: wrap;
-            overflow-x: visible;
+            gap: 2.5rem 2rem;
+            justify-items: center;
         }
 
         .partner-item {
-            flex-direction: column;
+            align-items: center;
             text-align: center;
-            gap: 1rem;
 
             .partner-logo {
                 width: 8rem;
@@ -142,7 +138,8 @@
             }
 
             .partner-name {
-                text-align: center;
+                max-width: 8rem;
+                font-size: 0.8rem;
             }
         }
 
@@ -154,41 +151,62 @@
     }
 }
 
+@media (max-width: 560px) {
+
+    .partners-content-section {
+        .container {
+            padding: 4rem;
+        }
+
+        .partners-logos {
+            grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+            gap: 2rem 1.25rem;
+        }
+
+        .partners-header {
+            text-align: left;
+            justify-items: start;
+
+            .section-title,
+            .section-description {
+                text-align: left;
+            }
+        }
+
+        .partner-item .partner-logo {
+            width: 7rem;
+            height: 7rem;
+        }
+    }
+}
+
 @media (max-width: 375px) {
     .partners-content-section {
         .container {
-            margin: 0;
-            margin-left: 0;
             padding: 0 1rem;
         }
 
         .partners-header {
-            display: block;
             text-align: left;
-            margin-bottom: 2rem;
+            justify-items: start;
 
-            .section-title {
-                text-align: left;
-                max-width: 100%;
-                margin-bottom: 1rem;
-            }
-
+            .section-title,
             .section-description {
                 text-align: left;
-                max-width: 100%;
             }
-        }
+        }   
 
         .partners-logos {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 2rem;
+            grid-template-columns: 1fr;
+            gap: 1.75rem;
+            justify-items: stretch;
         }
 
         .partner-item {
             flex-direction: row;
             align-items: center;
             gap: 1rem;
+            text-align: left;
 
             .partner-logo {
                 width: 5rem;
@@ -196,8 +214,8 @@
             }
 
             .partner-name {
-                text-align: left;
                 font-size: 0.75rem;
+                max-width: 100%;
             }
         }
 

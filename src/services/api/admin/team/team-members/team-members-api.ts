@@ -53,10 +53,10 @@ export const TeamMembersApi = {
 
         if (member.image && 'base64' in member.image) {
             if (member.imageId) {
-                const imageResult = await ImageApi.put(client, member.image as ImageValues, member.imageId);
+                const imageResult = await ImageApi.put(client, member.image, member.imageId);
                 finalImageId = imageResult.id;
             } else {
-                const imageResult = await ImageApi.post(client, member.image as ImageValues);
+                const imageResult = await ImageApi.post(client, member.image);
                 finalImageId = imageResult.id;
             }
         } else if (member.imageId && !member.image) {

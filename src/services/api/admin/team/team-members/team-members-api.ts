@@ -3,6 +3,7 @@ import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/c
 import { TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../types/admin/team-members';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
 import { ImageApi } from '../../image/image-api';
+import { ImageValues } from '../../../../../types/common/image';
 
 export const TeamMembersApi = {
     getAll: async (
@@ -50,12 +51,12 @@ export const TeamMembersApi = {
         let imageIdToDelete: number | null = null;
         let finalImageId = member.imageId;
 
-        if (member.image) {
+        if (member.image && 'base64' in member.image) {
             if (member.imageId) {
-                const imageResult = await ImageApi.put(client, member.image, member.imageId);
+                const imageResult = await ImageApi.put(client, member.image as ImageValues, member.imageId);
                 finalImageId = imageResult.id;
             } else {
-                const imageResult = await ImageApi.post(client, member.image);
+                const imageResult = await ImageApi.post(client, member.image as ImageValues);
                 finalImageId = imageResult.id;
             }
         } else if (member.imageId && !member.image) {
@@ -81,7 +82,7 @@ export const TeamMembersApi = {
 
     postMember: async (client: AxiosInstance, member: TeamMemberCreateUpdateRequest): Promise<TeamMember> => {
         let imageId: number | null = null;
-        if (member.image) {
+        if (member.image && 'base64' in member.image) {
             const imageResult = await ImageApi.post(client, member.image);
             imageId = imageResult.id;
         }

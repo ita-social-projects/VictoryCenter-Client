@@ -1,0 +1,21 @@
+@use '../../../../../assets/sass/variables/colors.scss';
+
+.support-options-form {
+    display: flex;
+    flex-direction: column;
+    background: colors.$grey-50;
+    border-radius: 8px;
+    border: 1px solid colors.$grey-700;
+    width: 100%;
+    gap: 1.875rem;
+    padding: 2.5rem 1.875rem;
+
+    &-title {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    &-btn-add {
+        height: 2.5rem;
+    }
+}

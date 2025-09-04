@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './Input.scss';
 
 interface InputProps {
@@ -7,8 +7,11 @@ interface InputProps {
     isTitle?: boolean;
     prefix?: string;
     name: string;
+    value?: string;
+    editable?: boolean;
     handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleBlur?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    className?: string;
 }
 
 export const Input = ({
@@ -17,17 +20,26 @@ export const Input = ({
     isTitle = false,
     prefix = '',
     name,
-    handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = e.target.value;
-        if (!newValue.startsWith(prefix)) {
-            setValue(prefix);
-        } else {
-            setValue(newValue);
-        }
-    },
+    value: externalValue,
+    editable = true,
+    handleChange,
     handleBlur,
+    className,
 }: InputProps) => {
     const [value, setValue] = useState(prefix);
+    const [initialValue, setInitialValue] = useState(prefix);
+    const [hasEdited, setHasEdited] = useState(false);
+
+    useEffect(() => {
+        if (externalValue !== undefined && externalValue !== null) {
+            const newValue = prefix + externalValue.replace(prefix, '');
+            setValue(newValue);
+            setInitialValue(newValue);
+        } else {
+            setValue(prefix);
+            setInitialValue(prefix);
+        }
+    }, [externalValue, prefix]);
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value;
@@ -38,6 +50,10 @@ export const Input = ({
             setValue(newValue);
         }
 
+        if (!hasEdited && newValue !== initialValue) {
+            setHasEdited(true);
+        }
+
         if (handleChange) {
             handleChange(e);
         }
@@ -45,14 +61,15 @@ export const Input = ({
 
     const handleClear = () => {
         setValue(prefix);
+        setHasEdited(true);
     };
 
-    const showClearButton = value !== prefix;
+    const showClearButton = editable && hasEdited && value.length > prefix.length;
     return (
-        <div className={`input ${isTitle ? 'input-title' : ''}`}>
+        <div className={`input ${isTitle ? 'input-title' : ''} ${hasEdited ? 'input-changed' : ''} ${className ?? ''}`}>
             {isTitle ? (
                 <>
-                    <div className="input-title-label">{label}</div>
+                    {label && <div className="input-title-label">{label}</div>}
                     <div className="input-title-body">
                         <input
                             name={name}
@@ -61,13 +78,14 @@ export const Input = ({
                             value={value}
                             onChange={onChange}
                             onBlur={handleBlur}
+                            readOnly={!editable}
                         />
                         {showClearButton && <button type="button" onClick={handleClear}></button>}
                     </div>
                 </>
             ) : (
                 <>
-                    <div className="input-label">{label}</div>
+                    {label && <div className="input-label">{label}</div>}
                     <div className="input-body">
                         <input
                             name={name}
@@ -76,6 +94,7 @@ export const Input = ({
                             value={value}
                             onChange={onChange}
                             onBlur={handleBlur}
+                            readOnly={!editable}
                         />
                         {showClearButton && <button type="button" onClick={handleClear}></button>}
                     </div>

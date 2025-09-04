@@ -6,7 +6,10 @@ export interface CurrencyCategory {
 export interface BankDetailsType {
     id: number;
     name: string;
-    value: string;
+    receiver: string;
+    edrpou: string;
+    iban: string;
+    paymentPurpose: string;
 }
 
 export interface SupportOptionsType {

@@ -2,13 +2,16 @@ import { useCallback, useEffect, useState } from 'react';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
 import { BankDetailsType, CurrencyCategory, SupportOptionsType } from '../../../../../types/admin/donate';
 import './DonatePageContent.scss';
-import { BankDetails } from '../bank-details/BankDetails';
 import { SupportOptions } from '../support-options/SupportOptions';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { GenericDetails } from '../generic-details/GenericDetails';
+import { BankDetailsForm } from '../bank-details/BankDetailsForm';
 
 export const DonatePageContent = () => {
     const [categories, setCategories] = useState<CurrencyCategory[]>([]);
     const [bankDetails, setBankDetails] = useState<BankDetailsType[]>([]);
     const [supportOptions, setSupportOptions] = useState<SupportOptionsType[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<CurrencyCategory | null>({ id: 1, name: 'UAH' });
 
     let isLoading = false;
 
@@ -37,20 +40,6 @@ export const DonatePageContent = () => {
         setSupportOptions(supportOptions);
     }, []);
 
-    const renderBankDetails = useCallback(
-        (bankDetails: BankDetailsType) => <div></div>,
-        [],
-        // (program: Program) => (
-        //     <ProgramListItem
-        //         key={program.id}
-        //         program={program}
-        //         handleOnEditProgram={handleEditProgramModelOpen}
-        //         handleOnDeleteProgram={handleDeleteProgramModalOpen}
-        //     />
-        // ),
-        // [handleEditProgramModelOpen, handleDeleteProgramModalOpen],
-    );
-
     const renderSupportOptions = useCallback((supportOptions: SupportOptionsType) => <div></div>, []);
 
     useEffect(() => {
@@ -61,7 +50,6 @@ export const DonatePageContent = () => {
         fetchBankDetails();
     }, [fetchBankDetails]);
 
-    const [selectedCategory, setSelectedCategory] = useState<CurrencyCategory | null>(null);
     const handleCategorySelect = useCallback((category: CurrencyCategory) => {
         setSelectedCategory(category);
     }, []);
@@ -75,10 +63,28 @@ export const DonatePageContent = () => {
                 getCategoryKey={(category) => category.id}
                 displayContextMenuButton={true}
             />
-            <div className="donate-page-credits-container">
-                <BankDetails items={bankDetails} renderItem={renderBankDetails} isLoading={isLoading} />
-                <SupportOptions items={supportOptions} renderItem={renderSupportOptions} isLoading={isLoading} />
-            </div>
+            {selectedCategory?.name === 'UAH' && (
+                <div className="donate-page-credits-container">
+                    <GenericDetails
+                        items={bankDetails}
+                        isLoading={false}
+                        FormComponent={BankDetailsForm}
+                        notFoundText={COMMON_TEXT_ADMIN.DONATE.BANK_DETAILS.NOT_FOUND}
+                        addNewText={COMMON_TEXT_ADMIN.DONATE.BANK_DETAILS.ADD_NEW}
+                        createEmptyItem={(data) => ({
+                            id: Date.now(),
+                            ...data,
+                        })}
+                    />
+
+                    <SupportOptions
+                        className={'donate-page-credits-item'}
+                        items={supportOptions}
+                        renderItem={renderSupportOptions}
+                        isLoading={isLoading}
+                    />
+                </div>
+            )}
         </div>
     );
 };

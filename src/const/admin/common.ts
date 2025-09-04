@@ -44,11 +44,12 @@ export const COMMON_TEXT_ADMIN = {
 
     DONATE: {
         BANK_DETAILS: {
-            NOT_FOUND: 'Ще не має реквізитів',
+            NOT_FOUND: 'Ще немає реквізитів',
             ADD_NEW: 'Додати реквізити',
         },
         SUPPORT_OPTIONS: {
-            NOT_FOUND: 'Ще не має варіантів підтримки',
+            NOT_FOUND: 'Ще немає варіантів підтримки',
+            ADD_NEW: 'Додати варіант підтримки',
         },
     },
 

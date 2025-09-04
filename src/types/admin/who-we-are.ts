@@ -1,32 +1,38 @@
-import {Image} from "../common/image";
-import {ContextType} from "react";
+import { Image, ImageValues } from '../common/image';
+import { ContextType } from 'react';
 
 export type WhoWeAreCategory = {
-
-    id: number
-    sectionType : string
-    title: string
-}
+    id: number;
+    sectionType: SectionType;
+    title: string;
+};
 
 export type WhoWeAreSection = {
-    id: number
-    sectionType: number
-    title: string
-    contents: Content[]
-}
+    id: number;
+    sectionType: SectionType;
+    title: string;
+    contents: Content[];
+};
 
 export type Content = {
-    id: number
-    contentType: ContentType
-    image: Image
-    description: string
-    title: string
-}
+    id: number;
+    contentType: ContentType;
+    image: Image | ImageValues;
+    description: string;
+    title: string;
+};
 
 export enum ContentType {
     Title,
     Description,
     Image,
-    Card
+    Card,
+}
 
+export enum SectionType {
+    Main,
+    WhatWeDo,
+    WhoWeSupport,
+    Team,
+    People,
 }

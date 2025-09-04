@@ -2,7 +2,7 @@ export const COMMON_TEXT_ADMIN = {
     TAB: {
         TEAM_MEMBERS: 'Команда',
         PROGRAMS: 'Програми',
-        WHO_WE_ARE: "Хто ми"
+        WHO_WE_ARE: 'Хто ми',
     },
 
     ALT: {
@@ -73,8 +73,8 @@ export const COMMON_TEXT_ADMIN = {
     },
     TYPE: {
         DESCRIPTION: 'Опис',
-        TITLE: 'Заголовок'
-    }
+        TITLE: 'Заголовок',
+    },
 };
 
 export const UI_CONFIG = {

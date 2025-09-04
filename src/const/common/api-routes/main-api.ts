@@ -19,6 +19,6 @@ export const API_ROUTES = {
         BASE: 'Image',
     },
     WHO_WE_ARE: {
-        Base: "WhoWeAre"
-    }
+        BASE: 'WhoWeAre',
+    },
 };

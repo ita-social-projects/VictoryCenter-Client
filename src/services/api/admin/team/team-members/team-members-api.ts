@@ -3,7 +3,6 @@ import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/c
 import { TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../types/admin/team-members';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
 import { ImageApi } from '../../image/image-api';
-import { ImageValues } from '../../../../../types/common/image';
 
 export const TeamMembersApi = {
     getAll: async (

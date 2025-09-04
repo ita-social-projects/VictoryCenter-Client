@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
-import { FaqQuestion, FaqSearchItemData, mapFaqQuestionDtoToModel, VisitorPage } from '../../../../../types/admin/faq';
+import { FaqQuestion, FaqSearchItemData, VisitorPage } from '../../../../../types/admin/faq';
 import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { FaqApi } from '../../../../../services/api/admin/faq/faq-api';
@@ -19,6 +19,7 @@ import './FaqPanelContent.scss';
 import axios from 'axios';
 import { AdminPanelToolbar } from '../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { FaqSearchItem } from '../faq-search-item/FaqSearchItem';
+import { mapFaqQuestionDtoToModel } from '../../../../../utils/functions/mappers/admin/faq-mappers';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;

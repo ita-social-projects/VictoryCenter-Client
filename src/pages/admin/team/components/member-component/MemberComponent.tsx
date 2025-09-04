@@ -1,9 +1,9 @@
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import './MemberComponent.scss';
 import BlankUserImage from '../../../../../assets/icons/blank-user.svg';
-import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 import { TeamMember } from '../../../../../types/admin/team-members';
 import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
+import { mapImageToBase64 } from '../../../../../utils/functions/mappers/common/image-mappers';
 
 export interface MemberComponentProps {
     member: TeamMember;

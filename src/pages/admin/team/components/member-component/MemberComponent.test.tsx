@@ -4,9 +4,9 @@ import { MemberComponent, MemberComponentProps } from './MemberComponent';
 import '@testing-library/jest-dom';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
+import { mapImageToBase64 } from '../../../../../utils/functions/mappers/common/image-mappers';
 
-jest.mock('../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64', () => ({
+jest.mock('../../../../../utils/functions/mappers/common/image-mappers', () => ({
     mapImageToBase64: jest.fn(),
 }));
 

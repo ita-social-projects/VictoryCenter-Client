@@ -7,7 +7,7 @@ import {
     TeamItem,
     TeamPageData,
 } from '../../../../types/public/team-page';
-import { mapImageToBase64 } from '../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
+import { mapImageToBase64 } from '../../../../utils/functions/mappers/common/image-mappers';
 import { axiosInstance } from '../../axios';
 
 const isValidCategory = (category: PublicCategoryWithTeamMembersDto): boolean => {

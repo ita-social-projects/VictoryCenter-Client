@@ -6,7 +6,7 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { VisibilityStatusLabelProps } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { Program } from '../../../../../types/admin/programs';
-import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
+import { mapImageToBase64 } from '../../../../../utils/functions/mappers/common/image-mappers';
 
 jest.mock('../../../../../assets/icons/blank-image.svg', () => ({
     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="blank-image" className={className} />,
@@ -31,7 +31,7 @@ jest.mock('../../../../../components/admin/visibility-status-label/VisibilitySta
     };
 });
 
-jest.mock('../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64');
+jest.mock('../../../../../utils/functions/mappers/common/image-mappers');
 
 describe('ProgramListItem', () => {
     const mockMapImageToBase64 = mapImageToBase64 as jest.MockedFunction<typeof mapImageToBase64>;

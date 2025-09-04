@@ -4,8 +4,8 @@ import UploadIcon from '../../../assets/icons/cloud-download.svg';
 import classNames from 'classnames';
 import './PhotoInput.scss';
 import { ImageValues } from '../../../types/common/image';
-import { mapImageToBase64 } from '../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { mapImageToBase64 } from '../../../utils/functions/mappers/common/image-mappers';
 
 export interface PhotoInputProps {
     value: ImageValues | null;

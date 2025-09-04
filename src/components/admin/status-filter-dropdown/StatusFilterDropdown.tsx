@@ -1,6 +1,7 @@
 import { Select } from '../select/Select';
-import { mapLabelToStatus, VisibilityStatus } from '../../../types/admin/common';
+import { VisibilityStatus } from '../../../types/admin/common';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { mapLabelToStatus } from '../../../utils/functions/mappers/common/status-mappers';
 
 interface StatusFilterDropdownProps {
     onStatusFilterChange: (statusFilter: VisibilityStatus | undefined) => void;

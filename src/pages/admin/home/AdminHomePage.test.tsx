@@ -1,25 +1,12 @@
-import { render, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { AdminHomePage } from './AdminHomePage';
-import * as adminHomeDataFetchModule from '../../../utils/mock-data/admin/home';
 import { MemoryRouter } from 'react-router';
 
-const spyAdminHomeDataFetch = jest.spyOn(adminHomeDataFetchModule, 'adminHomeDataFetch');
+jest.mock('../../../assets/icons/arrow-left-white.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="admin-page-action-hint-icon" />,
+}));
 
 describe('AdminHomePage', () => {
-    const mockHeader = 'Test Header';
-    const mockContent = 'Test Content';
-
-    beforeEach(() => {
-        spyAdminHomeDataFetch.mockResolvedValue({
-            header: mockHeader,
-            content: mockContent,
-        });
-    });
-
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
     it('renders the component', async () => {
         const { container } = render(
             <MemoryRouter>
@@ -27,17 +14,13 @@ describe('AdminHomePage', () => {
             </MemoryRouter>,
         );
 
-        const header = container.querySelector('.header');
-        const content = container.querySelector('.content');
-
-        expect(header).toBeInTheDocument();
-        expect(content).toBeInTheDocument();
-
-        await waitFor(() => {
-            expect(header?.textContent).toEqual(mockHeader);
-            expect(content?.textContent).toEqual(mockContent);
-        });
-
-        expect(spyAdminHomeDataFetch).toHaveBeenCalledTimes(1);
+        const pageContent = container.querySelector('.admin-page-content');
+        const pageMainText = container.querySelector('.admin-page-main-text');
+        const pageSubText = container.querySelector('.admin-page-sub-text');
+        const pageActionHint = container.querySelector('.admin-page-action-hint');
+        expect(pageContent).toBeInTheDocument();
+        expect(pageMainText).toBeInTheDocument();
+        expect(pageSubText).toBeInTheDocument();
+        expect(pageActionHint).toBeInTheDocument();
     });
 });

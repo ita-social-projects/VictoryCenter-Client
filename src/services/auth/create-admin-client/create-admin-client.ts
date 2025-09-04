@@ -6,7 +6,7 @@ export function CreateAdminClient(
     checkIsAuthenticated: () => boolean,
     getAccessToken: () => string,
     refreshAccessToken: () => Promise<void>,
-    logout: () => void,
+    logout: (token: string) => void,
     refreshHandler = resolveWithNewTokenConcurrent(refreshAccessToken, getAccessToken, logout),
 ): AxiosInstance {
     const client = axios.create({

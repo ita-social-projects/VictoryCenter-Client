@@ -112,7 +112,7 @@ export const ImageInput = ({ className = 'image-input-wrapper', label = COMMON_T
             onKeyDown={handleKeyDown}
             onFocus={handleFocus}
             onBlur={handleBlurEvent}
-            aria-label={COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image'}
+            aria-label={COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || COMMON_TEXT_ADMIN.INPUT.UPLOAD_IMAGE}
             tabIndex={disabled ? -1 : 0}
             role="button"
         >

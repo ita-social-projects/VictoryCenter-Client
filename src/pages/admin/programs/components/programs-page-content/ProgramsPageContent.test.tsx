@@ -20,22 +20,23 @@ jest.mock('../../../../../hooks/admin/use-modals-state/useModalsState', () => ({
     useModalsState: jest.fn(),
 }));
 
-jest.mock('../programs-page-toolbar/ProgramsPageToolbar', () => ({
-    ProgramsPageToolbar: (props: any) => {
-        const { VisibilityStatus } = require('../../../../../types/admin/common');
-        return (
-            <div data-testid="programs-toolbar">
-                <button onClick={props.onAddProgram}>Add Program</button>
-                <button onClick={() => props.onStatusFilterChange(VisibilityStatus.Published)}>Filter Published</button>
-                <button data-testid="select-program" onClick={() => props.onProgramSelect(1)}>
-                    Select Program
-                </button>
-                <button data-testid="clear-search" onClick={props.onSearchClear}>
-                    Clear Search
-                </button>
-            </div>
-        );
-    },
+jest.mock('../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
+    AdminPanelToolbar: ({ onSearchClear, onStatusFilterChange, onAddItem, AddItemButtonText, onSuggestionSelect }: any) => (
+        <div data-testid="programs-toolbar">
+            <button data-testid="select-program" onClick={() => onSuggestionSelect(1)}>
+                Select Program
+            </button>
+            <button data-testid="clear-search" onClick={onSearchClear}>
+                Clear Search
+            </button>
+            <button onClick={() => onStatusFilterChange(1)}>
+                Filter Published
+            </button>
+            <button data-testid="add-item-button" onClick={onAddItem}>
+                {AddItemButtonText}
+            </button>
+        </div>
+    ),
 }));
 
 jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
@@ -308,7 +309,7 @@ describe('ProgramsPageContent', () => {
             expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
                 1,
                 expect.objectContaining({ offset: 0, limit: 5 }),
-                VisibilityStatus.Published,
+                1,
             );
         });
     });

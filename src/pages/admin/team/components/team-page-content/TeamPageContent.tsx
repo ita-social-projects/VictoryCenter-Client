@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
 import { DeleteTeamMemberModal } from '../team-member-modals/delete-team-member-modal/DeleteTeamMemberModal';
 import { TeamMemberModal } from '../team-member-modals/team-member-modal/TeamMemberModal';

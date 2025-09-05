@@ -47,8 +47,8 @@ export const FaqComponent = ({ faq, handleOnDeleteFaq, handleOnEditFaq }: FaqCom
                     </div>
                 </ButtonTooltip>
                 <div className="faq-actions-buttons">
-                    <button type="button" onClick={handleEditFaq} className="edit-btn" />
-                    <button type="button" onClick={handleDeleteFaq} className="delete-btn" />
+                    <button type="button" onClick={handleEditFaq} className="faq-edit-btn" />
+                    <button type="button" onClick={handleDeleteFaq} className="faq-delete-btn" />
                 </div>
             </div>
         </div>

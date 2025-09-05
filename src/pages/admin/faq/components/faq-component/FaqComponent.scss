@@ -107,8 +107,8 @@
             justify-content: flex-end;
             gap: 0.625rem;
 
-            .edit-btn,
-            .delete-btn {
+            .faq-edit-btn,
+            .faq-delete-btn {
                 width: 1.5rem;
                 height: 1.5rem;
                 border: none;
@@ -117,19 +117,37 @@
                 background-size: cover;
             }
 
-            .edit-btn {
-                background: url('../../../../../assets/icons/edit.svg');
+            .faq-edit-btn {
+                background: url('../../../../../assets/icons/edit-default.svg');
 
-                &:active {
-                    background: url('../../../../../assets/icons/edit-filled.svg');
+                &:hover:not(:disabled){
+                    background: url('../../../../../assets/icons/edit-hover.svg');
+                }
+
+                &:active:not(:disabled) {
+                    background: url('../../../../../assets/icons/edit-pressed.svg');
+                }
+
+                &:disabled {
+                    background: url('../../../../../assets/icons/edit-disabled.svg');
+                    cursor: not-allowed;
                 }
             }
 
-            .delete-btn {
-                background: url('../../../../../assets/icons/delete.svg');
+            .faq-delete-btn {
+                background: url('../../../../../assets/icons/delete-default.svg');
 
-                &:active {
-                    background: url('../../../../../assets/icons/delete-filled.svg');
+                &:hover:not(:disabled) {
+                    background: url('../../../../../assets/icons/delete-hover.svg');
+                }
+
+                &:active:not(:disabled) {
+                    background: url('../../../../../assets/icons/delete-pressed.svg');
+                }
+
+                &:disabled {
+                    background: url('../../../../../assets/icons/delete-disabled.svg');
+                    cursor: not-allowed;
                 }
             }
         }

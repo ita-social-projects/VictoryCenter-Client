@@ -57,7 +57,7 @@ describe('FaqComponent', () => {
         const { container } = render(
             <FaqComponent faq={mockFaq} handleOnDeleteFaq={jest.fn()} handleOnEditFaq={handleOnEditFaq} />,
         );
-        fireEvent.click(container.querySelector('.edit-btn')!);
+        fireEvent.click(container.querySelector('.faq-edit-btn')!);
         expect(handleOnEditFaq).toHaveBeenCalledWith(mockFaq);
     });
 
@@ -66,7 +66,7 @@ describe('FaqComponent', () => {
         const { container } = render(
             <FaqComponent faq={mockFaq} handleOnDeleteFaq={handleOnDeleteFaq} handleOnEditFaq={jest.fn()} />,
         );
-        fireEvent.click(container.querySelector('.delete-btn')!);
+        fireEvent.click(container.querySelector('.faq-delete-btn')!);
         expect(handleOnDeleteFaq).toHaveBeenCalledWith(mockFaq);
     });
 });

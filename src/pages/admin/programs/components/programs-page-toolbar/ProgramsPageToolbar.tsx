@@ -14,6 +14,7 @@ import {
     useDataPaginationFetch,
 } from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import './ProgramsPageToolbar.scss';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 const SUGGESTIONS_PAGE_SIZE = 5;
 
@@ -34,15 +35,11 @@ export const ProgramsPageToolbar = ({
 }: ProgramPageToolbarProps) => {
     const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
     const [localSearchItems, setLocalSearchItems] = useState<ProgramSearchItemData[]>([]);
+    const client = useAdminClient();
 
     const getSearchItems = useCallback(
         async (params: PaginationRequestParams) => {
-            return ProgramsApi.fetchProgramSearchItems(
-                currentSearchTerm,
-                params.offset,
-                params.limit,
-                params.requestOptions,
-            );
+            return ProgramsApi.fetchProgramSearchItems(client, currentSearchTerm, params.offset, params.limit);
         },
         [currentSearchTerm],
     );

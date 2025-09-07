@@ -18,6 +18,7 @@ import {
     useDataPaginationFetch,
 } from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import './ProgramsPageContent.scss';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -30,6 +31,7 @@ interface ErrorState {
 export const ProgramsPageContent = () => {
     const [selectedCategory, setSelectedCategory] = useState<ProgramCategory | null>(null);
     const [pageSize, setPageSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
+    const client = useAdminClient();
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [searchProgramId, setSearchProgramId] = useState<number | undefined>();
     const [isSearchResultView, setIsSearchResultView] = useState(false);
@@ -42,7 +44,7 @@ export const ProgramsPageContent = () => {
 
     // Fetch functions
     const getProgramCategories = useCallback(async (options: RequestOptions) => {
-        return ProgramsApi.fetchProgramCategories(options);
+        return ProgramsApi.fetchProgramCategories(client);
     }, []);
 
     const getFilteredPrograms = useCallback(
@@ -51,13 +53,7 @@ export const ProgramsPageContent = () => {
                 return { items: [], totalItemsCount: 0 };
             }
 
-            return ProgramsApi.fetchPrograms(
-                selectedCategory.id,
-                params.offset,
-                params.limit,
-                statusFilter,
-                params.requestOptions,
-            );
+            return ProgramsApi.fetchPrograms(client, selectedCategory.id, params.offset, params.limit, statusFilter);
         },
         [selectedCategory, statusFilter],
     );
@@ -68,7 +64,7 @@ export const ProgramsPageContent = () => {
                 return null;
             }
 
-            return ProgramsApi.fetchProgramById(searchProgramId, options);
+            return ProgramsApi.fetchProgramById(searchProgramId, client);
         },
         [searchProgramId],
     );

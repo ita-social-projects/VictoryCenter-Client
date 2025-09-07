@@ -6,6 +6,7 @@ import { ProgramsApi } from '../../../../../../services/api/admin/programs/progr
 import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import '../ProgramModal.scss';
+import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 export interface DeleteProgramModalProps {
     isOpen: boolean;
@@ -17,6 +18,7 @@ export interface DeleteProgramModalProps {
 export const DeleteProgramModal = ({ isOpen, onClose, onDeleteProgram, programToDelete }: DeleteProgramModalProps) => {
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [error, setError] = useState<string>('');
+    const client = useAdminClient();
 
     const handleConfirmDelete = async () => {
         if (!programToDelete) return;
@@ -25,7 +27,7 @@ export const DeleteProgramModal = ({ isOpen, onClose, onDeleteProgram, programTo
             setIsSubmitting(true);
             setError('');
 
-            await ProgramsApi.deleteProgram(programToDelete.id);
+            await ProgramsApi.deleteProgram(programToDelete.id, client);
             onDeleteProgram(programToDelete);
             onClose();
         } catch {

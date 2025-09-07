@@ -11,6 +11,7 @@ import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './ProgramCategoryModal.scss';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 interface ProgramCategoryFormValues {
     name: string;
@@ -60,6 +61,7 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
 
     const [formState, setFormState] = useState<ProgramCategoryFormValues>(defaultFormState);
     const [errors, setErrors] = useState<FormErrorState>({});
+    const client = useAdminClient();
     const [initialFormState, setInitialFormState] = useState<ProgramCategoryFormValues>(defaultFormState);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
@@ -121,10 +123,10 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                 };
 
                 if (mode === 'add') {
-                    const newCategory = await ProgramsApi.addProgramCategory(categoryData);
+                    const newCategory = await ProgramsApi.addProgramCategory(categoryData, client);
                     props.onAddCategory(newCategory);
                 } else {
-                    const updatedCategory = await ProgramsApi.editProgramCategory(categoryData);
+                    const updatedCategory = await ProgramsApi.editProgramCategory(categoryData, client);
                     props.onEditCategory(updatedCategory);
                 }
 

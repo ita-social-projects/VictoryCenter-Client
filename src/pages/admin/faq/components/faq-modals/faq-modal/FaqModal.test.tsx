@@ -1,10 +1,10 @@
-import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
 import { FaqQuestion, VisitorPage } from '../../../../../../types/admin/faq';
 import { FaqModal, FaqModalProps } from './FaqModal';
 import { FAQ_TEXT } from '../../../../../../const/admin/faq';
+import { FaqApi } from '../../../../../../services/api/admin/faq/faq-api';
 
 // Mock the useAdminClient hook
 jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
@@ -23,8 +23,60 @@ jest.mock('../../../../../../services/api/admin/faq/faq-api', () => {
     };
 });
 
-// Get a reference to the mocked API
-const { FaqApi: mockFaqApi } = require('../../../../../../services/api/admin/faq/faq-api');
+const mockFaqApi = FaqApi as jest.Mocked<typeof FaqApi>;
+
+const mockFormRef = {
+    submit: jest.fn(),
+    isDirty: jest.fn(() => false),
+    isValid: jest.fn(() => true),
+};
+
+jest.mock('../../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({
+        isOpen,
+        title,
+        onConfirm,
+        onCancel,
+    }: {
+        isOpen: boolean;
+        title: string;
+        onConfirm: () => void;
+        onCancel: () => void;
+    }) =>
+        isOpen ? (
+            <div data-testid="question-modal">
+                <div data-testid="question-title">{title}</div>
+                <button data-testid="question-confirm" onClick={onConfirm}>
+                    Yes
+                </button>
+                <button data-testid="question-cancel" onClick={onCancel}>
+                    No
+                </button>
+            </div>
+        ) : null,
+}));
+
+jest.mock('../../../../../../components/admin/button/Button', () => ({
+    Button: ({
+        onClick,
+        disabled,
+        children,
+        buttonStyle,
+    }: {
+        onClick?: () => void;
+        disabled?: boolean;
+        children: React.ReactNode;
+        buttonStyle?: string;
+    }) => (
+        <button
+            onClick={onClick}
+            disabled={disabled}
+            data-testid={buttonStyle === 'secondary' ? 'draft-button' : 'publish-button'}
+        >
+            {children}
+        </button>
+    ),
+}));
 
 jest.mock('../../../../../../components/common/modal/Modal', () => {
     const MockModal = ({
@@ -55,59 +107,6 @@ jest.mock('../../../../../../components/common/modal/Modal', () => {
     );
     return { Modal: MockModal };
 });
-
-jest.mock('../../../../../../components/admin/button/Button', () => ({
-    Button: ({
-        onClick,
-        disabled,
-        children,
-        buttonStyle,
-    }: {
-        onClick?: () => void;
-        disabled?: boolean;
-        children: React.ReactNode;
-        buttonStyle?: string;
-    }) => (
-        <button
-            onClick={onClick}
-            disabled={disabled}
-            data-testid={buttonStyle === 'secondary' ? 'draft-button' : 'publish-button'}
-        >
-            {children}
-        </button>
-    ),
-}));
-
-jest.mock('../../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({
-        isOpen,
-        title,
-        onConfirm,
-        onCancel,
-    }: {
-        isOpen: boolean;
-        title: string;
-        onConfirm: () => void;
-        onCancel: () => void;
-    }) =>
-        isOpen ? (
-            <div data-testid="question-modal">
-                <div data-testid="question-title">{title}</div>
-                <button data-testid="question-confirm" onClick={onConfirm}>
-                    Yes
-                </button>
-                <button data-testid="question-cancel" onClick={onCancel}>
-                    No
-                </button>
-            </div>
-        ) : null,
-}));
-
-const mockFormRef = {
-    submit: jest.fn(),
-    isDirty: jest.fn(() => false),
-    isValid: jest.fn(() => true),
-};
 
 let capturedFormProps: any = {};
 jest.mock('../../faq-form/FaqForm', () => {

@@ -120,7 +120,7 @@
             .faq-edit-btn {
                 background: url('../../../../../assets/icons/edit-default.svg');
 
-                &:hover:not(:disabled){
+                &:hover:not(:disabled) {
                     background: url('../../../../../assets/icons/edit-hover.svg');
                 }
 

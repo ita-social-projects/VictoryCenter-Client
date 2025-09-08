@@ -21,7 +21,13 @@ jest.mock('../../../../../hooks/admin/use-modals-state/useModalsState', () => ({
 }));
 
 jest.mock('../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
-    AdminPanelToolbar: ({ onSearchClear, onStatusFilterChange, onAddItem, AddItemButtonText, onSuggestionSelect }: any) => (
+    AdminPanelToolbar: ({
+        onSearchClear,
+        onStatusFilterChange,
+        onAddItem,
+        AddItemButtonText,
+        onSuggestionSelect,
+    }: any) => (
         <div data-testid="programs-toolbar">
             <button data-testid="select-program" onClick={() => onSuggestionSelect(1)}>
                 Select Program
@@ -29,9 +35,7 @@ jest.mock('../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar'
             <button data-testid="clear-search" onClick={onSearchClear}>
                 Clear Search
             </button>
-            <button onClick={() => onStatusFilterChange(1)}>
-                Filter Published
-            </button>
+            <button onClick={() => onStatusFilterChange(1)}>Filter Published</button>
             <button data-testid="add-item-button" onClick={onAddItem}>
                 {AddItemButtonText}
             </button>

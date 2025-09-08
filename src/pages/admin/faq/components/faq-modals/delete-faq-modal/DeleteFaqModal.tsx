@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FaqQuestion } from '../../../../../../types/admin/faq';
-import '../FaqModal.scss';
+import './DeleteFaqModal.scss';
 import { FaqApi } from '../../../../../../services/api/admin/faq/faq-api';
 import { FAQ_TEXT } from '../../../../../../const/admin/faq';
 import { Modal } from '../../../../../../components/common/modal/Modal';
@@ -46,7 +46,7 @@ export const DeleteFaqModal = ({ isOpen, onClose, onDeleteFaq, faqToDelete }: De
     return (
         <Modal isOpen={isOpen} onClose={handleClose} data-testid="delete-faq-modal">
             <Modal.Title>{FAQ_TEXT.FORM.TITLE.DELETE_FAQ}</Modal.Title>
-            <Modal.Content>{error && <div className="error-container">{error}</div>}</Modal.Content>
+            <Modal.Content>{error && <div className="delete-faq-error-container">{error}</div>}</Modal.Content>
             <Modal.Actions>
                 <Button onClick={handleClose} buttonStyle="secondary" disabled={isSubmitting}>
                     {COMMON_TEXT_ADMIN.BUTTON.CANCEL}

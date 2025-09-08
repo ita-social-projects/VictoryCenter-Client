@@ -1,4 +1,3 @@
-import React from 'react';
 import { Program, ProgramCategory } from '../../../../../types/admin/programs';
 import { UseModalsStateResult } from '../../../../../hooks/admin/use-modals-state/useModalsState';
 import { ProgramModal } from './program-modal/ProgramModal';

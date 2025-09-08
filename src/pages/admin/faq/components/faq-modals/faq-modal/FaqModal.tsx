@@ -7,7 +7,6 @@ import { VisibilityStatus } from '../../../../../../types/admin/common';
 import { FaqCreateUpdate, FaqQuestion, VisitorPage } from '../../../../../../types/admin/faq';
 import { FaqForm, FaqFormRef, FaqFormValues } from '../../faq-form/FaqForm';
 import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
-import '../FaqModal.scss';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { mapFaqQuestionDtoToModel } from '../../../../../../utils/functions/mappers/admin/faq-mappers';
 

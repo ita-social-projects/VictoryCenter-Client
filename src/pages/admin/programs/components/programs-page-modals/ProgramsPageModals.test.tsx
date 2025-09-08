@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ProgramsPageModals } from './ProgramsPageModals';
 import { Program, ProgramCategory } from '../../../../../types/admin/programs';

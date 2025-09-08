@@ -1,6 +1,6 @@
-@use '../../../../../assets/sass/variables/colors';
+@use '../../../../../../assets/sass/variables/colors';
 
-.program-category-modal-error-container {
+.delete-faq-error-container {
     width: 100%;
     margin: 8px;
     text-align: center;
@@ -8,8 +8,4 @@
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-}
-
-.w-100 {
-    width: 100% !important;
 }

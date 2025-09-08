@@ -5,7 +5,6 @@ import { VisibilityStatus } from '../../../../../../types/admin/common';
 import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
-import '../ProgramModal.scss';
 import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
 import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
 

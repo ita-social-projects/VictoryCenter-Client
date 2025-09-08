@@ -326,26 +326,34 @@ export const FaqPanelContent = () => {
     );
 
     const renderFaqItem = useCallback(
-        (faq: FaqQuestion) => (
-            <DraggableListItem
-                key={faq.id}
-                entity={faq}
-                id={faq.id}
-                ariaLabel={FAQ_TEXT.ACTIONS.REORDER}
-                renderEntityComponent={(q) => (
-                    <FaqComponent
-                        key={q.id}
-                        faq={q}
-                        handleOnDeleteFaq={handleDeleteFaqModalOpen}
-                        handleOnEditFaq={handleEditFaqModalOpen}
-                    />
-                )}
-                entities={faqs}
-                idSelector={(q) => q.id}
-                onEntitiesReordered={handleEntitiesReordered}
-            ></DraggableListItem>
-        ),
-        [handleDeleteFaqModalOpen, handleEditFaqModalOpen, handleEntitiesReordered, faqs],
+        (faq: FaqQuestion) =>
+            statusFilter ? (
+                <FaqComponent
+                    key={faq.id}
+                    faq={faq}
+                    handleOnDeleteFaq={handleDeleteFaqModalOpen}
+                    handleOnEditFaq={handleEditFaqModalOpen}
+                />
+            ) : (
+                <DraggableListItem
+                    key={faq.id}
+                    entity={faq}
+                    id={faq.id}
+                    ariaLabel={FAQ_TEXT.ACTIONS.REORDER}
+                    renderEntityComponent={(q) => (
+                        <FaqComponent
+                            key={q.id}
+                            faq={q}
+                            handleOnDeleteFaq={handleDeleteFaqModalOpen}
+                            handleOnEditFaq={handleEditFaqModalOpen}
+                        />
+                    )}
+                    entities={faqs}
+                    idSelector={(q) => q.id}
+                    onEntitiesReordered={handleEntitiesReordered}
+                ></DraggableListItem>
+            ),
+        [handleDeleteFaqModalOpen, handleEditFaqModalOpen, handleEntitiesReordered, faqs, statusFilter],
     );
 
     return (

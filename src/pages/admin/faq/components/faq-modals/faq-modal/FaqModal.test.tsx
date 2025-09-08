@@ -10,16 +10,16 @@ import { FAQ_TEXT } from '../../../../../../const/admin/faq';
 jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn().mockReturnValue({
         // Add any properties the client should have
-        defaults: { headers: { common: {} } }
-    })
+        defaults: { headers: { common: {} } },
+    }),
 }));
 
 jest.mock('../../../../../../services/api/admin/faq/faq-api', () => {
     return {
         FaqApi: {
             post: jest.fn(),
-            update: jest.fn()
-        }
+            update: jest.fn(),
+        },
     };
 });
 

@@ -78,8 +78,12 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
         const handleFullNameChange = useCallback(
             (e: React.ChangeEvent<HTMLInputElement>) => {
                 setFormState((prev) => ({ ...prev, fullName: e.target.value }));
+                setErrors((prev) => ({
+                    ...prev,
+                    fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false),
+                }));
             },
-            [setFormState],
+            [formState.fullName, setErrors, setFormState],
         );
 
         const handleNameBlur = useCallback(() => {
@@ -106,8 +110,6 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
         const handleImgChange = useCallback(
             (file: ImageValues | Image | null) => {
                 const error = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(file, false);
-                console.log('caught');
-                console.log(error);
                 setErrors((prev) => ({
                     ...prev,
                     image: error,

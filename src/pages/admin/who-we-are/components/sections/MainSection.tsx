@@ -1,49 +1,56 @@
-import { BaseSection } from '../base-section/BaseSection';
-import { SectionType, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
-import { ImageInputProps } from "../../../../../components/admin/image-input/ImageInput";
-import { WHO_WE_ARE_TEXT } from "../../../../../const/admin/who-we-are";
+// MainSection.tsx
+
+import { Content, SectionType, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
+import { ImageInputProps } from '../../../../../components/admin/image-input/ImageInput';
+import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
+import { BaseContent } from '../base-content/BaseContent';
+import React from 'react';
+import { CardsSection } from './CardsSection';
+import { DescriptionSection } from './DescriptionSection';
+import { ImageSection } from './ImageSection';
+import { MainPageProps, TeamPageProps, WhatWeDoPageProps } from './SectionsProps';
 
 interface MainSectionProps {
-    section: WhoWeAreSection;
+    section: WhoWeAreSection | null;
+
+    onChange: (data: Content) => void;
+    className?: string;
 }
 
-export const MainSection = ({ section }: MainSectionProps) => {
-    const titleLimit = 100;
-    const descriptionLimit = 300;
+export const MainSection = ({ section, onChange, className }: MainSectionProps) => {
+    if (!section) {
+        return null;
+    }
 
-    const commonImageProps: Omit<ImageInputProps, "className"> = {
-        value: null,
-        onChange: () => {},
-        label: WHO_WE_ARE_TEXT.IMAGE.INPUT,
-        subText: "1440x860",
-    };
-
-    if (!section) return null;
+    let renderedContent;
 
     switch (section.sectionType) {
-        case SectionType.Main:
-            return (
-                <BaseSection
-                    section={section}
-                    descriptionLimit={descriptionLimit}
-                    titleLimit={titleLimit}
-                    className=""
-                    imageProps={{ ...commonImageProps, className: "who-we-are-image-input-wrapper--main" }}
-                />
+        case SectionType.WhatWeDo:
+            renderedContent = (
+                <DescriptionSection content={section.contents} onChange={onChange} {...WhatWeDoPageProps} />
             );
+            break;
+        case SectionType.WhoWeSupport:
+            renderedContent = (
+                <CardsSection content={section.contents} onChange={onChange} descriptionLimit={200} titleLimit={100} />
+            );
+            break;
+        case SectionType.People:
+            renderedContent = (
+                <CardsSection content={section.contents} onChange={onChange} descriptionLimit={200} titleLimit={100} />
+            );
+            break;
+        case SectionType.Main:
+            renderedContent = <ImageSection content={section.contents} onChange={onChange} {...MainPageProps} />;
+            break;
 
         case SectionType.Team:
-            return (
-                <BaseSection
-                    section={section}
-                    descriptionLimit={descriptionLimit}
-                    titleLimit={titleLimit}
-                    className=""
-                    imageProps={{ ...commonImageProps, className: "who-we-are-image-input-wrapper--team" }}
-                />
-            );
-
+            renderedContent = <ImageSection content={section.contents} onChange={onChange} {...TeamPageProps} />;
+            break;
+        // Додайте інші case-и, якщо вони є
         default:
-            return null;
+            renderedContent = null;
     }
+
+    return <div className={className}>{renderedContent}</div>;
 };

@@ -17,7 +17,7 @@ export type WhoWeAreSection = {
 export type Content = {
     id: number;
     contentType: ContentType;
-    image: Image | ImageValues;
+    image: Image | ImageValues | null;
     description: string;
     title: string;
 };

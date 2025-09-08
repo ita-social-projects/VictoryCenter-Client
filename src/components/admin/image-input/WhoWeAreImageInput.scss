@@ -1,15 +1,8 @@
 @use '../../../assets/sass/variables/colors';
 
-.who-we-are-image-input-wrapper{
-
-
-
-  &--main {
-    width: 52.5625rem;
-    height: 33.125rem;
-    background-image:
-            linear-gradient(rgba(colors.$grey-50, 0.85), rgba(colors.$grey-50, 0.85)),
-            url("../../../assets/images/public/about-us-page/background.jpg");
+// Загальні стилі для обгортки ImageInput, які застосовуються до всіх її варіантів.
+// Ці стилі служать "базою" і допомагають уникнути дублювання коду.
+.who-we-are-image-input-wrapper {
     background-size: cover;
     background-position: center;
     position: relative;
@@ -17,96 +10,100 @@
     justify-content: center;
     align-items: center;
     border: 1px solid colors.$grey-700;
-  }
 
-  // модифікатор №2 (новий варіант)
-  &--team {
-    width: 52.5625rem;
-    height: 46.875rem;
-    background-image:
+    // Модифікатор для Main-секції
+    &--main {
+        width: 52.5625rem;
+        height: 33.125rem;
+        background-image:
             linear-gradient(rgba(colors.$grey-50, 0.85), rgba(colors.$grey-50, 0.85)),
-            url("../../../assets/images/public/about-us-page/our-team.jpg");
-    background-size: cover;
-    background-position: center;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid colors.$grey-700;
-  }
-  &-focused {
-    background-color: colors.$blue-50;
-    border-color: rgba(colors.$grey-900, 0.8);
-  }
-
-  &-disabled {
-    background-color: colors.$grey-600;
-  }
-
-  .image-placeholder {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0;
-    background: none;
-    color: colors.$grey-900;
-    font-size: 16px;
-    font-weight: 600;
-    text-align: center;
-    line-height: 28px;
-    letter-spacing: -2%;
-
-
-    .placeholder-icon {
-      width: 4rem;
-      height: 4rem;
-      color: colors.$grey-700;
-    }
-  }
-
-  .image-preview {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border-radius: 4px;
-    overflow: hidden;
-
-    .preview-image {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: center;
+            url('../../../assets/images/public/about-us-page/background.jpg');
     }
 
-    .delete-button {
-      position: absolute;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      width: 2.75rem;
-      height: 2.75rem;
-      padding: 0.625rem;
-      margin: auto;
-      border-radius: 8px;
-      background: colors.$grey-900;
-      opacity: 0.8;
-
-      &:hover {
-        opacity: 1;
-      }
-
-      .delete-icon {
-        width: 4rem;
-        height: 4rem;
-      }
+    // Модифікатор для Team-секції
+    &--team {
+        width: 52.5625rem;
+        height: 46.875rem;
+        background-image:
+            linear-gradient(rgba(colors.$grey-50, 0.85), rgba(colors.$grey-50, 0.85)),
+            url('../../../assets/images/public/about-us-page/our-team.jpg');
     }
 
-    &:hover .delete-button {
-      display: flex;
+    // Стилі для станів (фокус, вимкнений)
+    &-focused {
+        background-color: colors.$blue-50;
+        border-color: rgba(colors.$grey-900, 0.8);
     }
-  }
+
+    &-disabled {
+        background-color: colors.$grey-600;
+    }
+
+    // Стилі для елемента-заглушки, який відображається, коли немає зображення.
+    .image-placeholder {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0;
+        background: none;
+        color: colors.$grey-900;
+        font-size: 16px;
+        font-weight: 600;
+        text-align: center;
+        line-height: 28px;
+        letter-spacing: -2%;
+
+        .placeholder-icon {
+            width: 4rem;
+            height: 4rem;
+            color: colors.$grey-700;
+        }
+    }
+
+    // Стилі для елемента, який відображає завантажене зображення.
+    .image-preview {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border-radius: 4px;
+        overflow: hidden;
+
+        .preview-image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+        }
+
+        .delete-button {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 2.75rem;
+            height: 2.75rem;
+            padding: 0.625rem;
+            margin: auto;
+            border-radius: 8px;
+            background: colors.$grey-900;
+            opacity: 0.8;
+
+            &:hover {
+                opacity: 1;
+            }
+
+            .delete-icon {
+                width: 4rem;
+                height: 4rem;
+            }
+        }
+
+        &:hover .delete-button {
+            display: flex;
+        }
+    }
 }

@@ -3,7 +3,7 @@ import DeleteIcon from '../../../assets/icons/delete.svg';
 import UploadIcon from '../../../assets/icons/cloud-download.svg';
 import classNames from 'classnames';
 import './ImageInput.scss';
-import './WhoWeAreImageInput.scss'
+import './WhoWeAreImageInput.scss';
 import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
@@ -17,9 +17,21 @@ export interface ImageInputProps {
     className?: string | null;
     label?: string | null;
     subText?: string | null;
+    style?: React.CSSProperties;
 }
 
-export const ImageInput = ({ className = 'image-input-wrapper', label = COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER, subText = null, value, onChange, onBlur, id, name, disabled = false }: ImageInputProps) => {
+export const ImageInput = ({
+    className = 'image-input-wrapper',
+    label = COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER,
+    subText = null,
+    value,
+    onChange,
+    onBlur,
+    id,
+    name,
+    disabled = false,
+    style,
+}: ImageInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -102,7 +114,11 @@ export const ImageInput = ({ className = 'image-input-wrapper', label = COMMON_T
 
     return (
         <div
-            className={classNames(className, { 'image-input-wrapper-focused': isFocused && !disabled, 'image-input-wrapper-disabled': disabled, })}
+            className={classNames(className, {
+                'image-input-wrapper-focused': isFocused && !disabled,
+                'image-input-wrapper-disabled': disabled,
+            })}
+            style={style}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -131,11 +147,11 @@ export const ImageInput = ({ className = 'image-input-wrapper', label = COMMON_T
             />
 
             {previewImage ? (
-                <div  className={classNames("image-preview")}>
+                <div className={classNames('image-preview')}>
                     <img
                         src={getImageSrc(previewImage)}
                         alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
-                        className={classNames("preview-image")}
+                        className={classNames('preview-image')}
                         data-testid="preview-image"
                     />
                     {!disabled && (
@@ -148,13 +164,21 @@ export const ImageInput = ({ className = 'image-input-wrapper', label = COMMON_T
                                 handleRemove();
                             }}
                         >
-                            <img src={DeleteIcon} alt={COMMON_TEXT_ADMIN.ALT.DELETE} className={classNames("delete-icon")} />
+                            <img
+                                src={DeleteIcon}
+                                alt={COMMON_TEXT_ADMIN.ALT.DELETE}
+                                className={classNames('delete-icon')}
+                            />
                         </button>
                     )}
                 </div>
             ) : (
-                <div className={classNames("image-placeholder")}>
-                    <img src={UploadIcon} alt={COMMON_TEXT_ADMIN.ALT.UPLOAD} className={classNames("placeholder-icon")} />
+                <div className={classNames('image-placeholder')}>
+                    <img
+                        src={UploadIcon}
+                        alt={COMMON_TEXT_ADMIN.ALT.UPLOAD}
+                        className={classNames('placeholder-icon')}
+                    />
                     <span>{label}</span>
                     <span>{subText}</span>
                 </div>

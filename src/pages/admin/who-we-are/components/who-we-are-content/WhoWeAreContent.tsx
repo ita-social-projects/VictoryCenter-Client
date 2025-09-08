@@ -1,11 +1,13 @@
-import {useCallback, useEffect, useState} from 'react';
-import {WhoWeAreApi} from '../../../../../services/api/admin/who-we-are/who-we-are-api';
-import {SectionType, WhoWeAreCategory, WhoWeAreSection} from '../../../../../types/admin/who-we-are';
-import {useAdminClient} from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import {CategoryBar} from '../../../../../components/admin/category-bar/CategoryBar';
+import { useCallback, useEffect, useState } from 'react';
+import { WhoWeAreApi } from '../../../../../services/api/admin/who-we-are/who-we-are-api';
+import { Content, SectionType, WhoWeAreCategory, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
 import axios from 'axios';
 import './who-we-are-content.scss';
-import {MainSection} from '../sections/MainSection';
+import { MainSection } from '../sections/MainSection';
+import { CardsSection } from '../sections/CardsSection';
+import { DescriptionSection } from '../sections/DescriptionSection';
 
 interface ErrorState {
     message: string | null;
@@ -18,6 +20,8 @@ export const WhoWeAreContent = () => {
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
     const [selectedCategory, setSelectedCategory] = useState<WhoWeAreCategory | null>(null);
     const [selectedSection, setSelectedSection] = useState<WhoWeAreSection | null>(null);
+    const [updatedSection, setUpdatedSection] = useState<WhoWeAreSection | null>(null);
+    const [contentToUpdate, setContentToUpdate] = useState<Content[]>([]);
 
     const clearError = useCallback(() => {
         setError({ message: null, type: null });
@@ -32,7 +36,7 @@ export const WhoWeAreContent = () => {
             const fetchedCategories = await WhoWeAreApi.getAll(client);
             if (fetchedCategories.length > 0) {
                 setCategories(fetchedCategories);
-                setSelectedCategory(fetchedCategories[0]); // ✅ беремо з масиву напряму
+                setSelectedCategory(fetchedCategories[0]);
             }
         } catch (error: any) {
             if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
@@ -48,6 +52,7 @@ export const WhoWeAreContent = () => {
             const fetchedSection = await WhoWeAreApi.getByType(client, selectedCategory.sectionType);
             if (fetchedSection) {
                 setSelectedSection(fetchedSection);
+                setUpdatedSection(fetchedSection);
             }
         } catch (error: any) {
             if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
@@ -65,6 +70,20 @@ export const WhoWeAreContent = () => {
         fetchSection();
     }, [fetchSection]);
 
+    const handleContentChange = useCallback((updatedContent: Content) => {
+        setUpdatedSection((prevSection) => {
+            if (!prevSection) return null;
+
+            const newContents = prevSection.contents.map((item) =>
+                item.id === updatedContent.id ? updatedContent : item,
+            );
+
+            return {
+                ...prevSection,
+                contents: newContents,
+            };
+        });
+    }, []);
     return (
         <div className="who-we-are-main-box">
             <CategoryBar<WhoWeAreCategory>
@@ -74,7 +93,7 @@ export const WhoWeAreContent = () => {
                 getCategoryKey={(category) => category.id}
                 onCategorySelect={handleCategorySelect}
             />
-             <MainSection section={selectedSection} />
+            <MainSection section={updatedSection} onChange={handleContentChange} />
         </div>
     );
 };

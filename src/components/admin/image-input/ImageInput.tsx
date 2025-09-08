@@ -28,7 +28,6 @@ export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false
 
     const handleFile = useCallback(
         async (file: File) => {
-            if (!file.type.startsWith('image/')) return;
             const imgItem = await convertFileToBase64(file);
             onChange(imgItem);
         },

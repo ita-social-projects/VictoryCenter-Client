@@ -33,24 +33,24 @@ const mockFormRef = {
 
 jest.mock('../../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({
-        isOpen,
         title,
+        isOpen,
         onConfirm,
         onCancel,
     }: {
-        isOpen: boolean;
         title: string;
+        isOpen: boolean;
         onConfirm: () => void;
         onCancel: () => void;
     }) =>
         isOpen ? (
             <div data-testid="question-modal">
-                <div data-testid="question-title">{title}</div>
+                <h3 data-testid="question-title">{title}</h3>
                 <button data-testid="question-confirm" onClick={onConfirm}>
-                    Yes
+                    Confirm
                 </button>
                 <button data-testid="question-cancel" onClick={onCancel}>
-                    No
+                    Cancel
                 </button>
             </div>
         ) : null,
@@ -69,8 +69,8 @@ jest.mock('../../../../../../components/admin/button/Button', () => ({
         buttonStyle?: string;
     }) => (
         <button
-            onClick={onClick}
             disabled={disabled}
+            onClick={onClick}
             data-testid={buttonStyle === 'secondary' ? 'draft-button' : 'publish-button'}
         >
             {children}
@@ -80,25 +80,24 @@ jest.mock('../../../../../../components/admin/button/Button', () => ({
 
 jest.mock('../../../../../../components/common/modal/Modal', () => {
     const MockModal = ({
-        isOpen,
-        children,
         onClose,
+        children,
+        isOpen,
     }: {
-        isOpen: boolean;
-        children: React.ReactNode;
         onClose: () => void;
+        children: React.ReactNode;
+        isOpen: boolean;
     }) => {
-        if (!isOpen) return null;
-        return (
+        return isOpen ? (
             <div data-testid="modal">
                 <button data-testid="modal-close" onClick={onClose}>
                     ×
                 </button>
                 {children}
             </div>
-        );
+        ) : null;
     };
-    MockModal.Title = ({ children }: { children: React.ReactNode }) => <h2 data-testid="modal-title">{children}</h2>;
+    MockModal.Title = ({ children }: { children: React.ReactNode }) => <h1 data-testid="modal-title">{children}</h1>;
     MockModal.Content = ({ children }: { children: React.ReactNode }) => (
         <div data-testid="modal-content">{children}</div>
     );

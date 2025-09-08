@@ -212,7 +212,7 @@ export const FaqPanelContent = () => {
             try {
                 setFaqs(faqs);
                 const orderedIds = faqs.map((m) => m.id);
-                const pageId = selectedVisitorPage?.id ?? 0;
+                const pageId = selectedVisitorPage?.id!;
 
                 await FaqApi.reorder(client, { pageId, orderedIds });
             } catch (error: any) {
@@ -285,7 +285,7 @@ export const FaqPanelContent = () => {
             setFaqs((prevFaqs) => {
                 if (
                     prevFaqs.length < listSize * currentPaginationPageRef.current &&
-                    faq.pages.map((p) => p.id).includes(selectedVisitorPage?.id || -1)
+                    faq.pages.map((p) => p.id).includes(selectedVisitorPage?.id!)
                 ) {
                     return [...prevFaqs, faq];
                 } else {

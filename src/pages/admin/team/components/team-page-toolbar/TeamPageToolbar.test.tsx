@@ -96,7 +96,7 @@ describe('TeamPageToolbar', () => {
             />,
         );
 
-        const addBtn = screen.getByRole('button', { name: /Додати учасника/ });
+        const addBtn = screen.getByRole('button', { name: /Додати в команду/ });
         fireEvent.click(addBtn);
         expect(onAddMember).toHaveBeenCalled();
     });

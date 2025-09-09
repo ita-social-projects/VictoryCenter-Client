@@ -1,6 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { DonatePage } from './DonatePage';
 
+jest.mock('../../../components/public/faq-section/FaqSection', () => ({
+    FaqSection: () => <div data-testid="faq-section"></div>,
+}));
+
 describe('DonatePage', () => {
     it('renders DonatePageIntro, DonateSection, and RightSection', () => {
         render(<DonatePage />);

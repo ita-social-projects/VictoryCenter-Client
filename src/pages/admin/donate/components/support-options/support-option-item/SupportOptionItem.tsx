@@ -80,6 +80,32 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
     const handleDelete = () => {
         if (!data?.id || !onDelete) return;
         onDelete(data.id);
+    };
+
+    const handleDeleteClick = () => {
+        setIsDeleting(true);
+        setModalConfig({
+            title: DONATE_TEXT.QUESTION.SUPPORT_OPTION.DELETE,
+            onConfirm: () => {
+                handleDelete();
+                setIsDeleting(false);
+            },
+        });
+    };
+
+    const handleSaveClick = () => {
+        if (mode === SupportOptionItemMode.Edit) {
+            handleSave();
+        } else {
+            setModalConfig({
+                title: DONATE_TEXT.QUESTION.SUPPORT_OPTION.ADD,
+                onConfirm: handleSave,
+            });
+        }
+    };
+
+    const handleModalCancelOrClose = () => {
+        setModalConfig(null);
         setIsDeleting(false);
     };
 
@@ -98,13 +124,8 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                         />
                         <button
                             aria-label="delete-btn"
-                            className={`delete-btn ${isDeleting ? 'pressed' : ''}`}
-                            onClick={() =>
-                                setModalConfig({
-                                    title: DONATE_TEXT.QUESTION.SUPPORT_OPTION.DELETE,
-                                    onConfirm: handleDelete,
-                                })
-                            }
+                            className={`delete-btn delete-btn-icon ${isDeleting ? 'pressed' : ''}`}
+                            onClick={handleDeleteClick}
                         />
                     </div>
                 )}
@@ -131,15 +152,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                     <Button
                         type="button"
                         aria-label="save-support-option"
-                        onClick={
-                            mode === SupportOptionItemMode.Edit
-                                ? handleSave
-                                : () =>
-                                      setModalConfig({
-                                          title: DONATE_TEXT.QUESTION.SUPPORT_OPTION.ADD,
-                                          onConfirm: handleSave,
-                                      })
-                        }
+                        onClick={handleSaveClick}
                         buttonStyle="primary"
                         disabled={isSubmitting || hasEmptyFields || !hasChanges()}
                     >
@@ -156,8 +169,8 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                     modalConfig?.onConfirm();
                     setModalConfig(null);
                 }}
-                onCancel={() => setModalConfig(null)}
-                onClose={() => setModalConfig(null)}
+                onCancel={handleModalCancelOrClose}
+                onClose={handleModalCancelOrClose}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />

@@ -73,6 +73,8 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
             const [mode, setMode] = useState<GenericFormMode>(initialMode);
             const [isExpanded, setIsExpanded] = useState(mode !== GenericFormMode.View);
             const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
+            const [isDeleting, setIsDeleting] = useState(false);
+
             const isItemsExpanded = true;
 
             const editable = mode !== GenericFormMode.View;
@@ -186,15 +188,25 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 }
             };
 
+            const handleModalCancelOrClose = () => {
+                setModalConfig(null);
+                setIsDeleting(false);
+            };
+
             const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+                e.preventDefault();
                 if (mode === GenericFormMode.Create) {
                     onClose?.();
                     return;
                 }
-                e.preventDefault();
+
+                setIsDeleting(true);
                 setModalConfig({
                     title: DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE,
-                    onConfirm: handleDelete,
+                    onConfirm: async () => {
+                        await handleDelete();
+                        setIsDeleting(false);
+                    },
                 });
             };
 
@@ -232,7 +244,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                     <button className={`edit-btn ${mode}`} onClick={handleEditClick} />
                                     <button className="delete-btn" type="button" onClick={handleDeleteClick}>
                                         <div className="delete-btn-title">{DONATE_TEXT.BUTTON.DELETE}</div>
-                                        <div className={`delete-btn-icon`}></div>
+                                        <div className={`delete-btn-icon ${isDeleting ? 'pressed' : ''}`}></div>
                                     </button>
                                 </div>
                             )}
@@ -251,7 +263,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                 onClick={handleEditClick}
                                             ></button>
                                             <button
-                                                className={`delete-btn delete-btn-icon`}
+                                                className={`delete-btn delete-btn-icon ${isDeleting ? 'pressed' : ''}`}
                                                 type="button"
                                                 onClick={handleDeleteClick}
                                             ></button>
@@ -305,7 +317,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                     />
                                                     <button
                                                         type="button"
-                                                        className="delete-btn delete-btn-icon"
+                                                        className={`delete-btn delete-btn-icon ${isDeleting ? 'pressed' : ''}`}
                                                         onClick={handleDeleteClick}
                                                     />
                                                 </div>
@@ -352,8 +364,8 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                             modalConfig?.onConfirm();
                             setModalConfig(null);
                         }}
-                        onCancel={() => setModalConfig(null)}
-                        onClose={() => setModalConfig(null)}
+                        onCancel={handleModalCancelOrClose}
+                        onClose={handleModalCancelOrClose}
                         confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                         cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                     />

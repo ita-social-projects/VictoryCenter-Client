@@ -29,7 +29,7 @@ describe('GenericForm', () => {
 
     test('switches to edit mode when edit button is clicked', () => {
         render(<GenericForm {...defaultProps} />);
-        const editButton = screen.getByRole('button', { name: '' });
+        const editButton = screen.getByRole('button', { name: 'edit-btn' });
         fireEvent.click(editButton);
         expect(screen.getByDisplayValue('Test Name')).toBeInTheDocument();
     });
@@ -74,7 +74,7 @@ describe('GenericForm', () => {
 
     test('opens confirmation modal on delete click', () => {
         render(<GenericForm {...defaultProps} />);
-        const deleteButton = screen.getByRole('button', { name: '' });
+        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
         fireEvent.click(deleteButton);
         expect(screen.getByText(DONATE_TEXT.BUTTON.DELETE)).toBeInTheDocument();
     });

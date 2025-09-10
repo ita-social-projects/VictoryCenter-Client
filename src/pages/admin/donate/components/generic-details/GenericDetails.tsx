@@ -38,7 +38,7 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
     children,
     onChangeItems,
 }: GenericDetailsProps<T>) {
-    const formRef = useRef<GenericFormRef>(null);
+    const addformRef = useRef<GenericFormRef>(null);
     const [items, setItems] = useState<T[]>(initialItems);
     const [isAddFormVisible, setIsAddFormVisible] = useState(false);
     const [isItemsExpanded, setIsItemsExpanded] = useState(initialIsItemsExpanded);
@@ -74,7 +74,7 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
 
     const handleSubmit = useCallback(
         async (data: T) => {
-            const currentIsValid = formRef.current?.isValid(false) || false;
+            const currentIsValid = addformRef.current?.isValid(false) || false;
             if (!currentIsValid) return;
 
             const newItem = createEmptyItem(data);
@@ -111,13 +111,13 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
                             {items.map((item) => (
                                 <div className="generic-details-item" key={item.id}>
                                     <FormComponent
-                                        ref={formRef}
+                                        ref={addformRef}
                                         initialData={item}
                                         initialMode={GenericFormMode.View}
                                         onSubmit={(updated) =>
                                             updateItems(items.map((i) => (i.id === item.id ? { ...i, ...updated } : i)))
                                         }
-                                        onClose={() => handleDelete(item?.id)}
+                                        onClose={handleClose}
                                         onDelete={handleDelete}
                                         isChildForm={isChildForm}
                                     >
@@ -130,7 +130,7 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
 
                     {isAddFormVisible && (
                         <FormComponent
-                            ref={formRef}
+                            ref={addformRef}
                             onSubmit={handleSubmit}
                             onClose={handleClose}
                             initialMode={GenericFormMode.Create}

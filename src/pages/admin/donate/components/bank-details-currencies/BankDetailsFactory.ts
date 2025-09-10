@@ -31,15 +31,13 @@ const baseFields: GenericFormField<BaseBankDetails>[] = [
     {
         name: 'name',
         isTitle: true,
-        validate: (val, isPublishing) =>
-            BANK_DETAILS_VALIDATION_FUNCTIONS.validateName(String(val ?? ''), isPublishing ?? false),
+        validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateName(String(val ?? '')),
         isRequired: true,
     },
     {
         name: 'receiver',
         label: 'Одержувач',
-        validate: (val, isPublishing) =>
-            BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver(String(val ?? ''), isPublishing ?? false),
+        validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver(String(val ?? '')),
         isRequired: true,
     },
 ];
@@ -52,22 +50,19 @@ function createForeignFields(currency: 'USD' | 'EUR'): GenericFormField<ForeignB
             label: `IBAN (${currency})`,
             prefix: 'UA',
             onlyNumbers: true,
-            validate: (val, isPublishing) =>
-                BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban(String(val ?? ''), isPublishing ?? false),
+            validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban(String(val ?? '')),
             isRequired: true,
         },
         {
             name: 'swift',
             label: 'SWIFT-код банку',
-            validate: (val, isPublishing) =>
-                BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift(String(val ?? ''), isPublishing ?? false),
+            validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift(String(val ?? '')),
             isRequired: true,
         },
         {
             name: 'address',
             label: 'Адреса',
-            validate: (val, isPublishing) =>
-                BANK_DETAILS_VALIDATION_FUNCTIONS.validateAddress(String(val ?? ''), isPublishing ?? false),
+            validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateAddress(String(val ?? '')),
             isRequired: true,
         },
     ];
@@ -80,8 +75,7 @@ function createUahFields(): GenericFormField<UahBankDetails>[] {
             name: 'edrpou',
             label: 'ЄДРПОУ',
             onlyNumbers: true,
-            validate: (val, isPublishing) =>
-                BANK_DETAILS_VALIDATION_FUNCTIONS.validateEdrpou(String(val ?? ''), isPublishing ?? false),
+            validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateEdrpou(String(val ?? '')),
             isRequired: true,
         },
         {
@@ -89,15 +83,13 @@ function createUahFields(): GenericFormField<UahBankDetails>[] {
             label: 'IBAN (UAH)',
             prefix: 'UA',
             onlyNumbers: true,
-            validate: (val, isPublishing) =>
-                BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban(String(val ?? ''), isPublishing ?? false),
+            validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban(String(val ?? '')),
             isRequired: true,
         },
         {
             name: 'paymentPurpose',
             label: 'Призначення платежу',
-            validate: (val, isPublishing) =>
-                BANK_DETAILS_VALIDATION_FUNCTIONS.validatePaymentPurpose(String(val ?? ''), isPublishing ?? false),
+            validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validatePaymentPurpose(String(val ?? '')),
             isRequired: true,
         },
     ];
@@ -120,4 +112,4 @@ const correspondentBanksFields: GenericFormField<CorrespondentBankDetails>[] = [
     { name: 'iban', label: 'IBAN' },
 ];
 
-export const CorrespondentBankDetialsForm = createGenericForm<CorrespondentBankDetails>(correspondentBanksFields);
+export const CorrespondentBankDetailsForm = createGenericForm<CorrespondentBankDetails>(correspondentBanksFields);

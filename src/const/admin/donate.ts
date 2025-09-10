@@ -67,5 +67,9 @@ export const DONATE_VALIDATION = {
         count: 11,
         getMinError: () => getMinSymbolsError(DONATE_VALIDATION.swift.count),
         getMaxError: () => getMaxSymbolsError(DONATE_VALIDATION.swift.count),
+        getRequiredError: () => getRequiredError('SWIFT'),
+    },
+    address: {
+        getRequiredError: () => getRequiredError('Адреса'),
     },
 };

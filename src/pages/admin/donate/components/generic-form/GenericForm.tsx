@@ -124,26 +124,6 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 isValid,
             }));
 
-            const handleChange =
-                (field: keyof T, onlyNumbers?: boolean, prefix: string = '') =>
-                (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-                    let value = e.target.value;
-
-                    if (onlyNumbers) {
-                        if (prefix && value.startsWith(prefix)) {
-                            const numbers = value.slice(prefix.length).replace(/\D/g, '');
-                            value = prefix + numbers;
-                        } else if (prefix) {
-                            const numbers = value.replace(/\D/g, '');
-                            value = prefix + numbers;
-                        } else {
-                            value = value.replace(/\D/g, '');
-                        }
-                    }
-
-                    setFormState((prev) => ({ ...prev, [field]: value }));
-                };
-
             const handleBlur = (field: keyof T) => () => {
                 const validator = fields.find((f) => f.name === field)?.validate;
                 if (validator) {
@@ -216,8 +196,9 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 }
                 try {
                     await onDelete(initialData.id);
-                } finally {
                     onClose?.();
+                } finally {
+                    handleModalCancelOrClose();
                 }
             };
 
@@ -248,8 +229,17 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                         <div className="form-head-container">
                             {!isChildForm && (
                                 <div className="form-header">
-                                    <button className={`edit-btn ${mode}`} onClick={handleEditClick} />
-                                    <button className="delete-btn" type="button" onClick={handleDeleteClick}>
+                                    <button
+                                        className={`edit-btn ${mode}`}
+                                        aria-label="edit-btn"
+                                        onClick={handleEditClick}
+                                    />
+                                    <button
+                                        className="delete-btn"
+                                        aria-label="delete-btn"
+                                        type="button"
+                                        onClick={handleDeleteClick}
+                                    >
                                         <div className="delete-btn-title">{DONATE_TEXT.BUTTON.DELETE}</div>
                                         <div className={`delete-btn-icon ${isDeleting ? 'pressed' : ''}`}></div>
                                     </button>
@@ -276,11 +266,13 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                         <div className="form-name-actions">
                                             <button
                                                 className="edit-btn"
+                                                aria-label="edit-btn"
                                                 type="button"
                                                 onClick={handleEditClick}
                                             ></button>
                                             <button
                                                 className={`delete-btn delete-btn-icon ${isDeleting ? 'pressed' : ''}`}
+                                                aria-label="delete-btn"
                                                 type="button"
                                                 onClick={handleDeleteClick}
                                             ></button>
@@ -320,7 +312,9 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                 prefix={f.prefix}
                                                 value={String(formState[f.name] ?? '')}
                                                 editable={editable}
-                                                handleChange={handleChange(f.name, f.onlyNumbers, f.prefix)}
+                                                onValueChange={(cleanValue) =>
+                                                    setFormState((prev) => ({ ...prev, [f.name]: cleanValue }))
+                                                }
                                                 handleBlur={handleBlur(f.name)}
                                                 onlyNumbers={f.onlyNumbers}
                                             />
@@ -329,11 +323,13 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                 <div className={`title-actions`}>
                                                     <button
                                                         type="button"
+                                                        aria-label="edit-btn"
                                                         className={`edit-btn ${mode}`}
                                                         onClick={handleEditClick}
                                                     />
                                                     <button
                                                         type="button"
+                                                        aria-label="delete-btn"
                                                         className={`delete-btn delete-btn-icon ${isDeleting ? 'pressed' : ''}`}
                                                         onClick={handleDeleteClick}
                                                     />

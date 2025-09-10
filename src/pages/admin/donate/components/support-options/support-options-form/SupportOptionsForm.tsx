@@ -57,10 +57,17 @@ export const SupportOptionsForm = ({ initialData = [], onChangeItems }: SupportO
                 <div className="support-options-form">
                     <div className="support-options-form title">{DONATE_TEXT.SUPPORT_OPTIONS.TITLE}</div>
                     {items.map((item) => (
-                        <SupportOptionItem data={item} onSave={handleSaveOption} onDelete={handleDeleteOption} />
+                        <SupportOptionItem
+                            key={item.id}
+                            data={item}
+                            onSave={handleSaveOption}
+                            onDelete={handleDeleteOption}
+                        />
                     ))}
 
-                    {isAdding && <SupportOptionItem onSave={handleSaveOption} onCancel={() => setIsAdding(false)} />}
+                    {isAdding && (
+                        <SupportOptionItem key="new" onSave={handleSaveOption} onCancel={() => setIsAdding(false)} />
+                    )}
 
                     <Button className="btn-add-new" onClick={handleAddOption} buttonStyle="primary">
                         {DONATE_TEXT.SUPPORT_OPTIONS.ADD_NEW}

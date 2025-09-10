@@ -18,10 +18,10 @@ export interface CorrespondentBankDetailsType {
     name: string;
     swift: string;
     account: string;
-    iban: string;
+    iban?: string;
 }
 
-export interface UsdBankDetailsType {
+export interface ForeignBankDetailsType {
     id: number;
     name: string;
     receiver: string;

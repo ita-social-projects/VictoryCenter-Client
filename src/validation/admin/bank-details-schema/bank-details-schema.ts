@@ -6,86 +6,81 @@ export interface BankDetailsValidationContext {
 }
 
 export const BankDetailsValidationSchema = Yup.object({
-    name: Yup.string().trim(),
-    receiver: Yup.string().trim(),
+    name: Yup.string().trim().required(DONATE_VALIDATION.name.getRequiredError()),
+    receiver: Yup.string().trim().required(DONATE_VALIDATION.receiver.getRequiredError()),
     edrpou: Yup.string()
         .matches(/^\d+$/, DONATE_VALIDATION.getDigitsOnlyError())
         .min(DONATE_VALIDATION.edrpou.count, DONATE_VALIDATION.edrpou.getMinError())
-        .max(DONATE_VALIDATION.edrpou.count, DONATE_VALIDATION.edrpou.getMaxError()),
+        .max(DONATE_VALIDATION.edrpou.count, DONATE_VALIDATION.edrpou.getMaxError())
+        .required(DONATE_VALIDATION.edrpou.getRequiredError()),
     iban: Yup.string()
+        .matches(/UA/, DONATE_VALIDATION.iban.getRequiredError())
         .matches(/^UA\d+$/, DONATE_VALIDATION.getDigitsOnlyError())
         .min(DONATE_VALIDATION.iban.count, DONATE_VALIDATION.iban.getMinError())
         .max(DONATE_VALIDATION.iban.count, DONATE_VALIDATION.iban.getMaxError()),
-    paymentPurpose: Yup.string().trim(),
-    swift: Yup.string().trim(),
-    address: Yup.string().trim(),
+    paymentPurpose: Yup.string().trim().required(DONATE_VALIDATION.paymentPurpose.getRequiredError()),
+    swift: Yup.string().trim().required(DONATE_VALIDATION.swift.getRequiredError()),
+    address: Yup.string().trim().required(DONATE_VALIDATION.address.getRequiredError()),
 });
 
 export const BANK_DETAILS_VALIDATION_FUNCTIONS = {
-    validateName: (value: string, isPublishing: boolean): string | undefined => {
-        const context: BankDetailsValidationContext = { isPublishing };
+    validateName: (value: string): string | undefined => {
         try {
-            BankDetailsValidationSchema.validateSyncAt('name', { name: value }, { context });
+            BankDetailsValidationSchema.validateSyncAt('name', { name: value });
             return undefined;
         } catch (error: any) {
             return error.message;
         }
     },
 
-    validateReceiver: (value: string, isPublishing: boolean): string | undefined => {
-        const context: BankDetailsValidationContext = { isPublishing };
+    validateReceiver: (value: string): string | undefined => {
         try {
-            BankDetailsValidationSchema.validateSyncAt('receiver', { receiver: value }, { context });
+            BankDetailsValidationSchema.validateSyncAt('receiver', { receiver: value });
             return undefined;
         } catch (error: any) {
             return error.message;
         }
     },
 
-    validateEdrpou: (value: string, isPublishing: boolean): string | undefined => {
-        const context: BankDetailsValidationContext = { isPublishing };
+    validateEdrpou: (value: string): string | undefined => {
         try {
-            BankDetailsValidationSchema.validateSyncAt('edrpou', { edrpou: value }, { context });
+            BankDetailsValidationSchema.validateSyncAt('edrpou', { edrpou: value });
             return undefined;
         } catch (error: any) {
             return error.message;
         }
     },
 
-    validateIban: (value: string, isPublishing: boolean): string | undefined => {
-        const context: BankDetailsValidationContext = { isPublishing };
+    validateIban: (value: string): string | undefined => {
         try {
-            BankDetailsValidationSchema.validateSyncAt('iban', { iban: value }, { context });
+            BankDetailsValidationSchema.validateSyncAt('iban', { iban: value });
             return undefined;
         } catch (error: any) {
             return error.message;
         }
     },
 
-    validatePaymentPurpose: (value: string, isPublishing: boolean): string | undefined => {
-        const context: BankDetailsValidationContext = { isPublishing };
+    validatePaymentPurpose: (value: string): string | undefined => {
         try {
-            BankDetailsValidationSchema.validateSyncAt('paymentPurpose', { paymentPurpose: value }, { context });
+            BankDetailsValidationSchema.validateSyncAt('paymentPurpose', { paymentPurpose: value });
             return undefined;
         } catch (error: any) {
             return error.message;
         }
     },
 
-    validateSwift: (value: string, isPublishing: boolean): string | undefined => {
-        const context: BankDetailsValidationContext = { isPublishing };
+    validateSwift: (value: string): string | undefined => {
         try {
-            BankDetailsValidationSchema.validateSyncAt('swift', { swift: value }, { context });
+            BankDetailsValidationSchema.validateSyncAt('swift', { swift: value });
             return undefined;
         } catch (error: any) {
             return error.message;
         }
     },
 
-    validateAddress: (value: string, isPublishing: boolean): string | undefined => {
-        const context: BankDetailsValidationContext = { isPublishing };
+    validateAddress: (value: string): string | undefined => {
         try {
-            BankDetailsValidationSchema.validateSyncAt('address', { address: value }, { context });
+            BankDetailsValidationSchema.validateSyncAt('address', { address: value });
             return undefined;
         } catch (error: any) {
             return error.message;

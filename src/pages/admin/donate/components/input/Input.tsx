@@ -12,7 +12,8 @@ interface InputProps {
     value?: string;
     editable?: boolean;
     handleChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-    handleBlur?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    handleBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
+    onValueChange?: (val: string) => void;
     onlyNumbers?: boolean;
     className?: string;
 }
@@ -28,6 +29,7 @@ export const Input = ({
     editable = true,
     handleChange,
     handleBlur,
+    onValueChange,
     onlyNumbers = false,
     className,
 }: InputProps) => {
@@ -62,10 +64,12 @@ export const Input = ({
         let newValue = e.target.value;
 
         if (onlyNumbers) {
-            newValue = newValue.replace(/\D/g, '');
+            const numbers = newValue.replace(/\D/g, '');
+            newValue = prefix ? prefix + numbers : numbers;
         }
+        setValue(newValue);
 
-        setValue(newValue.startsWith(prefix) ? newValue : prefix);
+        onValueChange?.(newValue);
 
         if (!hasEdited && newValue !== initialValue) {
             setHasEdited(true);

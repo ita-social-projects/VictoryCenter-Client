@@ -10,7 +10,7 @@ import { DONATE_TEXT } from '../../../../../const/admin/donate';
 export const DonatePageContent = () => {
     const currencyCategories = Object.values(Currencies);
     const [selectedCategory, setSelectedCategory] = useState<Currencies>(Currencies.UAH);
-    const { items, config, setItems } = useBankDetails(selectedCategory);
+    const { items, config, setItems, isLoading } = useBankDetails(selectedCategory);
 
     const [supportOptionsByCurrency, setSupportOptionsByCurrency] = useState<Record<Currencies, SupportOptionsType[]>>({
         [Currencies.UAH]: [],
@@ -25,8 +25,6 @@ export const DonatePageContent = () => {
             [selectedCategory]: newOptions,
         }));
     };
-
-    let isLoading = false;
 
     const handleCategorySelect = useCallback((currency: Currencies) => {
         setSelectedCategory(currency);

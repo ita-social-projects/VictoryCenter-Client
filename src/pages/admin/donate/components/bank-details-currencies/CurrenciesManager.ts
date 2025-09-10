@@ -9,11 +9,20 @@ export enum Currencies {
 
 export function useBankDetails<T extends keyof typeof bankDetailsConfig>(currency: T) {
     const [items, setItems] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
     const config = bankDetailsConfig[currency];
 
     useEffect(() => {
-        config.fetch().then(setItems);
+        let alive = true;
+        setIsLoading(true);
+        config
+            .fetch()
+            .then((data: any[]) => alive && setItems(data))
+            .finally(() => alive && setIsLoading(false));
+        return () => {
+            alive = false;
+        };
     }, [currency, config]);
 
-    return { items, setItems, config };
+    return { items, setItems, config, isLoading };
 }

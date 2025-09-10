@@ -1,90 +1,82 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
-import { BankDetailsType, CurrencyCategory, SupportOptionsType } from '../../../../../types/admin/donate';
+import { SupportOptionsType } from '../../../../../types/admin/donate';
 import './DonatePageContent.scss';
-import { SupportOptions } from '../support-options/SupportOptions';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { GenericDetails } from '../generic-details/GenericDetails';
-import { BankDetailsForm } from '../bank-details/BankDetailsForm';
+import { Currencies, useBankDetails } from '../bank-details-currencies/CurrenciesManager';
+import { SupportOptionsForm } from '../support-options/support-options-form/SupportOptionsForm';
+import { DONATE_TEXT } from '../../../../../const/admin/donate';
 
 export const DonatePageContent = () => {
-    const [categories, setCategories] = useState<CurrencyCategory[]>([]);
-    const [bankDetails, setBankDetails] = useState<BankDetailsType[]>([]);
-    const [supportOptions, setSupportOptions] = useState<SupportOptionsType[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState<CurrencyCategory | null>({ id: 1, name: 'UAH' });
+    const currencyCategories = Object.values(Currencies);
+    const [selectedCategory, setSelectedCategory] = useState<Currencies>(Currencies.UAH);
+    const { items, config, setItems } = useBankDetails(selectedCategory);
+
+    const [supportOptionsByCurrency, setSupportOptionsByCurrency] = useState<Record<Currencies, SupportOptionsType[]>>({
+        [Currencies.UAH]: [],
+        [Currencies.USD]: [],
+        [Currencies.EUR]: [],
+    });
+    const supportOptions = supportOptionsByCurrency[selectedCategory] ?? [];
+
+    const updateSupportOptions = (newOptions: SupportOptionsType[]) => {
+        setSupportOptionsByCurrency((prev) => ({
+            ...prev,
+            [selectedCategory]: newOptions,
+        }));
+    };
 
     let isLoading = false;
 
-    const fetchCategories = useCallback(() => {
-        const currencies: CurrencyCategory[] = [
-            { id: 1, name: 'UAH' },
-            { id: 2, name: 'USD' },
-            { id: 3, name: 'EUR' },
-        ];
-        setCategories(currencies);
+    const handleCategorySelect = useCallback((currency: Currencies) => {
+        setSelectedCategory(currency);
     }, []);
 
-    const fetchBankDetails = useCallback(() => {
-        const bankDetails: BankDetailsType[] = [
-            // { id: 1, name: 'Одержувач', value: 'ГО "ЦЕНТР ПЕРЕМОГИ"' },
-            // { id: 2, name: 'ЄДРПОУ', value: '45262516' },
-        ];
-        setBankDetails(bankDetails);
-    }, []);
-
-    const fetchSupportOptions = useCallback(() => {
-        const supportOptions: SupportOptionsType[] = [
-            { id: 1, name: 'Pay Pal', value: 'victorycenterua@gmail.com' },
-            { id: 2, name: 'Monobank баночка', value: 'monobank.ua' },
-        ];
-        setSupportOptions(supportOptions);
-    }, []);
-
-    const renderSupportOptions = useCallback((supportOptions: SupportOptionsType) => <div></div>, []);
-
-    useEffect(() => {
-        fetchCategories();
-    }, [fetchCategories]);
-
-    useEffect(() => {
-        fetchBankDetails();
-    }, [fetchBankDetails]);
-
-    const handleCategorySelect = useCallback((category: CurrencyCategory) => {
-        setSelectedCategory(category);
-    }, []);
     return (
         <div className="donate-page-wrapper">
-            <CategoryBar<CurrencyCategory>
-                categories={categories}
+            <CategoryBar<Currencies>
+                categories={currencyCategories}
                 selectedCategory={selectedCategory}
                 onCategorySelect={handleCategorySelect}
-                getCategoryDisplayName={(category) => category.name}
-                getCategoryKey={(category) => category.id}
+                getCategoryDisplayName={(currency) => currency}
+                getCategoryKey={(currency) => currency}
                 displayContextMenuButton={true}
             />
-            {selectedCategory?.name === 'UAH' && (
-                <div className="donate-page-credits-container">
-                    <GenericDetails
-                        items={bankDetails}
-                        isLoading={false}
-                        FormComponent={BankDetailsForm}
-                        notFoundText={COMMON_TEXT_ADMIN.DONATE.BANK_DETAILS.NOT_FOUND}
-                        addNewText={COMMON_TEXT_ADMIN.DONATE.BANK_DETAILS.ADD_NEW}
-                        createEmptyItem={(data) => ({
-                            id: Date.now(),
-                            ...data,
-                        })}
-                    />
-
-                    <SupportOptions
-                        className={'donate-page-credits-item'}
-                        items={supportOptions}
-                        renderItem={renderSupportOptions}
-                        isLoading={isLoading}
-                    />
+            <div className="donate-page-container">
+                <div className="donate-page-item">
+                    {config && (
+                        <GenericDetails
+                            items={items}
+                            isLoading={isLoading}
+                            FormComponent={config.form}
+                            notFoundText={DONATE_TEXT.BANK_DETAILS.NOT_FOUND}
+                            addNewText={DONATE_TEXT.BANK_DETAILS.ADD_FIRST}
+                            createEmptyItem={config.createEmptyItem}
+                            onChangeItems={setItems}
+                        >
+                            {config.withCorrespondentBanks
+                                ? ({ formState, isItemsExpanded }) => (
+                                      <GenericDetails
+                                          title={DONATE_TEXT.CORRESPONDENT_BANKS.TITLE}
+                                          items={formState.correspondentBanks ?? []}
+                                          isLoading={false}
+                                          FormComponent={config.correspondentForm!}
+                                          initialIsItemsExpanded={isItemsExpanded}
+                                          primaryAddButton={true}
+                                          addNewText={DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW}
+                                          createEmptyItem={(data) => ({ id: Date.now(), ...data })}
+                                          isChildForm={true}
+                                      />
+                                  )
+                                : () => null}
+                        </GenericDetails>
+                    )}
                 </div>
-            )}
+
+                <div className="donate-page-item">
+                    <SupportOptionsForm initialData={supportOptions} onChangeItems={updateSupportOptions} />
+                </div>
+            </div>
         </div>
     );
 };

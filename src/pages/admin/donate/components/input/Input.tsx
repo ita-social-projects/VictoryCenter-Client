@@ -1,62 +1,77 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './Input.scss';
+import { DONATE_TEXT } from '../../../../../const/admin/donate';
 
 interface InputProps {
     label?: string;
+    isRequired?: boolean;
     placeholder?: string;
     isTitle?: boolean;
     prefix?: string;
     name: string;
     value?: string;
     editable?: boolean;
-    handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    handleBlur?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    handleBlur?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    onlyNumbers?: boolean;
     className?: string;
 }
 
 export const Input = ({
     label,
-    placeholder = 'Введіть назву',
+    placeholder = DONATE_TEXT.PLACEHOLDER.DEFAULT,
     isTitle = false,
+    isRequired,
     prefix = '',
     name,
     value: externalValue,
     editable = true,
     handleChange,
     handleBlur,
+    onlyNumbers = false,
     className,
 }: InputProps) => {
     const [value, setValue] = useState(prefix);
     const [initialValue, setInitialValue] = useState(prefix);
     const [hasEdited, setHasEdited] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
+    const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
-        if (externalValue !== undefined && externalValue !== null) {
-            const newValue = prefix + externalValue.replace(prefix, '');
-            setValue(newValue);
-            setInitialValue(newValue);
-        } else {
-            setValue(prefix);
-            setInitialValue(prefix);
-        }
+        const newValue =
+            externalValue !== undefined && externalValue !== null ? prefix + externalValue.replace(prefix, '') : prefix;
+
+        setValue(newValue);
+        setInitialValue(newValue);
     }, [externalValue, prefix]);
 
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = e.target.value;
+    useEffect(() => {
+        if (!textAreaRef.current) return;
 
-        if (!newValue.startsWith(prefix)) {
-            setValue(prefix);
-        } else {
-            setValue(newValue);
+        const ta = textAreaRef.current;
+        const style = window.getComputedStyle(ta);
+        const minHeight = parseFloat(style.minHeight);
+
+        if (value && value !== prefix && ta.scrollHeight > minHeight) {
+            ta.style.height = style.minHeight;
+            ta.style.height = `${ta.scrollHeight}px`;
         }
+    }, [value, prefix]);
+
+    const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        let newValue = e.target.value;
+
+        if (onlyNumbers) {
+            newValue = newValue.replace(/\D/g, '');
+        }
+
+        setValue(newValue.startsWith(prefix) ? newValue : prefix);
 
         if (!hasEdited && newValue !== initialValue) {
             setHasEdited(true);
         }
 
-        if (handleChange) {
-            handleChange(e);
-        }
+        handleChange?.(e);
     };
 
     const handleClear = () => {
@@ -64,42 +79,38 @@ export const Input = ({
         setHasEdited(true);
     };
 
-    const showClearButton = editable && hasEdited && value.length > prefix.length;
+    const showClearButton = isFocused && value.length > prefix.length;
+
     return (
         <div className={`input ${isTitle ? 'input-title' : ''} ${hasEdited ? 'input-changed' : ''} ${className ?? ''}`}>
-            {isTitle ? (
-                <>
-                    {label && <div className="input-title-label">{label}</div>}
-                    <div className="input-title-body">
-                        <input
-                            name={name}
-                            type="text"
-                            placeholder={placeholder}
-                            value={value}
-                            onChange={onChange}
-                            onBlur={handleBlur}
-                            readOnly={!editable}
-                        />
-                        {showClearButton && <button type="button" onClick={handleClear}></button>}
-                    </div>
-                </>
-            ) : (
-                <>
-                    {label && <div className="input-label">{label}</div>}
-                    <div className="input-body">
-                        <input
-                            name={name}
-                            type="text"
-                            placeholder={placeholder}
-                            value={value}
-                            onChange={onChange}
-                            onBlur={handleBlur}
-                            readOnly={!editable}
-                        />
-                        {showClearButton && <button type="button" onClick={handleClear}></button>}
-                    </div>
-                </>
+            {label && (
+                <div className={isTitle ? 'input-title-label' : 'input-label'}>
+                    {isRequired && <span className="input-required">*</span>}
+                    {!isTitle && label}
+                </div>
             )}
+
+            <div className={isTitle ? 'input-title-body' : 'input-body'}>
+                {isTitle && isRequired && <span className="input-required">*</span>}
+
+                <textarea
+                    ref={textAreaRef}
+                    name={name}
+                    placeholder={placeholder}
+                    value={value}
+                    onChange={onChange}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={(e) => {
+                        setIsFocused(false);
+                        handleBlur?.(e);
+                    }}
+                    readOnly={!editable}
+                    className="input-textarea"
+                    inputMode={onlyNumbers ? 'numeric' : undefined}
+                />
+
+                {showClearButton && <button type="button" onClick={handleClear}></button>}
+            </div>
         </div>
     );
 };

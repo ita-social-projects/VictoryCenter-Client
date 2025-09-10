@@ -42,17 +42,6 @@ export const COMMON_TEXT_ADMIN = {
         NOT_FOUND: 'Нічого не знайдено',
     },
 
-    DONATE: {
-        BANK_DETAILS: {
-            NOT_FOUND: 'Ще немає реквізитів',
-            ADD_NEW: 'Додати реквізити',
-        },
-        SUPPORT_OPTIONS: {
-            NOT_FOUND: 'Ще немає варіантів підтримки',
-            ADD_NEW: 'Додати варіант підтримки',
-        },
-    },
-
     FILTER: {
         SEARCH_BY_NAME: 'Пошук за назвою',
         STATUS: {

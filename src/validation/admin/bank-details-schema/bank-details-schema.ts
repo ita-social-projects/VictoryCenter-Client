@@ -6,19 +6,19 @@ export interface BankDetailsValidationContext {
 }
 
 export const BankDetailsValidationSchema = Yup.object({
-    name: Yup.string().trim().required(DONATE_VALIDATION.name.getRequiredError()),
-    receiver: Yup.string().trim().required(DONATE_VALIDATION.receiver.getRequiredError()),
+    name: Yup.string().trim(),
+    receiver: Yup.string().trim(),
     edrpou: Yup.string()
-        .required(DONATE_VALIDATION.edrpou.getRequiredError())
         .matches(/^\d+$/, DONATE_VALIDATION.getDigitsOnlyError())
         .min(DONATE_VALIDATION.edrpou.count, DONATE_VALIDATION.edrpou.getMinError())
         .max(DONATE_VALIDATION.edrpou.count, DONATE_VALIDATION.edrpou.getMaxError()),
     iban: Yup.string()
-        .required(DONATE_VALIDATION.iban.getRequiredError())
         .matches(/^UA\d+$/, DONATE_VALIDATION.getDigitsOnlyError())
         .min(DONATE_VALIDATION.iban.count, DONATE_VALIDATION.iban.getMinError())
         .max(DONATE_VALIDATION.iban.count, DONATE_VALIDATION.iban.getMaxError()),
-    paymentPurpose: Yup.string().trim().required(DONATE_VALIDATION.paymentPurpose.getRequiredError()),
+    paymentPurpose: Yup.string().trim(),
+    swift: Yup.string().trim(),
+    address: Yup.string().trim(),
 });
 
 export const BANK_DETAILS_VALIDATION_FUNCTIONS = {
@@ -66,6 +66,26 @@ export const BANK_DETAILS_VALIDATION_FUNCTIONS = {
         const context: BankDetailsValidationContext = { isPublishing };
         try {
             BankDetailsValidationSchema.validateSyncAt('paymentPurpose', { paymentPurpose: value }, { context });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validateSwift: (value: string, isPublishing: boolean): string | undefined => {
+        const context: BankDetailsValidationContext = { isPublishing };
+        try {
+            BankDetailsValidationSchema.validateSyncAt('swift', { swift: value }, { context });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validateAddress: (value: string, isPublishing: boolean): string | undefined => {
+        const context: BankDetailsValidationContext = { isPublishing };
+        try {
+            BankDetailsValidationSchema.validateSyncAt('address', { address: value }, { context });
             return undefined;
         } catch (error: any) {
             return error.message;

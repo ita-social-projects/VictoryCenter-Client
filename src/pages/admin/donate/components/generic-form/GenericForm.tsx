@@ -1,0 +1,366 @@
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { Button } from '../../../../../components/admin/button/Button';
+import { Input } from '../input/Input';
+import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import './GenericForm.scss';
+import { FieldValues } from 'react-hook-form';
+import { DONATE_TEXT } from '../../../../../const/admin/donate';
+
+interface ModalConfig {
+    title: string;
+    onConfirm: () => void;
+}
+
+export interface GenericFormRef {
+    submit: () => Promise<void>;
+    isChanged: () => boolean;
+    isValid: (isPublishing?: boolean) => boolean;
+}
+
+export interface GenericFormProps<T extends FieldValues> {
+    isOpen?: boolean;
+    initialData?: T;
+    initialMode: GenericFormMode;
+    onSubmit: (data: T) => void;
+    onClose: () => void;
+    onDelete?: (id: number) => void;
+    isChildForm?: boolean;
+    children?: (form: { formState: T; isItemsExpanded: boolean }) => React.ReactNode;
+}
+
+export enum GenericFormMode {
+    Create = 'create',
+    Edit = 'edit',
+    View = 'view',
+}
+
+export interface GenericFormField<T extends Record<string, any>> {
+    name: keyof T;
+    label?: string;
+    placeholder?: string;
+    prefix?: string;
+    isTitle?: boolean;
+    isRequired?: boolean;
+    onlyNumbers?: boolean;
+    validate?: (value: T[keyof T], isPublishing?: boolean) => string | undefined;
+}
+
+export function createGenericForm<T extends { id?: number }>(fields: GenericFormField<T>[]) {
+    type Props = GenericFormProps<T>;
+    type Ref = GenericFormRef;
+
+    return forwardRef<Ref, Props>(
+        (
+            {
+                isOpen = true,
+                initialData = null,
+                initialMode = GenericFormMode.View,
+                onClose,
+                onSubmit,
+                onDelete,
+                isChildForm = false,
+                children,
+            },
+            ref,
+        ) => {
+            type FormState = T;
+
+            const [formState, setFormState] = useState<FormState>(initialData ?? ({} as FormState));
+            const [initialFormState, setInitialFormState] = useState<FormState>(initialData ?? ({} as FormState));
+            const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
+            const [isSubmitting, setIsSubmitting] = useState(false);
+            const [mode, setMode] = useState<GenericFormMode>(initialMode);
+            const [isExpanded, setIsExpanded] = useState(mode !== GenericFormMode.View);
+            const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
+            const isItemsExpanded = true;
+
+            const editable = mode !== GenericFormMode.View;
+
+            useEffect(() => {
+                const newState: FormState = { ...(initialData ?? ({} as FormState)) };
+                setFormState(newState);
+                setInitialFormState(newState);
+                setErrors({});
+            }, [initialData]);
+
+            const isChanged = useCallback(
+                () => JSON.stringify(formState) !== JSON.stringify(initialFormState),
+                [formState, initialFormState],
+            );
+
+            const isValid = useCallback(
+                (isPublishing = false) => {
+                    const newErrors: Partial<Record<keyof T, string>> = {};
+                    fields.forEach((f) => {
+                        if (f.validate) {
+                            newErrors[f.name] = f.validate(formState[f.name], isPublishing);
+                        }
+                    });
+                    setErrors(newErrors);
+                    return !Object.values(newErrors).some((e) => e !== undefined);
+                },
+                [formState],
+            );
+
+            const submit = useCallback(async () => {
+                if (isSubmitting || !onSubmit) return;
+                setIsSubmitting(true);
+                try {
+                    const submitData = { ...initialData, ...formState } as T;
+                    await onSubmit(submitData);
+                    setInitialFormState(formState);
+                    if (mode === GenericFormMode.Edit) setMode(GenericFormMode.View);
+                } finally {
+                    setIsSubmitting(false);
+                }
+            }, [formState, onSubmit, isSubmitting, mode, initialData]);
+
+            useImperativeHandle(ref, () => ({
+                submit,
+                isChanged,
+                isValid,
+            }));
+
+            const handleChange =
+                (field: keyof T, onlyNumbers?: boolean, prefix: string = '') =>
+                (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+                    let value = e.target.value;
+
+                    if (onlyNumbers) {
+                        if (prefix && value.startsWith(prefix)) {
+                            const numbers = value.slice(prefix.length).replace(/\D/g, '');
+                            value = prefix + numbers;
+                        } else if (prefix) {
+                            const numbers = value.replace(/\D/g, '');
+                            value = prefix + numbers;
+                        } else {
+                            value = value.replace(/\D/g, '');
+                        }
+                    }
+
+                    setFormState((prev) => ({ ...prev, [field]: value }));
+                };
+
+            const handleBlur = (field: keyof T) => () => {
+                const validator = fields.find((f) => f.name === field)?.validate;
+                if (validator) {
+                    setErrors((prev) => ({ ...prev, [field]: validator(formState[field]) }));
+                }
+            };
+
+            const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+                e.preventDefault();
+                setMode((prev) => (prev === GenericFormMode.View ? GenericFormMode.Edit : GenericFormMode.View));
+                setIsExpanded(true);
+            };
+
+            const handleEditCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
+                e.preventDefault();
+
+                if (isChanged()) {
+                    setModalConfig({
+                        title:
+                            mode === GenericFormMode.Edit
+                                ? COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
+                                : DONATE_TEXT.QUESTION.CANCEL_EDIT,
+                        onConfirm: () => {
+                            if (mode === GenericFormMode.Create) {
+                                onClose?.();
+                            } else {
+                                setFormState(initialFormState);
+                                setErrors({});
+                                setMode(GenericFormMode.View);
+                            }
+                        },
+                    });
+                    return;
+                }
+
+                if (mode === GenericFormMode.Create) {
+                    onClose?.();
+                } else {
+                    setFormState(initialFormState);
+                    setErrors({});
+                    setMode(GenericFormMode.View);
+                }
+            };
+
+            const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+                if (mode === GenericFormMode.Create) {
+                    onClose?.();
+                    return;
+                }
+                e.preventDefault();
+                setModalConfig({
+                    title: DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE,
+                    onConfirm: handleDelete,
+                });
+            };
+
+            const handleDelete = async () => {
+                if (!initialData?.id || !onDelete) {
+                    return;
+                }
+                try {
+                    await onDelete(initialData.id);
+                } finally {
+                    onClose?.();
+                }
+            };
+
+            const hasEmptyRequiredFields = useMemo(() => {
+                return fields.some((f) => {
+                    if (!f.isRequired) return false;
+                    const value = formState[f.name];
+                    if (Array.isArray(value)) return value.length === 0;
+                    return !String(value ?? '').trim();
+                });
+            }, [formState]);
+
+            if (!isOpen) return null;
+
+            return (
+                <form
+                    className={`generic-form ${mode} ${isChildForm ? 'child' : ''}`}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {mode !== GenericFormMode.Create && (
+                        <div className="form-head-container">
+                            {!isChildForm && (
+                                <div className="form-header">
+                                    <button className={`edit-btn ${mode}`} onClick={handleEditClick} />
+                                    <button className="delete-btn" type="button" onClick={handleDeleteClick}>
+                                        <div className="delete-btn-title">{DONATE_TEXT.BUTTON.DELETE}</div>
+                                        <div className={`delete-btn-icon`}></div>
+                                    </button>
+                                </div>
+                            )}
+
+                            {mode === GenericFormMode.View && (
+                                <>
+                                    <div className="form-name" onClick={() => setIsExpanded((prev) => !prev)}>
+                                        {String(formState[fields[0].name] ?? '')}
+                                        <span className={`arrow ${isExpanded ? 'expanded' : ''}`}></span>
+                                    </div>
+                                    {isChildForm && (
+                                        <div className="form-name-actions">
+                                            <button
+                                                className="edit-btn"
+                                                type="button"
+                                                onClick={handleEditClick}
+                                            ></button>
+                                            <button
+                                                className={`delete-btn delete-btn-icon`}
+                                                type="button"
+                                                onClick={handleDeleteClick}
+                                            ></button>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    )}
+
+                    {isExpanded && (
+                        <div className="form-body">
+                            {fields
+                                .slice(mode === GenericFormMode.View ? 1 : 0)
+                                .filter((f) => {
+                                    if (mode !== GenericFormMode.View) return true;
+                                    const value = formState[f.name];
+                                    if (Array.isArray(value)) return value.length > 0;
+                                    return Boolean(String(value ?? '').trim());
+                                })
+                                .map((f) => {
+                                    const isTitleField = f.isTitle;
+
+                                    return (
+                                        <div
+                                            key={String(f.name)}
+                                            className={`form-field ${isTitleField ? 'form-field-title-row' : ''}`}
+                                        >
+                                            <Input
+                                                name={String(f.name)}
+                                                label={f.label}
+                                                isRequired={
+                                                    mode === GenericFormMode.Create && isChildForm && f.isRequired
+                                                }
+                                                isTitle={f.isTitle}
+                                                placeholder={f.placeholder}
+                                                prefix={f.prefix}
+                                                value={String(formState[f.name] ?? '')}
+                                                editable={editable}
+                                                handleChange={handleChange(f.name, f.onlyNumbers, f.prefix)}
+                                                handleBlur={handleBlur(f.name)}
+                                                onlyNumbers={f.onlyNumbers}
+                                            />
+
+                                            {isChildForm && isTitleField && mode === GenericFormMode.Edit && (
+                                                <div className={`title-actions`}>
+                                                    <button
+                                                        type="button"
+                                                        className={`edit-btn ${mode}`}
+                                                        onClick={handleEditClick}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="delete-btn delete-btn-icon"
+                                                        onClick={handleDeleteClick}
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {errors[f.name] && <span className="error">{errors[f.name]}</span>}
+                                        </div>
+                                    );
+                                })}
+
+                            {editable && (
+                                <div className="form-footer">
+                                    <div className="actions">
+                                        <Button type="button" onClick={handleEditCancel} buttonStyle="secondary">
+                                            {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            onClick={
+                                                mode === GenericFormMode.Edit
+                                                    ? submit
+                                                    : () =>
+                                                          setModalConfig({
+                                                              title: DONATE_TEXT.BANK_DETAILS.ADD_NEW,
+                                                              onConfirm: submit,
+                                                          })
+                                            }
+                                            buttonStyle="primary"
+                                            disabled={isSubmitting || hasEmptyRequiredFields || !isChanged()}
+                                        >
+                                            {DONATE_TEXT.BUTTON.PUBLISH}
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    <ConfirmationModal
+                        isOpen={!!modalConfig}
+                        isButtonsDisabled={false}
+                        title={modalConfig?.title ?? ''}
+                        onConfirm={() => {
+                            modalConfig?.onConfirm();
+                            setModalConfig(null);
+                        }}
+                        onCancel={() => setModalConfig(null)}
+                        onClose={() => setModalConfig(null)}
+                        confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                        cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+                    />
+
+                    {!isChildForm && <>{children && children({ formState, isItemsExpanded })}</>}
+                </form>
+            );
+        },
+    );
+}

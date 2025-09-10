@@ -1,18 +1,58 @@
-.donate-page {
-    &-credits {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
+.generic-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 
-        &-item {
-            width: 100%;
+    &-item {
+        width: 100%;
+    }
+
+    &-btn {
+        &-add {
+            &-new {
+                width: 100%;
+                height: 2.5rem;
+            }
         }
+    }
 
-        &-btn {
-            &-add {
-                &-new {
-                    width: 100%;
-                    height: 2.5rem;
+    .child {
+        .generic-details {
+            &.header {
+                font-size: 2rem;
+                font-weight: 700;
+                display: inline;
+                cursor: pointer;
+
+                .arrow {
+                    display: inline-block;
+                    margin-left: 0.25rem;
+                    background: url('../../../../../assets/icons/chevron-down.svg') no-repeat center;
+                    width: 1.5rem;
+                    height: 1.5rem;
+                    transition: transform 0.2s ease;
+                }
+
+                .arrow.expanded {
+                    transform: rotate(180deg);
+                }
+            }
+
+            .form-name-actions {
+                display: none;
+            }
+
+            .btn-add {
+                width: 100%;
+            }
+        }
+    }
+
+    .edit {
+        .child {
+            .generic-details-item {
+                .form-name-actions {
+                    display: flex;
                 }
             }
         }

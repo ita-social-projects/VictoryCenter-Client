@@ -91,6 +91,12 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
             {title && (
                 <div
                     role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            setIsItemsExpanded((prev) => !prev);
+                        }
+                    }}
                     className="generic-details header"
                     onClick={() => setIsItemsExpanded((prev) => !prev)}
                 >

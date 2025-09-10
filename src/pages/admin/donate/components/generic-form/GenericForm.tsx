@@ -235,6 +235,13 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
             return (
                 <form
                     className={`generic-form ${mode} ${isChildForm ? 'child' : ''}`}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.stopPropagation();
+                        }
+                    }}
                     onClick={(e) => e.stopPropagation()}
                 >
                     {mode !== GenericFormMode.Create && (
@@ -251,7 +258,17 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
                             {mode === GenericFormMode.View && (
                                 <>
-                                    <div className="form-name" onClick={() => setIsExpanded((prev) => !prev)}>
+                                    <div
+                                        className="form-name"
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                setIsExpanded((prev) => !prev);
+                                            }
+                                        }}
+                                        onClick={() => setIsExpanded((prev) => !prev)}
+                                    >
                                         {String(formState[fields[0].name] ?? '')}
                                         <span className={`arrow ${isExpanded ? 'expanded' : ''}`}></span>
                                     </div>

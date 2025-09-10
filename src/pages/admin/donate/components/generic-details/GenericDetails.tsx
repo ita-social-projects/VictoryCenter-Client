@@ -89,7 +89,11 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
     return (
         <div className={`generic-details ${isChildForm ? 'child' : ''}`}>
             {title && (
-                <div className="generic-details header" onClick={() => setIsItemsExpanded((prev) => !prev)}>
+                <div
+                    role="button"
+                    className="generic-details header"
+                    onClick={() => setIsItemsExpanded((prev) => !prev)}
+                >
                     {title}
                     <span className={`arrow ${isItemsExpanded ? 'expanded' : ''}`}></span>
                 </div>

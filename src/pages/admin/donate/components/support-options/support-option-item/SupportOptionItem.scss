@@ -49,36 +49,6 @@
         &-actions {
             display: flex;
             gap: 0.5rem;
-
-            // .edit-btn,
-            // .delete-btn {
-            //     cursor: pointer;
-            //     transition: opacity 0.2s ease;
-            //     border: none;
-            //     background: none;
-            //     width: 1.5rem;
-            //     height: 1.5rem;
-
-            //     &:hover {
-            //         opacity: 0.7;
-            //     }
-            // }
-
-            // .edit-btn {
-            //     background: url('../../../../../../assets/icons/edit.svg');
-
-            //     &.edit {
-            //         background: url('../../../../../../assets/icons/edit-filled.svg');
-            //     }
-            // }
-
-            // .delete-btn {
-            //     background: url('../../../../../../assets/icons/delete.svg');
-
-            //     &.pressed {
-            //         background: url('../../../../../../assets/icons/delete-filled.svg');
-            //     }
-            // }
         }
 
         &.editable {

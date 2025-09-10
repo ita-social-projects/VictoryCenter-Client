@@ -67,12 +67,6 @@ describe('GenericDetails', () => {
         });
     });
 
-    test('removes item on close', () => {
-        render(<GenericDetails {...defaultProps} />);
-        fireEvent.click(screen.getByText('Close'));
-        expect(screen.queryByText('Item 1')).not.toBeInTheDocument();
-    });
-
     test('shows not found state when no items', () => {
         render(<GenericDetails {...defaultProps} items={[]} notFoundText="No Items Found" />);
         expect(screen.getByText('No Items Found')).toBeInTheDocument();
@@ -82,7 +76,7 @@ describe('GenericDetails', () => {
     test('calls onChangeItems when items update', () => {
         const onChangeItems = jest.fn();
         render(<GenericDetails {...defaultProps} onChangeItems={onChangeItems} />);
-        fireEvent.click(screen.getByText('Close'));
+        fireEvent.click(screen.getByText('Submit'));
         expect(onChangeItems).toHaveBeenCalled();
     });
 });

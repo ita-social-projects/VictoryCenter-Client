@@ -1,5 +1,5 @@
-import { BANK_DETAILS_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/bank-details-schema/bank-details-schema';
-import { createGenericForm, GenericFormField } from '../generic-form/GenericForm';
+import { BANK_DETAILS_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/bank-details-schema/bank-details-schema';
+import { createGenericForm, GenericFormField } from '../../generic-form/GenericForm';
 
 export interface BaseBankDetails {
     id?: number;

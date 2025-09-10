@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { GenericDetails, GenericDetailsProps } from './GenericDetails';
 import { GenericFormRef } from '../generic-form/GenericForm';
 import { forwardRef, useImperativeHandle } from 'react';
+import { DONATE_TEXT } from '../../../../../const/admin/donate';
 
 interface Item {
     id?: number;
@@ -78,5 +79,50 @@ describe('GenericDetails', () => {
         render(<GenericDetails {...defaultProps} onChangeItems={onChangeItems} />);
         fireEvent.click(screen.getByText('Submit'));
         expect(onChangeItems).toHaveBeenCalled();
+    });
+
+    it('toggles items expanded state via keydown', () => {
+        render(<GenericDetails {...defaultProps} />);
+        const header = screen.getByText('Test Title');
+        header.focus();
+        expect(document.activeElement).toBe(header);
+        fireEvent.keyDown(header, { key: 'Enter' });
+        fireEvent.keyDown(header, { key: ' ' });
+        expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(true);
+    });
+
+    it('renders not found state with add button', () => {
+        render(<GenericDetails {...defaultProps} items={[]} notFoundText="No Items Found" />);
+        expect(screen.getByText('No Items Found')).toBeInTheDocument();
+        expect(screen.getByText('Add New')).toBeInTheDocument();
+    });
+
+    it('submits new item and adds to list', async () => {
+        render(<GenericDetails {...defaultProps} items={[]} />);
+        const addButton = screen.getByText('Add New');
+        fireEvent.click(addButton);
+
+        const submitButton = screen.getByText('Submit');
+        fireEvent.click(submitButton);
+
+        await waitFor(() => {
+            expect(screen.getByText('New Item')).toBeInTheDocument();
+        });
+    });
+
+    it('renders children function for each item', () => {
+        render(<GenericDetails {...defaultProps} children={({ formState }) => <span>{formState.name}</span>} />);
+        expect(screen.getByText('Item 1')).toBeInTheDocument();
+    });
+
+    it('renders primaryAddButton style', () => {
+        render(<GenericDetails {...defaultProps} primaryAddButton />);
+        expect(screen.getByText(DONATE_TEXT.BANK_DETAILS.ADD_NEW)).toHaveClass('btn-primary');
+    });
+
+    it('renders child form correctly', () => {
+        render(<GenericDetails {...defaultProps} isChildForm />);
+        expect(document.querySelector('.generic-details.child')).toBeInTheDocument();
+        expect(screen.getByText(DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW)).toBeInTheDocument();
     });
 });

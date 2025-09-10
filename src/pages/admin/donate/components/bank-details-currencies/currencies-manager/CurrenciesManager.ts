@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { bankDetailsConfig } from './BankDetailsCurrenciesConfig';
+import { bankDetailsConfig } from '../bank-details-currencies-config/BankDetailsCurrenciesConfig';
 
 export enum Currencies {
     UAH = 'UAH',

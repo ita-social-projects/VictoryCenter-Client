@@ -3,7 +3,7 @@ import { CategoryBar } from '../../../../../components/admin/category-bar/Catego
 import { SupportOptionsType } from '../../../../../types/admin/donate';
 import './DonatePageContent.scss';
 import { GenericDetails } from '../generic-details/GenericDetails';
-import { Currencies, useBankDetails } from '../bank-details-currencies/CurrenciesManager';
+import { Currencies, useBankDetails } from '../bank-details-currencies/currencies-manager/CurrenciesManager';
 import { SupportOptionsForm } from '../support-options/support-options-form/SupportOptionsForm';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
 

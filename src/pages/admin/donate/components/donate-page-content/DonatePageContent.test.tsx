@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DonatePageContent } from './DonatePageContent';
 
-jest.mock('../bank-details-currencies/CurrenciesManager', () => ({
+jest.mock('../bank-details-currencies/currencies-manager/CurrenciesManager', () => ({
     Currencies: {
         UAH: 'UAH',
         USD: 'USD',
@@ -44,7 +44,7 @@ jest.mock('../support-options/support-options-form/SupportOptionsForm', () => ({
     ),
 }));
 
-const mockUseBankDetails = require('../bank-details-currencies/CurrenciesManager').useBankDetails;
+const mockUseBankDetails = require('../bank-details-currencies/currencies-manager/CurrenciesManager').useBankDetails;
 
 describe('DonatePageContent', () => {
     beforeEach(() => {
@@ -54,9 +54,11 @@ describe('DonatePageContent', () => {
             config: {
                 form: jest.fn(),
                 createEmptyItem: jest.fn(),
-                withCorrespondentBanks: false,
+                withCorrespondentBanks: true,
+                correspondentForm: jest.fn(),
             },
             setItems: jest.fn(),
+            isLoading: false,
         });
     });
 
@@ -81,7 +83,7 @@ describe('DonatePageContent', () => {
 
     it('render GenericDetails if config exists', () => {
         render(<DonatePageContent />);
-        expect(screen.getByTestId('generic-details')).toBeInTheDocument();
+        expect(screen.getAllByTestId('generic-details')[0]).toBeInTheDocument();
     });
 
     it('update SupportOptions on add', () => {

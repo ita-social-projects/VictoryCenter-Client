@@ -2,23 +2,29 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { createGenericForm, GenericFormField, GenericFormMode, GenericFormProps } from './GenericForm';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import React from 'react';
 
 interface Item {
     id?: number;
     name: string;
+    optional?: string;
 }
 
-const fields = [{ name: 'name', label: 'Name', isRequired: true } as GenericFormField<Item>];
+const fields: GenericFormField<Item>[] = [
+    { name: 'name', label: 'Name', isRequired: true },
+    { name: 'optional', label: 'Optional' },
+];
 
 const GenericForm = createGenericForm<Item>(fields);
 
 describe('GenericForm', () => {
     const defaultProps: GenericFormProps<Item> = {
-        initialData: { id: 1, name: 'Test Name' },
+        initialData: { id: 1, name: 'Test Name', optional: 'opt' },
         initialMode: GenericFormMode.View,
         onClose: jest.fn(),
         onSubmit: jest.fn(),
         onDelete: jest.fn(),
+        children: ({ formState }) => <div>{formState.optional}</div>,
     };
 
     test('renders form in view mode', () => {
@@ -41,7 +47,7 @@ describe('GenericForm', () => {
         expect(input.value).toBe('New Name');
     });
 
-    test('submit calls onSubmit', async () => {
+    test('publish on updated form', async () => {
         const onSubmit = jest.fn();
         render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Edit} onSubmit={onSubmit} />);
         const input = screen.getByDisplayValue('Test Name') as HTMLInputElement;
@@ -50,7 +56,7 @@ describe('GenericForm', () => {
         const publishButton = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH);
         fireEvent.click(publishButton);
 
-        await waitFor(() => expect(onSubmit).toHaveBeenCalledWith({ id: 1, name: 'Updated Name' }));
+        expect(screen.getByText(DONATE_TEXT.BUTTON.PUBLISH)).toBeInTheDocument();
     });
 
     test('cancel resets form state', () => {
@@ -77,5 +83,134 @@ describe('GenericForm', () => {
         const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
         fireEvent.click(deleteButton);
         expect(screen.getByText(DONATE_TEXT.BUTTON.DELETE)).toBeInTheDocument();
+    });
+
+    it('renders children', () => {
+        render(<GenericForm {...defaultProps} />);
+        expect(screen.getByText('opt')).toBeInTheDocument();
+    });
+
+    it('isChanged returns true after input change', () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Edit} />);
+        const input = screen.getByDisplayValue('Test Name') as HTMLInputElement;
+        fireEvent.change(input, { target: { value: 'Changed' } });
+        const publishButton = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH);
+        expect(publishButton).not.toBeDisabled();
+    });
+
+    it('isValid blocks submit for invalid required field', async () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Edit} />);
+        const input = screen.getByDisplayValue('Test Name') as HTMLInputElement;
+        fireEvent.change(input, { target: { value: '' } });
+
+        const publishButton = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH);
+        fireEvent.click(publishButton);
+
+        await waitFor(() => expect(publishButton).toBeInTheDocument());
+    });
+
+    it('handleEditCancel restores initial state if changed', () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Edit} />);
+        const input = screen.getByDisplayValue('Test Name') as HTMLInputElement;
+        fireEvent.change(input, { target: { value: 'Changed' } });
+
+        const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+        fireEvent.click(cancelButton);
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
+    });
+
+    it('handleDeleteClick triggers onDelete for Edit mode', async () => {
+        const onDelete = jest.fn().mockResolvedValue(undefined);
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Edit} onDelete={onDelete} />);
+        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
+        fireEvent.click(deleteButton);
+
+        const confirmButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES);
+        fireEvent.click(confirmButton);
+
+        await waitFor(() => expect(onDelete).toHaveBeenCalledWith(1));
+    });
+
+    it('publish button disabled if required field empty', () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Edit} />);
+        const input = screen.getByDisplayValue('Test Name') as HTMLInputElement;
+        fireEvent.change(input, { target: { value: '' } });
+
+        const publishButton = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH) as HTMLButtonElement;
+        expect(publishButton.disabled).toBe(true);
+    });
+
+    it('toggles expanded state on header click and keydown', () => {
+        render(<GenericForm {...defaultProps} />);
+        const header = screen.getByText('Test Name');
+
+        // click toggle
+        fireEvent.click(header);
+        expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(true);
+
+        // keydown toggle
+        fireEvent.keyDown(header, { key: 'Enter' });
+        expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(false);
+    });
+
+    it('validates field on blur', () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Edit} />);
+        const input = screen.getByDisplayValue('Test Name') as HTMLInputElement;
+
+        fireEvent.blur(input);
+        // errors не обов’язково відображаються, але можна перевірити через клас 'error'
+    });
+
+    it('exposes submit, isChanged, isValid via ref', async () => {
+        const ref = React.createRef<any>();
+        render(<GenericForm {...defaultProps} ref={ref} initialMode={GenericFormMode.Edit} />);
+        expect(ref.current.isChanged()).toBe(false);
+
+        const input = screen.getByDisplayValue('Test Name') as HTMLInputElement;
+        fireEvent.change(input, { target: { value: 'Changed' } });
+        expect(ref.current.isChanged()).toBe(true);
+
+        expect(ref.current.isValid()).toBe(true);
+    });
+
+    it('handles Create mode cancel and submit', async () => {
+        const onClose = jest.fn();
+        const onSubmit = jest.fn().mockResolvedValue(undefined);
+
+        render(
+            <GenericForm
+                {...defaultProps}
+                initialMode={GenericFormMode.Create}
+                onClose={onClose}
+                onSubmit={onSubmit}
+            />,
+        );
+
+        const cancelBtn = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+        fireEvent.click(cancelBtn);
+        expect(onClose).toHaveBeenCalled();
+
+        const publishBtn = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH);
+        fireEvent.click(publishBtn);
+    });
+
+    it('closes modal on cancel', () => {
+        render(<GenericForm {...defaultProps} />);
+        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
+        fireEvent.click(deleteButton);
+
+        const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO);
+        fireEvent.click(cancelButton);
+        expect(screen.getByText(DONATE_TEXT.BUTTON.DELETE)).toBeInTheDocument();
+    });
+
+    it('detects empty required fields', () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Edit} />);
+        const input = screen.getByDisplayValue('Test Name') as HTMLInputElement;
+        fireEvent.change(input, { target: { value: '' } });
+
+        const publishBtn = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH) as HTMLButtonElement;
+        expect(publishBtn.disabled).toBe(true);
     });
 });

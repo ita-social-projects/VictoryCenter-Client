@@ -62,4 +62,53 @@ describe('SupportOptionsForm', () => {
 
         expect(onChangeItems).toHaveBeenCalled();
     });
+
+    test('cancel adding new option hides the form', () => {
+        render(<SupportOptionsForm initialData={[]} />);
+        fireEvent.click(screen.getByText(DONATE_TEXT.SUPPORT_OPTIONS.ADD_FIRST));
+        const nameInput = screen.getByPlaceholderText('Введіть назву');
+        expect(nameInput).toBeInTheDocument();
+
+        const cancelButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.CANCEL });
+        fireEvent.click(cancelButton);
+
+        expect(screen.queryByPlaceholderText('Введіть назву')).not.toBeInTheDocument();
+    });
+
+    test('clicking "Add New" when items exist shows new SupportOptionItem', () => {
+        render(<SupportOptionsForm initialData={initialData} />);
+        fireEvent.click(screen.getByText(DONATE_TEXT.SUPPORT_OPTIONS.ADD_NEW));
+
+        expect(screen.getByPlaceholderText('Введіть назву')).toBeInTheDocument();
+    });
+
+    test('updating existing item calls onChangeItems', () => {
+        const onChangeItems = jest.fn();
+        render(<SupportOptionsForm initialData={initialData} onChangeItems={onChangeItems} />);
+
+        const editButton = screen.getAllByRole('button', { name: 'edit-btn' })[0];
+        fireEvent.click(editButton);
+        const nameInput = screen.getAllByPlaceholderText('Введіть назву')[0];
+        fireEvent.change(nameInput, { target: { value: 'Updated Option 1' } });
+
+        const valueInput = screen.getAllByPlaceholderText('Введіть реквізити')[0];
+        fireEvent.change(valueInput, { target: { value: 'Updated Value 1' } });
+
+        const saveButton = screen.getByRole('button', { name: DONATE_TEXT.BUTTON.PUBLISH });
+        fireEvent.click(saveButton);
+
+        expect(onChangeItems).toHaveBeenCalledWith([
+            { id: 1, name: 'Updated Option 1', value: 'Updated Value 1' },
+            { id: 2, name: 'Option 2', value: 'Value 2' },
+        ]);
+    });
+
+    test('useEffect resets items when initialData changes', () => {
+        const { rerender } = render(<SupportOptionsForm initialData={[]} />);
+        expect(screen.getByTestId('support-options-not-found')).toBeInTheDocument();
+
+        rerender(<SupportOptionsForm initialData={initialData} />);
+        expect(screen.queryByTestId('support-options-not-found')).not.toBeInTheDocument();
+        expect(screen.getByText('Option 1')).toBeInTheDocument();
+    });
 });

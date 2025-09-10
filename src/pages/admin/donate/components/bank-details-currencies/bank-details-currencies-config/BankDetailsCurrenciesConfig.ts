@@ -1,8 +1,8 @@
 import { ForwardRefExoticComponent, RefAttributes } from 'react';
-import { UahBankDetailsType, ForeignBankDetailsType } from '../../../../../types/admin/donate';
-import { GenericFormProps, GenericFormRef } from '../generic-form/GenericForm';
+import { UahBankDetailsType, ForeignBankDetailsType } from '../../../../../../types/admin/donate';
+import { GenericFormProps, GenericFormRef } from '../../generic-form/GenericForm';
 import { FieldValues } from 'react-hook-form';
-import { CorrespondentBankDetailsForm, createBankDetailsForm } from './BankDetailsFactory';
+import { CorrespondentBankDetailsForm, createBankDetailsForm } from '../bank-details-factory/BankDetailsFactory';
 
 export interface BankDetailsConfig<TItem extends FieldValues> {
     form: ForwardRefExoticComponent<GenericFormProps<TItem> & RefAttributes<GenericFormRef>>;

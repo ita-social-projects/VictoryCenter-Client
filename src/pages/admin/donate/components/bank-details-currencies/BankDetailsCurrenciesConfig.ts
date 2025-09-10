@@ -1,10 +1,8 @@
 import { ForwardRefExoticComponent, RefAttributes } from 'react';
 import { UahBankDetailsType, UsdBankDetailsType } from '../../../../../types/admin/donate';
 import { GenericFormProps, GenericFormRef } from '../generic-form/GenericForm';
-import { UahBankDetailsForm } from './UahBankDetails';
-import { CorrespondentBankDetialsForm, UsdBankDetailsForm } from './UsdBankDetails';
 import { FieldValues } from 'react-hook-form';
-import { EurBankDetailsForm } from './EurBankDetails';
+import { CorrespondentBankDetialsForm, createBankDetailsForm } from './BankDetailsFactory';
 
 export interface BankDetailsConfig<TItem extends FieldValues> {
     form: ForwardRefExoticComponent<GenericFormProps<TItem> & RefAttributes<GenericFormRef>>;
@@ -16,7 +14,7 @@ export interface BankDetailsConfig<TItem extends FieldValues> {
 
 export const bankDetailsConfig: Record<string, BankDetailsConfig<any>> = {
     UAH: {
-        form: UahBankDetailsForm,
+        form: createBankDetailsForm('UAH'),
         createEmptyItem: (data) => ({ id: Date.now(), ...data }) as UahBankDetailsType,
         fetch: async () => {
             // TODO
@@ -33,7 +31,7 @@ export const bankDetailsConfig: Record<string, BankDetailsConfig<any>> = {
         },
     },
     USD: {
-        form: UsdBankDetailsForm,
+        form: createBankDetailsForm('USD'),
         createEmptyItem: (data) => ({ id: Date.now(), ...data }) as UsdBankDetailsType,
         withCorrespondentBanks: true,
         correspondentForm: CorrespondentBankDetialsForm,
@@ -73,7 +71,7 @@ export const bankDetailsConfig: Record<string, BankDetailsConfig<any>> = {
         },
     },
     EUR: {
-        form: EurBankDetailsForm,
+        form: createBankDetailsForm('EUR'),
         createEmptyItem: (data: any) => ({ id: Date.now(), ...data }),
         fetch: async () => {
             // TODO

@@ -43,7 +43,7 @@ export interface GenericFormField<T extends Record<string, any>> {
     isTitle?: boolean;
     isRequired?: boolean;
     onlyNumbers?: boolean;
-    validate?: (value: T[keyof T], isPublishing?: boolean) => string | undefined;
+    validate?: (value: any, isPublishing?: boolean) => string | undefined;
 }
 
 export function createGenericForm<T extends { id?: number }>(fields: GenericFormField<T>[]) {

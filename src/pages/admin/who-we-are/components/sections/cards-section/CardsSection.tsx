@@ -8,7 +8,7 @@ import { CardContent } from '../../card-content/CardContent';
 import { Image, ImageValues } from '../../../../../../types/common/image';
 import { CardImageConfig } from '../SectionsProps';
 import './CardsSection.scss';
-import {Button} from "../../../../../../components/admin/button/Button";
+import { Button } from '../../../../../../components/admin/button/Button';
 
 export interface CardsSectionProps {
     content: Content[] | undefined;
@@ -95,7 +95,7 @@ export const CardsSection = ({
                     );
                 })}
             </div>
-            <Button className="button" buttonStyle={"primary"} onClick={onPublish} type={"submit"}>
+            <Button className="button" buttonStyle={'primary'} onClick={onPublish} type={'submit'}>
                 Опублікувати
             </Button>
         </div>

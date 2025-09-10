@@ -7,7 +7,7 @@ import { Image, ImageValues } from '../../../../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import bgImage from '../../../../../assets/images/public/about-us-page/background.jpg';
 import './ImageSection.scss';
-import {Button} from "../../../../../../components/admin/button/Button";
+import { Button } from '../../../../../../components/admin/button/Button';
 
 export interface ImageSectionProps {
     content: Content[] | undefined;
@@ -41,25 +41,29 @@ export const ImageSection = ({
             id: imageContent?.id!,
             description: '',
             title: '',
+            imageId: null,
         });
     };
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        onChange({
-            ...(titleContent || { contentType: ContentType.Title }),
-            title: e.target.value,
-            id: titleContent?.id ?? null,
-        });
+        if (titleContent?.id || titleContent) {
+            onChange({
+                ...(titleContent || { contentType: ContentType.Title }),
+                title: e.target.value,
+                id: titleContent.id,
+            });
+        }
     };
 
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        onChange({
-            ...(descriptionContent || { contentType: ContentType.Description }),
-            description: e.target.value,
-            id: descriptionContent?.id,
-        });
+        if (descriptionContent?.id || descriptionContent) {
+            onChange({
+                ...(descriptionContent || { contentType: ContentType.Description }),
+                description: e.target.value,
+                id: descriptionContent?.id,
+            });
+        }
     };
-
 
     if (!content) return null;
 
@@ -86,7 +90,7 @@ export const ImageSection = ({
                         <span>{COMMON_TEXT_ADMIN.TYPE.TITLE}</span>
                         <TextAreaWithCharacterLimit
                             onChange={handleTitleChange}
-                            value={titleContent.title}
+                            value={titleContent.title ?? ''}
                             maxLength={titleLimit}
                             name={COMMON_TEXT_ADMIN.TYPE.TITLE}
                             id={titleContent.id.toString()}
@@ -99,14 +103,14 @@ export const ImageSection = ({
                         <span>{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
                         <TextAreaWithCharacterLimit
                             onChange={handleDescriptionChange}
-                            value={descriptionContent.description}
+                            value={descriptionContent.description ?? ''}
                             maxLength={descriptionLimit!}
                             name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                             id={descriptionContent.id.toString()}
                         />
                     </div>
                 )}
-                <Button className="button" buttonStyle={"primary"} onClick={onPublish} type={"submit"}>
+                <Button className="button" buttonStyle={'primary'} onClick={onPublish} type={'submit'}>
                     Опублікувати
                 </Button>
             </div>

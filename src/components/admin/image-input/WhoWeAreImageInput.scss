@@ -58,24 +58,24 @@
             height: 100%;
             object-fit: fill;
             object-position: center;
-          transition: filter 0.3s ease;
+            transition: filter 0.3s ease;
         }
         &:hover .preview-image {
-          filter: grayscale(80%); // робить сіруватим
+            filter: grayscale(80%); // робить сіруватим
         }
 
         &::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          background: colors.$grey-50;
-          opacity: 0;
-          transition: opacity 0.3s ease;
-          z-index: 1;
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: colors.$grey-50;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
         }
 
         &:hover::after {
-          opacity: 0.78; // регулюй, наскільки сильно перекриває
+            opacity: 0.78; // регулюй, наскільки сильно перекриває
         }
         .delete-button {
             position: absolute;

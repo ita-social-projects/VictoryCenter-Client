@@ -6,9 +6,9 @@ import { PUBLIC_ROUTES } from '../../../../const/public/routes';
 import { ScrollableFrame } from './scrollable-frame/ScrollableFrame';
 
 interface OurMissionProps {
-    mainText?: string
+    mainText?: string;
 }
-export const OurMission = ({mainText = ABOUT_US_DATA.WHAT_WE_DO_DETAILS}: OurMissionProps) => {
+export const OurMission = ({ mainText = ABOUT_US_DATA.WHAT_WE_DO_DETAILS }: OurMissionProps) => {
     return (
         <div className="our-mission-block">
             <div className="what-we-do">

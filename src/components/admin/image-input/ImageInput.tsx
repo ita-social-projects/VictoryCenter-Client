@@ -1,12 +1,12 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import {ReactComponent as DeleteIcon} from '../../../assets/icons/delete.svg';
-import {ReactComponent as UploadIcon} from '../../../assets/icons/cloud-download.svg';
+import { ReactComponent as DeleteIcon } from '../../../assets/icons/delete.svg';
+import { ReactComponent as UploadIcon } from '../../../assets/icons/cloud-download.svg';
 import classNames from 'classnames';
 import './ImageInput.scss';
 import './WhoWeAreImageInput.scss';
 import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import {DeleteImageModal} from "./Image-input-modals/DeleteImageModal";
+import { DeleteImageModal } from './Image-input-modals/DeleteImageModal';
 
 export interface ImageInputProps {
     value: ImageValues | Image | null;
@@ -52,7 +52,6 @@ export const ImageInput = ({
         },
         [onChange],
     );
-
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -115,10 +114,9 @@ export const ImageInput = ({
         if (inputRef.current) inputRef.current.value = '';
     };
 
-    const handleModal =(value: boolean) =>{
+    const handleModal = (value: boolean) => {
         setIsDeleteImageModalOpen(value);
-
-    }
+    };
 
     const confirmDelete = () => {
         handleRemove(); // Call the function to remove the image
@@ -177,9 +175,7 @@ export const ImageInput = ({
                                 handleModal(true);
                             }}
                         >
-                            <DeleteIcon
-                                className={classNames('delete-icon')}
-                            />
+                            <DeleteIcon className={classNames('delete-icon')} />
                         </button>
                     )}
                 </div>

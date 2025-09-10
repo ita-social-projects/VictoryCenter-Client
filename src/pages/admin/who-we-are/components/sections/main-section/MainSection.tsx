@@ -33,23 +33,44 @@ export const MainSection = ({ section, onChange, className, onPublish }: MainSec
     switch (section.sectionType) {
         case SectionType.WhatWeDo:
             renderedContent = (
-                <DescriptionSection content={section.contents} onChange={onChange} onPublish={onPublish}  {...WhatWeDoPageProps} />
+                <DescriptionSection
+                    content={section.contents}
+                    onChange={onChange}
+                    onPublish={onPublish}
+                    {...WhatWeDoPageProps}
+                />
             );
             break;
         case SectionType.WhoWeSupport:
             renderedContent = (
-                <CardsSection content={section.contents} onPublish={onPublish} onChange={onChange} {...WhoWeSupportCardsProps} />
+                <CardsSection
+                    content={section.contents}
+                    onPublish={onPublish}
+                    onChange={onChange}
+                    {...WhoWeSupportCardsProps}
+                />
             );
             break;
         case SectionType.People:
-            renderedContent = <CardsSection content={section.contents} onPublish={onPublish} onChange={onChange} {...PeopleCardsProps} />;
+            renderedContent = (
+                <CardsSection
+                    content={section.contents}
+                    onPublish={onPublish}
+                    onChange={onChange}
+                    {...PeopleCardsProps}
+                />
+            );
             break;
         case SectionType.Main:
-            renderedContent = <ImageSection content={section.contents} onPublish={onPublish} onChange={onChange} {...MainPageProps} />;
+            renderedContent = (
+                <ImageSection content={section.contents} onPublish={onPublish} onChange={onChange} {...MainPageProps} />
+            );
             break;
 
         case SectionType.Team:
-            renderedContent = <ImageSection content={section.contents} onChange={onChange} onPublish={onPublish} {...TeamPageProps} />;
+            renderedContent = (
+                <ImageSection content={section.contents} onChange={onChange} onPublish={onPublish} {...TeamPageProps} />
+            );
             break;
         // Додайте інші case-и, якщо вони є
         default:

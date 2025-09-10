@@ -7,8 +7,8 @@ import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/t
 import { MainPageProps } from '../SectionsProps';
 import { ReactComponent as ArrowIcon } from '../../../../../../assets/icons/arrow-up-right.svg';
 import './DescriptionSection.scss';
-import {Button} from "../../../../../../components/admin/button/Button";
-import {OurMission} from "../../../../../public/about-us-page/our-mission/OurMission";
+import { Button } from '../../../../../../components/admin/button/Button';
+import { OurMission } from '../../../../../public/about-us-page/our-mission/OurMission';
 
 export interface DescriptionSectionProps {
     content: Content[] | undefined;
@@ -19,10 +19,12 @@ export interface DescriptionSectionProps {
 
 export const DescriptionSection = ({ content, onChange, descriptionLimit, onPublish }: DescriptionSectionProps) => {
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        onChange({
-            ...descriptionContent,
-            description: e.target.value,
-        });
+        if (descriptionContent?.id || descriptionContent) {
+            onChange({
+                ...descriptionContent,
+                description: e.target.value,
+            });
+        }
     };
 
     if (!content) return null;
@@ -47,7 +49,7 @@ export const DescriptionSection = ({ content, onChange, descriptionLimit, onPubl
                     id={descriptionContent.id.toString()}
                     maxLength={descriptionLimit}
                 />
-                <Button className="button" buttonStyle={"primary"} onClick={onPublish} type={"submit"}>
+                <Button className="button" buttonStyle={'primary'} onClick={onPublish} type={'submit'}>
                     Опублікувати
                 </Button>
             </div>

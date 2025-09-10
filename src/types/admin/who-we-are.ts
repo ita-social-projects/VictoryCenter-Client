@@ -18,8 +18,9 @@ export type Content = {
     id: number;
     contentType: ContentType;
     image: Image | ImageValues | null;
-    description: string;
-    title: string;
+    imageId: number | null;
+    description: string | null;
+    title: string | null;
 };
 
 export enum ContentType {

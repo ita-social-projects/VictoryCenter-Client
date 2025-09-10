@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import {COMMON_IMAGE_TEXT} from "../../../../const/admin/image";
-import { Modal } from "../../../common/modal/Modal";
-import {Button} from "../../button/Button";
-import {COMMON_TEXT_ADMIN} from "../../../../const/admin/common";
+import { COMMON_IMAGE_TEXT } from '../../../../const/admin/image';
+import { Modal } from '../../../common/modal/Modal';
+import { Button } from '../../button/Button';
+import { COMMON_TEXT_ADMIN } from '../../../../const/admin/common';
 
 interface DeleteImageModalProps {
     isOpen: boolean;
@@ -10,20 +10,18 @@ interface DeleteImageModalProps {
     onSubmit: () => void;
 }
 
-export const DeleteImageModal = ({
-                                          isOpen,
-                                          onClose,
-                                          onSubmit
-                                      }: DeleteImageModalProps) => {
-
+export const DeleteImageModal = ({ isOpen, onClose, onSubmit }: DeleteImageModalProps) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <Modal.Title>{COMMON_IMAGE_TEXT.DELETE.TITLE}</Modal.Title>
             <Modal.Actions>
-                <Button onClick={(e) => {
-                    e.stopPropagation(); // Stop the click event here
-                    onClose();
-                }} buttonStyle="secondary" >
+                <Button
+                    onClick={(e) => {
+                        e.stopPropagation(); // Stop the click event here
+                        onClose();
+                    }}
+                    buttonStyle="secondary"
+                >
                     {COMMON_TEXT_ADMIN.BUTTON.NO}
                 </Button>
                 <Button

@@ -12,6 +12,7 @@ export interface ImageSectionProps {
     content: Content[] | undefined;
     titleLimit?: number;
     descriptionLimit?: number;
+    rows?: number;
     onChange: (data: Content) => void;
     imageInputProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange'>;
 }
@@ -20,6 +21,7 @@ export const ImageSection = ({
     content,
     titleLimit = 10,
     descriptionLimit,
+    rows,
     onChange,
     imageInputProps,
 }: ImageSectionProps) => {
@@ -86,6 +88,7 @@ export const ImageSection = ({
                     value={imageContent?.image ?? null}
                     onChange={handleImageChange}
                     className="who-we-are-image-input-wrapper"
+                    label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
                     {...imageInputProps}
                 />
             </div>
@@ -100,6 +103,7 @@ export const ImageSection = ({
                             maxLength={titleLimit}
                             name={COMMON_TEXT_ADMIN.TYPE.TITLE}
                             id={titleContent.id.toString()}
+                            rows={1}
                         />
                     </div>
                 )}
@@ -113,6 +117,7 @@ export const ImageSection = ({
                             maxLength={descriptionLimit!}
                             name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                             id={descriptionContent.id.toString()}
+                            rows={rows}
                         />
                     </div>
                 )}

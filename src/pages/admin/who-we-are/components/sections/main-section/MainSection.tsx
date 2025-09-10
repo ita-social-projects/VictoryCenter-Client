@@ -1,9 +1,4 @@
-// MainSection.tsx
-
 import { Content, SectionType, WhoWeAreSection } from '../../../../../../types/admin/who-we-are';
-import { ImageInputProps } from '../../../../../../components/admin/image-input/ImageInput';
-import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
-import React from 'react';
 import { CardsSection } from '../cards-section/CardsSection';
 import { DescriptionSection } from '../description-section/DescriptionSection';
 import { ImageSection } from '../image-section/ImageSection';
@@ -19,10 +14,9 @@ interface MainSectionProps {
     section: WhoWeAreSection | null;
 
     onChange: (data: Content) => void;
-    className?: string;
 }
 
-export const MainSection = ({ section, onChange, className }: MainSectionProps) => {
+export const MainSection = ({ section, onChange }: MainSectionProps) => {
     if (!section) {
         return null;
     }
@@ -55,5 +49,5 @@ export const MainSection = ({ section, onChange, className }: MainSectionProps) 
             renderedContent = null;
     }
 
-    return <div className={className}>{renderedContent}</div>;
+    return <div className="who-we-are-main-section">{renderedContent}</div>;
 };

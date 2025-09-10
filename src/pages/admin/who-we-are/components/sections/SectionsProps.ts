@@ -16,8 +16,8 @@ import { CardsSectionProps } from './cards-section/CardsSection';
 export const MainPageProps: Omit<ImageSectionProps, 'content' | 'onChange'> = {
     titleLimit: 50,
     descriptionLimit: 300,
+    rows: 5,
     imageInputProps: {
-        label: WHO_WE_ARE_TEXT.IMAGE.INPUT,
         subText: '1440x860',
         style: {
             width: '52.5625rem',
@@ -33,8 +33,8 @@ export const MainPageProps: Omit<ImageSectionProps, 'content' | 'onChange'> = {
 
 export const TeamPageProps: Omit<ImageSectionProps, 'content' | 'onChange'> = {
     descriptionLimit: 360,
+    rows: 6,
     imageInputProps: {
-        label: WHO_WE_ARE_TEXT.IMAGE.INPUT,
         subText: '840x750',
         style: {
             width: '52.5625rem',
@@ -53,18 +53,17 @@ export const WhatWeDoPageProps: Omit<DescriptionSectionProps, 'content' | 'onCha
 };
 
 export interface CardImageConfig {
-    label: string;
     style: React.CSSProperties;
     subText: string;
 }
 
 export const WhoWeSupportCardsProps: Omit<CardsSectionProps, 'content' | 'onChange'> = {
-    descriptionLimit: 200,
-    titleLimit: 100,
+    descriptionLimit: 300,
+    titleText: WHO_WE_ARE_TEXT.WHO_WE_SUPPORT,
+    rows: 5,
     cardImageConfigs: [
         // first card
         {
-            label: WHO_WE_ARE_TEXT.IMAGE.INPUT,
             style: {
                 width: '31.6875rem',
                 height: '26.875rem',
@@ -74,11 +73,10 @@ export const WhoWeSupportCardsProps: Omit<CardsSectionProps, 'content' | 'onChan
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
             },
-            subText: '320x400',
+            subText: '500x430',
         },
         // second card
         {
-            label: WHO_WE_ARE_TEXT.IMAGE.INPUT,
             style: {
                 width: '26.875rem',
                 height: '26.875rem',
@@ -88,11 +86,10 @@ export const WhoWeSupportCardsProps: Omit<CardsSectionProps, 'content' | 'onChan
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
             },
-            subText: '320x400',
+            subText: '500x430',
         },
         // third card
         {
-            label: WHO_WE_ARE_TEXT.IMAGE.INPUT,
             style: {
                 width: '31.5rem',
                 height: '26.875rem',
@@ -102,18 +99,17 @@ export const WhoWeSupportCardsProps: Omit<CardsSectionProps, 'content' | 'onChan
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
             },
-            subText: '320x400',
+            subText: '500x430',
         },
     ],
 };
 
 export const PeopleCardsProps: Omit<CardsSectionProps, 'content' | 'onChange'> = {
-    descriptionLimit: 200,
-    titleLimit: 100,
+    descriptionLimit: 60,
+    rows: 2,
     cardImageConfigs: [
         // first card
         {
-            label: WHO_WE_ARE_TEXT.IMAGE.INPUT,
             style: {
                 width: '24rem',
                 height: '26.875rem',
@@ -123,11 +119,36 @@ export const PeopleCardsProps: Omit<CardsSectionProps, 'content' | 'onChange'> =
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
             },
-            subText: '320x400',
+            subText: '380x430',
         },
         // second card
         {
-            label: WHO_WE_ARE_TEXT.IMAGE.INPUT,
+            style: {
+                width: '21rem',
+                height: '26.875rem',
+                backgroundImage: `
+        linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
+        url(${GirlAndHorse})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+            },
+            subText: '330x430',
+        },
+        // third card
+        {
+            style: {
+                width: '21rem',
+                height: '26.875rem',
+                backgroundImage: `
+        linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
+        url(${OldManAndHorse})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+            },
+            subText: '330x430',
+        },
+        // fourth card
+        {
             style: {
                 width: '24rem',
                 height: '26.875rem',
@@ -137,35 +158,7 @@ export const PeopleCardsProps: Omit<CardsSectionProps, 'content' | 'onChange'> =
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
             },
-            subText: '320x400',
-        },
-        // third card
-        {
-            label: WHO_WE_ARE_TEXT.IMAGE.INPUT,
-            style: {
-                width: '24rem',
-                height: '26.875rem',
-                backgroundImage: `
-        linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
-        url(${GirlAndHorse})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-            },
-            subText: '320x400',
-        },
-        // fourth card
-        {
-            label: WHO_WE_ARE_TEXT.IMAGE.INPUT,
-            style: {
-                width: '24rem',
-                height: '26.875rem',
-                backgroundImage: `
-        linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
-        url(${OldManAndHorse})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-            },
-            subText: '320x400',
+            subText: '380x430',
         },
     ],
 };

@@ -34,7 +34,7 @@ export const DescriptionSection = ({ content, onChange, descriptionLimit }: Desc
         <div className="description-section">
             <h2>{WHO_WE_ARE_TEXT.WHAT_WE_DO}</h2>
             <div className="description-section-preview">
-                <span>{descriptionContent.description ?? ''}</span>
+                <span className="description-section-preview-text">{descriptionContent.description ?? ''}</span>
                 <div className="description-section-preview-link">
                     <span className="description-section-preview-link-title">{WHO_WE_ARE_TEXT.GO_TO_PROGRAMS}</span>
                     <ArrowIcon />
@@ -48,6 +48,7 @@ export const DescriptionSection = ({ content, onChange, descriptionLimit }: Desc
                     name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     id={descriptionContent.id.toString()}
                     maxLength={descriptionLimit}
+                    rows={5}
                 />
             </div>
         </div>

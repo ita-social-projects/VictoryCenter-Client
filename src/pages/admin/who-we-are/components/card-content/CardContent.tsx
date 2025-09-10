@@ -12,6 +12,7 @@ interface CardContentProps {
     onImageChange: (value: Image | ImageValues) => void;
     onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
     descriptionLimit: number;
+    rows?: number;
     imageInputProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange'>;
 }
 export const CardContent = ({
@@ -19,6 +20,7 @@ export const CardContent = ({
     onImageChange,
     onChange,
     descriptionLimit,
+    rows,
     imageInputProps,
 }: CardContentProps) => {
     return (
@@ -30,13 +32,17 @@ export const CardContent = ({
                 className="who-we-are-image-input-wrapper"
                 {...imageInputProps}
             />
-            <TextAreaWithCharacterLimit
-                onChange={(e) => onChange(e)}
-                value={content.description ?? ''}
-                maxLength={descriptionLimit}
-                name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
-                id={content.id.toString()}
-            ></TextAreaWithCharacterLimit>
+            <div className="card-content-description-wrapper">
+                <span>{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
+                <TextAreaWithCharacterLimit
+                    onChange={(e) => onChange(e)}
+                    value={content.description ?? ''}
+                    maxLength={descriptionLimit}
+                    name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                    id={content.id.toString()}
+                    rows={rows}
+                />
+            </div>
         </div>
     );
 };

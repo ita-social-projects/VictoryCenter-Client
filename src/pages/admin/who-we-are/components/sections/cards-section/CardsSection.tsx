@@ -11,20 +11,20 @@ import './CardsSection.scss';
 
 export interface CardsSectionProps {
     content: Content[] | undefined;
-    titleLimit: number;
     descriptionLimit: number;
+    rows?: number;
     onChange: (data: Content) => void;
-    className?: string; // <-- added this
     cardImageConfigs: CardImageConfig[];
+    titleText?: string;
 }
 
 export const CardsSection = ({
     content,
-    titleLimit,
     descriptionLimit,
+    rows,
     onChange,
-    className,
     cardImageConfigs,
+    titleText,
 }: CardsSectionProps) => {
     const commonImageProps: Omit<ImageInputProps, 'className' | 'value'> = {
         onChange: () => {},
@@ -56,7 +56,7 @@ export const CardsSection = ({
 
     return (
         <div className="cards-section-wrapper">
-            <span className="cards-section-wrapper-title">{WHO_WE_ARE_TEXT.WHO_WE_SUPPORT}</span>
+            {titleText && <span className="cards-section-wrapper-title">{titleText}</span>}
             <div className="cards-section-wrapper-cards">
                 {cardContents.map((c: Content, index: number) => {
                     // Створюємо унікальні обробники для кожного елемента в циклі
@@ -88,6 +88,7 @@ export const CardsSection = ({
                             onChange={handleDescriptionChange}
                             descriptionLimit={descriptionLimit}
                             imageInputProps={{ ...imageConfig }}
+                            rows={rows}
                         />
                     );
                 })}

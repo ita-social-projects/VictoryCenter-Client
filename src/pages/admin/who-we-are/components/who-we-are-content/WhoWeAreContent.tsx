@@ -92,6 +92,7 @@ export const WhoWeAreContent = () => {
                 getCategoryDisplayName={(category) => category.title}
                 getCategoryKey={(category) => category.id}
                 onCategorySelect={handleCategorySelect}
+                displayContextMenuButton={false}
             />
             <MainSection section={updatedSection} onChange={handleContentChange} />
         </div>

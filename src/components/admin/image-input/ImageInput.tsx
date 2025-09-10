@@ -1,11 +1,12 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import DeleteIcon from '../../../assets/icons/delete.svg';
-import UploadIcon from '../../../assets/icons/cloud-download.svg';
+import {ReactComponent as DeleteIcon} from '../../../assets/icons/delete.svg';
+import {ReactComponent as UploadIcon} from '../../../assets/icons/cloud-download.svg';
 import classNames from 'classnames';
 import './ImageInput.scss';
 import './WhoWeAreImageInput.scss';
 import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import {DeleteImageModal} from "./Image-input-modals/DeleteImageModal";
 
 export interface ImageInputProps {
     value: ImageValues | Image | null;
@@ -35,6 +36,7 @@ export const ImageInput = ({
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const [isDeleteImageModalOpen, setIsDeleteImageModalOpen] = useState<boolean>(false);
 
     useEffect(() => {
         if (value) {
@@ -50,6 +52,7 @@ export const ImageInput = ({
         },
         [onChange],
     );
+
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -112,6 +115,16 @@ export const ImageInput = ({
         if (inputRef.current) inputRef.current.value = '';
     };
 
+    const handleModal =(value: boolean) =>{
+        setIsDeleteImageModalOpen(value);
+
+    }
+
+    const confirmDelete = () => {
+        handleRemove(); // Call the function to remove the image
+        handleModal(false); // Close the modal
+    };
+
     return (
         <div
             className={classNames(className, {
@@ -161,28 +174,28 @@ export const ImageInput = ({
                             disabled={disabled}
                             onClick={(e) => {
                                 e.stopPropagation();
-                                handleRemove();
+                                handleModal(true);
                             }}
                         >
-                            <img
-                                src={DeleteIcon}
-                                alt={COMMON_TEXT_ADMIN.ALT.DELETE}
+                            <DeleteIcon
                                 className={classNames('delete-icon')}
                             />
                         </button>
                     )}
                 </div>
             ) : (
-                <div className={classNames('image-placeholder')}>
-                    <img
-                        src={UploadIcon}
-                        alt={COMMON_TEXT_ADMIN.ALT.UPLOAD}
-                        className={classNames('placeholder-icon')}
-                    />
+                <div className="image-placeholder">
+                    <UploadIcon className="placeholder-icon" />
                     <span>{label}</span>
                     <span>{subText}</span>
                 </div>
             )}
+
+            <DeleteImageModal
+                isOpen={isDeleteImageModalOpen}
+                onClose={() => handleModal(false)}
+                onSubmit={confirmDelete}
+            />
         </div>
     );
 };

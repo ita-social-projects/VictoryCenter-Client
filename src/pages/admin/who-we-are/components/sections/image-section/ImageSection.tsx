@@ -7,12 +7,14 @@ import { Image, ImageValues } from '../../../../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import bgImage from '../../../../../assets/images/public/about-us-page/background.jpg';
 import './ImageSection.scss';
+import {Button} from "../../../../../../components/admin/button/Button";
 
 export interface ImageSectionProps {
     content: Content[] | undefined;
     titleLimit?: number;
     descriptionLimit?: number;
     onChange: (data: Content) => void;
+    onPublish: () => void;
     imageInputProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange'>;
 }
 
@@ -21,6 +23,7 @@ export const ImageSection = ({
     titleLimit = 10,
     descriptionLimit,
     onChange,
+    onPublish,
     imageInputProps,
 }: ImageSectionProps) => {
     const commonImageProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange'> = {
@@ -42,34 +45,21 @@ export const ImageSection = ({
     };
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        // onChange({
-        //     ...(titleContent || { contentType: ContentType.Title }),
-        //     title: e.target.value,
-        //     id: titleContent?.id ?? null,
-        // });
+        onChange({
+            ...(titleContent || { contentType: ContentType.Title }),
+            title: e.target.value,
+            id: titleContent?.id ?? null,
+        });
     };
 
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        // onChange({
-        //     ...(descriptionContent || { contentType: ContentType.Description }),
-        //     description: e.target.value,
-        //     id: descriptionContent?.id,
-        // });
+        onChange({
+            ...(descriptionContent || { contentType: ContentType.Description }),
+            description: e.target.value,
+            id: descriptionContent?.id,
+        });
     };
 
-    //  const handleImageChange = (value: ImageValues | Image) => {
-    //        onChange({
-    //            ...cardContents,
-    //            image: value
-    //        });
-    //  };
-
-    //  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    //        onChange({
-    //            ...cardContents,
-    //            description: e.target.value
-    //        });
-    //  };
 
     if (!content) return null;
 
@@ -116,6 +106,9 @@ export const ImageSection = ({
                         />
                     </div>
                 )}
+                <Button className="button" buttonStyle={"primary"} onClick={onPublish} type={"submit"}>
+                    Опублікувати
+                </Button>
             </div>
         </div>
     );

@@ -13,7 +13,7 @@
 
     // Стилі для станів (фокус, вимкнений)
     &-focused {
-        background-color: colors.$blue-50;
+        background-color: colors.$grey-700;
         border-color: rgba(colors.$grey-900, 0.8);
     }
 
@@ -56,10 +56,27 @@
             display: block;
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: fill;
             object-position: center;
+          transition: filter 0.3s ease;
+        }
+        &:hover .preview-image {
+          filter: grayscale(80%); // робить сіруватим
         }
 
+        &::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: colors.$grey-50;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          z-index: 1;
+        }
+
+        &:hover::after {
+          opacity: 0.78; // регулюй, наскільки сильно перекриває
+        }
         .delete-button {
             position: absolute;
             inset: 0;
@@ -73,14 +90,16 @@
             border-radius: 8px;
             background: colors.$grey-900;
             opacity: 0.8;
+            z-index: 2;
 
             &:hover {
                 opacity: 1;
             }
 
             .delete-icon {
-                width: 4rem;
-                height: 4rem;
+                width: 0.75rem;
+                height: 0.78125rem;
+                color: colors.$grey-50;
             }
         }
 

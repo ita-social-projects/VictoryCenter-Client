@@ -7,19 +7,22 @@ import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/t
 import { MainPageProps } from '../SectionsProps';
 import { ReactComponent as ArrowIcon } from '../../../../../../assets/icons/arrow-up-right.svg';
 import './DescriptionSection.scss';
+import {Button} from "../../../../../../components/admin/button/Button";
+import {OurMission} from "../../../../../public/about-us-page/our-mission/OurMission";
 
 export interface DescriptionSectionProps {
     content: Content[] | undefined;
     descriptionLimit: number;
     onChange: (data: Content) => void;
+    onPublish: () => void;
 }
 
-export const DescriptionSection = ({ content, onChange, descriptionLimit }: DescriptionSectionProps) => {
+export const DescriptionSection = ({ content, onChange, descriptionLimit, onPublish }: DescriptionSectionProps) => {
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        // onChange({
-        //     ...descriptionContent,
-        //     description: e.target.value,
-        // });
+        onChange({
+            ...descriptionContent,
+            description: e.target.value,
+        });
     };
 
     if (!content) return null;
@@ -32,13 +35,8 @@ export const DescriptionSection = ({ content, onChange, descriptionLimit }: Desc
 
     return (
         <div className="description-section">
-            <h2>{WHO_WE_ARE_TEXT.WHAT_WE_DO}</h2>
-            <div className="description-section-preview">
-                <span>{descriptionContent.description ?? ''}</span>
-                <div className="description-section-preview-link">
-                    <span className="description-section-preview-link-title">{WHO_WE_ARE_TEXT.GO_TO_PROGRAMS}</span>
-                    <ArrowIcon />
-                </div>
+            <div className="our-mission">
+                <OurMission mainText={descriptionContent.description ?? ''} />
             </div>
             <div className="description-section-textarea">
                 <span>{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
@@ -49,6 +47,9 @@ export const DescriptionSection = ({ content, onChange, descriptionLimit }: Desc
                     id={descriptionContent.id.toString()}
                     maxLength={descriptionLimit}
                 />
+                <Button className="button" buttonStyle={"primary"} onClick={onPublish} type={"submit"}>
+                    Опублікувати
+                </Button>
             </div>
         </div>
     );

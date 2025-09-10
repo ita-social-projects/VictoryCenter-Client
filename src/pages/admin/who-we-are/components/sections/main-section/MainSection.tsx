@@ -1,8 +1,8 @@
 // MainSection.tsx
 
-import { Content, SectionType, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
-import { ImageInputProps } from '../../../../../components/admin/image-input/ImageInput';
-import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
+import { Content, SectionType, WhoWeAreSection } from '../../../../../../types/admin/who-we-are';
+import { ImageInputProps } from '../../../../../../components/admin/image-input/ImageInput';
+import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
 import React from 'react';
 import { CardsSection } from '../cards-section/CardsSection';
 import { DescriptionSection } from '../description-section/DescriptionSection';
@@ -38,11 +38,11 @@ export const MainSection = ({ section, onChange, className, onPublish }: MainSec
             break;
         case SectionType.WhoWeSupport:
             renderedContent = (
-                <CardsSection content={section.contents} onChange={onChange} {...WhoWeSupportCardsProps} />
+                <CardsSection content={section.contents} onPublish={onPublish} onChange={onChange} {...WhoWeSupportCardsProps} />
             );
             break;
         case SectionType.People:
-            renderedContent = <CardsSection content={section.contents} onChange={onChange} {...PeopleCardsProps} />;
+            renderedContent = <CardsSection content={section.contents} onPublish={onPublish} onChange={onChange} {...PeopleCardsProps} />;
             break;
         case SectionType.Main:
             renderedContent = <ImageSection content={section.contents} onPublish={onPublish} onChange={onChange} {...MainPageProps} />;

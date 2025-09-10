@@ -19,6 +19,9 @@ export const API_ROUTES = {
     IMAGE: {
         BASE: 'Image',
     },
+    FAQ: {
+        PUBLISHED_BY_SLUG: 'faq/published',
+    },
     WHO_WE_ARE: {
         BASE: 'WhoWeAre',
     },

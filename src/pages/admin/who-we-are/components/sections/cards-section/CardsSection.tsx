@@ -8,6 +8,7 @@ import { CardContent } from '../../card-content/CardContent';
 import { Image, ImageValues } from '../../../../../../types/common/image';
 import { CardImageConfig } from '../SectionsProps';
 import './CardsSection.scss';
+import {Button} from "../../../../../../components/admin/button/Button";
 
 export interface CardsSectionProps {
     content: Content[] | undefined;
@@ -16,6 +17,7 @@ export interface CardsSectionProps {
     onChange: (data: Content) => void;
     className?: string; // <-- added this
     cardImageConfigs: CardImageConfig[];
+    onPublish: () => void;
 }
 
 export const CardsSection = ({
@@ -23,6 +25,7 @@ export const CardsSection = ({
     titleLimit,
     descriptionLimit,
     onChange,
+    onPublish,
     className,
     cardImageConfigs,
 }: CardsSectionProps) => {
@@ -92,6 +95,9 @@ export const CardsSection = ({
                     );
                 })}
             </div>
+            <Button className="button" buttonStyle={"primary"} onClick={onPublish} type={"submit"}>
+                Опублікувати
+            </Button>
         </div>
     );
 };

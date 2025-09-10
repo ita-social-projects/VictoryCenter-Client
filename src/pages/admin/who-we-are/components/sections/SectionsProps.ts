@@ -58,7 +58,7 @@ export interface CardImageConfig {
     subText: string;
 }
 
-export const WhoWeSupportCardsProps: Omit<CardsSectionProps, 'content' | 'onChange'> = {
+export const WhoWeSupportCardsProps: Omit<CardsSectionProps, 'content' | 'onChange' | 'onPublish'> = {
     descriptionLimit: 200,
     titleLimit: 100,
     cardImageConfigs: [
@@ -107,7 +107,7 @@ export const WhoWeSupportCardsProps: Omit<CardsSectionProps, 'content' | 'onChan
     ],
 };
 
-export const PeopleCardsProps: Omit<CardsSectionProps, 'content' | 'onChange'> = {
+export const PeopleCardsProps: Omit<CardsSectionProps, 'content' | 'onChange' | 'onPublish'> = {
     descriptionLimit: 200,
     titleLimit: 100,
     cardImageConfigs: [

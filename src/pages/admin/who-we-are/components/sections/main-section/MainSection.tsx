@@ -1,14 +1,19 @@
 // MainSection.tsx
 
-import { Content, SectionType, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
-import { ImageInputProps } from '../../../../../components/admin/image-input/ImageInput';
-import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
-import { BaseContent } from '../base-content/BaseContent';
+import { Content, SectionType, WhoWeAreSection } from '../../../../../../types/admin/who-we-are';
+import { ImageInputProps } from '../../../../../../components/admin/image-input/ImageInput';
+import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
 import React from 'react';
-import { CardsSection } from './CardsSection';
-import { DescriptionSection } from './DescriptionSection';
-import { ImageSection } from './ImageSection';
-import { MainPageProps, TeamPageProps, WhatWeDoPageProps } from './SectionsProps';
+import { CardsSection } from '../cards-section/CardsSection';
+import { DescriptionSection } from '../description-section/DescriptionSection';
+import { ImageSection } from '../image-section/ImageSection';
+import {
+    MainPageProps,
+    PeopleCardsProps,
+    TeamPageProps,
+    WhatWeDoPageProps,
+    WhoWeSupportCardsProps,
+} from '../SectionsProps';
 
 interface MainSectionProps {
     section: WhoWeAreSection | null;
@@ -32,13 +37,11 @@ export const MainSection = ({ section, onChange, className }: MainSectionProps) 
             break;
         case SectionType.WhoWeSupport:
             renderedContent = (
-                <CardsSection content={section.contents} onChange={onChange} descriptionLimit={200} titleLimit={100} />
+                <CardsSection content={section.contents} onChange={onChange} {...WhoWeSupportCardsProps} />
             );
             break;
         case SectionType.People:
-            renderedContent = (
-                <CardsSection content={section.contents} onChange={onChange} descriptionLimit={200} titleLimit={100} />
-            );
+            renderedContent = <CardsSection content={section.contents} onChange={onChange} {...PeopleCardsProps} />;
             break;
         case SectionType.Main:
             renderedContent = <ImageSection content={section.contents} onChange={onChange} {...MainPageProps} />;

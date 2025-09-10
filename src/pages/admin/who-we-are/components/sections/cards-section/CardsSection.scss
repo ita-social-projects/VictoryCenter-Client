@@ -1,0 +1,20 @@
+.cards-section-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+
+	&-title {
+		text-transform: uppercase;
+		font-size: 2rem;
+		font-style: normal;
+		font-weight: 700;
+		line-height: 2.5rem; 
+		letter-spacing: -0.04rem;
+		align-self: flex-start;
+	}
+	
+	&-cards {
+		display: flex;
+		justify-content: space-between;
+	}
+}

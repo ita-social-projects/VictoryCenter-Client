@@ -1,0 +1,24 @@
+.image-section {
+	display: flex;
+	justify-content: space-between;
+
+	.content-wrapper {
+		width: 38rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+		justify-content: center;
+
+		&-title {
+			display: flex;
+			flex-direction: column;
+			gap: 0.38rem;
+		}
+
+		&-description {
+			display: flex;
+			flex-direction: column;
+			gap: 0.38rem;
+		}
+	}
+}

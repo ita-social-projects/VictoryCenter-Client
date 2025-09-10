@@ -4,10 +4,10 @@ import { Content, SectionType, WhoWeAreCategory, WhoWeAreSection } from '../../.
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
 import axios from 'axios';
-import './who-we-are-content.scss';
-import { MainSection } from '../sections/MainSection';
-import { CardsSection } from '../sections/CardsSection';
-import { DescriptionSection } from '../sections/DescriptionSection';
+import './WhoWeAreContent.scss';
+import { MainSection } from '../sections/main-section/MainSection';
+import { CardsSection } from '../sections/cards-section/CardsSection';
+import { DescriptionSection } from '../sections/description-section/DescriptionSection';
 
 interface ErrorState {
     message: string | null;

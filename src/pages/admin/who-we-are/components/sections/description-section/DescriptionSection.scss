@@ -1,0 +1,41 @@
+.description-section {
+	 display: flex;
+	 justify-content: space-around;
+	 margin-top: 10rem;
+
+	 h2 {
+		text-transform: uppercase;
+		font-size: 2rem;
+		font-weight: 700;
+		line-height: 2.5rem;
+		letter-spacing: -0.04rem;
+	 }
+
+	 &-preview {
+		 width: 25rem;
+		 display: flex;
+		 flex-direction: column;
+		 gap: 1.5rem;
+
+		 &-link {
+			 display: flex;
+			 align-items: center;
+			 justify-content: flex-end;
+		 }
+	 }
+
+	 &-textarea {
+		width: 38rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.38rem;
+
+		span {
+			font-size: 1.125rem;
+			font-style: normal;
+			font-weight: 400;
+			line-height: 1.75rem; 
+			letter-spacing: -0.0225rem;
+		}
+	 }
+}

@@ -1,8 +1,6 @@
-// DonatePageContent.test.tsx
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DonatePageContent } from './DonatePageContent';
 
-// 🔹 Мокуємо залежності
 jest.mock('../bank-details-currencies/CurrenciesManager', () => ({
     Currencies: {
         UAH: 'UAH',

@@ -18,16 +18,7 @@ export const bankDetailsConfig: Record<string, BankDetailsConfig<any>> = {
         createEmptyItem: (data) => ({ id: Date.now(), ...data }) as UahBankDetailsType,
         fetch: async () => {
             // TODO
-            return [
-                {
-                    id: 1,
-                    name: 'UAH Account',
-                    receiver: 'Some Receiver',
-                    iban: '444444444444444444444444444',
-                    edrpou: '88888888',
-                    paymentPurpose: 'Purpose',
-                },
-            ];
+            return [];
         },
     },
     USD: {
@@ -37,37 +28,7 @@ export const bankDetailsConfig: Record<string, BankDetailsConfig<any>> = {
         correspondentForm: CorrespondentBankDetialsForm,
         fetch: async () => {
             // TODO
-            return [
-                {
-                    id: 1,
-                    name: 'Main USD Account',
-                    receiver: 'Some Receiver',
-                    iban: 'US123...',
-                    swift: 'Uadsfadf',
-                    address: 'aboba',
-                    correspondentBanks: [
-                        {
-                            id: 1,
-                            name: 'Commerzbank AG, Frankfurt am Main, Germany',
-                            swift: 'COBADEFF',
-                            account: '400886700401',
-                        },
-                        {
-                            id: 2,
-                            name: 'J.P. Morgan AG, Frankfurt am Main, Germany',
-                            swift: 'CHASDEFX',
-                            account: '6231605145',
-                        },
-                        {
-                            id: 3,
-                            name: 'Citibank Europe PLC, Ireland',
-                            swift: 'CITIIE2X',
-                            account: '0042997188',
-                            iban: 'IE96CITI99005142997188',
-                        },
-                    ],
-                },
-            ];
+            return [];
         },
     },
     EUR: {

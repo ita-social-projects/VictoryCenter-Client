@@ -11,24 +11,6 @@
     align-items: center;
     border: 1px solid colors.$grey-700;
 
-    // Модифікатор для Main-секції
-    &--main {
-        width: 52.5625rem;
-        height: 33.125rem;
-        background-image:
-            linear-gradient(rgba(colors.$grey-50, 0.85), rgba(colors.$grey-50, 0.85)),
-            url('../../../assets/images/public/about-us-page/background.jpg');
-    }
-
-    // Модифікатор для Team-секції
-    &--team {
-        width: 52.5625rem;
-        height: 46.875rem;
-        background-image:
-            linear-gradient(rgba(colors.$grey-50, 0.85), rgba(colors.$grey-50, 0.85)),
-            url('../../../assets/images/public/about-us-page/our-team.jpg');
-    }
-
     // Стилі для станів (фокус, вимкнений)
     &-focused {
         background-color: colors.$blue-50;

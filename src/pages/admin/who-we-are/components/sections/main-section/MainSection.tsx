@@ -4,10 +4,16 @@ import { Content, SectionType, WhoWeAreSection } from '../../../../../types/admi
 import { ImageInputProps } from '../../../../../components/admin/image-input/ImageInput';
 import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
 import React from 'react';
-import { CardsSection } from './CardsSection';
-import { DescriptionSection } from './DescriptionSection';
-import { ImageSection } from './ImageSection';
-import { MainPageProps, TeamPageProps, WhatWeDoPageProps } from './SectionsProps';
+import { CardsSection } from '../cards-section/CardsSection';
+import { DescriptionSection } from '../description-section/DescriptionSection';
+import { ImageSection } from '../image-section/ImageSection';
+import {
+    MainPageProps,
+    PeopleCardsProps,
+    TeamPageProps,
+    WhatWeDoPageProps,
+    WhoWeSupportCardsProps,
+} from '../SectionsProps';
 
 interface MainSectionProps {
     section: WhoWeAreSection | null;
@@ -32,13 +38,11 @@ export const MainSection = ({ section, onChange, className, onPublish }: MainSec
             break;
         case SectionType.WhoWeSupport:
             renderedContent = (
-                <CardsSection content={section.contents} onChange={onChange} descriptionLimit={200} titleLimit={100} />
+                <CardsSection content={section.contents} onChange={onChange} {...WhoWeSupportCardsProps} />
             );
             break;
         case SectionType.People:
-            renderedContent = (
-                <CardsSection content={section.contents} onChange={onChange} descriptionLimit={200} titleLimit={100} />
-            );
+            renderedContent = <CardsSection content={section.contents} onChange={onChange} {...PeopleCardsProps} />;
             break;
         case SectionType.Main:
             renderedContent = <ImageSection content={section.contents} onPublish={onPublish} onChange={onChange} {...MainPageProps} />;

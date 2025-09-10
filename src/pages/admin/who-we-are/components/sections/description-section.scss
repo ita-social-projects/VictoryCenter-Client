@@ -1,0 +1,31 @@
+.container {
+  display: flex;
+  gap: 16px; // відступ між колонками
+  align-items: flex-start; // вирівнювання по верхньому краю
+
+  .our-mission {
+    flex: 0 0 55%; // ширина 55%
+  }
+
+  .text-area {
+    flex: 0 0 45%; // ширина 45%
+  }
+
+  .button {
+    margin-top: 16px; // якщо хочеш кнопку під блоками
+  }
+
+  // Адаптив для мобільних
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    .our-mission,
+    .text-area {
+      flex: 1 1 100%;
+    }
+
+    .button {
+      margin-top: 8px;
+    }
+  }
+}

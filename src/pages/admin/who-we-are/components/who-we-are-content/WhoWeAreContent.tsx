@@ -8,6 +8,7 @@ import './who-we-are-content.scss';
 import { MainSection } from '../sections/MainSection';
 import { CardsSection } from '../sections/CardsSection';
 import { DescriptionSection } from '../sections/DescriptionSection';
+import {forEach} from "lodash";
 
 interface ErrorState {
     message: string | null;
@@ -84,6 +85,36 @@ export const WhoWeAreContent = () => {
             };
         });
     }, []);
+
+    const handlePublishChange = useCallback(async () => {
+        if (!selectedSection || !updatedSection) return;
+
+        const changedContents = updatedSection.contents.filter(updatedItem => {
+            const originalItem = selectedSection.contents.find(sel => sel.id === updatedItem.id);
+
+            if (!originalItem) return true;
+            return JSON.stringify(updatedItem) !== JSON.stringify(originalItem);
+        });
+
+        if (selectedCategory && changedContents.length > 0) {
+            const result = await WhoWeAreApi.UpdateContent(client, changedContents, selectedCategory.sectionType);
+
+            // 3. Оновлюємо selectedSection (повністю) і updatedSection частково
+            setSelectedSection(result);
+
+            setUpdatedSection(prev => {
+                if (!prev) return null;
+
+                const newContents = prev.contents.map(item => {
+                    const updated = changedContents.find(c => c.id === item.id);
+                    return updated ?? item;
+                });
+
+                return { ...prev, contents: newContents };
+            });
+        }
+    }, [selectedSection, updatedSection, client, selectedCategory]);
+
     return (
         <div className="who-we-are-main-box">
             <CategoryBar<WhoWeAreCategory>
@@ -93,7 +124,7 @@ export const WhoWeAreContent = () => {
                 getCategoryKey={(category) => category.id}
                 onCategorySelect={handleCategorySelect}
             />
-            <MainSection section={updatedSection} onChange={handleContentChange} />
+            <MainSection section={updatedSection} onChange={handleContentChange} onPublish={handlePublishChange} />
         </div>
     );
 };

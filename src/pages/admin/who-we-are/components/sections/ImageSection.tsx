@@ -1,18 +1,19 @@
 import { Content, ContentType } from '../../../../../types/admin/who-we-are';
 import { ImageInput, ImageInputProps } from '../../../../../components/admin/image-input/ImageInput';
 import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
-import { BaseContent } from '../base-content/BaseContent';
 import React from 'react';
 import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { Image, ImageValues } from '../../../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import bgImage from '../../../../../assets/images/public/about-us-page/background.jpg';
+import {Button} from "../../../../../components/admin/button/Button";
 
 export interface ImageSectionProps {
     content: Content[] | undefined;
     titleLimit?: number;
     descriptionLimit?: number;
     onChange: (data: Content) => void;
+    onPublish: () => void;
     imageInputProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange'>;
 }
 
@@ -21,6 +22,7 @@ export const ImageSection = ({
     titleLimit = 10,
     descriptionLimit,
     onChange,
+    onPublish,
     imageInputProps,
 }: ImageSectionProps) => {
     const commonImageProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange'> = {
@@ -106,6 +108,7 @@ export const ImageSection = ({
                         id={descriptionContent.id.toString()}
                     ></TextAreaWithCharacterLimit>
                 ) : null}
+                <Button buttonStyle={"primary"} onClick={onPublish} type={"submit"}>Опублікувати</Button>
             </div>
         </div>
     );

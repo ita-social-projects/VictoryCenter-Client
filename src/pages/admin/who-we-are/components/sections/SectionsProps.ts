@@ -5,7 +5,7 @@ import MainPageImage from '../../../../../assets/images/public/about-us-page/bac
 import TeamPageImage from '../../../../../assets/images/public/about-us-page/our-team.jpg';
 import { DescriptionSectionProps } from './DescriptionSection';
 
-export const MainPageProps: Omit<ImageSectionProps, 'content' | 'onChange'> = {
+export const MainPageProps: Omit<ImageSectionProps, 'content' | 'onChange' | 'onPublish'> = {
     titleLimit: 50,
     descriptionLimit: 300,
     imageInputProps: {
@@ -13,7 +13,7 @@ export const MainPageProps: Omit<ImageSectionProps, 'content' | 'onChange'> = {
         subText: '1440x860',
         style: {
             width: '52.5625rem',
-            height: '46.875rem',
+            height: '33.125rem',
             backgroundImage: `
         linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
         url(${MainPageImage})`,
@@ -23,7 +23,7 @@ export const MainPageProps: Omit<ImageSectionProps, 'content' | 'onChange'> = {
     },
 };
 
-export const TeamPageProps: Omit<ImageSectionProps, 'content' | 'onChange'> = {
+export const TeamPageProps: Omit<ImageSectionProps, 'content' | 'onChange' | 'onPublish'> = {
     descriptionLimit: 360,
     imageInputProps: {
         label: WHO_WE_ARE_TEXT.IMAGE.INPUT,
@@ -40,6 +40,6 @@ export const TeamPageProps: Omit<ImageSectionProps, 'content' | 'onChange'> = {
     },
 };
 
-export const WhatWeDoPageProps: Omit<DescriptionSectionProps, 'content' | 'onChange'> = {
+export const WhatWeDoPageProps: Omit<DescriptionSectionProps, 'content' | 'onChange' | 'onPublish'> = {
     descriptionLimit: 300,
 };

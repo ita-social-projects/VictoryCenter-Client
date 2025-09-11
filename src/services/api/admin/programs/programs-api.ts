@@ -123,7 +123,13 @@ export const ProgramsApi = {
 
     fetchProgramCategories: async (client: AxiosInstance): Promise<ProgramCategory[]> => {
         const response = await client.get(API_ROUTES.PROGRAMCATEGORY.BASE);
-        return response.data;
+        const result = response.data.map((category: any) => {
+            return {
+                ...category,
+                programsCount: category.programs.length,
+            };
+        });
+        return result;
     },
 
     addProgramCategory: async (
@@ -143,7 +149,7 @@ export const ProgramsApi = {
     },
 
     deleteProgramCategory: async (id: number, client: AxiosInstance): Promise<void> => {
-        const response = client.delete(API_ROUTES.PROGRAMCATEGORY.BASE);
-        return (await response).data;
+        const response = await client.delete(`${API_ROUTES.PROGRAMCATEGORY.BASE}/${id}`);
+        return response.data;
     },
 };

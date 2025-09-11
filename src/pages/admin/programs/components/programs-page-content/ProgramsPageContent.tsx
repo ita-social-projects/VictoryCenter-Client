@@ -43,9 +43,14 @@ export const ProgramsPageContent = () => {
     const { incrementCategoriesCount, decrementCategoriesCount, updateCategoriesCount } = useCategoriesCounter();
 
     // Fetch functions
-    const getProgramCategories = useCallback(async (options: RequestOptions) => {
-        return ProgramsApi.fetchProgramCategories(client);
-    }, []);
+    const getProgramCategories = useCallback(async () => {
+        const categories = await ProgramsApi.fetchProgramCategories(client);
+
+        return categories.map((category) => ({
+            ...category,
+            programsCount: category.programsCount ? category.programsCount : 0,
+        }));
+    }, [client]);
 
     const getFilteredPrograms = useCallback(
         async (params: PaginationRequestParams): Promise<PaginationResult<Program>> => {
@@ -58,16 +63,13 @@ export const ProgramsPageContent = () => {
         [selectedCategory, statusFilter],
     );
 
-    const getSearchedProgram = useCallback(
-        async (options: RequestOptions): Promise<Program | null> => {
-            if (!searchProgramId) {
-                return null;
-            }
+    const getSearchedProgram = useCallback(async (): Promise<Program | null> => {
+        if (!searchProgramId) {
+            return null;
+        }
 
-            return ProgramsApi.fetchProgramById(searchProgramId, client);
-        },
-        [searchProgramId],
-    );
+        return ProgramsApi.fetchProgramById(searchProgramId, client);
+    }, [searchProgramId]);
 
     const getProgramId = useCallback((program: Program) => program.id, []);
 
@@ -140,6 +142,10 @@ export const ProgramsPageContent = () => {
             setErrorState(PROGRAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
         }
     }, [categoriesError, setErrorState]);
+
+    useEffect(() => {
+        console.log('categories', categories);
+    });
 
     useEffect(() => {
         if (programsFetchError) {

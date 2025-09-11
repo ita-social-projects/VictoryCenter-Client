@@ -67,4 +67,19 @@ describe('Header', () => {
         // eslint-disable-next-line no-console
         expect(console.log).toHaveBeenCalledWith('CONTACT USED!');
     });
+
+    it('toggles mobile menu when burger button is clicked', () => {
+        render(<Header />, { wrapper: MemoryRouter });
+
+        expect(screen.queryByText(ABOUT_US, { selector: '.mobileMenu a' })).not.toBeInTheDocument();
+
+        const burgerBtn = screen.getByTestId('burger-icon').parentElement!;
+        fireEvent.click(burgerBtn);
+
+        expect(screen.getByText(ABOUT_US, { selector: '.mobileMenu a' })).toBeInTheDocument();
+        expect(screen.getByText(PROGRAMS, { selector: '.mobileMenu a' })).toBeInTheDocument();
+
+        fireEvent.click(burgerBtn);
+        expect(screen.queryByText(ABOUT_US, { selector: '.mobileMenu a' })).not.toBeInTheDocument();
+    });
 });

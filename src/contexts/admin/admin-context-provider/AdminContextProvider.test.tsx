@@ -147,4 +147,19 @@ describe('<AdminContextProvider />', () => {
         expect(getTokenFnFail()).toBe('');
         expect(isAuthCheckerFail()).toBe(false);
     });
+
+    it('sets isLoading=false immediately if not on /admin path', async () => {
+        Object.defineProperty(window, 'location', {
+            value: { pathname: '/other' },
+            writable: true,
+        });
+
+        render(
+            <AdminContextProvider>
+                <Consumer />
+            </AdminContextProvider>,
+        );
+
+        expect(screen.getByTestId('loading')).toHaveTextContent('false');
+    });
 });

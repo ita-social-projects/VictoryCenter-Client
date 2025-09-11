@@ -33,6 +33,16 @@ describe('BankDetailsFactory', () => {
         expect(validator).toHaveBeenCalledWith(value);
     };
 
+    it('creates form for USD', () => {
+        const Form = createBankDetailsForm('USD');
+        expect(Form).toBeTruthy();
+    });
+
+    it('creates form for EUR', () => {
+        const Form = createBankDetailsForm('EUR');
+        expect(Form).toBeTruthy();
+    });
+
     describe('UAH fields', () => {
         beforeEach(() => {
             // eslint-disable-next-line testing-library/no-render-in-setup
@@ -115,10 +125,20 @@ describe('BankDetailsFactory', () => {
                 expect(getTextareaByName(name)).toBeInTheDocument();
             });
         });
+
+        it('allows entering values', () => {
+            const nameInput = getTextareaByName('name');
+            fireEvent.change(nameInput, { target: { value: 'Test Bank' } });
+            expect(nameInput).toHaveValue('Test Bank');
+
+            const swiftInput = getTextareaByName('swift');
+            fireEvent.change(swiftInput, { target: { value: 'TESTSWIFT' } });
+            expect(swiftInput).toHaveValue('TESTSWIFT');
+        });
     });
 
     it('returns undefined for unknown type', () => {
-        // @ts-expect-error тестимо runtime
+        // @ts-expect-error
         expect(createBankDetailsForm('GBP')).toBeUndefined();
     });
 });

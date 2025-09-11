@@ -102,6 +102,8 @@ export function createBankDetailsForm(type: 'USD' | 'EUR' | 'UAH') {
             return createGenericForm<ForeignBankDetails>(createForeignFields(type));
         case 'UAH':
             return createGenericForm<UahBankDetails>(createUahFields());
+        default:
+            return undefined;
     }
 }
 

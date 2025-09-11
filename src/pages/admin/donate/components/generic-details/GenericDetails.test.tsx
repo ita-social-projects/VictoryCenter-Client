@@ -9,11 +9,12 @@ interface Item {
     name: string;
 }
 
-const MockForm = forwardRef<GenericFormRef, any>(({ onSubmit, onClose, initialData }, ref) => {
+const MockForm = forwardRef<GenericFormRef, any>(({ onSubmit, onClose, initialData, onDelete }, ref) => {
     useImperativeHandle(ref, () => ({
         submit: async () => {},
         isChanged: () => false,
         isValid: () => true,
+        onDelete: () => {},
     }));
 
     const testId = initialData?.id ? `mock-form-${initialData.id}` : 'mock-form-new';
@@ -23,6 +24,7 @@ const MockForm = forwardRef<GenericFormRef, any>(({ onSubmit, onClose, initialDa
             <p>{initialData?.name}</p>
             <button onClick={() => onSubmit({ id: Date.now(), name: 'New Item' })}>Submit</button>
             <button onClick={onClose}>Close</button>
+            <button onClick={() => onDelete(1)}>Delete</button>
         </div>
     );
 });
@@ -124,5 +126,38 @@ describe('GenericDetails', () => {
         render(<GenericDetails {...defaultProps} isChildForm />);
         expect(document.querySelector('.generic-details.child')).toBeInTheDocument();
         expect(screen.getByText(DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW)).toBeInTheDocument();
+    });
+
+    it('does not show not found state while loading', () => {
+        render(<GenericDetails {...defaultProps} items={[]} isLoading notFoundText="No Items" />);
+        expect(screen.queryByText('No Items')).not.toBeInTheDocument();
+    });
+
+    it('removes item on delete', () => {
+        render(<GenericDetails {...defaultProps} />);
+        expect(screen.getByText('Item 1')).toBeInTheDocument();
+        fireEvent.click(screen.getByText('Delete'));
+        expect(screen.queryByText('Item 1')).not.toBeInTheDocument();
+    });
+
+    it('does not render children when collapsed', () => {
+        render(<GenericDetails {...defaultProps} children={({ formState }) => <span>{formState.name}-child</span>} />);
+        const header = screen.getByText('Test Title');
+        fireEvent.click(header);
+        expect(screen.queryByText('Item 1-child')).not.toBeInTheDocument();
+    });
+
+    it('closes add form on handleClose', () => {
+        render(<GenericDetails {...defaultProps} items={[]} />);
+        fireEvent.click(screen.getByText('Add New'));
+        expect(screen.getByTestId('mock-form-new')).toBeInTheDocument();
+        fireEvent.click(screen.getByText('Close'));
+        expect(screen.queryByTestId('mock-form-new')).not.toBeInTheDocument();
+    });
+
+    it('renders only button in not found state for child form', () => {
+        render(<GenericDetails {...defaultProps} items={[]} isChildForm addNewText="Add Child" />);
+        expect(screen.queryByText('No Items Found')).not.toBeInTheDocument();
+        expect(screen.getByText('Add Child')).toBeInTheDocument();
     });
 });

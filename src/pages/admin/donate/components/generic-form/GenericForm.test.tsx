@@ -145,11 +145,9 @@ describe('GenericForm', () => {
         render(<GenericForm {...defaultProps} />);
         const header = screen.getByText('Test Name');
 
-        // click toggle
         fireEvent.click(header);
         expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(true);
 
-        // keydown toggle
         fireEvent.keyDown(header, { key: 'Enter' });
         expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(false);
     });
@@ -159,7 +157,6 @@ describe('GenericForm', () => {
         const input = screen.getByDisplayValue('Test Name') as HTMLInputElement;
 
         fireEvent.blur(input);
-        // errors не обов’язково відображаються, але можна перевірити через клас 'error'
     });
 
     it('exposes submit, isChanged, isValid via ref', async () => {
@@ -212,5 +209,117 @@ describe('GenericForm', () => {
 
         const publishBtn = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH) as HTMLButtonElement;
         expect(publishBtn.disabled).toBe(true);
+    });
+
+    it('Create mode cancel without changes calls onClose directly', () => {
+        const onClose = jest.fn();
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Create} onClose={onClose} />);
+        const cancelBtn = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+        fireEvent.click(cancelBtn);
+        expect(onClose).toHaveBeenCalled();
+    });
+
+    it('does not call onDelete if no id provided', async () => {
+        const onDelete = jest.fn();
+        render(<GenericForm {...defaultProps} initialData={{ name: 'No ID' }} onDelete={onDelete} />);
+        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
+        fireEvent.click(deleteButton);
+
+        const confirmButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES);
+        fireEvent.click(confirmButton);
+
+        await waitFor(() => expect(onDelete).not.toHaveBeenCalled());
+    });
+
+    const arrayFields: GenericFormField<any>[] = [
+        { name: 'name', isRequired: true },
+        { name: 'tags', isRequired: true },
+    ];
+    const ArrayForm = createGenericForm<{ id?: number; name: string; tags: string[] }>(arrayFields);
+
+    it('disables publish when required array field is empty', () => {
+        render(
+            <ArrayForm
+                initialData={{ id: 1, name: 'Name', tags: [] }}
+                initialMode={GenericFormMode.Edit}
+                onClose={jest.fn()}
+                onSubmit={jest.fn()}
+            />,
+        );
+        const publishBtn = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH) as HTMLButtonElement;
+        expect(publishBtn.disabled).toBe(true);
+    });
+
+    it('does not render children when isChildForm is true', () => {
+        render(<GenericForm {...defaultProps} isChildForm={true} />);
+        expect(screen.queryByText('opt')).not.toBeInTheDocument();
+    });
+
+    it('shows cancel edit modal in Create mode when there are unsaved changes', () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Create} />);
+        const input = screen.getByDisplayValue('Test Name') as HTMLInputElement;
+        fireEvent.change(input, { target: { value: 'Changed' } });
+
+        const cancelBtn = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+        fireEvent.click(cancelBtn);
+
+        expect(screen.getByText(DONATE_TEXT.QUESTION.CANCEL_EDIT)).toBeInTheDocument();
+    });
+
+    it('resets isDeleting on modal cancel', () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Edit} />);
+        const deleteBtn = screen.getByRole('button', { name: 'delete-btn' });
+        fireEvent.click(deleteBtn);
+
+        const cancelBtn = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO);
+        fireEvent.click(cancelBtn);
+
+        const icon = screen.getByRole('button', { name: 'delete-btn' }).querySelector('.delete-btn-icon');
+        expect(icon?.classList.contains('pressed')).toBe(false);
+    });
+
+    it('returns null when isOpen is false', () => {
+        const { container } = render(<GenericForm {...defaultProps} isOpen={false} />);
+        expect(container.firstChild).toBeNull();
+    });
+
+    it('resets form and switches mode to View if no changes on cancel', () => {
+        const initialData = { name: 'Test Name', receiver: 'Test Receiver' };
+        const onClose = jest.fn();
+        interface TestForm {
+            id?: number;
+            name: string;
+            receiver: string;
+        }
+
+        const Form = createGenericForm<TestForm>([
+            { name: 'name', isTitle: true, isRequired: true },
+            { name: 'receiver', isRequired: true },
+        ]);
+
+        render(
+            React.createElement(Form as any, {
+                initialMode: GenericFormMode.Edit,
+                initialData,
+                onSubmit: jest.fn(),
+                onClose,
+            }),
+        );
+
+        const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+        fireEvent.click(cancelButton);
+
+        expect(screen.getByRole('button', { name: /edit-btn/i })).toBeInTheDocument();
+        expect(screen.getByText('Test Name')).toBeInTheDocument();
+        expect(screen.getByText('Test Receiver')).toBeInTheDocument();
+    });
+
+    it('calls onClose directly in Create mode if no changes', () => {
+        const onClose = jest.fn();
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Create} onClose={onClose} />);
+        const cancelBtn = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+        fireEvent.click(cancelBtn);
+
+        expect(onClose).toHaveBeenCalled();
     });
 });

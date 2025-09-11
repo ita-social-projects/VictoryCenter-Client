@@ -92,4 +92,39 @@ describe('DonatePageContent', () => {
         fireEvent.click(screen.getByText('Add option'));
         expect(screen.getByTestId('support-options')).toHaveTextContent('1 options');
     });
+    it('does not render GenericDetails if config is null', () => {
+        mockUseBankDetails.mockReturnValueOnce({
+            items: [],
+            config: null,
+            setItems: jest.fn(),
+            isLoading: false,
+        });
+        render(<DonatePageContent />);
+        expect(screen.queryByTestId('generic-details')).not.toBeInTheDocument();
+    });
+
+    it('does not render correspondent banks if withCorrespondentBanks = false', () => {
+        mockUseBankDetails.mockReturnValueOnce({
+            items: [],
+            config: {
+                form: jest.fn(),
+                createEmptyItem: jest.fn(),
+                withCorrespondentBanks: false,
+            },
+            setItems: jest.fn(),
+            isLoading: false,
+        });
+        render(<DonatePageContent />);
+        expect(screen.getAllByTestId('generic-details')).toHaveLength(1);
+    });
+
+    it('renders correspondent banks section if withCorrespondentBanks = true', () => {
+        render(<DonatePageContent />);
+        expect(screen.getAllByTestId('generic-details')).toHaveLength(2);
+    });
+
+    it('DonatePageContent calls getCategoryKey', () => {
+        render(<DonatePageContent />);
+        expect(screen.getByText('UAH')).toBeInTheDocument();
+    });
 });

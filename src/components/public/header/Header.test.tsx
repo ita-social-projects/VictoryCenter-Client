@@ -19,7 +19,7 @@ jest.mock('../../../assets/icons/chevron-down.svg', () => ({
 jest.mock('../../../assets/icons/menu.svg', () => ({
     ReactComponent: () => <svg data-testid="menu" />,
 }));
-jest.mock('../../../assets/icons/close-icon.svg', () => ({
+jest.mock('../../../assets/icons/cross.svg', () => ({
     ReactComponent: () => <svg data-testid="close" />,
 }));
 jest.mock('../../../assets/icons/burger.svg', () => ({

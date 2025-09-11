@@ -1,0 +1,36 @@
+@use '../../../assets/sass/variables/fonts';
+@use '../../../assets/sass/variables/colors';
+
+.dropdown {
+  position: relative;
+  &-button {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    font-size: 1rem;
+    font-family: fonts.$mulish-regular-font;
+    font-weight: 600;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  &-links {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 200%;
+    background-color: white;
+    z-index: 5000;
+  }
+
+  &-link {
+    display: block;
+    width: 100%;
+    padding: 16px 8px 12px 16px;
+    border-bottom: 1px solid colors.$blue-50;
+  }
+}

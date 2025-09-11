@@ -1,8 +1,9 @@
-import React from 'react';
 import { DonatePageIntro } from './donate-page-intro/DonatePageIntro';
 import { DonateSection } from './donate-section/DonateSection';
 import './DonatePage.scss';
 import { RightSection } from './right-section/RightSection';
+import { PAGE_SLUGS } from '../../../const/public/faq';
+import { FaqSection } from '../../../components/public/faq-section/FaqSection';
 
 export const DonatePage = () => {
     return (
@@ -14,6 +15,7 @@ export const DonatePage = () => {
                 </div>
                 <RightSection />
             </div>
+            <FaqSection slug={PAGE_SLUGS.DONATE} />
         </div>
     );
 };

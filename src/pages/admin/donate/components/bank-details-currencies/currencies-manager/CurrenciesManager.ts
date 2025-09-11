@@ -17,8 +17,15 @@ export function useBankDetails<T extends keyof typeof bankDetailsConfig>(currenc
         setIsLoading(true);
         config
             .fetch()
-            .then((data: any[]) => alive && setItems(data))
-            .finally(() => alive && setIsLoading(false));
+            .then((data: any[]) => {
+                if (alive) setItems(data);
+            })
+            .catch(() => {
+                if (alive) setItems([]);
+            })
+            .finally(() => {
+                if (alive) setIsLoading(false);
+            });
         return () => {
             alive = false;
         };

@@ -88,7 +88,7 @@ describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
 
     describe('validateSwift', () => {
         it('return undefined if value is valid', () => {
-            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift('SWIFT123')).toBeUndefined();
+            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift('ABCDUS33XXX')).toBeUndefined();
         });
 
         it('return error if value is empty', () => {

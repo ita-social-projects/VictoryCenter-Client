@@ -141,4 +141,63 @@ describe('BankDetailsFactory', () => {
         // @ts-expect-error
         expect(createBankDetailsForm('GBP')).toBeUndefined();
     });
+
+    it('returns undefined for no type presented', () => {
+        // @ts-expect-error
+        expect(createBankDetailsForm()).toBeUndefined();
+    });
+
+    it('calls validators with empty string when value is undefined (UAH)', () => {
+        const Form = createBankDetailsForm('UAH') as any;
+
+        render(
+            React.createElement(Form, {
+                initialMode: 'create',
+                onSubmit: jest.fn(),
+                onClose: jest.fn(),
+            }),
+        );
+
+        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'name')!);
+        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateName).toHaveBeenCalledWith('');
+
+        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'receiver')!);
+        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver).toHaveBeenCalledWith('');
+
+        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'edrpou')!);
+        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateEdrpou).toHaveBeenCalledWith('');
+
+        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'iban')!);
+        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban).toHaveBeenCalledWith('');
+
+        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'paymentPurpose')!);
+        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validatePaymentPurpose).toHaveBeenCalledWith('');
+    });
+
+    it('calls validators with empty string when value is undefined (USD)', () => {
+        const Form = createBankDetailsForm('USD') as any;
+
+        render(
+            React.createElement(Form, {
+                initialMode: 'create',
+                onSubmit: jest.fn(),
+                onClose: jest.fn(),
+            }),
+        );
+
+        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'name')!);
+        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateName).toHaveBeenCalledWith('');
+
+        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'receiver')!);
+        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver).toHaveBeenCalledWith('');
+
+        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'iban')!);
+        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban).toHaveBeenCalledWith('');
+
+        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'swift')!);
+        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift).toHaveBeenCalledWith('');
+
+        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'address')!);
+        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateAddress).toHaveBeenCalledWith('');
+    });
 });

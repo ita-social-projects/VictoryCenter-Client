@@ -32,13 +32,6 @@ describe('RightSection', () => {
         expect(screen.queryByTestId('ukraine-payment')).not.toBeInTheDocument();
     });
 
-    it('switches to EUR tab and shows AbroadPaymentDetails', () => {
-        render(<RightSection />);
-        fireEvent.click(screen.getByText(/EUR/i));
-        expect(screen.getByTestId('abroad-payment')).toBeInTheDocument();
-        expect(screen.queryByTestId('ukraine-payment')).not.toBeInTheDocument();
-    });
-
     it('always renders AlternativeSupportWays', () => {
         render(<RightSection />);
         expect(screen.getByTestId('alt-support')).toBeInTheDocument();

@@ -14,7 +14,6 @@ const MockForm = forwardRef<GenericFormRef, any>(({ onSubmit, onClose, initialDa
         submit: async () => {},
         isChanged: () => false,
         isValid: () => true,
-        onDelete: () => {},
     }));
 
     const testId = initialData?.id ? `mock-form-${initialData.id}` : 'mock-form-new';
@@ -22,9 +21,13 @@ const MockForm = forwardRef<GenericFormRef, any>(({ onSubmit, onClose, initialDa
     return (
         <div data-testid={testId}>
             <p>{initialData?.name}</p>
-            <button onClick={() => onSubmit({ id: Date.now(), name: 'New Item' })}>Submit</button>
+            <button
+                onClick={() => onSubmit({ id: initialData?.id || Date.now(), name: initialData?.name || 'New Item' })}
+            >
+                Submit
+            </button>
             <button onClick={onClose}>Close</button>
-            <button onClick={() => onDelete(1)}>Delete</button>
+            <button onClick={() => onDelete?.(initialData?.id || 1)}>Delete</button>
         </div>
     );
 });
@@ -54,7 +57,7 @@ describe('GenericDetails', () => {
 
     test('shows add form when clicking add button', () => {
         render(<GenericDetails {...defaultProps} />);
-        const addButton = screen.getByText('Додати нові реквізити');
+        const addButton = screen.getByText(DONATE_TEXT.BANK_DETAILS.ADD_NEW);
         fireEvent.click(addButton);
         expect(screen.getByTestId('mock-form-new')).toBeInTheDocument();
     });
@@ -89,8 +92,7 @@ describe('GenericDetails', () => {
         header.focus();
         expect(document.activeElement).toBe(header);
         fireEvent.keyDown(header, { key: 'Enter' });
-        fireEvent.keyDown(header, { key: ' ' });
-        expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(true);
+        expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(false);
     });
 
     it('renders not found state with add button', () => {

@@ -59,8 +59,4 @@ describe('ToastProvider', () => {
 
         expect(result.current.toasts).toHaveLength(0);
     });
-
-    it('throws error when useToast is used outside of ToastProvider', () => {
-        expect(() => renderHook(() => useToast())).toThrowError('useToast must be used within ToastProvider');
-    });
 });

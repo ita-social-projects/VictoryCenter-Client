@@ -130,11 +130,15 @@ export const useGenericModal = <
 
     const handleClose = useCallback(() => {
         if (formRef.current?.isDirty()) {
-            setShowCloseConfirmModal(true);
+            if (pendingAction === 'draft') {
+                onClose();
+            } else {
+                setShowCloseConfirmModal(true);
+            }
         } else if (!isSubmitting) {
             onClose();
         }
-    }, [isSubmitting, onClose]);
+    }, [isSubmitting, onClose, pendingAction]);
 
     const handleCancelClose = useCallback(() => {
         setShowCloseConfirmModal(false);

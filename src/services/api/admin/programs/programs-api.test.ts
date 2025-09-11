@@ -1,3 +1,4 @@
+import { AxiosInstance } from 'axios';
 import { VisibilityStatus } from '../../../../types/admin/common';
 import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '../../../../types/admin/programs';
 import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin/programs';
@@ -17,7 +18,7 @@ describe('ProgramsApi', () => {
 
     describe('fetchProgramCategories', () => {
         it('should return all program categories', async () => {
-            const promise = ProgramsApi.fetchProgramCategories();
+            const promise = ProgramsApi.fetchProgramCategories({} as AxiosInstance);
             jest.runAllTimers();
             const result = await promise;
 
@@ -28,7 +29,7 @@ describe('ProgramsApi', () => {
 
     describe('fetchProgramById', () => {
         it('should return program when found', async () => {
-            const promise = ProgramsApi.fetchProgramById(1);
+            const promise = ProgramsApi.fetchProgramById(1, {} as AxiosInstance);
             jest.runAllTimers();
             const result = await promise;
 
@@ -37,7 +38,7 @@ describe('ProgramsApi', () => {
         });
 
         it('should return null when program not found', async () => {
-            const promise = ProgramsApi.fetchProgramById(999);
+            const promise = ProgramsApi.fetchProgramById(999, {} as AxiosInstance);
             jest.runAllTimers();
             const result = await promise;
 
@@ -47,7 +48,7 @@ describe('ProgramsApi', () => {
 
     describe('fetchPrograms', () => {
         it('should return paginated programs for category', async () => {
-            const promise = ProgramsApi.fetchPrograms(1, 1, 5);
+            const promise = ProgramsApi.fetchPrograms({} as AxiosInstance, 1, 1, 5);
             jest.runAllTimers();
             const result = await promise;
 
@@ -57,7 +58,7 @@ describe('ProgramsApi', () => {
         });
 
         it('should filter by status when provided', async () => {
-            const promise = ProgramsApi.fetchPrograms(1, 1, 10, VisibilityStatus.Published);
+            const promise = ProgramsApi.fetchPrograms({} as AxiosInstance, 1, 1, 10, VisibilityStatus.Published);
             jest.runAllTimers();
             const result = await promise;
 
@@ -66,7 +67,7 @@ describe('ProgramsApi', () => {
 
         it('should handle pagination correctly', async () => {
             const pageSize = 2;
-            const promise = ProgramsApi.fetchPrograms(1, 1, pageSize);
+            const promise = ProgramsApi.fetchPrograms({} as AxiosInstance, 1, 1, pageSize);
             jest.runAllTimers();
             const result = await promise;
 
@@ -74,7 +75,7 @@ describe('ProgramsApi', () => {
         });
 
         it('should return empty array for non-existent category', async () => {
-            const promise = ProgramsApi.fetchPrograms(999, 1, 10);
+            const promise = ProgramsApi.fetchPrograms({} as AxiosInstance, 999, 1, 10);
             jest.runAllTimers();
             const result = await promise;
 
@@ -83,7 +84,7 @@ describe('ProgramsApi', () => {
         });
 
         it('should handle second page correctly', async () => {
-            const promise = ProgramsApi.fetchPrograms(1, 2, 1);
+            const promise = ProgramsApi.fetchPrograms({} as AxiosInstance, 1, 2, 1);
             jest.runAllTimers();
             const result = await promise;
 
@@ -102,7 +103,7 @@ describe('ProgramsApi', () => {
                 categoryIds: [1, 2],
             };
 
-            const promise = ProgramsApi.addProgram(programData);
+            const promise = ProgramsApi.addProgram({} as AxiosInstance, programData);
             jest.runAllTimers();
             const result = await promise;
 
@@ -123,7 +124,7 @@ describe('ProgramsApi', () => {
                 categoryIds: [2],
             };
 
-            const promise = ProgramsApi.addProgram(programData);
+            const promise = ProgramsApi.addProgram({} as AxiosInstance, programData);
             jest.runAllTimers();
             const result = await promise;
 
@@ -140,7 +141,7 @@ describe('ProgramsApi', () => {
                 categoryIds: [],
             };
 
-            const promise = ProgramsApi.addProgram(programData);
+            const promise = ProgramsApi.addProgram({} as AxiosInstance, programData);
             jest.runAllTimers();
             const result = await promise;
 
@@ -159,7 +160,7 @@ describe('ProgramsApi', () => {
                 categoryIds: [2],
             };
 
-            const promise = ProgramsApi.editProgram(programData);
+            const promise = ProgramsApi.editProgram(programData, {} as AxiosInstance);
             jest.runAllTimers();
             const result = await promise;
 
@@ -177,7 +178,7 @@ describe('ProgramsApi', () => {
                 categoryIds: [1, 2],
             };
 
-            const promise = ProgramsApi.editProgram(programData);
+            const promise = ProgramsApi.editProgram(programData, {} as AxiosInstance);
             jest.runAllTimers();
             const result = await promise;
 
@@ -194,7 +195,7 @@ describe('ProgramsApi', () => {
                 categoryIds: [1],
             };
 
-            const promise = ProgramsApi.editProgram(programData);
+            const promise = ProgramsApi.editProgram(programData, {} as AxiosInstance);
             jest.runAllTimers();
             await expect(promise).rejects.toThrow('Program not found');
         });
@@ -205,7 +206,7 @@ describe('ProgramsApi', () => {
             const initialLength = mockPrograms.length;
             const programToDelete = mockPrograms[0];
 
-            const promise = ProgramsApi.deleteProgram(programToDelete.id);
+            const promise = ProgramsApi.deleteProgram(programToDelete.id, {} as AxiosInstance);
             jest.runAllTimers();
             await promise;
 
@@ -214,7 +215,7 @@ describe('ProgramsApi', () => {
         });
 
         it('should throw error when program not found', async () => {
-            const promise = ProgramsApi.deleteProgram(999);
+            const promise = ProgramsApi.deleteProgram(999, {} as AxiosInstance);
             jest.runAllTimers();
             await expect(promise).rejects.toThrow('Program not found');
         });
@@ -226,7 +227,7 @@ describe('ProgramsApi', () => {
                 id: null,
                 name: 'New Category',
             };
-            const promise = ProgramsApi.addProgramCategory(categoryData);
+            const promise = ProgramsApi.addProgramCategory(categoryData, {} as AxiosInstance);
             jest.runAllTimers();
             const result = await promise;
 
@@ -244,7 +245,7 @@ describe('ProgramsApi', () => {
                 name: 'Updated Category Name',
             };
 
-            const promise = ProgramsApi.editProgramCategory(categoryData);
+            const promise = ProgramsApi.editProgramCategory(categoryData, {} as AxiosInstance);
             jest.runAllTimers();
             const result = await promise;
 
@@ -259,7 +260,7 @@ describe('ProgramsApi', () => {
                 name: 'Non-existent Category',
             };
 
-            const promise = ProgramsApi.editProgramCategory(categoryData);
+            const promise = ProgramsApi.editProgramCategory(categoryData, {} as AxiosInstance);
             jest.runAllTimers();
             await expect(promise).rejects.toThrow('Category not found');
         });
@@ -270,7 +271,7 @@ describe('ProgramsApi', () => {
             const categoryToDelete = mockCategories.find((c) => c.programsCount === 0)!;
             const initialLength = mockCategories.length;
 
-            const promise = ProgramsApi.deleteProgramCategory(categoryToDelete.id);
+            const promise = ProgramsApi.deleteProgramCategory(categoryToDelete.id, {} as AxiosInstance);
             jest.runAllTimers();
             await promise;
 
@@ -281,13 +282,13 @@ describe('ProgramsApi', () => {
         it('should throw error when category has programs', async () => {
             const categoryWithPrograms = mockCategories.find((c) => c.programsCount > 0)!;
 
-            const promise = ProgramsApi.deleteProgramCategory(categoryWithPrograms.id);
+            const promise = ProgramsApi.deleteProgramCategory(categoryWithPrograms.id, {} as AxiosInstance);
             jest.runAllTimers();
             await expect(promise).rejects.toThrow('Category has at least one program');
         });
 
         it('should throw error when category not found', async () => {
-            const promise = ProgramsApi.deleteProgramCategory(999);
+            const promise = ProgramsApi.deleteProgramCategory(999, {} as AxiosInstance);
             jest.runAllTimers();
             await expect(promise).rejects.toThrow('Category not found');
         });
@@ -314,7 +315,7 @@ describe('ProgramsApi', () => {
             mockPrograms.push(programWithNameMatch, programWithCategoryMatch);
 
             const searchTerm = 'Pilates';
-            const promise = ProgramsApi.fetchProgramSearchItems(searchTerm, 0, 10);
+            const promise = ProgramsApi.fetchProgramSearchItems({} as AxiosInstance, searchTerm, 0, 10);
             jest.runAllTimers();
             const result = await promise;
 
@@ -335,7 +336,7 @@ describe('ProgramsApi', () => {
             const limit = 2;
             const offset = 2;
 
-            const promise = ProgramsApi.fetchProgramSearchItems(searchTerm, offset, limit);
+            const promise = ProgramsApi.fetchProgramSearchItems({} as AxiosInstance, searchTerm, offset, limit);
             jest.runAllTimers();
             const result = await promise;
 
@@ -351,7 +352,7 @@ describe('ProgramsApi', () => {
 
         it('should return an empty result when no matches are found', async () => {
             const searchTerm = 'NonExistentProgramXYZ';
-            const promise = ProgramsApi.fetchProgramSearchItems(searchTerm, 0, 10);
+            const promise = ProgramsApi.fetchProgramSearchItems({} as AxiosInstance, searchTerm, 0, 10);
             jest.runAllTimers();
             const result = await promise;
 
@@ -363,7 +364,7 @@ describe('ProgramsApi', () => {
     describe('API Error and Cancellation Handling', () => {
         it('should reject fetchPrograms with AbortError if the request is cancelled', async () => {
             const controller = new AbortController();
-            const promise = ProgramsApi.fetchPrograms(1, 0, 10, undefined, { cancellationSignal: controller.signal });
+            const promise = ProgramsApi.fetchPrograms({} as AxiosInstance, 1, 0, 10, undefined);
 
             controller.abort();
             jest.runAllTimers();
@@ -374,9 +375,7 @@ describe('ProgramsApi', () => {
 
         it('should reject fetchProgramSearchItems with AbortError if the request is cancelled', async () => {
             const controller = new AbortController();
-            const promise = ProgramsApi.fetchProgramSearchItems('search', 0, 10, {
-                cancellationSignal: controller.signal,
-            });
+            const promise = ProgramsApi.fetchProgramSearchItems({} as AxiosInstance, 'search', 0, 10);
 
             controller.abort();
             jest.runAllTimers();
@@ -388,7 +387,7 @@ describe('ProgramsApi', () => {
             const controller = new AbortController();
             controller.abort();
 
-            const promise = ProgramsApi.fetchProgramById(1, { cancellationSignal: controller.signal });
+            const promise = ProgramsApi.fetchProgramById(1, {} as AxiosInstance);
 
             // No need to run timers, as it should reject almost instantly
             await expect(promise).rejects.toThrow('Request was cancelled');

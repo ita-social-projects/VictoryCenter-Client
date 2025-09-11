@@ -26,6 +26,11 @@ describe('BankDetailsFactory', () => {
         return el;
     };
 
+    const expectValidatorCalledWithEmpty = (name: string, validator: jest.Mock) => {
+        fireEvent.blur(getTextareaByName(name));
+        expect(validator).toHaveBeenCalledWith('');
+    };
+
     const testFieldValidation = (fieldName: string, validator: jest.Mock, value: string) => {
         const input = getTextareaByName(fieldName);
         fireEvent.change(input, { target: { value } });
@@ -158,20 +163,14 @@ describe('BankDetailsFactory', () => {
             }),
         );
 
-        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'name')!);
-        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateName).toHaveBeenCalledWith('');
-
-        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'receiver')!);
-        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver).toHaveBeenCalledWith('');
-
-        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'edrpou')!);
-        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateEdrpou).toHaveBeenCalledWith('');
-
-        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'iban')!);
-        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban).toHaveBeenCalledWith('');
-
-        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'paymentPurpose')!);
-        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validatePaymentPurpose).toHaveBeenCalledWith('');
+        expectValidatorCalledWithEmpty('name', BANK_DETAILS_VALIDATION_FUNCTIONS.validateName as any);
+        expectValidatorCalledWithEmpty('receiver', BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver as any);
+        expectValidatorCalledWithEmpty('edrpou', BANK_DETAILS_VALIDATION_FUNCTIONS.validateEdrpou as any);
+        expectValidatorCalledWithEmpty('iban', BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban as any);
+        expectValidatorCalledWithEmpty(
+            'paymentPurpose',
+            BANK_DETAILS_VALIDATION_FUNCTIONS.validatePaymentPurpose as any,
+        );
     });
 
     it('calls validators with empty string when value is undefined (USD)', () => {
@@ -185,19 +184,10 @@ describe('BankDetailsFactory', () => {
             }),
         );
 
-        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'name')!);
-        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateName).toHaveBeenCalledWith('');
-
-        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'receiver')!);
-        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver).toHaveBeenCalledWith('');
-
-        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'iban')!);
-        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban).toHaveBeenCalledWith('');
-
-        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'swift')!);
-        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift).toHaveBeenCalledWith('');
-
-        fireEvent.blur(screen.getAllByRole('textbox').find((el) => el.getAttribute('name') === 'address')!);
-        expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateAddress).toHaveBeenCalledWith('');
+        expectValidatorCalledWithEmpty('name', BANK_DETAILS_VALIDATION_FUNCTIONS.validateName as any);
+        expectValidatorCalledWithEmpty('receiver', BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver as any);
+        expectValidatorCalledWithEmpty('iban', BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban as any);
+        expectValidatorCalledWithEmpty('swift', BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift as any);
+        expectValidatorCalledWithEmpty('address', BANK_DETAILS_VALIDATION_FUNCTIONS.validateAddress as any);
     });
 });

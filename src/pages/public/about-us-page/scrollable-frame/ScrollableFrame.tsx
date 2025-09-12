@@ -2,18 +2,18 @@ import './ScrollableFrame.scss';
 import { Swiper, SwiperSlide, SwiperClass } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
 import { useState, useEffect, useRef } from 'react';
-import arrowRightWhite from '../../../../../assets/icons/arrow-right-white.svg';
-import arrowLeftWhite from '../../../../../assets/icons/arrow-left-white.svg';
-import arrowRightBlack from '../../../../../assets/icons/arrow-right.svg';
-import arrowLeftBlack from '../../../../../assets/icons/arrow-left.svg';
+import arrowRightWhite from '../../../../assets/icons/arrow-right-white.svg';
+import arrowLeftWhite from '../../../../assets/icons/arrow-left-white.svg';
+import arrowRightBlack from '../../../../assets/icons/arrow-right.svg';
+import arrowLeftBlack from '../../../../assets/icons/arrow-left.svg';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
-import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../../const/public/programs-page';
-import { PublishedProgram } from '../../../../../types/public/programs-page';
-import { programPageDataFetch } from '../../../../../services/api/public/programs/programs-api';
-import { ProgramCard } from '../../../programs-page/programs-section/program-card/ProgramCard';
+import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
+import { PublishedProgram } from '../../../../types/public/programs-page';
+import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
+import { ProgramCard } from '../../programs-page/programs-section/program-card/ProgramCard';
 
 export const ScrollableFrame = () => {
     const [programData, setProgramData] = useState<PublishedProgram[]>([]);

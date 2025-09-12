@@ -1,0 +1,46 @@
+.image-section {
+    display: flex;
+    justify-content: space-between;
+
+    .content-wrapper {
+        width: 38rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        justify-content: center;
+
+        &-title {
+            display: flex;
+            flex-direction: column;
+            gap: 0.38rem;
+
+            &-label {
+                font-size: 1rem;
+                font-weight: 400;
+                line-height: 1.5rem;
+                letter-spacing: -0.02rem;
+            }
+
+            &-field {
+                font-size: 1.125rem;
+                font-style: normal;
+                font-weight: 400;
+                line-height: 1.75rem;
+                letter-spacing: -0.0225rem;
+            }
+        }
+
+        &-description {
+            display: flex;
+            flex-direction: column;
+            gap: 0.38rem;
+
+            &-label {
+                font-size: 1rem;
+                font-weight: 400;
+                line-height: 1.5rem;
+                letter-spacing: -0.02rem;
+            }
+        }
+    }
+}

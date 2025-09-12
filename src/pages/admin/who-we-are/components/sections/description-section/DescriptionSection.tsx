@@ -37,17 +37,20 @@ export const DescriptionSection = ({ content, onChange, descriptionLimit, onPubl
 
     return (
         <div className="description-section">
-            <div className="our-mission">
-                <OurMission mainText={descriptionContent.description ?? ''} />
-            </div>
+            <OurMission
+                details={descriptionContent.description ?? ''}
+                className="description-section-show-block"
+                navigate={false}
+            />
             <div className="description-section-textarea">
-                <span>{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
+                <span className="description-section-textarea-label">{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
                 <TextAreaWithCharacterLimit
                     onChange={handleDescriptionChange}
                     value={descriptionContent.description ?? ''}
                     name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     id={descriptionContent.id.toString()}
                     maxLength={descriptionLimit}
+                    rows={5}
                 />
                 <Button className="button" buttonStyle={'primary'} onClick={onPublish} type={'submit'}>
                     Опублікувати

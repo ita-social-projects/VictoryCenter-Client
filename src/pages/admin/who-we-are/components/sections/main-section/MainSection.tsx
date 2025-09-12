@@ -1,12 +1,7 @@
-// MainSection.tsx
-
 import { Content, SectionType, WhoWeAreSection } from '../../../../../../types/admin/who-we-are';
-import { ImageInputProps } from '../../../../../../components/admin/image-input/ImageInput';
-import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
-import React from 'react';
 import { CardsSection } from '../cards-section/CardsSection';
 import { DescriptionSection } from '../description-section/DescriptionSection';
-import { ImageSection } from '../image-section/ImageSection';
+import { ImageSection } from '../image-block-section/ImageBlockSection';
 import {
     MainPageProps,
     PeopleCardsProps,
@@ -77,5 +72,5 @@ export const MainSection = ({ section, onChange, className, onPublish }: MainSec
             renderedContent = null;
     }
 
-    return <div className={className}>{renderedContent}</div>;
+    return <div className="who-we-are-main-section">{renderedContent}</div>;
 };

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { OurMission } from './OurMission';
+import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 
 jest.mock('../../../../const/public/about-us-page', () => ({
     ABOUT_US_DATA: {
@@ -27,7 +28,7 @@ describe('OurMission component', () => {
     it('should render the mission title', () => {
         render(
             <MemoryRouter>
-                <OurMission />
+                <OurMission details={ABOUT_US_DATA.WHAT_WE_DO_DETAILS} />
             </MemoryRouter>,
         );
         expect(screen.getByText('What we do title')).toBeInTheDocument();
@@ -36,7 +37,7 @@ describe('OurMission component', () => {
     it('should render the mission details', () => {
         render(
             <MemoryRouter>
-                <OurMission />
+                <OurMission details={ABOUT_US_DATA.WHAT_WE_DO_DETAILS} />
             </MemoryRouter>,
         );
         expect(screen.getByText('These are the details of what we do.')).toBeInTheDocument();
@@ -45,7 +46,7 @@ describe('OurMission component', () => {
     it('should render the link with correct text and href', () => {
         render(
             <MemoryRouter>
-                <OurMission />
+                <OurMission details={ABOUT_US_DATA.WHAT_WE_DO_DETAILS} />
             </MemoryRouter>,
         );
         const link = screen.getByRole('link', { name: /go to programs/i });
@@ -56,7 +57,7 @@ describe('OurMission component', () => {
     it('should render the ScrollableFrame component', () => {
         render(
             <MemoryRouter>
-                <OurMission />
+                <OurMission details={ABOUT_US_DATA.WHAT_WE_DO_DETAILS} />
             </MemoryRouter>,
         );
         expect(screen.getByTestId('scrollable-frame')).toBeInTheDocument();

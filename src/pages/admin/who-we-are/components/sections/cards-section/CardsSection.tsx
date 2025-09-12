@@ -4,7 +4,7 @@ import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
 import React from 'react';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { CardContent } from '../../card-content/CardContent';
+import { CardContent } from './card-content/CardContent';
 import { Image, ImageValues } from '../../../../../../types/common/image';
 import { CardImageConfig } from '../SectionsProps';
 import './CardsSection.scss';
@@ -12,43 +12,23 @@ import { Button } from '../../../../../../components/admin/button/Button';
 
 export interface CardsSectionProps {
     content: Content[] | undefined;
-    titleLimit: number;
     descriptionLimit: number;
+    rows?: number;
     onChange: (data: Content) => void;
-    className?: string; // <-- added this
     cardImageConfigs: CardImageConfig[];
+    titleText?: string;
     onPublish: () => void;
 }
 
 export const CardsSection = ({
     content,
-    titleLimit,
     descriptionLimit,
+    rows,
     onChange,
     onPublish,
-    className,
     cardImageConfigs,
+    titleText,
 }: CardsSectionProps) => {
-    const commonImageProps: Omit<ImageInputProps, 'className' | 'value'> = {
-        onChange: () => {},
-        label: WHO_WE_ARE_TEXT.IMAGE.INPUT,
-        subText: '1440x860',
-    };
-
-    //  const handleImageChange = (value: ImageValues | Image | null) => {
-    //      onChange({
-    //          ...cardContents,
-    //          image: value
-    //      });
-    //  };
-    //
-    // const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    //     onChange({
-    //         ...cardContents,
-    //         description: e.target.value
-    //     });
-    // };
-
     if (!content) return null;
 
     const cardContents = content.filter((item) => item.contentType === ContentType.Card);
@@ -60,7 +40,7 @@ export const CardsSection = ({
     return (
         <>
             <div className="cards-section-wrapper">
-                <span className="cards-section-wrapper-title">{WHO_WE_ARE_TEXT.WHO_WE_SUPPORT}</span>
+                {titleText && <span className="cards-section-wrapper-title">{titleText}</span>}
                 <div className="cards-section-wrapper-cards">
                     {cardContents.map((c: Content, index: number) => {
                         // Створюємо унікальні обробники для кожного елемента в циклі
@@ -92,6 +72,7 @@ export const CardsSection = ({
                                 onChange={handleDescriptionChange}
                                 descriptionLimit={descriptionLimit}
                                 imageInputProps={{ ...imageConfig }}
+                                rows={rows}
                             />
                         );
                     })}

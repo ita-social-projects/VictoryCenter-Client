@@ -5,13 +5,14 @@ import { CompanyValues } from './company-values/CompanyValues';
 import { OurTeam } from './our-team-section/OurTeam';
 import { MainValues } from './main-value/MainValue';
 import { DonateSection } from './donate-section/DonateSection';
-import { ScrollableFrame } from './our-mission/scrollable-frame/ScrollableFrame';
+import { ScrollableFrame } from './scrollable-frame/ScrollableFrame';
+import { ABOUT_US_DATA } from '../../../const/public/about-us-page';
 
 export const AboutUsPage = () => {
     return (
         <>
             <AboutUsIntro />
-            <OurMission />
+            <OurMission details={ABOUT_US_DATA.WHAT_WE_DO_DETAILS} />
             <ScrollableFrame />
             <SupportSection />
             <CompanyValues />

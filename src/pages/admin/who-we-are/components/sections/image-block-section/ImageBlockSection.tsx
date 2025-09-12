@@ -6,13 +6,15 @@ import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/t
 import { Image, ImageValues } from '../../../../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import bgImage from '../../../../../assets/images/public/about-us-page/background.jpg';
-import './ImageSection.scss';
+import './ImageBlockSection.scss';
+import { InputWithCharacterLimit } from '../../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { Button } from '../../../../../../components/admin/button/Button';
 
 export interface ImageSectionProps {
     content: Content[] | undefined;
     titleLimit?: number;
     descriptionLimit?: number;
+    rows?: number;
     onChange: (data: Content) => void;
     onPublish: () => void;
     imageInputProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange'>;
@@ -22,6 +24,7 @@ export const ImageSection = ({
     content,
     titleLimit = 10,
     descriptionLimit,
+    rows,
     onChange,
     onPublish,
     imageInputProps,
@@ -45,7 +48,7 @@ export const ImageSection = ({
         });
     };
 
-    const handleTitleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (titleContent?.id || titleContent) {
             onChange({
                 ...(titleContent || { contentType: ContentType.Title }),
@@ -80,6 +83,7 @@ export const ImageSection = ({
                     value={imageContent?.image ?? null}
                     onChange={handleImageChange}
                     className="who-we-are-image-input-wrapper"
+                    label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
                     {...imageInputProps}
                 />
             </div>
@@ -87,26 +91,28 @@ export const ImageSection = ({
             <div className="content-wrapper">
                 {titleContent && (
                     <div className="content-wrapper-title">
-                        <span>{COMMON_TEXT_ADMIN.TYPE.TITLE}</span>
-                        <TextAreaWithCharacterLimit
-                            onChange={handleTitleChange}
+                        <span className="content-wrapper-title-label">{COMMON_TEXT_ADMIN.TYPE.TITLE}</span>
+                        <InputWithCharacterLimit
                             value={titleContent.title ?? ''}
-                            maxLength={titleLimit}
+                            onChange={handleTitleChange}
                             name={COMMON_TEXT_ADMIN.TYPE.TITLE}
                             id={titleContent.id.toString()}
+                            maxLength={titleLimit}
+                            className="content-wrapper-title-field"
                         />
                     </div>
                 )}
 
                 {descriptionContent && (
                     <div className="content-wrapper-description">
-                        <span>{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
+                        <span className="content-wrapper-description-label">{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
                         <TextAreaWithCharacterLimit
                             onChange={handleDescriptionChange}
                             value={descriptionContent.description ?? ''}
                             maxLength={descriptionLimit!}
                             name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                             id={descriptionContent.id.toString()}
+                            rows={rows}
                         />
                     </div>
                 )}

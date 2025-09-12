@@ -87,7 +87,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 categoryIds: formData.categories.map((x) => x.id),
             }),
         }),
-        [isEditMode, isOpen, mode, onClose, onSuccess, program],
+        [isEditMode, isOpen, mode, onClose, onSuccess, program, client],
     );
 
     const modalHookData = useGenericModal<ProgramFormValues, Program, ProgramFormRef>(modalConfig);

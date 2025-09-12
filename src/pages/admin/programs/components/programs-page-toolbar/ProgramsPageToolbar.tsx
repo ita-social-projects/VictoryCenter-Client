@@ -41,7 +41,7 @@ export const ProgramsPageToolbar = ({
         async (params: PaginationRequestParams) => {
             return ProgramsApi.fetchProgramSearchItems(client, currentSearchTerm, params.offset, params.limit);
         },
-        [currentSearchTerm],
+        [currentSearchTerm, client],
     );
 
     const {

@@ -13,15 +13,15 @@ jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
-const mockedUseAdminClient = useAdminClient as jest.Mock;
+const mockedAdminClient = useAdminClient as jest.Mock;
 
 beforeEach(() => {
-    mockedUseAdminClient.mockReturnValue({
+    mockedAdminClient.mockReturnValue({
         client: {
-            get: jest.fn(),
-            post: jest.fn(),
-            put: jest.fn(),
-            delete: jest.fn(),
+            get: jest.fn().mockReturnValue(Object),
+            post: jest.fn().mockReturnValue(Object),
+            put: jest.fn().mockReturnValue(Object),
+            delete: jest.fn().mockReturnValue(Object),
         },
     });
 });

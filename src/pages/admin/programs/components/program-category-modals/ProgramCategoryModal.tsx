@@ -141,7 +141,7 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                 setIsSubmitting(false);
             }
         },
-        [formState, isSubmitting, isDuplicateName, mode, props, onClose],
+        [formState, isSubmitting, isDuplicateName, mode, props, onClose, client],
     );
 
     const handleSubmitClick = useCallback(() => {

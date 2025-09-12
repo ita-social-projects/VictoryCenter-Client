@@ -144,10 +144,6 @@ export const ProgramsPageContent = () => {
     }, [categoriesError, setErrorState]);
 
     useEffect(() => {
-        console.log('categories', categories);
-    });
-
-    useEffect(() => {
         if (programsFetchError) {
             setErrorState(PROGRAMS_TEXT.MESSAGE.FAIL_TO_FETCH_PROGRAMS, 'programs');
         }

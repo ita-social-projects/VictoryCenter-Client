@@ -7,6 +7,24 @@ import { InputLabelProps } from '../../../../../components/admin/input-label/Inp
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramCategory } from '../../../../../types/admin/programs';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+
+jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
+}));
+
+const mockedUseAdminClient = useAdminClient as jest.Mock;
+
+beforeEach(() => {
+    mockedUseAdminClient.mockReturnValue({
+        client: {
+            get: jest.fn(),
+            post: jest.fn(),
+            put: jest.fn(),
+            delete: jest.fn(),
+        },
+    });
+});
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
@@ -98,7 +116,7 @@ describe('DeleteCategoryModal', () => {
     };
 
     const expectDeleteApiCalled = (categoryId: number) => {
-        expect(mockedProgramsApi.deleteProgramCategory).toHaveBeenCalledWith(categoryId);
+        expect(mockedProgramsApi.deleteProgramCategory).toHaveBeenCalledWith(categoryId, expect.any(Object));
     };
 
     beforeEach(() => {

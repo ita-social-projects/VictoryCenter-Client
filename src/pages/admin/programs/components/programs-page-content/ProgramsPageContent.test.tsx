@@ -7,6 +7,11 @@ import { VisibilityStatus } from '../../../../../types/admin/common';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+
+jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
+}));
 
 jest.mock('../../../../../services/api/admin/programs/programs-api', () => ({
     ProgramsApi: {
@@ -142,6 +147,18 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
 const mockUseModalsState = require('../../../../../hooks/admin/use-modals-state/useModalsState');
 const mockProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
+const mockedUseAdminClient = useAdminClient as jest.Mock;
+
+beforeEach(() => {
+    mockedUseAdminClient.mockReturnValue({
+        client: {
+            get: jest.fn(),
+            post: jest.fn(),
+            put: jest.fn(),
+            delete: jest.fn(),
+        },
+    });
+});
 // Test data
 const mockCategories: ProgramCategory[] = [
     { id: 1, name: 'Category A', programsCount: 2 },
@@ -307,11 +324,11 @@ describe('ProgramsPageContent', () => {
 
         await waitFor(() => {
             expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
-                1, // categoryId
-                0, // offset
-                5, // limit
-                VisibilityStatus.Published, // status filter
-                expect.any(Object), // options
+                expect.any(Object),
+                1,
+                0,
+                5,
+                VisibilityStatus.Published,
             );
         });
     });

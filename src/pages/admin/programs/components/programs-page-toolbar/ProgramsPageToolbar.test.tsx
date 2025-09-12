@@ -9,6 +9,24 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonProps } from '../../../../../components/admin/button/Button';
 import { SelectOptionProps, SelectProps } from '../../../../../components/admin/select/Select';
 import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+
+jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
+}));
+
+const mockedUseAdminClient = useAdminClient as jest.Mock;
+
+beforeEach(() => {
+    mockedUseAdminClient.mockReturnValue({
+        client: {
+            get: jest.fn(),
+            post: jest.fn(),
+            put: jest.fn(),
+            delete: jest.fn(),
+        },
+    });
+});
 
 jest.mock('../../../../../assets/icons/plus.svg', () => ({
     ReactComponent: ({ ...props }: any) => <svg {...props} data-testid="plus-icon" />,
@@ -238,10 +256,10 @@ describe('ProgramsPageToolbar', () => {
         await fetchHandler(params);
 
         expect(mockProgramsApi.fetchProgramSearchItems).toHaveBeenCalledWith(
+            expect.any(Object),
             '',
             params.offset,
             params.limit,
-            params.requestOptions,
         );
     });
 

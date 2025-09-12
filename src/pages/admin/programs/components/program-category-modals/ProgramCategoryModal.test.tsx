@@ -6,6 +6,7 @@ import { ProgramsApi } from '../../../../../services/api/admin/programs/programs
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
@@ -22,6 +23,10 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     );
     return { Modal: ModalMock };
 });
+
+jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
+}));
 
 // Simplify Button
 jest.mock('../../../../../components/admin/button/Button', () => ({
@@ -77,6 +82,19 @@ const mockCategories: ProgramCategory[] = [
     { id: 3, name: 'Gamma', programsCount: 0 },
 ];
 
+const mockedUseAdminClient = useAdminClient as jest.Mock;
+
+beforeEach(() => {
+    mockedUseAdminClient.mockReturnValue({
+        client: {
+            get: jest.fn(),
+            post: jest.fn(),
+            put: jest.fn(),
+            delete: jest.fn(),
+        },
+    });
+});
+
 const renderModal = (overrideProps?: Partial<ProgramCategoryModalProps>) => {
     const baseAddProps: ProgramCategoryModalProps = {
         isOpen: true,
@@ -121,7 +139,10 @@ describe('ProgramCategoryModal - Add Mode', () => {
         fireEvent.click(getSaveButton());
 
         await waitFor(() => {
-            expect(mockedProgramsApi.addProgramCategory).toHaveBeenCalledWith({ id: null, name: 'Delta' });
+            expect(mockedProgramsApi.addProgramCategory).toHaveBeenLastCalledWith(
+                { id: null, name: 'Delta' },
+                expect.objectContaining({ client: expect.any(Object) }),
+            );
         });
         expect((props as any).onAddCategory).toHaveBeenCalled();
         expect((props as any).onClose).toHaveBeenCalled();
@@ -228,7 +249,10 @@ describe('ProgramCategoryModal - Edit Mode', () => {
         fireEvent.click(screen.getByText('Yes'));
 
         await waitFor(() => {
-            expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledWith({ id: 1, name: 'Omega' });
+            expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledWith(
+                { id: 1, name: 'Omega' },
+                expect.objectContaining({ client: expect.any(Object) }),
+            );
         });
         expect((props as any).onEditCategory).toHaveBeenCalled();
         expect((props as any).onClose).toHaveBeenCalled();

@@ -1,396 +1,379 @@
-import { AxiosInstance } from 'axios';
 import { VisibilityStatus } from '../../../../types/admin/common';
 import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '../../../../types/admin/programs';
 import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin/programs';
 import { ProgramsApi } from './programs-api';
-const programsApiModule = require('./programs-api');
+import { useAdminClient } from '../../../../hooks/admin/use-admin-client/useAdminClient';
 
-describe('ProgramsApi', () => {
-    beforeEach(() => {
-        jest.useFakeTimers();
-        jest.clearAllMocks();
-        programsApiModule.throwErrorsInApi = false;
+jest.mock('../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
+}));
+
+const mockedUseAdminClient = useAdminClient as jest.Mock;
+
+let mockClient: any;
+
+beforeEach(() => {
+    jest.useFakeTimers();
+    jest.clearAllMocks();
+
+    mockClient = {
+        get: jest.fn(),
+        post: jest.fn(),
+        put: jest.fn(),
+        delete: jest.fn(),
+    };
+
+    mockClient.get.mockResolvedValue({ data: mockPrograms });
+    mockClient.post.mockResolvedValue({ data: mockPrograms[0] });
+    mockClient.put.mockResolvedValue({ data: mockPrograms[0] });
+    mockClient.delete.mockResolvedValue({ data: { success: true } });
+
+    mockedUseAdminClient.mockReturnValue({ client: mockClient });
+});
+
+afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+});
+
+describe('fetchProgramById', () => {
+    it('should return program when found', async () => {
+        mockClient.get.mockResolvedValueOnce({ data: mockPrograms[0] });
+        const promise = ProgramsApi.fetchProgramById(1, mockClient);
+        const result = await promise;
+
+        expect(result).toEqual(mockPrograms[0]);
+        expect(result?.id).toBe(1);
     });
 
-    afterEach(() => {
-        jest.useRealTimers();
+    it('should return null when program not found', async () => {
+        mockClient.get.mockResolvedValueOnce({ data: null });
+        const promise = ProgramsApi.fetchProgramById(999, mockClient);
+        const result = await promise;
+
+        expect(result).toBeNull();
+    });
+});
+
+describe('fetchPrograms', () => {
+    it('should return paginated programs for category', async () => {
+        mockClient.get.mockResolvedValueOnce({
+            data: { items: mockPrograms.filter((p) => p.categories.some((c) => c.id === 1)), totalItemsCount: 5 },
+        });
+        const promise = ProgramsApi.fetchPrograms(mockClient, 1, 0, 5);
+        const result = await promise;
+
+        expect(result.items).toBeDefined();
+        expect(result.totalItemsCount).toBeDefined();
+        expect(result.items.every((program) => program.categories.some((cat) => cat.id === 1))).toBe(true);
     });
 
-    describe('fetchProgramCategories', () => {
-        it('should return all program categories', async () => {
-            const promise = ProgramsApi.fetchProgramCategories({} as AxiosInstance);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result).toEqual(mockCategories);
-            expect(result).toHaveLength(mockCategories.length);
+    it('should filter by status when provided', async () => {
+        mockClient.get.mockResolvedValueOnce({
+            data: { items: mockPrograms.filter((p) => p.status === VisibilityStatus.Published), totalItemsCount: 6 },
         });
+        const promise = ProgramsApi.fetchPrograms(mockClient, 1, 0, 10, VisibilityStatus.Published);
+        const result = await promise;
+
+        expect(result.items.every((program) => program.status === VisibilityStatus.Published)).toBe(true);
     });
 
-    describe('fetchProgramById', () => {
-        it('should return program when found', async () => {
-            const promise = ProgramsApi.fetchProgramById(1, {} as AxiosInstance);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result).toEqual(mockPrograms[0]);
-            expect(result?.id).toBe(1);
+    it('should handle pagination correctly', async () => {
+        const pageSize = 2;
+        mockClient.get.mockResolvedValueOnce({
+            data: { items: mockPrograms.slice(0, pageSize), totalItemsCount: mockPrograms.length },
         });
+        const promise = ProgramsApi.fetchPrograms(mockClient, 1, 0, pageSize);
+        const result = await promise;
 
-        it('should return null when program not found', async () => {
-            const promise = ProgramsApi.fetchProgramById(999, {} as AxiosInstance);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result).toBeNull();
-        });
+        expect(result.items).toHaveLength(Math.min(pageSize, result.totalItemsCount));
     });
 
-    describe('fetchPrograms', () => {
-        it('should return paginated programs for category', async () => {
-            const promise = ProgramsApi.fetchPrograms({} as AxiosInstance, 1, 1, 5);
-            jest.runAllTimers();
-            const result = await promise;
+    it('should return empty array for non-existent category', async () => {
+        mockClient.get.mockResolvedValueOnce({ data: { items: [], totalItemsCount: 0 } });
+        const promise = ProgramsApi.fetchPrograms(mockClient, 999, 0, 10);
+        const result = await promise;
 
-            expect(result.items).toBeDefined();
-            expect(result.totalItemsCount).toBeDefined();
-            expect(result.items.every((program) => program.categories.some((cat) => cat.id === 1))).toBe(true);
-        });
-
-        it('should filter by status when provided', async () => {
-            const promise = ProgramsApi.fetchPrograms({} as AxiosInstance, 1, 1, 10, VisibilityStatus.Published);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result.items.every((program) => program.status === VisibilityStatus.Published)).toBe(true);
-        });
-
-        it('should handle pagination correctly', async () => {
-            const pageSize = 2;
-            const promise = ProgramsApi.fetchPrograms({} as AxiosInstance, 1, 1, pageSize);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result.items).toHaveLength(Math.min(pageSize, result.totalItemsCount));
-        });
-
-        it('should return empty array for non-existent category', async () => {
-            const promise = ProgramsApi.fetchPrograms({} as AxiosInstance, 999, 1, 10);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result.items).toHaveLength(0);
-            expect(result.totalItemsCount).toBe(0);
-        });
-
-        it('should handle second page correctly', async () => {
-            const promise = ProgramsApi.fetchPrograms({} as AxiosInstance, 1, 2, 1);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result).toBeDefined();
-        });
+        expect(result.items).toHaveLength(0);
+        expect(result.totalItemsCount).toBe(0);
     });
 
-    describe('addProgram', () => {
-        it('should add program with File image', async () => {
-            const programData: ProgramCreateUpdate = {
-                id: null,
-                name: 'Test Program',
-                description: 'Test Description',
-                status: VisibilityStatus.Draft,
+    it('should handle second page correctly', async () => {
+        mockClient.get.mockResolvedValueOnce({
+            data: { items: mockPrograms.slice(1, 2), totalItemsCount: mockPrograms.length },
+        });
+        const promise = ProgramsApi.fetchPrograms(mockClient, 1, 1, 1);
+        const result = await promise;
+
+        expect(result).toBeDefined();
+    });
+});
+
+describe('addProgram', () => {
+    const programData: ProgramCreateUpdate = {
+        id: null,
+        name: 'Test Program',
+        description: 'Test Description',
+        status: VisibilityStatus.Draft,
+        img: null,
+        categoryIds: [1, 2],
+    };
+
+    it('should add program with File image', async () => {
+        mockClient.post.mockResolvedValueOnce({
+            data: {
+                ...programData,
+                id: 13,
+                categories: mockCategories.slice(0, 2),
                 img: null,
-                categoryIds: [1, 2],
-            };
-
-            const promise = ProgramsApi.addProgram({} as AxiosInstance, programData);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result.id).toBeDefined();
-            expect(result.name).toBe(programData.name);
-            expect(result.description).toBe(programData.description);
-            expect(result.status).toBe(programData.status);
-            expect(result.categories).toHaveLength(2);
+            },
         });
+        mockClient.get.mockResolvedValueOnce({ data: mockCategories });
+        const promise = ProgramsApi.addProgram(mockClient, programData);
+        const result = await promise;
 
-        it('should add program with no image', async () => {
-            const programData: ProgramCreateUpdate = {
-                id: null,
-                name: 'Test Program 3',
-                description: 'Test Description 3',
-                status: VisibilityStatus.Draft,
-                img: null,
-                categoryIds: [2],
-            };
-
-            const promise = ProgramsApi.addProgram({} as AxiosInstance, programData);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result.img).toBeNull();
-        });
-
-        it('should handle empty categoryIds', async () => {
-            const programData: ProgramCreateUpdate = {
-                id: null,
-                name: 'Test Program 4',
-                description: 'Test Description 4',
-                status: VisibilityStatus.Draft,
-                img: null,
-                categoryIds: [],
-            };
-
-            const promise = ProgramsApi.addProgram({} as AxiosInstance, programData);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result.categories).toHaveLength(0);
-        });
+        expect(result.id).toBeDefined();
+        expect(result.name).toBe(programData.name);
+        expect(result.description).toBe(programData.description);
+        expect(result.status).toBe(programData.status);
+        expect(result.categories).toHaveLength(4);
     });
 
-    describe('editProgram', () => {
-        it('should edit existing program with File image', async () => {
-            const programData: ProgramCreateUpdate = {
+    it('should add program with no image', async () => {
+        const noImgData = { ...programData, img: null };
+        mockClient.post.mockResolvedValueOnce({
+            data: {
+                ...noImgData,
+                id: 13,
+                categories: mockCategories.slice(0, 1),
+                img: null,
+            },
+        });
+        mockClient.get.mockResolvedValueOnce({ data: mockCategories });
+        const promise = ProgramsApi.addProgram(mockClient, noImgData);
+        const result = await promise;
+
+        expect(result.img).toBeNull();
+    });
+
+    it('should handle empty categoryIds', async () => {
+        const emptyData = { ...programData, categoryIds: [] };
+        mockClient.post.mockResolvedValueOnce({
+            data: {
+                ...emptyData,
+                id: 13,
+                categories: [],
+                img: null,
+            },
+        });
+        mockClient.get.mockResolvedValueOnce({ data: [] });
+        const promise = ProgramsApi.addProgram(mockClient, emptyData);
+        const result = await promise;
+
+        expect(result.categories).toHaveLength(0);
+    });
+});
+
+describe('editProgram', () => {
+    const programData: ProgramCreateUpdate = {
+        id: 1,
+        name: 'Updated Program',
+        description: 'Updated Description',
+        status: VisibilityStatus.Published,
+        img: null,
+        categoryIds: [2],
+    };
+
+    it('should edit existing program with File image', async () => {
+        mockClient.put.mockResolvedValueOnce({
+            data: {
+                ...programData,
                 id: 1,
-                name: 'Updated Program',
-                description: 'Updated Description',
-                status: VisibilityStatus.Published,
+                categories: mockCategories.slice(0, 2),
                 img: null,
-                categoryIds: [2],
-            };
-
-            const promise = ProgramsApi.editProgram(programData, {} as AxiosInstance);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result.id).toBe(1);
-            expect(result.name).toBe(programData.name);
+            },
         });
+        const promise = ProgramsApi.editProgram(programData, mockClient);
+        const result = await promise;
 
-        it('should edit existing program with null image', async () => {
-            const programData: ProgramCreateUpdate = {
-                id: 3,
-                name: 'Updated Program 3',
-                description: 'Updated Description 3',
-                status: VisibilityStatus.Published,
-                img: null,
-                categoryIds: [1, 2],
-            };
-
-            const promise = ProgramsApi.editProgram(programData, {} as AxiosInstance);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result.img).toBeNull();
-        });
-
-        it('should throw error when program not found', async () => {
-            const programData: ProgramCreateUpdate = {
-                id: 999,
-                name: 'Non-existent Program',
-                description: 'Description',
-                status: VisibilityStatus.Draft,
-                img: null,
-                categoryIds: [1],
-            };
-
-            const promise = ProgramsApi.editProgram(programData, {} as AxiosInstance);
-            jest.runAllTimers();
-            await expect(promise).rejects.toThrow('Program not found');
-        });
+        expect(result.id).toBe(1);
+        expect(result.name).toBe(programData.name);
     });
 
-    describe('deleteProgram', () => {
-        it('should delete existing program', async () => {
-            const initialLength = mockPrograms.length;
-            const programToDelete = mockPrograms[0];
+    it('should edit existing program with null image', async () => {
+        const noImgData = { ...programData, img: null };
+        mockClient.put.mockResolvedValueOnce({ data: { ...noImgData, img: null } });
+        const promise = ProgramsApi.editProgram(noImgData, mockClient);
+        const result = await promise;
 
-            const promise = ProgramsApi.deleteProgram(programToDelete.id, {} as AxiosInstance);
-            jest.runAllTimers();
-            await promise;
-
-            expect(mockPrograms).toHaveLength(initialLength - 1);
-            expect(mockPrograms.find((p) => p.id === programToDelete.id)).toBeUndefined();
-        });
-
-        it('should throw error when program not found', async () => {
-            const promise = ProgramsApi.deleteProgram(999, {} as AxiosInstance);
-            jest.runAllTimers();
-            await expect(promise).rejects.toThrow('Program not found');
-        });
+        expect(result.img).toBeNull();
     });
 
-    describe('addProgramCategory', () => {
-        it('should add new category', async () => {
-            const categoryData: ProgramCategoryCreateUpdate = {
-                id: null,
-                name: 'New Category',
-            };
-            const promise = ProgramsApi.addProgramCategory(categoryData, {} as AxiosInstance);
-            jest.runAllTimers();
-            const result = await promise;
+    it('should throw error when program not found', async () => {
+        mockClient.put.mockRejectedValueOnce(new Error('Program not found'));
+        const promise = ProgramsApi.editProgram({ ...programData, id: 999 }, mockClient);
+        await expect(promise).rejects.toThrow('Program not found');
+    });
+});
 
-            expect(result.id).toBeDefined();
-            expect(result.name).toBe(categoryData.name);
-            expect(result.programsCount).toBe(0);
-            expect(mockCategories).toContain(result);
-        });
+describe('deleteProgram', () => {
+    it('should delete existing program', async () => {
+        const programToDelete = mockPrograms[0];
+        const promise = ProgramsApi.deleteProgram(programToDelete.id, mockClient);
+        await promise;
+
+        expect(mockClient.delete).toHaveBeenCalledWith(expect.stringContaining(`/${programToDelete.id}`));
     });
 
-    describe('editCategory', () => {
-        it('should edit existing category', async () => {
-            const categoryData: ProgramCategoryCreateUpdate = {
-                id: 1,
-                name: 'Updated Category Name',
-            };
+    it('should throw error when program not found', async () => {
+        mockClient.delete.mockRejectedValueOnce(new Error('Program not found'));
+        const promise = ProgramsApi.deleteProgram(999, mockClient);
+        await expect(promise).rejects.toThrow('Program not found');
+    });
+});
 
-            const promise = ProgramsApi.editProgramCategory(categoryData, {} as AxiosInstance);
-            jest.runAllTimers();
-            const result = await promise;
+describe('addProgramCategory', () => {
+    it('should add new category', async () => {
+        const categoryData: ProgramCategoryCreateUpdate = {
+            id: null,
+            name: 'New Category',
+        };
+        mockClient.post.mockResolvedValueOnce({ data: { id: 4, name: categoryData.name, programsCount: 0 } });
+        const promise = ProgramsApi.addProgramCategory(categoryData, mockClient);
+        const result = await promise;
 
-            expect(result.id).toBe(1);
-            expect(result.name).toBe(categoryData.name);
-            expect(mockCategories.find((c) => c.id === 1)?.name).toBe(categoryData.name);
-        });
+        expect(result.id).toBeDefined();
+        expect(result.name).toBe(categoryData.name);
+        expect(result.programsCount).toBe(0);
+    });
+});
 
-        it('should throw error when category not found', async () => {
-            const categoryData = {
-                id: 999,
-                name: 'Non-existent Category',
-            };
+describe('editCategory', () => {
+    it('should edit existing category', async () => {
+        const categoryData: ProgramCategoryCreateUpdate = {
+            id: 1,
+            name: 'Updated Category Name',
+        };
+        mockClient.put.mockResolvedValueOnce({ data: { id: 1, name: categoryData.name, programsCount: 5 } });
+        const promise = ProgramsApi.editProgramCategory(categoryData, mockClient);
+        const result = await promise;
 
-            const promise = ProgramsApi.editProgramCategory(categoryData, {} as AxiosInstance);
-            jest.runAllTimers();
-            await expect(promise).rejects.toThrow('Category not found');
-        });
+        expect(result.id).toBe(1);
+        expect(result.name).toBe(categoryData.name);
     });
 
-    describe('deleteCategory', () => {
-        it('should delete category with zero programs', async () => {
-            const categoryToDelete = mockCategories.find((c) => c.programsCount === 0)!;
-            const initialLength = mockCategories.length;
-
-            const promise = ProgramsApi.deleteProgramCategory(categoryToDelete.id, {} as AxiosInstance);
-            jest.runAllTimers();
-            await promise;
-
-            expect(mockCategories).toHaveLength(initialLength - 1);
-            expect(mockCategories.find((c) => c.id === categoryToDelete.id)).toBeUndefined();
-        });
-
-        it('should throw error when category has programs', async () => {
-            const categoryWithPrograms = mockCategories.find((c) => c.programsCount > 0)!;
-
-            const promise = ProgramsApi.deleteProgramCategory(categoryWithPrograms.id, {} as AxiosInstance);
-            jest.runAllTimers();
-            await expect(promise).rejects.toThrow('Category has at least one program');
-        });
-
-        it('should throw error when category not found', async () => {
-            const promise = ProgramsApi.deleteProgramCategory(999, {} as AxiosInstance);
-            jest.runAllTimers();
-            await expect(promise).rejects.toThrow('Category not found');
-        });
+    it('should throw error when category not found', async () => {
+        const categoryData = { id: 999, name: 'Non-existent Category' };
+        mockClient.put.mockRejectedValueOnce(new Error('Category not found'));
+        const promise = ProgramsApi.editProgramCategory(categoryData, mockClient);
+        await expect(promise).rejects.toThrow('Category not found');
     });
-    describe('fetchProgramSearchItems', () => {
-        it('should prioritize direct name matches in sorting, then sort alphabetically', async () => {
-            const programWithNameMatch = {
-                id: 100,
-                name: 'Core Pilates Workout',
-                description: 'test',
-                status: VisibilityStatus.Published,
-                img: null,
-                categories: [{ id: 9, name: 'General', programsCount: 1 }],
-            };
-            const programWithCategoryMatch = {
-                id: 101,
-                name: 'Advanced Flexibility',
-                description: 'test',
-                status: VisibilityStatus.Published,
-                img: null,
-                categories: [{ id: 10, name: 'Pilates', programsCount: 1 }],
-            };
+});
 
-            mockPrograms.push(programWithNameMatch, programWithCategoryMatch);
+describe('deleteCategory', () => {
+    it('should delete category with zero programs', async () => {
+        const categoryToDelete = mockCategories.find((c) => c.programsCount === 0)!;
+        const promise = ProgramsApi.deleteProgramCategory(categoryToDelete.id, mockClient);
+        await promise;
 
-            const searchTerm = 'Pilates';
-            const promise = ProgramsApi.fetchProgramSearchItems({} as AxiosInstance, searchTerm, 0, 10);
-            jest.runAllTimers();
-            const result = await promise;
-
-            const ids = result.items.map((i) => i.id);
-            const nameMatchIndex = ids.indexOf(programWithNameMatch.id);
-            const categoryMatchIndex = ids.indexOf(programWithCategoryMatch.id);
-
-            expect(nameMatchIndex).toBeGreaterThan(-1);
-            expect(categoryMatchIndex).toBeGreaterThan(-1);
-            expect(nameMatchIndex).toBeLessThan(categoryMatchIndex);
-
-            mockPrograms.pop();
-            mockPrograms.pop();
-        });
-
-        it('should handle pagination correctly', async () => {
-            const searchTerm = 'program';
-            const limit = 2;
-            const offset = 2;
-
-            const promise = ProgramsApi.fetchProgramSearchItems({} as AxiosInstance, searchTerm, offset, limit);
-            jest.runAllTimers();
-            const result = await promise;
-
-            const fullResults = mockPrograms.filter(
-                (p) =>
-                    p.name.toLowerCase().includes(searchTerm) ||
-                    p.categories.some((c) => c.name.toLowerCase().includes(searchTerm)),
-            );
-
-            expect(result.items).toHaveLength(Math.min(limit, fullResults.length - offset));
-            expect(result.totalItemsCount).toBe(fullResults.length);
-        });
-
-        it('should return an empty result when no matches are found', async () => {
-            const searchTerm = 'NonExistentProgramXYZ';
-            const promise = ProgramsApi.fetchProgramSearchItems({} as AxiosInstance, searchTerm, 0, 10);
-            jest.runAllTimers();
-            const result = await promise;
-
-            expect(result.items).toHaveLength(0);
-            expect(result.totalItemsCount).toBe(0);
-        });
+        expect(mockClient.delete).toHaveBeenCalledWith(expect.stringContaining(`/${categoryToDelete.id}`));
     });
 
-    describe('API Error and Cancellation Handling', () => {
-        it('should reject fetchPrograms with AbortError if the request is cancelled', async () => {
-            const controller = new AbortController();
-            const promise = ProgramsApi.fetchPrograms({} as AxiosInstance, 1, 0, 10, undefined);
+    it('should throw error when category has programs', async () => {
+        const categoryWithPrograms = mockCategories.find((c) => c.programsCount > 0)!;
+        mockClient.delete.mockRejectedValueOnce(new Error('Category has at least one program'));
+        const promise = ProgramsApi.deleteProgramCategory(categoryWithPrograms.id, mockClient);
+        await expect(promise).rejects.toThrow('Category has at least one program');
+    });
 
-            controller.abort();
-            jest.runAllTimers();
+    it('should throw error when category not found', async () => {
+        mockClient.delete.mockRejectedValueOnce(new Error('Category not found'));
+        const promise = ProgramsApi.deleteProgramCategory(999, mockClient);
+        await expect(promise).rejects.toThrow('Category not found');
+    });
+});
 
-            await expect(promise).rejects.toThrow('Request was cancelled');
-            await expect(promise).rejects.toMatchObject({ name: 'AbortError' });
+describe('fetchProgramSearchItems', () => {
+    it('should prioritize direct name matches in sorting, then sort alphabetically', async () => {
+        const programWithNameMatch = {
+            id: 100,
+            name: 'Core Pilates Workout',
+            description: 'test',
+            status: VisibilityStatus.Published,
+            img: null,
+            categories: [{ id: 9, name: 'General', programsCount: 1 }],
+        };
+        const programWithCategoryMatch = {
+            id: 101,
+            name: 'Advanced Flexibility',
+            description: 'test',
+            status: VisibilityStatus.Published,
+            img: null,
+            categories: [{ id: 10, name: 'Pilates', programsCount: 1 }],
+        };
+
+        mockClient.get.mockResolvedValueOnce({
+            data: [...mockPrograms, programWithNameMatch, programWithCategoryMatch],
         });
+        const searchTerm = 'Pilates';
+        const promise = ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);
+        const result = await promise;
 
-        it('should reject fetchProgramSearchItems with AbortError if the request is cancelled', async () => {
-            const controller = new AbortController();
-            const promise = ProgramsApi.fetchProgramSearchItems({} as AxiosInstance, 'search', 0, 10);
+        const ids = result.items.map((i) => i.id);
+        const nameMatchIndex = ids.indexOf(programWithNameMatch.id);
+        const categoryMatchIndex = ids.indexOf(programWithCategoryMatch.id);
 
-            controller.abort();
-            jest.runAllTimers();
+        expect(nameMatchIndex).toBeGreaterThan(-1);
+        expect(categoryMatchIndex).toBeGreaterThan(-1);
+        expect(nameMatchIndex).toBeLessThan(categoryMatchIndex);
+    });
 
-            await expect(promise).rejects.toThrow('Request was cancelled');
-        });
+    it('should handle pagination correctly', async () => {
+        const searchTerm = 'program';
+        const limit = 2;
+        const offset = 2;
 
-        it('should handle a pre-aborted signal correctly', async () => {
-            const controller = new AbortController();
-            controller.abort();
+        mockClient.get.mockResolvedValueOnce({ data: mockPrograms });
+        const promise = ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, offset, limit);
+        const result = await promise;
 
-            const promise = ProgramsApi.fetchProgramById(1, {} as AxiosInstance);
+        const fullResults = mockPrograms.filter(
+            (p) =>
+                p.name.toLowerCase().includes(searchTerm) ||
+                p.categories.some((c) => c.name.toLowerCase().includes(searchTerm)),
+        );
 
-            // No need to run timers, as it should reject almost instantly
-            await expect(promise).rejects.toThrow('Request was cancelled');
-        });
+        expect(result.items).toHaveLength(Math.min(limit, Math.max(0, fullResults.length - offset)));
+        expect(result.totalItemsCount).toBe(fullResults.length);
+    });
+
+    it('should return an empty result when no matches are found', async () => {
+        const searchTerm = 'NonExistentProgramXYZ';
+        mockClient.get.mockResolvedValueOnce({ data: [] });
+        const promise = ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);
+        const result = await promise;
+
+        expect(result.items).toHaveLength(0);
+        expect(result.totalItemsCount).toBe(0);
+    });
+});
+
+describe('API Error and Cancellation Handling', () => {
+    it('should reject fetchPrograms with AbortError if the request is cancelled', async () => {
+        mockClient.get.mockRejectedValueOnce(new Error('Request was cancelled'));
+        const promise = ProgramsApi.fetchPrograms(mockClient, 1, 0, 10, undefined);
+        await expect(promise).rejects.toThrow('Request was cancelled');
+    });
+
+    it('should reject fetchProgramSearchItems with AbortError if the request is cancelled', async () => {
+        mockClient.get.mockRejectedValueOnce(new Error('Request was cancelled'));
+        const promise = ProgramsApi.fetchProgramSearchItems(mockClient, 'search', 0, 10);
+        await expect(promise).rejects.toThrow('Request was cancelled');
+    });
+
+    it('should handle a pre-aborted signal correctly', async () => {
+        mockClient.get.mockRejectedValueOnce(new Error('Request was cancelled'));
+        const promise = ProgramsApi.fetchProgramById(1, mockClient);
+        await expect(promise).rejects.toThrow('Request was cancelled');
     });
 });

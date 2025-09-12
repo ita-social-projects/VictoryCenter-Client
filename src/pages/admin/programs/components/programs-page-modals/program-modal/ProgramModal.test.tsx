@@ -6,6 +6,24 @@ import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
+import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
+
+jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
+}));
+
+const mockedUseAdminClient = useAdminClient as jest.Mock;
+
+beforeEach(() => {
+    mockedUseAdminClient.mockReturnValue({
+        client: {
+            get: jest.fn(),
+            post: jest.fn(),
+            put: jest.fn(),
+            delete: jest.fn(),
+        },
+    });
+});
 
 jest.mock('../../../../../../services/api/admin/programs/programs-api', () => ({
     ProgramsApi: {
@@ -267,9 +285,17 @@ describe('ProgramModal', () => {
 
             await waitFor(() => {
                 expect(mockedProgramsApi.addProgram).toHaveBeenCalledWith(
-                    expect.objectContaining({ status: VisibilityStatus.Draft }),
+                    expect.any(Object),
+                    expect.objectContaining({
+                        name: mockFormData.name,
+                        description: mockFormData.description,
+                        categoryIds: [1],
+                        status: VisibilityStatus.Draft,
+                        img: null,
+                    }),
                 );
             });
+
             expect(mockOnAddProgram).toHaveBeenCalled();
             expect(mockOnClose).toHaveBeenCalled();
         });
@@ -289,7 +315,14 @@ describe('ProgramModal', () => {
 
             await waitFor(() => {
                 expect(mockedProgramsApi.addProgram).toHaveBeenCalledWith(
-                    expect.objectContaining({ status: VisibilityStatus.Published }),
+                    expect.any(Object),
+                    expect.objectContaining({
+                        name: mockFormData.name,
+                        description: mockFormData.description,
+                        categoryIds: [1],
+                        status: VisibilityStatus.Published,
+                        img: null,
+                    }),
                 );
             });
             expect(mockOnAddProgram).toHaveBeenCalled();
@@ -329,7 +362,6 @@ describe('ProgramModal', () => {
         });
     });
 
-    // --- Edit Mode ---
     describe('Edit Mode', () => {
         it('should render with the correct "Edit Program" title', () => {
             render(<ProgramModal {...editModeProps} />);
@@ -348,7 +380,15 @@ describe('ProgramModal', () => {
 
             await waitFor(() => {
                 expect(mockedProgramsApi.editProgram).toHaveBeenCalledWith(
-                    expect.objectContaining({ id: mockProgram.id, status: VisibilityStatus.Draft }),
+                    expect.objectContaining({
+                        id: mockProgram.id,
+                        name: mockFormData.name,
+                        description: mockFormData.description,
+                        categoryIds: [1],
+                        status: VisibilityStatus.Draft,
+                        img: null,
+                    }),
+                    expect.any(Object), // client
                 );
             });
             expect(mockOnEditProgram).toHaveBeenCalled();

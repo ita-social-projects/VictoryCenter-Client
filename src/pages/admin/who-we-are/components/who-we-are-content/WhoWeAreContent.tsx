@@ -1,13 +1,17 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { WhoWeAreApi } from '../../../../../services/api/admin/who-we-are/who-we-are-api';
-import { Content, ContentType, WhoWeAreCategory, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
+import { Content, WhoWeAreCategory, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
 import axios from 'axios';
 import './WhoWeAreContent.scss';
 import { MainSection } from '../sections/main-section/MainSection';
-import { CardsSection } from '../sections/cards-section/CardsSection';
-import { DescriptionSection } from '../sections/description-section/DescriptionSection';
+import { Image } from '../../../../../types/common/image';
+import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { ToastType } from '../../../../../types/admin/toast';
+import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
+import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
 
 interface ErrorState {
     message: string | null;
@@ -22,6 +26,9 @@ export const WhoWeAreContent = () => {
     const [selectedSection, setSelectedSection] = useState<WhoWeAreSection | null>(null);
     const [updatedSection, setUpdatedSection] = useState<WhoWeAreSection | null>(null);
     const [contentToUpdate, setContentToUpdate] = useState<Content[]>([]);
+    const [isConfirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false);
+
+    const { addToast } = useToast();
 
     const clearError = useCallback(() => {
         setError({ message: null, type: null });
@@ -93,42 +100,54 @@ export const WhoWeAreContent = () => {
 
             if (!originalItem) return true;
             else {
-                if (updatedItem.contentType === ContentType.Image || updatedItem.contentType === ContentType.Card) {
-                    updatedItem.imageId = updatedItem.id ?? null;
+                if (isExistingImage(updatedItem.image)) {
+                    updatedItem.imageId = updatedItem.image?.id ?? null;
                 }
                 return JSON.stringify(updatedItem) !== JSON.stringify(originalItem);
             }
         });
+
+        function isExistingImage(image: any): image is Image {
+            return image !== null && typeof image === 'object' && 'id' in image && 'url' in image;
+        }
 
         if (selectedCategory && changedContents.length > 0) {
             const result = await WhoWeAreApi.UpdateContent(client, changedContents, selectedCategory.sectionType);
 
             // 3. Оновлюємо selectedSection (повністю) і updatedSection частково
             setSelectedSection(result);
-
-            setUpdatedSection((prev) => {
-                if (!prev) return null;
-
-                const newContents = prev.contents.map((item) => {
-                    const updated = changedContents.find((c) => c.id === item.id);
-                    return updated ?? item;
-                });
-
-                return { ...prev, contents: newContents };
-            });
+            setUpdatedSection(result);
+            addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
         }
     }, [selectedSection, updatedSection, client, selectedCategory]);
 
     return (
-        <div className="who-we-are-main-box">
-            <CategoryBar<WhoWeAreCategory>
-                categories={categories}
-                selectedCategory={selectedCategory}
-                getCategoryDisplayName={(category) => category.title}
-                getCategoryKey={(category) => category.id}
-                onCategorySelect={handleCategorySelect}
+        <>
+            <div className="who-we-are-main-box">
+                <CategoryBar<WhoWeAreCategory>
+                    categories={categories}
+                    selectedCategory={selectedCategory}
+                    getCategoryDisplayName={(category) => category.title}
+                    getCategoryKey={(category) => category.id}
+                    onCategorySelect={handleCategorySelect}
+                />
+                <MainSection
+                    section={updatedSection}
+                    onChange={handleContentChange}
+                    onPublish={() => setConfirmationModalOpen(true)}
+                />
+            </div>
+            <ConfirmationModal
+                isOpen={isConfirmationModalOpen}
+                onClose={() => setConfirmationModalOpen(false)}
+                title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
+                onConfirm={() => {
+                    setConfirmationModalOpen(false);
+                    handlePublishChange();
+                }}
+                onCancel={() => setConfirmationModalOpen(false)}
             />
-            <MainSection section={updatedSection} onChange={handleContentChange} onPublish={handlePublishChange} />
-        </div>
+            <ToastContainer />
+        </>
     );
 };

@@ -39,8 +39,8 @@ export const ImageSection = ({
             ...(imageContent || { contentType: ContentType.Image }), // Create new object if not found
             image: value,
             id: imageContent?.id!,
-            description: '',
-            title: '',
+            description: null,
+            title: null,
             imageId: null,
         });
     };

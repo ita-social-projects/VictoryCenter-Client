@@ -47,21 +47,7 @@ export const TeamMembersApi = {
         id: number,
         member: TeamMemberCreateUpdateRequest,
     ): Promise<TeamMember> => {
-        let imageIdToDelete: number | null = null;
-        let finalImageId = member.imageId;
-
-        if (member.image && 'base64' in member.image) {
-            if (member.imageId) {
-                const imageResult = await ImageApi.put(client, member.image, member.imageId);
-                finalImageId = imageResult.id;
-            } else {
-                const imageResult = await ImageApi.post(client, member.image);
-                finalImageId = imageResult.id;
-            }
-        } else if (member.imageId && !member.image) {
-            imageIdToDelete = member.imageId;
-            finalImageId = null;
-        }
+        const { finalImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(client, member.image, member.imageId);
 
         const response = await client.put(`${API_ROUTES.TEAM.BASE}/${id}`, {
             fullName: member.fullName,
@@ -75,7 +61,6 @@ export const TeamMembersApi = {
         if (imageIdToDelete && imageIdToDelete !== finalImageId) {
             await ImageApi.delete(client, imageIdToDelete);
         }
-
         return response.data as TeamMember;
     },
 

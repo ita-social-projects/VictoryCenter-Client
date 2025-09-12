@@ -58,46 +58,50 @@ export const CardsSection = ({
     }
 
     return (
-        <div className="cards-section-wrapper">
-            <span className="cards-section-wrapper-title">{WHO_WE_ARE_TEXT.WHO_WE_SUPPORT}</span>
-            <div className="cards-section-wrapper-cards">
-                {cardContents.map((c: Content, index: number) => {
-                    // Створюємо унікальні обробники для кожного елемента в циклі
-                    const handleImageChange = (value: ImageValues | Image) => {
-                        onChange({
-                            ...c,
-                            image: value,
-                        });
-                    };
+        <>
+            <div className="cards-section-wrapper">
+                <span className="cards-section-wrapper-title">{WHO_WE_ARE_TEXT.WHO_WE_SUPPORT}</span>
+                <div className="cards-section-wrapper-cards">
+                    {cardContents.map((c: Content, index: number) => {
+                        // Створюємо унікальні обробники для кожного елемента в циклі
+                        const handleImageChange = (value: ImageValues | Image) => {
+                            onChange({
+                                ...c,
+                                image: value,
+                            });
+                        };
 
-                    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                        onChange({
-                            ...c,
-                            description: e.target.value,
-                        });
-                    };
+                        const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                            onChange({
+                                ...c,
+                                description: e.target.value,
+                            });
+                        };
 
-                    const imageConfig = cardImageConfigs[index] || {
-                        style: { width: '20rem', height: '25rem' },
-                        subText: '320x400',
-                    };
+                        const imageConfig = cardImageConfigs[index] || {
+                            style: { width: '20rem', height: '25rem' },
+                            subText: '320x400',
+                        };
 
-                    // Передаємо унікальні обробники в CardContent
-                    return (
-                        <CardContent
-                            key={c.id}
-                            content={c}
-                            onImageChange={handleImageChange}
-                            onChange={handleDescriptionChange}
-                            descriptionLimit={descriptionLimit}
-                            imageInputProps={{ ...imageConfig }}
-                        />
-                    );
-                })}
+                        // Передаємо унікальні обробники в CardContent
+                        return (
+                            <CardContent
+                                key={c.id}
+                                content={c}
+                                onImageChange={handleImageChange}
+                                onChange={handleDescriptionChange}
+                                descriptionLimit={descriptionLimit}
+                                imageInputProps={{ ...imageConfig }}
+                            />
+                        );
+                    })}
+                </div>
             </div>
-            <Button className="button" buttonStyle={'primary'} onClick={onPublish} type={'submit'}>
-                Опублікувати
-            </Button>
-        </div>
+            <div className="button-section">
+                <Button className="button" buttonStyle={'primary'} onClick={onPublish} type={'submit'}>
+                    Опублікувати
+                </Button>
+            </div>
+        </>
     );
 };

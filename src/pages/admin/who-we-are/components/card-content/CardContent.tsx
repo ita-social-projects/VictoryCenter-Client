@@ -30,6 +30,7 @@ export const CardContent = ({
                 className="who-we-are-image-input-wrapper"
                 {...imageInputProps}
             />
+            <span>{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
             <TextAreaWithCharacterLimit
                 onChange={(e) => onChange(e)}
                 value={content.description ?? ''}

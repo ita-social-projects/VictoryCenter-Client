@@ -60,9 +60,6 @@
             object-position: center;
             transition: filter 0.3s ease;
         }
-        &:hover .preview-image {
-            filter: grayscale(80%); // робить сіруватим
-        }
 
         &::after {
             content: '';
@@ -72,6 +69,7 @@
             opacity: 0;
             transition: opacity 0.3s ease;
             z-index: 1;
+            cursor: pointer;
         }
 
         &:hover::after {
@@ -83,22 +81,23 @@
             display: none;
             align-items: center;
             justify-content: center;
-            width: 2.75rem;
-            height: 2.75rem;
+            height: 25%;
+            aspect-ratio: 1 / 1;
             padding: 0.625rem;
             margin: auto;
             border-radius: 8px;
             background: colors.$grey-900;
             opacity: 0.8;
             z-index: 2;
+            cursor: pointer;
 
             &:hover {
                 opacity: 1;
             }
 
             .delete-icon {
-                width: 0.75rem;
-                height: 0.78125rem;
+                width: 45%;
+                height: 45%;
                 color: colors.$grey-50;
             }
         }

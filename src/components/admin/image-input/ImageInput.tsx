@@ -6,7 +6,8 @@ import './ImageInput.scss';
 import './WhoWeAreImageInput.scss';
 import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { DeleteImageModal } from './Image-input-modals/DeleteImageModal';
+import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
+import { COMMON_IMAGE_TEXT } from '../../../const/admin/image';
 
 export interface ImageInputProps {
     value: ImageValues | Image | null;
@@ -119,78 +120,81 @@ export const ImageInput = ({
     };
 
     const confirmDelete = () => {
-        handleRemove(); // Call the function to remove the image
-        handleModal(false); // Close the modal
+        handleRemove();
+        handleModal(false);
     };
 
     return (
-        <div
-            className={classNames(className, {
-                'image-input-wrapper-focused': isFocused && !disabled,
-                'image-input-wrapper-disabled': disabled,
-            })}
-            style={style}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onClick={handleClick}
-            onKeyDown={handleKeyDown}
-            onFocus={handleFocus}
-            onBlur={handleBlurEvent}
-            aria-label={COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || COMMON_TEXT_ADMIN.INPUT.UPLOAD_IMAGE}
-            tabIndex={disabled ? -1 : 0}
-            role="button"
-        >
-            <input
-                ref={inputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleInputChange}
-                onBlur={onBlur}
-                style={{ display: 'none' }}
-                disabled={disabled}
-                data-testid="image-input-hidden"
-                id={id}
-                name={name}
-                tabIndex={-1}
-            />
+        <div>
+            <div
+                className={classNames(className, {
+                    'image-input-wrapper-focused': isFocused && !disabled,
+                    'image-input-wrapper-disabled': disabled,
+                })}
+                style={style}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onClick={handleClick}
+                onKeyDown={handleKeyDown}
+                onFocus={handleFocus}
+                onBlur={handleBlurEvent}
+                aria-label={COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || COMMON_TEXT_ADMIN.INPUT.UPLOAD_IMAGE}
+                tabIndex={disabled ? -1 : 0}
+                role="button"
+            >
+                <input
+                    ref={inputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleInputChange}
+                    onBlur={onBlur}
+                    style={{ display: 'none' }}
+                    disabled={disabled}
+                    data-testid="image-input-hidden"
+                    id={id}
+                    name={name}
+                    tabIndex={-1}
+                />
 
-            {previewImage ? (
-                <div className={classNames('image-preview')}>
-                    <img
-                        src={getImageSrc(previewImage)}
-                        alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
-                        className={classNames('preview-image')}
-                        data-testid="preview-image"
-                    />
-                    {!disabled && (
-                        <button
-                            type="button"
-                            className="delete-button"
-                            disabled={disabled}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleModal(true);
-                            }}
-                        >
-                            <DeleteIcon className={classNames('delete-icon')} />
-                        </button>
-                    )}
-                </div>
-            ) : (
-                <div className="image-placeholder">
-                    <UploadIcon className="placeholder-icon" />
-                    <span>{label}</span>
-                    <span>{subText}</span>
-                </div>
-            )}
-
-            <DeleteImageModal
+                {previewImage ? (
+                    <div className={classNames('image-preview')}>
+                        <img
+                            src={getImageSrc(previewImage)}
+                            alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
+                            className={classNames('preview-image')}
+                            data-testid="preview-image"
+                        />
+                        {!disabled && (
+                            <button
+                                type="button"
+                                className="delete-button"
+                                disabled={disabled}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleModal(true);
+                                }}
+                            >
+                                <DeleteIcon className={classNames('delete-icon')} />
+                            </button>
+                        )}
+                    </div>
+                ) : (
+                    <div className="image-placeholder">
+                        <UploadIcon className="placeholder-icon" />
+                        <span>{label}</span>
+                        <span>{subText}</span>
+                    </div>
+                )}
+            </div>
+            <ConfirmationModal
                 isOpen={isDeleteImageModalOpen}
                 onClose={() => handleModal(false)}
-                onSubmit={confirmDelete}
+                title={COMMON_IMAGE_TEXT.DELETE.TITLE}
+                onConfirm={confirmDelete}
+                onCancel={() => handleModal(false)}
             />
         </div>
     );

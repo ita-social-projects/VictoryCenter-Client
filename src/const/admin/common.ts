@@ -62,6 +62,10 @@ export const COMMON_TEXT_ADMIN = {
         PUBLISH_CHANGES: 'Опублікувати зміни?',
     },
 
+    MESSAGE: {
+        SUCCESSFULLY_PUBLISHED: 'успішно опубліковано',
+    },
+
     BUTTON: {
         YES: 'Так',
         NO: 'Ні',

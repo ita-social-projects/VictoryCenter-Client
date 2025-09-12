@@ -12,8 +12,8 @@ jest.mock('../../../assets/icons/logo-with-text.svg', () => ({
 jest.mock('../../../assets/icons/burger.svg', () => ({
     ReactComponent: () => <div data-testid="burger-icon" />,
 }));
-jest.mock('../../../assets/icons/close-icon.svg', () => ({
-    ReactComponent: () => <div data-testid="close" />,
+jest.mock('../../../assets/icons/cross.svg', () => ({
+    ReactComponent: () => <div data-testid="cross" />,
 }));
 
 describe('Header', () => {

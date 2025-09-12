@@ -1,4 +1,4 @@
-import { ImageSectionProps } from './image-section/ImageSection';
+import { ImageSectionProps } from './image-block-section/ImageBlockSection';
 import { ImageInputProps } from '../../../../../components/admin/image-input/ImageInput';
 import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
 import MainPageImage from '../../../../../assets/images/public/about-us-page/background.jpg';

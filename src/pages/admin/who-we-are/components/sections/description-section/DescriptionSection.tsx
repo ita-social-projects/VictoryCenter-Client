@@ -7,6 +7,7 @@ import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/t
 import { MainPageProps } from '../SectionsProps';
 import { ReactComponent as ArrowIcon } from '../../../../../../assets/icons/arrow-up-right.svg';
 import './DescriptionSection.scss';
+import { OurMission } from '../../../../../public/about-us-page/our-mission/OurMission';
 
 export interface DescriptionSectionProps {
     content: Content[] | undefined;
@@ -32,16 +33,13 @@ export const DescriptionSection = ({ content, onChange, descriptionLimit }: Desc
 
     return (
         <div className="description-section">
-            <h2>{WHO_WE_ARE_TEXT.WHAT_WE_DO}</h2>
-            <div className="description-section-preview">
-                <span className="description-section-preview-text">{descriptionContent.description ?? ''}</span>
-                <div className="description-section-preview-link">
-                    <span className="description-section-preview-link-title">{WHO_WE_ARE_TEXT.GO_TO_PROGRAMS}</span>
-                    <ArrowIcon />
-                </div>
-            </div>
+            <OurMission
+                details={descriptionContent.description}
+                className="description-section-show-block"
+                navigate={false}
+            />
             <div className="description-section-textarea">
-                <span>{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
+                <span className="description-section-textarea-label">{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
                 <TextAreaWithCharacterLimit
                     onChange={handleDescriptionChange}
                     value={descriptionContent.description ?? ''}

@@ -1,5 +1,4 @@
 import { Image, ImageValues } from '../common/image';
-import { ContextType } from 'react';
 
 export type WhoWeAreCategory = {
     id: number;

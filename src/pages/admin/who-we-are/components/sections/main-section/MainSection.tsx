@@ -1,7 +1,7 @@
 import { Content, SectionType, WhoWeAreSection } from '../../../../../../types/admin/who-we-are';
 import { CardsSection } from '../cards-section/CardsSection';
 import { DescriptionSection } from '../description-section/DescriptionSection';
-import { ImageSection } from '../image-section/ImageSection';
+import { ImageSection } from '../image-block-section/ImageBlockSection';
 import {
     MainPageProps,
     PeopleCardsProps,

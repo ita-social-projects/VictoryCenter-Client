@@ -1,10 +1,10 @@
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { COMMON_TEXT_ADMIN } from '../../../../../../../const/admin/common';
+import { TextAreaWithCharacterLimit } from '../../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import React from 'react';
-import { ImageInput, ImageInputProps } from '../../../../../components/admin/image-input/ImageInput';
-import { Content } from '../../../../../types/admin/who-we-are';
-import { Image, ImageValues } from '../../../../../types/common/image';
-import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
+import { ImageInput, ImageInputProps } from '../../../../../../../components/admin/image-input/ImageInput';
+import { Content } from '../../../../../../../types/admin/who-we-are';
+import { Image, ImageValues } from '../../../../../../../types/common/image';
+import { WHO_WE_ARE_TEXT } from '../../../../../../../const/admin/who-we-are';
 import './CardContent.scss';
 
 interface CardContentProps {
@@ -33,7 +33,7 @@ export const CardContent = ({
                 {...imageInputProps}
             />
             <div className="card-content-description-wrapper">
-                <span>{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
+                <span className="card-content-description-wrapper-label">{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
                 <TextAreaWithCharacterLimit
                     onChange={(e) => onChange(e)}
                     value={content.description ?? ''}

@@ -1,15 +1,18 @@
-@use '../../../../assets/sass/variables/colors';
-@use '../../../../assets/sass/variables/fonts';
+@use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/fonts';
 
-.qa-section {
+.faq-section {
     box-sizing: content-box;
-    padding: 7.5rem 3.5rem;
+    padding: 7.5rem 0rem;
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
+    margin: auto;
+    background-color: white;
 
-    .question-block {
-        width: 100%;
+    .faq-block {
+        width: 83rem;
         display: flex;
         justify-content: space-between;
         align-items: flex-start;

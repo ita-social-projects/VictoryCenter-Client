@@ -1,5 +1,4 @@
 import { ImageSectionProps } from './image-block-section/ImageBlockSection';
-import { ImageInputProps } from '../../../../../components/admin/image-input/ImageInput';
 import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
 import MainPageImage from '../../../../../assets/images/public/about-us-page/background.jpg';
 import TeamPageImage from '../../../../../assets/images/public/about-us-page/our-team.jpg';
@@ -13,7 +12,7 @@ import WomanAndHorse from '../../../../../assets/images/public/about-us-page/wom
 import { DescriptionSectionProps } from './description-section/DescriptionSection';
 import { CardsSectionProps } from './cards-section/CardsSection';
 
-export const MainPageProps: Omit<ImageSectionProps, 'content' | 'onChange'> = {
+export const MainPageProps: Omit<ImageSectionProps, 'content' | 'onChange' | 'onPublish'> = {
     titleLimit: 50,
     descriptionLimit: 300,
     rows: 5,
@@ -31,7 +30,7 @@ export const MainPageProps: Omit<ImageSectionProps, 'content' | 'onChange'> = {
     },
 };
 
-export const TeamPageProps: Omit<ImageSectionProps, 'content' | 'onChange'> = {
+export const TeamPageProps: Omit<ImageSectionProps, 'content' | 'onChange' | 'onPublish'> = {
     descriptionLimit: 360,
     rows: 6,
     imageInputProps: {
@@ -48,7 +47,7 @@ export const TeamPageProps: Omit<ImageSectionProps, 'content' | 'onChange'> = {
     },
 };
 
-export const WhatWeDoPageProps: Omit<DescriptionSectionProps, 'content' | 'onChange'> = {
+export const WhatWeDoPageProps: Omit<DescriptionSectionProps, 'content' | 'onChange' | 'onPublish'> = {
     descriptionLimit: 300,
 };
 
@@ -57,8 +56,8 @@ export interface CardImageConfig {
     subText: string;
 }
 
-export const WhoWeSupportCardsProps: Omit<CardsSectionProps, 'content' | 'onChange'> = {
-    descriptionLimit: 300,
+export const WhoWeSupportCardsProps: Omit<CardsSectionProps, 'content' | 'onChange' | 'onPublish'> = {
+    descriptionLimit: 200,
     titleText: WHO_WE_ARE_TEXT.WHO_WE_SUPPORT,
     rows: 5,
     cardImageConfigs: [
@@ -104,9 +103,8 @@ export const WhoWeSupportCardsProps: Omit<CardsSectionProps, 'content' | 'onChan
     ],
 };
 
-export const PeopleCardsProps: Omit<CardsSectionProps, 'content' | 'onChange'> = {
-    descriptionLimit: 60,
-    rows: 2,
+export const PeopleCardsProps: Omit<CardsSectionProps, 'content' | 'onChange' | 'onPublish'> = {
+    descriptionLimit: 200,
     cardImageConfigs: [
         // first card
         {

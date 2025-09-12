@@ -8,6 +8,7 @@ import { CardContent } from './card-content/CardContent';
 import { Image, ImageValues } from '../../../../../../types/common/image';
 import { CardImageConfig } from '../SectionsProps';
 import './CardsSection.scss';
+import { Button } from '../../../../../../components/admin/button/Button';
 
 export interface CardsSectionProps {
     content: Content[] | undefined;
@@ -16,6 +17,7 @@ export interface CardsSectionProps {
     onChange: (data: Content) => void;
     cardImageConfigs: CardImageConfig[];
     titleText?: string;
+    onPublish: () => void;
 }
 
 export const CardsSection = ({
@@ -23,15 +25,10 @@ export const CardsSection = ({
     descriptionLimit,
     rows,
     onChange,
+    onPublish,
     cardImageConfigs,
     titleText,
 }: CardsSectionProps) => {
-    const commonImageProps: Omit<ImageInputProps, 'className' | 'value'> = {
-        onChange: () => {},
-        label: WHO_WE_ARE_TEXT.IMAGE.INPUT,
-        subText: '1440x860',
-    };
-
     //  const handleImageChange = (value: ImageValues | Image | null) => {
     //      onChange({
     //          ...cardContents,
@@ -93,6 +90,9 @@ export const CardsSection = ({
                     );
                 })}
             </div>
+            <Button className="button" buttonStyle={'primary'} onClick={onPublish} type={'submit'}>
+                Опублікувати
+            </Button>
         </div>
     );
 };

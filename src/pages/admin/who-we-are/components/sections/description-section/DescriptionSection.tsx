@@ -7,20 +7,24 @@ import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/t
 import { MainPageProps } from '../SectionsProps';
 import { ReactComponent as ArrowIcon } from '../../../../../../assets/icons/arrow-up-right.svg';
 import './DescriptionSection.scss';
+import { Button } from '../../../../../../components/admin/button/Button';
 import { OurMission } from '../../../../../public/about-us-page/our-mission/OurMission';
 
 export interface DescriptionSectionProps {
     content: Content[] | undefined;
     descriptionLimit: number;
     onChange: (data: Content) => void;
+    onPublish: () => void;
 }
 
-export const DescriptionSection = ({ content, onChange, descriptionLimit }: DescriptionSectionProps) => {
+export const DescriptionSection = ({ content, onChange, descriptionLimit, onPublish }: DescriptionSectionProps) => {
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        // onChange({
-        //     ...descriptionContent,
-        //     description: e.target.value,
-        // });
+        if (descriptionContent?.id || descriptionContent) {
+            onChange({
+                ...descriptionContent,
+                description: e.target.value,
+            });
+        }
     };
 
     if (!content) return null;
@@ -34,7 +38,7 @@ export const DescriptionSection = ({ content, onChange, descriptionLimit }: Desc
     return (
         <div className="description-section">
             <OurMission
-                details={descriptionContent.description}
+                details={descriptionContent.description ?? ''}
                 className="description-section-show-block"
                 navigate={false}
             />
@@ -48,6 +52,9 @@ export const DescriptionSection = ({ content, onChange, descriptionLimit }: Desc
                     maxLength={descriptionLimit}
                     rows={5}
                 />
+                <Button className="button" buttonStyle={'primary'} onClick={onPublish} type={'submit'}>
+                    Опублікувати
+                </Button>
             </div>
         </div>
     );

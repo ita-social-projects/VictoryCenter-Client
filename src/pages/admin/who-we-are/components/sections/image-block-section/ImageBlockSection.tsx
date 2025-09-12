@@ -7,9 +7,8 @@ import { Image, ImageValues } from '../../../../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import bgImage from '../../../../../assets/images/public/about-us-page/background.jpg';
 import './ImageBlockSection.scss';
-import { Input } from '@mui/material';
-import { InputWithCharacterLimitGroup } from '../../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { InputWithCharacterLimit } from '../../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
+import { Button } from '../../../../../../components/admin/button/Button';
 
 export interface ImageSectionProps {
     content: Content[] | undefined;
@@ -17,6 +16,7 @@ export interface ImageSectionProps {
     descriptionLimit?: number;
     rows?: number;
     onChange: (data: Content) => void;
+    onPublish: () => void;
     imageInputProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange'>;
 }
 
@@ -26,6 +26,7 @@ export const ImageSection = ({
     descriptionLimit,
     rows,
     onChange,
+    onPublish,
     imageInputProps,
 }: ImageSectionProps) => {
     const commonImageProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange'> = {
@@ -43,38 +44,29 @@ export const ImageSection = ({
             id: imageContent?.id!,
             description: '',
             title: '',
+            imageId: null,
         });
     };
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // onChange({
-        //     ...(titleContent || { contentType: ContentType.Title }),
-        //     title: e.target.value,
-        //     id: titleContent?.id ?? null,
-        // });
+        if (titleContent?.id || titleContent) {
+            onChange({
+                ...(titleContent || { contentType: ContentType.Title }),
+                title: e.target.value,
+                id: titleContent.id,
+            });
+        }
     };
 
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        // onChange({
-        //     ...(descriptionContent || { contentType: ContentType.Description }),
-        //     description: e.target.value,
-        //     id: descriptionContent?.id,
-        // });
+        if (descriptionContent?.id || descriptionContent) {
+            onChange({
+                ...(descriptionContent || { contentType: ContentType.Description }),
+                description: e.target.value,
+                id: descriptionContent?.id,
+            });
+        }
     };
-
-    //  const handleImageChange = (value: ImageValues | Image) => {
-    //        onChange({
-    //            ...cardContents,
-    //            image: value
-    //        });
-    //  };
-
-    //  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    //        onChange({
-    //            ...cardContents,
-    //            description: e.target.value
-    //        });
-    //  };
 
     if (!content) return null;
 
@@ -101,7 +93,7 @@ export const ImageSection = ({
                     <div className="content-wrapper-title">
                         <span className="content-wrapper-title-label">{COMMON_TEXT_ADMIN.TYPE.TITLE}</span>
                         <InputWithCharacterLimit
-                            value={titleContent.title}
+                            value={titleContent.title ?? ''}
                             onChange={handleTitleChange}
                             name={COMMON_TEXT_ADMIN.TYPE.TITLE}
                             id={titleContent.id.toString()}
@@ -116,7 +108,7 @@ export const ImageSection = ({
                         <span className="content-wrapper-description-label">{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
                         <TextAreaWithCharacterLimit
                             onChange={handleDescriptionChange}
-                            value={descriptionContent.description}
+                            value={descriptionContent.description ?? ''}
                             maxLength={descriptionLimit!}
                             name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                             id={descriptionContent.id.toString()}
@@ -124,6 +116,9 @@ export const ImageSection = ({
                         />
                     </div>
                 )}
+                <Button className="button" buttonStyle={'primary'} onClick={onPublish} type={'submit'}>
+                    Опублікувати
+                </Button>
             </div>
         </div>
     );

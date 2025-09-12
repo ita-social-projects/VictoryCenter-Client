@@ -12,16 +12,10 @@ victory-center-client
 │   ├───ISSUE_TEMPLATE
 │   ├───PULL_REQUEST_TEMPLATE
 │   ├───workflows
-│   │   ├───lint.build.yml
-│   │   └───test.build.yml
-│   ├───CODEOWNERS
-│   └───pull_request_template.md
+│   └───CODEOWNERS
 ├───nginx
-│   └───nginx.conf
-├───public
-│   └───index.html
+├───public                              # Static assets root
 ├───scripts
-│   └───start-in-dev-over-https.mjs
 ├───src
 │   ├───__mocks__
 │   ├───assets
@@ -69,6 +63,8 @@ victory-center-client
 │   │   │   ├───modal
 │   │   │   └───page-loader
 │   │   └───public
+│   │       ├───faq-section
+│   │       │   └───faq-card
 │   │       ├───footer
 │   │       └───header
 │   ├───const
@@ -76,16 +72,16 @@ victory-center-client
 │   │   ├───common
 │   │   │   └───api-routes
 │   │   └───public
+│   ├───contexts
+│   │   ├───admin
+│   │   │   └───admin-context-provider
+│   │   └───public
 │   ├───hooks
 │   │   ├───admin
 │   │   │   ├───use-admin-client
 │   │   │   └───use-create-member-form
 │   │   └───common
 │   │       └───use-on-mount-unsafe
-│   ├───contexts
-│   │   ├───admin
-│   │   │   └───admin-context-provider
-│   │   └───public
 │   ├───layouts
 │   │   ├───admin-layout
 │   │   └───public-layout
@@ -102,15 +98,15 @@ victory-center-client
 │   │   │   │       ├───program-modals
 │   │   │   │       ├───programs-page-content
 │   │   │   │       └───programs-page-toolbar
-│   │   │   └──team
-│   │   │      └───components
-│   │   │          ├───member-component
-│   │   │          ├───member-drag-preview
-│   │   │          ├───member-form
-│   │   │          ├───members-list
-│   │   │          ├───members-list-item
-│   │   │          ├───team-page-content
-│   │   │          └───team-page-toolbar
+│   │   │   └───team
+│   │   │       └───components
+│   │   │           ├───member-component
+│   │   │           ├───member-drag-preview
+│   │   │           ├───member-form
+│   │   │           ├───members-list
+│   │   │           ├───members-list-item
+│   │   │           ├───team-page-content
+│   │   │           └───team-page-toolbar
 │   │   └───public
 │   │       ├───about-us-page
 │   │       │   ├───company-values
@@ -118,7 +114,7 @@ victory-center-client
 │   │       │   ├───intro-section
 │   │       │   ├───main-value
 │   │       │   ├───our-mission
-│   │       │   │    └───scrollable-frame 
+│   │       │   │   └───scrollable-frame
 │   │       │   ├───our-team-section
 │   │       │   └───support-section
 │   │       ├───donate-page
@@ -133,12 +129,10 @@ victory-center-client
 │   │       ├───programs-page
 │   │       │   ├───contact-section
 │   │       │   ├───intro-section
-│   │       │   ├───programs-section
-│   │       │   │   └───program-card
-│   │       │   └───question-section
-│   │       │       └───question-card
+│   │       │   └───programs-section
+│   │       │       └───program-card
 │   │       └───team-page
-│   │           └───TeamMemberCard
+│   │           └───team-member-card
 │   ├───routes
 │   │   └───app-router
 │   ├───services
@@ -148,9 +142,10 @@ victory-center-client
 │   │   │   │   ├───login
 │   │   │   │   ├───programs
 │   │   │   │   └───team
-│   │   │   │       ├───team-members
-│   │   │   │       └───team-categories
+│   │   │   │       ├───team-categories
+│   │   │   │       └───team-members
 │   │   │   └───public
+│   │   │       ├───faq
 │   │   │       ├───programs
 │   │   │       └───team
 │   │   └───auth
@@ -174,22 +169,22 @@ victory-center-client
 │   │   │   ├───program-category-schema
 │   │   │   └───program-schema
 │   │   └───public
-│   ├───index.jsx                           # Entry point (ReactDOM.createRoot)
-│   ├───index.css                           # Global styles (normalizer)
-│   ├───react-app-env.d.ts
-│   ├───reportWebVitals.ts
-│   ├───setupProxy.ts
-│   └───setupTests.ts
-├───.coderabbit.yaml
-├───.dockerignore
-├───.env.development
-├───.gitignore
-├───Dockerfile
-├───LICENSE
-├───package-lock.json
-├───package.json
-├───README.md
-└───tsconfig.json
+│   ├──index.tsx                           # Entry point (ReactDOM.createRoot)
+│   ├──index.css                           # Global styles (normalizer)
+│   ├──react-app-env.d.ts
+│   ├──reportWebVitals.ts
+│   ├──setupProxy.ts
+│   └──setupTests.ts
+├──.coderabbit.yaml
+├──.dockerignore
+├──.env.development
+├──.gitignore
+├──Dockerfile
+├──LICENSE
+├──package-lock.json
+├──package.json
+├──README.md
+└──tsconfig.json
 </code></pre>
 
 <div>

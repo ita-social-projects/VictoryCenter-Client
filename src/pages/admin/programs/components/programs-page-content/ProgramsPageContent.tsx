@@ -11,7 +11,6 @@ import { useCategoriesCounter } from '../../../../../hooks/admin/use-categories-
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { RequestOptions } from '../../../../../types/common/api';
 import { useDataFetch } from '../../../../../hooks/admin/fetch/use-data-fetch/useDataFetch';
 import {
     PaginationRequestParams,
@@ -60,7 +59,7 @@ export const ProgramsPageContent = () => {
 
             return ProgramsApi.fetchPrograms(client, selectedCategory.id, params.offset, params.limit, statusFilter);
         },
-        [selectedCategory, statusFilter],
+        [selectedCategory, statusFilter, client],
     );
 
     const getSearchedProgram = useCallback(async (): Promise<Program | null> => {
@@ -69,7 +68,7 @@ export const ProgramsPageContent = () => {
         }
 
         return ProgramsApi.fetchProgramById(searchProgramId, client);
-    }, [searchProgramId]);
+    }, [searchProgramId, client]);
 
     const getProgramId = useCallback((program: Program) => program.id, []);
 

@@ -1,5 +1,5 @@
 import './AdminHomePage.scss';
-import { ReactComponent as ArrowIcon } from '../../../assets/icons/arrow-left-white.svg';
+import { ReactComponent as ArrowIcon } from '../../../assets/icons/arrow-left.svg';
 import { MAIN_TEXT, SUB_TEXT, HINT_TEXT } from '../../../const/admin/home';
 
 export const AdminHomePage = () => {

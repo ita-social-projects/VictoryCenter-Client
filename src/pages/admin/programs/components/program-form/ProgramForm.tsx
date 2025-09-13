@@ -1,21 +1,23 @@
 import React, { forwardRef, useCallback, useMemo } from 'react';
 import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-schema';
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
+
 import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { MultiSelectInputGroup } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
 import { PhotoInputGroup } from '../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
-import { Image, ImageValues, ImageValuesToImage, ImageToImageValue } from '../../../../../types/common/image';
+import { Image, ImageValues } from '../../../../../types/common/image';
 import { ProgramCategory } from '../../../../../types/admin/programs';
-import { VisibilityStatus } from '../../../../../types/admin/common';
 import './ProgramForm.scss';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 
 export interface ProgramFormValues {
     name: string;
     categories: ProgramCategory[];
     description: string;
-    img: Image | null;
+    img: Image | ImageValues | null;
+    imgId: number | null;
 }
 
 export interface ProgramFormErrors {
@@ -57,6 +59,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 categories: [],
                 description: '',
                 img: null,
+                imgId: 0,
             }),
             [],
         );
@@ -117,7 +120,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         // Image handlers
         const handleImgChange = useCallback(
             (file: ImageValues | null) => {
-                const image = ImageValuesToImage(file);
+                const image = file;
                 setFormState((prev) => ({ ...prev, img: image }));
                 const error = PROGRAM_VALIDATION_FUNCTIONS.validateImg(image, false);
                 setErrors((prev) => ({ ...prev, img: error }));
@@ -176,7 +179,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     label={PROGRAMS_TEXT.FORM.LABEL.PHOTO}
                     id="img"
                     name="img"
-                    value={ImageToImageValue(formState.img)}
+                    value={formState.img}
                     onChange={handleImgChange}
                     disabled={isSubmitting || isFormDisabled}
                     error={errors.img}

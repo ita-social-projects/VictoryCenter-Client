@@ -1,3 +1,4 @@
+import default_team_member_photo from '../../../../assets/icons/team-member-blank.svg';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import {
     PublicCategoryWithTeamMembersDto,
@@ -6,7 +7,6 @@ import {
     TeamItem,
     TeamPageData,
 } from '../../../../types/public/team-page';
-import { mapImageToBase64 } from '../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 import { axiosInstance } from '../../axios';
 
 const isValidCategory = (category: PublicCategoryWithTeamMembersDto): boolean => {
@@ -23,7 +23,7 @@ const mapTeamMemberDtoToTeamMember = (dto: PublicTeamMemberDto): MemberCard => (
     id: dto.id,
     name: dto.fullName,
     role: dto.description || '',
-    photo: mapImageToBase64(dto.image),
+    photo: dto.image?.url ?? default_team_member_photo,
 });
 
 const mapCategoryDtoToTeamCategory = (dto: PublicCategoryWithTeamMembersDto): TeamItem => {

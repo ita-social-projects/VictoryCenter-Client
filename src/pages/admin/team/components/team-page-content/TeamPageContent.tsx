@@ -328,6 +328,8 @@ export const TeamPageContent = () => {
 
     const handleEditMember = useCallback(
         (updatedMember: TeamMember) => {
+            if (updatedMember.image && 'url' in updatedMember.image)
+                updatedMember.image.url = `${updatedMember.image.url}?cb=${Date.now()}`;
             setMembers((prevMembers) =>
                 prevMembers.map((member) => (member.id === updatedMember.id ? updatedMember : member)),
             );

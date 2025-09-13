@@ -1,3 +1,4 @@
+import React from 'react';
 import './TeamPage.scss';
 import { TeamPageContent } from './components/team-page-content/TeamPageContent';
 

@@ -113,17 +113,17 @@ describe('ProgramForm', () => {
     ];
 
     const mockFile: Image = {
-        id: null,
-        base64: 'ffdfdfdsfgsddgdgsdsg',
+        id: 1,
+        url: 'https://localhost:8080',
         mimeType: 'image/jpg',
-        size: 1024,
     };
 
     const mockInitialData: ProgramFormValues = {
         name: 'Існуюча програма',
         description: 'Існуючий опис',
         categories: [mockCategories[0]],
-        img: null,
+        img: mockFile,
+        imgId: 1,
     };
 
     const formRef = createRef<ProgramFormRef>();

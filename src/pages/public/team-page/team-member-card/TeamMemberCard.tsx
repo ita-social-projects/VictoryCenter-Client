@@ -1,13 +1,13 @@
 import { MemberCard } from '../../../../types/public/team-page';
 import { ReactComponent as DefaultTeamMemberIcon } from '../../../../assets/icons/team-member-blank.svg';
-import React from 'react';
+import { useState } from 'react';
 
 interface TeamMemberProps {
     member: MemberCard;
 }
 
 export const TeamMemberCard = ({ member }: TeamMemberProps) => {
-    const [error, setError] = React.useState(false);
+    const [error, setError] = useState(false);
 
     return (
         <div className="team-member">

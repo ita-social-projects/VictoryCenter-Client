@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import './MemberComponent.scss';
 import { ReactComponent as BlankUserImage } from '../../../../../assets/icons/blank-user.svg';
@@ -13,6 +13,11 @@ export interface MemberComponentProps {
 
 export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMember }: MemberComponentProps) => {
     const [error, setError] = useState(false);
+    const imageUrl = member.image && 'url' in member.image ? member.image.url : null;
+
+    useEffect(() => {
+        setError(false);
+    }, [imageUrl]);
 
     const handleEditMember = () => {
         handleOnEditMember(member);
@@ -21,15 +26,14 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
     const handleDeleteMember = () => {
         handleOnDeleteMember(member);
     };
-
     return (
         <div className="members-item">
             <div className="members-profile">
-                {error || !member.image || !('url' in member.image) ? (
+                {error || !imageUrl ? (
                     <BlankUserImage className="member-icon" />
                 ) : (
                     <img
-                        src={member.image.url}
+                        src={imageUrl}
                         alt={`${TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO}-${member.fullName}`}
                         onError={() => setError(true)}
                     />

@@ -1,6 +1,6 @@
 import { MemberCard } from '../../../../types/public/team-page';
 import { ReactComponent as DefaultTeamMemberIcon } from '../../../../assets/icons/team-member-blank.svg';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface TeamMemberProps {
     member: MemberCard;
@@ -8,6 +8,10 @@ interface TeamMemberProps {
 
 export const TeamMemberCard = ({ member }: TeamMemberProps) => {
     const [error, setError] = useState(false);
+
+    useEffect(() => {
+        setError(false);
+    }, [member.photo]);
 
     return (
         <div className="team-member">

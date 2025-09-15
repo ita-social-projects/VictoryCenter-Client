@@ -1,9 +1,9 @@
 import './Footer.scss';
 import { useState } from 'react';
 import { Link } from 'react-router';
-import arrowIcon from '../../../assets/icons/arrow-up-right.svg';
-import phoneIcon from '../../../assets/icons/phone.svg';
-import mailIcon from '../../../assets/icons/mail.svg';
+import { ReactComponent as ArrowUpIcon } from '../../../assets/icons/arrow-up-right.svg';
+import { ReactComponent as PhoneIcon } from '../../../assets/icons/phone.svg';
+import { ReactComponent as MailIcon } from '../../../assets/icons/mail.svg';
 import {
     ABOUT_US,
     HIPPOTHERAPY,
@@ -56,9 +56,9 @@ export const Footer = () => {
     return (
         <div className="footer-content">
             <div className="main-block">
-                <div className="email_field">
+                <div className="email-field">
                     <span className="title">{STAY_UP_TO_DATE_WITH_THE_NEWS}</span>
-                    <div className="input_block">
+                    <div className="input-block">
                         <input
                             type="email"
                             placeholder={ENTER_YOUR_EMAIL}
@@ -67,7 +67,7 @@ export const Footer = () => {
                             required
                         />
                         <button onClick={handleClick} className="subscribe-btn" aria-label={SIGN_UP}>
-                            <img src={arrowIcon} alt={SIGN_UP} />
+                            <ArrowUpIcon className="arrow-up-icon" />
                         </button>
                     </div>
                 </div>
@@ -88,7 +88,7 @@ export const Footer = () => {
                     </Link>
                 </div>
 
-                <div className="about_us">
+                <div className="about-us">
                     <span className="title">{ABOUT_US}</span>
                     <Link to={PUBLIC_ROUTES.ABOUT_US.FULL}>{ABOUT_US}</Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
@@ -114,15 +114,15 @@ export const Footer = () => {
             </div>
 
             <div className="contact-block">
-                <div className="main_contacts">
+                <div className="main-contacts">
                     <button className="contact-item" onClick={() => copyToClipboard(EMAIL)}>
-                        <img src={mailIcon} alt="mail" /> {EMAIL}
+                        <MailIcon /> {EMAIL}
                     </button>
                     <button className="contact-item" onClick={() => copyToClipboard(PHONE)}>
-                        <img src={phoneIcon} alt="phone" /> {PHONE}
+                        <PhoneIcon /> {PHONE}
                     </button>
                 </div>
-                <div className="social_media">
+                <div className="social-media">
                     <button className="contact-item" onClick={handleFacebookClick}>
                         Facebook
                     </button>

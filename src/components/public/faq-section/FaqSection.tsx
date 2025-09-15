@@ -33,8 +33,8 @@ export const FaqSection = ({ slug }: FaqSectionProps) => {
             <div className="faq-block">
                 <h2>{COMMON_QUESTIONS}</h2>
                 <div>
-                    {questions.map((item, index) => (
-                        <FaqCard key={index} faq={item} />
+                    {questions.map((item, _) => (
+                        <FaqCard key={item.id} faq={item} />
                     ))}
                 </div>
             </div>

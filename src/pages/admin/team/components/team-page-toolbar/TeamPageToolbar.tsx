@@ -4,7 +4,7 @@ import { COMMON_TEXT_ADMIN, UI_CONFIG } from '../../../../../const/admin/common'
 import { Select } from '../../../../../components/admin/select/Select';
 import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
 import { Button } from '../../../../../components/admin/button/Button';
-import PlusIcon from '../../../../../assets/icons/plus.svg';
+import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
 import './TeamPageToolbar.scss';
 
 export interface TeamPageToolbarProps {
@@ -48,7 +48,7 @@ export const TeamPageToolbar = ({ onSearchQueryChange, onStatusFilterChange, onA
                 </Select>
                 <Button onClick={onAddMember} buttonStyle="primary">
                     {TEAM_MEMBERS_TEXT.BUTTON.ADD_MEMBER}
-                    <img src={PlusIcon} alt={TEAM_MEMBERS_TEXT.BUTTON.ADD_MEMBER} />
+                    <PlusIcon />
                 </Button>
             </div>
         </div>

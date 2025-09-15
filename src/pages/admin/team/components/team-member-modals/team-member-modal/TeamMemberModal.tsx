@@ -97,7 +97,7 @@ export const TeamMemberModal = ({
             description: memberToEdit.description,
             categoryId: memberToEdit.categoryId,
             image: memberToEdit.image,
-            imageId: memberToEdit.image?.id ?? null,
+            imageId: memberToEdit.image && 'id' in memberToEdit.image ? memberToEdit.image.id : null,
         };
     }, [memberToEdit, isEditMode]);
 

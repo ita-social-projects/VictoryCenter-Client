@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { FaqSection } from './FaqSection';
 import { FaqApi } from '../../../services/api/public/faq/faq-api';

@@ -1,6 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { DonatePage } from './DonatePage';
 
+jest.mock('../../../components/public/faq-section/FaqSection', () => ({
+    FaqSection: () => <div data-testid="faq-section"></div>,
+}));
+
 describe('DonatePage', () => {
     it('renders DonatePageIntro, DonateSection, and RightSection', () => {
         render(<DonatePage />);
@@ -25,7 +29,6 @@ describe('DonatePage', () => {
         expect(screen.getByText(/Підписка/i)).toBeInTheDocument();
 
         expect(screen.getByText(/Реквізити для донатів в Україні/i)).toBeInTheDocument();
-
         expect(screen.getByText(/Інші варіанти підтримки/i)).toBeInTheDocument();
     });
 });

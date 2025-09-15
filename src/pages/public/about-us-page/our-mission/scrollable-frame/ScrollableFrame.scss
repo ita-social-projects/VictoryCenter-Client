@@ -36,33 +36,25 @@
             transition: all 0.8s ease;
             cursor: pointer;
 
-            .arrow-normal-state {
+            .arrow-icon {
                 position: absolute;
                 top: 0.5rem;
                 right: 0.5rem;
                 width: 1.5rem;
                 height: 1.5rem;
-            }
 
-            .arrow-hover-state {
-                position: absolute;
-                top: 0.5rem;
-                right: 0.5rem;
-                display: none;
-                width: 1.5rem;
-                height: 1.5rem;
+                path {
+                    stroke: colors.$grey-50;
+                }
             }
 
             &:hover {
                 background-color: colors.$yellow-500;
 
-                .arrow-hover-state {
-                    display: block !important;
+                .arrow-icon path {
+                    stroke: colors.$blue-900;
                 }
 
-                .arrow-normal-state {
-                    display: none;
-                }
                 transition: all 0.8s ease;
             }
         }

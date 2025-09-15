@@ -1,7 +1,7 @@
 import React from 'react';
 import './NotFoundMessage.scss';
 import { DESCRIPTION, TEXT, GO_BACK_BUTTON } from '../../../../const/public/notfound-page';
-import ArrowIcon from '../../../../assets/icons/arrow-up-right.svg';
+import { ReactComponent as ArrowIcon } from '../../../../assets/icons/arrow-up-right.svg';
 import { PUBLIC_ROUTES } from '../../../../const/public/routes';
 import { NavLink } from 'react-router';
 
@@ -16,7 +16,7 @@ export const NotFoundMessage = () => {
                 <NavLink to={PUBLIC_ROUTES.ABOUT_US.FULL} className="link-to-main">
                     <div className="link-block">
                         <span className="link-title">{GO_BACK_BUTTON}</span>
-                        <img src={ArrowIcon} alt="" />
+                        <ArrowIcon />
                     </div>
                 </NavLink>
             </div>

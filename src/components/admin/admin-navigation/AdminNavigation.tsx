@@ -1,6 +1,6 @@
 import { Button } from '../../admin/button/Button';
-import ExitIcon from '../../../assets/icons/exit-icon.svg';
-import Logo from '../../../assets/icons/logo.svg';
+import { ReactComponent as ExitIcon } from '../../../assets/icons/exit-icon.svg';
+import { ReactComponent as Logo } from '../../../assets/icons/logo-with-text.svg';
 import { useAdminContext } from '../../../contexts/admin/admin-context-provider/AdminContextProvider';
 import './AdminNavigation.scss';
 import classNames from 'classnames';
@@ -15,7 +15,7 @@ export const AdminNavigation = () => {
         <div className="admin-navigation">
             <div>
                 <div className="admin-logo">
-                    <img src={Logo} alt="Logo" />
+                    <Logo />
                 </div>
                 <div className="admin-pages">
                     <nav>
@@ -58,7 +58,7 @@ export const AdminNavigation = () => {
                 </div>
             </div>
             <Button className="exit-button" onClick={logout}>
-                <img src={ExitIcon} alt="exit-icon" />
+                <ExitIcon className="exit-icon" />
                 <span className="exit-button-text">{COMMON_TEXT_ADMIN.BUTTON.EXIT}</span>
             </Button>
         </div>

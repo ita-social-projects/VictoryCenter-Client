@@ -12,16 +12,10 @@ victory-center-client
 │   ├───ISSUE_TEMPLATE
 │   ├───PULL_REQUEST_TEMPLATE
 │   ├───workflows
-│   │   ├───lint.build.yml
-│   │   └───test.build.yml
-│   ├───CODEOWNERS
-│   └───pull_request_template.md
+│   └───CODEOWNERS
 ├───nginx
-│   └───nginx.conf
 ├───public
-│   └───index.html
 ├───scripts
-│   └───start-in-dev-over-https.mjs
 ├───src
 │   ├───__mocks__
 │   ├───assets
@@ -29,11 +23,13 @@ victory-center-client
 │   │   ├───icons
 │   │   ├───images
 │   │   │   ├───admin
+│   │   │   │   └───home
 │   │   │   ├───common
 │   │   │   └───public
 │   │   │       ├───about-us-page
 │   │   │       ├───programs-page
 │   │   │       └───team-page
+│   │   ├───partners-page-images
 │   │   ├───sass
 │   │   │   ├───mixins
 │   │   │   └───variables
@@ -47,50 +43,98 @@ victory-center-client
 │   │   ├───admin
 │   │   │   ├───admin-context-wrapper
 │   │   │   ├───admin-navigation
+│   │   │   ├───admin-panel-toolbar
 │   │   │   ├───button
 │   │   │   ├───button-tooltip
 │   │   │   ├───category-bar
 │   │   │   ├───confirmation-modal
 │   │   │   ├───context-menu-button
+│   │   │   ├───draggable-list-item
+│   │   │   ├───drag-preview
+│   │   │   ├───generic-modal-wrapper
 │   │   │   ├───hint-box
+│   │   │   ├───image-input
 │   │   │   ├───infinite-scroll-list
+│   │   │   ├───input-error
+│   │   │   ├───input-groups
+│   │   │   │   ├───input-with-character-limit-group
+│   │   │   │   ├───multi-select-input-group
+│   │   │   │   ├───photo-input-group
+│   │   │   │   ├───single-select-input-group
+│   │   │   │   └───text-area-with-character-limit-group
 │   │   │   ├───input-label
 │   │   │   ├───input-with-character-limit
 │   │   │   ├───multi-select-input
-│   │   │   ├───photo-input
 │   │   │   ├───private-route
 │   │   │   ├───public-route
 │   │   │   ├───search-bar
+│   │   │   │   ├───search-item-wrapper
+│   │   │   │   └───text-search-item
 │   │   │   ├───select
+│   │   │   ├───status-filter-dropdown
 │   │   │   ├───textarea-with-character-limit
+│   │   │   ├───toast
+│   │   │   │   ├───toast-container
+│   │   │   │   └───toast-item
+│   │   │   ├───tooltip
 │   │   │   └───visibility-status-label
 │   │   ├───common
 │   │   │   ├───inline-loader
 │   │   │   ├───modal
-│   │   │   └───page-loader
+│   │   │   ├───page-loader
+│   │   │   ├───partners
+│   │   │   ├───single-select-input
+│   │   │   └───tabs
 │   │   └───public
+│   │       ├───dropdown-menu
+│   │       ├───faq-section
+│   │       │   └───faq-card
 │   │       ├───footer
 │   │       └───header
 │   ├───const
 │   │   ├───admin
 │   │   ├───common
 │   │   │   └───api-routes
+│   │   ├───public
+│   │   └───routers
+│   ├───contexts
+│   │   ├───admin
+│   │   │   ├───admin-context-provider
+│   │   │   ├───toast-context-provider
+│   │   │   └───visitor-pages-provider
 │   │   └───public
 │   ├───hooks
 │   │   ├───admin
+│   │   │   ├───fetch
+│   │   │   │   ├───use-data-fetch
+│   │   │   │   └───use-data-pagination-fetch
 │   │   │   ├───use-admin-client
-│   │   │   └───use-create-member-form
+│   │   │   ├───use-categories-counter
+│   │   │   ├───use-form-manager
+│   │   │   ├───use-generic-modal
+│   │   │   └───use-modals-state
 │   │   └───common
-│   │       └───use-on-mount-unsafe
-│   ├───contexts
-│   │   ├───admin
-│   │   │   └───admin-context-provider
-│   │   └───public
+│   │       ├───use-container-size-from-children
+│   │       ├───use-debounced-value-callback
+│   │       ├───use-observe-element-size
+│   │       ├───use-on-click-outside
+│   │       ├───use-on-mount-unsafe
+│   │       └───use-scroll-handler
+│   ├───jest
 │   ├───layouts
 │   │   ├───admin-layout
 │   │   └───public-layout
 │   ├───pages
 │   │   ├───admin
+│   │   │   ├───faq
+│   │   │   │   └───components
+│   │   │   │       ├───faq-component
+│   │   │   │       ├───faq-form
+│   │   │   │       ├───faq-modals
+│   │   │   │       │   ├───delete-faq-modal
+│   │   │   │       │   └───faq-modal
+│   │   │   │       ├───faq-panel-content
+│   │   │   │       └───faq-search-item
 │   │   │   ├───home
 │   │   │   ├───login
 │   │   │   │   └───login-form
@@ -99,18 +143,20 @@ victory-center-client
 │   │   │   │       ├───program-category-modals
 │   │   │   │       ├───program-form
 │   │   │   │       ├───program-list-item
-│   │   │   │       ├───program-modals
+│   │   │   │       ├───program-search-item
 │   │   │   │       ├───programs-page-content
-│   │   │   │       └───programs-page-toolbar
-│   │   │   └──team
-│   │   │      └───components
-│   │   │          ├───member-component
-│   │   │          ├───member-drag-preview
-│   │   │          ├───member-form
-│   │   │          ├───members-list
-│   │   │          ├───members-list-item
-│   │   │          ├───team-page-content
-│   │   │          └───team-page-toolbar
+│   │   │   │       └───programs-page-modals
+│   │   │   │           ├───delete-program-modal
+│   │   │   │           └───program-modal
+│   │   │   └───team
+│   │   │       └───components
+│   │   │           ├───member-component
+│   │   │           ├───member-form
+│   │   │           ├───team-member-modals
+│   │   │           │   ├───delete-team-member-modal
+│   │   │           │   └───team-member-modal
+│   │   │           ├───team-page-content
+│   │   │           └───team-page-toolbar
 │   │   └───public
 │   │       ├───about-us-page
 │   │       │   ├───company-values
@@ -118,7 +164,7 @@ victory-center-client
 │   │       │   ├───intro-section
 │   │       │   ├───main-value
 │   │       │   ├───our-mission
-│   │       │   │    └───scrollable-frame 
+│   │       │   │   └───scrollable-frame
 │   │       │   ├───our-team-section
 │   │       │   └───support-section
 │   │       ├───donate-page
@@ -129,28 +175,34 @@ victory-center-client
 │   │       │       ├───abroad-payment-details
 │   │       │       ├───alternative-support-ways
 │   │       │       └───ukraine-payment-details
-│   │       ├───not-found
+│   │       ├───not-found-page
+│   │       │   ├───not-found-intro
+│   │       │   └───not-found-message
+│   │       ├───partners-page
+│   │       │   └───partners-sections
+│   │       │       ├───intro-section
+│   │       │       └───outro-section
 │   │       ├───programs-page
 │   │       │   ├───contact-section
 │   │       │   ├───intro-section
-│   │       │   ├───programs-section
-│   │       │   │   └───program-card
-│   │       │   └───question-section
-│   │       │       └───question-card
+│   │       │   └───programs-section
+│   │       │       └───program-card
 │   │       └───team-page
-│   │           └───TeamMemberCard
+│   │           └───team-member-card
 │   ├───routes
 │   │   └───app-router
 │   ├───services
 │   │   ├───api
 │   │   │   ├───admin
+│   │   │   │   ├───faq
 │   │   │   │   ├───image
 │   │   │   │   ├───login
 │   │   │   │   ├───programs
 │   │   │   │   └───team
-│   │   │   │       ├───team-members
-│   │   │   │       └───team-categories
+│   │   │   │       ├───team-categories
+│   │   │   │       └───team-members
 │   │   │   └───public
+│   │   │       ├───faq
 │   │   │       ├───programs
 │   │   │       └───team
 │   │   └───auth
@@ -164,17 +216,21 @@ victory-center-client
 │   ├───utils
 │   │   ├───functions
 │   │   │   ├───get-env-variable
-│   │   │   └───map-image-to-base-64
+│   │   │   └───mappers
+│   │   │       ├───admin
+│   │   │       ├───common
+│   │   │       └───public
 │   │   └───mock-data
 │   │       ├───admin
 │   │       └───public
 │   ├───validation
 │   │   ├───admin
-│   │   │   ├───create-member-schema
+│   │   │   ├───faq-schema
 │   │   │   ├───program-category-schema
-│   │   │   └───program-schema
+│   │   │   ├───program-schema
+│   │   │   └───team-member-schema
 │   │   └───public
-│   ├───index.jsx                           # Entry point (ReactDOM.createRoot)
+│   ├───index.tsx                           # Entry point (ReactDOM.createRoot)
 │   ├───index.css                           # Global styles (normalizer)
 │   ├───react-app-env.d.ts
 │   ├───reportWebVitals.ts

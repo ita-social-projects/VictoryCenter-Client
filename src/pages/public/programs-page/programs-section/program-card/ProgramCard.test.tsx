@@ -2,6 +2,10 @@ import { render, screen } from '@testing-library/react';
 import { ProgramCard } from './ProgramCard';
 import { PublishedProgram } from '../../../../../types/public/programs-page';
 
+jest.mock('../../../../../assets/icons/arrow-up-right.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-icon" />,
+}));
+
 describe('test program-card component', () => {
     const mockProgram: PublishedProgram = {
         image: 'https://via.placeholder.com/200x200?text=Ponys',
@@ -28,10 +32,9 @@ describe('test program-card component', () => {
         expect(image).toBeInTheDocument();
         expect(image).toHaveAttribute('src', mockProgram.image);
         expect(image).toHaveClass('card-img');
-    });
-    test('should contain correct classes', () => {
-        render(<ProgramCard program={mockProgram} />);
-        const container = screen.getByAltText(mockProgram.title).closest('.card-block');
-        expect(container).toBeInTheDocument();
+
+        const arrowIcon = screen.getByTestId('arrow-icon');
+        expect(arrowIcon).toBeInTheDocument();
+        expect(arrowIcon).toHaveClass('arrow-icon');
     });
 });

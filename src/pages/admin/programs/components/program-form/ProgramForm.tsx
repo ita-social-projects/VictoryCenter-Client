@@ -10,13 +10,13 @@ import { Image, ImageValues } from '../../../../../types/common/image';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import './ProgramForm.scss';
-import { ImageValuesToImage, ImageToImageValue } from '../../../../../utils/functions/mappers/common/image-mappers';
 
 export interface ProgramFormValues {
     name: string;
     categories: ProgramCategory[];
     description: string;
-    img: Image | null;
+    img: Image | ImageValues | null;
+    imgId: number | null;
 }
 
 export interface ProgramFormErrors {
@@ -58,6 +58,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 categories: [],
                 description: '',
                 img: null,
+                imgId: 0,
             }),
             [],
         );
@@ -118,7 +119,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         // Image handlers
         const handleImgChange = useCallback(
             (file: ImageValues | null) => {
-                const image = ImageValuesToImage(file);
+                const image = file;
                 setFormState((prev) => ({ ...prev, img: image }));
                 const error = PROGRAM_VALIDATION_FUNCTIONS.validateImg(image, false);
                 setErrors((prev) => ({ ...prev, img: error }));
@@ -177,7 +178,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     label={PROGRAMS_TEXT.FORM.LABEL.PHOTO}
                     id="img"
                     name="img"
-                    value={ImageToImageValue(formState.img)}
+                    value={formState.img}
                     onChange={handleImgChange}
                     disabled={isSubmitting || isFormDisabled}
                     error={errors.img}

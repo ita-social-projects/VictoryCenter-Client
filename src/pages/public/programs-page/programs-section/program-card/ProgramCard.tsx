@@ -1,7 +1,6 @@
 import React from 'react';
 import { PublishedProgram } from '../../../../../types/public/programs-page';
-import arrowBlack from '../../../../../assets/icons/arrow-up-right.svg';
-import arrowYellow from '../../../../../assets/icons/arrow-up-right-yellow.svg';
+import { ReactComponent as ArrowIcon } from '../../../../../assets/icons/arrow-up-right.svg';
 import './ProgramCard.scss';
 
 interface ProgramCardProps {
@@ -19,8 +18,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
                             <h2 className="program-title">{program.title}</h2>
                         </div>
                         <div className="arrow-container">
-                            <img src={arrowYellow} alt="" className="hover-img" />
-                            <img src={arrowBlack} alt="" className="default-img" />
+                            <ArrowIcon className="arrow-icon" />
                         </div>
                     </div>
                 </div>

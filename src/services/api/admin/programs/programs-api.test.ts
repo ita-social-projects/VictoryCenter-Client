@@ -2,11 +2,13 @@ import { VisibilityStatus } from '../../../../types/admin/common';
 import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '../../../../types/admin/programs';
 import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin/programs';
 import { ProgramsApi } from './programs-api';
+const programsApiModule = require('./programs-api');
 
 describe('ProgramsApi', () => {
     beforeEach(() => {
         jest.useFakeTimers();
         jest.clearAllMocks();
+        programsApiModule.throwErrorsInApi = false;
     });
 
     afterEach(() => {
@@ -288,6 +290,111 @@ describe('ProgramsApi', () => {
             const promise = ProgramsApi.deleteProgramCategory(999);
             jest.runAllTimers();
             await expect(promise).rejects.toThrow('Category not found');
+        });
+    });
+    describe('fetchProgramSearchItems', () => {
+        it('should prioritize direct name matches in sorting, then sort alphabetically', async () => {
+            const programWithNameMatch = {
+                id: 100,
+                name: 'Core Pilates Workout',
+                description: 'test',
+                status: VisibilityStatus.Published,
+                img: null,
+                categories: [{ id: 9, name: 'General', programsCount: 1 }],
+            };
+            const programWithCategoryMatch = {
+                id: 101,
+                name: 'Advanced Flexibility',
+                description: 'test',
+                status: VisibilityStatus.Published,
+                img: null,
+                categories: [{ id: 10, name: 'Pilates', programsCount: 1 }],
+            };
+
+            mockPrograms.push(programWithNameMatch, programWithCategoryMatch);
+
+            const searchTerm = 'Pilates';
+            const promise = ProgramsApi.fetchProgramSearchItems(searchTerm, { offset: 0, limit: 10 });
+            jest.runAllTimers();
+            const result = await promise;
+
+            const ids = result.items.map((i) => i.id);
+            const nameMatchIndex = ids.indexOf(programWithNameMatch.id);
+            const categoryMatchIndex = ids.indexOf(programWithCategoryMatch.id);
+
+            expect(nameMatchIndex).toBeGreaterThan(-1);
+            expect(categoryMatchIndex).toBeGreaterThan(-1);
+            expect(nameMatchIndex).toBeLessThan(categoryMatchIndex);
+
+            mockPrograms.pop();
+            mockPrograms.pop();
+        });
+
+        it('should handle pagination correctly', async () => {
+            const searchTerm = 'program';
+            const limit = 2;
+            const offset = 2;
+
+            const promise = ProgramsApi.fetchProgramSearchItems(searchTerm, { offset, limit });
+            jest.runAllTimers();
+            const result = await promise;
+
+            const fullResults = mockPrograms.filter(
+                (p) =>
+                    p.name.toLowerCase().includes(searchTerm) ||
+                    p.categories.some((c) => c.name.toLowerCase().includes(searchTerm)),
+            );
+
+            expect(result.items).toHaveLength(Math.min(limit, fullResults.length - offset));
+            expect(result.totalItemsCount).toBe(fullResults.length);
+        });
+
+        it('should return an empty result when no matches are found', async () => {
+            const searchTerm = 'NonExistentProgramXYZ';
+            const promise = ProgramsApi.fetchProgramSearchItems(searchTerm, { offset: 0, limit: 10 });
+            jest.runAllTimers();
+            const result = await promise;
+
+            expect(result.items).toHaveLength(0);
+            expect(result.totalItemsCount).toBe(0);
+        });
+    });
+
+    describe('API Error and Cancellation Handling', () => {
+        it('should reject fetchPrograms with AbortError if the request is cancelled', async () => {
+            const controller = new AbortController();
+            const promise = ProgramsApi.fetchPrograms(
+                1,
+                { offset: 0, limit: 10, requestOptions: { cancellationSignal: controller.signal } },
+            );
+
+            controller.abort();
+            jest.runAllTimers();
+
+            await expect(promise).rejects.toThrow('Request was cancelled');
+            await expect(promise).rejects.toMatchObject({ name: 'AbortError' });
+        });
+
+        it('should reject fetchProgramSearchItems with AbortError if the request is cancelled', async () => {
+            const controller = new AbortController();
+            const promise = ProgramsApi.fetchProgramSearchItems('search', 
+                { offset: 0, limit: 10, requestOptions: { cancellationSignal: controller.signal } 
+        });
+
+            controller.abort();
+            jest.runAllTimers();
+
+            await expect(promise).rejects.toThrow('Request was cancelled');
+        });
+
+        it('should handle a pre-aborted signal correctly', async () => {
+            const controller = new AbortController();
+            controller.abort();
+
+            const promise = ProgramsApi.fetchProgramById(1, { cancellationSignal: controller.signal });
+
+            // No need to run timers, as it should reject almost instantly
+            await expect(promise).rejects.toThrow('Request was cancelled');
         });
     });
 });

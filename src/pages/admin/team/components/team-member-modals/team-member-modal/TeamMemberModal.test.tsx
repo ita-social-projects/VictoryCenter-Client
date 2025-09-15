@@ -189,7 +189,7 @@ describe('TeamMemberModal', () => {
                 description: baseMember.description,
                 categoryId: baseMember.categoryId,
                 image: baseMember.image,
-                imageId: baseMember.image?.id ?? null,
+                imageId: baseMember.image && 'id' in baseMember.image ? baseMember.image?.id : null,
             }),
         );
     });

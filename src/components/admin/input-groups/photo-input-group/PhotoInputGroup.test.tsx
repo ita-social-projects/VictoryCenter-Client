@@ -6,8 +6,8 @@ jest.mock('../../input-label/InputLabel', () => ({
     InputLabel: ({ text }: { text: string }) => <div data-testid="mock-label">{text}</div>,
 }));
 
-jest.mock('../../photo-input/PhotoInput', () => ({
-    PhotoInput: () => <input data-testid="mock-photo-input" />,
+jest.mock('../../image-input/ImageInput', () => ({
+    ImageInput: () => <input data-testid="mock-image-input" />,
 }));
 
 jest.mock('../../input-error/InputError', () => ({
@@ -19,7 +19,7 @@ describe('PhotoInputGroup', () => {
         render(<PhotoInputGroup name="test" id="test" label="Test Photo Label" value={null} onChange={() => {}} />);
 
         expect(screen.getByTestId('mock-label')).toBeInTheDocument();
-        expect(screen.getByTestId('mock-photo-input')).toBeInTheDocument();
+        expect(screen.getByTestId('mock-image-input')).toBeInTheDocument();
         expect(screen.getByTestId('mock-error')).toBeInTheDocument();
     });
 });

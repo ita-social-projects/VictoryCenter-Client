@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { TEAM_MEMBER_VALIDATION } from '../../../const/admin/team';
-import { ImageValues } from '../../../types/common/image';
+import { Image, ImageValues } from '../../../types/common/image';
 
 export interface TeamMemberValidationContext {
     isPublishing: boolean;
@@ -25,8 +25,11 @@ export const teamMemberValidationSchema = Yup.object({
 
     category: Yup.number().required(TEAM_MEMBER_VALIDATION.category.getRequiredError()),
 
-    image: Yup.mixed<ImageValues | string>()
-        .transform((value) => (value === null ? undefined : value))
+    image: Yup.mixed<ImageValues | Image>()
+        .transform((value) => {
+            if (value === null || typeof value === 'string') return undefined;
+            return value;
+        })
         .when('$isPublishing', ([isPublishing], schema) =>
             isPublishing
                 ? schema.test(
@@ -42,15 +45,17 @@ export const teamMemberValidationSchema = Yup.object({
             if (value && typeof value === 'object' && 'id' in value && typeof value.id === 'number') {
                 return true;
             }
-            if (typeof value === 'string') return true;
-            if (value) {
+            if (value == null) return true;
+            if ('url' in value) return true;
+            if ('base64' in value) {
                 return value.size <= TEAM_MEMBER_VALIDATION.img.maxSizeBytes;
             }
             return true;
         })
         .test('fileType', TEAM_MEMBER_VALIDATION.img.getFormatError(), (value) => {
-            if (!value || typeof value === 'string') return true;
-            if ('mimeType' in value) {
+            if (value == null) return true;
+            if ('url' in value) return true;
+            if ('base64' in value) {
                 return TEAM_MEMBER_VALIDATION.img.allowedFormats.includes((value as any).mimeType);
             }
             return true;
@@ -90,7 +95,7 @@ export const TEAM_MEMBER_VALIDATION_FUNCTIONS = {
         }
     },
 
-    validateImage: (value: ImageValues | string | null, isPublishing: boolean): string | undefined => {
+    validateImage: (value: ImageValues | Image | null, isPublishing: boolean): string | undefined => {
         const context: TeamMemberValidationContext = { isPublishing };
         try {
             teamMemberValidationSchema.validateSyncAt('image', { image: value }, { context });

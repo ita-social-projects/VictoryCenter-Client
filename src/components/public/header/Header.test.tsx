@@ -3,11 +3,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { Header } from './Header';
 import { MemoryRouter } from 'react-router';
 import { PUBLIC_ROUTES } from '../../../const/public/routes';
-import { ABOUT_US, CONTACT_US, DONATE, HOW_TO_SUPPORT, PROGRAMS, REPORTING } from '../../../const/public/header';
+import { CONTACT_US, DONATE, HOW_TO_SUPPORT, PROGRAMS, REPORTING } from '../../../const/public/header';
 
 jest.mock('./Header.scss', () => ({}));
+
 jest.mock('../../../assets/icons/logo-with-text.svg', () => ({
-    ReactComponent: () => <div data-testid="logo" />,
+    ReactComponent: () => <svg data-testid="logo-icon" />,
 }));
 jest.mock('../../../assets/icons/burger.svg', () => ({
     ReactComponent: () => <div data-testid="burger-icon" />,
@@ -25,13 +26,12 @@ describe('Header', () => {
     it('renders the logo inside a link to "/"', () => {
         render(<Header />, { wrapper: MemoryRouter });
         expect(screen.getByRole('link', { name: '' })).toHaveAttribute('href', '/');
-        expect(screen.getByTestId('logo')).toBeInTheDocument();
+        expect(screen.getByTestId('logo-icon')).toBeInTheDocument();
     });
 
     it('renders nav links with correct text and href', () => {
         render(<Header />, { wrapper: MemoryRouter });
 
-        expect(screen.getByRole('link', { name: ABOUT_US })).toHaveAttribute('href', PUBLIC_ROUTES.ABOUT_US.FULL);
         expect(screen.getByRole('link', { name: PROGRAMS })).toHaveAttribute('href', PUBLIC_ROUTES.PROGRAMS.FULL);
         expect(screen.getByRole('link', { name: REPORTING })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
         expect(screen.getByRole('link', { name: HOW_TO_SUPPORT })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
@@ -54,5 +54,15 @@ describe('Header', () => {
 
         // eslint-disable-next-line no-console
         expect(console.log).toHaveBeenCalledWith('CONTACT USED!');
+    });
+
+    it('renders burger menu correctly', () => {
+        render(<Header />, { wrapper: MemoryRouter });
+
+        const burgerMenuButton = screen.getByTestId('burger-icon').closest('button');
+
+        expect(document.querySelector('.mobile-menu')).not.toBeInTheDocument();
+        fireEvent.click(burgerMenuButton!);
+        expect(document.querySelector('.mobile-menu')).toBeInTheDocument();
     });
 });

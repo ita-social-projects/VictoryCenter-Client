@@ -1,14 +1,13 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import DeleteIcon from '../../../assets/icons/delete.svg';
-import UploadIcon from '../../../assets/icons/cloud-download.svg';
+import { ReactComponent as DeleteIcon } from '../../../assets/icons/delete.svg';
+import { ReactComponent as UploadIcon } from '../../../assets/icons/cloud-download.svg';
 import classNames from 'classnames';
-import './PhotoInput.scss';
-import { ImageValues } from '../../../types/common/image';
+import './ImageInput.scss';
+import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { mapImageToBase64 } from '../../../utils/functions/mappers/common/image-mappers';
 
-export interface PhotoInputProps {
-    value: ImageValues | null;
+export interface ImageInputProps {
+    value: ImageValues | Image | null;
     onChange: (image: ImageValues | null) => void;
     onBlur?: () => void;
     disabled?: boolean;
@@ -16,9 +15,9 @@ export interface PhotoInputProps {
     name?: string;
 }
 
-export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false }: PhotoInputProps) => {
+export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false }: ImageInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
-    const [previewImage, setPreviewImage] = useState<ImageValues | null>(null);
+    const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -99,9 +98,9 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
 
     return (
         <div
-            className={classNames('photo-input-wrapper', {
-                'photo-input-wrapper-focused': isFocused && !disabled,
-                'photo-input-wrapper-disabled': disabled,
+            className={classNames('image-input-wrapper', {
+                'image-input-wrapper-focused': isFocused && !disabled,
+                'image-input-wrapper-disabled': disabled,
             })}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
@@ -112,7 +111,7 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
             onKeyDown={handleKeyDown}
             onFocus={handleFocus}
             onBlur={handleBlurEvent}
-            aria-label={COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER || 'Upload photo'}
+            aria-label={COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || COMMON_TEXT_ADMIN.INPUT.UPLOAD_IMAGE}
             tabIndex={disabled ? -1 : 0}
             role="button"
         >
@@ -124,16 +123,16 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
                 onBlur={onBlur}
                 style={{ display: 'none' }}
                 disabled={disabled}
-                data-testid="photo-input-hidden"
+                data-testid="image-input-hidden"
                 id={id}
                 name={name}
                 tabIndex={-1}
             />
 
             {previewImage ? (
-                <div className="photo-preview">
+                <div className="image-preview">
                     <img
-                        src={mapImageToBase64(previewImage) ?? undefined}
+                        src={getImageSrc(previewImage)}
                         alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
                         className="preview-image"
                         data-testid="preview-image"
@@ -143,25 +142,39 @@ export const PhotoInput = ({ value, onChange, onBlur, id, name, disabled = false
                             type="button"
                             className="delete-button"
                             disabled={disabled}
+                            data-testid="remove-photo-button"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleRemove();
                             }}
                         >
-                            <img src={DeleteIcon} alt={COMMON_TEXT_ADMIN.ALT.DELETE} className="delete-icon" />
+                            <DeleteIcon className="delete-icon" />
                         </button>
                     )}
                 </div>
             ) : (
-                <div className="photo-placeholder">
-                    <img src={UploadIcon} alt={COMMON_TEXT_ADMIN.ALT.UPLOAD} className="placeholder-icon" />
-                    <span>{COMMON_TEXT_ADMIN.INPUT.PHOTO_PLACEHOLDER}</span>
+                <div className="image-placeholder">
+                    <UploadIcon className="placeholder-icon" />
+                    <span>{COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER}</span>
                 </div>
             )}
         </div>
     );
 };
 
+export const getImageSrc = (img: Image | ImageValues | null) => {
+    if (!img) return undefined;
+
+    if ('url' in img && img.url) {
+        return img.url;
+    }
+
+    if ('base64' in img) {
+        return `data:${img.mimeType};base64,${img.base64}`;
+    }
+
+    return undefined;
+};
 export function convertFileToBase64(file: File): Promise<ImageValues> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();

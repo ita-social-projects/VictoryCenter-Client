@@ -1,5 +1,73 @@
+@use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/fonts';
+
 .admin-page-content {
-    h1 {
-        font-size: 25px;
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(colors.$grey-900, 0.4) url('../../../assets/images/admin/home/home-background.jpg') 50% / cover
+        no-repeat;
+    background-blend-mode: multiply;
+    position: relative;
+    z-index: 1;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(white, 0.4);
+        z-index: -1;
+    }
+
+    .admin-page-main-text {
+        text-align: center;
+        max-width: 64rem;
+
+        h1 {
+            color: white;
+            font-family: fonts.$mulish-regular-font;
+            font-size: 4rem;
+            line-height: 4.5rem;
+            text-transform: uppercase;
+        }
+    }
+
+    .admin-page-sub-text {
+        text-align: center;
+
+        p {
+            color: white;
+            font-family: fonts.$mulish-regular-font;
+            font-size: 1.5rem;
+            line-height: 2.25rem;
+            letter-spacing: -0.03rem;
+        }
+    }
+
+    .admin-page-action-hint {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1.5rem;
+
+        p {
+            color: white;
+            font-family: fonts.$mulish-regular-font;
+            line-height: 1.5rem;
+            letter-spacing: -0.02rem;
+        }
+
+        .admin-page-action-hint-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+
+            path {
+                stroke: white;
+            }
+        }
     }
 }

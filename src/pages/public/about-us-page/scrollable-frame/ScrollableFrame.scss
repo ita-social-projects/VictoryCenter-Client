@@ -1,0 +1,162 @@
+@use '../../../../assets/sass/variables/colors';
+@use '../../../../assets/sass/variables/fonts';
+
+.scroll-block {
+    position: relative;
+    height: 38.5rem;
+    background-color: colors.$grey-100;
+
+    .custom-scrollbar {
+        margin: 3rem 10.5rem;
+        height: 0.375rem;
+        background: colors.$grey-400;
+        border-radius: 0;
+
+        .swiper-scrollbar-drag {
+            border-radius: 0;
+            background-color: colors.$blue-900;
+        }
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: absolute;
+        width: 100%;
+        top: 42%;
+        z-index: 2;
+
+        .arrow-button {
+            background-color: colors.$blue-900;
+            position: absolute;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            transition: all 0.8s ease;
+            cursor: pointer;
+            z-index: 2;
+
+            .arrow-normal-state,
+            .arrow-hover-state {
+                position: absolute;
+                top: 0.5rem;
+                right: 0.5rem;
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+
+            .arrow-hover-state {
+                display: none;
+            }
+
+            &:hover {
+                background-color: colors.$yellow-500;
+
+                .arrow-hover-state {
+                    display: block !important;
+                }
+
+                .arrow-normal-state {
+                    display: none;
+                }
+            }
+        }
+
+        .arrow-left {
+            left: 2rem;
+        }
+
+        .arrow-right {
+            right: 2rem;
+        }
+    }
+}
+@media (max-width: 912px) {
+}
+
+@media (max-width: 768px) {
+    .scroll-block {
+
+        .custom-scrollbar {
+
+        }
+
+        .button-container {
+
+
+            .arrow-button {
+
+
+                .arrow-normal-state,
+                .arrow-hover-state {
+                }
+
+                .arrow-hover-state {
+                    display: none;
+                }
+
+                &:hover {
+
+
+                    .arrow-hover-state {
+                    }
+
+                    .arrow-normal-state {
+                    }
+                }
+            }
+
+            .arrow-left {
+            }
+
+            .arrow-right {
+            }
+        }
+    }  
+}
+
+@media (max-width: 568px) {
+    .scroll-block {
+        background-color: white;
+        height: 32.5rem;
+
+        .custom-scrollbar {
+            display: none;
+        }
+
+        .button-container {
+
+
+            .arrow-button {
+
+
+                .arrow-normal-state,
+                .arrow-hover-state {
+                }
+
+                .arrow-hover-state {
+                    display: none;
+                }
+
+                &:hover {
+
+
+                    .arrow-hover-state {
+                    }
+
+                    .arrow-normal-state {
+                    }
+                }
+            }
+
+            .arrow-left {
+                left: 0.9rem;
+            }
+
+            .arrow-right {
+                right: 0.9rem;
+            }
+        }
+    }
+}

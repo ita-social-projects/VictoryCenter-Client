@@ -2,22 +2,36 @@
 @use '../../../../assets/sass/variables/fonts';
 
 .support-block {
+    display: flex;
+    flex-wrap: wrap;
     position: relative;
-    min-height: 64rem;
+    margin-top: 6.25rem;
+    width: 100%;
+    height: 57.75rem;
     color: colors.$blue-900;
 
-    .support-title {
-        position: absolute;
-        width: 27rem;
-        top: 6.25rem;
-        left: 3.5rem;
+    .swiper {
+        width: 100%;
+    }
 
-        font-family: fonts.$mulish-regular-font;
-        font-weight: 700;
-        font-size: 2rem;
-        line-height: 2.5rem;
-        letter-spacing: -0.02em;
-        text-transform: uppercase;
+    .main-values-title {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        h2 {
+            position: absolute;
+            width: 27rem;
+            top: 0rem;
+            left: 3.5rem;
+            font-family: fonts.$mulish-regular-font;
+            font-weight: 700;
+            font-size: 2rem;
+            line-height: 2.5rem;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
     }
 
     .support-description {
@@ -35,42 +49,170 @@
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-    }
 
-    .support-card:nth-of-type(1) {
-        position: absolute;
-        top: 18.25rem;
-        width: 34%;
-
-        img {
-            width: 100%;
-            height: 27rem;
-            object-fit: cover;
+        &.card-1 {
+            transform: translateY(12.75rem);
         }
-    }
-    .support-card:nth-of-type(2) {
-        position: absolute;
-        left: 34%;
-        top: 29rem;
-        width: 32%;
+
+        &.card-2 {
+            transform: translateY(22.75rem);
+        }
+
+        &.card-3 {
+            transform: translateY(0.75rem);
+        }
 
         img {
             width: 100%;
-            height: 27rem;
+            height: 430px;
             object-fit: cover;
         }
     }
 
-    .support-card:nth-of-type(3) {
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         position: absolute;
-        top: 7rem;
-        left: 66%;
-        width: 34%;
+        width: 100%;
+        top: 50%;
+        z-index: 2;
+        padding: 0 2rem;
 
-        img {
-            width: 100%;
-            height: 27rem;
-            object-fit: cover;
+        .arrow-button {
+            background-color: colors.$blue-900;
+            position: absolute;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            transition: all 0.8s ease;
+            cursor: pointer;
+            z-index: 2;
+
+            .arrow-normal-state,
+            .arrow-hover-state {
+                position: absolute;
+                top: 0.5rem;
+                right: 0.5rem;
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+
+            .arrow-hover-state {
+                display: none;
+            }
+
+            &:hover {
+                background-color: colors.$yellow-500;
+
+                .arrow-hover-state {
+                    display: block !important;
+                }
+
+                .arrow-normal-state {
+                    display: none;
+                }
+            }
+        }
+
+        .arrow-left {
+            left: 2rem;
+        }
+
+        .arrow-right {
+            right: 2rem;
+        }
+    }
+}
+
+@media (max-width: 912px) {
+}
+
+@media (max-width: 768px) {
+    .support-block {
+        height: 80rem;
+
+        .main-values-title {
+
+            .support-title {
+                width: 22rem;
+                left: 0rem;
+                padding: 0 1rem;
+            }
+        }
+
+        .support-card {
+
+            &.card-1 {
+            }
+
+            &.card-2 {
+            }
+
+            &.card-3 {
+            }
+
+            img {
+                height: 24rem;
+            }
+        }
+
+        .button-container {
+            top: 22rem;
+
+            .arrow-left {
+                left: 0.9rem;
+            }
+
+            .arrow-right {
+                right: 0.9rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 568px) {
+    .support-block {
+        height: 53rem;
+
+        .main-values-title {
+
+            .support-title {
+                width: 22rem;
+                left: 0rem;
+                padding: 0 1rem;
+            }
+        }
+
+        .support-card {
+
+            &.card-1 {
+                transform: translateY(9.5rem);
+            }
+
+            &.card-2 {
+                transform: translateY(16.5rem);
+            }
+
+            &.card-3 {
+                transform: translateY(9.5rem);
+            }
+
+            img {
+                height: 24rem;
+            }
+        }
+
+        .button-container {
+            top: 22rem;
+
+            .arrow-left {
+                left: 0.9rem;
+            }
+
+            .arrow-right {
+                right: 0.9rem;
+            }
         }
     }
 }

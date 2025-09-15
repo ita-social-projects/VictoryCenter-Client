@@ -377,14 +377,16 @@ describe('ProgramsApi', () => {
 
         it('should reject fetchProgramSearchItems with AbortError if the request is cancelled', async () => {
             const controller = new AbortController();
-            const promise = ProgramsApi.fetchProgramSearchItems('search', 
-                { offset: 0, limit: 10, requestOptions: { cancellationSignal: controller.signal } 
-        });
+            const promise = ProgramsApi.fetchProgramSearchItems(
+                'search',
+                { offset: 0, limit: 10, requestOptions: { cancellationSignal: controller.signal } },
+            );
 
             controller.abort();
             jest.runAllTimers();
 
             await expect(promise).rejects.toThrow('Request was cancelled');
+            await expect(promise).rejects.toMatchObject({ name: 'AbortError' });
         });
 
         it('should handle a pre-aborted signal correctly', async () => {

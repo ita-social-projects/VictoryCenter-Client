@@ -4,14 +4,14 @@ import { useOnMountUnsafe } from '../../../hooks/common/use-on-mount-unsafe/useO
 import { FaqApi } from '../../../services/api/admin/faq/faq-api';
 import { useAdminClient } from '../../../hooks/admin/use-admin-client/useAdminClient';
 
-type Props = {
+interface Props {
     children: React.ReactNode;
-};
+}
 
 export interface VisitorPagesContextState {
     pages: VisitorPage[];
     isLoading: boolean;
-    error: unknown | null;
+    error: unknown;
     refetchPages: () => Promise<void>;
 }
 
@@ -21,7 +21,7 @@ export function VisitorPagesProvider({ children }: Props) {
     const client = useAdminClient();
     const [pages, setPages] = useState<VisitorPage[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [error, setError] = useState<unknown | null>(null);
+    const [error, setError] = useState<unknown>(null);
 
     const refetchPages = useCallback(async () => {
         try {

@@ -85,7 +85,7 @@ describe('FaqApi', () => {
     });
 
     it('reorder should call PUT with correct dto', async () => {
-        const dto: ReorderFaq = { ids: [1, 2, 3] } as any;
+        const dto: ReorderFaq = { pageId: 1, orderedIds: [1, 2, 3] };
         mockClient.put.mockResolvedValueOnce({});
         await FaqApi.reorder(mockClient, dto);
         expect(mockClient.put).toHaveBeenCalledWith(API_ROUTES.FAQ.REORDER, dto);

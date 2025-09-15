@@ -27,9 +27,9 @@ victory-center-client
 │   │   │   ├───common
 │   │   │   └───public
 │   │   │       ├───about-us-page
+│   │   │       ├───partners-page
 │   │   │       ├───programs-page
 │   │   │       └───team-page
-│   │   ├───partners-page-images
 │   │   ├───sass
 │   │   │   ├───mixins
 │   │   │   └───variables
@@ -37,6 +37,7 @@ victory-center-client
 │   │       ├───admin
 │   │       ├───common
 │   │       └───public
+│   │           ├───partners-page
 │   │           ├───programs-page
 │   │           └───team-page
 │   ├───components

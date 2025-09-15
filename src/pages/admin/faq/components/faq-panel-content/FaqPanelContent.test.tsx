@@ -22,7 +22,7 @@ jest.mock('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProv
         { id: 2, title: 'Page B', slug: 'page-b' },
         { id: 3, title: 'Page C', slug: 'page-c' },
     ];
-    
+
     return {
         VisitorPagesProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
         useVisitorPages: () => ({
@@ -40,8 +40,8 @@ jest.mock('../../../../../contexts/admin/toast-context-provider/ToastContextProv
     useToast: () => ({
         addToast: mockAddToast,
         toasts: [],
-        removeToast: jest.fn()
-    })
+        removeToast: jest.fn(),
+    }),
 }));
 
 jest.mock('../faq-modals/faq-modal/FaqModal', () => {
@@ -190,34 +190,28 @@ const mockNewFaq: FaqQuestion = {
 jest.mock('../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar', () => {
     const mockVisibilityStatus = {
         Published: 'published',
-        Draft: 'draft'
+        Draft: 'draft',
     };
-    
+
     return {
         AdminPanelToolbar: ({ onAddItem, onStatusFilterChange, onSearchClear, placeholder }: any) => (
             <div data-testid="admin-panel-toolbar">
-                <input 
-                    data-testid="search-input" 
-                    type="text" 
-                    placeholder={placeholder} 
+                <input
+                    data-testid="search-input"
+                    type="text"
+                    placeholder={placeholder}
                     onChange={(e) => onSearchClear(e.target.value)}
                 />
-                <button 
-                    data-testid="filter-published" 
+                <button
+                    data-testid="filter-published"
                     onClick={() => onStatusFilterChange(mockVisibilityStatus.Published)}
                 >
                     Filter Published
                 </button>
-                <button 
-                    data-testid="filter-draft" 
-                    onClick={() => onStatusFilterChange(mockVisibilityStatus.Draft)}
-                >
+                <button data-testid="filter-draft" onClick={() => onStatusFilterChange(mockVisibilityStatus.Draft)}>
                     Filter Draft
                 </button>
-                <button 
-                    data-testid="filter-clear" 
-                    onClick={() => onStatusFilterChange(undefined)}
-                >
+                <button data-testid="filter-clear" onClick={() => onStatusFilterChange(undefined)}>
                     Clear Filters
                 </button>
                 <button data-testid="add-faq-button" onClick={onAddItem}>
@@ -233,16 +227,10 @@ jest.mock('../faq-component/FaqComponent', () => ({
         <div data-testid={`faq-component-${faq.id}`}>
             <div data-testid={`faq-question-${faq.id}`}>{faq.questionText}</div>
             <div data-testid={`faq-answer-${faq.id}`}>{faq.answerText}</div>
-            <button
-                data-testid={`edit-faq-${faq.id}`}
-                onClick={() => handleOnEditFaq(faq)}
-            >
+            <button data-testid={`edit-faq-${faq.id}`} onClick={() => handleOnEditFaq(faq)}>
                 Edit
             </button>
-            <button
-                data-testid={`delete-faq-${faq.id}`}
-                onClick={() => handleOnDeleteFaq(faq)}
-            >
+            <button data-testid={`delete-faq-${faq.id}`} onClick={() => handleOnDeleteFaq(faq)}>
                 Delete
             </button>
         </div>
@@ -253,7 +241,7 @@ jest.mock('../../../../../components/admin/draggable-list-item/DraggableListItem
     DraggableListItem: ({ entity, renderEntityComponent, entities, onEntitiesReordered }: any) => {
         const faq = entity;
         return (
-            <div 
+            <div
                 data-testid={`draggable-item-${faq.id}`}
                 draggable={true}
                 onDragStart={(e) => {
@@ -262,9 +250,9 @@ jest.mock('../../../../../components/admin/draggable-list-item/DraggableListItem
                 onDrop={(e) => {
                     const draggedId = parseInt(e.dataTransfer.getData('text/plain'));
                     const newEntities = [...entities];
-                    const draggedIndex = newEntities.findIndex(item => item.id === draggedId);
-                    const targetIndex = newEntities.findIndex(item => item.id === faq.id);
-                    
+                    const draggedIndex = newEntities.findIndex((item) => item.id === draggedId);
+                    const targetIndex = newEntities.findIndex((item) => item.id === faq.id);
+
                     if (draggedIndex !== -1 && targetIndex !== -1 && draggedIndex !== targetIndex) {
                         const [draggedItem] = newEntities.splice(draggedIndex, 1);
                         newEntities.splice(targetIndex, 0, draggedItem);
@@ -285,12 +273,12 @@ jest.mock('../../../../../components/admin/toast/toast-container/ToastContainer'
 
 // Helper function to convert mock faqs to DTO format
 const convertFaqsToDto = (faqs: FaqQuestion[]) => {
-    return faqs.map(faq => ({
+    return faqs.map((faq) => ({
         id: faq.id,
         questionText: faq.questionText,
         answerText: faq.answerText,
         status: faq.status,
-        pageIds: faq.pages.map(p => p.id)
+        pageIds: faq.pages.map((p) => p.id),
     }));
 };
 
@@ -338,26 +326,26 @@ describe('FaqPanelContent', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        
+
         // Reset AbortController
-        (global as any).AbortController = function() {
+        (global as any).AbortController = function () {
             return {
                 signal: { aborted: false },
                 abort: jest.fn(),
             };
         };
-        
+
         // Mock API responses
         mockedUseAdminClient.mockReturnValue({
             client: {},
         });
-        
+
         // Mock FaqApi.getAll to return faqs in DTO format
         mockFaqApi.getAll = jest.fn().mockResolvedValue({
             items: convertFaqsToDto(mockFaqs),
             totalItemsCount: mockFaqs.length,
         });
-        
+
         mockFaqApi.reorder = jest.fn().mockResolvedValue({});
         mockFaqApi.getSearchItems = jest.fn().mockResolvedValue([]);
 
@@ -405,14 +393,14 @@ describe('FaqPanelContent', () => {
         it('should change faqs when different category is selected', async () => {
             const categoryBFaqs = [mockFaqs[1]]; // Just the second FAQ
             renderFaqPanelContent();
-            
+
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
             mockFaqApi.getAll.mockResolvedValueOnce({
                 items: convertFaqsToDto(categoryBFaqs),
                 totalItemsCount: 1,
             });
-            
+
             clickCategoryButton(2);
 
             await waitFor(() => {
@@ -429,7 +417,7 @@ describe('FaqPanelContent', () => {
                 items: convertFaqsToDto([mockFaqs[0]]),
                 totalItemsCount: 1,
             });
-            
+
             clickFilterPublishedButton();
 
             await waitFor(() => {
@@ -452,17 +440,11 @@ describe('FaqPanelContent', () => {
                 items: convertFaqsToDto([mockFaqs[1]]),
                 totalItemsCount: 1,
             });
-            
+
             clickFilterDraftButton();
 
             await waitFor(() => {
-                expect(mockFaqApi.getAll).toHaveBeenCalledWith(
-                    expect.anything(),
-                    1,
-                    'draft',
-                    0,
-                    expect.any(Number),
-                );
+                expect(mockFaqApi.getAll).toHaveBeenCalledWith(expect.anything(), 1, 'draft', 0, expect.any(Number));
             });
         });
 
@@ -475,29 +457,23 @@ describe('FaqPanelContent', () => {
                 items: convertFaqsToDto([mockFaqs[0]]),
                 totalItemsCount: 1,
             });
-            
+
             clickFilterPublishedButton();
-            
+
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2);
             });
-            
+
             // Then clear it
             mockFaqApi.getAll.mockResolvedValueOnce({
                 items: convertFaqsToDto(mockFaqs),
                 totalItemsCount: mockFaqs.length,
             });
-            
+
             clickClearFilterButton();
-            
+
             await waitFor(() => {
-                expect(mockFaqApi.getAll).toHaveBeenCalledWith(
-                    expect.anything(),
-                    1,
-                    undefined,
-                    0,
-                    expect.any(Number),
-                );
+                expect(mockFaqApi.getAll).toHaveBeenCalledWith(expect.anything(), 1, undefined, 0, expect.any(Number));
             });
         });
     });
@@ -565,32 +541,32 @@ describe('FaqPanelContent', () => {
             // Verify no error is shown for aborted requests
             expect(screen.queryByTestId('faq-error-container')).not.toBeInTheDocument();
         });
-        
+
         it('should handle reorder errors', async () => {
             renderFaqPanelContent();
-            
+
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-            
+
             // Mock a reorder error
             mockFaqApi.reorder.mockRejectedValueOnce(new Error('Reorder error'));
-            
+
             // Simulate drag and drop
             const draggedItem = screen.getByTestId('draggable-item-1');
             const targetItem = screen.getByTestId('draggable-item-2');
-            
+
             fireEvent.dragStart(draggedItem, {
                 dataTransfer: {
                     setData: jest.fn(),
                     getData: jest.fn().mockReturnValue('1'),
                 },
             });
-            
+
             fireEvent.drop(targetItem, {
                 dataTransfer: {
                     getData: jest.fn().mockReturnValue('1'),
                 },
             });
-            
+
             await waitFor(() => {
                 expect(getFaqErrorContainer()).toBeInTheDocument();
                 expect(screen.getByText(FAQ_TEXT.MESSAGE.FAIL_TO_REORDER_FAQ)).toBeInTheDocument();
@@ -598,144 +574,144 @@ describe('FaqPanelContent', () => {
         });
     });
 
-//             // Force selectedCategoryRef.current and hasMoreRef.current true so fetchMembers tries to run
-//             // This needs to be set on component instance, which is tricky. Instead, simulate by triggering fetchMembers indirectly:
+    //             // Force selectedCategoryRef.current and hasMoreRef.current true so fetchMembers tries to run
+    //             // This needs to be set on component instance, which is tricky. Instead, simulate by triggering fetchMembers indirectly:
 
     describe('Modal operations', () => {
         it('should open and close add FAQ modal', async () => {
             renderFaqPanelContent();
-            
+
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-            
+
             // Open add modal
             clickAddFaqButton();
             expect(getAddFaqModal()).toBeInTheDocument();
-            
+
             // Close add modal
             fireEvent.click(screen.getByTestId('close-add'));
             expect(getAddFaqModal()).not.toBeInTheDocument();
         });
-        
+
         it('should add a new FAQ', async () => {
             renderFaqPanelContent();
-            
+
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-            
+
             // Open add modal
             clickAddFaqButton();
             expect(getAddFaqModal()).toBeInTheDocument();
-            
+
             // Confirm adding
             clickConfirmAddButton();
-            
+
             await waitFor(() => {
                 expect(getAddFaqModal()).not.toBeInTheDocument();
                 expect(getFaqItems()).toHaveLength(3);
             });
         });
-        
+
         it('should open and close edit FAQ modal', async () => {
             renderFaqPanelContent();
-            
+
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-            
+
             // Open edit modal
             clickEditFaqButton(1);
             expect(getEditFaqModal()).toBeInTheDocument();
-            
+
             // Close edit modal
             fireEvent.click(screen.getByTestId('close-edit'));
             expect(getEditFaqModal()).not.toBeInTheDocument();
         });
-        
+
         it('should edit an existing FAQ', async () => {
             renderFaqPanelContent();
-            
+
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-            
+
             // Open edit modal
             clickEditFaqButton(1);
             expect(getEditFaqModal()).toBeInTheDocument();
-            
+
             // Confirm editing
             clickConfirmEditButton();
-            
+
             await waitFor(() => {
                 expect(getEditFaqModal()).not.toBeInTheDocument();
             });
         });
-        
+
         it('should open and close delete FAQ modal', async () => {
             renderFaqPanelContent();
-            
+
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-            
+
             // Open delete modal
             clickDeleteFaqButton(1);
             expect(getDeleteFaqModal()).toBeInTheDocument();
-            
+
             // Close delete modal
             fireEvent.click(screen.getByTestId('close-delete'));
             expect(getDeleteFaqModal()).not.toBeInTheDocument();
         });
-        
+
         it('should delete an existing FAQ', async () => {
             renderFaqPanelContent();
-            
+
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-            
+
             // Open delete modal
             clickDeleteFaqButton(1);
             expect(getDeleteFaqModal()).toBeInTheDocument();
-            
+
             // Confirm deleting
             clickConfirmDeleteButton();
-            
+
             await waitFor(() => {
                 expect(getDeleteFaqModal()).not.toBeInTheDocument();
                 expect(getFaqItems()).toHaveLength(1);
             });
         });
-        
+
         it('should not open multiple modals at the same time', async () => {
             renderFaqPanelContent();
-            
+
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-            
+
             // Open add modal
             clickAddFaqButton();
             expect(getAddFaqModal()).toBeInTheDocument();
-            
+
             // Try to open edit modal - should not work
             clickEditFaqButton(1);
             expect(getEditFaqModal()).not.toBeInTheDocument();
             expect(getAddFaqModal()).toBeInTheDocument();
-            
+
             // Close add modal
             fireEvent.click(screen.getByTestId('close-add'));
-            
+
             // Now edit modal should open
             clickEditFaqButton(1);
             expect(getEditFaqModal()).toBeInTheDocument();
         });
-        
+
         it('should not open delete modal when another modal is open', async () => {
             renderFaqPanelContent();
-            
+
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-            
+
             // Open add modal
             clickAddFaqButton();
             expect(getAddFaqModal()).toBeInTheDocument();
-            
+
             // Try to open delete modal - should not work
             clickDeleteFaqButton(1);
             expect(getDeleteFaqModal()).not.toBeInTheDocument();
             expect(getAddFaqModal()).toBeInTheDocument();
-            
+
             // Close add modal
             fireEvent.click(screen.getByTestId('close-add'));
-            
+
             // Now delete modal should open
             clickDeleteFaqButton(1);
             expect(getDeleteFaqModal()).toBeInTheDocument();
@@ -749,14 +725,14 @@ describe('FaqPanelContent', () => {
                 items: convertFaqsToDto(mockFaqs),
                 totalItemsCount: 4, // Total of 4, so there's more to load
             });
-            
+
             renderFaqPanelContent();
-            
+
             await waitFor(() => {
                 expect(getFaqItems()).toHaveLength(2);
                 expect(screen.getByTestId('load-more')).toBeInTheDocument();
             });
-            
+
             // Set up mock for load more
             const moreFaqs = [
                 {
@@ -774,15 +750,15 @@ describe('FaqPanelContent', () => {
                     pages: [mockPages[1]],
                 },
             ];
-            
+
             mockFaqApi.getAll.mockResolvedValueOnce({
                 items: convertFaqsToDto(moreFaqs),
                 totalItemsCount: 4,
             });
-            
+
             // Click load more
             clickLoadMoreButton();
-            
+
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2);
                 // Second call should use pagination
@@ -791,10 +767,10 @@ describe('FaqPanelContent', () => {
                     1,
                     undefined,
                     expect.any(Number),
-                    expect.any(Number)
+                    expect.any(Number),
                 );
             });
-            
+
             await waitFor(() => {
                 expect(getFaqItems()).toHaveLength(4);
                 // No more items to load
@@ -806,29 +782,29 @@ describe('FaqPanelContent', () => {
     describe('Search functionality', () => {
         it('should handle search input changes', async () => {
             renderFaqPanelContent();
-            
+
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
-            
+
             // Type in search input
             typeInSearchInput('test search query');
             expect(getSearchInput()).toHaveValue('test search query');
         });
     });
-    
+
     describe('Resize event handling', () => {
         it('adds and removes resize event listener on mount/unmount', () => {
             const addEventListenerSpy = jest.spyOn(window, 'addEventListener');
             const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
-            
+
             const { unmount } = renderFaqPanelContent();
-            
+
             expect(addEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
-            
+
             unmount();
-            
+
             expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
         });
-        
+
         it('updates list size on resize', async () => {
             // Since we can't reliably test if getAll is called after resize,
             // let's just test that updateListSize is called
@@ -839,106 +815,114 @@ describe('FaqPanelContent', () => {
                     mockUpdateListSize.mockImplementation(handler as any);
                 }
             });
-            
+
             renderFaqPanelContent();
-            
+
             // Trigger the resize handler directly
             mockUpdateListSize();
-            
+
             expect(mockUpdateListSize).toHaveBeenCalled();
         });
     });
-    
+
     describe('Edge cases', () => {
         it('should handle case when no visitor pages are available', async () => {
             // Mock empty pages
-            jest.spyOn(require('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider'), 'useVisitorPages')
-                .mockReturnValueOnce({
-                    pages: [],
-                    isLoading: false,
-                    error: null,
-                    refetchPages: jest.fn(),
-                });
-                
+            jest.spyOn(
+                require('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider'),
+                'useVisitorPages',
+            ).mockReturnValueOnce({
+                pages: [],
+                isLoading: false,
+                error: null,
+                refetchPages: jest.fn(),
+            });
+
             renderFaqPanelContent();
-            
+
             // Since there are no pages, getAll should not be called
             await waitFor(() => {
                 expect(mockFaqApi.getAll).not.toHaveBeenCalled();
             });
         });
-        
+
         it('should handle visitor pages loading state', async () => {
             // Mock loading pages
-            jest.spyOn(require('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider'), 'useVisitorPages')
-                .mockReturnValueOnce({
-                    pages: [],
-                    isLoading: true,
-                    error: null,
-                    refetchPages: jest.fn(),
-                });
-                
+            jest.spyOn(
+                require('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider'),
+                'useVisitorPages',
+            ).mockReturnValueOnce({
+                pages: [],
+                isLoading: true,
+                error: null,
+                refetchPages: jest.fn(),
+            });
+
             renderFaqPanelContent();
-            
+
             // While pages are loading, should see loading indicator
             expect(screen.getByTestId('infinite-scroll-loader')).toBeInTheDocument();
         });
-        
+
         it('should handle visitor pages error', async () => {
             // Mock pages error
-            jest.spyOn(require('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider'), 'useVisitorPages')
-                .mockReturnValue({
-                    pages: [],
-                    isLoading: false,
-                    error: new Error('Failed to fetch pages'),
-                    refetchPages: jest.fn(),
-                });
-                
+            jest.spyOn(
+                require('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider'),
+                'useVisitorPages',
+            ).mockReturnValue({
+                pages: [],
+                isLoading: false,
+                error: new Error('Failed to fetch pages'),
+                refetchPages: jest.fn(),
+            });
+
             renderFaqPanelContent();
-            
+
             await waitFor(() => {
                 expect(getFaqErrorContainer()).toBeInTheDocument();
                 expect(screen.getByText(FAQ_TEXT.MESSAGE.FAIL_TO_FETCH_PAGES)).toBeInTheDocument();
             });
         });
-        
+
         it('should retry fetching pages when error type is Pages', async () => {
             const mockRefetchPages = jest.fn();
-            
+
             // Mock visitor pages provider to return error
-            jest.spyOn(require('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider'), 'useVisitorPages')
-                .mockReturnValue({
-                    pages: [],
-                    isLoading: false,
-                    error: new Error('Failed to fetch pages'),
-                    refetchPages: mockRefetchPages,
-                });
-            
+            jest.spyOn(
+                require('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider'),
+                'useVisitorPages',
+            ).mockReturnValue({
+                pages: [],
+                isLoading: false,
+                error: new Error('Failed to fetch pages'),
+                refetchPages: mockRefetchPages,
+            });
+
             renderFaqPanelContent();
-            
+
             await waitFor(() => {
                 expect(getFaqErrorContainer()).toBeInTheDocument();
                 expect(screen.getByText(FAQ_TEXT.MESSAGE.FAIL_TO_FETCH_PAGES)).toBeInTheDocument();
             });
-            
+
             // Click Try Again button
             clickTryAgainButton();
-            
+
             // Verify refetchPages was called
             expect(mockRefetchPages).toHaveBeenCalledTimes(1);
         });
-        
+
         it('should handle adding FAQ when at list size limit', () => {
             // Test the condition directly by mocking the component instance
             const mockSetFaqs = jest.fn();
             const mockSetHasMore = jest.fn();
-            
+
             // Create a test instance of handleAddFaq
             const selectedVisitorPageRef = { current: { id: 1 } };
             const listSize = 5;
             const currentPaginationPageRef = { current: 1 };
             const hasMoreRef = { current: false };
-            
+
             // Create test function simulating handleAddFaq from the component
             const handleAddFaq = (faq: FaqQuestion) => {
                 const prevFaqs = mockFaqs;
@@ -952,34 +936,34 @@ describe('FaqPanelContent', () => {
                     hasMoreRef.current = true;
                 }
             };
-            
+
             // Test Case 1: FAQ belongs to the selected page and there's space in the list
             const faqToAdd = {
                 ...mockNewFaq,
-                pages: [{ id: 1, title: 'Selected Page', slug: 'selected' }]
+                pages: [{ id: 1, title: 'Selected Page', slug: 'selected' }],
             };
-            
+
             handleAddFaq(faqToAdd);
-            
+
             // The FAQ should be added directly to the list
             expect(mockSetFaqs).toHaveBeenCalledWith([...mockFaqs, faqToAdd]);
             expect(mockSetHasMore).not.toHaveBeenCalled();
-            
+
             // Reset mocks for next test
             jest.clearAllMocks();
-            
+
             // Test Case 2: FAQ belongs to a different page
             const faqWithDifferentPage = {
                 ...mockNewFaq,
-                pages: [{ id: 999, title: 'Other Page', slug: 'other' }]
+                pages: [{ id: 999, title: 'Other Page', slug: 'other' }],
             };
-            
+
             handleAddFaq(faqWithDifferentPage);
-            
+
             // The FAQ should not be added, but hasMore should be set to true
             expect(mockSetFaqs).not.toHaveBeenCalled();
             expect(mockSetHasMore).toHaveBeenCalledWith(true);
             expect(hasMoreRef.current).toBe(true);
         });
-      });
     });
+});

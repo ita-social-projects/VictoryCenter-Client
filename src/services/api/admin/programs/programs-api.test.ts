@@ -363,10 +363,11 @@ describe('ProgramsApi', () => {
     describe('API Error and Cancellation Handling', () => {
         it('should reject fetchPrograms with AbortError if the request is cancelled', async () => {
             const controller = new AbortController();
-            const promise = ProgramsApi.fetchPrograms(
-                1,
-                { offset: 0, limit: 10, requestOptions: { cancellationSignal: controller.signal } },
-            );
+            const promise = ProgramsApi.fetchPrograms(1, {
+                offset: 0,
+                limit: 10,
+                requestOptions: { cancellationSignal: controller.signal },
+            });
 
             controller.abort();
             jest.runAllTimers();
@@ -377,10 +378,11 @@ describe('ProgramsApi', () => {
 
         it('should reject fetchProgramSearchItems with AbortError if the request is cancelled', async () => {
             const controller = new AbortController();
-            const promise = ProgramsApi.fetchProgramSearchItems(
-                'search',
-                { offset: 0, limit: 10, requestOptions: { cancellationSignal: controller.signal } },
-            );
+            const promise = ProgramsApi.fetchProgramSearchItems('search', {
+                offset: 0,
+                limit: 10,
+                requestOptions: { cancellationSignal: controller.signal },
+            });
 
             controller.abort();
             jest.runAllTimers();

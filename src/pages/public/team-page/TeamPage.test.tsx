@@ -42,7 +42,7 @@ const mockTeamDataMultiple: TeamItem[] = [
 jest.mock('./team-member-card/TeamMemberCard', () => ({
     TeamMemberCard: ({ member }: { member: MemberCard }) => (
         <div data-testid="team-member">
-            <img alt={member.name} src={member.photo} />
+            <img alt={member.name} src={member.photo ?? undefined} />
             <div>{member.name}</div>
             <div>{member.role}</div>
         </div>

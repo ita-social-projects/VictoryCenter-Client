@@ -40,14 +40,14 @@ export const Header = () => {
     };
 
     return (
-        <div className="headerBlock">
-            <div className="logoContainer">
+        <div className="header-block">
+            <div className="logo-container">
                 <Link to="/">
                     <VictoryCenterLogo className="logo" />
                 </Link>
             </div>
 
-            <div className="linkContainer">
+            <div className="link-container">
                 <nav>
                     <DropdownMenu mainText={ABOUT_US} links={dropdownMenuLinks}></DropdownMenu>
                     <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{PROGRAMS}</Link>
@@ -60,19 +60,19 @@ export const Header = () => {
                 </nav>
             </div>
 
-            <div className="buttonContainer">
-                <button className="contactUsButton" onClick={onContactUsClick}>
+            <div className="button-container">
+                <button className="contact-us-button" onClick={onContactUsClick}>
                     {CONTACT_US}
                 </button>
-                <Link to={PUBLIC_ROUTES.DONATE.FULL} className="button donateButton">
+                <Link to={PUBLIC_ROUTES.DONATE.FULL} className="button donate-button">
                     {DONATE}
                 </Link>
-                <button onClick={toggleMenu} className="burgerMenuIcon">
+                <button onClick={toggleMenu} className="burger-menu-icon">
                     <BurgerIcon />
                 </button>
             </div>
             {isMenuOpen && (
-                <div className="mobileMenu">
+                <div className="mobile-menu">
                     <Link to={PUBLIC_ROUTES.ABOUT_US.FULL} onClick={toggleMenu}>
                         {ABOUT_US}
                     </Link>

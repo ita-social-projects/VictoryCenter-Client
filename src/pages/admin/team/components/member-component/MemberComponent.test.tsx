@@ -5,7 +5,9 @@ import '@testing-library/jest-dom';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 
-jest.mock('../../../../../assets/icons/blank-user.svg', () => 'blank-user.svg');
+jest.mock('../../../../../assets/icons/blank-user.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="blank-user-icon" />,
+}));
 
 jest.mock('../../../../../components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
     VisibilityStatusLabel: ({ status }: { status: VisibilityStatus }) => (
@@ -60,8 +62,7 @@ describe('MemberComponent', () => {
     it('falls back to BlankUserImage when image value is null', () => {
         renderComponent({ image: null });
 
-        const img = screen.getByRole('img');
-        expect(img).toHaveAttribute('src', 'blank-user.svg');
+        expect(screen.getByTestId('blank-user-icon')).toBeInTheDocument();
     });
 
     it('calls handleOnEditMember when edit button clicked', () => {

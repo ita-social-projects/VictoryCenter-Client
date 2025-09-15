@@ -1,4 +1,3 @@
-import default_team_member_photo from '../../../../assets/icons/team-member-blank.svg';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import {
     PublicCategoryWithTeamMembersDto,
@@ -23,7 +22,7 @@ const mapTeamMemberDtoToTeamMember = (dto: PublicTeamMemberDto): MemberCard => (
     id: dto.id,
     name: dto.fullName,
     role: dto.description || '',
-    photo: dto.image?.url ?? default_team_member_photo,
+    photo: dto.image?.url ?? null,
 });
 
 const mapCategoryDtoToTeamCategory = (dto: PublicCategoryWithTeamMembersDto): TeamItem => {

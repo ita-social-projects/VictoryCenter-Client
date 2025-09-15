@@ -5,7 +5,7 @@ export interface MemberCard {
     id: number;
     name: string;
     role: string;
-    photo: string;
+    photo: string | null;
 }
 
 export type Member = {

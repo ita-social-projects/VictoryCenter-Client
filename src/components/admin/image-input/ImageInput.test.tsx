@@ -8,17 +8,17 @@ jest.mock('../confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, onConfirm, onCancel, onClose }: any) => {
         if (!isOpen) return null;
         return (
-          <div data-testid="confirmation-modal">
-              <button data-testid="confirm-button" onClick={onConfirm}>
-                  Confirm
-              </button>
-              <button data-testid="cancel-button" onClick={onCancel}>
-                  Cancel
-              </button>
-              <button data-testid="close-button" onClick={onClose}>
-                  Close
-              </button>
-          </div>
+            <div data-testid="confirmation-modal">
+                <button data-testid="confirm-button" onClick={onConfirm}>
+                    Confirm
+                </button>
+                <button data-testid="cancel-button" onClick={onCancel}>
+                    Cancel
+                </button>
+                <button data-testid="close-button" onClick={onClose}>
+                    Close
+                </button>
+            </div>
         );
     },
 }));

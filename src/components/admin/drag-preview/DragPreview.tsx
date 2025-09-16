@@ -1,19 +1,13 @@
 import { DragPreviewModel } from '../../../types/admin/common';
-import DragIcon from '../../../assets/icons/dragger.svg';
+import { ReactComponent as DragIcon } from '../../../assets/icons/dragger.svg';
 import React from 'react';
 import './DragPreview.scss';
 export interface DragPreviewProps<TEntity> {
     entity: TEntity;
     dragPreview: DragPreviewModel<TEntity>;
     renderEntityComponent: (entity: TEntity) => React.ReactNode;
-    dragAltText: string;
 }
-export const DragPreview = <TEntity,>({
-    dragPreview,
-    entity,
-    renderEntityComponent,
-    dragAltText,
-}: DragPreviewProps<TEntity>) => {
+export const DragPreview = <TEntity,>({ dragPreview, entity, renderEntityComponent }: DragPreviewProps<TEntity>) => {
     if (!dragPreview.visible || !dragPreview.item) return <></>;
 
     return (
@@ -27,7 +21,7 @@ export const DragPreview = <TEntity,>({
         >
             <div className="drag-preview-wrapper">
                 <div className="dragger">
-                    <img src={DragIcon} alt={dragAltText} />
+                    <DragIcon />
                 </div>
                 {renderEntityComponent(entity)}
             </div>

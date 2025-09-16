@@ -1,6 +1,6 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import DeleteIcon from '../../../assets/icons/delete.svg';
-import UploadIcon from '../../../assets/icons/cloud-download.svg';
+import { ReactComponent as DeleteIcon } from '../../../assets/icons/delete.svg';
+import { ReactComponent as UploadIcon } from '../../../assets/icons/cloud-download.svg';
 import classNames from 'classnames';
 import './ImageInput.scss';
 import { Image, ImageValues } from '../../../types/common/image';
@@ -144,18 +144,19 @@ export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false
                             type="button"
                             className="delete-button"
                             disabled={disabled}
+                            data-testid="remove-photo-button"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setShowConfirmModal(true);
                             }}
                         >
-                            <img src={DeleteIcon} alt={COMMON_TEXT_ADMIN.ALT.DELETE} className="delete-icon" />
+                            <DeleteIcon className="delete-icon" />
                         </button>
                     )}
                 </div>
             ) : (
                 <div className="image-placeholder">
-                    <img src={UploadIcon} alt={COMMON_TEXT_ADMIN.ALT.UPLOAD} className="placeholder-icon" />
+                    <UploadIcon className="placeholder-icon" />
                     <span>{COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER}</span>
                 </div>
             )}

@@ -11,7 +11,7 @@ import { SelectOptionProps, SelectProps } from '../../../../../components/admin/
 import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
 
 jest.mock('../../../../../assets/icons/plus.svg', () => ({
-    ReactComponent: ({ ...props }: any) => <svg {...props} data-testid="plus-icon" />,
+    ReactComponent: (props: any) => <svg data-testid="plus-icon" {...props} />,
 }));
 
 jest.mock('../../../../../components/admin/button/Button', () => ({
@@ -138,10 +138,10 @@ describe('ProgramsPageToolbar', () => {
         expect(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT)).toBeInTheDocument();
     });
 
-    it('should render add program button', () => {
+    it('should render add program button with correct icon', () => {
         render(<ProgramsPageToolbar {...createProps()} />);
 
-        const button = screen.getByText(PROGRAMS_TEXT.BUTTON.ADD_PROGRAM);
+        const button = screen.getByTestId('plus-icon').closest('button');
         expect(button).toBeInTheDocument();
     });
 

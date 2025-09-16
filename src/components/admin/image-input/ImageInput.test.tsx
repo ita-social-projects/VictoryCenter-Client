@@ -24,6 +24,15 @@ jest.mock('../confirmation-modal/ConfirmationModal', () => ({
 }));
 
 const createImageFile = () => new File(['dummy content'], 'example.png', { type: 'image/png' });
+
+jest.mock('../../../assets/icons/cloud-download.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="upload-icon" />,
+}));
+
+jest.mock('../../../assets/icons/delete.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="delete-icon" />,
+}));
+
 const MockImageValue: ImageValues = {
     base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAocB9eQ6vqoAAAAASUVORK5CYII=',
     mimeType: 'image/jpeg',
@@ -50,7 +59,7 @@ describe('ImageInput', () => {
     it('renders placeholder when no image is selected', () => {
         render(<ImageInput value={null} onChange={onChangeMock} />);
         expect(screen.getByText(COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER)).toBeInTheDocument();
-        expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.UPLOAD)).toBeInTheDocument();
+        expect(screen.getByTestId('upload-icon')).toBeInTheDocument();
     });
 
     it('renders image preview when ImageValue is provided', () => {
@@ -90,7 +99,7 @@ describe('ImageInput', () => {
     it('shows confirmation modal when remove button is clicked', () => {
         render(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
 
-        const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
+        const removeButton = screen.getByTestId('delete-icon').closest('button')!;
         fireEvent.click(removeButton);
 
         expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
@@ -99,7 +108,7 @@ describe('ImageInput', () => {
     it('calls onChange with null when confirm button is clicked in modal', () => {
         render(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
 
-        const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
+        const removeButton = screen.getByTestId('remove-photo-button');
         fireEvent.click(removeButton);
 
         const confirmButton = screen.getByTestId('confirm-button');
@@ -111,7 +120,7 @@ describe('ImageInput', () => {
     it('closes confirmation modal when cancel button is clicked', () => {
         render(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
 
-        const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
+        const removeButton = screen.getByTestId('remove-photo-button');
         fireEvent.click(removeButton);
 
         const cancelButton = screen.getByTestId('cancel-button');
@@ -124,7 +133,7 @@ describe('ImageInput', () => {
     it('closes confirmation modal when close button is clicked', () => {
         render(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
 
-        const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
+        const removeButton = screen.getByTestId('remove-photo-button');
         fireEvent.click(removeButton);
 
         const closeButton = screen.getByTestId('close-button');
@@ -373,7 +382,7 @@ describe('ImageInput', () => {
     it('clears input value when removing file through confirmation modal', () => {
         render(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
 
-        const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
+        const removeButton = screen.getByTestId('delete-icon').closest('button')!;
         const fileInput = screen.getByTestId('image-input-hidden') as HTMLInputElement;
 
         Object.defineProperty(fileInput, 'value', {
@@ -429,13 +438,13 @@ describe('ImageInput', () => {
     it('does not show delete button when disabled', () => {
         render(<ImageInput value={MockImageValue} onChange={onChangeMock} disabled />);
 
-        expect(screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW })).not.toBeInTheDocument();
     });
 
     it('shows delete button when not disabled and image is present', () => {
         render(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
 
-        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE })).toBeInTheDocument();
+        expect(screen.getByTestId('remove-photo-button')).toBeInTheDocument();
     });
 
     it('stops propagation when delete button is clicked', () => {
@@ -443,7 +452,7 @@ describe('ImageInput', () => {
 
         render(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
 
-        const deleteButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
+        const deleteButton = screen.getByTestId('remove-photo-button');
 
         const mockEvent = new MouseEvent('click', { bubbles: true });
         Object.defineProperty(mockEvent, 'stopPropagation', {

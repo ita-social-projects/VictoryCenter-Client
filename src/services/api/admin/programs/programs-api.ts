@@ -30,7 +30,7 @@ const convertProgramToSuggestion = (program: Program): ProgramSearchItemData => 
 const mapProgramEditToProgram = async (program: ProgramCreateUpdate, client: AxiosInstance): Promise<Program> => {
     const response = await client.get(API_ROUTES.PROGRAMCATEGORY.BASE);
     return {
-        id: program.id ?? 1,
+        id: program.id as number,
         name: program.name,
         description: program.description,
         categories: response.data,
@@ -137,7 +137,11 @@ export const ProgramsApi = {
         client: AxiosInstance,
     ): Promise<ProgramCategory> => {
         const response = await client.post(API_ROUTES.PROGRAMCATEGORY.BASE, category);
-        return response.data;
+        const created = response.data;
+        return {
+            ...created,
+            programsCount: created.programs ? created.programs.length : 0,
+        };
     },
 
     editProgramCategory: async (

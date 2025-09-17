@@ -9,7 +9,7 @@ import './CardContent.scss';
 
 interface CardContentProps {
     content: Content;
-    onImageChange: (value: Image | ImageValues) => void;
+    onImageChange: (value: ImageValues | null) => void;
     onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
     descriptionLimit: number;
     rows?: number;
@@ -27,7 +27,7 @@ export const CardContent = ({
         <div style={{ width: imageInputProps.style?.width }} className="card-content">
             <ImageInput
                 value={content?.image ?? null}
-                onChange={(image) => onImageChange(image ?? content.image!)}
+                onChange={(image) => onImageChange(image ?? null)}
                 label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
                 className="who-we-are-image-input-wrapper"
                 {...imageInputProps}

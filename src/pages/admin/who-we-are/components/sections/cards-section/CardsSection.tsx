@@ -44,7 +44,7 @@ export const CardsSection = ({
                 <div className="cards-section-wrapper-cards">
                     {cardContents.map((c: Content, index: number) => {
                         // Створюємо унікальні обробники для кожного елемента в циклі
-                        const handleImageChange = (value: ImageValues | Image) => {
+                        const handleImageChange = (value: ImageValues | null) => {
                             onChange({
                                 ...c,
                                 image: value,

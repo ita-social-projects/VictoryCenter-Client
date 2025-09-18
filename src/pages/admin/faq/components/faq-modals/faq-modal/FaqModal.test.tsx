@@ -1,12 +1,11 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
-import { VisibilityStatus } from '../../../../../../types/admin/common';
+import { VisibilityStatus, ModalMode } from '../../../../../../types/admin/common';
 import { FaqQuestion, VisitorPage } from '../../../../../../types/admin/faq';
 import { FaqModal, FaqModalProps } from './FaqModal';
 import { FAQ_TEXT } from '../../../../../../const/admin/faq';
 import { FaqApi } from '../../../../../../services/api/admin/faq/faq-api';
 
-// Mock the useAdminClient hook
 jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn().mockReturnValue({
         // Add any properties the client should have
@@ -151,13 +150,13 @@ describe('FaqModal', () => {
 
     const addModeProps: FaqModalProps = {
         ...baseProps,
-        mode: 'add',
+        mode: ModalMode.Add,
         onAddFaq: mockOnAddFaq,
     };
 
     const editModeProps: FaqModalProps = {
         ...baseProps,
-        mode: 'edit',
+        mode: ModalMode.Edit,
         faqToEdit: mockFaq,
         onEditFaq: mockOnEditFaq,
     };

@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { FaqPanelContent } from './FaqPanelContent';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { VisibilityStatus } from '../../../../../types/admin/common';
+import { ModalMode, VisibilityStatus } from '../../../../../types/admin/common';
 import { FaqApi } from '../../../../../services/api/admin/faq/faq-api';
 import { FaqQuestion, VisitorPage } from '../../../../../types/admin/faq';
 import { FAQ_TEXT } from '../../../../../const/admin/faq';
@@ -48,9 +48,10 @@ jest.mock('../faq-modals/faq-modal/FaqModal', () => {
     return {
         FaqModal: (props: any) => {
             if (!props.isOpen) return null;
-
-            const isAddMode = props.mode === 'add';
-            const isEditMode = props.mode === 'edit';
+            
+            const { ModalMode } = require('../../../../../types/admin/common');
+            const isAddMode = props.mode === ModalMode.Add;
+            const isEditMode = props.mode === ModalMode.Edit;
 
             return (
                 <div data-testid={isAddMode ? 'add-faq-modal' : 'edit-faq-modal'}>
@@ -285,44 +286,16 @@ const convertFaqsToDto = (faqs: FaqQuestion[]) => {
 describe('FaqPanelContent', () => {
     const renderFaqPanelContent = () => render(<FaqPanelContent />);
 
-    const getFaqPanelContent = () => screen.getByTestId('faq-panel-content');
-    const getAdminPanelToolbar = () => screen.getByTestId('admin-panel-toolbar');
-    const getCategoryBar = () => screen.getByTestId('category-bar');
-    const getInfiniteScrollList = () => screen.getByTestId('infinite-scroll-list');
     const getFaqItems = () => screen.getAllByTestId('faq-item');
-    const getEmptyState = () => screen.getByTestId('empty-state');
-    const getAddFaqButton = () => screen.getByTestId('add-faq-button');
     const getAddFaqModal = () => screen.queryByTestId('add-faq-modal');
     const getEditFaqModal = () => screen.queryByTestId('edit-faq-modal');
     const getDeleteFaqModal = () => screen.queryByTestId('delete-faq-modal');
-    const getCategoryButton = (id: number) => screen.getByTestId(`category-${id}`);
-    const getFilterPublishedButton = () => screen.getByTestId('filter-published');
-    const getFilterDraftButton = () => screen.getByTestId('filter-draft');
-    const getClearFilterButton = () => screen.getByTestId('filter-clear');
-    const getSearchInput = () => screen.getByTestId('search-input');
     const getFaqErrorContainer = () => screen.getByTestId('faq-error-container');
-    const getTryAgainButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN);
-    const getConfirmAddButton = () => screen.getByTestId('confirm-add');
-    const getConfirmEditButton = () => screen.getByTestId('confirm-edit');
-    const getConfirmDeleteButton = () => screen.getByTestId('confirm-delete');
-    const getEditFaqButton = (id: number) => screen.getByTestId(`edit-faq-${id}`);
-    const getDeleteFaqButton = (id: number) => screen.getByTestId(`delete-faq-${id}`);
-    const getLoadMoreButton = () => screen.getByTestId('load-more');
-    const getLoadingIndicator = () => screen.getByTestId('infinite-scroll-loader');
 
-    const clickAddFaqButton = () => fireEvent.click(getAddFaqButton());
-    const clickCategoryButton = (id: number) => fireEvent.click(getCategoryButton(id));
-    const clickFilterPublishedButton = () => fireEvent.click(getFilterPublishedButton());
-    const clickFilterDraftButton = () => fireEvent.click(getFilterDraftButton());
-    const clickClearFilterButton = () => fireEvent.click(getClearFilterButton());
-    const clickTryAgainButton = () => fireEvent.click(getTryAgainButton());
-    const clickConfirmAddButton = () => fireEvent.click(getConfirmAddButton());
-    const clickConfirmEditButton = () => fireEvent.click(getConfirmEditButton());
-    const clickConfirmDeleteButton = () => fireEvent.click(getConfirmDeleteButton());
-    const clickEditFaqButton = (id: number) => fireEvent.click(getEditFaqButton(id));
-    const clickDeleteFaqButton = (id: number) => fireEvent.click(getDeleteFaqButton(id));
-    const clickLoadMoreButton = () => fireEvent.click(getLoadMoreButton());
-    const typeInSearchInput = (value: string) => fireEvent.change(getSearchInput(), { target: { value } });
+    const clickAddFaqButton = () => fireEvent.click(screen.getByTestId('add-faq-button'));
+    const clickFilterPublishedButton = () => fireEvent.click(screen.getByTestId('filter-published'));
+    const clickEditFaqButton = (id: number) => fireEvent.click(screen.getByTestId(`edit-faq-${id}`));
+    const clickDeleteFaqButton = (id: number) => fireEvent.click(screen.getByTestId(`delete-faq-${id}`));
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -359,10 +332,10 @@ describe('FaqPanelContent', () => {
         it('should render all main components and fetch initial data', async () => {
             renderFaqPanelContent();
 
-            expect(getFaqPanelContent()).toBeInTheDocument();
-            expect(getAdminPanelToolbar()).toBeInTheDocument();
-            expect(getCategoryBar()).toBeInTheDocument();
-            expect(getInfiniteScrollList()).toBeInTheDocument();
+            expect(screen.getByTestId('faq-panel-content')).toBeInTheDocument();
+            expect(screen.getByTestId('admin-panel-toolbar')).toBeInTheDocument();
+            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+            expect(screen.getByTestId('infinite-scroll-list')).toBeInTheDocument();
 
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledTimes(1);
@@ -383,7 +356,7 @@ describe('FaqPanelContent', () => {
             renderFaqPanelContent();
 
             await waitFor(() => {
-                expect(getEmptyState()).toBeInTheDocument();
+                expect(screen.getByTestId('empty-state')).toBeInTheDocument();
                 expect(screen.getByText(COMMON_TEXT_ADMIN.LIST.NOT_FOUND)).toBeInTheDocument();
             });
         });
@@ -401,7 +374,7 @@ describe('FaqPanelContent', () => {
                 totalItemsCount: 1,
             });
 
-            clickCategoryButton(2);
+            fireEvent.click(screen.getByTestId(`category-2`));
 
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledWith(expect.anything(), 2, undefined, 0, expect.any(Number));
@@ -441,7 +414,7 @@ describe('FaqPanelContent', () => {
                 totalItemsCount: 1,
             });
 
-            clickFilterDraftButton();
+            fireEvent.click(screen.getByTestId('filter-draft'));
 
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledWith(expect.anything(), 1, 'draft', 0, expect.any(Number));
@@ -470,7 +443,7 @@ describe('FaqPanelContent', () => {
                 totalItemsCount: mockFaqs.length,
             });
 
-            clickClearFilterButton();
+            fireEvent.click(screen.getByTestId('filter-clear'));
 
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledWith(expect.anything(), 1, undefined, 0, expect.any(Number));
@@ -493,11 +466,7 @@ describe('FaqPanelContent', () => {
                 totalItemsCount: mockFaqs.length,
             });
 
-            // Click Try Again
-            clickTryAgainButton();
-
-            // Change filter to trigger a new fetch
-            clickFilterPublishedButton();
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN));
 
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2);
@@ -602,7 +571,7 @@ describe('FaqPanelContent', () => {
             expect(getAddFaqModal()).toBeInTheDocument();
 
             // Confirm adding
-            clickConfirmAddButton();
+            fireEvent.click(screen.getByTestId('confirm-add'));
 
             await waitFor(() => {
                 expect(getAddFaqModal()).not.toBeInTheDocument();
@@ -634,7 +603,7 @@ describe('FaqPanelContent', () => {
             expect(getEditFaqModal()).toBeInTheDocument();
 
             // Confirm editing
-            clickConfirmEditButton();
+            fireEvent.click(screen.getByTestId('confirm-edit'));
 
             await waitFor(() => {
                 expect(getEditFaqModal()).not.toBeInTheDocument();
@@ -665,7 +634,7 @@ describe('FaqPanelContent', () => {
             expect(getDeleteFaqModal()).toBeInTheDocument();
 
             // Confirm deleting
-            clickConfirmDeleteButton();
+            fireEvent.click(screen.getByTestId('confirm-delete'));
 
             await waitFor(() => {
                 expect(getDeleteFaqModal()).not.toBeInTheDocument();
@@ -757,7 +726,7 @@ describe('FaqPanelContent', () => {
             });
 
             // Click load more
-            clickLoadMoreButton();
+            fireEvent.click(screen.getByTestId('load-more'));
 
             await waitFor(() => {
                 expect(mockFaqApi.getAll).toHaveBeenCalledTimes(2);
@@ -786,8 +755,8 @@ describe('FaqPanelContent', () => {
             await waitFor(() => expect(getFaqItems()).toHaveLength(2));
 
             // Type in search input
-            typeInSearchInput('test search query');
-            expect(getSearchInput()).toHaveValue('test search query');
+            fireEvent.change(screen.getByTestId('search-input'), { target: { value: 'test search query' } });
+            expect(screen.getByTestId('search-input')).toHaveValue('test search query');
         });
     });
 
@@ -906,7 +875,7 @@ describe('FaqPanelContent', () => {
             });
 
             // Click Try Again button
-            clickTryAgainButton();
+            fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN));
 
             // Verify refetchPages was called
             expect(mockRefetchPages).toHaveBeenCalledTimes(1);

@@ -4,9 +4,8 @@ import { useOnMountUnsafe } from '../../../hooks/common/use-on-mount-unsafe/useO
 import { FaqApi } from '../../../services/api/admin/faq/faq-api';
 import { useAdminClient } from '../../../hooks/admin/use-admin-client/useAdminClient';
 
-interface Props {
-    children: React.ReactNode;
-}
+// interface Props {
+// }
 
 export interface VisitorPagesContextState {
     pages: VisitorPage[];
@@ -17,7 +16,7 @@ export interface VisitorPagesContextState {
 
 const VisitorPagesContext = createContext<VisitorPagesContextState | undefined>(undefined);
 
-export function VisitorPagesProvider({ children }: Props) {
+export function VisitorPagesProvider({ children }: { children: React.ReactNode }) {
     const client = useAdminClient();
     const [pages, setPages] = useState<VisitorPage[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);

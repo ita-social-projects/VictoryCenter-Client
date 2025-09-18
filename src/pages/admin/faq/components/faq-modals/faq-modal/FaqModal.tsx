@@ -3,7 +3,7 @@ import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { FAQ_TEXT } from '../../../../../../const/admin/faq';
 import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
 import { FaqApi } from '../../../../../../services/api/admin/faq/faq-api';
-import { VisibilityStatus } from '../../../../../../types/admin/common';
+import { VisibilityStatus, ModalMode, PendingAction } from '../../../../../../types/admin/common';
 import { FaqCreateUpdate, FaqQuestion, VisitorPage } from '../../../../../../types/admin/faq';
 import { FaqForm, FaqFormRef, FaqFormValues } from '../../faq-form/FaqForm';
 import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
@@ -17,12 +17,12 @@ interface BaseProps {
 }
 
 interface AddModalProps extends BaseProps {
-    mode: 'add';
+    mode: ModalMode.Add;
     onAddFaq: (faq: FaqQuestion) => void;
 }
 
 interface EditModalProps extends BaseProps {
-    mode: 'edit';
+    mode: ModalMode.Edit;
     faqToEdit: FaqQuestion;
     onEditFaq: (faq: FaqQuestion) => void;
 }
@@ -32,13 +32,13 @@ export type FaqModalProps = AddModalProps | EditModalProps;
 export const FaqModal = (props: FaqModalProps) => {
     const client = useAdminClient();
     const { isOpen, onClose, mode, pages } = props;
-    const isEditMode = mode === 'edit';
+    const isEditMode = mode === ModalMode.Edit;
     const faq = isEditMode ? props.faqToEdit : undefined;
     const onSuccess = isEditMode ? props.onEditFaq : props.onAddFaq;
 
     const modalConfig = useMemo(
         () => ({
-            mode,
+            mode: isEditMode ? ModalMode.Edit : ModalMode.Add,
             isOpen,
             onClose,
             entity: faq,
@@ -47,43 +47,41 @@ export const FaqModal = (props: FaqModalProps) => {
                 const response = isEditMode ? await FaqApi.update(client, data) : await FaqApi.post(client, data);
                 return mapFaqQuestionDtoToModel(response, pages);
             },
-            getConfirmTitle: (
-                mode: 'add' | 'edit',
-                faq: FaqQuestion | undefined,
-                pendingAction: 'publish' | 'draft' | null,
-            ) => {
-                if (mode === 'edit' && faq) {
+            getConfirmTitle: (mode: ModalMode, faq: FaqQuestion | undefined, pendingAction: PendingAction | null) => {
+                if (mode === ModalMode.Edit && faq) {
                     if (faq.status === VisibilityStatus.Published)
-                        return pendingAction === 'draft'
+                        return pendingAction === PendingAction.Draft
                             ? COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION
                             : COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES;
-                    return pendingAction === 'draft'
+                    return pendingAction === PendingAction.Draft
                         ? COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES
                         : FAQ_TEXT.QUESTION.PUBLISH_FAQ;
                 }
-                return pendingAction === 'draft' ? FAQ_TEXT.QUESTION.DRAFT_FAQ : FAQ_TEXT.QUESTION.PUBLISH_FAQ;
+                return pendingAction === PendingAction.Draft
+                    ? FAQ_TEXT.QUESTION.DRAFT_FAQ
+                    : FAQ_TEXT.QUESTION.PUBLISH_FAQ;
             },
-            getErrorMessage: (mode: 'add' | 'edit') => {
-                return mode === 'edit'
+            getErrorMessage: (mode: ModalMode) => {
+                return mode === ModalMode.Edit
                     ? FAQ_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_FAQ
                     : FAQ_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_FAQ;
             },
-            getFormKey: (mode: 'add' | 'edit', faq?: FaqQuestion) => {
-                return mode === 'edit' && faq?.id ? faq.id : 'add';
+            getFormKey: (mode: ModalMode, faq?: FaqQuestion) => {
+                return mode === ModalMode.Edit && faq?.id ? faq.id : 'add';
             },
             transformFormData: (
                 formData: FaqFormValues,
                 status: VisibilityStatus,
                 faq?: FaqQuestion,
             ): FaqCreateUpdate => ({
-                id: mode === 'edit' && faq ? faq.id : null,
+                id: isEditMode && faq ? faq.id : null,
                 questionText: formData.questionText,
                 answerText: formData.answerText,
                 pageIds: formData.pages.map((p) => p.id),
                 status: status,
             }),
         }),
-        [isEditMode, isOpen, mode, onClose, onSuccess, faq, client, pages],
+        [isEditMode, isOpen, onClose, onSuccess, faq, client, pages],
     );
 
     const modalHookData = useGenericModal<FaqFormValues, FaqQuestion, FaqFormRef>(modalConfig);

@@ -4,6 +4,7 @@ import { ProgramModal } from './program-modal/ProgramModal';
 import { DeleteProgramModal } from './delete-program-modal/DeleteProgramModal';
 import { ProgramCategoryModal } from '../program-category-modals/ProgramCategoryModal';
 import { DeleteCategoryModal } from '../program-category-modals/DeleteCategoryModal';
+import { ModalMode } from '../../../../../types/admin/common';
 
 export interface ProgramsPageModalsProps {
     modalsStateControl: UseModalsStateResult<Program>;
@@ -31,7 +32,7 @@ export const ProgramsPageModals = ({
         <>
             {/* Program Modals */}
             <ProgramModal
-                mode="add"
+                mode={ModalMode.Add}
                 isOpen={modalState.isAddModalOpen}
                 onClose={closeModalActions.closeAddItemModal}
                 onAddProgram={onAddProgram}
@@ -39,7 +40,7 @@ export const ProgramsPageModals = ({
             />
 
             <ProgramModal
-                mode="edit"
+                mode={ModalMode.Edit}
                 isOpen={!!modalState.itemToEdit}
                 onClose={closeModalActions.closeEditItemModal}
                 programToEdit={modalState.itemToEdit!}

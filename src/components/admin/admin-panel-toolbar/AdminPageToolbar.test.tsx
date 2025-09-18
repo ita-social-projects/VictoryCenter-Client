@@ -4,9 +4,9 @@ import {
     SearchItemContentRef,
     SearchItemContentRenderProps,
 } from '../search-bar/search-item-wrapper/SearchItemWrapper';
-import { PaginationResult, VisibilityStatus } from '../../../types/admin/common';
+import { AdminPanelToolbar } from './AdminPageToolbar';
+import { UI_CONFIG } from '../../../const/admin/common';
 
-// Mock the modules before importing components
 jest.mock('../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch', () => ({
     useDataPaginationFetch: jest.fn(),
 }));
@@ -30,10 +30,6 @@ jest.mock('../button/Button', () => ({
 jest.mock('../../../assets/icons/plus.svg', () => ({
     ReactComponent: () => <div data-testid="plus-icon" />,
 }));
-
-// Now import the component
-import { AdminPanelToolbar } from './AdminPageToolbar';
-import { UI_CONFIG } from '../../../const/admin/common';
 
 describe('AdminPanelToolbar', () => {
     // Test data
@@ -277,12 +273,6 @@ describe('AdminPanelToolbar', () => {
 
     // Add a simple direct test for onSearch to increase coverage
     it('directly tests onSearch function with different search terms', () => {
-        // Create test items
-        const testItems = [
-            { id: 1, name: 'Test Item 1' },
-            { id: 2, name: 'Test Item 2' },
-        ];
-
         // Mock the useState setter functions
         const setCurrentSearchTerm = jest.fn();
         const setLocalSearchItems = jest.fn();

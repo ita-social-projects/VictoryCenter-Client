@@ -73,8 +73,10 @@ export const FaqApi = {
     },
 
     update: async (client: AxiosInstance, faq: FaqCreateUpdate): Promise<FaqQuestionDto> => {
+        if (faq.id == null) {
+            throw new Error('FaqApi.update: faq.id is required');
+        }
         const response = await client.put<FaqQuestionDto>(`${API_ROUTES.FAQ.BASE}/${faq.id}`, toPayload(faq));
-
         return response.data;
     },
 

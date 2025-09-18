@@ -67,7 +67,6 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
             ref,
         });
 
-        // Question handlers
         const handleQuestionChange = useCallback(
             (e: React.ChangeEvent<HTMLInputElement>) => {
                 const value = e.target.value;

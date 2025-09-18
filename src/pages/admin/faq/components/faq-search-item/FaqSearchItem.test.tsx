@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { FaqSearchItem } from './FaqSearchItem';
 
 const mockItem = {
@@ -10,14 +10,14 @@ const mockItem = {
 
 describe('FaqSearchItem', () => {
     it('renders question and pages', () => {
-        const { getByText } = render(<FaqSearchItem item={mockItem} />);
-        expect(getByText('What is Victory Center?')).toBeInTheDocument();
-        expect(getByText('Home, About')).toBeInTheDocument();
+        render(<FaqSearchItem item={mockItem} />);
+        expect(screen.getByText('What is Victory Center?')).toBeInTheDocument();
+        expect(screen.getByText('Home, About')).toBeInTheDocument();
     });
 
     it('returns tooltip content when overflowing', () => {
         const ref = React.createRef<any>();
-        const { container } = render(<FaqSearchItem item={mockItem} ref={ref} />);
+        render(<FaqSearchItem item={mockItem} ref={ref} />);
         // Mock overflowing
         if (ref.current) {
             ref.current.getTooltipContent = jest.fn(() => <div>Tooltip</div>);

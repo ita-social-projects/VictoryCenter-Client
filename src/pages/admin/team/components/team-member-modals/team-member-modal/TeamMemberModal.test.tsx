@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { AxiosInstance } from 'axios';
 import { TeamCategory, TeamMember } from '../../../../../../types/admin/team-members';
-import { VisibilityStatus } from '../../../../../../types/admin/common';
+import { VisibilityStatus, ModalMode } from '../../../../../../types/admin/common';
 import { TeamMembersApi } from '../../../../../../services/api/admin/team/team-members/team-members-api';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { TeamMemberModal } from './TeamMemberModal';
@@ -166,7 +166,7 @@ describe('TeamMemberModal', () => {
     });
 
     it('renders add mode and disables actions until valid', () => {
-        render(<TeamMemberModal mode="add" isOpen={true} onClose={jest.fn()} categories={mockCategories} />);
+        render(<TeamMemberModal mode={ModalMode.Add} isOpen={true} onClose={jest.fn()} categories={mockCategories} />);
         expect(screen.getByText('Add Member')).toBeInTheDocument();
         expect(screen.getByText('Save Draft')).toBeDisabled();
         expect(screen.getByText('Save Published')).toBeDisabled();
@@ -175,7 +175,7 @@ describe('TeamMemberModal', () => {
     it('renders edit mode with initial data mapped', () => {
         render(
             <TeamMemberModal
-                mode="edit"
+                mode={ModalMode.Edit}
                 isOpen={true}
                 onClose={jest.fn()}
                 memberToEdit={baseMember}
@@ -202,7 +202,7 @@ describe('TeamMemberModal', () => {
 
         render(
             <TeamMemberModal
-                mode="add"
+                mode={ModalMode.Add}
                 isOpen={true}
                 onClose={onClose}
                 onAddMember={onAddMember}
@@ -230,7 +230,7 @@ describe('TeamMemberModal', () => {
 
         render(
             <TeamMemberModal
-                mode="edit"
+                mode={ModalMode.Edit}
                 isOpen={true}
                 onClose={jest.fn()}
                 onEditMember={onEditMember}
@@ -254,7 +254,7 @@ describe('TeamMemberModal', () => {
     it('shows error message for failed create/update', async () => {
         mockedApi.postMember.mockRejectedValue(new Error('x'));
         const { unmount } = render(
-            <TeamMemberModal mode="add" isOpen={true} onClose={jest.fn()} categories={mockCategories} />,
+            <TeamMemberModal mode={ModalMode.Add} isOpen={true} onClose={jest.fn()} categories={mockCategories} />,
         );
         const addModal = screen.getByTestId('modal');
         await userEvent.click(within(addModal).getByTestId('toggle-valid'));
@@ -270,7 +270,7 @@ describe('TeamMemberModal', () => {
         mockedApi.updateMember.mockRejectedValue(new Error('y'));
         render(
             <TeamMemberModal
-                mode="edit"
+                mode={ModalMode.Edit}
                 isOpen={true}
                 onClose={jest.fn()}
                 memberToEdit={baseMember}
@@ -290,7 +290,7 @@ describe('TeamMemberModal', () => {
 
         // Clean form closes immediately
         const { unmount } = render(
-            <TeamMemberModal mode="add" isOpen={true} onClose={onClose} categories={mockCategories} />,
+            <TeamMemberModal mode={ModalMode.Add} isOpen={true} onClose={onClose} categories={mockCategories} />,
         );
         await userEvent.click(screen.getByTestId('modal-close'));
         expect(onClose).toHaveBeenCalled();
@@ -299,7 +299,7 @@ describe('TeamMemberModal', () => {
         // Dirty form shows confirmation
         const onClose2 = jest.fn();
         const { unmount: unmount2 } = render(
-            <TeamMemberModal mode="add" isOpen={true} onClose={onClose2} categories={mockCategories} />,
+            <TeamMemberModal mode={ModalMode.Add} isOpen={true} onClose={onClose2} categories={mockCategories} />,
         );
         const dirtyModal = screen.getByTestId('modal');
         await userEvent.click(within(dirtyModal).getByTestId('toggle-dirty'));
@@ -312,7 +312,7 @@ describe('TeamMemberModal', () => {
         // While submitting, close should not fire
         const onClose3 = jest.fn();
         mockedApi.postMember.mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 100)));
-        render(<TeamMemberModal mode="add" isOpen={true} onClose={onClose3} categories={mockCategories} />);
+        render(<TeamMemberModal mode={ModalMode.Add} isOpen={true} onClose={onClose3} categories={mockCategories} />);
         const submitModal = screen.getByTestId('modal');
         await userEvent.click(within(submitModal).getByTestId('toggle-valid'));
         await userEvent.click(within(submitModal).getByText('Save Draft'));

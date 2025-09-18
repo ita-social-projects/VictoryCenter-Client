@@ -4,7 +4,7 @@ import { FaqQuestion, FaqSearchItemData, VisitorPage } from '../../../../../type
 import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { FaqApi } from '../../../../../services/api/admin/faq/faq-api';
-import { VisibilityStatus } from '../../../../../types/admin/common';
+import { VisibilityStatus, ModalMode } from '../../../../../types/admin/common';
 import { FAQ_TEXT } from '../../../../../const/admin/faq';
 import { ToastType } from '../../../../../types/admin/toast';
 import { DraggableListItem } from '../../../../../components/admin/draggable-list-item/DraggableListItem';
@@ -229,6 +229,7 @@ export const FaqPanelContent = () => {
     const handleRetry = useCallback(() => {
         if (error.type === ErrorType.Faq) {
             resetFaqsState();
+            fetchFaqs(true);
         } else if (error.type === ErrorType.Pages) {
             refetchPages();
         }
@@ -278,7 +279,7 @@ export const FaqPanelContent = () => {
             resetFaqsState();
             fetchFaqs(true);
         }
-    }, [statusFilter, selectedVisitorPage, statusFilter, fetchFaqs, resetFaqsState]);
+    }, [statusFilter, selectedVisitorPage, fetchFaqs, resetFaqsState]);
 
     const handleAddFaq = useCallback(
         (faq: FaqQuestion) => {
@@ -327,14 +328,7 @@ export const FaqPanelContent = () => {
 
     const renderFaqItem = useCallback(
         (faq: FaqQuestion) =>
-            statusFilter ? (
-                <FaqComponent
-                    key={faq.id}
-                    faq={faq}
-                    handleOnDeleteFaq={handleDeleteFaqModalOpen}
-                    handleOnEditFaq={handleEditFaqModalOpen}
-                />
-            ) : (
+            statusFilter === undefined ? (
                 <DraggableListItem
                     key={faq.id}
                     entity={faq}
@@ -352,6 +346,15 @@ export const FaqPanelContent = () => {
                     idSelector={(q) => q.id}
                     onEntitiesReordered={handleEntitiesReordered}
                 ></DraggableListItem>
+            ) : (
+                <div className="nondraggable-faq-item-wrapper">
+                    <FaqComponent
+                        key={faq.id}
+                        faq={faq}
+                        handleOnDeleteFaq={handleDeleteFaqModalOpen}
+                        handleOnEditFaq={handleEditFaqModalOpen}
+                    />
+                </div>
             ),
         [handleDeleteFaqModalOpen, handleEditFaqModalOpen, handleEntitiesReordered, faqs, statusFilter],
     );
@@ -403,7 +406,7 @@ export const FaqPanelContent = () => {
             </div>
 
             <FaqModal
-                mode="add"
+                mode={ModalMode.Add}
                 isOpen={modalState.isAddFaqModalOpen}
                 onClose={closeModalActions.addFaq}
                 onAddFaq={handleAddFaq}
@@ -411,7 +414,7 @@ export const FaqPanelContent = () => {
             />
 
             <FaqModal
-                mode="edit"
+                mode={ModalMode.Edit}
                 isOpen={!!modalState.faqToEdit}
                 onClose={closeModalActions.editFaq}
                 faqToEdit={modalState.faqToEdit!}

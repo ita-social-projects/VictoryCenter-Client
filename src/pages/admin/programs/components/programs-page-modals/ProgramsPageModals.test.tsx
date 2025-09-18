@@ -6,7 +6,10 @@ import { VisibilityStatus } from '../../../../../types/admin/common';
 
 // Mock all modal components
 jest.mock('./program-modal/ProgramModal', () => ({
-    ProgramModal: ({ isOpen, mode }: any) => (isOpen ? <div data-testid={`program-modal-${mode}`} /> : null),
+    ProgramModal: ({ isOpen, mode }: any) => {
+        const modeString = mode === 0 ? 'add' : 'edit'; // 0 = ModalMode.Add, 1 = ModalMode.Edit
+        return isOpen ? <div data-testid={`program-modal-${modeString}`} /> : null;
+    },
 }));
 
 jest.mock('./delete-program-modal/DeleteProgramModal', () => ({

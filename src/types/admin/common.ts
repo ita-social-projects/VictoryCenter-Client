@@ -21,4 +21,14 @@ export enum VisibilityStatus {
     Published,
 }
 
+export enum ModalMode {
+    Add,
+    Edit,
+}
+
+export enum PendingAction {
+    Publish,
+    Draft,
+}
+
 export type StatusFilter = 'Усі' | 'Опубліковано' | 'Чернетка';

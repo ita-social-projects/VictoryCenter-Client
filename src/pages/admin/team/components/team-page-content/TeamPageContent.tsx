@@ -8,7 +8,7 @@ import axios from 'axios';
 import './TeamPageContent.scss';
 import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { VisibilityStatus } from '../../../../../types/admin/common';
+import { VisibilityStatus, ModalMode } from '../../../../../types/admin/common';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
@@ -413,7 +413,7 @@ export const TeamPageContent = () => {
             </div>
 
             <TeamMemberModal
-                mode="add"
+                mode={ModalMode.Add}
                 isOpen={modalState.isAddMemberModalOpen}
                 onClose={closeModalActions.addMember}
                 onAddMember={handleAddMember}
@@ -421,7 +421,7 @@ export const TeamPageContent = () => {
             />
 
             <TeamMemberModal
-                mode="edit"
+                mode={ModalMode.Edit}
                 isOpen={!!modalState.memberToEdit}
                 onClose={closeModalActions.editMember}
                 memberToEdit={modalState.memberToEdit!}

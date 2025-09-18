@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramCategoryModal, ProgramCategoryModalProps } from './ProgramCategoryModal';
-import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsApi, ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
@@ -10,6 +10,7 @@ import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useA
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
+const mockedProgramsCategoriesApi = ProgramsCategoriesApi as jest.Mocked<typeof ProgramsCategoriesApi>;
 
 // Simplify Modal rendering and expose structure hooks
 jest.mock('../../../../../components/common/modal/Modal', () => {
@@ -129,7 +130,11 @@ describe('ProgramCategoryModal - Add Mode', () => {
     });
 
     it('enables Save with valid non-duplicate name and submits successfully', async () => {
-        mockedProgramsApi.addProgramCategory.mockResolvedValue({ id: 10, name: 'Delta', programsCount: 0 } as any);
+        mockedProgramsCategoriesApi.addProgramCategory.mockResolvedValue({
+            id: 10,
+            name: 'Delta',
+            programsCount: 0,
+        } as any);
 
         const { props } = renderModal();
 
@@ -139,7 +144,7 @@ describe('ProgramCategoryModal - Add Mode', () => {
         fireEvent.click(getSaveButton());
 
         await waitFor(() => {
-            expect(mockedProgramsApi.addProgramCategory).toHaveBeenLastCalledWith(
+            expect(mockedProgramsCategoriesApi.addProgramCategory).toHaveBeenLastCalledWith(
                 { id: null, name: 'Delta' },
                 expect.objectContaining({ client: expect.any(Object) }),
             );
@@ -149,7 +154,7 @@ describe('ProgramCategoryModal - Add Mode', () => {
     });
 
     it('shows API error message on add failure and stays open', async () => {
-        mockedProgramsApi.addProgramCategory.mockRejectedValue(new Error('API Error'));
+        mockedProgramsCategoriesApi.addProgramCategory.mockRejectedValue(new Error('API Error'));
 
         const { props } = renderModal();
 
@@ -178,11 +183,11 @@ describe('ProgramCategoryModal - Add Mode', () => {
         fireEvent.click(getSaveButton());
 
         // Save does not proceed due to validation, API should not be called
-        expect(mockedProgramsApi.addProgramCategory).not.toHaveBeenCalled();
+        expect(mockedProgramsCategoriesApi.addProgramCategory).not.toHaveBeenCalled();
     });
 
     it('clears error message when modal re-opens', async () => {
-        mockedProgramsApi.addProgramCategory.mockRejectedValue(new Error('API Error'));
+        mockedProgramsCategoriesApi.addProgramCategory.mockRejectedValue(new Error('API Error'));
         const baseProps: ProgramCategoryModalProps = {
             isOpen: true,
             onClose: jest.fn(),
@@ -234,7 +239,11 @@ describe('ProgramCategoryModal - Edit Mode', () => {
     });
 
     it('opens confirm modal on Save, confirms and submits edit successfully', async () => {
-        mockedProgramsApi.editProgramCategory.mockResolvedValue({ id: 1, name: 'Omega', programsCount: 0 } as any);
+        mockedProgramsCategoriesApi.editProgramCategory.mockResolvedValue({
+            id: 1,
+            name: 'Omega',
+            programsCount: 0,
+        } as any);
 
         const { props } = renderEdit();
 
@@ -249,7 +258,7 @@ describe('ProgramCategoryModal - Edit Mode', () => {
         fireEvent.click(screen.getByText('Yes'));
 
         await waitFor(() => {
-            expect(mockedProgramsApi.editProgramCategory).toHaveBeenCalledWith(
+            expect(mockedProgramsCategoriesApi.editProgramCategory).toHaveBeenCalledWith(
                 { id: 1, name: 'Omega' },
                 expect.objectContaining({ client: expect.any(Object) }),
             );
@@ -259,7 +268,7 @@ describe('ProgramCategoryModal - Edit Mode', () => {
     });
 
     it('shows API error on edit failure and stays open', async () => {
-        mockedProgramsApi.editProgramCategory.mockRejectedValue(new Error('API Error'));
+        mockedProgramsCategoriesApi.editProgramCategory.mockRejectedValue(new Error('API Error'));
 
         const { props } = renderEdit();
 
@@ -277,7 +286,7 @@ describe('ProgramCategoryModal - Edit Mode', () => {
         const longRunningPromise = new Promise<any>((resolve) => {
             resolveRequest = () => resolve({ id: 1, name: 'Zeta', programsCount: 0 });
         });
-        mockedProgramsApi.editProgramCategory.mockReturnValue(longRunningPromise as any);
+        mockedProgramsCategoriesApi.editProgramCategory.mockReturnValue(longRunningPromise as any);
 
         renderEdit();
 

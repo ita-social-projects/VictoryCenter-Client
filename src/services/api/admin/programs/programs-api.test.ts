@@ -1,7 +1,7 @@
 import { VisibilityStatus } from '../../../../types/admin/common';
 import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '../../../../types/admin/programs';
 import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin/programs';
-import { ProgramsApi } from './programs-api';
+import { ProgramsApi, ProgramsCategoriesApi } from './programs-api';
 import { useAdminClient } from '../../../../hooks/admin/use-admin-client/useAdminClient';
 
 jest.mock('../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
@@ -239,7 +239,7 @@ describe('addProgramCategory', () => {
             name: 'New Category',
         };
         mockClient.post.mockResolvedValueOnce({ data: { id: 4, name: categoryData.name, programsCount: 0 } });
-        const promise = ProgramsApi.addProgramCategory(categoryData, mockClient);
+        const promise = ProgramsCategoriesApi.addProgramCategory(categoryData, mockClient);
         const result = await promise;
 
         expect(result.id).toBeDefined();
@@ -255,7 +255,7 @@ describe('editCategory', () => {
             name: 'Updated Category Name',
         };
         mockClient.put.mockResolvedValueOnce({ data: { id: 1, name: categoryData.name, programsCount: 5 } });
-        const promise = ProgramsApi.editProgramCategory(categoryData, mockClient);
+        const promise = ProgramsCategoriesApi.editProgramCategory(categoryData, mockClient);
         const result = await promise;
 
         expect(result.id).toBe(1);
@@ -265,7 +265,7 @@ describe('editCategory', () => {
     it('should throw error when category not found', async () => {
         const categoryData = { id: 999, name: 'Non-existent Category' };
         mockClient.put.mockRejectedValueOnce(new Error('Category not found'));
-        const promise = ProgramsApi.editProgramCategory(categoryData, mockClient);
+        const promise = ProgramsCategoriesApi.editProgramCategory(categoryData, mockClient);
         await expect(promise).rejects.toThrow('Category not found');
     });
 });
@@ -273,7 +273,7 @@ describe('editCategory', () => {
 describe('deleteCategory', () => {
     it('should delete category with zero programs', async () => {
         const categoryToDelete = mockCategories.find((c) => c.programsCount === 0)!;
-        const promise = ProgramsApi.deleteProgramCategory(categoryToDelete.id, mockClient);
+        const promise = ProgramsCategoriesApi.deleteProgramCategory(categoryToDelete.id, mockClient);
         await promise;
 
         expect(mockClient.delete).toHaveBeenCalledWith(expect.stringContaining(`/${categoryToDelete.id}`));
@@ -282,13 +282,13 @@ describe('deleteCategory', () => {
     it('should throw error when category has programs', async () => {
         const categoryWithPrograms = mockCategories.find((c) => c.programsCount > 0)!;
         mockClient.delete.mockRejectedValueOnce(new Error('Category has at least one program'));
-        const promise = ProgramsApi.deleteProgramCategory(categoryWithPrograms.id, mockClient);
+        const promise = ProgramsCategoriesApi.deleteProgramCategory(categoryWithPrograms.id, mockClient);
         await expect(promise).rejects.toThrow('Category has at least one program');
     });
 
     it('should throw error when category not found', async () => {
         mockClient.delete.mockRejectedValueOnce(new Error('Category not found'));
-        const promise = ProgramsApi.deleteProgramCategory(999, mockClient);
+        const promise = ProgramsCategoriesApi.deleteProgramCategory(999, mockClient);
         await expect(promise).rejects.toThrow('Category not found');
     });
 });

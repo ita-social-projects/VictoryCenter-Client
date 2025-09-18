@@ -9,15 +9,6 @@ import {
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 
-// !!!
-// Delete after actual integration with backend
-
-// ============================================
-//let mockProgramId = Math.max(...mockPrograms.map((p) => p.id), 0) + 1;
-//let mockCategoryId = Math.max(...mockCategories.map((c) => c.id), 0) + 1;
-//export let mockDelay = 400;
-//export let throwErrorsInApi = false;
-
 // Helper function to convert Program to ProgramSuggestion
 const convertProgramToSuggestion = (program: Program): ProgramSearchItemData => {
     return {
@@ -28,7 +19,7 @@ const convertProgramToSuggestion = (program: Program): ProgramSearchItemData => 
 };
 
 const mapProgramEditToProgram = async (program: ProgramCreateUpdate, client: AxiosInstance): Promise<Program> => {
-    const response = await client.get(API_ROUTES.PROGRAMCATEGORY.BASE);
+    const response = await client.get<ProgramCategory[]>(API_ROUTES.PROGRAMCATEGORY.BASE);
     return {
         id: program.id as number,
         name: program.name,
@@ -39,7 +30,43 @@ const mapProgramEditToProgram = async (program: ProgramCreateUpdate, client: Axi
     };
 };
 
-// Simulates an async delay with AbortSignal support — used for testing fetch cancellation behavior
+export const ProgramsCategoriesApi = {
+    fetchProgramCategories: async (client: AxiosInstance): Promise<ProgramCategory[]> => {
+        const response = await client.get<ProgramCategory[]>(API_ROUTES.PROGRAMCATEGORY.BASE);
+        const result = response.data.map((category: any) => {
+            return {
+                ...category,
+                programsCount: category.programs.length,
+            };
+        });
+        return result;
+    },
+
+    addProgramCategory: async (
+        category: ProgramCategoryCreateUpdate,
+        client: AxiosInstance,
+    ): Promise<ProgramCategory> => {
+        const response = await client.post(API_ROUTES.PROGRAMCATEGORY.BASE, category);
+        const created = response.data;
+        return {
+            ...created,
+            programsCount: created.programs ? created.programs.length : 0,
+        };
+    },
+
+    editProgramCategory: async (
+        category: ProgramCategoryCreateUpdate,
+        client: AxiosInstance,
+    ): Promise<ProgramCategory> => {
+        const response = await client.put(`${API_ROUTES.PROGRAMCATEGORY.BASE}/${category.id}`, category);
+        return response.data;
+    },
+
+    deleteProgramCategory: async (id: number, client: AxiosInstance): Promise<void> => {
+        const response = await client.delete(`${API_ROUTES.PROGRAMCATEGORY.BASE}/${id}`);
+        return response.data;
+    },
+};
 
 export const ProgramsApi = {
     fetchPrograms: async (
@@ -118,42 +145,6 @@ export const ProgramsApi = {
 
     deleteProgram: async (id: number, client: AxiosInstance): Promise<void> => {
         const response = await client.delete(`${API_ROUTES.PROGRAMS.BASE}/${id}`);
-        return response.data;
-    },
-
-    fetchProgramCategories: async (client: AxiosInstance): Promise<ProgramCategory[]> => {
-        const response = await client.get(API_ROUTES.PROGRAMCATEGORY.BASE);
-        const result = response.data.map((category: any) => {
-            return {
-                ...category,
-                programsCount: category.programs.length,
-            };
-        });
-        return result;
-    },
-
-    addProgramCategory: async (
-        category: ProgramCategoryCreateUpdate,
-        client: AxiosInstance,
-    ): Promise<ProgramCategory> => {
-        const response = await client.post(API_ROUTES.PROGRAMCATEGORY.BASE, category);
-        const created = response.data;
-        return {
-            ...created,
-            programsCount: created.programs ? created.programs.length : 0,
-        };
-    },
-
-    editProgramCategory: async (
-        category: ProgramCategoryCreateUpdate,
-        client: AxiosInstance,
-    ): Promise<ProgramCategory> => {
-        const response = await client.put(`${API_ROUTES.PROGRAMCATEGORY.BASE}/${category.id}`, category);
-        return response.data;
-    },
-
-    deleteProgramCategory: async (id: number, client: AxiosInstance): Promise<void> => {
-        const response = await client.delete(`${API_ROUTES.PROGRAMCATEGORY.BASE}/${id}`);
         return response.data;
     },
 };

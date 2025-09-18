@@ -172,7 +172,7 @@ export const FaqPanelContent = () => {
         [setErrorState, listSize, statusFilter, client, visitorPages],
     );
 
-    // Implement search functionality
+    // TODO: Implement search functionality
     // const handleSearchQueryByName = useCallback((_: string) => {}, []);
 
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
@@ -233,7 +233,7 @@ export const FaqPanelContent = () => {
         } else if (error.type === ErrorType.Pages) {
             refetchPages();
         }
-    }, [error.type, resetFaqsState, refetchPages]);
+    }, [error.type, fetchFaqs, resetFaqsState, refetchPages]);
 
     const updateListSize = () => {
         if (listContainerRef.current) {

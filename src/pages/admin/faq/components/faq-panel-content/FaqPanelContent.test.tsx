@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { FaqPanelContent } from './FaqPanelContent';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { ModalMode, VisibilityStatus } from '../../../../../types/admin/common';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 import { FaqApi } from '../../../../../services/api/admin/faq/faq-api';
 import { FaqQuestion, VisitorPage } from '../../../../../types/admin/faq';
 import { FAQ_TEXT } from '../../../../../const/admin/faq';
@@ -48,7 +48,7 @@ jest.mock('../faq-modals/faq-modal/FaqModal', () => {
     return {
         FaqModal: (props: any) => {
             if (!props.isOpen) return null;
-            
+
             const { ModalMode } = require('../../../../../types/admin/common');
             const isAddMode = props.mode === ModalMode.Add;
             const isEditMode = props.mode === ModalMode.Edit;

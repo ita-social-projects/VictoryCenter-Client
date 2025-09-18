@@ -123,7 +123,7 @@ export const AdminPanelToolbar = <T,>({
 
             <div className="admin-panel-toolbar-actions">
                 <StatusFilterDropdown onStatusFilterChange={onStatusFilterChange} />
-                <Button onClick={onAddItem} buttonStyle="primary" data-testid="add-item-button">
+                <Button onClick={onAddItem} buttonStyle="primary">
                     {AddItemButtonText} <PlusIcon />
                 </Button>
             </div>

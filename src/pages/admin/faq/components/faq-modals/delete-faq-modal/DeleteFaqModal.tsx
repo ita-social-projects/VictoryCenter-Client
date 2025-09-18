@@ -44,7 +44,7 @@ export const DeleteFaqModal = ({ isOpen, onClose, onDeleteFaq, faqToDelete }: De
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={handleClose} data-testid="delete-faq-modal">
+        <Modal isOpen={isOpen} onClose={handleClose}>
             <Modal.Title>{FAQ_TEXT.FORM.TITLE.DELETE_FAQ}</Modal.Title>
             <Modal.Content>{error && <div className="delete-faq-error-container">{error}</div>}</Modal.Content>
             <Modal.Actions>

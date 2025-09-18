@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { VisitorPagesProvider, useVisitorPages } from './VisitorPagesProvider';
 import { FaqApi } from '../../../services/api/admin/faq/faq-api';
 
@@ -39,45 +39,45 @@ describe('VisitorPagesProvider', () => {
 
     it('loads and provides pages', async () => {
         (FaqApi.getPages as jest.Mock).mockResolvedValue(mockPages);
-        const { getByTestId } = render(
+        render(
             <VisitorPagesProvider>
                 <TestComponent />
             </VisitorPagesProvider>,
         );
         await waitFor(() => {
-            expect(getByTestId('pages').textContent).toBe('Page A,Page B');
-            expect(getByTestId('loading').textContent).toBe('not-loading');
-            expect(getByTestId('error').textContent).toBe('no-error');
+            expect(screen.getByTestId('pages').textContent).toBe('Page A,Page B');
+            expect(screen.getByTestId('loading').textContent).toBe('not-loading');
+            expect(screen.getByTestId('error').textContent).toBe('no-error');
         });
     });
 
     it('handles error from API', async () => {
         (FaqApi.getPages as jest.Mock).mockRejectedValue(new Error('fail'));
-        const { getByTestId } = render(
+        render(
             <VisitorPagesProvider>
                 <TestComponent />
             </VisitorPagesProvider>,
         );
         await waitFor(() => {
-            expect(getByTestId('error').textContent).toBe('error');
-            expect(getByTestId('loading').textContent).toBe('not-loading');
+            expect(screen.getByTestId('error').textContent).toBe('error');
+            expect(screen.getByTestId('loading').textContent).toBe('not-loading');
         });
     });
 
     it('refetchPages updates pages', async () => {
         (FaqApi.getPages as jest.Mock).mockResolvedValueOnce([]).mockResolvedValueOnce(mockPages);
-        const { getByTestId } = render(
+        render(
             <VisitorPagesProvider>
                 <TestComponent />
             </VisitorPagesProvider>,
         );
         await waitFor(() => {
-            expect(getByTestId('pages').textContent).toBe('');
+            expect(screen.getByTestId('pages').textContent).toBe('');
         });
         (FaqApi.getPages as jest.Mock).mockResolvedValue(mockPages);
-        getByTestId('refetch').click();
+        screen.getByTestId('refetch').click();
         await waitFor(() => {
-            expect(getByTestId('pages').textContent).toBe('Page A,Page B');
+            expect(screen.getByTestId('pages').textContent).toBe('Page A,Page B');
         });
     });
 

@@ -2,9 +2,9 @@
 
 # Victory Center
 
-This repo contains front end part of the Victory center
+This repo contains the front-end part of the Victory Center project.
 
-Main structure of this project
+Main structure of this project:
 
 <pre><code>
 victory-center-client

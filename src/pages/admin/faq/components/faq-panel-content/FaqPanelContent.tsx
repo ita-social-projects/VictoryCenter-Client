@@ -208,22 +208,24 @@ export const FaqPanelContent = () => {
     );
 
     const handleEntitiesReordered = useCallback(
-        async (faqs: FaqQuestion[]) => {
-            try {
-                setFaqs(faqs);
-                const orderedIds = faqs.map((m) => m.id);
-                const pageId = selectedVisitorPage?.id!;
+        async (reorderedFaqs: FaqQuestion[]) => {
+            if (!selectedVisitorPage) return;
+            const previousState = faqs;
 
-                await FaqApi.reorder(client, { pageId, orderedIds });
+            try {
+                setFaqs(reorderedFaqs);
+                const orderedIds = reorderedFaqs.map((m) => m.id);
+                await FaqApi.reorder(client, { pageId: selectedVisitorPage.id, orderedIds });
             } catch (error: any) {
                 if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                     return;
                 }
 
+                setFaqs(previousState);
                 setErrorState(FAQ_TEXT.MESSAGE.FAIL_TO_REORDER_FAQ, ErrorType.Faq);
             }
         },
-        [client, selectedVisitorPage?.id, setErrorState],
+        [client, selectedVisitorPage, setErrorState, faqs],
     );
 
     const handleRetry = useCallback(() => {

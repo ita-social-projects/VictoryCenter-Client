@@ -17,11 +17,16 @@ describe('FaqSearchItem', () => {
 
     it('returns tooltip content when overflowing', () => {
         const ref = React.createRef<any>();
-        render(<FaqSearchItem item={mockItem} ref={ref} />);
-        // Mock overflowing
-        expect(ref.current).toBeTruthy();
-        ref.current.getTooltipContent = jest.fn(() => <div>Tooltip</div>);
-        expect(ref.current.getTooltipContent()).toBeTruthy();
+        const { container } = render(<FaqSearchItem item={mockItem} ref={ref} />);
+        const nameEl = container.querySelector('.faq-search-item__name') as HTMLSpanElement;
+        // Simulate overflow on the name element
+        Object.defineProperty(nameEl, 'scrollWidth', { value: 200, configurable: true });
+        Object.defineProperty(nameEl, 'clientWidth', { value: 100, configurable: true });
+
+        const content = ref.current!.getTooltipContent();
+        expect(content).not.toBeNull();
+        expect(content.type).toBe('div');
+        expect(content.props.className).toBe('faq-search-item-tooltip');
     });
 
     it('returns null for tooltip content when not overflowing', () => {

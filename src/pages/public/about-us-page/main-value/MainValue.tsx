@@ -10,8 +10,13 @@ import arrowLeftBlack from '../../../../assets/icons/arrow-left.svg';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
+import { AboutUsContent } from '../../../../types/public/about-us-page';
 
-export const MainValues = () => {
+export interface MainValuesProps {
+    content?: AboutUsContent[] | null;
+}
+
+export const MainValues = ({ content }: MainValuesProps) => {
     const swiperRef = useRef<SwiperClass | null>(null);
     const [canGoPrev, setCanGoPrev] = useState(false);
     const [canGoNext, setCanGoNext] = useState(true);
@@ -62,14 +67,20 @@ export const MainValues = () => {
                         },
                     }}
                 >
-                    {ABOUT_US_DATA.PEOPLE_DATA.map(({ IMG, ALT, INFO }, index) => (
-                        <SwiperSlide key={`${ALT}-${index}`}>
-                            <div className={`people-card card-${index + 1}`}>
-                                <img src={IMG} alt={ALT} />
-                                <p className="people-info">{INFO}</p>
-                            </div>
-                        </SwiperSlide>
-                    ))}
+                    {content
+                        ? content.map(({ image, description }, index) => {
+                              const imageUrl = image?.url ?? ABOUT_US_DATA.PEOPLE_DATA[index].IMG;
+
+                              return (
+                                  <SwiperSlide key={index}>
+                                      <div className={`people-card card-${index + 1}`}>
+                                          <img src={imageUrl} alt={ABOUT_US_DATA.PEOPLE_DATA[index].ALT} />
+                                          <p className="people-info">{description}</p>
+                                      </div>
+                                  </SwiperSlide>
+                              );
+                          })
+                        : null}
                 </Swiper>
 
                 {showButtons && (

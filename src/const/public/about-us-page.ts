@@ -5,6 +5,8 @@ import womenAndHorse from '../../assets/images/public/about-us-page/women-horse.
 import supportVeterans from '../../assets/images/public/about-us-page/support-veterans.jpg';
 import supportVolunteers from '../../assets/images/public/about-us-page/support-volunteers.jpg';
 import supportChildren from '../../assets/images/public/about-us-page/support-children.jpg';
+import ourTeam from '../../assets/images/public/about-us-page/our-team.jpg';
+
 export const ABOUT_US_DATA = {
     OUR_VALUES: 'Наші Цінності',
     VALUE_ITEMS: [
@@ -55,42 +57,22 @@ export const ABOUT_US_DATA = {
                 'Ми дотримуємось принципів відкритості, прозорості та етичності у нашій діяльності та за її межами.',
         },
     ],
-    INTRO_TITLE: {
-        FIRST_HIGHLIGHT: 'Простір',
-        MIDDLE_PART: ' довіри, турботи та твоєї ',
-        SECOND_HIGHLIGHT: 'внутрішньої сили',
-    },
-    INTRO_DETAILS:
-        'Victory Center — це не про терміни чи цифри. ' +
-        'Це про відчуття. Тут ти зупиняєшся в моменті, ' +
-        'де зникає напруга, і починається зцілення. ' +
-        'Через спільноту, природу й контакт із кіньми ти повертаєшся до себе справжнього/ої. ' +
-        'Ми не змінюємо людей. Ми допомагаємо їм згадати, ' +
-        'ким вони є.',
     PEOPLE_DATA: [
         {
             IMG: menAndHorse,
             ALT: 'Men and horse',
-            INFO: 'Учасники/ці, які вірять і довіряють',
-            CARD_CLASS: 'aside-card',
         },
         {
             IMG: girlAndHorse,
             ALT: 'Girl and horse',
-            INFO: 'Партнери, які поділяють наші мрії та цінності',
-            CARD_CLASS: 'middle-card',
         },
         {
             IMG: oldMenAndHorse,
             ALT: 'Old men and horse',
-            INFO: 'Волонтери/ки, які поруч, аби підтримати',
-            CARD_CLASS: 'middle-card',
         },
         {
             IMG: womenAndHorse,
             ALT: 'Women and horse',
-            INFO: 'Благодійники/ці, які допомагають втілити ідеї в реальність',
-            CARD_CLASS: 'aside-card',
         },
     ],
     MAIN_VALUE: {
@@ -108,24 +90,14 @@ export const ABOUT_US_DATA = {
         {
             IMG: supportVeterans,
             ALT: 'Підтримка ветеранів',
-            DESCRIPTION:
-                'Ветеранів/ок, що повернулися із фронту/полону та прагнуть відновити контакт із собою' +
-                ', своїм тілом та близькими.',
         },
         {
             IMG: supportVolunteers,
             ALT: 'Підтримка волонтерів',
-            DESCRIPTION:
-                'Волонтерів/ок та цивільних, які відчувають потребу в емоційному відновленні і прагнуть' +
-                ' продовжувати підтримувати інших.',
         },
         {
             IMG: supportChildren,
             ALT: 'Підтримка дітей',
-            DESCRIPTION:
-                'Дітей, що постраждали від війни та пройшли через втрату, страх, вимушений переїзд.' +
-                ' Через ігрову терапію, взаємодію у групах та контакт із тваринами, ми допомагаємо сформувати' +
-                ' довіру маленьких українців/ок до оточуючих та повернути відчуття безпеки.',
         },
     ],
     DONATE_TITLE: 'Ви завжди можете підтримати нас',
@@ -133,17 +105,10 @@ export const ABOUT_US_DATA = {
     DONATE: 'Донатити',
     BECOME_PARTNER: 'Стати партнером',
     WHAT_WE_DO: 'Що ми робимо',
-    WHAT_WE_DO_DETAILS:
-        'Ми створюємо терапевтичні програми, які поєднують взаємодію ' +
-        'з кіньми, тілесні практики, контакт із природою, психологічний ' +
-        'супровід, спільноту підтримки. Кожна програма адаптується під ' +
-        'індивідуальні запити учасників/ць групи.',
     GO_TO_PROGRAMS: 'Перейти до програм',
     GO_TO_TEAM: 'Переглянути команду',
-    TEAM_DETAILS:
-        'Victory Center — це спільна робота психологів, фасилітаторів, ' +
-        'координаторів, волонтерів, а також партнерських локацій (ранчо), об’єднаних ' +
-        'прагненням створити безпечне середовище для відновлення.' +
-        ' Наша команда працює з військовими/ветеранами, дітьми та їхніми родинами,' +
-        ' проходить регулярне навчання, дотримується етичного кодексу, не знецінює, а цінує та підтримує',
+    TEAM_DETAILS: {
+        IMG: ourTeam,
+    },
+    DOWNLOAD_ERROR: 'Не вдалося завантажити дані сторінки. Будь ласка, спробуйте пізніше.',
 };

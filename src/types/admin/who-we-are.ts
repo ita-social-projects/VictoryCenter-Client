@@ -1,3 +1,4 @@
+import { ContentType, SectionType } from '../common/about-us';
 import { Image, ImageValues } from '../common/image';
 
 export type WhoWeAreCategory = {
@@ -21,18 +22,3 @@ export type Content = {
     description: string | null;
     title: string | null;
 };
-
-export enum ContentType {
-    Title,
-    Description,
-    Image,
-    Card,
-}
-
-export enum SectionType {
-    Main,
-    WhatWeDo,
-    WhoWeSupport,
-    Team,
-    People,
-}

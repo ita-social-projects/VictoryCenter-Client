@@ -1,4 +1,4 @@
-import { Content, ContentType } from '../../../../../../types/admin/who-we-are';
+import { Content } from '../../../../../../types/admin/who-we-are';
 import { ImageInput, ImageInputProps } from '../../../../../../components/admin/image-input/ImageInput';
 import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
 import React from 'react';
@@ -9,6 +9,7 @@ import bgImage from '../../../../../assets/images/public/about-us-page/backgroun
 import './ImageBlockSection.scss';
 import { InputWithCharacterLimit } from '../../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { Button } from '../../../../../../components/admin/button/Button';
+import { ContentType } from '../../../../../../types/common/about-us';
 
 export interface ImageSectionProps {
     content: Content[] | undefined;
@@ -29,10 +30,6 @@ export const ImageSection = ({
     onPublish,
     imageInputProps,
 }: ImageSectionProps) => {
-    const commonImageProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange'> = {
-        label: WHO_WE_ARE_TEXT.IMAGE.INPUT,
-        subText: '1440x860',
-    };
     const imageContent = content?.find((item) => item.contentType === ContentType.Image) ?? null;
     const titleContent = content?.find((item) => item.contentType === ContentType.Title);
     const descriptionContent = content?.find((item) => item.contentType === ContentType.Description);

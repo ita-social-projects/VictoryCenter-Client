@@ -2,11 +2,12 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { OurMission } from './OurMission';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
+import { ContentType } from '../../../../types/common/about-us';
+import { AboutUsContent } from '../../../../types/public/about-us-page';
 
 jest.mock('../../../../const/public/about-us-page', () => ({
     ABOUT_US_DATA: {
         WHAT_WE_DO: 'What we do title',
-        WHAT_WE_DO_DETAILS: 'These are the details of what we do.',
         GO_TO_PROGRAMS: 'Go to programs',
     },
 }));
@@ -20,46 +21,44 @@ jest.mock('../../../../const/public/routes', () => ({
 }));
 
 jest.mock('../../../../assets/icons/arrow-up-right.svg', () => 'arrow-up-black.png');
-jest.mock('./scrollable-frame/ScrollableFrame', () => ({
-    ScrollableFrame: () => <div data-testid="scrollable-frame">ScrollableFrame</div>,
-}));
 
 describe('OurMission component', () => {
+    const Content: AboutUsContent[] = [
+        {
+            contentType: ContentType.Description,
+            description: 'Test description',
+            title: null,
+            id: 1,
+            image: null,
+        },
+    ];
+
     it('should render the mission title', () => {
         render(
             <MemoryRouter>
-                <OurMission details={ABOUT_US_DATA.WHAT_WE_DO_DETAILS} />
+                <OurMission content={Content} />
             </MemoryRouter>,
         );
-        expect(screen.getByText('What we do title')).toBeInTheDocument();
+        expect(screen.getByText(ABOUT_US_DATA.WHAT_WE_DO)).toBeInTheDocument();
     });
 
-    it('should render the mission details', () => {
+    it('should render the mission description', () => {
         render(
             <MemoryRouter>
-                <OurMission details={ABOUT_US_DATA.WHAT_WE_DO_DETAILS} />
+                <OurMission content={Content} />
             </MemoryRouter>,
         );
-        expect(screen.getByText('These are the details of what we do.')).toBeInTheDocument();
+        expect(screen.getByText('Test description')).toBeInTheDocument();
     });
 
     it('should render the link with correct text and href', () => {
         render(
             <MemoryRouter>
-                <OurMission details={ABOUT_US_DATA.WHAT_WE_DO_DETAILS} />
+                <OurMission content={Content} />
             </MemoryRouter>,
         );
         const link = screen.getByRole('link', { name: /go to programs/i });
         expect(link).toBeInTheDocument();
         expect(link).toHaveAttribute('href', '/programs');
-    });
-
-    it('should render the ScrollableFrame component', () => {
-        render(
-            <MemoryRouter>
-                <OurMission details={ABOUT_US_DATA.WHAT_WE_DO_DETAILS} />
-            </MemoryRouter>,
-        );
-        expect(screen.getByTestId('scrollable-frame')).toBeInTheDocument();
     });
 });

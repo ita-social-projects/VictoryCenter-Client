@@ -1,4 +1,5 @@
-import { Content, SectionType, WhoWeAreSection } from '../../../../../../types/admin/who-we-are';
+import { Content, WhoWeAreSection } from '../../../../../../types/admin/who-we-are';
+import { SectionType } from '../../../../../../types/common/about-us';
 import { CardsSection } from '../cards-section/CardsSection';
 import { DescriptionSection } from '../description-section/DescriptionSection';
 import { ImageSection } from '../image-block-section/ImageBlockSection';

@@ -10,8 +10,13 @@ import arrowLeftBlack from '../../../../assets/icons/arrow-left.svg';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
+import { AboutUsContent } from '../../../../types/public/about-us-page';
 
-export const SupportSection = () => {
+export interface SupportSectionProps {
+    content?: AboutUsContent[] | null;
+}
+
+export const SupportSection = ({ content }: SupportSectionProps) => {
     const swiperRef = useRef<SwiperClass | null>(null);
     const [canGoPrev, setCanGoPrev] = useState(false);
     const [canGoNext, setCanGoNext] = useState(true);
@@ -49,19 +54,25 @@ export const SupportSection = () => {
                     },
                 }}
             >
-                {ABOUT_US_DATA.SUPPORT_DATA.map(({ IMG, ALT, DESCRIPTION }, index) => (
-                    <SwiperSlide key={`${ALT}-${index}`}>
-                        {index === 0 && (
-                            <div className="main-values-title">
-                                <h2 className="support-title">{ABOUT_US_DATA.SUPPORT_TITLE}</h2>
-                            </div>
-                        )}
-                        <div className={`support-card card-${index + 1}`}>
-                            <img src={IMG} alt={ALT} />
-                            <p className="support-description">{DESCRIPTION}</p>
-                        </div>
-                    </SwiperSlide>
-                ))}
+                {content
+                    ? content.map(({ image, description }, index) => {
+                          const imageUrl = image?.url ?? ABOUT_US_DATA.SUPPORT_DATA[index].IMG;
+
+                          return (
+                              <SwiperSlide key={index}>
+                                  {index === 0 && (
+                                      <div className="main-values-title">
+                                          <h2 className="support-title">{ABOUT_US_DATA.SUPPORT_TITLE}</h2>
+                                      </div>
+                                  )}
+                                  <div className={`support-card card-${index + 1}`}>
+                                      <img src={imageUrl} alt={ABOUT_US_DATA.SUPPORT_DATA[index].ALT} />
+                                      <p className="support-description">{description}</p>
+                                  </div>
+                              </SwiperSlide>
+                          );
+                      })
+                    : null}
             </Swiper>
             {showButtons && (
                 <div className="button-container">

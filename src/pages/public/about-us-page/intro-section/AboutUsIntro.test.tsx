@@ -1,33 +1,61 @@
 import { render, screen } from '@testing-library/react';
 import { AboutUsIntro } from './AboutUsIntro';
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
+import { ContentType } from '../../../../types/common/about-us';
+import { AboutUsContent } from '../../../../types/public/about-us-page';
 
 describe('AboutUsIntro', () => {
-    it('should render images correctly', () => {
-        render(<AboutUsIntro />);
-        const images = screen.getAllByAltText('Men and Horse');
+    const Content: AboutUsContent[] = [
+        {
+            contentType: ContentType.Title,
+            title: 'Test title',
+            id: 1,
+            image: null,
+            description: null,
+        },
+        {
+            contentType: ContentType.Description,
+            description: 'Test description',
+            id: 2,
+            image: null,
+            title: null,
+        },
+        {
+            contentType: ContentType.Image,
+            image: {
+                id: null,
+                url: 'test.jpg',
+                mimeType: 'image.jpeg',
+            },
+            description: null,
+            id: 3,
+            title: null,
+        },
+    ];
+
+    it('should render default images correctly', () => {
+        render(<AboutUsIntro content={null} />);
+        const images = screen.getAllByRole('img');
         expect(images).toHaveLength(2);
         expect(images[0]).toHaveClass('background-img');
         expect(images[1]).toHaveClass('color-overlay');
     });
 
-    it('should render highlighted text correctly', () => {
-        render(<AboutUsIntro />);
-        const title = screen.getByRole('heading', { level: 1 });
-        expect(title).toBeInTheDocument();
-        expect(title).toHaveTextContent(ABOUT_US_DATA.INTRO_TITLE.FIRST_HIGHLIGHT);
-        expect(title).toHaveTextContent(ABOUT_US_DATA.INTRO_TITLE.MIDDLE_PART);
-        expect(title).toHaveTextContent(ABOUT_US_DATA.INTRO_TITLE.SECOND_HIGHLIGHT);
-
-        const highlightedSpans = document.querySelectorAll('.highlighted');
-        expect(highlightedSpans).toHaveLength(2);
+    it('should render custom images correctly', () => {
+        render(<AboutUsIntro content={Content} />);
+        const images = screen.getAllByRole('img');
+        expect(images).toHaveLength(2);
+        expect(images[0]).toHaveAttribute('src', 'test.jpg');
+        expect(images[1]).toHaveAttribute('src', 'test.jpg');
+        expect(images[0]).toHaveClass('background-img');
+        expect(images[1]).toHaveClass('color-overlay');
     });
 
-    it('should render title details correctly', () => {
-        render(<AboutUsIntro />);
-        Object.values(ABOUT_US_DATA.INTRO_DETAILS).forEach((line) => {
-            const paragraph = screen.queryByText((text) => text.trim().includes(line.trim()));
-            expect(paragraph).toBeInTheDocument();
-        });
+    it('should render title and description correctly', () => {
+        render(<AboutUsIntro content={Content} />);
+        const title = screen.getByText('Test title');
+        expect(title).toBeInTheDocument();
+
+        const description = screen.getByText('Test description');
+        expect(description).toBeInTheDocument();
     });
 });

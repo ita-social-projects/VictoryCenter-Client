@@ -1,4 +1,4 @@
-import { Content, ContentType } from '../../../../../../types/admin/who-we-are';
+import { Content } from '../../../../../../types/admin/who-we-are';
 import { ImageInputProps } from '../../../../../../components/admin/image-input/ImageInput';
 import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
 import React from 'react';
@@ -9,6 +9,7 @@ import { Image, ImageValues } from '../../../../../../types/common/image';
 import { CardImageConfig } from '../SectionsProps';
 import './CardsSection.scss';
 import { Button } from '../../../../../../components/admin/button/Button';
+import { ContentType } from '../../../../../../types/common/about-us';
 
 export interface CardsSectionProps {
     content: Content[] | undefined;

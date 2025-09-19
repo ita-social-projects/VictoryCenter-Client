@@ -24,5 +24,6 @@ export const API_ROUTES = {
     },
     WHO_WE_ARE: {
         BASE: 'WhoWeAre',
+        PUBLIC: 'WhoWeArePage',
     },
 };

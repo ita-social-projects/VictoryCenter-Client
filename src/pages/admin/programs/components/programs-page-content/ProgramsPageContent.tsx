@@ -8,7 +8,7 @@ import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/
 import { ProgramListItem } from '../program-list-item/ProgramListItem';
 import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
 import { useCategoriesCounter } from '../../../../../hooks/admin/use-categories-counter/useCategoriesCounter';
-import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsApi, ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { useDataFetch } from '../../../../../hooks/admin/fetch/use-data-fetch/useDataFetch';
@@ -43,7 +43,7 @@ export const ProgramsPageContent = () => {
 
     // Fetch functions
     const getProgramCategories = useCallback(async () => {
-        const categories = await ProgramsApi.fetchProgramCategories(client);
+        const categories = await ProgramsCategoriesApi.fetchProgramCategories(client);
 
         return categories.map((category) => ({
             ...category,

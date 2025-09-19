@@ -8,7 +8,7 @@ import { SingleSelectInputGroup } from '../../../../../components/admin/input-gr
 import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/admin/programs';
 import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-category-schema/program-category-schema';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
-import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './ProgramCategoryModal.scss';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
@@ -123,10 +123,10 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                 };
 
                 if (mode === 'add') {
-                    const newCategory = await ProgramsApi.addProgramCategory(categoryData, client);
+                    const newCategory = await ProgramsCategoriesApi.addProgramCategory(categoryData, client);
                     props.onAddCategory(newCategory);
                 } else {
-                    const updatedCategory = await ProgramsApi.editProgramCategory(categoryData, client);
+                    const updatedCategory = await ProgramsCategoriesApi.editProgramCategory(categoryData, client);
                     props.onEditCategory(updatedCategory);
                 }
 

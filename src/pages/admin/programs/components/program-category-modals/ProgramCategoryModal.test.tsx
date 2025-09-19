@@ -2,14 +2,13 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramCategoryModal, ProgramCategoryModalProps } from './ProgramCategoryModal';
-import { ProgramsApi, ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
-const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 const mockedProgramsCategoriesApi = ProgramsCategoriesApi as jest.Mocked<typeof ProgramsCategoriesApi>;
 
 // Simplify Modal rendering and expose structure hooks
@@ -144,7 +143,7 @@ describe('ProgramCategoryModal - Add Mode', () => {
         fireEvent.click(getSaveButton());
 
         await waitFor(() => {
-            expect(mockedProgramsCategoriesApi.addProgramCategory).toHaveBeenLastCalledWith(
+            expect(mockedProgramsCategoriesApi.addProgramCategory).toHaveBeenCalledWith(
                 { id: null, name: 'Delta' },
                 expect.objectContaining({ client: expect.any(Object) }),
             );

@@ -53,7 +53,7 @@ const categories: TeamCategory[] = [
 ];
 
 describe('MemberForm', () => {
-    it('reports validation state via onValidationChange and becomes valid after required fields set', () => {
+    it('reports validation state via onValidationChange and becomes valid after required fields set', async () => {
         const onSubmit = jest.fn();
         const onValidationChange = jest.fn();
         const ref = createRef<TeamMemberFormRef>();
@@ -78,8 +78,15 @@ describe('MemberForm', () => {
         fireEvent.change(fullNameInput, { target: { value: 'John Doe' } });
         fireEvent.blur(fullNameInput);
 
+        // Fill description with valid length (10+ chars)
+        const descriptionInput = screen.getByLabelText(/Опис/);
+        fireEvent.change(descriptionInput, { target: { value: 'Valid description text' } });
+        fireEvent.blur(descriptionInput);
+
         // Now valid for draft
-        expect(onValidationChange).toHaveBeenLastCalledWith(true);
+        await waitFor(() => {
+            expect(onValidationChange).toHaveBeenLastCalledWith(true);
+        });
     });
 
     it('shows validation errors on blur for invalid full name', () => {
@@ -106,6 +113,11 @@ describe('MemberForm', () => {
         fireEvent.change(screen.getByLabelText(/Ім'я та Прізвище/), {
             target: { value: 'Jane Doe' },
         });
+        
+        // Add valid description for draft
+        fireEvent.change(screen.getByLabelText(/Опис/), {
+            target: { value: 'Valid description text' },
+        });
 
         // Draft submit OK
         ref.current?.submit(VisibilityStatus.Draft);
@@ -113,7 +125,7 @@ describe('MemberForm', () => {
 
         onSubmit.mockClear();
 
-        // Publish submit blocked because image and description required
+        // Publish submit blocked because image required
         ref.current?.submit(VisibilityStatus.Published);
         await waitFor(() => expect(onSubmit).not.toHaveBeenCalled());
     });

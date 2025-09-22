@@ -56,7 +56,7 @@ export const DonatePageContent = () => {
                                 ? ({ formState, isItemsExpanded }) => (
                                       <GenericDetails
                                           title={DONATE_TEXT.CORRESPONDENT_BANKS.TITLE}
-                                          items={formState.correspondentBanks ?? []}
+                                          items={items.find((i) => i.id === formState.id)?.correspondentBanks ?? []}
                                           isLoading={false}
                                           FormComponent={config.correspondentForm!}
                                           initialIsItemsExpanded={isItemsExpanded}
@@ -64,6 +64,15 @@ export const DonatePageContent = () => {
                                           addNewText={DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW}
                                           createEmptyItem={(data) => ({ id: Date.now(), ...data })}
                                           isChildForm={true}
+                                          onChangeItems={(newBanks) => {
+                                              setItems(
+                                                  items.map((i) =>
+                                                      i.id === formState.id
+                                                          ? { ...i, correspondentBanks: newBanks }
+                                                          : i,
+                                                  ),
+                                              );
+                                          }}
                                       />
                                   )
                                 : () => null}

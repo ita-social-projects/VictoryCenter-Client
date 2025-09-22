@@ -26,7 +26,7 @@ export interface GenericDetailsProps<T extends FieldValues> {
 
 export function GenericDetails<T extends { id?: number } & FieldValues>({
     title,
-    items: initialItems,
+    items,
     isLoading,
     FormComponent,
     primaryAddButton,
@@ -39,19 +39,13 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
     onChangeItems,
 }: GenericDetailsProps<T>) {
     const addformRef = useRef<GenericFormRef>(null);
-    const [items, setItems] = useState<T[]>(initialItems);
     const [isAddFormVisible, setIsAddFormVisible] = useState(false);
     const [isItemsExpanded, setIsItemsExpanded] = useState(initialIsItemsExpanded);
     const [showNotFound, setShowNotFound] = useState(false);
 
-    useEffect(() => {
-        setItems(initialItems);
-    }, [initialItems]);
-
     const updateItems = useCallback(
         (newItems: T[]) => {
-            setItems(newItems);
-            if (onChangeItems) onChangeItems(newItems);
+            onChangeItems?.(newItems);
         },
         [onChangeItems],
     );

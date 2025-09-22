@@ -33,7 +33,9 @@ export const bankDetailsConfig: Record<string, BankDetailsConfig<any>> = {
     },
     EUR: {
         form: createBankDetailsForm('EUR'),
-        createEmptyItem: (data: any) => ({ id: Date.now(), ...data }) as ForeignBankDetailsType,
+        createEmptyItem: (data) => ({ id: Date.now(), ...data }) as ForeignBankDetailsType,
+        withCorrespondentBanks: true,
+        correspondentForm: CorrespondentBankDetailsForm,
         fetch: async () => {
             // TODO
             return [];

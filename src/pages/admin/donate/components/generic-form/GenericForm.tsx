@@ -214,7 +214,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
             if (!isOpen) return null;
 
             return (
-                <form
+                <div
                     className={`generic-form ${mode} ${isChildForm ? 'child' : ''}`}
                     role="button"
                     tabIndex={0}
@@ -384,7 +384,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                     />
 
                     {!isChildForm && <>{children && children({ formState, isItemsExpanded })}</>}
-                </form>
+                </div>
             );
         },
     );

@@ -99,7 +99,7 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
         const handleDescriptionBlur = useCallback(() => {
             setErrors((prev) => ({
                 ...prev,
-                description: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(formState.description, false),
+                description: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(formState.description, true),
             }));
         }, [formState.description, setErrors]);
 
@@ -108,7 +108,7 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                 setFormState((prev) => ({ ...prev, image: file }));
                 setErrors((prev) => ({
                     ...prev,
-                    image: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(file, false),
+                    image: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(file, true),
                 }));
             },
             [setFormState, setErrors],

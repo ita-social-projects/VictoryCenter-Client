@@ -45,7 +45,7 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
     );
 
     useEffect(() => {
-        const formErrors = validateForm(formState, false) || {};
+        const formErrors = validateForm(formState, true) || {};
         const valid = !Object.values(formErrors).some((e) => e !== undefined);
         onValidationChange?.(valid);
     }, [formState, validateForm, onValidationChange]);

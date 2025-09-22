@@ -269,7 +269,7 @@ export const FaqPanelContent = () => {
 
     useEffect(() => {
         selectedVisitorPageRef.current = selectedVisitorPage;
-    }, [selectedVisitorPage, resetFaqsState]);
+    }, [selectedVisitorPage]);
 
     useEffect(() => {
         if (selectedVisitorPage) {
@@ -280,10 +280,14 @@ export const FaqPanelContent = () => {
 
     const handleAddFaq = useCallback(
         (faq: FaqQuestion) => {
+            const belongsToSelectedPage = faq.pages.map((p) => p.id).includes(selectedVisitorPage?.id!);
+            const passesStatusFilter = statusFilter === undefined || faq.status === statusFilter;
+
             setFaqs((prevFaqs) => {
                 if (
                     prevFaqs.length < listSize * currentPaginationPageRef.current &&
-                    faq.pages.map((p) => p.id).includes(selectedVisitorPage?.id!)
+                    belongsToSelectedPage &&
+                    passesStatusFilter
                 ) {
                     return [...prevFaqs, faq];
                 } else {
@@ -300,15 +304,16 @@ export const FaqPanelContent = () => {
                 addToast(FAQ_TEXT.MESSAGE.DONT_FORGET_TO_ORDER, ToastType.Info);
             }
         },
-        [updateModalState, listSize, selectedVisitorPage?.id, addToast],
+        [updateModalState, listSize, selectedVisitorPage?.id, addToast, statusFilter],
     );
 
     const handleEditFaq = useCallback(
         (updatedFaq: FaqQuestion) => {
             const belongsToSelectedPage = updatedFaq.pages.some((p) => p.id === selectedVisitorPage?.id);
+            const passesStatusFilter = statusFilter === undefined || updatedFaq.status === statusFilter;
 
             setFaqs((prevFaqs) => {
-                if (belongsToSelectedPage) {
+                if (belongsToSelectedPage && passesStatusFilter) {
                     return prevFaqs.map((faq) => (faq.id === updatedFaq.id ? updatedFaq : faq));
                 } else {
                     return prevFaqs.filter((faq) => faq.id !== updatedFaq.id);
@@ -317,7 +322,7 @@ export const FaqPanelContent = () => {
 
             updateModalState({ faqToEdit: null });
         },
-        [updateModalState, selectedVisitorPage?.id],
+        [updateModalState, selectedVisitorPage?.id, statusFilter],
     );
 
     const handleDeleteFaq = useCallback(

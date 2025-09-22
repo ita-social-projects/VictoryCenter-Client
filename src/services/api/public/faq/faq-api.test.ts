@@ -1,41 +1,43 @@
-import { AxiosInstance } from 'axios';
-import { PublishedFaqQuestion } from '../../../../types/public/faq-section';
 import { FaqApi } from './faq-api';
-
-const mock_answer =
-    "Потрібно заповнити коротку анкету або написати координатору через форму на сайті. Після цього ми зв'яжемось для уточнення деталей";
+import { PublishedFaqQuestion } from '../../../../types/public/faq-section';
 
 describe('FaqApi', () => {
-    let client: jest.Mocked<Pick<AxiosInstance, 'get'>>;
+    const mockClient = {
+        get: jest.fn(),
+    } as any;
 
-    beforeEach(() => {
-        client = { get: jest.fn() } as any;
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
-    it('should return valid data', async () => {
-        const slug = 'programs-page';
-        const data: PublishedFaqQuestion[] = [
-            {
-                id: 1,
-                questionText: 'Як долучитись до програми?',
-                answerText: mock_answer,
-            },
-            {
-                id: 2,
-                questionText: 'Як проходять терапевтичні сесії?',
-                answerText: mock_answer,
-            },
+    it('should fetch questions by slug and return data', async () => {
+        const slug = 'test-slug';
+        const mockQuestions: PublishedFaqQuestion[] = [
+            { id: 1, questionText: 'Q1', answerText: 'A1' },
+            { id: 2, questionText: 'Q2', answerText: 'A2' },
         ];
-        client.get.mockResolvedValue({ data } as any);
+        mockClient.get.mockResolvedValueOnce({ data: mockQuestions });
 
-        await expect(FaqApi.getBySlug(client as unknown as AxiosInstance, slug)).resolves.toEqual(data);
+        const result = FaqApi.getBySlug(mockClient, slug);
+
+        expect(mockClient.get).toHaveBeenCalledWith(expect.stringContaining(slug));
+        expect(await result).toEqual(mockQuestions);
     });
 
-    it('should throw an error when rejected', async () => {
-        const slug = 'broken-slug';
-        const err = new Error();
-        client.get.mockRejectedValue(err);
+    it('should handle empty response', async () => {
+        const slug = 'empty-slug';
+        mockClient.get.mockResolvedValueOnce({ data: [] });
 
-        await expect(FaqApi.getBySlug(client as unknown as AxiosInstance, slug)).rejects.toThrow(err);
+        const result = FaqApi.getBySlug(mockClient, slug);
+
+        expect(await result).toEqual([]);
+    });
+
+    it('should propagate errors from axios', async () => {
+        const slug = 'error-slug';
+        const error = new Error('Network error');
+        mockClient.get.mockRejectedValueOnce(error);
+
+        await expect(FaqApi.getBySlug(mockClient, slug)).rejects.toThrow('Network error');
     });
 });

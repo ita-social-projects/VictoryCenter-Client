@@ -20,7 +20,7 @@ const createMockFetchHandler = (mockData: TestItem[][], totalCount: number = 25,
             return Promise.reject(new Error('Network error'));
         }
 
-        const page = params.offset / params.limit;
+        const page = params.offset! / params.limit!;
         const items = mockData[page] || [];
 
         return Promise.resolve({

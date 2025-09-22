@@ -12,4 +12,8 @@ export const ADMIN_ROUTES = {
         PATH: 'programs',
         FULL: '/admin-panel/programs',
     },
+    FAQ: {
+        PATH: 'faq',
+        FULL: '/admin-panel/faq',
+    },
 };

@@ -1,8 +1,8 @@
 @use '../../../../../assets/sass/variables/colors';
 
-.error-container {
+.program-category-modal-error-container {
     width: 100%;
-    margin: 0.5rem;
+    margin: 8px;
     text-align: center;
     color: colors.$error;
     font-weight: 400;

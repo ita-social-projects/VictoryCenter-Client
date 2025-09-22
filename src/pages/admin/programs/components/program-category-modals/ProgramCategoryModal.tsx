@@ -300,7 +300,7 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                             />
                         )}
 
-                        {error && <div className="error-container">{error}</div>}
+                        {error && <div className="program-category-modal-error-container">{error}</div>}
                     </form>
                 </Modal.Content>
                 <Modal.Actions>

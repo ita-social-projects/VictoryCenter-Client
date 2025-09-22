@@ -47,7 +47,7 @@ describe('ProgramsApi', () => {
 
     describe('fetchPrograms', () => {
         it('should return paginated programs for category', async () => {
-            const promise = ProgramsApi.fetchPrograms(1, 1, 5);
+            const promise = ProgramsApi.fetchPrograms(1, { offset: 1, limit: 5 });
             jest.runAllTimers();
             const result = await promise;
 
@@ -57,7 +57,7 @@ describe('ProgramsApi', () => {
         });
 
         it('should filter by status when provided', async () => {
-            const promise = ProgramsApi.fetchPrograms(1, 1, 10, VisibilityStatus.Published);
+            const promise = ProgramsApi.fetchPrograms(1, { offset: 1, limit: 10 }, VisibilityStatus.Published);
             jest.runAllTimers();
             const result = await promise;
 
@@ -66,7 +66,7 @@ describe('ProgramsApi', () => {
 
         it('should handle pagination correctly', async () => {
             const pageSize = 2;
-            const promise = ProgramsApi.fetchPrograms(1, 1, pageSize);
+            const promise = ProgramsApi.fetchPrograms(1, { offset: 1, limit: pageSize });
             jest.runAllTimers();
             const result = await promise;
 
@@ -74,7 +74,7 @@ describe('ProgramsApi', () => {
         });
 
         it('should return empty array for non-existent category', async () => {
-            const promise = ProgramsApi.fetchPrograms(999, 1, 10);
+            const promise = ProgramsApi.fetchPrograms(999, { offset: 1, limit: 10 });
             jest.runAllTimers();
             const result = await promise;
 
@@ -83,7 +83,7 @@ describe('ProgramsApi', () => {
         });
 
         it('should handle second page correctly', async () => {
-            const promise = ProgramsApi.fetchPrograms(1, 2, 1);
+            const promise = ProgramsApi.fetchPrograms(1, { offset: 2, limit: 1 });
             jest.runAllTimers();
             const result = await promise;
 
@@ -314,7 +314,7 @@ describe('ProgramsApi', () => {
             mockPrograms.push(programWithNameMatch, programWithCategoryMatch);
 
             const searchTerm = 'Pilates';
-            const promise = ProgramsApi.fetchProgramSearchItems(searchTerm, 0, 10);
+            const promise = ProgramsApi.fetchProgramSearchItems(searchTerm, { offset: 0, limit: 10 });
             jest.runAllTimers();
             const result = await promise;
 
@@ -335,7 +335,7 @@ describe('ProgramsApi', () => {
             const limit = 2;
             const offset = 2;
 
-            const promise = ProgramsApi.fetchProgramSearchItems(searchTerm, offset, limit);
+            const promise = ProgramsApi.fetchProgramSearchItems(searchTerm, { offset, limit });
             jest.runAllTimers();
             const result = await promise;
 
@@ -351,7 +351,7 @@ describe('ProgramsApi', () => {
 
         it('should return an empty result when no matches are found', async () => {
             const searchTerm = 'NonExistentProgramXYZ';
-            const promise = ProgramsApi.fetchProgramSearchItems(searchTerm, 0, 10);
+            const promise = ProgramsApi.fetchProgramSearchItems(searchTerm, { offset: 0, limit: 10 });
             jest.runAllTimers();
             const result = await promise;
 
@@ -363,7 +363,11 @@ describe('ProgramsApi', () => {
     describe('API Error and Cancellation Handling', () => {
         it('should reject fetchPrograms with AbortError if the request is cancelled', async () => {
             const controller = new AbortController();
-            const promise = ProgramsApi.fetchPrograms(1, 0, 10, undefined, { cancellationSignal: controller.signal });
+            const promise = ProgramsApi.fetchPrograms(1, {
+                offset: 0,
+                limit: 10,
+                requestOptions: { cancellationSignal: controller.signal },
+            });
 
             controller.abort();
             jest.runAllTimers();
@@ -374,14 +378,17 @@ describe('ProgramsApi', () => {
 
         it('should reject fetchProgramSearchItems with AbortError if the request is cancelled', async () => {
             const controller = new AbortController();
-            const promise = ProgramsApi.fetchProgramSearchItems('search', 0, 10, {
-                cancellationSignal: controller.signal,
+            const promise = ProgramsApi.fetchProgramSearchItems('search', {
+                offset: 0,
+                limit: 10,
+                requestOptions: { cancellationSignal: controller.signal },
             });
 
             controller.abort();
             jest.runAllTimers();
 
             await expect(promise).rejects.toThrow('Request was cancelled');
+            await expect(promise).rejects.toMatchObject({ name: 'AbortError' });
         });
 
         it('should handle a pre-aborted signal correctly', async () => {

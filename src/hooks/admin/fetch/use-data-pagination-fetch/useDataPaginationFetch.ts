@@ -4,9 +4,9 @@ import { PaginationResult } from '../../../../types/admin/common';
 import axios from 'axios';
 
 export interface PaginationRequestParams {
-    offset: number;
-    limit: number;
-    requestOptions: RequestOptions;
+    offset?: number;
+    limit?: number;
+    requestOptions?: RequestOptions;
 }
 
 export interface UseDataPaginationFetchResult<TResult> {

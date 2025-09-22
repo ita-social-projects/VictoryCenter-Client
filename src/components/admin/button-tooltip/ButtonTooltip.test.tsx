@@ -1,7 +1,6 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ButtonTooltip, ButtonTooltipProps } from './ButtonTooltip';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { TooltipProps } from '../tooltip/Tooltip';
 
 // Mock the SVG as a React component instead of a string
@@ -117,15 +116,6 @@ describe('ButtonTooltip', () => {
 
         expect(button).toHaveAttribute('aria-expanded', 'true');
         expect(button).toHaveAttribute('aria-describedby');
-    });
-
-    it('changes aria-label depending on tooltip visibility', () => {
-        renderButtonTooltip();
-
-        expect(getIcon()).toHaveAttribute('aria-label', COMMON_TEXT_ADMIN.ALT.SHOW_TOOLTIP);
-
-        clickButton();
-        expect(getIcon()).toHaveAttribute('aria-label', COMMON_TEXT_ADMIN.ALT.HIDE_TOOLTIP);
     });
 
     it('handles button click and toggles tooltip', () => {

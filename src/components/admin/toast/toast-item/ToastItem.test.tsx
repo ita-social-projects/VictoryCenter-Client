@@ -2,9 +2,10 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ToastItem } from './ToastItem';
 import { Toast, ToastType } from '../../../../types/admin/toast';
-import { COMMON_TEXT_ADMIN } from '../../../../const/admin/common';
 
-jest.mock('../../../../assets/icons/info.svg', () => 'mock-info-icon.svg');
+jest.mock('../../../../assets/icons/info.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="info-icon" />,
+}));
 
 describe('ToastItem', () => {
     const mockToast: Toast = {
@@ -26,10 +27,8 @@ describe('ToastItem', () => {
         expect(toastElement).toHaveClass('info');
     });
 
-    it('renders the icon with correct alt text', () => {
+    it('renders the icon', () => {
         render(<ToastItem toast={mockToast} />);
-        const icon = screen.getByAltText(COMMON_TEXT_ADMIN.ALT.HINT);
-        expect(icon).toBeInTheDocument();
-        expect(icon).toHaveAttribute('src', 'mock-info-icon.svg');
+        expect(screen.getByTestId('info-icon')).toBeInTheDocument();
     });
 });

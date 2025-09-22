@@ -2,7 +2,7 @@
 @use '../../../assets/sass/variables/fonts';
 @use '../../../assets/sass/mixins/utilits.mixins';
 
-.headerBlock {
+.header-block {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -24,14 +24,14 @@
 
     backdrop-filter: blur(10.375rem);
 
-    .logoContainer {
+    .logo-container {
         .logo {
             user-select: none;
             cursor: pointer;
         }
     }
 
-    .linkContainer {
+    .link-container {
         nav {
             display: flex;
             gap: 3rem;
@@ -48,12 +48,12 @@
         }
     }
 
-    .buttonContainer {
+    .button-container {
         display: flex;
         gap: 0.5rem;
         align-items: center;
 
-        .contactUsButton {
+        .contact-us-button {
             background-color: transparent;
             width: 8.2em;
             height: 2.5rem;
@@ -63,7 +63,7 @@
             cursor: pointer;
             border: 1px solid colors.$blue-900;
         }
-        .donateButton {
+        .donate-button {
             background-color: colors.$blue-900;
             color: white;
             font-family: fonts.$mulish-regular-font;
@@ -80,7 +80,7 @@
     }
 }
 
-.burgerMenuIcon {
+.burger-menu-icon {
     display: none;
     font-size: 2rem;
     cursor: pointer;
@@ -90,16 +90,16 @@
     color: black;
 }
 
-.mobileMenu {
+.mobile-menu {
     display: none;
 }
 
 @media (max-width: 1024px) {
-    .linkContainer {
+    .link-container {
         display: none;
     }
 
-    .mobileMenu {
+    .mobile-menu {
         display: flex;
         position: absolute;
         top: 4rem;
@@ -138,15 +138,15 @@
         }
     }
 
-    .burgerMenuIcon {
+    .burger-menu-icon {
         display: flex;
     }
 }
 
 @media (max-width: 568px) {
-    .headerBlock {
-        .buttonContainer {
-            .contactUsButton {
+    .header-block {
+        .button-container {
+            .contact-us-button {
                 display: none;
             }
         }

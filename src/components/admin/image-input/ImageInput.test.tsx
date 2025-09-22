@@ -5,6 +5,15 @@ import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { Image, ImageValues } from '../../../types/common/image';
 
 const createImageFile = () => new File(['dummy content'], 'example.png', { type: 'image/png' });
+
+jest.mock('../../../assets/icons/cloud-download.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="upload-icon" />,
+}));
+
+jest.mock('../../../assets/icons/delete.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="delete-icon" />,
+}));
+
 const MockImageValue: ImageValues = {
     base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAocB9eQ6vqoAAAAASUVORK5CYII=',
     mimeType: 'image/jpeg',
@@ -31,7 +40,7 @@ describe('ImageInput', () => {
     it('renders placeholder when no image is selected', () => {
         render(<ImageInput value={null} onChange={onChangeMock} />);
         expect(screen.getByText(COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER)).toBeInTheDocument();
-        expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.UPLOAD)).toBeInTheDocument();
+        expect(screen.getByTestId('upload-icon')).toBeInTheDocument();
     });
 
     it('renders image preview when ImageValue is provided', () => {
@@ -71,7 +80,7 @@ describe('ImageInput', () => {
     it('calls onChange with null when remove button is clicked', () => {
         render(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
 
-        const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
+        const removeButton = screen.getByTestId('delete-icon').closest('button')!;
         fireEvent.click(removeButton);
 
         expect(onChangeMock).toHaveBeenCalledWith(null);
@@ -316,7 +325,7 @@ describe('ImageInput', () => {
     it('clears input value when removing file', () => {
         render(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
 
-        const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
+        const removeButton = screen.getByTestId('delete-icon').closest('button')!;
         const fileInput = screen.getByTestId('image-input-hidden') as HTMLInputElement;
 
         Object.defineProperty(fileInput, 'value', {

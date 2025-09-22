@@ -66,7 +66,6 @@ export const FaqPanelContent = () => {
 
     const listContainerRef = useRef<HTMLDivElement>(null);
     const currentItemsCountRef = useRef<number>(0);
-    const totalItemsCountRef = useRef<number | null>(null);
     const selectedVisitorPageRef = useRef<VisitorPage | null>(null);
     const currentPaginationPageRef = useRef<number>(1);
     const hasMoreRef = useRef<boolean>(true);
@@ -100,7 +99,6 @@ export const FaqPanelContent = () => {
         setErrorState(null);
         currentPaginationPageRef.current = 1;
         currentItemsCountRef.current = 0;
-        totalItemsCountRef.current = null;
         isFaqsLoadingRef.current = false;
         hasMoreRef.current = true;
     }, [setErrorState]);
@@ -271,9 +269,6 @@ export const FaqPanelContent = () => {
 
     useEffect(() => {
         selectedVisitorPageRef.current = selectedVisitorPage;
-        if (selectedVisitorPage) {
-            resetFaqsState();
-        }
     }, [selectedVisitorPage, resetFaqsState]);
 
     useEffect(() => {

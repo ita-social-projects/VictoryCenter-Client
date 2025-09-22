@@ -310,11 +310,19 @@ export const FaqPanelContent = () => {
 
     const handleEditFaq = useCallback(
         (updatedFaq: FaqQuestion) => {
-            setFaqs((prevFaqs) => prevFaqs.map((faq) => (faq.id === updatedFaq.id ? updatedFaq : faq)));
+            const belongsToSelectedPage = updatedFaq.pages.some((p) => p.id === selectedVisitorPage?.id);
+
+            setFaqs((prevFaqs) => {
+                if (belongsToSelectedPage) {
+                    return prevFaqs.map((faq) => (faq.id === updatedFaq.id ? updatedFaq : faq));
+                } else {
+                    return prevFaqs.filter((faq) => faq.id !== updatedFaq.id);
+                }
+            });
 
             updateModalState({ faqToEdit: null });
         },
-        [updateModalState],
+        [updateModalState, selectedVisitorPage?.id],
     );
 
     const handleDeleteFaq = useCallback(

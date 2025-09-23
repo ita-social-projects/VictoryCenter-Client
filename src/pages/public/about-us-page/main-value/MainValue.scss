@@ -1,5 +1,6 @@
 @use '../../../../assets/sass/variables/colors';
 @use '../../../../assets/sass/variables/fonts';
+@use '../../../../assets/sass/variables/z-index.scss';
 
 .main-values-block * {
     margin: 0;
@@ -36,6 +37,7 @@
             line-height: 4.5rem;
             text-align: center;
             text-transform: uppercase;
+            z-index: map-get(z-index.$public-layout, about-us-page-main-value-text);
         }
 
         span:nth-child(3) {
@@ -65,7 +67,7 @@
             background: colors.$yellow-300;
             position: absolute;
             top: 0;
-            z-index: -1;
+            z-index: map-get(z-index.$public-layout, about-us-page-main-value-background);
         }
     }
     .people-block {

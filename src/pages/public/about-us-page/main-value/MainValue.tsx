@@ -30,8 +30,8 @@ export const MainValues = () => {
         <div className="main-values-block">
             <div className="main-values-title">
                 <h2>
-                    {ABOUT_US_DATA.MAIN_VALUE.FIRST_PART}
-                    <span>{ABOUT_US_DATA.MAIN_VALUE.FIRST_HIGHLIGHT}</span>
+                    {ABOUT_US_DATA.MAIN_VALUE.FIRST_PART} <br />
+                    <span>{ABOUT_US_DATA.MAIN_VALUE.FIRST_HIGHLIGHT}</span> <br />
                     {ABOUT_US_DATA.MAIN_VALUE.MIDDLE_PART} <br />
                     <span>{ABOUT_US_DATA.MAIN_VALUE.SECOND_HIGHLIGHT}</span>
                 </h2>
@@ -58,6 +58,9 @@ export const MainValues = () => {
                             slidesPerView: 2,
                         },
                         768: {
+                            slidesPerView: 2,
+                        },
+                        912: {
                             slidesPerView: 4,
                         },
                     }}
@@ -71,7 +74,6 @@ export const MainValues = () => {
                         </SwiperSlide>
                     ))}
                 </Swiper>
-
                 {showButtons && (
                     <div className="button-container">
                         {canGoPrev && (
@@ -89,7 +91,6 @@ export const MainValues = () => {
                     </div>
                 )}
             </div>
-
             <div className="summary-block">
                 <h3 className="summary-text">{ABOUT_US_DATA.MAIN_VALUE_DETAILS}</h3>
             </div>

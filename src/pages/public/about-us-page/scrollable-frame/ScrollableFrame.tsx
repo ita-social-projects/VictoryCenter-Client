@@ -84,7 +84,7 @@ export const ScrollableFrame = () => {
                     768: {
                         slidesPerView: 2,
                     },
-                    1440: {
+                    912: {
                         slidesPerView: 3,
                     },
                 }}

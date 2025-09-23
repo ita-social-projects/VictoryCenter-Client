@@ -1,6 +1,6 @@
 import './SupportSection.scss';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Swiper, SwiperSlide, SwiperClass } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 import arrowRightWhite from '../../../../assets/icons/arrow-right-white.svg';
@@ -10,14 +10,18 @@ import arrowLeftBlack from '../../../../assets/icons/arrow-left.svg';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
+import { SupportSectionResponsive } from './responsive/SupportSectionResponsive';
 
 export const SupportSection = () => {
     const swiperRef = useRef<SwiperClass | null>(null);
     const [canGoPrev, setCanGoPrev] = useState(false);
     const [canGoNext, setCanGoNext] = useState(true);
     const [showButtons, setShowButtons] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+
     const handlePrev = () => swiperRef.current?.slidePrev();
     const handleNext = () => swiperRef.current?.slideNext();
+
     const updateState = (swiper: SwiperClass) => {
         const perView = typeof swiper.params.slidesPerView === 'number' ? swiper.params.slidesPerView : 1;
         const total = swiper.slides.length;
@@ -26,59 +30,75 @@ export const SupportSection = () => {
         setShowButtons(total > perView);
     };
 
+    useEffect(() => {
+        const checkWidth = () => {
+            const width = window.innerWidth;
+            setIsVisible(width >= 568 && width <= 912);
+        };
+        checkWidth();
+        window.addEventListener('resize', checkWidth);
+        return () => window.removeEventListener('resize', checkWidth);
+    }, []);
+
     return (
-        <div className="support-block">
-            <Swiper
-                modules={[Navigation, Pagination]}
-                onSwiper={(swiper: SwiperClass) => {
-                    swiperRef.current = swiper;
-                    updateState(swiper);
-                    swiper.on('slideChange', updateState);
-                    swiper.on('resize', updateState);
-                    swiper.on('reachBeginning', updateState);
-                    swiper.on('reachEnd', updateState);
-                    swiper.on('fromEdge', updateState);
-                }}
-                slidesPerView={1}
-                navigation={false}
-                scrollbar={{ draggable: true, el: '.custom-scrollbar' }}
-                loop={false}
-                breakpoints={{
-                    568: {
-                        slidesPerView: 3,
-                    },
-                }}
-            >
-                {ABOUT_US_DATA.SUPPORT_DATA.map(({ IMG, ALT, DESCRIPTION }, index) => (
-                    <SwiperSlide key={`${ALT}-${index}`}>
-                        {index === 0 && (
-                            <div className="main-values-title">
-                                <h2 className="support-title">{ABOUT_US_DATA.SUPPORT_TITLE}</h2>
-                            </div>
-                        )}
-                        <div className={`support-card card-${index + 1}`}>
-                            <img src={IMG} alt={ALT} />
-                            <p className="support-description">{DESCRIPTION}</p>
+        <>
+            {isVisible ? (
+                <SupportSectionResponsive />
+            ) : (
+                <div className="support-block">
+                    <Swiper
+                        modules={[Navigation, Pagination]}
+                        onSwiper={(swiper: SwiperClass) => {
+                            swiperRef.current = swiper;
+                            updateState(swiper);
+                            swiper.on('slideChange', updateState);
+                            swiper.on('resize', updateState);
+                            swiper.on('reachBeginning', updateState);
+                            swiper.on('reachEnd', updateState);
+                            swiper.on('fromEdge', updateState);
+                        }}
+                        slidesPerView={1}
+                        navigation={false}
+                        scrollbar={{ draggable: true, el: '.custom-scrollbar' }}
+                        loop={false}
+                        breakpoints={{
+                            912: {
+                                slidesPerView: 3,
+                            },
+                        }}
+                    >
+                        {ABOUT_US_DATA.SUPPORT_DATA.map(({ IMG, ALT, DESCRIPTION }, index) => (
+                            <SwiperSlide key={`${ALT}-${index}`}>
+                                {index === 0 && (
+                                    <div className="main-values-title">
+                                        <h2 className="support-title">{ABOUT_US_DATA.SUPPORT_TITLE}</h2>
+                                    </div>
+                                )}
+                                <div className={`support-card card-${index + 1}`}>
+                                    <img src={IMG} alt={ALT} />
+                                    <p className="support-description">{DESCRIPTION}</p>
+                                </div>
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+                    {showButtons && (
+                        <div className="button-container">
+                            {canGoPrev && (
+                                <button onClick={handlePrev} className="arrow-button arrow-left">
+                                    <img src={arrowLeftWhite} alt="" className="arrow-normal-state" />
+                                    <img src={arrowLeftBlack} alt="" className="arrow-hover-state" />
+                                </button>
+                            )}
+                            {canGoNext && (
+                                <button onClick={handleNext} className="arrow-button arrow-right">
+                                    <img src={arrowRightWhite} alt="" className="arrow-normal-state" />
+                                    <img src={arrowRightBlack} alt="" className="arrow-hover-state" />
+                                </button>
+                            )}
                         </div>
-                    </SwiperSlide>
-                ))}
-            </Swiper>
-            {showButtons && (
-                <div className="button-container">
-                    {canGoPrev && (
-                        <button onClick={handlePrev} className="arrow-button arrow-left">
-                            <img src={arrowLeftWhite} alt="" className="arrow-normal-state" />
-                            <img src={arrowLeftBlack} alt="" className="arrow-hover-state" />
-                        </button>
-                    )}
-                    {canGoNext && (
-                        <button onClick={handleNext} className="arrow-button arrow-right">
-                            <img src={arrowRightWhite} alt="" className="arrow-normal-state" />
-                            <img src={arrowRightBlack} alt="" className="arrow-hover-state" />
-                        </button>
                     )}
                 </div>
             )}
-        </div>
+        </>
     );
 };

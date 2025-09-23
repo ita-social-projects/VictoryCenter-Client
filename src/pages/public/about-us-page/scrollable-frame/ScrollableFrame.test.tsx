@@ -3,27 +3,35 @@ import { ScrollableFrame } from './ScrollableFrame';
 import * as dataFetch from '../../../../services/api/public/programs/programs-api';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
 
-jest.mock('../../../../../assets/icons/arrow-left-white.svg', () => 'arrow-left.png');
-jest.mock('../../../../../assets/icons/arrow-right-white.svg', () => 'arrow-right.png');
-jest.mock('../../../../../assets/icons/arrow-left.svg', () => 'arrow-left-black.png');
-jest.mock('../../../../../assets/icons/arrow-right.svg', () => 'arrow-right-black.png');
+jest.mock('../../../../assets/icons/arrow-left-white.svg', () => 'arrow-left.png');
+jest.mock('../../../../assets/icons/arrow-right-white.svg', () => 'arrow-right.png');
+jest.mock('../../../../assets/icons/arrow-left.svg', () => 'arrow-left-black.png');
+jest.mock('../../../../assets/icons/arrow-right.svg', () => 'arrow-right-black.png');
 
-jest.mock('../../../programs-page/programs-section/program-card/ProgramCard', () => ({
+jest.mock('./program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: { program: any }) => <div data-testid="program-card">{program.title}</div>,
 }));
 
 jest.mock('swiper/react', () => {
+    const React = require('react');
     return {
-        Swiper: (props: any) => {
-            if (props.onSwiper) {
-                props.onSwiper({
-                    slideNext: jest.fn(),
-                    slidePrev: jest.fn(),
-                });
-            }
-            return <div data-testid="swiper">{props.children}</div>;
+        Swiper: ({ children, onSwiper }: any) => {
+            React.useEffect(() => {
+                if (onSwiper) {
+                    onSwiper({
+                        params: { slidesPerView: 1 },
+                        slides: [{}, {}, {}],
+                        isBeginning: true,
+                        isEnd: false,
+                        on: jest.fn(),
+                        slideNext: jest.fn(),
+                        slidePrev: jest.fn(),
+                    });
+                }
+            }, [onSwiper]);
+            return <div data-testid="swiper">{children}</div>;
         },
-        SwiperSlide: (props: any) => <div data-testid="swiper-slide">{props.children}</div>,
+        SwiperSlide: ({ children }: any) => <div data-testid="swiper-slide">{children}</div>,
     };
 });
 

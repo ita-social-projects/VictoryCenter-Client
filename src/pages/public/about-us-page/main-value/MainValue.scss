@@ -11,10 +11,10 @@
     color: colors.$blue-900;
     font-family: fonts.$mulish-regular-font;
     position: relative;
-    z-index: 0;
+    margin-top: 16rem;
+    overflow: hidden;
 
     .main-values-title {
-        margin-top: 16rem;
         width: 100%;
         display: flex;
         justify-content: center;
@@ -24,13 +24,15 @@
 
         h2 {
             width: 51.35rem;
-            font-weight: 400;
+            font-weight: 500;
             font-style: normal;
             font-size: 4rem;
             line-height: 4.5rem;
             letter-spacing: 0;
             text-align: center;
             text-transform: uppercase;
+            position: relative;
+            z-index: 1;
         }
 
         span {
@@ -41,10 +43,10 @@
             text-align: center;
             text-transform: uppercase;
             position: relative;
-            z-index: 3;
+            z-index: 2;
         }
 
-        span:nth-child(1) {
+        span:nth-child(2) {
             background: colors.$yellow-300;
             padding: 0 0.5rem;
 
@@ -60,7 +62,11 @@
             }
         }
 
-        span:nth-child(3) {
+        br:first-of-type {
+            display: none;
+        }
+
+        span:nth-child(5) {
             background: colors.$light-blue-200;
             padding: 0 0.5rem;
 
@@ -134,6 +140,8 @@
             z-index: 2;
             padding: 0 2rem;
             top: 50%;
+            transition: opacity 4s ease;
+            opacity: 0;
 
             .arrow-button {
                 background-color: colors.$blue-900;
@@ -207,24 +215,34 @@
         }
     }
 }
+.people-block:hover .button-container {
+    opacity: 1;
+    transition: opacity 1s ease;
+}
 
-@media (max-width: 568px) {
+@media (max-width: 912px) {
     .main-values-block {
+        margin-top: 11.25rem;
 
         .main-values-title {
             margin-top: 4.6rem;
+
             h2 {
-                width: 21rem;
-                font-size: 2.5rem;
-                line-height: 3rem;
+                width: 41rem;
+                font-size: 4rem;
+                line-height: 4.5rem;
             }
 
             span {
-                font-size: 2.5rem;
-                line-height: 3rem;
+                font-size: 4rem;
+                line-height: 4.5rem;
             }
 
-            span:nth-child(1) {
+            br:first-of-type {
+                display: inline;
+            }
+
+            span:nth-child(2) {
                 padding: 0 1.5rem;
 
                 &::after {
@@ -243,7 +261,7 @@
                 }
             }
 
-            span:nth-child(3) {
+            span:nth-child(5) {
 
                 &::before {
                     display: none;
@@ -260,6 +278,226 @@
                     z-index: -1;
                 }
             }
+        }
+
+        .people-block {
+            margin-top: 11rem;
+            height: 45.25rem;
+
+            .people-card {
+
+                &.card-1 {
+                    transform: translateY(0rem);
+                }
+
+                &.card-2 {
+                    transform: translateY(8rem);
+                }
+
+                &.card-3 {
+                    transform: translateY(0rem);
+                }
+
+                &.card-4 {
+                    transform: translateY(8rem);
+                }
+
+                img {
+                    height: 26.875rem;
+                }
+
+                p {
+                    padding: 0.9rem 1.125rem;
+                }
+            }
+
+            .button-container {
+                top: 45%;
+
+                .arrow-left {
+                    left: 0.9rem;
+                }
+
+                .arrow-right {
+                    right: 0.9rem;
+                }
+            }
+        }
+
+        .summary-block,
+        .summary-text {
+            max-width: 41rem;
+        }
+    }
+}
+@media (max-width: 768px) {
+    .main-values-block {
+        margin-top: 0rem;
+
+        .main-values-title {
+
+            h2 {
+                width: 27rem;
+                font-size: 3rem;
+                line-height: 3.375rem;
+            }
+
+            span {
+                font-size: 3rem;
+                line-height: 3.375rem;
+            }
+
+            br:first-of-type {
+                display: inline;
+            }
+
+            span:nth-child(2) {
+                padding: 0 1.5rem;
+
+                &::after {
+                    display: none;
+                }
+
+                &::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    right: 100%;
+                    width: 100vw;
+                    height: 100%;
+                    background: colors.$yellow-300;
+                    z-index: -1;
+                }
+            }
+
+            span:nth-child(5) {
+
+                &::before {
+                    display: none;
+                }
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 100%;
+                    width: 100vw;
+                    height: 100%;
+                    background: colors.$light-blue-200;
+                    z-index: -1;
+                }
+            }
+        }
+
+        .people-block {
+            margin-top: 6.75rem;
+            height: 45.25rem;
+
+            .people-card {
+
+                &.card-1 {
+                    transform: translateY(0rem);
+                }
+
+                &.card-2 {
+                    transform: translateY(7rem);
+                }
+
+                &.card-3 {
+                    transform: translateY(0rem);
+                }
+
+                &.card-4 {
+                    transform: translateY(7rem);
+                }
+
+                img {
+                    height: 26.875rem;
+                }
+
+                p {
+                    padding: 0.9rem 1.125rem;
+                }
+            }
+
+            .button-container {
+                top: 45%;
+
+                .arrow-left {
+                    left: 0.9rem;
+                }
+
+                .arrow-right {
+                    right: 0.9rem;
+                }
+            }
+        }
+
+        .summary-block,
+        .summary-text {
+            max-width: 27rem;
+        }
+    }
+}
+
+@media (max-width: 568px) {
+    .main-values-block {
+        margin-top: 4.688rem;
+
+        .main-values-title {
+
+            h2 {
+                width: 21rem;
+                font-size: 2.5rem;
+                line-height: 3rem;
+            }
+
+            span {
+                font-size: 2.5rem;
+                line-height: 3rem;
+            }
+
+            br:first-of-type {
+                display: inline;
+            }
+
+            span:nth-child(2) {
+                padding: 0 1.5rem;
+
+                &::after {
+                    display: none;
+                }
+
+                &::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    right: 100%;
+                    width: 100vw;
+                    height: 100%;
+                    background: colors.$yellow-300;
+                    z-index: -1;
+                }
+            }
+
+            span:nth-child(5) {
+
+                &::before {
+                    display: none;
+                }
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 100%;
+                    width: 100vw;
+                    height: 100%;
+                    background: colors.$light-blue-200;
+                    z-index: -1;
+                }
+            }
+
         }
 
         .people-block {

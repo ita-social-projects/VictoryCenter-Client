@@ -10,7 +10,6 @@ jest.mock('./Header.scss', () => ({}));
 jest.mock('../../../assets/icons/logo-with-text.svg', () => ({
     ReactComponent: () => <svg data-testid="logo-icon" />,
 }));
-
 jest.mock('../../../assets/icons/burger.svg', () => ({
     ReactComponent: () => <div data-testid="burger-icon" />,
 }));

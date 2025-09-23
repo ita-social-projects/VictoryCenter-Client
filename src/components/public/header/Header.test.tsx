@@ -8,20 +8,9 @@ import { CONTACT_US, DONATE, HOW_TO_SUPPORT, PROGRAMS, REPORTING } from '../../.
 jest.mock('./Header.scss', () => ({}));
 
 jest.mock('../../../assets/icons/logo-with-text.svg', () => ({
-    ReactComponent: () => <svg data-testid="logo" />,
+    ReactComponent: () => <svg data-testid="logo-icon" />,
 }));
-jest.mock('../../../assets/icons/chevron-up.svg', () => ({
-    ReactComponent: () => <svg data-testid="chevron-up" />,
-}));
-jest.mock('../../../assets/icons/chevron-down.svg', () => ({
-    ReactComponent: () => <svg data-testid="chevron-down" />,
-}));
-jest.mock('../../../assets/icons/menu.svg', () => ({
-    ReactComponent: () => <svg data-testid="menu" />,
-}));
-jest.mock('../../../assets/icons/cross.svg', () => ({
-    ReactComponent: () => <svg data-testid="close" />,
-}));
+
 jest.mock('../../../assets/icons/burger.svg', () => ({
     ReactComponent: () => <div data-testid="burger-icon" />,
 }));

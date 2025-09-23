@@ -1,3 +1,6 @@
+
+@use '../../../assets/sass/variables/z-index.scss';
+
 .full-page-loader {
     position: fixed;
     top: 0;
@@ -8,7 +11,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 15;
+    z-index: z-index.$full-page-loader;
 }
 
 .loader-icon {

@@ -1,0 +1,26 @@
+$modal: 900;
+$full-page-loader: 1000;
+$single-select-input: 10;
+$scrollable-frame-arrows: 1;
+
+
+$public-layout: (
+    dropdown-menu: 700,
+    header: 5,
+    about-us-page-main-value-text: 1,
+    about-us-page-main-value-background: -1,
+    programs-page-intro-section-text: 1,
+    programs-page-intro-section-background: -1,
+    team-page-members-loader: 10,
+);
+
+$admin-layout: (
+    toast-container: 800,
+    tooltip: 700,
+    context-menu-button-options: 10,
+    drag-preview: 20,
+    infinite-scroll-list-arrow-up: 10,
+    multi-select-input: 10,
+    search-bar-suggestions: 10,
+    select: 10,
+);

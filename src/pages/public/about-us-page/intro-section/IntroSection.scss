@@ -21,14 +21,12 @@
         clip-path: inset(9rem 34rem 18rem 1.25rem);
         object-fit: cover;
         object-position: top;
-        z-index: 2;
-        filter: grayscale(0%) brightness(1) saturate(130%) sepia(0.1);
+        filter: grayscale(0%) contrast(100%) brightness(1);
         animation: revealColor 4s ease-out forwards;
     }
 
     .about-us-main-title {
         position: absolute;
-        z-index: 3;
         width: 39.75rem;
         top: 10.5rem;
         left: 5rem;
@@ -50,7 +48,6 @@
     .title-details {
         width: 27rem;
         position: absolute;
-        z-index: 3;
         top: 34rem;
         left: 66.25vw;
         font-family: fonts.$mulish-regular-font;

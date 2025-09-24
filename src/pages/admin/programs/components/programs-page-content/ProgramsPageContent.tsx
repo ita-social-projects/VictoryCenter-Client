@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Program, ProgramCategory } from '../../../../../types/admin/programs';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Program, ProgramCategory, ProgramSearchItemData } from '../../../../../types/admin/programs';
 import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/common';
-import { ProgramsPageToolbar } from '../programs-page-toolbar/ProgramsPageToolbar';
 import { ProgramsPageModals } from '../programs-page-modals/ProgramsPageModals';
 import { InfiniteScrollList } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
 import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/category-bar/CategoryBar';
@@ -18,6 +17,8 @@ import {
 } from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import './ProgramsPageContent.scss';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { AdminPanelToolbar } from '../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar';
+import { ProgramSearchItem } from '../program-search-item/ProgramSearchItem';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -56,8 +57,13 @@ export const ProgramsPageContent = () => {
             if (!selectedCategory) {
                 return { items: [], totalItemsCount: 0 };
             }
-
-            return ProgramsApi.fetchPrograms(client, selectedCategory.id, params.offset, params.limit, statusFilter);
+            return ProgramsApi.fetchPrograms(
+                client,
+                selectedCategory.id,
+                params.offset as number,
+                params.limit as number,
+                statusFilter,
+            );
         },
         [selectedCategory, statusFilter, client],
     );
@@ -201,9 +207,9 @@ export const ProgramsPageContent = () => {
     );
 
     const handleProgramSuggestionSelect = useCallback(
-        (programId: number) => {
+        (programId: string | number) => {
             setIsSearchResultView(true);
-            setSearchProgramId(programId);
+            setSearchProgramId(typeof programId === 'string' ? parseInt(programId, 10) : programId);
             resetProgramsList();
         },
         [resetProgramsList],
@@ -384,12 +390,24 @@ export const ProgramsPageContent = () => {
     return (
         <div className="programs-page-wrapper" data-testid="programs-page-content">
             <div className="programs-page-toolbar-container">
-                <ProgramsPageToolbar
-                    onProgramSelect={handleProgramSuggestionSelect}
+                <AdminPanelToolbar<ProgramSearchItemData>
+                    getSearchItemKey={(item) => item.id}
+                    getSearchItemLabel={(item) => item.name}
+                    fetchSearchItems={(searchTerm, requestOptions) =>
+                        ProgramsApi.fetchProgramSearchItems(
+                            client,
+                            searchTerm,
+                            requestOptions.offset as number,
+                            requestOptions.limit as number,
+                        )
+                    }
+                    renderSearchItemComponent={ProgramSearchItem}
+                    placeholder={PROGRAMS_TEXT.PLACEHOLDER.SEARCH_PROGRAMS}
                     onSearchClear={handleSearchClear}
-                    statusFilterValue={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddProgram={openModalActions.openAddItemModal}
+                    onAddItem={openModalActions.openAddItemModal}
+                    AddItemButtonText={PROGRAMS_TEXT.BUTTON.ADD_PROGRAM}
+                    onSuggestionSelect={handleProgramSuggestionSelect}
                 />
             </div>
 

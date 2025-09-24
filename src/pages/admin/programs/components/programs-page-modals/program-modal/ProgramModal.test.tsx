@@ -2,6 +2,7 @@ import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramModal, ProgramModalProps } from './ProgramModal';
 import { Program, ProgramCategory } from '../../../../../../types/admin/programs';
+import { ModalMode } from '../../../../../../types/admin/common';
 import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
@@ -163,13 +164,13 @@ describe('ProgramModal', () => {
 
     const addModeProps: ProgramModalProps = {
         ...baseProps,
-        mode: 'add',
+        mode: ModalMode.Add,
         onAddProgram: mockOnAddProgram,
     };
 
     const editModeProps: ProgramModalProps = {
         ...baseProps,
-        mode: 'edit',
+        mode: ModalMode.Edit,
         programToEdit: mockProgram,
         onEditProgram: mockOnEditProgram,
     };

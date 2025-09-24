@@ -1,7 +1,7 @@
 import React, { RefObject, useState, useEffect } from 'react';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import ArrowDown from '../../../assets/icons/chevron-down.svg';
-import ArrowUp from '../../../assets/icons/chevron-up.svg';
+import { ReactComponent as ArrowDown } from '../../../assets/icons/chevron-down.svg';
+import { ReactComponent as ArrowUp } from '../../../assets/icons/chevron-up.svg';
 import classNames from 'classnames';
 import './Select.scss';
 
@@ -83,10 +83,7 @@ export const Select = <TValue,>({
             >
                 {selectedName ?? placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT}
             </span>
-            <img
-                src={isOpen ? ArrowUp : ArrowDown}
-                alt={isOpen ? COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST : COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST}
-            />
+            {isOpen ? <ArrowUp /> : <ArrowDown />}
             {isOpen && (
                 <div className={'select-options'}>
                     {options.map((opt, index) => {

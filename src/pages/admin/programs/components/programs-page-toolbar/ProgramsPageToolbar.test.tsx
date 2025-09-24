@@ -95,7 +95,7 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
 
 jest.mock('../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch');
 jest.mock('../../../../../services/api/admin/programs/programs-api');
-jest.mock('./program-suggestion-item/ProgramSearchItem', () => ({
+jest.mock('../program-search-item/ProgramSearchItem.tsx', () => ({
     ProgramSuggestionItem: ({ item }: any) => <div data-testid="suggestion-item">{item.name}</div>,
 }));
 

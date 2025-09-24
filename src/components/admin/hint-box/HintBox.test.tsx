@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { HintBox } from './HintBox';
 
-jest.mock('../../../assets/icons/info.svg', () => 'mocked-info-icon.svg');
+jest.mock('../../../assets/icons/info.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="info-icon" />,
+}));
 
 describe('HintBox', () => {
     it('renders title and icon', () => {
@@ -10,7 +11,7 @@ describe('HintBox', () => {
         render(<HintBox title={title} />);
 
         expect(screen.getByText(title)).toBeInTheDocument();
-        expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.HINT)).toBeInTheDocument();
+        expect(screen.getByTestId('info-icon')).toBeInTheDocument();
     });
 
     it('renders title and text when text is provided', () => {
@@ -40,14 +41,6 @@ describe('HintBox', () => {
 
         expect(container).toBeInTheDocument();
         expect(titleContainer).toHaveClass('hint-box-title');
-    });
-
-    it('icon has correct src and alt attributes', () => {
-        const title = 'Test title';
-        render(<HintBox title={title} />);
-
-        const icon = screen.getByAltText(COMMON_TEXT_ADMIN.ALT.HINT) as HTMLImageElement;
-        expect(icon.src).toContain('mocked-info-icon.svg');
     });
 
     it('renders empty text correctly', () => {

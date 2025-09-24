@@ -8,7 +8,6 @@ Object.defineProperty(global, 'ResizeObserver', {
     value: class ResizeObserver {
         observe = mockObserve;
         disconnect = mockDisconnect;
-        constructor(callback: ResizeObserverCallback) {}
     },
 });
 

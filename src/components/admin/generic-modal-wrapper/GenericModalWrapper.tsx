@@ -75,7 +75,7 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                         onValidationChange: onFormValidationChange,
                         ...(categories && { categories }),
                     })}
-                    {error && <div className="error-container">{error}</div>}
+                    {error && <div className="modal-content-error-container">{error}</div>}
                 </Modal.Content>
                 <Modal.Actions>
                     <Button buttonStyle="secondary" onClick={onDraftSubmit} disabled={isSubmitting || !isFormValid}>

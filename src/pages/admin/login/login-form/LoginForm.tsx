@@ -1,9 +1,9 @@
 import './LoginForm.scss';
 import React, { useState } from 'react';
 import { NavLink } from 'react-router';
-import Logo from '../../../../assets/icons/logo-with-text.svg';
-import EyeOpened from '../../../../assets/icons/eye-opened.svg';
-import EyeClosed from '../../../../assets/icons/eye-closed.svg';
+import { ReactComponent as Logo } from '../../../../assets/icons/logo-with-text.svg';
+import { ReactComponent as EyeOpened } from '../../../../assets/icons/eye-opened.svg';
+import { ReactComponent as EyeClosed } from '../../../../assets/icons/eye-closed.svg';
 import { Button } from '../../../../components/admin/button/Button';
 import { LOGIN_CONST } from '../../../../const/admin/login';
 import { PUBLIC_ROUTES } from '../../../../const/public/routes';
@@ -35,8 +35,8 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
 
     return (
         <form onSubmit={handleSubmit} className="login-form" spellCheck={false}>
-            <NavLink to={PUBLIC_ROUTES.ROOT} className="logo">
-                <img src={Logo} alt={LOGIN_CONST.FORM.LOGO_ALT} />
+            <NavLink to={PUBLIC_ROUTES.ROOT}>
+                <Logo />
             </NavLink>
             <h2 className="login-form-title">{LOGIN_CONST.FORM.TITLE}</h2>
             <div className="login-form-group">
@@ -63,16 +63,13 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
                         autoComplete="current-password"
                         required
                     />
-                    <button type="button" className="visibility-toggle" onClick={handleVisibilityChange}>
-                        <img
-                            src={isPasswordVisible ? EyeOpened : EyeClosed}
-                            alt={
-                                isPasswordVisible
-                                    ? LOGIN_CONST.FORM.SHOWED_PASSWORD_ALT
-                                    : LOGIN_CONST.FORM.HIDDEN_PASSWORD_ALT
-                            }
-                            className="toggle-icon"
-                        />
+                    <button
+                        type="button"
+                        className="visibility-toggle"
+                        data-testid="visibility-toggle-button"
+                        onClick={handleVisibilityChange}
+                    >
+                        {isPasswordVisible ? <EyeOpened /> : <EyeClosed />}
                     </button>
                 </div>
             </div>

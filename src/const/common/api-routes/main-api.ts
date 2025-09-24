@@ -26,4 +26,10 @@ export const API_ROUTES = {
     IMAGE: {
         BASE: 'Image',
     },
+    FAQ: {
+        BASE: 'faq',
+        PUBLISHED_BY_SLUG: 'faq/published',
+        REORDER: 'faq/reorder',
+        PAGES: 'faq/pages',
+    },
 };

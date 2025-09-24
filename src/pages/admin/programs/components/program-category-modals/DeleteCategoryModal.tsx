@@ -92,7 +92,7 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
                             text={PROGRAM_CATEGORY_VALIDATION.programsCount.getRelocationOrRemovalHint()}
                         />
                     )}
-                    {error && <div className="error-container">{error}</div>}
+                    {error && <div className="program-category-modal-error-container">{error}</div>}
                 </div>
             </Modal.Content>
             <Modal.Actions>

@@ -17,23 +17,22 @@ const resources = {
 const isTest = process.env.NODE_ENV === 'test';
 
 if (!isTest) {
-  i18n.use(LanguageDetector);
+    i18n.use(LanguageDetector);
 }
 
-i18n.use(initReactI18next)
-    .init({
-        resources,
-        fallbackLng: 'uk',
-        ns: ['aboutUsPage'], // namespaces
-        defaultNS: 'aboutUsPage',
-        interpolation: {
-            escapeValue: false, // leave it for React
-        },
-        detection: {
-            // saving selected language
-            order: ['localStorage', 'navigator'],
-            caches: ['localStorage'],
-        },
-    });
+i18n.use(initReactI18next).init({
+    resources,
+    fallbackLng: 'uk',
+    ns: ['aboutUsPage'], // namespaces
+    defaultNS: 'aboutUsPage',
+    interpolation: {
+        escapeValue: false, // leave it for React
+    },
+    detection: {
+        // saving selected language
+        order: ['localStorage', 'navigator'],
+        caches: ['localStorage'],
+    },
+});
 
 export default i18n;

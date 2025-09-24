@@ -1,17 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
+import aboutUsUk from '../../../../locales/uk/about-us.json';
 import { OurMission } from './OurMission';
 
 jest.mock('../../../../assets/icons/arrow-up-right.svg', () => ({
     ReactComponent: (props: any) => <svg data-testid="arrow-icon" {...props} />,
-}));
-
-jest.mock('../../../../const/public/about-us-page', () => ({
-    ABOUT_US_DATA: {
-        WHAT_WE_DO: 'What we do title',
-        WHAT_WE_DO_DETAILS: 'These are the details of what we do.',
-        GO_TO_PROGRAMS: 'Go to programs',
-    },
 }));
 
 jest.mock('../../../../const/public/routes', () => ({
@@ -28,41 +21,25 @@ jest.mock('./scrollable-frame/ScrollableFrame', () => ({
 
 describe('OurMission component', () => {
     it('should render the mission title', () => {
-        render(
-            <MemoryRouter>
-                <OurMission />
-            </MemoryRouter>,
-        );
-        expect(screen.getByText('What we do title')).toBeInTheDocument();
+        render(<OurMission />, { wrapper: MemoryRouter });
+        expect(screen.getByText(aboutUsUk.WHAT_WE_DO)).toBeInTheDocument();
     });
 
     it('should render the mission details', () => {
-        render(
-            <MemoryRouter>
-                <OurMission />
-            </MemoryRouter>,
-        );
-        expect(screen.getByText('These are the details of what we do.')).toBeInTheDocument();
+        render(<OurMission />, { wrapper: MemoryRouter });
+        expect(screen.getByText(aboutUsUk.WHAT_WE_DO_DETAILS)).toBeInTheDocument();
     });
 
     it('should render the link with correct text, href and icon', () => {
-        render(
-            <MemoryRouter>
-                <OurMission />
-            </MemoryRouter>,
-        );
-        const link = screen.getByRole('link', { name: /go to programs/i });
+        render(<OurMission />, { wrapper: MemoryRouter });
+        const link = screen.getByRole('link', { name: aboutUsUk.GO_TO_PROGRAMS });
         expect(link).toBeInTheDocument();
         expect(link).toHaveAttribute('href', '/programs');
         expect(screen.getByTestId('arrow-icon')).toBeInTheDocument();
     });
 
     it('should render the ScrollableFrame component', () => {
-        render(
-            <MemoryRouter>
-                <OurMission />
-            </MemoryRouter>,
-        );
+        render(<OurMission />, { wrapper: MemoryRouter });
         expect(screen.getByTestId('scrollable-frame')).toBeInTheDocument();
     });
 });

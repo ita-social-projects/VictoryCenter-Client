@@ -1,33 +1,37 @@
 import { render, screen } from '@testing-library/react';
 import { MainValues } from './MainValue';
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
+import aboutUsUk from '../../../../locales/uk/about-us.json';
 
 describe('MainValues component', () => {
     it('should render main title with correct parts and highlights', () => {
         render(<MainValues />);
-        expect(screen.getByText(/Головна /i)).toBeInTheDocument();
-        expect(screen.getByText(/цінність/i)).toBeInTheDocument();
-        expect(screen.getByText(/Victory Center/i)).toBeInTheDocument();
-        expect(screen.getByText(/це люди/i)).toBeInTheDocument();
+        checkForSubstrings(aboutUsUk['MAIN_VALUE.FIRST_PART']);
+        checkForSubstrings(aboutUsUk['MAIN_VALUE.FIRST_HIGHLIGHT']);
+        checkForSubstrings(aboutUsUk['MAIN_VALUE.MIDDLE_PART']);
+        checkForSubstrings(aboutUsUk['MAIN_VALUE.SECOND_HIGHLIGHT']);
     });
 
     it('should render correct number of people cards', () => {
         render(<MainValues />);
         const cards = screen.getAllByRole('img');
-        expect(cards.length).toBe(ABOUT_US_DATA.PEOPLE_DATA.length);
+        expect(cards.length).toBe(aboutUsUk.PEOPLE_DATA.length);
     });
 
     it('should render correct people info texts', () => {
         render(<MainValues />);
-        ABOUT_US_DATA.PEOPLE_DATA.forEach(({ INFO }) => {
+        aboutUsUk.PEOPLE_DATA.forEach(({ INFO }) => {
             expect(screen.getByText(INFO)).toBeInTheDocument();
         });
     });
 
     it('should render summary block with correct lines', () => {
         render(<MainValues />);
-        expect(screen.getByText(/Ми віримо в силу спільноти, в якій кожен голос /i)).toBeInTheDocument();
-        expect(screen.getByText(/важливий, а кожен крок - наближує до спільної /i)).toBeInTheDocument();
-        expect(screen.getByText(/перемоги./i)).toBeInTheDocument();
+        checkForSubstrings(aboutUsUk['MAIN_VALUE_DETAILS.FIRST_LINE']);
+        checkForSubstrings(aboutUsUk['MAIN_VALUE_DETAILS.SECOND_LINE']);
+        checkForSubstrings(aboutUsUk['MAIN_VALUE_DETAILS.THIRD_LINE']);
     });
 });
+
+const checkForSubstrings = (line: string) => {
+    expect(screen.getByText((content) => content.includes(line.trim()))).toBeInTheDocument();
+};

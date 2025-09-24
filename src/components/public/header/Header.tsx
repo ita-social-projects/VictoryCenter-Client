@@ -18,6 +18,7 @@ import {
 } from '../../../const/public/header';
 import { DropdownLink, DropdownMenu } from '../dropdown-menu/DropdownMenu';
 import { ReactComponent as BurgerIcon } from '../../../assets/icons/burger.svg';
+import LanguageSwitcher from '../language-switcher/LanguageSwitcher';
 
 export const Header = () => {
     const dropdownMenuLinks: DropdownLink[] = [
@@ -46,6 +47,8 @@ export const Header = () => {
                     <VictoryCenterLogo className="logo" />
                 </Link>
             </div>
+
+            <LanguageSwitcher />
 
             <div className="link-container">
                 <nav>

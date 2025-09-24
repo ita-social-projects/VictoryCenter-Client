@@ -1,11 +1,12 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { CompanyValues } from './CompanyValues';
+import aboutUsUk from '../../../../locales/uk/about-us.json';
 
 describe('Company Values Section', () => {
     it('should contain main title', () => {
         render(<CompanyValues />);
-        const title = screen.getByRole('heading', { name: 'Наші Цінності' });
+        const title = screen.getByRole('heading', { name: aboutUsUk.OUR_VALUES });
         expect(title).toBeInTheDocument();
         expect(title).toHaveClass('values-title');
     });
@@ -24,30 +25,10 @@ describe('Company Values Section', () => {
 
     it('should contain correct text', () => {
         render(<CompanyValues />);
-
-        expect(screen.getByRole('heading', { name: 'Емпатія' })).toBeInTheDocument();
-        expect(
-            screen.getByText(/Ми поділяємо почуття та емоції наших учасників\/ць,.*розумінням та повагою/i),
-        ).toBeInTheDocument();
-
-        expect(screen.getByRole('heading', { name: 'Розширення прав і можливостей' })).toBeInTheDocument();
-        expect(
-            screen.getByText(/Прагнемо не лише бути поруч із учасниками\/цями,.* особистому розвитку./i),
-        ).toBeInTheDocument();
-
-        expect(screen.getByRole('heading', { name: 'Єдність' })).toBeInTheDocument();
-        expect(screen.getByText(/Створюємо спільноту підтримки,.*разом ми сильніші./i)).toBeInTheDocument();
-
-        expect(screen.getByRole('heading', { name: 'Різноманіття' })).toBeInTheDocument();
-        expect(screen.getByText(/Ми поважаємо та цінуємо унікальний досвід.*з якою взаємодіємо./i)).toBeInTheDocument();
-
-        expect(screen.getByRole('heading', { name: 'Стійкість' })).toBeInTheDocument();
-        expect(screen.getByText(/Віримо у силу духу людини,.*та зміцнення життєстійкості./i)).toBeInTheDocument();
-
-        expect(screen.getByRole('heading', { name: 'Відповідальність' })).toBeInTheDocument();
-        expect(
-            screen.getByText(/Ми несемо відповідальність за наші дії.*партнерами й благодійниками./i),
-        ).toBeInTheDocument();
+        aboutUsUk.VALUE_ITEMS.forEach(({ NAME, DESCRIPTION }) => {
+            expect(screen.getByRole('heading', { name: NAME })).toBeInTheDocument();
+            expect(screen.getByText(DESCRIPTION)).toBeInTheDocument();
+        });
     });
 
     it('should render in correct container', () => {

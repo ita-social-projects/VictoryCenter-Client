@@ -7,7 +7,7 @@ import { ProgramSearchItemData } from '../../../../../types/admin/programs';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonProps } from '../../../../../components/admin/button/Button';
-import { SelectOptionProps, SelectProps } from '../../../../../components/admin/select/Select';
+import { SelectOptionProps, SelectProps } from '../../../../../components/common/select/Select';
 import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
 
 jest.mock('../../../../../assets/icons/plus.svg', () => ({
@@ -22,7 +22,7 @@ jest.mock('../../../../../components/admin/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/admin/select/Select', () => ({
+jest.mock('../../../../../components/common/select/Select', () => ({
     Select: Object.assign(
         ({ children, onValueChange, value, ...props }: SelectProps<any>) => (
             <div {...props}>

@@ -1,6 +1,6 @@
-@use '../../../../../../assets/sass/variables/colors';
+@use '../../../../../assets/sass/variables/colors';
 
-.program-search-item {
+.faq-search-item {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -9,8 +9,8 @@
     padding: 0.25rem 0.5rem;
 }
 
-.program-search-item__name,
-.program-search-item__categories {
+.faq-search-item__name,
+.faq-search-item__pages {
     display: block;
     width: 100%;
     white-space: nowrap;
@@ -18,31 +18,31 @@
     text-overflow: ellipsis;
 }
 
-.program-search-item__name {
+.faq-search-item__name {
     font-size: 1rem;
     font-weight: 500;
 }
 
-.program-search-item__categories {
+.faq-search-item__pages {
     font-size: 0.875rem;
     margin-top: 0.125rem;
     color: colors.$grey-900;
 }
 
-.program-search-item-tooltip__name,
-.program-search-item-tooltip__categories {
+.faq-search-item-tooltip__name,
+.faq-search-item-tooltip__pages {
     display: block;
     width: 100%;
     white-space: normal;
     word-wrap: break-word;
 }
 
-.program-search-item-tooltip__name {
+.faq-search-item-tooltip__name {
     font-size: 1rem;
     font-weight: 500;
 }
 
-.program-search-item-tooltip__categories {
+.faq-search-item-tooltip__pages {
     font-size: 0.875rem;
     margin-top: 0.125rem;
     color: colors.$grey-900;

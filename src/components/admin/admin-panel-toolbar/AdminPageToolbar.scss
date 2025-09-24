@@ -1,4 +1,4 @@
-﻿.programs-toolbar {
+.admin-panel-toolbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -10,8 +10,8 @@
         justify-content: space-between;
         gap: 1.25rem;
     }
-}
 
-.programs-toolbar-search {
-    width: 38.75rem;
+    &-search {
+        width: 38.75rem;
+    }
 }

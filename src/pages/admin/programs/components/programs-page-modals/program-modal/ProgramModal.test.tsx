@@ -5,7 +5,7 @@ import { Program, ProgramCategory } from '../../../../../../types/admin/programs
 import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
-import { VisibilityStatus } from '../../../../../../types/admin/common';
+import { VisibilityStatus, ModalMode } from '../../../../../../types/admin/common';
 
 jest.mock('../../../../../../services/api/admin/programs/programs-api', () => ({
     ProgramsApi: {
@@ -145,13 +145,13 @@ describe('ProgramModal', () => {
 
     const addModeProps: ProgramModalProps = {
         ...baseProps,
-        mode: 'add',
+        mode: ModalMode.Add,
         onAddProgram: mockOnAddProgram,
     };
 
     const editModeProps: ProgramModalProps = {
         ...baseProps,
-        mode: 'edit',
+        mode: ModalMode.Edit,
         programToEdit: mockProgram,
         onEditProgram: mockOnEditProgram,
     };

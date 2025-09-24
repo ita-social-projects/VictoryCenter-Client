@@ -5,7 +5,6 @@ import { Program } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { ReactComponent as BlankImage } from '../../../../../assets/icons/blank-image.svg';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import './ProgramListItem.scss';
 
 export interface ProgramListItemProps {
     program: Program;

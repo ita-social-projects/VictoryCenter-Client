@@ -47,8 +47,9 @@ jest.mock('../team-member-modals/team-member-modal/TeamMemberModal', () => ({
     TeamMemberModal: (props: any) => {
         if (!props.isOpen) return null;
 
-        const isAddMode = props.mode === 'add';
-        const isEditMode = props.mode === 'edit';
+        const { ModalMode } = require('../../../../../types/admin/common');
+        const isAddMode = props.mode === ModalMode.Add;
+        const isEditMode = props.mode === ModalMode.Edit;
 
         return (
             <div data-testid={isAddMode ? 'add-member-modal' : 'edit-member-modal'}>

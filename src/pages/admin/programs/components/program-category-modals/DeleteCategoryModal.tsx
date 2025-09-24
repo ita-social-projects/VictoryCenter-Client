@@ -5,9 +5,10 @@ import { HintBox } from '../../../../../components/admin/hint-box/HintBox';
 import { SingleSelectInputGroup } from '../../../../../components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import './ProgramCategoryModal.scss';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 interface DeleteCategoryModalProps {
     isOpen: boolean;
@@ -17,6 +18,7 @@ interface DeleteCategoryModalProps {
 }
 
 export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categories }: DeleteCategoryModalProps) => {
+    const client = useAdminClient();
     const [categoryId, setCategoryId] = useState<number>(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
@@ -31,7 +33,7 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
         try {
             setIsSubmitting(true);
 
-            await ProgramsApi.deleteProgramCategory(selectedCategory.id);
+            await ProgramsCategoriesApi.deleteProgramCategory(selectedCategory.id, client);
 
             onDeleteCategory(selectedCategory.id);
             setCategoryId(0);

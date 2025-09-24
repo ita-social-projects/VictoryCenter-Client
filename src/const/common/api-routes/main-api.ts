@@ -13,6 +13,13 @@ export const API_ROUTES = {
         CATEGORIES: 'Categories',
         PUBLISHED: 'team/published',
     },
+    PROGRAMS: {
+        BASE: 'Programs',
+        PUBLISHED: 'Programs/published',
+    },
+    PROGRAMCATEGORY: {
+        BASE: 'ProgramCategory',
+    },
     PAYMENTS: {
         DONATE: 'payments/donate',
     },

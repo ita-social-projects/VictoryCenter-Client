@@ -54,10 +54,9 @@ describe('SupportSection component', () => {
 
         const cards = screen.getAllByTestId('swiper-slide');
         for (let i = 0; i < cards.length; i++) {
-            expect(screen.getByAltText(`${ABOUT_US_DATA.SUPPORT_DATA[i].ALT}`)).toHaveAttribute(
-                'src',
-                ABOUT_US_DATA.SUPPORT_DATA[i].IMG,
-            );
+            const image = screen.getByAltText(`${ABOUT_US_DATA.SUPPORT_DATA[i].ALT}`);
+
+            expect(image).toHaveAttribute('src', ABOUT_US_DATA.SUPPORT_DATA[i].IMG);
         }
     });
 

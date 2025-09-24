@@ -22,7 +22,7 @@ export const OurMission = ({ content, description, className, navigate = true }:
             <div className="what-we-do">
                 <h2 className="mission-title">{ABOUT_US_DATA.WHAT_WE_DO}</h2>
                 <div className="details-block">
-                    <p className="mission-details">{description ? description : descriptionValue}</p>
+                    <p className="mission-details">{description ?? descriptionValue}</p>
                     <NavLink to={navigate ? PUBLIC_ROUTES.PROGRAMS.FULL : ''} className="link-to-programs">
                         <div className="link-block">
                             <span className="link-title">{ABOUT_US_DATA.GO_TO_PROGRAMS}</span>

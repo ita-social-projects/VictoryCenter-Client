@@ -58,8 +58,9 @@ describe('MainValues component', () => {
         expect(cards).toHaveLength(3);
 
         for (let i = 0; i < cards.length; i++) {
-            const image = ABOUT_US_DATA.PEOPLE_DATA[i].ALT;
-            expect(screen.getByAltText(image)).toHaveAttribute('src', ABOUT_US_DATA.PEOPLE_DATA[i].IMG);
+            const image = screen.getByAltText(ABOUT_US_DATA.PEOPLE_DATA[i].ALT);
+
+            expect(image).toHaveAttribute('src', ABOUT_US_DATA.PEOPLE_DATA[i].IMG);
         }
     });
 
@@ -71,6 +72,7 @@ describe('MainValues component', () => {
         for (let i = 0; i < cards.length; i++) {
             const image = screen.getByAltText(ABOUT_US_DATA.PEOPLE_DATA[i].ALT);
             const description = screen.getByText(`${Content[i].description}`);
+
             expect(image).toHaveAttribute('src', Content[i].image?.url);
             expect(description).toBeInTheDocument();
         }

@@ -3,9 +3,9 @@
 .about-us {
 	&-loader {
         width: 70%;
-        margin-bottom: 4rem;
         position: relative;
         z-index: 10;
+		  margin: 8rem auto 4rem;
 	}
 
 	&-error-message {

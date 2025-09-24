@@ -26,6 +26,7 @@ export const AboutUsPage = () => {
             try {
                 const sections = await AboutUsApi.get(axiosInstance);
                 setSections(sections);
+                setError(null);
             } catch (error) {
                 setSections([]);
                 setError(ABOUT_US_DATA.DOWNLOAD_ERROR);

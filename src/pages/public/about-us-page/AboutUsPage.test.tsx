@@ -1,7 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { AboutUsPage } from './AboutUsPage';
+import { before } from 'lodash';
+import { AboutUsApi } from '../../../services/api/public/about-us/about-us-api';
 
-jest.mock('./intro-section/IntroSection', () => ({
+jest.mock('./intro-section/AboutUsIntro', () => ({
     AboutUsIntro: () => <div data-testid="intro-section">Intro Section</div>,
 }));
 jest.mock('./our-mission/OurMission', () => ({
@@ -22,16 +24,42 @@ jest.mock('./main-value/MainValue', () => ({
 jest.mock('./donate-section/DonateSection', () => ({
     DonateSection: () => <div data-testid="donate-section">Donate Section</div>,
 }));
+jest.mock('../../../services/api/public/about-us/about-us-api');
 
 describe('AboutUsPage', () => {
-    it('should render IntroSection', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('should render loader when data is loading', () => {
+        (AboutUsApi.get as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
         render(<AboutUsPage />);
-        expect(screen.getByTestId('intro-section')).toBeInTheDocument();
-        expect(screen.getByTestId('mission-section')).toBeInTheDocument();
-        expect(screen.getByTestId('support-section')).toBeInTheDocument();
-        expect(screen.getByTestId('values-section')).toBeInTheDocument();
-        expect(screen.getByTestId('team-section')).toBeInTheDocument();
-        expect(screen.getByTestId('main-values-section')).toBeInTheDocument();
-        expect(screen.getByTestId('donate-section')).toBeInTheDocument();
+
+        expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    });
+
+    it('should render all sections', async () => {
+        render(<AboutUsPage />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('intro-section')).toBeInTheDocument();
+            expect(screen.getByTestId('mission-section')).toBeInTheDocument();
+            expect(screen.getByTestId('support-section')).toBeInTheDocument();
+            expect(screen.getByTestId('values-section')).toBeInTheDocument();
+            expect(screen.getByTestId('team-section')).toBeInTheDocument();
+            expect(screen.getByTestId('main-values-section')).toBeInTheDocument();
+            expect(screen.getByTestId('donate-section')).toBeInTheDocument();
+        });
+    });
+
+    it('should show error message when there is an error in fetching data', async () => {
+        (AboutUsApi.get as jest.Mock).mockRejectedValue(new Error('some error'));
+
+        render(<AboutUsPage />);
+
+        await waitFor(() => {
+            expect(screen.getByRole('alert')).toBeInTheDocument();
+        });
     });
 });

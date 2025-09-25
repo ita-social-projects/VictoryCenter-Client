@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { languages } from '../../../const/common/languages';
 import i18n from '../../../i18n';

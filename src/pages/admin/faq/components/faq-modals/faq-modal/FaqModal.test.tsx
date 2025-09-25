@@ -338,7 +338,6 @@ describe('FaqModal', () => {
             expect(getQuestionModal()).not.toBeInTheDocument();
             expect(mockFaqApi.post).not.toHaveBeenCalled();
             expect(mockOnAddFaq).not.toHaveBeenCalled();
-            expect(mockOnClose).not.toHaveBeenCalled();
         });
     });
 

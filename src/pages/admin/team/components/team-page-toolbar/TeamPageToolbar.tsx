@@ -6,26 +6,61 @@ import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar'
 import { Button } from '../../../../../components/admin/button/Button';
 import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
 import './TeamPageToolbar.scss';
+import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
+import { TeamMemberSearchItem } from '../../../../../components/admin/search-bar/team-member-search-item/TeamMemberSearchItem';
+import { forwardRef, useMemo } from 'react';
+import {
+    SearchItemContentRef,
+    SearchItemContentRenderProps,
+} from '../../../../../components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
 
 export interface TeamPageToolbarProps {
     onSearchQueryChange: (query: string) => void;
     onStatusFilterChange: (status: VisibilityStatus | undefined) => void;
     onAddMember: () => void;
+    searchItems: TeamMember[];
+    isSearchLoading: boolean;
+    searchHasMore: boolean;
+    onSearchLoadMore: () => void;
+    categories: TeamCategory[];
 }
+const TeamMemberItemRenderer = forwardRef<
+    SearchItemContentRef,
+    SearchItemContentRenderProps<TeamMember> & { categories: TeamCategory[] }
+>(({ categories, ...props }, ref) => <TeamMemberSearchItem {...props} categories={categories} ref={ref} />);
 
-export const TeamPageToolbar = ({ onSearchQueryChange, onStatusFilterChange, onAddMember }: TeamPageToolbarProps) => {
+const createItemRenderer = (categories: TeamCategory[]) =>
+    forwardRef<SearchItemContentRef, SearchItemContentRenderProps<TeamMember>>((props, ref) => (
+        <TeamMemberItemRenderer {...props} categories={categories} ref={ref} />
+    ));
+
+export const TeamPageToolbar = ({
+    onSearchQueryChange,
+    onStatusFilterChange,
+    onAddMember,
+    searchItems,
+    isSearchLoading,
+    searchHasMore,
+    onSearchLoadMore,
+    categories,
+}: TeamPageToolbarProps) => {
+    const itemRenderer = useMemo(() => createItemRenderer(categories), [categories]);
+
     return (
         <div className="toolbar" data-testid="team-page-toolbar">
             <div>
-                <SearchBar<string>
-                    getSearchItemKey={(suggestion) => suggestion}
-                    hasMore={false}
-                    searchItems={[]}
-                    onLoadMore={() => {}}
+                <SearchBar<TeamMember>
+                    searchItems={searchItems}
+                    isLoading={isSearchLoading}
+                    hasMore={searchHasMore}
+                    onLoadMore={onSearchLoadMore}
                     onQueryChange={onSearchQueryChange}
-                    isLoading={false}
-                    getSearchItemLabel={(suggestion) => suggestion}
-                    onSearchItemSelect={(_) => {}}
+                    getSearchItemKey={(m) => m.id}
+                    getSearchItemLabel={(m) => m.fullName}
+                    onSearchItemSelect={() => {
+                        /* TODO: Implement search item select */
+                    }}
+                    renderSearchItemComponent={itemRenderer}
                     placeholder={TEAM_MEMBERS_TEXT.SEARCH.INPUT_FULLNAME}
                     notFoundMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
                     minCharactersToSearch={UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH}

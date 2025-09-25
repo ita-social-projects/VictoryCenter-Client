@@ -202,14 +202,6 @@ victory-center-client
 
 ## Available Scripts
 
-In the project directory, you can run:
-
-# Setup
-
-To setup this project use this command in project folder:
-
-### `npm install`
-
 ### `npm start`
 
 Runs the app in the development mode.\

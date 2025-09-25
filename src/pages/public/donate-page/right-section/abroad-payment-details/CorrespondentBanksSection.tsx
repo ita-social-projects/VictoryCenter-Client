@@ -1,6 +1,7 @@
 import { ABROAD_PAYMENT_DETAILS, CORRESPONDENT_BANKS } from '../../../../../const/public/donate-page';
 import { CorrespondentBankBlock } from './CorrespondentBankBlock';
-import { Currency, currencyToString } from '../../../../../types/public/donate-page';
+import { Currency } from '../../../../../types/public/donate-page';
+import { currencyToString } from '../../../../../utils/functions/mappers/public/donate';
 
 type CorrespondentBankCurrency = keyof typeof CORRESPONDENT_BANKS;
 

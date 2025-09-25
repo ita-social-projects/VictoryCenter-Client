@@ -2,27 +2,16 @@ export const COMMON_TEXT_ADMIN = {
     TAB: {
         TEAM_MEMBERS: 'Команда',
         PROGRAMS: 'Програми',
+        FAQ: 'Часті питання',
     },
 
     ALT: {
-        DELETE: 'Видалити',
-        UPLOAD: 'Завантажити',
-        SCROLL_TO_TOP: 'Прокрутити вгору',
-        NOT_FOUND: 'Не знайдено',
-        EXPAND_OPTIONS_LIST: 'Відкрити список опцій',
-        COLLAPSE_OPTIONS_LIST: 'Закрити список опцій',
-        OPTION_SELECTED: 'Опцію вибрано',
-        OPTION_NOT_SELECTED: 'Опцію не вибрано',
-        SHOW_TOOLTIP: 'Показати підказку',
-        HIDE_TOOLTIP: 'ховати підказку',
-        HINT: 'Підказка',
-        OPEN_MENU: 'Відкрити меню',
-        CLOSE_MENU: 'Закрити меню',
         IMAGE_PREVIEW: "Прев'ю зображення",
     },
 
     INPUT: {
-        PHOTO_PLACEHOLDER: 'Перетягніть файл сюди або натисніть для завантаження',
+        IMAGE_PLACEHOLDER: 'Перетягніть файл сюди або натисніть для завантаження',
+        UPLOAD_IMAGE: 'Upload image',
     },
 
     STATUS: {
@@ -69,6 +58,7 @@ export const COMMON_TEXT_ADMIN = {
         SAVE_AS_DRAFT: 'Зберегти як чернетку',
         SAVE_AS_PUBLISHED: 'Опублікувати',
         TRY_AGAIN: 'Спробувати ще раз',
+        EXIT: 'Вихід',
     },
 };
 

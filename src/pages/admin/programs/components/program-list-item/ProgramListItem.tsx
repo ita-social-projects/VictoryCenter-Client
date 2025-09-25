@@ -1,11 +1,10 @@
 import { ButtonTooltip } from '../../../../../components/admin/button-tooltip/ButtonTooltip';
 import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
-import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
+import './ProgramListItem.scss';
 import { Program } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { ReactComponent as BlankImage } from '../../../../../assets/icons/blank-image.svg';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import './ProgramListItem.scss';
 
 export interface ProgramListItemProps {
     program: Program;
@@ -18,8 +17,8 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
         <div className="program-item">
             <div className="program-info">
                 <div className="program-info-identity">
-                    {program.img ? (
-                        <img src={mapImageToBase64(program.img) || undefined} alt={`${program.name}-img`} />
+                    {program.img && 'url' in program.img ? (
+                        <img src={program.img.url} alt={`${program.name}-img`} />
                     ) : (
                         <BlankImage className="program-info-identity-blank-image" />
                     )}

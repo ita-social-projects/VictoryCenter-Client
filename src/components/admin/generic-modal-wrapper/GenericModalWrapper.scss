@@ -1,0 +1,11 @@
+@use '../../../assets/sass/variables/colors';
+
+.modal-content-error-container {
+    width: 100%;
+    margin: 0.5rem;
+    text-align: center;
+    color: colors.$error;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+}

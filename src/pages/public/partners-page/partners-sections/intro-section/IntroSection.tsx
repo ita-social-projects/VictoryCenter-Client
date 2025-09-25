@@ -1,6 +1,5 @@
-import React from 'react';
 import './IntroSection.scss';
-import background from '../../../../../assets/partners-page-images/horses.png';
+import background from '../../../../../assets/images/public/partners-page/horses.png';
 import { PARTNERS_PAGE_SUBTITLE, PARTNERS_PAGE_TITLE } from '../../../../../const/public/partners-page';
 
 export const IntroSection = () => {

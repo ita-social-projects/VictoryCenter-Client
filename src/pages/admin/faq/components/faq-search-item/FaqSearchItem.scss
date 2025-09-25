@@ -1,0 +1,49 @@
+@use '../../../../../assets/sass/variables/colors';
+
+.faq-search-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    overflow: hidden;
+    padding: 0.25rem 0.5rem;
+}
+
+.faq-search-item__name,
+.faq-search-item__pages {
+    display: block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.faq-search-item__name {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.faq-search-item__pages {
+    font-size: 0.875rem;
+    margin-top: 0.125rem;
+    color: colors.$grey-900;
+}
+
+.faq-search-item-tooltip__name,
+.faq-search-item-tooltip__pages {
+    display: block;
+    width: 100%;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.faq-search-item-tooltip__name {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.faq-search-item-tooltip__pages {
+    font-size: 0.875rem;
+    margin-top: 0.125rem;
+    color: colors.$grey-900;
+}

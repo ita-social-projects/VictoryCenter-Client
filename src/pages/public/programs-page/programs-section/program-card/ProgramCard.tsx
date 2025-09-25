@@ -1,9 +1,7 @@
 import React from 'react';
 import { PublishedProgramDto } from '../../../../../types/public/programs-page';
-import arrowBlack from '../../../../../assets/icons/arrow-up-right.svg';
-import arrowYellow from '../../../../../assets/icons/arrow-up-right-yellow.svg';
+import { ReactComponent as ArrowIcon } from '../../../../../assets/icons/arrow-up-right.svg';
 import './ProgramCard.scss';
-import { mapImageToBase64 } from '../../../../../utils/functions/map-image-to-base-64/map-image-to-base-64';
 
 interface ProgramCardProps {
     program: PublishedProgramDto;
@@ -11,7 +9,7 @@ interface ProgramCardProps {
 export const ProgramCard = ({ program }: ProgramCardProps) => {
     return (
         <div className="card-block">
-            <img src={mapImageToBase64(program.image)!} alt={program.name} className="card-img" />
+            <img src={program.image?.url} alt={program.name} className="card-img" />
             <div className="card-content">
                 <div className="subtitle-info">
                     <div className="subtitle-content">
@@ -20,8 +18,7 @@ export const ProgramCard = ({ program }: ProgramCardProps) => {
                             <h2 className="program-title">{program.categories.map((x) => x.name).join(', ')}</h2>
                         </div>
                         <div className="arrow-container">
-                            <img src={arrowYellow} alt="" className="hover-img" />
-                            <img src={arrowBlack} alt="" className="default-img" />
+                            <ArrowIcon className="arrow-icon" />
                         </div>
                     </div>
                 </div>

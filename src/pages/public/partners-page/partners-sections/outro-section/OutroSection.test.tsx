@@ -1,9 +1,8 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { OutroSection } from './OutroSection';
 
-jest.mock('../../../../../assets/partners-page-images/outro.mp4', () => 'mocked-outro-video');
+jest.mock('../../../../../assets/videos/public/partners-page/outro.mp4', () => 'mocked-outro-video');
 
 jest.mock('../../../../../const/public/partners-page', () => ({
     OUTRO: {

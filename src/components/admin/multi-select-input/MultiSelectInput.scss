@@ -43,7 +43,7 @@
         color: colors.$grey-700;
 
         &--has-value {
-            color: colors.$blue-500;
+            color: colors.$blue-900;
         }
     }
 
@@ -107,6 +107,6 @@
         font-size: 1rem;
         font-weight: 400;
         line-height: 1.5rem;
-        color: colors.$grey-900;
+        color: colors.$blue-500;
     }
 }

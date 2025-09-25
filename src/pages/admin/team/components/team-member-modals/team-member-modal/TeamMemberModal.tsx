@@ -1,17 +1,16 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { MemberForm, TeamMemberFormRef, TeamMemberFormValues } from '../../member-form/MemberForm';
 import { TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { TeamCategory, TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { VisibilityStatus } from '../../../../../../types/admin/common';
 import { TeamMembersApi } from '../../../../../../services/api/admin/team/team-members/team-members-api';
-import '../TeamMemberModal.scss';
 import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
 import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
+import { VisibilityStatus, PendingAction, ModalMode } from '../../../../../../types/admin/common';
 
 interface TeamMemberModalProps {
-    mode: 'add' | 'edit';
+    mode: ModalMode;
     isOpen: boolean;
     onClose: () => void;
     onAddMember?: (memberData: TeamMember) => void;
@@ -30,7 +29,7 @@ export const TeamMemberModal = ({
     categories,
 }: TeamMemberModalProps) => {
     const client = useAdminClient();
-    const isEditMode = mode === 'edit';
+    const isEditMode = mode === ModalMode.Edit;
     const onSuccess = isEditMode ? onEditMember : onAddMember;
 
     const modalConfig = useMemo(
@@ -45,38 +44,34 @@ export const TeamMemberModal = ({
                     ? await TeamMembersApi.updateMember(client, data.id!, data)
                     : await TeamMembersApi.postMember(client, data);
             },
-            getConfirmTitle: (
-                mode: 'add' | 'edit',
-                member: TeamMember | undefined,
-                pendingAction: 'publish' | 'draft' | null,
-            ) => {
-                if (mode === 'edit' && member) {
+            getConfirmTitle: (mode: ModalMode, member: TeamMember | undefined, pendingAction: PendingAction | null) => {
+                if (mode === ModalMode.Edit && member) {
                     if (member.status === VisibilityStatus.Published)
-                        return pendingAction === 'draft'
+                        return pendingAction === PendingAction.Draft
                             ? COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION
                             : COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES;
-                    return pendingAction === 'draft'
+                    return pendingAction === PendingAction.Draft
                         ? COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES
                         : TEAM_MEMBERS_TEXT.QUESTION.PUBLISH_MEMBER;
                 }
-                return pendingAction === 'draft'
+                return pendingAction === PendingAction.Draft
                     ? TEAM_MEMBERS_TEXT.QUESTION.DRAFT_MEMBER
                     : TEAM_MEMBERS_TEXT.QUESTION.PUBLISH_MEMBER;
             },
-            getErrorMessage: (mode: 'add' | 'edit') => {
-                return mode === 'edit'
+            getErrorMessage: (mode: ModalMode) => {
+                return mode === ModalMode.Edit
                     ? TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_MEMBER
                     : TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_MEMBER;
             },
-            getFormKey: (mode: 'add' | 'edit', member?: TeamMember) => {
-                return mode === 'edit' && member?.id ? member.id : 'add';
+            getFormKey: (mode: ModalMode, member?: TeamMember) => {
+                return mode === ModalMode.Edit && member?.id ? member.id : 'add';
             },
             transformFormData: (
                 formData: TeamMemberFormValues,
                 status: VisibilityStatus,
                 member?: TeamMember,
             ): TeamMemberCreateUpdateRequest => ({
-                id: mode === 'edit' && member ? member.id : null,
+                id: mode === ModalMode.Edit && member ? member.id : null,
                 fullName: formData.fullName,
                 categoryId: formData.categoryId,
                 description: formData.description,
@@ -98,7 +93,7 @@ export const TeamMemberModal = ({
             description: memberToEdit.description,
             categoryId: memberToEdit.categoryId,
             image: memberToEdit.image,
-            imageId: memberToEdit.image?.id ?? null,
+            imageId: memberToEdit.image && 'id' in memberToEdit.image ? memberToEdit.image.id : null,
         };
     }, [memberToEdit, isEditMode]);
 

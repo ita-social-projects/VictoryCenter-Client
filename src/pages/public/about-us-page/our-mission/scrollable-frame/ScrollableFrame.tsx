@@ -2,10 +2,8 @@ import './ScrollableFrame.scss';
 import { Swiper, SwiperSlide, SwiperClass } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
 import { useState, useEffect, useRef } from 'react';
-import arrowRightWhite from '../../../../../assets/icons/arrow-right-white.svg';
-import arrowLeftWhite from '../../../../../assets/icons/arrow-left-white.svg';
-import arrowRightBlack from '../../../../../assets/icons/arrow-right.svg';
-import arrowLeftBlack from '../../../../../assets/icons/arrow-left.svg';
+import { ReactComponent as ArrowRight } from '../../../../../assets/icons/arrow-right.svg';
+import { ReactComponent as ArrowLeft } from '../../../../../assets/icons/arrow-left.svg';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -64,12 +62,10 @@ export const ScrollableFrame = () => {
 
             <div className="button-container">
                 <button onClick={handlePrev} className="arrow-button">
-                    <img src={arrowLeftWhite} alt="" className="arrow-normal-state" />
-                    <img src={arrowLeftBlack} alt="" className="arrow-hover-state" />
+                    <ArrowLeft className="arrow-icon" />
                 </button>
                 <button onClick={handleNext} className="arrow-button">
-                    <img src={arrowRightWhite} alt="" className="arrow-normal-state" />
-                    <img src={arrowRightBlack} alt="" className="arrow-hover-state" />
+                    <ArrowRight className="arrow-icon" />
                 </button>
             </div>
 

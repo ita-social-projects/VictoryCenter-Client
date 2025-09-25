@@ -2,7 +2,6 @@ import React, { useState, useRef, useCallback, useId } from 'react';
 import { ReactComponent as InfoIcon } from '../../../assets/icons/info.svg';
 import { Tooltip, TooltipPosition } from '../tooltip/Tooltip';
 import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/useOnClickOutside';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './ButtonTooltip.scss';
 
 export interface ButtonTooltipProps {
@@ -41,10 +40,7 @@ export const ButtonTooltip = ({ children, position = 'bottom' }: ButtonTooltipPr
             aria-label="Show additional information"
             aria-describedby={isVisible ? tooltipId : undefined}
         >
-            <InfoIcon
-                className="button-tooltip-icon"
-                aria-label={isVisible ? COMMON_TEXT_ADMIN.ALT.HIDE_TOOLTIP : COMMON_TEXT_ADMIN.ALT.SHOW_TOOLTIP}
-            />
+            <InfoIcon className="button-tooltip-icon" />
 
             {isVisible && (
                 <Tooltip

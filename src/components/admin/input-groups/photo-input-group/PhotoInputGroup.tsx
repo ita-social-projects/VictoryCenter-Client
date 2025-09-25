@@ -1,10 +1,10 @@
 import React from 'react';
 import { InputLabel, InputLabelProps } from '../../input-label/InputLabel';
 import { InputError, InputErrorProps } from '../../input-error/InputError';
-import { PhotoInput, PhotoInputProps } from '../../photo-input/PhotoInput';
+import { ImageInput, ImageInputProps } from '../../image-input/ImageInput';
 import '../input-group.scss';
 
-export interface PhotoInputGroupProps extends PhotoInputProps {
+export interface PhotoInputGroupProps extends ImageInputProps {
     label: InputLabelProps['text'];
     isRequired?: InputLabelProps['isRequired'];
     error?: InputErrorProps['error'];
@@ -25,7 +25,7 @@ export const PhotoInputGroup = ({
     return (
         <div className="input-group">
             <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
-            <PhotoInput id={id} name={name} value={value} onChange={onChange} onBlur={onBlur} disabled={disabled} />
+            <ImageInput id={id} name={name} value={value} onChange={onChange} onBlur={onBlur} disabled={disabled} />
             <InputError error={error} />
         </div>
     );

@@ -32,9 +32,8 @@ jest.mock('../../../../../components/common/single-select-input/SingleSelectInpu
     },
 }));
 
-// Mock PhotoInput to a simple button that injects an image value
-jest.mock('../../../../../components/admin/photo-input/PhotoInput', () => ({
-    PhotoInput: ({ onChange, disabled }: any) => (
+jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
+    ImageInput: ({ onChange, disabled }: any) => (
         <div>
             <button
                 type="button"

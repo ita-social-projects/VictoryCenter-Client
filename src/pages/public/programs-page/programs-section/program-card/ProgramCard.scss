@@ -77,27 +77,12 @@
 
                     .arrow-icon {
                         position: absolute;
-
-                        transition: fill 0.3s ease;
-                    }
-
-                    .default-img {
-                        position: absolute;
                         height: 1.5rem;
                         width: 1.5rem;
-                        top: 25%;
-                        left: 25%;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
                         transition: all 0.3s ease;
-                    }
-
-                    .hover-img {
-                        position: absolute;
-                        height: 3rem;
-                        width: 3rem;
-                        top: 0;
-                        right: 0;
-                        transition: all 0.3s ease;
-                        opacity: 0;
                     }
                 }
             }
@@ -114,8 +99,14 @@
     }
 
     &:hover {
-        .hover-img {
-            opacity: 1 !important;
+        .arrow-icon {
+            transform: translate(0, 0);
+            height: 3rem !important;
+            width: 3rem !important;
+
+            path {
+                stroke: colors.$yellow-600;
+            }
         }
 
         .card-img {
@@ -124,10 +115,6 @@
 
         .card-content {
             height: 45%;
-        }
-
-        .default-img {
-            opacity: 0;
         }
     }
 }

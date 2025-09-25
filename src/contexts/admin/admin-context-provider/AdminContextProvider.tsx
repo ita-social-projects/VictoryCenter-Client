@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { createContext, useContext, useMemo, ReactNode, useState, useCallback, useRef } from 'react';
-import { loginRequest, tokenRefreshRequest } from '../../../services/api/admin/login/login-api';
+import { loginRequest, tokenRefreshRequest, logoutRequest } from '../../../services/api/admin/login/login-api';
 import { API_ROUTES } from '../../../const/common/api-routes/main-api';
 import { Credentials } from '../../../types/admin/auth';
 import { isAccessTokenValid } from '../../../services/auth/auth-service/auth-service';
@@ -43,7 +43,8 @@ export const AdminContextProvider = ({ children }: Props) => {
         [updateToken],
     );
 
-    const logout = useCallback(() => {
+    const logout = useCallback(async () => {
+        await logoutRequest(tokenRef.current);
         updateToken('');
     }, [updateToken]);
 
@@ -55,11 +56,15 @@ export const AdminContextProvider = ({ children }: Props) => {
     // silent refresh on mount
     useOnMountUnsafe(() => {
         (async () => {
-            try {
-                await refreshAccessToken();
-            } catch {
-                logout();
-            } finally {
+            if (window.location.pathname.startsWith('/admin')) {
+                try {
+                    await refreshAccessToken();
+                } catch {
+                    logout();
+                } finally {
+                    setIsLoading(false);
+                }
+            } else {
                 setIsLoading(false);
             }
         })();

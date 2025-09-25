@@ -2,14 +2,32 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DeleteCategoryModal } from './DeleteCategoryModal';
-import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { InputLabelProps } from '../../../../../components/admin/input-label/InputLabel';
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramCategory } from '../../../../../types/admin/programs';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+
+jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
+}));
+
+const mockedAdminClient = useAdminClient as jest.Mock;
+
+beforeEach(() => {
+    mockedAdminClient.mockReturnValue({
+        client: {
+            get: jest.fn().mockReturnValue(Object),
+            post: jest.fn().mockReturnValue(Object),
+            put: jest.fn().mockReturnValue(Object),
+            delete: jest.fn().mockReturnValue(Object),
+        },
+    });
+});
 
 jest.mock('../../../../../services/api/admin/programs/programs-api');
-const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
+const mockedProgramsCategoriesApi = ProgramsCategoriesApi as jest.Mocked<typeof ProgramsCategoriesApi>;
 
 jest.mock('../../../../../components/admin/input-label/InputLabel', () => ({
     InputLabel: ({ htmlFor, text, isRequired }: InputLabelProps) => (
@@ -98,7 +116,7 @@ describe('DeleteCategoryModal', () => {
     };
 
     const expectDeleteApiCalled = (categoryId: number) => {
-        expect(mockedProgramsApi.deleteProgramCategory).toHaveBeenCalledWith(categoryId);
+        expect(mockedProgramsCategoriesApi.deleteProgramCategory).toHaveBeenCalledWith(categoryId, expect.any(Object));
     };
 
     beforeEach(() => {
@@ -135,7 +153,7 @@ describe('DeleteCategoryModal', () => {
     });
 
     it('should handle successful category deletion', async () => {
-        mockedProgramsApi.deleteProgramCategory.mockResolvedValue(undefined);
+        mockedProgramsCategoriesApi.deleteProgramCategory.mockResolvedValue(undefined);
         renderDeleteCategoryModal();
 
         clickDeleteButton();
@@ -149,7 +167,7 @@ describe('DeleteCategoryModal', () => {
     });
 
     it('should handle failed deletion and show an error message', async () => {
-        mockedProgramsApi.deleteProgramCategory.mockRejectedValue(new Error('API Error'));
+        mockedProgramsCategoriesApi.deleteProgramCategory.mockRejectedValue(new Error('API Error'));
         renderDeleteCategoryModal();
 
         clickDeleteButton();
@@ -185,7 +203,7 @@ describe('DeleteCategoryModal', () => {
         const longRunningPromise = new Promise<void>((resolve) => {
             resolveRequest = resolve;
         });
-        mockedProgramsApi.deleteProgramCategory.mockReturnValue(longRunningPromise);
+        mockedProgramsCategoriesApi.deleteProgramCategory.mockReturnValue(longRunningPromise);
 
         renderDeleteCategoryModal();
 
@@ -208,7 +226,7 @@ describe('DeleteCategoryModal', () => {
     });
 
     it('should clear the error message when the modal re-opens', async () => {
-        mockedProgramsApi.deleteProgramCategory.mockRejectedValue(new Error('API error'));
+        mockedProgramsCategoriesApi.deleteProgramCategory.mockRejectedValue(new Error('API error'));
         const { rerender } = renderDeleteCategoryModal();
 
         clickDeleteButton();

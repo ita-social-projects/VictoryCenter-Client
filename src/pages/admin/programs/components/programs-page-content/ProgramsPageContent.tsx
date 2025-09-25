@@ -7,16 +7,16 @@ import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/
 import { ProgramListItem } from '../program-list-item/ProgramListItem';
 import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
 import { useCategoriesCounter } from '../../../../../hooks/admin/use-categories-counter/useCategoriesCounter';
-import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsApi, ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { RequestOptions } from '../../../../../types/common/api';
 import { useDataFetch } from '../../../../../hooks/admin/fetch/use-data-fetch/useDataFetch';
 import {
     PaginationRequestParams,
     useDataPaginationFetch,
 } from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import './ProgramsPageContent.scss';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { AdminPanelToolbar } from '../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { ProgramSearchItem } from '../program-search-item/ProgramSearchItem';
 
@@ -31,6 +31,7 @@ interface ErrorState {
 export const ProgramsPageContent = () => {
     const [selectedCategory, setSelectedCategory] = useState<ProgramCategory | null>(null);
     const [pageSize, setPageSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
+    const client = useAdminClient();
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [searchProgramId, setSearchProgramId] = useState<number | undefined>();
     const [isSearchResultView, setIsSearchResultView] = useState(false);
@@ -42,31 +43,38 @@ export const ProgramsPageContent = () => {
     const { incrementCategoriesCount, decrementCategoriesCount, updateCategoriesCount } = useCategoriesCounter();
 
     // Fetch functions
-    const getProgramCategories = useCallback(async (options: RequestOptions) => {
-        return ProgramsApi.fetchProgramCategories(options);
-    }, []);
+    const getProgramCategories = useCallback(async () => {
+        const categories = await ProgramsCategoriesApi.fetchProgramCategories(client);
+
+        return categories.map((category) => ({
+            ...category,
+            programsCount: category.programsCount ? category.programsCount : 0,
+        }));
+    }, [client]);
 
     const getFilteredPrograms = useCallback(
         async (params: PaginationRequestParams): Promise<PaginationResult<Program>> => {
             if (!selectedCategory) {
                 return { items: [], totalItemsCount: 0 };
             }
-
-            return ProgramsApi.fetchPrograms(selectedCategory.id, params, statusFilter);
+            return ProgramsApi.fetchPrograms(
+                client,
+                selectedCategory.id,
+                params.offset as number,
+                params.limit as number,
+                statusFilter,
+            );
         },
-        [selectedCategory, statusFilter],
+        [selectedCategory, statusFilter, client],
     );
 
-    const getSearchedProgram = useCallback(
-        async (options: RequestOptions): Promise<Program | null> => {
-            if (!searchProgramId) {
-                return null;
-            }
+    const getSearchedProgram = useCallback(async (): Promise<Program | null> => {
+        if (!searchProgramId) {
+            return null;
+        }
 
-            return ProgramsApi.fetchProgramById(searchProgramId, options);
-        },
-        [searchProgramId],
-    );
+        return ProgramsApi.fetchProgramById(searchProgramId, client);
+    }, [searchProgramId, client]);
 
     const getProgramId = useCallback((program: Program) => program.id, []);
 
@@ -385,7 +393,14 @@ export const ProgramsPageContent = () => {
                 <AdminPanelToolbar<ProgramSearchItemData>
                     getSearchItemKey={(item) => item.id}
                     getSearchItemLabel={(item) => item.name}
-                    fetchSearchItems={ProgramsApi.fetchProgramSearchItems}
+                    fetchSearchItems={(searchTerm, requestOptions) =>
+                        ProgramsApi.fetchProgramSearchItems(
+                            client,
+                            searchTerm,
+                            requestOptions.offset as number,
+                            requestOptions.limit as number,
+                        )
+                    }
                     renderSearchItemComponent={ProgramSearchItem}
                     placeholder={PROGRAMS_TEXT.PLACEHOLDER.SEARCH_PROGRAMS}
                     onSearchClear={handleSearchClear}

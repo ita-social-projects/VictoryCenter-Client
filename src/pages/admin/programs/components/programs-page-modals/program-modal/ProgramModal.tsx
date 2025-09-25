@@ -7,6 +7,7 @@ import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
 import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
 import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
+import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 interface BaseProps {
     isOpen: boolean;
@@ -29,6 +30,7 @@ export type ProgramModalProps = AddModalProps | EditModalProps;
 
 export const ProgramModal = (props: ProgramModalProps) => {
     const { isOpen, onClose, mode, categories } = props;
+    const client = useAdminClient();
     const isEditMode = mode === ModalMode.Edit;
     const program = isEditMode ? props.programToEdit : undefined;
     const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
@@ -41,7 +43,9 @@ export const ProgramModal = (props: ProgramModalProps) => {
             entity: program,
             onSuccess: onSuccess || (() => {}),
             apiCall: async (data: ProgramCreateUpdate) => {
-                return isEditMode ? await ProgramsApi.editProgram(data) : await ProgramsApi.addProgram(data);
+                return isEditMode
+                    ? await ProgramsApi.editProgram(data, client)
+                    : await ProgramsApi.addProgram(client, data);
             },
             getConfirmTitle: (mode: ModalMode, program: Program | undefined, pendingAction: PendingAction | null) => {
                 if (mode === ModalMode.Edit && program) {
@@ -78,7 +82,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 categoryIds: formData.categories.map((x) => x.id),
             }),
         }),
-        [isEditMode, isOpen, mode, onClose, onSuccess, program],
+        [isEditMode, isOpen, mode, onClose, onSuccess, program, client],
     );
 
     const modalHookData = useGenericModal<ProgramFormValues, Program, ProgramFormRef>(modalConfig);
@@ -89,7 +93,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
         return {
             name: program.name,
             description: program.description,
-            categories: program.categories,
+            categories: program.categories.map((c) => ({ ...c, programsCount: c.programsCount ?? 0 })),
             img: program.img,
             imgId: program.img && 'id' in program.img ? program.img.id : null,
         };

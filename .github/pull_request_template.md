@@ -4,11 +4,11 @@
 
 ## Description
 
-<!--- Please decripe the main goal of this PR and why it was created --->
+<!--- Please describe the main goal of this PR and why was it created --->
 
 ## How it looks
 
-<!--- Please provide iamges(screenshots or screen recording) of changes --->
+<!--- Please provide images (screenshots or screen recording) of changes --->
 
 ## Summary of change
 
@@ -16,13 +16,13 @@
 
 ## How to recreate changes
 
-<!--- Please provide short instruction step-by-step how to see changes that was implemented by this PR --->
+<!--- Please provide short step-by-step instructions on how to see changes that were implemented by this PR --->
 
 ## CHECK LIST
 
-- [ ] New tests was added or existing was modified
-- [ ] Changes has severe impact on users
-- [ ] Changes has medium impact on users
-- [ ] Changes has light impact on users
-- [ ] Test covetage was updated
+- [ ] New tests were added or existing were modified
+- [ ] Changes have severe impact on users
+- [ ] Changes have medium impact on users
+- [ ] Changes have light impact on users
+- [ ] Test coverage was updated
 - [ ] PR meets all conventions

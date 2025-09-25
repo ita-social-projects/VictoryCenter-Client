@@ -50,6 +50,10 @@ export const TEAM_CATEGORY_TEXT = {
     },
 };
 
+export const TEAM_SEARCH = {
+    SUGGESTIONS_PAGE_SIZE: 5,
+};
+
 export const TEAM_MEMBER_VALIDATION = {
     fullName: {
         min: 2,

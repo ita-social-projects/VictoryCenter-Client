@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { Header } from './Header';
 import { MemoryRouter } from 'react-router';
 import { PUBLIC_ROUTES } from '../../../const/public/routes';
-import { CONTACT_US, DONATE, HOW_TO_SUPPORT, PROGRAMS, REPORTING } from '../../../const/public/header';
+import headerUk from '../../../locales/uk/header.json';
 
 jest.mock('./Header.scss', () => ({}));
 
@@ -35,16 +35,25 @@ describe('Header', () => {
     it('renders nav links with correct text and href', () => {
         render(<Header />, { wrapper: MemoryRouter });
 
-        expect(screen.getByRole('link', { name: PROGRAMS })).toHaveAttribute('href', PUBLIC_ROUTES.PROGRAMS.FULL);
-        expect(screen.getByRole('link', { name: REPORTING })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
-        expect(screen.getByRole('link', { name: HOW_TO_SUPPORT })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
+        expect(screen.getByRole('link', { name: headerUk['PROGRAMS'] })).toHaveAttribute(
+            'href',
+            PUBLIC_ROUTES.PROGRAMS.FULL,
+        );
+        expect(screen.getByRole('link', { name: headerUk['REPORTING'] })).toHaveAttribute(
+            'href',
+            PUBLIC_ROUTES.MOCK.FULL,
+        );
+        expect(screen.getByRole('link', { name: headerUk['HOW_TO_SUPPORT'] })).toHaveAttribute(
+            'href',
+            PUBLIC_ROUTES.MOCK.FULL,
+        );
     });
 
     it('renders Contact Us and Donate buttons', () => {
         render(<Header />, { wrapper: MemoryRouter });
 
-        expect(screen.getByRole('button', { name: CONTACT_US })).toBeInTheDocument();
-        const donateLink = screen.getByRole('link', { name: DONATE });
+        expect(screen.getByRole('button', { name: headerUk['CONTACT_US'] })).toBeInTheDocument();
+        const donateLink = screen.getByRole('link', { name: headerUk['DONATE'] });
         expect(donateLink).toBeInTheDocument();
         expect(donateLink).toHaveAttribute('href', PUBLIC_ROUTES.DONATE.FULL);
     });
@@ -52,7 +61,7 @@ describe('Header', () => {
     it('check if Contact Us button is clicked', () => {
         render(<Header />, { wrapper: MemoryRouter });
 
-        const contactUsBtn = screen.getByRole('button', { name: CONTACT_US });
+        const contactUsBtn = screen.getByRole('button', { name: headerUk['CONTACT_US'] });
         fireEvent.click(contactUsBtn);
 
         // eslint-disable-next-line no-console

@@ -2,14 +2,18 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-import aboutUsPageEn from './locales/en/about-us.json';
-import aboutUsPageUk from './locales/uk/about-us.json';
+import { headerUk, footerUk, aboutUsPageUk } from './locales/uk';
+import { headerEn, footerEn, aboutUsPageEn } from './locales/en';
 
 const resources = {
     uk: {
+        header: headerUk,
+        footer: footerUk,
         aboutUsPage: aboutUsPageUk,
     },
     en: {
+        header: headerEn,
+        footer: footerEn,
         aboutUsPage: aboutUsPageEn,
     },
 };
@@ -23,7 +27,7 @@ if (!isTest) {
 i18n.use(initReactI18next).init({
     resources,
     fallbackLng: 'uk',
-    ns: ['aboutUsPage'], // namespaces
+    ns: ['header', 'footer', 'aboutUsPage'], // namespaces
     defaultNS: 'aboutUsPage',
     interpolation: {
         escapeValue: false, // leave it for React

@@ -1,11 +1,13 @@
 import 'i18next';
-import aboutUsPage from '../../locales/uk/about-us.json';
+import { headerUk, footerUk, aboutUsPageUk } from '../../locales/uk';
 
 declare module 'i18next' {
     interface CustomTypeOptions {
         // inferring types automatically (such as arrays of objects)
         resources: {
-            aboutUsPage: typeof aboutUsPage;
+            header: typeof headerUk;
+            footer: typeof footerUk;
+            aboutUsPage: typeof aboutUsPageUk;
         };
     }
 }

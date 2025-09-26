@@ -1,10 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import {
-    FAILED_TO_LOAD_THE_PROGRAMS,
-    PROGRAMS_FOR_KIDS,
-    PROGRAMS_FOR_VETERANS,
-    PROGRAMS_ALL,
-} from '../../../../const/public/programs-page';
 import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
 import { ProgramCard } from './program-card/ProgramCard';
 import { PublishedProgram } from '../../../../types/public/programs-page';
@@ -12,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import './ProgramsSection.scss';
 
 export const ProgramsSection: React.FC = () => {
-    const { t } = useTranslation('footer');
+    const { t } = useTranslation(['programsPage', 'footer']);
 
     const [programData, setProgramData] = useState<PublishedProgram[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -24,7 +18,7 @@ export const ProgramsSection: React.FC = () => {
                 setProgramData(response.programData);
                 setError(null);
             } catch {
-                setError(FAILED_TO_LOAD_THE_PROGRAMS);
+                setError(t('FAILED_TO_LOAD_THE_PROGRAMS'));
                 setProgramData([]);
             }
         })();
@@ -35,9 +29,9 @@ export const ProgramsSection: React.FC = () => {
             <div className="menu-block">
                 <h2>{t('PROGRAMS')}</h2>
                 <div className="button-block">
-                    <button className="white-button">{PROGRAMS_FOR_KIDS}</button>
-                    <button className="white-button">{PROGRAMS_FOR_VETERANS}</button>
-                    <button className="black-button">{PROGRAMS_ALL}</button>
+                    <button className="white-button">{t('PROGRAMS_FOR_KIDS')}</button>
+                    <button className="white-button">{t('PROGRAMS_FOR_VETERANS')}</button>
+                    <button className="black-button">{t('PROGRAMS_ALL')}</button>
                 </div>
             </div>
             <div className="cards-block">

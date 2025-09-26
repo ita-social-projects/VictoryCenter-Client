@@ -1,5 +1,5 @@
 import 'i18next';
-import { headerUk, footerUk, aboutUsPageUk } from '../../locales/uk';
+import { headerUk, footerUk, aboutUsPageUk, programsPageUk } from '../../locales/uk';
 
 declare module 'i18next' {
     interface CustomTypeOptions {
@@ -8,6 +8,7 @@ declare module 'i18next' {
             header: typeof headerUk;
             footer: typeof footerUk;
             aboutUsPage: typeof aboutUsPageUk;
+            programsPage: typeof programsPageUk;
         };
     }
 }

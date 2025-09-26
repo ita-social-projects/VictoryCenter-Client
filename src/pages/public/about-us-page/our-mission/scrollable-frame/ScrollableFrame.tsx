@@ -1,4 +1,3 @@
-import './ScrollableFrame.scss';
 import { Swiper, SwiperSlide, SwiperClass } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
 import { useState, useEffect, useRef } from 'react';
@@ -8,12 +7,15 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
-import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../../const/public/programs-page';
 import { PublishedProgram } from '../../../../../types/public/programs-page';
 import { programPageDataFetch } from '../../../../../services/api/public/programs/programs-api';
 import { ProgramCard } from '../../../programs-page/programs-section/program-card/ProgramCard';
+import { useTranslation } from 'react-i18next';
+import './ScrollableFrame.scss';
 
 export const ScrollableFrame = () => {
+    const { t } = useTranslation('programsPage');
+
     const [programData, setProgramData] = useState<PublishedProgram[]>([]);
     const [error, setError] = useState<string | null>(null);
     const swiperRef = useRef<SwiperClass | null>(null);
@@ -33,7 +35,7 @@ export const ScrollableFrame = () => {
                 setProgramData(response.programData);
                 setError(null);
             } catch {
-                setError(FAILED_TO_LOAD_THE_PROGRAMS);
+                setError(t('FAILED_TO_LOAD_THE_PROGRAMS'));
                 setProgramData([]);
             }
         })();

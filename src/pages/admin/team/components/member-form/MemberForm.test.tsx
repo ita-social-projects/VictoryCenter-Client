@@ -113,7 +113,7 @@ describe('MemberForm', () => {
         fireEvent.change(screen.getByLabelText(/Ім'я та Прізвище/), {
             target: { value: 'Jane Doe' },
         });
-        
+
         // Add valid description for draft
         fireEvent.change(screen.getByLabelText(/Опис/), {
             target: { value: 'Valid description text' },

@@ -64,7 +64,8 @@ describe('teamMemberValidationSchema', () => {
         });
 
         it('rejects description with multiple spaces when publishing', () => {
-            const descriptionWithMultipleSpaces = 'Valid text    with multiple spaces but long enough to pass min length';
+            const descriptionWithMultipleSpaces =
+                'Valid text    with multiple spaces but long enough to pass min length';
             expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(descriptionWithMultipleSpaces, true)).toBe(
                 TEAM_MEMBER_VALIDATION.description.getMultipleSpacesError(),
             );

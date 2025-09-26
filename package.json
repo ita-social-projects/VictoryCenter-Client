@@ -34,6 +34,11 @@
         "web-vitals": "^2.1.4",
         "yup": "^1.6.1"
     },
+    "overrides": {
+        "react-scripts": {
+            "typescript": "^5.9.2"
+        }
+    },
     "scripts": {
         "start": "react-scripts start",
         "start-with-cert": "node scripts/start-in-dev-over-https.mjs",

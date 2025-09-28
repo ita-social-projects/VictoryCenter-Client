@@ -1,5 +1,5 @@
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { TEAM_MEMBERS_TEXT, TEAM_SEARCH } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '../../../../../const/admin/common';
 import { Select } from '../../../../../components/admin/select/Select';
 import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
@@ -23,6 +23,9 @@ export interface TeamPageToolbarProps {
     searchHasMore: boolean;
     onSearchLoadMore: () => void;
     categories: TeamCategory[];
+    onSearchItemSelect: (item: TeamMember) => void;
+    onSearchClear: () => void;
+    statusResetKey?: number;
 }
 const TeamMemberItemRenderer = forwardRef<
     SearchItemContentRef,
@@ -43,6 +46,9 @@ export const TeamPageToolbar = ({
     searchHasMore,
     onSearchLoadMore,
     categories,
+    onSearchItemSelect,
+    onSearchClear,
+    statusResetKey,
 }: TeamPageToolbarProps) => {
     const itemRenderer = useMemo(() => createItemRenderer(categories), [categories]);
 
@@ -57,18 +63,21 @@ export const TeamPageToolbar = ({
                     onQueryChange={onSearchQueryChange}
                     getSearchItemKey={(m) => m.id}
                     getSearchItemLabel={(m) => m.fullName}
-                    onSearchItemSelect={() => {
-                        /* TODO: Implement search item select */
-                    }}
+                    onSearchItemSelect={onSearchItemSelect}
                     renderSearchItemComponent={itemRenderer}
                     placeholder={TEAM_MEMBERS_TEXT.SEARCH.INPUT_FULLNAME}
                     notFoundMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
-                    minCharactersToSearch={UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH}
+                    minCharactersToSearch={TEAM_SEARCH.MIN_CHARACTERS_TO_SEARCH}
                     searchDelayMs={UI_CONFIG.SEARCH_BAR.SEARCH_DELAY_MS}
+                    onClear={onSearchClear}
                 />
             </div>
             <div className="toolbar-actions">
-                <Select<VisibilityStatus | undefined> onValueChange={onStatusFilterChange} data-testid="status-filter">
+                <Select<VisibilityStatus | undefined>
+                    key={statusResetKey}
+                    onValueChange={onStatusFilterChange}
+                    data-testid="status-filter"
+                >
                     <Select.Option key={1} value={undefined} name={COMMON_TEXT_ADMIN.FILTER.STATUS.ALL} />
                     <Select.Option<VisibilityStatus>
                         key={2}

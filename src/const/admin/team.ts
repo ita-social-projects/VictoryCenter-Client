@@ -52,6 +52,7 @@ export const TEAM_CATEGORY_TEXT = {
 
 export const TEAM_SEARCH = {
     SUGGESTIONS_PAGE_SIZE: 5,
+    MIN_CHARACTERS_TO_SEARCH: 2,
 };
 
 export const TEAM_MEMBER_VALIDATION = {

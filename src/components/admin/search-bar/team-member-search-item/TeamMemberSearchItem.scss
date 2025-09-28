@@ -1,0 +1,87 @@
+@use '../../../../assets/sass/variables/colors';
+@use '../../../../assets/sass/variables/fonts';
+
+.team-member-search-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    background: transparent;
+
+    &__avatar {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 26.67px;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: colors.$grey-200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    &__initials {
+        font-family: fonts.$mulish-regular-font;
+        font-size: 0.875rem;
+        line-height: 1;
+        color: colors.$blue-900;
+    }
+
+    &__info {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    &__name {
+        font-family: fonts.$mulish-regular-font;
+        font-weight: 400;
+        font-style: normal;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: -2%;
+        color: colors.$blue-900;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__subtitle {
+        font-family: fonts.$mulish-regular-font;
+        font-weight: 400;
+        font-style: normal;
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: -2%;
+        color: colors.$grey-900;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__tooltip {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    &__tooltip-name {
+        font-family: fonts.$mulish-regular-font;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: -2%;
+        color: colors.$blue-900;
+    }
+    &__tooltip-subtitle {
+        font-family: fonts.$mulish-regular-font;
+        font-size: 14px;
+        line-height: 20px;
+        letter-spacing: -2%;
+        color: colors.$grey-900;
+    }
+}

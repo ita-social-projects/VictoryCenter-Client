@@ -1,0 +1,78 @@
+import React, { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import { SearchItemContentRef, SearchItemContentRenderProps } from '../search-item-wrapper/SearchItemWrapper';
+import { TeamMember, TeamCategory } from '../../../../types/admin/team-members';
+import './TeamMemberSearchItem.scss';
+
+export type TeamMemberSearchItemProps = SearchItemContentRenderProps<TeamMember> & {
+    categories: TeamCategory[];
+};
+
+export const TeamMemberSearchItem = forwardRef<SearchItemContentRef, TeamMemberSearchItemProps>(
+    ({ item, isSearchItemActive, isSearchItemHovered, categories }, ref) => {
+        const nameRef = useRef<HTMLDivElement>(null);
+        const subtitleRef = useRef<HTMLDivElement>(null);
+
+        const categoryName = useMemo(
+            () => categories.find((c) => c.id === item.categoryId)?.name ?? '',
+            [categories, item.categoryId],
+        );
+
+        const imageUrl = useMemo(() => {
+            const img = item.image as any;
+            return img && typeof img === 'object' && 'url' in img ? (img.url as string) : null;
+        }, [item.image]);
+
+        const initials = useMemo(() => {
+            return item.fullName
+                .split(' ')
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((s) => s[0])
+                .join('')
+                .toUpperCase();
+        }, [item.fullName]);
+
+        useImperativeHandle(ref, () => ({
+            getTooltipContent: () => {
+                const nameOverflow = nameRef.current && nameRef.current.scrollWidth > nameRef.current.clientWidth;
+                const subOverflow =
+                    subtitleRef.current && subtitleRef.current.scrollWidth > subtitleRef.current.clientWidth;
+
+                if (nameOverflow || subOverflow) {
+                    return (
+                        <div className="team-member-search-item__tooltip">
+                            <div className="team-member-search-item__tooltip-name">{item.fullName}</div>
+                            {categoryName && (
+                                <div className="team-member-search-item__tooltip-subtitle">{categoryName}</div>
+                            )}
+                        </div>
+                    );
+                }
+                return null;
+            },
+        }));
+
+        return (
+            <div className="team-member-search-item" data-active={isSearchItemActive || isSearchItemHovered}>
+                <div className="team-member-search-item__avatar" aria-hidden="true">
+                    {imageUrl ? (
+                        <img src={imageUrl} alt="" className="team-member-search-item__img" />
+                    ) : (
+                        <span className="team-member-search-item__initials">{initials}</span>
+                    )}
+                </div>
+                <div className="team-member-search-item__info">
+                    <div ref={nameRef} className="team-member-search-item__name" title={item.fullName}>
+                        {item.fullName}
+                    </div>
+                    {categoryName && (
+                        <div ref={subtitleRef} className="team-member-search-item__subtitle" title={categoryName}>
+                            {categoryName}
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    },
+);
+TeamMemberSearchItem.displayName = 'TeamMemberSearchItem';

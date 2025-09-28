@@ -59,6 +59,8 @@ export const TeamPageContent = () => {
     const [searchSuggestions, setSearchSuggestions] = useState<TeamMember[]>([]);
     const [isSearchLoading, setIsSearchLoading] = useState(false);
     const [hasMoreSearch, setHasMoreSearch] = useState(false);
+    const [selectedSearchMember, setSelectedSearchMember] = useState<TeamMember | null>(null);
+    const [statusResetTick, setStatusResetTick] = useState(0);
 
     const listContainerRef = useRef<HTMLDivElement>(null);
     const currentItemsCountRef = useRef<number>(0);
@@ -98,6 +100,14 @@ export const TeamPageContent = () => {
         [updateModalState],
     );
 
+    const isSingleView = !!selectedSearchMember;
+    const itemsToRender = useMemo(() => {
+        if (isSingleView && selectedCategory && selectedSearchMember?.categoryId === selectedCategory.id) {
+            return [selectedSearchMember];
+        }
+        return members;
+    }, [isSingleView, selectedCategory, selectedSearchMember, members]);
+
     const resetMembersState = useCallback(() => {
         setMembers([]);
         setHasMore(true);
@@ -107,6 +117,9 @@ export const TeamPageContent = () => {
         totalItemsCountRef.current = null;
         isMembersLoadingRef.current = false;
         hasMoreRef.current = true;
+
+        abortControllerRef.current?.abort();
+        abortControllerRef.current = null;
     }, [clearError]);
 
     const fetchCategories = useCallback(async () => {
@@ -378,17 +391,11 @@ export const TeamPageContent = () => {
 
     useEffect(() => {
         selectedCategoryRef.current = selectedCategory;
-        if (selectedCategory) {
-            resetMembersState();
-        }
-    }, [selectedCategory, resetMembersState]);
-
-    useEffect(() => {
-        if (selectedCategory) {
+        if (selectedCategory && !selectedSearchMember) {
             resetMembersState();
             fetchMembers(true);
         }
-    }, [statusFilter, selectedCategory, statusFilter, fetchMembers, resetMembersState]);
+    }, [selectedCategory, statusFilter, selectedSearchMember, resetMembersState, fetchMembers]);
 
     const handleAddMember = useCallback(
         (member: TeamMember) => {
@@ -439,6 +446,25 @@ export const TeamPageContent = () => {
         [updateModalState],
     );
 
+    const handleSearchItemSelect = useCallback(
+        (member: TeamMember) => {
+            setSelectedSearchMember(member);
+            setStatusFilter(undefined);
+            setStatusResetTick((t) => t + 1);
+            const cat = categories.find((c) => c.id === member.categoryId) || null;
+            if (cat) setSelectedCategory(cat);
+        },
+        [categories],
+    );
+    const handleSearchClearSelection = useCallback(() => {
+        const wasSelected = selectedSearchMember !== null;
+        setSelectedSearchMember(null);
+        setStatusFilter(undefined);
+        setStatusResetTick((t) => t + 1);
+        resetMembersState();
+        if (!wasSelected) fetchMembers(true);
+    }, [selectedSearchMember, resetMembersState, fetchMembers]);
+
     const renderMemberItem = useCallback(
         (member: TeamMember) => (
             <DraggableListItem
@@ -474,6 +500,9 @@ export const TeamPageContent = () => {
                     searchHasMore={hasMoreSearch}
                     onSearchLoadMore={loadMoreSearchSuggestions}
                     categories={categories}
+                    onSearchItemSelect={handleSearchItemSelect}
+                    onSearchClear={handleSearchClearSelection}
+                    statusResetKey={statusResetTick}
                 />
             </div>
 
@@ -497,7 +526,7 @@ export const TeamPageContent = () => {
                 )}
 
                 <InfiniteScrollList<TeamMember>
-                    items={members}
+                    items={itemsToRender}
                     renderItem={renderMemberItem}
                     onLoadMore={fetchMembers}
                     hasMore={hasMore}

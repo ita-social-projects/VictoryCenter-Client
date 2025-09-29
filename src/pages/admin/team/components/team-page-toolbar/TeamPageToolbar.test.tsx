@@ -45,6 +45,13 @@ describe('TeamPageToolbar', () => {
                 onSearchQueryChange={onSearchQueryChange}
                 onStatusFilterChange={jest.fn()}
                 onAddMember={jest.fn()}
+                searchItems={[]}
+                isSearchLoading={false}
+                searchHasMore={false}
+                onSearchLoadMore={jest.fn()}
+                categories={[]}
+                onSearchItemSelect={jest.fn()}
+                onSearchClear={jest.fn()}
             />,
         );
 
@@ -64,6 +71,13 @@ describe('TeamPageToolbar', () => {
                 onSearchQueryChange={jest.fn()}
                 onStatusFilterChange={onStatusFilterChange}
                 onAddMember={jest.fn()}
+                searchItems={[]}
+                isSearchLoading={false}
+                searchHasMore={false}
+                onSearchLoadMore={jest.fn()}
+                categories={[]}
+                onSearchItemSelect={jest.fn()}
+                onSearchClear={jest.fn()}
             />,
         );
 
@@ -95,6 +109,13 @@ describe('TeamPageToolbar', () => {
                 onSearchQueryChange={jest.fn()}
                 onStatusFilterChange={jest.fn()}
                 onAddMember={onAddMember}
+                searchItems={[]}
+                isSearchLoading={false}
+                searchHasMore={false}
+                onSearchLoadMore={jest.fn()}
+                categories={[]}
+                onSearchItemSelect={jest.fn()}
+                onSearchClear={jest.fn()}
             />,
         );
 
@@ -103,5 +124,50 @@ describe('TeamPageToolbar', () => {
 
         fireEvent.click(addBtn);
         expect(onAddMember).toHaveBeenCalled();
+    });
+
+    it('calls onSearchClear when clear button clicked', () => {
+        const onSearchClear = jest.fn();
+        render(
+            <TeamPageToolbar
+                onSearchQueryChange={jest.fn()}
+                onStatusFilterChange={jest.fn()}
+                onAddMember={jest.fn()}
+                searchItems={[]}
+                isSearchLoading={false}
+                searchHasMore={false}
+                onSearchLoadMore={jest.fn()}
+                categories={[]}
+                onSearchItemSelect={jest.fn()}
+                onSearchClear={onSearchClear}
+            />,
+        );
+        fireEvent.click(screen.getByTestId('clear-button'));
+        expect(onSearchClear).toHaveBeenCalled();
+    });
+    it('calls onSearchQueryChange after debounce when typing 2+ chars', () => {
+        jest.useFakeTimers();
+        const onSearchQueryChange = jest.fn();
+        render(
+            <TeamPageToolbar
+                onSearchQueryChange={onSearchQueryChange}
+                onStatusFilterChange={jest.fn()}
+                onAddMember={jest.fn()}
+                searchItems={[]}
+                isSearchLoading={false}
+                searchHasMore={false}
+                onSearchLoadMore={jest.fn()}
+                categories={[]}
+                onSearchItemSelect={jest.fn()}
+                onSearchClear={jest.fn()}
+            />,
+        );
+        const input = screen.getByPlaceholderText(TEAM_MEMBERS_TEXT.SEARCH.INPUT_FULLNAME);
+        fireEvent.change(input, { target: { value: 'John' } });
+        act(() => {
+            jest.advanceTimersByTime(300);
+        });
+        expect(onSearchQueryChange).toHaveBeenLastCalledWith('John');
+        jest.useRealTimers();
     });
 });

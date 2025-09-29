@@ -34,8 +34,9 @@ export const TeamMembersApi = {
     search: async (
         client: AxiosInstance,
         fullName: string,
-        offset: number = 0,
-        limit: number = 5,
+        offset = 0,
+        limit = 5,
+        signal?: AbortSignal,
     ): Promise<PaginationResult<TeamMember>> => {
         const params: Record<string, any> = { fullName };
         if (offset !== undefined && offset !== null) {
@@ -44,8 +45,7 @@ export const TeamMembersApi = {
         if (limit !== undefined && limit !== null) {
             params.limit = Math.floor(limit);
         }
-        const response = await client.get<PaginationResult<TeamMember>>(`${API_ROUTES.TEAM.SEARCH}`, { params });
-
+        const response = await client.get<PaginationResult<TeamMember>>(API_ROUTES.TEAM.BASE, { params, signal });
         return response.data;
     },
 

@@ -500,7 +500,13 @@ describe('TeamPageContent', () => {
             typeInSearchInput('ab');
 
             await waitFor(() => {
-                expect(mockTeamMembersApi.search).toHaveBeenCalledWith(expect.any(Object), 'ab', 0, expect.any(Number));
+                expect(mockTeamMembersApi.search).toHaveBeenCalledWith(
+                    expect.any(Object),
+                    'ab',
+                    0,
+                    expect.any(Number),
+                    expect.any(AbortSignal),
+                );
             });
         });
 

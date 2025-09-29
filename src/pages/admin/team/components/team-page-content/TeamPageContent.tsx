@@ -244,6 +244,7 @@ export const TeamPageContent = () => {
             if (trimmed.length < 2) {
                 return;
             }
+            const localQuery = trimmed;
 
             searchAbortControllerRef.current?.abort();
             const abortController = new AbortController();
@@ -251,8 +252,8 @@ export const TeamPageContent = () => {
 
             setIsSearchLoading(true);
             try {
-                const res = await TeamMembersApi.search(client, trimmed, 0, PAGE_SIZE);
-                if (abortController.signal.aborted) return;
+                const res = await TeamMembersApi.search(client, trimmed, 0, PAGE_SIZE, abortController.signal);
+                if (searchQueryRef.current !== localQuery) return;
 
                 setSearchSuggestions(res.items);
                 searchPageRef.current = 1;

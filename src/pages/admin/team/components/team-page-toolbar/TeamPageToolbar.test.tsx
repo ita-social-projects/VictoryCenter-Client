@@ -17,9 +17,12 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
         onClear,
         placeholder,
         searchItems = [],
-        renderSearchItemComponent,
+        renderSearchItemComponent: view,
         getSearchItemKey,
+        getSearchItemLabel,
         onSearchItemSelect,
+        hasMore,
+        onLoadMore,
     }: SearchBarProps<ProgramSearchItemData>) => (
         <div>
             <input
@@ -31,18 +34,24 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
                 Clear
             </button>
             <ul data-testid="search-results">
-                {renderSearchItemComponent &&
+                {view &&
                     searchItems.map((item: any, index: number) => {
                         const key = getSearchItemKey ? getSearchItemKey(item) : index;
+                        const View = view as any;
+                        const label = getSearchItemLabel ? getSearchItemLabel(item) : '';
                         return (
                             <li key={key} onClick={() => onSearchItemSelect?.(item)}>
-                                <div data-testid="search-item" data-item={JSON.stringify(item)} data-index={index}>
-                                    {item?.fullName ?? ''} ({index})
-                                </div>
+                                <span data-testid="search-label">{label}</span>
+                                <View item={item} index={index} />
                             </li>
                         );
                     })}
             </ul>
+            {hasMore ? (
+                <button onClick={onLoadMore} data-testid="load-more">
+                    Load more
+                </button>
+            ) : null}
         </div>
     ),
 }));
@@ -224,9 +233,74 @@ describe('TeamPageToolbar', () => {
             />,
         );
 
+        const label = screen.getByTestId('search-label');
+        expect(label).toHaveTextContent('John Doe');
+
         const item = screen.getByTestId('team-member-item');
         expect(item).toHaveTextContent('John Doe - 1');
         fireEvent.click(item);
         expect(onSearchItemSelect).toHaveBeenCalledWith(searchItems[0]);
+    });
+
+    it('calls onSearchLoadMore when hasMore is true', () => {
+        const onSearchLoadMore = jest.fn();
+        render(
+            <TeamPageToolbar
+                onSearchQueryChange={jest.fn()}
+                onStatusFilterChange={jest.fn()}
+                onAddMember={jest.fn()}
+                searchItems={[]}
+                isSearchLoading={false}
+                searchHasMore={true}
+                onSearchLoadMore={onSearchLoadMore}
+                categories={[]}
+                onSearchItemSelect={jest.fn()}
+                onSearchClear={jest.fn()}
+            />,
+        );
+
+        const loadMore = screen.getByTestId('load-more');
+        fireEvent.click(loadMore);
+        expect(onSearchLoadMore).toHaveBeenCalled();
+    });
+
+    it('updates rendered item when categories change', () => {
+        const categories1 = [{ id: 'c1', name: 'Category 1' } as any];
+        const categories2 = [{ id: 'c1', name: 'Category 1' } as any, { id: 'c2', name: 'Category 2' } as any];
+        const searchItems = [{ id: '1', fullName: 'Jane Roe' } as any];
+
+        const { rerender } = render(
+            <TeamPageToolbar
+                onSearchQueryChange={jest.fn()}
+                onStatusFilterChange={jest.fn()}
+                onAddMember={jest.fn()}
+                searchItems={searchItems}
+                isSearchLoading={false}
+                searchHasMore={false}
+                onSearchLoadMore={jest.fn()}
+                categories={categories1}
+                onSearchItemSelect={jest.fn()}
+                onSearchClear={jest.fn()}
+            />,
+        );
+
+        expect(screen.getByTestId('team-member-item')).toHaveTextContent('Jane Roe - 1');
+
+        rerender(
+            <TeamPageToolbar
+                onSearchQueryChange={jest.fn()}
+                onStatusFilterChange={jest.fn()}
+                onAddMember={jest.fn()}
+                searchItems={searchItems}
+                isSearchLoading={false}
+                searchHasMore={false}
+                onSearchLoadMore={jest.fn()}
+                categories={categories2}
+                onSearchItemSelect={jest.fn()}
+                onSearchClear={jest.fn()}
+            />,
+        );
+
+        expect(screen.getByTestId('team-member-item')).toHaveTextContent('Jane Roe - 2');
     });
 });

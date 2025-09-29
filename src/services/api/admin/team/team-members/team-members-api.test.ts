@@ -58,19 +58,15 @@ describe('TeamMembersApi', () => {
     });
 
     describe('search', () => {
-        const localClient = {
-            get: jest.fn(),
-        } as unknown as jest.Mocked<AxiosInstance>;
-
         beforeEach(() => {
             jest.clearAllMocks();
-            localClient.get.mockResolvedValue({ data: { items: [], totalItemsCount: 0 } });
+            mockClient.get.mockResolvedValue({ data: { items: [], totalItemsCount: 0 } });
         });
 
         it('uses defaults offset=0, limit=5 and forwards AbortSignal', async () => {
             const ctrl = new AbortController();
-            await TeamMembersApi.search(localClient, 'John Doe', undefined, undefined, ctrl.signal);
-            expect(localClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
+            await TeamMembersApi.search(mockClient, 'John Doe', undefined, undefined, ctrl.signal);
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
                 params: { fullName: 'John Doe', offset: 0, limit: 5 },
                 signal: ctrl.signal,
             });
@@ -78,24 +74,24 @@ describe('TeamMembersApi', () => {
 
         it('respects provided offset and limit and forwards signal', async () => {
             const ctrl = new AbortController();
-            await TeamMembersApi.search(localClient, 'Jane', 20, 10, ctrl.signal);
-            expect(localClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
+            await TeamMembersApi.search(mockClient, 'Jane', 20, 10, ctrl.signal);
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
                 params: { fullName: 'Jane', offset: 20, limit: 10 },
                 signal: ctrl.signal,
             });
         });
 
         it('includes offset=0 when offset is undefined (default) and floors decimal limit', async () => {
-            await TeamMembersApi.search(localClient, 'Alex', undefined as any, 7.9 as any);
-            expect(localClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
+            await TeamMembersApi.search(mockClient, 'Alex', undefined as any, 7.9 as any);
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
                 params: { fullName: 'Alex', offset: 0, limit: 7 },
                 signal: undefined,
             });
         });
 
         it('accepts edge values 0 for offset and limit', async () => {
-            await TeamMembersApi.search(localClient, 'Edge', 0, 0);
-            expect(localClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
+            await TeamMembersApi.search(mockClient, 'Edge', 0, 0);
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
                 params: { fullName: 'Edge', offset: 0, limit: 0 },
                 signal: undefined,
             });
@@ -103,8 +99,8 @@ describe('TeamMembersApi', () => {
 
         it('returns response data as-is', async () => {
             const payload = { items: [{ id: 1, fullName: 'Rita' }], totalItemsCount: 1 };
-            (localClient.get as jest.Mock).mockResolvedValueOnce({ data: payload });
-            const result = await TeamMembersApi.search(localClient, 'Rita', 0, 5);
+            (mockClient.get as jest.Mock).mockResolvedValueOnce({ data: payload });
+            const result = await TeamMembersApi.search(mockClient, 'Rita', 0, 5);
             expect(result).toEqual(payload);
         });
     });

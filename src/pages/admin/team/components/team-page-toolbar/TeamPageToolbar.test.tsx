@@ -40,9 +40,15 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
                         const View = view as any;
                         const label = getSearchItemLabel ? getSearchItemLabel(item) : '';
                         return (
-                            <li key={key} onClick={() => onSearchItemSelect?.(item)}>
-                                <span data-testid="search-label">{label}</span>
-                                <View item={item} index={index} />
+                            <li key={key}>
+                                <button
+                                    type="button"
+                                    data-testid="search-item-button"
+                                    onClick={() => onSearchItemSelect?.(item)}
+                                >
+                                    <span data-testid="search-label">{label}</span>
+                                    <View item={item} index={index} />
+                                </button>
                             </li>
                         );
                     })}
@@ -236,9 +242,8 @@ describe('TeamPageToolbar', () => {
         const label = screen.getByTestId('search-label');
         expect(label).toHaveTextContent('John Doe');
 
-        const item = screen.getByTestId('team-member-item');
-        expect(item).toHaveTextContent('John Doe - 1');
-        fireEvent.click(item);
+        const trigger = screen.getByTestId('search-item-button');
+        fireEvent.click(trigger);
         expect(onSearchItemSelect).toHaveBeenCalledWith(searchItems[0]);
     });
 

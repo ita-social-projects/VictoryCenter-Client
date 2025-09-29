@@ -15,7 +15,7 @@ export const mockPrograms: Program[] = [
         description: 'Зменшення рівня стресу, тривоги та ПТСР у ветеранів, розвиток внутрішньої сили та опори.',
         categories: [mockCategories[0]],
         status: VisibilityStatus.Published,
-        img: null,
+        image: null,
     },
     {
         id: 2,
@@ -24,7 +24,7 @@ export const mockPrograms: Program[] = [
             'Покращення комунікаційних навичок, моторики та соціалізації для дітей з розладами спектру аутизму.',
         categories: [mockCategories[1], mockCategories[2]],
         status: VisibilityStatus.Draft,
-        img: null,
+        image: null,
     },
     {
         id: 3,
@@ -33,7 +33,7 @@ export const mockPrograms: Program[] = [
             'Програма для військових з фізичними травмами: підтримка рухливості, баланс, м’язова стабільність.',
         categories: [mockCategories[0]],
         status: VisibilityStatus.Published,
-        img: null,
+        image: null,
     },
     {
         id: 4,
@@ -41,7 +41,7 @@ export const mockPrograms: Program[] = [
         description: 'Розвиток уваги, емоційної стабільності та впевненості через взаємодію з кіньми в ігровій формі.',
         categories: [mockCategories[1]],
         status: VisibilityStatus.Draft,
-        img: null,
+        image: null,
     },
     {
         id: 5,
@@ -50,7 +50,7 @@ export const mockPrograms: Program[] = [
             'Повернення відчуття контролю та безпеки, адаптація до мирного життя через тілесно-орієнтовану терапію.',
         categories: [mockCategories[0], mockCategories[2]],
         status: VisibilityStatus.Published,
-        img: null,
+        image: null,
     },
     {
         id: 6,
@@ -58,7 +58,7 @@ export const mockPrograms: Program[] = [
         description: 'Покращення координації, зменшення м’язової спастики та розвиток моторики у дітей з ДЦП.',
         categories: [mockCategories[1], mockCategories[2]],
         status: VisibilityStatus.Published,
-        img: null,
+        image: null,
     },
     {
         id: 7,
@@ -66,7 +66,7 @@ export const mockPrograms: Program[] = [
         description: 'Розвиток довіри, емоційної безпеки та самоповаги через контакт із тваринами.',
         categories: [mockCategories[1]],
         status: VisibilityStatus.Draft,
-        img: null,
+        image: null,
     },
     {
         id: 8,
@@ -75,7 +75,7 @@ export const mockPrograms: Program[] = [
             'Підтримка когнітивного та емоційного розвитку у дітей із синдромом Дауна через рухову активність.',
         categories: [mockCategories[1], mockCategories[2]],
         status: VisibilityStatus.Published,
-        img: null,
+        image: null,
     },
     {
         id: 9,
@@ -83,7 +83,7 @@ export const mockPrograms: Program[] = [
         description: 'Зменшення тривоги, агресії, повернення до мирного ритму життя.',
         categories: [mockCategories[0]],
         status: VisibilityStatus.Draft,
-        img: null,
+        image: null,
     },
     {
         id: 10,
@@ -91,7 +91,7 @@ export const mockPrograms: Program[] = [
         description: 'Розвиток навичок співпраці, самоконтролю, самовираження.',
         categories: [mockCategories[1]],
         status: VisibilityStatus.Published,
-        img: null,
+        image: null,
     },
     {
         id: 11,
@@ -99,7 +99,7 @@ export const mockPrograms: Program[] = [
         description: 'Відновлення довіри до тіла, нормалізація сну та емоційний контакт через роботу з конем.',
         categories: [mockCategories[0]],
         status: VisibilityStatus.Published,
-        img: null,
+        image: null,
     },
     {
         id: 12,
@@ -107,6 +107,6 @@ export const mockPrograms: Program[] = [
         description: 'Зниження соціальної ізоляції та підтримка самовираження в групі.',
         categories: [mockCategories[1]],
         status: VisibilityStatus.Draft,
-        img: null,
+        image: null,
     },
 ];

@@ -130,7 +130,6 @@
             }
         }
 
-
         .partners-logos {
             grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
         }
@@ -138,9 +137,7 @@
 }
 
 @media (max-width: 560px) {
-
     .partners-content-section {
-
         .partners-logos {
             column-gap: 2rem;
         }
@@ -172,7 +169,7 @@
             text-align: left;
             justify-items: start;
 
-            .section-title{
+            .section-title {
                 font-size: 2rem;
             }
             .section-description {

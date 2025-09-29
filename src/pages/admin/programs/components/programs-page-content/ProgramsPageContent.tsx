@@ -262,6 +262,8 @@ export const ProgramsPageContent = () => {
             const statusMatches = statusFilter === undefined || updatedProgram.status === statusFilter;
 
             if (belongsToSelectedCategory && statusMatches) {
+                if (updatedProgram.image && 'url' in updatedProgram.image)
+                    updatedProgram.image.url = `${updatedProgram.image.url}?cb=${Date.now()}`;
                 updatePrograms((prev) => prev.map((p) => (p.id === updatedProgram.id ? updatedProgram : p)));
             } else {
                 updatePrograms((prev) => prev.filter((p) => p.id !== updatedProgram.id));

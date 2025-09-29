@@ -17,7 +17,7 @@ const createProgram = (props: Partial<Program> = {}): Program => ({
     description: 'Test description',
     status: VisibilityStatus.Draft,
     categories: [],
-    img: null,
+    image: null,
     ...props,
 });
 

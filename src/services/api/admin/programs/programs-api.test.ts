@@ -115,7 +115,8 @@ describe('addProgram', () => {
         name: 'Test Program',
         description: 'Test Description',
         status: VisibilityStatus.Draft,
-        img: null,
+        image: null,
+        imageId: null,
         categoryIds: [1, 2],
     };
 
@@ -153,7 +154,7 @@ describe('addProgram', () => {
         const promise = ProgramsApi.addProgram(mockClient, noImgData);
         const result = await promise;
 
-        expect(result.img).toBeNull();
+        expect(result.image).toBeNull();
     });
 
     it('should handle empty categoryIds', async () => {
@@ -180,7 +181,8 @@ describe('editProgram', () => {
         name: 'Updated Program',
         description: 'Updated Description',
         status: VisibilityStatus.Published,
-        img: null,
+        image: null,
+        imageId: null,
         categoryIds: [2],
     };
 
@@ -206,7 +208,7 @@ describe('editProgram', () => {
         const promise = ProgramsApi.editProgram(noImgData, mockClient);
         const result = await promise;
 
-        expect(result.img).toBeNull();
+        expect(result.image).toBeNull();
     });
 
     it('should throw error when program not found', async () => {

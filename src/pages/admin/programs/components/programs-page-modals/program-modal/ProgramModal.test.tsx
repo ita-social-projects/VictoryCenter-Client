@@ -136,7 +136,7 @@ const mockProgram: Program = {
     description: 'Test Description',
     categories: [{ id: 1, name: 'Category 1', programsCount: 1 }],
     status: VisibilityStatus.Draft,
-    img: null,
+    image: null,
 };
 
 const mockCategories: ProgramCategory[] = [

@@ -8,6 +8,8 @@ import {
 } from '../../../../types/admin/programs';
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
+import { ImageApi } from '../image/image-api';
+import { TeamMember } from '../../../../types/admin/team-members';
 
 // Helper function to convert Program to ProgramSuggestion
 const convertProgramToSuggestion = (program: Program): ProgramSearchItemData => {
@@ -26,7 +28,7 @@ const mapProgramEditToProgram = async (program: ProgramCreateUpdate, client: Axi
         description: program.description,
         categories: response.data,
         status: program.status,
-        img: program.img,
+        image: program.image,
     };
 };
 
@@ -134,12 +136,30 @@ export const ProgramsApi = {
     },
 
     addProgram: async (client: AxiosInstance, program: ProgramCreateUpdate): Promise<Program> => {
+        if (program.image && 'base64' in program.image) {
+            const imageResult = await ImageApi.post(client, program.image);
+            program.imageId = imageResult.id;
+        }
+
         const response = await client.post(API_ROUTES.PROGRAMS.BASE, program);
+
         return mapProgramEditToProgram(response.data, client);
     },
 
     editProgram: async (program: ProgramCreateUpdate, client: AxiosInstance): Promise<Program> => {
+        const { finalImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(
+            client,
+            program.image,
+            program.imageId,
+        );
+
+        program.imageId = finalImageId;
+
         const response = await client.put(`${API_ROUTES.PROGRAMS.BASE}/${program.id}`, program);
+
+        if (imageIdToDelete && imageIdToDelete !== finalImageId) {
+            await ImageApi.delete(client, imageIdToDelete);
+        }
         return response.data;
     },
 

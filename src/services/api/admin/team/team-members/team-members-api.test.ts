@@ -57,6 +57,52 @@ describe('TeamMembersApi', () => {
         });
     });
 
+    describe('TeamMembersApi.search', () => {
+        const mockClient = {
+            get: jest.fn(),
+        } as unknown as jest.Mocked<AxiosInstance>;
+
+        beforeEach(() => {
+            jest.clearAllMocks();
+            mockClient.get.mockResolvedValue({ data: { items: [], totalItemsCount: 0 } });
+        });
+
+        it('calls client.get with only fullName when using defaults (offset=0, limit=5)', async () => {
+            await TeamMembersApi.search(mockClient, 'John Doe');
+            expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.SEARCH}`, {
+                params: { fullName: 'John Doe', offset: 0, limit: 5 },
+            });
+        });
+
+        it('respects provided offset and limit when passed', async () => {
+            await TeamMembersApi.search(mockClient, 'Jane', 20, 10);
+            expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.SEARCH}`, {
+                params: { fullName: 'Jane', offset: 20, limit: 10 },
+            });
+        });
+
+        it('includes offset=0 when offset is undefined due to default, and floors limit when provided as decimal', async () => {
+            await TeamMembersApi.search(mockClient, 'Alex', undefined as any, 7.9 as any);
+            expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.SEARCH}`, {
+                params: { fullName: 'Alex', offset: 0, limit: 7 },
+            });
+        });
+
+        it('includes offset when it is 0 and limit when it is 0 (edge values)', async () => {
+            await TeamMembersApi.search(mockClient, 'Edge', 0, 0);
+            expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.SEARCH}`, {
+                params: { fullName: 'Edge', offset: 0, limit: 0 },
+            });
+        });
+
+        it('returns response data transparently', async () => {
+            const payload = { items: [{ id: 1, fullName: 'Rita' }], totalItemsCount: 1 };
+            (mockClient.get as jest.Mock).mockResolvedValueOnce({ data: payload });
+            const result = await TeamMembersApi.search(mockClient, 'Rita', 0, 5);
+            expect(result).toEqual(payload);
+        });
+    });
+
     describe('updateMember', () => {
         const mockImageValue = {
             base64: 'base64string',

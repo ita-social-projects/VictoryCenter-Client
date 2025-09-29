@@ -33,7 +33,7 @@ describe('TeamMemberSearchItem', () => {
 
     it('renders avatar image when image.url is provided', () => {
         const memberWithImage = makeMember({
-            image: { id: 10, url: 'http://test/image.jpg', mimeType: 'image/jpeg' } as any,
+            image: { id: 10, url: 'https://test/image.jpg', mimeType: 'image/jpeg' } as any,
         });
 
         render(
@@ -46,7 +46,7 @@ describe('TeamMemberSearchItem', () => {
             />,
         );
 
-        expect(screen.getByAltText('')).toHaveAttribute('src', 'http://test/image.jpg');
+        expect(screen.getByAltText('')).toHaveAttribute('src', 'https://test/image.jpg');
     });
 
     it('getTooltipContent returns null when there is no overflow', () => {

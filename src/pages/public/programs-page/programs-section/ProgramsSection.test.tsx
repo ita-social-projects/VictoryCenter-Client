@@ -1,14 +1,14 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramsSection } from './ProgramsSection';
-import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
+import { useDataFetch } from '../../../../hooks/common/use-data-fetch/useDataFetch';
 
 jest.mock('./program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: any) => <div data-testid="program-card">{program.name}</div>,
 }));
 
 jest.mock('../../../../services/api/public/programs/programs-api');
+jest.mock('../../../../hooks/common/use-data-fetch/useDataFetch');
 
 describe('ProgramsSection', () => {
     const mockPrograms = {
@@ -39,9 +39,11 @@ describe('ProgramsSection', () => {
     });
 
     it('renders loading state initially', async () => {
-        (programPageDataFetch as jest.Mock).mockImplementation(
-            () => new Promise(() => {}), // never resolves
-        );
+        (useDataFetch as jest.Mock).mockReturnValue({
+            data: mockPrograms,
+            isLoading: true,
+            error: null,
+        });
 
         render(<ProgramsSection />);
 
@@ -49,7 +51,11 @@ describe('ProgramsSection', () => {
     });
 
     it('renders programs after successful fetch', async () => {
-        (programPageDataFetch as jest.Mock).mockResolvedValue(mockPrograms);
+        (useDataFetch as jest.Mock).mockReturnValue({
+            data: mockPrograms,
+            isLoading: false,
+            error: null,
+        });
 
         render(<ProgramsSection />);
 
@@ -63,7 +69,11 @@ describe('ProgramsSection', () => {
     });
 
     it('filters programs by category', async () => {
-        (programPageDataFetch as jest.Mock).mockResolvedValue(mockPrograms);
+        (useDataFetch as jest.Mock).mockReturnValue({
+            data: mockPrograms,
+            isLoading: false,
+            error: null,
+        });
 
         render(<ProgramsSection />);
 
@@ -76,7 +86,11 @@ describe('ProgramsSection', () => {
     });
 
     it('resets filter when clicking "Усі"', async () => {
-        (programPageDataFetch as jest.Mock).mockResolvedValue(mockPrograms);
+        (useDataFetch as jest.Mock).mockReturnValue({
+            data: mockPrograms,
+            isLoading: false,
+            error: null,
+        });
 
         render(<ProgramsSection />);
 
@@ -92,7 +106,11 @@ describe('ProgramsSection', () => {
     });
 
     it('renders error message when fetch fails', async () => {
-        (programPageDataFetch as jest.Mock).mockRejectedValue(new Error('Network error'));
+        (useDataFetch as jest.Mock).mockReturnValue({
+            data: mockPrograms,
+            isLoading: false,
+            error: FAILED_TO_LOAD_THE_PROGRAMS,
+        });
 
         render(<ProgramsSection />);
 

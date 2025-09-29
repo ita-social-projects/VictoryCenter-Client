@@ -1,4 +1,4 @@
-import { programPageDataFetch, questionDataFetch } from './programs-api';
+import { programPageDataFetch } from './programs-api';
 import { axiosInstance } from '../../axios';
 import { MockQuestions } from '../../../../utils/mock-data/public/programs-page';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
@@ -61,13 +61,6 @@ describe('programs-api', () => {
             (axiosInstance.get as jest.Mock).mockRejectedValue(new Error('Network error'));
 
             await expect(programPageDataFetch()).rejects.toThrow('Network error');
-        });
-    });
-
-    describe('questionDataFetch', () => {
-        it('should return mocked questions', async () => {
-            const result = await questionDataFetch();
-            expect(result).toEqual(MockQuestions);
         });
     });
 });

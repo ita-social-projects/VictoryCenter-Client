@@ -1,4 +1,3 @@
-import { MockQuestions } from '../../../../utils/mock-data/public/programs-page';
 import { axiosInstance } from '../../axios';
 import { ProgramsPageData, PublishedProgramDto } from '../../../../types/public/programs-page';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
@@ -15,4 +14,3 @@ export const programPageDataFetch = async (): Promise<ProgramsPageData> => {
         programsCategories: programsCategories,
     };
 };
-export const questionDataFetch = async () => MockQuestions;

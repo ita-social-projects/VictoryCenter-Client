@@ -12,10 +12,6 @@ export interface PublishedProgramDto {
     description: string;
     categories: ProgramCategoryDto[];
 }
-export interface Question {
-    question: string;
-    answer: string;
-}
 
 export interface ProgramsPageData {
     programsCategories: ProgramCategoryDto[];

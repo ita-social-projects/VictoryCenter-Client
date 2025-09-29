@@ -12,7 +12,15 @@ jest.mock('../../../../../assets/icons/plus.svg', () => ({
 }));
 
 jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
-    SearchBar: ({ onQueryChange, onClear, placeholder }: SearchBarProps<ProgramSearchItemData>) => (
+    SearchBar: ({
+        onQueryChange,
+        onClear,
+        placeholder,
+        searchItems = [],
+        renderSearchItemComponent,
+        getSearchItemKey,
+        onSearchItemSelect,
+    }: SearchBarProps<ProgramSearchItemData>) => (
         <div>
             <input
                 placeholder={placeholder}
@@ -22,9 +30,33 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
             <button onClick={onClear} data-testid="clear-button">
                 Clear
             </button>
+            <ul data-testid="search-results">
+                {renderSearchItemComponent &&
+                    searchItems.map((item: any, index: number) => {
+                        const key = getSearchItemKey ? getSearchItemKey(item) : index;
+                        return (
+                            <li key={key} onClick={() => onSearchItemSelect?.(item)}>
+                                <div data-testid="search-item" data-item={JSON.stringify(item)} data-index={index}>
+                                    {item?.fullName ?? ''} ({index})
+                                </div>
+                            </li>
+                        );
+                    })}
+            </ul>
         </div>
     ),
 }));
+
+jest.mock('../../../../../components/admin/search-bar/team-member-search-item/TeamMemberSearchItem', () => {
+    const ReactActual = jest.requireActual('react');
+    return {
+        TeamMemberSearchItem: ReactActual.forwardRef(({ item, categories }: any, ref: any) => (
+            <div ref={ref} data-testid="team-member-item">
+                {item?.fullName} - {(categories?.length ?? 0).toString()}
+            </div>
+        )),
+    };
+});
 
 // Local mock for ResizeObserver used by hooks inside TeamPageToolbar
 beforeAll(() => {
@@ -145,6 +177,7 @@ describe('TeamPageToolbar', () => {
         fireEvent.click(screen.getByTestId('clear-button'));
         expect(onSearchClear).toHaveBeenCalled();
     });
+
     it('calls onSearchQueryChange after debounce when typing 2+ chars', () => {
         jest.useFakeTimers();
         const onSearchQueryChange = jest.fn();
@@ -169,5 +202,31 @@ describe('TeamPageToolbar', () => {
         });
         expect(onSearchQueryChange).toHaveBeenLastCalledWith('John');
         jest.useRealTimers();
+    });
+
+    it('renders search items via itemRenderer and selects item', () => {
+        const onSearchItemSelect = jest.fn();
+        const categories = [{ id: 'c1', name: 'Category 1' } as any];
+        const searchItems = [{ id: '1', fullName: 'John Doe' } as any];
+
+        render(
+            <TeamPageToolbar
+                onSearchQueryChange={jest.fn()}
+                onStatusFilterChange={jest.fn()}
+                onAddMember={jest.fn()}
+                searchItems={searchItems}
+                isSearchLoading={false}
+                searchHasMore={false}
+                onSearchLoadMore={jest.fn()}
+                categories={categories}
+                onSearchItemSelect={onSearchItemSelect}
+                onSearchClear={jest.fn()}
+            />,
+        );
+
+        const item = screen.getByTestId('team-member-item');
+        expect(item).toHaveTextContent('John Doe - 1');
+        fireEvent.click(item);
+        expect(onSearchItemSelect).toHaveBeenCalledWith(searchItems[0]);
     });
 });

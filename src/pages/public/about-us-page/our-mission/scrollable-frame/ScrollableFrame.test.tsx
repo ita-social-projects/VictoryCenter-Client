@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ScrollableFrame } from './ScrollableFrame';
 import * as dataFetch from '../../../../../services/api/public/programs/programs-api';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../../const/public/programs-page';
+import { mockPrograms } from '../../../../../utils/mock-data/public/programs-page';
 
 jest.mock('../../../../../assets/icons/arrow-right.svg', () => ({
     ReactComponent: (props: any) => <svg data-testid="arrow-right-icon" {...props} />,
@@ -57,28 +58,6 @@ describe('ScrollableFrame', () => {
     });
 
     it('should call slidePrev and slideNext when arrow buttons are clicked', async () => {
-        const mockPrograms = {
-            programsCategories: [
-                { id: 1, name: 'Category 1' },
-                { id: 2, name: 'Category 2' },
-            ],
-            programsData: [
-                {
-                    id: 1,
-                    image: null,
-                    name: 'Program A',
-                    description: 'Description A',
-                    categories: [{ id: 1, name: 'Category 1' }],
-                },
-                {
-                    id: 2,
-                    image: null,
-                    name: 'Program B',
-                    description: 'Description B',
-                    categories: [{ id: 2, name: 'Category 2' }],
-                },
-            ],
-        };
         jest.spyOn(dataFetch, 'programPageDataFetch').mockResolvedValue(mockPrograms);
 
         render(<ScrollableFrame />);

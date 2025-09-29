@@ -58,3 +58,25 @@ export const MockQuestions = {
         },
     ],
 };
+export const mockPrograms = {
+    programsCategories: [
+        { id: 1, name: 'Category 1' },
+        { id: 2, name: 'Category 2' },
+    ],
+    programsData: [
+        {
+            id: 1,
+            image: null,
+            name: 'Program A',
+            description: 'Description A',
+            categories: [{ id: 1, name: 'Category 1' }],
+        },
+        {
+            id: 2,
+            image: null,
+            name: 'Program B',
+            description: 'Description B',
+            categories: [{ id: 2, name: 'Category 2' }],
+        },
+    ],
+};

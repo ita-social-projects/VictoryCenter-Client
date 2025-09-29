@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramsSection } from './ProgramsSection';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
 import { useDataFetch } from '../../../../hooks/common/use-data-fetch/useDataFetch';
+import { mockPrograms } from '../../../../utils/mock-data/public/programs-page';
 
 jest.mock('./program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: any) => <div data-testid="program-card">{program.name}</div>,
@@ -11,29 +12,6 @@ jest.mock('../../../../services/api/public/programs/programs-api');
 jest.mock('../../../../hooks/common/use-data-fetch/useDataFetch');
 
 describe('ProgramsSection', () => {
-    const mockPrograms = {
-        programsCategories: [
-            { id: 1, name: 'Category 1' },
-            { id: 2, name: 'Category 2' },
-        ],
-        programsData: [
-            {
-                id: 1,
-                image: null,
-                name: 'Program A',
-                description: 'Description A',
-                categories: [{ id: 1, name: 'Category 1' }],
-            },
-            {
-                id: 2,
-                image: null,
-                name: 'Program B',
-                description: 'Description B',
-                categories: [{ id: 2, name: 'Category 2' }],
-            },
-        ],
-    };
-
     afterEach(() => {
         jest.clearAllMocks();
     });

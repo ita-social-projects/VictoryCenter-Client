@@ -32,24 +32,26 @@ export const TeamMemberSearchItem = forwardRef<SearchItemContentRef, TeamMemberS
                 .toUpperCase();
         }, [item.fullName]);
 
-        useImperativeHandle(ref, () => ({
-            getTooltipContent: () => {
-                const nameOverflow = nameRef.current && nameRef.current.scrollWidth > nameRef.current.clientWidth;
-                const subOverflow =
-                    subtitleRef.current && subtitleRef.current.scrollWidth > subtitleRef.current.clientWidth;
+        const getTooltipContent = () => {
+            const nameOverflow = nameRef.current && nameRef.current.scrollWidth > nameRef.current.clientWidth;
+            const subOverflow =
+                subtitleRef.current && subtitleRef.current.scrollWidth > subtitleRef.current.clientWidth;
 
-                if (nameOverflow || subOverflow) {
-                    return (
-                        <div className="team-member-search-item__tooltip">
-                            <div className="team-member-search-item__tooltip-name">{item.fullName}</div>
-                            {categoryName && (
-                                <div className="team-member-search-item__tooltip-subtitle">{categoryName}</div>
-                            )}
-                        </div>
-                    );
-                }
-                return null;
-            },
+            if (nameOverflow || subOverflow) {
+                return (
+                    <div className="team-member-search-item__tooltip">
+                        <div className="team-member-search-item__tooltip-name">{item.fullName}</div>
+                        {categoryName && (
+                            <div className="team-member-search-item__tooltip-subtitle">{categoryName}</div>
+                        )}
+                    </div>
+                );
+            }
+            return null;
+        };
+
+        useImperativeHandle(ref, () => ({
+            getTooltipContent,
         }));
 
         return (

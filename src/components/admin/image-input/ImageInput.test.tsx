@@ -19,6 +19,7 @@ const MockImage: Image = {
 
 describe('ImageInput', () => {
     let onChangeMock: jest.Mock;
+    let setErrorMock: jest.Mock;
 
     beforeEach(() => {
         onChangeMock = jest.fn();
@@ -29,20 +30,20 @@ describe('ImageInput', () => {
     });
 
     it('renders placeholder when no image is selected', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
         expect(screen.getByText(COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER)).toBeInTheDocument();
         expect(screen.getByAltText(COMMON_TEXT_ADMIN.ALT.UPLOAD)).toBeInTheDocument();
     });
 
     it('renders image preview when ImageValue is provided', () => {
-        render(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
+        render(<ImageInput value={MockImageValue} onChange={onChangeMock} setError={setErrorMock} />);
         const previewImage = screen.getByTestId('preview-image');
         expect(previewImage).toBeInTheDocument();
         expect(previewImage).toHaveAttribute('src', `data:${MockImageValue.mimeType};base64,${MockImageValue.base64}`);
     });
 
     it('renders image preview when Image is provided', () => {
-        render(<ImageInput value={MockImage} onChange={onChangeMock} />);
+        render(<ImageInput value={MockImage} onChange={onChangeMock} setError={setErrorMock} />);
         const previewImage = screen.getByTestId('preview-image');
         expect(previewImage).toBeInTheDocument();
         expect(previewImage).toHaveAttribute('src', MockImage.url);
@@ -51,7 +52,7 @@ describe('ImageInput', () => {
     it('calls onChange when file is selected via input', async () => {
         const file = createImageFile();
 
-        render(<ImageInput value={null} onChange={onChangeMock} />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
 
         const fileInput = screen.getByTestId('image-input-hidden') as HTMLInputElement;
 
@@ -69,7 +70,7 @@ describe('ImageInput', () => {
     });
 
     it('calls onChange with null when remove button is clicked', () => {
-        render(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
+        render(<ImageInput value={MockImageValue} onChange={onChangeMock} setError={setErrorMock} />);
 
         const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
         fireEvent.click(removeButton);
@@ -79,7 +80,7 @@ describe('ImageInput', () => {
 
     it('does not call onChange for non-image file', () => {
         const file = new File(['dummy content'], 'example.txt', { type: 'text/plain' });
-        render(<ImageInput value={null} onChange={onChangeMock} />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
 
         const fileInput = screen.getByTestId('image-input-hidden') as HTMLInputElement;
 
@@ -91,7 +92,7 @@ describe('ImageInput', () => {
     });
 
     it('handles drag and drop image', async () => {
-        render(<ImageInput value={null} onChange={onChangeMock} />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
         const dropZone = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -118,7 +119,7 @@ describe('ImageInput', () => {
     });
 
     it('adds focus class on drag over and removes on drag leave', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -131,7 +132,7 @@ describe('ImageInput', () => {
     });
 
     it('does not open file dialog or allow drop when disabled', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} disabled />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock}/>);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -151,7 +152,7 @@ describe('ImageInput', () => {
     });
 
     it('handles drag and drop when no files provided', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
         const dropZone = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -168,7 +169,7 @@ describe('ImageInput', () => {
     });
 
     it('handles file input change when no files provided', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
         const fileInput = screen.getByTestId('image-input-hidden') as HTMLInputElement;
 
         fireEvent.change(fileInput, {
@@ -179,7 +180,7 @@ describe('ImageInput', () => {
     });
 
     it('handles mouse enter and leave events', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -192,7 +193,7 @@ describe('ImageInput', () => {
     });
 
     it('does not add focus class on mouse enter when disabled', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} disabled />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} disabled />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -202,7 +203,7 @@ describe('ImageInput', () => {
     });
 
     it('does not add focus class on mouse leave when disabled', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} disabled />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} disabled />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -212,7 +213,7 @@ describe('ImageInput', () => {
     });
 
     it('handles keyboard events (Enter and Space)', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -232,7 +233,7 @@ describe('ImageInput', () => {
     });
 
     it('does not handle keyboard events when disabled', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} disabled />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} disabled />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -250,7 +251,7 @@ describe('ImageInput', () => {
     });
 
     it('ignores non-Enter/Space keyboard events', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -266,7 +267,7 @@ describe('ImageInput', () => {
 
     it('handles focus and blur events', () => {
         const onBlurMock = jest.fn();
-        render(<ImageInput value={null} onChange={onChangeMock} onBlur={onBlurMock} />);
+        render(<ImageInput value={null} onChange={onChangeMock} onBlur={onBlurMock} setError={setErrorMock} />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -281,7 +282,7 @@ describe('ImageInput', () => {
 
     it('does not handle focus/blur when disabled', () => {
         const onBlurMock = jest.fn();
-        render(<ImageInput value={null} onChange={onChangeMock} onBlur={onBlurMock} disabled />);
+        render(<ImageInput value={null} onChange={onChangeMock} onBlur={onBlurMock} setError={setErrorMock} disabled />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -295,7 +296,7 @@ describe('ImageInput', () => {
     });
 
     it('calls onBlur even without onBlur prop', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -304,7 +305,7 @@ describe('ImageInput', () => {
     });
 
     it('does not add focus class on drag over when disabled', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} disabled />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} disabled />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -314,7 +315,7 @@ describe('ImageInput', () => {
     });
 
     it('clears input value when removing file', () => {
-        render(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
+        render(<ImageInput value={MockImageValue} onChange={onChangeMock} setError={setErrorMock} />);
 
         const removeButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.ALT.DELETE });
         const fileInput = screen.getByTestId('image-input-hidden') as HTMLInputElement;
@@ -331,7 +332,7 @@ describe('ImageInput', () => {
     });
 
     it('renders with custom id and name attributes', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} id="custom-id" name="custom-name" />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} id="custom-id" name="custom-name" />);
 
         const fileInput = screen.getByTestId('image-input-hidden') as HTMLInputElement;
         expect(fileInput.id).toBe('custom-id');
@@ -339,7 +340,7 @@ describe('ImageInput', () => {
     });
 
     it('sets correct tabIndex when disabled', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} disabled />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} disabled />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -348,7 +349,7 @@ describe('ImageInput', () => {
     });
 
     it('sets correct tabIndex when enabled', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -357,12 +358,12 @@ describe('ImageInput', () => {
     });
 
     it('should update the preview when the value prop changes to a new image', () => {
-        const { rerender } = render(<ImageInput value={MockImage} onChange={onChangeMock} />);
+        const { rerender } = render(<ImageInput value={MockImage} onChange={onChangeMock} setError={setErrorMock} />);
 
         const preview = screen.getByTestId('preview-image') as HTMLImageElement;
         expect(preview.src).toBe(MockImage.url);
 
-        rerender(<ImageInput value={MockImageValue} onChange={onChangeMock} />);
+        rerender(<ImageInput value={MockImageValue} onChange={onChangeMock} setError={setErrorMock} />);
 
         expect(preview.src).toBe(`data:${MockImageValue.mimeType};base64,${MockImageValue.base64}`);
     });

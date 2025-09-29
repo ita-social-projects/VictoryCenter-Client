@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { WhoWeAreApi } from '../../../../../services/api/admin/who-we-are/who-we-are-api';
-import { Content, WhoWeAreCategory, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
+import { Content, ContentType, WhoWeAreCategory, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
 import axios from 'axios';
 import './WhoWeAreContent.scss';
-import { MainSection } from '../sections/main-section/MainSection';
+import { SectionsWrapper } from '../sections/main-section/SectionsWrapper';
 import { Image } from '../../../../../types/common/image';
 import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
@@ -27,6 +27,7 @@ export const WhoWeAreContent = () => {
     const [updatedSection, setUpdatedSection] = useState<WhoWeAreSection | null>(null);
     const [contentToUpdate, setContentToUpdate] = useState<Content[]>([]);
     const [isConfirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false);
+    const [isPublishButtonActive, setIsPublishButtonActive] = useState<boolean>(false);
 
     const { addToast } = useToast();
 
@@ -36,6 +37,7 @@ export const WhoWeAreContent = () => {
 
     const handleCategorySelect = useCallback((category: WhoWeAreCategory) => {
         setSelectedCategory(category);
+        setIsPublishButtonActive(false);
     }, []);
 
     const fetchCategories = useCallback(async () => {
@@ -117,6 +119,7 @@ export const WhoWeAreContent = () => {
             // 3. Оновлюємо selectedSection (повністю) і updatedSection частково
             setSelectedSection(result);
             setUpdatedSection(result);
+            setIsPublishButtonActive(false)
             addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
         }
     }, [selectedSection, updatedSection, client, selectedCategory]);
@@ -131,10 +134,12 @@ export const WhoWeAreContent = () => {
                     getCategoryKey={(category) => category.id}
                     onCategorySelect={handleCategorySelect}
                 />
-                <MainSection
+                <SectionsWrapper
                     section={updatedSection}
                     onChange={handleContentChange}
                     onPublish={() => setConfirmationModalOpen(true)}
+                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
+                    isPublishButtonActive={isPublishButtonActive}
                 />
             </div>
             <ConfirmationModal

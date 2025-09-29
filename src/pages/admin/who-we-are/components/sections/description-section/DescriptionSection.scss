@@ -1,7 +1,14 @@
+@use '../../../../../../assets/sass/variables/colors';
+
 .description-section {
     display: flex;
     margin-top: 9.75rem;
     gap: 5rem;
+
+    .error {
+        color: colors.$error;
+        font-size: 0.875rem;
+    }
 
     &-preview {
         margin-top: 1rem;

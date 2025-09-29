@@ -12,12 +12,17 @@ import WomanAndHorse from '../../../../../assets/images/public/about-us-page/wom
 import { DescriptionSectionProps } from './description-section/DescriptionSection';
 import { CardsSectionProps } from './cards-section/CardsSection';
 
-export const MainPageProps: Omit<ImageSectionProps, 'content' | 'onChange' | 'onPublish'> = {
+export const MainPageProps: Omit<
+    ImageSectionProps,
+    'content' | 'onChange' | 'onPublish' | 'setIsPublishButtonActive' | 'isPublishButtonActive'
+> = {
     titleLimit: 50,
     descriptionLimit: 300,
     rows: 5,
     imageInputProps: {
         subText: '1440x860',
+        width: 1440,
+        height: 860,
         style: {
             width: '52.5625rem',
             height: '33.125rem',
@@ -30,11 +35,16 @@ export const MainPageProps: Omit<ImageSectionProps, 'content' | 'onChange' | 'on
     },
 };
 
-export const TeamPageProps: Omit<ImageSectionProps, 'content' | 'onChange' | 'onPublish'> = {
+export const TeamPageProps: Omit<
+    ImageSectionProps,
+    'content' | 'onChange' | 'onPublish' | 'setIsPublishButtonActive' | 'isPublishButtonActive'
+> = {
     descriptionLimit: 360,
     rows: 6,
     imageInputProps: {
         subText: '840x750',
+        width: 840,
+        height: 750,
         style: {
             width: '52.5625rem',
             height: '46.875rem',
@@ -47,16 +57,24 @@ export const TeamPageProps: Omit<ImageSectionProps, 'content' | 'onChange' | 'on
     },
 };
 
-export const WhatWeDoPageProps: Omit<DescriptionSectionProps, 'content' | 'onChange' | 'onPublish'> = {
+export const WhatWeDoPageProps: Omit<
+    DescriptionSectionProps,
+    'content' | 'onChange' | 'onPublish' | 'setIsPublishButtonActive' | 'isPublishButtonActive'
+> = {
     descriptionLimit: 300,
 };
 
 export interface CardImageConfig {
     style: React.CSSProperties;
     subText: string;
+    width: number;
+    height: number;
 }
 
-export const WhoWeSupportCardsProps: Omit<CardsSectionProps, 'content' | 'onChange' | 'onPublish'> = {
+export const WhoWeSupportCardsProps: Omit<
+    CardsSectionProps,
+    'content' | 'onChange' | 'onPublish' | 'setIsPublishButtonActive' | 'isPublishButtonActive'
+> = {
     descriptionLimit: 200,
     titleText: WHO_WE_ARE_TEXT.WHO_WE_SUPPORT,
     rows: 5,
@@ -73,6 +91,8 @@ export const WhoWeSupportCardsProps: Omit<CardsSectionProps, 'content' | 'onChan
                 backgroundPosition: 'center',
             },
             subText: '500x430',
+            width: 500,
+            height: 430,
         },
         // second card
         {
@@ -86,6 +106,8 @@ export const WhoWeSupportCardsProps: Omit<CardsSectionProps, 'content' | 'onChan
                 backgroundPosition: 'center',
             },
             subText: '500x430',
+            width: 500,
+            height: 430,
         },
         // third card
         {
@@ -99,11 +121,16 @@ export const WhoWeSupportCardsProps: Omit<CardsSectionProps, 'content' | 'onChan
                 backgroundPosition: 'center',
             },
             subText: '500x430',
+            width: 500,
+            height: 430,
         },
     ],
 };
 
-export const PeopleCardsProps: Omit<CardsSectionProps, 'content' | 'onChange' | 'onPublish'> = {
+export const PeopleCardsProps: Omit<
+    CardsSectionProps,
+    'content' | 'onChange' | 'onPublish' | 'setIsPublishButtonActive' | 'isPublishButtonActive'
+> = {
     descriptionLimit: 200,
     cardImageConfigs: [
         // first card
@@ -118,6 +145,8 @@ export const PeopleCardsProps: Omit<CardsSectionProps, 'content' | 'onChange' | 
                 backgroundPosition: 'center',
             },
             subText: '380x430',
+            width: 380,
+            height: 430,
         },
         // second card
         {
@@ -131,6 +160,8 @@ export const PeopleCardsProps: Omit<CardsSectionProps, 'content' | 'onChange' | 
                 backgroundPosition: 'center',
             },
             subText: '330x430',
+            width: 330,
+            height: 430,
         },
         // third card
         {
@@ -144,6 +175,8 @@ export const PeopleCardsProps: Omit<CardsSectionProps, 'content' | 'onChange' | 
                 backgroundPosition: 'center',
             },
             subText: '330x430',
+            width: 330,
+            height: 430,
         },
         // fourth card
         {
@@ -157,6 +190,8 @@ export const PeopleCardsProps: Omit<CardsSectionProps, 'content' | 'onChange' | 
                 backgroundPosition: 'center',
             },
             subText: '380x430',
+            width: 380,
+            height: 430,
         },
     ],
 };

@@ -1,7 +1,13 @@
+@use '../../../../../../assets/sass/variables/colors';
+
 .image-section {
     display: flex;
     justify-content: space-between;
 
+    .error {
+        color: colors.$error;
+        font-size: 0.875rem;
+    }
     .content-wrapper {
         width: 38rem;
         display: flex;

@@ -1,7 +1,7 @@
 import { Content, ContentType } from '../../../../../../types/admin/who-we-are';
 import { ImageInputProps } from '../../../../../../components/admin/image-input/ImageInput';
 import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
-import React from 'react';
+import React, { useState } from 'react';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { MainPageProps } from '../SectionsProps';
@@ -9,15 +9,26 @@ import { ReactComponent as ArrowIcon } from '../../../../../../assets/icons/arro
 import './DescriptionSection.scss';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { OurMission } from '../../../../../public/about-us-page/our-mission/OurMission';
+import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
 
 export interface DescriptionSectionProps {
     content: Content[] | undefined;
     descriptionLimit: number;
     onChange: (data: Content) => void;
     onPublish: () => void;
+    isPublishButtonActive: boolean;
+    setIsPublishButtonActive: (value: boolean) => void;
 }
 
-export const DescriptionSection = ({ content, onChange, descriptionLimit, onPublish }: DescriptionSectionProps) => {
+export const DescriptionSection = ({
+    content,
+    onChange,
+    descriptionLimit,
+    onPublish,
+    setIsPublishButtonActive,
+    isPublishButtonActive,
+}: DescriptionSectionProps) => {
+    const [descriptionError, setDescriptionError] = useState<string | null>(null);
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         if (descriptionContent?.id || descriptionContent) {
             onChange({
@@ -25,6 +36,7 @@ export const DescriptionSection = ({ content, onChange, descriptionLimit, onPubl
                 description: e.target.value,
             });
         }
+        setIsPublishButtonActive(true);
     };
 
     if (!content) return null;
@@ -51,8 +63,19 @@ export const DescriptionSection = ({ content, onChange, descriptionLimit, onPubl
                     id={descriptionContent.id.toString()}
                     maxLength={descriptionLimit}
                     rows={5}
+                    onBlur={(e) => {
+                        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+                        setDescriptionError(error || null);
+                    }}
                 />
-                <Button className="button" buttonStyle={'primary'} onClick={onPublish} type={'submit'}>
+                {descriptionError && <p className="error">{descriptionError}</p>}
+                <Button
+                    className="button"
+                    buttonStyle={'primary'}
+                    onClick={onPublish}
+                    type={'submit'}
+                    disabled={!!descriptionError || !isPublishButtonActive}
+                >
                     Опублікувати
                 </Button>
             </div>

@@ -189,6 +189,12 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                         id="image"
                         name="image"
                         disabled={isSubmitting || formDisabled}
+                        setError={(error) =>
+                            setErrors((prev) => ({
+                                ...prev,
+                                image: error || undefined,
+                            }))
+                        }
                     />
                     {errors.image && <span className="error">{errors.image}</span>}
                 </div>

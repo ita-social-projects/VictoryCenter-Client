@@ -8,10 +8,13 @@ import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
 import { COMMON_IMAGE_TEXT } from '../../../const/admin/image';
+import { IMAGE_VALIDATION_FUNCTIONS } from '../../../validation/admin/image-schema';
+import { CropForm } from '../crop-form/CropForm';
 
 export interface ImageInputProps {
     value: ImageValues | Image | null;
     onChange: (image: ImageValues | null) => void;
+    setError: (error: string | null) => void;
     onBlur?: () => void;
     disabled?: boolean;
     id?: string;
@@ -20,12 +23,15 @@ export interface ImageInputProps {
     label?: string | null;
     subText?: string | null;
     style?: React.CSSProperties;
+    height?: number;
+    width?: number;
 }
 
 export const ImageInput = ({
     className = 'image-input-wrapper',
     label = COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER,
     subText = null,
+    setError,
     value,
     onChange,
     onBlur,
@@ -33,11 +39,15 @@ export const ImageInput = ({
     name,
     disabled = false,
     style,
+    height = 9,
+    width = 16,
 }: ImageInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
+    const [rawImage, setRawImage] = useState<ImageValues | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const [isDeleteImageModalOpen, setIsDeleteImageModalOpen] = useState<boolean>(false);
+    const [isCropFormOpen, setIsCropFormOpen] = useState<boolean>(false);
 
     useEffect(() => {
         if (value) {
@@ -48,8 +58,15 @@ export const ImageInput = ({
     const handleFile = useCallback(
         async (file: File) => {
             if (!file.type.startsWith('image/')) return;
+            setError(null);
+            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file, width, height);
+
+            if (error) {
+                setError(error);
+                return;
+            }
             const imgItem = await convertFileToBase64(file);
-            onChange(imgItem);
+            setRawImage(imgItem);
         },
         [onChange],
     );
@@ -106,10 +123,13 @@ export const ImageInput = ({
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) handleFile(file);
+        if (file) {
+            handleFile(file);
+        }
     };
 
     const handleRemove = () => {
+        setError(null);
         setPreviewImage(null);
         onChange(null);
         if (inputRef.current) inputRef.current.value = '';
@@ -182,13 +202,19 @@ export const ImageInput = ({
                         )}
                     </div>
                 ) : (
-                    <div className="image-placeholder">
-                        <UploadIcon className="placeholder-icon" />
+                    <div className={classNames('image-placeholder')}>
+                        <UploadIcon className={classNames('placeholder-icon')} />
                         <span>{label}</span>
                         <span>{subText}</span>
                     </div>
                 )}
+                {rawImage ? (
+                    <div className={classNames('overlay')} onClick={(e) => e.stopPropagation()}>
+                        <CropForm src={rawImage} height={height} width={width} onChange={onChange}></CropForm>
+                    </div>
+                ) : null}
             </div>
+
             <ConfirmationModal
                 isOpen={isDeleteImageModalOpen}
                 onClose={() => handleModal(false)}

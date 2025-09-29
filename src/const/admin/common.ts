@@ -80,6 +80,11 @@ export const COMMON_TEXT_ADMIN = {
         DESCRIPTION: 'Опис',
         TITLE: 'Заголовок',
     },
+
+    VALIDATION_MESSAGE: {
+        FIELD_REQUIRED: "Поле обов'язкове",
+        getMinError: (min: number) => `Не менше ${min} символів`,
+    },
 };
 
 export const UI_CONFIG = {

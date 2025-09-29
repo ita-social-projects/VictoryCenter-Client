@@ -41,25 +41,6 @@ export const teamMemberValidationSchema = Yup.object({
                   )
                 : schema,
         )
-        .test('fileSize', TEAM_MEMBER_VALIDATION.img.getSizeError(), (value) => {
-            if (value && typeof value === 'object' && 'id' in value && typeof value.id === 'number') {
-                return true;
-            }
-            if (value == null) return true;
-            if ('url' in value) return true;
-            if ('base64' in value) {
-                return value.size <= TEAM_MEMBER_VALIDATION.img.maxSizeBytes;
-            }
-            return true;
-        })
-        .test('fileType', TEAM_MEMBER_VALIDATION.img.getFormatError(), (value) => {
-            if (value == null) return true;
-            if ('url' in value) return true;
-            if ('base64' in value) {
-                return TEAM_MEMBER_VALIDATION.img.allowedFormats.includes((value as any).mimeType);
-            }
-            return true;
-        })
         .nullable()
         .notRequired(),
 });

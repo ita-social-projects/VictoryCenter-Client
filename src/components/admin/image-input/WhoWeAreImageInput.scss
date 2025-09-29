@@ -2,6 +2,7 @@
 
 // Загальні стилі для обгортки ImageInput, які застосовуються до всіх її варіантів.
 // Ці стилі служать "базою" і допомагають уникнути дублювання коду.
+
 .who-we-are-image-input-wrapper {
     background-size: cover;
     background-position: center;
@@ -19,6 +20,17 @@
 
     &-disabled {
         background-color: colors.$grey-600;
+    }
+
+    .overlay {
+        position: absolute;
+        top: 0;
+        right: 0; /* відступ від правого краю компонента */
+        width: 200px; /* ширина overlay */
+        height: 150px; /* або фіксовану висоту */
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 10; /* поверх усіх інших елементів */
+        border-radius: 8px;
     }
 
     // Стилі для елемента-заглушки, який відображається, коли немає зображення.

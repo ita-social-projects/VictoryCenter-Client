@@ -15,10 +15,17 @@ interface MainSectionProps {
 
     onChange: (data: Content) => void;
     onPublish: () => void;
-    className?: string;
+    isPublishButtonActive: boolean;
+    setIsPublishButtonActive: (value: boolean) => void;
 }
 
-export const MainSection = ({ section, onChange, className, onPublish }: MainSectionProps) => {
+export const SectionsWrapper = ({
+    section,
+    onChange,
+    onPublish,
+    setIsPublishButtonActive,
+    isPublishButtonActive,
+}: MainSectionProps) => {
     if (!section) {
         return null;
     }
@@ -32,6 +39,8 @@ export const MainSection = ({ section, onChange, className, onPublish }: MainSec
                     content={section.contents}
                     onChange={onChange}
                     onPublish={onPublish}
+                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
+                    isPublishButtonActive={isPublishButtonActive}
                     {...WhatWeDoPageProps}
                 />
             );
@@ -42,6 +51,8 @@ export const MainSection = ({ section, onChange, className, onPublish }: MainSec
                     content={section.contents}
                     onPublish={onPublish}
                     onChange={onChange}
+                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
+                    isPublishButtonActive={isPublishButtonActive}
                     {...WhoWeSupportCardsProps}
                 />
             );
@@ -52,19 +63,35 @@ export const MainSection = ({ section, onChange, className, onPublish }: MainSec
                     content={section.contents}
                     onPublish={onPublish}
                     onChange={onChange}
+                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
+                    isPublishButtonActive={isPublishButtonActive}
                     {...PeopleCardsProps}
                 />
             );
             break;
         case SectionType.Main:
             renderedContent = (
-                <ImageSection content={section.contents} onPublish={onPublish} onChange={onChange} {...MainPageProps} />
+                <ImageSection
+                    content={section.contents}
+                    onPublish={onPublish}
+                    onChange={onChange}
+                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
+                    isPublishButtonActive={isPublishButtonActive}
+                    {...MainPageProps}
+                />
             );
             break;
 
         case SectionType.Team:
             renderedContent = (
-                <ImageSection content={section.contents} onChange={onChange} onPublish={onPublish} {...TeamPageProps} />
+                <ImageSection
+                    content={section.contents}
+                    onChange={onChange}
+                    onPublish={onPublish}
+                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
+                    isPublishButtonActive={isPublishButtonActive}
+                    {...TeamPageProps}
+                />
             );
             break;
         // Додайте інші case-и, якщо вони є

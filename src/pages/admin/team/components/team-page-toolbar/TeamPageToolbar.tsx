@@ -54,7 +54,7 @@ export const TeamPageToolbar = ({
 
     return (
         <div className="toolbar" data-testid="team-page-toolbar">
-            <div>
+            <div className="toolbar-search">
                 <SearchBar<TeamMember>
                     searchItems={searchItems}
                     isLoading={isSearchLoading}

@@ -1,17 +1,18 @@
 .toolbar {
     display: flex;
     justify-content: space-between;
-
-    &-actions {
-        display: flex;
-        justify-content: space-between;
-        gap: 1.25rem;
-    }
+    align-items: center;
+    gap: 1.25rem;
 }
 
-@media (max-width: 1400px) {
-    .toolbar {
-        flex-wrap: wrap;
-        gap: 0.938rem;
-    }
+.toolbar-search {
+    width: 38.75rem;
+    flex: 0 0 38.75rem;
+    min-width: 0;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 1.25rem;
+    flex-shrink: 0;
 }

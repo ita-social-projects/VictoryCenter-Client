@@ -60,4 +60,15 @@ describe('fetchImageDataApi', () => {
         expect(mockClient.delete).toHaveBeenCalledWith(`${API_ROUTES.IMAGE.BASE}/1`);
         expect(result).toEqual(1);
     });
+
+    it('should return imageIdToDelete and null finalImageId when image is removed', async () => {
+        const imageId = 123;
+        const result = await ImageApi.getUpdateImageId(mockClient, null, imageId);
+        expect(result).toEqual({ finalImageId: null, imageIdToDelete: imageId });
+    });
+
+    it('should return imageIdToDelete and null finalImageId when image is removed', async () => {
+        const result = await ImageApi.getUpdateImageId(mockClient, mockImage, mockImage.id);
+        expect(result).toEqual({ finalImageId: mockImage.id, imageIdToDelete: null });
+    });
 });

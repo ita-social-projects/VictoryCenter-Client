@@ -1,40 +1,44 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ProgramCard } from './ProgramCard';
-import { PublishedProgram } from '../../../../../types/public/programs-page';
+import { PublishedProgramDto } from '../../../../../types/public/programs-page';
 
 jest.mock('../../../../../assets/icons/arrow-up-right.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-icon" />,
+    ReactComponent: (props: any) => <svg data-testid="arrow-up-right" {...props} />,
 }));
 
-describe('test program-card component', () => {
-    const mockProgram: PublishedProgram = {
-        image: 'https://via.placeholder.com/200x200?text=Ponys',
-        title: 'Коні лікують Літо 2025',
-        subtitle: 'Ветеранська програма',
-        description:
-            'Зменшення рівня стресу, тривоги та ПТСР у ветеранів, повернення відчуття контролю, розвиток внутрішньої сили та опори.',
+describe('ProgramCard', () => {
+    const program: PublishedProgramDto = {
+        id: 1,
+        image: {
+            id: 1,
+            url: 'mocked-image',
+            mimeType: 'mocked-mime-type',
+        },
+        name: 'Program A',
+        description: 'Description A',
+        categories: [
+            { id: 1, name: 'Category 1' },
+            { id: 2, name: 'Category 2' },
+        ],
     };
-    test('should contain correct information', () => {
-        render(<ProgramCard program={mockProgram} />);
-        const title = screen.getByRole('heading', { name: mockProgram.title });
-        expect(title).toBeInTheDocument();
-        expect(title).toHaveClass('program-title');
 
-        const subtitle = screen.getByText(mockProgram.subtitle);
-        expect(subtitle).toBeInTheDocument();
-        expect(subtitle).toHaveClass('program-subtitle');
+    it('renders program name, categories, and description', () => {
+        render(<ProgramCard program={program} />);
+        expect(screen.getByText('Program A')).toBeInTheDocument();
+        expect(screen.getByText('Category 1, Category 2')).toBeInTheDocument();
+        expect(screen.getByText('Description A')).toBeInTheDocument();
+    });
 
-        const description = screen.getByText(mockProgram.description);
-        expect(description).toBeInTheDocument();
-        expect(description).toHaveClass('program-description');
+    it('renders program image using mapImageToBase64', () => {
+        render(<ProgramCard program={program} />);
+        const img = screen.getByAltText('Program A') as HTMLImageElement;
+        expect(img).toHaveAttribute('src', 'mocked-image');
+    });
 
-        const image = screen.getByAltText(mockProgram.title);
-        expect(image).toBeInTheDocument();
-        expect(image).toHaveAttribute('src', mockProgram.image);
-        expect(image).toHaveClass('card-img');
-
-        const arrowIcon = screen.getByTestId('arrow-icon');
-        expect(arrowIcon).toBeInTheDocument();
-        expect(arrowIcon).toHaveClass('arrow-icon');
+    it('renders arrow icons', () => {
+        render(<ProgramCard program={program} />);
+        const arrows = screen.getAllByTestId('arrow-up-right');
+        expect(arrows).toHaveLength(1);
     });
 });

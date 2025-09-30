@@ -10,7 +10,7 @@ import { useCategoriesCounter } from '../../../../../hooks/admin/use-categories-
 import { ProgramsApi, ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { useDataFetch } from '../../../../../hooks/admin/fetch/use-data-fetch/useDataFetch';
+import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
 import {
     PaginationRequestParams,
     useDataPaginationFetch,

@@ -359,7 +359,7 @@ describe('ProgramModal', () => {
             expect(getQuestionModal()).not.toBeInTheDocument();
             expect(mockedProgramsApi.addProgram).not.toHaveBeenCalled();
             expect(mockOnAddProgram).not.toHaveBeenCalled();
-            expect(mockOnClose).not.toHaveBeenCalled();
+            expect(mockOnClose).toHaveBeenCalled();
         });
     });
 

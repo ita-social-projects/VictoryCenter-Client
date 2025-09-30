@@ -134,8 +134,13 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
                         </FormComponent>
                     )}
                     {!isAddFormVisible && !showNotFound && (
-                        <Button className="generic-details-btn-add-new" onClick={handleAdd} buttonStyle="primary">
-                            {isChildForm ? DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW : DONATE_TEXT.BANK_DETAILS.ADD_NEW}
+                        <Button className="generic-details btn-add-new" onClick={handleAdd} buttonStyle="primary">
+                            <>
+                                {isChildForm
+                                    ? DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW
+                                    : DONATE_TEXT.BANK_DETAILS.ADD_NEW}
+                            </>
+                            <div className="plus-icon"></div>
                         </Button>
                     )}
                 </div>
@@ -156,7 +161,8 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
                                 onClick={handleAdd}
                                 buttonStyle={primaryAddButton ? 'primary' : 'secondary'}
                             >
-                                {addNewText}
+                                <div>{addNewText}</div>
+                                <div className="plus-icon"></div>
                             </Button>
                         </>
                     }

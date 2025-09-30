@@ -18,7 +18,8 @@
 
         .form-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
+            gap: 0.5rem;
             flex-direction: row;
         }
 

@@ -50,7 +50,8 @@ export const SupportOptionsForm = ({ initialData = [], onChangeItems }: SupportO
                     <img src={NotFoundIcon} alt={COMMON_TEXT_ADMIN.ALT.NOT_FOUND} />
                     <p>{DONATE_TEXT.SUPPORT_OPTIONS.NOT_FOUND}</p>
                     <Button className="btn-add" onClick={handleAddOption} buttonStyle="secondary">
-                        {DONATE_TEXT.SUPPORT_OPTIONS.ADD_FIRST}
+                        <>{DONATE_TEXT.SUPPORT_OPTIONS.ADD_FIRST}</>
+                        <div className="plus-icon"></div>
                     </Button>
                 </div>
             ) : (

@@ -235,14 +235,10 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                         onClick={handleEditClick}
                                     />
                                     <button
-                                        className="delete-btn"
+                                        className={`delete-btn ${mode}`}
                                         aria-label="delete-btn"
-                                        type="button"
                                         onClick={handleDeleteClick}
-                                    >
-                                        <div className="delete-btn-title">{DONATE_TEXT.BUTTON.DELETE}</div>
-                                        <div className={`delete-btn-icon ${isDeleting ? 'pressed' : ''}`}></div>
-                                    </button>
+                                    ></button>
                                 </div>
                             )}
 

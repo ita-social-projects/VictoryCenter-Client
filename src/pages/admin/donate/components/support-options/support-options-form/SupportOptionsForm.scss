@@ -22,7 +22,18 @@
         font-weight: 700;
     }
 
-    .btn-add-new {
-        height: 2.5rem;
+    .btn-add {
+        display: flex;
+        gap: 0.5rem;
+        
+        .plus-icon {
+            background: url('../../../../../../assets/icons/plus.svg') no-repeat center;
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        &-new {
+            height: 2.5rem;
+        }
     }
 }

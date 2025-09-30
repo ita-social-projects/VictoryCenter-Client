@@ -7,8 +7,6 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
-import { PublishedProgram } from '../../../../../types/public/programs-page';
-import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../../const/public/programs-page';
 import { PublishedProgramDto } from '../../../../../types/public/programs-page';
 import { programPageDataFetch } from '../../../../../services/api/public/programs/programs-api';
 import { ProgramCard } from '../../../programs-page/programs-section/program-card/ProgramCard';
@@ -34,7 +32,7 @@ export const ScrollableFrame = () => {
     const fetchProgramData = useCallback(async () => {
         try {
             const response = await programPageDataFetch();
-            setProgramData(response.programData);
+            setProgramData(response.programsData);
             setError(null);
         } catch {
             setError(t('FAILED_TO_LOAD_THE_PROGRAMS'));

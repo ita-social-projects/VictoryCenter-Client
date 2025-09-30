@@ -2,7 +2,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ScrollableFrame } from './ScrollableFrame';
 import * as dataFetch from '../../../../../services/api/public/programs/programs-api';
 import programsPageUk from '../../../../../locales/uk/programs.json';
-import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../../const/public/programs-page';
 import { mockPrograms } from '../../../../../utils/mock-data/public/programs-page';
 
 jest.mock('../../../../../assets/icons/arrow-right.svg', () => ({

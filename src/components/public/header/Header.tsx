@@ -38,8 +38,6 @@ export const Header = () => {
                 </Link>
             </div>
 
-            <LanguageSwitcher />
-
             <div className="link-container">
                 <nav>
                     <DropdownMenu mainText={t('ABOUT_US')} links={dropdownMenuLinks}></DropdownMenu>
@@ -54,6 +52,7 @@ export const Header = () => {
             </div>
 
             <div className="button-container">
+                <LanguageSwitcher className="language-switcher" />
                 <button className="contact-us-button" onClick={onContactUsClick}>
                     {t('CONTACT_US')}
                 </button>
@@ -78,6 +77,7 @@ export const Header = () => {
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className="disable">
                         {t('HOW_TO_SUPPORT')}
                     </Link>
+                    <LanguageSwitcher onValueChange={toggleMenu} className="mobile-language-switcher" />
                 </div>
             )}
         </div>

@@ -8,6 +8,8 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 import { PublishedProgram } from '../../../../../types/public/programs-page';
+import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../../const/public/programs-page';
+import { PublishedProgramDto } from '../../../../../types/public/programs-page';
 import { programPageDataFetch } from '../../../../../services/api/public/programs/programs-api';
 import { ProgramCard } from '../../../programs-page/programs-section/program-card/ProgramCard';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +18,7 @@ import './ScrollableFrame.scss';
 export const ScrollableFrame = () => {
     const { t } = useTranslation('programsPage');
 
-    const [programData, setProgramData] = useState<PublishedProgram[]>([]);
+    const [programData, setProgramData] = useState<PublishedProgramDto[]>([]);
     const [error, setError] = useState<string | null>(null);
     const swiperRef = useRef<SwiperClass | null>(null);
 
@@ -59,7 +61,7 @@ export const ScrollableFrame = () => {
                 scrollbar={{ draggable: true, el: '.custom-scrollbar' }}
             >
                 {programData.map((item, index) => (
-                    <SwiperSlide key={`${item.title}-${index}`}>
+                    <SwiperSlide key={`${item.name}-${index}`}>
                         <ProgramCard program={item} />
                     </SwiperSlide>
                 ))}

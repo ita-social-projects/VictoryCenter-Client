@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { VisibilityStatus, PendingAction, ModalMode } from '../../../types/admin/common';
+import { ModalMode, PendingAction, VisibilityStatus } from '../../../types/admin/common';
 
 export interface GenericFormRef {
     submit: (status: VisibilityStatus) => void;
@@ -126,11 +126,15 @@ export const useGenericModal = <
 
     const handleClose = useCallback(() => {
         if (formRef.current?.isDirty()) {
-            setShowCloseConfirmModal(true);
+            if (pendingAction === PendingAction.Draft) {
+                onClose();
+            } else {
+                setShowCloseConfirmModal(true);
+            }
         } else if (!isSubmitting) {
             onClose();
         }
-    }, [isSubmitting, onClose]);
+    }, [isSubmitting, onClose, pendingAction]);
 
     const handleCancelClose = useCallback(() => {
         setShowCloseConfirmModal(false);

@@ -1,4 +1,5 @@
 @use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/z-index';
 
 .select {
     position: relative;
@@ -37,7 +38,7 @@
         width: 100%;
         border: 1px solid colors.$blue-500;
         background-color: white;
-        z-index: 4;
+        z-index: z-index.admin(select);
 
         button {
             color: black;

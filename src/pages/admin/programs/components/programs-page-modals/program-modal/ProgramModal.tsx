@@ -35,6 +35,18 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const program = isEditMode ? props.programToEdit : undefined;
     const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
 
+    const initialData = useMemo<ProgramFormValues | null>(() => {
+        if (!isEditMode || !program) return null;
+
+        return {
+            name: program.name,
+            description: program.description,
+            categories: program.categories.map((c) => ({ ...c, programsCount: c.programsCount ?? 0 })),
+            img: program.image,
+            imgId: program.image && 'id' in program.image ? program.image.id : null,
+        };
+    }, [program, isEditMode]);
+
     const modalConfig = useMemo(
         () => ({
             mode,
@@ -83,22 +95,10 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 imageId: initialData?.imgId ?? null,
             }),
         }),
-        [isEditMode, isOpen, mode, onClose, onSuccess, program, client],
+        [isEditMode, isOpen, mode, onClose, onSuccess, program, client, initialData],
     );
 
     const modalHookData = useGenericModal<ProgramFormValues, Program, ProgramFormRef>(modalConfig);
-
-    const initialData = useMemo<ProgramFormValues | null>(() => {
-        if (!isEditMode || !program) return null;
-
-        return {
-            name: program.name,
-            description: program.description,
-            categories: program.categories.map((c) => ({ ...c, programsCount: c.programsCount ?? 0 })),
-            img: program.image,
-            imgId: program.image && 'id' in program.image ? program.image.id : null,
-        };
-    }, [program, isEditMode]);
 
     const title = isEditMode ? PROGRAMS_TEXT.FORM.TITLE.EDIT_PROGRAM : PROGRAMS_TEXT.FORM.TITLE.ADD_PROGRAM;
 

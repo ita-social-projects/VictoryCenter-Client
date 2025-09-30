@@ -3,7 +3,7 @@ import { ReactComponent as DeleteIcon } from '../../../assets/icons/delete.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/cloud-download.svg';
 import classNames from 'classnames';
 import './ImageInput.scss';
-import './WhoWeAreImageInput.scss';
+import './ImageInputWithBackground.scss';
 import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
@@ -44,7 +44,6 @@ export const ImageInput = ({
 }: ImageInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
-    const [rawImage, setRawImage] = useState<ImageValues | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const [isDeleteImageModalOpen, setIsDeleteImageModalOpen] = useState<boolean>(false);
     const [isCropFormOpen, setIsCropFormOpen] = useState<boolean>(false);
@@ -66,7 +65,7 @@ export const ImageInput = ({
                 return;
             }
             const imgItem = await convertFileToBase64(file);
-            setRawImage(imgItem);
+            onChange(imgItem);
         },
         [onChange],
     );
@@ -208,11 +207,6 @@ export const ImageInput = ({
                         <span>{subText}</span>
                     </div>
                 )}
-                {rawImage ? (
-                    <div className={classNames('overlay')} onClick={(e) => e.stopPropagation()}>
-                        <CropForm src={rawImage} height={height} width={width} onChange={onChange}></CropForm>
-                    </div>
-                ) : null}
             </div>
 
             <ConfirmationModal

@@ -96,7 +96,7 @@ describe('TeamMembersApi', () => {
 
             const result = await TeamMembersApi.updateMember(mockClient, 1, memberData);
 
-            expect(ImageApi.post).toHaveBeenCalledWith(mockClient, mockImageValue);
+            expect(ImageApi.getUpdateImageId).toHaveBeenCalledWith(mockClient, mockImageValue, 1);
             expect(mockClient.put).toHaveBeenCalledWith(
                 `${API_ROUTES.TEAM.BASE}/1`,
                 expect.objectContaining({ imageId: mockImageResponse.id }),

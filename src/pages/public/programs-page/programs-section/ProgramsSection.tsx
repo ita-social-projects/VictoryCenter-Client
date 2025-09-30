@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useMemo, useState } from 'react';
-import { PROGRAMS } from '../../../../const/public/footer';
 import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
 import { ProgramCard } from './program-card/ProgramCard';
 import { ProgramCategoryDto, ProgramsPageData } from '../../../../types/public/programs-page';

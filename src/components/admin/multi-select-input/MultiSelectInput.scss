@@ -1,4 +1,5 @@
 @use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/z-index';
 
 .multiselect {
     position: relative;
@@ -43,7 +44,7 @@
         color: colors.$grey-700;
 
         &--has-value {
-            color: colors.$blue-500;
+            color: colors.$blue-900;
         }
     }
 
@@ -68,7 +69,7 @@
         position: absolute;
         top: calc(100% + 0.25rem);
         left: 0;
-        z-index: 10;
+        z-index: z-index.admin(multi-select-input);
         width: 100%;
         max-height: 12.5rem;
         overflow-y: auto;
@@ -107,6 +108,6 @@
         font-size: 1rem;
         font-weight: 400;
         line-height: 1.5rem;
-        color: colors.$grey-900;
+        color: colors.$blue-500;
     }
 }

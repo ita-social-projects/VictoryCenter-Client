@@ -13,14 +13,12 @@
         no-repeat;
     background-blend-mode: multiply;
     position: relative;
-    z-index: 1;
 
     &::before {
         content: '';
         position: absolute;
         inset: 0;
         background: rgba(white, 0.4);
-        z-index: -1;
     }
 
     .admin-page-main-text {

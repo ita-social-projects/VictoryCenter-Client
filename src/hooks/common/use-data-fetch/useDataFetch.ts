@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect, SetStateAction, Dispatch } from 'react';
-import { RequestOptions } from '../../../../types/common/api';
+import { RequestOptions } from '../../../types/common/api';
 import axios from 'axios';
 
 export interface UseDataFetchResult<TResult> {

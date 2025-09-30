@@ -57,47 +57,45 @@ describe('TeamMembersApi', () => {
         });
     });
 
-    describe('search', () => {
+    describe('TeamMembersApi.search', () => {
+        const mockClient = {
+            get: jest.fn(),
+        } as unknown as jest.Mocked<AxiosInstance>;
+
         beforeEach(() => {
             jest.clearAllMocks();
             mockClient.get.mockResolvedValue({ data: { items: [], totalItemsCount: 0 } });
         });
 
-        it('uses defaults offset=0, limit=5 and forwards AbortSignal', async () => {
-            const ctrl = new AbortController();
-            await TeamMembersApi.search(mockClient, 'John Doe', undefined, undefined, ctrl.signal);
-            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
+        it('calls client.get with only fullName when using defaults (offset=0, limit=5)', async () => {
+            await TeamMembersApi.search(mockClient, 'John Doe');
+            expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.SEARCH}`, {
                 params: { fullName: 'John Doe', offset: 0, limit: 5 },
-                signal: ctrl.signal,
             });
         });
 
-        it('respects provided offset and limit and forwards signal', async () => {
-            const ctrl = new AbortController();
-            await TeamMembersApi.search(mockClient, 'Jane', 20, 10, ctrl.signal);
-            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
+        it('respects provided offset and limit when passed', async () => {
+            await TeamMembersApi.search(mockClient, 'Jane', 20, 10);
+            expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.SEARCH}`, {
                 params: { fullName: 'Jane', offset: 20, limit: 10 },
-                signal: ctrl.signal,
             });
         });
 
-        it('includes offset=0 when offset is undefined (default) and floors decimal limit', async () => {
+        it('includes offset=0 when offset is undefined due to default, and floors limit when provided as decimal', async () => {
             await TeamMembersApi.search(mockClient, 'Alex', undefined as any, 7.9 as any);
-            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
+            expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.SEARCH}`, {
                 params: { fullName: 'Alex', offset: 0, limit: 7 },
-                signal: undefined,
             });
         });
 
-        it('accepts edge values 0 for offset and limit', async () => {
+        it('includes offset when it is 0 and limit when it is 0 (edge values)', async () => {
             await TeamMembersApi.search(mockClient, 'Edge', 0, 0);
-            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.BASE, {
+            expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.SEARCH}`, {
                 params: { fullName: 'Edge', offset: 0, limit: 0 },
-                signal: undefined,
             });
         });
 
-        it('returns response data as-is', async () => {
+        it('returns response data transparently', async () => {
             const payload = { items: [{ id: 1, fullName: 'Rita' }], totalItemsCount: 1 };
             (mockClient.get as jest.Mock).mockResolvedValueOnce({ data: payload });
             const result = await TeamMembersApi.search(mockClient, 'Rita', 0, 5);
@@ -172,7 +170,7 @@ describe('TeamMembersApi', () => {
                 image: mockImageValue,
                 categoryId: 1,
                 status: VisibilityStatus.Published,
-                imageId: 50,
+                imageId: 50, // existing image id
             };
 
             const result = await TeamMembersApi.updateMember(mockClient, 1, memberData);
@@ -202,10 +200,10 @@ describe('TeamMembersApi', () => {
                 id: 1,
                 fullName: 'Test',
                 description: '',
-                image: null,
+                image: null, // image removed
                 categoryId: 1,
                 status: VisibilityStatus.Draft,
-                imageId: 20,
+                imageId: 20, // old image id to delete
             };
 
             const result = await TeamMembersApi.updateMember(mockClient, 1, memberData);
@@ -342,7 +340,7 @@ describe('TeamMembersApi', () => {
         });
 
         it('does NOT add categoryId param if categoryId is null', async () => {
-            await TeamMembersApi.getAll(mockClient, null as any, VisibilityStatus.Published, 1, 1);
+            await TeamMembersApi.getAll(mockClient, null!, VisibilityStatus.Published, 1, 1);
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}`, {
                 params: { status: VisibilityStatus.Published, offset: 1, limit: 1 },
             });
@@ -375,7 +373,7 @@ describe('TeamMembersApi', () => {
         });
 
         it('does NOT add offset param if offset is null', async () => {
-            await TeamMembersApi.getAll(mockClient, 1, VisibilityStatus.Draft, null as any, 2);
+            await TeamMembersApi.getAll(mockClient, 1, VisibilityStatus.Draft, null!, 2);
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}`, {
                 params: {
                     categoryId: 1,

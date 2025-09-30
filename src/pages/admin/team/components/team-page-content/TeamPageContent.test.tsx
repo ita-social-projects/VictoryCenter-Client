@@ -500,13 +500,7 @@ describe('TeamPageContent', () => {
             typeInSearchInput('ab');
 
             await waitFor(() => {
-                expect(mockTeamMembersApi.search).toHaveBeenCalledWith(
-                    expect.any(Object),
-                    'ab',
-                    0,
-                    expect.any(Number),
-                    expect.any(AbortSignal),
-                );
+                expect(mockTeamMembersApi.search).toHaveBeenCalledWith(expect.any(Object), 'ab', 0, expect.any(Number));
             });
         });
 
@@ -634,7 +628,7 @@ describe('TeamPageContent', () => {
 
             it('should open edit modal and confirm edit updating member name and busting image cache when url present', async () => {
                 const membersWithImage: TeamMember[] = [
-                    { ...mockMembers[0], image: { url: 'https://img/test.png' } as any },
+                    { ...mockMembers[0], image: { url: 'http://img/test.png' } as any },
                     mockMembers[1],
                 ];
                 mockTeamMembersApi.getAll.mockResolvedValueOnce({

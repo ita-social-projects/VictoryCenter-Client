@@ -54,6 +54,9 @@
         gap: 0.5rem;
         align-items: center;
 
+        .language-switcher {
+            margin-right: 1rem;
+        }
         .contact-us-button {
             background-color: transparent;
             width: 8.2em;
@@ -93,6 +96,10 @@
 
 .mobile-menu {
     display: none;
+
+    .mobile-language-switcher {
+        display: none;
+    }
 }
 
 @media (max-width: 1024px) {
@@ -149,6 +156,22 @@
             .contact-us-button {
                 display: none;
             }
+        }
+    }
+
+    .button-container {
+        .language-switcher {
+            display: none;
+        }
+    }
+    
+    .mobile-menu {
+        .mobile-language-switcher {
+            display: flex;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 1rem 1rem;
+            color: black;
         }
     }
 }

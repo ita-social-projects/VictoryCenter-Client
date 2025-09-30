@@ -1,0 +1,186 @@
+@use '../../../../assets/sass/variables/colors';
+@use '../../../../assets/sass/variables/fonts';
+
+.about-us-block {
+    position: relative;
+    width: 100%;
+    height: 56rem;
+    margin: 0 auto;
+    overflow: hidden;
+
+    .background-img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top;
+        filter: grayscale(100%) contrast(120%) brightness(0.8);
+    }
+
+    .color-overlay {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        clip-path: inset(9rem 34rem 18rem 1.25rem);
+        object-fit: cover;
+        object-position: top;
+        z-index: 1;
+        filter: grayscale(0%) brightness(1) saturate(130%) sepia(0.1);
+        animation: revealColor 4s ease-out forwards;
+    }
+
+    .about-us-info {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        .about-us-main-title {
+            margin-top: 12.5rem;
+            margin-left: 3.5rem;
+            width: 39.75rem;
+            font-family: fonts.$mulish-regular-font;
+            font-weight: 500;
+            font-size: 4rem;
+            line-height: 5rem;
+            letter-spacing: 0;
+            text-transform: uppercase;
+            color: white;
+
+            .highlighted {
+                font-weight: 800;
+                font-style: italic;
+            }
+        }
+
+        .title-details {
+            margin-bottom: 9rem;
+            margin-right: 3.3rem;
+            align-self: flex-end;
+            width: 25rem;
+            z-index: 3;
+            font-family: fonts.$mulish-regular-font;
+            font-weight: 400;
+            font-size: 1.125rem;
+            line-height: 1.75rem;
+            letter-spacing: -0.02em;
+            color: white;
+
+            .title-details p {
+                margin-bottom: 0.5rem;
+            }
+        }
+    }
+}
+@keyframes revealColor {
+    0% {
+        clip-path: inset(9rem 34rem 18rem 1.25rem);
+    }
+    100% {
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+@media (max-width: 912px) {
+    .about-us-block {
+        height: 60.25rem;
+
+        .about-us-info {
+            .about-us-main-title {
+                margin: 0;
+                margin-top: 6rem;
+                padding: 0 4rem;
+                width: 100%;
+                text-align: center;
+                font-size: 4rem;
+                line-height: 4.5rem;
+                letter-spacing: -0.02em;
+            }
+
+            .title-details {
+                padding: 0 1rem;
+                margin: 0;
+                padding: 4rem;
+                width: 100%;
+                text-align: center;
+
+                p {
+                    font-size: 1.125rem;
+                    line-height: 1.75rem;
+                    letter-spacing: -0.02em;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .about-us-block {
+        height: 62.25rem;
+
+        .about-us-info {
+            .about-us-main-title {
+                margin: 0;
+                margin-top: 6rem;
+                padding: 0 4rem;
+                width: 100%;
+                text-align: center;
+                font-size: 3rem;
+                line-height: 3.125rem;
+                letter-spacing: -0.02em;
+            }
+
+            .title-details {
+                padding: 0 1rem;
+                margin: 0;
+                padding: 4rem;
+                width: 100%;
+                text-align: center;
+
+                p {
+                    font-size: 1rem;
+                    line-height: 1.5rem;
+                    letter-spacing: -0.02em;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 568px) {
+    .about-us-block {
+        height: 50rem;
+
+        .about-us-info {
+            .about-us-main-title {
+                margin: 0;
+                margin-top: 6rem;
+                padding: 0 1rem;
+                width: 100%;
+                font-size: 2.5rem;
+                line-height: 2.5rem;
+                letter-spacing: -0.02em;
+                text-align: center;
+            }
+
+            .title-details {
+                padding: 0 1rem;
+                margin: 0;
+                width: 100%;
+                text-align: center;
+                padding-bottom: 3rem;
+
+                p {
+                    font-size: 1rem;
+                    line-height: 1.5rem;
+                    letter-spacing: -0.02em;
+                }
+            }
+        }
+    }
+}

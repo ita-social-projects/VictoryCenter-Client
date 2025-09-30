@@ -1,4 +1,4 @@
-import { Content, ContentType } from '../../../../../../types/admin/who-we-are';
+import { Content } from '../../../../../../types/admin/who-we-are';
 import { ImageInputProps } from '../../../../../../components/admin/image-input/ImageInput';
 import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
 import React, { useState } from 'react';
@@ -10,6 +10,7 @@ import './DescriptionSection.scss';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { OurMission } from '../../../../../public/about-us-page/our-mission/OurMission';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
+import { ContentType } from '../../../../../../types/common/about-us';
 
 export interface DescriptionSectionProps {
     content: Content[] | undefined;
@@ -50,7 +51,7 @@ export const DescriptionSection = ({
     return (
         <div className="description-section">
             <OurMission
-                details={descriptionContent.description ?? ''}
+                description={descriptionContent.description ?? ''}
                 className="description-section-show-block"
                 navigate={false}
             />

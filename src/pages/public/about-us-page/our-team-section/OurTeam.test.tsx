@@ -1,18 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { OurTeam } from './OurTeam';
-
-jest.mock('../../../../assets/images/public/about-us-page/our-team.jpg', () => 'our-team.jpg');
-
-jest.mock('../../../../const/public/about-us-page', () => ({
-    ABOUT_US_DATA: {
-        TEAM_DETAILS: {
-            FIRST_PART: 'Meet our dedicated team.',
-            SECOND_PART: 'We work hard to bring you the best.',
-        },
-        GO_TO_TEAM: 'Go to team',
-    },
-}));
+import { AboutUsContent } from '../../../../types/public/about-us-page';
+import { ContentType } from '../../../../types/common/about-us';
+import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 
 jest.mock('../../../../const/public/routes', () => ({
     PUBLIC_ROUTES: {
@@ -23,25 +14,59 @@ jest.mock('../../../../const/public/routes', () => ({
 }));
 
 describe('OurTeam component', () => {
-    it('should render the team image', () => {
+    const Content: AboutUsContent[] = [
+        {
+            contentType: ContentType.Description,
+            description: 'Test description',
+            title: null,
+            id: 1,
+            image: null,
+        },
+        {
+            contentType: ContentType.Image,
+            image: {
+                id: null,
+                url: 'image.jpg',
+                mimeType: 'image.jpeg',
+            },
+            description: null,
+            title: null,
+            id: 1,
+        },
+    ];
+
+    it('should render the default team image', () => {
         render(
             <MemoryRouter>
                 <OurTeam />
             </MemoryRouter>,
         );
-        const img = screen.getByAltText('Our Team');
+
+        const img = screen.getByRole('img');
         expect(img).toBeInTheDocument();
-        expect(img).toHaveAttribute('src', 'our-team.jpg');
+        expect(img).toHaveAttribute('src', `${ABOUT_US_DATA.TEAM_DETAILS.IMG}`);
     });
 
-    it('should render the team description', () => {
+    it('should render the custom image', () => {
         render(
             <MemoryRouter>
-                <OurTeam />
+                <OurTeam content={Content} />
             </MemoryRouter>,
         );
-        expect(screen.getByText(/meet our dedicated team/i)).toBeInTheDocument();
-        expect(screen.getByText(/we work hard to bring you the best/i)).toBeInTheDocument();
+
+        const img = screen.getByRole('img');
+        expect(img).toBeInTheDocument();
+        expect(img).toHaveAttribute('src', 'image.jpg');
+    });
+
+    it('should render the provided description', () => {
+        render(
+            <MemoryRouter>
+                <OurTeam content={Content} />
+            </MemoryRouter>,
+        );
+
+        expect(screen.getByText('Test description')).toBeInTheDocument();
     });
 
     it('should render the link to team page', () => {
@@ -50,7 +75,8 @@ describe('OurTeam component', () => {
                 <OurTeam />
             </MemoryRouter>,
         );
-        const link = screen.getByRole('link', { name: /go to team/i });
+
+        const link = screen.getByRole('link', { name: ABOUT_US_DATA.GO_TO_TEAM });
         expect(link).toBeInTheDocument();
         expect(link).toHaveAttribute('href', '/team');
     });

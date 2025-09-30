@@ -16,7 +16,16 @@ jest.mock('../../input-error/InputError', () => ({
 
 describe('PhotoInputGroup', () => {
     it('renders label, photo input and error', () => {
-        render(<PhotoInputGroup name="test" id="test" label="Test Photo Label" value={null} onChange={() => {}} setError={() => {}}  />);
+        render(
+            <PhotoInputGroup
+                name="test"
+                id="test"
+                label="Test Photo Label"
+                value={null}
+                onChange={() => {}}
+                setError={() => {}}
+            />,
+        );
 
         expect(screen.getByTestId('mock-label')).toBeInTheDocument();
         expect(screen.getByTestId('mock-image-input')).toBeInTheDocument();

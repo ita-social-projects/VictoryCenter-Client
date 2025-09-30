@@ -13,19 +13,22 @@ import 'swiper/css/scrollbar';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
 import { PublishedProgram } from '../../../../types/public/programs-page';
 import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
-import { ProgramCard } from '../../programs-page/programs-section/program-card/ProgramCard';
+import { ProgramCard } from './program-card/ProgramCard';
 
 export const ScrollableFrame = () => {
     const [programData, setProgramData] = useState<PublishedProgram[]>([]);
     const [error, setError] = useState<string | null>(null);
     const swiperRef = useRef<SwiperClass | null>(null);
+    const [canGoPrev, setCanGoPrev] = useState(false);
+    const [canGoNext, setCanGoNext] = useState(false);
+    const [showButtons, setShowButtons] = useState(false);
 
     const handlePrev = () => {
-        swiperRef.current?.slidePrev();
+        if (canGoPrev) swiperRef.current?.slidePrev();
     };
 
     const handleNext = () => {
-        swiperRef.current?.slideNext();
+        if (canGoNext) swiperRef.current?.slideNext();
     };
 
     useEffect(() => {
@@ -50,10 +53,41 @@ export const ScrollableFrame = () => {
             )}
             <Swiper
                 modules={[Navigation, Pagination, Scrollbar]}
-                onSwiper={(swiper: SwiperClass) => (swiperRef.current = swiper)}
-                slidesPerView={3}
+                onSwiper={(swiper: SwiperClass) => {
+                    swiperRef.current = swiper;
+
+                    const updateState = () => {
+                        const perView =
+                            typeof swiper.params.slidesPerView === 'number' ? swiper.params.slidesPerView : 1;
+                        const total = swiper.slides.length;
+
+                        setCanGoPrev(!swiper.isBeginning);
+                        setCanGoNext(!swiper.isEnd);
+                        setShowButtons(total > perView);
+                    };
+
+                    updateState();
+                    swiper.on('slideChange', updateState);
+                    swiper.on('resize', updateState);
+                    swiper.on('reachBeginning', updateState);
+                    swiper.on('reachEnd', updateState);
+                    swiper.on('fromEdge', updateState);
+                }}
+                slidesPerView={1}
                 navigation={false}
                 scrollbar={{ draggable: true, el: '.custom-scrollbar' }}
+                loop={false}
+                breakpoints={{
+                    568: {
+                        slidesPerView: 1,
+                    },
+                    768: {
+                        slidesPerView: 2,
+                    },
+                    1440: {
+                        slidesPerView: 3,
+                    },
+                }}
             >
                 {programData.map((item, index) => (
                     <SwiperSlide key={`${item.title}-${index}`}>
@@ -62,16 +96,22 @@ export const ScrollableFrame = () => {
                 ))}
             </Swiper>
 
-            <div className="button-container">
-                <button onClick={handlePrev} className="arrow-button">
-                    <img src={arrowLeftWhite} alt="" className="arrow-normal-state" />
-                    <img src={arrowLeftBlack} alt="" className="arrow-hover-state" />
-                </button>
-                <button onClick={handleNext} className="arrow-button">
-                    <img src={arrowRightWhite} alt="" className="arrow-normal-state" />
-                    <img src={arrowRightBlack} alt="" className="arrow-hover-state" />
-                </button>
-            </div>
+            {showButtons && (
+                <div className="button-container">
+                    {canGoPrev && (
+                        <button onClick={handlePrev} className="arrow-button arrow-left">
+                            <img src={arrowLeftWhite} alt="" className="arrow-normal-state" />
+                            <img src={arrowLeftBlack} alt="" className="arrow-hover-state" />
+                        </button>
+                    )}
+                    {canGoNext && (
+                        <button onClick={handleNext} className="arrow-button arrow-right">
+                            <img src={arrowRightWhite} alt="" className="arrow-normal-state" />
+                            <img src={arrowRightBlack} alt="" className="arrow-hover-state" />
+                        </button>
+                    )}
+                </div>
+            )}
 
             <div className="custom-scrollbar" />
         </div>

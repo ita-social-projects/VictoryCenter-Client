@@ -1,4 +1,4 @@
-import { Content, SectionType, WhoWeAreSection } from '../../../../../../types/admin/who-we-are';
+import { Content, WhoWeAreSection } from '../../../../../../types/admin/who-we-are';
 import { CardsSection } from '../cards-section/CardsSection';
 import { DescriptionSection } from '../description-section/DescriptionSection';
 import { ImageSection } from '../image-block-section/ImageBlockSection';
@@ -9,6 +9,7 @@ import {
     WhatWeDoPageProps,
     WhoWeSupportCardsProps,
 } from '../SectionsProps';
+import { SectionType } from '../../../../../../types/common/about-us';
 
 interface MainSectionProps {
     section: WhoWeAreSection | null;

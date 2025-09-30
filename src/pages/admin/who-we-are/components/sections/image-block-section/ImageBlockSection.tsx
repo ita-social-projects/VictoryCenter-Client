@@ -1,4 +1,4 @@
-import { Content, ContentType } from '../../../../../../types/admin/who-we-are';
+import { Content } from '../../../../../../types/admin/who-we-are';
 import { ImageInput, ImageInputProps } from '../../../../../../components/admin/image-input/ImageInput';
 import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
 import React, { useCallback, useState } from 'react';
@@ -9,6 +9,7 @@ import bgImage from '../../../../../assets/images/public/about-us-page/backgroun
 import './ImageBlockSection.scss';
 import { InputWithCharacterLimit } from '../../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { Button } from '../../../../../../components/admin/button/Button';
+import { ContentType } from '../../../../../../types/common/about-us';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
 
 export interface ImageSectionProps {

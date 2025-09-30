@@ -132,7 +132,7 @@ describe('ImageInput', () => {
     });
 
     it('does not open file dialog or allow drop when disabled', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock}/>);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -282,7 +282,9 @@ describe('ImageInput', () => {
 
     it('does not handle focus/blur when disabled', () => {
         const onBlurMock = jest.fn();
-        render(<ImageInput value={null} onChange={onChangeMock} onBlur={onBlurMock} setError={setErrorMock} disabled />);
+        render(
+            <ImageInput value={null} onChange={onChangeMock} onBlur={onBlurMock} setError={setErrorMock} disabled />,
+        );
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || 'Upload image',
         });
@@ -332,7 +334,15 @@ describe('ImageInput', () => {
     });
 
     it('renders with custom id and name attributes', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} id="custom-id" name="custom-name" />);
+        render(
+            <ImageInput
+                value={null}
+                onChange={onChangeMock}
+                setError={setErrorMock}
+                id="custom-id"
+                name="custom-name"
+            />,
+        );
 
         const fileInput = screen.getByTestId('image-input-hidden') as HTMLInputElement;
         expect(fileInput.id).toBe('custom-id');

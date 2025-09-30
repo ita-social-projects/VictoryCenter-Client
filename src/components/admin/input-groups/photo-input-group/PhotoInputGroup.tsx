@@ -21,12 +21,20 @@ export const PhotoInputGroup = ({
     onBlur,
     disabled,
     error,
-    setError
+    setError,
 }: PhotoInputGroupProps) => {
     return (
         <div className="input-group">
             <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
-            <ImageInput id={id} name={name} value={value} onChange={onChange} onBlur={onBlur} disabled={disabled} setError={setError} />
+            <ImageInput
+                id={id}
+                name={name}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                disabled={disabled}
+                setError={setError}
+            />
             <InputError error={error} />
         </div>
     );

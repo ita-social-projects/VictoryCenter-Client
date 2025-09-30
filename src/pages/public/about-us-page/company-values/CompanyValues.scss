@@ -7,19 +7,31 @@
     box-sizing: border-box;
 }
 .values-block {
+    display: flex;
+    flex-wrap: wrap;
     position: relative;
-    min-height: 78rem;
+    height: 66.6rem;
+    width: 100%;
+
+    .swiper {
+        width: 100%;
+    }
 
     .values-title {
-        font-family: fonts.$mulish-regular-font;
-        font-weight: 700;
-        font-size: 2rem;
-        line-height: 2.5rem;
-        letter-spacing: -0.02rem;
-        text-transform: uppercase;
+        width: 100%;
+        display: flex;
         position: absolute;
-        top: 2.75rem;
-        left: 3.5rem;
+        left: 4rem;
+        top: 3.5rem;
+
+        h2 {
+            font-family: fonts.$mulish-regular-font;
+            font-weight: 700;
+            font-size: 2rem;
+            line-height: 2.5rem;
+            letter-spacing: -0.02rem;
+            text-transform: uppercase;
+        }
     }
 
     .value-card {
@@ -36,6 +48,7 @@
             flex-direction: column;
             align-items: flex-start;
             gap: 0.75rem;
+            width: 85%;
 
             .value-name {
                 width: 100%;
@@ -57,37 +70,122 @@
                 color: colors.$blue-900;
             }
         }
-    }
 
-    .value-card:nth-of-type(1) {
-        width: 34%;
-        top: 8.75rem;
-        padding: 4rem 3.5rem;
+        &.card-1,
+        &.card-2,
+        &.card-3 {
+            padding: 4rem 3.5rem;
+        }
 
-        .value-item {
-            width: 20rem;
+        &.card-1 {
+            top: 8.75rem;
+        }
+
+        &.card-2 {
+            top: 18rem;
+        }
+
+        &.card-3 {
+            top: 21.5rem;
         }
     }
 
-    .value-card:nth-of-type(2) {
-        width: 31%;
-        top: 17rem;
-        left: 34%;
-        padding: 4rem 1rem;
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: absolute;
+        width: 100%;
+        top: 50%;
+        z-index: 2;
+        padding: 0 2rem;
 
-        .value-item {
-            width: 19.75rem;
+        .arrow-button {
+            background-color: colors.$blue-900;
+            position: absolute;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            transition: all 0.8s ease;
+            cursor: pointer;
+            z-index: 2;
+
+            .arrow-normal-state,
+            .arrow-hover-state {
+                position: absolute;
+                top: 0.5rem;
+                right: 0.5rem;
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+
+            .arrow-hover-state {
+                display: none;
+            }
+
+            &:hover {
+                background-color: colors.$yellow-500;
+
+                .arrow-hover-state {
+                    display: block !important;
+                }
+
+                .arrow-normal-state {
+                    display: none;
+                }
+            }
+        }
+
+        .arrow-left {
+            left: 2rem;
+        }
+
+        .arrow-right {
+            right: 2rem;
         }
     }
+}
+@media (max-width: 768px) {
+}
 
-    .value-card:nth-of-type(3) {
-        width: 35%;
-        top: 21rem;
-        left: 65%;
-        padding: 4rem 1rem;
+@media (max-width: 568px) {
+    .values-block {
+        height: 58rem;
 
-        .value-item {
-            width: 20rem;
+        .values-title {
+            left: 1rem;
+            top: 4rem;
+        }
+
+        .value-card {
+            &.card-1,
+            &.card-2,
+            &.card-3 {
+                padding: 4rem 1rem;
+            }
+
+            &.card-1,
+            &.card-3 {
+                top: 11rem;
+            }
+
+            &.card-2 {
+                top: 0rem;
+            }
+
+            .value-item {
+                width: 90%;
+            }
+        }
+
+        .button-container {
+            .arrow-left {
+                left: 0.9rem;
+            }
+
+            .arrow-right {
+                right: 0.9rem;
+            }
         }
     }
 }

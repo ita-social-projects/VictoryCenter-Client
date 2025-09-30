@@ -185,7 +185,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     error={errors.img}
                     setError={(error) => setErrors((prev) => ({ ...prev, img: error || undefined }))}
                 />
-
             </form>
         );
     },

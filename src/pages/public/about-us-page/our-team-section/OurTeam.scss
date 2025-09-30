@@ -4,16 +4,21 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 8%;
     font-family: fonts.$mulish-regular-font;
     font-weight: 400;
+    height: 37rem;
 
     .our-team-image {
-        width: 51%;
+        width: 50%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
     }
 
     .team-info {
-        width: 27rem;
+        width: 50%;
+        padding: 0 8%;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
@@ -21,6 +26,8 @@
         gap: 4rem;
 
         .team-description {
+            width: 100%;
+            height: 50%;
             font-size: 1.125rem;
             line-height: 1.75rem;
             letter-spacing: -0.02em;
@@ -35,6 +42,55 @@
             border-bottom: 1px solid black;
             color: black;
             padding: 0.5rem 0;
+        }
+    }
+}
+
+@media (max-width: 912px) {
+}
+
+@media (max-width: 768px) {
+    .our-team-block {
+        .our-team-image {
+            height: 31rem;
+        }
+
+        .team-info {
+            .team-description {
+            }
+
+            .link-ro-team {
+            }
+        }
+    }
+}
+
+@media (max-width: 568px) {
+    .our-team-block {
+        height: 62rem;
+        justify-content: flex-start;
+        flex-direction: column;
+        padding: 3.75rem 0;
+
+        .our-team-image {
+            width: 100%;
+        }
+
+        .team-info {
+            width: 100%;
+            padding: 0rem 1rem;
+            margin-top: 3.75rem;
+            height: 100%;
+            gap: 0rem;
+            padding: 0 3%;
+
+            .team-description {
+                height: auto;
+            }
+
+            .link-ro-team {
+                margin-top: 4rem;
+            }
         }
     }
 }

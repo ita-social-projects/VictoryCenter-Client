@@ -6,17 +6,21 @@
     padding: 0;
     box-sizing: border-box;
 }
+
 .main-values-block {
-    height: 117.75rem;
     color: colors.$blue-900;
     font-family: fonts.$mulish-regular-font;
+    position: relative;
+    z-index: 0;
 
     .main-values-title {
-        height: 29rem;
+        margin-top: 16rem;
         width: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
+        position: relative;
+        overflow: hidden;
 
         h2 {
             width: 51.35rem;
@@ -36,43 +40,81 @@
             line-height: 4.5rem;
             text-align: center;
             text-transform: uppercase;
-        }
-
-        span:nth-child(3) {
-            background: colors.$light-blue-200;
             position: relative;
-        }
-
-        span:nth-child(3):before {
-            content: '';
-            width: 100vw;
-            height: 5rem;
-            background: colors.$light-blue-200;
-            position: absolute;
-            top: 0;
-            transform: translateX(-100%);
+            z-index: 3;
         }
 
         span:nth-child(1) {
             background: colors.$yellow-300;
-            position: relative;
+            padding: 0 0.5rem;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 100%;
+                width: 100vw;
+                height: 100%;
+                background: colors.$yellow-300;
+                z-index: -1;
+            }
         }
 
-        span:nth-child(1):before {
-            content: '';
-            width: 48.65vw;
-            height: 5rem;
-            background: colors.$yellow-300;
-            position: absolute;
-            top: 0;
-            z-index: -1;
+        span:nth-child(3) {
+            background: colors.$light-blue-200;
+            padding: 0 0.5rem;
+
+            &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 100%;
+                width: 100vw;
+                height: 100%;
+                background: colors.$light-blue-200;
+                z-index: -1;
+            }
         }
     }
+
     .people-block {
+        display: flex;
+        flex-wrap: wrap;
         position: relative;
+        width: 100%;
+        margin-top: 6.9rem;
         height: 65rem;
 
+        .swiper {
+            width: 100%;
+        }
+
         .people-card {
+            display: flex;
+            flex-direction: column;
+
+            &.card-1 {
+                transform: translateY(10rem);
+            }
+
+            &.card-2 {
+                transform: translateY(25rem);
+            }
+
+            &.card-3 {
+                transform: translateY(2.5rem);
+            }
+
+            &.card-4 {
+                transform: translateY(26rem);
+            }
+
+            img {
+                width: 100%;
+                height: 27rem;
+                object-fit: cover;
+            }
+
             p {
                 font-weight: 500;
                 font-style: normal;
@@ -83,70 +125,187 @@
             }
         }
 
-        .aside-card {
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             position: absolute;
-            width: 26%;
-            img {
-                width: 100%;
-                height: 26.875rem;
-                object-fit: cover;
+            width: 100%;
+            z-index: 2;
+            padding: 0 2rem;
+            top: 50%;
+
+            .arrow-button {
+                background-color: colors.$blue-900;
+                position: absolute;
+                width: 2.5rem;
+                height: 2.5rem;
+                border: none;
+                transition: all 0.8s ease;
+                cursor: pointer;
+                z-index: 2;
+
+                .arrow-normal-state,
+                .arrow-hover-state {
+                    position: absolute;
+                    top: 0.5rem;
+                    right: 0.5rem;
+                    width: 1.5rem;
+                    height: 1.5rem;
+                }
+
+                .arrow-hover-state {
+                    display: none;
+                }
+
+                &:hover {
+                    background-color: colors.$yellow-500;
+
+                    .arrow-hover-state {
+                        display: block !important;
+                    }
+
+                    .arrow-normal-state {
+                        display: none;
+                    }
+                }
             }
-        }
-        div:nth-child(1) {
-            top: 10rem;
 
-            .people-info {
-                text-align: center;
+            .arrow-left {
+                left: 2rem;
             }
-        }
-        div:nth-child(4) {
-            left: 74%;
-            top: 26rem;
-        }
 
-        .middle-card {
-            position: absolute;
-            width: 24%;
-            img {
-                width: 100%;
-                height: 26.875rem;
-                object-fit: cover;
-            }
-        }
-
-        div:nth-child(2) {
-            left: 26%;
-            top: 25rem;
-        }
-
-        div:nth-child(3) {
-            left: 50%;
-            top: 2.5rem;
-
-            img {
-                object-position: top right;
+            .arrow-right {
+                right: 2rem;
             }
         }
     }
+
     .summary-block {
-        padding-top: 1rem;
-        height: 23.25rem;
         position: relative;
         width: 100%;
         display: flex;
         justify-content: center;
-        align-items: flex-start;
+        align-items: center;
+        border-top: 2px solid colors.$main-value-summary-text;
+        max-width: 41rem;
+        margin: 0 auto;
 
         .summary-text {
             padding-top: 2rem;
-            width: 41rem;
-            height: 6.75rem;
-            border-top: 2px solid colors.$main-value-summary-text;
+            max-width: 39rem;
             font-weight: 500;
             font-size: 1.5rem;
             line-height: 2.25rem;
             letter-spacing: -0.02em;
             text-align: center;
+
+            h3 {
+                max-width: 35rem;
+                margin: 1rem auto 0;
+            }
+        }
+    }
+}
+
+@media (max-width: 568px) {
+    .main-values-block {
+        .main-values-title {
+            margin-top: 4.6rem;
+            h2 {
+                width: 21rem;
+                font-size: 2.5rem;
+                line-height: 3rem;
+            }
+
+            span {
+                font-size: 2.5rem;
+                line-height: 3rem;
+            }
+
+            span:nth-child(1) {
+                padding: 0 1.5rem;
+
+                &::after {
+                    display: none;
+                }
+
+                &::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    right: 100%;
+                    width: 100vw;
+                    height: 100%;
+                    background: colors.$yellow-300;
+                    z-index: -1;
+                }
+            }
+
+            span:nth-child(3) {
+                &::before {
+                    display: none;
+                }
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 100%;
+                    width: 100vw;
+                    height: 100%;
+                    background: colors.$light-blue-200;
+                    z-index: -1;
+                }
+            }
+        }
+
+        .people-block {
+            margin-top: 5.4rem;
+            height: 37rem;
+
+            .people-card {
+                &.card-1 {
+                    transform: translateY(0rem);
+                }
+
+                &.card-2 {
+                    transform: translateY(3.3rem);
+                }
+
+                &.card-3 {
+                    transform: translateY(0rem);
+                }
+
+                &.card-4 {
+                    transform: translateY(3.3rem);
+                }
+
+                img {
+                    height: 26.875rem;
+                }
+
+                p {
+                    padding: 0.9rem 1.125rem;
+                }
+            }
+
+            .button-container {
+                top: 41%;
+
+                .arrow-left {
+                    left: 0.9rem;
+                }
+
+                .arrow-right {
+                    right: 0.9rem;
+                }
+            }
+        }
+
+        .summary-block,
+        .summary-text {
+            max-width: 20.813rem;
         }
     }
 }

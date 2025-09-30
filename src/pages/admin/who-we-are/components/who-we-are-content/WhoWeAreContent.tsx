@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { WhoWeAreApi } from '../../../../../services/api/admin/who-we-are/who-we-are-api';
-import { Content, ContentType, WhoWeAreCategory, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
+import { Content, WhoWeAreCategory, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
 import axios from 'axios';
@@ -119,7 +119,7 @@ export const WhoWeAreContent = () => {
             // 3. Оновлюємо selectedSection (повністю) і updatedSection частково
             setSelectedSection(result);
             setUpdatedSection(result);
-            setIsPublishButtonActive(false)
+            setIsPublishButtonActive(false);
             addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
         }
     }, [selectedSection, updatedSection, client, selectedCategory]);

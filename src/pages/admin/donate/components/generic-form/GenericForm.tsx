@@ -304,9 +304,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                             <Input
                                                 name={String(f.name)}
                                                 label={f.label}
-                                                isRequired={
-                                                    mode === GenericFormMode.Create && isChildForm && f.isRequired
-                                                }
+                                                isRequired={mode === GenericFormMode.Create && f.isRequired}
                                                 isTitle={f.isTitle}
                                                 placeholder={f.placeholder}
                                                 prefix={f.prefix}

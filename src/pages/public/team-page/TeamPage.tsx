@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './TeamPage.scss';
+// import horseVideo from '../../../assets/videos/public/team-page/quote_background.mp4';
 import horseVideo from '../../../assets/videos/public/team-page/quote_background.mp4';
 import classNames from 'classnames';
 import {

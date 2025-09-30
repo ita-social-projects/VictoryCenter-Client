@@ -1,5 +1,5 @@
 @use '../../../assets/sass/variables/colors';
-@use '../../../assets/sass/variables/z-index.scss';
+@use '../../../assets/sass/variables/z-index';
 
 .infinite-scroll-list-container {
     display: flex;
@@ -31,7 +31,7 @@
         position: absolute;
         right: 9.375rem;
         bottom: 3.125rem;
-        z-index: map-get(z-index.$admin-layout, infinite-scroll-list-arrow-up);
+        z-index: z-index.admin(infinite-scroll-list-arrow-up);
         display: flex;
         align-items: center;
         justify-content: center;

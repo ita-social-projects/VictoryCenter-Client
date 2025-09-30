@@ -1,5 +1,5 @@
 @use '../../../assets/sass/variables/colors';
-@use '../../../assets/sass/variables/z-index.scss';
+@use '../../../assets/sass/variables/z-index';
 
 .search-bar {
     position: relative;
@@ -65,7 +65,7 @@
         border: 0.5px solid colors.$grey-900;
         border-top: none;
         background: white;
-        z-index: map-get(z-index.$admin-layout, search-bar-suggestions);
+        z-index: z-index.admin(search-bar-suggestions);
         scroll-behavior: smooth;
     }
 

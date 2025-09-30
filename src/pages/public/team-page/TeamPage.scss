@@ -1,6 +1,6 @@
 @use '../../../assets/sass/variables/colors';
 @use '../../../assets/sass/variables/fonts';
-@use '../../../assets/sass/variables/z-index.scss';
+@use '../../../assets/sass/variables/z-index';
 
 .team-page-container {
     width: 100%;
@@ -15,7 +15,7 @@
         width: 70%;
         margin-bottom: 4rem;
         position: relative;
-        z-index: map-get(z-index.$public-layout, team-page-members-loader);
+        z-index: z-index.public(team-page-members-loader);
     }
 
     h2 {

@@ -1,7 +1,7 @@
 @use '../../../assets/sass/variables/colors';
 @use '../../../assets/sass/variables/fonts';
 @use '../../../assets/sass/mixins/utilits.mixins';
-@use '../../../assets/sass/variables/z-index.scss';
+@use '../../../assets/sass/variables/z-index';
 
 .header-block {
     display: flex;
@@ -11,7 +11,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    z-index: map-get(z-index.$public-layout, header);
+    z-index: z-index.public(header);
 
     height: 4rem;
     padding-top: 0.85rem;

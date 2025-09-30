@@ -1,6 +1,6 @@
 @use '../../../../assets/sass/variables/colors';
 @use '../../../../assets/sass/variables/fonts';
-@use '../../../../assets/sass/variables/z-index.scss';
+@use '../../../../assets/sass/variables/z-index';
 
 * {
     margin: 0;
@@ -58,7 +58,7 @@
     span:nth-child(2) {
         background: colors.$light-blue-200;
         position: relative;
-        z-index: map-get(z-index.$public-layout, programs-page-intro-section-text);
+        z-index: z-index.public(programs-page-intro-section-text);
     }
 
     span:nth-child(2):before {
@@ -67,7 +67,7 @@
         height: 7rem;
         background: colors.$light-blue-200;
         position: absolute;
-        z-index: map-get(z-index.$public-layout, programs-page-intro-section-background);
+        z-index: z-index.public(programs-page-intro-section-background);
     }
 
     .additional-info {

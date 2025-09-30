@@ -10,7 +10,7 @@ describe('LanguageSwitcher', () => {
         fireEvent.click(selectContainer);
 
         LOCALES.forEach((locale) => {
-            expect(screen.getByRole('button', { name: locale })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: locale.toUpperCase() })).toBeInTheDocument();
         });
     });
 
@@ -19,6 +19,6 @@ describe('LanguageSwitcher', () => {
         i18n.changeLanguage(language);
         render(<LanguageSwitcher />);
 
-        expect(screen.getByText(language ?? '')).toBeInTheDocument();
+        expect(screen.getByText(language.toUpperCase() ?? '')).toBeInTheDocument();
     });
 });

@@ -158,7 +158,7 @@ describe('ProgramListItem', () => {
         expect(getProgramActionsButtons()).toBeInTheDocument();
     });
 
-    it('displays image when program has an image and ', () => {
+    it('displays image when program has an image and', () => {
         const programWithImage: Program = {
             ...mockProgram,
             img: {

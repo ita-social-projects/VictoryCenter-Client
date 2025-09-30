@@ -7,6 +7,24 @@ import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { Program } from '../../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
+import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
+
+jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
+}));
+
+const mockedUseAdminClient = useAdminClient as jest.Mock;
+
+beforeEach(() => {
+    mockedUseAdminClient.mockReturnValue({
+        client: {
+            get: jest.fn(),
+            post: jest.fn(),
+            put: jest.fn(),
+            delete: jest.fn(),
+        },
+    });
+});
 
 jest.mock('../../../../../../services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
@@ -133,7 +151,7 @@ describe('DeleteProgramModal', () => {
             clickDeleteButton();
 
             await waitFor(() => {
-                expect(mockedProgramsApi.deleteProgram).toHaveBeenCalledWith(mockProgram.id);
+                expect(mockedProgramsApi.deleteProgram).toHaveBeenCalledWith(mockProgram.id, expect.any(Object));
             });
 
             expectProgramDeleted();
@@ -149,7 +167,7 @@ describe('DeleteProgramModal', () => {
             const errorMessage = await screen.findByText(PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_PROGRAM);
             expect(errorMessage).toBeInTheDocument();
 
-            expect(mockedProgramsApi.deleteProgram).toHaveBeenCalledWith(mockProgram.id);
+            expect(mockedProgramsApi.deleteProgram).toHaveBeenCalledWith(mockProgram.id, expect.any(Object));
             expectProgramNotDeleted();
             expectModalNotClosed();
         });

@@ -4,6 +4,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SingleSelectInput } from './SingleSelectInput';
 
+jest.mock('../../../assets/icons/chevron-down.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-down-icon" />,
+}));
+
+jest.mock('../../../assets/icons/chevron-up.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-up-icon" />,
+}));
+
 interface Option {
     id: number;
     name: string;
@@ -173,5 +181,25 @@ describe('SingleSelectInput', () => {
 
         expect(onChange).not.toHaveBeenCalled();
         expect(screen.getByRole('listbox')).toBeInTheDocument();
+    });
+
+    it('displays correct arrow icon based on open/closed state', async () => {
+        render(
+            <SingleSelectInput<Option>
+                options={options}
+                getOptionId={getOptionId}
+                getOptionName={getOptionName}
+                placeholder="Select an option"
+                onChange={onChange}
+            />,
+        );
+
+        expect(screen.getByTestId('arrow-down-icon')).toBeInTheDocument();
+
+        await user.click(screen.getByRole('button'));
+        expect(screen.getByTestId('arrow-up-icon')).toBeInTheDocument();
+
+        await user.click(screen.getByRole('button'));
+        expect(screen.getByTestId('arrow-down-icon')).toBeInTheDocument();
     });
 });

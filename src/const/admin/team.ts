@@ -3,25 +3,25 @@ export const TEAM_MEMBERS_TEXT = {
         INPUT_FULLNAME: "Введіть ім'я та прізвище",
     },
     BUTTON: {
-        ADD_MEMBER: 'Додати учасника',
+        ADD_MEMBER: 'Додати в команду',
     },
 
     MESSAGE: {
         FAIL_TO_FETCH_MEMBERS: 'Виникла помилка, не вдалось завантажити учасників команди',
         FAIL_TO_REORDER_MEMBERS: 'Виникла помилка, не вдалось змінити пріоритет учасників команди',
-        DONT_FORGET_TO_ORDER: 'Hе забудьте налаштувати порядок відображення члена команди на сайті',
+        DONT_FORGET_TO_ORDER: 'Не забудь встановити порядок відображення',
     },
 
     QUESTION: {
-        PUBLISH_MEMBER: 'Опублікувати нового учасника команди?',
-        DRAFT_MEMBER: 'Зберегти нового учасника команди?',
+        PUBLISH_MEMBER: 'Опублікувати нового члена команди?',
+        DRAFT_MEMBER: 'Зберегти нового члена команди?',
     },
 
     FORM: {
         TITLE: {
-            ADD_MEMBER: 'Додати учасника',
-            EDIT_MEMBER: 'Редагування учасника команди',
-            DELETE_MEMBER: 'Видалити учасника команди?',
+            ADD_MEMBER: 'Додати в команду',
+            EDIT_MEMBER: 'Редагування члена команди',
+            DELETE_MEMBER: 'Видалити члена команди?',
         },
         MESSAGE: {
             FAIL_TO_CREATE_MEMBER: 'Виникла помилка під час додавання учасника',

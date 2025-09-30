@@ -9,8 +9,8 @@ jest.mock('./programs-section/ProgramsSection', () => ({
     ProgramsSection: () => <div data-testid="program-section">ProgramSection</div>,
 }));
 
-jest.mock('./question-section/QuestionSection', () => ({
-    QuestionSection: () => <div data-testid="question-section">QuestionSection</div>,
+jest.mock('../../../components/public/faq-section/FaqSection', () => ({
+    FaqSection: () => <div data-testid="faq-section">FaqSection</div>,
 }));
 
 jest.mock('./contact-section/ContactSection', () => ({
@@ -23,7 +23,7 @@ describe('ProgramsPage', () => {
 
         expect(screen.getByTestId('intro-section')).toBeInTheDocument();
         expect(screen.getByTestId('program-section')).toBeInTheDocument();
-        expect(screen.getByTestId('question-section')).toBeInTheDocument();
+        expect(screen.getByTestId('faq-section')).toBeInTheDocument();
         expect(screen.getByTestId('contact-section')).toBeInTheDocument();
     });
 });

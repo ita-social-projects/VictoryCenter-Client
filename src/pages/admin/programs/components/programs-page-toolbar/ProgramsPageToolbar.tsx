@@ -3,7 +3,7 @@ import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg
 import { Button } from '../../../../../components/admin/button/Button';
 import { Select } from '../../../../../components/admin/select/Select';
 import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
-import { ProgramSearchItem } from './program-suggestion-item/ProgramSearchItem';
+import { ProgramSearchItem } from '../program-search-item/ProgramSearchItem';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
@@ -14,6 +14,7 @@ import {
     useDataPaginationFetch,
 } from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import './ProgramsPageToolbar.scss';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 const SUGGESTIONS_PAGE_SIZE = 5;
 
@@ -34,17 +35,18 @@ export const ProgramsPageToolbar = ({
 }: ProgramPageToolbarProps) => {
     const [currentSearchTerm, setCurrentSearchTerm] = useState<string>('');
     const [localSearchItems, setLocalSearchItems] = useState<ProgramSearchItemData[]>([]);
+    const client = useAdminClient();
 
     const getSearchItems = useCallback(
         async (params: PaginationRequestParams) => {
             return ProgramsApi.fetchProgramSearchItems(
+                client,
                 currentSearchTerm,
-                params.offset,
-                params.limit,
-                params.requestOptions,
+                params.offset as number,
+                params.limit as number,
             );
         },
-        [currentSearchTerm],
+        [currentSearchTerm, client],
     );
 
     const {

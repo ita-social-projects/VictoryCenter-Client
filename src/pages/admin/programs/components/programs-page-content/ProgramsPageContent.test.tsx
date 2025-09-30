@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramsPageContent } from './ProgramsPageContent';
@@ -6,13 +5,22 @@ import { Program, ProgramCategory } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsApi, ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+
+jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
+}));
 
 jest.mock('../../../../../services/api/admin/programs/programs-api', () => ({
     ProgramsApi: {
         fetchProgramCategories: jest.fn(),
         fetchPrograms: jest.fn(),
         fetchProgramById: jest.fn(),
+    },
+    ProgramsCategoriesApi: {
+        fetchProgramCategories: jest.fn(),
+        deleteProgramCategory: jest.fn(),
     },
 }));
 
@@ -21,22 +29,27 @@ jest.mock('../../../../../hooks/admin/use-modals-state/useModalsState', () => ({
     useModalsState: jest.fn(),
 }));
 
-jest.mock('../programs-page-toolbar/ProgramsPageToolbar', () => ({
-    ProgramsPageToolbar: (props: any) => {
-        const { VisibilityStatus } = require('../../../../../types/admin/common');
-        return (
-            <div data-testid="programs-toolbar">
-                <button onClick={props.onAddProgram}>Add Program</button>
-                <button onClick={() => props.onStatusFilterChange(VisibilityStatus.Published)}>Filter Published</button>
-                <button data-testid="select-program" onClick={() => props.onProgramSelect(1)}>
-                    Select Program
-                </button>
-                <button data-testid="clear-search" onClick={props.onSearchClear}>
-                    Clear Search
-                </button>
-            </div>
-        );
-    },
+jest.mock('../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
+    AdminPanelToolbar: ({
+        onSearchClear,
+        onStatusFilterChange,
+        onAddItem,
+        AddItemButtonText,
+        onSuggestionSelect,
+    }: any) => (
+        <div data-testid="programs-toolbar">
+            <button data-testid="select-program" onClick={() => onSuggestionSelect(1)}>
+                Select Program
+            </button>
+            <button data-testid="clear-search" onClick={onSearchClear}>
+                Clear Search
+            </button>
+            <button onClick={() => onStatusFilterChange(1)}>Filter Published</button>
+            <button data-testid="add-item-button" onClick={onAddItem}>
+                {AddItemButtonText}
+            </button>
+        </div>
+    ),
 }));
 
 jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
@@ -141,7 +154,20 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
 
 const mockUseModalsState = require('../../../../../hooks/admin/use-modals-state/useModalsState');
 const mockProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
+const mockProgramsCategoriesApi = ProgramsCategoriesApi as jest.Mocked<typeof ProgramsCategoriesApi>;
 
+const mockedUseAdminClient = useAdminClient as jest.Mock;
+
+beforeEach(() => {
+    mockedUseAdminClient.mockReturnValue({
+        client: {
+            get: jest.fn(),
+            post: jest.fn(),
+            put: jest.fn(),
+            delete: jest.fn(),
+        },
+    });
+});
 // Test data
 const mockCategories: ProgramCategory[] = [
     { id: 1, name: 'Category A', programsCount: 2 },
@@ -206,7 +232,7 @@ describe('ProgramsPageContent', () => {
             closeModalActions: closeActions,
         });
 
-        mockProgramsApi.fetchProgramCategories.mockResolvedValue(mockCategories);
+        mockProgramsCategoriesApi.fetchProgramCategories.mockResolvedValue(mockCategories);
         mockProgramsApi.fetchPrograms.mockResolvedValue({
             items: mockPrograms,
             totalItemsCount: mockPrograms.length,
@@ -243,7 +269,7 @@ describe('ProgramsPageContent', () => {
 
     it('displays categories fetch error and retries', async () => {
         const errorMessage = 'Categories fetch failed';
-        mockProgramsApi.fetchProgramCategories.mockRejectedValue(new Error(errorMessage));
+        mockProgramsCategoriesApi.fetchProgramCategories.mockRejectedValue(new Error(errorMessage));
 
         render(<ProgramsPageContent />);
 
@@ -253,12 +279,12 @@ describe('ProgramsPageContent', () => {
         });
 
         // Reset mock to succeed on retry
-        mockProgramsApi.fetchProgramCategories.mockResolvedValue(mockCategories);
+        mockProgramsCategoriesApi.fetchProgramCategories.mockResolvedValue(mockCategories);
 
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN));
 
         await waitFor(() => {
-            expect(mockProgramsApi.fetchProgramCategories).toHaveBeenCalledTimes(2);
+            expect(mockProgramsCategoriesApi.fetchProgramCategories).toHaveBeenCalledTimes(2);
         });
     });
 
@@ -307,11 +333,11 @@ describe('ProgramsPageContent', () => {
 
         await waitFor(() => {
             expect(mockProgramsApi.fetchPrograms).toHaveBeenCalledWith(
-                1, // categoryId
-                0, // offset
-                5, // limit
-                VisibilityStatus.Published, // status filter
-                expect.any(Object), // options
+                expect.any(Object),
+                1,
+                0,
+                5,
+                VisibilityStatus.Published,
             );
         });
     });
@@ -368,7 +394,7 @@ describe('ProgramsPageContent', () => {
 
     it('shows loader when data is loading', async () => {
         // Mock API to delay response
-        mockProgramsApi.fetchProgramCategories.mockImplementation(
+        mockProgramsCategoriesApi.fetchProgramCategories.mockImplementation(
             () => new Promise((resolve) => setTimeout(() => resolve(mockCategories), 100)),
         );
 
@@ -387,7 +413,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('handles empty categories: still renders bar and empty state for programs', async () => {
-        mockProgramsApi.fetchProgramCategories.mockResolvedValue([]);
+        mockProgramsCategoriesApi.fetchProgramCategories.mockResolvedValue([]);
         mockProgramsApi.fetchPrograms.mockResolvedValue({
             items: [],
             totalItemsCount: 0,
@@ -425,7 +451,7 @@ describe('ProgramsPageContent', () => {
     });
 
     it('handles no selected category in getFilteredPrograms', async () => {
-        mockProgramsApi.fetchProgramCategories.mockResolvedValue([]);
+        mockProgramsCategoriesApi.fetchProgramCategories.mockResolvedValue([]);
 
         render(<ProgramsPageContent />);
 

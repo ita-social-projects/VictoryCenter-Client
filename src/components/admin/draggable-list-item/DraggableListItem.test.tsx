@@ -2,7 +2,9 @@ import React from 'react';
 import { createEvent, fireEvent, render, screen } from '@testing-library/react';
 import { DraggableListItem, DraggableListItemProps } from './DraggableListItem';
 
-jest.mock('../../../assets/icons/dragger.svg', () => 'mock-drag-icon.svg');
+jest.mock('../../../assets/icons/dragger.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="drag-icon" />,
+}));
 
 jest.mock('../drag-preview/DragPreview', () => ({
     DragPreview: ({ dragPreview, dragAltText }: any) => (
@@ -41,7 +43,7 @@ describe('DraggableListItem', () => {
     it('renders correctly with provided entity', () => {
         render(<DraggableListItem {...defaultProps} />);
         expect(screen.getByText('Entity 1')).toBeInTheDocument();
-        expect(screen.getByRole('img', { name: /drag item/i })).toHaveAttribute('src', 'mock-drag-icon.svg');
+        expect(screen.getByTestId('drag-icon')).toBeInTheDocument();
     });
 
     it('sets drag preview visible on drag start', () => {

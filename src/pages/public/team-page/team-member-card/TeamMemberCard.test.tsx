@@ -2,6 +2,10 @@ import { render, screen } from '@testing-library/react';
 import { MemberCard } from '../../../../types/public/team-page';
 import { TeamMemberCard } from './TeamMemberCard';
 
+jest.mock('../../../../assets/icons/team-member-blank.svg', () => ({
+    ReactComponent: () => <svg data-testid="default-member-icon" />,
+}));
+
 describe('TeamMemberCard component', () => {
     const mockMember: MemberCard = {
         id: 1,
@@ -30,5 +34,18 @@ describe('TeamMemberCard component', () => {
         render(<TeamMemberCard member={mockMember} />);
         const container = screen.getByText(mockMember.name).closest('.team-member');
         expect(container).toBeInTheDocument();
+    });
+
+    it('should render default icon when photo is not provided', () => {
+        const memberWithoutPhoto: MemberCard = {
+            id: 2,
+            name: 'Петро Петренко',
+            role: 'учасник',
+            photo: null,
+        };
+
+        render(<TeamMemberCard member={memberWithoutPhoto} />);
+
+        expect(screen.getByTestId('default-member-icon')).toBeInTheDocument();
     });
 });

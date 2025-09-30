@@ -26,8 +26,9 @@
         width: 100%;
         top: 42%;
         z-index: 2;
+        padding: 0 2rem;
+        transition: opacity 2s ease;
         opacity: 0;
-        transition: opacity 4s ease;
 
         .arrow-button {
             background-color: colors.$blue-900;
@@ -35,32 +36,27 @@
             width: 2.5rem;
             height: 2.5rem;
             border: none;
-            transition: all 0.8s ease;
+            transition: all 0.4s ease;
             cursor: pointer;
             z-index: 2;
 
-            .arrow-normal-state,
-            .arrow-hover-state {
+            .arrow-icon {
                 position: absolute;
                 top: 0.5rem;
                 right: 0.5rem;
                 width: 1.5rem;
                 height: 1.5rem;
-            }
 
-            .arrow-hover-state {
-                display: none;
+                path {
+                    stroke: colors.$grey-50;
+                }
             }
 
             &:hover {
                 background-color: colors.$yellow-500;
 
-                .arrow-hover-state {
-                    display: block !important;
-                }
-
-                .arrow-normal-state {
-                    display: none;
+                .arrow-icon path {
+                    stroke: colors.$blue-900;
                 }
             }
         }
@@ -79,23 +75,16 @@
     transition: opacity 1s ease;
 }
 
-
 @media (max-width: 912px) {
 }
 
 @media (max-width: 768px) {
     .scroll-block {
-
         .custom-scrollbar {
-
         }
 
         .button-container {
-
-
             .arrow-button {
-
-
                 .arrow-normal-state,
                 .arrow-hover-state {
                 }
@@ -105,8 +94,6 @@
                 }
 
                 &:hover {
-
-
                     .arrow-hover-state {
                     }
 
@@ -121,7 +108,7 @@
             .arrow-right {
             }
         }
-    }  
+    }
 }
 
 @media (max-width: 568px) {
@@ -134,11 +121,7 @@
         }
 
         .button-container {
-
-
             .arrow-button {
-
-
                 .arrow-normal-state,
                 .arrow-hover-state {
                 }
@@ -148,8 +131,6 @@
                 }
 
                 &:hover {
-
-
                     .arrow-hover-state {
                     }
 

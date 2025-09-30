@@ -137,10 +137,10 @@
             align-items: center;
             position: absolute;
             width: 100%;
+            top: 50%;
             z-index: 2;
             padding: 0 2rem;
-            top: 50%;
-            transition: opacity 4s ease;
+            transition: opacity 2s ease;
             opacity: 0;
 
             .arrow-button {
@@ -149,32 +149,27 @@
                 width: 2.5rem;
                 height: 2.5rem;
                 border: none;
-                transition: all 0.8s ease;
+                transition: all 0.4s ease;
                 cursor: pointer;
                 z-index: 2;
 
-                .arrow-normal-state,
-                .arrow-hover-state {
+                .arrow-icon {
                     position: absolute;
                     top: 0.5rem;
                     right: 0.5rem;
                     width: 1.5rem;
                     height: 1.5rem;
-                }
 
-                .arrow-hover-state {
-                    display: none;
+                    path {
+                        stroke: colors.$grey-50;
+                    }
                 }
 
                 &:hover {
                     background-color: colors.$yellow-500;
 
-                    .arrow-hover-state {
-                        display: block !important;
-                    }
-
-                    .arrow-normal-state {
-                        display: none;
+                    .arrow-icon path {
+                        stroke: colors.$blue-900;
                     }
                 }
             }
@@ -262,7 +257,6 @@
             }
 
             span:nth-child(5) {
-
                 &::before {
                     display: none;
                 }
@@ -285,7 +279,6 @@
             height: 45.25rem;
 
             .people-card {
-
                 &.card-1 {
                     transform: translateY(0rem);
                 }
@@ -335,7 +328,6 @@
         margin-top: 0rem;
 
         .main-values-title {
-
             h2 {
                 width: 27rem;
                 font-size: 3rem;
@@ -371,7 +363,6 @@
             }
 
             span:nth-child(5) {
-
                 &::before {
                     display: none;
                 }
@@ -394,7 +385,6 @@
             height: 45.25rem;
 
             .people-card {
-
                 &.card-1 {
                     transform: translateY(0rem);
                 }
@@ -445,7 +435,6 @@
         margin-top: 4.688rem;
 
         .main-values-title {
-
             h2 {
                 width: 21rem;
                 font-size: 2.5rem;
@@ -481,7 +470,6 @@
             }
 
             span:nth-child(5) {
-
                 &::before {
                     display: none;
                 }
@@ -497,7 +485,6 @@
                     z-index: -1;
                 }
             }
-
         }
 
         .people-block {
@@ -505,7 +492,6 @@
             height: 37rem;
 
             .people-card {
-
                 &.card-1 {
                     transform: translateY(0rem);
                 }

@@ -1,12 +1,22 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MultiSelectInput, MultiSelectInputProps } from './MultiSelectInput';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
-jest.mock('../../../assets/icons/chevron-checked.svg', () => 'chevron-checked.svg');
-jest.mock('../../../assets/icons/chevron-unchecked.svg', () => 'chevron-unchecked.svg');
-jest.mock('../../../assets/icons/chevron-down.svg', () => 'chevron-down.svg');
-jest.mock('../../../assets/icons/chevron-up.svg', () => 'chevron-up.svg');
+jest.mock('../../../assets/icons/chevron-checked.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-checked-icon" />,
+}));
+
+jest.mock('../../../assets/icons/chevron-unchecked.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-unchecked-icon" />,
+}));
+
+jest.mock('../../../assets/icons/chevron-down.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-down-icon" />,
+}));
+
+jest.mock('../../../assets/icons/chevron-up.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="chevron-up-icon" />,
+}));
 
 interface TestOption {
     id: number;
@@ -51,9 +61,9 @@ describe('Multiselect Component', () => {
     const getOptionsContainer = () => screen.queryByRole('listbox');
 
     // Icon getters
-    const getExpandIcon = () => screen.getByAltText(COMMON_TEXT_ADMIN.ALT.EXPAND_OPTIONS_LIST);
-    const getCollapseIcon = () => screen.getByAltText(COMMON_TEXT_ADMIN.ALT.COLLAPSE_OPTIONS_LIST);
-    const getUnselectedOptionIcons = () => screen.getAllByAltText(COMMON_TEXT_ADMIN.ALT.OPTION_NOT_SELECTED);
+    const getExpandIcon = () => screen.getByTestId('chevron-down-icon');
+    const getCollapseIcon = () => screen.getByTestId('chevron-up-icon');
+    const getUnselectedOptionIcons = () => screen.getAllByTestId('chevron-unchecked-icon');
 
     // DOM element getters with updated class names
     const getMultiselectContainer = () => document.querySelector('.multiselect');
@@ -138,7 +148,7 @@ describe('Multiselect Component', () => {
     };
 
     const expectSelectedIconsCount = (count: number) => {
-        expect(screen.getAllByAltText(COMMON_TEXT_ADMIN.ALT.OPTION_SELECTED)).toHaveLength(count);
+        expect(screen.getAllByTestId('chevron-checked-icon')).toHaveLength(count);
     };
 
     const expectUnselectedIconsCount = (count: number) => {

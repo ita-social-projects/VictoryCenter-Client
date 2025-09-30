@@ -9,7 +9,6 @@ import {
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import { ImageApi } from '../image/image-api';
-import { TeamMember } from '../../../../types/admin/team-members';
 
 // Helper function to convert Program to ProgramSuggestion
 const convertProgramToSuggestion = (program: Program): ProgramSearchItemData => {

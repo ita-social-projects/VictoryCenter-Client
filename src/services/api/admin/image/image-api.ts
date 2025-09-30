@@ -1,7 +1,6 @@
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import { Image, ImageValues } from '../../../../types/common/image';
 import { AxiosInstance, AxiosResponse } from 'axios';
-import { TeamMember } from '../../../../types/admin/team-members';
 
 export const ImageApi = {
     post: async (client: AxiosInstance, image: ImageValues): Promise<Image> => {

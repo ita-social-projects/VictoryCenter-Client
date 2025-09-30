@@ -67,7 +67,7 @@ describe('fetchImageDataApi', () => {
         expect(result).toEqual({ finalImageId: null, imageIdToDelete: imageId });
     });
 
-    it('should return imageIdToDelete and null finalImageId when image is removed', async () => {
+    it('should return null imageIdToDelete and finalImageId when image is removed', async () => {
         const result = await ImageApi.getUpdateImageId(mockClient, mockImage, mockImage.id);
         expect(result).toEqual({ finalImageId: mockImage.id, imageIdToDelete: null });
     });

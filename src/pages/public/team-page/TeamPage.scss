@@ -122,7 +122,6 @@
         height: auto;
         transform: translate(-50%, -50%);
         object-fit: cover;
-        z-index: -1;
     }
 
     .quote-overlay {
@@ -138,11 +137,11 @@
         font-weight: 600;
         padding: 5rem 0;
         justify-content: center;
+    }
 
-        p {
-            color: white;
-            display: inline-block;
-        }
+    .quote-overlay p {
+        color: white;
+        display: inline-block;
     }
 
     .author {

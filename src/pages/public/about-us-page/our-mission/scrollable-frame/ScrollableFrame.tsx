@@ -1,6 +1,6 @@
 import { Swiper, SwiperSlide, SwiperClass } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ReactComponent as ArrowRight } from '../../../../../assets/icons/arrow-right.svg';
 import { ReactComponent as ArrowLeft } from '../../../../../assets/icons/arrow-left.svg';
 import 'swiper/css';
@@ -28,18 +28,21 @@ export const ScrollableFrame = () => {
         swiperRef.current?.slideNext();
     };
 
+    // will fetch program data in a selected language later
+    const fetchProgramData = useCallback(async () => {
+        try {
+            const response = await programPageDataFetch();
+            setProgramData(response.programData);
+            setError(null);
+        } catch {
+            setError(t('FAILED_TO_LOAD_THE_PROGRAMS'));
+            setProgramData([]);
+        }
+    }, [t]);
+
     useEffect(() => {
-        (async () => {
-            try {
-                const response = await programPageDataFetch();
-                setProgramData(response.programData);
-                setError(null);
-            } catch {
-                setError(t('FAILED_TO_LOAD_THE_PROGRAMS'));
-                setProgramData([]);
-            }
-        })();
-    }, []);
+        fetchProgramData();
+    }, [fetchProgramData]);
 
     return (
         <div className="scroll-block">

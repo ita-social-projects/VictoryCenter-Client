@@ -99,7 +99,7 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
         const handleDescriptionBlur = useCallback(() => {
             setErrors((prev) => ({
                 ...prev,
-                description: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(formState.description, true),
+                description: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(formState.description, false),
             }));
         }, [formState.description, setErrors]);
 

@@ -79,7 +79,7 @@ describe('MemberForm', () => {
         fireEvent.blur(fullNameInput);
 
         // Now valid for draft
-        expect(onValidationChange).toHaveBeenLastCalledWith(false);
+        expect(onValidationChange).toHaveBeenLastCalledWith(true);
     });
 
     it('shows validation errors on blur for invalid full name', () => {

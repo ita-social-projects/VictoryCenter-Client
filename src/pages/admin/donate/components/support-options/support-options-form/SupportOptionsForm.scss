@@ -1,39 +1,52 @@
 @use '../../../../../../assets/sass/variables/colors.scss';
 
-.support-options-form {
-    display: flex;
-    flex-direction: column;
-    background: colors.$grey-50;
-    border-radius: 0.5rem;
-    border: 1px solid colors.$grey-700;
-    width: 100%;
-    height: fit-content;
-    gap: 1.875rem;
-    padding: 2.5rem 1.875rem;
-
-    &.not-found {
-        border: none;
+.support-options {
+    &-container {
+        height: 100%;
     }
 
-    &.title {
-        padding: 0;
-        border: 0;
-        font-size: 2rem;
-        font-weight: 700;
-    }
-
-    .btn-add {
+    &-form {
         display: flex;
-        gap: 0.5rem;
-        
-        .plus-icon {
-            background: url('../../../../../../assets/icons/plus.svg') no-repeat center;
-            width: 1.5rem;
-            height: 1.5rem;
+        flex-direction: column;
+        background: colors.$grey-50;
+        border-radius: 0.5rem;
+        border: 1px solid colors.$grey-700;
+        width: 100%;
+        height: fit-content;
+        gap: 1.875rem;
+        padding: 2.5rem 1.875rem;
+
+        &.not-found {
+            border: none;
+            height: 100%;
         }
 
-        &-new {
-            height: 2.5rem;
+        &.title {
+            padding: 0;
+            border: 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .btn-add {
+            display: flex;
+            gap: 0.5rem;
+
+            &.new {
+                height: 2.5rem;
+            }
+
+            .plus-icon {
+                background: url('../../../../../../assets/icons/plus.svg') no-repeat center;
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+
+            &.btn-primary {
+                .plus-icon {
+                    background: url('../../../../../../assets/icons/plus-white.svg') no-repeat center;
+                }
+            }
         }
     }
 }

@@ -133,14 +133,23 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
 
             <div className="support-option-fields">
                 {mode !== SupportOptionItemMode.View && (
-                    <Input name="name" value={name} editable={editable} handleChange={(e) => setName(e.target.value)} />
+                    <Input
+                        name="name"
+                        isTitle={true}
+                        value={name}
+                        editable={editable}
+                        handleChange={(e) => setName(e.target.value)}
+                        isRequired={true}
+                    />
                 )}
                 <Input
                     name="value"
+                    isTitle={true}
                     placeholder={DONATE_TEXT.PLACEHOLDER.SUPPORT_OPTION}
                     value={value}
                     editable={editable}
                     handleChange={(e) => setValue(e.target.value)}
+                    isRequired={true}
                 />
             </div>
 

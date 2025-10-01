@@ -9,10 +9,49 @@ export const DONATE_TEXT = {
         NOT_FOUND: 'Ще немає реквізитів',
         ADD_FIRST: 'Додати реквізити',
         ADD_NEW: 'Додати нові реквізити',
+
+        DEFAULT_PLACEHOLDER: 'Введіть назву',
+        NAME: {
+            PLACEHOLDER: 'Введіть назву банку',
+        },
+        RECEIVER: {
+            TITLE: 'Одержувач',
+        },
+        EDRPOU: {
+            TITLE: 'ЄДРПОУ',
+            PLACEHOLDER: 'Введіть код',
+        },
+        IBAN: {
+            TITLE: 'IBAN',
+        },
+        PAYMENT_PURPOSE: {
+            TITLE: 'Призначення платежу',
+        },
+        SWIFT: {
+            TITLE: 'SWIFT-код банку',
+            PLACEHOLDER: 'Введіть код',
+        },
+        ADDRESS: {
+            TITLE: 'Адреса',
+        },
     },
     CORRESPONDENT_BANKS: {
         TITLE: 'Кореспондентські банки',
         ADD_NEW: 'Додати банк',
+
+        DEFAULT_PLACEHOLDER: 'Введіть номер',
+        NAME: {
+            PLACEHOLDER: 'Введіть назву банку',
+        },
+        SWIFT: {
+            TITLE: 'SWIFT',
+        },
+        ACCOUNT: {
+            TITLE: 'Account',
+        },
+        IBAN: {
+            TITLE: 'IBAN',
+        },
     },
     SUPPORT_OPTIONS: {
         TITLE: 'Інші варіанти підтримки',
@@ -21,13 +60,17 @@ export const DONATE_TEXT = {
         ADD_NEW: 'Додати варіант',
     },
     QUESTION: {
-        CANCEL_EDIT: 'Відмінити реквізити?',
+        CANCEL_EDIT: 'Зміни буде втрачено. Видалити реквізити?',
         BANK_DETAILS: {
+            ADD: 'Додати нові реквізити?',
             DELETE: 'Видалити реквізити?',
+            FOREIGN: {
+                DELETE: 'Основний та кореспондентські банки буде видалено. Видалити реквізити?',
+            },
         },
         SUPPORT_OPTION: {
             ADD: 'Додати новий варіант підтримки?',
-            DELETE: 'Видалити варіант підтримки?',
+            DELETE: 'Видалити реквізити?',
         },
     },
     BUTTON: {

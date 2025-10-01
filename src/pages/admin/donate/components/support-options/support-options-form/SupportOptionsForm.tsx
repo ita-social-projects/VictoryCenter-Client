@@ -44,7 +44,7 @@ export const SupportOptionsForm = ({ initialData = [], onChangeItems }: SupportO
     const shouldShowNotFound = items.length === 0 && !isAdding;
 
     return (
-        <>
+        <div className="support-options-container">
             {shouldShowNotFound ? (
                 <div className="support-options-form not-found" data-testid="support-options-not-found">
                     <img src={NotFoundIcon} alt={COMMON_TEXT_ADMIN.ALT.NOT_FOUND} />
@@ -70,11 +70,14 @@ export const SupportOptionsForm = ({ initialData = [], onChangeItems }: SupportO
                         <SupportOptionItem key="new" onSave={handleSaveOption} onCancel={() => setIsAdding(false)} />
                     )}
 
-                    <Button className="btn-add-new" onClick={handleAddOption} buttonStyle="primary">
-                        {DONATE_TEXT.SUPPORT_OPTIONS.ADD_NEW}
-                    </Button>
+                    {!isAdding && (
+                        <Button className="btn-add new" onClick={handleAddOption} buttonStyle="primary">
+                            <>{DONATE_TEXT.SUPPORT_OPTIONS.ADD_NEW}</>
+                            <div className="plus-icon"></div>
+                        </Button>
+                    )}
                 </div>
             )}
-        </>
+        </div>
     );
 };

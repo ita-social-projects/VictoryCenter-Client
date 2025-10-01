@@ -15,6 +15,7 @@ interface InputProps {
     handleBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
     onValueChange?: (val: string) => void;
     onlyNumbers?: boolean;
+    maxLength?: number;
     className?: string;
 }
 
@@ -31,6 +32,7 @@ export const Input = ({
     handleBlur,
     onValueChange,
     onlyNumbers = false,
+    maxLength,
     className,
 }: InputProps) => {
     const [value, setValue] = useState(prefix);
@@ -89,13 +91,13 @@ export const Input = ({
         <div className={`input ${isTitle ? 'input-title' : ''} ${hasEdited ? 'input-changed' : ''} ${className ?? ''}`}>
             {label && (
                 <div className={isTitle ? 'input-title-label' : 'input-label'}>
-                    {isRequired && <span className="input-required">*</span>}
+                    {isRequired && editable && <span className="input-required">*</span>}
                     {!isTitle && label}
                 </div>
             )}
 
             <div className={isTitle ? 'input-title-body' : 'input-body'}>
-                {isTitle && isRequired && <span className="input-required">*</span>}
+                {isTitle && editable && isRequired && <span className="input-required">*</span>}
 
                 <textarea
                     ref={textAreaRef}
@@ -111,9 +113,12 @@ export const Input = ({
                     readOnly={!editable}
                     className="input-textarea"
                     inputMode={onlyNumbers ? 'numeric' : undefined}
+                    maxLength={maxLength}
                 />
 
-                {showClearButton && <button type="button" onClick={handleClear}></button>}
+                {showClearButton && (
+                    <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={handleClear}></button>
+                )}
             </div>
         </div>
     );

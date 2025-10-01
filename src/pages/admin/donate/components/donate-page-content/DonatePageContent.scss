@@ -66,27 +66,21 @@
 }
 
 .edit-btn {
-    cursor: pointer;
+    cursor: default;
     transition: opacity 0.2s ease;
     border: none;
     width: 1.5rem;
     height: 1.5rem;
     background: url('../../../../../assets/icons/edit.svg');
 
-    &:hover {
-        opacity: 0.7;
-    }
-
-    &.edit,
-    &.create {
+    &.edit {
         background: url('../../../../../assets/icons/edit-filled.svg');
     }
 
-    &.create {
-        cursor: default;
-
+    &.view {
+        cursor: pointer;
         &:hover {
-            opacity: 1;
+            opacity: 0.7;
         }
     }
 }

@@ -43,6 +43,7 @@ export interface GenericFormField<T extends Record<string, any>> {
     isTitle?: boolean;
     isRequired?: boolean;
     onlyNumbers?: boolean;
+    maxLength?: number;
     validate?: (value: any, isPublishing?: boolean) => string | undefined;
 }
 
@@ -133,6 +134,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
             const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
                 e.preventDefault();
+                if (mode === GenericFormMode.Edit) return;
                 setMode((prev) => (prev === GenericFormMode.View ? GenericFormMode.Edit : GenericFormMode.View));
                 setIsExpanded(true);
             };
@@ -144,8 +146,8 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                     setModalConfig({
                         title:
                             mode === GenericFormMode.Edit
-                                ? COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
-                                : DONATE_TEXT.QUESTION.CANCEL_EDIT,
+                                ? DONATE_TEXT.QUESTION.CANCEL_EDIT
+                                : COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
                         onConfirm: () => {
                             if (mode === GenericFormMode.Create) {
                                 onClose?.();
@@ -311,6 +313,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                 }
                                                 handleBlur={handleBlur(f.name)}
                                                 onlyNumbers={f.onlyNumbers}
+                                                maxLength={f.maxLength}
                                             />
 
                                             {isChildForm && isTitleField && mode === GenericFormMode.Edit && (
@@ -348,7 +351,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                     ? submit
                                                     : () =>
                                                           setModalConfig({
-                                                              title: DONATE_TEXT.BANK_DETAILS.ADD_NEW,
+                                                              title: DONATE_TEXT.QUESTION.BANK_DETAILS.ADD,
                                                               onConfirm: submit,
                                                           })
                                             }

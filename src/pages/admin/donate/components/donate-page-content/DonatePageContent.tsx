@@ -65,13 +65,21 @@ export const DonatePageContent = () => {
                                           createEmptyItem={(data) => ({ id: Date.now(), ...data })}
                                           isChildForm={true}
                                           onChangeItems={(newBanks) => {
-                                              setItems(
-                                                  items.map((i) =>
-                                                      i.id === formState.id
-                                                          ? { ...i, correspondentBanks: newBanks }
-                                                          : i,
-                                                  ),
-                                              );
+                                              setItems((prevItems) => {
+                                                  const itemExists = prevItems.some((i) => i.id === formState.id);
+                                                  if (itemExists) {
+                                                      return prevItems.map((i) =>
+                                                          i.id === formState.id
+                                                              ? { ...i, correspondentBanks: newBanks }
+                                                              : i,
+                                                      );
+                                                  } else {
+                                                      return [
+                                                          ...prevItems,
+                                                          { id: formState.id, correspondentBanks: newBanks } as any,
+                                                      ];
+                                                  }
+                                              });
                                           }}
                                       />
                                   )

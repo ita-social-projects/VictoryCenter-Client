@@ -1,3 +1,5 @@
+@use '../../../../../assets/sass/variables/colors';
+
 .generic-details {
     display: flex;
     flex-direction: column;
@@ -8,13 +10,12 @@
         width: 100%;
     }
 
-    
     .btn {
         &-add {
             display: flex;
             flex-direction: row;
             gap: 0.5rem;
-            
+
             .plus-icon {
                 width: 1.5rem;
                 height: 1.5rem;
@@ -50,6 +51,11 @@
                     .plus-icon {
                         background: url('../../../../../assets/icons/plus.svg') no-repeat center;
                     }
+                }
+
+                &.disabled {
+                    cursor: default;
+                    background-color: colors.$grey-700;
                 }
             }
         }

@@ -55,7 +55,17 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
     };
 
     const handleAdd = () => {
-        setIsAddFormVisible(true);
+        if (!isChildForm) {
+            const newItem = createEmptyItem({
+                id: Date.now(),
+                correspondentBanks: [],
+            } as any);
+
+            updateItems([...items, newItem]);
+            setIsAddFormVisible(true);
+        } else {
+            setIsAddFormVisible(true);
+        }
     };
 
     const handleClose = () => {
@@ -68,16 +78,21 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
 
     const handleSubmit = useCallback(
         async (data: T) => {
-            const currentIsValid = addformRef.current?.isValid(false) || false;
-            if (!currentIsValid) return;
+            if (isChildForm) {
+                updateItems([...items, data]);
+                setIsAddFormVisible(false);
+            } else {
+                const newItem = createEmptyItem({
+                    ...data,
+                    id: data.id || Date.now(),
+                    correspondentBanks: data.correspondentBanks || [],
+                } as any);
 
-            const newItem = createEmptyItem(data);
-
-            await new Promise((res) => setTimeout(res, 300));
-            updateItems([...items, newItem]);
-            setIsAddFormVisible(false);
+                updateItems([...items, newItem]);
+                setIsAddFormVisible(false);
+            }
         },
-        [createEmptyItem, items, updateItems],
+        [createEmptyItem, items, isChildForm, updateItems],
     );
 
     return (
@@ -133,8 +148,12 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
                             {(formProps) => <>{children && children(formProps)}</>}
                         </FormComponent>
                     )}
-                    {!isAddFormVisible && !showNotFound && (
-                        <Button className="generic-details btn-add-new" onClick={handleAdd} buttonStyle="primary">
+                    {!showNotFound && (
+                        <Button
+                            className={`generic-details btn-add-new ${isAddFormVisible ? 'disabled' : ''}`}
+                            onClick={handleAdd}
+                            buttonStyle="primary"
+                        >
                             <>
                                 {isChildForm
                                     ? DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW

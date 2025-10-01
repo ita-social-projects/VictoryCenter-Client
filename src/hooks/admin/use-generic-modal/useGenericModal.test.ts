@@ -232,37 +232,23 @@ describe('useGenericModal', () => {
     });
 
     it('re-renders on every validation change even with same boolean value', () => {
-        const apiCall = jest.fn();
-        const onSuccess = jest.fn();
-        const onClose = jest.fn();
-        const getErrorMessage = jest.fn(() => 'err');
-        const getFormKey = jest.fn(() => 'key');
-        const transformFormData = jest.fn((d) => d);
-        const getConfirmTitle = jest.fn(() => 'title');
+        const localGetConfirmTitle = jest.fn(() => 'title');
 
         const { result } = renderHook(() =>
             useGenericModal({
-                mode: ModalMode.Add,
-                isOpen: true,
-                onClose,
-                entity: { id: 1 },
-                onSuccess,
-                apiCall,
-                getConfirmTitle,
-                getErrorMessage,
-                getFormKey,
-                transformFormData,
+                ...defaultConfig,
+                getConfirmTitle: localGetConfirmTitle,
             }),
         );
 
-        expect(getConfirmTitle).toHaveBeenCalled();
+        expect(localGetConfirmTitle).toHaveBeenCalled();
 
-        const initialCalls = getConfirmTitle.mock.calls.length;
-
-        act(() => result.current.handleFormValidationChange(true));
-        expect(getConfirmTitle).toHaveBeenCalledTimes(initialCalls + 1);
+        const initialCalls = localGetConfirmTitle.mock.calls.length;
 
         act(() => result.current.handleFormValidationChange(true));
-        expect(getConfirmTitle).toHaveBeenCalledTimes(initialCalls + 2);
+        expect(localGetConfirmTitle).toHaveBeenCalledTimes(initialCalls + 1);
+
+        act(() => result.current.handleFormValidationChange(true));
+        expect(localGetConfirmTitle).toHaveBeenCalledTimes(initialCalls + 2);
     });
 });

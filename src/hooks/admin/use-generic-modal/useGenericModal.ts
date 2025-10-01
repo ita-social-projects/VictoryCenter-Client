@@ -47,14 +47,13 @@ export const useGenericModal = <
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
     const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
     const [pendingFormData, setPendingFormData] = useState<TFormValues | null>(null);
-    const [isFormValid, setIsFormValid] = useState(false);
-    const [validationTick, setValidationTick] = useState(0);
+
+    const [formValidation, setFormValidation] = useState({ valid: false, timestamp: 0 });
 
     const isEditMode = mode === ModalMode.Edit;
 
     const handleFormValidationChange = useCallback((isValid: boolean) => {
-        setIsFormValid(isValid);
-        setValidationTick((x) => x + 1);
+        setFormValidation({ valid: isValid, timestamp: Date.now() });
     }, []);
 
     useEffect(() => {
@@ -64,7 +63,7 @@ export const useGenericModal = <
         setShowCloseConfirmModal(false);
         setPendingAction(null);
         setPendingFormData(null);
-        setIsFormValid(false);
+        setFormValidation({ valid: false, timestamp: 0 });
     }, [isOpen]);
 
     const resetPendingState = useCallback(() => {
@@ -164,7 +163,7 @@ export const useGenericModal = <
         error,
         showFormConfirmModal,
         showCloseConfirmModal,
-        isFormValid,
+        isFormValid: formValidation.valid,
         isEditMode,
         formKey,
         formConfirmTitle,

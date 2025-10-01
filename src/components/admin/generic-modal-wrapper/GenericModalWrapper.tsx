@@ -62,10 +62,10 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
     categories,
 }: GenericModalWrapperProps<TFormValues, TFormRef>) => {
     const api = (formRef?.current as any) || null;
-    const hasIsValid = typeof api?.isValid === 'function';
+    const hasApi = typeof api?.isValid === 'function';
 
-    const draftValid = hasIsValid ? api.isValid(false) : isFormValid;
-    const publishValid = hasIsValid ? api.isValid(true) : false;
+    const draftValid = hasApi && isFormValid ? api.isValid(false) : isFormValid;
+    const publishValid = hasApi && isFormValid ? api.isValid(true) : false;
 
     const handleCancel = () => {
         onCancelConfirmation();

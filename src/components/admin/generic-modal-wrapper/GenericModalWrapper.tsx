@@ -61,6 +61,12 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
     renderForm,
     categories,
 }: GenericModalWrapperProps<TFormValues, TFormRef>) => {
+    const api = (formRef?.current as any) || null;
+    const hasIsValid = typeof api?.isValid === 'function';
+
+    const draftValid = hasIsValid ? api.isValid(false) : isFormValid;
+    const publishValid = hasIsValid ? api.isValid(true) : false;
+
     return (
         <>
             <Modal isOpen={isOpen} onClose={onClose}>
@@ -78,10 +84,10 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                     {error && <div className="error-container">{error}</div>}
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button buttonStyle="secondary" onClick={onDraftSubmit} disabled={isSubmitting || !isFormValid}>
+                    <Button buttonStyle="secondary" onClick={onDraftSubmit} disabled={isSubmitting || !draftValid}>
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
                     </Button>
-                    <Button buttonStyle="primary" onClick={onPublishSubmit} disabled={isSubmitting || !isFormValid}>
+                    <Button buttonStyle="primary" onClick={onPublishSubmit} disabled={isSubmitting || !publishValid}>
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                     </Button>
                 </Modal.Actions>

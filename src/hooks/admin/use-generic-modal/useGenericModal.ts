@@ -47,7 +47,6 @@ export const useGenericModal = <
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
     const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
     const [pendingFormData, setPendingFormData] = useState<TFormValues | null>(null);
-
     const [formValidation, setFormValidation] = useState({ valid: false, timestamp: 0 });
 
     const isEditMode = mode === ModalMode.Edit;

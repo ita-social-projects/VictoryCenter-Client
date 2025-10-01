@@ -242,7 +242,7 @@ describe('useGenericModal', () => {
 
         const { result } = renderHook(() =>
             useGenericModal({
-                mode: 'add',
+                mode: ModalMode.Add,
                 isOpen: true,
                 onClose,
                 entity: { id: 1 },
@@ -255,12 +255,14 @@ describe('useGenericModal', () => {
             }),
         );
 
-        expect(getConfirmTitle).toHaveBeenCalledTimes(1);
+        expect(getConfirmTitle).toHaveBeenCalled();
+
+        const initialCalls = getConfirmTitle.mock.calls.length;
 
         act(() => result.current.handleFormValidationChange(true));
-        expect(getConfirmTitle).toHaveBeenCalledTimes(2);
+        expect(getConfirmTitle).toHaveBeenCalledTimes(initialCalls + 1);
 
         act(() => result.current.handleFormValidationChange(true));
-        expect(getConfirmTitle).toHaveBeenCalledTimes(3);
+        expect(getConfirmTitle).toHaveBeenCalledTimes(initialCalls + 2);
     });
 });

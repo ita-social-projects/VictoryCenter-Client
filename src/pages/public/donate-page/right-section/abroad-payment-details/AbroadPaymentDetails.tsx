@@ -1,8 +1,9 @@
 import './AbroadPaymentDetails.scss';
 import { CorrespondentBanksSection } from './CorrespondentBanksSection';
 import { PaymentDetailsSection } from './PaymentDetailsSection';
-import { Currency, currencyToString } from '../../../../../types/public/donate-page';
+import { Currency } from '../../../../../types/public/donate-page';
 import { ABROAD_PAYMENT_DETAILS } from '../../../../../const/public/donate-page';
+import { currencyToString } from '../../../../../utils/functions/mappers/public/donate';
 
 type AbroadCurrency = 'USD' | 'EUR';
 

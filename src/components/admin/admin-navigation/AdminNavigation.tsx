@@ -42,12 +42,24 @@ export const AdminNavigation = () => {
                         >
                             {COMMON_TEXT_ADMIN.TAB.PROGRAMS}
                         </NavLink>
+
+                        <NavLink
+                            to={ADMIN_ROUTES.FAQ.FULL}
+                            end
+                            className={({ isActive }) =>
+                                classNames('admin-page-link', {
+                                    'admin-pages-selected': isActive,
+                                })
+                            }
+                        >
+                            {COMMON_TEXT_ADMIN.TAB.FAQ}
+                        </NavLink>
                     </nav>
                 </div>
             </div>
             <Button className="exit-button" onClick={logout}>
                 <ExitIcon className="exit-icon" />
-                <span className="exit-button-text">Вихід</span>
+                <span className="exit-button-text">{COMMON_TEXT_ADMIN.BUTTON.EXIT}</span>
             </Button>
         </div>
     );

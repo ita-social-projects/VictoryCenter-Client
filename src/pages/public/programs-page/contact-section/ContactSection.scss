@@ -11,7 +11,6 @@
         width: 100%;
         position: absolute;
         object-fit: cover;
-        z-index: 1;
         pointer-events: none;
     }
 
@@ -20,7 +19,6 @@
         padding-top: 3.75rem;
         width: 65rem;
         position: relative;
-        z-index: 2;
         text-align: center;
 
         .contact-title {

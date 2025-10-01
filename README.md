@@ -2,9 +2,9 @@
 
 # Victory Center
 
-This repo contains front end part of the Victory center
+This repo contains the front-end part of the Victory Center project.
 
-Main structure of this project
+Main structure of this project:
 
 <pre><code>
 victory-center-client
@@ -14,7 +14,7 @@ victory-center-client
 │   ├───workflows
 │   └───CODEOWNERS
 ├───nginx
-├───public                              # Static assets root
+├───public
 ├───scripts
 ├───src
 │   ├───__mocks__
@@ -23,9 +23,11 @@ victory-center-client
 │   │   ├───icons
 │   │   ├───images
 │   │   │   ├───admin
+│   │   │   │   └───home
 │   │   │   ├───common
 │   │   │   └───public
 │   │   │       ├───about-us-page
+│   │   │       ├───partners-page
 │   │   │       ├───programs-page
 │   │   │       └───team-page
 │   │   ├───sass
@@ -35,34 +37,57 @@ victory-center-client
 │   │       ├───admin
 │   │       ├───common
 │   │       └───public
+│   │           ├───partners-page
 │   │           ├───programs-page
 │   │           └───team-page
 │   ├───components
 │   │   ├───admin
 │   │   │   ├───admin-context-wrapper
 │   │   │   ├───admin-navigation
+│   │   │   ├───admin-panel-toolbar
 │   │   │   ├───button
 │   │   │   ├───button-tooltip
 │   │   │   ├───category-bar
 │   │   │   ├───confirmation-modal
 │   │   │   ├───context-menu-button
+│   │   │   ├───draggable-list-item
+│   │   │   ├───drag-preview
+│   │   │   ├───generic-modal-wrapper
 │   │   │   ├───hint-box
+│   │   │   ├───image-input
 │   │   │   ├───infinite-scroll-list
+│   │   │   ├───input-error
+│   │   │   ├───input-groups
+│   │   │   │   ├───input-with-character-limit-group
+│   │   │   │   ├───multi-select-input-group
+│   │   │   │   ├───photo-input-group
+│   │   │   │   ├───single-select-input-group
+│   │   │   │   └───text-area-with-character-limit-group
 │   │   │   ├───input-label
 │   │   │   ├───input-with-character-limit
 │   │   │   ├───multi-select-input
-│   │   │   ├───photo-input
 │   │   │   ├───private-route
 │   │   │   ├───public-route
 │   │   │   ├───search-bar
+│   │   │   │   ├───search-item-wrapper
+│   │   │   │   └───text-search-item
 │   │   │   ├───select
+│   │   │   ├───status-filter-dropdown
 │   │   │   ├───textarea-with-character-limit
+│   │   │   ├───toast
+│   │   │   │   ├───toast-container
+│   │   │   │   └───toast-item
+│   │   │   ├───tooltip
 │   │   │   └───visibility-status-label
 │   │   ├───common
 │   │   │   ├───inline-loader
 │   │   │   ├───modal
-│   │   │   └───page-loader
+│   │   │   ├───page-loader
+│   │   │   ├───partners
+│   │   │   ├───single-select-input
+│   │   │   └───tabs
 │   │   └───public
+│   │       ├───dropdown-menu
 │   │       ├───faq-section
 │   │       │   └───faq-card
 │   │       ├───footer
@@ -71,22 +96,46 @@ victory-center-client
 │   │   ├───admin
 │   │   ├───common
 │   │   │   └───api-routes
-│   │   └───public
+│   │   ├───public
+│   │   └───routers
 │   ├───contexts
 │   │   ├───admin
-│   │   │   └───admin-context-provider
+│   │   │   ├───admin-context-provider
+│   │   │   ├───toast-context-provider
+│   │   │   └───visitor-pages-provider
 │   │   └───public
 │   ├───hooks
 │   │   ├───admin
+│   │   │   ├───fetch
+│   │   │   │   ├───use-data-fetch
+│   │   │   │   └───use-data-pagination-fetch
 │   │   │   ├───use-admin-client
-│   │   │   └───use-create-member-form
+│   │   │   ├───use-categories-counter
+│   │   │   ├───use-form-manager
+│   │   │   ├───use-generic-modal
+│   │   │   └───use-modals-state
 │   │   └───common
-│   │       └───use-on-mount-unsafe
+│   │       ├───use-container-size-from-children
+│   │       ├───use-debounced-value-callback
+│   │       ├───use-observe-element-size
+│   │       ├───use-on-click-outside
+│   │       ├───use-on-mount-unsafe
+│   │       └───use-scroll-handler
+│   ├───jest
 │   ├───layouts
 │   │   ├───admin-layout
 │   │   └───public-layout
 │   ├───pages
 │   │   ├───admin
+│   │   │   ├───faq
+│   │   │   │   └───components
+│   │   │   │       ├───faq-component
+│   │   │   │       ├───faq-form
+│   │   │   │       ├───faq-modals
+│   │   │   │       │   ├───delete-faq-modal
+│   │   │   │       │   └───faq-modal
+│   │   │   │       ├───faq-panel-content
+│   │   │   │       └───faq-search-item
 │   │   │   ├───home
 │   │   │   ├───login
 │   │   │   │   └───login-form
@@ -95,16 +144,18 @@ victory-center-client
 │   │   │   │       ├───program-category-modals
 │   │   │   │       ├───program-form
 │   │   │   │       ├───program-list-item
-│   │   │   │       ├───program-modals
+│   │   │   │       ├───program-search-item
 │   │   │   │       ├───programs-page-content
-│   │   │   │       └───programs-page-toolbar
+│   │   │   │       └───programs-page-modals
+│   │   │   │           ├───delete-program-modal
+│   │   │   │           └───program-modal
 │   │   │   └───team
 │   │   │       └───components
 │   │   │           ├───member-component
-│   │   │           ├───member-drag-preview
 │   │   │           ├───member-form
-│   │   │           ├───members-list
-│   │   │           ├───members-list-item
+│   │   │           ├───team-member-modals
+│   │   │           │   ├───delete-team-member-modal
+│   │   │           │   └───team-member-modal
 │   │   │           ├───team-page-content
 │   │   │           └───team-page-toolbar
 │   │   └───public
@@ -125,7 +176,13 @@ victory-center-client
 │   │       │       ├───abroad-payment-details
 │   │       │       ├───alternative-support-ways
 │   │       │       └───ukraine-payment-details
-│   │       ├───not-found
+│   │       ├───not-found-page
+│   │       │   ├───not-found-intro
+│   │       │   └───not-found-message
+│   │       ├───partners-page
+│   │       │   └───partners-sections
+│   │       │       ├───intro-section
+│   │       │       └───outro-section
 │   │       ├───programs-page
 │   │       │   ├───contact-section
 │   │       │   ├───intro-section
@@ -138,6 +195,7 @@ victory-center-client
 │   ├───services
 │   │   ├───api
 │   │   │   ├───admin
+│   │   │   │   ├───faq
 │   │   │   │   ├───image
 │   │   │   │   ├───login
 │   │   │   │   ├───programs
@@ -159,35 +217,40 @@ victory-center-client
 │   ├───utils
 │   │   ├───functions
 │   │   │   ├───get-env-variable
-│   │   │   └───map-image-to-base-64
+│   │   │   └───mappers
+│   │   │       ├───admin
+│   │   │       ├───common
+│   │   │       └───public
 │   │   └───mock-data
 │   │       ├───admin
 │   │       └───public
 │   ├───validation
 │   │   ├───admin
-│   │   │   ├───create-member-schema
+│   │   │   ├───faq-schema
 │   │   │   ├───program-category-schema
-│   │   │   └───program-schema
+│   │   │   ├───program-schema
+│   │   │   └───team-member-schema
 │   │   └───public
-│   ├──index.tsx                           # Entry point (ReactDOM.createRoot)
-│   ├──index.css                           # Global styles (normalizer)
-│   ├──react-app-env.d.ts
-│   ├──reportWebVitals.ts
-│   ├──setupProxy.ts
-│   └──setupTests.ts
-├──.coderabbit.yaml
-├──.dockerignore
-├──.env.development
-├──.gitignore
-├──Dockerfile
-├──LICENSE
-├──package-lock.json
-├──package.json
-├──README.md
-└──tsconfig.json
+│   ├───index.tsx                           # Entry point (ReactDOM.createRoot)
+│   ├───index.css                           # Global styles (normalizer)
+│   ├───react-app-env.d.ts
+│   ├───reportWebVitals.ts
+│   ├───setupProxy.ts
+│   └───setupTests.ts
+├───.coderabbit.yaml
+├───.dockerignore
+├───.env.development
+├───.gitignore
+├───Dockerfile
+├───LICENSE
+├───package-lock.json
+├───package.json
+├───README.md
+└───tsconfig.json
 </code></pre>
 
 <div>
+
 [![Build Status](https://img.shields.io/travis/ita-social-projects/VictoryCenter-Client/main?style=flat-square)](https://travis-ci.org/github/ita-social-projects/VictoryCenter-Client)
 [![Coverage Status](https://img.shields.io/gitlab/coverage/ita-social-projects/VictoryCenter-Client/main?style=flat-square)](https://coveralls.io)
 [![Github Issues](https://img.shields.io/github/issues/ita-social-projects/VictoryCenter-Client?style=flat-square)](https://github.com/ita-social-projects/VictoryCenter-Client/issues)
@@ -200,14 +263,6 @@ victory-center-client
 ---
 
 ## Available Scripts
-
-In the project directory, you can run:
-
-# Setup
-
-To setup this project use this command in project folder:
-
-### `npm install`
 
 ### `npm start`
 
@@ -262,8 +317,8 @@ Ensure you have installed the [back-end project](https://github.com/ita-social-p
 
 ### Required to install
 
-- Node.js (24.0.0) or higher
-- npm (11.4.2) or higher
+- [Node.js](https://nodejs.org) (24.0.0) or higher
+- npm (11.4.2) or higher (installed with Node.js)
 
 ### Clone
 
@@ -311,25 +366,16 @@ mkcert -install
 mkcert -key-file localhost-key.pem -cert-file localhost-cert.pem localhost 127.0.0.1 ::1
 ```
 
-### Required to install
-
-- Modify this section later
-
 ### Environment
 
-- Modify this section later
-
-environmental variables
+environmental variables (already set in .env.development)
 
 ```properties
-spring.datasource.url=${DATASOURCE_URL}
-spring.datasource.username=${DATASOURCE_USER}
-spring.datasource.password=${DATASOURCE_PASSWORD}
-spring.mail.username=${EMAIL_ADDRESS}
-spring.mail.password=${EMAIL_PASSWORD}
-cloud.name=${CLOUD_NAME}
-api.key=${API_KEY}
-api.secret=${API_SECRET}
+HTTPS=true
+SSL_KEY_FILE=certs/localhost-key.pem
+SSL_CRT_FILE=certs/localhost-cert.pem
+REACT_APP_PROXY_TARGET=https://backend.historycode.online/api
+REACT_APP_BACKEND_URL=/api
 ```
 
 ## Contributing
@@ -344,7 +390,7 @@ api.secret=${API_SECRET}
     - 🍴 Fork this repo!
 
 - **Option 2**
-    - 👯 Clone this repo to your local machine using `https://github.com/ita-social-projects/SOMEREPO.git`
+    - 👯 Clone this repo to your local machine using `https://github.com/ita-social-projects/VictoryCenter-Client`
 
 #### Step 2
 
@@ -352,7 +398,7 @@ api.secret=${API_SECRET}
 
 #### Step 3
 
-- 🔃 Create a new pull request using <a href="https://github.com/ita-social-projects/SOMEREPO/compare/" target="_blank">github.com/ita-social-projects/SOMEREPO</a>.
+- 🔃 Create a new pull request using <a href="https://github.com/ita-social-projects/VictoryCenter-Client/compare" target="_blank">github.com/ita-social-projects/VictoryCenter-Client/compare</a>.
 
 ### Issue flow
 
@@ -362,11 +408,8 @@ api.secret=${API_SECRET}
 
 > Or Contributors/People
 
-[![@IrynaZavushchak](https://avatars.githubusercontent.com/u/45690640?s=100&v=4)](https://github.com/IrynaZavushchak)
-[![@LanchevychMaxym](https://avatars.githubusercontent.com/u/47561209?s=100&v=4)](https://github.com/LanchevychMaxym)
-
-- You can just grab their GitHub profile image URL
-- You should probably resize their picture using `?s=200` at the end of the image URL.
+[![@IrynaZavushchak](https://avatars.githubusercontent.com/u/45690640?s=200&v=4)](https://github.com/IrynaZavushchak)
+[![@LanchevychMaxym](https://avatars.githubusercontent.com/u/47561209?s=200&v=4)](https://github.com/LanchevychMaxym)
 
 ---
 
@@ -377,6 +420,7 @@ api.secret=${API_SECRET}
 Reach out to us at one of the following places!
 
 - Discord at <a href="https://discord.com/">`ira_zavushchak`</a>
+- Telegram at <a href="https://t.me/ira_zavushchak" target="_blank">`Iryna Zavushchak`</a>
 
 ---
 

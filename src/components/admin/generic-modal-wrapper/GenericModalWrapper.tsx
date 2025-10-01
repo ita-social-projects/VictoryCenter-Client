@@ -67,6 +67,11 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
     const draftValid = hasIsValid ? api.isValid(false) : isFormValid;
     const publishValid = hasIsValid ? api.isValid(true) : false;
 
+    const handleCancel = () => {
+        onCancelConfirmation();
+        onClose();
+    };
+
     return (
         <>
             <Modal isOpen={isOpen} onClose={onClose}>
@@ -81,7 +86,7 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                         onValidationChange: onFormValidationChange,
                         ...(categories && { categories }),
                     })}
-                    {error && <div className="error-container">{error}</div>}
+                    {error && <div className="modal-content-error-container">{error}</div>}
                 </Modal.Content>
                 <Modal.Actions>
                     <Button buttonStyle="secondary" onClick={onDraftSubmit} disabled={isSubmitting || !draftValid}>
@@ -98,8 +103,8 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                 isButtonsDisabled={isSubmitting}
                 title={formConfirmTitle}
                 onConfirm={onConfirmAction}
-                onCancel={onCancelConfirmation}
-                onClose={onCancelConfirmation}
+                onCancel={handleCancel}
+                onClose={onClose}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
@@ -110,7 +115,7 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
                 onConfirm={onConfirmClose}
                 onCancel={onCancelClose}
-                onClose={onCancelClose}
+                onClose={onClose}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />

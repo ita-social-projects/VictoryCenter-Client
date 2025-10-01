@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
 import { Program, ProgramCategory, ProgramCreateUpdate } from '../../../../../../types/admin/programs';
-import { VisibilityStatus } from '../../../../../../types/admin/common';
+import { VisibilityStatus, PendingAction, ModalMode } from '../../../../../../types/admin/common';
 import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
-import '../ProgramModal.scss';
 import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
 import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
+import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 interface BaseProps {
     isOpen: boolean;
@@ -16,12 +16,12 @@ interface BaseProps {
 }
 
 interface AddModalProps extends BaseProps {
-    mode: 'add';
+    mode: ModalMode.Add;
     onAddProgram: (program: Program) => void;
 }
 
 interface EditModalProps extends BaseProps {
-    mode: 'edit';
+    mode: ModalMode.Edit;
     programToEdit: Program;
     onEditProgram: (program: Program) => void;
 }
@@ -30,7 +30,8 @@ export type ProgramModalProps = AddModalProps | EditModalProps;
 
 export const ProgramModal = (props: ProgramModalProps) => {
     const { isOpen, onClose, mode, categories } = props;
-    const isEditMode = mode === 'edit';
+    const client = useAdminClient();
+    const isEditMode = mode === ModalMode.Edit;
     const program = isEditMode ? props.programToEdit : undefined;
     const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
 
@@ -42,40 +43,38 @@ export const ProgramModal = (props: ProgramModalProps) => {
             entity: program,
             onSuccess: onSuccess || (() => {}),
             apiCall: async (data: ProgramCreateUpdate) => {
-                return isEditMode ? await ProgramsApi.editProgram(data) : await ProgramsApi.addProgram(data);
+                return isEditMode
+                    ? await ProgramsApi.editProgram(data, client)
+                    : await ProgramsApi.addProgram(client, data);
             },
-            getConfirmTitle: (
-                mode: 'add' | 'edit',
-                program: Program | undefined,
-                pendingAction: 'publish' | 'draft' | null,
-            ) => {
-                if (mode === 'edit' && program) {
+            getConfirmTitle: (mode: ModalMode, program: Program | undefined, pendingAction: PendingAction | null) => {
+                if (mode === ModalMode.Edit && program) {
                     if (program.status === VisibilityStatus.Published)
-                        return pendingAction === 'draft'
+                        return pendingAction === PendingAction.Draft
                             ? COMMON_TEXT_ADMIN.QUESTION.REMOVE_FROM_PUBLICATION
                             : COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES;
-                    return pendingAction === 'draft'
+                    return pendingAction === PendingAction.Draft
                         ? COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES
                         : PROGRAMS_TEXT.QUESTION.PUBLISH_PROGRAM;
                 }
-                return pendingAction === 'draft'
+                return pendingAction === PendingAction.Draft
                     ? PROGRAMS_TEXT.QUESTION.DRAFT_PROGRAM
                     : PROGRAMS_TEXT.QUESTION.PUBLISH_PROGRAM;
             },
-            getErrorMessage: (mode: 'add' | 'edit') => {
-                return mode === 'edit'
+            getErrorMessage: (mode: ModalMode) => {
+                return mode === ModalMode.Edit
                     ? PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_PROGRAM
                     : PROGRAMS_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_PROGRAM;
             },
-            getFormKey: (mode: 'add' | 'edit', program?: Program) => {
-                return mode === 'edit' && program?.id ? program.id : 'add';
+            getFormKey: (mode: ModalMode, program?: Program) => {
+                return mode === ModalMode.Edit && program?.id ? program.id : 'add';
             },
             transformFormData: (
                 formData: ProgramFormValues,
                 status: VisibilityStatus,
                 program?: Program,
             ): ProgramCreateUpdate => ({
-                id: mode === 'edit' && program ? program.id : null,
+                id: mode === ModalMode.Edit && program ? program.id : null,
                 name: formData.name,
                 description: formData.description,
                 img: formData.img && 'base64' in formData.img ? formData.img : null,
@@ -83,7 +82,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 categoryIds: formData.categories.map((x) => x.id),
             }),
         }),
-        [isEditMode, isOpen, mode, onClose, onSuccess, program],
+        [isEditMode, isOpen, mode, onClose, onSuccess, program, client],
     );
 
     const modalHookData = useGenericModal<ProgramFormValues, Program, ProgramFormRef>(modalConfig);
@@ -94,7 +93,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
         return {
             name: program.name,
             description: program.description,
-            categories: program.categories,
+            categories: program.categories.map((c) => ({ ...c, programsCount: c.programsCount ?? 0 })),
             img: program.img,
             imgId: program.img && 'id' in program.img ? program.img.id : null,
         };

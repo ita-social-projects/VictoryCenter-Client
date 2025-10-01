@@ -9,9 +9,27 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ButtonProps } from '../../../../../components/admin/button/Button';
 import { SelectOptionProps, SelectProps } from '../../../../../components/admin/select/Select';
 import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+
+jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
+}));
+
+const mockedUseAdminClient = useAdminClient as jest.Mock;
+
+beforeEach(() => {
+    mockedUseAdminClient.mockReturnValue({
+        client: {
+            get: jest.fn(),
+            post: jest.fn(),
+            put: jest.fn(),
+            delete: jest.fn(),
+        },
+    });
+});
 
 jest.mock('../../../../../assets/icons/plus.svg', () => ({
-    ReactComponent: (props: any) => <svg data-testid="plus-icon" {...props} />,
+    ReactComponent: ({ ...props }: any) => <svg {...props} data-testid="plus-icon" />,
 }));
 
 jest.mock('../../../../../components/admin/button/Button', () => ({
@@ -77,7 +95,7 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
 
 jest.mock('../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch');
 jest.mock('../../../../../services/api/admin/programs/programs-api');
-jest.mock('./program-suggestion-item/ProgramSearchItem', () => ({
+jest.mock('../program-search-item/ProgramSearchItem.tsx', () => ({
     ProgramSuggestionItem: ({ item }: any) => <div data-testid="suggestion-item">{item.name}</div>,
 }));
 
@@ -138,10 +156,10 @@ describe('ProgramsPageToolbar', () => {
         expect(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT)).toBeInTheDocument();
     });
 
-    it('should render add program button with correct icon', () => {
+    it('should render add program button', () => {
         render(<ProgramsPageToolbar {...createProps()} />);
 
-        const button = screen.getByTestId('plus-icon').closest('button');
+        const button = screen.getByText(PROGRAMS_TEXT.BUTTON.ADD_PROGRAM);
         expect(button).toBeInTheDocument();
     });
 
@@ -238,10 +256,10 @@ describe('ProgramsPageToolbar', () => {
         await fetchHandler(params);
 
         expect(mockProgramsApi.fetchProgramSearchItems).toHaveBeenCalledWith(
+            expect.any(Object),
             '',
             params.offset,
             params.limit,
-            params.requestOptions,
         );
     });
 

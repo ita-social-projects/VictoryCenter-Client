@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import './ImageInput.scss';
 import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
 
 export interface ImageInputProps {
     value: ImageValues | Image | null;
@@ -19,6 +20,7 @@ export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
 
     useEffect(() => {
         if (value) {
@@ -28,7 +30,6 @@ export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false
 
     const handleFile = useCallback(
         async (file: File) => {
-            if (!file.type.startsWith('image/')) return;
             const imgItem = await convertFileToBase64(file);
             onChange(imgItem);
         },
@@ -94,6 +95,7 @@ export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false
         setPreviewImage(null);
         onChange(null);
         if (inputRef.current) inputRef.current.value = '';
+        setShowConfirmModal(false);
     };
 
     return (
@@ -145,7 +147,7 @@ export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false
                             data-testid="remove-photo-button"
                             onClick={(e) => {
                                 e.stopPropagation();
-                                handleRemove();
+                                setShowConfirmModal(true);
                             }}
                         >
                             <DeleteIcon className="delete-icon" />
@@ -158,6 +160,17 @@ export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false
                     <span>{COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER}</span>
                 </div>
             )}
+
+            <ConfirmationModal
+                isOpen={showConfirmModal}
+                isButtonsDisabled={false}
+                title={'Видалити фото?'}
+                onConfirm={handleRemove}
+                onCancel={() => setShowConfirmModal(false)}
+                onClose={() => setShowConfirmModal(false)}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
+            />
         </div>
     );
 };

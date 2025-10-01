@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useGenericModal, GenericFormRef } from './useGenericModal';
-import { VisibilityStatus } from '../../../types/admin/common';
+import { VisibilityStatus, ModalMode } from '../../../types/admin/common';
 
 describe('useGenericModal', () => {
     const apiCall = jest.fn();
@@ -12,7 +12,7 @@ describe('useGenericModal', () => {
     const transformFormData = jest.fn((data) => ({ ...data, transformed: true }));
 
     const defaultConfig = {
-        mode: 'add' as const,
+        mode: ModalMode.Add,
         isOpen: true,
         onClose,
         entity: { id: 1 },
@@ -113,7 +113,7 @@ describe('useGenericModal', () => {
 
         expect(localApiCall).toHaveBeenCalled();
         expect(onSuccess).not.toHaveBeenCalled();
-        expect(mockGetErrorMessage).toHaveBeenCalledWith('add'); // or 'edit' depending on your defaultConfig.mode
+        expect(mockGetErrorMessage).toHaveBeenCalledWith(ModalMode.Add); // or ModalMode.Edit depending on your defaultConfig.mode
         expect(result.current.error).toBe('boom');
         expect(result.current.isSubmitting).toBe(false);
     });

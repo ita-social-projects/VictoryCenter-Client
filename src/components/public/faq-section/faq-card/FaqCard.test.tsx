@@ -18,7 +18,6 @@ describe('test question card component', () => {
             'Потрібно заповнити коротку анкету або написати координатору через форму на сайті.' +
             " Після цього ми зв'яжемось для уточнення деталей.",
     };
-
     test('should contain correct information', () => {
         render(<FaqCard faq={mockQuestion} />);
         const question = screen.getByText(mockQuestion.questionText);

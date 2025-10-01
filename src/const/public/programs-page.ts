@@ -5,7 +5,7 @@ export const COMMON_QUESTIONS = 'Часті питання';
 export const PROGRAMS = 'Програми';
 export const PROGRAMS_FOR_KIDS = 'Дитячі';
 export const PROGRAMS_FOR_VETERANS = 'Ветеранські';
-export const PROGRAMS_ALL = 'Всі';
+export const PROGRAMS_ALL = 'Усі';
 export const CONTACT = "Зв'язатись";
 export const ABOUT_PROGRAMS =
     'Наші програми — це про повернення до себе і віднайдення внутрішньої сили.' +

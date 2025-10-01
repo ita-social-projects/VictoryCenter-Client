@@ -1,23 +1,24 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Program, ProgramCategory } from '../../../../../types/admin/programs';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Program, ProgramCategory, ProgramSearchItemData } from '../../../../../types/admin/programs';
 import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/common';
-import { ProgramsPageToolbar } from '../programs-page-toolbar/ProgramsPageToolbar';
 import { ProgramsPageModals } from '../programs-page-modals/ProgramsPageModals';
 import { InfiniteScrollList } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
 import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/category-bar/CategoryBar';
 import { ProgramListItem } from '../program-list-item/ProgramListItem';
 import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
 import { useCategoriesCounter } from '../../../../../hooks/admin/use-categories-counter/useCategoriesCounter';
-import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
+import { ProgramsApi, ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { RequestOptions } from '../../../../../types/common/api';
-import { useDataFetch } from '../../../../../hooks/admin/fetch/use-data-fetch/useDataFetch';
+import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
 import {
     PaginationRequestParams,
     useDataPaginationFetch,
 } from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import './ProgramsPageContent.scss';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { AdminPanelToolbar } from '../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar';
+import { ProgramSearchItem } from '../program-search-item/ProgramSearchItem';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -30,6 +31,7 @@ interface ErrorState {
 export const ProgramsPageContent = () => {
     const [selectedCategory, setSelectedCategory] = useState<ProgramCategory | null>(null);
     const [pageSize, setPageSize] = useState(DEFAULT_LOAD_ITEMS_COUNT);
+    const client = useAdminClient();
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [searchProgramId, setSearchProgramId] = useState<number | undefined>();
     const [isSearchResultView, setIsSearchResultView] = useState(false);
@@ -41,37 +43,38 @@ export const ProgramsPageContent = () => {
     const { incrementCategoriesCount, decrementCategoriesCount, updateCategoriesCount } = useCategoriesCounter();
 
     // Fetch functions
-    const getProgramCategories = useCallback(async (options: RequestOptions) => {
-        return ProgramsApi.fetchProgramCategories(options);
-    }, []);
+    const getProgramCategories = useCallback(async () => {
+        const categories = await ProgramsCategoriesApi.fetchProgramCategories(client);
+
+        return categories.map((category) => ({
+            ...category,
+            programsCount: category.programsCount ? category.programsCount : 0,
+        }));
+    }, [client]);
 
     const getFilteredPrograms = useCallback(
         async (params: PaginationRequestParams): Promise<PaginationResult<Program>> => {
             if (!selectedCategory) {
                 return { items: [], totalItemsCount: 0 };
             }
-
             return ProgramsApi.fetchPrograms(
+                client,
                 selectedCategory.id,
-                params.offset,
-                params.limit,
+                params.offset as number,
+                params.limit as number,
                 statusFilter,
-                params.requestOptions,
             );
         },
-        [selectedCategory, statusFilter],
+        [selectedCategory, statusFilter, client],
     );
 
-    const getSearchedProgram = useCallback(
-        async (options: RequestOptions): Promise<Program | null> => {
-            if (!searchProgramId) {
-                return null;
-            }
+    const getSearchedProgram = useCallback(async (): Promise<Program | null> => {
+        if (!searchProgramId) {
+            return null;
+        }
 
-            return ProgramsApi.fetchProgramById(searchProgramId, options);
-        },
-        [searchProgramId],
-    );
+        return ProgramsApi.fetchProgramById(searchProgramId, client);
+    }, [searchProgramId, client]);
 
     const getProgramId = useCallback((program: Program) => program.id, []);
 
@@ -204,9 +207,9 @@ export const ProgramsPageContent = () => {
     );
 
     const handleProgramSuggestionSelect = useCallback(
-        (programId: number) => {
+        (programId: string | number) => {
             setIsSearchResultView(true);
-            setSearchProgramId(programId);
+            setSearchProgramId(typeof programId === 'string' ? parseInt(programId, 10) : programId);
             resetProgramsList();
         },
         [resetProgramsList],
@@ -387,12 +390,24 @@ export const ProgramsPageContent = () => {
     return (
         <div className="programs-page-wrapper" data-testid="programs-page-content">
             <div className="programs-page-toolbar-container">
-                <ProgramsPageToolbar
-                    onProgramSelect={handleProgramSuggestionSelect}
+                <AdminPanelToolbar<ProgramSearchItemData>
+                    getSearchItemKey={(item) => item.id}
+                    getSearchItemLabel={(item) => item.name}
+                    fetchSearchItems={(searchTerm, requestOptions) =>
+                        ProgramsApi.fetchProgramSearchItems(
+                            client,
+                            searchTerm,
+                            requestOptions.offset as number,
+                            requestOptions.limit as number,
+                        )
+                    }
+                    renderSearchItemComponent={ProgramSearchItem}
+                    placeholder={PROGRAMS_TEXT.PLACEHOLDER.SEARCH_PROGRAMS}
                     onSearchClear={handleSearchClear}
-                    statusFilterValue={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddProgram={openModalActions.openAddItemModal}
+                    onAddItem={openModalActions.openAddItemModal}
+                    AddItemButtonText={PROGRAMS_TEXT.BUTTON.ADD_PROGRAM}
+                    onSuggestionSelect={handleProgramSuggestionSelect}
                 />
             </div>
 

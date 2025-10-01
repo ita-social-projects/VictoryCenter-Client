@@ -1,10 +1,19 @@
-export interface PublishedProgram {
-    image: string;
-    title: string;
-    subtitle: string;
-    description: string;
+import { Image } from '../common/image';
+
+export interface ProgramCategoryDto {
+    id: number;
+    name: string;
 }
-export interface Question {
-    question: string;
-    answer: string;
+
+export interface PublishedProgramDto {
+    id: number;
+    image: Image | null;
+    name: string;
+    description: string;
+    categories: ProgramCategoryDto[];
+}
+
+export interface ProgramsPageData {
+    programsCategories: ProgramCategoryDto[];
+    programsData: PublishedProgramDto[];
 }

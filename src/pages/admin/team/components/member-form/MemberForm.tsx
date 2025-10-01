@@ -108,7 +108,7 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                 setFormState((prev) => ({ ...prev, image: file }));
                 setErrors((prev) => ({
                     ...prev,
-                    image: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(file, true),
+                    image: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(file, false),
                 }));
             },
             [setFormState, setErrors],

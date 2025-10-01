@@ -230,4 +230,37 @@ describe('useGenericModal', () => {
         });
         expect(submit).toHaveBeenCalledWith(VisibilityStatus.Draft);
     });
+
+    it('re-renders on every validation change even with same boolean value', () => {
+        const apiCall = jest.fn();
+        const onSuccess = jest.fn();
+        const onClose = jest.fn();
+        const getErrorMessage = jest.fn(() => 'err');
+        const getFormKey = jest.fn(() => 'key');
+        const transformFormData = jest.fn((d) => d);
+        const getConfirmTitle = jest.fn(() => 'title');
+
+        const { result } = renderHook(() =>
+            useGenericModal({
+                mode: 'add',
+                isOpen: true,
+                onClose,
+                entity: { id: 1 },
+                onSuccess,
+                apiCall,
+                getConfirmTitle,
+                getErrorMessage,
+                getFormKey,
+                transformFormData,
+            }),
+        );
+
+        expect(getConfirmTitle).toHaveBeenCalledTimes(1);
+
+        act(() => result.current.handleFormValidationChange(true));
+        expect(getConfirmTitle).toHaveBeenCalledTimes(2);
+
+        act(() => result.current.handleFormValidationChange(true));
+        expect(getConfirmTitle).toHaveBeenCalledTimes(3);
+    });
 });

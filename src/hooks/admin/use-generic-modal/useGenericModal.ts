@@ -52,11 +52,13 @@ export const useGenericModal = <
     const [pendingAction, setPendingAction] = useState<'publish' | 'draft' | null>(null);
     const [pendingFormData, setPendingFormData] = useState<TFormValues | null>(null);
     const [isFormValid, setIsFormValid] = useState(false);
+    const [validationTick, setValidationTick] = useState(0);
 
     const isEditMode = mode === 'edit';
 
     const handleFormValidationChange = useCallback((isValid: boolean) => {
         setIsFormValid(isValid);
+        setValidationTick((x) => x + 1);
     }, []);
 
     useEffect(() => {

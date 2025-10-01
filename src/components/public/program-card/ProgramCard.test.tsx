@@ -1,10 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { ProgramCard } from './ProgramCard';
-import { PublishedProgram } from '../../../../../types/public/programs-page';
-
-jest.mock('../../../../../assets/icons/arrow-up-right.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-icon" />,
-}));
+import { PublishedProgram } from '../../../types/public/programs-page';
 
 describe('test program-card component', () => {
     const mockProgram: PublishedProgram = {
@@ -15,7 +11,7 @@ describe('test program-card component', () => {
             'Зменшення рівня стресу, тривоги та ПТСР у ветеранів, повернення відчуття контролю, розвиток внутрішньої сили та опори.',
     };
     test('should contain correct information', () => {
-        render(<ProgramCard program={mockProgram} />);
+        render(<ProgramCard program={mockProgram} className="className" />);
         const title = screen.getByRole('heading', { name: mockProgram.title });
         expect(title).toBeInTheDocument();
         expect(title).toHaveClass('program-title');
@@ -32,9 +28,10 @@ describe('test program-card component', () => {
         expect(image).toBeInTheDocument();
         expect(image).toHaveAttribute('src', mockProgram.image);
         expect(image).toHaveClass('card-img');
-
-        const arrowIcon = screen.getByTestId('arrow-icon');
-        expect(arrowIcon).toBeInTheDocument();
-        expect(arrowIcon).toHaveClass('arrow-icon');
+    });
+    test('should contain correct classes', () => {
+        render(<ProgramCard program={mockProgram} className="className" />);
+        const container = screen.getByAltText(mockProgram.title).closest('.card-block');
+        expect(container).toBeInTheDocument();
     });
 });

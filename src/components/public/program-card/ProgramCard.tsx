@@ -1,14 +1,16 @@
 import React from 'react';
-import { PublishedProgram } from '../../../../../types/public/programs-page';
-import { ReactComponent as ArrowIcon } from '../../../../../assets/icons/arrow-up-right.svg';
-import './ProgramCard.scss';
+import { PublishedProgram } from '../../../types/public/programs-page';
+import { ReactComponent as ArrowIcon } from '../../../assets/icons/arrow-up-right.svg';
+import './ProgramCardProgramsPage.scss';
+import './ProgramCardAboutUsPage.scss';
 
 interface ProgramCardProps {
     program: PublishedProgram;
+    className: string;
 }
-export const ProgramCard: React.FC<ProgramCardProps> = ({ program }) => {
+export const ProgramCard: React.FC<ProgramCardProps> = ({ program, className }) => {
     return (
-        <div className="card-block">
+        <div className={`card-block ${className}`}>
             <img src={program.image} alt={program.title} className="card-img" />
             <div className="card-content">
                 <div className="subtitle-info">

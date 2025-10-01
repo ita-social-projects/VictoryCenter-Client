@@ -8,7 +8,7 @@ import {
     PROGRAMS_ALL,
 } from '../../../../const/public/programs-page';
 import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
-import { ProgramCard } from './program-card/ProgramCard';
+import { ProgramCard } from '../../../../components/public/program-card/ProgramCard';
 import { PublishedProgram } from '../../../../types/public/programs-page';
 
 export const ProgramsSection: React.FC = () => {
@@ -45,7 +45,7 @@ export const ProgramsSection: React.FC = () => {
                     </div>
                 )}
                 {programData.map((item, index) => (
-                    <ProgramCard key={index} program={item} />
+                    <ProgramCard key={index} program={item} className="programpage-card" />
                 ))}
             </div>
         </div>

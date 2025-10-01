@@ -25,9 +25,8 @@ describe('AboutUsIntro', () => {
 
     it('should render title details correctly', () => {
         render(<AboutUsIntro />);
-        Object.values(ABOUT_US_DATA.INTRO_DETAILS).forEach((line) => {
-            const paragraph = screen.queryByText((text) => text.trim().includes(line.trim()));
-            expect(paragraph).toBeInTheDocument();
-        });
+
+        const paragraph = screen.getByText(ABOUT_US_DATA.INTRO_DETAILS, { exact: false });
+        expect(paragraph).toBeInTheDocument();
     });
 });

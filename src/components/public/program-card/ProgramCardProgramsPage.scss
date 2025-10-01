@@ -1,7 +1,7 @@
-@use '../../../../../assets/sass/variables/colors';
-@use '../../../../../assets/sass/variables/fonts';
+@use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/fonts';
 
-.card-block {
+.card-block.programpage-card {
     height: 70vh;
     overflow: hidden;
     display: flex;

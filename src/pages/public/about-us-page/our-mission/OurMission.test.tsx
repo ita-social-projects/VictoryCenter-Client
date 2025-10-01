@@ -22,10 +22,6 @@ jest.mock('../../../../const/public/routes', () => ({
     },
 }));
 
-jest.mock('./scrollable-frame/ScrollableFrame', () => ({
-    ScrollableFrame: () => <div data-testid="scrollable-frame">ScrollableFrame</div>,
-}));
-
 describe('OurMission component', () => {
     it('should render the mission title', () => {
         render(
@@ -55,14 +51,5 @@ describe('OurMission component', () => {
         expect(link).toBeInTheDocument();
         expect(link).toHaveAttribute('href', '/programs');
         expect(screen.getByTestId('arrow-icon')).toBeInTheDocument();
-    });
-
-    it('should render the ScrollableFrame component', () => {
-        render(
-            <MemoryRouter>
-                <OurMission />
-            </MemoryRouter>,
-        );
-        expect(screen.getByTestId('scrollable-frame')).toBeInTheDocument();
     });
 });

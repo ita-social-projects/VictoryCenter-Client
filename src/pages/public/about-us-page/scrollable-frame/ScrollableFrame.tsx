@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
 import { PublishedProgram } from '../../../../types/public/programs-page';
 import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
-import { ProgramCard } from './program-card/ProgramCard';
+import { ProgramCard } from '../../../../components/public/program-card/ProgramCard';
 import { CustomSwiper } from '../../../../components/public/swiper/CustomSwiper';
 
 export const ScrollableFrame = () => {
@@ -40,7 +40,7 @@ export const ScrollableFrame = () => {
                 }}
                 renderItem={(program) => (
                     <>
-                        <ProgramCard program={program} />
+                        <ProgramCard program={program} className="about-us-page-card" />
                     </>
                 )}
                 showScrollbar={true}

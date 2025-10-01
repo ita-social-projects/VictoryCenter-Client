@@ -25,7 +25,7 @@ const mockPrograms: PublishedProgram[] = [
         description: 'descriptiontest3',
     },
 ];
-jest.mock('./program-card/ProgramCard', () => ({
+jest.mock('../../../../components/public/program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: { program: PublishedProgram }) => (
         <div data-testid="test-card-content">
             <img src={program.image} alt={program.title} />

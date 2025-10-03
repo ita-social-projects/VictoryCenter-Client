@@ -62,11 +62,11 @@
         }
 
         .arrow-left {
-            left: 2rem;
+            left: 1.75rem;
         }
 
         .arrow-right {
-            right: 2rem;
+            right: 1.75rem;
         }
     }
 }
@@ -76,36 +76,28 @@
 }
 
 @media (max-width: 912px) {
+    .scroll-block {
+        .button-container {
+            .arrow-left {
+                left: 1rem;
+            }
+
+            .arrow-right {
+                right: 1rem;
+            }
+        }
+    }
 }
 
 @media (max-width: 768px) {
     .scroll-block {
-        .custom-scrollbar {
-        }
-
         .button-container {
-            .arrow-button {
-                .arrow-normal-state,
-                .arrow-hover-state {
-                }
-
-                .arrow-hover-state {
-                    display: none;
-                }
-
-                &:hover {
-                    .arrow-hover-state {
-                    }
-
-                    .arrow-normal-state {
-                    }
-                }
-            }
-
             .arrow-left {
+                left: 1rem;
             }
 
             .arrow-right {
+                right: 1rem;
             }
         }
     }
@@ -121,30 +113,12 @@
         }
 
         .button-container {
-            .arrow-button {
-                .arrow-normal-state,
-                .arrow-hover-state {
-                }
-
-                .arrow-hover-state {
-                    display: none;
-                }
-
-                &:hover {
-                    .arrow-hover-state {
-                    }
-
-                    .arrow-normal-state {
-                    }
-                }
-            }
-
             .arrow-left {
-                left: 0.9rem;
+                left: 0.25rem;
             }
 
             .arrow-right {
-                right: 0.9rem;
+                right: 0.25rem;
             }
         }
     }

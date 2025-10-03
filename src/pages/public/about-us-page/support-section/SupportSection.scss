@@ -113,11 +113,11 @@
         }
 
         .arrow-left {
-            left: 2rem;
+            left: 1.75rem;
         }
 
         .arrow-right {
-            right: 2rem;
+            right: 1.75rem;
         }
     }
 }
@@ -177,6 +177,16 @@
                 margin-top: 17.5rem;
             }
         }
+
+        .button-container {
+            .arrow-left {
+                left: 1rem;
+            }
+
+            .arrow-right {
+                right: 1rem;
+            }
+        }
     }
 }
 
@@ -222,6 +232,16 @@
 
             .right {
                 margin-top: 14.313rem;
+            }
+        }
+
+        .button-container {
+            .arrow-left {
+                left: 1rem;
+            }
+
+            .arrow-right {
+                right: 1rem;
             }
         }
     }
@@ -271,6 +291,16 @@
                 padding: 0 1rem;
                 font-size: 1rem;
                 line-height: 1.5rem;
+            }
+        }
+
+        .button-container {
+            .arrow-left {
+                left: 0.25rem;
+            }
+
+            .arrow-right {
+                right: 0.25rem;
             }
         }
     }

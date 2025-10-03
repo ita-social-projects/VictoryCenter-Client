@@ -131,12 +131,13 @@
                 }
             }
         }
+
         .arrow-left {
-            left: 2rem;
+            left: 1.75rem;
         }
 
         .arrow-right {
-            right: 2rem;
+            right: 1.75rem;
         }
     }
 }
@@ -173,6 +174,16 @@
 
             &.card-3 {
                 margin-top: 11.125rem;
+            }
+        }
+
+        .button-container {
+            .arrow-left {
+                left: 1rem;
+            }
+
+            .arrow-right {
+                right: 1rem;
             }
         }
     }
@@ -222,6 +233,16 @@
                 margin-top: 13.7rem;
             }
         }
+
+        .button-container {
+            .arrow-left {
+                left: 1rem;
+            }
+
+            .arrow-right {
+                right: 1rem;
+            }
+        }
     }
 }
 
@@ -256,6 +277,16 @@
 
             &.card-3 {
                 margin-top: 11.125rem;
+            }
+        }
+
+        .button-container {
+            .arrow-left {
+                left: 0.25rem;
+            }
+
+            .arrow-right {
+                right: 0.25rem;
             }
         }
     }

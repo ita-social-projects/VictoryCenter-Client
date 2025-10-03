@@ -122,8 +122,8 @@ describe('ProgramForm', () => {
         name: 'Існуюча програма',
         description: 'Існуючий опис',
         categories: [mockCategories[0]],
-        img: mockFile,
-        imgId: 1,
+        image: mockFile,
+        imageId: 1,
     };
 
     const formRef = createRef<ProgramFormRef>();
@@ -202,7 +202,7 @@ describe('ProgramForm', () => {
             PROGRAM_VALIDATION.description.getRequiredWhenPublishingError(),
         );
         expect(await screen.findByTestId('error-img')).toHaveTextContent(
-            PROGRAM_VALIDATION.img.getRequiredWhenPublishingError(),
+            PROGRAM_VALIDATION.image.getRequiredWhenPublishingError(),
         );
         expect(mockOnSubmit).not.toHaveBeenCalled();
     });
@@ -269,7 +269,7 @@ describe('ProgramForm', () => {
                     name: 'Нова публікація',
                     categories: [mockCategories[1]],
                     description: 'Дуже важливий опис',
-                    img: mockFile,
+                    image: mockFile,
                 }),
                 VisibilityStatus.Published,
             );

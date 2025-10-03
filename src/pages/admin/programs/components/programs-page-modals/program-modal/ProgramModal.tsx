@@ -42,8 +42,8 @@ export const ProgramModal = (props: ProgramModalProps) => {
             name: program.name,
             description: program.description,
             categories: program.categories.map((c) => ({ ...c, programsCount: c.programsCount ?? 0 })),
-            img: program.image,
-            imgId: program.image && 'id' in program.image ? program.image.id : null,
+            image: program.image,
+            imageId: program.image && 'id' in program.image ? program.image.id : null,
         };
     }, [program, isEditMode]);
 
@@ -89,10 +89,10 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 id: mode === ModalMode.Edit && program ? program.id : null,
                 name: formData.name,
                 description: formData.description,
-                image: formData.img && 'base64' in formData.img ? formData.img : null,
+                image: formData.image && 'base64' in formData.image ? formData.image : null,
                 status: status,
                 categoryIds: formData.categories.map((x) => x.id),
-                imageId: initialData?.imgId ?? null,
+                imageId: initialData?.imageId ?? null,
             }),
         }),
         [isEditMode, isOpen, mode, onClose, onSuccess, program, client, initialData],

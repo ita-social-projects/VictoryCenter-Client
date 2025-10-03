@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { AboutUsIntro } from './AboutUsIntro';
+import { AboutUsIntro } from './IntroSection';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 
 describe('AboutUsIntro', () => {

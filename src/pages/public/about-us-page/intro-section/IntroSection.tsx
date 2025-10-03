@@ -1,6 +1,6 @@
 import background from '../../../../assets/images/public/about-us-page/background.jpg';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
-import './AboutUsIntro.scss';
+import './IntroSection.scss';
 
 export const AboutUsIntro = () => {
     return (

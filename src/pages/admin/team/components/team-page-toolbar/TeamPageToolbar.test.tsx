@@ -9,22 +9,29 @@ import { ProgramSearchItemData } from '../../../../../types/admin/programs';
 
 type PartialProps = Partial<React.ComponentProps<typeof TeamPageToolbar>>;
 
+const DEFAULT_PROPS: React.ComponentProps<typeof TeamPageToolbar> = {
+    onSearchQueryChange: jest.fn(),
+    onStatusFilterChange: jest.fn(),
+    onAddMember: jest.fn(),
+    searchItems: [],
+    isSearchLoading: false,
+    searchHasMore: false,
+    onSearchLoadMore: jest.fn(),
+    categories: [],
+    onSearchItemSelect: jest.fn(),
+    onSearchClear: jest.fn(),
+};
+
 const renderToolbar = (overrides: PartialProps = {}) => {
-    const defaults: React.ComponentProps<typeof TeamPageToolbar> = {
-        onSearchQueryChange: jest.fn(),
-        onStatusFilterChange: jest.fn(),
-        onAddMember: jest.fn(),
-        searchItems: [],
-        isSearchLoading: false,
-        searchHasMore: false,
-        onSearchLoadMore: jest.fn(),
-        categories: [],
-        onSearchItemSelect: jest.fn(),
-        onSearchClear: jest.fn(),
-    };
-    const props = { ...defaults, ...overrides };
+    const props = { ...DEFAULT_PROPS, ...overrides };
     return render(<TeamPageToolbar {...props} />);
 };
+
+// Тестові дані для уніфікації повторів
+const CATS_1 = [{ id: 'c1', name: 'Category 1' } as any];
+const CATS_2 = [...CATS_1, { id: 'c2', name: 'Category 2' } as any];
+const ITEM_JOHN = [{ id: '1', fullName: 'John Doe' } as any];
+const ITEM_JANE = [{ id: '1', fullName: 'Jane Roe' } as any];
 
 jest.mock('../../../../../assets/icons/plus.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="plus-icon" />,
@@ -184,17 +191,14 @@ describe('TeamPageToolbar', () => {
 
     it('renders search items via itemRenderer and selects item', () => {
         const onSearchItemSelect = jest.fn();
-        const categories = [{ id: 'c1', name: 'Category 1' } as any];
-        const searchItems = [{ id: '1', fullName: 'John Doe' } as any];
-
-        renderToolbar({ onSearchItemSelect, categories, searchItems });
+        renderToolbar({ onSearchItemSelect, categories: CATS_1, searchItems: ITEM_JOHN });
 
         const label = screen.getByTestId('search-label');
         expect(label).toHaveTextContent('John Doe');
 
         const trigger = screen.getByTestId('search-item-button');
         fireEvent.click(trigger);
-        expect(onSearchItemSelect).toHaveBeenCalledWith(searchItems[0]);
+        expect(onSearchItemSelect).toHaveBeenCalledWith(ITEM_JOHN[0]);
     });
 
     it('calls onSearchLoadMore when hasMore is true', () => {
@@ -207,28 +211,11 @@ describe('TeamPageToolbar', () => {
     });
 
     it('updates rendered item when categories change', () => {
-        const categories1 = [{ id: 'c1', name: 'Category 1' } as any];
-        const categories2 = [{ id: 'c1', name: 'Category 1' } as any, { id: 'c2', name: 'Category 2' } as any];
-        const searchItems = [{ id: '1', fullName: 'Jane Roe' } as any];
-
-        const { rerender } = renderToolbar({ categories: categories1, searchItems });
+        const { rerender } = renderToolbar({ categories: CATS_1, searchItems: ITEM_JANE });
 
         expect(screen.getByTestId('team-member-item')).toHaveTextContent('Jane Roe - 1');
 
-        rerender(
-            <TeamPageToolbar
-                onSearchQueryChange={jest.fn()}
-                onStatusFilterChange={jest.fn()}
-                onAddMember={jest.fn()}
-                searchItems={searchItems}
-                isSearchLoading={false}
-                searchHasMore={false}
-                onSearchLoadMore={jest.fn()}
-                categories={categories2}
-                onSearchItemSelect={jest.fn()}
-                onSearchClear={jest.fn()}
-            />,
-        );
+        rerender(<TeamPageToolbar {...{ ...DEFAULT_PROPS, categories: CATS_2, searchItems: ITEM_JANE }} />);
 
         expect(screen.getByTestId('team-member-item')).toHaveTextContent('Jane Roe - 2');
     });

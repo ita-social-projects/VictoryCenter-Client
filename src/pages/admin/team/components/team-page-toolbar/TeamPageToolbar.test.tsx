@@ -92,16 +92,13 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
     },
 }));
 
-jest.mock('../../../../../components/admin/search-bar/team-member-search-item/TeamMemberSearchItem', () => {
-    const ReactActual = jest.requireActual('react');
-    return {
-        TeamMemberSearchItem: ReactActual.forwardRef(({ item, categories }: any, ref: any) => (
-            <div ref={ref} data-testid="team-member-item">
-                {item?.fullName} - {(categories?.length ?? 0).toString()}
-            </div>
-        )),
-    };
-});
+jest.mock('../../../../../components/admin/search-bar/team-member-search-item/TeamMemberSearchItem', () => ({
+    TeamMemberSearchItem: ({ item, categories }: any) => (
+        <div data-testid="team-member-item">
+            {item?.fullName} - {(categories?.length ?? 0).toString()}
+        </div>
+    ),
+}));
 
 // Local mock for ResizeObserver used by hooks inside TeamPageToolbar
 beforeAll(() => {

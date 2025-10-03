@@ -27,7 +27,6 @@ const renderToolbar = (overrides: PartialProps = {}) => {
     return render(<TeamPageToolbar {...props} />);
 };
 
-// Тестові дані для уніфікації повторів
 const CATS_1 = [{ id: 'c1', name: 'Category 1' } as any];
 const CATS_2 = [...CATS_1, { id: 'c2', name: 'Category 2' } as any];
 const ITEM_JOHN = [{ id: '1', fullName: 'John Doe' } as any];
@@ -92,13 +91,16 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
     },
 }));
 
-jest.mock('../../../../../components/admin/search-bar/team-member-search-item/TeamMemberSearchItem', () => ({
-    TeamMemberSearchItem: ({ item, categories }: any) => (
-        <div data-testid="team-member-item">
-            {item?.fullName} - {(categories?.length ?? 0).toString()}
-        </div>
-    ),
-}));
+jest.mock('../../../../../components/admin/search-bar/team-member-search-item/TeamMemberSearchItem', () => {
+    const ReactActual = jest.requireActual('react');
+    return {
+        TeamMemberSearchItem: ReactActual.forwardRef(({ item, categories }: any, ref: any) => (
+            <div ref={ref} data-testid="team-member-item">
+                {item?.fullName} - {(categories?.length ?? 0).toString()}
+            </div>
+        )),
+    };
+});
 
 // Local mock for ResizeObserver used by hooks inside TeamPageToolbar
 beforeAll(() => {
@@ -111,42 +113,40 @@ beforeAll(() => {
     (global as any).ResizeObserver = MockResizeObserver as any;
 });
 
+const testSearchQueryChange = (inputValue: string) => {
+    jest.useFakeTimers();
+    const onSearchQueryChange = jest.fn();
+    renderToolbar({ onSearchQueryChange });
+
+    const input = screen.getByPlaceholderText(TEAM_MEMBERS_TEXT.SEARCH.INPUT_FULLNAME);
+    fireEvent.change(input, { target: { value: inputValue } });
+    act(() => {
+        jest.advanceTimersByTime(300);
+    });
+
+    expect(onSearchQueryChange).toHaveBeenLastCalledWith(inputValue);
+    jest.useRealTimers();
+};
+
 describe('TeamPageToolbar', () => {
     it('calls onSearchQueryChange when typing into input', () => {
-        jest.useFakeTimers();
-        const onSearchQueryChange = jest.fn();
-        renderToolbar({ onSearchQueryChange });
-
-        const input = screen.getByPlaceholderText(TEAM_MEMBERS_TEXT.SEARCH.INPUT_FULLNAME);
-        fireEvent.change(input, { target: { value: 'Jo' } });
-        act(() => {
-            jest.advanceTimersByTime(300);
-        });
-
-        expect(onSearchQueryChange).toHaveBeenLastCalledWith('Jo');
-        jest.useRealTimers();
+        testSearchQueryChange('Jo');
     });
 
     it('changes status filter to All, Published, Draft by interacting with select', () => {
         const onStatusFilterChange = jest.fn();
         renderToolbar({ onStatusFilterChange });
 
-        // Select root has role="toolbar"
         const statusSelect = screen.getByRole('toolbar');
-
-        // Open select
         fireEvent.click(statusSelect);
 
-        // Choose All (undefined)
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.ALL));
         expect(onStatusFilterChange).toHaveBeenCalledWith(undefined);
 
-        // Open again and choose Published
         fireEvent.click(statusSelect);
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED));
         expect(onStatusFilterChange).toHaveBeenCalledWith(VisibilityStatus.Published);
 
-        // Open again and choose Draft
         fireEvent.click(statusSelect);
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT));
         expect(onStatusFilterChange).toHaveBeenCalledWith(VisibilityStatus.Draft);
@@ -172,18 +172,7 @@ describe('TeamPageToolbar', () => {
     });
 
     it('calls onSearchQueryChange after debounce when typing 2+ chars', () => {
-        jest.useFakeTimers();
-        const onSearchQueryChange = jest.fn();
-        renderToolbar({ onSearchQueryChange });
-
-        const input = screen.getByPlaceholderText(TEAM_MEMBERS_TEXT.SEARCH.INPUT_FULLNAME);
-        fireEvent.change(input, { target: { value: 'John' } });
-        act(() => {
-            jest.advanceTimersByTime(300);
-        });
-
-        expect(onSearchQueryChange).toHaveBeenLastCalledWith('John');
-        jest.useRealTimers();
+        testSearchQueryChange('John');
     });
 
     it('renders search items via itemRenderer and selects item', () => {

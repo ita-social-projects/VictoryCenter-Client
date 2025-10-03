@@ -43,6 +43,10 @@ export const ImageSection = ({
     const titleContent = content?.find((item) => item.contentType === ContentType.Title);
     const descriptionContent = content?.find((item) => item.contentType === ContentType.Description);
 
+    if (!descriptionContent) {
+        return null;
+    }
+
     const handleImageChange = (value: ImageValues | null) => {
         onChange({
             ...(imageContent || { contentType: ContentType.Image }),

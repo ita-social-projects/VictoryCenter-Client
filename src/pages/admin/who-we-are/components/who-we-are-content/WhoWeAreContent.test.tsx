@@ -2,7 +2,7 @@ import React from 'react';
 import {render, screen, fireEvent, waitFor, act} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import {WhoWeAreContent} from "../../../who-we-are/components/who-we-are-content/WhoWeAreContent";
+import { WhoWeAreContent } from './WhoWeAreContent';
 import { WhoWeAreApi } from '../../../../../services/api/admin/who-we-are/who-we-are-api';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
@@ -10,7 +10,6 @@ import axios from 'axios';
 import { SectionType } from '../../../../../types/common/about-us';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ContentType } from '../../../../../types/common/about-us';
-import {SectionsWrapper} from "../../../who-we-are/components/sections-wrapper/SectionsWrapper";
 
 // Initialize user event setup for modern user-event API
 const user = userEvent.setup();
@@ -34,52 +33,52 @@ jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({ categories, selectedCategory, onCategorySelect }: any) => (
         <div data-testid="category-bar">
             {categories.map((c: any) => (
-                    <button
-                        key={c.id}
-                data-testid={`category-${c.id}`}
-    onClick={() => onCategorySelect(c)}
->
-{c.title}
-</button>
-))}
-</div>
-),
+                <button
+                    key={c.id}
+                    data-testid={`category-${c.id}`}
+                    onClick={() => onCategorySelect(c)}
+                >
+                    {c.title}
+                </button>
+            ))}
+        </div>
+    ),
 }));
 
-jest.mock('../../../who-we-are/components/sections-wrapper/SectionsWrapper', () => {
+jest.mock('../sections-wrapper/SectionsWrapper', () => {
     // FIX: Import ContentType inside the mock factory to resolve ReferenceError
-    const { ContentType } = jest.requireActual('../../../../../types/common/about-us');
+    const { ContentType } = jest.requireActual('../../../../../../types/common/about-us');
 
     return {
         SectionsWrapper: (props: any) => (
             <div data-testid="sections-wrapper" data-contents={JSON.stringify(props.section?.contents)}>
-        <button data-testid="publish-trigger" onClick={props.onPublish}>
-            Publish
-            </button>
-            <button
-        data-testid="content-change-trigger"
-        onClick={() => props.onChange({ id: 1, title: 'Mock Change', contentType: ContentType.Title })}
->
-    Change Content
-    </button>
-    </div>
-),
-};
+                <button data-testid="publish-trigger" onClick={props.onPublish}>
+                    Publish
+                </button>
+                <button
+                    data-testid="content-change-trigger"
+                    onClick={() => props.onChange({ id: 1, title: 'Mock Change', contentType: ContentType.Title })}
+                >
+                    Change Content
+                </button>
+            </div>
+        ),
+    };
 });
 
 jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
-        ConfirmationModal: ({ isOpen, onConfirm, onCancel, title }: any) =>
-            isOpen ? (
-                <div data-testid="confirmation-modal">
-                    <span>{title}</span>
-                    <button onClick={onConfirm} data-testid="confirm-button">
-            Confirm
-            </button>
-            <button onClick={onCancel} data-testid="cancel-button">
-            Cancel
-            </button>
+    ConfirmationModal: ({ isOpen, onConfirm, onCancel, title }: any) =>
+        isOpen ? (
+            <div data-testid="confirmation-modal">
+                <span>{title}</span>
+                <button onClick={onConfirm} data-testid="confirm-button">
+                    Confirm
+                </button>
+                <button onClick={onCancel} data-testid="cancel-button">
+                    Cancel
+                </button>
             </div>
-) : null,
+        ) : null,
 }));
 
 jest.mock('../../../../../components/admin/toast/toast-container/ToastContainer', () => ({

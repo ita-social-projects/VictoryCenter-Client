@@ -1,15 +1,15 @@
-import { Content, WhoWeAreSection } from '../../../../../../types/admin/who-we-are';
-import { SectionType } from '../../../../../../types/common/about-us';
-import { CardsSection } from '../cards-section/CardsSection';
-import { DescriptionSection } from '../description-section/DescriptionSection';
-import { ImageSection } from '../image-block-section/ImageBlockSection';
+import { Content, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
+import { CardsSection } from '../sections/cards-section/CardsSection';
+import { DescriptionSection } from '../sections/description-section/DescriptionSection';
+import { ImageSection } from '../sections/image-block-section/ImageBlockSection';
 import {
     MainPageProps,
     PeopleCardsProps,
     TeamPageProps,
     WhatWeDoPageProps,
     WhoWeSupportCardsProps,
-} from '../SectionsProps';
+} from '../sections/SectionsProps';
+import { SectionType } from '../../../../../types/common/about-us';
 
 interface MainSectionProps {
     section: WhoWeAreSection | null;

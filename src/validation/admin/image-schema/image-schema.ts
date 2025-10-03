@@ -41,9 +41,6 @@ export const IMAGE_VALIDATION_FUNCTIONS = {
             await schema.validate(file, { abortEarly: true });
             return undefined;
         } catch (err) {
-            if (err instanceof Yup.ValidationError) {
-                return err.message;
-            }
             return IMAGE_VALIDATION.UnexpectedError();
         }
     },

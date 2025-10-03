@@ -1,12 +1,12 @@
-import { COMMON_TEXT_ADMIN } from '../../../../../../../const/admin/common';
-import { TextAreaWithCharacterLimit } from '../../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import React, { useState } from 'react';
-import { ImageInput, ImageInputProps } from '../../../../../../../components/admin/image-input/ImageInput';
-import { Content } from '../../../../../../../types/admin/who-we-are';
-import { Image, ImageValues } from '../../../../../../../types/common/image';
-import { WHO_WE_ARE_TEXT } from '../../../../../../../const/admin/who-we-are';
+import { ImageInput, ImageInputProps } from '../../../../../components/admin/image-input/ImageInput';
+import { Content } from '../../../../../types/admin/who-we-are';
+import { Image, ImageValues } from '../../../../../types/common/image';
+import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
 import './CardContent.scss';
-import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
+import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
 
 interface CardContentProps {
     content: Content;

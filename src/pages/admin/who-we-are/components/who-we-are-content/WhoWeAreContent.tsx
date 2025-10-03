@@ -5,7 +5,7 @@ import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useA
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
 import axios from 'axios';
 import './WhoWeAreContent.scss';
-import { SectionsWrapper } from '../sections/main-section/SectionsWrapper';
+import { SectionsWrapper } from '../sections-wrapper/SectionsWrapper';
 import { Image } from '../../../../../types/common/image';
 import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
@@ -25,7 +25,6 @@ export const WhoWeAreContent = () => {
     const [selectedCategory, setSelectedCategory] = useState<WhoWeAreCategory | null>(null);
     const [selectedSection, setSelectedSection] = useState<WhoWeAreSection | null>(null);
     const [updatedSection, setUpdatedSection] = useState<WhoWeAreSection | null>(null);
-    const [contentToUpdate, setContentToUpdate] = useState<Content[]>([]);
     const [isConfirmationModalOpen, setConfirmationModalOpen] = useState<boolean>(false);
     const [isPublishButtonActive, setIsPublishButtonActive] = useState<boolean>(false);
 

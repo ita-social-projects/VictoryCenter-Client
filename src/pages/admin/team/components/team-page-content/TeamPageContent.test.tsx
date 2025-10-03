@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { act } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { TeamPageContent } from './TeamPageContent';
 import { TEAM_CATEGORY_TEXT, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
@@ -526,7 +526,7 @@ describe('TeamPageContent', () => {
             await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(2));
         });
 
-        it('should select search item, reset status, bump reset key and switch category, and then clear selection', async () => {
+        it('should select search item, reset status and switch category, then clear selection and return to list', async () => {
             mockTeamMembersApi.search.mockResolvedValueOnce({
                 items: [{ id: 10, fullName: 'Search Person 1', categoryId: 2, status: VisibilityStatus.Published }],
                 totalItemsCount: 1,
@@ -536,22 +536,19 @@ describe('TeamPageContent', () => {
 
             typeInSearchInput('ab');
             await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1));
-
             await waitFor(() => expect(getSelectFirstResultButton()).toBeInTheDocument());
-            const keyBefore = getStatusResetKey().textContent;
 
             clickSelectFirstResult();
 
             await waitFor(() => {
-                expect(getStatusResetKey().textContent).not.toEqual(keyBefore);
+                expect(screen.getByTestId('member-name-10')).toHaveTextContent('Search Person 1');
             });
-
-            const keyMid = getStatusResetKey().textContent;
 
             clickClearSearchSelection();
 
             await waitFor(() => {
-                expect(getStatusResetKey().textContent).not.toEqual(keyMid);
+                expect(screen.getByTestId(`member-name-${mockMembers[0].id}`)).toBeInTheDocument();
+                expect(screen.getByTestId(`member-name-${mockMembers[1].id}`)).toBeInTheDocument();
             });
         });
 

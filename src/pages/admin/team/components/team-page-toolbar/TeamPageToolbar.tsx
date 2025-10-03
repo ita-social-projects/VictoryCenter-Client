@@ -1,8 +1,8 @@
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TEAM_MEMBERS_TEXT, TEAM_SEARCH } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '../../../../../const/admin/common';
-import { Select } from '../../../../../components/admin/select/Select';
 import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
+import { StatusFilterDropdown } from '../../../../../components/admin/status-filter-dropdown/StatusFilterDropdown';
 import { Button } from '../../../../../components/admin/button/Button';
 import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
 import './TeamPageToolbar.scss';
@@ -25,7 +25,6 @@ export interface TeamPageToolbarProps {
     categories: TeamCategory[];
     onSearchItemSelect: (item: TeamMember) => void;
     onSearchClear: () => void;
-    statusResetKey?: number;
 }
 const TeamMemberItemRenderer = forwardRef<
     SearchItemContentRef,
@@ -48,7 +47,6 @@ export const TeamPageToolbar = ({
     categories,
     onSearchItemSelect,
     onSearchClear,
-    statusResetKey,
 }: TeamPageToolbarProps) => {
     const itemRenderer = useMemo(() => createItemRenderer(categories), [categories]);
 
@@ -73,23 +71,7 @@ export const TeamPageToolbar = ({
                 />
             </div>
             <div className="toolbar-actions">
-                <Select<VisibilityStatus | undefined>
-                    key={statusResetKey}
-                    onValueChange={onStatusFilterChange}
-                    data-testid="status-filter"
-                >
-                    <Select.Option key={1} value={undefined} name={COMMON_TEXT_ADMIN.FILTER.STATUS.ALL} />
-                    <Select.Option<VisibilityStatus>
-                        key={2}
-                        value={VisibilityStatus.Published}
-                        name={COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED}
-                    />
-                    <Select.Option<VisibilityStatus>
-                        key={3}
-                        value={VisibilityStatus.Draft}
-                        name={COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT}
-                    />
-                </Select>
+                <StatusFilterDropdown onStatusFilterChange={onStatusFilterChange} />
                 <Button onClick={onAddMember} buttonStyle="primary">
                     {TEAM_MEMBERS_TEXT.BUTTON.ADD_MEMBER}
                     <PlusIcon />

@@ -60,7 +60,6 @@ export const TeamPageContent = () => {
     const [isSearchLoading, setIsSearchLoading] = useState(false);
     const [hasMoreSearch, setHasMoreSearch] = useState(false);
     const [selectedSearchMember, setSelectedSearchMember] = useState<TeamMember | null>(null);
-    const [statusResetTick, setStatusResetTick] = useState(0);
 
     const listContainerRef = useRef<HTMLDivElement>(null);
     const currentItemsCountRef = useRef<number>(0);
@@ -450,7 +449,6 @@ export const TeamPageContent = () => {
         (member: TeamMember) => {
             setSelectedSearchMember(member);
             setStatusFilter(undefined);
-            setStatusResetTick((t) => t + 1);
             const cat = categories.find((c) => c.id === member.categoryId) || null;
             if (cat) setSelectedCategory(cat);
         },
@@ -460,7 +458,6 @@ export const TeamPageContent = () => {
         const wasSelected = selectedSearchMember !== null;
         setSelectedSearchMember(null);
         setStatusFilter(undefined);
-        setStatusResetTick((t) => t + 1);
         resetMembersState();
         if (!wasSelected) fetchMembers(true);
     }, [selectedSearchMember, resetMembersState, fetchMembers]);
@@ -502,7 +499,6 @@ export const TeamPageContent = () => {
                     categories={categories}
                     onSearchItemSelect={handleSearchItemSelect}
                     onSearchClear={handleSearchClearSelection}
-                    statusResetKey={statusResetTick}
                 />
             </div>
 

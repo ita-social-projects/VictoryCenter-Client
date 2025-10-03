@@ -35,9 +35,9 @@ export const CardsSection = ({
     isPublishButtonActive,
     setIsPublishButtonActive,
 }: CardsSectionProps) => {
-    if (!content) return null;
-
     const [errors, setErrors] = useState<Record<number, { image: string | null; description?: string | null }>>({});
+
+    if (!content) return null;
 
     const cardContents = content.filter((item) => item.contentType === ContentType.Card);
 

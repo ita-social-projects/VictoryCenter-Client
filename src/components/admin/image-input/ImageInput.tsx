@@ -9,7 +9,6 @@ import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
 import { COMMON_IMAGE_TEXT } from '../../../const/admin/image';
 import { IMAGE_VALIDATION_FUNCTIONS } from '../../../validation/admin/image-schema/image-schema';
-import { CropForm } from '../crop-form/CropForm';
 
 export interface ImageInputProps {
     value: ImageValues | Image | null;

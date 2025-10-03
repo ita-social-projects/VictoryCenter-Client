@@ -1,4 +1,3 @@
-import React, { act } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { TeamPageContent } from './TeamPageContent';
 import { TEAM_CATEGORY_TEXT, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
@@ -245,7 +244,6 @@ describe('TeamPageContent', () => {
     const getSearchLoadMoreButton = () => screen.getByTestId('search-load-more');
     const getSelectFirstResultButton = () => screen.getByTestId('select-first-result');
     const getClearSearchSelectionButton = () => screen.getByTestId('clear-search-selection');
-    const getStatusResetKey = () => screen.getByTestId('status-reset-key');
 
     const clickAddMemberButton = () => fireEvent.click(getAddMemberButton());
     const clickCategoryButton = (id: number) => fireEvent.click(getCategoryButton(id));

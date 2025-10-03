@@ -18,7 +18,7 @@ export const TeamMemberSearchItem = forwardRef<SearchItemContentRef, TeamMemberS
         );
 
         const imageUrl = useMemo(() => {
-            const img = item.image as any;
+            const img = item.image;
             return img && 'url' in img ? img.url : null;
         }, [item.image]);
 

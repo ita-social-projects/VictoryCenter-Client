@@ -7,7 +7,7 @@ describe('Company Values Section', () => {
         render(<CompanyValues />);
         const title = screen.getByRole('heading', { name: 'Наші Цінності' });
         expect(title).toBeInTheDocument();
-        expect(title).toHaveClass('values-title');
+        expect(title.closest('.values-title')).toBeInTheDocument();
     });
 
     it('should contain value cards', () => {

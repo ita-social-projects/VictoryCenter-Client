@@ -3,10 +3,30 @@ import './Header.scss';
 import { Link } from 'react-router';
 import { ReactComponent as VictoryCenterLogo } from '../../../assets/icons/logo-with-text.svg';
 import { PUBLIC_ROUTES } from '../../../const/public/routes';
-import { ABOUT_US, CONTACT_US, DONATE, HOW_TO_SUPPORT, PROGRAMS, REPORTING } from '../../../const/public/header';
+import {
+    ABOUT_US,
+    CONTACT_US,
+    DONATE,
+    HISTORY,
+    HOW_TO_SUPPORT,
+    EVENTS_AND_NEWS,
+    PARTNERS,
+    PROGRAMS,
+    REPORTING,
+    TEAM,
+    WHO_WE_ARE,
+} from '../../../const/public/header';
+import { DropdownLink, DropdownMenu } from '../dropdown-menu/DropdownMenu';
 import { ReactComponent as BurgerIcon } from '../../../assets/icons/burger.svg';
 
 export const Header = () => {
+    const dropdownMenuLinks: DropdownLink[] = [
+        { text: WHO_WE_ARE, navigateTo: PUBLIC_ROUTES.ABOUT_US.FULL, isDisabled: false },
+        { text: HISTORY, navigateTo: '', isDisabled: true },
+        { text: TEAM, navigateTo: PUBLIC_ROUTES.TEAM.FULL, isDisabled: false },
+        { text: PARTNERS, navigateTo: PUBLIC_ROUTES.PARTNERS.FULL, isDisabled: false },
+        { text: EVENTS_AND_NEWS, navigateTo: '', isDisabled: true },
+    ];
     const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
     const toggleMenu = () => {
@@ -20,16 +40,16 @@ export const Header = () => {
     };
 
     return (
-        <div className="headerBlock">
-            <div className="logoContainer">
+        <div className="header-block">
+            <div className="logo-container">
                 <Link to="/">
                     <VictoryCenterLogo className="logo" />
                 </Link>
             </div>
 
-            <div className="linkContainer">
+            <div className="link-container">
                 <nav>
-                    <Link to={PUBLIC_ROUTES.ABOUT_US.FULL}>{ABOUT_US}</Link>
+                    <DropdownMenu mainText={ABOUT_US} links={dropdownMenuLinks}></DropdownMenu>
                     <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{PROGRAMS}</Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {REPORTING}
@@ -40,19 +60,19 @@ export const Header = () => {
                 </nav>
             </div>
 
-            <div className="buttonContainer">
-                <button className="contactUsButton" onClick={onContactUsClick}>
+            <div className="button-container">
+                <button className="contact-us-button" onClick={onContactUsClick}>
                     {CONTACT_US}
                 </button>
-                <Link to={PUBLIC_ROUTES.DONATE.FULL} className="button donateButton">
+                <Link to={PUBLIC_ROUTES.DONATE.FULL} className="button donate-button">
                     {DONATE}
                 </Link>
-                <button onClick={toggleMenu} className="burgerMenuIcon">
+                <button onClick={toggleMenu} className="burger-menu-icon">
                     <BurgerIcon />
                 </button>
             </div>
             {isMenuOpen && (
-                <div className="mobileMenu">
+                <div className="mobile-menu">
                     <Link to={PUBLIC_ROUTES.ABOUT_US.FULL} onClick={toggleMenu}>
                         {ABOUT_US}
                     </Link>

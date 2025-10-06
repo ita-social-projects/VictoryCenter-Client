@@ -1,13 +1,15 @@
 @use '../../../../assets/sass/variables/colors';
 @use '../../../../assets/sass/variables/fonts';
+@use '../../../../assets/sass/variables/z-index';
 
 .support-block {
     display: flex;
     flex-wrap: wrap;
     position: relative;
-    margin-top: 6.25rem;
+    padding-top: 6.25rem;
     width: 100%;
-    height: 57.75rem;
+    height: auto;
+    padding-bottom: 4rem;
     color: colors.$blue-900;
 
     .swiper {
@@ -19,28 +21,17 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        padding-left: 3.5rem;
 
         h2 {
-            position: absolute;
-            width: 27rem;
-            top: 0rem;
-            left: 3.5rem;
             font-family: fonts.$mulish-regular-font;
             font-weight: 700;
             font-size: 2rem;
             line-height: 2.5rem;
             letter-spacing: -0.02em;
             text-transform: uppercase;
+            margin: 0 auto;
         }
-    }
-
-    .support-description {
-        font-family: fonts.$mulish-regular-font;
-        padding: 0 1rem;
-        font-weight: 400;
-        font-size: 1.125rem;
-        line-height: 1.75rem;
-        letter-spacing: -0.02em;
     }
 
     .support-card {
@@ -48,24 +39,34 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 0.5rem;
+        gap: 1rem;
+        position: relative;
 
         &.card-1 {
-            transform: translateY(12.75rem);
+            margin-top: 7.75rem;
         }
 
         &.card-2 {
-            transform: translateY(22.75rem);
+            margin-top: 17.75rem;
         }
 
         &.card-3 {
-            transform: translateY(0.75rem);
+            margin-top: 0.75rem;
         }
 
         img {
             width: 100%;
-            height: 430px;
+            height: 26.9rem;
             object-fit: cover;
+        }
+
+        .support-description {
+            font-family: fonts.$mulish-regular-font;
+            padding: 0 1rem;
+            font-weight: 400;
+            font-size: 1.125rem;
+            line-height: 1.75rem;
+            letter-spacing: -0.02em;
         }
     }
 
@@ -76,8 +77,10 @@
         position: absolute;
         width: 100%;
         top: 50%;
-        z-index: 2;
+        z-index: z-index.$scrollable-frame-arrows;
         padding: 0 2rem;
+        transition: opacity 2s ease;
+        opacity: 0;
 
         .arrow-button {
             background-color: colors.$blue-900;
@@ -85,85 +88,160 @@
             width: 2.5rem;
             height: 2.5rem;
             border: none;
-            transition: all 0.8s ease;
+            transition: all 0.4s ease;
             cursor: pointer;
-            z-index: 2;
 
-            .arrow-normal-state,
-            .arrow-hover-state {
+            .arrow-icon {
                 position: absolute;
                 top: 0.5rem;
                 right: 0.5rem;
                 width: 1.5rem;
                 height: 1.5rem;
-            }
 
-            .arrow-hover-state {
-                display: none;
+                path {
+                    stroke: colors.$grey-50;
+                }
             }
 
             &:hover {
                 background-color: colors.$yellow-500;
 
-                .arrow-hover-state {
-                    display: block !important;
-                }
-
-                .arrow-normal-state {
-                    display: none;
+                .arrow-icon path {
+                    stroke: colors.$blue-900;
                 }
             }
         }
 
         .arrow-left {
-            left: 2rem;
+            left: 1.75rem;
         }
 
         .arrow-right {
-            right: 2rem;
+            right: 1.75rem;
         }
     }
 }
 
-@media (max-width: 912px) {
+.support-block:hover .button-container {
+    opacity: 1;
+    transition: opacity 1s ease;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 912px) {
     .support-block {
-        height: 80rem;
+        width: 100%;
+        padding-top: 3.75rem;
+        padding-bottom: 0rem;
 
         .main-values-title {
-            .support-title {
-                width: 22rem;
-                left: 0rem;
-                padding: 0 1rem;
+            padding: 0 3.5rem;
+            width: 657px;
+
+            h2 {
+                font-size: 2.5rem;
+                line-height: 3rem;
             }
         }
 
-        .support-card {
-            &.card-1 {
+        .support-columns {
+            display: flex;
+            width: 100%;
+
+            .support-col {
+                width: 50%;
+
+                .support-card {
+                    gap: 0.5rem;
+
+                    img {
+                        height: 27rem;
+                    }
+
+                    &.card-1 {
+                        margin-top: 5.625rem;
+                    }
+
+                    &.card-2 {
+                        margin-top: 5.625rem;
+                    }
+
+                    .support-description {
+                        padding: 0 1rem;
+                        font-size: 1.125rem;
+                        line-height: 1.75rem;
+                    }
+                }
             }
 
-            &.card-2 {
-            }
-
-            &.card-3 {
-            }
-
-            img {
-                height: 24rem;
+            .right {
+                margin-top: 17.5rem;
             }
         }
 
         .button-container {
-            top: 22rem;
-
             .arrow-left {
-                left: 0.9rem;
+                left: 1rem;
             }
 
             .arrow-right {
-                right: 0.9rem;
+                right: 1rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .support-block {
+        padding-top: 3.75rem;
+        padding-bottom: 0rem;
+
+        .main-values-title {
+            padding: 0 4rem;
+            width: auto;
+
+            h2 {
+                font-size: 2rem;
+                line-height: 2.5rem;
+            }
+        }
+
+        .support-columns {
+            .support-col {
+                .support-card {
+                    gap: 0.5rem;
+
+                    img {
+                        height: 22.5rem;
+                    }
+
+                    &.card-1 {
+                        margin-top: 5.625rem;
+                    }
+
+                    &.card-2 {
+                        margin-top: 5.625rem;
+                    }
+
+                    .support-description {
+                        padding: 0 1rem;
+                        font-size: 1rem;
+                        line-height: 1.5rem;
+                    }
+                }
+            }
+
+            .right {
+                margin-top: 14.313rem;
+            }
+        }
+
+        .button-container {
+            .arrow-left {
+                left: 1rem;
+            }
+
+            .arrow-right {
+                right: 1rem;
             }
         }
     }
@@ -171,43 +249,58 @@
 
 @media (max-width: 568px) {
     .support-block {
-        height: 53rem;
+        padding-top: 6.125rem;
+        padding-bottom: 0rem;
+
+        .swiper {
+            width: 100%;
+        }
 
         .main-values-title {
-            .support-title {
-                width: 22rem;
-                left: 0rem;
-                padding: 0 1rem;
+            padding: 0 1rem;
+            width: auto;
+
+            h2 {
+                font-size: 2rem;
+                line-height: 2.5rem;
             }
         }
 
         .support-card {
+            gap: 0.5rem;
+
             &.card-1 {
-                transform: translateY(9.5rem);
+                margin-top: 4.5rem;
             }
 
             &.card-2 {
-                transform: translateY(16.5rem);
+                margin-top: 16.5rem;
             }
 
             &.card-3 {
-                transform: translateY(9.5rem);
+                margin-top: 9.5rem;
             }
 
             img {
-                height: 24rem;
+                width: 100%;
+                height: 24.125rem;
+                object-fit: cover;
+            }
+
+            .support-description {
+                padding: 0 1rem;
+                font-size: 1rem;
+                line-height: 1.5rem;
             }
         }
 
         .button-container {
-            top: 22rem;
-
             .arrow-left {
-                left: 0.9rem;
+                left: 0.25rem;
             }
 
             .arrow-right {
-                right: 0.9rem;
+                right: 0.25rem;
             }
         }
     }

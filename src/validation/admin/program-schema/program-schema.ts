@@ -34,19 +34,19 @@ export const programValidationSchema = Yup.object({
                 : schema.notRequired(),
         ),
 
-    img: Yup.mixed<Image | ImageValues>()
+    image: Yup.mixed<Image | ImageValues>()
         .nullable()
         .default(null)
         .when('$isPublishing', ([isPublishing], schema) =>
             isPublishing
-                ? schema.required(PROGRAM_VALIDATION.img.getRequiredWhenPublishingError())
+                ? schema.required(PROGRAM_VALIDATION.image.getRequiredWhenPublishingError())
                 : schema.notRequired(),
         )
         .transform((value) => {
             if (value === undefined || value === '') return null;
             return value;
         })
-        .test('fileFormat', PROGRAM_VALIDATION.img.getFormatError(), (value) => {
+        .test('fileFormat', PROGRAM_VALIDATION.image.getFormatError(), (value) => {
             if (!value) return true;
 
             if ('url' in value && 'mimeType' in value) {
@@ -54,16 +54,16 @@ export const programValidationSchema = Yup.object({
             }
 
             if ('base64' in value && 'mimeType' in value) {
-                return PROGRAM_VALIDATION.img.allowedFormats.includes(value.mimeType);
+                return PROGRAM_VALIDATION.image.allowedFormats.includes(value.mimeType);
             }
 
             return false;
         })
-        .test('fileSize', PROGRAM_VALIDATION.img.getSizeError(), (value) => {
+        .test('fileSize', PROGRAM_VALIDATION.image.getSizeError(), (value) => {
             if (value === null) return true;
             if ('url' in value) return true;
             if ('base64' in value && 'size' in value) {
-                return value.size <= PROGRAM_VALIDATION.img.maxSizeBytes;
+                return value.size <= PROGRAM_VALIDATION.image.maxSizeBytes;
             }
         }),
 });
@@ -99,10 +99,10 @@ export const PROGRAM_VALIDATION_FUNCTIONS = {
         }
     },
 
-    validateImg: (value: Image | ImageValues | null, isPublishing: boolean): string | undefined => {
+    validateImage: (value: Image | ImageValues | null, isPublishing: boolean): string | undefined => {
         const context: ProgramValidationContext = { isPublishing };
         try {
-            programValidationSchema.validateSyncAt('img', { img: value }, { context });
+            programValidationSchema.validateSyncAt('image', { image: value }, { context });
             return undefined;
         } catch (error: any) {
             return error.message;

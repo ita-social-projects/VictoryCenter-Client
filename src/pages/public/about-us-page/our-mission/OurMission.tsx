@@ -1,6 +1,6 @@
 import './OurMission.scss';
 import { NavLink } from 'react-router';
-import ArrowIcon from '../../../../assets/icons/arrow-up-right.svg';
+import { ReactComponent as ArrowIcon } from '../../../../assets/icons/arrow-up-right.svg';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import { PUBLIC_ROUTES } from '../../../../const/public/routes';
 import classNames from 'classnames';
@@ -26,7 +26,7 @@ export const OurMission = ({ content, description, className, navigate = true }:
                     <NavLink to={navigate ? PUBLIC_ROUTES.PROGRAMS.FULL : ''} className="link-to-programs">
                         <div className="link-block">
                             <span className="link-title">{ABOUT_US_DATA.GO_TO_PROGRAMS}</span>
-                            <img src={ArrowIcon} alt="" />
+                            <ArrowIcon className="arrow-icon" />
                         </div>
                     </NavLink>
                 </div>

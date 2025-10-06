@@ -15,6 +15,11 @@ export const teamMemberValidationSchema = Yup.object({
 
     description: Yup.string()
         .max(TEAM_MEMBER_VALIDATION.description.max, TEAM_MEMBER_VALIDATION.description.getMaxError())
+        .min(TEAM_MEMBER_VALIDATION.description.min, TEAM_MEMBER_VALIDATION.description.getMinError())
+        .test('no-multiple-spaces', TEAM_MEMBER_VALIDATION.description.getMultipleSpacesError(), (value) => {
+            if (!value) return true;
+            return !/\s{2,}/.test(value);
+        })
         .when('$isPublishing', ([isPublishing], schema) =>
             isPublishing
                 ? schema

@@ -173,4 +173,39 @@ describe('DeleteTeamMemberModal', () => {
 
         expect(onClose).toHaveBeenCalledTimes(1);
     });
+
+    it('disables "Yes" button while submitting to prevent duplicate requests', async () => {
+        let resolvePromise: () => void;
+        (TeamMembersApi.delete as jest.Mock).mockImplementation(
+            () =>
+                new Promise<void>((resolve) => {
+                    resolvePromise = resolve;
+                }),
+        );
+
+        render(
+            <DeleteTeamMemberModal
+                isOpen={true}
+                onClose={onClose}
+                memberToDelete={member}
+                onDeleteMember={onDeleteMember}
+            />,
+        );
+
+        const yesButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES });
+        expect(yesButton).not.toBeDisabled();
+
+        fireEvent.click(yesButton);
+        expect(yesButton).toBeDisabled();
+
+        // Try clicking again while submitting
+        fireEvent.click(yesButton);
+        expect(TeamMembersApi.delete).toHaveBeenCalledTimes(1);
+
+        resolvePromise!();
+
+        await waitFor(() => {
+            expect(onClose).toHaveBeenCalled();
+        });
+    });
 });

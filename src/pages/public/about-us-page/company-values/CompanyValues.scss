@@ -1,17 +1,22 @@
 @use '../../../../assets/sass/variables/colors';
 @use '../../../../assets/sass/variables/fonts';
+@use '../../../../assets/sass/variables/z-index';
 
 .values-block * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
 }
+.values-block:hover .button-container {
+    opacity: 1;
+    transition: opacity 1s ease;
+}
 .values-block {
     display: flex;
     flex-wrap: wrap;
     position: relative;
-    height: 66.6rem;
     width: 100%;
+    height: auto;
 
     .swiper {
         width: 100%;
@@ -21,8 +26,8 @@
         width: 100%;
         display: flex;
         position: absolute;
-        left: 4rem;
-        top: 3.5rem;
+        padding-top: 2.75rem;
+        padding-left: 3.531rem;
 
         h2 {
             font-family: fonts.$mulish-regular-font;
@@ -35,13 +40,14 @@
     }
 
     .value-card {
-        position: absolute;
+        position: relative;
         background-color: colors.$light-blue-50;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         justify-content: flex-start;
         gap: 2rem;
+        padding: 4rem 3.5rem;
 
         .value-item {
             display: flex;
@@ -71,22 +77,16 @@
             }
         }
 
-        &.card-1,
-        &.card-2,
-        &.card-3 {
-            padding: 4rem 3.5rem;
-        }
-
         &.card-1 {
-            top: 8.75rem;
+            margin-top: 8.75rem;
         }
 
         &.card-2 {
-            top: 18rem;
+            margin-top: 17.5rem;
         }
 
         &.card-3 {
-            top: 21.5rem;
+            margin-top: 21.5rem;
         }
     }
 
@@ -97,8 +97,10 @@
         position: absolute;
         width: 100%;
         top: 50%;
-        z-index: 2;
+        z-index: z-index.$scrollable-frame-arrows;
         padding: 0 2rem;
+        transition: opacity 2s ease;
+        opacity: 0;
 
         .arrow-button {
             background-color: colors.$blue-900;
@@ -106,85 +108,185 @@
             width: 2.5rem;
             height: 2.5rem;
             border: none;
-            transition: all 0.8s ease;
+            transition: all 0.4s ease;
             cursor: pointer;
-            z-index: 2;
 
-            .arrow-normal-state,
-            .arrow-hover-state {
+            .arrow-icon {
                 position: absolute;
                 top: 0.5rem;
                 right: 0.5rem;
                 width: 1.5rem;
                 height: 1.5rem;
-            }
 
-            .arrow-hover-state {
-                display: none;
+                path {
+                    stroke: colors.$grey-50;
+                }
             }
 
             &:hover {
                 background-color: colors.$yellow-500;
 
-                .arrow-hover-state {
-                    display: block !important;
-                }
-
-                .arrow-normal-state {
-                    display: none;
+                .arrow-icon path {
+                    stroke: colors.$blue-900;
                 }
             }
         }
 
         .arrow-left {
-            left: 2rem;
+            left: 1.75rem;
         }
 
         .arrow-right {
-            right: 2rem;
+            right: 1.75rem;
         }
     }
 }
-@media (max-width: 768px) {
-}
 
-@media (max-width: 568px) {
+@media (max-width: 912px) {
     .values-block {
-        height: 58rem;
+        padding: 3.75rem 0;
+
+        .swiper {
+            width: 100%;
+        }
 
         .values-title {
-            left: 1rem;
-            top: 4rem;
+            width: 100%;
+            padding-top: 4rem;
+            padding-left: 3.375rem;
         }
 
         .value-card {
-            &.card-1,
-            &.card-2,
-            &.card-3 {
-                padding: 4rem 1rem;
+            padding: 4rem 3.375rem;
+            padding-right: 1rem;
+
+            .value-item {
+                width: 100%;
             }
 
-            &.card-1,
-            &.card-3 {
-                top: 11rem;
+            &.card-1 {
+                margin-top: 11.125rem;
             }
 
             &.card-2 {
-                top: 0rem;
+                margin-top: 0rem;
             }
 
-            .value-item {
-                width: 90%;
+            &.card-3 {
+                margin-top: 11.125rem;
             }
         }
 
         .button-container {
             .arrow-left {
-                left: 0.9rem;
+                left: 1rem;
             }
 
             .arrow-right {
-                right: 0.9rem;
+                right: 1rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .values-block {
+        padding: 3.75rem 0;
+
+        .swiper {
+            width: 100%;
+        }
+
+        .values-title {
+            width: 14.5rem;
+            padding-top: 4rem;
+            padding-left: 3.375rem;
+
+            h2 {
+                font-family: fonts.$mulish-regular-font;
+                font-weight: 700;
+                font-size: 2rem;
+                line-height: 2.5rem;
+                letter-spacing: -0.02rem;
+                text-transform: uppercase;
+            }
+        }
+
+        .value-card {
+            padding: 4rem 0rem;
+            padding-left: 3.375rem;
+            padding-right: 1rem;
+
+            .value-item {
+                width: 100%;
+            }
+
+            &.card-1 {
+                margin-top: 13.7rem;
+            }
+
+            &.card-2 {
+                margin-top: 0rem;
+            }
+
+            &.card-3 {
+                margin-top: 13.7rem;
+            }
+        }
+
+        .button-container {
+            .arrow-left {
+                left: 1rem;
+            }
+
+            .arrow-right {
+                right: 1rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 568px) {
+    .values-block {
+        padding: 3.75rem 0;
+
+        .swiper {
+            width: 100%;
+        }
+
+        .values-title {
+            width: 100%;
+            padding-top: 4rem;
+            padding-left: 1rem;
+        }
+
+        .value-card {
+            padding: 4rem 1rem;
+
+            .value-item {
+                width: 100%;
+            }
+
+            &.card-1 {
+                margin-top: 11.125rem;
+            }
+
+            &.card-2 {
+                margin-top: 3.7rem;
+            }
+
+            &.card-3 {
+                margin-top: 11.125rem;
+            }
+        }
+
+        .button-container {
+            .arrow-left {
+                left: 0.25rem;
+            }
+
+            .arrow-right {
+                right: 0.25rem;
             }
         }
     }

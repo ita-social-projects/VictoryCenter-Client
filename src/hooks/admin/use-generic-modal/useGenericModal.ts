@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { VisibilityStatus } from '../../../types/admin/common';
+import { ModalMode, PendingAction, VisibilityStatus } from '../../../types/admin/common';
 
 export interface GenericFormRef {
     submit: (status: VisibilityStatus) => void;
@@ -12,19 +12,15 @@ export interface GenericFormValues {
 }
 
 export interface UseGenericModalConfig<TFormValues extends GenericFormValues, TEntity> {
-    mode: 'add' | 'edit';
+    mode: ModalMode;
     isOpen: boolean;
     onClose: () => void;
     entity?: TEntity;
     onSuccess: (entity: TEntity) => void;
     apiCall: (data: any) => Promise<TEntity>;
-    getConfirmTitle: (
-        mode: 'add' | 'edit',
-        entity: TEntity | undefined,
-        pendingAction: 'publish' | 'draft' | null,
-    ) => string;
-    getErrorMessage: (mode: 'add' | 'edit') => string;
-    getFormKey: (mode: 'add' | 'edit', entity?: TEntity) => string | number;
+    getConfirmTitle: (mode: ModalMode, entity: TEntity | undefined, pendingAction: PendingAction | null) => string;
+    getErrorMessage: (mode: ModalMode) => string;
+    getFormKey: (mode: ModalMode, entity?: TEntity) => string | number;
     transformFormData: (formData: TFormValues, status: VisibilityStatus, entity?: TEntity) => any;
 }
 
@@ -49,11 +45,11 @@ export const useGenericModal = <
     const [error, setError] = useState('');
     const [showFormConfirmModal, setShowFormConfirmModal] = useState(false);
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
-    const [pendingAction, setPendingAction] = useState<'publish' | 'draft' | null>(null);
+    const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
     const [pendingFormData, setPendingFormData] = useState<TFormValues | null>(null);
     const [isFormValid, setIsFormValid] = useState(false);
 
-    const isEditMode = mode === 'edit';
+    const isEditMode = mode === ModalMode.Edit;
 
     const handleFormValidationChange = useCallback((isValid: boolean) => {
         setIsFormValid(isValid);
@@ -81,7 +77,7 @@ export const useGenericModal = <
     }, [resetPendingState]);
 
     const handleConfirmAction = useCallback(async () => {
-        if (!pendingFormData || !pendingAction) return;
+        if (!pendingFormData || pendingAction === null) return;
 
         setShowFormConfirmModal(false);
         setIsSubmitting(true);
@@ -89,7 +85,7 @@ export const useGenericModal = <
 
         try {
             const status: VisibilityStatus =
-                pendingAction === 'publish' ? VisibilityStatus.Published : VisibilityStatus.Draft;
+                pendingAction === PendingAction.Publish ? VisibilityStatus.Published : VisibilityStatus.Draft;
 
             const transformedData = transformFormData(pendingFormData, status, entity);
             const result = await apiCall(transformedData);
@@ -124,17 +120,21 @@ export const useGenericModal = <
         }
 
         setPendingFormData(data);
-        setPendingAction(status === VisibilityStatus.Published ? 'publish' : 'draft');
+        setPendingAction(status === VisibilityStatus.Published ? PendingAction.Publish : PendingAction.Draft);
         setShowFormConfirmModal(true);
     }, []);
 
     const handleClose = useCallback(() => {
         if (formRef.current?.isDirty()) {
-            setShowCloseConfirmModal(true);
+            if (pendingAction === PendingAction.Draft) {
+                onClose();
+            } else {
+                setShowCloseConfirmModal(true);
+            }
         } else if (!isSubmitting) {
             onClose();
         }
-    }, [isSubmitting, onClose]);
+    }, [isSubmitting, onClose, pendingAction]);
 
     const handleCancelClose = useCallback(() => {
         setShowCloseConfirmModal(false);

@@ -78,8 +78,12 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
         const handleFullNameChange = useCallback(
             (e: React.ChangeEvent<HTMLInputElement>) => {
                 setFormState((prev) => ({ ...prev, fullName: e.target.value }));
+                setErrors((prev) => ({
+                    ...prev,
+                    fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false),
+                }));
             },
-            [setFormState],
+            [formState.fullName, setErrors, setFormState],
         );
 
         const handleNameBlur = useCallback(() => {
@@ -105,11 +109,15 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
 
         const handleImgChange = useCallback(
             (file: ImageValues | Image | null) => {
-                setFormState((prev) => ({ ...prev, image: file }));
+                const error = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(file, false);
                 setErrors((prev) => ({
                     ...prev,
-                    image: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(file, false),
+                    image: error,
                 }));
+
+                if (!error) {
+                    setFormState((prev) => ({ ...prev, image: file }));
+                }
             },
             [setFormState, setErrors],
         );
@@ -179,7 +187,7 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                         disabled={isSubmitting || formDisabled}
                         maxLength={TEAM_MEMBER_VALIDATION.description.max}
                     />
-                    {errors.description && <span className="error">{errors.description}</span>}
+                    {errors.description && <span className="error desc-error">{errors.description}</span>}
                 </div>
                 <div className="form-group">
                     <InputLabel htmlFor={'image'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO} />

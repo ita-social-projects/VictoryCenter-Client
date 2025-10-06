@@ -1,5 +1,6 @@
 @use '../../../../assets/sass/variables/colors';
 @use '../../../../assets/sass/variables/fonts';
+@use '../../../../assets/sass/variables/z-index';
 
 .scroll-block {
     position: relative;
@@ -24,7 +25,10 @@
         position: absolute;
         width: 100%;
         top: 42%;
-        z-index: 2;
+        z-index: z-index.$scrollable-frame-arrows;
+        padding: 0 2rem;
+        transition: opacity 2s ease;
+        opacity: 0;
 
         .arrow-button {
             background-color: colors.$blue-900;
@@ -32,76 +36,67 @@
             width: 2.5rem;
             height: 2.5rem;
             border: none;
-            transition: all 0.8s ease;
+            transition: all 0.4s ease;
             cursor: pointer;
-            z-index: 2;
 
-            .arrow-normal-state,
-            .arrow-hover-state {
+            .arrow-icon {
                 position: absolute;
                 top: 0.5rem;
                 right: 0.5rem;
                 width: 1.5rem;
                 height: 1.5rem;
-            }
 
-            .arrow-hover-state {
-                display: none;
+                path {
+                    stroke: colors.$grey-50;
+                }
             }
 
             &:hover {
                 background-color: colors.$yellow-500;
 
-                .arrow-hover-state {
-                    display: block !important;
-                }
-
-                .arrow-normal-state {
-                    display: none;
+                .arrow-icon path {
+                    stroke: colors.$blue-900;
                 }
             }
         }
 
         .arrow-left {
-            left: 2rem;
+            left: 1.75rem;
         }
 
         .arrow-right {
-            right: 2rem;
+            right: 1.75rem;
         }
     }
 }
+.scroll-block:hover .button-container {
+    opacity: 1;
+    transition: opacity 1s ease;
+}
+
 @media (max-width: 912px) {
+    .scroll-block {
+        .button-container {
+            .arrow-left {
+                left: 1rem;
+            }
+
+            .arrow-right {
+                right: 1rem;
+            }
+        }
+    }
 }
 
 @media (max-width: 768px) {
     .scroll-block {
-        .custom-scrollbar {
-        }
-
         .button-container {
-            .arrow-button {
-                .arrow-normal-state,
-                .arrow-hover-state {
-                }
-
-                .arrow-hover-state {
-                    display: none;
-                }
-
-                &:hover {
-                    .arrow-hover-state {
-                    }
-
-                    .arrow-normal-state {
-                    }
-                }
-            }
-
             .arrow-left {
+                left: 1rem;
             }
 
             .arrow-right {
+                right: 1rem;
             }
         }
     }
@@ -117,30 +112,12 @@
         }
 
         .button-container {
-            .arrow-button {
-                .arrow-normal-state,
-                .arrow-hover-state {
-                }
-
-                .arrow-hover-state {
-                    display: none;
-                }
-
-                &:hover {
-                    .arrow-hover-state {
-                    }
-
-                    .arrow-normal-state {
-                    }
-                }
-            }
-
             .arrow-left {
-                left: 0.9rem;
+                left: 0.25rem;
             }
 
             .arrow-right {
-                right: 0.9rem;
+                right: 0.25rem;
             }
         }
     }

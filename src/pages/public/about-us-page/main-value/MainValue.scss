@@ -173,9 +173,12 @@
                 }
             }
 
-            .arrow-right,
             .arrow-left {
                 left: 1.75rem;
+            }
+
+            .arrow-right {
+                right: 1.75rem;
             }
         }
     }
@@ -303,7 +306,10 @@
             .button-container {
                 top: 45%;
 
-                .arrow-left,
+                .arrow-left {
+                    left: 1rem;
+                }
+
                 .arrow-right {
                     right: 1rem;
                 }
@@ -406,7 +412,10 @@
             .button-container {
                 top: 45%;
 
-                .arrow-left,
+                .arrow-left {
+                    left: 1rem;
+                }
+
                 .arrow-right {
                     right: 1rem;
                 }
@@ -510,7 +519,10 @@
             .button-container {
                 top: 41%;
 
-                .arrow-left,
+                .arrow-left {
+                    left: 0.25rem;
+                }
+
                 .arrow-right {
                     right: 0.25rem;
                 }

@@ -2,13 +2,13 @@ import '../../../i18n';
 import { useTranslation } from 'react-i18next';
 import { Select } from '../../common/select/Select';
 import { LOCALES } from '../../../const/common/locales';
-import './LanguageSwitcher.scss';
 import classNames from 'classnames';
+import './LanguageSwitcher.scss';
 
-export type LanguageSwitcherProps = {
+export interface LanguageSwitcherProps {
     onValueChange?: () => void;
     className?: string;
-};
+}
 
 export const LanguageSwitcher = ({ onValueChange, className }: LanguageSwitcherProps) => {
     const { i18n } = useTranslation();
@@ -32,5 +32,3 @@ export const LanguageSwitcher = ({ onValueChange, className }: LanguageSwitcherP
         </Select>
     );
 };
-
-export default LanguageSwitcher;

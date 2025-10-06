@@ -4,6 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 import aboutUsPageEn from './locales/en/about-us.json';
 import aboutUsPageUk from './locales/uk/about-us.json';
+import { DEFAULT_LOCALE, LOCALES } from './const/common/locales';
 
 const resources = {
     uk: {
@@ -22,7 +23,8 @@ if (!isTest) {
 
 i18n.use(initReactI18next).init({
     resources,
-    fallbackLng: 'uk',
+    supportedLngs: LOCALES,
+    fallbackLng: DEFAULT_LOCALE,
     ns: ['aboutUsPage'], // namespaces
     defaultNS: 'aboutUsPage',
     interpolation: {

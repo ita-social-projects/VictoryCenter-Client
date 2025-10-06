@@ -13,7 +13,7 @@ export interface Program {
     description: string;
     categories: ProgramCategory[];
     status: VisibilityStatus;
-    img: Image | ImageValues | null;
+    image: Image | ImageValues | null;
 }
 
 export interface ProgramSearchItemData {
@@ -28,7 +28,8 @@ export interface ProgramCreateUpdate {
     description: string;
     categoryIds: number[];
     status: VisibilityStatus;
-    img: ImageValues | null;
+    image: ImageValues | null;
+    imageId: number | null;
 }
 
 export interface ProgramCategoryCreateUpdate {

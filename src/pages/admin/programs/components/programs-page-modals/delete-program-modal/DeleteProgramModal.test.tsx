@@ -64,7 +64,7 @@ describe('DeleteProgramModal', () => {
         name: 'Test program',
         description: 'Description',
         status: VisibilityStatus.Published,
-        img: null,
+        image: null,
         categories: [],
     };
 

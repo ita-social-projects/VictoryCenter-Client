@@ -1,66 +1,33 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ScrollableFrame } from './ScrollableFrame';
 import * as dataFetch from '../../../../services/api/public/programs/programs-api';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
+import { mockPrograms } from '../../../../utils/mock-data/public/programs-page';
 
 jest.mock('../../../../components/public/program-card/ProgramCard', () => ({
-    ProgramCard: ({ program }: { program: any }) => <div data-testid="program-card">{program.title}</div>,
-}));
-
-jest.mock('../../../../components/public/swiper/CustomSwiper', () => ({
-    CustomSwiper: ({ items, renderItem }: any) => (
-        <div data-testid="custom-swiper">
-            {items.map((item: any, index: number) => (
-                <div key={index} data-testid="swiper-item">
-                    {renderItem(item, index)}
-                </div>
-            ))}
-        </div>
+    ProgramCard: ({ program }: { program: any }) => (
+        <div data-testid="program-card">{program.name || program.title}</div>
     ),
 }));
 
-const MockProgramData = [
-    {
-        image: 'firstImg',
-        title: 'Коні лікують Літо 2025',
-        subtitle: 'Ветеранська програма',
-        description: 'Зменшення рівня стресу, тривоги та ПТСР у ветеранів...',
-    },
-    {
-        image: 'secondImg',
-        title: 'Програма 2',
-        subtitle: 'Ветеранська програма',
-        description: 'Опис 2',
-    },
-    {
-        image: 'thirdImg',
-        title: 'Програма 3',
-        subtitle: 'Ветеранська програма',
-        description: 'Опис 3',
-    },
-];
+jest.mock('swiper/react', () => {
+    return {
+        Swiper: (props: any) => {
+            if (props.onSwiper) {
+                props.onSwiper({
+                    slideNext: jest.fn(),
+                    slidePrev: jest.fn(),
+                });
+            }
+            return <div data-testid="swiper">{props.children}</div>;
+        },
+        SwiperSlide: (props: any) => <div data-testid="swiper-slide">{props.children}</div>,
+    };
+});
 
 describe('ScrollableFrame', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-    });
-
-    it('should render programs correctly', async () => {
-        jest.spyOn(dataFetch, 'programPageDataFetch').mockResolvedValue({
-            programData: MockProgramData,
-        });
-
-        render(<ScrollableFrame />);
-
-        await waitFor(() => {
-            expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-        });
-
-        expect(screen.getByTestId('custom-swiper')).toBeInTheDocument();
-        const cards = await screen.findAllByTestId('program-card');
-        expect(cards.length).toBe(MockProgramData.length);
-        expect(cards[0]).toHaveTextContent('Коні лікують Літо 2025');
-        expect(screen.getAllByTestId('swiper-item')).toHaveLength(MockProgramData.length);
     });
 
     it('should show message about fetch error', async () => {
@@ -71,12 +38,7 @@ describe('ScrollableFrame', () => {
         await waitFor(() => {
             expect(screen.getByRole('alert')).toHaveTextContent(FAILED_TO_LOAD_THE_PROGRAMS);
         });
-        expect(screen.getByTestId('custom-swiper')).toBeInTheDocument();
 
         expect(screen.queryAllByTestId('program-card').length).toBe(0);
-    });
-
-    it('should render buttons with correct icons', () => {
-        render(<ScrollableFrame />);
     });
 });

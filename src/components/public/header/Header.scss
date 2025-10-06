@@ -1,6 +1,7 @@
 @use '../../../assets/sass/variables/colors';
 @use '../../../assets/sass/variables/fonts';
 @use '../../../assets/sass/mixins/utilits.mixins';
+@use '../../../assets/sass/variables/z-index';
 
 .header-block {
     display: flex;
@@ -10,7 +11,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 5;
+    z-index: z-index.public(header);
 
     height: 4rem;
     padding-top: 0.85rem;
@@ -107,7 +108,6 @@
         background-color: white;
         width: 12rem;
         flex-direction: column;
-        z-index: 10;
 
         a {
             font-weight: 600;

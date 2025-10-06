@@ -26,15 +26,13 @@
         clip-path: inset(9rem 34rem 18rem 1.25rem);
         object-fit: cover;
         object-position: top;
-        z-index: 1;
-        filter: grayscale(0%) brightness(1) saturate(130%) sepia(0.1);
+        filter: grayscale(0%) contrast(100%) brightness(1);
         animation: revealColor 4s ease-out forwards;
     }
 
     .about-us-info {
         position: absolute;
         inset: 0;
-        z-index: 2;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -63,7 +61,6 @@
             margin-right: 3.3rem;
             align-self: flex-end;
             width: 25rem;
-            z-index: 3;
             font-family: fonts.$mulish-regular-font;
             font-weight: 400;
             font-size: 1.125rem;

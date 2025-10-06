@@ -1,5 +1,6 @@
 @use '../../../../assets/sass/variables/colors';
 @use '../../../../assets/sass/variables/fonts';
+@use '../../../../assets/sass/variables/z-index';
 
 .values-block * {
     padding: 0;
@@ -96,7 +97,7 @@
         position: absolute;
         width: 100%;
         top: 50%;
-        z-index: 2;
+        z-index: z-index.$scrollable-frame-arrows;
         padding: 0 2rem;
         transition: opacity 2s ease;
         opacity: 0;
@@ -109,7 +110,6 @@
             border: none;
             transition: all 0.4s ease;
             cursor: pointer;
-            z-index: 2;
 
             .arrow-icon {
                 position: absolute;

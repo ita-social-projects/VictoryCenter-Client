@@ -1,4 +1,5 @@
 @use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/z-index';
 
 .tooltip-popup {
     position: absolute;
@@ -10,7 +11,7 @@
     word-wrap: break-word;
     border: 1px solid colors.$grey-700;
     transition: opacity 0.2s;
-    z-index: 20;
+    z-index: z-index.admin(tooltip);
 
     // Common arrow base styles (used for both before and after pseudo-elements)
     &::before,

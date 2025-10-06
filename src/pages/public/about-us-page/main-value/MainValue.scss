@@ -1,5 +1,6 @@
 @use '../../../../assets/sass/variables/colors';
 @use '../../../../assets/sass/variables/fonts';
+@use '../../../../assets/sass/variables/z-index';
 
 .main-values-block * {
     margin: 0;
@@ -32,7 +33,7 @@
             text-align: center;
             text-transform: uppercase;
             position: relative;
-            z-index: 1;
+            z-index: z-index.public(about-us-page-main-value-text);
         }
 
         span {
@@ -43,7 +44,6 @@
             text-align: center;
             text-transform: uppercase;
             position: relative;
-            z-index: 2;
         }
 
         span:nth-child(2) {
@@ -58,7 +58,7 @@
                 width: 100vw;
                 height: 100%;
                 background: colors.$yellow-300;
-                z-index: -1;
+                z-index: z-index.public(about-us-page-main-value-background);
             }
         }
 
@@ -78,7 +78,7 @@
                 width: 100vw;
                 height: 100%;
                 background: colors.$light-blue-200;
-                z-index: -1;
+                z-index: z-index.public(about-us-page-main-value-background);
             }
         }
     }
@@ -138,7 +138,7 @@
             position: absolute;
             width: 100%;
             top: 50%;
-            z-index: 2;
+            z-index: z-index.$scrollable-frame-arrows;
             padding: 0 2rem;
             transition: opacity 2s ease;
             opacity: 0;
@@ -151,7 +151,6 @@
                 border: none;
                 transition: all 0.4s ease;
                 cursor: pointer;
-                z-index: 2;
 
                 .arrow-icon {
                     position: absolute;
@@ -252,7 +251,7 @@
                     width: 100vw;
                     height: 100%;
                     background: colors.$yellow-300;
-                    z-index: -1;
+                    z-index: z-index.public(about-us-page-main-value-background);
                 }
             }
 
@@ -269,7 +268,7 @@
                     width: 100vw;
                     height: 100%;
                     background: colors.$light-blue-200;
-                    z-index: -1;
+                    z-index: z-index.public(about-us-page-main-value-background);
                 }
             }
         }
@@ -358,7 +357,7 @@
                     width: 100vw;
                     height: 100%;
                     background: colors.$yellow-300;
-                    z-index: -1;
+                    z-index: z-index.public(about-us-page-main-value-background);
                 }
             }
 
@@ -375,7 +374,7 @@
                     width: 100vw;
                     height: 100%;
                     background: colors.$light-blue-200;
-                    z-index: -1;
+                    z-index: z-index.public(about-us-page-main-value-background);
                 }
             }
         }
@@ -465,7 +464,7 @@
                     width: 100vw;
                     height: 100%;
                     background: colors.$yellow-300;
-                    z-index: -1;
+                    z-index: z-index.public(about-us-page-main-value-background);
                 }
             }
 
@@ -482,7 +481,7 @@
                     width: 100vw;
                     height: 100%;
                     background: colors.$light-blue-200;
-                    z-index: -1;
+                    z-index: z-index.public(about-us-page-main-value-background);
                 }
             }
         }

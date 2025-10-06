@@ -1,20 +1,20 @@
 import './ScrollableFrame.scss';
 import { useState, useEffect } from 'react';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
-import { PublishedProgram } from '../../../../types/public/programs-page';
 import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
 import { ProgramCard } from '../../../../components/public/program-card/ProgramCard';
 import { CustomSwiper } from '../../../../components/public/swiper/CustomSwiper';
+import { PublishedProgramDto } from '../../../../types/public/programs-page';
 
 export const ScrollableFrame = () => {
-    const [programData, setProgramData] = useState<PublishedProgram[]>([]);
+    const [programData, setProgramData] = useState<PublishedProgramDto[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         (async () => {
             try {
                 const response = await programPageDataFetch();
-                setProgramData(response.programData);
+                setProgramData(response.programsData);
                 setError(null);
             } catch {
                 setError(FAILED_TO_LOAD_THE_PROGRAMS);

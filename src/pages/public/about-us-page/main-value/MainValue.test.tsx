@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { MainValues } from './MainValue';
 import aboutUsUk from '../../../../locales/uk/about-us.json';
+import { checkForSubstrings } from '../../../../utils/functions/test-helpers/test-helpers';
 
 describe('MainValues component', () => {
     it('should render main title with correct parts and highlights', () => {
@@ -31,7 +32,3 @@ describe('MainValues component', () => {
         checkForSubstrings(aboutUsUk['MAIN_VALUE_DETAILS.THIRD_LINE']);
     });
 });
-
-const checkForSubstrings = (line: string) => {
-    expect(screen.getByText((content) => content.includes(line.trim()))).toBeInTheDocument();
-};

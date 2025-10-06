@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import { OurTeam } from './OurTeam';
 import aboutUsUk from '../../../../locales/uk/about-us.json';
+import { checkForSubstrings } from '../../../../utils/functions/test-helpers/test-helpers';
 
 jest.mock('../../../../assets/images/public/about-us-page/our-team.jpg', () => 'our-team.jpg');
 
@@ -34,7 +35,3 @@ describe('OurTeam component', () => {
         expect(link).toHaveAttribute('href', '/team');
     });
 });
-
-const checkForSubstrings = (line: string) => {
-    expect(screen.getByText((content) => content.includes(line.trim()))).toBeInTheDocument();
-};

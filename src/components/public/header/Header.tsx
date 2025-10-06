@@ -4,7 +4,7 @@ import { ReactComponent as VictoryCenterLogo } from '../../../assets/icons/logo-
 import { PUBLIC_ROUTES } from '../../../const/public/routes';
 import { DropdownLink, DropdownMenu } from '../dropdown-menu/DropdownMenu';
 import { ReactComponent as BurgerIcon } from '../../../assets/icons/burger.svg';
-import LanguageSwitcher from '../language-switcher/LanguageSwitcher';
+import { LanguageSwitcher } from '../language-switcher/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 

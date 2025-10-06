@@ -36,7 +36,7 @@ describe('ProgramListItem', () => {
         name: 'Test Program',
         description: 'Test program description',
         status: VisibilityStatus.Published,
-        img: null,
+        image: null,
         categories: [
             { id: 1, name: 'Category 1', programsCount: 1 },
             { id: 2, name: 'Category 2', programsCount: 2 },
@@ -161,7 +161,7 @@ describe('ProgramListItem', () => {
     it('displays image when program has an image and', () => {
         const programWithImage: Program = {
             ...mockProgram,
-            img: {
+            image: {
                 id: 1,
                 url: 'test-base64',
                 mimeType: 'image/png',

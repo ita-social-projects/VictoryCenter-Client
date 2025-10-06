@@ -8,7 +8,7 @@ interface ProgramCardProps {
     program: PublishedProgramDto;
     className: string;
 }
-export const ProgramCard: React.FC<ProgramCardProps> = ({ program, className }) => {
+export const ProgramCard = ({ program, className }: ProgramCardProps) => {
     return (
         <div className={`card-block ${className}`}>
             <img src={program.image?.url} alt={program.name} className="card-img" />

@@ -1,8 +1,7 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { ScrollableFrame } from './ScrollableFrame';
 import * as dataFetch from '../../../../services/api/public/programs/programs-api';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
-import { mockPrograms } from '../../../../utils/mock-data/public/programs-page';
 
 jest.mock('../../../../components/public/program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: { program: any }) => (

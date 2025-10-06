@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { AboutUsPage } from './AboutUsPage';
 
-jest.mock('./intro-section/AboutUsIntro', () => ({
+jest.mock('./intro-section/IntroSection', () => ({
     AboutUsIntro: () => <div data-testid="intro-section">About Us Intro</div>,
 }));
 jest.mock('./our-mission/OurMission', () => ({

@@ -21,4 +21,16 @@ describe('LanguageSwitcher', () => {
 
         expect(screen.getByText(language.toUpperCase() ?? '')).toBeInTheDocument();
     });
+
+    it('calls onValueChange when language is changed', () => {
+        const onValueChange = jest.fn();
+        render(<LanguageSwitcher onValueChange={onValueChange} />);
+        const selectContainer = screen.getByRole('toolbar', { name: '' });
+        fireEvent.click(selectContainer);
+
+        const nextLocale = LOCALES.find((lng) => lng !== i18n.language) || LOCALES[0];
+        fireEvent.click(screen.getByRole('button', { name: nextLocale.toUpperCase() }));
+
+        expect(onValueChange).toHaveBeenCalled();
+    });
 });

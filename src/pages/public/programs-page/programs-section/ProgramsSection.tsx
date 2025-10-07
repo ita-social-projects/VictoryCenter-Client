@@ -68,7 +68,7 @@ export const ProgramsSection = () => {
                     </div>
                 ) : (
                     programsByCategory?.map((item, index) => (
-                        <ProgramCard key={index} program={item} className={'programpage-card'} />
+                        <ProgramCard key={index} program={item} className={'program-page-card'} />
                     ))
                 )}
             </div>

@@ -1,19 +1,21 @@
-import './ScrollableFrame.scss';
 import { Swiper, SwiperSlide, SwiperClass } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ReactComponent as ArrowRight } from '../../../../../assets/icons/arrow-right.svg';
 import { ReactComponent as ArrowLeft } from '../../../../../assets/icons/arrow-left.svg';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
-import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../../const/public/programs-page';
 import { PublishedProgramDto } from '../../../../../types/public/programs-page';
 import { programPageDataFetch } from '../../../../../services/api/public/programs/programs-api';
 import { ProgramCard } from '../../../programs-page/programs-section/program-card/ProgramCard';
+import { useTranslation } from 'react-i18next';
+import './ScrollableFrame.scss';
 
 export const ScrollableFrame = () => {
+    const { t } = useTranslation('programsPage');
+
     const [programData, setProgramData] = useState<PublishedProgramDto[]>([]);
     const [error, setError] = useState<string | null>(null);
     const swiperRef = useRef<SwiperClass | null>(null);
@@ -26,18 +28,21 @@ export const ScrollableFrame = () => {
         swiperRef.current?.slideNext();
     };
 
+    // will fetch program data in a selected language later
+    const fetchProgramData = useCallback(async () => {
+        try {
+            const response = await programPageDataFetch();
+            setProgramData(response.programsData);
+            setError(null);
+        } catch {
+            setError(t('FAILED_TO_LOAD_THE_PROGRAMS'));
+            setProgramData([]);
+        }
+    }, [t]);
+
     useEffect(() => {
-        (async () => {
-            try {
-                const response = await programPageDataFetch();
-                setProgramData(response.programsData);
-                setError(null);
-            } catch {
-                setError(FAILED_TO_LOAD_THE_PROGRAMS);
-                setProgramData([]);
-            }
-        })();
-    }, []);
+        fetchProgramData();
+    }, [fetchProgramData]);
 
     return (
         <div className="scroll-block">

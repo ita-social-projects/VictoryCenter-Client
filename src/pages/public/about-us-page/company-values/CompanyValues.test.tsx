@@ -1,12 +1,12 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { CompanyValues } from './CompanyValues';
-import aboutUsUk from '../../../../locales/uk/about-us.json';
+import aboutUsPageUk from '../../../../locales/uk/about-us.json';
 
 describe('Company Values Section', () => {
     it('should contain main title', () => {
         render(<CompanyValues />);
-        const title = screen.getByRole('heading', { name: aboutUsUk.OUR_VALUES });
+        const title = screen.getByRole('heading', { name: aboutUsPageUk.OUR_VALUES });
         expect(title).toBeInTheDocument();
         expect(title).toHaveClass('values-title');
     });
@@ -25,7 +25,7 @@ describe('Company Values Section', () => {
 
     it('should contain correct text', () => {
         render(<CompanyValues />);
-        aboutUsUk.VALUE_ITEMS.forEach(({ NAME, DESCRIPTION }) => {
+        aboutUsPageUk.VALUE_ITEMS.forEach(({ NAME, DESCRIPTION }) => {
             expect(screen.getByRole('heading', { name: NAME })).toBeInTheDocument();
             expect(screen.getByText(DESCRIPTION)).toBeInTheDocument();
         });

@@ -33,7 +33,7 @@ describe('PublicLayout Component', () => {
                         <Route index element={<HomePage />} />
                     </Route>
                 </Routes>
-            </MemoryRouter>
+            </MemoryRouter>,
         );
 
         expect(screen.getByText('Mock Header')).toBeInTheDocument();
@@ -46,7 +46,7 @@ describe('PublicLayout Component', () => {
         render(
             <MemoryRouter initialEntries={['/']}>
                 <PublicLayout />
-            </MemoryRouter>
+            </MemoryRouter>,
         );
 
         expect(scrollToSpy).toHaveBeenCalledTimes(1);
@@ -61,7 +61,7 @@ describe('PublicLayout Component', () => {
         render(
             <MemoryRouter initialEntries={['/']}>
                 <PublicLayout behavior="smooth" />
-            </MemoryRouter>
+            </MemoryRouter>,
         );
 
         expect(scrollToSpy).toHaveBeenCalledTimes(1);
@@ -85,7 +85,7 @@ describe('PublicLayout Component', () => {
                         <Route path="about" element={<AboutPage />} />
                     </Route>
                 </Routes>
-            </MemoryRouter>
+            </MemoryRouter>,
         );
 
         expect(screen.getByText('Home Page Content')).toBeInTheDocument();

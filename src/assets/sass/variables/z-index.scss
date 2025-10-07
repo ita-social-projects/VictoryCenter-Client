@@ -1,0 +1,40 @@
+// Global z-index ranges:
+// 1000+ – global elements
+// 900-999  – modal
+// 800-899  – toast
+// 700-799  – tooltip, dropdowns
+// 1–100 – small elements (inputs, arrows, loaders etc.)
+
+$full-page-loader: 1000;
+$modal: 900;
+$single-select-input: 10;
+$scrollable-frame-arrows: 1;
+
+$public-layout: (
+    dropdown-menu: 700,
+    header: 5,
+    about-us-page-main-value-text: 1,
+    about-us-page-main-value-background: -1,
+    programs-page-intro-section-text: 1,
+    programs-page-intro-section-background: -1,
+    team-page-members-loader: 10,
+);
+
+$admin-layout: (
+    toast-container: 800,
+    tooltip: 700,
+    context-menu-button-options: 10,
+    drag-preview: 20,
+    infinite-scroll-list-arrow-up: 10,
+    multi-select-input: 10,
+    search-bar-suggestions: 10,
+    select: 10,
+);
+
+@function public($key) {
+    @return map-get($public-layout, $key);
+}
+
+@function admin($key) {
+    @return map-get($admin-layout, $key);
+}

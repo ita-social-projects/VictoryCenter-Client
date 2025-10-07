@@ -7,7 +7,7 @@ import { ContentType } from '../../../../../../types/common/about-us';
 import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
-import { Image } from "../../../../../../types/common/image";
+import { Image } from '../../../../../../types/common/image';
 
 // Mock child components
 jest.mock('../../../../../../components/admin/image-input/ImageInput', () => ({
@@ -74,9 +74,30 @@ describe('ImageSection', () => {
     const renderComponent = (props: Partial<ImageSectionProps> = {}) => {
         const defaultProps: ImageSectionProps = {
             content: [
-                { id: 1, contentType: ContentType.Image, image: { id: 1, url: "https://example.com/card/1", mimeType: 'image/png' } as Image, title: null, imageId: 1, description: null },
-                { id: 2, contentType: ContentType.Title, title: 'Initial Title', image: null, imageId: null, description: null },
-                { id: 3, contentType: ContentType.Description, description: 'Initial Description', title: null, imageId: null, image: null },
+                {
+                    id: 1,
+                    contentType: ContentType.Image,
+                    image: { id: 1, url: 'https://example.com/card/1', mimeType: 'image/png' } as Image,
+                    title: null,
+                    imageId: 1,
+                    description: null,
+                },
+                {
+                    id: 2,
+                    contentType: ContentType.Title,
+                    title: 'Initial Title',
+                    image: null,
+                    imageId: null,
+                    description: null,
+                },
+                {
+                    id: 3,
+                    contentType: ContentType.Description,
+                    description: 'Initial Description',
+                    title: null,
+                    imageId: null,
+                    image: null,
+                },
             ],
             titleLimit,
             descriptionLimit,
@@ -115,7 +136,10 @@ describe('ImageSection', () => {
         const { container: nullContentContainer } = renderComponent({ content: undefined });
         expect(nullContentContainer).toBeEmptyDOMElement();
         const { container: noDescriptionContainer } = renderComponent({
-            content: [{ id: 1, contentType: ContentType.Image, title: null, description: null, imageId: null, image: null }, { id: 2, contentType: ContentType.Title, title: null, description: null, imageId: null, image: null }],
+            content: [
+                { id: 1, contentType: ContentType.Image, title: null, description: null, imageId: null, image: null },
+                { id: 2, contentType: ContentType.Title, title: null, description: null, imageId: null, image: null },
+            ],
         });
         expect(noDescriptionContainer).toBeEmptyDOMElement();
     });
@@ -125,7 +149,9 @@ describe('ImageSection', () => {
         const file = new File(['dummy content'], 'test.png', { type: 'image/png' });
         const input = screen.getByTestId('mock-image-input-file');
         fireEvent.change(input, { target: { files: [file] } });
-        expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({ contentType: ContentType.Image, image: file }));
+        expect(mockOnChange).toHaveBeenCalledWith(
+            expect.objectContaining({ contentType: ContentType.Image, image: file }),
+        );
         expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
@@ -134,7 +160,9 @@ describe('ImageSection', () => {
         const titleInput = screen.getByTestId('mock-title-input');
         const newTitle = 'New Title';
         fireEvent.change(titleInput, { target: { value: newTitle } });
-        expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({ contentType: ContentType.Title, title: newTitle }));
+        expect(mockOnChange).toHaveBeenCalledWith(
+            expect.objectContaining({ contentType: ContentType.Title, title: newTitle }),
+        );
         expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
@@ -143,7 +171,9 @@ describe('ImageSection', () => {
         const descriptionTextarea = screen.getByTestId('mock-description-textarea');
         const newDescription = 'New Description';
         fireEvent.change(descriptionTextarea, { target: { value: newDescription } });
-        expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({ contentType: ContentType.Description, description: newDescription }));
+        expect(mockOnChange).toHaveBeenCalledWith(
+            expect.objectContaining({ contentType: ContentType.Description, description: newDescription }),
+        );
         expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
@@ -209,12 +239,18 @@ describe('ImageSection', () => {
         expect(await screen.findByText('image size error')).toBeInTheDocument();
     });
 
-
     it('should render correctly without title content', () => {
         renderComponent({
             content: [
                 { id: 1, contentType: ContentType.Image, image: null, title: null, imageId: null, description: null },
-                { id: 3, contentType: ContentType.Description, description: 'Initial Description', title: null, imageId: null, image: null },
+                {
+                    id: 3,
+                    contentType: ContentType.Description,
+                    description: 'Initial Description',
+                    title: null,
+                    imageId: null,
+                    image: null,
+                },
             ],
         });
         expect(screen.queryByText(COMMON_TEXT_ADMIN.TYPE.TITLE)).not.toBeInTheDocument();

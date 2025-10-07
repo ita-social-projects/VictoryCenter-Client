@@ -9,8 +9,7 @@ import { WhoWeAreCategory, WhoWeAreSection, Content } from '../../../../../types
 // Припускаємо, що ці enum існують. Якщо ні, можна використовувати рядки.
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ToastType } from '../../../../../types/admin/toast';
-import {ContentType, SectionType} from "../../../../../types/common/about-us";
-
+import { ContentType, SectionType } from '../../../../../types/common/about-us';
 
 // 1. Мокуємо API-сервіс
 jest.mock('../../../../../services/api/admin/who-we-are/who-we-are-api');
@@ -76,7 +75,6 @@ jest.mock('../../../../../components/admin/toast/toast-container/ToastContainer'
     ToastContainer: () => <div data-testid="toast-container" />,
 }));
 
-
 // --- ОНОВЛЕНІ Тестові дані ---
 // Дані тепер узгоджені між собою та з логікою тестів.
 
@@ -90,7 +88,14 @@ const mockSection1: WhoWeAreSection = {
     title: 'History Section',
     sectionType: SectionType.WhatWeDo,
     contents: [
-        { id: 1, contentType: ContentType.Image, description: null, title: null, image: { id: 1, url: 'url1.jpg', mimeType: 'image/png' }, imageId: 1 },
+        {
+            id: 1,
+            contentType: ContentType.Image,
+            description: null,
+            title: null,
+            image: { id: 1, url: 'url1.jpg', mimeType: 'image/png' },
+            imageId: 1,
+        },
     ],
 };
 
@@ -178,9 +183,7 @@ describe('WhoWeAreContent Component', () => {
     it('should fetch new section data when a different category is selected', async () => {
         // Arrange
         mockedWhoWeAreApi.getAll.mockResolvedValue(mockCategories);
-        mockedWhoWeAreApi.getByType
-            .mockResolvedValueOnce(mockSection1)
-            .mockResolvedValueOnce(mockSection2);
+        mockedWhoWeAreApi.getByType.mockResolvedValueOnce(mockSection1).mockResolvedValueOnce(mockSection2);
 
         render(<WhoWeAreContent />);
         await waitFor(() => expect(screen.getByText('History Section')).toBeInTheDocument());
@@ -232,7 +235,7 @@ describe('WhoWeAreContent Component', () => {
         expect(mockedWhoWeAreApi.UpdateContent).toHaveBeenCalledWith(
             { client: 'mocked-client' },
             expectedPayload,
-            'HISTORY'
+            'HISTORY',
         );
         expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
         expect(screen.getByRole('button', { name: 'Publish' })).toBeDisabled();

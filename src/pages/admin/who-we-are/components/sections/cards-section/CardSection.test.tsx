@@ -2,24 +2,24 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { CardsSection, CardsSectionProps } from './CardsSection';
 import '@testing-library/jest-dom';
-import {ContentType} from "../../../../../../types/common/about-us";
-import {WHO_WE_ARE_VALIDATION_FUNCTIONS} from "../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema";
-import {Image} from "../../../../../../types/common/image";
+import { ContentType } from '../../../../../../types/common/about-us';
+import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
+import { Image } from '../../../../../../types/common/image';
 
 // Mock child components to isolate the component being tested
 jest.mock('../../card-content/CardContent', () => ({
     CardContent: ({
-                      content,
-                      onImageChange,
-                      onChange,
-                      onDescriptionBlur,
-                      descriptionError,
-                      imageError,
-                      setImageError,
-                      descriptionLimit,
-                      imageInputProps,
-                      rows,
-                  }: any) => (
+        content,
+        onImageChange,
+        onChange,
+        onDescriptionBlur,
+        descriptionError,
+        imageError,
+        setImageError,
+        descriptionLimit,
+        imageInputProps,
+        rows,
+    }: any) => (
         <div data-testid={`mock-card-content-${content.id}`}>
             <textarea
                 data-testid={`mock-textarea-${content.id}`}
@@ -59,11 +59,11 @@ describe('CardsSection', () => {
             contentType: ContentType.Card,
             description: 'Card 1 description',
             image: {
-                id : 1,
-                url: "https://example.com/card/1",
+                id: 1,
+                url: 'https://example.com/card/1',
                 mimeType: 'image/png',
-        } as Image,
-            imageId : 10,
+            } as Image,
+            imageId: 10,
             title: null,
         },
         {
@@ -71,11 +71,11 @@ describe('CardsSection', () => {
             contentType: ContentType.Card,
             description: 'Card 2 description',
             image: {
-                id : 2,
-                url: "https://example.com/card/2124",
+                id: 2,
+                url: 'https://example.com/card/2124',
                 mimeType: 'image/png',
             } as Image,
-            imageId : 2,
+            imageId: 2,
             title: null,
         },
     ];
@@ -113,7 +113,16 @@ describe('CardsSection', () => {
         expect(nullContentContainer).toBeEmptyDOMElement();
 
         const { container: noCardsContainer } = renderComponent({
-            content: [{ id: 3, contentType: ContentType.Description, description: 'test', image : null, imageId : null, title: null }],
+            content: [
+                {
+                    id: 3,
+                    contentType: ContentType.Description,
+                    description: 'test',
+                    image: null,
+                    imageId: null,
+                    title: null,
+                },
+            ],
         });
         expect(noCardsContainer).toBeEmptyDOMElement();
     });
@@ -125,10 +134,12 @@ describe('CardsSection', () => {
 
         fireEvent.change(textarea, { target: { value: newDescription } });
 
-        expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({
-            id: 1,
-            description: newDescription,
-        }));
+        expect(mockOnChange).toHaveBeenCalledWith(
+            expect.objectContaining({
+                id: 1,
+                description: newDescription,
+            }),
+        );
         expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
@@ -139,10 +150,12 @@ describe('CardsSection', () => {
 
         fireEvent.change(imageInput, { target: { value: newImage } });
 
-        expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({
-            id: 1,
-            image: newImage,
-        }));
+        expect(mockOnChange).toHaveBeenCalledWith(
+            expect.objectContaining({
+                id: 1,
+                image: newImage,
+            }),
+        );
         expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 

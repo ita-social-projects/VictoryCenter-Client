@@ -1,11 +1,10 @@
 import { Content } from '../../../../../../types/admin/who-we-are';
 import { ImageInput, ImageInputProps } from '../../../../../../components/admin/image-input/ImageInput';
 import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { Image, ImageValues } from '../../../../../../types/common/image';
+import { ImageValues } from '../../../../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
-import bgImage from '../../../../../assets/images/public/about-us-page/background.jpg';
 import './ImageBlockSection.scss';
 import { InputWithCharacterLimit } from '../../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { Button } from '../../../../../../components/admin/button/Button';

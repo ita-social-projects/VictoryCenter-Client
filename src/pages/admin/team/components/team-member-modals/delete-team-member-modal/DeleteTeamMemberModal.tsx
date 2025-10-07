@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Modal } from '../../../../../../components/common/modal/Modal';
 import { TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
-import '../TeamMemberModal.scss';
+import './DeleteTeamMemberModal.scss';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { TeamMember } from '../../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
@@ -51,7 +51,7 @@ export const DeleteTeamMemberModal = ({
     return (
         <Modal isOpen={isOpen} onClose={handleClose}>
             <Modal.Title>{TEAM_MEMBERS_TEXT.FORM.TITLE.DELETE_MEMBER}</Modal.Title>
-            <Modal.Content>{error && <div className="error-container">{error}</div>}</Modal.Content>
+            <Modal.Content>{error && <div className="delete-team-member-error-container">{error}</div>}</Modal.Content>
             <Modal.Actions>
                 <Button onClick={handleClose} buttonStyle="secondary" disabled={isSubmitting}>
                     {COMMON_TEXT_ADMIN.BUTTON.NO}

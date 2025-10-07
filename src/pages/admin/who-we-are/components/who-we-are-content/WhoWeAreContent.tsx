@@ -121,7 +121,7 @@ export const WhoWeAreContent = () => {
             setIsPublishButtonActive(false);
             addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
         }
-    }, [selectedSection, updatedSection, client, selectedCategory]);
+    }, [selectedSection, updatedSection, client, selectedCategory, addToast]);
 
     return (
         <>

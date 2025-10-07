@@ -1,10 +1,10 @@
 import { Button } from '../../admin/button/Button';
-import ExitIcon from '../../../assets/icons/exit-icon.svg';
+import { ReactComponent as ExitIcon } from '../../../assets/icons/exit-icon.svg';
+import { ReactComponent as Logo } from '../../../assets/icons/logo-with-text.svg';
 import { useAdminContext } from '../../../contexts/admin/admin-context-provider/AdminContextProvider';
 import './AdminNavigation.scss';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
-import Logo from '../../../assets/icons/logo-with-text.svg';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ADMIN_ROUTES } from '../../../const/admin/routes';
 
@@ -15,7 +15,7 @@ export const AdminNavigation = () => {
         <div className="admin-navigation">
             <div>
                 <div className="admin-logo">
-                    <img src={Logo} alt="Logo" />
+                    <Logo />
                 </div>
                 <div className="admin-pages">
                     <nav>
@@ -42,6 +42,19 @@ export const AdminNavigation = () => {
                         >
                             {COMMON_TEXT_ADMIN.TAB.PROGRAMS}
                         </NavLink>
+
+                        <NavLink
+                            to={ADMIN_ROUTES.FAQ.FULL}
+                            end
+                            className={({ isActive }) =>
+                                classNames('admin-page-link', {
+                                    'admin-pages-selected': isActive,
+                                })
+                            }
+                        >
+                            {COMMON_TEXT_ADMIN.TAB.FAQ}
+                        </NavLink>
+
                         <NavLink
                             to={ADMIN_ROUTES.WHO_WE_ARE.FULL}
                             end
@@ -57,8 +70,8 @@ export const AdminNavigation = () => {
                 </div>
             </div>
             <Button className="exit-button" onClick={logout}>
-                <img src={ExitIcon} alt="exit-icon" />
-                <span className="exit-button-text">Вихід</span>
+                <ExitIcon className="exit-icon" />
+                <span className="exit-button-text">{COMMON_TEXT_ADMIN.BUTTON.EXIT}</span>
             </Button>
         </div>
     );

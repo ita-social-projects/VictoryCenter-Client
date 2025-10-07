@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AboutUsIntro } from './intro-section/AboutUsIntro';
+import { AboutUsIntro } from './intro-section/IntroSection';
 import { OurMission } from './our-mission/OurMission';
 import { SupportSection } from './support-section/SupportSection';
 import { CompanyValues } from './company-values/CompanyValues';

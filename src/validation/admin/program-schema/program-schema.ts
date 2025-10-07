@@ -34,18 +34,18 @@ export const programValidationSchema = Yup.object({
                 : schema.notRequired(),
         ),
 
-    img: Yup.mixed<Image | ImageValues>()
+    image: Yup.mixed<Image | ImageValues>()
         .nullable()
         .default(null)
         .when('$isPublishing', ([isPublishing], schema) =>
             isPublishing
-                ? schema.required(PROGRAM_VALIDATION.img.getRequiredWhenPublishingError())
+                ? schema.required(PROGRAM_VALIDATION.image.getRequiredWhenPublishingError())
                 : schema.notRequired(),
         )
         .transform((value) => {
             if (value === undefined || value === '') return null;
             return value;
-        })
+        }),
 });
 
 export const PROGRAM_VALIDATION_FUNCTIONS = {
@@ -79,10 +79,10 @@ export const PROGRAM_VALIDATION_FUNCTIONS = {
         }
     },
 
-    validateImg: (value: Image | ImageValues | null, isPublishing: boolean): string | undefined => {
+    validateImage: (value: Image | ImageValues | null, isPublishing: boolean): string | undefined => {
         const context: ProgramValidationContext = { isPublishing };
         try {
-            programValidationSchema.validateSyncAt('img', { img: value }, { context });
+            programValidationSchema.validateSyncAt('image', { image: value }, { context });
             return undefined;
         } catch (error: any) {
             return error.message;

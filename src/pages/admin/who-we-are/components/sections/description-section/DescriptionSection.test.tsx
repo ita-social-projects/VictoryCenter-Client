@@ -47,14 +47,16 @@ describe('DescriptionSection', () => {
     // Setup function to render the component with consistent props
     const renderComponent = (props: Partial<DescriptionSectionProps> = {}) => {
         const defaultProps: DescriptionSectionProps = {
-            content: [{
-                id: 1,
-                contentType: ContentType.Description,
-                description: initialDescription,
-                image: null,
-                imageId: null,
-                title: null
-            }],
+            content: [
+                {
+                    id: 1,
+                    contentType: ContentType.Description,
+                    description: initialDescription,
+                    image: null,
+                    imageId: null,
+                    title: null,
+                },
+            ],
             descriptionLimit,
             onChange: mockOnChange,
             onPublish: mockOnPublish,
@@ -93,14 +95,18 @@ describe('DescriptionSection', () => {
 
     // Test for handling content without a description item
     it('should not render anything if there is no description content item', () => {
-        const { container } = renderComponent({ content: [{
-                id: 2,
-                contentType: ContentType.Image, // A different content type
-                description: '',
-                image: null,
-                imageId: null,
-                title: null
-            }]});
+        const { container } = renderComponent({
+            content: [
+                {
+                    id: 2,
+                    contentType: ContentType.Image, // A different content type
+                    description: '',
+                    image: null,
+                    imageId: null,
+                    title: null,
+                },
+            ],
+        });
         expect(container).toBeEmptyDOMElement();
     });
 
@@ -111,10 +117,12 @@ describe('DescriptionSection', () => {
         const newText = 'This is a new test description.';
         fireEvent.change(textarea, { target: { value: newText } });
 
-        expect(mockOnChange).toHaveBeenCalledWith(expect.objectContaining({
-            description: newText,
-            contentType: ContentType.Description,
-        }));
+        expect(mockOnChange).toHaveBeenCalledWith(
+            expect.objectContaining({
+                description: newText,
+                contentType: ContentType.Description,
+            }),
+        );
         expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 

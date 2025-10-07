@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, within } from '@testing-library/react';
 import { TeamPageToolbar } from './TeamPageToolbar';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
@@ -7,7 +7,9 @@ import { VisibilityStatus } from '../../../../../types/admin/common';
 import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
 import { ProgramSearchItemData } from '../../../../../types/admin/programs';
 
-jest.mock('../../../../../assets/icons/plus.svg', () => 'mocked-plus-icon.svg');
+jest.mock('../../../../../assets/icons/plus.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="plus-icon" />,
+}));
 
 jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
     SearchBar: ({ onQueryChange, onClear, placeholder }: SearchBarProps<ProgramSearchItemData>) => (
@@ -96,7 +98,9 @@ describe('TeamPageToolbar', () => {
             />,
         );
 
-        const addBtn = screen.getByRole('button', { name: /Додати учасника/ });
+        const addBtn = screen.getByRole('button', { name: TEAM_MEMBERS_TEXT.BUTTON.ADD_MEMBER });
+        expect(within(addBtn).getByTestId('plus-icon')).toBeInTheDocument();
+
         fireEvent.click(addBtn);
         expect(onAddMember).toHaveBeenCalled();
     });

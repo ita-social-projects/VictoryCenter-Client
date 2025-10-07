@@ -101,10 +101,10 @@ jest.mock('../team-member-modals/delete-team-member-modal/DeleteTeamMemberModal'
 
 jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({
-                      categories,
-                      selectedCategory,
-                      onCategorySelect,
-                  }: {
+        categories,
+        selectedCategory,
+        onCategorySelect,
+    }: {
         categories: TeamCategory[];
         selectedCategory?: TeamCategory;
         onCategorySelect: (category: TeamCategory) => void;

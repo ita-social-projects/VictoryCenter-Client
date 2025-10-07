@@ -1,11 +1,7 @@
 import { Content } from '../../../../../../types/admin/who-we-are';
-import { ImageInputProps } from '../../../../../../components/admin/image-input/ImageInput';
-import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
 import React, { useState } from 'react';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { MainPageProps } from '../SectionsProps';
-import { ReactComponent as ArrowIcon } from '../../../../../../assets/icons/arrow-up-right.svg';
 import './DescriptionSection.scss';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { OurMission } from '../../../../../public/about-us-page/our-mission/OurMission';

@@ -13,6 +13,13 @@ export const API_ROUTES = {
         CATEGORIES: 'Categories',
         PUBLISHED: 'team/published',
     },
+    PROGRAMS: {
+        BASE: 'Programs',
+        PUBLISHED: 'Programs/published',
+    },
+    PROGRAMCATEGORY: {
+        BASE: 'ProgramCategory',
+    },
     PAYMENTS: {
         DONATE: 'payments/donate',
     },
@@ -20,7 +27,10 @@ export const API_ROUTES = {
         BASE: 'Image',
     },
     FAQ: {
+        BASE: 'faq',
         PUBLISHED_BY_SLUG: 'faq/published',
+        REORDER: 'faq/reorder',
+        PAGES: 'faq/pages',
     },
     WHO_WE_ARE: {
         BASE: 'WhoWeAre',

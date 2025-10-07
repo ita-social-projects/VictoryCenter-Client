@@ -1,5 +1,4 @@
 import { VisibilityStatus, PaginationResult } from '../../../../types/admin/common';
-import { RequestOptions } from '../../../../types/common/api';
 import {
     ProgramCategory,
     ProgramCreateUpdate,
@@ -7,18 +6,10 @@ import {
     ProgramSearchItemData,
     Program,
 } from '../../../../types/admin/programs';
-import { mockPrograms, mockCategories } from '../../../../utils/mock-data/admin/programs';
+import { AxiosInstance } from 'axios';
+import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
+import { ImageApi } from '../image/image-api';
 
-// !!!
-// Delete after actual integration with backend
-
-// ============================================
-let mockProgramId = Math.max(...mockPrograms.map((p) => p.id), 0) + 1;
-let mockCategoryId = Math.max(...mockCategories.map((c) => c.id), 0) + 1;
-export let mockDelay = 400;
-export let throwErrorsInApi = false;
-
-// Helper function to convert Program to ProgramSuggestion
 const convertProgramToSuggestion = (program: Program): ProgramSearchItemData => {
     return {
         id: program.id,
@@ -27,73 +18,83 @@ const convertProgramToSuggestion = (program: Program): ProgramSearchItemData => 
     };
 };
 
-// Simulates an async delay with AbortSignal support — used for testing fetch cancellation behavior
-const simulateAsyncOperation = (delay: number, signal?: AbortSignal): Promise<void> => {
-    return new Promise((resolve, reject) => {
-        const timeoutId = setTimeout(() => {
-            cleanup();
-            resolve();
-        }, delay);
-
-        const cleanup = () => {
-            clearTimeout(timeoutId);
-            signal?.removeEventListener('abort', onAbort);
-        };
-
-        const onAbort = () => {
-            cleanup();
-            const error = new Error('Request was cancelled');
-            error.name = 'AbortError';
-            reject(error);
-        };
-
-        if (signal?.aborted) {
-            onAbort();
-        } else {
-            signal?.addEventListener('abort', onAbort, { once: true });
-        }
-    });
+const mapProgramEditToProgram = async (program: ProgramCreateUpdate, client: AxiosInstance): Promise<Program> => {
+    const response = await client.get<ProgramCategory[]>(API_ROUTES.PROGRAMCATEGORY.BASE);
+    return {
+        id: program.id as number,
+        name: program.name,
+        description: program.description,
+        categories: response.data,
+        status: program.status,
+        image: program.image,
+    };
 };
-// ============================================
-// !!!
-// !!!
+
+export const ProgramsCategoriesApi = {
+    fetchProgramCategories: async (client: AxiosInstance): Promise<ProgramCategory[]> => {
+        const response = await client.get<ProgramCategory[]>(API_ROUTES.PROGRAMCATEGORY.BASE);
+        const result = response.data.map((category: any) => {
+            return {
+                ...category,
+                programsCount: category.programs.length,
+            };
+        });
+        return result;
+    },
+
+    addProgramCategory: async (
+        category: ProgramCategoryCreateUpdate,
+        client: AxiosInstance,
+    ): Promise<ProgramCategory> => {
+        const response = await client.post(API_ROUTES.PROGRAMCATEGORY.BASE, category);
+        const created = response.data;
+        return {
+            ...created,
+            programsCount: created.programs ? created.programs.length : 0,
+        };
+    },
+
+    editProgramCategory: async (
+        category: ProgramCategoryCreateUpdate,
+        client: AxiosInstance,
+    ): Promise<ProgramCategory> => {
+        const response = await client.put(`${API_ROUTES.PROGRAMCATEGORY.BASE}/${category.id}`, category);
+        return response.data;
+    },
+
+    deleteProgramCategory: async (id: number, client: AxiosInstance): Promise<void> => {
+        const response = await client.delete(`${API_ROUTES.PROGRAMCATEGORY.BASE}/${id}`);
+        return response.data;
+    },
+};
 
 export const ProgramsApi = {
     fetchPrograms: async (
+        client: AxiosInstance,
         categoryId: number,
         offset: number,
         limit: number,
         status?: VisibilityStatus,
-        options?: RequestOptions,
     ): Promise<PaginationResult<Program>> => {
-        await simulateAsyncOperation(mockDelay, options?.cancellationSignal);
-        if (throwErrorsInApi) throw new Error('Error fetching programs');
-
-        const filtered = mockPrograms.filter((program) => {
-            const inCategory = program.categories.some((category: ProgramCategory) => category.id === categoryId);
-            const statusMatches = status === undefined || program.status === status;
-            return inCategory && statusMatches;
+        const response = await client.get<PaginationResult<Program>>(API_ROUTES.PROGRAMS.BASE, {
+            params: {
+                categoryId,
+                offset,
+                limit,
+                status,
+            },
         });
-
-        const start = offset;
-        const end = offset + limit;
-
-        return {
-            items: filtered.slice(start, end),
-            totalItemsCount: filtered.length,
-        };
+        return response.data;
     },
 
     fetchProgramSearchItems: async (
+        client: AxiosInstance,
         searchTerm: string,
         offset: number,
         limit: number,
-        options?: RequestOptions,
     ): Promise<PaginationResult<ProgramSearchItemData>> => {
-        await simulateAsyncOperation(mockDelay, options?.cancellationSignal);
-        if (throwErrorsInApi) throw new Error('Error fetching program suggestions');
-
-        const filtered = mockPrograms.filter((program) => {
+        const response = await client.get<Program[]>(API_ROUTES.PROGRAMS.BASE);
+        const filtered = response.data.filter((program) => {
             const nameMatches = program.name.toLowerCase().includes(searchTerm.toLowerCase());
             const categoryMatches = program.categories.some((cat) =>
                 cat.name.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -123,114 +124,45 @@ export const ProgramsApi = {
         };
     },
 
-    fetchProgramById: async (id: number, options?: RequestOptions): Promise<Program | null> => {
-        await simulateAsyncOperation(mockDelay, options?.cancellationSignal);
-        if (throwErrorsInApi) throw new Error('Error fetching program');
-        return mockPrograms.find((program) => program.id === id) ?? null;
+    fetchProgramById: async (id: number, client: AxiosInstance): Promise<Program | null> => {
+        const response = await client.get<Program>(API_ROUTES.PROGRAMS.BASE, {
+            params: {
+                id,
+            },
+        });
+        return response.data;
     },
 
-    addProgram: async (program: ProgramCreateUpdate): Promise<Program> => {
-        await new Promise((resolve) => setTimeout(resolve, mockDelay));
-
-        if (throwErrorsInApi) throw new Error('Error imitation');
-
-        const newProgram: Program = {
-            id: ++mockProgramId,
-            name: program.name,
-            description: program.description,
-            status: program.status,
-            img: program.img,
-            categories: mockCategories.filter((c) => program.categoryIds.includes(c.id)),
-        };
-
-        mockPrograms.push(newProgram);
-        return newProgram;
-    },
-
-    editProgram: async (program: ProgramCreateUpdate): Promise<Program> => {
-        await new Promise((resolve) => setTimeout(resolve, mockDelay));
-
-        if (throwErrorsInApi) throw new Error('Error imitation');
-
-        const index = mockPrograms.findIndex((p) => p.id === program.id);
-        if (index === -1) throw new Error('Program not found');
-
-        const updatedProgram: Program = {
-            id: program.id!,
-            name: program.name,
-            description: program.description,
-            status: program.status,
-            img: program.img,
-            categories: mockCategories.filter((c) => program.categoryIds.includes(c.id)),
-        };
-
-        mockPrograms[index] = updatedProgram;
-        return updatedProgram;
-    },
-
-    deleteProgram: async (id: number): Promise<void> => {
-        await new Promise((resolve) => setTimeout(resolve, mockDelay));
-
-        if (throwErrorsInApi) throw new Error('Error imitation');
-
-        const index = mockPrograms.findIndex((p) => p.id === id);
-        if (index === -1) throw new Error('Program not found');
-        mockPrograms.splice(index, 1);
-    },
-
-    fetchProgramCategories: async (options?: RequestOptions): Promise<ProgramCategory[]> => {
-        await simulateAsyncOperation(mockDelay, options?.cancellationSignal);
-        if (throwErrorsInApi) throw new Error('Error fetching program categories');
-        return [...mockCategories];
-    },
-
-    addProgramCategory: async (category: ProgramCategoryCreateUpdate): Promise<ProgramCategory> => {
-        await new Promise((resolve) => setTimeout(resolve, mockDelay));
-
-        if (throwErrorsInApi) throw new Error('Error imitation');
-
-        const newCategory: ProgramCategory = {
-            id: ++mockCategoryId,
-            name: category.name,
-            programsCount: 0,
-        };
-
-        mockCategories.push(newCategory);
-        return newCategory;
-    },
-
-    editProgramCategory: async (category: ProgramCategoryCreateUpdate): Promise<ProgramCategory> => {
-        await new Promise((resolve) => setTimeout(resolve, mockDelay));
-
-        if (throwErrorsInApi) throw new Error('Error imitation');
-
-        const index = mockCategories.findIndex((c) => c.id === category.id);
-        if (index === -1) throw new Error('Category not found');
-
-        const updated = {
-            ...mockCategories[index],
-            name: category.name,
-        };
-
-        mockCategories[index] = updated;
-
-        return updated;
-    },
-
-    deleteProgramCategory: async (id: number): Promise<void> => {
-        await new Promise((resolve) => setTimeout(resolve, mockDelay));
-
-        if (throwErrorsInApi) throw new Error('Error imitation');
-
-        const index = mockCategories.findIndex((c) => c.id === id);
-        if (index === -1) throw new Error('Category not found');
-
-        const category = mockCategories[index];
-
-        if (category.programsCount > 0) {
-            throw new Error('Category has at least one program');
+    addProgram: async (client: AxiosInstance, program: ProgramCreateUpdate): Promise<Program> => {
+        if (program.image && 'base64' in program.image) {
+            const imageResult = await ImageApi.post(client, program.image);
+            program.imageId = imageResult.id;
         }
 
-        mockCategories.splice(index, 1);
+        const response = await client.post(API_ROUTES.PROGRAMS.BASE, program);
+
+        return mapProgramEditToProgram(response.data, client);
+    },
+
+    editProgram: async (program: ProgramCreateUpdate, client: AxiosInstance): Promise<Program> => {
+        const { finalImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(
+            client,
+            program.image,
+            program.imageId,
+        );
+
+        program.imageId = finalImageId;
+
+        const response = await client.put(`${API_ROUTES.PROGRAMS.BASE}/${program.id}`, program);
+
+        if (imageIdToDelete && imageIdToDelete !== finalImageId) {
+            await ImageApi.delete(client, imageIdToDelete);
+        }
+        return response.data;
+    },
+
+    deleteProgram: async (id: number, client: AxiosInstance): Promise<void> => {
+        const response = await client.delete(`${API_ROUTES.PROGRAMS.BASE}/${id}`);
+        return response.data;
     },
 };

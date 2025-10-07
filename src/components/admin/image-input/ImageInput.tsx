@@ -44,8 +44,7 @@ export const ImageInput = ({
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const [isDeleteImageModalOpen, setIsDeleteImageModalOpen] = useState<boolean>(false);
-    const [isCropFormOpen, setIsCropFormOpen] = useState<boolean>(false);
+    const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
 
     useEffect(() => {
         if (value) {
@@ -66,7 +65,7 @@ export const ImageInput = ({
             const imgItem = await convertFileToBase64(file);
             onChange(imgItem);
         },
-        [onChange],
+        [onChange, height, width, setError],
     );
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -131,15 +130,7 @@ export const ImageInput = ({
         setPreviewImage(null);
         onChange(null);
         if (inputRef.current) inputRef.current.value = '';
-    };
-
-    const handleModal = (value: boolean) => {
-        setIsDeleteImageModalOpen(value);
-    };
-
-    const confirmDelete = () => {
-        handleRemove();
-        handleModal(false);
+        setShowConfirmModal(false);
     };
 
     return (
@@ -192,7 +183,7 @@ export const ImageInput = ({
                                 disabled={disabled}
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleModal(true);
+                                    setShowConfirmModal(true);
                                 }}
                             >
                                 <DeleteIcon className={classNames('delete-icon')} />
@@ -209,25 +200,28 @@ export const ImageInput = ({
             </div>
 
             <ConfirmationModal
-                isOpen={isDeleteImageModalOpen}
-                onClose={() => handleModal(false)}
+                isOpen={showConfirmModal}
+                isButtonsDisabled={false}
                 title={COMMON_IMAGE_TEXT.DELETE.TITLE}
-                onConfirm={confirmDelete}
-                onCancel={() => handleModal(false)}
+                onConfirm={handleRemove}
+                onCancel={() => setShowConfirmModal(false)}
+                onClose={() => setShowConfirmModal(false)}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
         </div>
     );
 };
 
-export const getImageSrc = (img: Image | ImageValues | null) => {
-    if (!img) return undefined;
+export const getImageSrc = (image: Image | ImageValues | null) => {
+    if (!image) return undefined;
 
-    if ('url' in img && img.url) {
-        return img.url;
+    if ('url' in image && image.url) {
+        return image.url;
     }
 
-    if ('base64' in img) {
-        return `data:${img.mimeType};base64,${img.base64}`;
+    if ('base64' in image) {
+        return `data:${image.mimeType};base64,${image.base64}`;
     }
 
     return undefined;

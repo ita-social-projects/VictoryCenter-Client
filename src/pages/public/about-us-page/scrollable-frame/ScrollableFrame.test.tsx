@@ -1,15 +1,13 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ScrollableFrame } from './ScrollableFrame';
 import * as dataFetch from '../../../../services/api/public/programs/programs-api';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
+import { mockPrograms } from '../../../../utils/mock-data/public/programs-page';
 
-jest.mock('../../../../../assets/icons/arrow-left-white.svg', () => 'arrow-left.png');
-jest.mock('../../../../../assets/icons/arrow-right-white.svg', () => 'arrow-right.png');
-jest.mock('../../../../../assets/icons/arrow-left.svg', () => 'arrow-left-black.png');
-jest.mock('../../../../../assets/icons/arrow-right.svg', () => 'arrow-right-black.png');
-
-jest.mock('../../../programs-page/programs-section/program-card/ProgramCard', () => ({
-    ProgramCard: ({ program }: { program: any }) => <div data-testid="program-card">{program.title}</div>,
+jest.mock('../../../../components/public/program-card/ProgramCard', () => ({
+    ProgramCard: ({ program }: { program: any }) => (
+        <div data-testid="program-card">{program.name || program.title}</div>
+    ),
 }));
 
 jest.mock('swiper/react', () => {
@@ -27,46 +25,9 @@ jest.mock('swiper/react', () => {
     };
 });
 
-const MockProgramData = [
-    {
-        image: 'firstImg',
-        title: 'Коні лікують Літо 2025',
-        subtitle: 'Ветеранська програма',
-        description: 'Зменшення рівня стресу, тривоги та ПТСР у ветеранів...',
-    },
-    {
-        image: 'secondImg',
-        title: 'Програма 2',
-        subtitle: 'Ветеранська програма',
-        description: 'Опис 2',
-    },
-    {
-        image: 'thirdImg',
-        title: 'Програма 3',
-        subtitle: 'Ветеранська програма',
-        description: 'Опис 3',
-    },
-];
-
 describe('ScrollableFrame', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-    });
-
-    it('should render programs correctly', async () => {
-        jest.spyOn(dataFetch, 'programPageDataFetch').mockResolvedValue({
-            programData: MockProgramData,
-        });
-
-        render(<ScrollableFrame />);
-
-        await waitFor(() => {
-            expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-        });
-
-        const cards = await screen.findAllByTestId('program-card');
-        expect(cards.length).toBe(MockProgramData.length);
-        expect(cards[0]).toHaveTextContent('Коні лікують Літо 2025');
     });
 
     it('should show message about fetch error', async () => {

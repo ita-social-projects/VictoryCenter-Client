@@ -18,7 +18,6 @@ const mockImage: Image = {
 const imageValue: ImageValues = {
     base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+iF9kAAAAASUVORK5CYII=',
     mimeType: 'image/png',
-    size: 0,
 };
 describe('fetchImageDataApi', () => {
     it('should fetch image data', async () => {
@@ -59,5 +58,16 @@ describe('fetchImageDataApi', () => {
         const result = await ImageApi.delete(mockClient, id);
         expect(mockClient.delete).toHaveBeenCalledWith(`${API_ROUTES.IMAGE.BASE}/1`);
         expect(result).toEqual(1);
+    });
+
+    it('should return imageIdToDelete and null finalImageId when image is removed', async () => {
+        const imageId = 123;
+        const result = await ImageApi.getUpdateImageId(mockClient, null, imageId);
+        expect(result).toEqual({ finalImageId: null, imageIdToDelete: imageId });
+    });
+
+    it('should return null imageIdToDelete and finalImageId when image is removed', async () => {
+        const result = await ImageApi.getUpdateImageId(mockClient, mockImage, mockImage.id);
+        expect(result).toEqual({ finalImageId: mockImage.id, imageIdToDelete: null });
     });
 });

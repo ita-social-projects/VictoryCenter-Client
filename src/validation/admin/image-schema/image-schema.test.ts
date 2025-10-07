@@ -6,8 +6,6 @@ const createTestFile = (size: number, type: string = 'image/jpeg', name: string 
     return new File(['content'.repeat(size / 10)], name, { type, lastModified: Date.now() });
 };
 
-
-
 describe('ImageValidationSchema', () => {
     const minWidth = 100;
     const minHeight = 100;

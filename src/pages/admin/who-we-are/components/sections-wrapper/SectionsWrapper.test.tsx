@@ -128,7 +128,7 @@ describe('SectionsWrapper', () => {
     it('should render the wrapper but no child section for an unknown section type', () => {
         const section = {
             id: 6,
-            sectionType: 'unknown' as SectionType,
+            sectionType: 'unknown' as unknown as SectionType,
             title: 'Null',
             contents: [],
         };

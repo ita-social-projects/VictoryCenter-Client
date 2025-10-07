@@ -47,19 +47,55 @@
 }
 
 @media (max-width: 912px) {
+    .our-team-block {
+        height: 38.5rem;
+        padding: 3.75rem 0;
+
+        .our-team-image {
+            width: 50%;
+            height: 100%;
+        }
+
+        .team-info {
+            width: 50%;
+            height: 100%;
+            padding: 0 1rem;
+            padding-right: 3.5rem;
+            gap: 0rem;
+
+            .team-description {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
 }
 
 @media (max-width: 768px) {
     .our-team-block {
+        height: 66.25rem;
+        justify-content: flex-start;
+        flex-direction: column;
+        padding: 3.75rem 0;
+
         .our-team-image {
-            height: 31rem;
+            width: 100%;
+            min-height: 31rem;
         }
 
         .team-info {
+            width: 100%;
+            margin-top: 3.75rem;
+            height: 100%;
+            gap: 0rem;
+            padding: 0 4rem;
+
             .team-description {
+                height: auto;
             }
 
             .link-ro-team {
+                margin-top: 4rem;
             }
         }
     }
@@ -74,16 +110,15 @@
 
         .our-team-image {
             width: 100%;
+            min-height: 31rem;
         }
 
         .team-info {
             width: 100%;
-            padding: 0rem 1rem;
+            padding: 0 1rem;
             margin-top: 3.75rem;
             height: 100%;
             gap: 0rem;
-            padding: 0 3%;
-
             .team-description {
                 height: auto;
             }

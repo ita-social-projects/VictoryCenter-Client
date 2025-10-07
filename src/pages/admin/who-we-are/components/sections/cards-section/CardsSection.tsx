@@ -1,11 +1,7 @@
-import { ImageInputProps } from '../../../../../../components/admin/image-input/ImageInput';
 import { Content } from '../../../../../../types/admin/who-we-are';
-import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
 import React, { useState } from 'react';
-import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
-import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { CardContent } from '../../card-content/CardContent';
-import { Image, ImageValues } from '../../../../../../types/common/image';
+import { ImageValues } from '../../../../../../types/common/image';
 import { CardImageConfig } from '../SectionsProps';
 import './CardsSection.scss';
 import { Button } from '../../../../../../components/admin/button/Button';

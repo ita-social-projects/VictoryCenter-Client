@@ -5,7 +5,6 @@ import { Program } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { ReactComponent as BlankImage } from '../../../../../assets/icons/blank-image.svg';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import './ProgramListItem.scss';
 
 export interface ProgramListItemProps {
     program: Program;
@@ -18,8 +17,8 @@ export const ProgramListItem = ({ program, handleOnDeleteProgram, handleOnEditPr
         <div className="program-item">
             <div className="program-info">
                 <div className="program-info-identity">
-                    {program.img && 'url' in program.img ? (
-                        <img src={program.img.url} alt={`${program.name}-img`} />
+                    {program.image && 'url' in program.image ? (
+                        <img src={program.image.url} alt={`${program.name}-img`} />
                     ) : (
                         <BlankImage className="program-info-identity-blank-image" />
                     )}

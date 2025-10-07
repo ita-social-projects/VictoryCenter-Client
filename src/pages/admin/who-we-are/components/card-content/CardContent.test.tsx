@@ -5,7 +5,7 @@ import { CardContent } from './CardContent';
 import { ContentType } from '../../../../../types/common/about-us';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
-import { Image } from "../../../../../types/common/image";
+import { Image } from '../../../../../types/common/image';
 
 // Mock child components to isolate the component being tested
 jest.mock('../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
@@ -40,11 +40,11 @@ describe('CardContent', () => {
                 description: 'Initial description',
                 image: {
                     id: 1,
-                    url: "https://example.com/card/1",
+                    url: 'https://example.com/card/1',
                     mimeType: 'image/png',
                 } as Image,
                 title: null,
-                imageId: 10
+                imageId: 10,
             },
             onImageChange: mockOnImageChange,
             onChange: mockOnChange,
@@ -131,7 +131,7 @@ describe('CardContent', () => {
             description: 'No image card',
             image: null,
             title: null,
-            imageId: null
+            imageId: null,
         };
 
         renderComponent({ content: contentWithNullImage });
@@ -151,11 +151,11 @@ describe('CardContent', () => {
             description: null, // Test for null
             image: {
                 id: 1,
-                url: "https://example.com/card/1",
+                url: 'https://example.com/card/1',
                 mimeType: 'image/png',
             } as Image,
             title: null,
-            imageId: 1
+            imageId: 1,
         };
 
         renderComponent({ content: contentWithNullDescription });

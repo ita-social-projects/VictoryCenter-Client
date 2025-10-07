@@ -5,6 +5,10 @@ import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import { ContentType } from '../../../../types/common/about-us';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
 
+jest.mock('../../../../assets/icons/arrow-up-right.svg', () => ({
+    ReactComponent: (props: any) => <svg data-testid="arrow-icon" {...props} />,
+}));
+
 jest.mock('../../../../const/public/about-us-page', () => ({
     ABOUT_US_DATA: {
         WHAT_WE_DO: 'What we do title',
@@ -19,8 +23,6 @@ jest.mock('../../../../const/public/routes', () => ({
         },
     },
 }));
-
-jest.mock('../../../../assets/icons/arrow-up-right.svg', () => 'arrow-up-black.png');
 
 describe('OurMission component', () => {
     const Content: AboutUsContent[] = [
@@ -51,7 +53,7 @@ describe('OurMission component', () => {
         expect(screen.getByText('Test description')).toBeInTheDocument();
     });
 
-    it('should render the link with correct text and href', () => {
+    it('should render the link with correct text, href and icon', () => {
         render(
             <MemoryRouter>
                 <OurMission content={Content} />
@@ -60,5 +62,6 @@ describe('OurMission component', () => {
         const link = screen.getByRole('link', { name: /go to programs/i });
         expect(link).toBeInTheDocument();
         expect(link).toHaveAttribute('href', '/programs');
+        expect(screen.getByTestId('arrow-icon')).toBeInTheDocument();
     });
 });

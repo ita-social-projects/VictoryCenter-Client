@@ -1,10 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { AboutUsPage } from './AboutUsPage';
-import { before } from 'lodash';
 import { AboutUsApi } from '../../../services/api/public/about-us/about-us-api';
 
-jest.mock('./intro-section/AboutUsIntro', () => ({
-    AboutUsIntro: () => <div data-testid="intro-section">Intro Section</div>,
+jest.mock('./intro-section/IntroSection', () => ({
+    AboutUsIntro: () => <div data-testid="intro-section">About Us Intro</div>,
 }));
 jest.mock('./our-mission/OurMission', () => ({
     OurMission: () => <div data-testid="mission-section">Mission Section</div>,
@@ -25,6 +24,9 @@ jest.mock('./donate-section/DonateSection', () => ({
     DonateSection: () => <div data-testid="donate-section">Donate Section</div>,
 }));
 jest.mock('../../../services/api/public/about-us/about-us-api');
+jest.mock('./scrollable-frame/ScrollableFrame', () => ({
+    ScrollableFrame: () => <div data-testid="scrollable-frame">Scrollable Frame</div>,
+}));
 
 describe('AboutUsPage', () => {
     beforeEach(() => {
@@ -50,6 +52,7 @@ describe('AboutUsPage', () => {
             expect(screen.getByTestId('team-section')).toBeInTheDocument();
             expect(screen.getByTestId('main-values-section')).toBeInTheDocument();
             expect(screen.getByTestId('donate-section')).toBeInTheDocument();
+            expect(screen.getByTestId('scrollable-frame')).toBeInTheDocument();
         });
     });
 

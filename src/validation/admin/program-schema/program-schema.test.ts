@@ -5,7 +5,6 @@ import { Image, ImageValues } from '../../../types/common/image';
 const createMockFile = (type = 'image/jpeg', size = 1024) => {
     const image: ImageValues = {
         base64: 'fsdgdsgdsdgsdgsd',
-        size: size,
         mimeType: type,
     };
     return image;
@@ -27,7 +26,7 @@ const getValidData = (overrides?: any) => ({
     name: 'Valid Program Name',
     categories: [mockCategory],
     description: 'This is a valid description with enough characters.',
-    img: createMockFile(),
+    image: createMockFile(),
     ...overrides,
 });
 
@@ -104,7 +103,7 @@ describe('Program Validation Schema', () => {
 
     describe('Description validation (Publish mode)', () => {
         const publishContext = { isPublishing: true };
-        const validDataForPublish = getValidData({ img: createMockFile() });
+        const validDataForPublish = getValidData({ image: createMockFile() });
 
         const invalidPublishCases = [
             {
@@ -137,30 +136,30 @@ describe('Program Validation Schema', () => {
         const invalidImageCases = [
             {
                 description: 'is required for publishing but is null',
-                data: getValidData({ img: null }),
+                data: getValidData({ image: null }),
                 context: { isPublishing: true },
-                expectedError: PROGRAM_VALIDATION.img.getRequiredWhenPublishingError(),
+                expectedError: PROGRAM_VALIDATION.image.getRequiredWhenPublishingError(),
             },
             {
                 description: 'has invalid file format (GIF)',
-                data: getValidData({ img: createMockFile('image/gifs') }),
+                data: getValidData({ image: createMockFile('image/gifs') }),
                 context: undefined,
-                expectedError: PROGRAM_VALIDATION.img.getFormatError(),
+                expectedError: PROGRAM_VALIDATION.image.getFormatError(),
             },
             {
                 description: 'is too large',
-                data: getValidData({ img: createMockFile('image/jpeg', PROGRAM_VALIDATION.img.maxSizeBytes + 1) }),
+                data: getValidData({ image: createMockFile('image/jpeg', PROGRAM_VALIDATION.image.maxSizeBytes + 1) }),
                 context: undefined,
-                expectedError: PROGRAM_VALIDATION.img.getSizeError(),
+                expectedError: PROGRAM_VALIDATION.image.getSizeError(),
             },
         ];
 
         const validImageCases: [string, any, ProgramValidationContext | undefined][] = [
-            ['is null in draft mode', getValidData({ img: null }), { isPublishing: false }],
-            ['is a valid Image type in publish mode', getValidData({ img: mockImage }), { isPublishing: true }],
+            ['is null in draft mode', getValidData({ image: null }), { isPublishing: false }],
+            ['is a valid Image type in publish mode', getValidData({ image: mockImage }), { isPublishing: true }],
             [
                 'is a valid ImageValue type in publish mode',
-                getValidData({ img: createMockFile() }),
+                getValidData({ image: createMockFile() }),
                 { isPublishing: true },
             ],
         ];
@@ -181,9 +180,9 @@ describe('Program Validation Schema', () => {
         ];
 
         it.each(transformCases)('should transform $description to null', async ({ value }) => {
-            const data = getValidData({ img: value });
+            const data = getValidData({ image: value });
             const result = await programValidationSchema.validate(data);
-            expect(result.img).toBeNull();
+            expect(result.image).toBeNull();
         });
     });
 });

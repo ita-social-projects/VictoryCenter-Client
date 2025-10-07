@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { AppRouter } from './routes/app-router/AppRouter';
-import './i18n';
+import './locales/i18n';
 import './index.css';
 import './assets/fonts/fonts.styles.scss';
 

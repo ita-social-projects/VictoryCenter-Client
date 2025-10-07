@@ -2,9 +2,9 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-import { headerUk, footerUk, aboutUsPageUk, programsPageUk } from './locales/uk';
-import { headerEn, footerEn, aboutUsPageEn, programsPageEn } from './locales/en';
-import { DEFAULT_LOCALE, LOCALES } from './const/common/locales';
+import { headerUk, footerUk, aboutUsPageUk, programsPageUk } from './uk';
+import { headerEn, footerEn, aboutUsPageEn, programsPageEn } from './en';
+import { DEFAULT_LOCALE, LOCALES } from '../const/common/locales';
 
 const resources = {
     uk: {

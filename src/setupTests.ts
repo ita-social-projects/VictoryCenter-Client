@@ -4,7 +4,7 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 import { TextEncoder, TextDecoder } from 'util';
-import i18n from './i18n';
+import i18n from './locales/i18n';
 
 i18n.changeLanguage('uk');
 

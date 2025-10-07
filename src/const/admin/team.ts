@@ -44,12 +44,6 @@ export const TEAM_MEMBERS_TEXT = {
     },
 };
 
-export const TEAM_CATEGORY_TEXT = {
-    MESSAGE: {
-        FAIL_TO_FETCH_CATEGORIES: 'Виникла помилка, не вдалось завантажити категорії',
-    },
-};
-
 export const TEAM_MEMBER_VALIDATION = {
     fullName: {
         min: 2,

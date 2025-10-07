@@ -1,16 +1,35 @@
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { TeamCategory, TeamCategoryDto } from '../../../../../types/admin/team-members';
+import { TeamCategory, TeamCategoryCreateUpdate } from '../../../../../types/admin/team-category';
+
+type TeamCategoryPayload = Omit<TeamCategoryCreateUpdate, 'id'>;
+const toPayload = (category: TeamCategoryCreateUpdate): TeamCategoryPayload => {
+    const { name, description } = category;
+    return { name, description };
+};
 
 export const TeamCategoriesApi = {
     getAll: async (client: AxiosInstance): Promise<TeamCategory[]> => {
-        const response = await client.get<TeamCategoryDto[]>(API_ROUTES.TEAM.CATEGORIES);
-        return response.data.map(mapTeamCategoryDtoToTeamCategory);
+        const response = await client.get<TeamCategory[]>(API_ROUTES.TEAM.CATEGORIES);
+        return response.data;
+    },
+
+    create: async (client: AxiosInstance, category: TeamCategoryCreateUpdate): Promise<TeamCategory> => {
+        const response = await client.post<TeamCategory>(API_ROUTES.TEAM.CATEGORIES, toPayload(category));
+        return response.data;
+    },
+
+    update: async (client: AxiosInstance, category: TeamCategoryCreateUpdate): Promise<TeamCategory> => {
+        if (category.id == null) {
+            throw new Error('TeamCategoriesApi.update: category.id is required');
+        }
+
+        const response = await client.put(`${API_ROUTES.TEAM.CATEGORIES}/${category.id}`, toPayload(category));
+        return response.data;
+    },
+
+    delete: async (id: number, client: AxiosInstance): Promise<void> => {
+        const response = await client.delete(`${API_ROUTES.TEAM.CATEGORIES}/${id}`);
+        return response.data;
     },
 };
-
-export const mapTeamCategoryDtoToTeamCategory = (dto: TeamCategoryDto): TeamCategory => ({
-    id: dto.id,
-    name: dto.name,
-    description: dto.description,
-});

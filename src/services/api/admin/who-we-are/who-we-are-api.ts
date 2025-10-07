@@ -13,7 +13,7 @@ export const WhoWeAreApi = {
         const response = await client.get(`${API_ROUTES.WHO_WE_ARE.BASE}/${type}`);
         return response.data as WhoWeAreSection;
     },
-    UpdateContent: async (
+    updateContent: async (
         client: AxiosInstance,
         contents: Content[],
         sectionType: SectionType,

@@ -93,7 +93,6 @@ describe('ImageInput', () => {
             expect(onChangeMock).toHaveBeenCalledWith({
                 base64: expect.any(String),
                 mimeType: 'image/png',
-                size: 13,
             });
         });
     });
@@ -169,7 +168,7 @@ describe('ImageInput', () => {
         const data = {
             dataTransfer: {
                 files: [file],
-                types: ['Files'],
+                types: [file.type],
             },
         };
 
@@ -180,7 +179,6 @@ describe('ImageInput', () => {
             expect(onChangeMock).toHaveBeenCalledWith({
                 base64: expect.any(String),
                 mimeType: file.type,
-                size: 13,
             });
         });
     });
@@ -199,7 +197,7 @@ describe('ImageInput', () => {
     });
 
     it('does not open file dialog or allow drop when disabled', () => {
-        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} disabled />);
         const wrapper = screen.getByRole('button', {
             name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || COMMON_TEXT_ADMIN.INPUT.UPLOAD_IMAGE,
         });

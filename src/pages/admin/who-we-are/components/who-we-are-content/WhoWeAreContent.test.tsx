@@ -6,23 +6,19 @@ import { WhoWeAreApi } from '../../../../../services/api/admin/who-we-are/who-we
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
 import { WhoWeAreCategory, WhoWeAreSection, Content } from '../../../../../types/admin/who-we-are';
-// Припускаємо, що ці enum існують. Якщо ні, можна використовувати рядки.
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ToastType } from '../../../../../types/admin/toast';
 import { ContentType, SectionType } from '../../../../../types/common/about-us';
 
-// 1. Мокуємо API-сервіс
 jest.mock('../../../../../services/api/admin/who-we-are/who-we-are-api');
 const mockedWhoWeAreApi = WhoWeAreApi as jest.Mocked<typeof WhoWeAreApi>;
 
-// 2. Мокуємо кастомні хуки
 jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient');
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 
 jest.mock('../../../../../contexts/admin/toast-context-provider/ToastContextProvider');
 const mockedUseToast = useToast as jest.Mock;
 
-// 3. Мокуємо дочірні компоненти
 jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({ categories, onCategorySelect, getCategoryDisplayName }: any) => (
         <div>
@@ -35,7 +31,6 @@ jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
     ),
 }));
 
-// ОНОВЛЕНО: Мок SectionsWrapper тепер гнучкіший і рендерить title/description
 jest.mock('../sections-wrapper/SectionsWrapper', () => ({
     SectionsWrapper: ({ section, onChange, onPublish, setIsPublishButtonActive, isPublishButtonActive }: any) => (
         <div>
@@ -75,17 +70,14 @@ jest.mock('../../../../../components/admin/toast/toast-container/ToastContainer'
     ToastContainer: () => <div data-testid="toast-container" />,
 }));
 
-// --- ОНОВЛЕНІ Тестові дані ---
-// Дані тепер узгоджені між собою та з логікою тестів.
-
 const mockCategories: WhoWeAreCategory[] = [
-    { id: 1, title: 'History', sectionType: SectionType.Main },
-    { id: 2, title: 'Mission', sectionType: SectionType.People },
+    { id: 1, title: 'Main', sectionType: SectionType.Main },
+    { id: 2, title: 'People', sectionType: SectionType.People },
 ];
 
 const mockSection1: WhoWeAreSection = {
     id: 1,
-    title: 'History Section',
+    title: 'What we do',
     sectionType: SectionType.WhatWeDo,
     contents: [
         {
@@ -108,8 +100,6 @@ const mockSection2: WhoWeAreSection = {
     ],
 };
 
-// --- Основний блок тестів ---
-
 describe('WhoWeAreContent Component', () => {
     let mockAddToast: jest.Mock;
 
@@ -121,51 +111,40 @@ describe('WhoWeAreContent Component', () => {
     });
 
     it('should fetch categories and the first section content on initial render', async () => {
-        // Arrange
         mockedWhoWeAreApi.getAll.mockResolvedValue(mockCategories);
         mockedWhoWeAreApi.getByType.mockResolvedValue(mockSection1);
 
-        // Act
         render(<WhoWeAreContent />);
 
-        // Assert
         await waitFor(() => {
-            expect(screen.getByText('History')).toBeInTheDocument();
+            expect(screen.getByText('Main')).toBeInTheDocument();
         });
 
         await waitFor(() => {
-            expect(screen.getByText('History Section')).toBeInTheDocument();
-            // ОНОВЛЕНО: Тепер шукаємо description, який є в даних
-            expect(screen.getByText('It began long ago.')).toBeInTheDocument();
+            expect(screen.getByText('Main')).toBeInTheDocument();
+            expect(screen.getByText('People')).toBeInTheDocument();
         });
 
         expect(mockedWhoWeAreApi.getAll).toHaveBeenCalledTimes(1);
         expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledTimes(1);
-        expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledWith({ client: 'mocked-client' }, 'HISTORY');
+        expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledWith({ client: 'mocked-client' }, 0);
     });
 
     it('should display an error if fetching categories fails', async () => {
-        // Arrange
         mockedWhoWeAreApi.getAll.mockRejectedValue(new Error('API Error'));
 
-        // Act
         render(<WhoWeAreContent />);
 
-        // Assert
-        // Цей тест пройде після додавання логіки рендеру помилок в компонент
         const errorMessage = await screen.findByText('Failed to load categories');
         expect(errorMessage).toBeInTheDocument();
     });
 
     it('should display an error if fetching a section fails', async () => {
-        // Arrange
         mockedWhoWeAreApi.getAll.mockResolvedValue(mockCategories);
         mockedWhoWeAreApi.getByType.mockRejectedValue(new Error('API Error'));
 
-        // Act
         render(<WhoWeAreContent />);
 
-        // Assert
         const errorMessage = await screen.findByText('Failed to load section');
         expect(errorMessage).toBeInTheDocument();
     });
@@ -181,29 +160,26 @@ describe('WhoWeAreContent Component', () => {
     });
 
     it('should fetch new section data when a different category is selected', async () => {
-        // Arrange
         mockedWhoWeAreApi.getAll.mockResolvedValue(mockCategories);
         mockedWhoWeAreApi.getByType.mockResolvedValueOnce(mockSection1).mockResolvedValueOnce(mockSection2);
 
         render(<WhoWeAreContent />);
-        await waitFor(() => expect(screen.getByText('History Section')).toBeInTheDocument());
+        await waitFor(() => expect(screen.getByText('What we do')).toBeInTheDocument());
 
-        // Act
-        fireEvent.click(screen.getByText('Mission'));
+        fireEvent.click(screen.getByText('Main'));
+        fireEvent.click(screen.getByText('People'));
 
-        // Assert
         await waitFor(() => {
-            expect(screen.getByText('Mission Section')).toBeInTheDocument();
-            // ОНОВЛЕНО: Шукаємо текст з mockSection2
-            expect(screen.getByText('To be the best.')).toBeInTheDocument();
+            expect(screen.getByText('Main')).toBeInTheDocument();
+            expect(screen.getByText('People')).toBeInTheDocument();
         });
 
         expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledTimes(2);
-        expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledWith({ client: 'mocked-client' }, 'MISSION');
+        expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledWith({ client: 'mocked-client' }, 0);
+        expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledWith({ client: 'mocked-client' }, 4);
     });
 
-    it('should open confirmation modal on publish click, then publish on confirm', async () => {
-        // Arrange
+    it('should open confirmation modal on publish click, then publish on confirm and disable button', async () => {
         const updatedDescription = 'A new beginning.';
         const updatedSection = {
             ...mockSection1,
@@ -211,35 +187,30 @@ describe('WhoWeAreContent Component', () => {
         };
         mockedWhoWeAreApi.getAll.mockResolvedValue(mockCategories);
         mockedWhoWeAreApi.getByType.mockResolvedValue(JSON.parse(JSON.stringify(mockSection1)));
-        mockedWhoWeAreApi.UpdateContent.mockResolvedValue(updatedSection);
+        mockedWhoWeAreApi.updateContent.mockResolvedValue(updatedSection);
 
         render(<WhoWeAreContent />);
-        await waitFor(() => expect(screen.getByText('History Section')).toBeInTheDocument());
+        await waitFor(() => expect(screen.getByText('What we do')).toBeInTheDocument());
 
-        // Act: Змінити контент і натиснути Publish
-        fireEvent.change(screen.getByTestId('input-c1'), { target: { value: updatedDescription } });
-        fireEvent.click(screen.getByRole('button', { name: 'Publish' }));
+        fireEvent.change(screen.getByTestId('input-1'), { target: { value: updatedDescription } });
 
-        // Assert: Модальне вікно відкрите
+        const publishButton = screen.getByRole('button', { name: 'Publish' });
+        expect(publishButton).toBeEnabled();
+        fireEvent.click(publishButton);
+
         expect(await screen.findByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).toBeInTheDocument();
 
-        // Act: Підтвердити публікацію
         fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-        // Assert: API викликано, тост показано
         await waitFor(() => {
-            expect(mockedWhoWeAreApi.UpdateContent).toHaveBeenCalledTimes(1);
+            const expectedPayload = [{ ...mockSection1.contents[0], description: updatedDescription }];
+            expect(mockedWhoWeAreApi.updateContent).toHaveBeenCalledWith(
+                { client: 'mocked-client' },
+                expectedPayload,
+                SectionType.Main,
+            );
+            expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
+            expect(publishButton).toBeDisabled();
         });
-
-        const expectedPayload = [{ ...mockSection1.contents[0], description: updatedDescription }];
-        expect(mockedWhoWeAreApi.UpdateContent).toHaveBeenCalledWith(
-            { client: 'mocked-client' },
-            expectedPayload,
-            'HISTORY',
-        );
-        expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
-        expect(screen.getByRole('button', { name: 'Publish' })).toBeDisabled();
     });
-
-    // ... інші тести залишаються без змін, оскільки їхня логіка не залежала від тексту
 });

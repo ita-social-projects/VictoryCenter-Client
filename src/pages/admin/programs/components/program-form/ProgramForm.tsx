@@ -181,7 +181,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     value={formState.image}
                     onChange={handleImageChange}
                     disabled={isSubmitting || isFormDisabled}
-                    error={errors.img}
+                    error={errors.image}
                     setError={(error) => setErrors((prev) => ({ ...prev, img: error || undefined }))}
                 />
             </form>

@@ -35,12 +35,15 @@ export const getImageValidationSchema = (minWidth: number, minHeight: number) =>
 };
 
 export const IMAGE_VALIDATION_FUNCTIONS = {
-    validateImage: async (file: File, maxWidth = 1920, maxHeight = 1080): Promise<string | undefined> => {
+    validateImage: async (file: File, minWidth = 1920, minHeight = 1080): Promise<string | undefined> => {
         try {
-            const schema = getImageValidationSchema(maxWidth, maxHeight);
+            const schema = getImageValidationSchema(minWidth, minHeight);
             await schema.validate(file, { abortEarly: true });
             return undefined;
         } catch (err) {
+            if (err instanceof Yup.ValidationError) {
+                return err.message;
+            }
             return IMAGE_VALIDATION.UnexpectedError();
         }
     },

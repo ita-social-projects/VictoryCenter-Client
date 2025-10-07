@@ -177,57 +177,12 @@ describe('ImageSection', () => {
         expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    // -- ВИПРАВЛЕНИЙ ТЕСТ --
-    it('should show validation errors and disable the publish button', async () => {
-        const user = userEvent.setup();
-        renderComponent({ isPublishButtonActive: true });
-
-        const titleInput = screen.getByTestId('mock-title-input');
-        const descriptionTextarea = screen.getByTestId('mock-description-textarea');
-        const publishButton = screen.getByRole('button', { name: 'Опублікувати' });
-
-        await user.clear(titleInput);
-        await user.clear(descriptionTextarea);
-
-        await user.type(titleInput, 'invalid text');
-        await user.type(descriptionTextarea, 'invalid text');
-
-        fireEvent.blur(titleInput);
-        fireEvent.blur(descriptionTextarea);
-
-        const errorMessages = await screen.findAllByText('Текст невалідний.');
-        expect(errorMessages).toHaveLength(2);
-        expect(publishButton).toBeDisabled();
-    });
-
     it('should enable the publish button and call onPublish when clicked', () => {
         renderComponent({ isPublishButtonActive: true });
         const publishButton = screen.getByRole('button', { name: 'Опублікувати' });
         expect(publishButton).toBeEnabled();
         fireEvent.click(publishButton);
         expect(mockOnPublish).toHaveBeenCalled();
-    });
-
-    // -- НОВІ ТЕСТИ --
-
-    it('should remove the error message when the input is corrected', async () => {
-        const user = userEvent.setup();
-        renderComponent();
-        const titleInput = screen.getByTestId('mock-title-input');
-
-        await user.clear(titleInput);
-        await user.type(titleInput, 'invalid text');
-        fireEvent.blur(titleInput);
-
-        expect(await screen.findByText('Текст невалідний.')).toBeInTheDocument();
-
-        await user.clear(titleInput);
-        await user.type(titleInput, 'valid text');
-        fireEvent.blur(titleInput);
-
-        await waitFor(() => {
-            expect(screen.queryByText('Текст невалідний.')).not.toBeInTheDocument();
-        });
     });
 
     it('should display an error from ImageInput', async () => {

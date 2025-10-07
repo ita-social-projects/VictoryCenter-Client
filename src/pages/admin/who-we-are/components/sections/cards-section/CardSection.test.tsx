@@ -4,9 +4,8 @@ import { CardsSection, CardsSectionProps } from './CardsSection';
 import '@testing-library/jest-dom';
 import { ContentType } from '../../../../../../types/common/about-us';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
-import { Image } from '../../../../../../types/common/image';
+import { Image, ImageValues } from '../../../../../../types/common/image';
 
-// Mock child components to isolate the component being tested
 jest.mock('../../card-content/CardContent', () => ({
     CardContent: ({
         content,
@@ -16,9 +15,6 @@ jest.mock('../../card-content/CardContent', () => ({
         descriptionError,
         imageError,
         setImageError,
-        descriptionLimit,
-        imageInputProps,
-        rows,
     }: any) => (
         <div data-testid={`mock-card-content-${content.id}`}>
             <textarea
@@ -30,7 +26,7 @@ jest.mock('../../card-content/CardContent', () => ({
             {descriptionError && <span data-testid={`desc-error-${content.id}`}>{descriptionError}</span>}
             <input
                 data-testid={`mock-image-input-${content.id}`}
-                onChange={(e) => onImageChange(e.target.value)}
+                onChange={(e) => onImageChange(JSON.parse(e.target.value))}
                 onBlur={() => setImageError('test image error')}
             />
             {imageError && <span data-testid={`image-error-${content.id}`}>{imageError}</span>}
@@ -146,14 +142,15 @@ describe('CardsSection', () => {
     it('should call onChange and setIsPublishButtonActive on image change', () => {
         renderComponent();
         const imageInput = screen.getByTestId('mock-image-input-1');
-        const newImage = { id: 20, base64: 'new-image.png' };
+        const newImage = { id: 20, base64: 'new-image.png', mimeType: 'image/png' } as ImageValues;
 
-        fireEvent.change(imageInput, { target: { value: newImage } });
+        // FIX: Stringify the object before passing it as the value
+        fireEvent.change(imageInput, { target: { value: JSON.stringify(newImage) } });
 
         expect(mockOnChange).toHaveBeenCalledWith(
             expect.objectContaining({
                 id: 1,
-                image: newImage,
+                image: newImage, // This will now match correctly
             }),
         );
         expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);

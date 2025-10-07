@@ -73,7 +73,7 @@ export const DescriptionSection = ({
                     type={'submit'}
                     disabled={!!descriptionError || !isPublishButtonActive}
                 >
-                    Опублікувати
+                    {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                 </Button>
             </div>
         </div>

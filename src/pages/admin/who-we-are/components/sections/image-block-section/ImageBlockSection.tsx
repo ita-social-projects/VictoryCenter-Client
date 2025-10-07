@@ -50,7 +50,7 @@ export const ImageSection = ({
         onChange({
             ...(imageContent || { contentType: ContentType.Image }),
             image: value,
-            id: imageContent?.id!,
+            id: imageContent ? imageContent.id : 0,
             description: null,
             title: null,
             imageId: null,
@@ -93,7 +93,11 @@ export const ImageSection = ({
                     label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
                     {...imageInputProps}
                 />
-                {imageError && <p className="error">{imageError}</p>}
+                {imageError && (
+                    <p data-testid={'image-error'} className="error">
+                        {imageError}
+                    </p>
+                )}
             </div>
 
             <div className="content-wrapper">
@@ -114,7 +118,11 @@ export const ImageSection = ({
                                 setTitleError(error || null);
                             }}
                         />
-                        {titleError && <p className="error">{titleError}</p>}
+                        {titleError && (
+                            <p data-testid={'title-error'} className="error">
+                                {titleError}
+                            </p>
+                        )}
                     </div>
                 )}
 
@@ -135,7 +143,11 @@ export const ImageSection = ({
                                 setDescriptionError(error || null);
                             }}
                         />
-                        {descriptionError && <p className="error">{descriptionError}</p>}
+                        {descriptionError && (
+                            <p data-testid={'description-error'} className="error">
+                                {descriptionError}
+                            </p>
+                        )}
                     </div>
                 )}
                 <Button
@@ -145,7 +157,7 @@ export const ImageSection = ({
                     type={'submit'}
                     disabled={!!descriptionError || !!titleError || !isPublishButtonActive}
                 >
-                    Опублікувати
+                    {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                 </Button>
             </div>
         </div>

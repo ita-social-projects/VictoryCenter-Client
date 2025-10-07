@@ -1,6 +1,6 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ProgramsPageToolbar } from './ProgramsPageToolbar';
 import { ProgramSearchItemData } from '../../../../../types/admin/programs';
@@ -120,19 +120,22 @@ const createProps = (overrides = {}) => ({
 });
 
 describe('ProgramsPageToolbar', () => {
-    const mockHookReturn = {
-        data: [],
-        isLoading: false,
-        hasMore: false,
-        error: null,
-        fetchMore: jest.fn(),
-        fetchFromStart: jest.fn(),
-        setData: jest.fn(),
-        resetList: jest.fn(),
-    };
+    let mockHookReturn: any;
 
     beforeEach(() => {
         jest.clearAllMocks();
+
+        mockHookReturn = {
+            data: [],
+            isLoading: false,
+            hasMore: false,
+            error: null,
+            fetchMore: jest.fn(),
+            fetchFromStart: jest.fn(),
+            setData: jest.fn(),
+            resetList: jest.fn(),
+        };
+
         mockUseDataPaginationFetch.mockReturnValue(mockHookReturn);
         mockProgramsApi.fetchProgramSearchItems = jest.fn().mockResolvedValue({
             items: [],
@@ -168,7 +171,7 @@ describe('ProgramsPageToolbar', () => {
         render(<ProgramsPageToolbar {...createProps({ onAddProgram })} />);
 
         const button = screen.getByText(PROGRAMS_TEXT.BUTTON.ADD_PROGRAM);
-        userEvent.click(button);
+        await userEvent.click(button);
 
         expect(onAddProgram).toHaveBeenCalledTimes(1);
     });
@@ -177,7 +180,7 @@ describe('ProgramsPageToolbar', () => {
         render(<ProgramsPageToolbar {...createProps()} />);
 
         const searchInput = screen.getByTestId('search-input');
-        userEvent.type(searchInput, 'test program');
+        await userEvent.type(searchInput, 'test program');
 
         expect(mockUseDataPaginationFetch).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -210,7 +213,7 @@ describe('ProgramsPageToolbar', () => {
         render(<ProgramsPageToolbar {...createProps({ onProgramSelect })} />);
 
         const suggestion = screen.getByTestId('suggestion-0');
-        userEvent.click(suggestion);
+        await userEvent.click(suggestion);
 
         expect(onProgramSelect).toHaveBeenCalledWith(1);
         expect(mockHookReturn.resetList).toHaveBeenCalled();
@@ -221,7 +224,7 @@ describe('ProgramsPageToolbar', () => {
         render(<ProgramsPageToolbar {...createProps({ onSearchClear })} />);
 
         const clearButton = screen.getByTestId('clear-button');
-        userEvent.click(clearButton);
+        await userEvent.click(clearButton);
 
         expect(onSearchClear).toHaveBeenCalledTimes(1);
         expect(mockHookReturn.resetList).toHaveBeenCalled();

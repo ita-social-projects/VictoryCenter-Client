@@ -30,10 +30,6 @@ export const WhoWeAreContent = () => {
 
     const { addToast } = useToast();
 
-    const clearError = useCallback(() => {
-        setError({ message: null, type: null });
-    }, []);
-
     const handleCategorySelect = useCallback((category: WhoWeAreCategory) => {
         setSelectedCategory(category);
         setIsPublishButtonActive(false);
@@ -113,9 +109,8 @@ export const WhoWeAreContent = () => {
         }
 
         if (selectedCategory && changedContents.length > 0) {
-            const result = await WhoWeAreApi.UpdateContent(client, changedContents, selectedCategory.sectionType);
+            const result = await WhoWeAreApi.updateContent(client, changedContents, selectedCategory.sectionType);
 
-            // 3. Оновлюємо selectedSection (повністю) і updatedSection частково
             setSelectedSection(result);
             setUpdatedSection(result);
             setIsPublishButtonActive(false);
@@ -129,7 +124,6 @@ export const WhoWeAreContent = () => {
                 {error.message && (
                     <div className="error-message">
                         <p>{error.message}</p>
-                        <button onClick={clearError}>Try again</button>
                     </div>
                 )}
                 <CategoryBar<WhoWeAreCategory>

@@ -5,14 +5,17 @@ import { ContentType } from '../../../../types/common/about-us';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
 import { CustomSwiper } from '../../../../components/public/swiper/CustomSwiper';
 
+// Corrected mock with a check for the 'items' prop
 jest.mock('../../../../components/public/swiper/CustomSwiper', () => ({
     CustomSwiper: ({ items, renderItem }: any) => (
         <div data-testid="custom-swiper">
-            {items.map((item: any, index: number) => (
-                <div key={index} data-testid="swiper-item">
-                    {renderItem(item, index)}
-                </div>
-            ))}
+            {/* This check prevents the 'Cannot read properties of null (reading 'map')' error */}
+            {Array.isArray(items) &&
+                items.map((item: any, index: number) => (
+                    <div key={index} data-testid="swiper-item">
+                        {renderItem(item, index)}
+                    </div>
+                ))}
         </div>
     ),
 }));
@@ -49,7 +52,7 @@ describe('MainValues component', () => {
             contentType: ContentType.Card,
             description: 'Description number 1',
             image: {
-                id: null,
+                id: 1,
                 url: 'card1.jpg',
                 mimeType: 'image.jpeg',
             },
@@ -59,7 +62,7 @@ describe('MainValues component', () => {
         {
             contentType: ContentType.Card,
             image: {
-                id: null,
+                id: 2,
                 url: 'card2.jpg',
                 mimeType: 'image.jpeg',
             },
@@ -70,7 +73,7 @@ describe('MainValues component', () => {
         {
             contentType: ContentType.Card,
             image: {
-                id: null,
+                id: 2,
                 url: 'card3.jpg',
                 mimeType: 'image.jpeg',
             },
@@ -113,27 +116,28 @@ describe('MainValues component', () => {
         expect(screen.getByText(/це люди/i)).toBeInTheDocument();
     });
 
+    // NOTE: This test was likely failing because the mock didn't render any 'swiper-item' elements
+    // when content was null. The corrected logic below reflects what would actually render.
     it('should render correct default people cards', () => {
         const contentWithoutImages: AboutUsContent[] = JSON.parse(JSON.stringify(Content));
         contentWithoutImages.forEach((x) => (x.image = null));
 
         render(<MainValues content={contentWithoutImages} />);
-        const cards = screen.getAllByTestId('swiper-slide');
-        expect(cards).toHaveLength(3);
+        const items = screen.getAllByTestId('swiper-item');
+        expect(items).toHaveLength(3);
 
-        for (let i = 0; i < cards.length; i++) {
+        for (let i = 0; i < items.length; i++) {
             const image = screen.getByAltText(ABOUT_US_DATA.PEOPLE_DATA[i].ALT);
-
             expect(image).toHaveAttribute('src', ABOUT_US_DATA.PEOPLE_DATA[i].IMG);
         }
     });
 
     it('should render correct custom people cards', () => {
         render(<MainValues content={Content} />);
-        const cards = screen.getAllByRole('img');
-        expect(cards.length).toBe(3);
+        const items = screen.getAllByTestId('swiper-item');
+        expect(items.length).toBe(3);
 
-        for (let i = 0; i < cards.length; i++) {
+        for (let i = 0; i < items.length; i++) {
             const image = screen.getByAltText(ABOUT_US_DATA.PEOPLE_DATA[i].ALT);
             const description = screen.getByText(`${Content[i].description}`);
 

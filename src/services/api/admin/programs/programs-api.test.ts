@@ -3,10 +3,13 @@ import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '../../../../ty
 import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin/programs';
 import { ProgramsApi, ProgramsCategoriesApi } from './programs-api';
 import { useAdminClient } from '../../../../hooks/admin/use-admin-client/useAdminClient';
+import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
+import { ImageApi } from '../image/image-api';
 
 jest.mock('../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
+jest.mock('../image/image-api');
 
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 
@@ -34,6 +37,39 @@ beforeEach(() => {
 afterEach(() => {
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
+});
+
+describe('fetchProgramCategories', () => {
+    it('should fetch categories and add the correct programsCount property', async () => {
+        const mockApiData = [
+            { id: 1, name: 'Yoga', programs: [{}, {}, {}] },
+            { id: 2, name: 'Pilates', programs: [{}] },
+            { id: 3, name: 'Cardio', programs: [] },
+        ];
+
+        mockClient.get.mockResolvedValue({ data: mockApiData });
+
+        const result = await ProgramsCategoriesApi.fetchProgramCategories(mockClient);
+
+        expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PROGRAMCATEGORY.BASE);
+
+        expect(result).toHaveLength(3);
+
+        expect(result[0].programsCount).toBe(3);
+        expect(result[1].programsCount).toBe(1);
+        expect(result[2].programsCount).toBe(0);
+
+        expect(result[0].name).toBe('Yoga');
+    });
+
+    it('should return an empty array if the API provides no categories', async () => {
+        mockClient.get.mockResolvedValue({ data: [] });
+
+        const result = await ProgramsCategoriesApi.fetchProgramCategories(mockClient);
+
+        expect(result).toEqual([]);
+        expect(result).toHaveLength(0);
+    });
 });
 
 describe('fetchProgramById', () => {
@@ -120,18 +156,43 @@ describe('addProgram', () => {
         categoryIds: [1, 2],
     };
 
-    it('should add program with File image', async () => {
+    it('should add program with File image and call ImageApi', async () => {
+        const programData: ProgramCreateUpdate = {
+            id: null,
+            name: 'Test Program',
+            description: 'Test Description',
+            status: VisibilityStatus.Draft,
+            image: { base64: 'test-base64-string', mimeType: 'image/png' },
+            imageId: null,
+            categoryIds: [1, 2],
+        };
+
+        const mockImageResponse = { id: 100, url: 'http://example.com/img.png', mimeType: 'image/png' };
+        (ImageApi.post as jest.Mock).mockResolvedValue(mockImageResponse);
+
         mockClient.post.mockResolvedValueOnce({
             data: {
                 ...programData,
                 id: 13,
+                imageId: mockImageResponse.id,
                 categories: mockCategories.slice(0, 2),
-                img: null,
             },
         });
+
         mockClient.get.mockResolvedValueOnce({ data: mockCategories });
-        const promise = ProgramsApi.addProgram(mockClient, programData);
-        const result = await promise;
+
+        const result = await ProgramsApi.addProgram(mockClient, programData);
+
+        expect(ImageApi.post).toHaveBeenCalledTimes(1);
+        expect(ImageApi.post).toHaveBeenCalledWith(mockClient, programData.image);
+
+        expect(mockClient.post).toHaveBeenCalledWith(
+            API_ROUTES.PROGRAMS.BASE,
+            expect.objectContaining({
+                ...programData,
+                imageId: mockImageResponse.id,
+            }),
+        );
 
         expect(result.id).toBeDefined();
         expect(result.name).toBe(programData.name);
@@ -186,6 +247,12 @@ describe('editProgram', () => {
         categoryIds: [2],
     };
 
+    beforeEach(() => {
+        const initialImageId = 55;
+        const mockUpdateImageResponse = { finalImageId: 101, imageIdToDelete: initialImageId };
+        (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue(mockUpdateImageResponse);
+    });
+
     it('should edit existing program with File image', async () => {
         mockClient.put.mockResolvedValueOnce({
             data: {
@@ -219,6 +286,12 @@ describe('editProgram', () => {
 });
 
 describe('deleteProgram', () => {
+    beforeEach(() => {
+        const initialImageId = 55;
+        const mockUpdateImageResponse = { finalImageId: 101, imageIdToDelete: initialImageId };
+        (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue(mockUpdateImageResponse);
+    });
+
     it('should delete existing program', async () => {
         const programToDelete = mockPrograms[0];
         const promise = ProgramsApi.deleteProgram(programToDelete.id, mockClient);
@@ -357,6 +430,27 @@ describe('fetchProgramSearchItems', () => {
 
         expect(result.items).toHaveLength(0);
         expect(result.totalItemsCount).toBe(0);
+    });
+
+    it('should sort matches alphabetically when match priority is the same', async () => {
+        const searchTerm = 'терапія';
+
+        const mockApiData = [
+            { id: 1, name: 'Психологічна терапія', categories: [] },
+            { id: 2, name: 'Фітнес для всіх', categories: [{ name: 'Реабілітаційна терапія' }] },
+            { id: 3, name: 'Арт-терапія', categories: [] }, // Збіг за назвою
+            { id: 4, name: 'Йога для спини', categories: [{ name: 'Фізична терапія' }] },
+        ];
+
+        mockClient.get.mockResolvedValueOnce({ data: mockApiData });
+
+        const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);
+
+        const expectedOrder = ['Арт-терапія', 'Психологічна терапія', 'Йога для спини', 'Фітнес для всіх'];
+
+        const actualNames = result.items.map((item) => item.name);
+
+        expect(actualNames).toEqual(expectedOrder);
     });
 });
 

@@ -7,6 +7,7 @@ import './CardsSection.scss';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { ContentType } from '../../../../../../types/common/about-us';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
+import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 
 export interface CardsSectionProps {
     content: Content[] | undefined;
@@ -57,10 +58,9 @@ export const CardsSection = ({
                 image: value,
             },
         }));
-        setIsPublishButtonActive(true);
     };
 
-    if (!cardContents) {
+    if (cardContents.length === 0) {
         return null;
     }
 
@@ -75,6 +75,7 @@ export const CardsSection = ({
                                 ...c,
                                 image: value,
                             });
+                            setIsPublishButtonActive(true);
                         };
 
                         const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -82,6 +83,7 @@ export const CardsSection = ({
                                 ...c,
                                 description: e.target.value,
                             });
+                            setIsPublishButtonActive(true);
                         };
 
                         const imageConfig = cardImageConfigs[index] || {
@@ -118,7 +120,7 @@ export const CardsSection = ({
                         !isPublishButtonActive
                     }
                 >
-                    Опублікувати
+                    {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                 </Button>
             </div>
         </>

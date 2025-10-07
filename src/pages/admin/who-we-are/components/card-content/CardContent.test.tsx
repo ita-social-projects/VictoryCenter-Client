@@ -31,7 +31,6 @@ describe('CardContent', () => {
     let mockSetImageError: jest.Mock;
     const descriptionLimit = 250;
 
-    // Helper function to render the component with a fresh set of props
     const renderComponent = (props = {}) => {
         const baseProps = {
             content: {
@@ -62,7 +61,6 @@ describe('CardContent', () => {
     };
 
     beforeEach(() => {
-        // Initialize the mock functions before each test
         mockOnImageChange = jest.fn();
         mockOnChange = jest.fn();
         mockOnDescriptionBlur = jest.fn();
@@ -79,7 +77,6 @@ describe('CardContent', () => {
         expect(textarea).toHaveValue('Initial description');
         expect(textarea).toHaveAttribute('maxLength', descriptionLimit.toString());
 
-        // Check for no error messages initially
         expect(screen.queryByText('This is a description error message.')).not.toBeInTheDocument();
         expect(screen.queryByText('This is an image error message.')).not.toBeInTheDocument();
     });
@@ -124,7 +121,6 @@ describe('CardContent', () => {
     });
 
     it('should handle a null image prop gracefully', () => {
-        // Override the baseProps to have a null image
         const contentWithNullImage = {
             id: 2,
             contentType: ContentType.Card,
@@ -137,18 +133,14 @@ describe('CardContent', () => {
         renderComponent({ content: contentWithNullImage });
 
         const imageInput = screen.getByTestId('mock-image-input');
-        // We can't directly check the value prop of a mocked component,
-        // so we rely on the mock implementation to behave correctly.
-        // The key is that the component renders without errors.
         expect(imageInput).toBeInTheDocument();
     });
 
     it('should handle a null or undefined description prop and render an empty string', () => {
-        // Override the baseProps to have a null description
         const contentWithNullDescription = {
             id: 3,
             contentType: ContentType.Card,
-            description: null, // Test for null
+            description: null,
             image: {
                 id: 1,
                 url: 'https://example.com/card/1',
@@ -161,6 +153,6 @@ describe('CardContent', () => {
         renderComponent({ content: contentWithNullDescription });
 
         const textarea = screen.getByTestId('mock-textarea');
-        expect(textarea).toHaveValue(''); // Expect an empty string
+        expect(textarea).toHaveValue('');
     });
 });

@@ -47,9 +47,7 @@ export const ImageInput = ({
     const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
 
     useEffect(() => {
-        if (value) {
-            setPreviewImage(value);
-        }
+        setPreviewImage(value);
     }, [value]);
 
     const handleFile = useCallback(
@@ -178,6 +176,7 @@ export const ImageInput = ({
                         />
                         {!disabled && (
                             <button
+                                data-testid="remove-photo-button"
                                 type="button"
                                 className="delete-button"
                                 disabled={disabled}

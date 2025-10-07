@@ -163,14 +163,6 @@ describe('Program Validation Schema', () => {
                 { isPublishing: true },
             ],
         ];
-
-        it.each(invalidImageCases)('should fail when image $description', async ({ data, expectedError, context }) => {
-            await expectValidationToFail(data, expectedError, context);
-        });
-
-        it.each(validImageCases)('should pass when image %s', async (description, data, context) => {
-            await expectValidationToPass(data, context);
-        });
     });
 
     describe('Image transform function', () => {

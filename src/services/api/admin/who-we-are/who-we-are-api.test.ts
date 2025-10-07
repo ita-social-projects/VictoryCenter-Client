@@ -79,7 +79,7 @@ describe('WhoWeAreApi', () => {
             };
             mockClient.put.mockResolvedValue({ data: mockResponse });
 
-            const result = await WhoWeAreApi.UpdateContent(mockClient, mockContents, mockSectionType);
+            const result = await WhoWeAreApi.updateContent(mockClient, mockContents, mockSectionType);
 
             expect(ImageApi.getUpdateImageId).not.toHaveBeenCalled();
             expect(ImageApi.delete).not.toHaveBeenCalled();
@@ -122,7 +122,7 @@ describe('WhoWeAreApi', () => {
             });
             mockClient.put.mockResolvedValue({ data: mockResponse });
 
-            const result = await WhoWeAreApi.UpdateContent(mockClient, mockContents, mockSectionType);
+            const result = await WhoWeAreApi.updateContent(mockClient, mockContents, mockSectionType);
 
             expect(ImageApi.getUpdateImageId).toHaveBeenCalledWith(mockClient, newImageFile, null);
             expect(ImageApi.delete).not.toHaveBeenCalled();
@@ -177,7 +177,7 @@ describe('WhoWeAreApi', () => {
             mockClient.put.mockResolvedValue({ data: mockResponse });
             (ImageApi.delete as jest.Mock).mockResolvedValue({});
 
-            const result = await WhoWeAreApi.UpdateContent(mockClient, mockContents, mockSectionType);
+            const result = await WhoWeAreApi.updateContent(mockClient, mockContents, mockSectionType);
 
             expect(ImageApi.getUpdateImageId).toHaveBeenCalledWith(mockClient, newImageFile, 50);
             expect(ImageApi.delete).toHaveBeenCalledWith(mockClient, 50);

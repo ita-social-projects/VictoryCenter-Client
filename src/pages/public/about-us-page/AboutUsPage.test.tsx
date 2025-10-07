@@ -8,7 +8,6 @@ import { OurTeam } from './our-team-section/OurTeam';
 import { MainValues } from './main-value/MainValue';
 import { SectionType } from '../../../types/common/about-us';
 
-// --- No changes to mocks ---
 jest.mock('./intro-section/IntroSection');
 jest.mock('./our-mission/OurMission');
 jest.mock('./support-section/SupportSection');
@@ -125,7 +124,6 @@ describe('AboutUsPage', () => {
             render(<AboutUsPage />);
 
             await waitFor(() => {
-                // Check that the mock functions were called correctly
                 expect(MockedAboutUsIntro).toHaveBeenLastCalledWith(
                     expect.objectContaining({ content: null }),
                     undefined,
@@ -144,8 +142,6 @@ describe('AboutUsPage', () => {
                     undefined,
                 );
 
-                // FIX: Check for the DOM elements inside the same waitFor block
-                // This ensures we wait for the final render to complete.
                 expect(screen.getByTestId('intro-section')).toBeInTheDocument();
                 expect(screen.getByTestId('mission-section')).toBeInTheDocument();
             });

@@ -7,7 +7,6 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
 import { Image } from '../../../../../types/common/image';
 
-// Mock child components to isolate the component being tested
 jest.mock('../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
     TextAreaWithCharacterLimit: ({ onChange, value, maxLength, onBlur }: any) => (
         <textarea data-testid="mock-textarea" onChange={onChange} value={value} maxLength={maxLength} onBlur={onBlur} />

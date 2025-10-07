@@ -164,7 +164,7 @@ describe('WhoWeAreContent Component', () => {
         mockedWhoWeAreApi.getByType.mockResolvedValueOnce(mockSection1).mockResolvedValueOnce(mockSection2);
 
         render(<WhoWeAreContent />);
-        await waitFor(() => expect(screen.getByText('What we do')).toBeInTheDocument());
+        await screen.findByText('What we do');
 
         fireEvent.click(screen.getByText('Main'));
         fireEvent.click(screen.getByText('People'));
@@ -190,7 +190,7 @@ describe('WhoWeAreContent Component', () => {
         mockedWhoWeAreApi.updateContent.mockResolvedValue(updatedSection);
 
         render(<WhoWeAreContent />);
-        await waitFor(() => expect(screen.getByText('What we do')).toBeInTheDocument());
+        await screen.findByText('What we do');
 
         fireEvent.change(screen.getByTestId('input-1'), { target: { value: updatedDescription } });
 

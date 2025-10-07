@@ -34,7 +34,6 @@ jest.mock('../../card-content/CardContent', () => ({
     ),
 }));
 
-// Mock the validation function to control its behavior during tests
 jest.mock('../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
     WHO_WE_ARE_VALIDATION_FUNCTIONS: {
         validateText: jest.fn(),
@@ -198,7 +197,6 @@ describe('CardsSection', () => {
     it('should keep the publish button disabled if there are any validation errors', () => {
         renderComponent({ isPublishButtonActive: true });
 
-        // Simulate a validation error state
         fireEvent.blur(screen.getByTestId('mock-textarea-1'));
 
         const publishButton = screen.getByRole('button', { name: 'Опублікувати' });

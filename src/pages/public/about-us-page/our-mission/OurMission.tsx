@@ -10,8 +10,8 @@ import { ContentType } from '../../../../types/common/about-us';
 export interface OurMissionProps {
     content?: AboutUsContent[] | null;
     description?: string;
-    className?: string;
     navigate?: boolean;
+    className?: string;
 }
 
 export const OurMission = ({ content, description, className, navigate = true }: OurMissionProps) => {

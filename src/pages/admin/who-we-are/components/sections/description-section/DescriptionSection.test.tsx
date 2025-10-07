@@ -35,7 +35,6 @@ jest.mock('../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema',
 }));
 
 describe('DescriptionSection', () => {
-    // Declare mock functions for props
     let mockOnChange: jest.Mock;
     let mockOnPublish: jest.Mock;
     let mockSetIsPublishButtonActive: jest.Mock;

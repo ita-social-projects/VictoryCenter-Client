@@ -13,24 +13,20 @@ import {
 import { Content } from '../../../../../types/admin/who-we-are';
 import { Image } from '../../../../../types/common/image';
 
-// Mock all child section components and their specific props
 jest.mock('../sections/cards-section/CardsSection', () => ({
     CardsSection: (props: any) => {
-        // Mock a change event to call the setIsPublishButtonActive prop
         props.setIsPublishButtonActive(true);
         return <div data-testid="cards-section" data-props={JSON.stringify(props)} />;
     },
 }));
 jest.mock('../sections/description-section/DescriptionSection', () => ({
     DescriptionSection: (props: any) => {
-        // Mock a change event to call the setIsPublishButtonActive prop
         props.setIsPublishButtonActive(true);
         return <div data-testid="description-section" data-props={JSON.stringify(props)} />;
     },
 }));
 jest.mock('../sections/image-block-section/ImageBlockSection', () => ({
     ImageSection: (props: any) => {
-        // Mock a change event to call the setIsPublishButtonActive prop
         props.setIsPublishButtonActive(true);
         return <div data-testid="image-section" data-props={JSON.stringify(props)} />;
     },
@@ -48,7 +44,6 @@ describe('SectionsWrapper', () => {
         jest.clearAllMocks();
     });
 
-    // Test case for SectionType.WhatWeDo
     it('should render DescriptionSection and call setIsPublishButtonActive', () => {
         const section = {
             id: 1,
@@ -62,7 +57,6 @@ describe('SectionsWrapper', () => {
         expect(mockProps.setIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    // Test case for SectionType.WhoWeSupport
     it('should render CardsSection and call setIsPublishButtonActive for WhoWeSupport', () => {
         const section = {
             id: 2,
@@ -76,7 +70,6 @@ describe('SectionsWrapper', () => {
         expect(mockProps.setIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    // Test case for SectionType.People
     it('should render CardsSection and call setIsPublishButtonActive for People', () => {
         const section = {
             id: 3,
@@ -90,7 +83,6 @@ describe('SectionsWrapper', () => {
         expect(mockProps.setIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    // Test case for SectionType.Main
     it('should render ImageSection and call setIsPublishButtonActive for Main', () => {
         const section = {
             id: 4,
@@ -104,7 +96,6 @@ describe('SectionsWrapper', () => {
         expect(mockProps.setIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    // Test case for SectionType.Team
     it('should render ImageSection and call setIsPublishButtonActive for Team', () => {
         const section = {
             id: 5,
@@ -118,13 +109,11 @@ describe('SectionsWrapper', () => {
         expect(mockProps.setIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    // Test for a null section
     it('should not render anything if the section prop is null', () => {
         const { container } = render(<SectionsWrapper {...mockProps} section={null} />);
         expect(container).toBeEmptyDOMElement();
     });
 
-    // Test for an unknown section type
     it('should render the wrapper but no child section for an unknown section type', () => {
         const section = {
             id: 6,

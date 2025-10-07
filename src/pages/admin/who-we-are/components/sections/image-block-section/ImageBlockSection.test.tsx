@@ -1,7 +1,5 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import userEvent from '@testing-library/user-event';
 import { ImageSection, ImageSectionProps } from './ImageBlockSection';
 import { ContentType } from '../../../../../../types/common/about-us';
 import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
@@ -9,7 +7,6 @@ import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { Image } from '../../../../../../types/common/image';
 
-// Mock child components
 jest.mock('../../../../../../components/admin/image-input/ImageInput', () => ({
     ImageInput: ({ onChange, label, setError }: any) => (
         <div data-testid="mock-image-input">
@@ -20,7 +17,6 @@ jest.mock('../../../../../../components/admin/image-input/ImageInput', () => ({
                 onChange={(e) => onChange(e.target.files?.[0])}
                 id="mock-image-input-id"
             />
-            {/* Додаємо кнопку для симуляції помилки */}
             <button onClick={() => setError('image size error')}>Set Error</button>
         </div>
     ),
@@ -52,7 +48,6 @@ jest.mock('../../../../../../components/admin/textarea-with-character-limit/Text
     ),
 }));
 
-// Mock the validation function
 jest.mock('../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
     WHO_WE_ARE_VALIDATION_FUNCTIONS: {
         validateText: jest.fn((value: string) => {

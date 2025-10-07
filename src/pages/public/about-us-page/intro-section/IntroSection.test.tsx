@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { AboutUsIntro } from './IntroSection';
-import aboutUsUk from '../../../../locales/uk/about-us.json';
+import aboutUsPageUk from '../../../../locales/uk/about-us.json';
 
 describe('AboutUsIntro', () => {
     it('should render images correctly', () => {
@@ -15,9 +15,9 @@ describe('AboutUsIntro', () => {
         render(<AboutUsIntro />);
         const title = screen.getByRole('heading', { level: 1 });
         expect(title).toBeInTheDocument();
-        expect(title).toHaveTextContent(aboutUsUk['INTRO_TITLE.FIRST_HIGHLIGHT']);
-        expect(title).toHaveTextContent(aboutUsUk['INTRO_TITLE.MIDDLE_PART']);
-        expect(title).toHaveTextContent(aboutUsUk['INTRO_TITLE.SECOND_HIGHLIGHT']);
+        expect(title).toHaveTextContent(aboutUsPageUk['INTRO_TITLE.FIRST_HIGHLIGHT']);
+        expect(title).toHaveTextContent(aboutUsPageUk['INTRO_TITLE.MIDDLE_PART']);
+        expect(title).toHaveTextContent(aboutUsPageUk['INTRO_TITLE.SECOND_HIGHLIGHT']);
 
         const highlightedSpans = document.querySelectorAll('.highlighted');
         expect(highlightedSpans).toHaveLength(2);
@@ -25,11 +25,11 @@ describe('AboutUsIntro', () => {
 
     it('should render title details correctly', () => {
         render(<AboutUsIntro />);
-        prepareAndFindTitleDetails(aboutUsUk['INTRO_DETAILS.FIRST_LINE']);
-        prepareAndFindTitleDetails(aboutUsUk['INTRO_DETAILS.SECOND_LINE']);
-        prepareAndFindTitleDetails(aboutUsUk['INTRO_DETAILS.THIRD_LINE']);
-        prepareAndFindTitleDetails(aboutUsUk['INTRO_DETAILS.FOURTH_LINE']);
-        prepareAndFindTitleDetails(aboutUsUk['INTRO_DETAILS.FIFTH_LINE']);
+        prepareAndFindTitleDetails(aboutUsPageUk['INTRO_DETAILS.FIRST_LINE']);
+        prepareAndFindTitleDetails(aboutUsPageUk['INTRO_DETAILS.SECOND_LINE']);
+        prepareAndFindTitleDetails(aboutUsPageUk['INTRO_DETAILS.THIRD_LINE']);
+        prepareAndFindTitleDetails(aboutUsPageUk['INTRO_DETAILS.FOURTH_LINE']);
+        prepareAndFindTitleDetails(aboutUsPageUk['INTRO_DETAILS.FIFTH_LINE']);
     });
 });
 

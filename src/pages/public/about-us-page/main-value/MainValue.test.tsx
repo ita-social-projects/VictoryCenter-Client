@@ -1,34 +1,34 @@
 import { render, screen } from '@testing-library/react';
 import { MainValues } from './MainValue';
-import aboutUsUk from '../../../../locales/uk/about-us.json';
+import aboutUsPageUk from '../../../../locales/uk/about-us.json';
 import { checkForSubstrings } from '../../../../utils/functions/test-helpers/test-helpers';
 
 describe('MainValues component', () => {
     it('should render main title with correct parts and highlights', () => {
         render(<MainValues />);
-        checkForSubstrings(aboutUsUk['MAIN_VALUE.FIRST_PART']);
-        checkForSubstrings(aboutUsUk['MAIN_VALUE.FIRST_HIGHLIGHT']);
-        checkForSubstrings(aboutUsUk['MAIN_VALUE.MIDDLE_PART']);
-        checkForSubstrings(aboutUsUk['MAIN_VALUE.SECOND_HIGHLIGHT']);
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE.FIRST_PART']);
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE.FIRST_HIGHLIGHT']);
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE.MIDDLE_PART']);
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE.SECOND_HIGHLIGHT']);
     });
 
     it('should render correct number of people cards', () => {
         render(<MainValues />);
         const cards = screen.getAllByRole('img');
-        expect(cards.length).toBe(aboutUsUk.PEOPLE_DATA.length);
+        expect(cards.length).toBe(aboutUsPageUk.PEOPLE_DATA.length);
     });
 
     it('should render correct people info texts', () => {
         render(<MainValues />);
-        aboutUsUk.PEOPLE_DATA.forEach(({ INFO }) => {
+        aboutUsPageUk.PEOPLE_DATA.forEach(({ INFO }) => {
             expect(screen.getByText(INFO)).toBeInTheDocument();
         });
     });
 
     it('should render summary block with correct lines', () => {
         render(<MainValues />);
-        checkForSubstrings(aboutUsUk['MAIN_VALUE_DETAILS.FIRST_LINE']);
-        checkForSubstrings(aboutUsUk['MAIN_VALUE_DETAILS.SECOND_LINE']);
-        checkForSubstrings(aboutUsUk['MAIN_VALUE_DETAILS.THIRD_LINE']);
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS.FIRST_LINE']);
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS.SECOND_LINE']);
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS.THIRD_LINE']);
     });
 });

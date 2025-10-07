@@ -1,7 +1,7 @@
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN, UI_CONFIG } from '../../../../../const/admin/common';
-import { Select } from '../../../../../components/admin/select/Select';
+import { Select } from '../../../../../components/common/select/Select';
 import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
 import { Button } from '../../../../../components/admin/button/Button';
 import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';

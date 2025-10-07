@@ -14,6 +14,7 @@
     gap: 8.25rem;
     justify-content: center;
     align-items: center;
+    overflow-x: hidden;
 
     h1 {
         width: 68.875rem;
@@ -41,12 +42,12 @@
         background: antiquewhite;
     }
 
-    span:nth-child(1) {
+    span:nth-child(2) {
         background: colors.$yellow-400;
         position: relative;
     }
 
-    span:nth-child(1):before {
+    span:nth-child(2):before {
         content: '';
         width: 100vw;
         height: 7rem;
@@ -55,15 +56,15 @@
         transform: translateX(-100%);
     }
 
-    span:nth-child(2) {
+    span:nth-child(3) {
         background: colors.$light-blue-200;
         position: relative;
         z-index: z-index.public(programs-page-intro-section-text);
     }
 
-    span:nth-child(2):before {
+    span:nth-child(3):before {
         content: '';
-        width: 48.65vw;
+        width: 100vw;
         height: 7rem;
         background: colors.$light-blue-200;
         position: absolute;

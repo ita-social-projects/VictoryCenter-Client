@@ -1,10 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { StatusFilterDropdown } from './StatusFilterDropdown';
 import { VisibilityStatus } from '../../../types/admin/common';
-import { SelectProps } from '../select/Select';
+import { SelectProps } from '../../common/select/Select';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
-jest.mock('../select/Select', () => {
+jest.mock('../../common/select/Select', () => {
     const MockOption = ({ value, name, ...props }: any) => (
         <option value={value === undefined ? 'undefined' : value} {...props}>
             {name}

@@ -83,12 +83,6 @@ export const ImageSection = ({
 
     if (!content) return null;
 
-    const cardContents = content.filter((item) => item.contentType === ContentType.Description);
-
-    if (!cardContents) {
-        return null;
-    }
-
     return (
         <div className="image-section">
             <div className="image-wrapper">
@@ -106,7 +100,9 @@ export const ImageSection = ({
             <div className="content-wrapper">
                 {titleContent && (
                     <div className="content-wrapper-title">
-                        <span className="content-wrapper-title-label">{COMMON_TEXT_ADMIN.TYPE.TITLE}</span>
+                        <label htmlFor={titleContent.id.toString()} className="content-wrapper-title-label">
+                            {COMMON_TEXT_ADMIN.TYPE.TITLE}
+                        </label>
                         <InputWithCharacterLimit
                             value={titleContent.title ?? ''}
                             onChange={handleTitleChange}
@@ -125,7 +121,9 @@ export const ImageSection = ({
 
                 {descriptionContent && (
                     <div className="content-wrapper-description">
-                        <span className="content-wrapper-description-label">{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
+                        <label htmlFor={descriptionContent.id.toString()} className="content-wrapper-description-label">
+                            {COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                        </label>
                         <TextAreaWithCharacterLimit
                             onChange={handleDescriptionChange}
                             value={descriptionContent.description ?? ''}

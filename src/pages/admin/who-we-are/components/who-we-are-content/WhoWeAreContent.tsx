@@ -126,6 +126,12 @@ export const WhoWeAreContent = () => {
     return (
         <>
             <div className="who-we-are-main-box">
+                {error.message && (
+                    <div className="error-message">
+                        <p>{error.message}</p>
+                        <button onClick={clearError}>Try again</button>
+                    </div>
+                )}
                 <CategoryBar<WhoWeAreCategory>
                     categories={categories}
                     selectedCategory={selectedCategory}

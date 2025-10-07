@@ -7,8 +7,7 @@ import { Image, ImageValues } from '../../../types/common/image';
 const createImageFile = () => new File(['dummy content'], 'example.png', { type: 'image/png' });
 const MockImageValue: ImageValues = {
     base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAocB9eQ6vqoAAAAASUVORK5CYII=',
-    mimeType: 'image/jpeg',
-    size: 0,
+    mimeType: 'image/jpeg'
 };
 
 const MockImage: Image = {
@@ -23,6 +22,7 @@ describe('ImageInput', () => {
 
     beforeEach(() => {
         onChangeMock = jest.fn();
+        setErrorMock = jest.fn();
         global.URL.createObjectURL = jest.fn(() => 'mock-preview-url');
         global.URL.revokeObjectURL = jest.fn();
 
@@ -385,7 +385,6 @@ describe('ImageInput', () => {
 
             expect(result.base64).toEqual(expect.any(String));
             expect(result.mimeType).toBe('image/png');
-            expect(result.size).toBe(4);
         });
 
         it('should reject the promise if the FileReader fails', async () => {

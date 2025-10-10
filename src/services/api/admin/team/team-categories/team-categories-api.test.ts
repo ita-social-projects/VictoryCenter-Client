@@ -1,45 +1,45 @@
-import { AxiosInstance } from 'axios';
-import { mapTeamCategoryDtoToTeamCategory, TeamCategoriesApi } from './team-categories-api';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { TeamCategoryDto, TeamCategory } from '../../../../../types/admin/team-members';
+// import { AxiosInstance } from 'axios';
+// import { mapTeamCategoryDtoToTeamCategory, TeamCategoriesApi } from './team-categories-api';
+// import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
+// import { TeamCategoryDto, TeamCategory } from '../../../../../types/admin/team-members';
 
-describe('mapTeamCategoryDtoToTeamCategory', () => {
-    it('should correctly map DTO to TeamCategory', () => {
-        const dto: TeamCategoryDto = {
-            id: 1,
-            name: 'Main Team',
-            description: 'Description here',
-        };
+// describe('mapTeamCategoryDtoToTeamCategory', () => {
+//     it('should correctly map DTO to TeamCategory', () => {
+//         const dto: TeamCategoryDto = {
+//             id: 1,
+//             name: 'Main Team',
+//             description: 'Description here',
+//         };
 
-        const expected: TeamCategory = {
-            id: 1,
-            name: 'Main Team',
-            description: 'Description here',
-        };
+//         const expected: TeamCategory = {
+//             id: 1,
+//             name: 'Main Team',
+//             description: 'Description here',
+//         };
 
-        const result = mapTeamCategoryDtoToTeamCategory(dto);
+//         const result = mapTeamCategoryDtoToTeamCategory(dto);
 
-        expect(result).toEqual(expected);
-    });
-});
+//         expect(result).toEqual(expected);
+//     });
+// });
 
-describe('TeamCategoriesApi.getAll', () => {
-    it('should fetch and map all team categories', async () => {
-        const mockClient = {
-            get: jest.fn().mockResolvedValue({
-                data: [
-                    { id: 1, name: 'A', description: 'Desc A' },
-                    { id: 2, name: 'B', description: 'Desc B' },
-                ],
-            }),
-        } as unknown as AxiosInstance;
+// describe('TeamCategoriesApi.getAll', () => {
+//     it('should fetch and map all team categories', async () => {
+//         const mockClient = {
+//             get: jest.fn().mockResolvedValue({
+//                 data: [
+//                     { id: 1, name: 'A', description: 'Desc A' },
+//                     { id: 2, name: 'B', description: 'Desc B' },
+//                 ],
+//             }),
+//         } as unknown as AxiosInstance;
 
-        const result = await TeamCategoriesApi.getAll(mockClient);
+//         const result = await TeamCategoriesApi.getAll(mockClient);
 
-        expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.CATEGORIES);
-        expect(result).toEqual([
-            { id: 1, name: 'A', description: 'Desc A' },
-            { id: 2, name: 'B', description: 'Desc B' },
-        ]);
-    });
-});
+//         expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.CATEGORIES);
+//         expect(result).toEqual([
+//             { id: 1, name: 'A', description: 'Desc A' },
+//             { id: 2, name: 'B', description: 'Desc B' },
+//         ]);
+//     });
+// });

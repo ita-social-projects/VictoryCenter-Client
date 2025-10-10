@@ -1,4 +1,3 @@
-
 export interface TeamCategory {
     id: number;
     name: string;

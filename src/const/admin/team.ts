@@ -73,3 +73,35 @@ export const TEAM_MEMBER_VALIDATION = {
         getSizeError: () => `Фото не більше ${TEAM_MEMBER_VALIDATION.img.maxSizeBytes / (1024 * 1024)} MB`,
     },
 };
+
+export const TEAM_CATEGORY_TEXT = {
+    FORM: {
+        LABEL: {
+            NAME: 'Назва',
+            DESCRIPTION: 'Опис',
+            CATEGORY: 'Категорія',
+        },
+    },
+};
+
+export const TEAM_CATEGORY_VALIDATION = {
+    name: {
+        min: 5,
+        max: 20,
+        getRequiredError: () => 'Назва обов’язкова',
+        getMinError: () => `Не менше ${TEAM_CATEGORY_VALIDATION.name.min} символів`,
+        getMaxError: () => `Не більше ${TEAM_CATEGORY_VALIDATION.name.max} символів`,
+        getDuplicateNameError: () => 'Категорія з такою назвою вже існує',
+    },
+    description: {
+        min: 10,
+        max: 500,
+        getRequiredError: () => 'Опис обов’язковий',
+        getMinError: () => `Не менше ${TEAM_CATEGORY_VALIDATION.description.min} символів`,
+        getMaxError: () => `Не більше ${TEAM_CATEGORY_VALIDATION.description.max} символів`,
+    },
+    teamMembersCount: {
+        getHasTeamMembersCountError: (count: number) => `Категорія містить ${count} членів команди`,
+        getRelocationOrRemovalHint: () => 'Перенесіть їх в іншу категорію або видаліть, щоб продовжити',
+    },
+};

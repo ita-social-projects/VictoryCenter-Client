@@ -1,13 +1,14 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { TeamPageContent } from './TeamPageContent';
-import { TEAM_CATEGORY_TEXT, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
-import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
+import { TeamMember } from '../../../../../types/admin/team-members';
 import { VisibilityStatus } from '../../../../../types/admin/common';
+import { TeamCategory } from '../../../../../types/admin/team-category';
 
 jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient');
 
@@ -144,8 +145,8 @@ jest.mock('../../../../../components/admin/infinite-scroll-list/InfiniteScrollLi
 }));
 
 const mockCategories: TeamCategory[] = [
-    { id: 1, name: 'Category A', description: 'desc' },
-    { id: 2, name: 'Category B', description: 'desc' },
+    { id: 1, name: 'Category A', description: 'desc', teamMembersCount: 0 },
+    { id: 2, name: 'Category B', description: 'desc', teamMembersCount: 0 },
 ];
 
 const mockMembers: TeamMember[] = [
@@ -330,7 +331,7 @@ describe('TeamPageContent', () => {
             renderTeamPageContent();
 
             await waitFor(() => {
-                expectErrorToBeDisplayed(TEAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES);
+                expectErrorToBeDisplayed(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES);
             });
 
             mockTeamCategoriesApi.getAll.mockResolvedValueOnce(mockCategories);

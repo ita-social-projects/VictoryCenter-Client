@@ -2,22 +2,24 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
 import { DeleteTeamMemberModal } from '../team-member-modals/delete-team-member-modal/DeleteTeamMemberModal';
 import { TeamMemberModal } from '../team-member-modals/team-member-modal/TeamMemberModal';
-import { TEAM_CATEGORY_TEXT, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import axios from 'axios';
 import './TeamPageContent.scss';
-import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
+import { TeamMember } from '../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { VisibilityStatus, ModalMode } from '../../../../../types/admin/common';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
-import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
+import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/category-bar/CategoryBar';
 import { InfiniteScrollList } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
 import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '../../../../../types/admin/toast';
 import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
 import { DraggableListItem } from '../../../../../components/admin/draggable-list-item/DraggableListItem';
 import { MemberComponent } from '../member-component/MemberComponent';
+import { TeamCategory } from '../../../../../types/admin/team-category';
+import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -56,6 +58,8 @@ export const TeamPageContent = () => {
         isEditCategoryModalOpen: false,
         isDeleteCategoryModalOpen: false,
     });
+    const modalsStateControl = useModalsState<TeamMember>();
+    const openModalActions = modalsStateControl.openModalActions;
 
     const listContainerRef = useRef<HTMLDivElement>(null);
     const currentItemsCountRef = useRef<number>(0);
@@ -92,6 +96,28 @@ export const TeamPageContent = () => {
         [updateModalState],
     );
 
+    const onContextMenuOptionSelected = useCallback(
+        (id: string) => {
+            if (id === 'add') {
+                openModalActions.openAddCategoryModal();
+            } else if (id === 'edit') {
+                openModalActions.openEditCategoryModal();
+            } else if (id === 'delete') {
+                openModalActions.openDeleteCategoryModal();
+            }
+        },
+        [openModalActions],
+    );
+
+    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
+        () => [
+            { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
+            { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
+            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
+        ],
+        [],
+    );
+
     const resetMembersState = useCallback(() => {
         setMembers([]);
         setHasMore(true);
@@ -117,14 +143,14 @@ export const TeamPageContent = () => {
             setCategories(fetchedCategories);
 
             if (fetchedCategories.length > 0) {
-                setSelectedCategory((prevSelected) => prevSelected ?? fetchedCategories[0]);
+                setSelectedCategory((prevSelected: TeamCategory | null) => prevSelected ?? fetchedCategories[0]);
             }
         } catch (error: any) {
             if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                 return;
             }
 
-            setErrorState(TEAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
+            setErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
         } finally {
             isCategoriesLoadingRef.current = false;
             setIsCategoriesLoading(false);
@@ -390,7 +416,9 @@ export const TeamPageContent = () => {
                     onCategorySelect={handleCategorySelect}
                     getCategoryDisplayName={(category) => category.name}
                     getCategoryKey={(category) => category.id}
-                    displayContextMenuButton={false}
+                    displayContextMenuButton={true}
+                    contextMenuOptions={categoryBarContextMenuOptions}
+                    onContextMenuOptionSelected={onContextMenuOptionSelected}
                 />
 
                 {error.message && (

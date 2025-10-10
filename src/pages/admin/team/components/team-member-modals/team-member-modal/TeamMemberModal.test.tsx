@@ -2,11 +2,12 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { AxiosInstance } from 'axios';
-import { TeamCategory, TeamMember } from '../../../../../../types/admin/team-members';
+import { TeamMember } from '../../../../../../types/admin/team-members';
 import { VisibilityStatus, ModalMode } from '../../../../../../types/admin/common';
 import { TeamMembersApi } from '../../../../../../services/api/admin/team/team-members/team-members-api';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { TeamMemberModal } from './TeamMemberModal';
+import { TeamCategory } from '../../../../../../types/admin/team-category';
 
 // Mock data-fetch API
 jest.mock('../../../../../../services/api/admin/team/team-members/team-members-api', () => ({
@@ -144,7 +145,7 @@ const mockClient = {
     delete: jest.fn(),
 } as unknown as jest.Mocked<AxiosInstance>;
 
-const mockCategories: TeamCategory[] = [{ id: 1, name: 'Cat 1', description: '' }];
+const mockCategories: TeamCategory[] = [{ id: 1, name: 'Cat 1', description: '', teamMembersCount: 0 }];
 
 const baseMember: TeamMember = {
     id: 10,

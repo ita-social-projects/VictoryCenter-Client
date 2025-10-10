@@ -65,13 +65,13 @@ export const COMMON_TEXT_ADMIN = {
         MESSAGE: {
             FAIL_TO_FETCH_CATEGORIES: 'Виникла помилка, не вдалось завантажити категорії',
         },
-    
+
         BUTTON: {
             ADD_CATEGORY: 'Додати категорію',
             EDIT_CATEGORY: 'Редагувати',
             DELETE_CATEGORY: 'Видалити',
         },
-    
+
         FORM: {
             TITLE: {
                 ADD_CATEGORY: 'Додати категорію',

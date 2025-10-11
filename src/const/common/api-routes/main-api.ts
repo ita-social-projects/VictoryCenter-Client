@@ -3,7 +3,7 @@ import { getEnvVariable } from '../../../utils/functions/get-env-variable/get-en
 export const API_ROUTES = {
     BASE: getEnvVariable('REACT_APP_BACKEND_URL'),
     AUTH: {
-        LOGIN: 'api/auth/login',
+        LOGIN: 'auth/login',
         LOGOUT: 'auth/logout',
         REFRESH_TOKEN: 'auth/refresh-token',
     },

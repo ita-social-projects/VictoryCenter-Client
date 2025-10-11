@@ -1,34 +1,33 @@
 import { useEffect, useState } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/admin/button/Button';
-import { HintBox } from '../../../../../components/admin/hint-box/HintBox';
 import { SingleSelectInputGroup } from '../../../../../components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import './TeamCategoryModal.scss';
+import { HintBox } from '../../../../../components/admin/hint-box/HintBox';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { TeamCategory } from '../../../../../types/admin/team-category';
-import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 import { TEAM_CATEGORY_VALIDATION } from '../../../../../const/admin/team';
+import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
+import './DeleteTeamCategoryModal.scss';
 
-interface DeleteCategoryModalProps {
+interface DeleteTeamCategoryModalProps {
     isOpen: boolean;
     onClose: () => void;
     onConfirm: (categoryId: number) => void;
     categories: TeamCategory[];
 }
 
-export const DeleteCategoryModal = ({ isOpen, onClose, onConfirm, categories }: DeleteCategoryModalProps) => {
+export const DeleteTeamCategoryModal = ({ isOpen, onClose, onConfirm, categories }: DeleteTeamCategoryModalProps) => {
     const client = useAdminClient();
     const [selectedCategory, setSelectedCategory] = useState<TeamCategory>();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
 
-    const handleSubmit = async () => {
+    const handleConfirmation = async () => {
         if (isSubmitting || !selectedCategory || selectedCategory.teamMembersCount > 0) return;
 
-        setError('');
-
         try {
+            setError('');
             setIsSubmitting(true);
 
             await TeamCategoriesApi.delete(client, selectedCategory.id);
@@ -87,7 +86,7 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onConfirm, categories }: 
                             text={TEAM_CATEGORY_VALIDATION.teamMembersCount.getRelocationOrRemovalHint()}
                         />
                     )}
-                    {error && <div className="program-category-modal-error-container">{error}</div>}
+                    {error && <div className="team-category-modal-error-container">{error}</div>}
                 </div>
             </Modal.Content>
             <Modal.Actions>
@@ -96,7 +95,7 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onConfirm, categories }: 
                 </Button>
                 <Button
                     buttonStyle="primary"
-                    onClick={handleSubmit}
+                    onClick={handleConfirmation}
                     disabled={(!!selectedCategory && selectedCategory.teamMembersCount > 0) || isSubmitting}
                 >
                     {COMMON_TEXT_ADMIN.BUTTON.DELETE}

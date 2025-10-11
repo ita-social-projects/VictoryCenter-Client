@@ -1,0 +1,15 @@
+@use '../../../../../assets/sass/variables/colors';
+
+.team-category-modal-error-container {
+    font-weight: 400;
+    font-size: 14px;
+    text-align: center;
+    line-height: 20px;
+    width: 100%;
+    margin: 8px;
+    color: colors.$error;
+}
+
+.team-category-modal-save-button {
+    width: 100% !important;
+}

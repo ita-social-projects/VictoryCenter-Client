@@ -1,13 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
-import { DeleteTeamMemberModal } from '../team-member-modals/delete-team-member-modal/DeleteTeamMemberModal';
-import { TeamMemberModal } from '../team-member-modals/team-member-modal/TeamMemberModal';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import axios from 'axios';
 import './TeamPageContent.scss';
 import { TeamMember } from '../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { VisibilityStatus, ModalMode } from '../../../../../types/admin/common';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
 import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/category-bar/CategoryBar';
@@ -20,18 +18,10 @@ import { MemberComponent } from '../member-component/MemberComponent';
 import { TeamCategory } from '../../../../../types/admin/team-category';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
+import { TeamPageModals } from '../team-page-modals/TeamPageModals';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
-
-interface ModalState {
-    isAddMemberModalOpen: boolean;
-    memberToDelete: TeamMember | null;
-    memberToEdit: TeamMember | null;
-    isAddCategoryModalOpen: boolean;
-    isEditCategoryModalOpen: boolean;
-    isDeleteCategoryModalOpen: boolean;
-}
 
 interface ErrorState {
     message: string | null;
@@ -50,16 +40,8 @@ export const TeamPageContent = () => {
     const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
-    const [modalState, setModalState] = useState<ModalState>({
-        isAddMemberModalOpen: false,
-        memberToDelete: null,
-        memberToEdit: null,
-        isAddCategoryModalOpen: false,
-        isEditCategoryModalOpen: false,
-        isDeleteCategoryModalOpen: false,
-    });
     const modalsStateControl = useModalsState<TeamMember>();
-    const openModalActions = modalsStateControl.openModalActions;
+    const { openModalActions, closeModalActions } = modalsStateControl;
 
     const listContainerRef = useRef<HTMLDivElement>(null);
     const currentItemsCountRef = useRef<number>(0);
@@ -79,22 +61,17 @@ export const TeamPageContent = () => {
         setError({ message: null, type: null });
     }, []);
 
-    const updateModalState = useCallback((updates: Partial<ModalState>) => {
-        setModalState((prev) => ({ ...prev, ...updates }));
-    }, []);
-
     const isAnyModalOpened = useMemo(() => {
-        return Object.values(modalState).some((value) => (typeof value === 'boolean' ? value : value !== null));
-    }, [modalState]);
-
-    const closeModalActions = useMemo(
-        () => ({
-            addMember: () => updateModalState({ isAddMemberModalOpen: false }),
-            editMember: () => updateModalState({ memberToEdit: null }),
-            deleteMember: () => updateModalState({ memberToDelete: null }),
-        }),
-        [updateModalState],
-    );
+        const { modalState } = modalsStateControl;
+        return (
+            modalState.isAddModalOpen ||
+            modalState.isAddCategoryModalOpen ||
+            modalState.isEditCategoryModalOpen ||
+            modalState.isDeleteCategoryModalOpen ||
+            !!modalState.itemToEdit ||
+            !!modalState.itemToDelete
+        );
+    }, [modalsStateControl]);
 
     const onContextMenuOptionSelected = useCallback(
         (id: string) => {
@@ -246,23 +223,23 @@ export const TeamPageContent = () => {
     );
 
     const handleAddMemberModalOpen = useCallback(() => {
-        updateModalState({ isAddMemberModalOpen: true });
-    }, [updateModalState]);
+        openModalActions.openAddItemModal();
+    }, [openModalActions]);
 
     const handleDeleteTeamMemberModalOpen = useCallback(
         (member: TeamMember) => {
             if (isAnyModalOpened) return;
-            updateModalState({ memberToDelete: member });
+            openModalActions.openDeleteItemModal(member);
         },
-        [isAnyModalOpened, updateModalState],
+        [isAnyModalOpened, openModalActions],
     );
 
     const handleEditMemberModalOpen = useCallback(
         (member: TeamMember) => {
             if (isAnyModalOpened) return;
-            updateModalState({ memberToEdit: member });
+            openModalActions.openEditItemModal(member);
         },
-        [isAnyModalOpened, updateModalState],
+        [isAnyModalOpened, openModalActions],
     );
 
     const handleEntitiesReordered = useCallback(
@@ -341,15 +318,22 @@ export const TeamPageContent = () => {
                 }
                 return prevMembers;
             });
-
             currentItemsCountRef.current += 1;
 
-            updateModalState({ isAddMemberModalOpen: false });
+            setCategories((prevCategories) =>
+                prevCategories.map((category) =>
+                    category.id === selectedCategory!.id
+                        ? { ...category, memberCount: category.teamMembersCount + 1 }
+                        : category,
+                ),
+            );
+
+            closeModalActions.closeAddItemModal();
             if (member.status === VisibilityStatus.Published) {
                 addToast(TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER, ToastType.Info);
             }
         },
-        [updateModalState, pageSize, selectedCategory?.id, addToast],
+        [closeModalActions, pageSize, selectedCategory?.id, addToast],
     );
 
     const handleEditMember = useCallback(
@@ -360,20 +344,72 @@ export const TeamPageContent = () => {
                 prevMembers.map((member) => (member.id === updatedMember.id ? updatedMember : member)),
             );
 
-            updateModalState({ memberToEdit: null });
+            if (updatedMember.categoryId !== selectedCategory!.id) {
+                setCategories((prevCategories) =>
+                    prevCategories.map((category) => {
+                        if (category.id === selectedCategory!.id) {
+                            return { ...category, memberCount: category.teamMembersCount - 1 };
+                        } else if (category.id === updatedMember.categoryId) {
+                            return { ...category, memberCount: category.teamMembersCount + 1 };
+                        }
+                        return category;
+                    }),
+                );
+            }
+
+            closeModalActions.closeEditItemModal();
         },
-        [updateModalState],
+        [closeModalActions, selectedCategory?.id],
     );
 
     const handleDeleteMember = useCallback(
         (memberToDelete: TeamMember) => {
             setMembers((prevMembers) => prevMembers.filter((member) => member.id !== memberToDelete.id));
-
             currentItemsCountRef.current -= 1;
+            setCategories((prevCategories) =>
+                prevCategories.map((category) =>
+                    category.id === selectedCategory!.id
+                        ? { ...category, memberCount: category.teamMembersCount - 1 }
+                        : category,
+                ),
+            );
 
-            updateModalState({ memberToDelete: null });
+            closeModalActions.closeDeleteItemModal();
         },
-        [updateModalState],
+        [closeModalActions, selectedCategory?.id],
+    );
+
+    const handleAddCategory = useCallback((newCategory: TeamCategory) => {
+        setCategories((prevCategories) => [...prevCategories, newCategory]);
+    }, []);
+
+    const handleEditCategory = useCallback(
+        (updatedCategory: TeamCategory) => {
+            setCategories((prevCategories) =>
+                prevCategories.map((category) => (category.id === updatedCategory.id ? updatedCategory : category)),
+            );
+
+            if (selectedCategory?.id === updatedCategory.id) {
+                setSelectedCategory(updatedCategory);
+            }
+        },
+        [selectedCategory?.id],
+    );
+
+    const handleDeleteCategory = useCallback(
+        (categoryIdToDelete: number) => {
+            setCategories((prevCategories) => {
+                const updatedCategories = prevCategories.filter((category) => category.id !== categoryIdToDelete);
+
+                if (selectedCategory?.id === categoryIdToDelete && updatedCategories.length > 0) {
+                    setSelectedCategory(updatedCategories[0]);
+                } else if (updatedCategories.length === 0) {
+                    setSelectedCategory(null);
+                }
+                return updatedCategories;
+            });
+        },
+        [selectedCategory?.id],
     );
 
     const renderMemberItem = useCallback(
@@ -440,28 +476,15 @@ export const TeamPageContent = () => {
                 />
             </div>
 
-            <TeamMemberModal
-                mode={ModalMode.Add}
-                isOpen={modalState.isAddMemberModalOpen}
-                onClose={closeModalActions.addMember}
-                onAddMember={handleAddMember}
+            <TeamPageModals
+                modalsStateControl={modalsStateControl}
                 categories={categories}
-            />
-
-            <TeamMemberModal
-                mode={ModalMode.Edit}
-                isOpen={!!modalState.memberToEdit}
-                onClose={closeModalActions.editMember}
-                memberToEdit={modalState.memberToEdit!}
-                onEditMember={handleEditMember}
-                categories={categories}
-            />
-
-            <DeleteTeamMemberModal
-                isOpen={!!modalState.memberToDelete}
-                onClose={closeModalActions.deleteMember}
-                memberToDelete={modalState.memberToDelete}
-                onDeleteMember={handleDeleteMember}
+                onAddTeamMember={handleAddMember}
+                onEditTeamMember={handleEditMember}
+                onDeleteTeamMember={handleDeleteMember}
+                onAddTeamCategory={handleAddCategory}
+                onEditTeamCategory={handleEditCategory}
+                onDeleteTeamCategory={handleDeleteCategory}
             />
 
             <ToastContainer />

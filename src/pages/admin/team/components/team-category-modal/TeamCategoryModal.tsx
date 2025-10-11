@@ -13,6 +13,7 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './TeamCategoryModal.scss';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { ModalMode } from '../../../../../types/admin/common';
 
 interface TeamCategoryFormValues {
     name: string;
@@ -31,12 +32,12 @@ interface BaseProps {
 }
 
 interface AddModalProps extends BaseProps {
-    mode: 'add';
+    mode: ModalMode.Add;
     onAddCategory: (category: TeamCategory) => void;
 }
 
 interface EditModalProps extends BaseProps {
-    mode: 'edit';
+    mode: ModalMode.Edit;
     onEditCategory: (category: TeamCategory) => void;
 }
 
@@ -55,6 +56,7 @@ const hasErrors = (errors: FormErrorState): boolean => {
 
 export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
     const { isOpen, onClose, categories, mode } = props;
+    const client = useAdminClient();
 
     const defaultFormState = useMemo<TeamCategoryFormValues>(
         () => ({
@@ -66,7 +68,6 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
 
     const [formState, setFormState] = useState<TeamCategoryFormValues>(defaultFormState);
     const [errors, setErrors] = useState<FormErrorState>({});
-    const client = useAdminClient();
     const [initialFormState, setInitialFormState] = useState<TeamCategoryFormValues>(defaultFormState);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
@@ -88,7 +89,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
     const isDirty = JSON.stringify(formState) !== JSON.stringify(initialFormState);
 
     const isDuplicateName = categories.some((category: TeamCategory) => {
-        if (mode === 'edit') {
+        if (mode === ModalMode.Edit) {
             return (
                 category.id !== selectedCategoryRef.current?.id &&
                 category.name.trim().toLowerCase() === formState.name.trim().toLowerCase()
@@ -126,7 +127,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
             }
 
             if (isSubmitting || isDuplicateName) return;
-            if (mode === 'edit' && !selectedCategoryRef.current) return;
+            if (mode === ModalMode.Edit && !selectedCategoryRef.current) return;
 
             setIsSubmitting(true);
             setError('');
@@ -134,12 +135,12 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
 
             try {
                 const categoryData = {
-                    id: mode === 'edit' ? selectedCategoryRef.current!.id : null,
+                    id: mode === ModalMode.Edit ? selectedCategoryRef.current!.id : null,
                     name: formState.name.trim(),
                     description: formState.description.trim(),
                 };
 
-                if (mode === 'add') {
+                if (mode === ModalMode.Add) {
                     const newCategory = await TeamCategoriesApi.create(client, categoryData);
                     props.onAddCategory(newCategory);
                 } else {
@@ -150,7 +151,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                 onClose();
             } catch {
                 const errorMessage =
-                    mode === 'add'
+                    mode === ModalMode.Add
                         ? TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_MEMBER
                         : TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_MEMBER;
                 setError(errorMessage);
@@ -163,7 +164,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
 
     const handleSubmitClick = useCallback(() => {
         if (isSubmitting || isDuplicateName) return;
-        if (mode === 'edit' && !selectedCategoryRef.current) return;
+        if (mode === ModalMode.Edit && !selectedCategoryRef.current) return;
 
         const formErrors = validateForm(formState);
         setErrors(formErrors);
@@ -172,7 +173,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
             return;
         }
 
-        if (mode === 'edit') {
+        if (mode === ModalMode.Edit) {
             setShowSaveConfirmModal(true);
         } else {
             onSubmit();
@@ -213,7 +214,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
     useEffect(() => {
         if (!isOpen) return;
 
-        if (mode === 'edit') {
+        if (mode === ModalMode.Edit) {
             if (categories.length > 0) {
                 const firstCategory = categories[0];
                 selectedCategoryRef.current = firstCategory;
@@ -230,13 +231,17 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
 
     const isSubmitDisabled = () => {
         const nameValidationError = TEAM_CATEGORY_VALIDATION_FUNCTIONS.validateName(formState.name);
-        const descriptionValidationError = TEAM_CATEGORY_VALIDATION_FUNCTIONS.validateDescription(formState.description);
-        const hasValidationErrors = nameValidationError !== undefined || descriptionValidationError !== undefined || isDuplicateName;
+        const descriptionValidationError = TEAM_CATEGORY_VALIDATION_FUNCTIONS.validateDescription(
+            formState.description,
+        );
+        const hasValidationErrors =
+            nameValidationError !== undefined || descriptionValidationError !== undefined || isDuplicateName;
         const hasEmptyFields = !formState.name.trim() || !formState.description.trim();
 
-        if (mode === 'edit') {
+        if (mode === ModalMode.Edit) {
             const hasNoSelectedCategory = !selectedCategoryRef.current;
-            const noChanges = !!selectedCategoryRef.current && 
+            const noChanges =
+                !!selectedCategoryRef.current &&
                 formState.name.trim() === selectedCategoryRef.current.name.trim() &&
                 formState.description.trim() === selectedCategoryRef.current.description.trim();
 
@@ -247,32 +252,24 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
     };
 
     const getTitle = () => {
-        return mode === 'add'
+        return mode === ModalMode.Add
             ? COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.ADD_CATEGORY
             : COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.EDIT_CATEGORY;
     };
 
     const getFormId = () => {
-        return mode === 'add' ? 'add-program-category-form' : 'edit-program-category-form';
+        return mode === ModalMode.Add ? 'add-program-category-form' : 'edit-program-category-form';
     };
 
     const getFieldId = (field: string) => {
-        return mode === 'add' ? `add-category-${field}` : `edit-category-${field}`;
+        return mode === ModalMode.Add ? `add-category-${field}` : `edit-category-${field}`;
     };
 
-    const handleSaveConfirmClose = useCallback(() => {
+    const handleSaveConfirmModalClose = useCallback(() => {
         setShowSaveConfirmModal(false);
     }, []);
 
-    const handleSaveConfirmCancel = useCallback(() => {
-        setShowSaveConfirmModal(false);
-    }, []);
-
-    const handleCloseConfirmClose = useCallback(() => {
-        setShowCloseConfirmModal(false);
-    }, []);
-
-    const handleCloseConfirmCancel = useCallback(() => {
+    const handleCloseConfirmModalClose = useCallback(() => {
         setShowCloseConfirmModal(false);
     }, []);
 
@@ -282,7 +279,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                 <Modal.Title>{getTitle()}</Modal.Title>
                 <Modal.Content>
                     <form onSubmit={(e) => e.preventDefault()} className="program-form-main" id={getFormId()}>
-                        {mode === 'edit' && (
+                        {mode === ModalMode.Edit && (
                             <SingleSelectInputGroup
                                 id={getFieldId('select')}
                                 label={TEAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
@@ -326,7 +323,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
 
                         {isDuplicateName && <HintBox title={TEAM_CATEGORY_VALIDATION.name.getDuplicateNameError()} />}
 
-                        {error && <div className="program-category-modal-error-container">{error}</div>}
+                        {error && <div className="team-category-modal-error-container">{error}</div>}
                     </form>
                 </Modal.Content>
                 <Modal.Actions>
@@ -348,8 +345,8 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                 title={COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-                onClose={handleSaveConfirmClose}
-                onCancel={handleSaveConfirmCancel}
+                onClose={handleSaveConfirmModalClose}
+                onCancel={handleSaveConfirmModalClose}
                 onConfirm={onSubmit}
             />
 
@@ -359,8 +356,8 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-                onClose={handleCloseConfirmClose}
-                onCancel={handleCloseConfirmCancel}
+                onClose={handleCloseConfirmModalClose}
+                onCancel={handleCloseConfirmModalClose}
                 onConfirm={handleConfirmClose}
             />
         </>

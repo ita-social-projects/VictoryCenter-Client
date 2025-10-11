@@ -44,6 +44,7 @@ export const DonatePageContent = () => {
                 <div className="donate-page-item">
                     {config && (
                         <GenericDetails
+                            key={`bank-details-${selectedCategory}`}
                             items={items}
                             isLoading={isLoading}
                             FormComponent={config.form}
@@ -55,6 +56,7 @@ export const DonatePageContent = () => {
                             {config.withCorrespondentBanks
                                 ? ({ formState, isItemsExpanded }) => (
                                       <GenericDetails
+                                          key={`corr-${selectedCategory}-${formState.id}`}
                                           title={DONATE_TEXT.CORRESPONDENT_BANKS.TITLE}
                                           items={items.find((i) => i.id === formState.id)?.correspondentBanks ?? []}
                                           isLoading={false}

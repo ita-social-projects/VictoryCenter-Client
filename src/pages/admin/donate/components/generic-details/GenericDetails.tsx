@@ -55,17 +55,7 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
     };
 
     const handleAdd = () => {
-        if (!isChildForm) {
-            const newItem = createEmptyItem({
-                id: Date.now(),
-                correspondentBanks: [],
-            } as any);
-
-            updateItems([...items, newItem]);
-            setIsAddFormVisible(true);
-        } else {
-            setIsAddFormVisible(true);
-        }
+        setIsAddFormVisible(true);
     };
 
     const handleClose = () => {

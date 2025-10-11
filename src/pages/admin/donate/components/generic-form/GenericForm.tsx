@@ -299,22 +299,25 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                             key={String(f.name)}
                                             className={`form-field ${isTitleField ? 'form-field-title-row' : ''}`}
                                         >
-                                            <Input
-                                                name={String(f.name)}
-                                                label={f.label}
-                                                isRequired={mode === GenericFormMode.Create && f.isRequired}
-                                                isTitle={f.isTitle}
-                                                placeholder={f.placeholder}
-                                                prefix={f.prefix}
-                                                value={String(formState[f.name] ?? '')}
-                                                editable={editable}
-                                                onValueChange={(cleanValue) =>
-                                                    setFormState((prev) => ({ ...prev, [f.name]: cleanValue }))
-                                                }
-                                                handleBlur={handleBlur(f.name)}
-                                                onlyNumbers={f.onlyNumbers}
-                                                maxLength={f.maxLength}
-                                            />
+                                            <div className="form-field-content">
+                                                <Input
+                                                    name={String(f.name)}
+                                                    label={f.label}
+                                                    isRequired={mode === GenericFormMode.Create && f.isRequired}
+                                                    isTitle={f.isTitle}
+                                                    placeholder={f.placeholder}
+                                                    prefix={f.prefix}
+                                                    value={String(formState[f.name] ?? '')}
+                                                    editable={editable}
+                                                    onValueChange={(cleanValue) =>
+                                                        setFormState((prev) => ({ ...prev, [f.name]: cleanValue }))
+                                                    }
+                                                    handleBlur={handleBlur(f.name)}
+                                                    onlyNumbers={f.onlyNumbers}
+                                                    maxLength={f.maxLength}
+                                                />
+                                                {errors[f.name] && <span className="error">{errors[f.name]}</span>}
+                                            </div>
 
                                             {isChildForm && isTitleField && mode === GenericFormMode.Edit && (
                                                 <div className={`title-actions`}>
@@ -332,8 +335,6 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                     />
                                                 </div>
                                             )}
-
-                                            {errors[f.name] && <span className="error">{errors[f.name]}</span>}
                                         </div>
                                     );
                                 })}

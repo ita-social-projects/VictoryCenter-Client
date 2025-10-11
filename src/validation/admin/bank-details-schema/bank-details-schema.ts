@@ -19,8 +19,13 @@ export const BankDetailsValidationSchema = Yup.object({
         .min(DONATE_VALIDATION.iban.count, DONATE_VALIDATION.iban.getMinError())
         .max(DONATE_VALIDATION.iban.count, DONATE_VALIDATION.iban.getMaxError()),
     paymentPurpose: Yup.string().trim().required(DONATE_VALIDATION.paymentPurpose.getRequiredError()),
-    swift: Yup.string().trim().required(DONATE_VALIDATION.swift.getRequiredError()),
+    swift: Yup.string()
+        .trim()
+        .required(DONATE_VALIDATION.swift.getRequiredError())
+        .min(DONATE_VALIDATION.swift.count, DONATE_VALIDATION.swift.getMinError())
+        .max(DONATE_VALIDATION.swift.count, DONATE_VALIDATION.swift.getMaxError()),
     address: Yup.string().trim().required(DONATE_VALIDATION.address.getRequiredError()),
+    account: Yup.string().trim().required(DONATE_VALIDATION.account.getRequiredError()),
 });
 
 export const BANK_DETAILS_VALIDATION_FUNCTIONS = {
@@ -81,6 +86,15 @@ export const BANK_DETAILS_VALIDATION_FUNCTIONS = {
     validateAddress: (value: string): string | undefined => {
         try {
             BankDetailsValidationSchema.validateSyncAt('address', { address: value });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validateAccount: (value: string): string | undefined => {
+        try {
+            BankDetailsValidationSchema.validateSyncAt('account', { account: value });
             return undefined;
         } catch (error: any) {
             return error.message;

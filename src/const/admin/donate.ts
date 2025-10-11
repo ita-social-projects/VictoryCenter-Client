@@ -115,4 +115,7 @@ export const DONATE_VALIDATION = {
     address: {
         getRequiredError: () => getRequiredError('Адреса'),
     },
+    account: {
+        getRequiredError: () => getRequiredError('Account'),
+    },
 };

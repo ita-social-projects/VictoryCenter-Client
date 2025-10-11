@@ -118,10 +118,16 @@ export function createBankDetailsForm(type: 'USD' | 'EUR' | 'UAH') {
 }
 
 const correspondentBanksFields: GenericFormField<CorrespondentBankDetails>[] = [
-    { name: 'name', isTitle: true, isRequired: true },
+    {
+        name: 'name',
+        isTitle: true,
+        validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateName(String(val ?? '')),
+        isRequired: true,
+    },
     {
         name: 'swift',
         label: DONATE_TEXT.CORRESPONDENT_BANKS.SWIFT.TITLE,
+        validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift(String(val ?? '')),
         isRequired: true,
         placeholder: DONATE_TEXT.CORRESPONDENT_BANKS.DEFAULT_PLACEHOLDER,
         maxLength: 20,
@@ -129,6 +135,7 @@ const correspondentBanksFields: GenericFormField<CorrespondentBankDetails>[] = [
     {
         name: 'account',
         label: DONATE_TEXT.CORRESPONDENT_BANKS.ACCOUNT.TITLE,
+        validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateAccount(String(val ?? '')),
         isRequired: true,
         placeholder: DONATE_TEXT.CORRESPONDENT_BANKS.DEFAULT_PLACEHOLDER,
         maxLength: 20,
@@ -136,6 +143,7 @@ const correspondentBanksFields: GenericFormField<CorrespondentBankDetails>[] = [
     {
         name: 'iban',
         label: DONATE_TEXT.CORRESPONDENT_BANKS.IBAN.TITLE,
+        validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban(String(val ?? '')),
         placeholder: DONATE_TEXT.CORRESPONDENT_BANKS.DEFAULT_PLACEHOLDER,
         maxLength: 29,
     },

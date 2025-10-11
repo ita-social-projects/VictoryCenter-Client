@@ -59,10 +59,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
     const handleCancel = () => {
         if (hasChanges()) {
             setModalConfig({
-                title:
-                    mode === SupportOptionItemMode.Edit
-                        ? COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
-                        : DONATE_TEXT.QUESTION.CANCEL_EDIT,
+                title: COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
                 onConfirm: resetForm,
             });
         } else {

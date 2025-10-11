@@ -60,7 +60,6 @@ export const DONATE_TEXT = {
         ADD_NEW: 'Додати варіант',
     },
     QUESTION: {
-        CANCEL_EDIT: 'Зміни буде втрачено. Видалити реквізити?',
         BANK_DETAILS: {
             ADD: 'Додати нові реквізити?',
             DELETE: 'Видалити реквізити?',

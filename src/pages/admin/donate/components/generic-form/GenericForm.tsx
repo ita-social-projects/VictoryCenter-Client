@@ -144,10 +144,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
                 if (isChanged()) {
                     setModalConfig({
-                        title:
-                            mode === GenericFormMode.Edit
-                                ? DONATE_TEXT.QUESTION.CANCEL_EDIT
-                                : COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+                        title: COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
                         onConfirm: () => {
                             if (mode === GenericFormMode.Create) {
                                 onClose?.();

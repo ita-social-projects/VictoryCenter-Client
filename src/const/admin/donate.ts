@@ -62,6 +62,7 @@ export const DONATE_TEXT = {
     QUESTION: {
         BANK_DETAILS: {
             ADD: 'Додати нові реквізити?',
+            CANCEL_CREATE: 'Відмінити додавання реквізитів?',
             DELETE: 'Видалити реквізити?',
             FOREIGN: {
                 DELETE: 'Основний та кореспондентські банки буде видалено. Видалити реквізити?',

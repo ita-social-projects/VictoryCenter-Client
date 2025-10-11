@@ -139,32 +139,43 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 setIsExpanded(true);
             };
 
-            const handleEditCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
-                e.preventDefault();
+            const handleCreateCancel = () => {
+                if (isChanged()) {
+                    setModalConfig({
+                        title: DONATE_TEXT.QUESTION.BANK_DETAILS.CANCEL_CREATE,
+                        onConfirm: () => onClose?.(),
+                    });
+                } else {
+                    onClose?.();
+                }
+            };
 
+            const handleEditCancel = () => {
                 if (isChanged()) {
                     setModalConfig({
                         title: COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
                         onConfirm: () => {
-                            if (mode === GenericFormMode.Create) {
-                                onClose?.();
-                            } else {
-                                setFormState(initialFormState);
-                                setErrors({});
-                                setMode(GenericFormMode.View);
-                            }
+                            setFormState(initialFormState);
+                            setErrors({});
+                            setMode(GenericFormMode.View);
                         },
                     });
-                    return;
-                }
-
-                if (mode === GenericFormMode.Create) {
-                    onClose?.();
                 } else {
                     setFormState(initialFormState);
                     setErrors({});
                     setMode(GenericFormMode.View);
                 }
+            };
+
+            const handleViewCancel = () => {
+                setIsExpanded(false);
+            };
+
+            const handleCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
+                e.preventDefault();
+                if (mode === GenericFormMode.Create) return handleCreateCancel();
+                if (mode === GenericFormMode.Edit) return handleEditCancel();
+                return handleViewCancel();
             };
 
             const handleModalCancelOrClose = () => {
@@ -338,7 +349,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                             {editable && (
                                 <div className="form-footer">
                                     <div className="actions">
-                                        <Button type="button" onClick={handleEditCancel} buttonStyle="secondary">
+                                        <Button type="button" onClick={handleCancel} buttonStyle="secondary">
                                             {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                                         </Button>
                                         <Button

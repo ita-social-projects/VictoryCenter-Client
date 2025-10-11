@@ -263,7 +263,7 @@ describe('GenericForm', () => {
         const cancelBtn = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
         fireEvent.click(cancelBtn);
 
-        expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
+        expect(screen.getByText(DONATE_TEXT.QUESTION.BANK_DETAILS.CANCEL_CREATE)).toBeInTheDocument();
     });
 
     it('resets isDeleting on modal cancel', () => {

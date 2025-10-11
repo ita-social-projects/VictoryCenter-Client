@@ -41,7 +41,6 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
     const addformRef = useRef<GenericFormRef>(null);
     const [isAddFormVisible, setIsAddFormVisible] = useState(false);
     const [isItemsExpanded, setIsItemsExpanded] = useState(initialIsItemsExpanded);
-    const [showNotFound, setShowNotFound] = useState(false);
 
     const updateItems = useCallback(
         (newItems: T[]) => {
@@ -62,10 +61,6 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
         setIsAddFormVisible(false);
     };
 
-    useEffect(() => {
-        setShowNotFound(items.length === 0 && !isAddFormVisible && !isLoading);
-    }, [items, isAddFormVisible, isLoading]);
-
     const handleSubmit = useCallback(
         async (data: T) => {
             if (isChildForm) {
@@ -84,6 +79,8 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
         },
         [createEmptyItem, items, isChildForm, updateItems],
     );
+
+    const showNotFound = !isLoading && !isAddFormVisible && items.length === 0;
 
     return (
         <div className={`generic-details ${isChildForm ? 'child' : ''}`}>

@@ -28,6 +28,11 @@ export const BankDetailsValidationSchema = Yup.object({
     account: Yup.string().trim().required(DONATE_VALIDATION.account.getRequiredError()),
 });
 
+export const SupportOptionsValidationSchema = Yup.object({
+    name: Yup.string().trim().required(DONATE_VALIDATION.getDigitsOnlyError()),
+    value: Yup.string().trim().required(DONATE_VALIDATION.getDigitsOnlyError()),
+});
+
 export const BANK_DETAILS_VALIDATION_FUNCTIONS = {
     validateName: (value: string): string | undefined => {
         try {
@@ -95,6 +100,25 @@ export const BANK_DETAILS_VALIDATION_FUNCTIONS = {
     validateAccount: (value: string): string | undefined => {
         try {
             BankDetailsValidationSchema.validateSyncAt('account', { account: value });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+};
+
+export const SUPPORT_OPTIONS_VALIDATION_FUNCTIONS = {
+    validateName: (value: string): string | undefined => {
+        try {
+            SupportOptionsValidationSchema.validateSyncAt('name', { name: value });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+    validateValue: (value: string): string | undefined => {
+        try {
+            SupportOptionsValidationSchema.validateSyncAt('value', { value: value });
             return undefined;
         } catch (error: any) {
             return error.message;

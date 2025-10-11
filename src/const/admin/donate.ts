@@ -60,6 +60,7 @@ export const DONATE_TEXT = {
         ADD_NEW: 'Додати варіант',
     },
     QUESTION: {
+        CANCEL_EDIT: 'Відмінити зміни?',
         BANK_DETAILS: {
             ADD: 'Додати нові реквізити?',
             CANCEL_CREATE: 'Відмінити додавання реквізитів?',
@@ -117,5 +118,13 @@ export const DONATE_VALIDATION = {
     },
     account: {
         getRequiredError: () => getRequiredError('Account'),
+    },
+    supportOptions: {
+        name: {
+            getRequiredError: () => getRequiredError('Name'),
+        },
+        value: {
+            getRequiredError: () => getRequiredError('Value'),
+        },
     },
 };

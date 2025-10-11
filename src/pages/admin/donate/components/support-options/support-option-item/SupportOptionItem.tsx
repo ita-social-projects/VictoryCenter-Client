@@ -6,6 +6,7 @@ import { SupportOptionsType } from '../../../../../../types/admin/donate';
 import { ConfirmationModal } from '../../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { DONATE_TEXT } from '../../../../../../const/admin/donate';
+import { SUPPORT_OPTIONS_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/bank-details-schema/bank-details-schema';
 
 export enum SupportOptionItemMode {
     Create = 'create',
@@ -35,10 +36,12 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
+    const [errors, setErrors] = useState<{ name?: string; value?: string }>({});
 
     useEffect(() => {
         setName(data?.name ?? '');
         setValue(data?.value ?? '');
+        setErrors({});
     }, [data]);
 
     const hasEmptyFields = !name.trim() || !value.trim();
@@ -47,8 +50,25 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
         return name !== (data?.name ?? '') || value !== (data?.value ?? '');
     };
 
+    const validateField = (field: 'name' | 'value', val: string) => {
+        const validator =
+            field === 'name'
+                ? SUPPORT_OPTIONS_VALIDATION_FUNCTIONS.validateName
+                : SUPPORT_OPTIONS_VALIDATION_FUNCTIONS.validateValue;
+        const error = validator(val);
+        setErrors((prev) => ({ ...prev, [field]: error }));
+        return error === undefined;
+    };
+
+    const validateAll = () => {
+        const nameError = SUPPORT_OPTIONS_VALIDATION_FUNCTIONS.validateName(name);
+        const valueError = SUPPORT_OPTIONS_VALIDATION_FUNCTIONS.validateValue(value);
+        setErrors({ name: nameError, value: valueError });
+        return !nameError && !valueError;
+    };
+
     const handleSave = () => {
-        if (hasEmptyFields) return;
+        if (hasEmptyFields || !validateAll()) return;
         setIsSubmitting(true);
         const newItem: SupportOptionsType = { id: data?.id ?? Date.now(), name, value };
         onSave?.(newItem);
@@ -59,7 +79,10 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
     const handleCancel = () => {
         if (hasChanges()) {
             setModalConfig({
-                title: COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+                title:
+                    mode === SupportOptionItemMode.Edit
+                        ? COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
+                        : DONATE_TEXT.QUESTION.CANCEL_EDIT,
                 onConfirm: resetForm,
             });
         } else {
@@ -70,6 +93,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
     const resetForm = () => {
         setName(data?.name ?? '');
         setValue(data?.value ?? '');
+        setErrors({}); // 👈 сбрасывай ошибки
         if (mode === SupportOptionItemMode.Create) onCancel?.();
         else setMode(SupportOptionItemMode.View);
     };
@@ -108,6 +132,8 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
 
     const editable = mode !== SupportOptionItemMode.View;
 
+    const hasErrors = !!errors.name || !!errors.value;
+
     return (
         <div className="support-option">
             <div className={`support-option-header ${editable ? 'editable' : ''}`}>
@@ -130,24 +156,32 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
 
             <div className="support-option-fields">
                 {mode !== SupportOptionItemMode.View && (
+                    <div className="support-option-field">
+                        <Input
+                            name="name"
+                            isTitle={true}
+                            value={name}
+                            editable={editable}
+                            handleChange={(e) => setName(e.target.value)}
+                            handleBlur={() => validateField('name', name)}
+                            isRequired={true}
+                        />
+                        {errors.name && <span className="error">{errors.name}</span>}
+                    </div>
+                )}
+                <div className="support-option-field">
                     <Input
-                        name="name"
+                        name="value"
                         isTitle={true}
-                        value={name}
+                        placeholder={DONATE_TEXT.PLACEHOLDER.SUPPORT_OPTION}
+                        value={value}
                         editable={editable}
-                        handleChange={(e) => setName(e.target.value)}
+                        handleChange={(e) => setValue(e.target.value)}
+                        handleBlur={() => validateField('value', value)}
                         isRequired={true}
                     />
-                )}
-                <Input
-                    name="value"
-                    isTitle={true}
-                    placeholder={DONATE_TEXT.PLACEHOLDER.SUPPORT_OPTION}
-                    value={value}
-                    editable={editable}
-                    handleChange={(e) => setValue(e.target.value)}
-                    isRequired={true}
-                />
+                    {errors.value && <span className="error">{errors.value}</span>}
+                </div>
             </div>
 
             {editable && (
@@ -160,7 +194,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                         aria-label="save-support-option"
                         onClick={handleSaveClick}
                         buttonStyle="primary"
-                        disabled={isSubmitting || hasEmptyFields || !hasChanges()}
+                        disabled={isSubmitting || hasEmptyFields || !hasChanges() || hasErrors}
                     >
                         {DONATE_TEXT.BUTTON.PUBLISH}
                     </Button>

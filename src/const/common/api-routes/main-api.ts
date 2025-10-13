@@ -10,8 +10,10 @@ export const API_ROUTES = {
     TEAM: {
         BASE: 'TeamMembers',
         REORDER: 'TeamMembers/reorder',
-        CATEGORIES: 'Categories',
         PUBLISHED: 'team/published',
+    },
+    TEAM_CATEGORIES: {
+        BASE: 'TeamCategories',
     },
     PROGRAMS: {
         BASE: 'Programs',

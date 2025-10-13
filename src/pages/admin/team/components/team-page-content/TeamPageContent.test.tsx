@@ -59,26 +59,46 @@ jest.mock('../../../../../hooks/admin/use-modals-state/useModalsState', () => {
                 isEditCategoryModalOpen: false,
                 isDeleteCategoryModalOpen: false,
             });
-            
+
             mockSetModalState = setModalState;
-            
+
             return {
                 modalState,
                 openModalActions: {
                     openAddItemModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isAddModalOpen: true }))),
-                    openEditItemModal: jest.fn((item: any) => setModalState((prev: any) => ({ ...prev, itemToEdit: item }))),
-                    openDeleteItemModal: jest.fn((item: any) => setModalState((prev: any) => ({ ...prev, itemToDelete: item }))),
-                    openAddCategoryModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isAddCategoryModalOpen: true }))),
-                    openEditCategoryModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isEditCategoryModalOpen: true }))),
-                    openDeleteCategoryModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isDeleteCategoryModalOpen: true }))),
+                    openEditItemModal: jest.fn((item: any) =>
+                        setModalState((prev: any) => ({ ...prev, itemToEdit: item })),
+                    ),
+                    openDeleteItemModal: jest.fn((item: any) =>
+                        setModalState((prev: any) => ({ ...prev, itemToDelete: item })),
+                    ),
+                    openAddCategoryModal: jest.fn(() =>
+                        setModalState((prev: any) => ({ ...prev, isAddCategoryModalOpen: true })),
+                    ),
+                    openEditCategoryModal: jest.fn(() =>
+                        setModalState((prev: any) => ({ ...prev, isEditCategoryModalOpen: true })),
+                    ),
+                    openDeleteCategoryModal: jest.fn(() =>
+                        setModalState((prev: any) => ({ ...prev, isDeleteCategoryModalOpen: true })),
+                    ),
                 },
                 closeModalActions: {
-                    closeAddItemModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isAddModalOpen: false }))),
+                    closeAddItemModal: jest.fn(() =>
+                        setModalState((prev: any) => ({ ...prev, isAddModalOpen: false })),
+                    ),
                     closeEditItemModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, itemToEdit: null }))),
-                    closeDeleteItemModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, itemToDelete: null }))),
-                    closeAddCategoryModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isAddCategoryModalOpen: false }))),
-                    closeEditCategoryModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isEditCategoryModalOpen: false }))),
-                    closeDeleteCategoryModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isDeleteCategoryModalOpen: false }))),
+                    closeDeleteItemModal: jest.fn(() =>
+                        setModalState((prev: any) => ({ ...prev, itemToDelete: null })),
+                    ),
+                    closeAddCategoryModal: jest.fn(() =>
+                        setModalState((prev: any) => ({ ...prev, isAddCategoryModalOpen: false })),
+                    ),
+                    closeEditCategoryModal: jest.fn(() =>
+                        setModalState((prev: any) => ({ ...prev, isEditCategoryModalOpen: false })),
+                    ),
+                    closeDeleteCategoryModal: jest.fn(() =>
+                        setModalState((prev: any) => ({ ...prev, isDeleteCategoryModalOpen: false })),
+                    ),
                 },
             };
         },
@@ -87,7 +107,15 @@ jest.mock('../../../../../hooks/admin/use-modals-state/useModalsState', () => {
 
 jest.mock('../team-page-modals/TeamPageModals', () => ({
     TeamPageModals: (props: any) => {
-        const { modalsStateControl, onAddTeamMember, onEditTeamMember, onDeleteTeamMember, onAddTeamCategory, onEditTeamCategory, onDeleteTeamCategory } = props;
+        const {
+            modalsStateControl,
+            onAddTeamMember,
+            onEditTeamMember,
+            onDeleteTeamMember,
+            onAddTeamCategory,
+            onEditTeamCategory,
+            onDeleteTeamCategory,
+        } = props;
         const { modalState, closeModalActions } = modalsStateControl;
 
         return (
@@ -156,7 +184,12 @@ jest.mock('../team-page-modals/TeamPageModals', () => ({
                         <button
                             data-testid="confirm-add-category"
                             onClick={() => {
-                                onAddTeamCategory({ id: 99, name: 'New Category', description: 'desc', teamMembersCount: 0 });
+                                onAddTeamCategory({
+                                    id: 99,
+                                    name: 'New Category',
+                                    description: 'desc',
+                                    teamMembersCount: 0,
+                                });
                             }}
                         >
                             Confirm Add Category
@@ -174,7 +207,12 @@ jest.mock('../team-page-modals/TeamPageModals', () => ({
                         <button
                             data-testid="confirm-edit-category"
                             onClick={() => {
-                                onEditTeamCategory({ id: 1, name: 'Updated Category', description: 'desc', teamMembersCount: 0 });
+                                onEditTeamCategory({
+                                    id: 1,
+                                    name: 'Updated Category',
+                                    description: 'desc',
+                                    teamMembersCount: 0,
+                                });
                             }}
                         >
                             Confirm Edit Category
@@ -197,7 +235,10 @@ jest.mock('../team-page-modals/TeamPageModals', () => ({
                         >
                             Confirm Delete Category
                         </button>
-                        <button data-testid="close-delete-category" onClick={closeModalActions.closeDeleteCategoryModal}>
+                        <button
+                            data-testid="close-delete-category"
+                            onClick={closeModalActions.closeDeleteCategoryModal}
+                        >
                             Close
                         </button>
                     </div>
@@ -339,7 +380,7 @@ describe('TeamPageContent', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
-        
+
         mockedUseAdminClient.mockReturnValue({
             client: {}, // mock client object here
         });

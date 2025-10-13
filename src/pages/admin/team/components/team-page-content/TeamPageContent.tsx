@@ -322,8 +322,8 @@ export const TeamPageContent = () => {
 
             setCategories((prevCategories) =>
                 prevCategories.map((category) =>
-                    category.id === selectedCategory!.id
-                        ? { ...category, memberCount: category.teamMembersCount + 1 }
+                    category.id === member.categoryId
+                        ? { ...category, teamMembersCount: category.teamMembersCount + 1 }
                         : category,
                 ),
             );
@@ -345,12 +345,13 @@ export const TeamPageContent = () => {
             );
 
             if (updatedMember.categoryId !== selectedCategory!.id) {
+                setMembers((prev) => prev.filter((m) => m.id !== updatedMember.id));
                 setCategories((prevCategories) =>
                     prevCategories.map((category) => {
                         if (category.id === selectedCategory!.id) {
-                            return { ...category, memberCount: category.teamMembersCount - 1 };
+                            return { ...category, teamMembersCount: category.teamMembersCount - 1 };
                         } else if (category.id === updatedMember.categoryId) {
-                            return { ...category, memberCount: category.teamMembersCount + 1 };
+                            return { ...category, teamMembersCount: category.teamMembersCount + 1 };
                         }
                         return category;
                     }),
@@ -368,12 +369,14 @@ export const TeamPageContent = () => {
             currentItemsCountRef.current -= 1;
             setCategories((prevCategories) =>
                 prevCategories.map((category) =>
-                    category.id === selectedCategory!.id
-                        ? { ...category, memberCount: category.teamMembersCount - 1 }
+                    category.id === memberToDelete.categoryId
+                        ? { ...category, teamMembersCount: category.teamMembersCount - 1 }
                         : category,
                 ),
             );
 
+            setHasMore(true);
+            hasMoreRef.current = true;
             closeModalActions.closeDeleteItemModal();
         },
         [closeModalActions, selectedCategory?.id],

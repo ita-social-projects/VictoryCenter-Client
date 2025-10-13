@@ -98,7 +98,6 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
         return category.name.trim().toLowerCase() === formState.name.trim().toLowerCase();
     });
 
-    // Name handler
     const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setFormState((prev: TeamCategoryFormValues) => ({ ...prev, name: value }));
@@ -109,7 +108,6 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
         setErrors((prev) => ({ ...prev, name: error }));
     }, [formState.name]);
 
-    // Description handler
     const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const value = e.target.value;
         setFormState((prev: TeamCategoryFormValues) => ({ ...prev, description: value }));
@@ -152,8 +150,8 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
             } catch {
                 const errorMessage =
                     mode === ModalMode.Add
-                        ? TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_MEMBER
-                        : TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_MEMBER;
+                        ? COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY
+                        : COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY;
                 setError(errorMessage);
             } finally {
                 setIsSubmitting(false);
@@ -184,7 +182,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
         setShowCloseConfirmModal(false);
         onClose();
     }, [onClose]);
-    
+
     const handleClose = useCallback(() => {
         if (isSubmitting) return;
 
@@ -210,7 +208,6 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
         [categories, reset],
     );
 
-    // Reset form on open
     useEffect(() => {
         if (!isOpen) return;
 
@@ -258,7 +255,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
     };
 
     const getFormId = () => {
-        return mode === ModalMode.Add ? 'add-program-category-form' : 'edit-program-category-form';
+        return mode === ModalMode.Add ? 'add-team-category-form' : 'edit-team-category-form';
     };
 
     const getFieldId = (field: string) => {
@@ -278,7 +275,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
             <Modal isOpen={isOpen} onClose={handleClose}>
                 <Modal.Title>{getTitle()}</Modal.Title>
                 <Modal.Content>
-                    <form onSubmit={(e) => e.preventDefault()} className="program-form-main" id={getFormId()}>
+                    <form onSubmit={(e) => e.preventDefault()} className="team-category-modal-form" id={getFormId()}>
                         {mode === ModalMode.Edit && (
                             <SingleSelectInputGroup
                                 id={getFieldId('select')}
@@ -339,7 +336,6 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                 </Modal.Actions>
             </Modal>
 
-            {/* Save confirmation */}
             <ConfirmationModal
                 isOpen={showSaveConfirmModal}
                 title={COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES}
@@ -350,7 +346,6 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                 onConfirm={onSubmit}
             />
 
-            {/* Close confirmation */}
             <ConfirmationModal
                 isOpen={showCloseConfirmModal}
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}

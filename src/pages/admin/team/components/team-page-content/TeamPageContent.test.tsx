@@ -44,61 +44,168 @@ jest.mock('../../../../../contexts/admin/toast-context-provider/ToastContextProv
     }),
 }));
 
-// jest.mock('../team-member-modals/team-member-modal/TeamMemberModal', () => ({
-//     TeamMemberModal: (props: any) => {
-//         if (!props.isOpen) return null;
+// Mock useModalsState to return actual React state behavior
+let mockSetModalState: React.Dispatch<React.SetStateAction<any>>;
 
-//         const { ModalMode } = require('../../../../../types/admin/common');
-//         const isAddMode = props.mode === ModalMode.Add;
-//         const isEditMode = props.mode === ModalMode.Edit;
+jest.mock('../../../../../hooks/admin/use-modals-state/useModalsState', () => {
+    const React = require('react');
+    return {
+        useModalsState: () => {
+            const [modalState, setModalState] = React.useState({
+                isAddModalOpen: false,
+                itemToEdit: null as any,
+                itemToDelete: null as any,
+                isAddCategoryModalOpen: false,
+                isEditCategoryModalOpen: false,
+                isDeleteCategoryModalOpen: false,
+            });
+            
+            mockSetModalState = setModalState;
+            
+            return {
+                modalState,
+                openModalActions: {
+                    openAddItemModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isAddModalOpen: true }))),
+                    openEditItemModal: jest.fn((item: any) => setModalState((prev: any) => ({ ...prev, itemToEdit: item }))),
+                    openDeleteItemModal: jest.fn((item: any) => setModalState((prev: any) => ({ ...prev, itemToDelete: item }))),
+                    openAddCategoryModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isAddCategoryModalOpen: true }))),
+                    openEditCategoryModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isEditCategoryModalOpen: true }))),
+                    openDeleteCategoryModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isDeleteCategoryModalOpen: true }))),
+                },
+                closeModalActions: {
+                    closeAddItemModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isAddModalOpen: false }))),
+                    closeEditItemModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, itemToEdit: null }))),
+                    closeDeleteItemModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, itemToDelete: null }))),
+                    closeAddCategoryModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isAddCategoryModalOpen: false }))),
+                    closeEditCategoryModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isEditCategoryModalOpen: false }))),
+                    closeDeleteCategoryModal: jest.fn(() => setModalState((prev: any) => ({ ...prev, isDeleteCategoryModalOpen: false }))),
+                },
+            };
+        },
+    };
+});
 
-//         return (
-//             <div data-testid={isAddMode ? 'add-member-modal' : 'edit-member-modal'}>
-//                 <h2>{isAddMode ? 'Add Member Modal' : 'Edit Member Modal'}</h2>
-//                 {isEditMode && props.memberToEdit && <p>Editing: {props.memberToEdit.fullName}</p>}
-//                 {isAddMode && <p>Adding new member</p>}
-//                 <button
-//                     data-testid={isAddMode ? 'confirm-add' : 'confirm-edit'}
-//                     onClick={() => {
-//                         if (isAddMode && props.onAddMember) {
-//                             props.onAddMember(mockNewMember);
-//                         } else if (isEditMode && props.onEditMember && props.memberToEdit) {
-//                             props.onEditMember({ ...props.memberToEdit, fullName: 'Updated Member' });
-//                         }
-//                         props.onClose();
-//                     }}
-//                 >
-//                     {isAddMode ? 'Confirm Add' : 'Confirm Edit'}
-//                 </button>
-//                 <button data-testid={isAddMode ? 'close-add' : 'close-edit'} onClick={props.onClose}>
-//                     {isAddMode ? 'Close Add' : 'Close Edit'}
-//                 </button>
-//             </div>
-//         );
-//     },
-// }));
+jest.mock('../team-page-modals/TeamPageModals', () => ({
+    TeamPageModals: (props: any) => {
+        const { modalsStateControl, onAddTeamMember, onEditTeamMember, onDeleteTeamMember, onAddTeamCategory, onEditTeamCategory, onDeleteTeamCategory } = props;
+        const { modalState, closeModalActions } = modalsStateControl;
 
-// jest.mock('../team-member-modals/delete-team-member-modal/DeleteTeamMemberModal', () => ({
-//     DeleteTeamMemberModal: (props: any) =>
-//         props.isOpen ? (
-//             <div data-testid="delete-member-modal">
-//                 <h2>Delete Member Modal</h2>
-//                 <p>Deleting: {props.memberToDelete?.fullName}</p>
-//                 <button
-//                     data-testid="confirm-delete"
-//                     onClick={() => {
-//                         props.onDeleteMember(props.memberToDelete);
-//                         props.onClose();
-//                     }}
-//                 >
-//                     Confirm Delete
-//                 </button>
-//                 <button data-testid="close-delete" onClick={props.onClose}>
-//                     Close Delete
-//                 </button>
-//             </div>
-//         ) : null,
-// }));
+        return (
+            <div data-testid="team-page-modals">
+                {/* Add Member Modal */}
+                {modalState.isAddModalOpen && (
+                    <div data-testid="add-member-modal">
+                        <h2>Add Member Modal</h2>
+                        <p>Adding new member</p>
+                        <button
+                            data-testid="confirm-add"
+                            onClick={() => {
+                                onAddTeamMember(mockNewMember);
+                            }}
+                        >
+                            Confirm Add
+                        </button>
+                        <button data-testid="close-add" onClick={closeModalActions.closeAddItemModal}>
+                            Close Add
+                        </button>
+                    </div>
+                )}
+
+                {/* Edit Member Modal */}
+                {!!modalState.itemToEdit && (
+                    <div data-testid="edit-member-modal">
+                        <h2>Edit Member Modal</h2>
+                        <p>Editing: {modalState.itemToEdit.fullName}</p>
+                        <button
+                            data-testid="confirm-edit"
+                            onClick={() => {
+                                onEditTeamMember({ ...modalState.itemToEdit, fullName: 'Updated Member' });
+                            }}
+                        >
+                            Confirm Edit
+                        </button>
+                        <button data-testid="close-edit" onClick={closeModalActions.closeEditItemModal}>
+                            Close Edit
+                        </button>
+                    </div>
+                )}
+
+                {/* Delete Member Modal */}
+                {!!modalState.itemToDelete && (
+                    <div data-testid="delete-member-modal">
+                        <h2>Delete Member Modal</h2>
+                        <p>Deleting: {modalState.itemToDelete?.fullName}</p>
+                        <button
+                            data-testid="confirm-delete"
+                            onClick={() => {
+                                onDeleteTeamMember(modalState.itemToDelete);
+                            }}
+                        >
+                            Confirm Delete
+                        </button>
+                        <button data-testid="close-delete" onClick={closeModalActions.closeDeleteItemModal}>
+                            Close Delete
+                        </button>
+                    </div>
+                )}
+
+                {/* Add Category Modal */}
+                {modalState.isAddCategoryModalOpen && (
+                    <div data-testid="add-category-modal">
+                        <h2>Add Category Modal</h2>
+                        <button
+                            data-testid="confirm-add-category"
+                            onClick={() => {
+                                onAddTeamCategory({ id: 99, name: 'New Category', description: 'desc', teamMembersCount: 0 });
+                            }}
+                        >
+                            Confirm Add Category
+                        </button>
+                        <button data-testid="close-add-category" onClick={closeModalActions.closeAddCategoryModal}>
+                            Close
+                        </button>
+                    </div>
+                )}
+
+                {/* Edit Category Modal */}
+                {modalState.isEditCategoryModalOpen && (
+                    <div data-testid="edit-category-modal">
+                        <h2>Edit Category Modal</h2>
+                        <button
+                            data-testid="confirm-edit-category"
+                            onClick={() => {
+                                onEditTeamCategory({ id: 1, name: 'Updated Category', description: 'desc', teamMembersCount: 0 });
+                            }}
+                        >
+                            Confirm Edit Category
+                        </button>
+                        <button data-testid="close-edit-category" onClick={closeModalActions.closeEditCategoryModal}>
+                            Close
+                        </button>
+                    </div>
+                )}
+
+                {/* Delete Category Modal */}
+                {modalState.isDeleteCategoryModalOpen && (
+                    <div data-testid="delete-category-modal">
+                        <h2>Delete Category Modal</h2>
+                        <button
+                            data-testid="confirm-delete-category"
+                            onClick={() => {
+                                onDeleteTeamCategory(1);
+                            }}
+                        >
+                            Confirm Delete Category
+                        </button>
+                        <button data-testid="close-delete-category" onClick={closeModalActions.closeDeleteCategoryModal}>
+                            Close
+                        </button>
+                    </div>
+                )}
+            </div>
+        );
+    },
+}));
 
 jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({
@@ -232,6 +339,7 @@ describe('TeamPageContent', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        
         mockedUseAdminClient.mockReturnValue({
             client: {}, // mock client object here
         });
@@ -519,11 +627,16 @@ describe('TeamPageContent', () => {
                 // Open add member modal
                 clickAddMemberButton();
 
+                await waitFor(() => {
+                    expect(getAddMemberModal()).toBeInTheDocument();
+                });
+
                 // Confirm adding member when list is at page size (lines 401-403)
                 clickConfirmAddButton();
 
                 await waitFor(() => {
-                    expect(getAddMemberModal()).not.toBeInTheDocument();
+                    // Member should be added to the list
+                    expect(getMemberItems()).toHaveLength(3);
                 });
             });
         });

@@ -180,6 +180,11 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
         }
     }, [onSubmit, formState, isSubmitting, isDuplicateName, mode]);
 
+    const handleConfirmClose = useCallback(() => {
+        setShowCloseConfirmModal(false);
+        onClose();
+    }, [onClose]);
+    
     const handleClose = useCallback(() => {
         if (isSubmitting) return;
 
@@ -190,11 +195,6 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
 
         onClose();
     }, [isSubmitting, isDirty, onClose]);
-
-    const handleConfirmClose = useCallback(() => {
-        setShowCloseConfirmModal(false);
-        onClose();
-    }, [onClose]);
 
     const handleCategoryChange = useCallback(
         (category: TeamCategory) => {

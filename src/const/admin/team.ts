@@ -32,7 +32,7 @@ export const TEAM_MEMBERS_TEXT = {
             FULLNAME: "Ім'я та Прізвище",
             DESCRIPTION: 'Опис',
             CATEGORY: 'Категорія',
-            SELECT_CATEGORY: 'Виберіть категорію',
+            SELECT_CATEGORY: 'Оберіть категорію',
             PHOTO: 'Фото',
         },
     },

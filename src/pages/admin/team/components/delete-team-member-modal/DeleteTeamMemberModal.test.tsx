@@ -5,10 +5,10 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
 
-jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
-jest.mock('../../../../../../services/api/admin/team/team-members/team-members-api', () => ({
+jest.mock('../../../../../services/api/admin/team/team-members/team-members-api', () => ({
     TeamMembersApi: {
         delete: jest.fn(),
     },

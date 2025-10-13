@@ -44,61 +44,61 @@ jest.mock('../../../../../contexts/admin/toast-context-provider/ToastContextProv
     }),
 }));
 
-jest.mock('../team-member-modals/team-member-modal/TeamMemberModal', () => ({
-    TeamMemberModal: (props: any) => {
-        if (!props.isOpen) return null;
+// jest.mock('../team-member-modals/team-member-modal/TeamMemberModal', () => ({
+//     TeamMemberModal: (props: any) => {
+//         if (!props.isOpen) return null;
 
-        const { ModalMode } = require('../../../../../types/admin/common');
-        const isAddMode = props.mode === ModalMode.Add;
-        const isEditMode = props.mode === ModalMode.Edit;
+//         const { ModalMode } = require('../../../../../types/admin/common');
+//         const isAddMode = props.mode === ModalMode.Add;
+//         const isEditMode = props.mode === ModalMode.Edit;
 
-        return (
-            <div data-testid={isAddMode ? 'add-member-modal' : 'edit-member-modal'}>
-                <h2>{isAddMode ? 'Add Member Modal' : 'Edit Member Modal'}</h2>
-                {isEditMode && props.memberToEdit && <p>Editing: {props.memberToEdit.fullName}</p>}
-                {isAddMode && <p>Adding new member</p>}
-                <button
-                    data-testid={isAddMode ? 'confirm-add' : 'confirm-edit'}
-                    onClick={() => {
-                        if (isAddMode && props.onAddMember) {
-                            props.onAddMember(mockNewMember);
-                        } else if (isEditMode && props.onEditMember && props.memberToEdit) {
-                            props.onEditMember({ ...props.memberToEdit, fullName: 'Updated Member' });
-                        }
-                        props.onClose();
-                    }}
-                >
-                    {isAddMode ? 'Confirm Add' : 'Confirm Edit'}
-                </button>
-                <button data-testid={isAddMode ? 'close-add' : 'close-edit'} onClick={props.onClose}>
-                    {isAddMode ? 'Close Add' : 'Close Edit'}
-                </button>
-            </div>
-        );
-    },
-}));
+//         return (
+//             <div data-testid={isAddMode ? 'add-member-modal' : 'edit-member-modal'}>
+//                 <h2>{isAddMode ? 'Add Member Modal' : 'Edit Member Modal'}</h2>
+//                 {isEditMode && props.memberToEdit && <p>Editing: {props.memberToEdit.fullName}</p>}
+//                 {isAddMode && <p>Adding new member</p>}
+//                 <button
+//                     data-testid={isAddMode ? 'confirm-add' : 'confirm-edit'}
+//                     onClick={() => {
+//                         if (isAddMode && props.onAddMember) {
+//                             props.onAddMember(mockNewMember);
+//                         } else if (isEditMode && props.onEditMember && props.memberToEdit) {
+//                             props.onEditMember({ ...props.memberToEdit, fullName: 'Updated Member' });
+//                         }
+//                         props.onClose();
+//                     }}
+//                 >
+//                     {isAddMode ? 'Confirm Add' : 'Confirm Edit'}
+//                 </button>
+//                 <button data-testid={isAddMode ? 'close-add' : 'close-edit'} onClick={props.onClose}>
+//                     {isAddMode ? 'Close Add' : 'Close Edit'}
+//                 </button>
+//             </div>
+//         );
+//     },
+// }));
 
-jest.mock('../team-member-modals/delete-team-member-modal/DeleteTeamMemberModal', () => ({
-    DeleteTeamMemberModal: (props: any) =>
-        props.isOpen ? (
-            <div data-testid="delete-member-modal">
-                <h2>Delete Member Modal</h2>
-                <p>Deleting: {props.memberToDelete?.fullName}</p>
-                <button
-                    data-testid="confirm-delete"
-                    onClick={() => {
-                        props.onDeleteMember(props.memberToDelete);
-                        props.onClose();
-                    }}
-                >
-                    Confirm Delete
-                </button>
-                <button data-testid="close-delete" onClick={props.onClose}>
-                    Close Delete
-                </button>
-            </div>
-        ) : null,
-}));
+// jest.mock('../team-member-modals/delete-team-member-modal/DeleteTeamMemberModal', () => ({
+//     DeleteTeamMemberModal: (props: any) =>
+//         props.isOpen ? (
+//             <div data-testid="delete-member-modal">
+//                 <h2>Delete Member Modal</h2>
+//                 <p>Deleting: {props.memberToDelete?.fullName}</p>
+//                 <button
+//                     data-testid="confirm-delete"
+//                     onClick={() => {
+//                         props.onDeleteMember(props.memberToDelete);
+//                         props.onClose();
+//                     }}
+//                 >
+//                     Confirm Delete
+//                 </button>
+//                 <button data-testid="close-delete" onClick={props.onClose}>
+//                     Close Delete
+//                 </button>
+//             </div>
+//         ) : null,
+// }));
 
 jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({

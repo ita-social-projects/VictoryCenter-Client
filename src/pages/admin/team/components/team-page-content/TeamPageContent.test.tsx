@@ -44,9 +44,6 @@ jest.mock('../../../../../contexts/admin/toast-context-provider/ToastContextProv
     }),
 }));
 
-// Mock useModalsState to return actual React state behavior
-let mockSetModalState: React.Dispatch<React.SetStateAction<any>>;
-
 jest.mock('../../../../../hooks/admin/use-modals-state/useModalsState', () => {
     const React = require('react');
     return {
@@ -59,8 +56,6 @@ jest.mock('../../../../../hooks/admin/use-modals-state/useModalsState', () => {
                 isEditCategoryModalOpen: false,
                 isDeleteCategoryModalOpen: false,
             });
-
-            mockSetModalState = setModalState;
 
             return {
                 modalState,

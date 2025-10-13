@@ -360,7 +360,7 @@ export const TeamPageContent = () => {
 
             closeModalActions.closeEditItemModal();
         },
-        [closeModalActions, selectedCategory?.id],
+        [closeModalActions, selectedCategory],
     );
 
     const handleDeleteMember = useCallback(
@@ -379,7 +379,7 @@ export const TeamPageContent = () => {
             hasMoreRef.current = true;
             closeModalActions.closeDeleteItemModal();
         },
-        [closeModalActions, selectedCategory?.id],
+        [closeModalActions],
     );
 
     const handleAddCategory = useCallback((newCategory: TeamCategory) => {

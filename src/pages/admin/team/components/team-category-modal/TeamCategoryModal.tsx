@@ -7,7 +7,7 @@ import { InputWithCharacterLimitGroup } from '../../../../../components/admin/in
 import { SingleSelectInputGroup } from '../../../../../components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
 import { TeamCategory } from '../../../../../types/admin/team-category';
 import { TEAM_CATEGORY_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/team-category-schema/team-category-schema';
-import { TEAM_CATEGORY_TEXT, TEAM_CATEGORY_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { TEAM_CATEGORY_TEXT, TEAM_CATEGORY_VALIDATION } from '../../../../../const/admin/team';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './TeamCategoryModal.scss';

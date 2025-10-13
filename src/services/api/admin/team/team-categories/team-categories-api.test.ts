@@ -1,45 +1,76 @@
-// import { AxiosInstance } from 'axios';
-// import { mapTeamCategoryDtoToTeamCategory, TeamCategoriesApi } from './team-categories-api';
-// import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-// import { TeamCategoryDto, TeamCategory } from '../../../../../types/admin/team-members';
+import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
+import { TeamCategory, TeamCategoryCreateUpdate } from '../../../../../types/admin/team-category';
+import { TeamCategoriesApi } from './team-categories-api';
 
-// describe('mapTeamCategoryDtoToTeamCategory', () => {
-//     it('should correctly map DTO to TeamCategory', () => {
-//         const dto: TeamCategoryDto = {
-//             id: 1,
-//             name: 'Main Team',
-//             description: 'Description here',
-//         };
+describe('TeamCategoriesApi', () => {
+    const mockClient = {
+        get: jest.fn(),
+        post: jest.fn(),
+        put: jest.fn(),
+        delete: jest.fn(),
+    } as any;
 
-//         const expected: TeamCategory = {
-//             id: 1,
-//             name: 'Main Team',
-//             description: 'Description here',
-//         };
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
 
-//         const result = mapTeamCategoryDtoToTeamCategory(dto);
+    it('getAll should call GET and return data', async () => {
+        const mockCategories: TeamCategory[] = [
+            { id: 1, name: 'Category 1', description: 'Description 1', teamMembersCount: 1 },
+            { id: 2, name: 'Category 2', description: 'Description 2', teamMembersCount: 2 },
+        ];
+        mockClient.get.mockResolvedValueOnce({ data: mockCategories });
+        const result = await TeamCategoriesApi.getAll(mockClient);
+        expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM_CATEGORIES.BASE);
+        expect(result).toEqual(mockCategories);
+    });
 
-//         expect(result).toEqual(expected);
-//     });
-// });
+    it('create should call POST with correct payload and return data', async () => {
+        const newCategory: TeamCategoryCreateUpdate = {
+            id: null,
+            name: 'New Category',
+            description: 'New Description',
+        };
+        const createdCategory: TeamCategory = { ...newCategory, id: 3, teamMembersCount: 0 };
+        mockClient.post.mockResolvedValueOnce({ data: createdCategory });
+        const result = await TeamCategoriesApi.create(mockClient, newCategory);
+        expect(mockClient.post).toHaveBeenCalledWith(
+            API_ROUTES.TEAM_CATEGORIES.BASE,
+            expect.objectContaining({ name: 'New Category', description: 'New Description' }),
+        );
+        expect(result).toEqual(createdCategory);
+    });
 
-// describe('TeamCategoriesApi.getAll', () => {
-//     it('should fetch and map all team categories', async () => {
-//         const mockClient = {
-//             get: jest.fn().mockResolvedValue({
-//                 data: [
-//                     { id: 1, name: 'A', description: 'Desc A' },
-//                     { id: 2, name: 'B', description: 'Desc B' },
-//                 ],
-//             }),
-//         } as unknown as AxiosInstance;
+    it('update should call PUT with correct payload and return data', async () => {
+        const updatedCategory: TeamCategoryCreateUpdate = {
+            id: 2,
+            name: 'Updated Category',
+            description: 'Updated Description',
+        };
+        const returnedCategory: TeamCategory = {
+            ...(updatedCategory as Omit<TeamCategory, 'teamMembersCount'>),
+            teamMembersCount: 5,
+        };
+        mockClient.put.mockResolvedValueOnce({ data: returnedCategory });
+        const result = await TeamCategoriesApi.update(mockClient, updatedCategory);
+        expect(mockClient.put).toHaveBeenCalledWith(
+            `${API_ROUTES.TEAM_CATEGORIES.BASE}/2`,
+            expect.objectContaining({ name: 'Updated Category', description: 'Updated Description' }),
+        );
+        expect(result).toEqual(returnedCategory);
+    });
 
-//         const result = await TeamCategoriesApi.getAll(mockClient);
+    it('update should throw error if id is null', async () => {
+        const invalidCategory: TeamCategoryCreateUpdate = { id: null, name: 'Invalid', description: 'Invalid' };
+        await expect(TeamCategoriesApi.update(mockClient, invalidCategory)).rejects.toThrow(
+            'TeamCategoriesApi.update: category.id is required',
+        );
+        expect(mockClient.put).not.toHaveBeenCalled();
+    });
 
-//         expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.TEAM.CATEGORIES);
-//         expect(result).toEqual([
-//             { id: 1, name: 'A', description: 'Desc A' },
-//             { id: 2, name: 'B', description: 'Desc B' },
-//         ]);
-//     });
-// });
+    it('delete should call DELETE with correct id', async () => {
+        mockClient.delete.mockResolvedValueOnce({});
+        await TeamCategoriesApi.delete(mockClient, 4);
+        expect(mockClient.delete).toHaveBeenCalledWith(`${API_ROUTES.TEAM_CATEGORIES.BASE}/4`);
+    });
+});

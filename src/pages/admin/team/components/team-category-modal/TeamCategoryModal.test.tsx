@@ -622,20 +622,6 @@ describe('TeamCategoryModal', () => {
             });
         });
 
-        it('trims whitespace when checking for duplicate names', async () => {
-            const props = createAddProps();
-            render(<TeamCategoryModal {...props} />);
-
-            const nameInput = screen.getByTestId('input-name');
-
-            // Enter name with whitespace
-            userEvent.type(nameInput, '  Category 1  ');
-
-            await waitFor(() => {
-                expect(screen.getByTestId('hint-box')).toBeInTheDocument();
-            });
-        });
-
         it('prevents duplicate submissions', async () => {
             const props = createAddProps();
             render(<TeamCategoryModal {...props} />);

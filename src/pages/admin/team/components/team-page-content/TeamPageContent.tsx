@@ -247,7 +247,7 @@ export const TeamPageContent = () => {
             try {
                 setMembers(members);
                 const orderedIds = members.map((m) => m.id);
-                const categoryId = selectedCategory?.id ?? 0;
+                const categoryId = selectedCategory!.id;
 
                 await TeamMembersApi.reorder(client, categoryId, orderedIds);
             } catch (error: any) {
@@ -258,7 +258,7 @@ export const TeamPageContent = () => {
                 setErrorState(TEAM_MEMBERS_TEXT.MESSAGE.FAIL_TO_REORDER_MEMBERS, 'members');
             }
         },
-        [client, selectedCategory?.id, setErrorState],
+        [client, selectedCategory, setErrorState],
     );
 
     const handleRetry = useCallback(() => {

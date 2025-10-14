@@ -95,14 +95,14 @@ export const DraggableListItem = <TEntity,>({
     };
 
     return (
-        <>
+        <div className="draggable-item-wrapper">
             <DragPreview
                 entity={entity}
                 dragPreview={dragPreview}
                 renderEntityComponent={renderEntityComponent}
             ></DragPreview>
             <div
-                className={'draggable-item-wrapper'}
+                className={'draggable-item'}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, id)}
                 onDragEnd={handleDragEnd}
@@ -122,6 +122,6 @@ export const DraggableListItem = <TEntity,>({
                 </div>
                 <div className="item-data">{renderEntityComponent(entity)}</div>
             </div>
-        </>
+        </div>
     );
 };

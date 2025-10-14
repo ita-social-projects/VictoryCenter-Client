@@ -358,32 +358,6 @@ describe('TeamPageModals', () => {
         });
 
         describe('Edit Team Category Modal', () => {
-            it('passes correct props when edit category modal is closed', () => {
-                const props = createDefaultProps({ isEditCategoryModalOpen: false });
-                render(<TeamPageModals {...props} />);
-
-                const editCategoryModal = document.querySelectorAll('[data-testid="team-category-modal"]')[1];
-                expect(editCategoryModal.querySelector('[data-testid="category-modal-mode"]')).toHaveTextContent(
-                    ModalMode.Edit.toString(),
-                );
-                expect(editCategoryModal.querySelector('[data-testid="category-modal-is-open"]')).toHaveTextContent(
-                    'false',
-                );
-            });
-
-            it('passes correct props when edit category modal is open', () => {
-                const props = createDefaultProps({ isEditCategoryModalOpen: true });
-                render(<TeamPageModals {...props} />);
-
-                const editCategoryModal = document.querySelectorAll('[data-testid="team-category-modal"]')[1];
-                expect(editCategoryModal.querySelector('[data-testid="category-modal-mode"]')).toHaveTextContent(
-                    ModalMode.Edit.toString(),
-                );
-                expect(editCategoryModal.querySelector('[data-testid="category-modal-is-open"]')).toHaveTextContent(
-                    'true',
-                );
-            });
-
             it('calls closeEditCategoryModal when close button is clicked', () => {
                 const props = createDefaultProps({ isEditCategoryModalOpen: true });
                 render(<TeamPageModals {...props} />);

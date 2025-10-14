@@ -304,22 +304,6 @@ const mockMembers: TeamMember[] = [
     },
 ];
 
-const mockNewMember: TeamMember = {
-    id: 3,
-    fullName: 'New Member',
-    description: 'New description.',
-    status: VisibilityStatus.Published,
-    categoryId: 1,
-    image: null,
-};
-
-const mockNewCategory: TeamCategory = {
-    id: 3,
-    name: 'New Category',
-    description: 'New description',
-    teamMembersCount: 0,
-};
-
 const mockClient = {};
 
 describe('TeamPageContent', () => {

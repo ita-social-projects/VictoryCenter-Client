@@ -155,20 +155,23 @@ jest.mock('../../../../../components/admin/input-groups/single-select-input-grou
         value,
     }: any) => (
         <div data-testid={`select-group-${id}`}>
-            <label data-testid={`label-select`}>
+            <label data-testid="label-select">
                 {label} {isRequired && '*'}
             </label>
             <select
                 data-testid="category-select"
                 onChange={(e) => {
-                    const selectedId = parseInt(e.target.value);
-                    const selectedOption = options.find((opt: any) => getOptionId(opt) === selectedId);
+                    if (e.target.value === '') {
+                        onChange(null);
+                        return;
+                    }
+                    const selectedOption = options.find((opt: any) => getOptionId(opt) === parseInt(e.target.value));
                     if (selectedOption) onChange(selectedOption);
                 }}
                 disabled={disabled}
                 value={value ? getOptionId(value) : ''}
             >
-                <option value="">Select category...</option>
+                <option value="">Select category</option>
                 {options.map((option: any) => (
                     <option key={getOptionId(option)} value={getOptionId(option)}>
                         {getOptionName(option)}

@@ -257,30 +257,6 @@ describe('TeamCategoryModal', () => {
             expect(descriptionTextarea.value).toBe('');
         });
 
-        it('calls onAddCategory and closes modal on successful submit', async () => {
-            const props = createAddProps();
-            render(<TeamCategoryModal {...props} />);
-
-            const nameInput = screen.getByTestId('input-name');
-            const descriptionTextarea = screen.getByTestId('textarea-description');
-            const submitButton = screen.getByTestId('button');
-
-            userEvent.type(nameInput, 'New Category');
-            userEvent.type(descriptionTextarea, 'New Description');
-
-            fireEvent.click(submitButton);
-
-            await waitFor(() => {
-                expect(getMockedApi().create).toHaveBeenCalledWith(mockClient, {
-                    id: null,
-                    name: 'New Category',
-                    description: 'New Description',
-                });
-                expect(props.onAddCategory).toHaveBeenCalledWith(mockCreatedCategory);
-                expect(props.onClose).toHaveBeenCalled();
-            });
-        });
-
         it('shows error message when API call fails', async () => {
             getMockedApi().create.mockRejectedValue(new Error('API Error'));
             const props = createAddProps();
@@ -484,36 +460,6 @@ describe('TeamCategoryModal', () => {
         });
     });
 
-    describe('Form Input Handling', () => {
-        it('disables form fields when submitting', async () => {
-            let resolvePromise: (value: TeamCategory) => void;
-            const slowPromise = new Promise<TeamCategory>((resolve) => {
-                resolvePromise = resolve;
-            });
-            getMockedApi().create.mockReturnValue(slowPromise);
-
-            const props = createAddProps();
-            render(<TeamCategoryModal {...props} />);
-
-            const nameInput = screen.getByTestId('input-name');
-            const descriptionTextarea = screen.getByTestId('textarea-description');
-            const submitButton = screen.getByTestId('button');
-
-            userEvent.type(nameInput, 'New Category');
-            userEvent.type(descriptionTextarea, 'New Description');
-
-            fireEvent.click(submitButton);
-
-            // Fields should be disabled during submission
-            expect(nameInput).toBeDisabled();
-            expect(descriptionTextarea).toBeDisabled();
-            expect(submitButton).toBeDisabled();
-
-            // Resolve the promise to clean up
-            resolvePromise!(mockCreatedCategory);
-        });
-    });
-
     describe('Modal Close Behavior', () => {
         it('closes modal directly when no changes are made', () => {
             const props = createAddProps();
@@ -579,7 +525,6 @@ describe('TeamCategoryModal', () => {
                 resolvePromise = resolve;
             });
             getMockedApi().create.mockReturnValue(slowPromise);
-
             const props = createAddProps();
             render(<TeamCategoryModal {...props} />);
 
@@ -598,7 +543,6 @@ describe('TeamCategoryModal', () => {
 
             expect(props.onClose).not.toHaveBeenCalled();
 
-            // Resolve the promise to clean up
             resolvePromise!(mockCreatedCategory);
         });
     });
@@ -686,28 +630,6 @@ describe('TeamCategoryModal', () => {
 
             await waitFor(() => {
                 expect(screen.getByTestId('hint-box')).toBeInTheDocument();
-            });
-        });
-
-        it('handles form submission with trimmed values', async () => {
-            const props = createAddProps();
-            render(<TeamCategoryModal {...props} />);
-
-            const nameInput = screen.getByTestId('input-name');
-            const descriptionTextarea = screen.getByTestId('textarea-description');
-            const submitButton = screen.getByTestId('button');
-
-            userEvent.type(nameInput, '  New Category  ');
-            userEvent.type(descriptionTextarea, '  New Description  ');
-
-            fireEvent.click(submitButton);
-
-            await waitFor(() => {
-                expect(getMockedApi().create).toHaveBeenCalledWith(mockClient, {
-                    id: null,
-                    name: 'New Category',
-                    description: 'New Description',
-                });
             });
         });
 

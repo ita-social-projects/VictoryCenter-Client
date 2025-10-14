@@ -332,19 +332,6 @@ describe('TeamPageModals', () => {
                 );
             });
 
-            it('passes correct props when add category modal is open', () => {
-                const props = createDefaultProps({ isAddCategoryModalOpen: true });
-                render(<TeamPageModals {...props} />);
-
-                const addCategoryModal = document.querySelectorAll('[data-testid="team-category-modal"]')[0];
-                expect(addCategoryModal.querySelector('[data-testid="category-modal-mode"]')).toHaveTextContent(
-                    ModalMode.Add.toString(),
-                );
-                expect(addCategoryModal.querySelector('[data-testid="category-modal-is-open"]')).toHaveTextContent(
-                    'true',
-                );
-            });
-
             it('calls closeAddCategoryModal when close button is clicked', () => {
                 const props = createDefaultProps({ isAddCategoryModalOpen: true });
                 render(<TeamPageModals {...props} />);

@@ -5,6 +5,7 @@ export const adminRoutes = {
     teamPageRoute: '/admin-page/team',
     programsSubRoute: 'programs',
     programsPageRoute: '/admin-page/programs',
+    partnersPageRoute: '/admin-page/partners',
 };
 
 // user pages routes

@@ -4,6 +4,7 @@ export const COMMON_TEXT_ADMIN = {
         PROGRAMS: 'Програми',
         FAQ: 'Часті питання',
         WHO_WE_ARE: 'Хто ми',
+        PARTNERS: 'Партнери',
     },
 
     ALT: {

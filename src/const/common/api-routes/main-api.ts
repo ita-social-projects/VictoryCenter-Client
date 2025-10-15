@@ -38,4 +38,10 @@ export const API_ROUTES = {
         PREVIEWS: 'WhoWeAre/previews',
         PUBLIC: 'WhoWeArePage',
     },
+    PARTNERS: {
+        BASE: 'Partners',
+        BANNER: 'Partners/banner',
+        SECTION: 'Partners/section',
+        PUBLISHED: 'Partners/published',
+    },
 };

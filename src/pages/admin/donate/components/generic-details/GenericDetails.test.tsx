@@ -63,10 +63,23 @@ describe('GenericDetails', () => {
     });
 
     test('adds a new item on form submit', async () => {
-        render(<GenericDetails {...defaultProps} items={[]} />);
-        fireEvent.click(screen.getByText('Add New'));
+        const onChangeItems = jest.fn((updater) => {
+            const newItems = typeof updater === 'function' ? updater([]) : updater;
+            return newItems;
+        });
 
+        const { rerender } = render(<GenericDetails {...defaultProps} items={[]} onChangeItems={onChangeItems} />);
+
+        fireEvent.click(screen.getByText('Add New'));
         fireEvent.click(screen.getByText('Submit'));
+
+        await waitFor(() => {
+            expect(onChangeItems).toHaveBeenCalled();
+        });
+
+        const newItems = onChangeItems.mock.calls[0][0];
+
+        rerender(<GenericDetails {...defaultProps} items={newItems} onChangeItems={onChangeItems} />);
 
         await waitFor(() => {
             expect(screen.getByText('New Item')).toBeInTheDocument();
@@ -101,13 +114,27 @@ describe('GenericDetails', () => {
         expect(screen.getByText('Add New')).toBeInTheDocument();
     });
 
-    it('submits new item and adds to list', async () => {
-        render(<GenericDetails {...defaultProps} items={[]} />);
+    test('submits new item and adds to list', async () => {
+        const onChangeItems = jest.fn((updater) => {
+            const newItems = typeof updater === 'function' ? updater([]) : updater;
+            return newItems;
+        });
+
+        const { rerender } = render(<GenericDetails {...defaultProps} items={[]} onChangeItems={onChangeItems} />);
+
         const addButton = screen.getByText('Add New');
         fireEvent.click(addButton);
 
         const submitButton = screen.getByText('Submit');
         fireEvent.click(submitButton);
+
+        await waitFor(() => {
+            expect(onChangeItems).toHaveBeenCalled();
+        });
+
+        const newItems = onChangeItems.mock.calls[0][0];
+
+        rerender(<GenericDetails {...defaultProps} items={newItems} onChangeItems={onChangeItems} />);
 
         await waitFor(() => {
             expect(screen.getByText('New Item')).toBeInTheDocument();
@@ -135,10 +162,21 @@ describe('GenericDetails', () => {
         expect(screen.queryByText('No Items')).not.toBeInTheDocument();
     });
 
-    it('removes item on delete', () => {
-        render(<GenericDetails {...defaultProps} />);
+    test('removes item on delete', () => {
+        const onChangeItems = jest.fn();
+        const { rerender } = render(<GenericDetails {...defaultProps} onChangeItems={onChangeItems} />);
+
         expect(screen.getByText('Item 1')).toBeInTheDocument();
+
         fireEvent.click(screen.getByText('Delete'));
+
+        expect(onChangeItems).toHaveBeenCalled();
+
+        const newItems = onChangeItems.mock.calls[0][0];
+        expect(newItems).toEqual([]);
+
+        rerender(<GenericDetails {...defaultProps} items={[]} onChangeItems={onChangeItems} />);
+
         expect(screen.queryByText('Item 1')).not.toBeInTheDocument();
     });
 

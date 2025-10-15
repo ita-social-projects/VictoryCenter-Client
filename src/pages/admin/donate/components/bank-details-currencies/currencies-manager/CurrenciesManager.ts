@@ -1,11 +1,23 @@
 import { useEffect, useState } from 'react';
 import { bankDetailsConfig } from '../bank-details-currencies-config/BankDetailsCurrenciesConfig';
+import { BankCurrency } from '../../../../../../../src/types/admin/donate';
 
 export enum Currencies {
     UAH = 'UAH',
     USD = 'USD',
     EUR = 'EUR',
 }
+
+export const mapCurrencyToBankCurrency = (currency: Currencies): BankCurrency => {
+    switch (currency) {
+        case Currencies.UAH:
+            return BankCurrency.Uah;
+        case Currencies.USD:
+            return BankCurrency.Usd;
+        case Currencies.EUR:
+            return BankCurrency.Eur;
+    }
+};
 
 export function useBankDetails<T extends keyof typeof bankDetailsConfig>(currency: T) {
     const [items, setItems] = useState<any[]>([]);

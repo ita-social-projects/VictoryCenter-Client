@@ -1,34 +1,130 @@
-import { useCallback, useState } from 'react';
-import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
+import { useCallback, useEffect, useState } from 'react';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { SupportOptionsApi } from '../../../../../services/api/admin/donate/support-options/support-options-api';
 import { SupportOptionsType } from '../../../../../types/admin/donate';
-import './DonatePageContent.scss';
-import { GenericDetails } from '../generic-details/GenericDetails';
-import { Currencies, useBankDetails } from '../bank-details-currencies/currencies-manager/CurrenciesManager';
-import { SupportOptionsForm } from '../support-options/support-options-form/SupportOptionsForm';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
+import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
+import { GenericDetails } from '../generic-details/GenericDetails';
+import { SupportOptionsForm } from '../support-options/support-options-form/SupportOptionsForm';
+import {
+    Currencies,
+    useBankDetails,
+    mapCurrencyToBankCurrency,
+} from '../bank-details-currencies/currencies-manager/CurrenciesManager';
+import './DonatePageContent.scss';
 
 export const DonatePageContent = () => {
+    const client = useAdminClient();
     const currencyCategories = Object.values(Currencies);
     const [selectedCategory, setSelectedCategory] = useState<Currencies>(Currencies.UAH);
     const { items, config, setItems, isLoading } = useBankDetails(selectedCategory);
+    const [supportOptions, setSupportOptions] = useState<SupportOptionsType[]>([]);
+    const [isSupportOptionsLoading, setIsSupportOptionsLoading] = useState(false);
 
-    const [supportOptionsByCurrency, setSupportOptionsByCurrency] = useState<Record<Currencies, SupportOptionsType[]>>({
-        [Currencies.UAH]: [],
-        [Currencies.USD]: [],
-        [Currencies.EUR]: [],
-    });
-    const supportOptions = supportOptionsByCurrency[selectedCategory] ?? [];
+    useEffect(() => {
+        let isAlive = true;
+        const bankCurrency = mapCurrencyToBankCurrency(selectedCategory);
 
-    const updateSupportOptions = (newOptions: SupportOptionsType[]) => {
-        setSupportOptionsByCurrency((prev) => ({
-            ...prev,
-            [selectedCategory]: newOptions,
-        }));
-    };
+        setIsSupportOptionsLoading(true);
+        SupportOptionsApi.getAll(client, bankCurrency)
+            .then((data) => {
+                if (isAlive) {
+                    setSupportOptions(data);
+                }
+            })
+            .catch(() => {
+                if (isAlive) {
+                    setSupportOptions([]);
+                }
+            })
+            .finally(() => {
+                if (isAlive) {
+                    setIsSupportOptionsLoading(false);
+                }
+            });
+
+        return () => {
+            isAlive = false;
+        };
+    }, [client, selectedCategory]);
 
     const handleCategorySelect = useCallback((currency: Currencies) => {
         setSelectedCategory(currency);
     }, []);
+
+    const handleCreateSupportOption = useCallback(
+        async (name: string, value: string) => {
+            const bankCurrency = mapCurrencyToBankCurrency(selectedCategory);
+            setIsSupportOptionsLoading(true);
+            try {
+                const newOption = await SupportOptionsApi.create(client, { name, value, currency: bankCurrency });
+                setSupportOptions((prev) => [...prev, newOption]);
+            } finally {
+                setIsSupportOptionsLoading(false);
+            }
+        },
+        [client, selectedCategory],
+    );
+
+    const handleUpdateSupportOption = useCallback(
+        async (id: number, name: string, value: string) => {
+            setIsSupportOptionsLoading(true);
+            try {
+                const updatedOption = await SupportOptionsApi.update(client, id, { name, value });
+                setSupportOptions((prev) => prev.map((option) => (option.id === id ? updatedOption : option)));
+            } finally {
+                setIsSupportOptionsLoading(false);
+            }
+        },
+        [client],
+    );
+
+    const handleDeleteSupportOption = useCallback(
+        async (id: number) => {
+            setIsSupportOptionsLoading(true);
+            try {
+                await SupportOptionsApi.delete(client, id);
+                setSupportOptions((prev) => prev.filter((option) => option.id !== id));
+            } finally {
+                setIsSupportOptionsLoading(false);
+            }
+        },
+        [client],
+    );
+
+    const updateItemsWithCorrespondentBanks = useCallback((prevItems: any, formStateId: number, newBanks: any) => {
+        const itemExists = prevItems.some((i: any) => i.id === formStateId);
+        if (itemExists) {
+            return prevItems.map((i: any) => (i.id === formStateId ? { ...i, correspondentBanks: newBanks } : i));
+        }
+        return [...prevItems, { id: formStateId, correspondentBanks: newBanks }];
+    }, []);
+
+    const handleCorrespondentBanksChange = useCallback(
+        (formStateId: number) => (newBanks: any) => {
+            setItems((prevItems: any) => updateItemsWithCorrespondentBanks(prevItems, formStateId, newBanks));
+        },
+        [setItems, updateItemsWithCorrespondentBanks],
+    );
+
+    const renderCorrespondentBanks = useCallback(
+        ({ formState, isItemsExpanded }: any) => (
+            <GenericDetails
+                key={`corr-${selectedCategory}-${formState.id}`}
+                title={DONATE_TEXT.CORRESPONDENT_BANKS.TITLE}
+                items={items.find((i) => i.id === formState.id)?.correspondentBanks ?? []}
+                isLoading={false}
+                FormComponent={config?.correspondentForm!}
+                initialIsItemsExpanded={isItemsExpanded}
+                primaryAddButton={true}
+                addNewText={DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW}
+                createEmptyItem={(data: any) => ({ id: Date.now(), ...data })}
+                isChildForm={true}
+                onChangeItems={handleCorrespondentBanksChange(formState.id)}
+            />
+        ),
+        [selectedCategory, items, config, handleCorrespondentBanksChange],
+    );
 
     return (
         <div className="donate-page-wrapper">
@@ -53,45 +149,20 @@ export const DonatePageContent = () => {
                             createEmptyItem={config.createEmptyItem}
                             onChangeItems={setItems}
                         >
-                            {config.withCorrespondentBanks
-                                ? ({ formState, isItemsExpanded }) => (
-                                      <GenericDetails
-                                          key={`corr-${selectedCategory}-${formState.id}`}
-                                          title={DONATE_TEXT.CORRESPONDENT_BANKS.TITLE}
-                                          items={items.find((i) => i.id === formState.id)?.correspondentBanks ?? []}
-                                          isLoading={false}
-                                          FormComponent={config.correspondentForm!}
-                                          initialIsItemsExpanded={isItemsExpanded}
-                                          primaryAddButton={true}
-                                          addNewText={DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW}
-                                          createEmptyItem={(data) => ({ id: Date.now(), ...data })}
-                                          isChildForm={true}
-                                          onChangeItems={(newBanks) => {
-                                              setItems((prevItems) => {
-                                                  const itemExists = prevItems.some((i) => i.id === formState.id);
-                                                  if (itemExists) {
-                                                      return prevItems.map((i) =>
-                                                          i.id === formState.id
-                                                              ? { ...i, correspondentBanks: newBanks }
-                                                              : i,
-                                                      );
-                                                  } else {
-                                                      return [
-                                                          ...prevItems,
-                                                          { id: formState.id, correspondentBanks: newBanks } as any,
-                                                      ];
-                                                  }
-                                              });
-                                          }}
-                                      />
-                                  )
-                                : () => null}
+                            {config.withCorrespondentBanks ? renderCorrespondentBanks : () => null}
                         </GenericDetails>
                     )}
                 </div>
 
                 <div className="donate-page-item">
-                    <SupportOptionsForm initialData={supportOptions} onChangeItems={updateSupportOptions} />
+                    <SupportOptionsForm
+                        key={selectedCategory}
+                        supportOptions={supportOptions}
+                        isLoading={isSupportOptionsLoading}
+                        onCreateOption={handleCreateSupportOption}
+                        onUpdateOption={handleUpdateSupportOption}
+                        onDeleteOption={handleDeleteSupportOption}
+                    />
                 </div>
             </div>
         </div>

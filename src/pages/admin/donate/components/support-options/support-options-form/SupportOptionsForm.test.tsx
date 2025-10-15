@@ -222,4 +222,51 @@ describe('SupportOptionsForm', () => {
         fireEvent.click(screen.getByTestId('btn-add new'));
         expect(screen.queryByTestId('btn-add new')).not.toBeInTheDocument();
     });
+
+    it('shows loader when loading with no items', () => {
+        render(
+            <SupportOptionsForm
+                supportOptions={[]}
+                isLoading={true}
+                onCreateOption={mockOnCreateOption}
+                onUpdateOption={mockOnUpdateOption}
+                onDeleteOption={mockOnDeleteOption}
+            />,
+        );
+
+        expect(screen.getByAltText('Зачекайте...')).toBeInTheDocument();
+        expect(screen.queryByTestId('support-options-not-found')).not.toBeInTheDocument();
+    });
+
+    it('does not show loader when loading with existing items', () => {
+        const mockOptions = [{ id: 1, name: 'Option 1', value: 'Value 1', currency: BankCurrency.Uah }];
+
+        render(
+            <SupportOptionsForm
+                supportOptions={mockOptions}
+                isLoading={true}
+                onCreateOption={mockOnCreateOption}
+                onUpdateOption={mockOnUpdateOption}
+                onDeleteOption={mockOnDeleteOption}
+            />,
+        );
+
+        expect(screen.queryByAltText('Завантаження...')).not.toBeInTheDocument();
+        expect(screen.getByText('Option 1')).toBeInTheDocument();
+    });
+
+    it('does not show loader when not loading', () => {
+        render(
+            <SupportOptionsForm
+                supportOptions={[]}
+                isLoading={false}
+                onCreateOption={mockOnCreateOption}
+                onUpdateOption={mockOnUpdateOption}
+                onDeleteOption={mockOnDeleteOption}
+            />,
+        );
+
+        expect(screen.queryByAltText('Завантаження...')).not.toBeInTheDocument();
+        expect(screen.getByTestId('support-options-not-found')).toBeInTheDocument();
+    });
 });

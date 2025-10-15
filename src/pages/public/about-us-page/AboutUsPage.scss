@@ -1,10 +1,11 @@
 @use '../../../assets/sass/variables/colors.scss';
+@use '../../../assets/sass/variables/z-index.scss';
 
 .about-us {
     &-loader {
         width: 70%;
         position: relative;
-        z-index: 10;
+        z-index: z-index.public('about-us-page-loader');
         margin: 8rem auto 4rem;
     }
 

@@ -1,4 +1,5 @@
 @use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/z-index.scss';
 
 // Загальні стилі для обгортки ImageInput, які застосовуються до всіх її варіантів.
 // Ці стилі служать "базою" і допомагають уникнути дублювання коду.
@@ -12,7 +13,6 @@
     align-items: center;
     border: 1px solid colors.$grey-700;
 
-    // Стилі для станів (фокус, вимкнений)
     &-focused {
         background-color: colors.$grey-700;
         border-color: rgba(colors.$grey-900, 0.8);
@@ -22,18 +22,6 @@
         background-color: colors.$grey-600;
     }
 
-    .overlay {
-        position: absolute;
-        top: 0;
-        right: 0; /* відступ від правого краю компонента */
-        width: 200px; /* ширина overlay */
-        height: 150px; /* або фіксовану висоту */
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 10; /* поверх усіх інших елементів */
-        border-radius: 8px;
-    }
-
-    // Стилі для елемента-заглушки, який відображається, коли немає зображення.
     .image-placeholder {
         display: flex;
         flex-direction: column;
@@ -56,7 +44,6 @@
         }
     }
 
-    // Стилі для елемента, який відображає завантажене зображення.
     .image-preview {
         position: relative;
         width: 100%;
@@ -80,12 +67,12 @@
             background: colors.$grey-50;
             opacity: 0;
             transition: opacity 0.3s ease;
-            z-index: 1;
+            z-index: z-index.admin('who-we-are-page-image-preview');
             cursor: pointer;
         }
 
         &:hover::after {
-            opacity: 0.78; // регулюй, наскільки сильно перекриває
+            opacity: 0.78;
         }
         .delete-button {
             position: absolute;
@@ -100,7 +87,7 @@
             border-radius: 8px;
             background: colors.$grey-900;
             opacity: 0.8;
-            z-index: 2;
+            z-index: z-index.admin('who-we-are-page-delete-button');
             cursor: pointer;
 
             &:hover {

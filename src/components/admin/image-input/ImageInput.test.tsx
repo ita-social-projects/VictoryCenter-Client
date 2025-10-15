@@ -53,7 +53,6 @@ describe('ImageInput', () => {
         setErrorMock = jest.fn();
         global.URL.createObjectURL = jest.fn(() => 'mock-preview-url');
         global.URL.revokeObjectURL = jest.fn();
-        setErrorMock = jest.fn();
 
         jest.clearAllMocks();
     });

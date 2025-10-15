@@ -11,6 +11,24 @@ export interface SupportOptionsType {
     id: number;
     name: string;
     value: string;
+    currency: BankCurrency;
+}
+
+export enum BankCurrency {
+    Uah = 0,
+    Usd = 1,
+    Eur = 2,
+}
+
+export interface CreateSupportOptionsRequest {
+    name: string;
+    value: string;
+    currency: BankCurrency;
+}
+
+export interface UpdateSupportOptionsRequest {
+    name: string;
+    value: string;
 }
 
 export interface CorrespondentBankDetailsType {

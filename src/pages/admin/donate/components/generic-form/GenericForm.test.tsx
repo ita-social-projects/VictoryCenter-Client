@@ -30,7 +30,7 @@ describe('GenericForm', () => {
     test('renders form in view mode', () => {
         render(<GenericForm {...defaultProps} />);
         expect(screen.getByText('Test Name')).toBeInTheDocument();
-        expect(screen.getByText(DONATE_TEXT.BUTTON.DELETE)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'delete-btn' })).toBeInTheDocument();
     });
 
     test('switches to edit mode when edit button is clicked', () => {
@@ -82,7 +82,7 @@ describe('GenericForm', () => {
         render(<GenericForm {...defaultProps} />);
         const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
         fireEvent.click(deleteButton);
-        expect(screen.getByText(DONATE_TEXT.BUTTON.DELETE)).toBeInTheDocument();
+        expect(screen.getByText(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE)).toBeInTheDocument();
     });
 
     it('renders children', () => {
@@ -192,14 +192,15 @@ describe('GenericForm', () => {
         fireEvent.click(publishBtn);
     });
 
-    it('closes modal on cancel', () => {
+    test('closes modal on cancel', () => {
         render(<GenericForm {...defaultProps} />);
         const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
         fireEvent.click(deleteButton);
 
         const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO);
         fireEvent.click(cancelButton);
-        expect(screen.getByText(DONATE_TEXT.BUTTON.DELETE)).toBeInTheDocument();
+
+        expect(screen.queryByText(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE)).not.toBeInTheDocument();
     });
 
     it('detects empty required fields', () => {
@@ -266,16 +267,27 @@ describe('GenericForm', () => {
         expect(screen.getByText(DONATE_TEXT.QUESTION.BANK_DETAILS.CANCEL_CREATE)).toBeInTheDocument();
     });
 
-    it('resets isDeleting on modal cancel', () => {
-        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Edit} />);
+    test('resets isDeleting on modal cancel', () => {
+        const fields: GenericFormField<Item>[] = [
+            { name: 'name', label: 'Name', isTitle: true, isRequired: true },
+            { name: 'optional', label: 'Optional' },
+        ];
+        const ChildForm = createGenericForm<Item>(fields);
+
+        render(<ChildForm {...defaultProps} initialMode={GenericFormMode.View} isChildForm />);
+
+        const header = screen.getByText('Test Name');
+        fireEvent.click(header);
+
         const deleteBtn = screen.getByRole('button', { name: 'delete-btn' });
         fireEvent.click(deleteBtn);
+
+        expect(screen.getByText(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE)).toBeInTheDocument();
 
         const cancelBtn = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO);
         fireEvent.click(cancelBtn);
 
-        const icon = screen.getByRole('button', { name: 'delete-btn' }).querySelector('.delete-btn-icon');
-        expect(icon?.classList.contains('pressed')).toBe(false);
+        expect(screen.queryByText(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE)).not.toBeInTheDocument();
     });
 
     it('returns null when isOpen is false', () => {

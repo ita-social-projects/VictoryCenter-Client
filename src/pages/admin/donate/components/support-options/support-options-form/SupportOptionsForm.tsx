@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { SupportOptionsType } from '../../../../../../types/admin/donate';
+import { InlineLoader } from '../../../../../../components/common/inline-loader/InlineLoader';
 import './SupportOptionsForm.scss';
 import { SupportOptionItem } from '../support-option-item/SupportOptionItem';
 import NotFoundIcon from '../../../../../../assets/icons/not-found.svg';
@@ -30,6 +31,17 @@ export const SupportOptionsForm = ({
     };
 
     const shouldShowNotFound = supportOptions.length === 0 && !isAdding && !isLoading;
+    const shouldShowLoader = isLoading && supportOptions.length === 0 && !isAdding;
+
+    if (shouldShowLoader) {
+        return (
+            <div className="support-options-container">
+                <div className="support-options-loader">
+                    <InlineLoader size={3} />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="support-options-container">

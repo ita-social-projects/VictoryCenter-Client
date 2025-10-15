@@ -22,4 +22,7 @@ export const API_ROUTES = {
     FAQ: {
         PUBLISHED_BY_SLUG: 'faq/published',
     },
+    DONATE: {
+        SUPPORT_OPTIONS: 'SupportOptions',
+    },
 };

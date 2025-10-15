@@ -93,7 +93,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
     const resetForm = () => {
         setName(data?.name ?? '');
         setValue(data?.value ?? '');
-        setErrors({}); // 👈 сбрасывай ошибки
+        setErrors({});
         if (mode === SupportOptionItemMode.Create) onCancel?.();
         else setMode(SupportOptionItemMode.View);
     };

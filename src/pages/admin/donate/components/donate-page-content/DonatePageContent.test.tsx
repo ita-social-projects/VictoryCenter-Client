@@ -61,19 +61,33 @@ jest.mock('../support-options/support-options-form/SupportOptionsForm', () => ({
 }));
 
 describe('DonatePageContent', () => {
+    const createMockConfig = (withCorrespondentBanks = false) => ({
+        form: jest.fn(),
+        createEmptyItem: jest.fn(),
+        withCorrespondentBanks,
+        ...(withCorrespondentBanks && { correspondentForm: jest.fn() }),
+    });
+
+    const setupMockBankDetails = (items: any[] = [], config: any = createMockConfig(), isLoading = false) => {
+        mockUseBankDetails.mockReturnValue({
+            items,
+            config,
+            setItems: mockSetItems,
+            isLoading,
+        });
+    };
+
+    const renderAndWait = async (component: React.ReactElement) => {
+        render(component);
+        await waitFor(() => {
+            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+        });
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
         mockUseAdminClient.mockReturnValue('mockClient');
-        mockUseBankDetails.mockReturnValue({
-            items: [],
-            config: {
-                form: jest.fn(),
-                createEmptyItem: jest.fn(),
-                withCorrespondentBanks: false,
-            },
-            setItems: mockSetItems,
-            isLoading: false,
-        });
+        setupMockBankDetails();
         mockGetAll.mockResolvedValue([]);
         mockCreate.mockResolvedValue({ id: 1, name: 'Test', value: '123', currency: BankCurrency.Uah });
         mockUpdate.mockResolvedValue({ id: 1, name: 'Updated', value: '456', currency: BankCurrency.Uah });
@@ -81,73 +95,37 @@ describe('DonatePageContent', () => {
     });
 
     it('renders component successfully', async () => {
-        render(<DonatePageContent />);
-        await waitFor(() => {
-            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
-            expect(screen.getByTestId('support-options-form')).toBeInTheDocument();
-        });
+        await renderAndWait(<DonatePageContent />);
+        expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+        expect(screen.getByTestId('support-options-form')).toBeInTheDocument();
     });
 
     it('renders GenericDetails when config exists', async () => {
-        render(<DonatePageContent />);
-        await waitFor(() => {
-            expect(screen.getByTestId('generic-details')).toBeInTheDocument();
-        });
+        await renderAndWait(<DonatePageContent />);
+        expect(screen.getByTestId('generic-details')).toBeInTheDocument();
     });
 
     it('does not render GenericDetails when config is null', async () => {
-        mockUseBankDetails.mockReturnValue({
-            items: [],
-            config: null,
-            setItems: mockSetItems,
-            isLoading: false,
-        });
-        render(<DonatePageContent />);
-        await waitFor(() => {
-            expect(screen.queryByTestId('generic-details')).not.toBeInTheDocument();
-        });
+        setupMockBankDetails([], null);
+        await renderAndWait(<DonatePageContent />);
+        expect(screen.queryByTestId('generic-details')).not.toBeInTheDocument();
     });
 
     it('renders correspondent banks when withCorrespondentBanks is true', async () => {
-        mockUseBankDetails.mockReturnValue({
-            items: [{ id: 1, correspondentBanks: [] }],
-            config: {
-                form: jest.fn(),
-                createEmptyItem: jest.fn(),
-                withCorrespondentBanks: true,
-                correspondentForm: jest.fn(),
-            },
-            setItems: mockSetItems,
-            isLoading: false,
-        });
-        render(<DonatePageContent />);
-        await waitFor(() => {
-            expect(screen.getAllByTestId('generic-details')).toHaveLength(2);
-        });
+        setupMockBankDetails([{ id: 1, correspondentBanks: [] }], createMockConfig(true));
+        await renderAndWait(<DonatePageContent />);
+        expect(screen.getAllByTestId('generic-details')).toHaveLength(2);
     });
 
     it('does not render correspondent banks when withCorrespondentBanks is false', async () => {
-        mockUseBankDetails.mockReturnValue({
-            items: [{ id: 1 }],
-            config: {
-                form: jest.fn(),
-                createEmptyItem: jest.fn(),
-                withCorrespondentBanks: false,
-            },
-            setItems: mockSetItems,
-            isLoading: false,
-        });
-        render(<DonatePageContent />);
-        await waitFor(() => {
-            expect(screen.getAllByTestId('generic-details')).toHaveLength(1);
-        });
+        setupMockBankDetails([{ id: 1 }], createMockConfig(false));
+        await renderAndWait(<DonatePageContent />);
+        expect(screen.getAllByTestId('generic-details')).toHaveLength(1);
     });
 
     it('fetches support options on mount', async () => {
-        render(<DonatePageContent />);
-        await waitFor(() => {
-            expect(mockGetAll).toHaveBeenCalledWith('mockClient', 'UAH');
-        });
+        await renderAndWait(<DonatePageContent />);
+        expect(mockGetAll).toHaveBeenCalledWith('mockClient', 'UAH');
     });
 
     it('handles category change', async () => {
@@ -191,56 +169,35 @@ describe('DonatePageContent', () => {
 
     it('handles fetch error gracefully', async () => {
         mockGetAll.mockRejectedValue(new Error('Network error'));
-        render(<DonatePageContent />);
-        await waitFor(() => {
-            expect(mockGetAll).toHaveBeenCalled();
-        });
+        await renderAndWait(<DonatePageContent />);
+        expect(mockGetAll).toHaveBeenCalled();
     });
 
     it('handles correspondent banks change for existing item', async () => {
-        mockUseBankDetails.mockReturnValue({
-            items: [{ id: 1, correspondentBanks: [] }],
-            config: {
-                form: jest.fn(),
-                createEmptyItem: jest.fn(),
-                withCorrespondentBanks: true,
-                correspondentForm: jest.fn(),
-            },
-            setItems: mockSetItems,
-            isLoading: false,
-        });
-        render(<DonatePageContent />);
-        await waitFor(() => {
-            expect(screen.getAllByTestId('generic-details')).toHaveLength(2);
-        });
+        setupMockBankDetails([{ id: 1, correspondentBanks: [] }], createMockConfig(true));
+        await renderAndWait(<DonatePageContent />);
+        expect(screen.getAllByTestId('generic-details')).toHaveLength(2);
+
         const changeButtons = screen.getAllByText('Change Items');
         fireEvent.click(changeButtons[1]);
+
         await waitFor(() => {
             expect(mockSetItems).toHaveBeenCalled();
         });
     });
 
     it('handles correspondent banks change for new item', async () => {
-        mockUseBankDetails.mockReturnValue({
-            items: [{ id: 999 }],
-            config: {
-                form: jest.fn(),
-                createEmptyItem: jest.fn(),
-                withCorrespondentBanks: true,
-                correspondentForm: jest.fn(),
-            },
-            setItems: mockSetItems,
-            isLoading: false,
-        });
-        render(<DonatePageContent />);
-        await waitFor(() => {
-            expect(screen.getAllByTestId('generic-details')).toHaveLength(2);
-        });
+        setupMockBankDetails([{ id: 999 }], createMockConfig(true));
+        await renderAndWait(<DonatePageContent />);
+        expect(screen.getAllByTestId('generic-details')).toHaveLength(2);
+
         const changeButtons = screen.getAllByText('Change Items');
         fireEvent.click(changeButtons[1]);
+
         await waitFor(() => {
             expect(mockSetItems).toHaveBeenCalledWith(expect.any(Function));
         });
+
         const setItemsCallback = mockSetItems.mock.calls[0][0];
         const result = setItemsCallback([{ id: 999 }]);
         expect(result).toEqual([{ id: 999 }, { id: 1, correspondentBanks: [{ id: 1 }] }]);

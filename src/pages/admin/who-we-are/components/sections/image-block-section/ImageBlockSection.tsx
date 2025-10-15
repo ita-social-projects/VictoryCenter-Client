@@ -14,7 +14,7 @@ import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../validation/ad
 export interface ImageSectionProps {
     content: Content[] | undefined;
     titleLimit?: number;
-    descriptionLimit?: number;
+    descriptionLimit: number;
     rows?: number;
     onChange: (data: Content) => void;
     onPublish: () => void;

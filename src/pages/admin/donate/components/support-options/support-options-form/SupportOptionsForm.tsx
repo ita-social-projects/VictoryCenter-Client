@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { SupportOptionsType } from '../../../../../../types/admin/donate';
 import './SupportOptionsForm.scss';
@@ -8,40 +8,28 @@ import { DONATE_TEXT } from '../../../../../../const/admin/donate';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 
 export interface SupportOptionsFormProps {
-    initialData?: SupportOptionsType[];
-    onChangeItems?: (newItems: SupportOptionsType[]) => void;
+    supportOptions: SupportOptionsType[];
+    isLoading: boolean;
+    onCreateOption: (name: string, value: string) => Promise<void>;
+    onUpdateOption: (id: number, name: string, value: string) => Promise<void>;
+    onDeleteOption: (id: number) => Promise<void>;
 }
 
-export const SupportOptionsForm = ({ initialData = [], onChangeItems }: SupportOptionsFormProps) => {
-    const [items, setItems] = useState<SupportOptionsType[]>(initialData);
+export const SupportOptionsForm = ({
+    supportOptions,
+    isLoading,
+    onCreateOption,
+    onUpdateOption,
+    onDeleteOption,
+}: SupportOptionsFormProps) => {
     const [isAdding, setIsAdding] = useState(false);
 
-    useEffect(() => {
-        setItems(initialData);
-        setIsAdding(false);
-    }, [initialData]);
-
-    const handleSaveOption = (item: SupportOptionsType) => {
-        setItems((prev) => {
-            const exists = prev.find((i) => i.id === item.id);
-            const newItems = exists ? prev.map((i) => (i.id === item.id ? item : i)) : [...prev, item];
-            onChangeItems?.(newItems);
-            return newItems;
-        });
+    const handleSaveNewOption = async (name: string, value: string) => {
+        await onCreateOption(name, value);
         setIsAdding(false);
     };
 
-    const handleDeleteOption = (id: number) => {
-        setItems((prev) => {
-            const newItems = prev.filter((i) => i.id !== id);
-            onChangeItems?.(newItems);
-            return newItems;
-        });
-    };
-
-    const handleAddOption = () => setIsAdding(true);
-
-    const shouldShowNotFound = items.length === 0 && !isAdding;
+    const shouldShowNotFound = supportOptions.length === 0 && !isAdding && !isLoading;
 
     return (
         <div className="support-options-container">
@@ -49,7 +37,7 @@ export const SupportOptionsForm = ({ initialData = [], onChangeItems }: SupportO
                 <div className="support-options-form not-found" data-testid="support-options-not-found">
                     <img src={NotFoundIcon} alt={COMMON_TEXT_ADMIN.ALT.NOT_FOUND} />
                     <p>{DONATE_TEXT.SUPPORT_OPTIONS.NOT_FOUND}</p>
-                    <Button className="btn-add" onClick={handleAddOption} buttonStyle="secondary">
+                    <Button className="btn-add" onClick={() => setIsAdding(true)} buttonStyle="secondary">
                         <>{DONATE_TEXT.SUPPORT_OPTIONS.ADD_FIRST}</>
                         <div className="plus-icon"></div>
                     </Button>
@@ -57,21 +45,26 @@ export const SupportOptionsForm = ({ initialData = [], onChangeItems }: SupportO
             ) : (
                 <div className="support-options-form">
                     <div className="support-options-form title">{DONATE_TEXT.SUPPORT_OPTIONS.TITLE}</div>
-                    {items.map((item) => (
+                    {supportOptions.map((item) => (
                         <SupportOptionItem
                             key={item.id}
                             data={item}
-                            onSave={handleSaveOption}
-                            onDelete={handleDeleteOption}
+                            onSave={(name, value) => onUpdateOption(item.id, name, value)}
+                            onDelete={() => onDeleteOption(item.id)}
                         />
                     ))}
 
                     {isAdding && (
-                        <SupportOptionItem key="new" onSave={handleSaveOption} onCancel={() => setIsAdding(false)} />
+                        <SupportOptionItem key="new" onSave={handleSaveNewOption} onCancel={() => setIsAdding(false)} />
                     )}
 
                     {!isAdding && (
-                        <Button className="btn-add new" onClick={handleAddOption} buttonStyle="primary">
+                        <Button
+                            className="btn-add new"
+                            onClick={() => setIsAdding(true)}
+                            buttonStyle="primary"
+                            disabled={isLoading}
+                        >
                             <>{DONATE_TEXT.SUPPORT_OPTIONS.ADD_NEW}</>
                             <div className="plus-icon"></div>
                         </Button>

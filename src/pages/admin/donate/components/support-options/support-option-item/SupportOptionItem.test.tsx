@@ -1,31 +1,73 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { SupportOptionItem, SupportOptionItemMode } from './SupportOptionItem';
 import { DONATE_TEXT } from '../../../../../../const/admin/donate';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
+import { BankCurrency } from '../../../../../../types/admin/donate';
+
+jest.mock('../../input/Input', () => ({
+    Input: ({ value, handleChange, handleBlur, name }: any) => (
+        <input value={value} onChange={handleChange} onBlur={handleBlur} data-testid={`input-${name}`} />
+    ),
+}));
+
+jest.mock('../../../../../../components/admin/button/Button', () => ({
+    Button: ({ children, onClick, disabled }: any) => (
+        <button onClick={onClick} disabled={disabled}>
+            {children}
+        </button>
+    ),
+}));
+
+jest.mock('../../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel }: any) =>
+        isOpen ? (
+            <div data-testid="confirmation-modal">
+                <p>{title}</p>
+                <button onClick={onConfirm}>Yes</button>
+                <button onClick={onCancel}>No</button>
+            </div>
+        ) : null,
+}));
+
+jest.mock('../../../../../../validation/admin/bank-details-schema/bank-details-schema', () => ({
+    SUPPORT_OPTIONS_VALIDATION_FUNCTIONS: {
+        validateName: (val: string) => (val.length < 2 ? 'Name too short' : undefined),
+        validateValue: (val: string) => (val.length < 2 ? 'Value too short' : undefined),
+    },
+}));
 
 describe('SupportOptionItem', () => {
-    const defaultData = { id: 1, name: 'Option 1', value: 'Value 1' };
+    const defaultData = {
+        id: 1,
+        name: 'Option 1',
+        value: 'Value 1',
+        currency: BankCurrency.Uah,
+    };
 
-    test('renders in view mode with data', () => {
+    it('renders in view mode with data', () => {
         render(<SupportOptionItem data={defaultData} />);
         expect(screen.getByText('Option 1')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'edit-btn' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'delete-btn' })).toBeInTheDocument();
     });
 
-    test('switches to edit mode when edit button clicked', () => {
+    it('renders in create mode by default without data', () => {
+        render(<SupportOptionItem />);
+        expect(screen.getByTestId('input-name')).toBeInTheDocument();
+        expect(screen.getByTestId('input-value')).toBeInTheDocument();
+    });
+
+    it('switches to edit mode when edit button clicked', () => {
         render(<SupportOptionItem data={defaultData} />);
-        const editButton = screen.getAllByRole('button')[0];
+        const editButton = screen.getByRole('button', { name: 'edit-btn' });
         fireEvent.click(editButton);
-        expect(screen.getByDisplayValue('Option 1')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('Value 1')).toBeInTheDocument();
+        expect(screen.getByTestId('input-name')).toBeInTheDocument();
     });
 
-    test('save calls onSave with updated values', () => {
-        const onSave = jest.fn();
+    it('calls onSave with updated values in edit mode', async () => {
+        const onSave = jest.fn().mockResolvedValue(undefined);
         render(<SupportOptionItem data={defaultData} onSave={onSave} initialMode={SupportOptionItemMode.Edit} />);
-        const nameInput = screen.getByDisplayValue('Option 1');
-        const valueInput = screen.getByDisplayValue('Value 1');
+
+        const nameInput = screen.getByTestId('input-name');
+        const valueInput = screen.getByTestId('input-value');
 
         fireEvent.change(nameInput, { target: { value: 'Updated Name' } });
         fireEvent.change(valueInput, { target: { value: 'Updated Value' } });
@@ -33,38 +75,144 @@ describe('SupportOptionItem', () => {
         const publishButton = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH);
         fireEvent.click(publishButton);
 
-        expect(onSave).toHaveBeenCalledWith({ id: 1, name: 'Updated Name', value: 'Updated Value' });
+        await waitFor(() => {
+            expect(onSave).toHaveBeenCalledWith('Updated Name', 'Updated Value');
+        });
     });
 
-    test('cancel with changes opens confirmation modal', () => {
+    it('shows confirmation modal when saving in create mode', async () => {
+        const onSave = jest.fn().mockResolvedValue(undefined);
+        render(<SupportOptionItem onSave={onSave} initialMode={SupportOptionItemMode.Create} />);
+
+        const nameInput = screen.getByTestId('input-name');
+        const valueInput = screen.getByTestId('input-value');
+
+        fireEvent.change(nameInput, { target: { value: 'New Name' } });
+        fireEvent.change(valueInput, { target: { value: 'New Value' } });
+
+        const publishButton = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH);
+        fireEvent.click(publishButton);
+
+        await waitFor(() => {
+            expect(screen.getByText(DONATE_TEXT.QUESTION.SUPPORT_OPTION.ADD)).toBeInTheDocument();
+        });
+
+        const yesButton = screen.getByText('Yes');
+        fireEvent.click(yesButton);
+
+        await waitFor(() => {
+            expect(onSave).toHaveBeenCalledWith('New Name', 'New Value');
+        });
+    });
+
+    it('cancel with changes opens confirmation modal', () => {
         render(<SupportOptionItem data={defaultData} initialMode={SupportOptionItemMode.Edit} />);
-        const nameInput = screen.getByDisplayValue('Option 1');
+        const nameInput = screen.getByTestId('input-name');
         fireEvent.change(nameInput, { target: { value: 'Changed' } });
 
         const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
         fireEvent.click(cancelButton);
 
-        expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
+        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
     });
 
-    test('delete button opens confirmation modal and calls onDelete', () => {
-        const onDelete = jest.fn();
-        render(<SupportOptionItem data={defaultData} onDelete={onDelete} />);
-        const deleteButton = screen.getAllByRole('button')[1];
-        fireEvent.click(deleteButton);
+    it('cancel without changes resets form directly', () => {
+        render(<SupportOptionItem data={defaultData} initialMode={SupportOptionItemMode.Edit} />);
+        const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+        fireEvent.click(cancelButton);
 
-        expect(screen.getByText(DONATE_TEXT.QUESTION.SUPPORT_OPTION.DELETE)).toBeInTheDocument();
+        expect(screen.queryByTestId('input-name')).not.toBeInTheDocument();
+    });
 
-        const yesButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES);
+    it('cancel in create mode calls onCancel', () => {
+        const onCancel = jest.fn();
+        render(<SupportOptionItem onCancel={onCancel} initialMode={SupportOptionItemMode.Create} />);
+
+        const nameInput = screen.getByTestId('input-name');
+        fireEvent.change(nameInput, { target: { value: 'Test' } });
+
+        const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+        fireEvent.click(cancelButton);
+
+        const yesButton = screen.getByText('Yes');
         fireEvent.click(yesButton);
 
-        expect(onDelete).toHaveBeenCalledWith(1);
+        expect(onCancel).toHaveBeenCalled();
     });
 
-    test('create mode disables publish button if fields empty', () => {
-        const onSave = jest.fn();
-        render(<SupportOptionItem initialMode={SupportOptionItemMode.Create} onSave={onSave} />);
+    it('delete button opens confirmation modal and calls onDelete', async () => {
+        const onDelete = jest.fn().mockResolvedValue(undefined);
+        render(<SupportOptionItem data={defaultData} onDelete={onDelete} />);
+
+        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
+        fireEvent.click(deleteButton);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+        });
+
+        const yesButton = screen.getByText('Yes');
+        fireEvent.click(yesButton);
+
+        await waitFor(() => {
+            expect(onDelete).toHaveBeenCalled();
+        });
+    });
+
+    it('disables publish button if fields are empty', () => {
+        render(<SupportOptionItem initialMode={SupportOptionItemMode.Create} />);
         const publishButton = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH);
         expect(publishButton).toBeDisabled();
+    });
+
+    it('disables publish button if no changes were made', () => {
+        render(<SupportOptionItem data={defaultData} initialMode={SupportOptionItemMode.Edit} />);
+        const publishButton = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH);
+        expect(publishButton).toBeDisabled();
+    });
+
+    it('shows validation errors on blur', () => {
+        render(<SupportOptionItem initialMode={SupportOptionItemMode.Create} />);
+
+        const nameInput = screen.getByTestId('input-name');
+        fireEvent.change(nameInput, { target: { value: 'A' } });
+        fireEvent.blur(nameInput);
+
+        expect(screen.getByText('Name too short')).toBeInTheDocument();
+    });
+
+    it('disables publish button when validation errors exist', () => {
+        render(<SupportOptionItem data={defaultData} initialMode={SupportOptionItemMode.Edit} />);
+
+        const nameInput = screen.getByTestId('input-name');
+        fireEvent.change(nameInput, { target: { value: 'X' } });
+        fireEvent.blur(nameInput);
+
+        const publishButton = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH);
+        expect(publishButton).toBeDisabled();
+    });
+
+    it('updates state when data prop changes', () => {
+        const { rerender } = render(<SupportOptionItem data={defaultData} />);
+
+        const newData = { id: 2, name: 'New Option', value: 'New Value', currency: BankCurrency.Usd };
+        rerender(<SupportOptionItem data={newData} />);
+
+        expect(screen.getByText('New Option')).toBeInTheDocument();
+    });
+
+    it('closes modal on cancel button click', () => {
+        render(<SupportOptionItem data={defaultData} initialMode={SupportOptionItemMode.Edit} />);
+
+        const nameInput = screen.getByTestId('input-name');
+        fireEvent.change(nameInput, { target: { value: 'Changed' } });
+
+        const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+        fireEvent.click(cancelButton);
+
+        const noButton = screen.getByText('No');
+        fireEvent.click(noButton);
+
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
     });
 });

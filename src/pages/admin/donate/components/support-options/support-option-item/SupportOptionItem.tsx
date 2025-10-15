@@ -22,9 +22,9 @@ interface ModalConfig {
 export interface SupportOptionItemProps {
     data?: SupportOptionsType;
     initialMode?: SupportOptionItemMode;
-    onSave?: (item: SupportOptionsType) => void;
+    onSave?: (name: string, value: string) => Promise<void>;
     onCancel?: () => void;
-    onDelete?: (id: number) => void;
+    onDelete?: () => Promise<void>;
 }
 
 export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelete }: SupportOptionItemProps) => {
@@ -34,7 +34,6 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
     const [name, setName] = useState(data?.name ?? '');
     const [value, setValue] = useState(data?.value ?? '');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isDeleting, setIsDeleting] = useState(false);
     const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
     const [errors, setErrors] = useState<{ name?: string; value?: string }>({});
 
@@ -67,13 +66,16 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
         return !nameError && !valueError;
     };
 
-    const handleSave = () => {
-        if (hasEmptyFields || !validateAll()) return;
+    const handleSave = async () => {
+        if (hasEmptyFields || !validateAll() || !onSave) return;
+
         setIsSubmitting(true);
-        const newItem: SupportOptionsType = { id: data?.id ?? Date.now(), name, value };
-        onSave?.(newItem);
-        setMode(SupportOptionItemMode.View);
-        setIsSubmitting(false);
+        try {
+            await onSave(name, value);
+            setMode(SupportOptionItemMode.View);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleCancel = () => {
@@ -98,20 +100,15 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
         else setMode(SupportOptionItemMode.View);
     };
 
-    const handleDelete = () => {
-        if (!data?.id || !onDelete) return;
-        onDelete(data.id);
-    };
+    const handleDelete = async () => {
+        if (!onDelete) return;
 
-    const handleDeleteClick = () => {
-        setIsDeleting(true);
-        setModalConfig({
-            title: DONATE_TEXT.QUESTION.SUPPORT_OPTION.DELETE,
-            onConfirm: () => {
-                handleDelete();
-                setIsDeleting(false);
-            },
-        });
+        setIsSubmitting(true);
+        try {
+            await onDelete();
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleSaveClick = () => {
@@ -125,13 +122,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
         }
     };
 
-    const handleModalCancelOrClose = () => {
-        setModalConfig(null);
-        setIsDeleting(false);
-    };
-
     const editable = mode !== SupportOptionItemMode.View;
-
     const hasErrors = !!errors.name || !!errors.value;
 
     return (
@@ -144,11 +135,18 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                             aria-label="edit-btn"
                             className={`edit-btn ${editable ? 'edit' : ''}`}
                             onClick={() => setMode(SupportOptionItemMode.Edit)}
+                            disabled={isSubmitting}
                         />
                         <button
                             aria-label="delete-btn"
-                            className={`delete-btn delete-btn-icon ${isDeleting ? 'pressed' : ''}`}
-                            onClick={handleDeleteClick}
+                            className="delete-btn delete-btn-icon"
+                            onClick={() =>
+                                setModalConfig({
+                                    title: DONATE_TEXT.QUESTION.SUPPORT_OPTION.DELETE,
+                                    onConfirm: handleDelete,
+                                })
+                            }
+                            disabled={isSubmitting}
                         />
                     </div>
                 )}
@@ -186,12 +184,11 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
 
             {editable && (
                 <div className="support-option-actions">
-                    <Button type="button" onClick={handleCancel} buttonStyle="secondary">
+                    <Button type="button" onClick={handleCancel} buttonStyle="secondary" disabled={isSubmitting}>
                         {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                     </Button>
                     <Button
                         type="button"
-                        aria-label="save-support-option"
                         onClick={handleSaveClick}
                         buttonStyle="primary"
                         disabled={isSubmitting || hasEmptyFields || !hasChanges() || hasErrors}
@@ -203,14 +200,14 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
 
             <ConfirmationModal
                 isOpen={!!modalConfig}
-                isButtonsDisabled={false}
+                isButtonsDisabled={isSubmitting}
                 title={modalConfig?.title ?? ''}
                 onConfirm={() => {
                     modalConfig?.onConfirm();
                     setModalConfig(null);
                 }}
-                onCancel={handleModalCancelOrClose}
-                onClose={handleModalCancelOrClose}
+                onCancel={() => setModalConfig(null)}
+                onClose={() => setModalConfig(null)}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />

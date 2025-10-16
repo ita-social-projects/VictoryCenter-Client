@@ -596,7 +596,7 @@ describe('TeamPageContent', () => {
 
             await waitFor(
                 () => {
-                    expect(mockTeamMembersApi.getAll.mock.calls.length).toBeLessThanOrEqual(initialGetAllCallCount);
+                    expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(initialGetAllCallCount);
                 },
                 { timeout: 100 },
             );

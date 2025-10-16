@@ -16,11 +16,11 @@ export const API_ROUTES = {
         BASE: 'TeamCategories',
     },
     PROGRAMS: {
-        BASE: 'Programs',
-        PUBLISHED: 'Programs/published',
+        BASE: 'HippotherapyPrograms',
+        PUBLISHED: 'HippotherapyPrograms/published',
     },
     PROGRAMCATEGORY: {
-        BASE: 'ProgramCategory',
+        BASE: 'HippotherapyProgramCategories',
     },
     PAYMENTS: {
         DONATE: 'payments/donate',

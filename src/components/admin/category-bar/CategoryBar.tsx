@@ -1,5 +1,8 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 import { ContextMenuButton } from '../context-menu-button/ContextMenuButton';
+import { ReactComponent as ArrowLeftIcon } from '../../../assets/icons/arrow-left.svg';
+import { ReactComponent as ArrowRightIcon } from '../../../assets/icons/arrow-right.svg';
 import './CategoryBar.scss';
 
 export interface ContextMenuOption {
@@ -16,6 +19,7 @@ export interface CategoryBarProps<T> {
     onCategorySelect: (category: T) => void;
     contextMenuOptions?: ContextMenuOption[];
     onContextMenuOptionSelected?: (id: string) => void;
+    scrollAmount?: number;
 }
 
 export const CategoryBar = <T,>({
@@ -27,7 +31,46 @@ export const CategoryBar = <T,>({
     onCategorySelect,
     contextMenuOptions = [],
     onContextMenuOptionSelected,
+    scrollAmount = 400,
 }: CategoryBarProps<T>) => {
+    const categoriesContainerRef = useRef<HTMLDivElement>(null);
+    const [showLeftArrow, setShowLeftArrow] = useState(false);
+    const [showRightArrow, setShowRightArrow] = useState(false);
+
+    const checkScroll = useCallback(() => {
+        const container = categoriesContainerRef.current;
+        if (!container) return;
+
+        const { scrollLeft, scrollWidth, clientWidth } = container;
+        const isAtStart = scrollLeft <= 1;
+        const isAtEnd = scrollLeft >= scrollWidth - clientWidth - 1;
+
+        setShowLeftArrow(!isAtStart);
+        setShowRightArrow(!isAtEnd);
+    }, []);
+
+    useEffect(() => {
+        checkScroll();
+        const container = categoriesContainerRef.current;
+        if (!container) return;
+
+        const resizeObserver = new ResizeObserver(checkScroll);
+        resizeObserver.observe(container);
+
+        return () => resizeObserver.disconnect();
+    }, [categories, checkScroll]);
+
+    const handleScroll = useCallback(
+        (direction: 'left' | 'right') => {
+            const container = categoriesContainerRef.current;
+            if (!container) return;
+
+            const scrollValue = direction === 'left' ? -scrollAmount : scrollAmount;
+            container.scrollBy({ left: scrollValue, behavior: 'smooth' });
+        },
+        [scrollAmount],
+    );
+
     const handleContextMenuOptionSelected = (id: string) => {
         onContextMenuOptionSelected?.(id);
     };
@@ -43,23 +86,43 @@ export const CategoryBar = <T,>({
                     ))}
                 </ContextMenuButton>
             )}
-            {categories.map((category) => {
-                const key = getCategoryKey(category);
-                const name = getCategoryDisplayName(category);
-                const selected = !!selectedCategory && key === getCategoryKey(selectedCategory);
+            {showLeftArrow && (
+                <button
+                    className="category-bar-arrow category-bar-arrow-left"
+                    onClick={() => handleScroll('left')}
+                    type="button"
+                >
+                    <ArrowLeftIcon />
+                </button>
+            )}
+            <div ref={categoriesContainerRef} className="category-bar-categories" onScroll={checkScroll}>
+                {categories.map((category) => {
+                    const key = getCategoryKey(category);
+                    const name = getCategoryDisplayName(category);
+                    const selected = !!selectedCategory && key === getCategoryKey(selectedCategory);
 
-                return (
-                    <button
-                        key={key}
-                        onClick={() => onCategorySelect(category)}
-                        className={classNames('category-bar-button', {
-                            'category-bar-button-selected': selected,
-                        })}
-                    >
-                        {name}
-                    </button>
-                );
-            })}
+                    return (
+                        <button
+                            key={key}
+                            onClick={() => onCategorySelect(category)}
+                            className={classNames('category-bar-button', {
+                                'category-bar-button-selected': selected,
+                            })}
+                        >
+                            {name}
+                        </button>
+                    );
+                })}
+            </div>
+            {showRightArrow && (
+                <button
+                    className="category-bar-arrow category-bar-arrow-right"
+                    onClick={() => handleScroll('right')}
+                    type="button"
+                >
+                    <ArrowRightIcon />
+                </button>
+            )}
         </div>
     );
 };

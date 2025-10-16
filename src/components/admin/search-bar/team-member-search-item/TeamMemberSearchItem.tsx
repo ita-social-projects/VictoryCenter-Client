@@ -12,15 +12,16 @@ export const TeamMemberSearchItem = forwardRef<SearchItemContentRef, TeamMemberS
         const nameRef = useRef<HTMLDivElement>(null);
         const subtitleRef = useRef<HTMLDivElement>(null);
 
+        const { image } = item;
+
         const categoryName = useMemo(
             () => categories.find((c) => c.id === item.categoryId)?.name ?? '',
             [categories, item.categoryId],
         );
 
         const imageUrl = useMemo(() => {
-            const img = item.image;
-            return img && 'url' in img ? img.url : null;
-        }, [item.image]);
+            return image && 'url' in image ? image.url : null;
+        }, [image]);
 
         const initials = useMemo(() => {
             return item.fullName

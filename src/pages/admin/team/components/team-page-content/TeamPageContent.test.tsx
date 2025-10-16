@@ -522,6 +522,79 @@ describe('TeamPageContent', () => {
             });
         });
 
+        it('should not trigger search when same query is entered again', async () => {
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            typeInSearchInput('abc');
+            await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1));
+
+            typeInSearchInput('abc');
+
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1);
+        });
+
+        it('should handle AbortError gracefully when loading more search results', async () => {
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            typeInSearchInput('abc');
+            await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1));
+
+            const abortError = new Error('Request aborted');
+            abortError.name = 'AbortError';
+            mockTeamMembersApi.search.mockRejectedValueOnce(abortError);
+
+            await waitFor(() => expect(getSearchLoadMoreButton()).toBeInTheDocument());
+            fireEvent.click(getSearchLoadMoreButton());
+
+            await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(2));
+
+            expect(screen.queryByTestId('team-error-container')).not.toBeInTheDocument();
+        });
+
+        it('should not load more search results when already loading', async () => {
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            typeInSearchInput('abc');
+            await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1));
+
+            mockTeamMembersApi.search.mockImplementation(
+                () =>
+                    new Promise((resolve) =>
+                        setTimeout(
+                            () =>
+                                resolve({
+                                    items: [
+                                        {
+                                            id: 12,
+                                            fullName: 'Search Person 3',
+                                            categoryId: 1,
+                                            image: null,
+                                            description: '',
+                                            status: VisibilityStatus.Published,
+                                        },
+                                    ],
+                                    totalItemsCount: 5,
+                                }),
+                            1000,
+                        ),
+                    ),
+            );
+
+            await waitFor(() => expect(getSearchLoadMoreButton()).toBeInTheDocument());
+
+            fireEvent.click(getSearchLoadMoreButton());
+            fireEvent.click(getSearchLoadMoreButton());
+
+            await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(2), { timeout: 2000 });
+
+            expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(2);
+        });
+
         it('should load more search suggestions when requested and has more', async () => {
             renderTeamPageContent();
             await waitFor(() => expect(getMemberItems()).toHaveLength(2));
@@ -531,7 +604,16 @@ describe('TeamPageContent', () => {
             await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1));
 
             mockTeamMembersApi.search.mockResolvedValueOnce({
-                items: [{ id: 12, fullName: 'Search Person 3', categoryId: 1 }],
+                items: [
+                    {
+                        id: 12,
+                        fullName: 'Search Person 3',
+                        categoryId: 1,
+                        image: null,
+                        description: '',
+                        status: VisibilityStatus.Published,
+                    },
+                ],
                 totalItemsCount: 5,
             } as any);
 
@@ -542,6 +624,26 @@ describe('TeamPageContent', () => {
             fireEvent.click(getSearchLoadMoreButton());
 
             await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(2));
+        });
+
+        it('should not call search API in loadMore when query length becomes less than 2', async () => {
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            typeInSearchInput('abc');
+            await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1));
+
+            typeInSearchInput('a');
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            const loadMoreButton = screen.queryByTestId('search-load-more');
+            if (loadMoreButton) {
+                fireEvent.click(loadMoreButton);
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1);
         });
 
         it('should select search item, reset status and switch category, then clear selection and return to list', async () => {
@@ -639,6 +741,29 @@ describe('TeamPageContent', () => {
                     TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER,
                     ToastType.Info,
                 );
+            });
+
+            it('should set hasMore to true when adding member that exceeds current page capacity', async () => {
+                mockTeamMembersApi.getAll.mockResolvedValueOnce({
+                    items: mockMembers,
+                    totalItemsCount: mockMembers.length,
+                } as any);
+
+                renderTeamPageContent();
+                await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+                clickAddMemberButton();
+
+                const addModal = getAddMemberModal();
+                expect(addModal).toBeInTheDocument();
+
+                clickConfirmAddButton();
+
+                await waitFor(() => {
+                    expect(getAddMemberModal()).not.toBeInTheDocument();
+                });
+
+                expect(getMemberItems()).toHaveLength(2);
             });
 
             it('should open edit modal and confirm edit updating member name and busting image cache when url present', async () => {

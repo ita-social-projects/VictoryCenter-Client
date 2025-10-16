@@ -588,9 +588,12 @@ describe('TeamPageContent', () => {
 
             typeInSearchInput('   ');
 
-            await new Promise((resolve) => setTimeout(resolve, 100));
-
-            expect(mockTeamMembersApi.getAll.mock.calls.length).toBeLessThanOrEqual(initialGetAllCallCount + 1);
+            await waitFor(
+                () => {
+                    expect(mockTeamMembersApi.getAll.mock.calls.length).toBeLessThanOrEqual(initialGetAllCallCount);
+                },
+                { timeout: 100 },
+            );
         });
 
         it('should not trigger search when same query is entered again', async () => {
@@ -602,9 +605,12 @@ describe('TeamPageContent', () => {
 
             typeInSearchInput('abc');
 
-            await new Promise((resolve) => setTimeout(resolve, 100));
-
-            expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1);
+            await waitFor(
+                () => {
+                    expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1);
+                },
+                { timeout: 100 },
+            );
         });
 
         it('should handle AbortError gracefully when loading more search results', async () => {
@@ -690,11 +696,12 @@ describe('TeamPageContent', () => {
 
             await waitFor(() => expect(getSearchLoadMoreButton()).toBeInTheDocument());
 
-            await Promise.resolve();
-
             fireEvent.click(getSearchLoadMoreButton());
 
-            await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(2));
+            await waitFor(() => {
+                expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(2);
+                expect(mockTeamMembersApi.search).toHaveBeenNthCalledWith(2, expect.any(Object), 'ab', 5, 5);
+            });
         });
 
         it('should not call search API in loadMore when query length becomes less than 2', async () => {
@@ -705,16 +712,15 @@ describe('TeamPageContent', () => {
             await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1));
 
             typeInSearchInput('a');
-            await new Promise((resolve) => setTimeout(resolve, 100));
 
             const loadMoreButton = screen.queryByTestId('search-load-more');
             if (loadMoreButton) {
                 fireEvent.click(loadMoreButton);
             }
 
-            await new Promise((resolve) => setTimeout(resolve, 100));
-
-            expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1);
+            await waitFor(() => {
+                expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1);
+            });
         });
 
         it('should select search item, reset status and switch category, then clear selection and return to list', async () => {

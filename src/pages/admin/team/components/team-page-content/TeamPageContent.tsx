@@ -452,10 +452,10 @@ export const TeamPageContent = () => {
                 <CategoryBar<TeamCategory>
                     categories={categories}
                     selectedCategory={selectedCategory}
+                    displayContextMenuButton={true}
                     onCategorySelect={handleCategorySelect}
                     getCategoryDisplayName={(category) => category.name}
                     getCategoryKey={(category) => category.id}
-                    displayContextMenuButton={true}
                     contextMenuOptions={categoryBarContextMenuOptions}
                     onContextMenuOptionSelected={onContextMenuOptionSelected}
                 />

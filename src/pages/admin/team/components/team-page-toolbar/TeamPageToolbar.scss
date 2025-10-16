@@ -1,18 +1,19 @@
 .toolbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     gap: 1.25rem;
-}
 
-.toolbar-search {
-    width: 38.75rem;
-    flex: 0 0 38.75rem;
-    min-width: 0;
-}
+    &-search {
+        width: 38.75rem;
+        flex: 0 0 38.75rem;
+        min-width: 0;
+        margin-right: auto;
+    }
 
-.toolbar-actions {
-    display: flex;
-    gap: 1.25rem;
-    flex-shrink: 0;
+    &-actions {
+        display: flex;
+        gap: 1.25rem;
+        flex-shrink: 0;
+    }
 }

@@ -5,10 +5,10 @@ import TeamPageImage from '../../../../../assets/images/public/about-us-page/our
 import SupportVeterans from '../../../../../assets/images/public/about-us-page/support-veterans.jpg';
 import SupportVolunteers from '../../../../../assets/images/public/about-us-page/support-volunteers.jpg';
 import SupportChildren from '../../../../../assets/images/public/about-us-page/support-children.jpg';
-import ManAndHorse from '../../../../../assets/images/public/about-us-page/men-horse.jpg';
+import ManAndHorse from '../../../../../assets/images/public/about-us-page/man-horse.jpg';
 import GirlAndHorse from '../../../../../assets/images/public/about-us-page/girl-horse.jpg';
-import OldManAndHorse from '../../../../../assets/images/public/about-us-page/old-men-horse.jpg';
-import WomanAndHorse from '../../../../../assets/images/public/about-us-page/women-horse.jpg';
+import OldManAndHorse from '../../../../../assets/images/public/about-us-page/old-man-horse.jpg';
+import WomanAndHorse from '../../../../../assets/images/public/about-us-page/woman-horse.jpg';
 import { DescriptionSectionProps } from './description-section/DescriptionSection';
 import { CardsSectionProps } from './cards-section/CardsSection';
 
@@ -172,7 +172,7 @@ export const PeopleCardsProps: Omit<
         linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
         url(${OldManAndHorse})`,
                 backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                backgroundPosition: 'right',
             },
             subText: '330x430',
             width: 330,

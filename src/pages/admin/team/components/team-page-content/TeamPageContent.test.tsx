@@ -22,6 +22,13 @@ const mockTeamCategoriesApi = TeamCategoriesApi as jest.Mocked<typeof TeamCatego
 jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
     TeamPageToolbar: (props: any) => {
         const { VisibilityStatus } = require('../../../../../types/admin/common');
+
+        const handleSelectFirstResult = () => {
+            if (props.searchItems?.[0]) {
+                props.onSearchItemSelect(props.searchItems[0]);
+            }
+        };
+
         return (
             <div data-testid="team-page-toolbar">
                 <button onClick={props.onAddMember}>Add Member</button>
@@ -29,10 +36,7 @@ jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
                 <button onClick={props.onSearchLoadMore} data-testid="search-load-more">
                     Load More Results
                 </button>
-                <button
-                    onClick={() => props.searchItems?.[0] && props.onSearchItemSelect(props.searchItems[0])}
-                    data-testid="select-first-result"
-                >
+                <button onClick={handleSelectFirstResult} data-testid="select-first-result">
                     Select First Result
                 </button>
                 <button onClick={props.onSearchClear} data-testid="clear-search-selection">

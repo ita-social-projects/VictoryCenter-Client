@@ -24,28 +24,32 @@ export const ScrollableFrame = () => {
     }, []);
 
     return (
-        <div className="scroll-block">
-            {error && (
-                <div className="error-message" role="alert" style={{ color: 'red' }}>
-                    {error}
-                </div>
-            )}
-            <CustomSwiper
-                items={programData}
-                slidesPerView={1}
-                breakpoints={{
-                    568: { slidesPerView: 1 },
-                    768: { slidesPerView: 2 },
-                    912: { slidesPerView: 3 },
-                }}
-                renderItem={(program) => (
-                    <>
-                        <ProgramCard program={program} className="about-us-page-card" />
-                    </>
+        <div>
+            <div className="swiper-block">
+                {error && (
+                    <div className="error-message" role="alert" style={{ color: 'red', marginBottom: '1rem' }}>
+                        {error}
+                    </div>
                 )}
-                showScrollbar={true}
-            />
-            <div className="custom-scrollbar" />
+                <CustomSwiper
+                    items={programData}
+                    slidesPerView={1}
+                    breakpoints={{
+                        568: { slidesPerView: 1 },
+                        768: { slidesPerView: 2 },
+                        912: { slidesPerView: 3 },
+                    }}
+                    renderItem={(program) => (
+                        <>
+                            <ProgramCard program={program} className="about-us-page-card" />
+                        </>
+                    )}
+                    showScrollbar={true}
+                />
+            </div>
+            <div className="scrollbar-block">
+                <div className="custom-scrollbar" />
+            </div>
         </div>
     );
 };

@@ -391,6 +391,22 @@ describe('TeamPageContent', () => {
                 );
             });
         });
+
+        it('should not reset members or refetch when clicking the same category twice', async () => {
+            renderTeamPageContent();
+
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            const initialCallCount = mockTeamMembersApi.getAll.mock.calls.length;
+
+            clickCategoryButton(1);
+
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(initialCallCount);
+
+            expect(getMemberItems()).toHaveLength(2);
+        });
     });
 
     describe('Error handling', () => {

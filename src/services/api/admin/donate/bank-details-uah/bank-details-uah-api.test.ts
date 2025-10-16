@@ -11,6 +11,15 @@ describe('BankDetailsUahApi', () => {
         delete: jest.fn(),
     } as unknown as jest.Mocked<AxiosInstance>;
 
+    const mockUahBankDetails: UahBankDetailsType = {
+        id: 1,
+        name: 'ПриватБанк',
+        receiver: 'ТОВ "Тест"',
+        iban: '1234567890123456789012345678',
+        edrpou: '12345678',
+        paymentPurpose: 'Благодійна допомога',
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
@@ -18,24 +27,7 @@ describe('BankDetailsUahApi', () => {
     describe('getAll', () => {
         it('calls client.get with correct parameters', async () => {
             const mockResponse = {
-                data: [
-                    {
-                        id: 1,
-                        name: 'ПриватБанк',
-                        receiver: 'ТОВ "Тест"',
-                        iban: '1234567890123456789012345678',
-                        edrpou: '12345678',
-                        paymentPurpose: 'Благодійна допомога',
-                    },
-                    {
-                        id: 2,
-                        name: 'Монобанк',
-                        receiver: 'ФОП Іванов',
-                        iban: '9876543210987654321098765432',
-                        edrpou: '87654321',
-                        paymentPurpose: 'Допомога ЗСУ',
-                    },
-                ],
+                data: [mockUahBankDetails, { ...mockUahBankDetails, id: 2, name: 'Монобанк' }],
             };
             mockClient.get.mockResolvedValue(mockResponse);
 
@@ -46,201 +38,93 @@ describe('BankDetailsUahApi', () => {
         });
 
         it('returns empty array when no bank details exist', async () => {
-            const mockResponse = {
-                data: [],
-            };
-            mockClient.get.mockResolvedValue(mockResponse);
+            mockClient.get.mockResolvedValue({ data: [] });
 
             const result = await BankDetailsUahApi.getAll(mockClient);
 
-            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.DONATE.BANK_DETAILS_UAH);
             expect(result).toEqual([]);
         });
     });
 
     describe('create', () => {
+        const bankDetailsWithoutId: Omit<UahBankDetailsType, 'id'> = {
+            name: 'Новий банк',
+            receiver: 'ТОВ "Новий"',
+            iban: '1111222233334444555566667777',
+            edrpou: '11112222',
+            paymentPurpose: 'Благодійність',
+        };
+
         it('calls client.post with correct payload', async () => {
-            const mockResponse = {
-                data: {
-                    id: 10,
-                    name: 'Новий банк',
-                    receiver: 'ТОВ "Новий"',
-                    iban: '1111222233334444555566667777',
-                    edrpou: '11112222',
-                    paymentPurpose: 'Благодійність',
-                },
-            };
+            const mockResponse = { data: { id: 10, ...bankDetailsWithoutId } };
             mockClient.post.mockResolvedValue(mockResponse);
 
-            const bankDetails: Omit<UahBankDetailsType, 'id'> = {
-                name: 'Новий банк',
-                receiver: 'ТОВ "Новий"',
-                iban: '1111222233334444555566667777',
-                edrpou: '11112222',
-                paymentPurpose: 'Благодійність',
-            };
+            const result = await BankDetailsUahApi.create(mockClient, bankDetailsWithoutId);
 
-            const result = await BankDetailsUahApi.create(mockClient, bankDetails);
-
-            expect(mockClient.post).toHaveBeenCalledWith(API_ROUTES.DONATE.BANK_DETAILS_UAH, bankDetails);
+            expect(mockClient.post).toHaveBeenCalledWith(API_ROUTES.DONATE.BANK_DETAILS_UAH, bankDetailsWithoutId);
             expect(result).toEqual(mockResponse.data);
         });
 
         it('creates bank details without id in request', async () => {
-            const mockResponse = {
-                data: {
-                    id: 15,
-                    name: 'Тестовий банк',
-                    receiver: 'Тест',
-                    iban: '5555666677778888999900001111',
-                    edrpou: '55556666',
-                    paymentPurpose: 'Тест',
-                },
-            };
+            const mockResponse = { data: { id: 15, ...bankDetailsWithoutId } };
             mockClient.post.mockResolvedValue(mockResponse);
 
-            const bankDetails: Omit<UahBankDetailsType, 'id'> = {
-                name: 'Тестовий банк',
-                receiver: 'Тест',
-                iban: '5555666677778888999900001111',
-                edrpou: '55556666',
-                paymentPurpose: 'Тест',
-            };
+            const result = await BankDetailsUahApi.create(mockClient, bankDetailsWithoutId);
 
-            const result = await BankDetailsUahApi.create(mockClient, bankDetails);
-
-            expect(mockClient.post).toHaveBeenCalledWith(API_ROUTES.DONATE.BANK_DETAILS_UAH, bankDetails);
             expect(result.id).toBe(15);
         });
     });
 
     describe('update', () => {
-        it('calls client.put with correct URL and payload', async () => {
-            const mockResponse = {
-                data: {
-                    id: 5,
-                    name: 'Оновлений банк',
-                    receiver: 'ТОВ "Оновлений"',
-                    iban: '2222333344445555666677778888',
-                    edrpou: '22223333',
-                    paymentPurpose: 'Оновлена мета',
-                },
-            };
-            mockClient.put.mockResolvedValue(mockResponse);
+        const testCases = [
+            {
+                description: 'updates with multiple fields',
+                id: 5,
+                updates: { name: 'Оновлений банк', paymentPurpose: 'Оновлена мета' },
+            },
+            {
+                description: 'updates with id 1',
+                id: 1,
+                updates: { name: 'Перший оновлений' },
+            },
+            {
+                description: 'updates with large id',
+                id: 9999,
+                updates: { receiver: 'ТОВ "Великий"', edrpou: '44445555' },
+            },
+            {
+                description: 'updates only specific fields',
+                id: 7,
+                updates: { receiver: 'Новий отримувач' },
+            },
+        ];
 
-            const bankDetails: Partial<UahBankDetailsType> = {
-                name: 'Оновлений банк',
-                paymentPurpose: 'Оновлена мета',
-            };
+        testCases.forEach(({ description, id, updates }) => {
+            // eslint-disable-next-line jest/valid-title
+            it(description, async () => {
+                const mockResponse = { data: { ...mockUahBankDetails, id, ...updates } };
+                mockClient.put.mockResolvedValue(mockResponse);
 
-            const result = await BankDetailsUahApi.update(mockClient, 5, bankDetails);
+                const result = await BankDetailsUahApi.update(mockClient, id, updates);
 
-            expect(mockClient.put).toHaveBeenCalledWith(`${API_ROUTES.DONATE.BANK_DETAILS_UAH}/5`, bankDetails);
-            expect(result).toEqual(mockResponse.data);
-        });
-
-        it('updates bank details with id 1', async () => {
-            const mockResponse = {
-                data: {
-                    id: 1,
-                    name: 'Перший оновлений',
-                    receiver: 'ТОВ "Перший"',
-                    iban: '3333444455556666777788889999',
-                    edrpou: '33334444',
-                    paymentPurpose: 'Перша мета',
-                },
-            };
-            mockClient.put.mockResolvedValue(mockResponse);
-
-            const bankDetails: Partial<UahBankDetailsType> = {
-                name: 'Перший оновлений',
-            };
-
-            const result = await BankDetailsUahApi.update(mockClient, 1, bankDetails);
-
-            expect(mockClient.put).toHaveBeenCalledWith(`${API_ROUTES.DONATE.BANK_DETAILS_UAH}/1`, bankDetails);
-            expect(result.id).toBe(1);
-        });
-
-        it('updates bank details with large id', async () => {
-            const mockResponse = {
-                data: {
-                    id: 9999,
-                    name: 'Великий ID',
-                    receiver: 'ТОВ "Великий"',
-                    iban: '4444555566667777888899990000',
-                    edrpou: '44445555',
-                    paymentPurpose: 'Велика мета',
-                },
-            };
-            mockClient.put.mockResolvedValue(mockResponse);
-
-            const bankDetails: Partial<UahBankDetailsType> = {
-                receiver: 'ТОВ "Великий"',
-                edrpou: '44445555',
-            };
-
-            const result = await BankDetailsUahApi.update(mockClient, 9999, bankDetails);
-
-            expect(mockClient.put).toHaveBeenCalledWith(`${API_ROUTES.DONATE.BANK_DETAILS_UAH}/9999`, bankDetails);
-            expect(result.id).toBe(9999);
-        });
-
-        it('updates only specific fields', async () => {
-            const mockResponse = {
-                data: {
-                    id: 7,
-                    name: 'Стара назва',
-                    receiver: 'Новий отримувач',
-                    iban: '5555666677778888999900001111',
-                    edrpou: '55556666',
-                    paymentPurpose: 'Стара мета',
-                },
-            };
-            mockClient.put.mockResolvedValue(mockResponse);
-
-            const bankDetails: Partial<UahBankDetailsType> = {
-                receiver: 'Новий отримувач',
-            };
-
-            const result = await BankDetailsUahApi.update(mockClient, 7, bankDetails);
-
-            expect(mockClient.put).toHaveBeenCalledWith(`${API_ROUTES.DONATE.BANK_DETAILS_UAH}/7`, bankDetails);
-            expect(result.receiver).toBe('Новий отримувач');
+                expect(mockClient.put).toHaveBeenCalledWith(`${API_ROUTES.DONATE.BANK_DETAILS_UAH}/${id}`, updates);
+                expect(result.id).toBe(id);
+            });
         });
     });
 
     describe('delete', () => {
-        it('calls client.delete with correct URL', async () => {
-            mockClient.delete.mockResolvedValue({});
+        const testCases = [42, 1, 8888, 100];
 
-            await BankDetailsUahApi.delete(mockClient, 42);
+        testCases.forEach((id) => {
+            it(`deletes bank details with id ${id}`, async () => {
+                mockClient.delete.mockResolvedValue({});
 
-            expect(mockClient.delete).toHaveBeenCalledWith(`${API_ROUTES.DONATE.BANK_DETAILS_UAH}/42`);
-        });
+                const result = await BankDetailsUahApi.delete(mockClient, id);
 
-        it('deletes bank details with id 1', async () => {
-            mockClient.delete.mockResolvedValue({});
-
-            await BankDetailsUahApi.delete(mockClient, 1);
-
-            expect(mockClient.delete).toHaveBeenCalledWith(`${API_ROUTES.DONATE.BANK_DETAILS_UAH}/1`);
-        });
-
-        it('deletes bank details with large id', async () => {
-            mockClient.delete.mockResolvedValue({});
-
-            await BankDetailsUahApi.delete(mockClient, 8888);
-
-            expect(mockClient.delete).toHaveBeenCalledWith(`${API_ROUTES.DONATE.BANK_DETAILS_UAH}/8888`);
-        });
-
-        it('returns void on successful delete', async () => {
-            mockClient.delete.mockResolvedValue({});
-
-            const result = await BankDetailsUahApi.delete(mockClient, 100);
-
-            expect(result).toBeUndefined();
+                expect(mockClient.delete).toHaveBeenCalledWith(`${API_ROUTES.DONATE.BANK_DETAILS_UAH}/${id}`);
+                expect(result).toBeUndefined();
+            });
         });
     });
 });

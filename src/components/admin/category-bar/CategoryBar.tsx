@@ -54,10 +54,14 @@ export const CategoryBar = <T,>({
         const container = categoriesContainerRef.current;
         if (!container) return;
 
-        const resizeObserver = new ResizeObserver(checkScroll);
-        resizeObserver.observe(container);
+        if (typeof ResizeObserver !== 'undefined') {
+            const resizeObserver = new ResizeObserver(checkScroll);
+            resizeObserver.observe(container);
 
-        return () => resizeObserver.disconnect();
+            return () => resizeObserver.disconnect();
+        }
+
+        return undefined;
     }, [categories, checkScroll]);
 
     const handleScroll = useCallback(

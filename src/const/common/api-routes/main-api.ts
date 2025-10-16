@@ -18,7 +18,7 @@ export const API_ROUTES = {
         PUBLISHED: 'HippotherapyPrograms/published',
     },
     PROGRAMCATEGORY: {
-        BASE: 'HippotherapyProgramCategory',
+        BASE: 'HippotherapyProgramCategories',
     },
     PAYMENTS: {
         DONATE: 'payments/donate',

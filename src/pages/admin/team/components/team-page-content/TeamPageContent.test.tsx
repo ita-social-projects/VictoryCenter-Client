@@ -401,12 +401,9 @@ describe('TeamPageContent', () => {
 
             clickCategoryButton(1);
 
-            await waitFor(
-                () => {
-                    expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(initialCallCount);
-                },
-                { timeout: 100 },
-            );
+            await waitFor(() => {
+                expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(initialCallCount);
+            });
 
             expect(getMemberItems()).toHaveLength(2);
         });
@@ -459,11 +456,13 @@ describe('TeamPageContent', () => {
 
             renderTeamPageContent();
 
-            await new Promise((resolve) => setTimeout(resolve, 100));
+            await waitFor(() => {
+                expect(screen.queryByTestId('team-error-container')).not.toBeInTheDocument();
+            });
 
-            expect(screen.queryByTestId('team-error-container')).not.toBeInTheDocument();
-
-            expect(screen.queryByTestId('category-1')).not.toBeInTheDocument();
+            await waitFor(() => {
+                expect(screen.queryByTestId('category-1')).not.toBeInTheDocument();
+            });
         });
 
         it('should handle search error gracefully and not show error message', async () => {
@@ -965,7 +964,7 @@ describe('TeamPageContent', () => {
                 const canceledError = {
                     name: 'CanceledError',
                     message: 'Request canceled',
-                } as any;
+                } as Error;
 
                 mockTeamMembersApi.getAll.mockRejectedValueOnce(canceledError);
 

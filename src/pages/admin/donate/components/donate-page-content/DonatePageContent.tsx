@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { SupportOptionsApi } from '../../../../../services/api/admin/donate/support-options/support-options-api';
+import { CorrespondentBankDetailsApi } from '../../../../../services/api/admin/donate/correspondent-banks/correspondent-banks-api';
 import { SupportOptionsType } from '../../../../../types/admin/donate';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
@@ -98,8 +99,9 @@ export const DonatePageContent = () => {
         async (data: any) => {
             if (!config) return;
             try {
-                const newItem = await config.create(client, data);
-                setItems((prev: any) => [...prev, newItem]);
+                const { correspondentBanks: _, ...bankData } = data;
+                const newItem = await config.create(client, bankData);
+                setItems((prev: any) => [...prev, { ...newItem, correspondentBanks: [] }]);
             } catch (error) {
                 throw error;
             }
@@ -111,8 +113,13 @@ export const DonatePageContent = () => {
         async (id: number, data: any) => {
             if (!config) return;
             try {
-                const updatedItem = await config.update(client, id, data);
-                setItems((prev: any) => prev.map((item: any) => (item.id === id ? updatedItem : item)));
+                const { correspondentBanks: _, ...bankData } = data;
+                const updatedItem = await config.update(client, id, bankData);
+                setItems((prev: any) =>
+                    prev.map((item: any) =>
+                        item.id === id ? { ...updatedItem, correspondentBanks: item.correspondentBanks || [] } : item,
+                    ),
+                );
             } catch (error) {
                 throw error;
             }
@@ -133,19 +140,73 @@ export const DonatePageContent = () => {
         [client, config, setItems],
     );
 
-    const updateItemsWithCorrespondentBanks = useCallback((prevItems: any, formStateId: number, newBanks: any) => {
-        const itemExists = prevItems.some((i: any) => i.id === formStateId);
-        if (itemExists) {
-            return prevItems.map((i: any) => (i.id === formStateId ? { ...i, correspondentBanks: newBanks } : i));
-        }
-        return [...prevItems, { id: formStateId, correspondentBanks: newBanks }];
-    }, []);
-
-    const handleCorrespondentBanksChange = useCallback(
-        (formStateId: number) => (newBanks: any) => {
-            setItems((prevItems: any) => updateItemsWithCorrespondentBanks(prevItems, formStateId, newBanks));
+    // Correspondent Bank Details handlers
+    const handleCreateCorrespondentBank = useCallback(
+        async (foreignBankId: number, data: any) => {
+            try {
+                const newBank = await CorrespondentBankDetailsApi.create(client, {
+                    ...data,
+                    foreignBankDetailsId: foreignBankId,
+                });
+                setItems((prev: any) =>
+                    prev.map((item: any) =>
+                        item.id === foreignBankId
+                            ? { ...item, correspondentBanks: [...(item.correspondentBanks || []), newBank] }
+                            : item,
+                    ),
+                );
+            } catch (error) {
+                throw error;
+            }
         },
-        [setItems, updateItemsWithCorrespondentBanks],
+        [client, setItems],
+    );
+
+    const handleUpdateCorrespondentBank = useCallback(
+        async (foreignBankId: number, id: number, data: any) => {
+            try {
+                const updatedBank = await CorrespondentBankDetailsApi.update(client, id, {
+                    ...data,
+                    foreignBankDetailsId: foreignBankId,
+                });
+                setItems((prev: any) =>
+                    prev.map((item: any) =>
+                        item.id === foreignBankId
+                            ? {
+                                  ...item,
+                                  correspondentBanks: item.correspondentBanks.map((cb: any) =>
+                                      cb.id === id ? updatedBank : cb,
+                                  ),
+                              }
+                            : item,
+                    ),
+                );
+            } catch (error) {
+                throw error;
+            }
+        },
+        [client, setItems],
+    );
+
+    const handleDeleteCorrespondentBank = useCallback(
+        async (foreignBankId: number, id: number) => {
+            try {
+                await CorrespondentBankDetailsApi.delete(client, id);
+                setItems((prev: any) =>
+                    prev.map((item: any) =>
+                        item.id === foreignBankId
+                            ? {
+                                  ...item,
+                                  correspondentBanks: item.correspondentBanks.filter((cb: any) => cb.id !== id),
+                              }
+                            : item,
+                    ),
+                );
+            } catch (error) {
+                throw error;
+            }
+        },
+        [client, setItems],
     );
 
     const renderCorrespondentBanks = useCallback(
@@ -161,10 +222,19 @@ export const DonatePageContent = () => {
                 addNewText={DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW}
                 createEmptyItem={(data: any) => ({ id: Date.now(), ...data })}
                 isChildForm={true}
-                onChangeItems={handleCorrespondentBanksChange(formState.id)}
+                onSubmit={(data) => handleCreateCorrespondentBank(formState.id, data)}
+                onUpdate={(id, data) => handleUpdateCorrespondentBank(formState.id, id, data)}
+                onDelete={(id) => handleDeleteCorrespondentBank(formState.id, id)}
             />
         ),
-        [selectedCategory, items, config, handleCorrespondentBanksChange],
+        [
+            selectedCategory,
+            items,
+            config,
+            handleCreateCorrespondentBank,
+            handleUpdateCorrespondentBank,
+            handleDeleteCorrespondentBank,
+        ],
     );
 
     return (

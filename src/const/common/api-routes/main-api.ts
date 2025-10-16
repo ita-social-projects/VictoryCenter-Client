@@ -25,5 +25,7 @@ export const API_ROUTES = {
     DONATE: {
         SUPPORT_OPTIONS: 'SupportOptions',
         BANK_DETAILS_UAH: 'UahBankDetails',
+        BANK_DETAILS_FOREIGN: 'ForeignBankDetails',
+        CORRESPONDENT_BANK_DETAILS: 'CorrespondentBankDetails',
     },
 };

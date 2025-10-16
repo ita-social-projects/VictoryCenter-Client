@@ -1,6 +1,5 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { DonatePageContent } from './DonatePageContent';
-import { BankCurrency } from '../../../../../types/admin/donate';
 
 const mockUseBankDetails = jest.fn();
 const mockUseAdminClient = jest.fn();
@@ -9,6 +8,12 @@ const mockCreate = jest.fn();
 const mockUpdate = jest.fn();
 const mockDelete = jest.fn();
 const mockSetItems = jest.fn();
+
+const mockBankCurrency = {
+    Uah: 0,
+    Usd: 1,
+    Eur: 2,
+};
 
 jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => mockUseAdminClient(),
@@ -23,6 +28,14 @@ jest.mock('../../../../../services/api/admin/donate/support-options/support-opti
     },
 }));
 
+jest.mock('../../../../../services/api/admin/donate/correspondent-banks/correspondent-banks-api', () => ({
+    CorrespondentBankDetailsApi: {
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+    },
+}));
+
 jest.mock('../bank-details-currencies/currencies-manager/CurrenciesManager', () => ({
     Currencies: {
         UAH: 'UAH',
@@ -30,7 +43,18 @@ jest.mock('../bank-details-currencies/currencies-manager/CurrenciesManager', () 
         EUR: 'EUR',
     },
     useBankDetails: () => mockUseBankDetails(),
-    mapCurrencyToBankCurrency: (currency: string) => currency,
+    mapCurrencyToBankCurrency: (currency: string) => {
+        switch (currency) {
+            case 'UAH':
+                return 0;
+            case 'USD':
+                return 1;
+            case 'EUR':
+                return 2;
+            default:
+                return currency;
+        }
+    },
 }));
 
 jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
@@ -42,9 +66,12 @@ jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
 }));
 
 jest.mock('../generic-details/GenericDetails', () => ({
-    GenericDetails: ({ children, onChangeItems }: any) => (
+    GenericDetails: ({ children, onChangeItems, onSubmit, onUpdate, onDelete }: any) => (
         <div data-testid="generic-details">
-            <button onClick={() => onChangeItems([{ id: 1 }])}>Change Items</button>
+            {onChangeItems && <button onClick={() => onChangeItems([{ id: 1 }])}>Change Items</button>}
+            {onSubmit && <button onClick={() => onSubmit({ id: 1 })}>Submit</button>}
+            {onUpdate && <button onClick={() => onUpdate(1, { name: 'Updated' })}>Update</button>}
+            {onDelete && <button onClick={() => onDelete(1)}>Delete</button>}
             {children && typeof children === 'function' && children({ formState: { id: 1 }, isItemsExpanded: false })}
         </div>
     ),
@@ -64,6 +91,9 @@ describe('DonatePageContent', () => {
     const createMockConfig = (withCorrespondentBanks = false) => ({
         form: jest.fn(),
         createEmptyItem: jest.fn(),
+        create: jest.fn().mockResolvedValue({ id: 1 }),
+        update: jest.fn().mockResolvedValue({ id: 1 }),
+        delete: jest.fn().mockResolvedValue(undefined),
         withCorrespondentBanks,
         ...(withCorrespondentBanks && { correspondentForm: jest.fn() }),
     });
@@ -89,8 +119,8 @@ describe('DonatePageContent', () => {
         mockUseAdminClient.mockReturnValue('mockClient');
         setupMockBankDetails();
         mockGetAll.mockResolvedValue([]);
-        mockCreate.mockResolvedValue({ id: 1, name: 'Test', value: '123', currency: BankCurrency.Uah });
-        mockUpdate.mockResolvedValue({ id: 1, name: 'Updated', value: '456', currency: BankCurrency.Uah });
+        mockCreate.mockResolvedValue({ id: 1, name: 'Test', value: '123', currency: mockBankCurrency.Uah });
+        mockUpdate.mockResolvedValue({ id: 1, name: 'Updated', value: '456', currency: mockBankCurrency.Uah });
         mockDelete.mockResolvedValue(undefined);
     });
 
@@ -125,14 +155,14 @@ describe('DonatePageContent', () => {
 
     it('fetches support options on mount', async () => {
         await renderAndWait(<DonatePageContent />);
-        expect(mockGetAll).toHaveBeenCalledWith('mockClient', 'UAH');
+        expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0);
     });
 
     it('handles category change', async () => {
         render(<DonatePageContent />);
         fireEvent.click(screen.getByText('USD'));
         await waitFor(() => {
-            expect(mockGetAll).toHaveBeenCalledWith('mockClient', 'USD');
+            expect(mockGetAll).toHaveBeenCalledWith('mockClient', 1);
         });
     });
 
@@ -143,14 +173,18 @@ describe('DonatePageContent', () => {
             expect(mockCreate).toHaveBeenCalledWith('mockClient', {
                 name: 'Test',
                 value: '123',
-                currency: 'UAH',
+                currency: 0,
             });
         });
     });
 
     it('updates support option successfully', async () => {
         render(<DonatePageContent />);
-        fireEvent.click(screen.getByText('Update'));
+
+        const supportOptionsForm = screen.getByTestId('support-options-form');
+        const updateButton = within(supportOptionsForm).getByText('Update');
+        fireEvent.click(updateButton);
+
         await waitFor(() => {
             expect(mockUpdate).toHaveBeenCalledWith('mockClient', 1, {
                 name: 'Updated',
@@ -161,7 +195,11 @@ describe('DonatePageContent', () => {
 
     it('deletes support option successfully', async () => {
         render(<DonatePageContent />);
-        fireEvent.click(screen.getByText('Delete'));
+
+        const supportOptionsForm = screen.getByTestId('support-options-form');
+        const deleteButton = within(supportOptionsForm).getByText('Delete');
+        fireEvent.click(deleteButton);
+
         await waitFor(() => {
             expect(mockDelete).toHaveBeenCalledWith('mockClient', 1);
         });
@@ -173,33 +211,11 @@ describe('DonatePageContent', () => {
         expect(mockGetAll).toHaveBeenCalled();
     });
 
-    it('handles correspondent banks change for existing item', async () => {
+    it('handles correspondent banks with onSubmit prop', async () => {
         setupMockBankDetails([{ id: 1, correspondentBanks: [] }], createMockConfig(true));
         await renderAndWait(<DonatePageContent />);
-        expect(screen.getAllByTestId('generic-details')).toHaveLength(2);
 
-        const changeButtons = screen.getAllByText('Change Items');
-        fireEvent.click(changeButtons[1]);
-
-        await waitFor(() => {
-            expect(mockSetItems).toHaveBeenCalled();
-        });
-    });
-
-    it('handles correspondent banks change for new item', async () => {
-        setupMockBankDetails([{ id: 999 }], createMockConfig(true));
-        await renderAndWait(<DonatePageContent />);
-        expect(screen.getAllByTestId('generic-details')).toHaveLength(2);
-
-        const changeButtons = screen.getAllByText('Change Items');
-        fireEvent.click(changeButtons[1]);
-
-        await waitFor(() => {
-            expect(mockSetItems).toHaveBeenCalledWith(expect.any(Function));
-        });
-
-        const setItemsCallback = mockSetItems.mock.calls[0][0];
-        const result = setItemsCallback([{ id: 999 }]);
-        expect(result).toEqual([{ id: 999 }, { id: 1, correspondentBanks: [{ id: 1 }] }]);
+        const genericDetails = screen.getAllByTestId('generic-details');
+        expect(genericDetails).toHaveLength(2);
     });
 });

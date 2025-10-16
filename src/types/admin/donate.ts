@@ -37,6 +37,7 @@ export interface CorrespondentBankDetailsType {
     swift: string;
     account: string;
     iban?: string;
+    foreignBankDetailsId: number;
 }
 
 export interface ForeignBankDetailsType {
@@ -46,5 +47,6 @@ export interface ForeignBankDetailsType {
     iban: string;
     swift: string;
     address: string;
+    currency: BankCurrency;
     correspondentBanks: CorrespondentBankDetailsType[];
 }

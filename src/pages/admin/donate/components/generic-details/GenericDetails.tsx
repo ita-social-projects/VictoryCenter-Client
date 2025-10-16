@@ -6,6 +6,7 @@ import './GenericDetails.scss';
 import { FieldValues } from 'react-hook-form';
 import { GenericFormMode, GenericFormProps, GenericFormRef } from '../generic-form/GenericForm';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
+import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
 
 export interface GenericDetailsProps<T extends FieldValues> {
     title?: string;
@@ -115,6 +116,25 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
     );
 
     const showNotFound = !isLoading && !isAddFormVisible && items.length === 0;
+    const shouldShowLoader = isLoading && items.length === 0 && !isAddFormVisible;
+
+    if (shouldShowLoader) {
+        return (
+            <div className={`generic-details ${isChildForm ? 'child' : ''}`}>
+                {title && (
+                    <div className="generic-details header">
+                        {title}
+                        <span className="arrow"></span>
+                    </div>
+                )}
+                <div className="generic-details body">
+                    <div className="generic-details-loader">
+                        <InlineLoader size={3} />
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={`generic-details ${isChildForm ? 'child' : ''}`}>

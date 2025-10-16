@@ -3,12 +3,17 @@ import { UahBankDetailsType, ForeignBankDetailsType } from '../../../../../../ty
 import { GenericFormProps, GenericFormRef } from '../../generic-form/GenericForm';
 import { FieldValues } from 'react-hook-form';
 import { CorrespondentBankDetailsForm, createBankDetailsForm } from '../bank-details-factory/BankDetailsFactory';
+import { BankDetailsUahApi } from '../../../../../../services/api/admin/donate/bank-details-uah/bank-details-uah-api';
+import { AxiosInstance } from 'axios';
 
 export interface BankDetailsConfig<TItem extends FieldValues> {
     form: ForwardRefExoticComponent<GenericFormProps<TItem> & RefAttributes<GenericFormRef>>;
     createEmptyItem: (data: Partial<TItem>) => TItem;
     withCorrespondentBanks?: boolean;
-    fetch: () => Promise<TItem[]>;
+    fetch: (client: AxiosInstance) => Promise<TItem[]>;
+    create: (client: AxiosInstance, data: Omit<TItem, 'id'>) => Promise<TItem>;
+    update: (client: AxiosInstance, id: number, data: Partial<TItem>) => Promise<TItem>;
+    delete: (client: AxiosInstance, id: number) => Promise<void>;
     correspondentForm?: ForwardRefExoticComponent<GenericFormProps<any> & RefAttributes<GenericFormRef>>;
 }
 
@@ -16,10 +21,10 @@ export const bankDetailsConfig: Record<string, BankDetailsConfig<any>> = {
     UAH: {
         form: createBankDetailsForm('UAH'),
         createEmptyItem: (data) => ({ id: Date.now(), ...data }) as UahBankDetailsType,
-        fetch: async () => {
-            // TODO
-            return [];
-        },
+        fetch: (client) => BankDetailsUahApi.getAll(client),
+        create: (client, data) => BankDetailsUahApi.create(client, data),
+        update: (client, id, data) => BankDetailsUahApi.update(client, id, data),
+        delete: (client, id) => BankDetailsUahApi.delete(client, id),
     },
     USD: {
         form: createBankDetailsForm('USD'),
@@ -30,6 +35,15 @@ export const bankDetailsConfig: Record<string, BankDetailsConfig<any>> = {
             // TODO
             return [];
         },
+        create: async () => {
+            throw new Error('Not implemented');
+        },
+        update: async () => {
+            throw new Error('Not implemented');
+        },
+        delete: async () => {
+            throw new Error('Not implemented');
+        },
     },
     EUR: {
         form: createBankDetailsForm('EUR'),
@@ -39,6 +53,15 @@ export const bankDetailsConfig: Record<string, BankDetailsConfig<any>> = {
         fetch: async () => {
             // TODO
             return [];
+        },
+        create: async () => {
+            throw new Error('Not implemented');
+        },
+        update: async () => {
+            throw new Error('Not implemented');
+        },
+        delete: async () => {
+            throw new Error('Not implemented');
         },
     },
 };

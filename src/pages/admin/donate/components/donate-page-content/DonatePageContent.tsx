@@ -52,6 +52,7 @@ export const DonatePageContent = () => {
         setSelectedCategory(currency);
     }, []);
 
+    // Support Options handlers
     const handleCreateSupportOption = useCallback(
         async (name: string, value: string) => {
             const bankCurrency = mapCurrencyToBankCurrency(selectedCategory);
@@ -90,6 +91,46 @@ export const DonatePageContent = () => {
             }
         },
         [client],
+    );
+
+    // Bank Details handlers
+    const handleCreateBankDetails = useCallback(
+        async (data: any) => {
+            if (!config) return;
+            try {
+                const newItem = await config.create(client, data);
+                setItems((prev: any) => [...prev, newItem]);
+            } catch (error) {
+                throw error;
+            }
+        },
+        [client, config, setItems],
+    );
+
+    const handleUpdateBankDetails = useCallback(
+        async (id: number, data: any) => {
+            if (!config) return;
+            try {
+                const updatedItem = await config.update(client, id, data);
+                setItems((prev: any) => prev.map((item: any) => (item.id === id ? updatedItem : item)));
+            } catch (error) {
+                throw error;
+            }
+        },
+        [client, config, setItems],
+    );
+
+    const handleDeleteBankDetails = useCallback(
+        async (id: number) => {
+            if (!config) return;
+            try {
+                await config.delete(client, id);
+                setItems((prev: any) => prev.filter((item: any) => item.id !== id));
+            } catch (error) {
+                throw error;
+            }
+        },
+        [client, config, setItems],
     );
 
     const updateItemsWithCorrespondentBanks = useCallback((prevItems: any, formStateId: number, newBanks: any) => {
@@ -147,7 +188,9 @@ export const DonatePageContent = () => {
                             notFoundText={DONATE_TEXT.BANK_DETAILS.NOT_FOUND}
                             addNewText={DONATE_TEXT.BANK_DETAILS.ADD_FIRST}
                             createEmptyItem={config.createEmptyItem}
-                            onChangeItems={setItems}
+                            onSubmit={handleCreateBankDetails}
+                            onUpdate={handleUpdateBankDetails}
+                            onDelete={handleDeleteBankDetails}
                         >
                             {config.withCorrespondentBanks ? renderCorrespondentBanks : () => null}
                         </GenericDetails>

@@ -4,6 +4,13 @@ import { bankDetailsConfig } from '../bank-details-currencies-config/BankDetails
 import { Currencies, mapCurrencyToBankCurrency, useBankDetails } from './CurrenciesManager';
 import { BankCurrency } from '../../../../../../types/admin/donate';
 
+jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(() => ({
+        get: jest.fn(),
+        post: jest.fn(),
+    })),
+}));
+
 jest.mock('../bank-details-currencies-config/BankDetailsCurrenciesConfig', () => ({
     bankDetailsConfig: {
         UAH: { fetch: jest.fn() },

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Button } from '../../../../../components/admin/button/Button';
 import NotFoundIcon from '../../../../../assets/icons/not-found.svg';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
@@ -22,6 +22,9 @@ export interface GenericDetailsProps<T extends FieldValues> {
     isChildForm?: boolean;
     children?: (form: { formState: T; isItemsExpanded: boolean }) => React.ReactNode;
     onChangeItems?: React.Dispatch<React.SetStateAction<T[]>>;
+    onSubmit?: (data: T) => Promise<void>;
+    onUpdate?: (id: number, data: T) => Promise<void>;
+    onDelete?: (id: number) => Promise<void>;
 }
 
 export function GenericDetails<T extends { id?: number } & FieldValues>({
@@ -37,6 +40,9 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
     isChildForm = false,
     children,
     onChangeItems,
+    onSubmit,
+    onUpdate,
+    onDelete,
 }: GenericDetailsProps<T>) {
     const addformRef = useRef<GenericFormRef>(null);
     const [isAddFormVisible, setIsAddFormVisible] = useState(false);
@@ -49,9 +55,12 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
         [onChangeItems],
     );
 
-    const handleDelete = (id?: number) => {
-        updateItems(items.filter((i) => i.id !== id));
-    };
+    const handleDelete = useCallback(
+        (id?: number) => {
+            updateItems(items.filter((i) => i.id !== id));
+        },
+        [items, updateItems],
+    );
 
     const handleAdd = () => {
         setIsAddFormVisible(true);
@@ -63,7 +72,10 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
 
     const handleSubmit = useCallback(
         async (data: T) => {
-            if (isChildForm) {
+            if (onSubmit) {
+                await onSubmit(data);
+                setIsAddFormVisible(false);
+            } else if (isChildForm) {
                 updateItems([...items, data]);
                 setIsAddFormVisible(false);
             } else {
@@ -77,7 +89,29 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
                 setIsAddFormVisible(false);
             }
         },
-        [createEmptyItem, items, isChildForm, updateItems],
+        [onSubmit, createEmptyItem, items, isChildForm, updateItems],
+    );
+
+    const handleItemUpdate = useCallback(
+        async (item: T, updated: T) => {
+            if (onUpdate && item.id) {
+                await onUpdate(item.id, updated);
+            } else {
+                updateItems(items.map((i) => (i.id === item.id ? { ...i, ...updated } : i)));
+            }
+        },
+        [onUpdate, items, updateItems],
+    );
+
+    const handleItemDelete = useCallback(
+        async (id?: number) => {
+            if (onDelete && id) {
+                await onDelete(id);
+            } else {
+                handleDelete(id);
+            }
+        },
+        [onDelete, handleDelete],
     );
 
     const showNotFound = !isLoading && !isAddFormVisible && items.length === 0;
@@ -110,11 +144,9 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
                                         ref={addformRef}
                                         initialData={item}
                                         initialMode={GenericFormMode.View}
-                                        onSubmit={(updated) =>
-                                            updateItems(items.map((i) => (i.id === item.id ? { ...i, ...updated } : i)))
-                                        }
+                                        onSubmit={(updated) => handleItemUpdate(item, updated)}
                                         onClose={handleClose}
-                                        onDelete={handleDelete}
+                                        onDelete={() => handleItemDelete(item.id)}
                                         isChildForm={isChildForm}
                                     >
                                         {(formProps) => <>{children && children(formProps)}</>}

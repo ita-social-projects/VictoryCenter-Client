@@ -1,8 +1,18 @@
 import { bankDetailsConfig } from './BankDetailsCurrenciesConfig';
 import { UahBankDetailsType, ForeignBankDetailsType } from '../../../../../../types/admin/donate';
+import { BankDetailsUahApi } from '../../../../../../services/api/admin/donate/bank-details-uah/bank-details-uah-api';
+import { AxiosInstance } from 'axios';
+
+const mockClient = {} as AxiosInstance;
+
+jest.mock('../../../../../../services/api/admin/donate/bank-details-uah/bank-details-uah-api');
 
 describe('bankDetailsConfig', () => {
     describe('UAH config', () => {
+        beforeEach(() => {
+            jest.clearAllMocks();
+        });
+
         it('createEmptyItem add id', () => {
             const item = bankDetailsConfig.UAH.createEmptyItem({ name: 'MonoBank' });
             expect(item).toHaveProperty('id');
@@ -10,8 +20,10 @@ describe('bankDetailsConfig', () => {
         });
 
         it('fetch return empty array', async () => {
-            const result = await bankDetailsConfig.UAH.fetch();
+            (BankDetailsUahApi.getAll as jest.Mock).mockResolvedValue([]);
+            const result = await bankDetailsConfig.UAH.fetch(mockClient);
             expect(result).toEqual([]);
+            expect(BankDetailsUahApi.getAll).toHaveBeenCalledWith(mockClient);
         });
 
         it('form exists', () => {
@@ -35,7 +47,7 @@ describe('bankDetailsConfig', () => {
         });
 
         it('fetch return empty array', async () => {
-            const result = await bankDetailsConfig.USD.fetch();
+            const result = await bankDetailsConfig.USD.fetch(mockClient);
             expect(result).toEqual([]);
         });
     });
@@ -48,7 +60,7 @@ describe('bankDetailsConfig', () => {
         });
 
         it('fetch return empty array', async () => {
-            const result = await bankDetailsConfig.EUR.fetch();
+            const result = await bankDetailsConfig.EUR.fetch(mockClient);
             expect(result).toEqual([]);
         });
 

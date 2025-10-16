@@ -426,6 +426,61 @@ describe('TeamPageContent', () => {
             });
         });
 
+        it('should not fetch categories if already loading', async () => {
+            let resolveFirstCall: any;
+            const firstCallPromise = new Promise((resolve) => {
+                resolveFirstCall = resolve;
+            });
+
+            mockTeamCategoriesApi.getAll.mockImplementationOnce(() => firstCallPromise as Promise<TeamCategory[]>);
+
+            renderTeamPageContent();
+
+            await waitFor(() => {
+                expect(mockTeamCategoriesApi.getAll).toHaveBeenCalledTimes(1);
+            });
+
+            resolveFirstCall(mockCategories);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+            });
+
+            expect(mockTeamCategoriesApi.getAll).toHaveBeenCalledTimes(1);
+        });
+
+        it('should handle AbortError gracefully when fetching categories', async () => {
+            const abortError = new Error('Categories fetch aborted');
+            abortError.name = 'AbortError';
+            mockTeamCategoriesApi.getAll.mockRejectedValueOnce(abortError);
+
+            renderTeamPageContent();
+
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            expect(screen.queryByTestId('team-error-container')).not.toBeInTheDocument();
+
+            expect(screen.queryByTestId('category-1')).not.toBeInTheDocument();
+        });
+
+        it('should handle search error gracefully and not show error message', async () => {
+            const searchError = new Error('Search API failed');
+            mockTeamMembersApi.search.mockRejectedValueOnce(searchError);
+
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            typeInSearchInput('abc');
+
+            await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1));
+
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            expect(screen.queryByTestId('team-error-container')).not.toBeInTheDocument();
+
+            expect(screen.queryByTestId('search-item-button')).not.toBeInTheDocument();
+        });
+
         it('should display error when members fail to load and allow retry via changing filter', async () => {
             mockTeamMembersApi.getAll.mockRejectedValueOnce(new Error('API Error'));
             renderTeamPageContent();
@@ -757,6 +812,29 @@ describe('TeamPageContent', () => {
                     TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER,
                     ToastType.Info,
                 );
+            });
+
+            it('should edit member without image cache busting when no url present', async () => {
+                const membersWithoutImageUrl: TeamMember[] = [
+                    { ...mockMembers[0], image: { id: 1 } as any },
+                    mockMembers[1],
+                ];
+                mockTeamMembersApi.getAll.mockResolvedValueOnce({
+                    items: membersWithoutImageUrl,
+                    totalItemsCount: membersWithoutImageUrl.length,
+                } as any);
+
+                renderTeamPageContent();
+                await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+                fireEvent.click(screen.getByTestId(`edit-${membersWithoutImageUrl[0].id}`));
+                await waitFor(() => expect(getEditMemberModal()).toBeInTheDocument());
+
+                clickConfirmEditButton();
+
+                await waitFor(() => expect(getEditMemberModal()).not.toBeInTheDocument());
+
+                expect(screen.getByTestId('member-name-1')).toHaveTextContent('Updated Member');
             });
 
             it('should set hasMore to true when adding member that exceeds current page capacity', async () => {

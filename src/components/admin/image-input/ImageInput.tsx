@@ -175,15 +175,15 @@ export const ImageInput = ({ value, onChange, onBlur, id, name, disabled = false
     );
 };
 
-export const getImageSrc = (img: Image | ImageValues | null) => {
-    if (!img) return undefined;
+export const getImageSrc = (image: Image | ImageValues | null) => {
+    if (!image) return undefined;
 
-    if ('url' in img && img.url) {
-        return img.url;
+    if ('url' in image && image.url) {
+        return image.url;
     }
 
-    if ('base64' in img) {
-        return `data:${img.mimeType};base64,${img.base64}`;
+    if ('base64' in image) {
+        return `data:${image.mimeType};base64,${image.base64}`;
     }
 
     return undefined;

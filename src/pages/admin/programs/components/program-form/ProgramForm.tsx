@@ -15,15 +15,15 @@ export interface ProgramFormValues {
     name: string;
     categories: ProgramCategory[];
     description: string;
-    img: Image | ImageValues | null;
-    imgId: number | null;
+    image: Image | ImageValues | null;
+    imageId: number | null;
 }
 
 export interface ProgramFormErrors {
     name?: string;
     categories?: string;
     description?: string;
-    img?: string;
+    image?: string;
     [key: string]: string | undefined;
 }
 
@@ -46,7 +46,7 @@ const validateForm = (formState: ProgramFormValues, isPublishing: boolean): Prog
         name: PROGRAM_VALIDATION_FUNCTIONS.validateName(formState.name, isPublishing),
         categories: PROGRAM_VALIDATION_FUNCTIONS.validateCategories(formState.categories, isPublishing),
         description: PROGRAM_VALIDATION_FUNCTIONS.validateDescription(formState.description, isPublishing),
-        img: PROGRAM_VALIDATION_FUNCTIONS.validateImg(formState.img, isPublishing),
+        image: PROGRAM_VALIDATION_FUNCTIONS.validateImage(formState.image, isPublishing),
     };
 };
 
@@ -57,8 +57,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 name: '',
                 categories: [],
                 description: '',
-                img: null,
-                imgId: 0,
+                image: null,
+                imageId: 0,
             }),
             [],
         );
@@ -117,12 +117,12 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         }, [formState.description, setErrors]);
 
         // Image handlers
-        const handleImgChange = useCallback(
+        const handleImageChange = useCallback(
             (file: ImageValues | null) => {
                 const image = file;
-                setFormState((prev) => ({ ...prev, img: image }));
-                const error = PROGRAM_VALIDATION_FUNCTIONS.validateImg(image, false);
-                setErrors((prev) => ({ ...prev, img: error }));
+                setFormState((prev) => ({ ...prev, image: image }));
+                const error = PROGRAM_VALIDATION_FUNCTIONS.validateImage(image, false);
+                setErrors((prev) => ({ ...prev, image: error }));
             },
             [setErrors, setFormState],
         );
@@ -178,10 +178,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     label={PROGRAMS_TEXT.FORM.LABEL.PHOTO}
                     id="img"
                     name="img"
-                    value={formState.img}
-                    onChange={handleImgChange}
+                    value={formState.image}
+                    onChange={handleImageChange}
                     disabled={isSubmitting || isFormDisabled}
-                    error={errors.img}
+                    error={errors.image}
                 />
             </form>
         );

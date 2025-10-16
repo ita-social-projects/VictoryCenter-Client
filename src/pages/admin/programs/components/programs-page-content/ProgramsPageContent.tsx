@@ -10,7 +10,7 @@ import { useCategoriesCounter } from '../../../../../hooks/admin/use-categories-
 import { ProgramsApi, ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { useDataFetch } from '../../../../../hooks/admin/fetch/use-data-fetch/useDataFetch';
+import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
 import {
     PaginationRequestParams,
     useDataPaginationFetch,
@@ -262,6 +262,8 @@ export const ProgramsPageContent = () => {
             const statusMatches = statusFilter === undefined || updatedProgram.status === statusFilter;
 
             if (belongsToSelectedCategory && statusMatches) {
+                if (updatedProgram.image && 'url' in updatedProgram.image)
+                    updatedProgram.image.url = `${updatedProgram.image.url}?cb=${Date.now()}`;
                 updatePrograms((prev) => prev.map((p) => (p.id === updatedProgram.id ? updatedProgram : p)));
             } else {
                 updatePrograms((prev) => prev.filter((p) => p.id !== updatedProgram.id));

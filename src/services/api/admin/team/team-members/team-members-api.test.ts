@@ -117,8 +117,14 @@ describe('TeamMembersApi', () => {
             size: 1234,
         };
 
+        const mockGetUpdateImageId = ImageApi.getUpdateImageId as jest.Mock;
+
         it('uploads new image and updates member with new imageId', async () => {
             (ImageApi.post as jest.Mock).mockResolvedValue(mockImageResponse);
+            mockGetUpdateImageId.mockResolvedValue({
+                finalImageId: mockImageResponse.id,
+                imageIdToDelete: null,
+            });
             mockClient.put.mockResolvedValue({
                 data: {
                     id: 1,
@@ -142,7 +148,7 @@ describe('TeamMembersApi', () => {
 
             const result = await TeamMembersApi.updateMember(mockClient, 1, memberData);
 
-            expect(ImageApi.post).toHaveBeenCalledWith(mockClient, mockImageValue);
+            expect(ImageApi.getUpdateImageId).toHaveBeenCalledWith(mockClient, mockImageValue, memberData.imageId);
             expect(mockClient.put).toHaveBeenCalledWith(
                 `${API_ROUTES.TEAM.BASE}/1`,
                 expect.objectContaining({ imageId: mockImageResponse.id }),
@@ -152,6 +158,10 @@ describe('TeamMembersApi', () => {
 
         it('updates existing image and member', async () => {
             (ImageApi.put as jest.Mock).mockResolvedValue(mockImageResponse);
+            mockGetUpdateImageId.mockResolvedValue({
+                finalImageId: mockImageResponse.id,
+                imageIdToDelete: 50,
+            });
             mockClient.put.mockResolvedValue({
                 data: {
                     id: 1,
@@ -175,7 +185,7 @@ describe('TeamMembersApi', () => {
 
             const result = await TeamMembersApi.updateMember(mockClient, 1, memberData);
 
-            expect(ImageApi.put).toHaveBeenCalledWith(mockClient, mockImageValue, 50);
+            expect(ImageApi.getUpdateImageId).toHaveBeenCalledWith(mockClient, mockImageValue, memberData.imageId);
             expect(mockClient.put).toHaveBeenCalledWith(
                 `${API_ROUTES.TEAM.BASE}/1`,
                 expect.objectContaining({ imageId: mockImageResponse.id }),
@@ -185,6 +195,10 @@ describe('TeamMembersApi', () => {
 
         it('deletes old image when image removed', async () => {
             (ImageApi.delete as jest.Mock).mockResolvedValue({});
+            mockGetUpdateImageId.mockResolvedValue({
+                finalImageId: null,
+                imageIdToDelete: 20,
+            });
             mockClient.put.mockResolvedValue({
                 data: {
                     id: 1,
@@ -226,6 +240,10 @@ describe('TeamMembersApi', () => {
                     status: VisibilityStatus.Draft,
                     image: null,
                 },
+            });
+            mockGetUpdateImageId.mockResolvedValue({
+                finalImageId: null,
+                imageIdToDelete: null,
             });
 
             const memberData = {

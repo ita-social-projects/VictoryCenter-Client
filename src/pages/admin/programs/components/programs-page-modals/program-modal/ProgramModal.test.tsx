@@ -136,7 +136,7 @@ const mockProgram: Program = {
     description: 'Test Description',
     categories: [{ id: 1, name: 'Category 1', programsCount: 1 }],
     status: VisibilityStatus.Draft,
-    img: null,
+    image: null,
 };
 
 const mockCategories: ProgramCategory[] = [
@@ -292,7 +292,9 @@ describe('ProgramModal', () => {
                         description: mockFormData.description,
                         categoryIds: [1],
                         status: VisibilityStatus.Draft,
-                        img: null,
+                        image: null,
+                        imageId: null,
+                        id: null,
                     }),
                 );
             });
@@ -322,7 +324,7 @@ describe('ProgramModal', () => {
                         description: mockFormData.description,
                         categoryIds: [1],
                         status: VisibilityStatus.Published,
-                        img: null,
+                        imageId: null,
                     }),
                 );
             });
@@ -387,7 +389,7 @@ describe('ProgramModal', () => {
                         description: mockFormData.description,
                         categoryIds: [1],
                         status: VisibilityStatus.Draft,
-                        img: null,
+                        imageId: null,
                     }),
                     expect.any(Object), // client
                 );

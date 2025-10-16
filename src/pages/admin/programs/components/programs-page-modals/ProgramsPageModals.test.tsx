@@ -32,7 +32,7 @@ describe('ProgramsPageModals', () => {
         description: 'Test Description',
         categories: [],
         status: VisibilityStatus.Published,
-        img: null,
+        image: null,
     };
 
     const mockCategories: ProgramCategory[] = [

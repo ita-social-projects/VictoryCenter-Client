@@ -164,6 +164,11 @@ export const SearchBar = <T,>({
         }
     };
 
+    const handleMouseLeave = useCallback(() => {
+        clearActive();
+        hideTooltip();
+    }, [clearActive, hideTooltip]);
+
     useEffect(() => {
         if (activeIndex >= 0 && suggestionsListRef.current) {
             const activeItem = suggestionsListRef.current.children[activeIndex] as HTMLLIElement;
@@ -260,10 +265,7 @@ export const SearchBar = <T,>({
                         <ul
                             className="search-bar__suggestions-list"
                             ref={suggestionsListRef}
-                            onMouseLeave={() => {
-                                clearActive();
-                                hideTooltip();
-                            }}
+                            onMouseLeave={handleMouseLeave}
                         >
                             {searchItems.map((item, index) => {
                                 const key = getSearchItemKey(item);

@@ -401,9 +401,12 @@ describe('TeamPageContent', () => {
 
             clickCategoryButton(1);
 
-            await new Promise((resolve) => setTimeout(resolve, 100));
-
-            expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(initialCallCount);
+            await waitFor(
+                () => {
+                    expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(initialCallCount);
+                },
+                { timeout: 100 },
+            );
 
             expect(getMemberItems()).toHaveLength(2);
         });
@@ -474,9 +477,12 @@ describe('TeamPageContent', () => {
 
             await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1));
 
-            await new Promise((resolve) => setTimeout(resolve, 100));
-
-            expect(screen.queryByTestId('team-error-container')).not.toBeInTheDocument();
+            await waitFor(
+                () => {
+                    expect(screen.queryByTestId('team-error-container')).not.toBeInTheDocument();
+                },
+                { timeout: 100 },
+            );
 
             expect(screen.queryByTestId('search-item-button')).not.toBeInTheDocument();
         });
@@ -639,28 +645,28 @@ describe('TeamPageContent', () => {
             typeInSearchInput('abc');
             await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1));
 
-            mockTeamMembersApi.search.mockImplementation(
-                () =>
-                    new Promise((resolve) =>
-                        setTimeout(
-                            () =>
-                                resolve({
-                                    items: [
-                                        {
-                                            id: 12,
-                                            fullName: 'Search Person 3',
-                                            categoryId: 1,
-                                            image: null,
-                                            description: '',
-                                            status: VisibilityStatus.Published,
-                                        },
-                                    ],
-                                    totalItemsCount: 5,
-                                }),
-                            1000,
-                        ),
-                    ),
-            );
+            const slowSearchResponse = {
+                items: [
+                    {
+                        id: 12,
+                        fullName: 'Search Person 3',
+                        categoryId: 1,
+                        image: null,
+                        description: '',
+                        status: VisibilityStatus.Published,
+                    },
+                ],
+                totalItemsCount: 5,
+            };
+
+            const createDelayedPromise = () => {
+                return new Promise<typeof slowSearchResponse>((resolve) => {
+                    const timeoutCallback = () => resolve(slowSearchResponse);
+                    setTimeout(timeoutCallback, 1000);
+                });
+            };
+
+            mockTeamMembersApi.search.mockImplementation(createDelayedPromise);
 
             await waitFor(() => expect(getSearchLoadMoreButton()).toBeInTheDocument());
 

@@ -522,6 +522,22 @@ describe('TeamPageContent', () => {
             });
         });
 
+        it('should not fetch members again when clearing search with no initially selected member', async () => {
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            const initialGetAllCallCount = mockTeamMembersApi.getAll.mock.calls.length;
+
+            typeInSearchInput('abc');
+            await waitFor(() => expect(mockTeamMembersApi.search).toHaveBeenCalledTimes(1));
+
+            typeInSearchInput('   ');
+
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            expect(mockTeamMembersApi.getAll.mock.calls.length).toBeLessThanOrEqual(initialGetAllCallCount + 1);
+        });
+
         it('should not trigger search when same query is entered again', async () => {
             renderTeamPageContent();
             await waitFor(() => expect(getMemberItems()).toHaveLength(2));

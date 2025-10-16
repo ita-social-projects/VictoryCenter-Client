@@ -10,15 +10,15 @@ export const API_ROUTES = {
     TEAM: {
         BASE: 'TeamMembers',
         REORDER: 'TeamMembers/reorder',
-        CATEGORIES: 'Categories',
+        CATEGORIES: 'teamcategories',
         PUBLISHED: 'team/published',
     },
     PROGRAMS: {
-        BASE: 'Programs',
-        PUBLISHED: 'Programs/published',
+        BASE: 'HippotherapyPrograms',
+        PUBLISHED: 'HippotherapyPrograms/published',
     },
     PROGRAMCATEGORY: {
-        BASE: 'ProgramCategory',
+        BASE: 'HippotherapyProgramCategory',
     },
     PAYMENTS: {
         DONATE: 'payments/donate',

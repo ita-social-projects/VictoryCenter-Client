@@ -231,24 +231,61 @@ describe('useGenericModal', () => {
         expect(submit).toHaveBeenCalledWith(VisibilityStatus.Draft);
     });
 
-    it('re-renders on every validation change even with same boolean value', () => {
-        const localGetConfirmTitle = jest.fn(() => 'title');
+    it('re-renders buttonStates on every validation change', () => {
+        const { result } = renderHook(() => useGenericModal(defaultConfig));
 
-        const { result } = renderHook(() =>
-            useGenericModal({
-                ...defaultConfig,
-                getConfirmTitle: localGetConfirmTitle,
-            }),
-        );
+        result.current.formRef.current = makeFormRef({
+            isValid: jest.fn(() => true),
+        });
 
-        expect(localGetConfirmTitle).toHaveBeenCalled();
-
-        const initialCalls = localGetConfirmTitle.mock.calls.length;
+        const initialButtonStates = result.current.buttonStates;
 
         act(() => result.current.handleFormValidationChange(true));
-        expect(localGetConfirmTitle).toHaveBeenCalledTimes(initialCalls + 1);
+        const newButtonStates = result.current.buttonStates;
+
+        expect(newButtonStates).not.toBe(initialButtonStates);
 
         act(() => result.current.handleFormValidationChange(true));
-        expect(localGetConfirmTitle).toHaveBeenCalledTimes(initialCalls + 2);
+        const anotherButtonStates = result.current.buttonStates;
+
+        expect(anotherButtonStates).not.toBe(newButtonStates);
+    });
+
+    it('buttonStates should reflect form validation state correctly', () => {
+        const { result } = renderHook(() => useGenericModal(defaultConfig));
+
+        result.current.formRef.current = makeFormRef({
+            isValid: jest.fn((isPublishing) => !isPublishing),
+        });
+
+        expect(result.current.buttonStates.draftValid).toBe(false);
+        expect(result.current.buttonStates.publishValid).toBe(false);
+
+        act(() => {
+            result.current.handleFormValidationChange(true);
+        });
+
+        expect(result.current.buttonStates.draftValid).toBe(true);
+        expect(result.current.buttonStates.publishValid).toBe(false);
+    });
+
+    it('buttonStates should work without form api', () => {
+        const { result } = renderHook(() => useGenericModal(defaultConfig));
+
+        result.current.formRef.current = null;
+
+        act(() => {
+            result.current.handleFormValidationChange(true);
+        });
+
+        expect(result.current.buttonStates.draftValid).toBe(true);
+        expect(result.current.buttonStates.publishValid).toBe(false);
+    });
+
+    it('buttonStates should not expose internal _trigger', () => {
+        const { result } = renderHook(() => useGenericModal(defaultConfig));
+
+        expect(result.current.buttonStates).not.toHaveProperty('_trigger');
+        expect(Object.keys(result.current.buttonStates)).toEqual(['draftValid', 'publishValid']);
     });
 });

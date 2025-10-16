@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ModalMode, PendingAction, VisibilityStatus } from '../../../types/admin/common';
 
 export interface GenericFormRef {
@@ -47,12 +47,25 @@ export const useGenericModal = <
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
     const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
     const [pendingFormData, setPendingFormData] = useState<TFormValues | null>(null);
-    const [formValidation, setFormValidation] = useState({ valid: false, timestamp: 0 });
+    const [isFormValid, setIsFormValid] = useState(false);
+    const [updateTrigger, setUpdateTrigger] = useState(0);
 
     const isEditMode = mode === ModalMode.Edit;
 
+    const buttonStates = useMemo(() => {
+        const api = (formRef?.current as any) || null;
+        const hasApi = typeof api?.isValid === 'function';
+
+        return {
+            draftValid: hasApi && isFormValid ? api.isValid(false) : isFormValid,
+            publishValid: hasApi && isFormValid ? api.isValid(true) : false,
+            _trigger: updateTrigger,
+        };
+    }, [isFormValid, updateTrigger]);
+
     const handleFormValidationChange = useCallback((isValid: boolean) => {
-        setFormValidation({ valid: isValid, timestamp: Date.now() });
+        setIsFormValid(isValid);
+        setUpdateTrigger((prev) => prev + 1);
     }, []);
 
     useEffect(() => {
@@ -62,7 +75,8 @@ export const useGenericModal = <
         setShowCloseConfirmModal(false);
         setPendingAction(null);
         setPendingFormData(null);
-        setFormValidation({ valid: false, timestamp: 0 });
+        setIsFormValid(false);
+        setUpdateTrigger(0);
     }, [isOpen]);
 
     const resetPendingState = useCallback(() => {
@@ -156,16 +170,19 @@ export const useGenericModal = <
     const formConfirmTitle = getConfirmTitle(mode, entity, pendingAction);
     const formKey = getFormKey(mode, entity);
 
+    const { _trigger, ...cleanButtonStates } = buttonStates;
+
     return {
         formRef,
         isSubmitting,
         error,
         showFormConfirmModal,
         showCloseConfirmModal,
-        isFormValid: formValidation.valid,
+        isFormValid,
         isEditMode,
         formKey,
         formConfirmTitle,
+        buttonStates: cleanButtonStates,
 
         handleFormValidationChange,
         handleFormSubmit,

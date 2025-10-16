@@ -41,7 +41,7 @@ export const TeamPageContent = () => {
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
     const modalsStateControl = useModalsState<TeamMember>();
-    const { openModalActions, closeModalActions } = modalsStateControl;
+    const { isAnyModalOpened, openModalActions, closeModalActions } = modalsStateControl;
 
     const listContainerRef = useRef<HTMLDivElement>(null);
     const currentItemsCountRef = useRef<number>(0);
@@ -60,18 +60,6 @@ export const TeamPageContent = () => {
     const clearError = useCallback(() => {
         setError({ message: null, type: null });
     }, []);
-
-    const isAnyModalOpened = useMemo(() => {
-        const { modalState } = modalsStateControl;
-        return (
-            modalState.isAddModalOpen ||
-            modalState.isAddCategoryModalOpen ||
-            modalState.isEditCategoryModalOpen ||
-            modalState.isDeleteCategoryModalOpen ||
-            !!modalState.itemToEdit ||
-            !!modalState.itemToDelete
-        );
-    }, [modalsStateControl]);
 
     const onContextMenuOptionSelected = useCallback(
         (id: string) => {
@@ -221,10 +209,6 @@ export const TeamPageContent = () => {
         },
         [resetMembersState],
     );
-
-    const handleAddMemberModalOpen = useCallback(() => {
-        openModalActions.openAddItemModal();
-    }, [openModalActions]);
 
     const handleDeleteTeamMemberModalOpen = useCallback(
         (member: TeamMember) => {
@@ -444,7 +428,7 @@ export const TeamPageContent = () => {
                 <TeamPageToolbar
                     onSearchQueryChange={handleSearchQueryByName}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddMember={handleAddMemberModalOpen}
+                    onAddMember={openModalActions.openAddItemModal}
                 />
             </div>
 

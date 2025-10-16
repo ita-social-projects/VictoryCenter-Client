@@ -335,7 +335,7 @@ describe('TeamPageContent', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        mockedUseAdminClient.mockReturnValue({} as any);
+        mockedUseAdminClient.mockReturnValue(mockClient as any);
         mockTeamCategoriesApi.getAll.mockResolvedValue(mockCategories);
         mockTeamMembersApi.getAll.mockResolvedValue({
             items: mockMembers,

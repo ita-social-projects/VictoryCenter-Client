@@ -308,10 +308,13 @@ export const TeamPageContent = () => {
 
     const handleCategorySelect = useCallback(
         (category: TeamCategory) => {
+            if (selectedCategory?.id === category.id) {
+                return;
+            }
             setSelectedCategory(category);
             resetMembersState();
         },
-        [resetMembersState],
+        [selectedCategory, resetMembersState],
     );
 
     const handleAddMemberModalOpen = useCallback(() => {

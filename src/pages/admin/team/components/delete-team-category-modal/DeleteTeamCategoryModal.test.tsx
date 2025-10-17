@@ -159,13 +159,28 @@ describe('DeleteTeamCategoryModal', () => {
             expect(categorySelect.value).toBe('');
         });
 
-        it('resets error and selects first category when modal reopens', () => {
-            const props = createProps({ isOpen: false });
+        it('resets error and selects first category when modal reopens', async () => {
+            getMockedApi().delete.mockRejectedValueOnce(new Error('API Error'));
+            const props = createProps({ isOpen: false, categories: mockCategoriesNoMembers });
             const { rerender } = render(<DeleteTeamCategoryModal {...props} />);
 
-            // Reopen modal
             rerender(<DeleteTeamCategoryModal {...props} isOpen={true} />);
 
+            const deleteButton = screen.getByTestId('delete-button');
+            fireEvent.click(deleteButton);
+
+            await waitFor(() => {
+                expect(
+                    screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY),
+                ).toBeInTheDocument();
+            });
+
+            rerender(<DeleteTeamCategoryModal {...props} isOpen={false} />);
+            rerender(<DeleteTeamCategoryModal {...props} isOpen={true} categories={mockCategoriesWithMembers} />);
+
+            expect(
+                screen.queryByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY),
+            ).not.toBeInTheDocument();
             const categorySelect = screen.getByTestId('category-select') as HTMLSelectElement;
             expect(categorySelect.value).toBe(mockCategoriesWithMembers[0].id.toString());
         });
@@ -435,10 +450,24 @@ describe('DeleteTeamCategoryModal', () => {
             expect(deleteButton).not.toBeDisabled();
         });
 
-        it('clears error when modal reopens', () => {
-            const props = createProps({ isOpen: false });
+        it('clears error when modal reopens', async () => {
+            getMockedApi().delete.mockRejectedValueOnce(new Error('API Error'));
+            const props = createProps({ isOpen: false, categories: mockCategoriesNoMembers });
             const { rerender } = render(<DeleteTeamCategoryModal {...props} />);
 
+            rerender(<DeleteTeamCategoryModal {...props} isOpen={true} />);
+
+            // Trigger error by attempting delete
+            const deleteButton = screen.getByTestId('delete-button');
+            fireEvent.click(deleteButton);
+
+            await waitFor(() => {
+                expect(
+                    screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY),
+                ).toBeInTheDocument();
+            });
+
+            rerender(<DeleteTeamCategoryModal {...props} isOpen={false} />);
             rerender(<DeleteTeamCategoryModal {...props} isOpen={true} />);
 
             expect(

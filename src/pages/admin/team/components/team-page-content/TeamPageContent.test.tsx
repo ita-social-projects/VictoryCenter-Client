@@ -88,7 +88,7 @@ const mockCloseModalActions = {
 jest.mock('../../../../../hooks/admin/use-modals-state/useModalsState', () => ({
     useModalsState: () => {
         const isAnyModalOpened = Object.values(mockModalState).some((value) =>
-            typeof value === 'boolean' ? value : value !== null
+            typeof value === 'boolean' ? value : value !== null,
         );
         return {
             modalState: mockModalState,

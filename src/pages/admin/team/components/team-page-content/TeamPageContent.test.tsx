@@ -86,11 +86,17 @@ const mockCloseModalActions = {
 };
 
 jest.mock('../../../../../hooks/admin/use-modals-state/useModalsState', () => ({
-    useModalsState: () => ({
-        modalState: mockModalState,
-        openModalActions: mockOpenModalActions,
-        closeModalActions: mockCloseModalActions,
-    }),
+    useModalsState: () => {
+        const isAnyModalOpened = Object.values(mockModalState).some((value) =>
+            typeof value === 'boolean' ? value : value !== null
+        );
+        return {
+            modalState: mockModalState,
+            openModalActions: mockOpenModalActions,
+            closeModalActions: mockCloseModalActions,
+            isAnyModalOpened,
+        };
+    },
 }));
 
 jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({

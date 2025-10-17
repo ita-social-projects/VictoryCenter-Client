@@ -95,7 +95,7 @@ export const TEAM_CATEGORY_VALIDATION = {
     },
     description: {
         min: 10,
-        max: 500,
+        max: 200,
         getRequiredError: () => 'Опис обов’язковий',
         getMinError: () => `Не менше ${TEAM_CATEGORY_VALIDATION.description.min} символів`,
         getMaxError: () => `Не більше ${TEAM_CATEGORY_VALIDATION.description.max} символів`,

@@ -161,6 +161,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                             value={name}
                             editable={editable}
                             handleChange={(e) => setName(e.target.value)}
+                            onValueChange={setName}
                             handleBlur={() => validateField('name', name)}
                             isRequired={true}
                         />
@@ -175,6 +176,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                         value={value}
                         editable={editable}
                         handleChange={(e) => setValue(e.target.value)}
+                        onValueChange={setValue}
                         handleBlur={() => validateField('value', value)}
                         isRequired={true}
                     />

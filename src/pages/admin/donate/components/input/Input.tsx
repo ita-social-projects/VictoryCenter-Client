@@ -85,6 +85,7 @@ export const Input = ({
 
     const handleClear = () => {
         setValue(prefix);
+        onValueChange?.(prefix);
         setHasEdited(true);
     };
 

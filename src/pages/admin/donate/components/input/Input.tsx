@@ -35,8 +35,11 @@ export const Input = ({
     maxLength,
     className,
 }: InputProps) => {
-    const [value, setValue] = useState(prefix);
-    const [initialValue, setInitialValue] = useState(prefix);
+    const computedInitialValue =
+        externalValue !== undefined && externalValue !== null ? prefix + externalValue.replace(prefix, '') : prefix;
+
+    const [value, setValue] = useState(computedInitialValue);
+    const [initialValue, setInitialValue] = useState(computedInitialValue);
     const [hasEdited, setHasEdited] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -87,6 +90,8 @@ export const Input = ({
 
     const showClearButton = isFocused && value.length > prefix.length;
 
+    const hasValue = value && value !== prefix;
+
     return (
         <div className={`input ${isTitle ? 'input-title' : ''} ${hasEdited ? 'input-changed' : ''} ${className ?? ''}`}>
             {label && (
@@ -102,7 +107,7 @@ export const Input = ({
                 <textarea
                     ref={textAreaRef}
                     name={name}
-                    placeholder={placeholder}
+                    placeholder={hasValue ? '' : placeholder}
                     value={value}
                     onChange={onChange}
                     onFocus={() => setIsFocused(true)}

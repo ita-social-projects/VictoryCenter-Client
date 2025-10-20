@@ -122,7 +122,13 @@ export const Input = ({
                 />
 
                 {showClearButton && (
-                    <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={handleClear}></button>
+                    <button
+                        type="button"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={handleClear}
+                        aria-label="Clear input"
+                        className="input-clear-button"
+                    ></button>
                 )}
             </div>
         </div>

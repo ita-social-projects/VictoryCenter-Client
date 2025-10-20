@@ -36,7 +36,8 @@
         caret-color: transparent;
     }
 
-    button {
+    button,
+    .input-clear-button {
         position: absolute;
         right: 1rem;
         top: 50%;

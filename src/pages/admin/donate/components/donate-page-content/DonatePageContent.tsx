@@ -49,9 +49,18 @@ export const DonatePageContent = () => {
         };
     }, [client, selectedCategory]);
 
-    const handleCategorySelect = useCallback((currency: Currencies) => {
-        setSelectedCategory(currency);
-    }, []);
+    const handleCategorySelect = useCallback(
+        (currency: Currencies) => {
+            if (currency === selectedCategory) {
+                return;
+            }
+
+            setSupportOptions([]);
+            setIsSupportOptionsLoading(true);
+            setSelectedCategory(currency);
+        },
+        [selectedCategory],
+    );
 
     // Support Options handlers
     const handleCreateSupportOption = useCallback(
@@ -269,7 +278,6 @@ export const DonatePageContent = () => {
 
                 <div className="donate-page-item">
                     <SupportOptionsForm
-                        key={selectedCategory}
                         supportOptions={supportOptions}
                         isLoading={isSupportOptionsLoading}
                         onCreateOption={handleCreateSupportOption}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ModalMode, PendingAction, VisibilityStatus } from '../../../types/admin/common';
 
 export interface GenericFormRef {
@@ -48,25 +48,29 @@ export const useGenericModal = <
     const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
     const [pendingFormData, setPendingFormData] = useState<TFormValues | null>(null);
     const [isFormValid, setIsFormValid] = useState(false);
-    const [updateTrigger, setUpdateTrigger] = useState(0);
+    const [buttonStates, setButtonStates] = useState({
+        draftValid: false,
+        publishValid: false,
+    });
 
     const isEditMode = mode === ModalMode.Edit;
 
-    const buttonStates = useMemo(() => {
-        const api = (formRef?.current as any) || null;
-        const hasApi = typeof api?.isValid === 'function';
+    const updateButtonStates = useCallback(() => {
+        const api = formRef.current;
 
-        return {
-            draftValid: hasApi && isFormValid ? api.isValid(false) : isFormValid,
-            publishValid: hasApi && isFormValid ? api.isValid(true) : false,
-            _trigger: updateTrigger,
-        };
-    }, [isFormValid, updateTrigger]);
+        setButtonStates({
+            draftValid: api?.isValid?.(false) ?? isFormValid,
+            publishValid: api?.isValid?.(true) ?? isFormValid,
+        });
+    }, [isFormValid]);
 
-    const handleFormValidationChange = useCallback((isValid: boolean) => {
-        setIsFormValid(isValid);
-        setUpdateTrigger((prev) => prev + 1);
-    }, []);
+    const handleFormValidationChange = useCallback(
+        (isValid: boolean) => {
+            setIsFormValid(isValid);
+            updateButtonStates();
+        },
+        [updateButtonStates],
+    );
 
     useEffect(() => {
         if (!isOpen) return;
@@ -76,7 +80,6 @@ export const useGenericModal = <
         setPendingAction(null);
         setPendingFormData(null);
         setIsFormValid(false);
-        setUpdateTrigger(0);
     }, [isOpen]);
 
     const resetPendingState = useCallback(() => {
@@ -170,8 +173,6 @@ export const useGenericModal = <
     const formConfirmTitle = getConfirmTitle(mode, entity, pendingAction);
     const formKey = getFormKey(mode, entity);
 
-    const { _trigger, ...cleanButtonStates } = buttonStates;
-
     return {
         formRef,
         isSubmitting,
@@ -182,7 +183,7 @@ export const useGenericModal = <
         isEditMode,
         formKey,
         formConfirmTitle,
-        buttonStates: cleanButtonStates,
+        buttonStates,
 
         handleFormValidationChange,
         handleFormSubmit,

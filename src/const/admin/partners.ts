@@ -1,7 +1,11 @@
+// const/admin/partners.ts
 export const PARTNERS_TEXT = {
     BUTTON: {
         ADD_PARTNER_SECTION: 'Додати секцію партнерів',
         PUBLISH: 'Опублікувати',
+        YES: 'Так',
+        NO: 'Ні',
+        ADD_PARTNER: 'Додати партнера',
     },
     FORM: {
         LABEL: {
@@ -14,6 +18,29 @@ export const PARTNERS_TEXT = {
         MESSAGE: {
             FAIL_TO_DELETE_PARTNER_SECTION: 'Виникла помилка під час видалення секції партнерів',
         },
+    },
+    IMAGE: {
+        INPUT: 'Додайте файл сюди',
+    },
+    SECTION: {
+        TITLE_PLACEHOLDER: 'Введіть заголовок секції',
+        DESCRIPTION_PLACEHOLDER: 'Введіть опис секції',
+        EMPTY_MESSAGE: 'Додайте хоча б одного партнера до секції',
+        MAX_PARTNERS: 'Максимальна кількість партнерів: 10',
+        ADD_PARTNER: 'Додати партнера',
+        DELETE_SECTION: 'Видалити секцію',
+    },
+    PARTNER: {
+        DESCRIPTION_LABEL: 'Опис партнера',
+        DESCRIPTION_PLACEHOLDER: 'Введіть опис партнера',
+        DELETE: 'Видалити партнера',
+    },
+    MESSAGE: {
+        SECTION_CREATED: 'Секція успішно створена',
+        SECTION_UPDATED: 'Секція успішно оновлена',
+        SECTION_DELETED: 'Секція успішно видалена',
+        SECTION_PUBLISHED: 'Секція успішно опублікована',
+        BANNER_SAVED: 'Банер успішно збережено',
     },
 };
 

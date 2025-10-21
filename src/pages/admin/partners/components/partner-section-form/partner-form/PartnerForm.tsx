@@ -1,23 +1,19 @@
-import React, { forwardRef, useCallback, useState } from 'react';
-import { ReactComponent as DragIcon } from '../../../../../assets/icons/drag.svg';
-import { ReactComponent as DeleteIcon } from '../../../../../assets/icons/delete.svg';
+import React from 'react';
+import { ReactComponent as DeleteIcon } from '../../../../../../assets/icons/delete.svg';
+import { ReactComponent as EditIcon } from '../../../../../../assets/icons/edit.svg';
 import { ImageInput } from '../../../../../../components/admin/image-input/ImageInput';
-import { InputLabel } from '../../../../../../components/admin/input-label/InputLabel';
 import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { InputLabel } from '../../../../../../components/admin/input-label/InputLabel';
 import { InputError } from '../../../../../../components/admin/input-error/InputError';
-import { ImageValues, Image } from '../../../../../../types/common/image';
+import { PartnerFormValues } from '../../../../../../types/admin/partners';
 import './PartnerForm.scss';
-import { PARTNERS_TEXT } from '../../../../../../const/admin/partners';
-
-export interface PartnerFormValues {
-    image: ImageValues | Image | null;
-    description: string;
-}
+import { ImageValues } from '../../../../../../types/common/image';
 
 export interface PartnerFormProps {
     value: PartnerFormValues;
     onChange: (value: PartnerFormValues) => void;
     onDelete: () => void;
+    onEdit: () => void;
     disabled?: boolean;
     error?: {
         image?: string;
@@ -25,91 +21,71 @@ export interface PartnerFormProps {
     };
 }
 
+export const PartnerForm: React.FC<PartnerFormProps> = ({
+    value,
+    onChange,
+    onDelete,
+    onEdit,
+    disabled = false,
+    error,
+}) => {
+    const handleImageChange = (image: ImageValues | null) => {
+        onChange({ ...value, image });
+    };
 
+    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        onChange({ ...value, description: e.target.value });
+    };
 
-export const PartnerForm = forwardRef<HTMLDivElement, PartnerFormProps>(
-    ({ value, onChange, onDelete, disabled = false, error }, ref) => {
-        const [isDragging, setIsDragging] = useState(false);
-
-        const handleImageChange = useCallback(
-            (image: ImageValues | null) => {
-                onChange({ ...value, image });
-            },
-            [value, onChange]
-        );
-
-        const handleDescriptionChange = useCallback(
-            (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                onChange({ ...value, description: e.target.value });
-            },
-            [value, onChange]
-        );
-
-        const handleDragStart = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-            setIsDragging(true);
-            e.dataTransfer.effectAllowed = 'move';
-        }, []);
-
-        const handleDragEnd = useCallback(() => {
-            setIsDragging(false);
-        }, []);
-
-        return (
-            <div
-                ref={ref}
-                className={`partner-form ${isDragging ? 'partner-form--dragging' : ''} ${disabled ? 'partner-card--disabled' : ''}`}
-                draggable={!disabled}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
+    return (
+        <div className="partner-form">
+            <button
+                type="button"
+                className="partner-form__edit"
+                onClick={onEdit}
+                disabled={disabled}
+                aria-label="Редагувати партнера"
             >
-                <div className="partner-form__header">
-                    <button
-                        type="button"
-                        className="partner-form__drag-button"
-                        disabled={disabled}
-                        aria-label="Перетягнути"
-                    >
-                        <DragIcon className="partner-form__drag-icon" />
-                    </button>
-                    <button
-                        type="button"
-                        className="partner-form__delete-button"
-                        onClick={onDelete}
-                        disabled={disabled}
-                        aria-label="Видалити"
-                    >
-                        <DeleteIcon className="partner-form__delete-icon" />
-                    </button>
-                </div>
+                <EditIcon />
+            </button>
+            <button
+                type="button"
+                className="partner-form__delete"
+                onClick={onDelete}
+                disabled={disabled}
+                aria-label="Видалити партнера"
+            >
+                <DeleteIcon />
+            </button>
 
-                <div className="partner-form__image-section">
+            <div className="partner-form__content">
+                <div className="partner-form__image">
                     <ImageInput
                         value={value.image}
                         onChange={handleImageChange}
                         disabled={disabled}
-                        id={`partner-image-${Math.random()}`}
-                        name="partner-image"
+                        id={`partner-image-${Date.now()}`}
+                        name="partnerImage"
                     />
                     {error?.image && <InputError error={error.image} />}
                 </div>
 
-                <div className="partner-form__description-section">
-                    <InputLabel htmlFor="partner-description" text={PARTNERS_TEXT.FORM.LABEL.DESCRIPTION} />
+                <div className="partner-form__description">
+                    <InputLabel htmlFor={`partner-description-${Date.now()}`} text="Опис партнера" />
                     <TextAreaWithCharacterLimit
                         value={value.description}
                         onChange={handleDescriptionChange}
-                        id="partner-description"
-                        name="description"
+                        id={`partner-description-${Date.now()}`}
+                        name="partnerDescription"
                         disabled={disabled}
-                        maxLength={50}
-                        placeholder="Введіть текст"
+                        maxLength={200}
+                        placeholder="Введіть опис партнера"
                         rows={3}
                     />
                     {error?.description && <InputError error={error.description} />}
                 </div>
             </div>
-        );
-    }
-);
+        </div>
+    );
+};
 
-PartnerForm.displayName = 'PartnerForm';

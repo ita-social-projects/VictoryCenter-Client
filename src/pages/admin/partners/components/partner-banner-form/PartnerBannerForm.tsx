@@ -1,5 +1,4 @@
 import React, { forwardRef, useCallback, useMemo, useState } from 'react';
-import { ReactComponent as UploadImage } from '../../../../../assets/icons/cloud-with-down-arrow.svg';
 import { ImageValues, Image } from '../../../../../types/common/image';
 import './PartnerBannerForm.scss';
 import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
@@ -10,6 +9,7 @@ import { InputWithCharacterLimit } from '../../../../../components/admin/input-w
 import { PARTNER_VALIDATION, PARTNERS_TEXT } from '../../../../../const/admin/partners';
 import { ImageInput } from '../../../../../components/admin/image-input/ImageInput';
 import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { InputError } from '../../../../../components/admin/input-error/InputError';
 
 export interface PartnerBannerFormValues {
     title: string;
@@ -109,137 +109,52 @@ export const PartnerBannerForm = forwardRef<PartnerBannerFormRef, PartnerBannerF
             [setFormState, setErrors],
         );
 
-        const hadleDescriptionBlur = useCallback(() => {
+        const handleDescriptionBlur = useCallback(() => {
             setErrors((prev) => ({
                 ...prev,
                 description: PARTNER_VALIDATION_FUNCTIONS.validateDescription(formState.description, false),
             }));
         }, [formState.description, setErrors]);
 
-        const handleImgChange = useCallback(
-            (file: ImageValues | Image | null) => {
-                const error = PARTNER_VALIDATION_FUNCTIONS.validateImage(file, false);
+        const handleImageChange = useCallback(
+            (value: ImageValues | null) => {
+                setFormState((prev) => ({ ...prev, image: value }));
                 setErrors((prev) => ({
                     ...prev,
-                    image: error,
+                    image: PARTNER_VALIDATION_FUNCTIONS.validateImage(value, false),
                 }));
-
-                if (!error) {
-                    setFormState((prev) => ({ ...prev, image: file }));
-                }
             },
             [setFormState, setErrors],
         );
 
-        const [isDragging, setIsDragging] = useState(false);
+        const handleImageBlur = useCallback(() => {
+            setErrors((prev) => ({
+                ...prev,
+                image: PARTNER_VALIDATION_FUNCTIONS.validateImage(formState.image, false),
+            }));
+        }, [formState.image, setErrors]);
 
-        const handleImageUpload = useCallback(
-            (file: File) => {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    const result = reader.result as string;
-                    const parts = result.split(',');
-                    if (parts.length === 2) {
-                        const imageData: ImageValues = {
-                            base64: parts[1],
-                            mimeType: file.type,
-                            size: file.size,
-                        };
-                        handleImgChange(imageData);
-                    }
-                };
-                reader.readAsDataURL(file);
-            },
-            [handleImgChange],
-        );
-
-        const handleFileInputChange = useCallback(
-            (e: React.ChangeEvent<HTMLInputElement>) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                    handleImageUpload(file);
-                }
-            },
-            [handleImageUpload],
-        );
-
-        const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsDragging(true);
-        }, []);
-
-        const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setIsDragging(false);
-        }, []);
-
-        const handleDrop = useCallback(
-            (e: React.DragEvent<HTMLDivElement>) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsDragging(false);
-
-                const file = e.dataTransfer.files?.[0];
-                if (file && file.type.startsWith('image/')) {
-                    handleImageUpload(file);
-                }
-            },
-            [handleImageUpload],
-        );
-
-        const imagePreview = useMemo(() => {
-            if (formState.image) {
-                if ('url' in formState.image && formState.image.url) {
-                    return formState.image.url;
-                } else if ('base64' in formState.image) {
-                    return `data:${formState.image.mimeType};base64,${formState.image.base64}`;
-                }
+        const handlePublish = useCallback(() => {
+            if (!formDisabled && !isSubmitting) {
+                // Trigger form submission with Published status
+                handleSubmit(formState, VisibilityStatus.Published);
             }
-            return null;
-        }, [formState.image]);
+        }, [formState, formDisabled, isSubmitting, handleSubmit]);
 
         return (
             <div className="partner-banner-form">
                 <div className="partner-banner-form__container">
-                    <div className="partner-banner-form__left">
-                        <div
-                            className={`partner-banner-form__upload-area ${isDragging ? 'partner-banner-form__upload-area--dragging' : ''} ${imagePreview ? 'partner-banner-form__upload-area--has-image' : ''}`}
-                            onDragOver={handleDragOver}
-                            onDragLeave={handleDragLeave}
-                            onDrop={handleDrop}
-                        >
-                            <input
-                                type="file"
-                                id="partner-image-upload"
-                                className="partner-banner-form__file-input"
-                                accept="image/*"
-                                onChange={handleFileInputChange}
-                                disabled={formDisabled}
-                            />
-
-                            {imagePreview ? (
-                                <>
-                                    <img
-                                        src={imagePreview}
-                                        alt="Preview"
-                                        className="partner-banner-form__preview-image"
-                                    />
-                                    <label
-                                        htmlFor="partner-image-upload"
-                                        className="partner-banner-form__upload-overlay partner-banner-form__upload-overlay--visible"
-                                    >
-                                        <UploadImage className="partner-banner-form__upload-icon" />
-                                    </label>
-                                </>
-                            ) : (
-                                <label htmlFor="partner-image-upload" className="partner-banner-form__upload-label">
-                                    <UploadImage className="partner-banner-form__upload-icon" />
-                                </label>
-                            )}
-                        </div>
-                        {errors.image && <p className="error">{errors.image}</p>}
+                    <div className="image-wrapper">
+                        <InputLabel htmlFor="partner-image" text={PARTNERS_TEXT.IMAGE.INPUT} />
+                        <ImageInput
+                            value={formState.image}
+                            onChange={handleImageChange}
+                            onBlur={handleImageBlur}
+                            disabled={formDisabled || isSubmitting}
+                            id="partner-image"
+                            name="partner-image"
+                        />
+                        {errors.image && <InputError error={errors.image} />}
                     </div>
 
                     <div className="partner-banner-form__right">
@@ -252,9 +167,9 @@ export const PartnerBannerForm = forwardRef<PartnerBannerFormRef, PartnerBannerF
                                 name="title"
                                 id="title"
                                 maxLength={PARTNER_VALIDATION.title.max}
-                                disabled={formDisabled}
+                                disabled={formDisabled || isSubmitting}
                             />
-                            {errors.title && <p className="error title-error">{errors.title}</p>}
+                            {errors.title && <InputError error={errors.title} />}
                         </div>
 
                         <div className="form-group inp2">
@@ -262,19 +177,20 @@ export const PartnerBannerForm = forwardRef<PartnerBannerFormRef, PartnerBannerF
                             <TextAreaWithCharacterLimit
                                 value={formState.description}
                                 onChange={handleDescriptionChange}
-                                onBlur={hadleDescriptionBlur}
+                                onBlur={handleDescriptionBlur}
                                 id="description"
                                 name="description"
                                 disabled={formDisabled || isSubmitting}
                                 maxLength={PARTNER_VALIDATION.description.max}
                                 rows={2}
                             />
-                            {errors.description && <p className="error desc-error">{errors.description}</p>}
+                            {errors.description && <InputError error={errors.description} />}
                         </div>
 
                         <button
                             type="button"
                             className="partner-banner-form__submit-btn"
+                            onClick={handlePublish}
                             disabled={formDisabled || isSubmitting}
                         >
                             {PARTNERS_TEXT.BUTTON.PUBLISH}

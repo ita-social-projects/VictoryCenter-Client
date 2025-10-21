@@ -41,7 +41,6 @@ export const API_ROUTES = {
     PARTNERS: {
         BASE: 'Partners',
         BANNER: 'Partners/banner',
-        SECTION: 'Partners/section',
-        PUBLISHED: 'Partners/published',
+        SECTIONS: 'Partners/section',
     },
 };

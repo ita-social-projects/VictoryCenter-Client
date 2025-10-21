@@ -8,6 +8,11 @@ import supportChildren from '../../assets/images/public/about-us-page/support-ch
 import ourTeam from '../../assets/images/public/about-us-page/our-team.jpg';
 
 export const ABOUT_US_DATA = {
+    INTRO_TITLE: {
+        FIRST_HIGHLIGHT: 'Простір',
+        MIDDLE_PART: ' довіри, турботи та твоєї ',
+        SECOND_HIGHLIGHT: 'внутрішньої сили',
+    },
     OUR_VALUES: 'Наші Цінності',
     VALUE_ITEMS: [
         {

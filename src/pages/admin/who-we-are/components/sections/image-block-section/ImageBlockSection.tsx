@@ -117,6 +117,7 @@ export const ImageSection = ({
                                 const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
                                 setTitleError(error || null);
                             }}
+                            disabled={true}
                         />
                         {titleError && (
                             <p data-testid={'title-error'} className="error">

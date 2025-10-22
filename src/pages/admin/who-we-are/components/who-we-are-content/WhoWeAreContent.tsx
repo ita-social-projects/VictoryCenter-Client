@@ -37,7 +37,7 @@ export const WhoWeAreContent = () => {
 
     const fetchCategories = useCallback(async () => {
         try {
-            const fetchedCategories = await WhoWeAreApi.getAll(client);
+            const fetchedCategories = await WhoWeAreApi.getPreviews(client);
             if (fetchedCategories.length > 0) {
                 setCategories(fetchedCategories);
                 setSelectedCategory(fetchedCategories[0]);

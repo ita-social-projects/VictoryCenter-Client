@@ -111,7 +111,7 @@ describe('WhoWeAreContent Component', () => {
     });
 
     it('should fetch categories and the first section content on initial render', async () => {
-        mockedWhoWeAreApi.getAll.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
         mockedWhoWeAreApi.getByType.mockResolvedValue(mockSection1);
 
         render(<WhoWeAreContent />);
@@ -125,13 +125,13 @@ describe('WhoWeAreContent Component', () => {
             expect(screen.getByText('People')).toBeInTheDocument();
         });
 
-        expect(mockedWhoWeAreApi.getAll).toHaveBeenCalledTimes(1);
+        expect(mockedWhoWeAreApi.getPreviews).toHaveBeenCalledTimes(1);
         expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledTimes(1);
         expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledWith({ client: 'mocked-client' }, 0);
     });
 
     it('should display an error if fetching categories fails', async () => {
-        mockedWhoWeAreApi.getAll.mockRejectedValue(new Error('API Error'));
+        mockedWhoWeAreApi.getPreviews.mockRejectedValue(new Error('API Error'));
 
         render(<WhoWeAreContent />);
 
@@ -140,7 +140,7 @@ describe('WhoWeAreContent Component', () => {
     });
 
     it('should display an error if fetching a section fails', async () => {
-        mockedWhoWeAreApi.getAll.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
         mockedWhoWeAreApi.getByType.mockRejectedValue(new Error('API Error'));
 
         render(<WhoWeAreContent />);
@@ -150,17 +150,17 @@ describe('WhoWeAreContent Component', () => {
     });
 
     it('should handle gracefully when no categories are returned', async () => {
-        mockedWhoWeAreApi.getAll.mockResolvedValue([]);
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue([]);
         render(<WhoWeAreContent />);
         await waitFor(() => {
-            expect(mockedWhoWeAreApi.getAll).toHaveBeenCalledTimes(1);
+            expect(mockedWhoWeAreApi.getPreviews).toHaveBeenCalledTimes(1);
         });
         expect(mockedWhoWeAreApi.getByType).not.toHaveBeenCalled();
         expect(screen.queryByText('History')).not.toBeInTheDocument();
     });
 
     it('should fetch new section data when a different category is selected', async () => {
-        mockedWhoWeAreApi.getAll.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
         mockedWhoWeAreApi.getByType.mockResolvedValueOnce(mockSection1).mockResolvedValueOnce(mockSection2);
 
         render(<WhoWeAreContent />);
@@ -185,7 +185,7 @@ describe('WhoWeAreContent Component', () => {
             ...mockSection1,
             contents: [{ ...mockSection1.contents[0], description: updatedDescription }],
         };
-        mockedWhoWeAreApi.getAll.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
         mockedWhoWeAreApi.getByType.mockResolvedValue(JSON.parse(JSON.stringify(mockSection1)));
         mockedWhoWeAreApi.updateContent.mockResolvedValue(updatedSection);
 

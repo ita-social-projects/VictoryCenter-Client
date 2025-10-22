@@ -25,7 +25,7 @@ describe('WhoWeAreApi', () => {
             const mockData: WhoWeAreCategory[] = [{ id: 1, title: 'Category 1', sectionType: SectionType.Main }];
             mockClient.get.mockResolvedValue({ data: mockData });
 
-            const result = await WhoWeAreApi.getAll(mockClient);
+            const result = await WhoWeAreApi.getPreviews(mockClient);
 
             expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.WHO_WE_ARE.BASE);
             expect(result).toEqual(mockData);

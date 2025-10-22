@@ -34,6 +34,7 @@ export const API_ROUTES = {
     },
     WHO_WE_ARE: {
         BASE: 'WhoWeAre',
+        PREVIEWS: 'WhoWeAre/previews',
         PUBLIC: 'WhoWeArePage',
     },
 };

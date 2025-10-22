@@ -9,6 +9,7 @@ import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
 import { COMMON_IMAGE_TEXT } from '../../../const/admin/image';
 import { IMAGE_VALIDATION_FUNCTIONS } from '../../../validation/admin/image-schema/image-schema';
+import { CropModal} from "../cropper-modal/CropperModal";
 
 export interface ImageInputProps {
     value: ImageValues | Image | null;
@@ -45,6 +46,7 @@ export const ImageInput = ({
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+    const [showCropperModal, setShowCropperModal] = useState<boolean>(false);
 
     useEffect(() => {
         setPreviewImage(value);
@@ -175,18 +177,33 @@ export const ImageInput = ({
                             data-testid="preview-image"
                         />
                         {!disabled && (
-                            <button
-                                data-testid="remove-photo-button"
-                                type="button"
-                                className="delete-button"
-                                disabled={disabled}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowConfirmModal(true);
-                                }}
-                            >
-                                <DeleteIcon className={classNames('delete-icon')} />
-                            </button>
+                            <>
+                                <button
+                                    data-testid="remove-photo-button"
+                                    type="button"
+                                    className="delete-button"
+                                    disabled={disabled}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShowConfirmModal(true);
+                                    }}
+                                >
+                                    <DeleteIcon className={classNames('delete-icon')} />
+                                </button>
+                                <h1>Hello world</h1>
+                                <button
+                                    data-testid="crop-photo-button"
+                                    type="button"
+                                    className="crop-button"
+                                    disabled={disabled}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShowCropperModal(true);
+                                    }}
+                                >
+                                    <DeleteIcon className={classNames('crop-icon')} />
+                                </button>
+                            </>
                         )}
                     </div>
                 ) : (
@@ -208,6 +225,7 @@ export const ImageInput = ({
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
+            {previewImage && showCropperModal && <CropModal src={previewImage} onChange={setPreviewImage} height={height} width={width} onCancel={() => setShowCropperModal(false)} isOpen={showCropperModal} />}
         </div>
     );
 };

@@ -87,6 +87,7 @@
         &:hover::after {
             opacity: 0.78; // регулюй, наскільки сильно перекриває
         }
+
         .delete-button {
             position: absolute;
             inset: 0;
@@ -114,8 +115,37 @@
             }
         }
 
-        &:hover .delete-button {
-            display: flex;
+        .crop-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: none; // Цю властивість буде змінено при :hover
+            align-items: center;
+            justify-content: center;
+            height: 25%;
+            aspect-ratio: 1 / 1;
+            padding: 0.625rem;
+            border-radius: 8px;
+            background: colors.$grey-900;
+            opacity: 0.8;
+            z-index: 2;
+            cursor: pointer;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+
+        .delete-icon {
+            width: 55%;
+            height: 55%;
+            color: colors.$grey-50;
+        }
+
+        &:hover {
+            .delete-button, .crop-button { // Додайте .crop-button до селектора
+                display: flex;
+            }
         }
     }
 }

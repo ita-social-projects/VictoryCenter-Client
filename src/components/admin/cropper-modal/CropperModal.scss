@@ -1,0 +1,85 @@
+@use "../../../assets/sass/variables/colors";
+
+
+/* Основна область обрізання */
+.ReactCrop__crop-selection {
+  border: none !important;
+  outline: 45px dashed colors.$blue-700 !important;
+  outline-offset: -30px; // щоб рамка співпала з попереднім border
+}
+
+/* Приховуємо самі ручки, але залишаємо їх інтерактивними */
+.ReactCrop__drag-handle {
+  width: 45px !important;
+  height: 45px !important;
+  background-color: transparent !important;
+  border: none !important;
+  z-index: 25 !important; /* Робимо їх трохи вищими, щоб вони були клікабельними */
+  opacity: 0 !important; /* Повністю приховуємо їх */
+}
+
+/* Створюємо видимі кутові маркери за допомогою псевдоелементів */
+
+/* Верхній лівий кут */
+.ReactCrop__drag-handle.ord-nws::before {
+  content: '';
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  border-left: 2px solid white;
+  border-top: 2px solid white;
+  transform: translate(-50%, -50%); /* Відцентровуємо маркер */
+  opacity: 1 !important;
+  z-index: 30; /* Розташовуємо їх над усіма елементами */
+}
+
+/* Верхній правий кут */
+.ReactCrop__drag-handle.ord-nes::before {
+  content: '';
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  border-right: 2px solid white;
+  border-top: 2px solid white;
+  transform: translate(50%, -50%);
+  opacity: 1 !important;
+  z-index: 30;
+}
+
+/* Нижній лівий кут */
+.ReactCrop__drag-handle.ord-sws::before {
+  content: '';
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  border-left: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: translate(-50%, 50%);
+  opacity: 1 !important;
+  z-index: 30;
+}
+
+/* Нижній правий кут */
+.ReactCrop__drag-handle.ord-ses::before {
+  content: '';
+  position: absolute;
+  width: 45px;
+  height: 45px;
+  border-right: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: translate(50%, 50%);
+  opacity: 1 !important;
+  z-index: 30;
+}
+
+/* Затінена маска */
+.ReactCrop__child-wrapper::after {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  z-index: 1 !important;
+}
+
+/* Прибираємо стилі сітки */
+.ReactCrop--fixed-aspect .ReactCrop__rule-of-thirds-h,
+.ReactCrop--fixed-aspect .ReactCrop__rule-of-thirds-v {
+  border-color: transparent;
+}

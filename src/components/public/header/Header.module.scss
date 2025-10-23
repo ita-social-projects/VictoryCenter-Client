@@ -1,0 +1,76 @@
+@use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/fonts';
+@use '../../../assets/sass/mixins/utilits.mixins';
+@use '../../../assets/sass/variables/z-index';
+
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: z-index.public(header);
+    padding: 0.85rem 3.5rem;
+    background-color: rgba(colors.$grey-50, 0.5);
+    backdrop-filter: blur(10.375rem);
+
+    @media (max-width: 768px) {
+        padding: 0.5rem 1rem;
+    }
+}
+
+.navigation {
+    display: flex;
+    gap: 3rem;
+    align-items: center;
+    font-weight: 600;
+
+    a {
+        @include utilits.link-base(colors.$blue-900, colors.$blue-300, colors.$blue-100);
+    }
+
+    a.disableLink {
+        @include utilits.link-disabled();
+    }
+
+    @media (max-width: 1440px) {
+        display: none;
+    }
+}
+
+.buttonContainer {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.whiteButton {
+    background-color: transparent;
+    width: 8.2em;
+    height: 2.5rem;
+    font-family: fonts.$mulish-regular-font;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid colors.$blue-900;
+    font-size: 1rem;
+
+    @media (max-width: 560px) {
+        display: none;
+    }
+}
+
+.blackButton {
+    background-color: colors.$blue-900;
+    color: white;
+    font-family: fonts.$mulish-regular-font;
+    width: 7.5rem;
+    height: 2.5rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid colors.$blue-900;
+}

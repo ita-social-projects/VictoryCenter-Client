@@ -1,0 +1,35 @@
+@use '../../../../assets/sass/mixins/utilits.mixins';
+@use '../../../../assets/sass/variables/colors';
+
+.burgerMenuIcon {
+    cursor: pointer;
+    background: none;
+    border: none;
+    align-self: center;
+    color: black;
+    height: 40px;
+    padding-block: 0;
+}
+
+.menu {
+    display: flex;
+    position: absolute;
+    top: 4rem;
+    right: 0;
+    background-color: white;
+    width: 12rem;
+    flex-direction: column;
+}
+
+.menuLink {
+    font-weight: 600;
+    text-decoration: none;
+    padding: 1rem;
+    color: black;
+    position: relative;
+    border-bottom: 1px solid colors.$blue-50;
+
+    &.disableLink {
+        @include utilits.link-disabled();
+    }
+}

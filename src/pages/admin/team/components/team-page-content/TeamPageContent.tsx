@@ -24,8 +24,9 @@ const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
 
 interface ModalState {
     isAddMemberModalOpen: boolean;
-    memberToDelete: TeamMember | null;
+    memberToTranslate: TeamMember | null;
     memberToEdit: TeamMember | null;
+    memberToDelete: TeamMember | null;
     isAddCategoryModalOpen: boolean;
     isEditCategoryModalOpen: boolean;
     isDeleteCategoryModalOpen: boolean;
@@ -50,8 +51,9 @@ export const TeamPageContent = () => {
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
     const [modalState, setModalState] = useState<ModalState>({
         isAddMemberModalOpen: false,
-        memberToDelete: null,
+        memberToTranslate: null,
         memberToEdit: null,
+        memberToDelete: null,
         isAddCategoryModalOpen: false,
         isEditCategoryModalOpen: false,
         isDeleteCategoryModalOpen: false,
@@ -86,6 +88,7 @@ export const TeamPageContent = () => {
     const closeModalActions = useMemo(
         () => ({
             addMember: () => updateModalState({ isAddMemberModalOpen: false }),
+            translateMember: () => updateModalState({ memberToTranslate: null }),
             editMember: () => updateModalState({ memberToEdit: null }),
             deleteMember: () => updateModalState({ memberToDelete: null }),
         }),
@@ -223,10 +226,10 @@ export const TeamPageContent = () => {
         updateModalState({ isAddMemberModalOpen: true });
     }, [updateModalState]);
 
-    const handleDeleteTeamMemberModalOpen = useCallback(
+    const handleTranslateMemberModalOpen = useCallback(
         (member: TeamMember) => {
             if (isAnyModalOpened) return;
-            updateModalState({ memberToDelete: member });
+            updateModalState({ memberToTranslate: member });
         },
         [isAnyModalOpened, updateModalState],
     );
@@ -235,6 +238,14 @@ export const TeamPageContent = () => {
         (member: TeamMember) => {
             if (isAnyModalOpened) return;
             updateModalState({ memberToEdit: member });
+        },
+        [isAnyModalOpened, updateModalState],
+    );
+
+    const handleDeleteTeamMemberModalOpen = useCallback(
+        (member: TeamMember) => {
+            if (isAnyModalOpened) return;
+            updateModalState({ memberToDelete: member });
         },
         [isAnyModalOpened, updateModalState],
     );
@@ -361,8 +372,9 @@ export const TeamPageContent = () => {
                     <MemberComponent
                         key={m.id}
                         member={m}
-                        handleOnDeleteMember={handleDeleteTeamMemberModalOpen}
+                        handleOnTranslateMember={handleTranslateMemberModalOpen}
                         handleOnEditMember={handleEditMemberModalOpen}
+                        handleOnDeleteMember={handleDeleteTeamMemberModalOpen}
                     />
                 )}
                 entities={members}
@@ -419,6 +431,8 @@ export const TeamPageContent = () => {
                 onAddMember={handleAddMember}
                 categories={categories}
             />
+
+            <TranslateTeamMemberModal></TranslateTeamMemberModal>
 
             <TeamMemberModal
                 mode={ModalMode.Edit}

@@ -13,6 +13,9 @@ export const API_ROUTES = {
         CATEGORIES: 'Categories',
         PUBLISHED: 'team/published',
     },
+    TEAM_LOCALIZATIONS: {
+        BASE: 'TeamMemberLocalizations',
+    },
     PROGRAMS: {
         BASE: 'Programs',
         PUBLISHED: 'Programs/published',

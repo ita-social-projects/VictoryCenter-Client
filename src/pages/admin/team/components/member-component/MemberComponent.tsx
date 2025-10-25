@@ -1,23 +1,33 @@
 import { useState, useEffect } from 'react';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import './MemberComponent.scss';
 import { ReactComponent as BlankUserImage } from '../../../../../assets/icons/blank-user.svg';
 import { TeamMember } from '../../../../../types/admin/team-members';
 import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
+import './MemberComponent.scss';
 
 export interface MemberComponentProps {
     member: TeamMember;
-    handleOnDeleteMember: (member: TeamMember) => void;
+    handleOnTranslateMember: (member: TeamMember) => void;
     handleOnEditMember: (member: TeamMember) => void;
+    handleOnDeleteMember: (member: TeamMember) => void;
 }
 
-export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMember }: MemberComponentProps) => {
+export const MemberComponent = ({
+    member,
+    handleOnTranslateMember,
+    handleOnEditMember,
+    handleOnDeleteMember,
+}: MemberComponentProps) => {
     const [error, setError] = useState(false);
     const imageUrl = member.image && 'url' in member.image ? member.image.url : null;
 
     useEffect(() => {
         setError(false);
     }, [imageUrl]);
+
+    const handleTranslateMember = () => {
+        handleOnTranslateMember(member);
+    };
 
     const handleEditMember = () => {
         handleOnEditMember(member);
@@ -26,6 +36,7 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
     const handleDeleteMember = () => {
         handleOnDeleteMember(member);
     };
+
     return (
         <div className="members-item">
             <div className="members-profile">
@@ -48,6 +59,12 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
                     <VisibilityStatusLabel status={member.status} />
                 </div>
                 <div className="members-actions">
+                    <button
+                        aria-label={TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE}
+                        type="button"
+                        onClick={handleTranslateMember}
+                        className="members-actions-translate"
+                    />
                     <button
                         aria-label={TEAM_MEMBERS_TEXT.ACTIONS.EDIT}
                         type="button"

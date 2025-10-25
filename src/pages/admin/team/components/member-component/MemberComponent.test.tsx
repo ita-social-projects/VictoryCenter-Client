@@ -24,11 +24,13 @@ const baseMember = {
 };
 
 describe('MemberComponent', () => {
+    let handleOnTranslateMember: jest.Mock;
     let handleOnEditMember: jest.Mock;
     let handleOnDeleteMember: jest.Mock;
 
     beforeEach(() => {
         jest.clearAllMocks();
+        handleOnTranslateMember = jest.fn();
         handleOnEditMember = jest.fn();
         handleOnDeleteMember = jest.fn();
     });
@@ -37,6 +39,7 @@ describe('MemberComponent', () => {
         render(
             <MemberComponent
                 member={{ ...baseMember, ...override }}
+                handleOnTranslateMember={handleOnTranslateMember}
                 handleOnEditMember={handleOnEditMember}
                 handleOnDeleteMember={handleOnDeleteMember}
             />,

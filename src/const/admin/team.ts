@@ -20,6 +20,7 @@ export const TEAM_MEMBERS_TEXT = {
     FORM: {
         TITLE: {
             ADD_MEMBER: 'Додати в команду',
+            TRANSLATE_MEMBER: 'Додати переклад',
             EDIT_MEMBER: 'Редагування члена команди',
             DELETE_MEMBER: 'Видалити члена команди?',
         },
@@ -39,6 +40,7 @@ export const TEAM_MEMBERS_TEXT = {
 
     ACTIONS: {
         REORDER: 'Змінити порядок елемента',
+        TRANSLATE: 'Локалізувати дані учасника',
         EDIT: 'Редагувати учасника',
         DELETE: 'Видалити учасника',
     },

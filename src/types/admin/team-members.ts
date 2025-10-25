@@ -1,5 +1,6 @@
 import { Image, ImageValues } from '../common/image';
 import { VisibilityStatus } from './common';
+import { TeamMemberLocalization } from './localization/team-members';
 
 export type TeamMember = {
     id: number;
@@ -8,6 +9,7 @@ export type TeamMember = {
     description: string;
     status: VisibilityStatus;
     categoryId: number;
+    localizations: TeamMemberLocalization[];
 };
 
 export interface TeamMemberDto {

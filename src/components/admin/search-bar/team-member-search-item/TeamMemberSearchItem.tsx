@@ -1,6 +1,7 @@
-import React, { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { SearchItemContentRef, SearchItemContentRenderProps } from '../search-item-wrapper/SearchItemWrapper';
 import { TeamMember, TeamCategory } from '../../../../types/admin/team-members';
+import { generateInitials } from '../../../../utils/functions/formatters/text-formatters';
 import './TeamMemberSearchItem.scss';
 
 export type TeamMemberSearchItemProps = SearchItemContentRenderProps<TeamMember> & {
@@ -23,15 +24,7 @@ export const TeamMemberSearchItem = forwardRef<SearchItemContentRef, TeamMemberS
             return image && 'url' in image ? image.url : null;
         }, [image]);
 
-        const initials = useMemo(() => {
-            return item.fullName
-                .split(' ')
-                .filter(Boolean)
-                .slice(0, 2)
-                .map((s) => s[0])
-                .join('')
-                .toUpperCase();
-        }, [item.fullName]);
+        const initials = useMemo(() => generateInitials(item.fullName), [item.fullName]);
 
         const getTooltipContent = () => {
             const nameOverflow = nameRef.current && nameRef.current.scrollWidth > nameRef.current.clientWidth;

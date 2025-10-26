@@ -1,4 +1,4 @@
-import React, { createRef } from 'react';
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { TeamMemberSearchItem } from './TeamMemberSearchItem';
 import { SearchItemContentRef } from '../search-item-wrapper/SearchItemWrapper';
@@ -18,16 +18,17 @@ describe('TeamMemberSearchItem', () => {
         ...overrides,
     });
 
-    it('renders initials when image is not provided', () => {
+    it('renders initials from generateInitials utility when image is not provided', () => {
         render(
             <TeamMemberSearchItem
                 ref={createRef<SearchItemContentRef>()}
-                item={makeMember()}
+                item={makeMember({ fullName: 'John Doe' })}
                 isSearchItemActive={false}
                 isSearchItemHovered={false}
                 categories={categories}
             />,
         );
+
         expect(screen.getByText('JD')).toBeInTheDocument();
     });
 

@@ -13,10 +13,13 @@ interface GenericModalWrapperProps<TFormValues, TFormRef> {
     initialData: TFormValues | null;
     isSubmitting: boolean;
     error: string;
-    isFormValid: boolean;
     showFormConfirmModal: boolean;
     showCloseConfirmModal: boolean;
     formConfirmTitle: string;
+    buttonStates: {
+        draftValid: boolean;
+        publishValid: boolean;
+    };
     onClose: () => void;
     onFormValidationChange: (isValid: boolean) => void;
     onFormSubmit: (data: TFormValues, status: VisibilityStatus) => void;
@@ -45,10 +48,10 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
     initialData,
     isSubmitting,
     error,
-    isFormValid,
     showFormConfirmModal,
     showCloseConfirmModal,
     formConfirmTitle,
+    buttonStates,
     onClose,
     onFormValidationChange,
     onFormSubmit,
@@ -83,10 +86,18 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                     {error && <div className="modal-content-error-container">{error}</div>}
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button buttonStyle="secondary" onClick={onDraftSubmit} disabled={isSubmitting || !isFormValid}>
+                    <Button
+                        buttonStyle="secondary"
+                        onClick={onDraftSubmit}
+                        disabled={isSubmitting || !buttonStates.draftValid}
+                    >
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
                     </Button>
-                    <Button buttonStyle="primary" onClick={onPublishSubmit} disabled={isSubmitting || !isFormValid}>
+                    <Button
+                        buttonStyle="primary"
+                        onClick={onPublishSubmit}
+                        disabled={isSubmitting || !buttonStates.publishValid}
+                    >
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                     </Button>
                 </Modal.Actions>

@@ -55,19 +55,19 @@ export const useGenericModal = <
 
     const isEditMode = mode === ModalMode.Edit;
 
-    const updateButtonStates = useCallback(() => {
+    const updateButtonStates = useCallback((currentIsValid: boolean) => {
         const api = formRef.current;
 
         setButtonStates({
-            draftValid: api?.isValid?.(false) ?? isFormValid,
-            publishValid: api?.isValid?.(true) ?? isFormValid,
+            draftValid: api?.isValid?.(false) ?? currentIsValid,
+            publishValid: api?.isValid?.(true) ?? currentIsValid,
         });
-    }, [isFormValid]);
+    }, []);
 
     const handleFormValidationChange = useCallback(
         (isValid: boolean) => {
             setIsFormValid(isValid);
-            updateButtonStates();
+            updateButtonStates(isValid);
         },
         [updateButtonStates],
     );

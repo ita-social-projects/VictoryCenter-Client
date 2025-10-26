@@ -53,8 +53,8 @@ describe('useGenericModal', () => {
         act(() => result.current.handleFormValidationChange(true));
 
         expect(result.current.buttonStates).toEqual({
-            draftValid: false,
-            publishValid: false,
+            draftValid: true,
+            publishValid: true,
         });
     });
 
@@ -312,7 +312,7 @@ describe('useGenericModal', () => {
             result.current.handleFormValidationChange(true);
         });
 
-        expect(result.current.buttonStates.draftValid).toBe(false);
-        expect(result.current.buttonStates.publishValid).toBe(false);
+        expect(result.current.buttonStates.draftValid).toBe(true);
+        expect(result.current.buttonStates.publishValid).toBe(true);
     });
 });

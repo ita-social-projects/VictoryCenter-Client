@@ -36,16 +36,16 @@ export const TeamMembersApi = {
         fullName: string,
         offset: number = 0,
         limit: number = 5,
+        signal?: AbortSignal,
     ): Promise<PaginationResult<TeamMember>> => {
         const params: Record<string, any> = { fullName };
-        if (offset !== undefined && offset !== null) {
-            params.offset = offset;
-        }
-        if (limit !== undefined && limit !== null) {
-            params.limit = Math.floor(limit);
-        }
-        const response = await client.get<PaginationResult<TeamMember>>(`${API_ROUTES.TEAM.SEARCH}`, { params });
+        params.offset = offset;
+        params.limit = Math.floor(limit);
 
+        const response = await client.get<PaginationResult<TeamMember>>(`${API_ROUTES.TEAM.SEARCH}`, {
+            params,
+            signal,
+        });
         return response.data;
     },
 

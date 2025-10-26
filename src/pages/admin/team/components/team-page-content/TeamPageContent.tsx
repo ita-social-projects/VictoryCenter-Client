@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
 import { DeleteTeamMemberModal } from '../team-member-modals/delete-team-member-modal/DeleteTeamMemberModal';
 import { TeamMemberModal } from '../team-member-modals/team-member-modal/TeamMemberModal';
-import { TEAM_CATEGORY_TEXT, TEAM_MEMBERS_TEXT, TEAM_SEARCH } from '../../../../../const/admin/team';
+import { TEAM_CATEGORY_TEXT, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import axios from 'axios';
 import './TeamPageContent.scss';
@@ -18,6 +18,7 @@ import { ToastType } from '../../../../../types/admin/toast';
 import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
 import { DraggableListItem } from '../../../../../components/admin/draggable-list-item/DraggableListItem';
 import { MemberComponent } from '../member-component/MemberComponent';
+import { useTeamMemberSearch } from '../../../../../hooks/admin/team/useTeamMemberSearch';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -56,10 +57,16 @@ export const TeamPageContent = () => {
         isEditCategoryModalOpen: false,
         isDeleteCategoryModalOpen: false,
     });
-    const [searchSuggestions, setSearchSuggestions] = useState<TeamMember[]>([]);
-    const [isSearchLoading, setIsSearchLoading] = useState(false);
-    const [hasMoreSearch, setHasMoreSearch] = useState(false);
     const [selectedSearchMember, setSelectedSearchMember] = useState<TeamMember | null>(null);
+
+    const {
+        searchSuggestions,
+        isSearchLoading,
+        hasMoreSearch,
+        handleSearchQueryByName,
+        loadMoreSearchSuggestions,
+        cleanup,
+    } = useTeamMemberSearch(client);
 
     const listContainerRef = useRef<HTMLDivElement>(null);
     const currentItemsCountRef = useRef<number>(0);
@@ -70,9 +77,6 @@ export const TeamPageContent = () => {
     const isMembersLoadingRef = useRef(false);
     const isCategoriesLoadingRef = useRef(false);
     const abortControllerRef = useRef<AbortController | null>(null);
-    const searchQueryRef = useRef<string>('');
-    const searchPageRef = useRef<number>(0);
-    const searchAbortControllerRef = useRef<AbortController | null>(null);
 
     const setErrorState = useCallback((message: string, type: 'categories' | 'members') => {
         setError({ message, type });
@@ -221,87 +225,6 @@ export const TeamPageContent = () => {
         [clearError, setErrorState, pageSize, statusFilter, client],
     );
 
-    const handleSearchQueryByName = useCallback(
-        async (query: string) => {
-            const PAGE_SIZE = TEAM_SEARCH.SUGGESTIONS_PAGE_SIZE;
-
-            const trimmed = (query ?? '').trim();
-            if (trimmed === searchQueryRef.current) {
-                return;
-            }
-            searchQueryRef.current = trimmed;
-
-            if (trimmed.length === 0) {
-                searchAbortControllerRef.current?.abort();
-                setSearchSuggestions([]);
-                setHasMoreSearch(false);
-                setIsSearchLoading(false);
-                searchPageRef.current = 0;
-                return;
-            }
-
-            if (trimmed.length < TEAM_SEARCH.MIN_CHARACTERS_TO_SEARCH) {
-                return;
-            }
-
-            searchAbortControllerRef.current?.abort();
-            const abortController = new AbortController();
-            searchAbortControllerRef.current = abortController;
-
-            setIsSearchLoading(true);
-            try {
-                const res = await TeamMembersApi.search(client, trimmed, 0, PAGE_SIZE);
-                if (abortController.signal.aborted) return;
-
-                setSearchSuggestions(res.items);
-                searchPageRef.current = 1;
-                setHasMoreSearch(res.items.length < res.totalItemsCount);
-            } catch (e) {
-                if (axios.isCancel?.(e) || (e as any)?.name === 'CanceledError' || (e as any)?.name === 'AbortError')
-                    return;
-                setSearchSuggestions([]);
-                setHasMoreSearch(false);
-            } finally {
-                if (!abortController.signal.aborted) setIsSearchLoading(false);
-            }
-        },
-        [client],
-    );
-
-    const loadMoreSearchSuggestions = useCallback(async () => {
-        const PAGE_SIZE = TEAM_SEARCH.SUGGESTIONS_PAGE_SIZE;
-
-        if (isSearchLoading || !hasMoreSearch) return;
-        const q = searchQueryRef.current;
-        if (!q || q.length < 2) return;
-
-        searchAbortControllerRef.current?.abort();
-        const abortController = new AbortController();
-        searchAbortControllerRef.current = abortController;
-
-        setIsSearchLoading(true);
-        try {
-            const offset = searchPageRef.current * PAGE_SIZE;
-            const res = await TeamMembersApi.search(client, q, offset, PAGE_SIZE);
-            if (abortController.signal.aborted) return;
-
-            setSearchSuggestions((prev) => {
-                const existing = new Set(prev.map((m) => m.id));
-                const unique = res.items.filter((m) => !existing.has(m.id));
-                return [...prev, ...unique];
-            });
-
-            searchPageRef.current += 1;
-            const loaded = searchPageRef.current * PAGE_SIZE;
-            setHasMoreSearch(loaded < res.totalItemsCount);
-        } catch (e) {
-            if (axios.isCancel?.(e) || (e as any)?.name === 'CanceledError' || (e as any)?.name === 'AbortError')
-                return;
-        } finally {
-            if (!abortController.signal.aborted) setIsSearchLoading(false);
-        }
-    }, [client, hasMoreSearch, isSearchLoading]);
-
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
         setStatusFilter(status);
     }, []);
@@ -372,11 +295,7 @@ export const TeamPageContent = () => {
         }
     };
 
-    useEffect(() => {
-        return () => {
-            searchAbortControllerRef.current?.abort();
-        };
-    }, []);
+    useEffect(() => cleanup, [cleanup]);
 
     useEffect(() => {
         window.addEventListener('resize', updatePageSize);

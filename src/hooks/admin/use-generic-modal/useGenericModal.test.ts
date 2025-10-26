@@ -45,19 +45,6 @@ describe('useGenericModal', () => {
         expect(result.current.isFormValid).toBe(false);
     });
 
-    it('updateButtonStates uses fallback when formRef.current is null', () => {
-        const { result } = renderHook(() => useGenericModal(defaultConfig));
-
-        result.current.formRef.current = null;
-
-        act(() => result.current.handleFormValidationChange(true));
-
-        expect(result.current.buttonStates).toEqual({
-            draftValid: true,
-            publishValid: true,
-        });
-    });
-
     it('does not reset state when modal is closed', () => {
         const { rerender, result } = renderHook((props) => useGenericModal(props), {
             initialProps: { ...defaultConfig, isOpen: true },

@@ -375,6 +375,27 @@ describe('TeamPageContent', () => {
             });
         });
 
+        it('should pass search props to toolbar correctly', async () => {
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            const toolbar = getTeamToolbar();
+            expect(toolbar).toBeInTheDocument();
+
+            const searchInput = getSearchInput();
+            fireEvent.change(searchInput, { target: { value: 'test query' } });
+
+            await waitFor(() => {
+                expect(mockTeamMembersApi.search).toHaveBeenCalledWith(
+                    expect.any(Object),
+                    'test query',
+                    0,
+                    expect.any(Number),
+                    expect.any(AbortSignal),
+                );
+            });
+        });
+
         it('should handle status filter changes', async () => {
             renderTeamPageContent();
             await waitFor(() => expect(getMemberItems()).toHaveLength(2));
@@ -423,6 +444,27 @@ describe('TeamPageContent', () => {
 
             await waitFor(() => {
                 expect(mockTeamCategoriesApi.getAll).toHaveBeenCalledTimes(2);
+            });
+        });
+
+        it('should handle reorder API error gracefully', async () => {
+            const reorderError = new Error('Reorder failed');
+            mockTeamMembersApi.reorder.mockRejectedValueOnce(reorderError);
+
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            fireEvent.click(screen.getAllByTestId('reorder')[0]);
+
+            await waitFor(() => {
+                expect(mockTeamMembersApi.reorder).toHaveBeenCalledWith(expect.any(Object), mockCategories[0].id, [
+                    mockMembers[1].id,
+                    mockMembers[0].id,
+                ]);
+            });
+
+            await waitFor(() => {
+                expectErrorToBeDisplayed(TEAM_MEMBERS_TEXT.MESSAGE.FAIL_TO_REORDER_MEMBERS);
             });
         });
 
@@ -600,6 +642,70 @@ describe('TeamPageContent', () => {
                 const { unmount } = renderTeamPageContent();
 
                 unmount();
+            });
+        });
+
+        it('should handle useEffect cleanup for search hook', async () => {
+            const { unmount } = renderTeamPageContent();
+
+            await waitFor(() => {
+                expect(screen.getByTestId('team-page-content')).toBeInTheDocument();
+            });
+
+            unmount();
+        });
+
+        it('should handle modal state when modals are already opened', async () => {
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            clickAddMemberButton();
+            await waitFor(() => expect(getAddMemberModal()).toBeInTheDocument());
+
+            fireEvent.click(screen.getByTestId(`edit-${mockMembers[0].id}`));
+
+            expect(getAddMemberModal()).toBeInTheDocument();
+            expect(getEditMemberModal()).not.toBeInTheDocument();
+
+            fireEvent.click(screen.getByTestId(`delete-${mockMembers[0].id}`));
+
+            expect(getAddMemberModal()).toBeInTheDocument();
+            expect(getDeleteMemberModal()).not.toBeInTheDocument();
+        });
+
+        it('should handle search query change through toolbar', async () => {
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            typeInSearchInput('test');
+
+            await waitFor(() => {
+                expect(mockTeamMembersApi.search).toHaveBeenCalledWith(
+                    expect.any(Object),
+                    'test',
+                    0,
+                    expect.any(Number),
+                    expect.any(AbortSignal),
+                );
+            });
+        });
+
+        it('should handle search clear selection and restore normal view', async () => {
+            mockTeamMembersApi.getAll
+                .mockResolvedValueOnce({ items: mockMembers, totalItemsCount: mockMembers.length } as any)
+                .mockResolvedValueOnce({ items: mockMembers, totalItemsCount: mockMembers.length } as any);
+
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            typeInSearchInput('test');
+            clickSelectFirstResult();
+
+            clickClearSearchSelection();
+
+            await waitFor(() => {
+                expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(2);
+                expect(getMemberItems()).toHaveLength(2);
             });
         });
 

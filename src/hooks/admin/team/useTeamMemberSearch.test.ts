@@ -23,6 +23,43 @@ describe('useTeamMemberSearch', () => {
         mockTeamMembersApi.search.mockResolvedValue(mockSearchResults as any);
     });
 
+    it('should handle API errors gracefully and reset state', async () => {
+        const searchError = new Error('API Error');
+        mockTeamMembersApi.search.mockRejectedValueOnce(searchError);
+
+        const { result } = renderHook(() => useTeamMemberSearch(mockClient));
+
+        await act(async () => {
+            await result.current.handleSearchQueryByName('test');
+        });
+
+        await waitFor(() => {
+            expect(result.current.searchSuggestions).toEqual([]);
+            expect(result.current.hasMoreSearch).toBe(false);
+            expect(result.current.isSearchLoading).toBe(false);
+        });
+    });
+
+    it('should not load more suggestions when conditions are not met', async () => {
+        const { result } = renderHook(() => useTeamMemberSearch(mockClient));
+
+        await act(async () => {
+            await result.current.loadMoreSearchSuggestions();
+        });
+
+        expect(mockTeamMembersApi.search).not.toHaveBeenCalled();
+
+        await act(async () => {
+            await result.current.handleSearchQueryByName('a');
+        });
+
+        await act(async () => {
+            await result.current.loadMoreSearchSuggestions();
+        });
+
+        expect(mockTeamMembersApi.search).not.toHaveBeenCalled();
+    });
+
     it('should initialize with empty state', () => {
         const { result } = renderHook(() => useTeamMemberSearch(mockClient));
 

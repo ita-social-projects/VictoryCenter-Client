@@ -240,7 +240,7 @@ export const TeamPageContent = () => {
                 return;
             }
 
-            if (trimmed.length < 2) {
+            if (trimmed.length < TEAM_SEARCH.MIN_CHARACTERS_TO_SEARCH) {
                 return;
             }
 

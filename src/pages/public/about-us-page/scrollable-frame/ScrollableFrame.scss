@@ -4,9 +4,6 @@
 
 .swiper-block {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
     .button-container {
         display: flex;
@@ -59,6 +56,13 @@
         }
     }
 }
+
+.error-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .scrollbar-block {
     position: relative;
     background-color: colors.$grey-100;
@@ -86,7 +90,7 @@
     transition: opacity 1s ease;
 }
 
-@media (max-width: 912px) {
+@media (max-width: 1024px) {
     .swiper-block {
         .button-container {
             .arrow-left {
@@ -98,6 +102,7 @@
             }
         }
     }
+
     .scrollbar-block .custom-scrollbar {
         margin: 3rem 3.5rem;
     }

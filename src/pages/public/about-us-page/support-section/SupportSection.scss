@@ -9,7 +9,7 @@
     padding-top: 6.25rem;
     width: 100%;
     height: auto;
-    padding-bottom: 4rem;
+    padding-bottom: 1.875rem;
     color: colors.$blue-900;
 
     .swiper {
@@ -63,7 +63,6 @@
         .support-description {
             font-family: fonts.$mulish-regular-font;
             padding: 0 1rem;
-            font-weight: 400;
             font-size: 1.125rem;
             line-height: 1.75rem;
             letter-spacing: -0.02em;
@@ -127,7 +126,7 @@
     transition: opacity 1s ease;
 }
 
-@media (max-width: 912px) {
+@media (max-width: 1024px) {
     .support-block {
         width: 100%;
         padding-top: 3.75rem;

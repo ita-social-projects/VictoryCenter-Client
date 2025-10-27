@@ -21,15 +21,13 @@ export const MainValues = () => {
                     breakpoints={{
                         568: { slidesPerView: 2 },
                         768: { slidesPerView: 2 },
-                        912: { slidesPerView: 4 },
+                        1025: { slidesPerView: 4 },
                     }}
                     renderItem={(person, index) => (
-                        <>
-                            <div className={`people-card card-${index + 1}`}>
-                                <img src={person.IMG} alt={person.ALT} />
-                                <p className="people-info">{person.INFO}</p>
-                            </div>
-                        </>
+                        <div className={`people-card card-${index + 1}`}>
+                            <img src={person.IMG} alt={person.ALT} />
+                            <p className="people-info">{person.INFO}</p>
+                        </div>
                     )}
                 />
             </div>

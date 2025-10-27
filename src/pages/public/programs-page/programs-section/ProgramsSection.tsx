@@ -64,7 +64,7 @@ export const ProgramsSection = () => {
                 )}
                 {isLoading ? (
                     <div>
-                        <LinearProgress></LinearProgress>
+                        <LinearProgress />
                     </div>
                 ) : (
                     programsByCategory?.map((item, index) => (

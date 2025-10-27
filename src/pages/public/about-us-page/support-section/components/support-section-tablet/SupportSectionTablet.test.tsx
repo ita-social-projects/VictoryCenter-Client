@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
-import { SupportSectionResponsive } from './SupportSectionResponsive';
+import { SupportSectionTablet } from './SupportSectionTablet';
 
-jest.mock('../../../../../const/public/about-us-page', () => ({
+jest.mock('../../../../../../const/public/about-us-page', () => ({
     ABOUT_US_DATA: {
-        SUPPORT_TITLE: 'Підтримка наших цінностей',
+        SUPPORT_TITLE: 'Support Title',
         SUPPORT_DATA: [
             {
                 IMG: 'img1.jpg',
@@ -31,19 +31,19 @@ jest.mock('../../../../../const/public/about-us-page', () => ({
 
 describe('SupportSectionResponsive component', () => {
     it('should render main support title', () => {
-        render(<SupportSectionResponsive />);
-        expect(screen.getByText('Підтримка наших цінностей')).toBeInTheDocument();
+        render(<SupportSectionTablet />);
+        expect(screen.getByText('Support Title')).toBeInTheDocument();
     });
 
     it('should render support card images with correct alt texts', () => {
-        render(<SupportSectionResponsive />);
+        render(<SupportSectionTablet />);
         ['Alt 1', 'Alt 2', 'Alt 3', 'Alt 4'].forEach((alt) => {
             expect(screen.getByAltText(alt)).toBeInTheDocument();
         });
     });
 
     it('should render support card descriptions correctly', () => {
-        render(<SupportSectionResponsive />);
+        render(<SupportSectionTablet />);
         ['Description 1', 'Description 2', 'Description 3', 'Description 4'].forEach((desc) => {
             expect(screen.getByText(desc)).toBeInTheDocument();
         });

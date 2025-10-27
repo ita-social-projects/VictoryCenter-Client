@@ -26,7 +26,7 @@ export const MainValues = ({ content }: MainValuesProps) => {
                     breakpoints={{
                         568: { slidesPerView: 2 },
                         768: { slidesPerView: 2 },
-                        912: { slidesPerView: 4 },
+                        1025: { slidesPerView: 4 },
                     }}
                     renderItem={(person, index) => {
                         const imageUrl = person.image?.url ?? ABOUT_US_DATA.PEOPLE_DATA[index].IMG;
@@ -34,12 +34,10 @@ export const MainValues = ({ content }: MainValuesProps) => {
                         const description = person.description;
 
                         return (
-                            <>
-                                <div className={`people-card card-${index + 1}`}>
-                                    <img src={imageUrl} alt={altText} />
-                                    <p className="people-info">{description}</p>
-                                </div>
-                            </>
+                            <div className={`people-card card-${index + 1}`}>
+                                <img src={imageUrl} alt={altText} />
+                                <p className="people-info">{description}</p>
+                            </div>
                         );
                     }}
                 />

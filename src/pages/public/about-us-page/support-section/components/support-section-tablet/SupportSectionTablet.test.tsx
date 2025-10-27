@@ -1,10 +1,33 @@
 import { render, screen } from '@testing-library/react';
-import { SupportSectionResponsive } from './SupportSectionResponsive';
-import { ABOUT_US_DATA } from '../../../../../const/public/about-us-page';
-import { ContentType } from '../../../../../types/common/about-us';
-import { AboutUsContent } from '../../../../../types/public/about-us-page';
+import { SupportSectionTablet } from './SupportSectionTablet';
+import { AboutUsContent } from '../../../../../../types/public/about-us-page';
+import { ContentType } from '../../../../../../types/common/about-us';
+import { ABOUT_US_DATA } from '../../../../../../const/public/about-us-page';
 
-describe('SupportSectionResponsive component', () => {
+jest.mock('../../../../../../const/public/about-us-page', () => ({
+    ABOUT_US_DATA: {
+        SUPPORT_TITLE: 'Support Title',
+        SUPPORT_DATA: [
+            {
+                IMG: 'img1.jpg',
+                ALT: 'Alt 1',
+                DESCRIPTION: 'Description 1',
+            },
+            {
+                IMG: 'img2.jpg',
+                ALT: 'Alt 2',
+                DESCRIPTION: 'Description 2',
+            },
+            {
+                IMG: 'img3.jpg',
+                ALT: 'Alt 3',
+                DESCRIPTION: 'Description 3',
+            },
+        ],
+    },
+}));
+
+describe('SupportSectionTablet component', () => {
     const content: AboutUsContent[] = [
         {
             contentType: ContentType.Card,
@@ -29,13 +52,13 @@ describe('SupportSectionResponsive component', () => {
         },
     ];
 
-    it('renders main support title', () => {
-        render(<SupportSectionResponsive content={content} />);
+    it('should render main support title', () => {
+        render(<SupportSectionTablet content={content} />);
         expect(screen.getByText(ABOUT_US_DATA.SUPPORT_TITLE)).toBeInTheDocument();
     });
 
     it('renders all images with correct alt and src attributes', () => {
-        render(<SupportSectionResponsive content={content} />);
+        render(<SupportSectionTablet content={content} />);
 
         ABOUT_US_DATA.SUPPORT_DATA.forEach((data, index) => {
             const image = screen.getByAltText(data.ALT);
@@ -45,7 +68,7 @@ describe('SupportSectionResponsive component', () => {
 
     it('renders fallback images when image is null', () => {
         const contentWithoutImages = content.map((item) => ({ ...item, image: null }));
-        render(<SupportSectionResponsive content={contentWithoutImages} />);
+        render(<SupportSectionTablet content={contentWithoutImages} />);
 
         ABOUT_US_DATA.SUPPORT_DATA.forEach((data) => {
             const image = screen.getByAltText(data.ALT);
@@ -53,15 +76,22 @@ describe('SupportSectionResponsive component', () => {
         });
     });
 
+    it('should render support card descriptions correctly', () => {
+        render(<SupportSectionTablet content={content} />);
+        content.forEach((card) => {
+            expect(screen.getByText(card.description!)).toBeInTheDocument();
+        });
+    });
+
     it('renders all descriptions correctly', () => {
-        render(<SupportSectionResponsive content={content} />);
+        render(<SupportSectionTablet content={content} />);
         content.forEach((item) => {
             expect(screen.getByText(item.description!)).toBeInTheDocument();
         });
     });
 
     it('renders nothing when content is null', () => {
-        const { container } = render(<SupportSectionResponsive content={null} />);
+        const { container } = render(<SupportSectionTablet content={null} />);
         expect(container.firstChild).toBeNull();
     });
 });

@@ -1,12 +1,11 @@
-import ReactCrop, { centerCrop, Crop, makeAspectCrop, PixelCrop } from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
-import { useEffect, useRef, useState } from "react";
-import { Image, ImageValues } from "../../../types/common/image";
-import { ReactComponent as PhoneIcon } from "../../../assets/icons/phone.svg"
-import { Modal } from "../../common/modal/Modal";
-import { Button } from "../button/Button";
-import { COMMON_TEXT_ADMIN } from "../../../const/admin/common";
-import "./CropperModal.scss";
+import ReactCrop, { centerCrop, Crop, makeAspectCrop, PixelCrop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
+import { useEffect, useRef, useState } from 'react';
+import { Image, ImageValues } from '../../../types/common/image';
+import { Modal } from '../../common/modal/Modal';
+import { Button } from '../button/Button';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import './CropperModal.scss';
 
 interface CropModalProps {
     src: ImageValues | Image;
@@ -17,11 +16,7 @@ interface CropModalProps {
     isOpen: boolean;
 }
 
-function centerAspectCrop(
-    mediaWidth: number,
-    mediaHeight: number,
-    aspect: number,
-) {
+function centerAspectCrop(mediaWidth: number, mediaHeight: number, aspect: number) {
     return centerCrop(
         makeAspectCrop(
             {
@@ -34,7 +29,7 @@ function centerAspectCrop(
         ),
         mediaWidth,
         mediaHeight,
-    )
+    );
 }
 
 export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: CropModalProps) => {
@@ -51,8 +46,8 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
         if ('url' in src) {
             // It's an image with a URL, so fetch and convert
             fetch(src.url)
-                .then(response => response.blob())
-                .then(blob => {
+                .then((response) => response.blob())
+                .then((blob) => {
                     const reader = new FileReader();
                     reader.onloadend = () => {
                         const base64data = reader.result as string;
@@ -65,7 +60,7 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
                     };
                     reader.readAsDataURL(blob);
                 })
-                .catch(error => console.error("Error fetching image from URL:", error));
+                .catch((error) => console.error('Error fetching image from URL:', error));
         } else {
             // It's already a Base64 string
             setRawImage(src);
@@ -88,7 +83,7 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
     const getCroppedImageBase64 = () => {
         const image = imgRef.current;
         if (!image || !completedCrop) {
-            console.error("Image or completed crop not available.");
+            console.error('Image or completed crop not available.');
             return null;
         }
         // ... rest of the cropping logic, which is fine
@@ -113,7 +108,7 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
             0,
             0,
             completedCrop.width * scaleX,
-            completedCrop.height * scaleY
+            completedCrop.height * scaleY,
         );
 
         return canvas.toDataURL(rawImage?.mimeType);
@@ -130,20 +125,24 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
 
     // Show loading or empty state if image is not ready
     if (!displaySrc) {
-        return <Modal isOpen={isOpen} onClose={onCancel}><div>Loading image...</div></Modal>;
+        return (
+            <Modal isOpen={isOpen} onClose={onCancel}>
+                <div>Loading image...</div>
+            </Modal>
+        );
     }
 
     return (
-        <Modal isOpen={isOpen} onClose={onCancel}>
+        <Modal isOpen={isOpen} onClose={onCancel} maxWidth={`600 px`}>
             <Modal.Title>Редагувати фото</Modal.Title>
             <Modal.Content>
-                <div style={{ width: width, height: height }}>
+                {/* Прибираємо інлайн-стилі і додаємо клас */}
+                <div className="cropper-container">
                     <ReactCrop
                         crop={crop}
                         onChange={(c) => setCrop(c)}
                         onComplete={(c) => setCompletedCrop(c)}
                         minHeight={50}
-                        aspect={aspectRatio}
                     >
                         <img ref={imgRef} src={displaySrc} onLoad={onImageLoad} />
                     </ReactCrop>

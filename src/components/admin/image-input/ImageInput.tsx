@@ -1,6 +1,7 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { ReactComponent as DeleteIcon } from '../../../assets/icons/delete.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/cloud-download.svg';
+import { ReactComponent as CropIcon } from '../../../assets/icons/crop.svg';
 import classNames from 'classnames';
 import './ImageInput.scss';
 import './ImageInputWithBackground.scss';
@@ -9,7 +10,7 @@ import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
 import { COMMON_IMAGE_TEXT } from '../../../const/admin/image';
 import { IMAGE_VALIDATION_FUNCTIONS } from '../../../validation/admin/image-schema/image-schema';
-import { CropModal} from "../cropper-modal/CropperModal";
+import { CropModal } from '../cropper-modal/CropperModal';
 
 export interface ImageInputProps {
     value: ImageValues | Image | null;
@@ -177,7 +178,7 @@ export const ImageInput = ({
                             data-testid="preview-image"
                         />
                         {!disabled && (
-                            <>
+                            <div className="preview-actions">
                                 <button
                                     data-testid="remove-photo-button"
                                     type="button"
@@ -190,7 +191,6 @@ export const ImageInput = ({
                                 >
                                     <DeleteIcon className={classNames('delete-icon')} />
                                 </button>
-                                <h1>Hello world</h1>
                                 <button
                                     data-testid="crop-photo-button"
                                     type="button"
@@ -201,9 +201,9 @@ export const ImageInput = ({
                                         setShowCropperModal(true);
                                     }}
                                 >
-                                    <DeleteIcon className={classNames('crop-icon')} />
+                                    <CropIcon className={classNames('crop-icon')} />
                                 </button>
-                            </>
+                            </div>
                         )}
                     </div>
                 ) : (
@@ -225,7 +225,16 @@ export const ImageInput = ({
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
-            {previewImage && showCropperModal && <CropModal src={previewImage} onChange={setPreviewImage} height={height} width={width} onCancel={() => setShowCropperModal(false)} isOpen={showCropperModal} />}
+            {previewImage && showCropperModal && (
+                <CropModal
+                    src={previewImage}
+                    onChange={setPreviewImage}
+                    height={height}
+                    width={width}
+                    onCancel={() => setShowCropperModal(false)}
+                    isOpen={showCropperModal}
+                />
+            )}
         </div>
     );
 };

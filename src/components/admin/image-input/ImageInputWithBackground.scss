@@ -88,63 +88,50 @@
             opacity: 0.78; // регулюй, наскільки сильно перекриває
         }
 
-        .delete-button {
+        .preview-actions {
             position: absolute;
             inset: 0;
-            display: none;
+            margin: auto; // Центрує саму обгортку
+            display: flex; // Розміщує кнопки в ряд
+            gap: 0.5rem; // Відстань між кнопками
+            width: fit-content; // Ширина по вмісту
+            height: fit-content; // Висота по вмісту
+            z-index: 2;
+        }
+
+        .delete-button, .crop-button {
+            display: none; // Повтор для надійності
             align-items: center;
             justify-content: center;
-            height: 25%;
+            width: 5rem;
+            height: 5rem;
             aspect-ratio: 1 / 1;
             padding: 0.625rem;
-            margin: auto;
             border-radius: 8px;
             background: colors.$grey-900;
             opacity: 0.8;
-            z-index: 2;
             cursor: pointer;
 
             &:hover {
                 opacity: 1;
             }
 
-            .delete-icon {
+            .delete-icon, .crop-icon {
                 width: 55%;
                 height: 55%;
                 color: colors.$grey-50;
             }
         }
 
-        .crop-button {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            display: none; // Цю властивість буде змінено при :hover
-            align-items: center;
-            justify-content: center;
-            height: 25%;
-            aspect-ratio: 1 / 1;
-            padding: 0.625rem;
-            border-radius: 8px;
-            background: colors.$grey-900;
-            opacity: 0.8;
-            z-index: 2;
-            cursor: pointer;
-
-            &:hover {
-                opacity: 1;
-            }
-        }
-
-        .delete-icon {
-            width: 55%;
-            height: 55%;
-            color: colors.$grey-50;
-        }
 
         &:hover {
-            .delete-button, .crop-button { // Додайте .crop-button до селектора
-                display: flex;
+            // Цей селектор покаже кнопки, ЯКЩО вони лежать всередині .preview-actions
+            // (як у JSX з минулої відповіді)
+            .preview-actions {
+                .delete-button,
+                .crop-button {
+                    display: flex;
+                }
             }
         }
     }

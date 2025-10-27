@@ -5,9 +5,10 @@ interface ModalProps {
     children?: ReactNode;
     isOpen: boolean;
     onClose: () => void;
+    maxWidth?: string;
 }
 
-export const Modal = ({ children, isOpen, onClose }: ModalProps) => {
+export const Modal = ({ children, isOpen, onClose, maxWidth }: ModalProps) => {
     const mouseDownInsideModal = useRef(false);
     const modalRef = useRef<HTMLDivElement>(null);
     const titleId = useId();
@@ -126,6 +127,7 @@ export const Modal = ({ children, isOpen, onClose }: ModalProps) => {
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
                 tabIndex={-1}
+                style = {{maxWidth: maxWidth}}
             >
                 <div className="modal-header">
                     <div className="close-icon">

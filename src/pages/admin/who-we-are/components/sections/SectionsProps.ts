@@ -75,7 +75,7 @@ export const WhoWeSupportCardsProps: Omit<
         // first card
         {
             style: {
-                width: '31.6875rem',
+                width: '30rem',
                 height: '26.875rem',
                 backgroundImage: `
         linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
@@ -84,13 +84,11 @@ export const WhoWeSupportCardsProps: Omit<
                 backgroundPosition: 'center',
             },
             subText: '500x430',
-            width: 500,
-            height: 430,
         },
         // second card
         {
             style: {
-                width: '26.875rem',
+                width: '30rem',
                 height: '26.875rem',
                 backgroundImage: `
         linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
@@ -99,13 +97,11 @@ export const WhoWeSupportCardsProps: Omit<
                 backgroundPosition: 'center',
             },
             subText: '500x430',
-            width: 500,
-            height: 430,
         },
         // third card
         {
             style: {
-                width: '31.5rem',
+                width: '30rem',
                 height: '26.875rem',
                 backgroundImage: `
         linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
@@ -114,8 +110,6 @@ export const WhoWeSupportCardsProps: Omit<
                 backgroundPosition: 'center',
             },
             subText: '500x430',
-            width: 500,
-            height: 430,
         },
     ],
 };
@@ -129,7 +123,7 @@ export const PeopleCardsProps: Omit<
         // first card
         {
             style: {
-                width: '24rem',
+                width: '22.5rem',
                 height: '26.875rem',
                 backgroundImage: `
         linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
@@ -137,14 +131,12 @@ export const PeopleCardsProps: Omit<
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
             },
-            subText: '380x430',
-            width: 380,
-            height: 430,
+            subText: '360x430',
         },
         // second card
         {
             style: {
-                width: '21rem',
+                width: '22.5rem',
                 height: '26.875rem',
                 backgroundImage: `
         linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
@@ -152,14 +144,12 @@ export const PeopleCardsProps: Omit<
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
             },
-            subText: '330x430',
-            width: 330,
-            height: 430,
+            subText: '360x430',
         },
         // third card
         {
             style: {
-                width: '21rem',
+                width: '22.5rem',
                 height: '26.875rem',
                 backgroundImage: `
         linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
@@ -167,14 +157,12 @@ export const PeopleCardsProps: Omit<
                 backgroundSize: 'cover',
                 backgroundPosition: 'right',
             },
-            subText: '330x430',
-            width: 330,
-            height: 430,
+            subText: '360x430',
         },
         // fourth card
         {
             style: {
-                width: '24rem',
+                width: '22.5rem',
                 height: '26.875rem',
                 backgroundImage: `
         linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
@@ -182,9 +170,7 @@ export const PeopleCardsProps: Omit<
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
             },
-            subText: '380x430',
-            width: 380,
-            height: 430,
+            subText: '360x430',
         },
     ],
 };

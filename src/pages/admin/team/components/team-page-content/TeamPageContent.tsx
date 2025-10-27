@@ -155,6 +155,10 @@ export const TeamPageContent = () => {
 
     const fetchMembers = useCallback(
         async (shouldResetList: boolean = false) => {
+            if (isSingleView && selectedCategory && selectedSearchMember?.categoryId === selectedCategory.id) {
+                return;
+            }
+
             if (
                 isMembersLoadingRef.current ||
                 !selectedCategoryRef.current ||
@@ -224,6 +228,20 @@ export const TeamPageContent = () => {
         },
         [clearError, setErrorState, pageSize, statusFilter, client],
     );
+
+    const hasMoreToShow = useMemo(() => {
+        if (isSingleView && selectedCategory && selectedSearchMember?.categoryId === selectedCategory.id) {
+            return false;
+        }
+        return hasMore;
+    }, [isSingleView, selectedCategory, selectedSearchMember, hasMore]);
+
+    const handleLoadMore = useCallback(() => {
+        if (isSingleView && selectedCategory && selectedSearchMember?.categoryId === selectedCategory.id) {
+            return;
+        }
+        fetchMembers();
+    }, [isSingleView, selectedCategory, selectedSearchMember, fetchMembers]);
 
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
         setStatusFilter(status);
@@ -446,8 +464,8 @@ export const TeamPageContent = () => {
                 <InfiniteScrollList<TeamMember>
                     items={itemsToRender}
                     renderItem={renderMemberItem}
-                    onLoadMore={fetchMembers}
-                    hasMore={hasMore}
+                    onLoadMore={handleLoadMore}
+                    hasMore={hasMoreToShow}
                     isLoading={isMembersLoading || isCategoriesLoading}
                     emptyStateMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
                 />

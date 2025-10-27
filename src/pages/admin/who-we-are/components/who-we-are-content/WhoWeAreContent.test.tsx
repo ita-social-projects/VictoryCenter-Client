@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { WhoWeAreContent } from './WhoWeAreContent';
 import { WhoWeAreApi } from '../../../../../services/api/admin/who-we-are/who-we-are-api';
@@ -9,6 +9,7 @@ import { WhoWeAreCategory, WhoWeAreSection, Content } from '../../../../../types
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ToastType } from '../../../../../types/admin/toast';
 import { ContentType, SectionType } from '../../../../../types/common/about-us';
+import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
 
 jest.mock('../../../../../services/api/admin/who-we-are/who-we-are-api');
 const mockedWhoWeAreApi = WhoWeAreApi as jest.Mocked<typeof WhoWeAreApi>;
@@ -48,6 +49,7 @@ jest.mock('../sections-wrapper/SectionsWrapper', () => ({
                     />
                 </div>
             ))}
+
             <button onClick={onPublish} disabled={!isPublishButtonActive}>
                 Publish
             </button>
@@ -78,12 +80,12 @@ const mockCategories: WhoWeAreCategory[] = [
 const mockSection1: WhoWeAreSection = {
     id: 1,
     title: 'What we do',
-    sectionType: SectionType.WhatWeDo,
+    sectionType: SectionType.Main,
     contents: [
         {
             id: 1,
             contentType: ContentType.Image,
-            description: null,
+            description: 'Initial Description',
             title: null,
             image: { id: 1, url: 'url1.jpg', mimeType: 'image/png' },
             imageId: 1,
@@ -96,7 +98,7 @@ const mockSection2: WhoWeAreSection = {
     title: 'Mission Section',
     sectionType: SectionType.People,
     contents: [
-        { id: 2, contentType: ContentType.Title, title: 'Our Goal', image: null, imageId: null, description: null },
+        { id: 2, contentType: ContentType.Title, title: 'Our Goal', image: null, imageId: null, description: 'null' },
     ],
 };
 
@@ -116,18 +118,13 @@ describe('WhoWeAreContent Component', () => {
 
         render(<WhoWeAreContent />);
 
-        await waitFor(() => {
-            expect(screen.getByText('Main')).toBeInTheDocument();
-        });
-
-        await waitFor(() => {
-            expect(screen.getByText('Main')).toBeInTheDocument();
-            expect(screen.getByText('People')).toBeInTheDocument();
-        });
+        expect(await screen.findByText('Main')).toBeInTheDocument();
+        expect(screen.getByText('People')).toBeInTheDocument();
+        expect(await screen.findByText('What we do')).toBeInTheDocument();
 
         expect(mockedWhoWeAreApi.getPreviews).toHaveBeenCalledTimes(1);
         expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledTimes(1);
-        expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledWith({ client: 'mocked-client' }, 0);
+        expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledWith({ client: 'mocked-client' }, SectionType.Main);
     });
 
     it('should display an error if fetching categories fails', async () => {
@@ -135,8 +132,9 @@ describe('WhoWeAreContent Component', () => {
 
         render(<WhoWeAreContent />);
 
-        const errorMessage = await screen.findByText('Failed to load categories');
+        const errorMessage = await screen.findByText(WHO_WE_ARE_TEXT.FAIL_TO_FETCH_PREVIEWS);
         expect(errorMessage).toBeInTheDocument();
+        expect(mockedWhoWeAreApi.getByType).not.toHaveBeenCalled();
     });
 
     it('should display an error if fetching a section fails', async () => {
@@ -145,18 +143,22 @@ describe('WhoWeAreContent Component', () => {
 
         render(<WhoWeAreContent />);
 
-        const errorMessage = await screen.findByText('Failed to load section');
+        expect(await screen.findByText('Main')).toBeInTheDocument();
+
+        const errorMessage = await screen.findByText(WHO_WE_ARE_TEXT.FAIL_TO_FETCH_SECTION);
         expect(errorMessage).toBeInTheDocument();
     });
 
     it('should handle gracefully when no categories are returned', async () => {
         mockedWhoWeAreApi.getPreviews.mockResolvedValue([]);
         render(<WhoWeAreContent />);
+
         await waitFor(() => {
             expect(mockedWhoWeAreApi.getPreviews).toHaveBeenCalledTimes(1);
         });
+
+        expect(screen.queryByText('Main')).not.toBeInTheDocument();
         expect(mockedWhoWeAreApi.getByType).not.toHaveBeenCalled();
-        expect(screen.queryByText('History')).not.toBeInTheDocument();
     });
 
     it('should fetch new section data when a different category is selected', async () => {
@@ -164,19 +166,21 @@ describe('WhoWeAreContent Component', () => {
         mockedWhoWeAreApi.getByType.mockResolvedValueOnce(mockSection1).mockResolvedValueOnce(mockSection2);
 
         render(<WhoWeAreContent />);
-        await screen.findByText('What we do');
 
-        fireEvent.click(screen.getByText('Main'));
+        expect(await screen.findByText('Main')).toBeInTheDocument();
+        expect(await screen.findByText('What we do')).toBeInTheDocument();
+
+        expect(mockedWhoWeAreApi.getPreviews).toHaveBeenCalledTimes(1);
+        expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledTimes(1);
+        expect(mockedWhoWeAreApi.getByType).toHaveBeenLastCalledWith({ client: 'mocked-client' }, SectionType.Main);
+
         fireEvent.click(screen.getByText('People'));
 
-        await waitFor(() => {
-            expect(screen.getByText('Main')).toBeInTheDocument();
-            expect(screen.getByText('People')).toBeInTheDocument();
-        });
+        expect(await screen.findByText('Mission Section')).toBeInTheDocument();
+        expect(screen.queryByText('What we do')).not.toBeInTheDocument();
 
         expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledTimes(2);
-        expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledWith({ client: 'mocked-client' }, 0);
-        expect(mockedWhoWeAreApi.getByType).toHaveBeenCalledWith({ client: 'mocked-client' }, 4);
+        expect(mockedWhoWeAreApi.getByType).toHaveBeenLastCalledWith({ client: 'mocked-client' }, SectionType.People);
     });
 
     it('should open confirmation modal on publish click, then publish on confirm and disable button', async () => {
@@ -190,11 +194,14 @@ describe('WhoWeAreContent Component', () => {
         mockedWhoWeAreApi.updateContent.mockResolvedValue(updatedSection);
 
         render(<WhoWeAreContent />);
-        await screen.findByText('What we do');
-
-        fireEvent.change(screen.getByTestId('input-1'), { target: { value: updatedDescription } });
-
+        expect(await screen.findByText('What we do')).toBeInTheDocument();
+        const input = screen.getByTestId('input-1');
         const publishButton = screen.getByRole('button', { name: 'Publish' });
+
+        expect(publishButton).toBeDisabled();
+
+        fireEvent.change(input, { target: { value: updatedDescription } });
+
         expect(publishButton).toBeEnabled();
         fireEvent.click(publishButton);
 
@@ -203,13 +210,24 @@ describe('WhoWeAreContent Component', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
         await waitFor(() => {
-            const expectedPayload = [{ ...mockSection1.contents[0], description: updatedDescription }];
+            const expectedPayload = [
+                {
+                    ...mockSection1.contents[0],
+                    description: updatedDescription,
+                },
+            ];
             expect(mockedWhoWeAreApi.updateContent).toHaveBeenCalledWith(
                 { client: 'mocked-client' },
                 expectedPayload,
                 SectionType.Main,
             );
+        });
+
+        await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
+        });
+
+        await waitFor(() => {
             expect(publishButton).toBeDisabled();
         });
     });

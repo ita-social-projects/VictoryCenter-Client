@@ -32,7 +32,7 @@ export const TEAM_MEMBERS_TEXT = {
             FULLNAME: "Ім'я та Прізвище",
             DESCRIPTION: 'Опис',
             CATEGORY: 'Категорія',
-            SELECT_CATEGORY: 'Виберіть категорію',
+            SELECT_CATEGORY: 'Оберіть категорію',
             PHOTO: 'Фото',
         },
     },
@@ -42,6 +42,11 @@ export const TEAM_MEMBERS_TEXT = {
         EDIT: 'Редагувати учасника',
         DELETE: 'Видалити учасника',
     },
+};
+
+export const TEAM_SEARCH = {
+    SUGGESTIONS_PAGE_SIZE: 5,
+    MIN_CHARACTERS_TO_SEARCH: 2,
 };
 
 export const TEAM_MEMBER_VALIDATION = {
@@ -81,6 +86,9 @@ export const TEAM_CATEGORY_TEXT = {
             DESCRIPTION: 'Опис',
             CATEGORY: 'Категорія',
         },
+    },
+    MESSAGE: {
+        FAIL_TO_FETCH_CATEGORIES: 'Виникла помилка, не вдалось завантажити категорії',
     },
 };
 

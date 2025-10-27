@@ -9,6 +9,7 @@ export const API_ROUTES = {
     },
     TEAM: {
         BASE: 'TeamMembers',
+        SEARCH: 'TeamMembers/search',
         REORDER: 'TeamMembers/reorder',
         PUBLISHED: 'team/published',
     },

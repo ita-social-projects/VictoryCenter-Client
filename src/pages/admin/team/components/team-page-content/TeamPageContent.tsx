@@ -1,7 +1,7 @@
+import axios from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import axios from 'axios';
 import './TeamPageContent.scss';
 import { TeamMember } from '../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
@@ -19,6 +19,7 @@ import { TeamCategory } from '../../../../../types/admin/team-category';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
 import { TeamPageModals } from '../team-page-modals/TeamPageModals';
+import { useTeamMemberSearch } from '../../../../../hooks/admin/team/useTeamMemberSearch';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -42,6 +43,17 @@ export const TeamPageContent = () => {
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
     const modalsStateControl = useModalsState<TeamMember>();
     const { isAnyModalOpened, openModalActions, closeModalActions } = modalsStateControl;
+
+    const [selectedSearchMember, setSelectedSearchMember] = useState<TeamMember | null>(null);
+
+    const {
+        searchSuggestions,
+        isSearchLoading,
+        hasMoreSearch,
+        handleSearchQueryByName,
+        loadMoreSearchSuggestions,
+        cleanup,
+    } = useTeamMemberSearch(client);
 
     const listContainerRef = useRef<HTMLDivElement>(null);
     const currentItemsCountRef = useRef<number>(0);
@@ -83,6 +95,14 @@ export const TeamPageContent = () => {
         [],
     );
 
+    const isSingleView = !!selectedSearchMember;
+    const itemsToRender = useMemo(() => {
+        if (isSingleView && selectedCategory && selectedSearchMember?.categoryId === selectedCategory.id) {
+            return [selectedSearchMember];
+        }
+        return members;
+    }, [isSingleView, selectedCategory, selectedSearchMember, members]);
+
     const resetMembersState = useCallback(() => {
         setMembers([]);
         setHasMore(true);
@@ -92,6 +112,9 @@ export const TeamPageContent = () => {
         totalItemsCountRef.current = null;
         isMembersLoadingRef.current = false;
         hasMoreRef.current = true;
+
+        abortControllerRef.current?.abort();
+        abortControllerRef.current = null;
     }, [clearError]);
 
     const fetchCategories = useCallback(async () => {
@@ -124,6 +147,10 @@ export const TeamPageContent = () => {
 
     const fetchMembers = useCallback(
         async (shouldResetList: boolean = false) => {
+            if (isSingleView && selectedCategory && selectedSearchMember?.categoryId === selectedCategory.id) {
+                return;
+            }
+
             if (
                 isMembersLoadingRef.current ||
                 !selectedCategoryRef.current ||
@@ -191,12 +218,31 @@ export const TeamPageContent = () => {
                 setIsMembersLoading(false);
             }
         },
-        [clearError, setErrorState, pageSize, statusFilter, client],
+        [
+            clearError,
+            setErrorState,
+            pageSize,
+            statusFilter,
+            client,
+            isSingleView,
+            selectedCategory,
+            selectedSearchMember?.categoryId,
+        ],
     );
 
-    const handleSearchQueryByName = useCallback((_: string) => {
-        // Implement search functionality
-    }, []);
+    const hasMoreToShow = useMemo(() => {
+        if (isSingleView && selectedCategory && selectedSearchMember?.categoryId === selectedCategory.id) {
+            return false;
+        }
+        return hasMore;
+    }, [isSingleView, selectedCategory, selectedSearchMember, hasMore]);
+
+    const handleLoadMore = useCallback(() => {
+        if (isSingleView && selectedCategory && selectedSearchMember?.categoryId === selectedCategory.id) {
+            return;
+        }
+        fetchMembers();
+    }, [isSingleView, selectedCategory, selectedSearchMember, fetchMembers]);
 
     const onStatusFilterChange = useCallback((status: VisibilityStatus | undefined) => {
         setStatusFilter(status);
@@ -204,10 +250,13 @@ export const TeamPageContent = () => {
 
     const handleCategorySelect = useCallback(
         (category: TeamCategory) => {
+            if (selectedCategory?.id === category.id) {
+                return;
+            }
             setSelectedCategory(category);
             resetMembersState();
         },
-        [resetMembersState],
+        [selectedCategory, resetMembersState],
     );
 
     const handleDeleteTeamMemberModalOpen = useCallback(
@@ -261,6 +310,8 @@ export const TeamPageContent = () => {
         }
     };
 
+    useEffect(() => cleanup, [cleanup]);
+
     useEffect(() => {
         window.addEventListener('resize', updatePageSize);
         return () => window.removeEventListener('resize', updatePageSize);
@@ -276,17 +327,11 @@ export const TeamPageContent = () => {
 
     useEffect(() => {
         selectedCategoryRef.current = selectedCategory;
-        if (selectedCategory) {
-            resetMembersState();
-        }
-    }, [selectedCategory, resetMembersState]);
-
-    useEffect(() => {
-        if (selectedCategory) {
+        if (selectedCategory && !selectedSearchMember) {
             resetMembersState();
             fetchMembers(true);
         }
-    }, [statusFilter, selectedCategory, statusFilter, fetchMembers, resetMembersState]);
+    }, [selectedCategory, statusFilter, selectedSearchMember, resetMembersState, fetchMembers]);
 
     const handleAddMember = useCallback(
         (member: TeamMember) => {
@@ -399,6 +444,23 @@ export const TeamPageContent = () => {
         [selectedCategory?.id],
     );
 
+    const handleSearchItemSelect = useCallback(
+        (member: TeamMember) => {
+            setSelectedSearchMember(member);
+            setStatusFilter(undefined);
+            const cat = categories.find((c) => c.id === member.categoryId) || null;
+            if (cat) setSelectedCategory(cat);
+        },
+        [categories],
+    );
+    const handleSearchClearSelection = useCallback(() => {
+        const wasSelected = selectedSearchMember !== null;
+        setSelectedSearchMember(null);
+        setStatusFilter(undefined);
+        resetMembersState();
+        if (!wasSelected) fetchMembers(true);
+    }, [selectedSearchMember, resetMembersState, fetchMembers]);
+
     const renderMemberItem = useCallback(
         (member: TeamMember) => (
             <DraggableListItem
@@ -429,6 +491,13 @@ export const TeamPageContent = () => {
                     onSearchQueryChange={handleSearchQueryByName}
                     onStatusFilterChange={onStatusFilterChange}
                     onAddMember={openModalActions.openAddItemModal}
+                    searchItems={searchSuggestions}
+                    isSearchLoading={isSearchLoading}
+                    searchHasMore={hasMoreSearch}
+                    onSearchLoadMore={loadMoreSearchSuggestions}
+                    categories={categories}
+                    onSearchItemSelect={handleSearchItemSelect}
+                    onSearchClear={handleSearchClearSelection}
                 />
             </div>
 
@@ -454,10 +523,10 @@ export const TeamPageContent = () => {
                 )}
 
                 <InfiniteScrollList<TeamMember>
-                    items={members}
+                    items={itemsToRender}
                     renderItem={renderMemberItem}
-                    onLoadMore={fetchMembers}
-                    hasMore={hasMore}
+                    onLoadMore={handleLoadMore}
+                    hasMore={hasMoreToShow}
                     isLoading={isMembersLoading || isCategoriesLoading}
                     emptyStateMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
                 />

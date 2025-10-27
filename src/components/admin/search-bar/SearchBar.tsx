@@ -78,6 +78,8 @@ export const SearchBar = <T,>({
         setTooltipState({ content: null, positioner: null, isVisible: false });
     }, []);
 
+    const clearActive = useCallback(() => setActiveIndex(-1), []);
+
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newQuery = event.target.value;
         setSearchQuery(newQuery);
@@ -161,6 +163,11 @@ export const SearchBar = <T,>({
             setActiveIndex(-1);
         }
     };
+
+    const handleMouseLeave = useCallback(() => {
+        clearActive();
+        hideTooltip();
+    }, [clearActive, hideTooltip]);
 
     useEffect(() => {
         if (activeIndex >= 0 && suggestionsListRef.current) {
@@ -258,7 +265,7 @@ export const SearchBar = <T,>({
                         <ul
                             className="search-bar__suggestions-list"
                             ref={suggestionsListRef}
-                            onMouseLeave={hideTooltip}
+                            onMouseLeave={handleMouseLeave}
                         >
                             {searchItems.map((item, index) => {
                                 const key = getSearchItemKey(item);

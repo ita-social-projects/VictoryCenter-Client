@@ -3,7 +3,6 @@ import { WhoWeAreApi } from '../../../../../services/api/admin/who-we-are/who-we
 import { Content, WhoWeAreCategory, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
-import axios from 'axios';
 import './WhoWeAreContent.scss';
 import { SectionsWrapper } from '../sections-wrapper/SectionsWrapper';
 import { Image } from '../../../../../types/common/image';
@@ -12,6 +11,8 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ToastType } from '../../../../../types/admin/toast';
 import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
 import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
+import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
+import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
 
 interface ErrorState {
     message: string | null;
@@ -20,7 +21,6 @@ interface ErrorState {
 
 export const WhoWeAreContent = () => {
     const client = useAdminClient();
-    const [categories, setCategories] = useState<WhoWeAreCategory[]>([]);
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
     const [selectedCategory, setSelectedCategory] = useState<WhoWeAreCategory | null>(null);
     const [selectedSection, setSelectedSection] = useState<WhoWeAreSection | null>(null);
@@ -30,49 +30,58 @@ export const WhoWeAreContent = () => {
 
     const { addToast } = useToast();
 
+    const getCategories = useCallback(async () => {
+        const categories = await WhoWeAreApi.getPreviews(client);
+        return categories;
+    }, [client]);
+
+    const getSection = useCallback(async () => {
+        if (!selectedCategory) return null;
+        const section = await WhoWeAreApi.getByType(client, selectedCategory.sectionType);
+        return section;
+    }, [client, selectedCategory]);
+
+    const { data: categories, error: categoryError } = useDataFetch<WhoWeAreCategory[]>({
+        initialData: [],
+        fetchHandler: getCategories,
+        autoFetchDependencies: [getCategories],
+    });
+
+    const { data: fetchedSection, error: sectionError } = useDataFetch<WhoWeAreSection | null>({
+        initialData: null,
+        fetchHandler: getSection,
+        autoFetchDependencies: [getSection],
+    });
+
+    useEffect(() => {
+        if (categories && categories.length > 0 && !selectedCategory) {
+            setSelectedCategory(categories[0]);
+        }
+    }, [categories, selectedCategory]);
+
+    useEffect(() => {
+        if (fetchedSection) {
+            setSelectedSection(fetchedSection);
+            setUpdatedSection(fetchedSection);
+        }
+    }, [fetchedSection]);
+
+    useEffect(() => {
+        if (categoryError) {
+            setError({ message: WHO_WE_ARE_TEXT.FAIL_TO_FETCH_PREVIEWS, type: 'categories' });
+        }
+    }, [categoryError]);
+
+    useEffect(() => {
+        if (sectionError) {
+            setError({ message: WHO_WE_ARE_TEXT.FAIL_TO_FETCH_SECTION, type: 'entity' });
+        }
+    }, [sectionError]);
+
     const handleCategorySelect = useCallback((category: WhoWeAreCategory) => {
         setSelectedCategory(category);
         setIsPublishButtonActive(false);
     }, []);
-
-    const fetchCategories = useCallback(async () => {
-        try {
-            const fetchedCategories = await WhoWeAreApi.getPreviews(client);
-            if (fetchedCategories.length > 0) {
-                setCategories(fetchedCategories);
-                setSelectedCategory(fetchedCategories[0]);
-            }
-        } catch (error: any) {
-            if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
-                return;
-            }
-            setError({ message: 'Failed to load categories', type: 'categories' });
-        }
-    }, [client]);
-
-    const fetchSection = useCallback(async () => {
-        if (!selectedCategory) return;
-        try {
-            const fetchedSection = await WhoWeAreApi.getByType(client, selectedCategory.sectionType);
-            if (fetchedSection) {
-                setSelectedSection(fetchedSection);
-                setUpdatedSection(fetchedSection);
-            }
-        } catch (error: any) {
-            if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
-                return;
-            }
-            setError({ message: 'Failed to load section', type: 'entity' });
-        }
-    }, [client, selectedCategory]);
-
-    useEffect(() => {
-        fetchCategories();
-    }, [fetchCategories]);
-
-    useEffect(() => {
-        fetchSection();
-    }, [fetchSection]);
 
     const handleContentChange = useCallback((updatedContent: Content) => {
         setUpdatedSection((prevSection) => {
@@ -126,11 +135,6 @@ export const WhoWeAreContent = () => {
     return (
         <>
             <div className="who-we-are-main-box">
-                {error.message && (
-                    <div className="error-message">
-                        <p>{error.message}</p>
-                    </div>
-                )}
                 <CategoryBar<WhoWeAreCategory>
                     categories={categories}
                     selectedCategory={selectedCategory}
@@ -138,6 +142,13 @@ export const WhoWeAreContent = () => {
                     getCategoryKey={(category) => category.id}
                     onCategorySelect={handleCategorySelect}
                 />
+
+                {error.message && (
+                    <div className="who-we-are-main-box-error-message">
+                        <p>{error.message}</p>
+                    </div>
+                )}
+
                 <SectionsWrapper
                     section={updatedSection}
                     onChange={handleContentChange}

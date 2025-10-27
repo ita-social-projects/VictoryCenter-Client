@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { AboutUsIntro } from './intro-section/IntroSection';
 import { OurMission } from './our-mission/OurMission';
 import { SupportSection } from './support-section/SupportSection';
@@ -8,12 +7,12 @@ import { MainValues } from './main-value/MainValue';
 import { DonateSection } from './donate-section/DonateSection';
 import { ScrollableFrame } from './scrollable-frame/ScrollableFrame';
 import { AboutUsApi } from '../../../services/api/public/about-us/about-us-api';
-import { axiosInstance } from '../../../services/api/axios';
 import { AboutUsSection, AboutUsContent } from '../../../types/public/about-us-page';
 import { SectionType } from '../../../types/common/about-us';
 import { LinearProgress } from '@mui/material';
 import { ABOUT_US_DATA } from '../../../const/public/about-us-page';
 import './AboutUsPage.scss';
+import { useDataFetch } from '../../../hooks/common/use-data-fetch/useDataFetch';
 
 const getContentBySection = (sections: AboutUsSection[] | null, sectionType: SectionType): AboutUsContent[] | null => {
     if (!sections) return null;
@@ -25,29 +24,16 @@ const getContentBySection = (sections: AboutUsSection[] | null, sectionType: Sec
 };
 
 export const AboutUsPage = () => {
-    const [sections, setSections] = useState<AboutUsSection[] | null>(null);
-    const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
+    const {
+        data: sections,
+        isLoading,
+        error,
+    } = useDataFetch<AboutUsSection[] | null>({
+        initialData: null,
+        fetchHandler: AboutUsApi.get,
+    });
 
-    useEffect(() => {
-        const fetchAboutUsSections = async () => {
-            setLoading(true);
-            try {
-                const sections = await AboutUsApi.get(axiosInstance);
-                setSections(sections);
-                setError(null);
-            } catch (error) {
-                setSections([]);
-                setError(ABOUT_US_DATA.DOWNLOAD_ERROR);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchAboutUsSections();
-    }, []);
-
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="about-us-loader">
                 <LinearProgress />
@@ -58,7 +44,7 @@ export const AboutUsPage = () => {
     if (error) {
         return (
             <div className="about-us-error-message" role="alert">
-                {error}
+                {ABOUT_US_DATA.DOWNLOAD_ERROR}
             </div>
         );
     }

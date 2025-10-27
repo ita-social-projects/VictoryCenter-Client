@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
 import { Button } from '../../../../../components/admin/button/Button';
-import { Select } from '../../../../../components/admin/select/Select';
+import { Select } from '../../../../../components/common/select/Select';
 import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
 import { ProgramSearchItem } from '../program-search-item/ProgramSearchItem';
 import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';

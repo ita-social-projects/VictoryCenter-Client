@@ -88,9 +88,11 @@ jest.mock('../../member-form/MemberForm', () => {
                 isDirty: () => isDirty,
             }));
 
+            const { onValidationChange } = props;
+
             React.useEffect(() => {
-                props.onValidationChange?.(isValid);
-            }, [isValid, props, props.onValidationChange]);
+                onValidationChange?.(isValid);
+            }, [isValid, onValidationChange]);
 
             return React.createElement(
                 'div',

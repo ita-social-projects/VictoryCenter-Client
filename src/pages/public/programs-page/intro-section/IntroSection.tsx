@@ -1,23 +1,25 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import './IntroSection.scss';
-import { MAIN_TITLE, VICTORY_CENTER_BELIEF, ABOUT_PROGRAMS } from '../../../../const/public/programs-page';
 
 export const IntroSection: React.FC = () => {
+    const { t } = useTranslation('programsPage');
+
     return (
         <div className="intro-section">
             <h1>
-                {MAIN_TITLE.PREFIX}
-                <span>{MAIN_TITLE.FIRST_HIGHLIGHT}</span>
-                {MAIN_TITLE.MIDDLE}
-                <span>{MAIN_TITLE.SECOND_HIGHLIGHT}</span>
+                <p>{t('MAIN_TITLE.PREFIX')}</p>
+                <span>{t('MAIN_TITLE.FIRST_HIGHLIGHT')}</span>
+                {t('MAIN_TITLE.MIDDLE')}
+                <span>{t('MAIN_TITLE.SECOND_HIGHLIGHT')}</span>
             </h1>
             <div className="additional-info">
                 <p>
-                    {VICTORY_CENTER_BELIEF.FIRST_LINE}
+                    {t('VICTORY_CENTER_BELIEF.FIRST_LINE')}
                     <br />
-                    {VICTORY_CENTER_BELIEF.SECOND_LINE}
+                    {t('VICTORY_CENTER_BELIEF.SECOND_LINE')}
                 </p>
-                <p>{ABOUT_PROGRAMS}</p>
+                <p>{t('ABOUT_PROGRAMS')}</p>
             </div>
         </div>
     );

@@ -1,8 +1,6 @@
-import { Content } from '../../../../../../types/admin/who-we-are';
-import React, { useState } from 'react';
+import { CardImageConfig, Content } from '../../../../../../types/admin/who-we-are';
+import { useState } from 'react';
 import { CardContent } from '../../card-content/CardContent';
-import { ImageValues } from '../../../../../../types/common/image';
-import { CardImageConfig } from '../SectionsProps';
 import './CardsSection.scss';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { ContentType } from '../../../../../../types/common/about-us';
@@ -69,44 +67,21 @@ export const CardsSection = ({
             <div className="cards-section-wrapper">
                 {titleText && <span className="cards-section-wrapper-title">{titleText}</span>}
                 <div className="cards-section-wrapper-cards">
-                    {cardContents.map((c: Content, index: number) => {
-                        const handleImageChange = (value: ImageValues | null) => {
-                            onChange({
-                                ...c,
-                                image: value,
-                            });
-                            setIsPublishButtonActive(true);
-                        };
-
-                        const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                            onChange({
-                                ...c,
-                                description: e.target.value,
-                            });
-                            setIsPublishButtonActive(true);
-                        };
-
-                        const imageConfig = cardImageConfigs[index] || {
-                            style: { width: '20rem', height: '25rem' },
-                            subText: '320x400',
-                        };
-
-                        return (
-                            <CardContent
-                                key={c.id}
-                                content={c}
-                                onImageChange={handleImageChange}
-                                onChange={handleDescriptionChange}
-                                onDescriptionBlur={(value) => handleDescriptionBlur(c.id, value.target.value)}
-                                descriptionError={errors[c.id]?.description ?? null}
-                                imageError={errors[c.id]?.image}
-                                setImageError={(value) => handleSetImageError(c.id, value)}
-                                descriptionLimit={descriptionLimit}
-                                imageInputProps={{ ...imageConfig }}
-                                rows={rows}
-                            />
-                        );
-                    })}
+                    {cardContents.map((c: Content, index: number) => (
+                        <CardContent
+                            key={c.id}
+                            content={c}
+                            onChange={onChange}
+                            onDescriptionBlur={(value) => handleDescriptionBlur(c.id, value.target.value)}
+                            descriptionError={errors[c.id]?.description ?? null}
+                            imageError={errors[c.id]?.image}
+                            setImageError={(value) => handleSetImageError(c.id, value)}
+                            descriptionLimit={descriptionLimit}
+                            imageInputProps={{ ...(cardImageConfigs[index] || {}) }}
+                            rows={rows}
+                            setIsPublishButtonActive={setIsPublishButtonActive}
+                        />
+                    ))}
                 </div>
             </div>
             <div className="button-section">

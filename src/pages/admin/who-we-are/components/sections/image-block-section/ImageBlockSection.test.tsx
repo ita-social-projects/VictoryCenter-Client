@@ -206,4 +206,40 @@ describe('ImageSection', () => {
         expect(screen.queryByText(COMMON_TEXT_ADMIN.TYPE.TITLE)).not.toBeInTheDocument();
         expect(screen.getByText(COMMON_TEXT_ADMIN.TYPE.DESCRIPTION)).toBeInTheDocument();
     });
+
+    it('should call onChange with a new image content object if one does not exist', () => {
+        const contentWithoutImage = [
+            {
+                id: 2,
+                contentType: ContentType.Title,
+                title: 'Initial Title',
+                image: null,
+                imageId: null,
+                description: null,
+            },
+            {
+                id: 3,
+                contentType: ContentType.Description,
+                description: 'Initial Description',
+                title: null,
+                imageId: null,
+                image: null,
+            },
+        ];
+        renderComponent({ content: contentWithoutImage });
+
+        const file = new File(['dummy content'], 'test.png', { type: 'image/png' });
+        const input = screen.getByTestId('mock-image-input-file');
+        fireEvent.change(input, { target: { files: [file] } });
+
+        expect(mockOnChange).toHaveBeenCalledWith({
+            contentType: ContentType.Image,
+            image: file,
+            id: 0,
+            description: null,
+            title: null,
+            imageId: null,
+        });
+        expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
+    });
 });

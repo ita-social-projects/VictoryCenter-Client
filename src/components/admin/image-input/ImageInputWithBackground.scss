@@ -1,9 +1,6 @@
 @use '../../../assets/sass/variables/colors';
 @use '../../../assets/sass/variables/z-index.scss';
 
-// Загальні стилі для обгортки ImageInput, які застосовуються до всіх її варіантів.
-// Ці стилі служать "базою" і допомагають уникнути дублювання коду.
-
 .who-we-are-image-input-wrapper {
     background-size: cover;
     background-position: center;

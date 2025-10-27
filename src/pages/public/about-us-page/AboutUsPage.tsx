@@ -15,6 +15,15 @@ import { LinearProgress } from '@mui/material';
 import { ABOUT_US_DATA } from '../../../const/public/about-us-page';
 import './AboutUsPage.scss';
 
+const getContentBySection = (sections: AboutUsSection[] | null, sectionType: SectionType): AboutUsContent[] | null => {
+    if (!sections) return null;
+
+    const section = sections.find((x) => x.sectionType === sectionType);
+    if (!section || !section.contents || !section.contents.length) return null;
+
+    return section.contents;
+};
+
 export const AboutUsPage = () => {
     const [sections, setSections] = useState<AboutUsSection[] | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -38,41 +47,32 @@ export const AboutUsPage = () => {
         fetchAboutUsSections();
     }, []);
 
+    if (loading) {
+        return (
+            <div className="about-us-loader">
+                <LinearProgress />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="about-us-error-message" role="alert">
+                {error}
+            </div>
+        );
+    }
+
     return (
         <>
-            {loading ? (
-                <div className="about-us-loader">
-                    <LinearProgress />
-                </div>
-            ) : (
-                <>
-                    {error ? (
-                        <div className="about-us-error-message" role="alert">
-                            {error}
-                        </div>
-                    ) : (
-                        <>
-                            <AboutUsIntro content={getContentBySection(sections, SectionType.Main)} />
-                            <OurMission content={getContentBySection(sections, SectionType.WhatWeDo)} />
-                            <ScrollableFrame />
-                            <SupportSection content={getContentBySection(sections, SectionType.WhoWeSupport)} />
-                            <CompanyValues />
-                            <OurTeam content={getContentBySection(sections, SectionType.Team)} />
-                            <MainValues content={getContentBySection(sections, SectionType.People)} />
-                            <DonateSection />
-                        </>
-                    )}
-                </>
-            )}
+            <AboutUsIntro content={getContentBySection(sections, SectionType.Main)} />
+            <OurMission content={getContentBySection(sections, SectionType.WhatWeDo)} />
+            <ScrollableFrame />
+            <SupportSection content={getContentBySection(sections, SectionType.WhoWeSupport)} />
+            <CompanyValues />
+            <OurTeam content={getContentBySection(sections, SectionType.Team)} />
+            <MainValues content={getContentBySection(sections, SectionType.People)} />
+            <DonateSection />
         </>
     );
-};
-
-const getContentBySection = (sections: AboutUsSection[] | null, sectionType: SectionType): AboutUsContent[] | null => {
-    if (!sections) return null;
-
-    const section = sections.find((x) => x.sectionType === sectionType);
-    if (!section || !section.contents || !section.contents.length) return null;
-
-    return section.contents;
 };

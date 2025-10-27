@@ -26,6 +26,7 @@ export const DescriptionSection = ({
     isPublishButtonActive,
 }: DescriptionSectionProps) => {
     const [descriptionError, setDescriptionError] = useState<string | null>(null);
+
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         if (descriptionContent?.id || descriptionContent) {
             onChange({
@@ -36,9 +37,12 @@ export const DescriptionSection = ({
         setIsPublishButtonActive(true);
     };
 
-    if (!content) return null;
+    const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+        setDescriptionError(error || null);
+    };
 
-    const descriptionContent = content.find((item) => item.contentType === ContentType.Description);
+    const descriptionContent = content?.find((item) => item.contentType === ContentType.Description);
 
     if (!descriptionContent) {
         return null;
@@ -60,10 +64,7 @@ export const DescriptionSection = ({
                     id={descriptionContent.id.toString()}
                     maxLength={descriptionLimit}
                     rows={5}
-                    onBlur={(e) => {
-                        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
-                        setDescriptionError(error || null);
-                    }}
+                    onBlur={handleBlur}
                 />
                 {descriptionError && <p className="error">{descriptionError}</p>}
                 <Button

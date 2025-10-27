@@ -20,14 +20,14 @@ describe('WhoWeAreApi', () => {
         jest.clearAllMocks();
     });
 
-    describe('getAll', () => {
+    describe('getPreviews', () => {
         it('should call client.get with the correct URL and return data', async () => {
             const mockData: WhoWeAreCategory[] = [{ id: 1, title: 'Category 1', sectionType: SectionType.Main }];
             mockClient.get.mockResolvedValue({ data: mockData });
 
             const result = await WhoWeAreApi.getPreviews(mockClient);
 
-            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.WHO_WE_ARE.BASE);
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.WHO_WE_ARE.PREVIEWS);
             expect(result).toEqual(mockData);
         });
     });

@@ -42,7 +42,7 @@ export const ImageSection = ({
     const titleContent = content?.find((item) => item.contentType === ContentType.Title);
     const descriptionContent = content?.find((item) => item.contentType === ContentType.Description);
 
-    if (!descriptionContent) {
+    if (!content || !descriptionContent) {
         return null;
     }
 
@@ -80,7 +80,15 @@ export const ImageSection = ({
         }
     };
 
-    if (!content) return null;
+    const handleTitleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+        setTitleError(error || null);
+    };
+
+    const handleDescriptionBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+        setDescriptionError(error || null);
+    };
 
     return (
         <div className="image-section">
@@ -94,7 +102,7 @@ export const ImageSection = ({
                     {...imageInputProps}
                 />
                 {imageError && (
-                    <p data-testid={'image-error'} className="error">
+                    <p data-testid="image-error" className="error">
                         {imageError}
                     </p>
                 )}
@@ -113,14 +121,11 @@ export const ImageSection = ({
                             id={titleContent.id.toString()}
                             maxLength={titleLimit}
                             className="content-wrapper-title-field"
-                            onBlur={(e) => {
-                                const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
-                                setTitleError(error || null);
-                            }}
+                            onBlur={handleTitleBlur}
                             disabled={true}
                         />
                         {titleError && (
-                            <p data-testid={'title-error'} className="error">
+                            <p data-testid="title-error" className="error">
                                 {titleError}
                             </p>
                         )}
@@ -135,17 +140,14 @@ export const ImageSection = ({
                         <TextAreaWithCharacterLimit
                             onChange={handleDescriptionChange}
                             value={descriptionContent.description ?? ''}
-                            maxLength={descriptionLimit!}
+                            maxLength={descriptionLimit}
                             name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                             id={descriptionContent.id.toString()}
                             rows={rows}
-                            onBlur={(e) => {
-                                const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
-                                setDescriptionError(error || null);
-                            }}
+                            onBlur={handleDescriptionBlur}
                         />
                         {descriptionError && (
-                            <p data-testid={'description-error'} className="error">
+                            <p data-testid="description-error" className="error">
                                 {descriptionError}
                             </p>
                         )}
@@ -153,9 +155,9 @@ export const ImageSection = ({
                 )}
                 <Button
                     className="button"
-                    buttonStyle={'primary'}
+                    buttonStyle="primary"
                     onClick={onPublish}
-                    type={'submit'}
+                    type="submit"
                     disabled={!!descriptionError || !!titleError || !isPublishButtonActive}
                 >
                     {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}

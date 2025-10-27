@@ -1,32 +1,39 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { CardsSection, CardsSectionProps } from './CardsSection';
 import '@testing-library/jest-dom';
 import { ContentType } from '../../../../../../types/common/about-us';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { Image, ImageValues } from '../../../../../../types/common/image';
+import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 
 jest.mock('../../card-content/CardContent', () => ({
     CardContent: ({
         content,
-        onImageChange,
         onChange,
         onDescriptionBlur,
         descriptionError,
         imageError,
         setImageError,
+        setIsPublishButtonActive,
     }: any) => (
         <div data-testid={`mock-card-content-${content.id}`}>
             <textarea
                 data-testid={`mock-textarea-${content.id}`}
-                onChange={onChange}
+                onChange={(e) => {
+                    onChange({ ...content, description: e.target.value });
+                    setIsPublishButtonActive(true);
+                }}
                 onBlur={onDescriptionBlur}
                 value={content.description}
             />
             {descriptionError && <span data-testid={`desc-error-${content.id}`}>{descriptionError}</span>}
             <input
                 data-testid={`mock-image-input-${content.id}`}
-                onChange={(e) => onImageChange(JSON.parse(e.target.value))}
+                onChange={(e) => {
+                    const newImage = JSON.parse(e.target.value);
+                    onChange({ ...content, image: newImage });
+                    setIsPublishButtonActive(true);
+                }}
                 onBlur={() => setImageError('test image error')}
             />
             {imageError && <span data-testid={`image-error-${content.id}`}>{imageError}</span>}
@@ -100,7 +107,7 @@ describe('CardsSection', () => {
         renderComponent();
         expect(screen.getByText(titleText)).toBeInTheDocument();
         expect(screen.getAllByTestId(/mock-card-content-/)).toHaveLength(2);
-        expect(screen.getByRole('button', { name: 'Опублікувати' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeInTheDocument();
     });
 
     it('should not render if content is null or there are no card items', () => {
@@ -143,13 +150,12 @@ describe('CardsSection', () => {
         const imageInput = screen.getByTestId('mock-image-input-1');
         const newImage = { id: 20, base64: 'new-image.png', mimeType: 'image/png' } as ImageValues;
 
-        // FIX: Stringify the object before passing it as the value
         fireEvent.change(imageInput, { target: { value: JSON.stringify(newImage) } });
 
         expect(mockOnChange).toHaveBeenCalledWith(
             expect.objectContaining({
                 id: 1,
-                image: newImage, // This will now match correctly
+                image: newImage,
             }),
         );
         expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
@@ -162,11 +168,11 @@ describe('CardsSection', () => {
         renderComponent();
         const textarea = screen.getByTestId('mock-textarea-1');
 
-        fireEvent.blur(textarea);
+        fireEvent.blur(textarea, { target: { value: '' } });
 
         await waitFor(() => {
             expect(screen.getByTestId('desc-error-1')).toHaveTextContent(errorMessage);
-            const publishButton = screen.getByRole('button', { name: 'Опублікувати' });
+            const publishButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
             expect(publishButton).toBeDisabled();
         });
     });
@@ -179,7 +185,7 @@ describe('CardsSection', () => {
 
         await waitFor(() => {
             expect(screen.getByTestId('image-error-1')).toHaveTextContent('test image error');
-            const publishButton = screen.getByRole('button', { name: 'Опублікувати' });
+            const publishButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
             expect(publishButton).toBeDisabled();
         });
     });
@@ -187,20 +193,29 @@ describe('CardsSection', () => {
     it('should enable the publish button and call onPublish when clicked', () => {
         renderComponent({ isPublishButtonActive: true });
 
-        const publishButton = screen.getByRole('button', { name: 'Опублікувати' });
+        const publishButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
         expect(publishButton).toBeEnabled();
 
         fireEvent.click(publishButton);
         expect(mockOnPublish).toHaveBeenCalled();
     });
 
-    it('should keep the publish button disabled if there are any validation errors', () => {
+    it('should keep the publish button disabled if there are any validation errors', async () => {
+        const errorMessage = 'Description cannot be empty.';
+        (WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText as jest.Mock).mockReturnValue(errorMessage);
+
         renderComponent({ isPublishButtonActive: true });
 
-        fireEvent.blur(screen.getByTestId('mock-textarea-1'));
+        const textarea = screen.getByTestId('mock-textarea-1');
+        fireEvent.blur(textarea, { target: { value: '' } });
 
-        const publishButton = screen.getByRole('button', { name: 'Опублікувати' });
-        expect(publishButton).toBeDisabled();
+        const publishButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
+
+        await waitFor(() => {
+            expect(screen.getByTestId('desc-error-1')).toHaveTextContent(errorMessage);
+            expect(publishButton).toBeDisabled();
+        });
+
         expect(mockOnPublish).not.toHaveBeenCalled();
     });
 });

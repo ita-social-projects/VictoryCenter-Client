@@ -118,6 +118,11 @@ export const WhoWeAreContent = () => {
         }
     }, [selectedSection, updatedSection, client, selectedCategory, addToast]);
 
+    const handleConfirmPublish = useCallback(() => {
+        setConfirmationModalOpen(false);
+        handlePublishChange();
+    }, [handlePublishChange]);
+
     return (
         <>
             <div className="who-we-are-main-box">
@@ -145,10 +150,7 @@ export const WhoWeAreContent = () => {
                 isOpen={isConfirmationModalOpen}
                 onClose={() => setConfirmationModalOpen(false)}
                 title={COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES}
-                onConfirm={() => {
-                    setConfirmationModalOpen(false);
-                    handlePublishChange();
-                }}
+                onConfirm={handleConfirmPublish}
                 onCancel={() => setConfirmationModalOpen(false)}
             />
             <ToastContainer />

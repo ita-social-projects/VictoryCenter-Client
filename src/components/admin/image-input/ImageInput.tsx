@@ -167,11 +167,11 @@ export const ImageInput = ({
                 />
 
                 {previewImage ? (
-                    <div className={classNames('image-preview')}>
+                    <div className="image-preview">
                         <img
                             src={getImageSrc(previewImage)}
                             alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
-                            className={classNames('preview-image')}
+                            className="preview-image"
                             data-testid="preview-image"
                         />
                         {!disabled && (
@@ -185,13 +185,13 @@ export const ImageInput = ({
                                     setShowConfirmModal(true);
                                 }}
                             >
-                                <DeleteIcon className={classNames('delete-icon')} />
+                                <DeleteIcon className="delete-icon" />
                             </button>
                         )}
                     </div>
                 ) : (
-                    <div className={classNames('image-placeholder')}>
-                        <UploadIcon className={classNames('placeholder-icon')} />
+                    <div className="image-placeholder">
+                        <UploadIcon className="placeholder-icon" />
                         <span>{label}</span>
                         <span>{subText}</span>
                     </div>

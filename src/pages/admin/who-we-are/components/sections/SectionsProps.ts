@@ -64,13 +64,6 @@ export const WhatWeDoPageProps: Omit<
     descriptionLimit: 300,
 };
 
-export interface CardImageConfig {
-    style: React.CSSProperties;
-    subText: string;
-    width: number;
-    height: number;
-}
-
 export const WhoWeSupportCardsProps: Omit<
     CardsSectionProps,
     'content' | 'onChange' | 'onPublish' | 'setIsPublishButtonActive' | 'isPublishButtonActive'

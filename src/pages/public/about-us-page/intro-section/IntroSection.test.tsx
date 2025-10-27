@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { AboutUsIntro } from './IntroSection';
 import { ContentType } from '../../../../types/common/about-us';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
+import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 
 describe('AboutUsIntro', () => {
     const Content: AboutUsContent[] = [
@@ -52,8 +53,10 @@ describe('AboutUsIntro', () => {
 
     it('should render title and description correctly', () => {
         render(<AboutUsIntro content={Content} />);
-        const title = screen.getByText('Test title');
-        expect(title).toBeInTheDocument();
+        // TODO: Replace with: "expect(screen.getByText('Test title')).toBeInTheDocument();" when rich text component is implemented
+        expect(screen.getByText(ABOUT_US_DATA.INTRO_TITLE.FIRST_HIGHLIGHT)).toBeInTheDocument();
+        expect(screen.getByText(ABOUT_US_DATA.INTRO_TITLE.MIDDLE_PART.trim())).toBeInTheDocument();
+        expect(screen.getByText(ABOUT_US_DATA.INTRO_TITLE.SECOND_HIGHLIGHT)).toBeInTheDocument();
 
         const description = screen.getByText('Test description');
         expect(description).toBeInTheDocument();

@@ -22,3 +22,10 @@ export type Content = {
     description: string | null;
     title: string | null;
 };
+
+export interface CardImageConfig {
+    style: React.CSSProperties;
+    subText: string;
+    width: number;
+    height: number;
+}

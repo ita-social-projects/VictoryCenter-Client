@@ -226,7 +226,16 @@ export const TeamPageContent = () => {
                 setIsMembersLoading(false);
             }
         },
-        [clearError, setErrorState, pageSize, statusFilter, client],
+        [
+            clearError,
+            setErrorState,
+            pageSize,
+            statusFilter,
+            client,
+            isSingleView,
+            selectedCategory,
+            selectedSearchMember?.categoryId,
+        ],
     );
 
     const hasMoreToShow = useMemo(() => {

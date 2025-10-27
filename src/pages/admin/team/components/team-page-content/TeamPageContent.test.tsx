@@ -655,6 +655,59 @@ describe('TeamPageContent', () => {
             unmount();
         });
 
+        it('should disable hasMore in single view mode', async () => {
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            const loadMoreButton = screen.queryByTestId('load-more');
+            expect(loadMoreButton).not.toBeInTheDocument();
+
+            expect(getMemberItems()).toHaveLength(2);
+        });
+
+        it('should test itemsToRender computation for single view', async () => {
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            expect(getMemberItems()).toHaveLength(2);
+            expect(screen.getByTestId('member-name-1')).toHaveTextContent('Test Member Alpha');
+            expect(screen.getByTestId('member-name-2')).toHaveTextContent('Test Member Beta');
+        });
+
+        it('should handle isAnyModalOpened calculation correctly', async () => {
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            fireEvent.click(screen.getByTestId('edit-1'));
+
+            await waitFor(() => {
+                expect(getEditMemberModal()).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByTestId('close-edit'));
+
+            await waitFor(() => {
+                expect(getEditMemberModal()).not.toBeInTheDocument();
+            });
+        });
+
+        it('should test closeModalActions functionality', async () => {
+            renderTeamPageContent();
+            await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            fireEvent.click(screen.getByTestId('edit-1'));
+            await waitFor(() => expect(getEditMemberModal()).toBeInTheDocument());
+
+            fireEvent.click(screen.getByTestId('close-edit'));
+            await waitFor(() => expect(getEditMemberModal()).not.toBeInTheDocument());
+
+            fireEvent.click(screen.getByTestId('delete-1'));
+            await waitFor(() => expect(getDeleteMemberModal()).toBeInTheDocument());
+
+            fireEvent.click(screen.getByTestId('close-delete'));
+            await waitFor(() => expect(getDeleteMemberModal()).not.toBeInTheDocument());
+        });
+
         it('should handle modal state when modals are already opened', async () => {
             renderTeamPageContent();
             await waitFor(() => expect(getMemberItems()).toHaveLength(2));

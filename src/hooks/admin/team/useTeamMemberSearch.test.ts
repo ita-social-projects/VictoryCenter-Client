@@ -147,4 +147,27 @@ describe('useTeamMemberSearch', () => {
 
         unmount();
     });
+
+    it('should handle AbortError gracefully in loadMoreSearchSuggestions', async () => {
+        const abortError = new Error('Request was aborted');
+        abortError.name = 'AbortError';
+
+        mockTeamMembersApi.search.mockResolvedValueOnce(mockSearchResults as any).mockRejectedValueOnce(abortError);
+
+        const { result } = renderHook(() => useTeamMemberSearch(mockClient));
+
+        await act(async () => {
+            await result.current.handleSearchQueryByName('test');
+        });
+
+        expect(result.current.searchSuggestions).toEqual(mockSearchResults.items);
+        expect(result.current.hasMoreSearch).toBe(true);
+
+        await act(async () => {
+            await result.current.loadMoreSearchSuggestions();
+        });
+
+        expect(result.current.searchSuggestions).toEqual(mockSearchResults.items);
+        expect(result.current.isSearchLoading).toBe(false);
+    });
 });

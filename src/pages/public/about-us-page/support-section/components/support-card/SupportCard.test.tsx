@@ -1,41 +1,49 @@
 import { render, screen } from '@testing-library/react';
 import { SupportCard } from './SupportCard';
+import { ContentType } from '../../../../../../types/common/about-us';
+import { AboutUsContent } from '../../../../../../types/public/about-us-page';
+import { ABOUT_US_DATA } from '../../../../../../const/public/about-us-page';
 
 describe('SupportCard component', () => {
-    const mockProps = {
-        IMG: '/images/support1.png',
-        ALT: 'Support Image',
-        DESCRIPTION: 'We provide great support!',
-        index: 0,
+    const card: AboutUsContent = {
+        id: 1,
+        contentType: ContentType.Card,
+        image: {
+            id: 1,
+            url: 'https://example.com/image.jpg',
+            mimeType: 'image/jpeg',
+        },
+        description: 'This is a support card description.',
+        title: null,
     };
 
     test('renders image with correct src and alt', () => {
-        render(<SupportCard {...mockProps} />);
-        const image = screen.getByRole('img', { name: mockProps.ALT });
+        render(<SupportCard card={card} />);
+        const image = screen.getByRole('img');
         expect(image).toBeInTheDocument();
-        expect(image).toHaveAttribute('src', mockProps.IMG);
-        expect(image).toHaveAttribute('alt', mockProps.ALT);
+        expect(image).toHaveAttribute('src', card.image!.url);
+        expect(image).toHaveAttribute('alt', ABOUT_US_DATA.SUPPORT_DATA[0].ALT);
     });
 
     test('renders description text', () => {
-        render(<SupportCard {...mockProps} />);
-        expect(screen.getByText(mockProps.DESCRIPTION)).toBeInTheDocument();
+        render(<SupportCard card={card} />);
+        expect(screen.getByText(card.description!)).toBeInTheDocument();
     });
 
     test('applies correct class based on index', () => {
-        render(<SupportCard {...mockProps} />);
-        const card = screen.getByRole('img', { name: mockProps.ALT }).closest('div');
-        expect(card).toHaveClass('support-card');
-        expect(card).toHaveClass(`card-${mockProps.index + 1}`);
+        render(<SupportCard card={card} />);
+        const div = screen.getByRole('img').closest('div');
+        expect(div).toHaveClass('support-card');
+        expect(div).toHaveClass(`card-1`);
     });
 
     test('renders correctly for multiple indexes', () => {
-        const { rerender } = render(<SupportCard {...mockProps} index={1} />);
-        const card2 = screen.getByRole('img', { name: mockProps.ALT }).closest('div');
+        const { rerender } = render(<SupportCard card={card} index={1} />);
+        const card2 = screen.getByRole('img').closest('div');
         expect(card2).toHaveClass('card-2');
 
-        rerender(<SupportCard {...mockProps} index={3} />);
-        const card4 = screen.getByRole('img', { name: mockProps.ALT }).closest('div');
-        expect(card4).toHaveClass('card-4');
+        rerender(<SupportCard card={card} index={2} />);
+        const card4 = screen.getByRole('img').closest('div');
+        expect(card4).toHaveClass('card-3');
     });
 });

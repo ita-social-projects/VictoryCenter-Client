@@ -81,14 +81,21 @@ export const useTeamMemberSearch = (client: AxiosInstance) => {
             );
             if (abortController.signal.aborted) return;
 
+            let actualLoadedCount = 0;
+
             setSearchSuggestions((prev) => {
                 const existingIds = new Set(prev.map((m) => m.id));
                 const newItems = res.items.filter((m) => !existingIds.has(m.id));
-                return [...prev, ...newItems];
+
+                const updatedList = [...prev, ...newItems];
+                actualLoadedCount = updatedList.length;
+
+                return updatedList;
             });
 
             searchPageRef.current += 1;
-            setHasMoreSearch(searchPageRef.current * TEAM_SEARCH.SUGGESTIONS_PAGE_SIZE < res.totalItemsCount);
+
+            setHasMoreSearch(actualLoadedCount < res.totalItemsCount);
         } catch (e: any) {
             if (axios.isCancel?.(e) || e?.name === 'CanceledError' || e?.name === 'AbortError') return;
         } finally {

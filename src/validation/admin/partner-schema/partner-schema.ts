@@ -60,12 +60,12 @@ export const partnerBannerSchema = Yup.object({
 // Схема для окремого партнера
 export const partnerItemSchema = Yup.object({
     description: Yup.string()
-        .required('Опис партнера обов\'язковий')
+        .required("Опис партнера обов'язковий")
         .min(10, 'Мінімум 10 символів')
         .max(200, 'Максимум 200 символів'),
-    
+
     image: Yup.mixed<ImageValues | Image>()
-        .required('Зображення партнера обов\'язкове')
+        .required("Зображення партнера обов'язкове")
         .test('fileSize', PARTNER_VALIDATION.image.getSizeError(), (value) => {
             if (!value) return false;
             if (typeof value === 'object' && 'id' in value && typeof value.id === 'number') {
@@ -85,86 +85,77 @@ export const partnerItemSchema = Yup.object({
             }
             return true;
         }),
-    
+
     imageId: Yup.number().nullable(),
 });
 
 // Схема для секції партнерів
 export const partnerSectionSchema = Yup.object({
     title: Yup.string()
-        .required('Заголовок секції обов\'язковий')
+        .required("Заголовок секції обов'язковий")
         .min(5, 'Мінімум 5 символів')
         .max(50, 'Максимум 50 символів'),
-    
+
     description: Yup.string()
-        .required('Опис секції обов\'язковий')
+        .required("Опис секції обов'язковий")
         .min(10, 'Мінімум 10 символів')
         .max(70, 'Максимум 70 символів'),
-    
-    partners: Yup.array()
-        .of(partnerItemSchema)
-        .min(1, 'Потрібен хоча б один партнер')
-        .max(10, 'Максимум 10 партнерів'),
+
+    partners: Yup.array().of(partnerItemSchema).min(1, 'Потрібен хоча б один партнер').max(10, 'Максимум 10 партнерів'),
 });
 
 // Схема для створення секції (для API)
 export const partnerSectionCreateSchema = Yup.object({
     title: Yup.string()
-        .required('Заголовок секції обов\'язковий')
+        .required("Заголовок секції обов'язковий")
         .min(5, 'Мінімум 5 символів')
         .max(50, 'Максимум 50 символів'),
-    
+
     description: Yup.string()
-        .required('Опис секції обов\'язковий')
+        .required("Опис секції обов'язковий")
         .min(10, 'Мінімум 10 символів')
         .max(70, 'Максимум 70 символів'),
-    
+
     partners: Yup.array()
         .of(
             Yup.object({
                 description: Yup.string()
-                    .required('Опис партнера обов\'язковий')
+                    .required("Опис партнера обов'язковий")
                     .min(10, 'Мінімум 10 символів')
                     .max(200, 'Максимум 200 символів'),
-                imageId: Yup.number()
-                    .required('ID зображення обов\'язкове')
-                    .positive('ID має бути позитивним числом'),
-            })
+                imageId: Yup.number().required("ID зображення обов'язкове").positive('ID має бути позитивним числом'),
+            }),
         )
         .min(1, 'Потрібен хоча б один партнер')
-        .required('Список партнерів обов\'язковий'),
+        .required("Список партнерів обов'язковий"),
 });
 
 // Схема для оновлення секції
 export const partnerSectionUpdateSchema = Yup.object({
     title: Yup.string()
-        .required('Заголовок секції обов\'язковий')
+        .required("Заголовок секції обов'язковий")
         .min(5, 'Мінімум 5 символів')
         .max(50, 'Максимум 50 символів'),
-    
+
     description: Yup.string()
-        .required('Опис секції обов\'язковий')
+        .required("Опис секції обов'язковий")
         .min(10, 'Мінімум 10 символів')
         .max(70, 'Максимум 70 символів'),
-    
+
     partnersToUpdate: Yup.array()
         .of(
             Yup.object({
                 id: Yup.number().nullable(),
                 description: Yup.string()
-                    .required('Опис партнера обов\'язковий')
+                    .required("Опис партнера обов'язковий")
                     .min(10, 'Мінімум 10 символів')
                     .max(200, 'Максимум 200 символів'),
-                imageId: Yup.number()
-                    .required('ID зображення обов\'язкове')
-                    .positive('ID має бути позитивним числом'),
-            })
+                imageId: Yup.number().required("ID зображення обов'язкове").positive('ID має бути позитивним числом'),
+            }),
         )
         .min(1, 'Потрібен хоча б один партнер'),
-    
-    partnerIdsToDelete: Yup.array()
-        .of(Yup.number().positive())
-        .default([]),
+
+    partnerIdsToDelete: Yup.array().of(Yup.number().positive()).default([]),
 });
 
 // Функції валідації для банера
@@ -258,9 +249,9 @@ export const PARTNER_SECTION_VALIDATION = {
             await partnerSectionSchema.validate(section, { abortEarly: false });
             return { isValid: true };
         } catch (error: any) {
-            return { 
-                isValid: false, 
-                errors: error.errors || error.message 
+            return {
+                isValid: false,
+                errors: error.errors || error.message,
             };
         }
     },
@@ -271,9 +262,9 @@ export const PARTNER_SECTION_VALIDATION = {
             await partnerSectionCreateSchema.validate(data, { abortEarly: false });
             return { isValid: true };
         } catch (error: any) {
-            return { 
-                isValid: false, 
-                errors: error.errors || error.message 
+            return {
+                isValid: false,
+                errors: error.errors || error.message,
             };
         }
     },
@@ -284,9 +275,9 @@ export const PARTNER_SECTION_VALIDATION = {
             await partnerSectionUpdateSchema.validate(data, { abortEarly: false });
             return { isValid: true };
         } catch (error: any) {
-            return { 
-                isValid: false, 
-                errors: error.errors || error.message 
+            return {
+                isValid: false,
+                errors: error.errors || error.message,
             };
         }
     },

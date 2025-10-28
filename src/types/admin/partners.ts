@@ -274,9 +274,5 @@ export function isPartnerImageValues(value: any): value is ImageValues {
 }
 
 export function isPartnerSection(value: any): value is PartnerSection {
-    return value !== null && 
-           typeof value === 'object' && 
-           'id' in value && 
-           'title' in value && 
-           'partners' in value;
+    return value !== null && typeof value === 'object' && 'id' in value && 'title' in value && 'partners' in value;
 }

@@ -6,45 +6,38 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { PartnersApi } from '../../../../../services/api/admin/partners/partners-api';
 
-jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
-jest.mock('../../../../../../services/api/admin/team/team-members/team-members-api', () => ({
-    TeamMembersApi: {
-        delete: jest.fn(),
+jest.mock('../../../../../services/api/admin/partners/partners-api', () => ({
+    PartnersApi: {
+        deleteSection: jest.fn(),
     },
 }));
 
-describe('DeleteTeamMemberModal', () => {
+describe('DeletePartnerSectionModal', () => {
     const onClose = jest.fn();
     const onDeleteSection = jest.fn();
-
-    const member = {
-        id: 123,
-        image: null,
-        fullName: 'John Doe',
-        description: 'Developer',
-        status: 0,
-        categoryId: 1,
-    };
 
     const section = {
         id: 123,
         title: 'Ті, хто відкрили нам',
         description: 'Ранчо, завдяки яким',
-        partners: [{
-            id: 12,
-            image: null,
-            description: 'Ранчо, завдяки яким',
-            imageId: 13,
-        }, 
-        {
-            id: 11,
-            image: null,
-            description: 'Ранчо, завдяки яким',
-            imageId: 14,
-        }]
-    }
+        partners: [
+            {
+                id: 12,
+                image: null,
+                description: 'Ранчо, завдяки яким',
+                imageId: 13,
+            },
+            {
+                id: 11,
+                image: null,
+                description: 'Ранчо, завдяки яким',
+                imageId: 14,
+            },
+        ],
+    };
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -69,7 +62,7 @@ describe('DeleteTeamMemberModal', () => {
     it('does not render modal content when closed', () => {
         const { container } = render(
             <DeletePartnerSectionModal
-                isOpen={true}
+                isOpen={false}
                 onClose={onClose}
                 sectionToDelete={section}
                 onDeleteSection={onDeleteSection}
@@ -108,10 +101,10 @@ describe('DeleteTeamMemberModal', () => {
 
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
 
-        expect(PartnersApi.deleteSection).toHaveBeenCalledWith({}, member.id);
+        expect(PartnersApi.deleteSection).toHaveBeenCalledWith({}, section.id);
 
         await waitFor(() => {
-            expect(onDeleteSection).toHaveBeenCalledWith(member);
+            expect(onDeleteSection).toHaveBeenCalledWith(section);
             expect(onClose).toHaveBeenCalled();
         });
     });
@@ -120,7 +113,7 @@ describe('DeleteTeamMemberModal', () => {
         (PartnersApi.deleteSection as jest.Mock).mockResolvedValue(undefined);
 
         render(
-           <DeletePartnerSectionModal
+            <DeletePartnerSectionModal
                 isOpen={true}
                 onClose={onClose}
                 sectionToDelete={null}
@@ -202,7 +195,7 @@ describe('DeleteTeamMemberModal', () => {
         );
 
         render(
-           <DeletePartnerSectionModal
+            <DeletePartnerSectionModal
                 isOpen={true}
                 onClose={onClose}
                 sectionToDelete={section}

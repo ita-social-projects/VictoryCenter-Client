@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useMemo } from 'react';
 import { ImageValues, Image } from '../../../../../types/common/image';
 import './PartnerBannerForm.scss';
 import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
@@ -136,7 +136,6 @@ export const PartnerBannerForm = forwardRef<PartnerBannerFormRef, PartnerBannerF
 
         const handlePublish = useCallback(() => {
             if (!formDisabled && !isSubmitting) {
-                // Trigger form submission with Published status
                 handleSubmit(formState, VisibilityStatus.Published);
             }
         }, [formState, formDisabled, isSubmitting, handleSubmit]);

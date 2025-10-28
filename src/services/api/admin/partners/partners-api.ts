@@ -49,7 +49,6 @@ export const PartnersApi = {
             section.partners.map(async (partner) => {
                 if (partner.image && 'base64' in partner.image) {
                     const imageId = await ImageApi.post(client, partner.image);
-                    partner.imageId = partner.imageId;
                 }
             }),
         );

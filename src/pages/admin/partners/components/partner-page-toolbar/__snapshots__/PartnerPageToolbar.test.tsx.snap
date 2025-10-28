@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PartnerPageToolbar Snapshot should match snapshot 1`] = `
+<div
+  class="toolbar par-toolbar"
+  data-testid="partner-page-toolbar"
+>
+  <div
+    class="toolbar-actions"
+  >
+    <button
+      data-button-style="primary"
+      data-testid="add-partner-button"
+    >
+      Add Partner Section
+      <svg
+        data-testid="plus-icon"
+      >
+        Plus Icon
+      </svg>
+    </button>
+  </div>
+</div>
+`;

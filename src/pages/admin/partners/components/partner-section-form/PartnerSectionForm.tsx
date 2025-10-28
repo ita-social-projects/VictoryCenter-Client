@@ -60,14 +60,12 @@ export const PartnerSectionForm = forwardRef<HTMLDivElement, PartnerSectionFormP
             [value, onChange],
         );
 
-        // Обробка зміни партнера
         const handlePartnerChange = useCallback(
             (index: number, partnerValue: PartnerFormValues) => {
                 const newPartners = [...value.partners];
                 newPartners[index] = partnerValue;
                 onChange({ ...value, partners: newPartners });
 
-                // Валідація партнера
                 const imageError = PARTNER_SECTION_VALIDATION.validatePartnerImage(partnerValue.image);
                 const descError = PARTNER_SECTION_VALIDATION.validatePartnerDescription(partnerValue.description);
 
@@ -81,31 +79,23 @@ export const PartnerSectionForm = forwardRef<HTMLDivElement, PartnerSectionFormP
             [value, onChange, localErrors.partners],
         );
 
-        // Видалення партнера
         const handlePartnerDelete = useCallback(
             (index: number) => {
                 const newPartners = value.partners.filter((_: PartnerFormValues, i: number) => i !== index);
                 onChange({ ...value, partners: newPartners });
 
-                // Оновлення помилок
                 const newPartnerErrors = localErrors.partners?.filter((_, i) => i !== index);
                 setLocalErrors((prev) => ({ ...prev, partners: newPartnerErrors }));
             },
             [value, onChange, localErrors.partners],
         );
 
-        const handlePartnerEdit = useCallback(
-            (index: number) => {
-                // 'isEditing' does not exist on PartnerFormValues, so we cannot add it directly
-                // If editing state is needed, manage it separately in component state instead
-                // If this function is not needed, remove it. Otherwise, leave it as a no-op:
-                // Option 1: As a no-op handler
-                // Option 2: Remove if unused (not shown here)
-            },
-            [value, onChange],
-        );
+        const [editingPartnerIndex, setEditingPartnerIndex] = useState<number | null>(null);
 
-        // Додавання нового партнера
+        const handlePartnerEdit = useCallback((index: number) => {
+            setEditingPartnerIndex((prev) => (prev === index ? null : index));
+        }, []);
+
         const handleAddPartner = useCallback(() => {
             const newPartner: PartnerFormValues = {
                 image: null,
@@ -114,7 +104,6 @@ export const PartnerSectionForm = forwardRef<HTMLDivElement, PartnerSectionFormP
             onChange({ ...value, partners: [...value.partners, newPartner] });
         }, [value, onChange]);
 
-        // Drag & Drop функції
         const handleDragStart = useCallback((index: number) => {
             setDraggedIndex(index);
         }, []);
@@ -153,13 +142,18 @@ export const PartnerSectionForm = forwardRef<HTMLDivElement, PartnerSectionFormP
             setDropTargetIndex(null);
         }, []);
 
-        // Перевірка валідності форми
         const isFormValid = () => {
             if (localErrors.title || localErrors.description) return false;
             if (localErrors.partners?.some((p) => p?.image || p?.description)) return false;
             if (!value.title || !value.description) return false;
             if (value.partners.length === 0) return false;
-            return true;
+
+            // Перевірка, що всі партнери мають зображення та опис
+            const allPartnersValid = value.partners.every(
+                (partner) => partner.image !== null && partner.description.trim() !== '',
+            );
+
+            return allPartnersValid;
         };
 
         const displayErrors = errors || localErrors;
@@ -184,7 +178,11 @@ export const PartnerSectionForm = forwardRef<HTMLDivElement, PartnerSectionFormP
                         </div>
 
                         <div className="partner-section__field">
-                            <InputLabel htmlFor="section-description" text={PARTNERS_TEXT.FORM.LABEL.DESCRIPTION} isRequired />
+                            <InputLabel
+                                htmlFor="section-description"
+                                text={PARTNERS_TEXT.FORM.LABEL.DESCRIPTION}
+                                isRequired
+                            />
                             <TextAreaWithCharacterLimit
                                 value={value.description}
                                 onChange={handleDescriptionChange}
@@ -200,15 +198,6 @@ export const PartnerSectionForm = forwardRef<HTMLDivElement, PartnerSectionFormP
                     </div>
 
                     <div className="partner-section__partners">
-                        <div className="partner-section__partners-header">
-                            <h3>Партнери ({value.partners.length})</h3>
-                            {value.partners.length === 0 && (
-                                <p className="partner-section__empty-message">
-                                    {PARTNERS_TEXT.SECTION.EMPTY_MESSAGE}
-                                </p>
-                            )}
-                        </div>
-
                         <div className="partner-section__partners-list">
                             {value.partners.map((partner: PartnerFormValues, index: number) => (
                                 <div
@@ -232,6 +221,7 @@ export const PartnerSectionForm = forwardRef<HTMLDivElement, PartnerSectionFormP
                                         onChange={(newValue) => handlePartnerChange(index, newValue)}
                                         onDelete={() => handlePartnerDelete(index)}
                                         onEdit={() => handlePartnerEdit(index)}
+                                        onDragStart={() => handleDragStart(index)}
                                         disabled={disabled}
                                         error={displayErrors?.partners?.[index]}
                                     />
@@ -253,10 +243,10 @@ export const PartnerSectionForm = forwardRef<HTMLDivElement, PartnerSectionFormP
 
                 <div className="partner-section__actions">
                     <Button buttonStyle="secondary" onClick={onDelete} disabled={disabled}>
-                        Видалити секцію
+                        {PARTNERS_TEXT.SECTION.DELETE_SECTION}
                     </Button>
                     <Button buttonStyle="primary" onClick={onPublish} disabled={disabled || !isFormValid()}>
-                        Опублікувати
+                        {PARTNERS_TEXT.BUTTON.PUBLISH}
                     </Button>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DropdownMenu, DropdownLink } from './DropdownMenu';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 
 jest.mock('../../../assets/icons/chevron-up.svg', () => ({
     ReactComponent: () => <span data-testid="arrow-up" />,

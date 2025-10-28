@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Header } from './Header';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '../../../const/public/routes';
 import headerUk from '../../../locales/uk/header.json';
 

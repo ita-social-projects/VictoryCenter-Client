@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 import { OurTeam } from './OurTeam';
 import aboutUsPageUk from '../../../../locales/uk/about-us.json';
 import { checkForSubstrings } from '../../../../utils/functions/test-helpers/test-helpers';

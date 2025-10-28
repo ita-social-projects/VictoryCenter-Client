@@ -280,7 +280,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                             <SingleSelectInputGroup
                                 id={getFieldId('select')}
                                 label={TEAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
-                                isRequired={true}
+                                isRequired
                                 options={categories}
                                 getOptionId={(c) => c.id}
                                 getOptionName={(c) => c.name}
@@ -292,7 +292,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                         )}
 
                         <InputWithCharacterLimitGroup
-                            isRequired={true}
+                            isRequired
                             label={TEAM_CATEGORY_TEXT.FORM.LABEL.NAME}
                             error={errors.name}
                             value={formState.name}
@@ -306,7 +306,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                         />
 
                         <TextAreaWithCharacterLimitGroup
-                            isRequired={true}
+                            isRequired
                             label={TEAM_CATEGORY_TEXT.FORM.LABEL.DESCRIPTION}
                             error={errors.description}
                             value={formState.description}

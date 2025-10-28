@@ -49,11 +49,11 @@ export const DeleteTeamCategoryModal = ({ isOpen, onClose, onConfirm, categories
     };
 
     useEffect(() => {
-        if (isOpen) {
-            setError('');
-            if (categories.length > 0) {
-                setSelectedCategory(categories[0]);
-            }
+        if (!isOpen) return;
+
+        setError('');
+        if (categories.length > 0) {
+            setSelectedCategory(categories[0]);
         }
     }, [isOpen, categories]);
 
@@ -69,7 +69,7 @@ export const DeleteTeamCategoryModal = ({ isOpen, onClose, onConfirm, categories
                     <SingleSelectInputGroup
                         id="delete-category-select"
                         label={COMMON_TEXT_ADMIN.CATEGORIES.FORM.LABEL.CATEGORY}
-                        isRequired={true}
+                        isRequired
                         options={categories}
                         getOptionId={(c) => c.id}
                         getOptionName={(c) => c.name}
@@ -96,7 +96,7 @@ export const DeleteTeamCategoryModal = ({ isOpen, onClose, onConfirm, categories
                 <Button
                     buttonStyle="primary"
                     onClick={handleConfirmation}
-                    disabled={(!!selectedCategory && selectedCategory.teamMembersCount > 0) || isSubmitting}
+                    disabled={!selectedCategory?.id || selectedCategory.teamMembersCount > 0 || isSubmitting}
                 >
                     {COMMON_TEXT_ADMIN.BUTTON.DELETE}
                 </Button>

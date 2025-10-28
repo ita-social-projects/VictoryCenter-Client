@@ -5,7 +5,6 @@ import { TeamMemberModal } from '../team-member-modals/team-member-modal/TeamMem
 import { TEAM_CATEGORY_TEXT, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import axios from 'axios';
-import './TeamPageContent.scss';
 import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { VisibilityStatus, ModalMode } from '../../../../../types/admin/common';
@@ -18,6 +17,8 @@ import { ToastType } from '../../../../../types/admin/toast';
 import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
 import { DraggableListItem } from '../../../../../components/admin/draggable-list-item/DraggableListItem';
 import { MemberComponent } from '../member-component/MemberComponent';
+import { TranslateTeamMemberModal } from '../team-member-modals/translate-team-member-modal/TranslateTeamMemberModal';
+import './TeamPageContent.scss';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -432,7 +433,20 @@ export const TeamPageContent = () => {
                 categories={categories}
             />
 
-            <TranslateTeamMemberModal></TranslateTeamMemberModal>
+            <TranslateTeamMemberModal
+                isOpen={!!modalState.memberToTranslate}
+                onClose={closeModalActions.translateMember}
+                onTranslateMember={() => {}}
+                memberToEdit={{
+                    id: 0,
+                    image: null,
+                    fullName: '',
+                    description: '',
+                    status: VisibilityStatus.Draft,
+                    categoryId: 0,
+                    localizations: [],
+                }}
+            />
 
             <TeamMemberModal
                 mode={ModalMode.Edit}

@@ -1,16 +1,16 @@
 import React, { forwardRef, useCallback, useMemo } from 'react';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import { TeamCategory } from '../../../../../types/admin/team-members';
 import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/team-member-schema/team-member-schema';
-import { ImageValues, Image } from '../../../../../types/common/image';
 import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
-import { SingleSelectInput } from '../../../../../components/common/single-select-input/SingleSelectInput';
 import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { ImageInput } from '../../../../../components/admin/image-input/ImageInput';
 import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
-import './MemberForm.scss';
+import { Select } from '../../../../../components/common/select/Select';
+import { Button } from '../../../../../components/admin/button/Button';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { ReactComponent as TranslateIcon } from '../../../../../assets/icons/translate-grey.svg';
+import './TranslateMemberForm.scss';
 
 export interface TranslateTeamMemberFormValues {
     fullName: string;
@@ -51,10 +51,7 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
         const defaultFormState = useMemo<TranslateTeamMemberFormValues>(
             () => ({
                 fullName: '',
-                categoryId: null,
-                imageId: null,
                 description: '',
-                image: null,
             }),
             [],
         );
@@ -110,19 +107,14 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
                 data-testid="test-form"
                 noValidate
             >
-                <div className="form-group">
-                    <InputLabel htmlFor={'category'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.CATEGORY} isRequired />
-                    <SingleSelectInput
-                        disabled={isSubmitting || formDisabled}
-                        onBlur={handleCategoryBlur}
-                        onChange={handleCategoryChange}
-                        value={categories.filter((c) => c.id === formState.categoryId)[0]}
-                        options={categories}
-                        getOptionId={(c: TeamCategory) => c.id}
-                        getOptionName={(c: TeamCategory) => c.name}
-                        placeholder={TEAM_MEMBERS_TEXT.FORM.LABEL.SELECT_CATEGORY}
-                    />
-                    {errors.category && <p className="error">{errors.category}</p>}
+                <div className="functional-group">
+                    <Select<string> className="language-select" value="EN" onValueChange={() => {}}>
+                        <Select.Option value="EN" name="EN"></Select.Option>
+                    </Select>
+                    <Button className="generate-button" buttonStyle="primary" disabled={isSubmitting}>
+                        {COMMON_TEXT_ADMIN.BUTTON.GENERATE_TRANSLATION}
+                        <TranslateIcon className="translate-icon" />
+                    </Button>
                 </div>
 
                 <div className="form-group">

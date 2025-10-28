@@ -5,12 +5,34 @@
     flex-direction: column;
     gap: 7px;
 
-    .form-group {
+    .functional-group {
         position: relative;
         display: flex;
         justify-content: space-around;
         flex-direction: row;
+        gap: 10px;
+        margin: 0.5rem 0;
+    }
+
+    .form-group {
+        position: relative;
+        display: flex;
+        justify-content: space-around;
+        flex-direction: column;
         gap: 6px;
+    }
+
+    .language-select {
+        width: 140px;
+    }
+
+    .generate-button {
+        width: 45%;
+    }
+
+    .translate-icon {
+        width: 1.5rem;
+        height: 1.5rem;
     }
 
     .error {

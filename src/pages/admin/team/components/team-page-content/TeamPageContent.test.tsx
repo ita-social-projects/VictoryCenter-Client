@@ -156,6 +156,7 @@ const mockMembers: TeamMember[] = [
         status: VisibilityStatus.Published,
         categoryId: 1,
         image: null,
+        localizations: [],
     },
     {
         id: 2,
@@ -164,6 +165,7 @@ const mockMembers: TeamMember[] = [
         status: VisibilityStatus.Draft,
         categoryId: 1,
         image: null,
+        localizations: [],
     },
 ];
 
@@ -174,6 +176,7 @@ const mockNewMember: TeamMember = {
     status: VisibilityStatus.Draft,
     categoryId: 1,
     image: null,
+    localizations: [],
 };
 
 describe('TeamPageContent', () => {
@@ -284,6 +287,7 @@ describe('TeamPageContent', () => {
                     status: VisibilityStatus.Published,
                     categoryId: 2,
                     image: null,
+                    localizations: [],
                 },
             ];
             renderTeamPageContent();

@@ -21,6 +21,7 @@ const baseMember = {
     description: 'Frontend Developer',
     status: VisibilityStatus.Published,
     categoryId: 5,
+    localizations: [],
 };
 
 describe('MemberComponent', () => {

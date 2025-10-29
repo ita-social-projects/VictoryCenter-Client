@@ -36,26 +36,41 @@ export const CardsSection = ({
 
     const cardContents = content.filter((item) => item.contentType === ContentType.Card);
 
-    const handleDescriptionBlur = (id: number, value: string) => {
+    const handleDescriptionValidate = (id: number, value: string) => {
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(value);
-        setErrors((prev) => ({
-            ...prev,
-            [id]: {
-                ...prev[id],
-                description: error || undefined,
-            },
-        }));
+
+        setErrors((prev) => {
+            const cardErrors = prev[id] || { image: null, description: null };
+            return {
+                ...prev,
+                [id]: {
+                    ...cardErrors,
+                    description: error || undefined,
+                },
+            };
+        });
+
+        setIsPublishButtonActive(true);
+    };
+
+    const handleDescriptionBlur = (id: number, value: string) => {
+        handleDescriptionValidate(id, value);
         setIsPublishButtonActive(true);
     };
 
     const handleSetImageError = (id: number, value: string | null) => {
-        setErrors((prev) => ({
-            ...prev,
-            [id]: {
-                ...prev[id],
-                image: value,
-            },
-        }));
+        setErrors((prev) => {
+            const cardErrors = prev[id] || { image: null, description: null };
+            return {
+                ...prev,
+                [id]: {
+                    ...cardErrors,
+                    image: value,
+                },
+            };
+        });
+
+        setIsPublishButtonActive(true);
     };
 
     if (cardContents.length === 0) {
@@ -73,6 +88,7 @@ export const CardsSection = ({
                             content={c}
                             onChange={onChange}
                             onDescriptionBlur={(value) => handleDescriptionBlur(c.id, value.target.value)}
+                            onDescriptionValidate={(value) => handleDescriptionValidate(c.id, value.target.value)}
                             descriptionError={errors[c.id]?.description ?? null}
                             imageError={errors[c.id]?.image}
                             setImageError={(value) => handleSetImageError(c.id, value)}

@@ -26,6 +26,7 @@ jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
 describe('CardContent', () => {
     let mockOnChange: jest.Mock;
     let mockOnDescriptionBlur: jest.Mock;
+    let mockOnDescriptionValidate: jest.Mock;
     let mockSetImageError: jest.Mock;
     let mockSetIsPublishButtonActive: jest.Mock;
     const descriptionLimit = 250;
@@ -53,6 +54,7 @@ describe('CardContent', () => {
                 subText: '200x200',
             },
             onDescriptionBlur: mockOnDescriptionBlur,
+            onDescriptionValidate: mockOnDescriptionValidate,
             descriptionError: null,
             imageError: null,
             setImageError: mockSetImageError,
@@ -66,6 +68,7 @@ describe('CardContent', () => {
         mockOnDescriptionBlur = jest.fn();
         mockSetImageError = jest.fn();
         mockSetIsPublishButtonActive = jest.fn();
+        mockOnDescriptionValidate = jest.fn();
     });
 
     it('should render the component with initial values and no errors', () => {

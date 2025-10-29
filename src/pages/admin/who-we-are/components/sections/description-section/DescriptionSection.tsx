@@ -34,6 +34,9 @@ export const DescriptionSection = ({
                 description: e.target.value,
             });
         }
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+        setDescriptionError(error || null);
+
         setIsPublishButtonActive(true);
     };
 

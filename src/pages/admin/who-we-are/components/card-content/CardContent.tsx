@@ -14,11 +14,13 @@ interface CardContentProps {
     rows?: number;
     imageInputProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange' | 'setError'>;
     onDescriptionBlur: (value: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    onDescriptionValidate: (value: React.ChangeEvent<HTMLTextAreaElement>) => void;
     descriptionError: string | null;
     imageError: string | null;
     setImageError: (value: string | null) => void;
     setIsPublishButtonActive: (value: boolean) => void;
 }
+
 export const CardContent = ({
     content,
     onChange,
@@ -26,6 +28,7 @@ export const CardContent = ({
     rows,
     imageInputProps,
     onDescriptionBlur,
+    onDescriptionValidate,
     descriptionError,
     imageError,
     setImageError,
@@ -44,6 +47,7 @@ export const CardContent = ({
             ...content,
             description: e.target.value,
         });
+        onDescriptionValidate(e);
         setIsPublishButtonActive(true);
     };
 

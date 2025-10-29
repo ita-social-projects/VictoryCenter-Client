@@ -65,6 +65,9 @@ export const ImageSection = ({
             title: e.target.value,
         });
         setIsPublishButtonActive(true);
+
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+        setTitleError(error || null);
     };
 
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -74,6 +77,9 @@ export const ImageSection = ({
             description: e.target.value,
         });
         setIsPublishButtonActive(true);
+
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+        setDescriptionError(error || null);
     };
 
     const handleTitleBlur = (e: React.FocusEvent<HTMLInputElement>) => {

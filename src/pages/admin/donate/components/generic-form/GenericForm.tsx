@@ -191,8 +191,22 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 }
 
                 setIsDeleting(true);
+                let deleteTitle;
+
+                if (isChildForm) {
+                    deleteTitle = DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE;
+                } else if (
+                    'correspondentBanks' in formState &&
+                    Array.isArray(formState.correspondentBanks) &&
+                    formState.correspondentBanks.length > 0
+                ) {
+                    deleteTitle = DONATE_TEXT.QUESTION.BANK_DETAILS.FOREIGN.DELETE;
+                } else {
+                    deleteTitle = DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE;
+                }
+
                 setModalConfig({
-                    title: DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE,
+                    title: deleteTitle,
                     onConfirm: async () => {
                         await handleDelete();
                         setIsDeleting(false);
@@ -357,7 +371,11 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                             type="button"
                                             onClick={
                                                 mode === GenericFormMode.Edit
-                                                    ? submit
+                                                    ? () =>
+                                                          setModalConfig({
+                                                              title: DONATE_TEXT.QUESTION.BANK_DETAILS.UPDATE,
+                                                              onConfirm: submit,
+                                                          })
                                                     : () =>
                                                           setModalConfig({
                                                               title: DONATE_TEXT.QUESTION.BANK_DETAILS.ADD,

@@ -73,6 +73,7 @@ export const DONATE_TEXT = {
             ADD: 'Додати нові реквізити?',
             CANCEL_CREATE: 'Відмінити додавання реквізитів?',
             DELETE: 'Видалити реквізити?',
+            UPDATE: 'Опублікувати зміни?',
             FOREIGN: {
                 DELETE: 'Основний та кореспондентські банки буде видалено. Видалити реквізити?',
             },
@@ -80,6 +81,9 @@ export const DONATE_TEXT = {
         SUPPORT_OPTION: {
             ADD: 'Опублікувати новий варіант підтримки?',
             DELETE: 'Видалити варіант підтримки?',
+        },
+        CORRESPONDENT_BANKS: {
+            DELETE: 'Видалити банк-кореспондент?',
         },
     },
     BUTTON: {
@@ -89,6 +93,13 @@ export const DONATE_TEXT = {
     PLACEHOLDER: {
         DEFAULT: 'Введіть назву',
         SUPPORT_OPTION: 'Введіть реквізити',
+    },
+    MESSAGE: {
+        SUPPORT_OPTION_PUBLISHED: 'Варіант підтримки успішно опубліковано',
+        CHANGES_SAVED: 'Зміни успішно опубліковано',
+        CORRESPONDENT_BANKS: {
+            DELETED: 'Банк-кореспондент видалено успішно',
+        },
     },
 };
 

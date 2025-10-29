@@ -12,9 +12,13 @@ import {
     useBankDetails,
     mapCurrencyToBankCurrency,
 } from '../bank-details-currencies/currencies-manager/CurrenciesManager';
+import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '../../../../../types/admin/toast';
+import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
 import './DonatePageContent.scss';
 
 export const DonatePageContent = () => {
+    const { addToast } = useToast();
     const client = useAdminClient();
     const currencyCategories = Object.values(Currencies);
     const [selectedCategory, setSelectedCategory] = useState<Currencies>(Currencies.UAH);
@@ -70,11 +74,13 @@ export const DonatePageContent = () => {
             try {
                 const newOption = await SupportOptionsApi.create(client, { name, value, currency: bankCurrency });
                 setSupportOptions((prev) => [...prev, newOption]);
+
+                addToast(DONATE_TEXT.MESSAGE.SUPPORT_OPTION_PUBLISHED, ToastType.Info);
             } finally {
                 setIsSupportOptionsLoading(false);
             }
         },
-        [client, selectedCategory],
+        [client, selectedCategory, addToast],
     );
 
     const handleUpdateSupportOption = useCallback(
@@ -129,11 +135,12 @@ export const DonatePageContent = () => {
                         item.id === id ? { ...updatedItem, correspondentBanks: item.correspondentBanks || [] } : item,
                     ),
                 );
+                addToast(DONATE_TEXT.MESSAGE.CHANGES_SAVED, ToastType.Info);
             } catch (error) {
                 throw error;
             }
         },
-        [client, config, setItems],
+        [client, config, setItems, addToast],
     );
 
     const handleDeleteBankDetails = useCallback(
@@ -211,11 +218,13 @@ export const DonatePageContent = () => {
                             : item,
                     ),
                 );
+
+                addToast(DONATE_TEXT.MESSAGE.CORRESPONDENT_BANKS.DELETED, ToastType.Info);
             } catch (error) {
                 throw error;
             }
         },
-        [client, setItems],
+        [client, setItems, addToast],
     );
 
     const renderCorrespondentBanks = useCallback(
@@ -286,6 +295,7 @@ export const DonatePageContent = () => {
                     />
                 </div>
             </div>
+            <ToastContainer />
         </div>
     );
 };

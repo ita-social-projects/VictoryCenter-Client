@@ -150,16 +150,17 @@ describe('ImageSection', () => {
         expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
-    it('should call onChange and setIsPublishButtonActive on title change', () => {
-        renderComponent();
-        const titleInput = screen.getByTestId('mock-title-input');
-        const newTitle = 'New Title';
-        fireEvent.change(titleInput, { target: { value: newTitle } });
-        expect(mockOnChange).toHaveBeenCalledWith(
-            expect.objectContaining({ contentType: ContentType.Title, title: newTitle }),
-        );
-        expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
-    });
+    //TODO: uncomment this when title editing is enabled
+    //  it('should call onChange and setIsPublishButtonActive on title change', () => {
+    //      renderComponent();
+    //      const titleInput = screen.getByTestId('mock-title-input');
+    //      const newTitle = 'New Title';
+    //      fireEvent.change(titleInput, { target: { value: newTitle } });
+    //      expect(mockOnChange).toHaveBeenCalledWith(
+    //          expect.objectContaining({ contentType: ContentType.Title, title: newTitle }),
+    //      );
+    //      expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
+    //  });
 
     it('should call onChange and setIsPublishButtonActive on description change', () => {
         renderComponent();

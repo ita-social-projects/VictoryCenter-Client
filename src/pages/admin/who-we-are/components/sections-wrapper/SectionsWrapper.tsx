@@ -37,7 +37,7 @@ export const SectionsWrapper = ({
                 content={section.contents}
                 onPublish={onPublish}
                 onChange={onChange}
-                setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
+                setIsPublishButtonActive={setIsPublishButtonActive}
                 isPublishButtonActive={isPublishButtonActive}
                 {...MainPageProps}
             />
@@ -47,7 +47,7 @@ export const SectionsWrapper = ({
                 content={section.contents}
                 onChange={onChange}
                 onPublish={onPublish}
-                setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
+                setIsPublishButtonActive={setIsPublishButtonActive}
                 isPublishButtonActive={isPublishButtonActive}
                 {...WhatWeDoPageProps}
             />
@@ -57,7 +57,7 @@ export const SectionsWrapper = ({
                 content={section.contents}
                 onPublish={onPublish}
                 onChange={onChange}
-                setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
+                setIsPublishButtonActive={setIsPublishButtonActive}
                 isPublishButtonActive={isPublishButtonActive}
                 {...WhoWeSupportCardsProps}
             />
@@ -67,7 +67,7 @@ export const SectionsWrapper = ({
                 content={section.contents}
                 onPublish={onPublish}
                 onChange={onChange}
-                setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
+                setIsPublishButtonActive={setIsPublishButtonActive}
                 isPublishButtonActive={isPublishButtonActive}
                 {...PeopleCardsProps}
             />
@@ -77,7 +77,7 @@ export const SectionsWrapper = ({
                 content={section.contents}
                 onChange={onChange}
                 onPublish={onPublish}
-                setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
+                setIsPublishButtonActive={setIsPublishButtonActive}
                 isPublishButtonActive={isPublishButtonActive}
                 {...TeamPageProps}
             />

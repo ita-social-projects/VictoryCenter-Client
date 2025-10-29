@@ -87,9 +87,9 @@ export const CardsSection = ({
             <div className="button-section">
                 <Button
                     className="button"
-                    buttonStyle={'primary'}
+                    buttonStyle="primary"
                     onClick={onPublish}
-                    type={'submit'}
+                    type="submit"
                     disabled={
                         Object.values(errors).some((error) => error.image !== null || error.description != null) ||
                         !isPublishButtonActive

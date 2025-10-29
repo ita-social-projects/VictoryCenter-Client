@@ -4,7 +4,7 @@ import { ImageApi } from '../image/image-api';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import { Content, WhoWeAreCategory, WhoWeAreSection } from '../../../../types/admin/who-we-are';
 import { ContentType, SectionType } from '../../../../types/common/about-us';
-import { Image } from '../../../../types/common/image';
+import { ImageValues } from '../../../../types/common/image';
 
 jest.mock('../image/image-api');
 
@@ -18,6 +18,8 @@ describe('WhoWeAreApi', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        (ImageApi.getUpdateImageId as jest.Mock).mockClear();
+        (ImageApi.delete as jest.Mock).mockClear();
     });
 
     describe('getPreviews', () => {
@@ -62,14 +64,6 @@ describe('WhoWeAreApi', () => {
                     image: null,
                     description: null,
                 },
-                {
-                    id: 2,
-                    description: 'Text 2',
-                    contentType: ContentType.Description,
-                    imageId: null,
-                    image: null,
-                    title: null,
-                },
             ];
             const mockResponse: WhoWeAreSection = {
                 id: 1,
@@ -91,29 +85,31 @@ describe('WhoWeAreApi', () => {
         });
 
         it('should update content with a new image and not delete any old images', async () => {
-            const newImageFile = {
-                id: 1,
-                url: 'https://example.com/card/1',
+            const newImageValues: ImageValues = {
+                base64: 'data:image/png;base64,mock-base64-string',
                 mimeType: 'image/png',
-            } as Image;
+            };
             const mockContents: Content[] = [
                 {
                     id: 1,
                     title: 'Text 1',
                     imageId: null,
-                    image: newImageFile,
+                    image: newImageValues,
                     description: null,
                     contentType: ContentType.Description,
                 },
-            ];
-            const updatedContents: Content[] = [
-                { id: 1, title: 'Text 1', imageId: 99, image: null, description: null, contentType: ContentType.Title },
             ];
             const mockResponse: WhoWeAreSection = {
                 id: 1,
                 title: 'Main',
                 sectionType: SectionType.Main,
-                contents: updatedContents,
+                contents: [
+                    {
+                        ...mockContents[0],
+                        imageId: 99,
+                        image: null,
+                    },
+                ],
             };
 
             (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue({
@@ -124,7 +120,7 @@ describe('WhoWeAreApi', () => {
 
             const result = await WhoWeAreApi.updateContent(mockClient, mockContents, mockSectionType);
 
-            expect(ImageApi.getUpdateImageId).toHaveBeenCalledWith(mockClient, newImageFile, null);
+            expect(ImageApi.getUpdateImageId).toHaveBeenCalledWith(mockClient, newImageValues, null);
             expect(ImageApi.delete).not.toHaveBeenCalled();
             expect(mockClient.put).toHaveBeenCalledWith(
                 `${API_ROUTES.WHO_WE_ARE.BASE}/${mockSectionType}`,
@@ -133,41 +129,32 @@ describe('WhoWeAreApi', () => {
             expect(result).toEqual(mockResponse);
         });
 
-        it('should update content with an existing image and delete the old image', async () => {
-            const newImageFile = {
-                id: 1,
-                url: 'https://example.com/card/1',
+        it('should replace an existing image and delete the old one', async () => {
+            const replacingImageValues: ImageValues = {
+                base64: 'data:image/png;base64,new-mock-base64-string',
                 mimeType: 'image/png',
-            } as Image;
+            };
             const mockContents: Content[] = [
                 {
                     id: 1,
                     title: 'Text 1',
                     imageId: 50,
-                    image: {
-                        id: 1,
-                        url: 'https://example.com/card/1',
-                        mimeType: 'image/png',
-                    } as Image,
+                    image: replacingImageValues,
                     description: null,
                     contentType: ContentType.Title,
-                },
-            ];
-            const updatedContents: Content[] = [
-                {
-                    id: 1,
-                    title: 'Text 1',
-                    imageId: 99,
-                    image: newImageFile,
-                    description: null,
-                    contentType: ContentType.Card,
                 },
             ];
             const mockResponse: WhoWeAreSection = {
                 id: 1,
                 title: 'History',
                 sectionType: mockSectionType,
-                contents: updatedContents,
+                contents: [
+                    {
+                        ...mockContents[0],
+                        imageId: 99,
+                        image: null,
+                    },
+                ],
             };
 
             (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue({
@@ -179,11 +166,52 @@ describe('WhoWeAreApi', () => {
 
             const result = await WhoWeAreApi.updateContent(mockClient, mockContents, mockSectionType);
 
-            expect(ImageApi.getUpdateImageId).toHaveBeenCalledWith(mockClient, newImageFile, 50);
+            expect(ImageApi.getUpdateImageId).toHaveBeenCalledWith(mockClient, replacingImageValues, 50);
             expect(ImageApi.delete).toHaveBeenCalledWith(mockClient, 50);
             expect(mockClient.put).toHaveBeenCalledWith(
                 `${API_ROUTES.WHO_WE_ARE.BASE}/${mockSectionType}`,
                 expect.arrayContaining([expect.objectContaining({ imageId: 99 })]),
+            );
+            expect(result).toEqual(mockResponse);
+        });
+
+        it('should delete an image without replacing it', async () => {
+            const mockContents: Content[] = [
+                {
+                    id: 1,
+                    title: 'Text 1',
+                    imageId: 50,
+                    image: null,
+                    description: null,
+                    contentType: ContentType.Title,
+                },
+            ];
+            const mockResponse: WhoWeAreSection = {
+                id: 1,
+                title: 'History',
+                sectionType: mockSectionType,
+                contents: [
+                    {
+                        ...mockContents[0],
+                        imageId: null,
+                    },
+                ],
+            };
+
+            (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue({
+                finalImageId: null,
+                imageIdToDelete: 50,
+            });
+            mockClient.put.mockResolvedValue({ data: mockResponse });
+            (ImageApi.delete as jest.Mock).mockResolvedValue({});
+
+            const result = await WhoWeAreApi.updateContent(mockClient, mockContents, mockSectionType);
+
+            expect(ImageApi.getUpdateImageId).toHaveBeenCalledWith(mockClient, null, 50);
+            expect(ImageApi.delete).toHaveBeenCalledWith(mockClient, 50);
+            expect(mockClient.put).toHaveBeenCalledWith(
+                `${API_ROUTES.WHO_WE_ARE.BASE}/${mockSectionType}`,
+                expect.arrayContaining([expect.objectContaining({ imageId: null })]),
             );
             expect(result).toEqual(mockResponse);
         });

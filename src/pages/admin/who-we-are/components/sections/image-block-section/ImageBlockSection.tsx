@@ -59,25 +59,21 @@ export const ImageSection = ({
     };
 
     const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (titleContent?.id || titleContent) {
-            onChange({
-                ...(titleContent || { contentType: ContentType.Title }),
-                title: e.target.value,
-                id: titleContent?.id,
-            });
-            setIsPublishButtonActive(true);
-        }
+        if (!titleContent) return;
+        onChange({
+            ...titleContent,
+            title: e.target.value,
+        });
+        setIsPublishButtonActive(true);
     };
 
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        if (descriptionContent?.id || descriptionContent) {
-            onChange({
-                ...(descriptionContent || { contentType: ContentType.Description }),
-                description: e.target.value,
-                id: descriptionContent?.id,
-            });
-            setIsPublishButtonActive(true);
-        }
+        if (!descriptionContent) return;
+        onChange({
+            ...descriptionContent,
+            description: e.target.value,
+        });
+        setIsPublishButtonActive(true);
     };
 
     const handleTitleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -158,7 +154,7 @@ export const ImageSection = ({
                     buttonStyle="primary"
                     onClick={onPublish}
                     type="submit"
-                    disabled={!!descriptionError || !!titleError || !isPublishButtonActive}
+                    disabled={!!imageError || !!descriptionError || !!titleError || !isPublishButtonActive}
                 >
                     {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                 </Button>

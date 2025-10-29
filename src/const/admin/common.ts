@@ -52,6 +52,7 @@ export const COMMON_TEXT_ADMIN = {
 
     MESSAGE: {
         SUCCESSFULLY_PUBLISHED: 'успішно опубліковано',
+        FAIL_TO_PUBLISH_CHANGES: 'Не вдалося опублікувати зміни',
     },
 
     BUTTON: {

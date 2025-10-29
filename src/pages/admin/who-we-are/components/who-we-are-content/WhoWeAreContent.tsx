@@ -19,6 +19,10 @@ interface ErrorState {
     type: 'categories' | 'entity' | null;
 }
 
+function isExistingImage(image: any): image is Image {
+    return image !== null && typeof image === 'object' && 'id' in image && 'url' in image;
+}
+
 export const WhoWeAreContent = () => {
     const client = useAdminClient();
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
@@ -113,17 +117,17 @@ export const WhoWeAreContent = () => {
             }
         });
 
-        function isExistingImage(image: any): image is Image {
-            return image !== null && typeof image === 'object' && 'id' in image && 'url' in image;
-        }
-
         if (selectedCategory && changedContents.length > 0) {
-            const result = await WhoWeAreApi.updateContent(client, changedContents, selectedCategory.sectionType);
+            try {
+                const result = await WhoWeAreApi.updateContent(client, changedContents, selectedCategory.sectionType);
 
-            setSelectedSection(result);
-            setUpdatedSection(result);
-            setIsPublishButtonActive(false);
-            addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
+                setSelectedSection(result);
+                setUpdatedSection(result);
+                setIsPublishButtonActive(false);
+                addToast(COMMON_TEXT_ADMIN.MESSAGE.SUCCESSFULLY_PUBLISHED, ToastType.Info);
+            } catch (error) {
+                addToast(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
+            }
         }
     }, [selectedSection, updatedSection, client, selectedCategory, addToast]);
 

@@ -98,7 +98,7 @@ const mockSection2: WhoWeAreSection = {
     title: 'Mission Section',
     sectionType: SectionType.People,
     contents: [
-        { id: 2, contentType: ContentType.Title, title: 'Our Goal', image: null, imageId: null, description: 'null' },
+        { id: 2, contentType: ContentType.Title, title: 'Our Goal', image: null, imageId: null, description: null },
     ],
 };
 

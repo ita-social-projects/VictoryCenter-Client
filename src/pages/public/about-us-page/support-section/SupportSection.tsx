@@ -1,7 +1,7 @@
 import './SupportSection.scss';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import { SupportSectionTablet } from './components/support-section-tablet/SupportSectionTablet';
-import { CustomSwiper } from '../../../../components/public/swiper/CustomSwiper';
+import { Swiper } from '../../../../components/public/swiper/Swiper';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { SupportCard } from './components/support-card/SupportCard';
 
@@ -13,7 +13,7 @@ export const SupportSection = () => {
             {isTablet ? (
                 <SupportSectionTablet />
             ) : (
-                <CustomSwiper
+                <Swiper
                     items={ABOUT_US_DATA.SUPPORT_DATA}
                     slidesPerView={1}
                     breakpoints={{
@@ -26,7 +26,7 @@ export const SupportSection = () => {
                                     <h2 className="support-title">{ABOUT_US_DATA.SUPPORT_TITLE}</h2>
                                 </div>
                             )}
-                            <SupportCard IMG={item.IMG} ALT={item.ALT} DESCRIPTION={item.DESCRIPTION} index={index} />
+                            <SupportCard img={item.IMG} alt={item.ALT} description={item.DESCRIPTION} index={index} />
                         </>
                     )}
                 />

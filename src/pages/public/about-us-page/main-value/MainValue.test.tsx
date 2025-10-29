@@ -1,10 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { MainValues } from './MainValue';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
-import { CustomSwiper } from '../../../../components/public/swiper/CustomSwiper';
+import { Swiper } from '../../../../components/public/swiper/Swiper';
 
-jest.mock('../../../../components/public/swiper/CustomSwiper', () => ({
-    CustomSwiper: ({ items, renderItem }: any) => (
+jest.mock('../../../../components/public/swiper/Swiper', () => ({
+    Swiper: ({ items, renderItem }: any) => (
         <div data-testid="custom-swiper">
             {items.map((item: any, index: number) => (
                 <div key={index} data-testid="swiper-item">
@@ -44,7 +44,7 @@ const MockProgramData = [
 describe('MainValues component', () => {
     it('should render people cards correctly', async () => {
         render(
-            <CustomSwiper
+            <Swiper
                 items={MockProgramData}
                 renderItem={(person, index) => (
                     <div className={`people-card card-${index + 1}`} data-testid="people-card">

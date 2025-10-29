@@ -13,9 +13,7 @@ export const AboutUsIntro = () => {
                     {ABOUT_US_DATA.INTRO_TITLE.MIDDLE_PART}
                     <span className="highlighted">{ABOUT_US_DATA.INTRO_TITLE.SECOND_HIGHLIGHT}</span>
                 </h1>
-                <div className="title-details">
-                    <p>{ABOUT_US_DATA.INTRO_DETAILS}</p>
-                </div>
+                <p className="title-details">{ABOUT_US_DATA.INTRO_DETAILS}</p>
             </div>
         </div>
     );

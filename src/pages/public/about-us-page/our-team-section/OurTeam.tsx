@@ -10,7 +10,7 @@ export const OurTeam = () => {
             <img src={ourTeam} alt="Our Team" className="our-team-image" />
             <div className="team-info">
                 <p className="team-description">{ABOUT_US_DATA.TEAM_DETAILS}</p>
-                <NavLink to={PUBLIC_ROUTES.TEAM.FULL} className="link-ro-team">
+                <NavLink to={PUBLIC_ROUTES.TEAM.FULL} className="link-to-team">
                     {ABOUT_US_DATA.GO_TO_TEAM}
                 </NavLink>
             </div>

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
 import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
 import { ProgramCard } from '../../../../components/public/program-card/ProgramCard';
-import { CustomSwiper } from '../../../../components/public/swiper/CustomSwiper';
+import { Swiper } from '../../../../components/public/swiper/Swiper';
 import { PublishedProgramDto } from '../../../../types/public/programs-page';
 
 export const ScrollableFrame = () => {
@@ -26,13 +26,13 @@ export const ScrollableFrame = () => {
     return (
         <>
             {error ? (
-                <div className="error-message" role="alert" style={{ color: 'red', marginBottom: '1rem' }}>
+                <div className="error-message" role="alert">
                     {error}
                 </div>
             ) : (
                 <>
                     <div className="swiper-block">
-                        <CustomSwiper
+                        <Swiper
                             items={programData}
                             slidesPerView={1}
                             breakpoints={{
@@ -41,7 +41,7 @@ export const ScrollableFrame = () => {
                                 1025: { slidesPerView: 3 },
                             }}
                             renderItem={(program) => <ProgramCard program={program} className="about-us-page-card" />}
-                            showScrollbar={true}
+                            showScrollbar
                         />
                     </div>
                     <div className="scrollbar-block">

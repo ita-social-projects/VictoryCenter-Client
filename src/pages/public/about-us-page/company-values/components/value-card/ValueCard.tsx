@@ -14,7 +14,7 @@ export function ValueCard({ group, groupIndex }: ValueGroupProps) {
             )}
             <div className={`value-card card-${groupIndex + 1}`}>
                 {group.map((val, index) => (
-                    <div className="value-item" key={`${val.NAME}-${index}`}>
+                    <div className="value-item" key={index}>
                         <h3 className="value-name">{val.NAME}</h3>
                         <div className="value-description">{val.DESCRIPTION}</div>
                     </div>

@@ -1,6 +1,6 @@
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import './MainValue.scss';
-import { CustomSwiper } from '../../../../components/public/swiper/CustomSwiper';
+import { Swiper } from '../../../../components/public/swiper/Swiper';
 
 export const MainValues = () => {
     return (
@@ -15,7 +15,7 @@ export const MainValues = () => {
             </div>
 
             <div className="people-block">
-                <CustomSwiper
+                <Swiper
                     items={ABOUT_US_DATA.PEOPLE_DATA}
                     slidesPerView={1}
                     breakpoints={{

@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { CompanyValues } from './CompanyValues';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -8,8 +8,8 @@ jest.mock('@mui/material/useMediaQuery', () => ({
     default: jest.fn(),
 }));
 
-jest.mock('../../../../components/public/swiper/CustomSwiper', () => ({
-    CustomSwiper: ({ items, renderItem }: any) => (
+jest.mock('../../../../components/public/swiper/Swiper', () => ({
+    Swiper: ({ items, renderItem }: any) => (
         <div data-testid="custom-swiper">
             {items.map((group: any, index: number) => (
                 <div key={index} data-testid={`swiper-group-${index}`}>
@@ -29,7 +29,7 @@ describe('CompanyValues', () => {
         jest.clearAllMocks();
     });
 
-    it('renders wrapper and CustomSwiper', () => {
+    it('renders wrapper and Swiper', () => {
         (useMediaQuery as jest.Mock).mockReturnValue(false);
         render(<CompanyValues />);
         expect(screen.getByTestId('custom-swiper')).toBeInTheDocument();

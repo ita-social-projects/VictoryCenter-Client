@@ -20,6 +20,11 @@ interface MainSectionProps {
     setIsPublishButtonActive: (value: boolean) => void;
 }
 
+interface SectionConfig {
+    component: React.ComponentType<any>;
+    additionalProps: Record<string, any>;
+}
+
 export const SectionsWrapper = ({
     section,
     onChange,
@@ -31,58 +36,48 @@ export const SectionsWrapper = ({
         return null;
     }
 
-    const contents: Record<SectionType, React.JSX.Element> = {
-        [SectionType.Main]: (
-            <ImageSection
-                content={section.contents}
-                onPublish={onPublish}
-                onChange={onChange}
-                setIsPublishButtonActive={setIsPublishButtonActive}
-                isPublishButtonActive={isPublishButtonActive}
-                {...MainPageProps}
-            />
-        ),
-        [SectionType.WhatWeDo]: (
-            <DescriptionSection
-                content={section.contents}
-                onChange={onChange}
-                onPublish={onPublish}
-                setIsPublishButtonActive={setIsPublishButtonActive}
-                isPublishButtonActive={isPublishButtonActive}
-                {...WhatWeDoPageProps}
-            />
-        ),
-        [SectionType.WhoWeSupport]: (
-            <CardsSection
-                content={section.contents}
-                onPublish={onPublish}
-                onChange={onChange}
-                setIsPublishButtonActive={setIsPublishButtonActive}
-                isPublishButtonActive={isPublishButtonActive}
-                {...WhoWeSupportCardsProps}
-            />
-        ),
-        [SectionType.People]: (
-            <CardsSection
-                content={section.contents}
-                onPublish={onPublish}
-                onChange={onChange}
-                setIsPublishButtonActive={setIsPublishButtonActive}
-                isPublishButtonActive={isPublishButtonActive}
-                {...PeopleCardsProps}
-            />
-        ),
-        [SectionType.Team]: (
-            <ImageSection
-                content={section.contents}
-                onChange={onChange}
-                onPublish={onPublish}
-                setIsPublishButtonActive={setIsPublishButtonActive}
-                isPublishButtonActive={isPublishButtonActive}
-                {...TeamPageProps}
-            />
-        ),
+    const commonProps = {
+        content: section.contents,
+        onChange,
+        onPublish,
+        setIsPublishButtonActive,
+        isPublishButtonActive,
     };
 
-    return <div className="who-we-are-main-section">{contents[section.sectionType] || null}</div>;
+    const contentConfigs: Record<SectionType, SectionConfig> = {
+        [SectionType.Main]: {
+            component: ImageSection,
+            additionalProps: MainPageProps,
+        },
+        [SectionType.WhatWeDo]: {
+            component: DescriptionSection,
+            additionalProps: WhatWeDoPageProps,
+        },
+        [SectionType.WhoWeSupport]: {
+            component: CardsSection,
+            additionalProps: WhoWeSupportCardsProps,
+        },
+        [SectionType.People]: {
+            component: CardsSection,
+            additionalProps: PeopleCardsProps,
+        },
+        [SectionType.Team]: {
+            component: ImageSection,
+            additionalProps: TeamPageProps,
+        },
+    };
+
+    const config = contentConfigs[section.sectionType];
+
+    if (!config) {
+        return null;
+    }
+
+    const { component: Component, additionalProps } = config;
+
+    return (
+        <div className="who-we-are-main-section">
+            <Component {...commonProps} {...additionalProps} />
+        </div>
+    );
 };

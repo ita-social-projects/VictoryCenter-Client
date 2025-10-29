@@ -3,13 +3,6 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SectionsWrapper } from './SectionsWrapper';
 import { ContentType, SectionType } from '../../../../../types/common/about-us';
-import {
-    MainPageProps,
-    PeopleCardsProps,
-    TeamPageProps,
-    WhatWeDoPageProps,
-    WhoWeSupportCardsProps,
-} from '../sections/SectionsProps';
 import { Content } from '../../../../../types/admin/who-we-are';
 import { Image } from '../../../../../types/common/image';
 
@@ -122,8 +115,7 @@ describe('SectionsWrapper', () => {
             contents: [],
         };
         const { container } = render(<SectionsWrapper {...mockProps} section={section} />);
-        expect(container.firstChild).toHaveClass('who-we-are-main-section');
-        expect(container.firstChild).toBeEmptyDOMElement();
+        expect(container).toBeEmptyDOMElement();
         expect(mockProps.setIsPublishButtonActive).not.toHaveBeenCalled();
     });
 });

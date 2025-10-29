@@ -4,6 +4,14 @@ const getMinSymbolsError = (count: number) => `Введено менше ${count
 const getMaxSymbolsError = (count: number) => `Введено більше ${count} символів`;
 const getRequiredError = (field: string) => `${field} є обов'язковим полем`;
 
+const COMMON_TEXT = {
+    TITLE_IBAN: 'IBAN',
+    TITLE_SWIFT: 'SWIFT',
+    TITLE_EDRPOU: 'ЄДРПОУ',
+    PLACEHOLDER_CODE: 'Введіть код',
+    PLACEHOLDER_BANK_NAME: 'Введіть назву банку',
+};
+
 export const DONATE_TEXT = {
     BANK_DETAILS: {
         NOT_FOUND: 'Ще немає реквізитів',
@@ -12,24 +20,24 @@ export const DONATE_TEXT = {
 
         DEFAULT_PLACEHOLDER: 'Введіть назву',
         NAME: {
-            PLACEHOLDER: 'Введіть назву банку',
+            PLACEHOLDER: COMMON_TEXT.PLACEHOLDER_BANK_NAME,
         },
         RECEIVER: {
             TITLE: 'Одержувач',
         },
         EDRPOU: {
-            TITLE: 'ЄДРПОУ',
-            PLACEHOLDER: 'Введіть код',
+            TITLE: COMMON_TEXT.TITLE_EDRPOU,
+            PLACEHOLDER: COMMON_TEXT.PLACEHOLDER_CODE,
         },
         IBAN: {
-            TITLE: 'IBAN',
+            TITLE: COMMON_TEXT.TITLE_IBAN,
         },
         PAYMENT_PURPOSE: {
             TITLE: 'Призначення платежу',
         },
         SWIFT: {
             TITLE: 'SWIFT-код банку',
-            PLACEHOLDER: 'Введіть код',
+            PLACEHOLDER: COMMON_TEXT.PLACEHOLDER_CODE,
         },
         ADDRESS: {
             TITLE: 'Адреса',
@@ -41,16 +49,16 @@ export const DONATE_TEXT = {
 
         DEFAULT_PLACEHOLDER: 'Введіть номер',
         NAME: {
-            PLACEHOLDER: 'Введіть назву банку',
+            PLACEHOLDER: COMMON_TEXT.PLACEHOLDER_BANK_NAME,
         },
         SWIFT: {
-            TITLE: 'SWIFT',
+            TITLE: COMMON_TEXT.TITLE_SWIFT,
         },
         ACCOUNT: {
             TITLE: 'Account',
         },
         IBAN: {
-            TITLE: 'IBAN',
+            TITLE: COMMON_TEXT.TITLE_IBAN,
         },
     },
     SUPPORT_OPTIONS: {
@@ -60,7 +68,7 @@ export const DONATE_TEXT = {
         ADD_NEW: 'Додати варіант',
     },
     QUESTION: {
-        CANCEL_EDIT: 'Відмінити зміни?',
+        CANCEL_EDIT: 'Зміни будуть втрачені. Бажаєте продовжити?',
         BANK_DETAILS: {
             ADD: 'Додати нові реквізити?',
             CANCEL_CREATE: 'Відмінити додавання реквізитів?',
@@ -70,8 +78,8 @@ export const DONATE_TEXT = {
             },
         },
         SUPPORT_OPTION: {
-            ADD: 'Додати новий варіант підтримки?',
-            DELETE: 'Видалити реквізити?',
+            ADD: 'Опублікувати новий варіант підтримки?',
+            DELETE: 'Видалити варіант підтримки?',
         },
     },
     BUTTON: {
@@ -84,40 +92,46 @@ export const DONATE_TEXT = {
     },
 };
 
+const VALIDATION_PARAMS = {
+    edrpou: { count: 8 },
+    iban: { count: 29, errorLength: 27 },
+    swift: { count: 11 },
+};
+
 export const DONATE_VALIDATION = {
     getDigitsOnlyError: () => `Мають бути цифри`,
     name: {
         getRequiredError: () => getRequiredError('Назва банку'),
     },
     receiver: {
-        getRequiredError: () => getRequiredError('Одержувач'),
+        getRequiredError: () => getRequiredError(DONATE_TEXT.BANK_DETAILS.RECEIVER.TITLE),
     },
     edrpou: {
-        count: 8,
-        getMinError: () => getMinDigitsError(DONATE_VALIDATION.edrpou.count),
-        getMaxError: () => getMaxDigitsError(DONATE_VALIDATION.edrpou.count),
-        getRequiredError: () => getRequiredError('ЄДРПОУ'),
+        count: VALIDATION_PARAMS.edrpou.count,
+        getMinError: () => getMinDigitsError(VALIDATION_PARAMS.edrpou.count),
+        getMaxError: () => getMaxDigitsError(VALIDATION_PARAMS.edrpou.count),
+        getRequiredError: () => getRequiredError(COMMON_TEXT.TITLE_EDRPOU),
     },
     iban: {
-        count: 29,
-        getMinError: () => getMinDigitsError(DONATE_VALIDATION.iban.count - 2),
-        getMaxError: () => getMaxDigitsError(DONATE_VALIDATION.iban.count - 2),
-        getRequiredError: () => getRequiredError('IBAN'),
+        count: VALIDATION_PARAMS.iban.count,
+        getMinError: () => getMinDigitsError(VALIDATION_PARAMS.iban.errorLength),
+        getMaxError: () => getMaxDigitsError(VALIDATION_PARAMS.iban.errorLength),
+        getRequiredError: () => getRequiredError(COMMON_TEXT.TITLE_IBAN),
     },
     paymentPurpose: {
-        getRequiredError: () => getRequiredError('Призначення платежу'),
+        getRequiredError: () => getRequiredError(DONATE_TEXT.BANK_DETAILS.PAYMENT_PURPOSE.TITLE),
     },
     swift: {
-        count: 11,
-        getMinError: () => getMinSymbolsError(DONATE_VALIDATION.swift.count),
-        getMaxError: () => getMaxSymbolsError(DONATE_VALIDATION.swift.count),
-        getRequiredError: () => getRequiredError('SWIFT'),
+        count: VALIDATION_PARAMS.swift.count,
+        getMinError: () => getMinSymbolsError(VALIDATION_PARAMS.swift.count),
+        getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.swift.count),
+        getRequiredError: () => getRequiredError(COMMON_TEXT.TITLE_SWIFT),
     },
     address: {
-        getRequiredError: () => getRequiredError('Адреса'),
+        getRequiredError: () => getRequiredError(DONATE_TEXT.BANK_DETAILS.ADDRESS.TITLE),
     },
     account: {
-        getRequiredError: () => getRequiredError('Account'),
+        getRequiredError: () => getRequiredError(DONATE_TEXT.CORRESPONDENT_BANKS.ACCOUNT.TITLE),
     },
     supportOptions: {
         name: {

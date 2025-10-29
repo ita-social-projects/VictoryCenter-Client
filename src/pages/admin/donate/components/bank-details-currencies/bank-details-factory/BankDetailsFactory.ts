@@ -28,11 +28,26 @@ export interface CorrespondentBankDetails {
     iban?: string;
 }
 
+type Validatable = string | number | boolean | Date | null | undefined;
+
+const toStringSafe = (v: Validatable): string => {
+    if (v === null || v === undefined) return '';
+    if (typeof v === 'string') return v;
+    if (typeof v === 'number' || typeof v === 'boolean') return String(v);
+    if (v instanceof Date) return v.toISOString();
+    return '';
+};
+
+const withNullCheck =
+    (validator: (val: string) => string | undefined) =>
+    (val: unknown): string | undefined =>
+        validator(toStringSafe(val as Validatable));
+
 const baseFields: GenericFormField<BaseBankDetails>[] = [
     {
         name: 'name',
         isTitle: true,
-        validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateName(String(val ?? '')),
+        validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateName),
         isRequired: true,
         placeholder: DONATE_TEXT.BANK_DETAILS.NAME.PLACEHOLDER,
         maxLength: 200,
@@ -40,7 +55,7 @@ const baseFields: GenericFormField<BaseBankDetails>[] = [
     {
         name: 'receiver',
         label: DONATE_TEXT.BANK_DETAILS.RECEIVER.TITLE,
-        validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver(String(val ?? '')),
+        validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver),
         isRequired: true,
         maxLength: 200,
     },
@@ -54,14 +69,14 @@ function createForeignFields(currency: 'USD' | 'EUR'): GenericFormField<ForeignB
             label: `${DONATE_TEXT.BANK_DETAILS.IBAN.TITLE} (${currency})`,
             prefix: 'UA',
             onlyNumbers: true,
-            validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban(String(val ?? '')),
+            validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban),
             isRequired: true,
             maxLength: 29,
         },
         {
             name: 'swift',
             label: DONATE_TEXT.BANK_DETAILS.SWIFT.TITLE,
-            validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift(String(val ?? '')),
+            validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift),
             isRequired: true,
             placeholder: DONATE_TEXT.BANK_DETAILS.SWIFT.PLACEHOLDER,
             maxLength: 20,
@@ -69,7 +84,7 @@ function createForeignFields(currency: 'USD' | 'EUR'): GenericFormField<ForeignB
         {
             name: 'address',
             label: DONATE_TEXT.BANK_DETAILS.ADDRESS.TITLE,
-            validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateAddress(String(val ?? '')),
+            validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateAddress),
             isRequired: true,
             maxLength: 200,
         },
@@ -83,7 +98,7 @@ function createUahFields(): GenericFormField<UahBankDetails>[] {
             name: 'edrpou',
             label: DONATE_TEXT.BANK_DETAILS.EDRPOU.TITLE,
             onlyNumbers: true,
-            validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateEdrpou(String(val ?? '')),
+            validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateEdrpou),
             isRequired: true,
             placeholder: DONATE_TEXT.BANK_DETAILS.EDRPOU.PLACEHOLDER,
             maxLength: 10,
@@ -93,14 +108,14 @@ function createUahFields(): GenericFormField<UahBankDetails>[] {
             label: `${DONATE_TEXT.BANK_DETAILS.IBAN.TITLE} (UAH)`,
             prefix: 'UA',
             onlyNumbers: true,
-            validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban(String(val ?? '')),
+            validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban),
             isRequired: true,
             maxLength: 29,
         },
         {
             name: 'paymentPurpose',
             label: DONATE_TEXT.BANK_DETAILS.PAYMENT_PURPOSE.TITLE,
-            validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validatePaymentPurpose(String(val ?? '')),
+            validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validatePaymentPurpose),
             isRequired: true,
             maxLength: 500,
         },
@@ -121,13 +136,13 @@ const correspondentBanksFields: GenericFormField<CorrespondentBankDetails>[] = [
     {
         name: 'name',
         isTitle: true,
-        validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateName(String(val ?? '')),
+        validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateName),
         isRequired: true,
     },
     {
         name: 'swift',
         label: DONATE_TEXT.CORRESPONDENT_BANKS.SWIFT.TITLE,
-        validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift(String(val ?? '')),
+        validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift),
         isRequired: true,
         placeholder: DONATE_TEXT.CORRESPONDENT_BANKS.DEFAULT_PLACEHOLDER,
         maxLength: 20,
@@ -135,7 +150,7 @@ const correspondentBanksFields: GenericFormField<CorrespondentBankDetails>[] = [
     {
         name: 'account',
         label: DONATE_TEXT.CORRESPONDENT_BANKS.ACCOUNT.TITLE,
-        validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateAccount(String(val ?? '')),
+        validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateAccount),
         isRequired: true,
         placeholder: DONATE_TEXT.CORRESPONDENT_BANKS.DEFAULT_PLACEHOLDER,
         maxLength: 20,
@@ -143,7 +158,7 @@ const correspondentBanksFields: GenericFormField<CorrespondentBankDetails>[] = [
     {
         name: 'iban',
         label: DONATE_TEXT.CORRESPONDENT_BANKS.IBAN.TITLE,
-        validate: (val) => BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban(String(val ?? '')),
+        validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban),
         placeholder: DONATE_TEXT.CORRESPONDENT_BANKS.DEFAULT_PLACEHOLDER,
         maxLength: 29,
     },

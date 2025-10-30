@@ -14,3 +14,6 @@
         background: colors.$blue-50;
     }
 }
+.search-item-wrapper + .search-item-wrapper {
+    border-top: 0.5px solid colors.$grey-900;
+}

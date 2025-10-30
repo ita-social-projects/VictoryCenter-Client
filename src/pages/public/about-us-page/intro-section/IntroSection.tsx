@@ -11,7 +11,6 @@ export interface AboutUsIntroProps {
 export const AboutUsIntro = ({ content }: AboutUsIntroProps) => {
     // TODO: Replace with real title when rich text component is implemented
     // const title = content?.find((x) => x.contentType === ContentType.Title)?.title;
-
     const imageUrl = content?.find((x) => x.contentType === ContentType.Image)?.image?.url ?? background;
     const description = content?.find((x) => x.contentType === ContentType.Description)?.description;
 

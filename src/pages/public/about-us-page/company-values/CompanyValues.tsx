@@ -1,5 +1,5 @@
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import './CompanyValues.scss';
 import { CustomSwiper } from '../../../../components/public/swiper/CustomSwiper';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -13,6 +13,10 @@ export interface ValueItem {
 export const CompanyValues = () => {
     const [chunkedValues, setChunkedValues] = useState<ValueItem[][]>([]);
     const isTablet = useMediaQuery('(min-width:768px) and (max-width:1024px)');
+
+    const { t } = useTranslation('aboutUsPage');
+    const valueItems = useMemo<ValueItem[]>(() => t('VALUE_ITEMS', { returnObjects: true }) as ValueItem[], [t]);
+
     useEffect(() => {
         const chunkValues = (values: ValueItem[]): ValueItem[][] => {
             if (isTablet) {
@@ -31,8 +35,8 @@ export const CompanyValues = () => {
                 }, []);
             }
         };
-        setChunkedValues(chunkValues(ABOUT_US_DATA.VALUE_ITEMS));
-    }, [isTablet]);
+        setChunkedValues(chunkValues(valueItems));
+    }, [isTablet, valueItems]);
 
     return (
         <div className="values-block">

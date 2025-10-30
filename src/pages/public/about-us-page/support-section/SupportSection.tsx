@@ -1,16 +1,17 @@
-import './SupportSection.scss';
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
+import { useTranslation } from 'react-i18next';
 import { SupportSectionTablet } from './components/support-section-tablet/SupportSectionTablet';
 import { CustomSwiper } from '../../../../components/public/swiper/CustomSwiper';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { SupportCard } from './components/support-card/SupportCard';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
+import './SupportSection.scss';
 
 export interface SupportSectionProps {
     content: AboutUsContent[] | null;
 }
 
 export const SupportSection = ({ content }: SupportSectionProps) => {
+    const { t } = useTranslation('aboutUsPage');
     const isTablet = useMediaQuery('(min-width:768px) and (max-width:1024px)');
 
     return (
@@ -29,7 +30,7 @@ export const SupportSection = ({ content }: SupportSectionProps) => {
                             <>
                                 {index === 0 && (
                                     <div className="main-values-title">
-                                        <h2 className="support-title">{ABOUT_US_DATA.SUPPORT_TITLE}</h2>
+                                        <h2 className="support-title">{t('SUPPORT_TITLE')}</h2>
                                     </div>
                                 )}
                                 <SupportCard card={item} index={index} />

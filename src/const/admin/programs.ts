@@ -32,7 +32,7 @@ export const PROGRAMS_TEXT = {
             NAME: 'Назва',
             DESCRIPTION: 'Опис',
             CATEGORY: 'Категорія',
-            SELECT_CATEGORY: 'Виберіть категорію',
+            SELECT_CATEGORY: 'Оберіть категорію',
             PHOTO: 'Фото',
         },
     },

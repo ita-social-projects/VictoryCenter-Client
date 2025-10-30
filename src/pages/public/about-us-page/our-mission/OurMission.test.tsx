@@ -1,19 +1,12 @@
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
+import aboutUsPageUk from '../../../../locales/uk/about-us.json';
 import { OurMission } from './OurMission';
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import { ContentType } from '../../../../types/common/about-us';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
 
 jest.mock('../../../../assets/icons/arrow-up-right.svg', () => ({
     ReactComponent: (props: any) => <svg data-testid="arrow-icon" {...props} />,
-}));
-
-jest.mock('../../../../const/public/about-us-page', () => ({
-    ABOUT_US_DATA: {
-        WHAT_WE_DO: 'What we do title',
-        GO_TO_PROGRAMS: 'Go to programs',
-    },
 }));
 
 jest.mock('../../../../const/public/routes', () => ({
@@ -41,7 +34,7 @@ describe('OurMission component', () => {
                 <OurMission content={Content} />
             </MemoryRouter>,
         );
-        expect(screen.getByText(ABOUT_US_DATA.WHAT_WE_DO)).toBeInTheDocument();
+        expect(screen.getByText(aboutUsPageUk.WHAT_WE_DO)).toBeInTheDocument();
     });
 
     it('should render the mission description from content', () => {
@@ -68,20 +61,23 @@ describe('OurMission component', () => {
                 <OurMission content={Content} />
             </MemoryRouter>,
         );
-        const link = screen.getByRole('link', { name: /go to programs/i });
+        const link = screen.getByRole('link', { name: aboutUsPageUk.GO_TO_PROGRAMS });
         expect(link).toBeInTheDocument();
         expect(link).toHaveAttribute('href', '/programs');
         expect(screen.getByTestId('arrow-icon')).toBeInTheDocument();
     });
 
-    it('should render link without href when navigate is false', () => {
+    it('should render as non-interactive text when navigate is false', () => {
         render(
             <MemoryRouter>
                 <OurMission content={Content} navigate={false} />
             </MemoryRouter>,
         );
-        const link = screen.getByRole('link', { name: /go to programs/i });
-        expect(link).toHaveAttribute('href', '/');
+        const textElement = screen.getByText(aboutUsPageUk.GO_TO_PROGRAMS);
+        expect(textElement).toBeInTheDocument();
+
+        const link = screen.queryByRole('link', { name: aboutUsPageUk.GO_TO_PROGRAMS });
+        expect(link).not.toBeInTheDocument();
     });
 
     it('should apply additional className to root element', () => {

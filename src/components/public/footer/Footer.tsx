@@ -1,37 +1,15 @@
-import './Footer.scss';
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { ReactComponent as ArrowUpIcon } from '../../../assets/icons/arrow-up-right.svg';
 import { ReactComponent as PhoneIcon } from '../../../assets/icons/phone.svg';
 import { ReactComponent as MailIcon } from '../../../assets/icons/mail.svg';
-import {
-    ABOUT_US,
-    HIPPOTHERAPY,
-    MENU,
-    REPORTING,
-    STORE,
-    HOW_TO_SUPPORT,
-    STORIES_OF_VICTORIES,
-    OUR_HISTORY,
-    OUR_TEAM,
-    PARTNERS,
-    EVENTS_AND_NEWS,
-    PROGRAMS,
-    PROGRAMS_SESSIONS,
-    VICTORY_STARTS_WITH_YOU,
-    STAY_UP_TO_DATE_WITH_THE_NEWS,
-    ENTER_YOUR_EMAIL,
-    SIGN_UP,
-    WHAT_IS_HIPPOTHERAPY,
-    EMAIL,
-    PHONE,
-    FACEBOOK,
-    INSTAGRAM,
-    TELEGRAM,
-} from '../../../const/public/footer';
 import { PUBLIC_ROUTES } from '../../../const/public/routes';
+import { useTranslation } from 'react-i18next';
+import './Footer.scss';
 
 export const Footer = () => {
+    const { t } = useTranslation('footer');
+
     const [email, setEmail] = useState('');
 
     const handleClick = () => {
@@ -42,84 +20,84 @@ export const Footer = () => {
         navigator.clipboard.writeText(text);
     };
     const handleFacebookClick = () => {
-        window.open(FACEBOOK, '_blank', 'noopener,noreferrer');
+        window.open(t('FACEBOOK'), '_blank', 'noopener,noreferrer');
     };
 
     const handleTelegramClick = () => {
-        window.open(TELEGRAM, '_blank', 'noopener,noreferrer');
+        window.open(t('TELEGRAM'), '_blank', 'noopener,noreferrer');
     };
 
     const handleInstagramClick = () => {
-        window.open(INSTAGRAM, '_blank', 'noopener,noreferrer');
+        window.open(t('INSTAGRAM'), '_blank', 'noopener,noreferrer');
     };
 
     return (
         <div className="footer-content">
             <div className="main-block">
                 <div className="email-field">
-                    <span className="title">{STAY_UP_TO_DATE_WITH_THE_NEWS}</span>
+                    <span className="title">{t('STAY_UP_TO_DATE_WITH_THE_NEWS')}</span>
                     <div className="input-block">
                         <input
                             type="email"
-                            placeholder={ENTER_YOUR_EMAIL}
+                            placeholder={t('ENTER_YOUR_EMAIL')}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
-                        <button onClick={handleClick} className="subscribe-btn" aria-label={SIGN_UP}>
+                        <button onClick={handleClick} className="subscribe-btn" aria-label={t('SIGN_UP')}>
                             <ArrowUpIcon className="arrow-up-icon" />
                         </button>
                     </div>
                 </div>
 
                 <div className="menu">
-                    <span className="title">{MENU}</span>
+                    <span className="title">{t('MENU')}</span>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {REPORTING}
+                        {t('REPORTING')}
                     </Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {STORE}
+                        {t('STORE')}
                     </Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {HOW_TO_SUPPORT}
+                        {t('HOW_TO_SUPPORT')}
                     </Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {STORIES_OF_VICTORIES}
+                        {t('STORIES_OF_VICTORIES')}
                     </Link>
                 </div>
 
                 <div className="about-us">
-                    <span className="title">{ABOUT_US}</span>
-                    <Link to={PUBLIC_ROUTES.ABOUT_US.FULL}>{ABOUT_US}</Link>
+                    <span className="title">{t('ABOUT_US')}</span>
+                    <Link to={PUBLIC_ROUTES.ABOUT_US.FULL}>{t('ABOUT_US')}</Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {OUR_HISTORY}
+                        {t('OUR_HISTORY')}
                     </Link>
-                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{OUR_TEAM}</Link>
-                    <Link to={PUBLIC_ROUTES.PARTNERS.FULL}>{PARTNERS}</Link>
+                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{t('OUR_TEAM')}</Link>
+                    <Link to={PUBLIC_ROUTES.PARTNERS.FULL}>{t('PARTNERS')}</Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {EVENTS_AND_NEWS}
+                        {t('EVENTS_AND_NEWS')}
                     </Link>
                 </div>
 
                 <div className="hippotherapy">
-                    <span className="title">{HIPPOTHERAPY}</span>
+                    <span className="title">{t('HIPPOTHERAPY')}</span>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {WHAT_IS_HIPPOTHERAPY}
+                        {t('WHAT_IS_HIPPOTHERAPY')}
                     </Link>
-                    <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{PROGRAMS}</Link>
+                    <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{t('PROGRAMS')}</Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {PROGRAMS_SESSIONS}
+                        {t('PROGRAMS_SESSIONS')}
                     </Link>
                 </div>
             </div>
 
             <div className="contact-block">
                 <div className="main-contacts">
-                    <button className="contact-item" onClick={() => copyToClipboard(EMAIL)}>
-                        <MailIcon /> {EMAIL}
+                    <button className="contact-item" onClick={() => copyToClipboard(t('EMAIL'))}>
+                        <MailIcon /> {t('EMAIL')}
                     </button>
-                    <button className="contact-item" onClick={() => copyToClipboard(PHONE)}>
-                        <PhoneIcon /> {PHONE}
+                    <button className="contact-item" onClick={() => copyToClipboard(t('PHONE'))}>
+                        <PhoneIcon /> {t('PHONE')}
                     </button>
                 </div>
                 <div className="social-media">
@@ -136,8 +114,8 @@ export const Footer = () => {
             </div>
             <div className="scrolling-text-wrapper">
                 <p className="scrolling-text">
-                    <span>{VICTORY_STARTS_WITH_YOU} </span>
-                    <span> {VICTORY_STARTS_WITH_YOU}</span>
+                    <span>{t('VICTORY_STARTS_WITH_YOU')} </span>
+                    <span> {t('VICTORY_STARTS_WITH_YOU')}</span>
                 </p>
             </div>
         </div>

@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { CompanyValues } from './CompanyValues';
 import useMediaQuery from '@mui/material/useMediaQuery';
 

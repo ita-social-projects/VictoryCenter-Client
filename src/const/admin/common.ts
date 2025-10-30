@@ -39,7 +39,7 @@ export const COMMON_TEXT_ADMIN = {
         },
         CATEGORY: {
             CATEGORY_LABEL: 'Категорія',
-            SELECT_CATEGORY: 'Виберіть категорію',
+            SELECT_CATEGORY: 'Оберіть категорію',
         },
     },
 

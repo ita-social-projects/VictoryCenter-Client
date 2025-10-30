@@ -43,9 +43,9 @@ const withNullCheck =
     (val: unknown): string | undefined =>
         validator(toStringSafe(val as Validatable));
 
-const baseFields: GenericFormField<BaseBankDetails>[] = [
+const baseFields = [
     {
-        name: 'name',
+        name: 'name' as const,
         isTitle: true,
         validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateName),
         isRequired: true,
@@ -53,7 +53,7 @@ const baseFields: GenericFormField<BaseBankDetails>[] = [
         maxLength: 200,
     },
     {
-        name: 'receiver',
+        name: 'receiver' as const,
         label: DONATE_TEXT.BANK_DETAILS.RECEIVER.TITLE,
         validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver),
         isRequired: true,

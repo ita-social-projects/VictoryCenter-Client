@@ -41,13 +41,15 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
         setName(data?.name ?? '');
         setValue(data?.value ?? '');
         setErrors({});
-    }, [data]);
+        setMode(initialMode ?? (data ? SupportOptionItemMode.View : SupportOptionItemMode.Create));
+    }, [data, initialMode]);
 
+    const isViewMode = mode === SupportOptionItemMode.View;
+    const isCreateMode = mode === SupportOptionItemMode.Create;
+    const editable = !isViewMode;
+    const hasErrors = !!errors.name || !!errors.value;
     const hasEmptyFields = !name.trim() || !value.trim();
-
-    const hasChanges = () => {
-        return name !== (data?.name ?? '') || value !== (data?.value ?? '');
-    };
+    const hasChanges = name !== (data?.name ?? '') || value !== (data?.value ?? '');
 
     const validateField = (field: 'name' | 'value', val: string) => {
         const validator =
@@ -79,7 +81,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
     };
 
     const handleCancel = () => {
-        if (hasChanges()) {
+        if (hasChanges) {
             setModalConfig({
                 title:
                     mode === SupportOptionItemMode.Edit
@@ -96,7 +98,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
         setName(data?.name ?? '');
         setValue(data?.value ?? '');
         setErrors({});
-        if (mode === SupportOptionItemMode.Create) onCancel?.();
+        if (isCreateMode) onCancel?.();
         else setMode(SupportOptionItemMode.View);
     };
 
@@ -122,14 +124,11 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
         }
     };
 
-    const editable = mode !== SupportOptionItemMode.View;
-    const hasErrors = !!errors.name || !!errors.value;
-
     return (
         <div className="support-option">
             <div className={`support-option-header ${editable ? 'editable' : ''}`}>
-                {mode === SupportOptionItemMode.View && <div className="support-option-header-title">{data?.name}</div>}
-                {mode !== SupportOptionItemMode.Create && (
+                {isViewMode && <div className="support-option-header-title">{data?.name}</div>}
+                {!isCreateMode && (
                     <div className="support-option-header-actions">
                         <button
                             aria-label="edit-btn"
@@ -153,7 +152,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
             </div>
 
             <div className="support-option-fields">
-                {mode !== SupportOptionItemMode.View && (
+                {!isViewMode && (
                     <div className="support-option-field">
                         <Input
                             name="name"
@@ -193,7 +192,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                         type="button"
                         onClick={handleSaveClick}
                         buttonStyle="primary"
-                        disabled={isSubmitting || hasEmptyFields || !hasChanges() || hasErrors}
+                        disabled={isSubmitting || hasEmptyFields || !hasChanges || hasErrors}
                     >
                         {DONATE_TEXT.BUTTON.PUBLISH}
                     </Button>

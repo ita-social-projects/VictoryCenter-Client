@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { DonateSection } from './DonateSection';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 import aboutUsPageUk from '../../../../locales/uk/about-us.json';
 
 describe('DonateSection', () => {

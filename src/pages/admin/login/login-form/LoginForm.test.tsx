@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import * as AdminContext from '../../../../contexts/admin/admin-context-provider/AdminContextProvider';
 import { LoginForm } from './LoginForm';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 import { LOGIN_CONST } from '../../../../const/admin/login';
 
 jest.mock('../../../../assets/icons/logo-with-text.svg', () => ({

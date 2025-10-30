@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router';
+import { NavLink } from 'react-router-dom';
 import { ReactComponent as ArrowIcon } from '../../../../assets/icons/arrow-up-right.svg';
 import { PUBLIC_ROUTES } from '../../../../const/public/routes';
 import { ScrollableFrame } from './scrollable-frame/ScrollableFrame';

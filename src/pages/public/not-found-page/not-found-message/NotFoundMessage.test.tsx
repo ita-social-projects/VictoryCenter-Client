@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
 import { NotFoundMessage } from './NotFoundMessage';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 
 describe('NotFoundMessage', () => {
     it('renders the component', () => {

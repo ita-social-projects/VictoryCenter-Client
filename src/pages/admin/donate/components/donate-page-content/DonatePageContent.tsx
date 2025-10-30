@@ -131,7 +131,15 @@ export const DonatePageContent = () => {
                 const updatedItem = await config.update(client, id, data);
 
                 setItems((prev: (UahBankDetailsType | ForeignBankDetailsType)[]) =>
-                    prev.map((item) => (item.id === id ? updatedItem : item)),
+                    prev.map((item) => {
+                        if (item.id === id) {
+                            return {
+                                ...updatedItem,
+                                correspondentBanks: 'correspondentBanks' in item ? item.correspondentBanks : [],
+                            };
+                        }
+                        return item;
+                    }),
                 );
                 addToast(DONATE_TEXT.MESSAGE.CHANGES_SAVED, ToastType.Info);
             } catch (error) {

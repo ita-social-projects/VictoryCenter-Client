@@ -1,5 +1,5 @@
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import './CompanyValues.scss';
 import { Swiper } from '../../../../components/public/swiper/Swiper';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -9,6 +9,7 @@ export interface ValueItem {
     NAME: string;
     DESCRIPTION: string;
 }
+
 const chunk = <T,>(arr: T[], size: number): T[][] => {
     const result: T[][] = [];
     for (let i = 0; i < arr.length; i += size) {
@@ -48,7 +49,7 @@ export const CompanyValues = () => {
                     768: { slidesPerView: 2 },
                     1025: { slidesPerView: 3 },
                 }}
-                renderItem={(group, groupIndex) => <ValueCard group={group} groupIndex={groupIndex} />}
+                renderItem={(group, groupIndex) => <ValueCard key={groupIndex} group={group} groupIndex={groupIndex} />}
             />
         </div>
     );

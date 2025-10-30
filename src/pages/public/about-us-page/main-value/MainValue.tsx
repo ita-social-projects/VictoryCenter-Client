@@ -7,9 +7,9 @@ export const MainValues = () => {
         <div className="main-values-block">
             <div className="main-values-title">
                 <h2>
-                    {ABOUT_US_DATA.MAIN_VALUE.FIRST_PART} <br />
-                    <span>{ABOUT_US_DATA.MAIN_VALUE.FIRST_HIGHLIGHT}</span> <br />
-                    {ABOUT_US_DATA.MAIN_VALUE.MIDDLE_PART} <br />
+                    {ABOUT_US_DATA.MAIN_VALUE.FIRST_PART}
+                    <span>{ABOUT_US_DATA.MAIN_VALUE.FIRST_HIGHLIGHT}</span>
+                    {ABOUT_US_DATA.MAIN_VALUE.MIDDLE_PART}
                     <span>{ABOUT_US_DATA.MAIN_VALUE.SECOND_HIGHLIGHT}</span>
                 </h2>
             </div>

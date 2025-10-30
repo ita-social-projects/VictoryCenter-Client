@@ -157,7 +157,7 @@
                     gap: 0.5rem;
 
                     img {
-                        height: 27rem;
+                        height: 26.875rem;
                     }
 
                     &.card-1 {
@@ -165,7 +165,11 @@
                     }
 
                     &.card-2 {
-                        margin-top: 5.625rem;
+                        margin-top: 23.3125rem;
+                    }
+
+                    &.card-3 {
+                        margin-top: 8.0625rem;
                     }
 
                     .support-description {
@@ -174,10 +178,6 @@
                         line-height: 1.75rem;
                     }
                 }
-            }
-
-            .right {
-                margin-top: 17.5rem;
             }
         }
 

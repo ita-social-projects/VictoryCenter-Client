@@ -4,7 +4,7 @@ import './IntroSection.scss';
 
 export const AboutUsIntro = () => {
     return (
-        <div className="about-us-block">
+        <section className="about-us-block">
             <img src={background} className="background-img" alt="Men and Horse" />
             <img src={background} className="color-overlay" alt="Men and Horse" />
             <div className="about-us-info">
@@ -15,6 +15,6 @@ export const AboutUsIntro = () => {
                 </h1>
                 <p className="title-details">{ABOUT_US_DATA.INTRO_DETAILS}</p>
             </div>
-        </div>
+        </section>
     );
 };

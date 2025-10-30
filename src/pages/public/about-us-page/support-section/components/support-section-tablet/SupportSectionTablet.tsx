@@ -21,25 +21,13 @@ export const SupportSectionTablet = () => {
 
             <div className="support-columns">
                 <div className="support-col left">
-                    {leftColumn.map(({ IMG, ALT, DESCRIPTION }, originalIndex) => (
-                        <SupportCard
-                            key={originalIndex}
-                            img={IMG}
-                            alt={ALT}
-                            description={DESCRIPTION}
-                            index={originalIndex}
-                        />
+                    {leftColumn.map(({ IMG, ALT, DESCRIPTION, originalIndex }) => (
+                        <SupportCard key={IMG} img={IMG} alt={ALT} description={DESCRIPTION} index={originalIndex} />
                     ))}
                 </div>
                 <div className="support-col right">
-                    {rightColumn.map(({ IMG, ALT, DESCRIPTION }, originalIndex) => (
-                        <SupportCard
-                            key={originalIndex}
-                            img={IMG}
-                            alt={ALT}
-                            description={DESCRIPTION}
-                            index={originalIndex}
-                        />
+                    {rightColumn.map(({ IMG, ALT, DESCRIPTION, originalIndex }) => (
+                        <SupportCard key={IMG} img={IMG} alt={ALT} description={DESCRIPTION} index={originalIndex} />
                     ))}
                 </div>
             </div>

@@ -21,7 +21,7 @@ export const ForeignBankDetailsApi = {
     update: async (
         client: AxiosInstance,
         id: number,
-        bankDetails: Omit<ForeignBankDetailsType, 'id'>,
+        bankDetails: Partial<ForeignBankDetailsType>,
     ): Promise<ForeignBankDetailsType> => {
         const response = await client.put<ForeignBankDetailsType>(
             `${API_ROUTES.DONATE.BANK_DETAILS_FOREIGN}/${id}`,

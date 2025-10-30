@@ -1,10 +1,6 @@
 import { DONATE_VALIDATION } from '../../../const/admin/donate';
 import * as Yup from 'yup';
 
-export interface BankDetailsValidationContext {
-    isPublishing: boolean;
-}
-
 export const BankDetailsValidationSchema = Yup.object({
     name: Yup.string().trim().required(DONATE_VALIDATION.name.getRequiredError()),
     receiver: Yup.string().trim().required(DONATE_VALIDATION.receiver.getRequiredError()),
@@ -14,7 +10,8 @@ export const BankDetailsValidationSchema = Yup.object({
         .max(DONATE_VALIDATION.edrpou.count, DONATE_VALIDATION.edrpou.getMaxError())
         .required(DONATE_VALIDATION.edrpou.getRequiredError()),
     iban: Yup.string()
-        .matches(/UA/, DONATE_VALIDATION.iban.getRequiredError())
+        .trim()
+        .required(DONATE_VALIDATION.iban.getRequiredError())
         .matches(/^UA\d+$/, DONATE_VALIDATION.getDigitsOnlyError())
         .min(DONATE_VALIDATION.iban.count, DONATE_VALIDATION.iban.getMinError())
         .max(DONATE_VALIDATION.iban.count, DONATE_VALIDATION.iban.getMaxError()),
@@ -29,99 +26,36 @@ export const BankDetailsValidationSchema = Yup.object({
 });
 
 export const SupportOptionsValidationSchema = Yup.object({
-    name: Yup.string().trim().required(DONATE_VALIDATION.getDigitsOnlyError()),
-    value: Yup.string().trim().required(DONATE_VALIDATION.getDigitsOnlyError()),
+    name: Yup.string().trim().required(DONATE_VALIDATION.supportOptions.name.getRequiredError()),
+    value: Yup.string().trim().required(DONATE_VALIDATION.supportOptions.value.getRequiredError()),
 });
 
+function createValidator<T extends Yup.AnyObjectSchema>(schema: T, field: keyof T['fields']) {
+    return (value: string): string | undefined => {
+        try {
+            schema.validateSyncAt(field as string, { [field]: value });
+            return undefined;
+        } catch (error: unknown) {
+            if (error instanceof Yup.ValidationError) {
+                return error.message;
+            }
+            return 'An unexpected validation error occurred.';
+        }
+    };
+}
+
 export const BANK_DETAILS_VALIDATION_FUNCTIONS = {
-    validateName: (value: string): string | undefined => {
-        try {
-            BankDetailsValidationSchema.validateSyncAt('name', { name: value });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
-
-    validateReceiver: (value: string): string | undefined => {
-        try {
-            BankDetailsValidationSchema.validateSyncAt('receiver', { receiver: value });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
-
-    validateEdrpou: (value: string): string | undefined => {
-        try {
-            BankDetailsValidationSchema.validateSyncAt('edrpou', { edrpou: value });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
-
-    validateIban: (value: string): string | undefined => {
-        try {
-            BankDetailsValidationSchema.validateSyncAt('iban', { iban: value });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
-
-    validatePaymentPurpose: (value: string): string | undefined => {
-        try {
-            BankDetailsValidationSchema.validateSyncAt('paymentPurpose', { paymentPurpose: value });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
-
-    validateSwift: (value: string): string | undefined => {
-        try {
-            BankDetailsValidationSchema.validateSyncAt('swift', { swift: value });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
-
-    validateAddress: (value: string): string | undefined => {
-        try {
-            BankDetailsValidationSchema.validateSyncAt('address', { address: value });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
-
-    validateAccount: (value: string): string | undefined => {
-        try {
-            BankDetailsValidationSchema.validateSyncAt('account', { account: value });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
+    validateName: createValidator(BankDetailsValidationSchema, 'name'),
+    validateReceiver: createValidator(BankDetailsValidationSchema, 'receiver'),
+    validateEdrpou: createValidator(BankDetailsValidationSchema, 'edrpou'),
+    validateIban: createValidator(BankDetailsValidationSchema, 'iban'),
+    validatePaymentPurpose: createValidator(BankDetailsValidationSchema, 'paymentPurpose'),
+    validateSwift: createValidator(BankDetailsValidationSchema, 'swift'),
+    validateAddress: createValidator(BankDetailsValidationSchema, 'address'),
+    validateAccount: createValidator(BankDetailsValidationSchema, 'account'),
 };
 
 export const SUPPORT_OPTIONS_VALIDATION_FUNCTIONS = {
-    validateName: (value: string): string | undefined => {
-        try {
-            SupportOptionsValidationSchema.validateSyncAt('name', { name: value });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
-    validateValue: (value: string): string | undefined => {
-        try {
-            SupportOptionsValidationSchema.validateSyncAt('value', { value: value });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
+    validateName: createValidator(SupportOptionsValidationSchema, 'name'),
+    validateValue: createValidator(SupportOptionsValidationSchema, 'value'),
 };

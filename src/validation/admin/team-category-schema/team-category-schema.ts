@@ -4,13 +4,13 @@ import * as Yup from 'yup';
 export const TeamCategoryValidationSchema = Yup.object({
     name: Yup.string()
         .trim()
-        .required(TEAM_CATEGORY_VALIDATION.name.getRequiredError)
+        .required(TEAM_CATEGORY_VALIDATION.name.getRequiredError())
         .min(TEAM_CATEGORY_VALIDATION.name.min, TEAM_CATEGORY_VALIDATION.name.getMinError())
         .max(TEAM_CATEGORY_VALIDATION.name.max, TEAM_CATEGORY_VALIDATION.name.getMaxError()),
 
     description: Yup.string()
         .trim()
-        .required(TEAM_CATEGORY_VALIDATION.description.getRequiredError)
+        .required(TEAM_CATEGORY_VALIDATION.description.getRequiredError())
         .min(TEAM_CATEGORY_VALIDATION.description.min, TEAM_CATEGORY_VALIDATION.description.getMinError())
         .max(TEAM_CATEGORY_VALIDATION.description.max, TEAM_CATEGORY_VALIDATION.description.getMaxError()),
 });

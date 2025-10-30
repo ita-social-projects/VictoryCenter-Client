@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { SupportOptionsApi } from '../../../../../services/api/admin/donate/support-options/support-options-api';
 import { CorrespondentBankDetailsApi } from '../../../../../services/api/admin/donate/correspondent-banks/correspondent-banks-api';
-import { SupportOptionsType } from '../../../../../types/admin/donate';
+import { ForeignBankDetailsType, SupportOptionsType, UahBankDetailsType } from '../../../../../types/admin/donate';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
 import { GenericDetails } from '../generic-details/GenericDetails';
@@ -111,12 +111,12 @@ export const DonatePageContent = () => {
 
     // Bank Details handlers
     const handleCreateBankDetails = useCallback(
-        async (data: any) => {
+        async (data: Omit<UahBankDetailsType | ForeignBankDetailsType, 'correspondentBanks'>) => {
             if (!config) return;
             try {
-                const { correspondentBanks: _, ...bankData } = data;
-                const newItem = await config.create(client, bankData);
-                setItems((prev: any) => [...prev, { ...newItem, correspondentBanks: [] }]);
+                const newItem = await config.create(client, data);
+
+                setItems((prev: (UahBankDetailsType | ForeignBankDetailsType)[]) => [...prev, newItem]);
             } catch (error) {
                 throw error;
             }
@@ -125,15 +125,13 @@ export const DonatePageContent = () => {
     );
 
     const handleUpdateBankDetails = useCallback(
-        async (id: number, data: any) => {
+        async (id: number, data: UahBankDetailsType | ForeignBankDetailsType) => {
             if (!config) return;
             try {
-                const { correspondentBanks: _, ...bankData } = data;
-                const updatedItem = await config.update(client, id, bankData);
-                setItems((prev: any) =>
-                    prev.map((item: any) =>
-                        item.id === id ? { ...updatedItem, correspondentBanks: item.correspondentBanks || [] } : item,
-                    ),
+                const updatedItem = await config.update(client, id, data);
+
+                setItems((prev: (UahBankDetailsType | ForeignBankDetailsType)[]) =>
+                    prev.map((item) => (item.id === id ? updatedItem : item)),
                 );
                 addToast(DONATE_TEXT.MESSAGE.CHANGES_SAVED, ToastType.Info);
             } catch (error) {

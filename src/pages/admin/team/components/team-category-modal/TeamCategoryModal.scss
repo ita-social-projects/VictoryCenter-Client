@@ -4,7 +4,7 @@
     &-modal-form {
         display: flex;
         flex-direction: column;
-        gap: 7px;
+        gap: 0.375rem;
     }
 
     &-modal-error-container {
@@ -12,7 +12,7 @@
         text-align: center;
         line-height: 20px;
         width: 100%;
-        margin: 8px;
+        margin: 0.5rem;
         color: colors.$error;
     }
 

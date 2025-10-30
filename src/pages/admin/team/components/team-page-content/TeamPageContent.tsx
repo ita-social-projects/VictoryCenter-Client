@@ -20,6 +20,7 @@ import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
 import { TeamPageModals } from '../team-page-modals/TeamPageModals';
 import { useTeamMemberSearch } from '../../../../../hooks/admin/team/useTeamMemberSearch';
+import { updateCategoryMemberCounts } from '../../../../../utils/functions/update-category-member-counts/update-category-member-counts';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -376,14 +377,7 @@ export const TeamPageContent = () => {
             if (updatedMember.categoryId !== selectedCategory!.id) {
                 setMembers((prev) => prev.filter((m) => m.id !== updatedMember.id));
                 setCategories((prevCategories) =>
-                    prevCategories.map((category) => {
-                        if (category.id === selectedCategory!.id) {
-                            return { ...category, teamMembersCount: category.teamMembersCount - 1 };
-                        } else if (category.id === updatedMember.categoryId) {
-                            return { ...category, teamMembersCount: category.teamMembersCount + 1 };
-                        }
-                        return category;
-                    }),
+                    updateCategoryMemberCounts(prevCategories, selectedCategory!.id, updatedMember),
                 );
             }
 

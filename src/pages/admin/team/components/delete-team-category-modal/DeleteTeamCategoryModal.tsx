@@ -76,7 +76,7 @@ export const DeleteTeamCategoryModal = ({ isOpen, onClose, onConfirm, categories
                         options={categories}
                         getOptionId={(c) => c.id}
                         getOptionName={(c) => c.name}
-                        placeholder=""
+                        placeholder={''}
                         onChange={handleCategoryChange}
                         disabled={isSubmitting}
                         value={selectedCategory}

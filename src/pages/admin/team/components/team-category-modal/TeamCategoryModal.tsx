@@ -156,7 +156,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                 setIsSubmitting(false);
             }
         },
-        [formState, isSubmitting, isDuplicateName, mode, props, onClose, client],
+        [formState, isSubmitting, isDuplicateName, selectedCategory, mode, props, onClose, client],
     );
 
     const handleSubmitClick = useCallback(() => {
@@ -175,7 +175,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
         } else {
             onSubmit();
         }
-    }, [onSubmit, formState, isSubmitting, isDuplicateName, mode]);
+    }, [onSubmit, formState, isSubmitting, isDuplicateName, selectedCategory, mode]);
 
     const handleConfirmClose = useCallback(() => {
         setShowCloseConfirmModal(false);
@@ -315,6 +315,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                             id={getFieldId('description')}
                             maxLength={TEAM_CATEGORY_VALIDATION.description.max}
                             disabled={isSubmitting}
+                            rows={5}
                         />
 
                         {isDuplicateName && <HintBox title={TEAM_CATEGORY_VALIDATION.name.getDuplicateNameError()} />}

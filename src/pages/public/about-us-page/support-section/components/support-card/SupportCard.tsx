@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import { ABOUT_US_DATA } from '../../../../../../const/public/about-us-page';
+import { aboutUsPageUk } from '../../../../../../locales/uk';
 import { AboutUsContent } from '../../../../../../types/public/about-us-page';
 
 interface SupportCardProps {
@@ -7,8 +9,11 @@ interface SupportCardProps {
 }
 
 export function SupportCard({ card, index = 0 }: SupportCardProps) {
+    const { t } = useTranslation('aboutUsPage');
+    const supportData = t('SUPPORT_DATA', { returnObjects: true });
+
     const imageUrl = card.image?.url ?? ABOUT_US_DATA.SUPPORT_DATA[index].IMG;
-    const altText = ABOUT_US_DATA.SUPPORT_DATA[index].ALT;
+    const altText = supportData[index].ALT;
     const description = card.description;
 
     return (

@@ -3,6 +3,7 @@ import { SupportSectionTablet } from './SupportSectionTablet';
 import { AboutUsContent } from '../../../../../../types/public/about-us-page';
 import { ContentType } from '../../../../../../types/common/about-us';
 import { ABOUT_US_DATA } from '../../../../../../const/public/about-us-page';
+import { aboutUsPageUk } from '../../../../../../locales/uk';
 
 jest.mock('../../../../../../const/public/about-us-page', () => ({
     ABOUT_US_DATA: {
@@ -54,13 +55,13 @@ describe('SupportSectionTablet component', () => {
 
     it('should render main support title', () => {
         render(<SupportSectionTablet content={content} />);
-        expect(screen.getByText(ABOUT_US_DATA.SUPPORT_TITLE)).toBeInTheDocument();
+        expect(screen.getByText(aboutUsPageUk.SUPPORT_TITLE)).toBeInTheDocument();
     });
 
     it('renders all images with correct alt and src attributes', () => {
         render(<SupportSectionTablet content={content} />);
 
-        ABOUT_US_DATA.SUPPORT_DATA.forEach((data, index) => {
+        aboutUsPageUk.SUPPORT_DATA.forEach((data, index) => {
             const image = screen.getByAltText(data.ALT);
             expect(image).toHaveAttribute('src', content[index].image?.url);
         });
@@ -70,9 +71,9 @@ describe('SupportSectionTablet component', () => {
         const contentWithoutImages = content.map((item) => ({ ...item, image: null }));
         render(<SupportSectionTablet content={contentWithoutImages} />);
 
-        ABOUT_US_DATA.SUPPORT_DATA.forEach((data) => {
+        aboutUsPageUk.SUPPORT_DATA.forEach((data, index) => {
             const image = screen.getByAltText(data.ALT);
-            expect(image).toHaveAttribute('src', data.IMG);
+            expect(image).toHaveAttribute('src', ABOUT_US_DATA.SUPPORT_DATA[index].IMG);
         });
     });
 

@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { ScrollableFrame } from './ScrollableFrame';
 import * as dataFetch from '../../../../services/api/public/programs/programs-api';
-import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
+import { aboutUsPageUk, programsPageUk } from '../../../../locales/uk';
 
 jest.mock('../../../../components/public/program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: { program: any }) => (
@@ -35,7 +35,7 @@ describe('ScrollableFrame', () => {
         render(<ScrollableFrame />);
 
         await waitFor(() => {
-            expect(screen.getByRole('alert')).toHaveTextContent(FAILED_TO_LOAD_THE_PROGRAMS);
+            expect(screen.getByRole('alert')).toHaveTextContent(programsPageUk.FAILED_TO_LOAD_THE_PROGRAMS);
         });
 
         expect(screen.queryAllByTestId('program-card').length).toBe(0);

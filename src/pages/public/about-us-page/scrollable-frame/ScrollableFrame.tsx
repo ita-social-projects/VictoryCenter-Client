@@ -1,27 +1,32 @@
 import './ScrollableFrame.scss';
-import { useState, useEffect } from 'react';
-import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
+import { useState, useEffect, useCallback } from 'react';
 import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
 import { ProgramCard } from '../../../../components/public/program-card/ProgramCard';
 import { CustomSwiper } from '../../../../components/public/swiper/CustomSwiper';
 import { PublishedProgramDto } from '../../../../types/public/programs-page';
+import { useTranslation } from 'react-i18next';
 
 export const ScrollableFrame = () => {
     const [programData, setProgramData] = useState<PublishedProgramDto[]>([]);
     const [error, setError] = useState<string | null>(null);
 
+    const { t } = useTranslation('programsPage');
+
+    // will fetch program data in a selected language later
+    const fetchProgramData = useCallback(async () => {
+        try {
+            const response = await programPageDataFetch();
+            setProgramData(response.programsData);
+            setError(null);
+        } catch {
+            setError(t('FAILED_TO_LOAD_THE_PROGRAMS'));
+            setProgramData([]);
+        }
+    }, [t]);
+
     useEffect(() => {
-        (async () => {
-            try {
-                const response = await programPageDataFetch();
-                setProgramData(response.programsData);
-                setError(null);
-            } catch {
-                setError(FAILED_TO_LOAD_THE_PROGRAMS);
-                setProgramData([]);
-            }
-        })();
-    }, []);
+        fetchProgramData();
+    }, [fetchProgramData]);
 
     return (
         <>

@@ -1,4 +1,4 @@
-import { ABOUT_US_DATA } from '../../../../../../const/public/about-us-page';
+import { useTranslation } from 'react-i18next';
 import { AboutUsContent } from '../../../../../../types/public/about-us-page';
 import { SupportCard } from '../support-card/SupportCard';
 
@@ -7,6 +7,8 @@ export interface SupportSectionTabletProps {
 }
 
 export const SupportSectionTablet = ({ content }: SupportSectionTabletProps) => {
+    const { t } = useTranslation('aboutUsPage');
+
     if (!content) return null;
 
     const leftColumn = content.filter((_, i) => i % 2 === 0);
@@ -15,7 +17,7 @@ export const SupportSectionTablet = ({ content }: SupportSectionTabletProps) => 
     return (
         <>
             <div className="main-values-title">
-                <h2 className="support-title">{ABOUT_US_DATA.SUPPORT_TITLE}</h2>
+                <h2 className="support-title">{t('SUPPORT_TITLE')}</h2>
             </div>
 
             <div className="support-columns">

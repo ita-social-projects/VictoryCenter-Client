@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { SupportCard } from './SupportCard';
 import { ContentType } from '../../../../../../types/common/about-us';
 import { AboutUsContent } from '../../../../../../types/public/about-us-page';
-import { ABOUT_US_DATA } from '../../../../../../const/public/about-us-page';
+import { aboutUsPageUk } from '../../../../../../locales/uk';
 
 describe('SupportCard component', () => {
     const card: AboutUsContent = {
@@ -22,7 +22,7 @@ describe('SupportCard component', () => {
         const image = screen.getByRole('img');
         expect(image).toBeInTheDocument();
         expect(image).toHaveAttribute('src', card.image!.url);
-        expect(image).toHaveAttribute('alt', ABOUT_US_DATA.SUPPORT_DATA[0].ALT);
+        expect(image).toHaveAttribute('alt', aboutUsPageUk.SUPPORT_DATA[0].ALT);
     });
 
     test('renders description text', () => {

@@ -3,6 +3,7 @@ import { SupportSection } from './SupportSection';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import { ContentType } from '../../../../types/common/about-us';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
+import aboutUsPageUk from '../../../../locales/uk/about-us.json';
 
 describe('SupportSection component', () => {
     const Content: AboutUsContent[] = [
@@ -43,7 +44,7 @@ describe('SupportSection component', () => {
 
     it('renders section title', () => {
         render(<SupportSection content={Content} />);
-        expect(screen.getByText(ABOUT_US_DATA.SUPPORT_TITLE)).toBeInTheDocument();
+        expect(screen.getByText(aboutUsPageUk.SUPPORT_TITLE)).toBeInTheDocument();
     });
 
     it('renders all default images', () => {
@@ -54,7 +55,7 @@ describe('SupportSection component', () => {
 
         const cards = screen.getAllByTestId('swiper-slide');
         for (let i = 0; i < cards.length; i++) {
-            const image = screen.getByAltText(`${ABOUT_US_DATA.SUPPORT_DATA[i].ALT}`);
+            const image = screen.getByAltText(`${aboutUsPageUk.SUPPORT_DATA[i].ALT}`);
 
             expect(image).toHaveAttribute('src', ABOUT_US_DATA.SUPPORT_DATA[i].IMG);
         }
@@ -65,7 +66,7 @@ describe('SupportSection component', () => {
 
         const cards = screen.getAllByTestId('swiper-slide');
         for (let i = 0; i < cards.length; i++) {
-            const image = screen.getByAltText(`${ABOUT_US_DATA.SUPPORT_DATA[i].ALT}`);
+            const image = screen.getByAltText(`${aboutUsPageUk.SUPPORT_DATA[i].ALT}`);
             const description = screen.getByText(`${Content[i].description}`);
 
             expect(image).toHaveAttribute('src', Content[i].image?.url);

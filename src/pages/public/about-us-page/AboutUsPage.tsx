@@ -13,6 +13,7 @@ import { LinearProgress } from '@mui/material';
 import { ABOUT_US_DATA } from '../../../const/public/about-us-page';
 import './AboutUsPage.scss';
 import { useDataFetch } from '../../../hooks/common/use-data-fetch/useDataFetch';
+import { useTranslation } from 'react-i18next';
 
 const getContentBySection = (sections: AboutUsSection[] | null, sectionType: SectionType): AboutUsContent[] | null => {
     if (!sections) return null;
@@ -24,6 +25,8 @@ const getContentBySection = (sections: AboutUsSection[] | null, sectionType: Sec
 };
 
 export const AboutUsPage = () => {
+    const { t } = useTranslation('aboutUsPage');
+
     const {
         data: sections,
         isLoading,
@@ -31,6 +34,7 @@ export const AboutUsPage = () => {
     } = useDataFetch<AboutUsSection[] | null>({
         initialData: null,
         fetchHandler: AboutUsApi.get,
+        autoFetchDependencies: [t],
     });
 
     if (isLoading) {
@@ -44,7 +48,7 @@ export const AboutUsPage = () => {
     if (error) {
         return (
             <div className="about-us-error-message" role="alert">
-                {ABOUT_US_DATA.DOWNLOAD_ERROR}
+                {t('DOWNLOAD_ERROR')}
             </div>
         );
     }

@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import { ABOUT_US_DATA } from '../../../../../../const/public/about-us-page';
-import { aboutUsPageUk } from '../../../../../../locales/uk';
 import { AboutUsContent } from '../../../../../../types/public/about-us-page';
 
 interface SupportCardProps {

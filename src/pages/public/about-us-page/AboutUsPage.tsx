@@ -10,7 +10,6 @@ import { AboutUsApi } from '../../../services/api/public/about-us/about-us-api';
 import { AboutUsSection, AboutUsContent } from '../../../types/public/about-us-page';
 import { SectionType } from '../../../types/common/about-us';
 import { LinearProgress } from '@mui/material';
-import { ABOUT_US_DATA } from '../../../const/public/about-us-page';
 import './AboutUsPage.scss';
 import { useDataFetch } from '../../../hooks/common/use-data-fetch/useDataFetch';
 import { useTranslation } from 'react-i18next';

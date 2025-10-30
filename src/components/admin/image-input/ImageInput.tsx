@@ -54,7 +54,7 @@ export const ImageInput = ({
         async (file: File) => {
             if (!file.type.startsWith('image/')) return;
             setError(null);
-            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file, width, height);
+            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file);
 
             if (error) {
                 setError(error);

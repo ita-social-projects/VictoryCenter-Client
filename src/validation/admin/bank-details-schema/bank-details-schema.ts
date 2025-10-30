@@ -12,7 +12,6 @@ export const BankDetailsValidationSchema = Yup.object({
     iban: Yup.string()
         .trim()
         .required(DONATE_VALIDATION.iban.getRequiredError())
-        .matches(/^UA\d+$/, DONATE_VALIDATION.getDigitsOnlyError())
         .min(DONATE_VALIDATION.iban.count, DONATE_VALIDATION.iban.getMinError())
         .max(DONATE_VALIDATION.iban.count, DONATE_VALIDATION.iban.getMaxError()),
     paymentPurpose: Yup.string().trim().required(DONATE_VALIDATION.paymentPurpose.getRequiredError()),

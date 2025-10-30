@@ -53,16 +53,6 @@ describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
             expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban('UA123456789012345678901234567')).toBeUndefined();
         });
 
-        it('return error if no prefix is present', () => {
-            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban('123456')).toBe(
-                DONATE_VALIDATION.iban.getRequiredError(),
-            );
-        });
-
-        it('return error if no digits is present', () => {
-            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban('UA')).toBe(DONATE_VALIDATION.getDigitsOnlyError());
-        });
-
         it('return error if value is too short', () => {
             expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban('UA12')).toBe(DONATE_VALIDATION.iban.getMinError());
         });

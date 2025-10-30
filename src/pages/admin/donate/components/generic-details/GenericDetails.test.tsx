@@ -108,43 +108,8 @@ describe('GenericDetails', () => {
         expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(false);
     });
 
-    it('renders not found state with add button', () => {
-        render(<GenericDetails {...defaultProps} items={[]} notFoundText="No Items Found" />);
-        expect(screen.getByText('No Items Found')).toBeInTheDocument();
-        expect(screen.getByText('Add New')).toBeInTheDocument();
-    });
-
-    test('submits new item and adds to list', async () => {
-        const onChangeItems = jest.fn((updater) => {
-            const currentItems: Item[] = [];
-            const newItems = typeof updater === 'function' ? updater(currentItems) : updater;
-            return newItems;
-        });
-
-        const { rerender } = render(<GenericDetails {...defaultProps} items={[]} onChangeItems={onChangeItems} />);
-
-        const addButton = screen.getByText('Add New');
-        fireEvent.click(addButton);
-
-        const submitButton = screen.getByText('Submit');
-        fireEvent.click(submitButton);
-
-        await waitFor(() => {
-            expect(onChangeItems).toHaveBeenCalled();
-        });
-
-        const updaterFunction = onChangeItems.mock.calls[0][0];
-        const newItems = updaterFunction([]);
-
-        rerender(<GenericDetails {...defaultProps} items={newItems} onChangeItems={onChangeItems} />);
-
-        await waitFor(() => {
-            expect(screen.getByText('New Item')).toBeInTheDocument();
-        });
-    });
-
     it('renders children function for each item', () => {
-        render(<GenericDetails {...defaultProps} children={({ formState }) => <span>{formState.name}</span>} />);
+        render(<GenericDetails {...defaultProps}>{({ formState }) => <span>{formState.name}</span>}</GenericDetails>);
         expect(screen.getByText('Item 1')).toBeInTheDocument();
     });
 

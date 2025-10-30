@@ -76,19 +76,42 @@ describe('ForeignBankDetailsApi', () => {
 
     describe('update', () => {
         const testCases = [
-            { id: 5, updates: { name: 'Updated Bank', address: 'Updated Address' } },
-            { id: 1, updates: { receiver: 'Updated Receiver Only' } },
-            { id: 9999, updates: { name: 'Large ID Bank' } },
+            {
+                id: 5,
+                updates: createMockBankDetails({
+                    name: 'Updated Bank',
+                    address: 'Updated Address',
+                    currency: BankCurrency.Usd,
+                }),
+            },
+            {
+                id: 1,
+                updates: createMockBankDetails({
+                    receiver: 'Updated Receiver Only',
+                    currency: BankCurrency.Eur,
+                }),
+            },
+            {
+                id: 9999,
+                updates: createMockBankDetails({
+                    name: 'Large ID Bank',
+                    currency: BankCurrency.Usd,
+                }),
+            },
         ];
 
         testCases.forEach(({ id, updates }) => {
             it(`updates bank with id ${id}`, async () => {
-                const mockResponse = { data: createMockBankDetails({ id, ...updates }) };
+                const { id: _, ...updatesWithoutId } = updates;
+                const mockResponse = { data: createMockBankDetails({ id, ...updatesWithoutId }) };
                 mockClient.put.mockResolvedValue(mockResponse);
 
-                const result = await ForeignBankDetailsApi.update(mockClient, id, updates);
+                const result = await ForeignBankDetailsApi.update(mockClient, id, updatesWithoutId);
 
-                expect(mockClient.put).toHaveBeenCalledWith(`${API_ROUTES.DONATE.BANK_DETAILS_FOREIGN}/${id}`, updates);
+                expect(mockClient.put).toHaveBeenCalledWith(
+                    `${API_ROUTES.DONATE.BANK_DETAILS_FOREIGN}/${id}`,
+                    updatesWithoutId,
+                );
                 expect(result.id).toBe(id);
             });
         });

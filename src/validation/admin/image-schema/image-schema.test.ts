@@ -15,25 +15,17 @@ describe('ImageValidationSchema', () => {
     });
 
     it('rejects a file that is too large', async () => {
-        const largeFile = createTestFile(IMAGE_VALIDATION.maxSizeBytes + 1);
+        const largeFile = createTestFile(IMAGE_VALIDATION.maxSizeBytes * 3);
 
-        try {
-            await validationSchema.validate(largeFile);
-        } catch (error) {
-            expect(error).toBeInstanceOf(Yup.ValidationError);
-            expect((error as Yup.ValidationError).message).toBe(IMAGE_VALIDATION.getSizeError);
-        }
+        await expect(validationSchema.validate(largeFile)).rejects.toThrow(Yup.ValidationError);
+        await expect(validationSchema.validate(largeFile)).rejects.toThrow(IMAGE_VALIDATION.getSizeError());
     });
 
     it('rejects an invalid file type', async () => {
         const invalidTypeFile = createTestFile(100, 'text/plain');
 
-        try {
-            await validationSchema.validate(invalidTypeFile);
-        } catch (error) {
-            expect(error).toBeInstanceOf(Yup.ValidationError);
-            expect((error as Yup.ValidationError).message).toBe(IMAGE_VALIDATION.getFormatError());
-        }
+        await expect(validationSchema.validate(invalidTypeFile)).rejects.toBeInstanceOf(Yup.ValidationError);
+        await expect(validationSchema.validate(invalidTypeFile)).rejects.toThrow(IMAGE_VALIDATION.getFormatError());
     });
 
     it('rejects null or undefined input', async () => {

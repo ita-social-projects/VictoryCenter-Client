@@ -44,6 +44,7 @@ describe('WhoWeAreApi', () => {
             };
             mockClient.get.mockResolvedValue({ data: mockData });
 
+            // eslint-disable-next-line testing-library/no-await-sync-query
             const result = await WhoWeAreApi.getByType(mockClient, SectionType.Main);
 
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.WHO_WE_ARE.BASE}/${SectionType.Main}`);

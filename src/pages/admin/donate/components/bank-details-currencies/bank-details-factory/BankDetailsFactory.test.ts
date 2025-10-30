@@ -26,11 +26,6 @@ describe('BankDetailsFactory', () => {
         return el;
     };
 
-    const expectValidatorCalledWithEmpty = (name: string, validator: jest.Mock) => {
-        fireEvent.blur(getTextareaByName(name));
-        expect(validator).toHaveBeenCalledWith('');
-    };
-
     const testFieldValidation = (fieldName: string, validator: jest.Mock, value: string) => {
         const input = getTextareaByName(fieldName);
         fireEvent.change(input, { target: { value } });
@@ -150,44 +145,5 @@ describe('BankDetailsFactory', () => {
     it('returns undefined for no type presented', () => {
         // @ts-expect-error
         expect(createBankDetailsForm()).toBeUndefined();
-    });
-
-    it('calls validators with empty string when value is undefined (UAH)', () => {
-        const Form = createBankDetailsForm('UAH') as any;
-
-        render(
-            React.createElement(Form, {
-                initialMode: 'create',
-                onSubmit: jest.fn(),
-                onClose: jest.fn(),
-            }),
-        );
-
-        expectValidatorCalledWithEmpty('name', BANK_DETAILS_VALIDATION_FUNCTIONS.validateName as any);
-        expectValidatorCalledWithEmpty('receiver', BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver as any);
-        expectValidatorCalledWithEmpty('edrpou', BANK_DETAILS_VALIDATION_FUNCTIONS.validateEdrpou as any);
-        expectValidatorCalledWithEmpty('iban', BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban as any);
-        expectValidatorCalledWithEmpty(
-            'paymentPurpose',
-            BANK_DETAILS_VALIDATION_FUNCTIONS.validatePaymentPurpose as any,
-        );
-    });
-
-    it('calls validators with empty string when value is undefined (USD)', () => {
-        const Form = createBankDetailsForm('USD') as any;
-
-        render(
-            React.createElement(Form, {
-                initialMode: 'create',
-                onSubmit: jest.fn(),
-                onClose: jest.fn(),
-            }),
-        );
-
-        expectValidatorCalledWithEmpty('name', BANK_DETAILS_VALIDATION_FUNCTIONS.validateName as any);
-        expectValidatorCalledWithEmpty('receiver', BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver as any);
-        expectValidatorCalledWithEmpty('iban', BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban as any);
-        expectValidatorCalledWithEmpty('swift', BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift as any);
-        expectValidatorCalledWithEmpty('address', BANK_DETAILS_VALIDATION_FUNCTIONS.validateAddress as any);
     });
 });

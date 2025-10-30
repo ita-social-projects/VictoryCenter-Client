@@ -70,6 +70,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
             const [formState, setFormState] = useState<FormState>(initialData ?? ({} as FormState));
             const [initialFormState, setInitialFormState] = useState<FormState>(initialData ?? ({} as FormState));
             const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
+            const [touchedFields, setTouchedFields] = useState<Set<keyof T>>(new Set());
             const [isSubmitting, setIsSubmitting] = useState(false);
             const [mode, setMode] = useState<GenericFormMode>(initialMode);
             const [isExpanded, setIsExpanded] = useState(mode !== GenericFormMode.View);
@@ -85,6 +86,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 setFormState(newState);
                 setInitialFormState(newState);
                 setErrors({});
+                setTouchedFields(new Set());
             }, [initialData]);
 
             const isChanged = useCallback(
@@ -125,12 +127,21 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 isValid,
             }));
 
-            const handleBlur = (field: keyof T) => () => {
-                const validator = fields.find((f) => f.name === field)?.validate;
-                if (validator) {
-                    setErrors((prev) => ({ ...prev, [field]: validator(formState[field]) }));
-                }
-            };
+            const handleValueChange = useCallback(
+                (field: keyof T, value: string) => {
+                    setFormState((prev) => ({ ...prev, [field]: value as any }));
+
+                    setTouchedFields((prev) => new Set(prev).add(field));
+
+                    const validator = fields.find((f) => f.name === field)?.validate;
+                    if (validator) {
+                        const error = validator(value as any);
+                        setErrors((prev) => ({ ...prev, [field]: error }));
+                    }
+                },
+                // eslint-disable-next-line react-hooks/exhaustive-deps
+                [fields],
+            );
 
             const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
                 e.preventDefault();
@@ -157,12 +168,14 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                         onConfirm: () => {
                             setFormState(initialFormState);
                             setErrors({});
+                            setTouchedFields(new Set());
                             setMode(GenericFormMode.View);
                         },
                     });
                 } else {
                     setFormState(initialFormState);
                     setErrors({});
+                    setTouchedFields(new Set());
                     setMode(GenericFormMode.View);
                 }
             };
@@ -332,13 +345,14 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                     value={String(formState[f.name] ?? '')}
                                                     editable={editable}
                                                     onValueChange={(cleanValue) =>
-                                                        setFormState((prev) => ({ ...prev, [f.name]: cleanValue }))
+                                                        handleValueChange(f.name, cleanValue)
                                                     }
-                                                    handleBlur={handleBlur(f.name)}
                                                     onlyNumbers={f.onlyNumbers}
                                                     maxLength={f.maxLength}
                                                 />
-                                                {errors[f.name] && <span className="error">{errors[f.name]}</span>}
+                                                {touchedFields.has(f.name) && errors[f.name] && (
+                                                    <span className="error">{errors[f.name]}</span>
+                                                )}
                                             </div>
 
                                             {isChildForm && isTitleField && mode === GenericFormMode.Edit && (

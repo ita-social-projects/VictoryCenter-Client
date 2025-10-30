@@ -1,16 +1,17 @@
 import React, { forwardRef, useCallback, useMemo } from 'react';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { TeamCategory } from '../../../../../types/admin/team-members';
-import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/team-member-schema/team-member-schema';
-import { ImageValues, Image } from '../../../../../types/common/image';
-import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
-import { SingleSelectInput } from '../../../../../components/common/single-select-input/SingleSelectInput';
-import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { ImageInput } from '../../../../../components/admin/image-input/ImageInput';
+import { VisibilityStatus } from '../../../../../../types/admin/common';
+import { TeamCategory } from '../../../../../../types/admin/team-members';
+import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/team-member-schema/team-member-schema';
+import { ImageValues, Image } from '../../../../../../types/common/image';
+import { InputLabel } from '../../../../../../components/admin/input-label/InputLabel';
+import { SingleSelectInput } from '../../../../../../components/common/single-select-input/SingleSelectInput';
+import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
+import { InputWithCharacterLimit } from '../../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
+import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { ImageInput } from '../../../../../../components/admin/image-input/ImageInput';
+import { useFormManager } from '../../../../../../hooks/admin/use-form-manager/useFormManager';
 import './MemberForm.scss';
-import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
+
 export interface TeamMemberFormValues {
     categoryId: number | null;
     fullName: string;

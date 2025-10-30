@@ -6,7 +6,7 @@ import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
 import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
-import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
+import { GenericModalWrapper } from '../../../../../../components/admin/modal-wrappers/generic-modal-wrapper/GenericModalWrapper';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 interface BaseProps {

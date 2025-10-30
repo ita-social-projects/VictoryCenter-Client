@@ -1,12 +1,12 @@
-import { VisibilityStatus } from '../../../types/admin/common';
+import { VisibilityStatus } from '../../../../types/admin/common';
 import React from 'react';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
-import { Modal } from '../../common/modal/Modal';
-import { Button } from '../button/Button';
+import { COMMON_TEXT_ADMIN } from '../../../../const/admin/common';
+import { Modal } from '../../../common/modal/Modal';
+import { Button } from '../../button/Button';
 import './LocalizationModalWrapper.scss';
+import { ConfirmationModals, ConfirmationModalsProps } from '../confirmation-modals/ConfirmationModals';
 
-interface GenericModalWrapperProps<TFormValues, TFormRef> {
+interface GenericModalWrapperProps<TFormValues, TFormRef> extends ConfirmationModalsProps {
     isOpen: boolean;
     title: string;
     formRef: React.RefObject<TFormRef>;
@@ -14,17 +14,9 @@ interface GenericModalWrapperProps<TFormValues, TFormRef> {
     initialData: TFormValues | null;
     isSubmitting: boolean;
     error: string;
-    showFormConfirmModal: boolean;
-    showCloseConfirmModal: boolean;
-    formConfirmTitle: string;
-    onClose: () => void;
     onFormValidationChange: (isValid: boolean) => void;
     onFormSubmit: (data: TFormValues, status: VisibilityStatus) => void;
     onPublishSubmit: () => void;
-    onConfirmAction: () => void;
-    onCancelConfirmation: () => void;
-    onConfirmClose: () => void;
-    onCancelClose: () => void;
     renderForm: (props: {
         ref: React.RefObject<TFormRef>;
         key: string | number;
@@ -56,11 +48,6 @@ export const LocalizationModalWrapper = <TFormValues, TFormRef>({
     onCancelClose,
     renderForm,
 }: GenericModalWrapperProps<TFormValues, TFormRef>) => {
-    const handleCancel = () => {
-        onCancelConfirmation();
-        onClose();
-    };
-
     return (
         <>
             <Modal isOpen={isOpen} onClose={onClose}>
@@ -88,26 +75,16 @@ export const LocalizationModalWrapper = <TFormValues, TFormRef>({
                 </Modal.Actions>
             </Modal>
 
-            <ConfirmationModal
-                isOpen={showFormConfirmModal}
-                isButtonsDisabled={isSubmitting}
-                title={formConfirmTitle}
-                onConfirm={onConfirmAction}
-                onCancel={handleCancel}
+            <ConfirmationModals
+                showFormConfirmModal={showFormConfirmModal}
+                showCloseConfirmModal={showCloseConfirmModal}
+                formConfirmTitle={formConfirmTitle}
+                isSubmitting={isSubmitting}
+                onConfirmClose={onConfirmClose}
+                onCancelClose={onCancelClose}
+                onCancelConfirmation={onCancelConfirmation}
+                onConfirmAction={onConfirmAction}
                 onClose={onClose}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
-            />
-
-            <ConfirmationModal
-                isOpen={showCloseConfirmModal}
-                isButtonsDisabled={false}
-                title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
-                onConfirm={onConfirmClose}
-                onCancel={onCancelClose}
-                onClose={onClose}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
         </>
     );

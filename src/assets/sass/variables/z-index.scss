@@ -32,9 +32,9 @@ $admin-layout: (
 );
 
 @function public($key) {
-  @return map-get($public-layout, $key);
+    @return map-get($public-layout, $key);
 }
 
 @function admin($key) {
-  @return map-get($admin-layout, $key);
+    @return map-get($admin-layout, $key);
 }

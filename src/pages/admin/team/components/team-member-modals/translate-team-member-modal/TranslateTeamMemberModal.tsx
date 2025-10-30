@@ -5,7 +5,7 @@ import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/u
 import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
 import { TranslateMemberForm, TranslateTeamMemberFormRef } from '../../translate-member-form/TranslateMemberForm';
 import { ModalMode } from '../../../../../../types/admin/common';
-import { LocalizationModalWrapper } from '../../../../../../components/admin/localization-modal-wrapper/LocalizationModalWrapper';
+import { LocalizationModalWrapper } from '../../../../../../components/admin/modal-wrappers/localization-modal-wrapper/LocalizationModalWrapper';
 
 interface TranslateTeamMemberModalProps {
     isOpen: boolean;

@@ -1,14 +1,14 @@
 import React, { forwardRef, useCallback, useMemo } from 'react';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/team-member-schema/team-member-schema';
-import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
-import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
-import { Select } from '../../../../../components/common/select/Select';
-import { Button } from '../../../../../components/admin/button/Button';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { VisibilityStatus } from '../../../../../../types/admin/common';
+import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/team-member-schema/team-member-schema';
+import { InputLabel } from '../../../../../../components/admin/input-label/InputLabel';
+import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
+import { InputWithCharacterLimit } from '../../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
+import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { useFormManager } from '../../../../../../hooks/admin/use-form-manager/useFormManager';
+import { Select } from '../../../../../../components/common/select/Select';
+import { Button } from '../../../../../../components/admin/button/Button';
+import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { ReactComponent as TranslateIcon } from '../../../../../assets/icons/translate-grey.svg';
 import './TranslateMemberForm.scss';
 

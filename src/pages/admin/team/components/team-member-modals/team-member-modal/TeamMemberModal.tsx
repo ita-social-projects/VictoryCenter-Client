@@ -5,7 +5,7 @@ import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { TeamCategory, TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { TeamMembersApi } from '../../../../../../services/api/admin/team/team-members/team-members-api';
-import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
+import { GenericModalWrapper } from '../../../../../../components/admin/modal-wrappers/generic-modal-wrapper/GenericModalWrapper';
 import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
 import { VisibilityStatus, PendingAction, ModalMode } from '../../../../../../types/admin/common';
 

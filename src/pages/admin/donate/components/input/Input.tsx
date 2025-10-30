@@ -98,7 +98,7 @@ export const Input = ({
             {label && (
                 <div className={isTitle ? 'input-title-label' : 'input-label'}>
                     {isRequired && editable && <span className="input-required">*</span>}
-                    {!isTitle && label}
+                    {label}
                 </div>
             )}
 

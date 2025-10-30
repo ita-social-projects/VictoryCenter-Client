@@ -282,12 +282,12 @@ describe('GenericForm', () => {
         const deleteBtn = screen.getByRole('button', { name: 'delete-btn' });
         fireEvent.click(deleteBtn);
 
-        expect(screen.getByText(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE)).toBeInTheDocument();
+        expect(screen.getByText(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE)).toBeInTheDocument();
 
         const cancelBtn = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.NO);
         fireEvent.click(cancelBtn);
 
-        expect(screen.queryByText(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE)).not.toBeInTheDocument();
+        expect(screen.queryByText(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE)).not.toBeInTheDocument();
     });
 
     it('returns null when isOpen is false', () => {

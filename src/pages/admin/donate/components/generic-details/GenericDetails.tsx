@@ -5,7 +5,6 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './GenericDetails.scss';
 import { FieldValues } from 'react-hook-form';
 import { GenericFormMode, GenericFormProps, GenericFormRef } from '../generic-form/GenericForm';
-import { DONATE_TEXT } from '../../../../../const/admin/donate';
 import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
 
 export interface GenericDetailsProps<T extends FieldValues> {
@@ -19,7 +18,6 @@ export interface GenericDetailsProps<T extends FieldValues> {
     initialIsItemsExpanded?: boolean;
     notFoundText?: string;
     addNewText: string;
-    createEmptyItem: (data: any) => T;
     isChildForm?: boolean;
     children?: (form: { formState: T; isItemsExpanded: boolean }) => React.ReactNode;
     onChangeItems?: React.Dispatch<React.SetStateAction<T[]>>;
@@ -28,7 +26,7 @@ export interface GenericDetailsProps<T extends FieldValues> {
     onDelete?: (id: number) => Promise<void>;
 }
 
-export function GenericDetails<T extends { id?: number } & FieldValues>({
+export function GenericDetails<T extends { id: number } & FieldValues>({
     title,
     items,
     isLoading,
@@ -37,7 +35,6 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
     initialIsItemsExpanded = true,
     notFoundText,
     addNewText,
-    createEmptyItem,
     isChildForm = false,
     children,
     onChangeItems,
@@ -50,17 +47,10 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
     const [isItemsExpanded, setIsItemsExpanded] = useState(initialIsItemsExpanded);
 
     const updateItems = useCallback(
-        (newItems: T[]) => {
-            onChangeItems?.(newItems);
+        (updater: React.SetStateAction<T[]>) => {
+            onChangeItems?.(updater);
         },
         [onChangeItems],
-    );
-
-    const handleDelete = useCallback(
-        (id?: number) => {
-            updateItems(items.filter((i) => i.id !== id));
-        },
-        [items, updateItems],
     );
 
     const handleAdd = () => {
@@ -77,42 +67,38 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
                 await onSubmit(data);
                 setIsAddFormVisible(false);
             } else if (isChildForm) {
-                updateItems([...items, data]);
+                onChangeItems?.((prevItems) => [...prevItems, data]);
                 setIsAddFormVisible(false);
             } else {
-                const newItem = createEmptyItem({
-                    ...data,
-                    id: data.id || Date.now(),
-                    correspondentBanks: data.correspondentBanks || [],
-                } as any);
+                const newItemWithId = { ...data, id: data.id || Date.now() };
 
-                updateItems([...items, newItem]);
+                onChangeItems?.((prevItems) => [...prevItems, newItemWithId]);
                 setIsAddFormVisible(false);
             }
         },
-        [onSubmit, createEmptyItem, items, isChildForm, updateItems],
+        [onSubmit, isChildForm, onChangeItems],
     );
 
     const handleItemUpdate = useCallback(
         async (item: T, updated: T) => {
-            if (onUpdate && item.id) {
+            if (onUpdate) {
                 await onUpdate(item.id, updated);
             } else {
-                updateItems(items.map((i) => (i.id === item.id ? { ...i, ...updated } : i)));
+                updateItems((prevItems) => prevItems.map((i) => (i.id === item.id ? { ...i, ...updated } : i)));
             }
         },
-        [onUpdate, items, updateItems],
+        [onUpdate, updateItems],
     );
 
     const handleItemDelete = useCallback(
-        async (id?: number) => {
+        async (id: number) => {
             if (onDelete && id) {
                 await onDelete(id);
             } else {
-                handleDelete(id);
+                updateItems((prevItems) => prevItems.filter((i) => i.id !== id));
             }
         },
-        [onDelete, handleDelete],
+        [onDelete, updateItems],
     );
 
     const showNotFound = !isLoading && !isAddFormVisible && items.length === 0;
@@ -161,7 +147,6 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
                             {items.map((item) => (
                                 <div className="generic-details-item" key={item.id}>
                                     <FormComponent
-                                        ref={addformRef}
                                         initialData={item}
                                         initialMode={GenericFormMode.View}
                                         onSubmit={(updated) => handleItemUpdate(item, updated)}
@@ -193,11 +178,7 @@ export function GenericDetails<T extends { id?: number } & FieldValues>({
                             onClick={handleAdd}
                             buttonStyle="primary"
                         >
-                            <>
-                                {isChildForm
-                                    ? DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW
-                                    : DONATE_TEXT.BANK_DETAILS.ADD_NEW}
-                            </>
+                            <div>{addNewText}</div>
                             <div className="plus-icon"></div>
                         </Button>
                     )}

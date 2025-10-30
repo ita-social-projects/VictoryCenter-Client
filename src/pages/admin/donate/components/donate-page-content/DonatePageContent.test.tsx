@@ -8,6 +8,7 @@ const mockCreate = jest.fn();
 const mockUpdate = jest.fn();
 const mockDelete = jest.fn();
 const mockSetItems = jest.fn();
+const mockAddToast = jest.fn();
 
 const mockBankCurrency = {
     Uah: 0,
@@ -17,6 +18,16 @@ const mockBankCurrency = {
 
 jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => mockUseAdminClient(),
+}));
+
+jest.mock('../../../../../contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({
+        addToast: mockAddToast,
+    }),
+}));
+
+jest.mock('../../../../../components/admin/toast/toast-container/ToastContainer', () => ({
+    ToastContainer: () => <div data-testid="toast-container" />,
 }));
 
 jest.mock('../../../../../services/api/admin/donate/support-options/support-options-api', () => ({
@@ -66,9 +77,8 @@ jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
 }));
 
 jest.mock('../generic-details/GenericDetails', () => ({
-    GenericDetails: ({ children, onChangeItems, onSubmit, onUpdate, onDelete }: any) => (
+    GenericDetails: ({ children, onSubmit, onUpdate, onDelete }: any) => (
         <div data-testid="generic-details">
-            {onChangeItems && <button onClick={() => onChangeItems([{ id: 1 }])}>Change Items</button>}
             {onSubmit && <button onClick={() => onSubmit({ id: 1 })}>Submit</button>}
             {onUpdate && <button onClick={() => onUpdate(1, { name: 'Updated' })}>Update</button>}
             {onDelete && <button onClick={() => onDelete(1)}>Delete</button>}
@@ -90,7 +100,6 @@ jest.mock('../support-options/support-options-form/SupportOptionsForm', () => ({
 describe('DonatePageContent', () => {
     const createMockConfig = (withCorrespondentBanks = false) => ({
         form: jest.fn(),
-        createEmptyItem: jest.fn(),
         create: jest.fn().mockResolvedValue({ id: 1 }),
         update: jest.fn().mockResolvedValue({ id: 1 }),
         delete: jest.fn().mockResolvedValue(undefined),
@@ -107,13 +116,6 @@ describe('DonatePageContent', () => {
         });
     };
 
-    const renderAndWait = async (component: React.ReactElement) => {
-        render(component);
-        await waitFor(() => {
-            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
-        });
-    };
-
     beforeEach(() => {
         jest.clearAllMocks();
         mockUseAdminClient.mockReturnValue('mockClient');
@@ -125,37 +127,51 @@ describe('DonatePageContent', () => {
     });
 
     it('renders component successfully', async () => {
-        await renderAndWait(<DonatePageContent />);
-        expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+        render(<DonatePageContent />);
+        await waitFor(() => {
+            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+        });
         expect(screen.getByTestId('support-options-form')).toBeInTheDocument();
+        expect(screen.getByTestId('toast-container')).toBeInTheDocument();
     });
 
     it('renders GenericDetails when config exists', async () => {
-        await renderAndWait(<DonatePageContent />);
-        expect(screen.getByTestId('generic-details')).toBeInTheDocument();
+        render(<DonatePageContent />);
+        await waitFor(() => {
+            expect(screen.getByTestId('generic-details')).toBeInTheDocument();
+        });
     });
 
     it('does not render GenericDetails when config is null', async () => {
         setupMockBankDetails([], null);
-        await renderAndWait(<DonatePageContent />);
+        render(<DonatePageContent />);
+        await waitFor(() => {
+            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+        });
         expect(screen.queryByTestId('generic-details')).not.toBeInTheDocument();
     });
 
     it('renders correspondent banks when withCorrespondentBanks is true', async () => {
         setupMockBankDetails([{ id: 1, correspondentBanks: [] }], createMockConfig(true));
-        await renderAndWait(<DonatePageContent />);
-        expect(screen.getAllByTestId('generic-details')).toHaveLength(2);
+        render(<DonatePageContent />);
+        await waitFor(() => {
+            expect(screen.getAllByTestId('generic-details')).toHaveLength(2);
+        });
     });
 
     it('does not render correspondent banks when withCorrespondentBanks is false', async () => {
         setupMockBankDetails([{ id: 1 }], createMockConfig(false));
-        await renderAndWait(<DonatePageContent />);
-        expect(screen.getAllByTestId('generic-details')).toHaveLength(1);
+        render(<DonatePageContent />);
+        await waitFor(() => {
+            expect(screen.getAllByTestId('generic-details')).toHaveLength(1);
+        });
     });
 
     it('fetches support options on mount', async () => {
-        await renderAndWait(<DonatePageContent />);
-        expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0);
+        render(<DonatePageContent />);
+        await waitFor(() => {
+            expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0);
+        });
     });
 
     it('handles category change', async () => {
@@ -207,15 +223,54 @@ describe('DonatePageContent', () => {
 
     it('handles fetch error gracefully', async () => {
         mockGetAll.mockRejectedValue(new Error('Network error'));
-        await renderAndWait(<DonatePageContent />);
-        expect(mockGetAll).toHaveBeenCalled();
+        render(<DonatePageContent />);
+        await waitFor(() => {
+            expect(mockGetAll).toHaveBeenCalled();
+        });
     });
 
-    it('handles correspondent banks with onSubmit prop', async () => {
-        setupMockBankDetails([{ id: 1, correspondentBanks: [] }], createMockConfig(true));
-        await renderAndWait(<DonatePageContent />);
+    it('calls bank details handlers correctly', async () => {
+        const mockConfig = createMockConfig();
+        setupMockBankDetails([{ id: 1, name: 'Test Bank' }], mockConfig);
 
-        const genericDetails = screen.getAllByTestId('generic-details');
-        expect(genericDetails).toHaveLength(2);
+        render(<DonatePageContent />);
+
+        const genericDetails = screen.getByTestId('generic-details');
+
+        fireEvent.click(within(genericDetails).getByText('Submit'));
+        await waitFor(() => {
+            expect(mockConfig.create).toHaveBeenCalledWith('mockClient', { id: 1 });
+        });
+
+        fireEvent.click(within(genericDetails).getByText('Update'));
+        await waitFor(() => {
+            expect(mockConfig.update).toHaveBeenCalledWith('mockClient', 1, { name: 'Updated' });
+        });
+
+        fireEvent.click(within(genericDetails).getByText('Delete'));
+        await waitFor(() => {
+            expect(mockConfig.delete).toHaveBeenCalledWith('mockClient', 1);
+        });
+    });
+
+    it('calls setItems when handlers complete successfully', async () => {
+        const mockConfig = createMockConfig();
+        setupMockBankDetails([{ id: 1, name: 'Test Bank' }], mockConfig);
+
+        render(<DonatePageContent />);
+
+        fireEvent.click(screen.getByText('Submit'));
+        await waitFor(() => {
+            expect(mockSetItems).toHaveBeenCalled();
+        });
+    });
+
+    it('calls addToast on successful operations', async () => {
+        render(<DonatePageContent />);
+
+        fireEvent.click(screen.getByText('Create'));
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalled();
+        });
     });
 });

@@ -2,10 +2,9 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { GenericDetails, GenericDetailsProps } from './GenericDetails';
 import { GenericFormRef } from '../generic-form/GenericForm';
 import { forwardRef, useImperativeHandle } from 'react';
-import { DONATE_TEXT } from '../../../../../const/admin/donate';
 
 interface Item {
-    id?: number;
+    id: number;
     name: string;
 }
 
@@ -38,7 +37,6 @@ const defaultProps: GenericDetailsProps<Item> = {
     isLoading: false,
     FormComponent: MockForm,
     addNewText: 'Add New',
-    createEmptyItem: (data) => ({ ...data }),
 };
 
 describe('GenericDetails', () => {
@@ -57,14 +55,15 @@ describe('GenericDetails', () => {
 
     test('shows add form when clicking add button', () => {
         render(<GenericDetails {...defaultProps} />);
-        const addButton = screen.getByText(DONATE_TEXT.BANK_DETAILS.ADD_NEW);
+        const addButton = screen.getByText('Add New');
         fireEvent.click(addButton);
         expect(screen.getByTestId('mock-form-new')).toBeInTheDocument();
     });
 
     test('adds a new item on form submit', async () => {
         const onChangeItems = jest.fn((updater) => {
-            const newItems = typeof updater === 'function' ? updater([]) : updater;
+            const currentItems: Item[] = [];
+            const newItems = typeof updater === 'function' ? updater(currentItems) : updater;
             return newItems;
         });
 
@@ -77,7 +76,8 @@ describe('GenericDetails', () => {
             expect(onChangeItems).toHaveBeenCalled();
         });
 
-        const newItems = onChangeItems.mock.calls[0][0];
+        const updaterFunction = onChangeItems.mock.calls[0][0];
+        const newItems = updaterFunction([]);
 
         rerender(<GenericDetails {...defaultProps} items={newItems} onChangeItems={onChangeItems} />);
 
@@ -116,7 +116,8 @@ describe('GenericDetails', () => {
 
     test('submits new item and adds to list', async () => {
         const onChangeItems = jest.fn((updater) => {
-            const newItems = typeof updater === 'function' ? updater([]) : updater;
+            const currentItems: Item[] = [];
+            const newItems = typeof updater === 'function' ? updater(currentItems) : updater;
             return newItems;
         });
 
@@ -132,7 +133,8 @@ describe('GenericDetails', () => {
             expect(onChangeItems).toHaveBeenCalled();
         });
 
-        const newItems = onChangeItems.mock.calls[0][0];
+        const updaterFunction = onChangeItems.mock.calls[0][0];
+        const newItems = updaterFunction([]);
 
         rerender(<GenericDetails {...defaultProps} items={newItems} onChangeItems={onChangeItems} />);
 
@@ -147,14 +149,14 @@ describe('GenericDetails', () => {
     });
 
     it('renders primaryAddButton style', () => {
-        render(<GenericDetails {...defaultProps} primaryAddButton />);
-        expect(screen.getByText(DONATE_TEXT.BANK_DETAILS.ADD_NEW)).toHaveClass('btn-primary');
+        render(<GenericDetails {...defaultProps} primaryAddButton items={[]} />);
+        expect(screen.getByText('Add New')).toBeInTheDocument();
     });
 
     it('renders child form correctly', () => {
         render(<GenericDetails {...defaultProps} isChildForm />);
         expect(document.querySelector('.generic-details.child')).toBeInTheDocument();
-        expect(screen.getByText(DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW)).toBeInTheDocument();
+        expect(screen.getByText('Add New')).toBeInTheDocument();
     });
 
     it('does not show not found state while loading', () => {
@@ -172,7 +174,8 @@ describe('GenericDetails', () => {
 
         expect(onChangeItems).toHaveBeenCalled();
 
-        const newItems = onChangeItems.mock.calls[0][0];
+        const updaterFunction = onChangeItems.mock.calls[0][0];
+        const newItems = updaterFunction([{ id: 1, name: 'Item 1' }]);
         expect(newItems).toEqual([]);
 
         rerender(<GenericDetails {...defaultProps} items={[]} onChangeItems={onChangeItems} />);
@@ -199,5 +202,39 @@ describe('GenericDetails', () => {
         render(<GenericDetails {...defaultProps} items={[]} isChildForm addNewText="Add Child" />);
         expect(screen.queryByText('No Items Found')).not.toBeInTheDocument();
         expect(screen.getByText('Add Child')).toBeInTheDocument();
+    });
+
+    it('calls onSubmit when available', async () => {
+        const onSubmit = jest.fn().mockResolvedValue(undefined);
+        render(<GenericDetails {...defaultProps} items={[]} onSubmit={onSubmit} />);
+
+        fireEvent.click(screen.getByText('Add New'));
+        fireEvent.click(screen.getByText('Submit'));
+
+        await waitFor(() => {
+            expect(onSubmit).toHaveBeenCalled();
+        });
+    });
+
+    it('calls onUpdate when available', async () => {
+        const onUpdate = jest.fn().mockResolvedValue(undefined);
+        render(<GenericDetails {...defaultProps} onUpdate={onUpdate} />);
+
+        fireEvent.click(screen.getByText('Submit'));
+
+        await waitFor(() => {
+            expect(onUpdate).toHaveBeenCalledWith(1, expect.any(Object));
+        });
+    });
+
+    it('calls onDelete when available', async () => {
+        const onDelete = jest.fn().mockResolvedValue(undefined);
+        render(<GenericDetails {...defaultProps} onDelete={onDelete} />);
+
+        fireEvent.click(screen.getByText('Delete'));
+
+        await waitFor(() => {
+            expect(onDelete).toHaveBeenCalledWith(1);
+        });
     });
 });

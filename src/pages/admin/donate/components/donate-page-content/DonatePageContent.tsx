@@ -236,7 +236,6 @@ export const DonatePageContent = () => {
                 initialIsItemsExpanded={isItemsExpanded}
                 primaryAddButton={true}
                 addNewText={DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW}
-                createEmptyItem={(data: any) => ({ id: Date.now(), ...data })}
                 isChildForm={true}
                 onSubmit={(data) => handleCreateCorrespondentBank(formState.id, data)}
                 onUpdate={(id, data) => handleUpdateCorrespondentBank(formState.id, id, data)}
@@ -273,7 +272,6 @@ export const DonatePageContent = () => {
                             FormComponent={config.form}
                             notFoundText={DONATE_TEXT.BANK_DETAILS.NOT_FOUND}
                             addNewText={DONATE_TEXT.BANK_DETAILS.ADD_FIRST}
-                            createEmptyItem={config.createEmptyItem}
                             onSubmit={handleCreateBankDetails}
                             onUpdate={handleUpdateBankDetails}
                             onDelete={handleDeleteBankDetails}

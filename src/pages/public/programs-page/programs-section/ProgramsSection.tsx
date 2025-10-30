@@ -63,9 +63,7 @@ export const ProgramsSection = () => {
                     </div>
                 )}
                 {isLoading ? (
-                    <div>
-                        <LinearProgress />
-                    </div>
+                    <LinearProgress />
                 ) : (
                     programsByCategory?.map((item) => (
                         <ProgramCard key={item.id} program={item} className={'program-page-card'} />

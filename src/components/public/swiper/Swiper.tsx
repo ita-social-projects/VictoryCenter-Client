@@ -62,45 +62,45 @@ export function Swiper<T>({
         return modules;
     }, [showScrollbar]);
 
+    if (!items || items.length === 0) {
+        return null;
+    }
+
     return (
         <>
-            {items && items.length > 0 ? (
-                <>
-                    <SwiperReact
-                        modules={swiperModules}
-                        onInit={handleInit}
-                        onResize={handleResize}
-                        onReachBeginning={handleReachBeginning}
-                        onReachEnd={handleReachEnd}
-                        onFromEdge={handleFromEdge}
-                        slidesPerView={slidesPerView}
-                        scrollbar={{ draggable: true, el: '.custom-scrollbar' }}
-                        breakpoints={breakpoints}
-                    >
-                        {items.map((item, index) => (
-                            <SwiperSlide key={index}>{renderItem(item, index)}</SwiperSlide>
-                        ))}
-                    </SwiperReact>
-                    <div className="button-container">
-                        <button
-                            type="button"
-                            onClick={handlePrev}
-                            className="arrow-button arrow-left"
-                            disabled={!isPrevEnabled}
-                        >
-                            <ArrowLeft className="arrow-icon" />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={handleNext}
-                            className="arrow-button arrow-right"
-                            disabled={!isNextEnabled}
-                        >
-                            <ArrowRight className="arrow-icon" />
-                        </button>
-                    </div>
-                </>
-            ) : null}
+            <SwiperReact
+                modules={swiperModules}
+                onInit={handleInit}
+                onResize={handleResize}
+                onReachBeginning={handleReachBeginning}
+                onReachEnd={handleReachEnd}
+                onFromEdge={handleFromEdge}
+                slidesPerView={slidesPerView}
+                scrollbar={{ draggable: true, el: '.custom-scrollbar' }}
+                breakpoints={breakpoints}
+            >
+                {items.map((item, index) => (
+                    <SwiperSlide key={index}>{renderItem(item, index)}</SwiperSlide>
+                ))}
+            </SwiperReact>
+            <div className="button-container">
+                <button
+                    type="button"
+                    onClick={handlePrev}
+                    className="arrow-button arrow-left"
+                    disabled={!isPrevEnabled}
+                >
+                    <ArrowLeft className="arrow-icon" />
+                </button>
+                <button
+                    type="button"
+                    onClick={handleNext}
+                    className="arrow-button arrow-right"
+                    disabled={!isNextEnabled}
+                >
+                    <ArrowRight className="arrow-icon" />
+                </button>
+            </div>
         </>
     );
 }

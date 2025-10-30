@@ -195,9 +195,6 @@
 
 @media (max-width: 768px) {
     .support-block {
-        padding-top: 3.75rem;
-        padding-bottom: 0rem;
-
         .main-values-title {
             padding: 0 4rem;
             width: auto;
@@ -217,10 +214,7 @@
                         height: 22.5rem;
                     }
 
-                    &.card-1 {
-                        margin-top: 5.625rem;
-                    }
-
+                    &.card-1,
                     &.card-2 {
                         margin-top: 5.625rem;
                     }

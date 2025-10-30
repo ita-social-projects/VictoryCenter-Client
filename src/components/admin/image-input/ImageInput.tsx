@@ -22,8 +22,6 @@ export interface ImageInputProps {
     label?: string | null;
     subText?: string | null;
     style?: React.CSSProperties;
-    height?: number;
-    width?: number;
 }
 
 export const ImageInput = ({
@@ -38,8 +36,6 @@ export const ImageInput = ({
     name,
     disabled = false,
     style,
-    height = 9,
-    width = 16,
 }: ImageInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
@@ -63,7 +59,7 @@ export const ImageInput = ({
             const imgItem = await convertFileToBase64(file);
             onChange(imgItem);
         },
-        [onChange, height, width, setError],
+        [onChange, setError],
     );
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {

@@ -491,10 +491,7 @@ describe('ImageInput', () => {
             const error = new Error('FileReader Error');
             const mockReader = {
                 readAsDataURL: jest.fn(),
-                // Set the onerror property to be called immediately, now with correct types
                 set onerror(callback: (reason?: any) => void) {
-                    // The callback is the 'reject' function of the promise.
-                    // We can safely call it with our mock error.
                     if (callback) {
                         callback(error);
                     }
@@ -510,15 +507,10 @@ describe('ImageInput', () => {
             const file = new File(['test'], 'image.png', { type: 'image/png' });
             const mockError = new DOMException('FileReader Error');
 
-            // Mock the global FileReader to simulate an error
             jest.spyOn(global, 'FileReader').mockImplementation(() => {
-                // Create a simple mock object that mimics FileReader's API
-                // This avoids the recursive call that was causing the stack overflow.
                 const mockReader = {
                     onerror: null as ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null,
                     readAsDataURL: jest.fn(function (this: any) {
-                        // When readAsDataURL is called, we immediately trigger the onerror handler
-                        // to simulate a failure.
                         if (this.onerror) {
                             this.onerror(mockError as any);
                         }
@@ -527,14 +519,12 @@ describe('ImageInput', () => {
                 return mockReader as any;
             });
 
-            // We expect the promise to reject with the error we simulated.
             await expect(convertFileToBase64(file)).rejects.toBe(mockError);
         });
 
         it('should reject the promise if data URL format is invalid', async () => {
             const file = new File(['test'], 'image.png', { type: 'image/png' });
 
-            // Mock FileReader to return invalid data URL format
             jest.spyOn(global, 'FileReader').mockImplementation(() => {
                 const mockReader = {
                     onload: null as ((this: FileReader, ev: ProgressEvent<FileReader>) => any) | null,
@@ -558,25 +548,20 @@ describe('ImageInput', () => {
             expect(getImageSrc(null)).toBeUndefined();
         });
 
-        // This tests the condition `if ('url' in img && img.url)` where `img.url` is not truthy.
         it('should return undefined for an Image object with an empty string URL', () => {
             const mockImage = {
                 id: 1,
-                url: '', // Falsy URL
+                url: '',
                 mimeType: 'image/png',
             };
             expect(getImageSrc(mockImage)).toBeUndefined();
         });
 
-        // Test case 3: Input is an object that doesn't match expected shapes
-        // This handles the final `return undefined` statement. It simulates receiving an object
-        // that has neither a 'url' nor a 'base64' property.
         it('should return undefined for an object that does not have a url or base64 property', () => {
             const malformedImageObject = {
                 someOtherProp: 'value',
             };
-            // The function expects an object of type Image or ImageValues, but we cast to 'any'
-            // to test this edge case where the object shape is incorrect.
+
             expect(getImageSrc(malformedImageObject as any)).toBeUndefined();
         });
     });

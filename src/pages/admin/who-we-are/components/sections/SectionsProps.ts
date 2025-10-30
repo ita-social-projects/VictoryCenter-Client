@@ -21,8 +21,6 @@ export const MainPageProps: Omit<
     rows: 5,
     imageInputProps: {
         subText: '1440x860',
-        width: 1440,
-        height: 860,
         style: {
             width: '52.5625rem',
             height: '33.125rem',
@@ -43,8 +41,6 @@ export const TeamPageProps: Omit<
     rows: 6,
     imageInputProps: {
         subText: '840x750',
-        width: 840,
-        height: 750,
         style: {
             width: '52.5625rem',
             height: '46.875rem',

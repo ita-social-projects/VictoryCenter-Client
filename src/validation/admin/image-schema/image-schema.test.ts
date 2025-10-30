@@ -7,7 +7,6 @@ const createTestFile = (size: number, type: string = 'image/jpeg', name: string 
 };
 
 describe('ImageValidationSchema', () => {
-
     const validationSchema = getImageValidationSchema();
 
     it('Accepts a valid image file', async () => {

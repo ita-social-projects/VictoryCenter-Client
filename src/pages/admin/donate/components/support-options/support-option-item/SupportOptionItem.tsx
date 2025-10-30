@@ -203,9 +203,14 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                 isOpen={!!modalConfig}
                 isButtonsDisabled={isSubmitting}
                 title={modalConfig?.title ?? ''}
-                onConfirm={() => {
-                    modalConfig?.onConfirm();
-                    setModalConfig(null);
+                onConfirm={async () => {
+                    try {
+                        await modalConfig?.onConfirm?.();
+                        setModalConfig(null);
+                    } catch (error) {
+                        // Error handling is delegated to the action handlers
+                        // Keep modal open for user retry or cancellation
+                    }
                 }}
                 onCancel={() => setModalConfig(null)}
                 onClose={() => setModalConfig(null)}

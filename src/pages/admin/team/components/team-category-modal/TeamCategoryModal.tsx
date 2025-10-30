@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/admin/button/Button';
 import { HintBox } from '../../../../../components/admin/hint-box/HintBox';
@@ -73,8 +73,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
     const [showCloseConfirmModal, setShowCloseConfirmModal] = useState(false);
     const [showSaveConfirmModal, setShowSaveConfirmModal] = useState(false);
     const [error, setError] = useState('');
-
-    const selectedCategoryRef = useRef<null | TeamCategory>(null);
+    const [selectedCategory, setSelectedCategory] = useState<TeamCategory | null>(null);
 
     const reset = useCallback(
         (data?: TeamCategoryFormValues) => {
@@ -91,7 +90,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
     const isDuplicateName = categories.some((category: TeamCategory) => {
         if (mode === ModalMode.Edit) {
             return (
-                category.id !== selectedCategoryRef.current?.id &&
+                category.id !== selectedCategory?.id &&
                 category.name.trim().toLowerCase() === formState.name.trim().toLowerCase()
             );
         }
@@ -125,7 +124,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
             }
 
             if (isSubmitting || isDuplicateName) return;
-            if (mode === ModalMode.Edit && !selectedCategoryRef.current) return;
+            if (mode === ModalMode.Edit && !selectedCategory) return;
 
             setIsSubmitting(true);
             setError('');
@@ -133,7 +132,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
 
             try {
                 const categoryData = {
-                    id: mode === ModalMode.Edit ? selectedCategoryRef.current!.id : null,
+                    id: mode === ModalMode.Edit ? selectedCategory!.id : null,
                     name: formState.name.trim(),
                     description: formState.description.trim(),
                 };
@@ -162,7 +161,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
 
     const handleSubmitClick = useCallback(() => {
         if (isSubmitting || isDuplicateName) return;
-        if (mode === ModalMode.Edit && !selectedCategoryRef.current) return;
+        if (mode === ModalMode.Edit && !selectedCategory) return;
 
         const formErrors = validateForm(formState);
         setErrors(formErrors);
@@ -198,10 +197,10 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
         (category: TeamCategory) => {
             const selected = categories.find((cat) => cat.id === category.id);
             if (selected) {
-                selectedCategoryRef.current = selected;
+                setSelectedCategory(selected);
                 reset({ name: selected.name, description: selected.description });
             } else {
-                selectedCategoryRef.current = null;
+                setSelectedCategory(null);
                 reset({ name: '', description: '' });
             }
         },
@@ -214,10 +213,10 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
         if (mode === ModalMode.Edit) {
             if (categories.length > 0) {
                 const firstCategory = categories[0];
-                selectedCategoryRef.current = firstCategory;
+                setSelectedCategory(firstCategory);
                 reset({ name: firstCategory.name, description: firstCategory.description });
             } else {
-                selectedCategoryRef.current = null;
+                setSelectedCategory(null);
                 reset({ name: '', description: '' });
             }
         } else {
@@ -236,11 +235,11 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
         const hasEmptyFields = !formState.name.trim() || !formState.description.trim();
 
         if (mode === ModalMode.Edit) {
-            const hasNoSelectedCategory = !selectedCategoryRef.current;
+            const hasNoSelectedCategory = !selectedCategory;
             const noChanges =
-                !!selectedCategoryRef.current &&
-                formState.name.trim() === selectedCategoryRef.current.name.trim() &&
-                formState.description.trim() === selectedCategoryRef.current.description.trim();
+                !!selectedCategory &&
+                formState.name.trim() === selectedCategory.name.trim() &&
+                formState.description.trim() === selectedCategory.description.trim();
 
             return isSubmitting || hasValidationErrors || hasEmptyFields || hasNoSelectedCategory || noChanges;
         }
@@ -287,7 +286,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                                 disabled={isSubmitting}
                                 onChange={handleCategoryChange}
                                 placeholder={''}
-                                value={selectedCategoryRef.current || undefined}
+                                value={selectedCategory || undefined}
                             />
                         )}
 

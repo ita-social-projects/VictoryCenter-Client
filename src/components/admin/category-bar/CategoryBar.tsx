@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import classNames from 'classnames';
 import { ContextMenuButton } from '../context-menu-button/ContextMenuButton';
+import { CategoryButton } from '../category-button/CategoryButton';
 import { ReactComponent as ArrowLeftIcon } from '../../../assets/icons/arrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '../../../assets/icons/arrow-right.svg';
 import './CategoryBar.scss';
@@ -106,15 +106,13 @@ export const CategoryBar = <T,>({
                     const selected = !!selectedCategory && key === getCategoryKey(selectedCategory);
 
                     return (
-                        <button
+                        <CategoryButton
                             key={key}
-                            onClick={() => onCategorySelect(category)}
-                            className={classNames('category-bar-button', {
-                                'category-bar-button-selected': selected,
-                            })}
-                        >
-                            {name}
-                        </button>
+                            category={category}
+                            isSelected={selected}
+                            name={name}
+                            onSelect={onCategorySelect}
+                        />
                     );
                 })}
             </div>

@@ -61,11 +61,14 @@ export const DeleteTeamCategoryModal = ({ isOpen, onClose, onConfirm, categories
         setSelectedCategory(category);
     };
 
+    const isCategoryDeletable = !!selectedCategory?.id && selectedCategory.teamMembersCount === 0;
+    const isDeleteDisabled = !isCategoryDeletable || isSubmitting;
+
     return (
         <Modal isOpen={isOpen} onClose={handleClose}>
             <Modal.Title>{COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY}</Modal.Title>
             <Modal.Content>
-                <div className="program-form-main">
+                <div className="delete-category-modal-content">
                     <SingleSelectInputGroup
                         id="delete-category-select"
                         label={COMMON_TEXT_ADMIN.CATEGORIES.FORM.LABEL.CATEGORY}
@@ -93,11 +96,7 @@ export const DeleteTeamCategoryModal = ({ isOpen, onClose, onConfirm, categories
                 <Button buttonStyle="secondary" onClick={handleClose} disabled={isSubmitting}>
                     {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                 </Button>
-                <Button
-                    buttonStyle="primary"
-                    onClick={handleConfirmation}
-                    disabled={!selectedCategory?.id || selectedCategory.teamMembersCount > 0 || isSubmitting}
-                >
+                <Button buttonStyle="primary" onClick={handleConfirmation} disabled={isDeleteDisabled}>
                     {COMMON_TEXT_ADMIN.BUTTON.DELETE}
                 </Button>
             </Modal.Actions>

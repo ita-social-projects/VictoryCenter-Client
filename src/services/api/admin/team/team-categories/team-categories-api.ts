@@ -29,7 +29,6 @@ export const TeamCategoriesApi = {
     },
 
     delete: async (client: AxiosInstance, id: number): Promise<void> => {
-        const response = await client.delete(`${API_ROUTES.TEAM_CATEGORIES.BASE}/${id}`);
-        return response.data;
+        await client.delete(`${API_ROUTES.TEAM_CATEGORIES.BASE}/${id}`);
     },
 };

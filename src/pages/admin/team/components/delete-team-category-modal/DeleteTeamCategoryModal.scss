@@ -8,3 +8,9 @@
     margin: 0.5rem;
     color: colors.$error;
 }
+
+.delete-category-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4375rem;
+}

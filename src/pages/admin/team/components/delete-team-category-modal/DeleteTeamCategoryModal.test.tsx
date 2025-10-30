@@ -446,8 +446,8 @@ describe('DeleteTeamCategoryModal', () => {
             });
 
             const deleteButton = screen.getByTestId('delete-button');
-            // When no category is selected, button should be enabled but handleConfirmation will prevent action
-            expect(deleteButton).not.toBeDisabled();
+            // When no category is selected, button should be disabled
+            expect(deleteButton).toBeDisabled();
         });
 
         it('clears error when modal reopens', async () => {

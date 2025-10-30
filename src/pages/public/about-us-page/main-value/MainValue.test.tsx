@@ -97,6 +97,6 @@ describe('MainValues component', () => {
         render(<MainValues content={null} />);
         checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS.FIRST_LINE']);
         checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS.SECOND_LINE']);
-        checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS.THIRD_LINE']);;
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS.THIRD_LINE']);
     });
 });

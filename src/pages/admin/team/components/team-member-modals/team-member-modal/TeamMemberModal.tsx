@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { MemberForm, TeamMemberFormRef, TeamMemberFormValues } from '../../member-form/MemberForm';
 import { TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { TeamCategory, TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../../types/admin/team-members';
@@ -8,6 +7,7 @@ import { TeamMembersApi } from '../../../../../../services/api/admin/team/team-m
 import { GenericModalWrapper } from '../../../../../../components/admin/modal-wrappers/generic-modal-wrapper/GenericModalWrapper';
 import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
 import { VisibilityStatus, PendingAction, ModalMode } from '../../../../../../types/admin/common';
+import { TeamMemberFormValues, TeamMemberFormRef, MemberForm } from '../../forms/member-form/MemberForm';
 
 interface TeamMemberModalProps {
     mode: ModalMode;

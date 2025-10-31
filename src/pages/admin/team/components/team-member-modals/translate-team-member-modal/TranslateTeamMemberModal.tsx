@@ -3,9 +3,9 @@ import { TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
 import { TeamMember } from '../../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
-import { TranslateMemberForm, TranslateTeamMemberFormRef } from '../../translate-member-form/TranslateMemberForm';
 import { ModalMode } from '../../../../../../types/admin/common';
 import { LocalizationModalWrapper } from '../../../../../../components/admin/modal-wrappers/localization-modal-wrapper/LocalizationModalWrapper';
+import { TranslateMemberForm, TranslateTeamMemberFormRef } from '../../forms/translate-member-form/TranslateMemberForm';
 
 interface TranslateTeamMemberModalProps {
     isOpen: boolean;

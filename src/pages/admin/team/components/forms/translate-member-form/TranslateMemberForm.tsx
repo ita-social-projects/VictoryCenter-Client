@@ -5,12 +5,12 @@ import { InputLabel } from '../../../../../../components/admin/input-label/Input
 import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
 import { InputWithCharacterLimit } from '../../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { useFormManager } from '../../../../../../hooks/admin/use-form-manager/useFormManager';
 import { Select } from '../../../../../../components/common/select/Select';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
-import { ReactComponent as TranslateIcon } from '../../../../../assets/icons/translate-grey.svg';
+import { ReactComponent as TranslateIcon } from '../../../../../../assets/icons/translate-grey.svg';
 import './TranslateMemberForm.scss';
+import { useTeamMemberForm } from '../use-team-member-form/useTeamMemberForm';
 
 export interface TranslateTeamMemberFormValues {
     fullName: string;
@@ -30,7 +30,7 @@ export interface TranslateTeamMemberFormRef {
 }
 
 export interface TranslateMemberFormProps {
-    onSubmit: (data: TranslateTeamMemberFormValues, status: VisibilityStatus) => void;
+    onSubmit: (data: TranslateTeamMemberFormValues) => void;
     initialData?: TranslateTeamMemberFormValues | null;
     formDisabled?: boolean;
     onValidationChange?: (isValid: boolean) => void;
@@ -56,10 +56,15 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
             [],
         );
 
-        const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
-            TranslateTeamMemberFormValues,
-            TranslateTeamMemberFormErrorState
-        >({
+        const {
+            formState,
+            errors,
+            isSubmitting,
+            handleFullNameChange,
+            handleFullNameBlur,
+            handleDescriptionChange,
+            handleDescriptionBlur,
+        } = useTeamMemberForm({
             defaultFormState,
             initialData,
             validateForm,
@@ -67,38 +72,6 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
             onValidationChange,
             ref,
         });
-
-        const handleFullNameChange = useCallback(
-            (e: React.ChangeEvent<HTMLInputElement>) => {
-                setFormState((prev) => ({ ...prev, fullName: e.target.value }));
-                setErrors((prev) => ({
-                    ...prev,
-                    fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false),
-                }));
-            },
-            [formState.fullName, setErrors, setFormState],
-        );
-
-        const handleNameBlur = useCallback(() => {
-            setErrors((prev) => ({
-                ...prev,
-                fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false),
-            }));
-        }, [formState.fullName, setErrors]);
-
-        const handleDescriptionChange = useCallback(
-            (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                setFormState((prev) => ({ ...prev, description: e.target.value }));
-            },
-            [setFormState],
-        );
-
-        const handleDescriptionBlur = useCallback(() => {
-            setErrors((prev) => ({
-                ...prev,
-                description: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(formState.description, false),
-            }));
-        }, [formState.description, setErrors]);
 
         return (
             <form
@@ -122,7 +95,7 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
                     <InputWithCharacterLimit
                         value={formState.fullName}
                         onChange={handleFullNameChange}
-                        onBlur={handleNameBlur}
+                        onBlur={handleFullNameBlur}
                         id="fullName"
                         name="fullName"
                         maxLength={TEAM_MEMBER_VALIDATION.fullName.max}

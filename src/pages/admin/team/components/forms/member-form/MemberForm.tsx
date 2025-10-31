@@ -11,6 +11,7 @@ import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/t
 import { ImageInput } from '../../../../../../components/admin/image-input/ImageInput';
 import { useFormManager } from '../../../../../../hooks/admin/use-form-manager/useFormManager';
 import './MemberForm.scss';
+import { useTeamMemberForm } from '../use-team-member-form/useTeamMemberForm';
 
 export interface TeamMemberFormValues {
     categoryId: number | null;
@@ -64,10 +65,17 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
             [],
         );
 
-        const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
-            TeamMemberFormValues,
-            TeamMemberFormErrorState
-        >({
+        const {
+            formState,
+            setFormState,
+            setErrors,
+            errors,
+            isSubmitting,
+            handleFullNameChange,
+            handleFullNameBlur,
+            handleDescriptionChange,
+            handleDescriptionBlur,
+        } = useTeamMemberForm({
             defaultFormState,
             initialData,
             validateForm,
@@ -75,38 +83,6 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
             onValidationChange,
             ref,
         });
-
-        const handleFullNameChange = useCallback(
-            (e: React.ChangeEvent<HTMLInputElement>) => {
-                setFormState((prev) => ({ ...prev, fullName: e.target.value }));
-                setErrors((prev) => ({
-                    ...prev,
-                    fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false),
-                }));
-            },
-            [formState.fullName, setErrors, setFormState],
-        );
-
-        const handleNameBlur = useCallback(() => {
-            setErrors((prev) => ({
-                ...prev,
-                fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false),
-            }));
-        }, [formState.fullName, setErrors]);
-
-        const handleDescriptionChange = useCallback(
-            (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                setFormState((prev) => ({ ...prev, description: e.target.value }));
-            },
-            [setFormState],
-        );
-
-        const handleDescriptionBlur = useCallback(() => {
-            setErrors((prev) => ({
-                ...prev,
-                description: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(formState.description, false),
-            }));
-        }, [formState.description, setErrors]);
 
         const handleImgChange = useCallback(
             (file: ImageValues | Image | null) => {
@@ -168,7 +144,7 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                     <InputWithCharacterLimit
                         value={formState.fullName}
                         onChange={handleFullNameChange}
-                        onBlur={handleNameBlur}
+                        onBlur={handleFullNameBlur}
                         id="fullName"
                         name="fullName"
                         maxLength={TEAM_MEMBER_VALIDATION.fullName.max}

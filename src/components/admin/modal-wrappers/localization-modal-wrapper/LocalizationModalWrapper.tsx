@@ -15,14 +15,14 @@ interface GenericModalWrapperProps<TFormValues, TFormRef> extends ConfirmationMo
     isSubmitting: boolean;
     error: string;
     onFormValidationChange: (isValid: boolean) => void;
-    onFormSubmit: (data: TFormValues, status: VisibilityStatus) => void;
+    onFormSubmit: (data: TFormValues) => void;
     onPublishSubmit: () => void;
     renderForm: (props: {
         ref: React.RefObject<TFormRef>;
         key: string | number;
         initialData: TFormValues | null;
         formDisabled: boolean;
-        onSubmit: (data: TFormValues, status: VisibilityStatus) => void;
+        onSubmit: (data: TFormValues) => void;
         onValidationChange: (isValid: boolean) => void;
     }) => React.ReactElement;
 }

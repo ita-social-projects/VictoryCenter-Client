@@ -21,7 +21,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     const Modal = ({ children, isOpen, onClose }: any) =>
         isOpen ? (
             <div data-testid="modal">
-                <button data-testid="modal-close" onClick={onClose}>
+                <button data-testid="close-modal" onClick={onClose}>
                     Close
                 </button>
                 <div data-testid="modal-content-area">{children}</div>
@@ -350,7 +350,7 @@ describe('DeleteTeamCategoryModal', () => {
             const props = createProps();
             render(<DeleteTeamCategoryModal {...props} />);
 
-            const closeButton = screen.getByTestId('modal-close');
+            const closeButton = screen.getByTestId('close-modal');
             fireEvent.click(closeButton);
 
             expect(props.onClose).toHaveBeenCalled();
@@ -379,7 +379,7 @@ describe('DeleteTeamCategoryModal', () => {
             const deleteButton = screen.getByTestId('delete-button');
             fireEvent.click(deleteButton);
 
-            const closeButton = screen.getByTestId('modal-close');
+            const closeButton = screen.getByTestId('close-modal');
             const cancelButton = screen.getByTestId('cancel-button');
 
             fireEvent.click(closeButton);

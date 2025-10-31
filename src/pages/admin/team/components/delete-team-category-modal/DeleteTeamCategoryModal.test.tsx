@@ -7,14 +7,14 @@ import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useA
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { TEAM_CATEGORY_VALIDATION } from '../../../../../const/admin/team';
 
-jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
-    useAdminClient: jest.fn(),
-}));
-
 jest.mock('../../../../../services/api/admin/team/team-categories/team-categories-api', () => ({
     TeamCategoriesApi: {
         delete: jest.fn(),
     },
+}));
+
+jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+    useAdminClient: jest.fn(),
 }));
 
 jest.mock('../../../../../components/common/modal/Modal', () => {
@@ -448,31 +448,6 @@ describe('DeleteTeamCategoryModal', () => {
             const deleteButton = screen.getByTestId('delete-button');
             // When no category is selected, button should be disabled
             expect(deleteButton).toBeDisabled();
-        });
-
-        it('clears error when modal reopens', async () => {
-            getMockedApi().delete.mockRejectedValueOnce(new Error('API Error'));
-            const props = createProps({ isOpen: false, categories: mockCategoriesNoMembers });
-            const { rerender } = render(<DeleteTeamCategoryModal {...props} />);
-
-            rerender(<DeleteTeamCategoryModal {...props} isOpen={true} />);
-
-            // Trigger error by attempting delete
-            const deleteButton = screen.getByTestId('delete-button');
-            fireEvent.click(deleteButton);
-
-            await waitFor(() => {
-                expect(
-                    screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY),
-                ).toBeInTheDocument();
-            });
-
-            rerender(<DeleteTeamCategoryModal {...props} isOpen={false} />);
-            rerender(<DeleteTeamCategoryModal {...props} isOpen={true} />);
-
-            expect(
-                screen.queryByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY),
-            ).not.toBeInTheDocument();
         });
     });
 

@@ -248,6 +248,10 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 });
             }, [formState]);
 
+            const hasErrors = useMemo(() => {
+                return Object.values(errors).some(Boolean);
+            }, [errors]);
+
             if (!isOpen) return null;
 
             return (
@@ -397,7 +401,9 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                           })
                                             }
                                             buttonStyle="primary"
-                                            disabled={isSubmitting || hasEmptyRequiredFields || !isChanged()}
+                                            disabled={
+                                                isSubmitting || hasEmptyRequiredFields || hasErrors || !isChanged()
+                                            }
                                         >
                                             {DONATE_TEXT.BUTTON.PUBLISH}
                                         </Button>

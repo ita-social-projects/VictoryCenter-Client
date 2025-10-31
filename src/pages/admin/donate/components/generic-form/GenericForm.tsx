@@ -81,6 +81,9 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
             const editable = mode !== GenericFormMode.View;
 
+            const titleField = useMemo(() => fields.find((f) => f.isTitle), []);
+            const titleFieldName = titleField?.name;
+
             useEffect(() => {
                 const newState: FormState = { ...(initialData ?? ({} as FormState)) };
                 setFormState(newState);
@@ -296,7 +299,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                         }}
                                         onClick={() => setIsExpanded((prev) => !prev)}
                                     >
-                                        {String(formState[fields[0].name] ?? '')}
+                                        {titleFieldName ? String(formState[titleFieldName] ?? '') : ''}
                                         <span className={`arrow ${isExpanded ? 'expanded' : ''}`}></span>
                                     </div>
                                     {isChildForm && (
@@ -323,12 +326,14 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                     {isExpanded && (
                         <div className="form-body">
                             {fields
-                                .slice(mode === GenericFormMode.View ? 1 : 0)
                                 .filter((f) => {
-                                    if (mode !== GenericFormMode.View) return true;
-                                    const value = formState[f.name];
-                                    if (Array.isArray(value)) return value.length > 0;
-                                    return Boolean(String(value ?? '').trim());
+                                    if (mode === GenericFormMode.View) {
+                                        if (f.isTitle) return false;
+                                        const value = formState[f.name];
+                                        if (Array.isArray(value)) return value.length > 0;
+                                        return Boolean(String(value ?? '').trim());
+                                    }
+                                    return true;
                                 })
                                 .map((f) => {
                                     const isTitleField = f.isTitle;

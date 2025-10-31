@@ -11,7 +11,7 @@ interface Item {
 }
 
 const fields: GenericFormField<Item>[] = [
-    { name: 'name', label: 'Name', isRequired: true },
+    { name: 'name', label: 'Name', isRequired: true, isTitle: true },
     { name: 'optional', label: 'Optional' },
 ];
 
@@ -233,7 +233,7 @@ describe('GenericForm', () => {
     });
 
     const arrayFields: GenericFormField<any>[] = [
-        { name: 'name', isRequired: true },
+        { name: 'name', isRequired: true, isTitle: true },
         { name: 'tags', isRequired: true },
     ];
     const ArrayForm = createGenericForm<{ id?: number; name: string; tags: string[] }>(arrayFields);

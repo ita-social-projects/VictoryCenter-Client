@@ -48,8 +48,8 @@ export const ImageInput = ({
 
     const handleFile = useCallback(
         async (file: File) => {
-            if (!file.type.startsWith('image/')) return;
             setError(null);
+            if (!file.type.startsWith('image/')) return;
             const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file);
 
             if (error) {

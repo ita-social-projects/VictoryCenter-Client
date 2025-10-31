@@ -167,7 +167,7 @@ describe('ImageInput', () => {
         const data = {
             dataTransfer: {
                 files: [file],
-                types: [file.type],
+                types: ['Files'],
             },
         };
 
@@ -445,9 +445,8 @@ describe('ImageInput', () => {
     });
 
     it('does not show delete button when disabled', () => {
-        render(<ImageInput value={MockImageValue} onChange={onChangeMock} setError={setErrorMock} />);
-
-        expect(screen.queryByRole('button', { name: COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW })).not.toBeInTheDocument();
+        render(<ImageInput value={MockImageValue} onChange={onChangeMock} setError={setErrorMock} disabled />);
+        expect(screen.queryByTestId('remove-photo-button')).not.toBeInTheDocument();
     });
 
     it('shows delete button when not disabled and image is present', () => {

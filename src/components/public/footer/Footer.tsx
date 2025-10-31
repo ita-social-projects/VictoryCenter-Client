@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { ReactComponent as ArrowUpIcon } from '../../../assets/icons/arrow-up-right.svg';
 import { ReactComponent as PhoneIcon } from '../../../assets/icons/phone.svg';
 import { ReactComponent as MailIcon } from '../../../assets/icons/mail.svg';

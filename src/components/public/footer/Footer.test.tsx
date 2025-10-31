@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Footer } from './Footer';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '../../../const/public/routes';
 import footerUk from '../../../locales/uk/footer.json';
 

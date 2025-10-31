@@ -11,8 +11,8 @@ jest.mock('../../../../../../const/public/about-us-page', () => ({
 
 describe('ValueCard Component', () => {
     const mockGroup = [
-        { NAME: 'Емпатія', DESCRIPTION: 'Ми розуміємо почуття інших.' },
-        { NAME: 'Різноманіття', DESCRIPTION: 'Ми цінуємо унікальність кожного.' },
+        { name: 'Емпатія', description: 'Ми розуміємо почуття інших.' },
+        { name: 'Різноманіття', description: 'Ми цінуємо унікальність кожного.' },
     ];
 
     it('should render the title only for the first group (groupIndex === 0)', () => {

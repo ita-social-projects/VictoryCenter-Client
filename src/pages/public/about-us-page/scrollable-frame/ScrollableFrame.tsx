@@ -16,7 +16,11 @@ export const ScrollableFrame = () => {
     });
 
     if (isLoading) {
-        return <LinearProgress />;
+        return (
+            <div className="swiper-loader">
+                <LinearProgress />
+            </div>
+        );
     }
 
     if (error) {

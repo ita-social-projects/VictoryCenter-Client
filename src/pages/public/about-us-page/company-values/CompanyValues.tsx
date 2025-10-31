@@ -6,8 +6,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { ValueCard } from './components/value-card/ValueCard';
 
 export interface ValueItem {
-    NAME: string;
-    DESCRIPTION: string;
+    name: string;
+    description: string;
 }
 
 const chunk = <T,>(arr: T[], size: number): T[][] => {
@@ -29,10 +29,21 @@ const chunkStaggered = (values: ValueItem[]): ValueItem[][] => {
     return result;
 };
 
+const toCamelCaseValues = (items: Record<string, string>[]): ValueItem[] =>
+    items.map(({ NAME, DESCRIPTION }) => ({
+        name: NAME,
+        description: DESCRIPTION,
+    }));
+
 export const CompanyValues = () => {
     const isTablet = useMediaQuery('(min-width:768px) and (max-width:1024px)');
     const { t } = useTranslation('aboutUsPage');
-    const valueItems = useMemo<ValueItem[]>(() => t('VALUE_ITEMS', { returnObjects: true }) as ValueItem[], [t]);
+
+    const date = useMemo<Record<string, string>[]>(() => {
+        return t('VALUE_ITEMS', { returnObjects: true }) as Record<string, string>[];
+    }, [t]);
+
+    const valueItems = useMemo<ValueItem[]>(() => toCamelCaseValues(date), [date]);
 
     const chunkedValues = useMemo(() => {
         if (isTablet) {

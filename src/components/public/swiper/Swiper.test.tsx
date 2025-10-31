@@ -29,7 +29,7 @@ jest.mock('swiper/react', () => {
     };
 });
 
-describe('CustomSwiper', () => {
+describe('Swiper', () => {
     const items = [
         { id: 1, name: 'Item 1' },
         { id: 2, name: 'Item 2' },
@@ -37,23 +37,23 @@ describe('CustomSwiper', () => {
     ];
     const renderItem = (item: any) => <div data-testid="slide-item">{item.name}</div>;
 
-    test('renders slides correctly', () => {
+    it('renders slides correctly', () => {
         render(<Swiper items={items} renderItem={renderItem} slidesPerView={1} />);
         const slides = screen.getAllByTestId('slide-item');
         expect(slides).toHaveLength(items.length);
     });
 
-    test('renders swiper container', () => {
+    it('renders swiper container', () => {
         render(<Swiper items={items} renderItem={renderItem} />);
         expect(screen.getByTestId('swiper')).toBeInTheDocument();
     });
 
-    test('renders slide wrappers', () => {
+    it('renders slide wrappers', () => {
         render(<Swiper items={items} renderItem={renderItem} />);
         expect(screen.getAllByTestId('swiper-slide')).toHaveLength(items.length);
     });
 
-    test('renders navigation buttons and triggers actions', () => {
+    it('renders navigation buttons and triggers actions', () => {
         render(<Swiper items={items} renderItem={renderItem} slidesPerView={1} />);
         const leftArrow = screen.getByTestId('arrow-left');
         const rightArrow = screen.getByTestId('arrow-right');

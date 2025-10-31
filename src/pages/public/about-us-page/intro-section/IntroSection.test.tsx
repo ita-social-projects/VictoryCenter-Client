@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { AboutUsIntro } from './IntroSection';
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
+import aboutUsPageUk from '../../../../locales/uk/about-us.json';
 
 describe('AboutUsIntro', () => {
     it('should render images correctly', () => {
@@ -15,9 +15,9 @@ describe('AboutUsIntro', () => {
         render(<AboutUsIntro />);
         const title = screen.getByRole('heading', { level: 1 });
         expect(title).toBeInTheDocument();
-        expect(title).toHaveTextContent(ABOUT_US_DATA.INTRO_TITLE.FIRST_HIGHLIGHT);
-        expect(title).toHaveTextContent(ABOUT_US_DATA.INTRO_TITLE.MIDDLE_PART);
-        expect(title).toHaveTextContent(ABOUT_US_DATA.INTRO_TITLE.SECOND_HIGHLIGHT);
+        expect(title).toHaveTextContent(aboutUsPageUk['INTRO_TITLE.FIRST_HIGHLIGHT']);
+        expect(title).toHaveTextContent(aboutUsPageUk['INTRO_TITLE.MIDDLE_PART']);
+        expect(title).toHaveTextContent(aboutUsPageUk['INTRO_TITLE.SECOND_HIGHLIGHT']);
 
         const highlightedSpans = document.querySelectorAll('.highlighted');
         expect(highlightedSpans).toHaveLength(2);
@@ -25,8 +25,11 @@ describe('AboutUsIntro', () => {
 
     it('should render title details correctly', () => {
         render(<AboutUsIntro />);
-
-        const paragraph = screen.getByText(ABOUT_US_DATA.INTRO_DETAILS, { exact: false });
-        expect(paragraph).toBeInTheDocument();
+        prepareAndFindTitleDetails(aboutUsPageUk['INTRO_DETAILS']);
     });
 });
+
+const prepareAndFindTitleDetails = (line: string) => {
+    const paragraph = screen.queryByText((text) => text.trim().includes(line.trim()));
+    expect(paragraph).toBeInTheDocument();
+};

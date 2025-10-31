@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { ValueCard } from './ValueCard';
-import { ABOUT_US_DATA } from '../../../../../../const/public/about-us-page';
+import { aboutUsPageUk } from '../../../../../../locales/uk';
 
 jest.mock('../../../../../../const/public/about-us-page', () => ({
     ABOUT_US_DATA: {
@@ -17,14 +17,14 @@ describe('ValueCard Component', () => {
 
     it('should render the title only for the first group (groupIndex === 0)', () => {
         render(<ValueCard group={mockGroup} groupIndex={0} />);
-        const title = screen.getByRole('heading', { name: ABOUT_US_DATA.OUR_VALUES });
+        const title = screen.getByRole('heading', { name: aboutUsPageUk.OUR_VALUES });
         expect(title).toBeInTheDocument();
         expect(title.closest('.values-title')).toBeInTheDocument();
     });
 
     it('should not render the title for groupIndex > 0', () => {
         render(<ValueCard group={mockGroup} groupIndex={1} />);
-        const title = screen.queryByRole('heading', { name: ABOUT_US_DATA.OUR_VALUES });
+        const title = screen.queryByRole('heading', { name: aboutUsPageUk.OUR_VALUES });
         expect(title).not.toBeInTheDocument();
     });
 

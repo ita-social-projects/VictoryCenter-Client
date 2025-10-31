@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { useLocation } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import { PublicRoute } from './PublicRoute';
 import { ADMIN_ROUTES } from '../../../const/admin/routes';
 import { useAdminContext } from '../../../contexts/admin/admin-context-provider/AdminContextProvider';
@@ -7,7 +7,7 @@ import { useAdminContext } from '../../../contexts/admin/admin-context-provider/
 const mockUseAdminContext = useAdminContext as jest.MockedFunction<typeof useAdminContext>;
 const mockUseLocation = useLocation as jest.MockedFunction<typeof useLocation>;
 
-jest.mock('react-router', () => ({
+jest.mock('react-router-dom', () => ({
     Navigate: ({ to, replace }: any) => <div data-testid="navigate" data-to={to} data-replace={String(replace)} />,
     Outlet: () => <div data-testid="outlet" />,
     useLocation: jest.fn(),

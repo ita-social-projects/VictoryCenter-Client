@@ -1,5 +1,5 @@
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import './CompanyValues.scss';
 import { Swiper } from '../../../../components/public/swiper/Swiper';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -31,13 +31,15 @@ const chunkStaggered = (values: ValueItem[]): ValueItem[][] => {
 
 export const CompanyValues = () => {
     const isTablet = useMediaQuery('(min-width:768px) and (max-width:1024px)');
+    const { t } = useTranslation('aboutUsPage');
+    const valueItems = useMemo<ValueItem[]>(() => t('VALUE_ITEMS', { returnObjects: true }) as ValueItem[], [t]);
+
     const chunkedValues = useMemo(() => {
-        const values = ABOUT_US_DATA.VALUE_ITEMS;
         if (isTablet) {
-            return chunkStaggered(values);
+            return chunkStaggered(valueItems);
         }
-        return chunk(values, 3);
-    }, [isTablet]);
+        return chunk(valueItems, 3);
+    }, [isTablet, valueItems]);
 
     return (
         <div className="values-block">

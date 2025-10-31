@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { COMMON_QUESTIONS } from '../../../const/public/programs-page';
+import { useTranslation } from 'react-i18next';
 import { axiosInstance } from '../../../services/api/axios';
 import { FaqApi } from '../../../services/api/public/faq/faq-api';
 import { PublishedFaqQuestion } from '../../../types/public/faq-section';
@@ -11,6 +11,8 @@ interface FaqSectionProps {
 }
 
 export const FaqSection = ({ slug }: FaqSectionProps) => {
+    const { t } = useTranslation('programsPage');
+
     const [questions, setQuestions] = useState<PublishedFaqQuestion[]>([]);
 
     useEffect(() => {
@@ -31,7 +33,7 @@ export const FaqSection = ({ slug }: FaqSectionProps) => {
     return (
         <div className="faq-section">
             <div className="faq-block">
-                <h2>{COMMON_QUESTIONS}</h2>
+                <h2>{t('COMMON_QUESTIONS')}</h2>
                 <div>
                     {questions.map((item, _) => (
                         <FaqCard key={item.id} faq={item} />

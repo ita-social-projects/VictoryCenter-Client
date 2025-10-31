@@ -1,4 +1,4 @@
-import { Navigate, Outlet, useLocation } from 'react-router';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { PageLoader } from '../../common/page-loader/PageLoader';
 import { ADMIN_ROUTES } from '../../../const/admin/routes';
 import { useAdminContext } from '../../../contexts/admin/admin-context-provider/AdminContextProvider';

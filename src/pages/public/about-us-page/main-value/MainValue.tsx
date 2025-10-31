@@ -1,22 +1,26 @@
+import { useTranslation } from 'react-i18next';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import './MainValue.scss';
 import { Swiper } from '../../../../components/public/swiper/Swiper';
 
 export const MainValues = () => {
+    const { t } = useTranslation('aboutUsPage');
+    const peopleData = t('PEOPLE_DATA', { returnObjects: true });
+
     return (
         <div className="main-values-block">
             <div className="main-values-title">
                 <h2>
-                    {ABOUT_US_DATA.MAIN_VALUE.FIRST_PART}
-                    <span>{ABOUT_US_DATA.MAIN_VALUE.FIRST_HIGHLIGHT}</span>
-                    {ABOUT_US_DATA.MAIN_VALUE.MIDDLE_PART}
-                    <span>{ABOUT_US_DATA.MAIN_VALUE.SECOND_HIGHLIGHT}</span>
+                    {t('MAIN_VALUE.FIRST_PART')}
+                    <span>{t('MAIN_VALUE.FIRST_HIGHLIGHT')}</span>
+                    {t('MAIN_VALUE.MIDDLE_PART')}
+                    <span>{t('MAIN_VALUE.SECOND_HIGHLIGHT')}</span>
                 </h2>
             </div>
 
             <div className="people-block">
                 <Swiper
-                    items={ABOUT_US_DATA.PEOPLE_DATA}
+                    items={peopleData}
                     slidesPerView={1}
                     breakpoints={{
                         568: { slidesPerView: 2 },
@@ -25,14 +29,14 @@ export const MainValues = () => {
                     }}
                     renderItem={(person, index) => (
                         <div className={`people-card card-${index + 1}`}>
-                            <img src={person.IMG} alt={person.ALT} />
+                            <img src={ABOUT_US_DATA.PEOPLE_DATA[index].IMG} alt={person.ALT} />
                             <p className="people-info">{person.INFO}</p>
                         </div>
                     )}
                 />
             </div>
             <div className="summary-block">
-                <h3 className="summary-text">{ABOUT_US_DATA.MAIN_VALUE_DETAILS}</h3>
+                <h3 className="summary-text">{t('MAIN_VALUE_DETAILS')}</h3>
             </div>
         </div>
     );

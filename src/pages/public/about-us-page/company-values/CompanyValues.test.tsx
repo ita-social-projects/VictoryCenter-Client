@@ -29,7 +29,7 @@ describe('CompanyValues', () => {
         jest.clearAllMocks();
     });
 
-    it('renders wrapper and Swiper', () => {
+    it('renders wrapper and CustomSwiper', () => {
         (useMediaQuery as jest.Mock).mockReturnValue(false);
         render(<CompanyValues />);
         expect(screen.getByTestId('custom-swiper')).toBeInTheDocument();

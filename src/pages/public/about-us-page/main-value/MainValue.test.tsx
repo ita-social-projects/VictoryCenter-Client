@@ -1,7 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { MainValues } from './MainValue';
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
+import aboutUsPageUk from '../../../../locales/uk/about-us.json';
+import { checkForSubstrings } from '../../../../utils/functions/test-helpers/test-helpers';
 import { Swiper } from '../../../../components/public/swiper/Swiper';
+import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 
 jest.mock('../../../../components/public/swiper/Swiper', () => ({
     Swiper: ({ items, renderItem }: any) => (
@@ -17,27 +19,23 @@ jest.mock('../../../../components/public/swiper/Swiper', () => ({
 
 const MockProgramData = [
     {
-        IMG: '–§–æ—Ç–æ 1',
         ALT: 'Men and horse',
-        INFO: '–£—á–∞—Å–Ω–∏–∫–∏/—Ü—ñ, —è–∫—ñ –≤—ñ—Ä—è—Ç—å —ñ –¥–æ–≤—ñ—Ä—è—é—Ç—å',
+        INFO: '”˜‡ÒÌËÍË/ˆ≥, ˇÍ≥ ‚≥ˇÚ¸ ≥ ‰Ó‚≥ˇ˛Ú¸',
         CARD_CLASS: 'aside-card',
     },
     {
-        IMG: '–§–æ—Ç–æ 2',
         ALT: 'Girl and horse',
-        INFO: '–ü–∞—Ä—Ç–Ω–µ—Ä–∏, —è–∫—ñ –ø–æ–¥—ñ–ª—è—é—Ç—å –Ω–∞—à—ñ –º—Ä—ñ—ó —Ç–∞ —Ü—ñ–Ω–Ω–æ—Å—Ç—ñ',
+        INFO: 'œ‡ÚÌÂË, ˇÍ≥ ÔÓ‰≥Îˇ˛Ú¸ Ì‡¯≥ Ï≥ø Ú‡ ˆ≥ÌÌÓÒÚ≥',
         CARD_CLASS: 'middle-card',
     },
     {
-        IMG: '–§–æ—Ç–æ 3',
         ALT: 'Old men and horse',
-        INFO: '–í–æ–ª–æ–Ω—Ç–µ—Ä–∏/–∫–∏, —è–∫—ñ –ø–æ—Ä—É—á, –∞–±–∏ –ø—ñ–¥—Ç—Ä–∏–º–∞—Ç–∏',
+        INFO: '¬ÓÎÓÌÚÂË/ÍË, ˇÍ≥ ÔÓÛ˜, ‡·Ë Ô≥‰ÚËÏ‡ÚË',
         CARD_CLASS: 'middle-card',
     },
     {
-        IMG: '–§–æ—Ç–æ 4',
         ALT: 'Women and horse',
-        INFO: '–ë–ª–∞–≥–æ–¥—ñ–π–Ω–∏–∫–∏/—Ü—ñ, —è–∫—ñ –¥–æ–ø–æ–º–∞–≥–∞—é—Ç—å –≤—Ç—ñ–ª–∏—Ç–∏ —ñ–¥–µ—ó –≤ —Ä–µ–∞–ª—å–Ω—ñ—Å—Ç—å',
+        INFO: '¡Î‡„Ó‰≥ÈÌËÍË/ˆ≥, ˇÍ≥ ‰ÓÔÓÏ‡„‡˛Ú¸ ‚Ú≥ÎËÚË ≥‰Âø ‚ Â‡Î¸Ì≥ÒÚ¸',
         CARD_CLASS: 'aside-card',
     },
 ];
@@ -48,7 +46,7 @@ describe('MainValues component', () => {
                 items={MockProgramData}
                 renderItem={(person, index) => (
                     <div className={`people-card card-${index + 1}`} data-testid="people-card">
-                        <img src={person.IMG} alt={person.ALT} />
+                        <img src={ABOUT_US_DATA.PEOPLE_DATA[index].IMG} alt={person.ALT} />
                         <p className="people-info">{person.INFO}</p>
                     </div>
                 )}
@@ -69,29 +67,27 @@ describe('MainValues component', () => {
 
     it('should render main title with correct parts and highlights', () => {
         render(<MainValues />);
-        expect(screen.getByText(/–ì–æ–ª–æ–≤–Ω–∞ /i)).toBeInTheDocument();
-        expect(screen.getByText(/—Ü—ñ–Ω–Ω—ñ—Å—Ç—å/i)).toBeInTheDocument();
-        expect(screen.getByText(/Victory Center/i)).toBeInTheDocument();
-        expect(screen.getByText(/—Ü–µ –ª—é–¥–∏/i)).toBeInTheDocument();
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE.FIRST_PART']);
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE.FIRST_HIGHLIGHT']);
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE.MIDDLE_PART']);
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE.SECOND_HIGHLIGHT']);
     });
 
     it('should render correct number of people cards', () => {
         render(<MainValues />);
         const cards = screen.getAllByRole('img');
-        expect(cards.length).toBe(ABOUT_US_DATA.PEOPLE_DATA.length);
+        expect(cards.length).toBe(aboutUsPageUk.PEOPLE_DATA.length);
     });
 
     it('should render correct people info texts', () => {
         render(<MainValues />);
-        ABOUT_US_DATA.PEOPLE_DATA.forEach(({ INFO }) => {
+        aboutUsPageUk.PEOPLE_DATA.forEach(({ INFO }) => {
             expect(screen.getByText(INFO)).toBeInTheDocument();
         });
     });
 
     it('should render summary block with correct lines', () => {
         render(<MainValues />);
-        expect(screen.getByText(/–ú–∏ –≤—ñ—Ä–∏–º–æ –≤ —Å–∏–ª—É —Å–ø—ñ–ª—å–Ω–æ—Ç–∏, –≤ —è–∫—ñ–π –∫–æ–∂–µ–Ω –≥–æ–ª–æ—Å /i)).toBeInTheDocument();
-        expect(screen.getByText(/–≤–∞–∂–ª–∏–≤–∏–π, –∞ –∫–æ–∂–µ–Ω –∫—Ä–æ–∫ - –Ω–∞–±–ª–∏–∂—É—î –¥–æ —Å–ø—ñ–ª—å–Ω–æ—ó /i)).toBeInTheDocument();
-        expect(screen.getByText(/–ø–µ—Ä–µ–º–æ–≥–∏./i)).toBeInTheDocument();
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS']);
     });
 });

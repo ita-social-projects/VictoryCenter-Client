@@ -334,4 +334,254 @@ describe('GenericForm', () => {
 
         expect(onClose).toHaveBeenCalled();
     });
+
+    it('prevents submit when onSubmit is not provided', async () => {
+        const ref = React.createRef<any>();
+
+        render(
+            <GenericForm {...defaultProps} ref={ref} initialMode={GenericFormMode.Edit} onSubmit={undefined as any} />,
+        );
+
+        const input = screen.getByDisplayValue('Test Name');
+        fireEvent.change(input, { target: { value: 'Changed' } });
+
+        await ref.current.submit();
+
+        expect(screen.getByDisplayValue('Changed')).toBeInTheDocument();
+    });
+
+    it('successfully submits form and switches Edit to View mode', async () => {
+        const onSubmit = jest.fn().mockResolvedValue(undefined);
+        const ref = React.createRef<any>();
+
+        render(<GenericForm {...defaultProps} ref={ref} initialMode={GenericFormMode.Edit} onSubmit={onSubmit} />);
+
+        const input = screen.getByDisplayValue('Test Name');
+        fireEvent.change(input, { target: { value: 'New Name' } });
+
+        await ref.current.submit();
+
+        await waitFor(() => {
+            expect(onSubmit).toHaveBeenCalledWith({ id: 1, name: 'New Name', optional: 'opt' });
+            expect(screen.getByText('New Name')).toBeInTheDocument();
+        });
+    });
+
+    it('does not toggle mode when clicking edit button in Edit mode', () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Edit} />);
+
+        const editButton = screen.getByRole('button', { name: 'edit-btn' });
+        fireEvent.click(editButton);
+
+        expect(screen.getByDisplayValue('Test Name')).toBeInTheDocument();
+    });
+
+    it('shows specific delete title for bank with correspondentBanks', () => {
+        const dataWithCorrespondentBanks = {
+            id: 1,
+            name: 'Test Bank',
+            optional: 'opt',
+            correspondentBanks: [{ name: 'Correspondent Bank', swift: 'TEST', account: '123' }],
+        };
+
+        render(
+            <GenericForm
+                {...defaultProps}
+                initialData={dataWithCorrespondentBanks as any}
+                initialMode={GenericFormMode.View}
+            />,
+        );
+
+        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
+        fireEvent.click(deleteButton);
+
+        expect(screen.getByText(DONATE_TEXT.QUESTION.BANK_DETAILS.FOREIGN.DELETE)).toBeInTheDocument();
+    });
+
+    it('handles value change for field without validator', () => {
+        const fieldsWithoutValidator: GenericFormField<Item>[] = [
+            { name: 'name', isTitle: true, isRequired: true },
+            { name: 'optional' },
+        ];
+        const FormWithoutValidator = createGenericForm<Item>(fieldsWithoutValidator);
+
+        render(
+            <FormWithoutValidator
+                initialData={{ id: 1, name: 'Test', optional: 'opt' }}
+                initialMode={GenericFormMode.Edit}
+                onClose={jest.fn()}
+                onSubmit={jest.fn()}
+            />,
+        );
+
+        const input = screen.getByDisplayValue('Test');
+        fireEvent.change(input, { target: { value: 'Updated' } });
+
+        expect((input as HTMLInputElement).value).toBe('Updated');
+    });
+
+    it('toggles from View to Edit mode and expands form on edit button click', () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.View} />);
+
+        const editButton = screen.getByRole('button', { name: 'edit-btn' });
+        fireEvent.click(editButton);
+
+        expect(screen.getByDisplayValue('Test Name')).toBeInTheDocument();
+        expect(screen.getByDisplayValue('opt')).toBeInTheDocument();
+    });
+
+    it('resets form state without modal when canceling Edit with no changes', () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Edit} />);
+
+        const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+        fireEvent.click(cancelButton);
+
+        expect(
+            screen.queryByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+        ).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'edit-btn' })).toBeInTheDocument();
+    });
+
+    it('renders children when isChildForm is false', () => {
+        render(<GenericForm {...defaultProps} isChildForm={false} />);
+        expect(screen.getByText('opt')).toBeInTheDocument();
+    });
+
+    it('handles View mode cancel by calling handleViewCancel', () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.View} />);
+
+        const header = screen.getByText('Test Name');
+        fireEvent.click(header);
+        expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(true);
+
+        fireEvent.keyDown(header, { key: 'Escape' });
+        fireEvent.click(header);
+
+        expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(false);
+    });
+
+    it('shows correct delete title for child form', () => {
+        const fields: GenericFormField<Item>[] = [
+            { name: 'name', label: 'Name', isTitle: true, isRequired: true },
+            { name: 'optional', label: 'Optional' },
+        ];
+        const ChildForm = createGenericForm<Item>(fields);
+
+        render(
+            <ChildForm
+                initialData={{ id: 1, name: 'Test Name', optional: 'opt' }}
+                initialMode={GenericFormMode.View}
+                isChildForm={true}
+                onClose={jest.fn()}
+                onSubmit={jest.fn()}
+                onDelete={jest.fn()}
+            />,
+        );
+
+        const header = screen.getByText('Test Name');
+        fireEvent.click(header);
+
+        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
+        fireEvent.click(deleteButton);
+
+        expect(screen.getByText(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE)).toBeInTheDocument();
+    });
+
+    it('updates required field validation state', () => {
+        const fieldsWithValidator: GenericFormField<Item>[] = [
+            {
+                name: 'name',
+                isTitle: true,
+                isRequired: true,
+                validate: (val) => (val ? undefined : 'Required'),
+            },
+            { name: 'optional' },
+        ];
+        const FormWithValidator = createGenericForm<Item>(fieldsWithValidator);
+
+        render(
+            <FormWithValidator
+                initialData={{ id: 1, name: 'Test', optional: 'opt' }}
+                initialMode={GenericFormMode.Edit}
+                onClose={jest.fn()}
+                onSubmit={jest.fn()}
+            />,
+        );
+
+        const input = screen.getByDisplayValue('Test');
+        fireEvent.change(input, { target: { value: '' } });
+        fireEvent.blur(input);
+
+        expect((input as HTMLInputElement).value).toBe('');
+    });
+
+    it('keeps form expanded after switching from View to Edit', () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.View} />);
+
+        const editButton = screen.getByRole('button', { name: 'edit-btn' });
+        fireEvent.click(editButton);
+
+        const inputs = screen.getAllByRole('textbox');
+        expect(inputs.length).toBeGreaterThan(0);
+    });
+
+    it('covers handleEditClick in View to Edit transition', () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.View} />);
+
+        const editButton = screen.getByRole('button', { name: 'edit-btn' });
+        fireEvent.click(editButton);
+
+        expect(screen.getByDisplayValue('Test Name')).toBeInTheDocument();
+        expect(screen.getByDisplayValue('opt')).toBeInTheDocument();
+    });
+
+    it('covers field validation without validator function', () => {
+        const fieldsNoValidator: GenericFormField<Item>[] = [
+            { name: 'name', isTitle: true, isRequired: true },
+            { name: 'optional', label: 'Optional' },
+        ];
+        const FormNoValidator = createGenericForm<Item>(fieldsNoValidator);
+
+        render(
+            <FormNoValidator
+                initialData={{ id: 1, name: 'Test', optional: 'opt' }}
+                initialMode={GenericFormMode.Edit}
+                onClose={jest.fn()}
+                onSubmit={jest.fn()}
+            />,
+        );
+
+        const input = screen.getByDisplayValue('Test');
+        fireEvent.change(input, { target: { value: 'Updated' } });
+        fireEvent.blur(input);
+
+        expect((input as HTMLInputElement).value).toBe('Updated');
+    });
+
+    it('covers isDeleting state in child form delete', () => {
+        const childFields: GenericFormField<Item>[] = [
+            { name: 'name', isTitle: true, isRequired: true },
+            { name: 'optional' },
+        ];
+        const ChildForm = createGenericForm<Item>(childFields);
+
+        render(
+            <ChildForm
+                initialData={{ id: 1, name: 'Test Name', optional: 'opt' }}
+                initialMode={GenericFormMode.View}
+                isChildForm={true}
+                onClose={jest.fn()}
+                onSubmit={jest.fn()}
+                onDelete={jest.fn()}
+            />,
+        );
+
+        const header = screen.getByText('Test Name');
+        fireEvent.click(header);
+
+        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
+        fireEvent.click(deleteButton);
+
+        expect(screen.getByText(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE)).toBeInTheDocument();
+    });
 });

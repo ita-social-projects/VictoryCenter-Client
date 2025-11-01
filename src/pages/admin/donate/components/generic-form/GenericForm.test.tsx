@@ -52,6 +52,25 @@ describe('GenericForm', () => {
         return deleteButton;
     };
 
+    const testFieldChange = (fieldsConfig: GenericFormField<Item>[], changeValue: string, expectedValue: string) => {
+        const TestForm = createGenericForm<Item>(fieldsConfig);
+
+        render(
+            <TestForm
+                initialData={{ id: 1, name: 'Test', optional: 'opt' }}
+                initialMode={GenericFormMode.Edit}
+                onClose={jest.fn()}
+                onSubmit={jest.fn()}
+            />,
+        );
+
+        const input = screen.getByDisplayValue('Test');
+        fireEvent.change(input, { target: { value: changeValue } });
+        fireEvent.blur(input);
+
+        expect((input as HTMLInputElement).value).toBe(expectedValue);
+    };
+
     test('renders form in view mode', () => {
         render(<GenericForm {...defaultProps} />);
         expect(screen.getByText('Test Name')).toBeInTheDocument();
@@ -413,25 +432,7 @@ describe('GenericForm', () => {
     });
 
     it('handles value change for field without validator', () => {
-        const fieldsWithoutValidator: GenericFormField<Item>[] = [
-            { name: 'name', isTitle: true, isRequired: true },
-            { name: 'optional' },
-        ];
-        const FormWithoutValidator = createGenericForm<Item>(fieldsWithoutValidator);
-
-        render(
-            <FormWithoutValidator
-                initialData={{ id: 1, name: 'Test', optional: 'opt' }}
-                initialMode={GenericFormMode.Edit}
-                onClose={jest.fn()}
-                onSubmit={jest.fn()}
-            />,
-        );
-
-        const input = screen.getByDisplayValue('Test');
-        fireEvent.change(input, { target: { value: 'Updated' } });
-
-        expect((input as HTMLInputElement).value).toBe('Updated');
+        testFieldChange(fields, 'Updated', 'Updated');
     });
 
     it('toggles from View to Edit mode and expands form on edit button click', () => {
@@ -482,31 +483,19 @@ describe('GenericForm', () => {
     });
 
     it('updates required field validation state', () => {
-        const fieldsWithValidator: GenericFormField<Item>[] = [
-            {
-                name: 'name',
-                isTitle: true,
-                isRequired: true,
-                validate: (val) => (val ? undefined : 'Required'),
-            },
-            { name: 'optional' },
-        ];
-        const FormWithValidator = createGenericForm<Item>(fieldsWithValidator);
-
-        render(
-            <FormWithValidator
-                initialData={{ id: 1, name: 'Test', optional: 'opt' }}
-                initialMode={GenericFormMode.Edit}
-                onClose={jest.fn()}
-                onSubmit={jest.fn()}
-            />,
+        testFieldChange(
+            [
+                {
+                    name: 'name',
+                    isTitle: true,
+                    isRequired: true,
+                    validate: (val) => (val ? undefined : 'Required'),
+                },
+                { name: 'optional' },
+            ],
+            '',
+            '',
         );
-
-        const input = screen.getByDisplayValue('Test');
-        fireEvent.change(input, { target: { value: '' } });
-        fireEvent.blur(input);
-
-        expect((input as HTMLInputElement).value).toBe('');
     });
 
     it('keeps form expanded after switching from View to Edit', () => {
@@ -527,29 +516,6 @@ describe('GenericForm', () => {
 
         expect(screen.getByDisplayValue('Test Name')).toBeInTheDocument();
         expect(screen.getByDisplayValue('opt')).toBeInTheDocument();
-    });
-
-    it('covers field validation without validator function', () => {
-        const fieldsNoValidator: GenericFormField<Item>[] = [
-            { name: 'name', isTitle: true, isRequired: true },
-            { name: 'optional', label: 'Optional' },
-        ];
-        const FormNoValidator = createGenericForm<Item>(fieldsNoValidator);
-
-        render(
-            <FormNoValidator
-                initialData={{ id: 1, name: 'Test', optional: 'opt' }}
-                initialMode={GenericFormMode.Edit}
-                onClose={jest.fn()}
-                onSubmit={jest.fn()}
-            />,
-        );
-
-        const input = screen.getByDisplayValue('Test');
-        fireEvent.change(input, { target: { value: 'Updated' } });
-        fireEvent.blur(input);
-
-        expect((input as HTMLInputElement).value).toBe('Updated');
     });
 
     it('covers isDeleting state in child form delete', () => {

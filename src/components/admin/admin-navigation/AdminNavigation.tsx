@@ -42,7 +42,7 @@ export const AdminNavigation = () => {
                         >
                             {COMMON_TEXT_ADMIN.TAB.PROGRAMS}
                         </NavLink>
-                        
+
                         <NavLink
                             to={ADMIN_ROUTES.DONATE.FULL}
                             end

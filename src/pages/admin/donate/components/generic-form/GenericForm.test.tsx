@@ -27,6 +27,31 @@ describe('GenericForm', () => {
         children: ({ formState }) => <div>{formState.optional}</div>,
     };
 
+    const getChildFormDeleteButton = () => {
+        const childFields: GenericFormField<Item>[] = [
+            { name: 'name', label: 'Name', isTitle: true, isRequired: true },
+            { name: 'optional', label: 'Optional' },
+        ];
+        const ChildForm = createGenericForm<Item>(childFields);
+
+        render(
+            <ChildForm
+                initialData={{ id: 1, name: 'Test Name', optional: 'opt' }}
+                initialMode={GenericFormMode.View}
+                isChildForm={true}
+                onClose={jest.fn()}
+                onSubmit={jest.fn()}
+                onDelete={jest.fn()}
+            />,
+        );
+
+        const header = screen.getByText('Test Name');
+        fireEvent.click(header);
+
+        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
+        return deleteButton;
+    };
+
     test('renders form in view mode', () => {
         render(<GenericForm {...defaultProps} />);
         expect(screen.getByText('Test Name')).toBeInTheDocument();
@@ -268,19 +293,8 @@ describe('GenericForm', () => {
     });
 
     test('resets isDeleting on modal cancel', () => {
-        const fields: GenericFormField<Item>[] = [
-            { name: 'name', label: 'Name', isTitle: true, isRequired: true },
-            { name: 'optional', label: 'Optional' },
-        ];
-        const ChildForm = createGenericForm<Item>(fields);
-
-        render(<ChildForm {...defaultProps} initialMode={GenericFormMode.View} isChildForm />);
-
-        const header = screen.getByText('Test Name');
-        fireEvent.click(header);
-
-        const deleteBtn = screen.getByRole('button', { name: 'delete-btn' });
-        fireEvent.click(deleteBtn);
+        const deleteButton = getChildFormDeleteButton();
+        fireEvent.click(deleteButton);
 
         expect(screen.getByText(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE)).toBeInTheDocument();
 
@@ -461,27 +475,7 @@ describe('GenericForm', () => {
     });
 
     it('shows correct delete title for child form', () => {
-        const fields: GenericFormField<Item>[] = [
-            { name: 'name', label: 'Name', isTitle: true, isRequired: true },
-            { name: 'optional', label: 'Optional' },
-        ];
-        const ChildForm = createGenericForm<Item>(fields);
-
-        render(
-            <ChildForm
-                initialData={{ id: 1, name: 'Test Name', optional: 'opt' }}
-                initialMode={GenericFormMode.View}
-                isChildForm={true}
-                onClose={jest.fn()}
-                onSubmit={jest.fn()}
-                onDelete={jest.fn()}
-            />,
-        );
-
-        const header = screen.getByText('Test Name');
-        fireEvent.click(header);
-
-        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
+        const deleteButton = getChildFormDeleteButton();
         fireEvent.click(deleteButton);
 
         expect(screen.getByText(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE)).toBeInTheDocument();
@@ -559,27 +553,7 @@ describe('GenericForm', () => {
     });
 
     it('covers isDeleting state in child form delete', () => {
-        const childFields: GenericFormField<Item>[] = [
-            { name: 'name', isTitle: true, isRequired: true },
-            { name: 'optional' },
-        ];
-        const ChildForm = createGenericForm<Item>(childFields);
-
-        render(
-            <ChildForm
-                initialData={{ id: 1, name: 'Test Name', optional: 'opt' }}
-                initialMode={GenericFormMode.View}
-                isChildForm={true}
-                onClose={jest.fn()}
-                onSubmit={jest.fn()}
-                onDelete={jest.fn()}
-            />,
-        );
-
-        const header = screen.getByText('Test Name');
-        fireEvent.click(header);
-
-        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
+        const deleteButton = getChildFormDeleteButton();
         fireEvent.click(deleteButton);
 
         expect(screen.getByText(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE)).toBeInTheDocument();

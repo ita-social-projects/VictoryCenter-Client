@@ -1,8 +1,9 @@
 @use '../../../assets/sass/variables/colors';
+@use '../../../assets/sass/variables/z-index';
 
 .drag-preview {
     position: fixed;
-    z-index: 12;
+    z-index: z-index.admin(drag-preview);
     pointer-events: none;
     background-color: white;
     border: 2px solid colors.$blue-50;
@@ -12,6 +13,7 @@
     opacity: 0.9;
     transition: none;
     cursor: grabbing;
+    width: 70%;
 
     &:focus-within {
         cursor: grabbing;
@@ -23,6 +25,15 @@
 
     .dragger {
         background-color: colors.$blue-50;
+    }
+
+    .item-data {
+        width: 100%;
+        height: 100%;
+        padding: 1.875rem;
+        box-sizing: border-box;
+        background: colors.$grey-50;
+        box-shadow: 0 1px 2.8px 0 rgba(black, 0.15);
     }
 }
 

@@ -50,8 +50,29 @@ describe('teamMemberValidationSchema', () => {
     });
 
     describe('description validation', () => {
-        it('accepts optional description when not publishing', () => {
+        it('accepts short description when not publishing', () => {
+            expect(
+                TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(invalidDescriptionShort, false),
+            ).toBeUndefined();
+        });
+
+        it('accepts empty description when not publishing', () => {
             expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription('', false)).toBeUndefined();
+        });
+
+        it('rejects description with multiple spaces when not publishing', () => {
+            const descriptionWithMultipleSpaces = 'Valid text   with multiple spaces';
+            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(descriptionWithMultipleSpaces, false)).toBe(
+                TEAM_MEMBER_VALIDATION.description.getMultipleSpacesError(),
+            );
+        });
+
+        it('rejects description with multiple spaces when publishing', () => {
+            const descriptionWithMultipleSpaces =
+                'Valid text    with multiple spaces but long enough to pass min length';
+            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(descriptionWithMultipleSpaces, true)).toBe(
+                TEAM_MEMBER_VALIDATION.description.getMultipleSpacesError(),
+            );
         });
 
         it('rejects description too long', () => {

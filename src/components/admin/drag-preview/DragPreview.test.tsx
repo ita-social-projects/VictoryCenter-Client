@@ -2,7 +2,9 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { DragPreview, DragPreviewProps } from './DragPreview';
 
-jest.mock('../../../assets/icons/dragger.svg', () => 'mock-drag-icon.svg');
+jest.mock('../../../assets/icons/dragger.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="drag-icon" />,
+}));
 
 describe('DragPreview', () => {
     interface TestEntity {
@@ -21,7 +23,6 @@ describe('DragPreview', () => {
             y: 200,
         },
         renderEntityComponent: (entity) => <span>{entity.name}</span>,
-        dragAltText: 'Drag me',
     };
 
     it('should render nothing when dragPreview.visible is false', () => {
@@ -40,14 +41,16 @@ describe('DragPreview', () => {
 
     it('should render drag preview when visible and item are provided', () => {
         render(<DragPreview {...defaultProps} />);
-        expect(screen.getByAltText(/drag me/i)).toBeInTheDocument();
+        expect(screen.getByTestId('drag-icon')).toBeInTheDocument();
         expect(screen.getByText(/test entity/i)).toBeInTheDocument();
     });
 
     it('should apply correct position styles', () => {
         render(<DragPreview {...defaultProps} />);
-        const preview = screen.getByRole('img', { hidden: true }).closest('.drag-preview') as HTMLElement;
-        expect(preview).toHaveStyle({ left: `${100 - 45}px`, top: `${200 - 55}px` });
+        const icon = screen.getByTestId('drag-icon');
+        const node = icon.closest('.drag-preview') as HTMLElement;
+
+        expect(node).toHaveStyle({ left: `${100 - 45}px`, top: `${200 - 55}px` });
     });
 
     it('should use keySelector for the wrapper key', () => {
@@ -62,11 +65,5 @@ describe('DragPreview', () => {
         render(<DragPreview {...defaultProps} renderEntityComponent={customRender} />);
         expect(screen.getByText(/custom: test entity/i)).toBeInTheDocument();
         expect(customRender).toHaveBeenCalledWith(defaultEntity);
-    });
-
-    it('should render image with provided alt text', () => {
-        render(<DragPreview {...defaultProps} />);
-        const img = screen.getByRole('img', { name: /drag me/i, hidden: true });
-        expect(img).toHaveAttribute('src', 'mock-drag-icon.svg');
     });
 });

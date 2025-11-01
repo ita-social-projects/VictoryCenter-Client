@@ -32,7 +32,7 @@ export const PROGRAMS_TEXT = {
             NAME: 'Назва',
             DESCRIPTION: 'Опис',
             CATEGORY: 'Категорія',
-            SELECT_CATEGORY: 'Виберіть категорію',
+            SELECT_CATEGORY: 'Оберіть категорію',
             PHOTO: 'Фото',
         },
     },
@@ -87,12 +87,12 @@ export const PROGRAM_VALIDATION = {
     categories: {
         getAtLeastOneRequiredError: () => 'Потрібно обрати хоча б одну категорію',
     },
-    img: {
+    image: {
         maxSizeBytes: 3 * 1024 * 1024,
         allowedFormats: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
         getRequiredWhenPublishingError: () => 'Фото обов’язкове при публікації',
         getFormatError: () => 'Невірний формат фото, дозволено jpeg, jpg, png, webp',
-        getSizeError: () => `Фото не більше ${PROGRAM_VALIDATION.img.maxSizeBytes / (1024 * 1024)} Mb`,
+        getSizeError: () => `Фото не більше ${PROGRAM_VALIDATION.image.maxSizeBytes / (1024 * 1024)} Mb`,
     },
 };
 

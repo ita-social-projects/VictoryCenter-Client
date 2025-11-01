@@ -1,22 +1,22 @@
-import './ScrollableFrame.scss';
 import { Swiper, SwiperSlide, SwiperClass } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
-import { useState, useEffect, useRef } from 'react';
-import arrowRightWhite from '../../../../../assets/icons/arrow-right-white.svg';
-import arrowLeftWhite from '../../../../../assets/icons/arrow-left-white.svg';
-import arrowRightBlack from '../../../../../assets/icons/arrow-right.svg';
-import arrowLeftBlack from '../../../../../assets/icons/arrow-left.svg';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { ReactComponent as ArrowRight } from '../../../../../assets/icons/arrow-right.svg';
+import { ReactComponent as ArrowLeft } from '../../../../../assets/icons/arrow-left.svg';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
-import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../../const/public/programs-page';
-import { PublishedProgram } from '../../../../../types/public/programs-page';
+import { PublishedProgramDto } from '../../../../../types/public/programs-page';
 import { programPageDataFetch } from '../../../../../services/api/public/programs/programs-api';
 import { ProgramCard } from '../../../programs-page/programs-section/program-card/ProgramCard';
+import { useTranslation } from 'react-i18next';
+import './ScrollableFrame.scss';
 
 export const ScrollableFrame = () => {
-    const [programData, setProgramData] = useState<PublishedProgram[]>([]);
+    const { t } = useTranslation('programsPage');
+
+    const [programData, setProgramData] = useState<PublishedProgramDto[]>([]);
     const [error, setError] = useState<string | null>(null);
     const swiperRef = useRef<SwiperClass | null>(null);
 
@@ -28,18 +28,21 @@ export const ScrollableFrame = () => {
         swiperRef.current?.slideNext();
     };
 
+    // will fetch program data in a selected language later
+    const fetchProgramData = useCallback(async () => {
+        try {
+            const response = await programPageDataFetch();
+            setProgramData(response.programsData);
+            setError(null);
+        } catch {
+            setError(t('FAILED_TO_LOAD_THE_PROGRAMS'));
+            setProgramData([]);
+        }
+    }, [t]);
+
     useEffect(() => {
-        (async () => {
-            try {
-                const response = await programPageDataFetch();
-                setProgramData(response.programData);
-                setError(null);
-            } catch {
-                setError(FAILED_TO_LOAD_THE_PROGRAMS);
-                setProgramData([]);
-            }
-        })();
-    }, []);
+        fetchProgramData();
+    }, [fetchProgramData]);
 
     return (
         <div className="scroll-block">
@@ -56,7 +59,7 @@ export const ScrollableFrame = () => {
                 scrollbar={{ draggable: true, el: '.custom-scrollbar' }}
             >
                 {programData.map((item, index) => (
-                    <SwiperSlide key={`${item.title}-${index}`}>
+                    <SwiperSlide key={`${item.name}-${index}`}>
                         <ProgramCard program={item} />
                     </SwiperSlide>
                 ))}
@@ -64,12 +67,10 @@ export const ScrollableFrame = () => {
 
             <div className="button-container">
                 <button onClick={handlePrev} className="arrow-button">
-                    <img src={arrowLeftWhite} alt="" className="arrow-normal-state" />
-                    <img src={arrowLeftBlack} alt="" className="arrow-hover-state" />
+                    <ArrowLeft className="arrow-icon" />
                 </button>
                 <button onClick={handleNext} className="arrow-button">
-                    <img src={arrowRightWhite} alt="" className="arrow-normal-state" />
-                    <img src={arrowRightBlack} alt="" className="arrow-hover-state" />
+                    <ArrowRight className="arrow-icon" />
                 </button>
             </div>
 

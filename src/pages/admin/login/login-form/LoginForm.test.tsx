@@ -2,9 +2,20 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import * as AdminContext from '../../../../contexts/admin/admin-context-provider/AdminContextProvider';
 import { LoginForm } from './LoginForm';
-import Logo from '../../../../assets/icons/logo-with-text.svg';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 import { LOGIN_CONST } from '../../../../const/admin/login';
+
+jest.mock('../../../../assets/icons/logo-with-text.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="logo-icon" />,
+}));
+
+jest.mock('../../../../assets/icons/eye-opened.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="eye-opened-icon" />,
+}));
+
+jest.mock('../../../../assets/icons/eye-closed.svg', () => ({
+    ReactComponent: (props: any) => <svg {...props} data-testid="eye-closed-icon" />,
+}));
 
 describe('<LoginForm />', () => {
     let loginMock: jest.Mock<Promise<void>, [creds: any]>;
@@ -32,9 +43,7 @@ describe('<LoginForm />', () => {
             </MemoryRouter>,
         );
 
-        const logo = screen.getByAltText(LOGIN_CONST.FORM.LOGO_ALT) as HTMLImageElement;
-        expect(logo).toBeInTheDocument();
-        expect(logo.src).toContain(Logo);
+        expect(screen.getByTestId('logo-icon')).toBeInTheDocument();
 
         expect(screen.getByText(LOGIN_CONST.FORM.TITLE)).toBeInTheDocument();
 
@@ -44,9 +53,7 @@ describe('<LoginForm />', () => {
         const passwordInput = screen.getByLabelText(LOGIN_CONST.FORM.PASSWORD_FIELD_LABEL) as HTMLInputElement;
         expect(passwordInput.value).toBe('');
         expect(passwordInput.type).toBe('password');
-        const toggleBtn = screen.getByRole('button', {
-            name: LOGIN_CONST.FORM.HIDDEN_PASSWORD_ALT,
-        });
+        const toggleBtn = screen.getByTestId('visibility-toggle-button');
         expect(toggleBtn).toBeInTheDocument();
 
         expect(screen.getByRole('button', { name: LOGIN_CONST.FORM.SUBMIT_BUTTON })).toBeInTheDocument();
@@ -81,17 +88,15 @@ describe('<LoginForm />', () => {
         );
 
         const passwordInput = screen.getByLabelText(LOGIN_CONST.FORM.PASSWORD_FIELD_LABEL) as HTMLInputElement;
-        const toggleBtn = screen.getByRole('button', {
-            name: LOGIN_CONST.FORM.HIDDEN_PASSWORD_ALT,
-        });
+        const toggleBtn = screen.getByTestId('visibility-toggle-button');
 
         fireEvent.click(toggleBtn);
         expect(passwordInput.type).toBe('text');
-        expect(screen.getByRole('button', { name: LOGIN_CONST.FORM.SHOWED_PASSWORD_ALT })).toBeInTheDocument();
+        expect(screen.getByTestId('eye-opened-icon')).toBeInTheDocument();
 
-        fireEvent.click(screen.getByRole('button', { name: LOGIN_CONST.FORM.SHOWED_PASSWORD_ALT }));
+        fireEvent.click(toggleBtn);
         expect(passwordInput.type).toBe('password');
-        expect(screen.getByRole('button', { name: LOGIN_CONST.FORM.HIDDEN_PASSWORD_ALT })).toBeInTheDocument();
+        expect(screen.getByTestId('eye-closed-icon')).toBeInTheDocument();
     });
 
     it('calls login with credentials on submit (success)', async () => {

@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useGenericModal, GenericFormRef } from './useGenericModal';
-import { VisibilityStatus } from '../../../types/admin/common';
+import { VisibilityStatus, ModalMode } from '../../../types/admin/common';
 
 describe('useGenericModal', () => {
     const apiCall = jest.fn();
@@ -12,7 +12,7 @@ describe('useGenericModal', () => {
     const transformFormData = jest.fn((data) => ({ ...data, transformed: true }));
 
     const defaultConfig = {
-        mode: 'add' as const,
+        mode: ModalMode.Add,
         isOpen: true,
         onClose,
         entity: { id: 1 },
@@ -43,6 +43,47 @@ describe('useGenericModal', () => {
         expect(result.current.error).toBe('');
         expect(result.current.showFormConfirmModal).toBe(false);
         expect(result.current.isFormValid).toBe(false);
+    });
+
+    it('does not reset state when modal is closed', () => {
+        const { rerender, result } = renderHook((props) => useGenericModal(props), {
+            initialProps: { ...defaultConfig, isOpen: true },
+        });
+
+        act(() => result.current.handleFormValidationChange(true));
+        expect(result.current.isFormValid).toBe(true);
+
+        rerender({ ...defaultConfig, isOpen: false });
+        expect(result.current.isFormValid).toBe(true);
+    });
+
+    it('calls updateButtonStates when form validation changes', () => {
+        const { result } = renderHook(() => useGenericModal(defaultConfig));
+
+        const mockIsValid = jest.fn((isPublishing) => !isPublishing);
+        result.current.formRef.current = makeFormRef({ isValid: mockIsValid });
+
+        act(() => result.current.handleFormValidationChange(true));
+
+        expect(mockIsValid).toHaveBeenCalledWith(false);
+        expect(mockIsValid).toHaveBeenCalledWith(true);
+        expect(result.current.buttonStates.draftValid).toBe(true);
+        expect(result.current.buttonStates.publishValid).toBe(false);
+    });
+
+    it('updateButtonStates respects different isValid results for draft vs publish', () => {
+        const { result } = renderHook(() => useGenericModal(defaultConfig));
+
+        result.current.formRef.current = makeFormRef({
+            isValid: jest.fn((isPublishing) => !isPublishing),
+        });
+
+        act(() => result.current.handleFormValidationChange(false));
+
+        expect(result.current.buttonStates).toEqual({
+            draftValid: true,
+            publishValid: false,
+        });
     });
 
     it('handles form validation change', () => {
@@ -113,7 +154,7 @@ describe('useGenericModal', () => {
 
         expect(localApiCall).toHaveBeenCalled();
         expect(onSuccess).not.toHaveBeenCalled();
-        expect(mockGetErrorMessage).toHaveBeenCalledWith('add'); // or 'edit' depending on your defaultConfig.mode
+        expect(mockGetErrorMessage).toHaveBeenCalledWith(ModalMode.Add); // or ModalMode.Edit depending on your defaultConfig.mode
         expect(result.current.error).toBe('boom');
         expect(result.current.isSubmitting).toBe(false);
     });
@@ -229,5 +270,36 @@ describe('useGenericModal', () => {
             result.current.handleDraftSubmit();
         });
         expect(submit).toHaveBeenCalledWith(VisibilityStatus.Draft);
+    });
+
+    it('buttonStates should reflect form validation state correctly', () => {
+        const { result } = renderHook(() => useGenericModal(defaultConfig));
+
+        result.current.formRef.current = makeFormRef({
+            isValid: jest.fn((isPublishing) => !isPublishing),
+        });
+
+        expect(result.current.buttonStates.draftValid).toBe(false);
+        expect(result.current.buttonStates.publishValid).toBe(false);
+
+        act(() => {
+            result.current.handleFormValidationChange(true);
+        });
+
+        expect(result.current.buttonStates.draftValid).toBe(true);
+        expect(result.current.buttonStates.publishValid).toBe(false);
+    });
+
+    it('buttonStates should work without form api', () => {
+        const { result } = renderHook(() => useGenericModal(defaultConfig));
+
+        result.current.formRef.current = null;
+
+        act(() => {
+            result.current.handleFormValidationChange(true);
+        });
+
+        expect(result.current.buttonStates.draftValid).toBe(true);
+        expect(result.current.buttonStates.publishValid).toBe(true);
     });
 });

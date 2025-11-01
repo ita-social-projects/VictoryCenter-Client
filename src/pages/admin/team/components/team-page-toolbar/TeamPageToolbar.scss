@@ -1,17 +1,19 @@
 .toolbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1.25rem;
+
+    &-search {
+        width: 38.75rem;
+        flex: 0 0 38.75rem;
+        min-width: 0;
+        margin-right: auto;
+    }
 
     &-actions {
         display: flex;
-        justify-content: space-between;
         gap: 1.25rem;
-    }
-}
-
-@media (max-width: 1400px) {
-    .toolbar {
-        flex-wrap: wrap;
-        gap: 0.938rem;
+        flex-shrink: 0;
     }
 }

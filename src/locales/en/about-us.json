@@ -1,0 +1,99 @@
+{
+    "OUR_VALUES": "Our Values",
+    "VALUE_ITEMS": [
+        {
+            "NAME": "Empathy",
+            "DESCRIPTION": "We share the feelings and emotions of our participants and treat the emotional state of veterans and children with understanding and respect."
+        },
+        {
+            "NAME": "Empowerment",
+            "DESCRIPTION": "We strive not only to be there for participants but also to directly contribute to their recovery and further personal development."
+        },
+        {
+            "NAME": "Unity",
+            "DESCRIPTION": "We create a community of support, care, and trust, because together we are stronger."
+        },
+        {
+            "NAME": "Diversity",
+            "DESCRIPTION": "We respect and value the unique experience and life path of every person we interact with."
+        },
+        {
+            "NAME": "Resilience",
+            "DESCRIPTION": "We believe in the strength of the human spirit and sincerely strive to support everyone on their path of overcoming difficulties and building resilience."
+        },
+        {
+            "NAME": "Responsibility",
+            "DESCRIPTION": "We take responsibility for our actions and words before participants, partners, and benefactors."
+        },
+        {
+            "NAME": "Partnership",
+            "DESCRIPTION": "We cultivate partnership and the exchange of experience at the local, national, and international levels."
+        },
+        {
+            "NAME": "Innovation",
+            "DESCRIPTION": "We strive for continuous search and implementation of new approaches to therapy and mental health recovery for effective support of our community."
+        },
+        {
+            "NAME": "Transparency and Honesty",
+            "DESCRIPTION": "We adhere to the principles of openness, transparency, and ethics in our activities and beyond."
+        }
+    ],
+    "INTRO_TITLE.FIRST_HIGHLIGHT": "A space",
+    "INTRO_TITLE.MIDDLE_PART": " of trust, care, and your ",
+    "INTRO_TITLE.SECOND_HIGHLIGHT": "inner strength",
+    "INTRO_DETAILS.FIRST_LINE": "Victory Center is not about terms or numbers. ",
+    "INTRO_DETAILS.SECOND_LINE": "It’s about feelings. Here you stop in the moment, ",
+    "INTRO_DETAILS.THIRD_LINE": "where tension disappears and healing begins. ",
+    "INTRO_DETAILS.FOURTH_LINE": "Through community, nature, and contact with horses you return to your true self. We don’t change people. ",
+    "INTRO_DETAILS.FIFTH_LINE": "We help them remember who they are.",
+    "PEOPLE_DATA": [
+        {
+            "ALT": "Men and horse",
+            "INFO": "Participants who believe and trust"
+        },
+        {
+            "ALT": "Girl and horse",
+            "INFO": "Partners who share our dreams and values"
+        },
+        {
+            "ALT": "Old man and horse",
+            "INFO": "Volunteers who are there to support"
+        },
+        {
+            "ALT": "Woman and horse",
+            "INFO": "Donors who help bring ideas to life"
+        }
+    ],
+    "MAIN_VALUE.FIRST_PART": "The main ",
+    "MAIN_VALUE.FIRST_HIGHLIGHT": "value",
+    "MAIN_VALUE.MIDDLE_PART": " of Victory Center ",
+    "MAIN_VALUE.SECOND_HIGHLIGHT": "is people",
+    "MAIN_VALUE_DETAILS.FIRST_LINE": "We believe in the power of community, where every voice ",
+    "MAIN_VALUE_DETAILS.SECOND_LINE": "matters, and every step brings us closer to a shared ",
+    "MAIN_VALUE_DETAILS.THIRD_LINE": "victory.",
+    "SUPPORT_TITLE": "Who we can support",
+    "SUPPORT_DATA": [
+        {
+            "ALT": "Support of veterans",
+            "DESCRIPTION": "Veterans who returned from the frontlines or captivity and strive to restore contact with themselves, their bodies, and their loved ones."
+        },
+        {
+            "ALT": "Support of volunteers",
+            "DESCRIPTION": "Volunteers and civilians who feel the need for emotional recovery and want to continue supporting others."
+        },
+        {
+            "ALT": "Support of children",
+            "DESCRIPTION": "Children affected by war who have experienced loss, fear, or displacement. Through play therapy, group interaction, and contact with animals, we help restore trust and a sense of safety."
+        }
+    ],
+    "DONATE_TITLE": "You can always support us",
+    "DONATE_DETAILS": "Choose the way that works best for you",
+    "DONATE": "Donate",
+    "BECOME_PARTNER": "Become a partner",
+    "WHAT_WE_DO": "What we do",
+    "WHAT_WE_DO_DETAILS": "We create therapeutic programs that combine interaction with horses, body practices, contact with nature, psychological support, and a supportive community. Each program is adapted to the individual needs of participants.",
+    "GO_TO_PROGRAMS": "Go to programs",
+    "GO_TO_TEAM": "Meet the team",
+    "TEAM_DETAILS.FIRST_PART": "Victory Center is the joint work of psychologists, facilitators, coordinators, volunteers, and partner ranches, united by the goal of creating a safe environment for recovery.",
+    "TEAM_DETAILS.SECOND_PART": "Our team works with servicemen/veterans, children, and their families, undergoes regular training, adheres to the ethical code, values and supports each person."
+}

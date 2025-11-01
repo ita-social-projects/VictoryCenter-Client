@@ -1,5 +1,6 @@
 @use '../../../assets/sass/variables/colors';
 @use '../../../assets/sass/variables/fonts';
+@use '../../../assets/sass/variables/z-index';
 
 .team-page-container {
     width: 100%;
@@ -14,7 +15,7 @@
         width: 70%;
         margin-bottom: 4rem;
         position: relative;
-        z-index: 10;
+        z-index: z-index.public(team-page-members-loader);
     }
 
     h2 {
@@ -122,7 +123,6 @@
         height: auto;
         transform: translate(-50%, -50%);
         object-fit: cover;
-        z-index: -1;
     }
 
     .quote-overlay {
@@ -132,17 +132,16 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        z-index: 1;
         max-width: 70%;
         color: white;
         font-weight: 600;
         padding: 5rem 0;
         justify-content: center;
+    }
 
-        p {
-            color: white;
-            display: inline-block;
-        }
+    .quote-overlay p {
+        color: white;
+        display: inline-block;
     }
 
     .author {

@@ -15,5 +15,8 @@ export const ADMIN_ROUTES = {
     DONATE: {
         PATH: 'donate',
         FULL: '/admin-panel/donate',
+    FAQ: {
+        PATH: 'faq',
+        FULL: '/admin-panel/faq',
     },
 };

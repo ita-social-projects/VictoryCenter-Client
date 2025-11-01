@@ -1,18 +1,21 @@
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
+import { useTranslation } from 'react-i18next';
 import './CompanyValues.scss';
 
 export const CompanyValues = () => {
-    const chunkedValues = ABOUT_US_DATA.VALUE_ITEMS.reduce(
+    const { t } = useTranslation('aboutUsPage');
+    const valueItems = t('VALUE_ITEMS', { returnObjects: true });
+
+    const chunkedValues = valueItems.reduce(
         (acc, _, i) => {
-            if (i % 3 === 0) acc.push(ABOUT_US_DATA.VALUE_ITEMS.slice(i, i + 3));
+            if (i % 3 === 0) acc.push(valueItems.slice(i, i + 3));
             return acc;
         },
-        [] as (typeof ABOUT_US_DATA.VALUE_ITEMS)[],
+        [] as (typeof valueItems)[],
     );
 
     return (
         <div className="values-block">
-            <h2 className="values-title">{ABOUT_US_DATA.OUR_VALUES}</h2>
+            <h2 className="values-title">{t('OUR_VALUES')}</h2>
             {chunkedValues.map((group, groupIndex) => (
                 <div className="value-card" key={groupIndex}>
                     {group.map((val, index) => (

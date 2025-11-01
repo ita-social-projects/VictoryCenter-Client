@@ -1,29 +1,29 @@
 import { render, screen } from '@testing-library/react';
 import { DonateSection } from './DonateSection';
-import { MemoryRouter } from 'react-router';
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
+import { MemoryRouter } from 'react-router-dom';
+import aboutUsPageUk from '../../../../locales/uk/about-us.json';
 
 describe('DonateSection', () => {
     it('should render section with correct title', () => {
         render(<DonateSection />, { wrapper: MemoryRouter });
-        expect(screen.getByText(ABOUT_US_DATA.DONATE_TITLE)).toBeInTheDocument();
+        expect(screen.getByText(aboutUsPageUk.DONATE_TITLE)).toBeInTheDocument();
     });
 
     it('should render subtitle correctly', () => {
         render(<DonateSection />, { wrapper: MemoryRouter });
-        expect(screen.getByText(ABOUT_US_DATA.DONATE_DETAILS)).toBeInTheDocument();
+        expect(screen.getByText(aboutUsPageUk.DONATE_DETAILS)).toBeInTheDocument();
     });
 
     it('should render donate button', () => {
         render(<DonateSection />, { wrapper: MemoryRouter });
-        expect(screen.getByText(ABOUT_US_DATA.DONATE)).toBeInTheDocument();
-        expect(screen.getByText(ABOUT_US_DATA.DONATE)).toHaveClass('donate-button');
+        expect(screen.getByText(aboutUsPageUk.DONATE)).toBeInTheDocument();
+        expect(screen.getByText(aboutUsPageUk.DONATE)).toHaveClass('donate-button');
     });
 
     it('should render "become-a-partner" button correctly', () => {
         render(<DonateSection />, { wrapper: MemoryRouter });
-        expect(screen.getByText(ABOUT_US_DATA.BECOME_PARTNER)).toBeInTheDocument();
-        expect(screen.getByText(ABOUT_US_DATA.BECOME_PARTNER)).toHaveClass('partner-button');
+        expect(screen.getByText(aboutUsPageUk.BECOME_PARTNER)).toBeInTheDocument();
+        expect(screen.getByText(aboutUsPageUk.BECOME_PARTNER)).toHaveClass('partner-button');
     });
 
     it('should render background image with correct className', () => {

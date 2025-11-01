@@ -3,25 +3,25 @@ export const TEAM_MEMBERS_TEXT = {
         INPUT_FULLNAME: "Введіть ім'я та прізвище",
     },
     BUTTON: {
-        ADD_MEMBER: 'Додати учасника',
+        ADD_MEMBER: 'Додати в команду',
     },
 
     MESSAGE: {
         FAIL_TO_FETCH_MEMBERS: 'Виникла помилка, не вдалось завантажити учасників команди',
         FAIL_TO_REORDER_MEMBERS: 'Виникла помилка, не вдалось змінити пріоритет учасників команди',
-        DONT_FORGET_TO_ORDER: 'Hе забудьте налаштувати порядок відображення члена команди на сайті',
+        DONT_FORGET_TO_ORDER: 'Не забудь встановити порядок відображення',
     },
 
     QUESTION: {
-        PUBLISH_MEMBER: 'Опублікувати нового учасника команди?',
-        DRAFT_MEMBER: 'Зберегти нового учасника команди?',
+        PUBLISH_MEMBER: 'Опублікувати нового члена команди?',
+        DRAFT_MEMBER: 'Зберегти нового члена команди?',
     },
 
     FORM: {
         TITLE: {
-            ADD_MEMBER: 'Додати учасника',
-            EDIT_MEMBER: 'Редагування учасника команди',
-            DELETE_MEMBER: 'Видалити учасника команди?',
+            ADD_MEMBER: 'Додати в команду',
+            EDIT_MEMBER: 'Редагування члена команди',
+            DELETE_MEMBER: 'Видалити члена команди?',
         },
         MESSAGE: {
             FAIL_TO_CREATE_MEMBER: 'Виникла помилка під час додавання учасника',
@@ -32,7 +32,7 @@ export const TEAM_MEMBERS_TEXT = {
             FULLNAME: "Ім'я та Прізвище",
             DESCRIPTION: 'Опис',
             CATEGORY: 'Категорія',
-            SELECT_CATEGORY: 'Виберіть категорію',
+            SELECT_CATEGORY: 'Оберіть категорію',
             PHOTO: 'Фото',
         },
     },
@@ -48,6 +48,11 @@ export const TEAM_CATEGORY_TEXT = {
     MESSAGE: {
         FAIL_TO_FETCH_CATEGORIES: 'Виникла помилка, не вдалось завантажити категорії',
     },
+};
+
+export const TEAM_SEARCH = {
+    SUGGESTIONS_PAGE_SIZE: 5,
+    MIN_CHARACTERS_TO_SEARCH: 2,
 };
 
 export const TEAM_MEMBER_VALIDATION = {
@@ -66,6 +71,7 @@ export const TEAM_MEMBER_VALIDATION = {
         getRequiredWhenPublishingError: () => "Опис обов'язковий при публікації",
         getMinError: () => `Не менше ${TEAM_MEMBER_VALIDATION.description.min} символів`,
         getMaxError: () => `Не більше ${TEAM_MEMBER_VALIDATION.description.max} символів`,
+        getMultipleSpacesError: () => `Не можна використовувати більше одного пробіла`,
     },
     category: {
         getRequiredError: () => "Категорія обов'язкова",

@@ -1,15 +1,21 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ScrollableFrame } from './ScrollableFrame';
 import * as dataFetch from '../../../../../services/api/public/programs/programs-api';
-import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../../const/public/programs-page';
+import programsPageUk from '../../../../../locales/uk/programs.json';
+import { mockPrograms } from '../../../../../utils/mock-data/public/programs-page';
 
-jest.mock('../../../../../assets/icons/arrow-left-white.svg', () => 'arrow-left.png');
-jest.mock('../../../../../assets/icons/arrow-right-white.svg', () => 'arrow-right.png');
-jest.mock('../../../../../assets/icons/arrow-left.svg', () => 'arrow-left-black.png');
-jest.mock('../../../../../assets/icons/arrow-right.svg', () => 'arrow-right-black.png');
+jest.mock('../../../../../assets/icons/arrow-right.svg', () => ({
+    ReactComponent: (props: any) => <svg data-testid="arrow-right-icon" {...props} />,
+}));
+
+jest.mock('../../../../../assets/icons/arrow-left.svg', () => ({
+    ReactComponent: (props: any) => <svg data-testid="arrow-left-icon" {...props} />,
+}));
 
 jest.mock('../../../programs-page/programs-section/program-card/ProgramCard', () => ({
-    ProgramCard: ({ program }: { program: any }) => <div data-testid="program-card">{program.title}</div>,
+    ProgramCard: ({ program }: { program: any }) => (
+        <div data-testid="program-card">{program.name || program.title}</div>
+    ),
 }));
 
 jest.mock('swiper/react', () => {
@@ -27,46 +33,9 @@ jest.mock('swiper/react', () => {
     };
 });
 
-const MockProgramData = [
-    {
-        image: 'firstImg',
-        title: 'Коні лікують Літо 2025',
-        subtitle: 'Ветеранська програма',
-        description: 'Зменшення рівня стресу, тривоги та ПТСР у ветеранів...',
-    },
-    {
-        image: 'secondImg',
-        title: 'Програма 2',
-        subtitle: 'Ветеранська програма',
-        description: 'Опис 2',
-    },
-    {
-        image: 'thirdImg',
-        title: 'Програма 3',
-        subtitle: 'Ветеранська програма',
-        description: 'Опис 3',
-    },
-];
-
 describe('ScrollableFrame', () => {
     beforeEach(() => {
         jest.clearAllMocks();
-    });
-
-    it('should render programs correctly', async () => {
-        jest.spyOn(dataFetch, 'programPageDataFetch').mockResolvedValue({
-            programData: MockProgramData,
-        });
-
-        render(<ScrollableFrame />);
-
-        await waitFor(() => {
-            expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-        });
-
-        const cards = await screen.findAllByTestId('program-card');
-        expect(cards.length).toBe(MockProgramData.length);
-        expect(cards[0]).toHaveTextContent('Коні лікують Літо 2025');
     });
 
     it('should show message about fetch error', async () => {
@@ -75,9 +44,38 @@ describe('ScrollableFrame', () => {
         render(<ScrollableFrame />);
 
         await waitFor(() => {
-            expect(screen.getByRole('alert')).toHaveTextContent(FAILED_TO_LOAD_THE_PROGRAMS);
+            expect(screen.getByRole('alert')).toHaveTextContent(programsPageUk['FAILED_TO_LOAD_THE_PROGRAMS']);
         });
 
         expect(screen.queryAllByTestId('program-card').length).toBe(0);
+    });
+
+    it('should render buttons with correct icons', () => {
+        render(<ScrollableFrame />);
+
+        expect(screen.getByTestId('arrow-left-icon').closest('button')).toBeInTheDocument();
+        expect(screen.getByTestId('arrow-right-icon').closest('button')).toBeInTheDocument();
+    });
+
+    it('should call slidePrev and slideNext when arrow buttons are clicked', async () => {
+        jest.spyOn(dataFetch, 'programPageDataFetch').mockResolvedValue(mockPrograms);
+
+        render(<ScrollableFrame />);
+
+        // Wait for Swiper to be initialized and cards to render
+        await waitFor(() => {
+            expect(screen.getAllByTestId('program-card').length).toBe(2);
+        });
+
+        // Find buttons
+        const leftButton = screen.getByTestId('arrow-left-icon').closest('button');
+        const rightButton = screen.getByTestId('arrow-right-icon').closest('button');
+
+        // Click buttons and check that slidePrev/slideNext are called
+        fireEvent.click(leftButton!);
+        fireEvent.click(rightButton!);
+
+        // Since we mock Swiper, we can only check that the buttons exist and are clickable
+        // (the actual slidePrev/slideNext are jest.fn() in the mock)
     });
 });

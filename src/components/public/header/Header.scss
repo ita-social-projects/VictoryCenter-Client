@@ -1,8 +1,9 @@
 @use '../../../assets/sass/variables/colors';
 @use '../../../assets/sass/variables/fonts';
 @use '../../../assets/sass/mixins/utilits.mixins';
+@use '../../../assets/sass/variables/z-index';
 
-.headerBlock {
+.header-block {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -10,7 +11,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 5;
+    z-index: z-index.public(header);
 
     height: 4rem;
     padding-top: 0.85rem;
@@ -24,14 +25,14 @@
 
     backdrop-filter: blur(10.375rem);
 
-    .logoContainer {
+    .logo-container {
         .logo {
             user-select: none;
             cursor: pointer;
         }
     }
 
-    .linkContainer {
+    .link-container {
         nav {
             display: flex;
             gap: 3rem;
@@ -48,12 +49,15 @@
         }
     }
 
-    .buttonContainer {
+    .button-container {
         display: flex;
         gap: 0.5rem;
         align-items: center;
 
-        .contactUsButton {
+        .language-switcher {
+            margin-right: 1rem;
+        }
+        .contact-us-button {
             background-color: transparent;
             width: 8.2em;
             height: 2.5rem;
@@ -63,7 +67,7 @@
             cursor: pointer;
             border: 1px solid colors.$blue-900;
         }
-        .donateButton {
+        .donate-button {
             background-color: colors.$blue-900;
             color: white;
             font-family: fonts.$mulish-regular-font;
@@ -80,7 +84,7 @@
     }
 }
 
-.burgerMenuIcon {
+.burger-menu-icon {
     display: none;
     font-size: 2rem;
     cursor: pointer;
@@ -90,16 +94,20 @@
     color: black;
 }
 
-.mobileMenu {
+.mobile-menu {
     display: none;
+
+    .mobile-language-switcher {
+        display: none;
+    }
 }
 
 @media (max-width: 1024px) {
-    .linkContainer {
+    .link-container {
         display: none;
     }
 
-    .mobileMenu {
+    .mobile-menu {
         display: flex;
         position: absolute;
         top: 4rem;
@@ -107,7 +115,6 @@
         background-color: white;
         width: 12rem;
         flex-direction: column;
-        z-index: 10;
 
         a {
             font-weight: 600;
@@ -138,17 +145,33 @@
         }
     }
 
-    .burgerMenuIcon {
+    .burger-menu-icon {
         display: flex;
     }
 }
 
 @media (max-width: 568px) {
-    .headerBlock {
-        .buttonContainer {
-            .contactUsButton {
+    .header-block {
+        .button-container {
+            .contact-us-button {
                 display: none;
             }
+        }
+    }
+
+    .button-container {
+        .language-switcher {
+            display: none;
+        }
+    }
+    
+    .mobile-menu {
+        .mobile-language-switcher {
+            display: flex;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 1rem 1rem;
+            color: black;
         }
     }
 }

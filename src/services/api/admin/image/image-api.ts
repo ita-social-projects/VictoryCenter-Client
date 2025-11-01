@@ -28,4 +28,27 @@ export const ImageApi = {
         const response: AxiosResponse<Image> = await client.get<Image>(`${API_ROUTES.IMAGE.BASE}/${id}`);
         return response.data;
     },
+
+    getUpdateImageId: async (
+        client: AxiosInstance,
+        image: Image | ImageValues | null,
+        imageId: number | null,
+    ): Promise<{ finalImageId: number | null; imageIdToDelete: number | null }> => {
+        let imageIdToDelete: number | null = null;
+        let finalImageId = imageId;
+
+        if (image && 'base64' in image) {
+            if (imageId) {
+                const imageResult = await ImageApi.put(client, image, imageId);
+                finalImageId = imageResult.id;
+            } else {
+                const imageResult = await ImageApi.post(client, image);
+                finalImageId = imageResult.id;
+            }
+        } else if (imageId && !image) {
+            imageIdToDelete = imageId;
+            finalImageId = null;
+        }
+        return { finalImageId, imageIdToDelete };
+    },
 };

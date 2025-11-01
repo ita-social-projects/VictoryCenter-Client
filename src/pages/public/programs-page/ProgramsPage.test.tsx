@@ -10,7 +10,7 @@ jest.mock('./programs-section/ProgramsSection', () => ({
 }));
 
 jest.mock('../../../components/public/faq-section/FaqSection', () => ({
-    FaqSection: () => <div data-testid="faq-section">QuestionSection</div>,
+    FaqSection: () => <div data-testid="faq-section">FaqSection</div>,
 }));
 
 jest.mock('./contact-section/ContactSection', () => ({

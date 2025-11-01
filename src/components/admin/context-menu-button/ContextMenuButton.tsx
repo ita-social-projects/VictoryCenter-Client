@@ -1,18 +1,15 @@
-import React, { RefObject, useCallback, useRef, useState } from 'react';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import React, { useCallback, useRef, useState } from 'react';
 import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/useOnClickOutside';
-import DefaultIcon from '../../../assets/icons/menu.svg';
+import { ReactComponent as MenuIcon } from '../../../assets/icons/menu.svg';
 import classNames from 'classnames';
 import './ContextMenuButton.scss';
 
 export interface ContextMenuButtonProps {
     children: React.ReactNode;
     onOptionSelected: (value: string, data?: any) => void;
-    containerRef?: RefObject<HTMLDivElement | null>;
-    customIcon?: string;
 }
 
-export const ContextMenuButton = ({ children, onOptionSelected, containerRef, customIcon }: ContextMenuButtonProps) => {
+export const ContextMenuButton = ({ children, onOptionSelected }: ContextMenuButtonProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -41,7 +38,7 @@ export const ContextMenuButton = ({ children, onOptionSelected, containerRef, cu
     return (
         <div
             role="menu"
-            ref={containerRef || menuRef}
+            ref={menuRef}
             data-testid="context-menu"
             className={classNames('context-menu-button', {
                 'context-menu-button-active': isOpen,
@@ -55,11 +52,7 @@ export const ContextMenuButton = ({ children, onOptionSelected, containerRef, cu
                 }
             }}
         >
-            <img
-                src={customIcon || DefaultIcon}
-                alt={isOpen ? COMMON_TEXT_ADMIN.ALT.CLOSE_MENU : COMMON_TEXT_ADMIN.ALT.OPEN_MENU}
-                className="context-menu-button-icon"
-            />
+            <MenuIcon className="context-menu-button-icon" />
 
             <div
                 className={classNames('context-menu-button-options', {

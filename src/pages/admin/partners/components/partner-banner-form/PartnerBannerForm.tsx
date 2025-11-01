@@ -66,7 +66,7 @@ export const PartnerBannerForm = forwardRef<PartnerBannerFormRef, PartnerBannerF
             [onSubmit],
         );
 
-        const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
+        const { formState, setFormState, errors, setErrors, isSubmitting, isValid } = useFormManager<
             PartnerBannerFormValues,
             PartnerBannerFormErrorState
         >({
@@ -144,7 +144,6 @@ export const PartnerBannerForm = forwardRef<PartnerBannerFormRef, PartnerBannerF
             <div className="partner-banner-form">
                 <div className="partner-banner-form__container">
                     <div className="image-wrapper">
-                        <InputLabel htmlFor="partner-image" text={PARTNERS_TEXT.IMAGE.INPUT} />
                         <ImageInput
                             value={formState.image}
                             onChange={handleImageChange}
@@ -168,7 +167,11 @@ export const PartnerBannerForm = forwardRef<PartnerBannerFormRef, PartnerBannerF
                                 maxLength={PARTNER_VALIDATION.title.max}
                                 disabled={formDisabled || isSubmitting}
                             />
-                            {errors.title && <InputError error={errors.title} />}
+                            {errors.title && (
+                                <div className="title-error inp1">
+                                    <InputError error={errors.title} />
+                                </div>
+                            )}
                         </div>
 
                         <div className="form-group inp2">
@@ -183,14 +186,18 @@ export const PartnerBannerForm = forwardRef<PartnerBannerFormRef, PartnerBannerF
                                 maxLength={PARTNER_VALIDATION.description.max}
                                 rows={2}
                             />
-                            {errors.description && <InputError error={errors.description} />}
+                            {errors.description && (
+                                <div className="description-error inp2">
+                                    <InputError error={errors.description} />
+                                </div>
+                            )}
                         </div>
 
                         <button
                             type="button"
                             className="partner-banner-form__submit-btn"
                             onClick={handlePublish}
-                            disabled={formDisabled || isSubmitting}
+                            disabled={formDisabled || isSubmitting || !isValid(true)}
                         >
                             {PARTNERS_TEXT.BUTTON.PUBLISH}
                         </button>

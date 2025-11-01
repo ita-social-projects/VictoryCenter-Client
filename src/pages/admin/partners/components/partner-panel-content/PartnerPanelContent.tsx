@@ -97,13 +97,18 @@ export const PartnerPanelContent = () => {
             setIsSubmitting(true);
 
             try {
-                await PartnersApi.updateBanner(client, {
+                const updatedBanner = await PartnersApi.updateBanner(client, {
                     title: data.title,
                     description: data.description,
                     imageId: data.imageId || 0,
                     image: data.image,
                 });
-                setBannerData(data);
+                setBannerData({
+                    title: updatedBanner.title || '',
+                    description: updatedBanner.description || '',
+                    image: updatedBanner.image,
+                    imageId: updatedBanner.image?.id || null,
+                });
                 addToast(PARTNERS_TEXT.MESSAGE.BANNER_SAVED, ToastType.Success);
             } catch (error: any) {
                 if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {

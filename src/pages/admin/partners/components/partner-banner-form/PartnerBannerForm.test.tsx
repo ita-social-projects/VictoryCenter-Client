@@ -101,6 +101,13 @@ describe('PartnerBannerForm', () => {
                         }
                     }),
                     isSubmitting,
+                    isValid: jest.fn((isPublishing = false) => {
+                        if (validateForm) {
+                            const validationErrors = validateForm(formState, isPublishing);
+                            return !Object.values(validationErrors).some((error) => error);
+                        }
+                        return true;
+                    }),
                 };
             },
         );

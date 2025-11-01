@@ -38,7 +38,7 @@ export interface PartnerBannerDto {
     id: number;
     title: string;
     description: string;
-    image: Image;
+    image: Image | null;
 }
 
 export interface PartnerDto {

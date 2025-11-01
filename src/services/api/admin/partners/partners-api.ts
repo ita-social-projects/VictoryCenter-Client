@@ -36,9 +36,11 @@ export const PartnersApi = {
         await client.delete(`${API_ROUTES.PARTNERS.BASE}/${id}`);
     },
 
-    getAll: async (client: AxiosInstance): Promise<{ banner: PartnerBannerDto; section: PartnersSectionDto[] }> => {
+    getAll: async (
+        client: AxiosInstance,
+    ): Promise<{ banner: PartnerBannerDto | null; section: PartnersSectionDto[] }> => {
         const response = await client.get<{
-            banner: PartnerBannerDto;
+            banner: PartnerBannerDto | null;
             section: PartnersSectionDto[];
         }>(API_ROUTES.PARTNERS.BASE);
         return response.data;

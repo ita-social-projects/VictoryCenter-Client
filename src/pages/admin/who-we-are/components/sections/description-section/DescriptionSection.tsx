@@ -27,13 +27,17 @@ export const DescriptionSection = ({
 }: DescriptionSectionProps) => {
     const [descriptionError, setDescriptionError] = useState<string | null>(null);
 
+    const descriptionContent = content?.find((item) => item.contentType === ContentType.Description);
+
+    if (!descriptionContent) {
+        return null;
+    }
+
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        if (descriptionContent?.id || descriptionContent) {
-            onChange({
-                ...descriptionContent,
-                description: e.target.value,
-            });
-        }
+        onChange({
+            ...descriptionContent,
+            description: e.target.value,
+        });
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
         setDescriptionError(error || null);
 
@@ -44,12 +48,6 @@ export const DescriptionSection = ({
         const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
         setDescriptionError(error || null);
     };
-
-    const descriptionContent = content?.find((item) => item.contentType === ContentType.Description);
-
-    if (!descriptionContent) {
-        return null;
-    }
 
     return (
         <div className="description-section">

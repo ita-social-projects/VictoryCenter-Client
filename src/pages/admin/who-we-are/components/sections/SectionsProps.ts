@@ -37,8 +37,8 @@ export const TeamPageProps: Omit<
     ImageSectionProps,
     'content' | 'onChange' | 'onPublish' | 'setIsPublishButtonActive' | 'isPublishButtonActive'
 > = {
-    descriptionLimit: 360,
-    rows: 6,
+    descriptionLimit: 400,
+    rows: 7,
     imageInputProps: {
         subText: '840x750',
         style: {
@@ -64,9 +64,9 @@ export const WhoWeSupportCardsProps: Omit<
     CardsSectionProps,
     'content' | 'onChange' | 'onPublish' | 'setIsPublishButtonActive' | 'isPublishButtonActive'
 > = {
-    descriptionLimit: 200,
+    descriptionLimit: 400,
     titleText: WHO_WE_ARE_TEXT.WHO_WE_SUPPORT,
-    rows: 5,
+    rows: 6,
     cardImageConfigs: [
         // first card
         {
@@ -114,7 +114,8 @@ export const PeopleCardsProps: Omit<
     CardsSectionProps,
     'content' | 'onChange' | 'onPublish' | 'setIsPublishButtonActive' | 'isPublishButtonActive'
 > = {
-    descriptionLimit: 200,
+    descriptionLimit: 60,
+    rows: 2,
     cardImageConfigs: [
         // first card
         {

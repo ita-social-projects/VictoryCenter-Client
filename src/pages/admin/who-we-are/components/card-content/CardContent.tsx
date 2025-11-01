@@ -13,7 +13,6 @@ interface CardContentProps {
     descriptionLimit: number;
     rows?: number;
     imageInputProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange' | 'setError'>;
-    onDescriptionBlur: (value: React.ChangeEvent<HTMLTextAreaElement>) => void;
     onDescriptionValidate: (value: React.ChangeEvent<HTMLTextAreaElement>) => void;
     descriptionError: string | null;
     imageError: string | null;
@@ -27,7 +26,6 @@ export const CardContent = ({
     descriptionLimit,
     rows,
     imageInputProps,
-    onDescriptionBlur,
     onDescriptionValidate,
     descriptionError,
     imageError,
@@ -48,7 +46,6 @@ export const CardContent = ({
             description: e.target.value,
         });
         onDescriptionValidate(e);
-        setIsPublishButtonActive(true);
     };
 
     return (
@@ -71,7 +68,7 @@ export const CardContent = ({
                     name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     id={content.id.toString()}
                     rows={rows}
-                    onBlur={onDescriptionBlur}
+                    onBlur={onDescriptionValidate}
                 />
                 {descriptionError && <p className="error">{descriptionError}</p>}
             </div>

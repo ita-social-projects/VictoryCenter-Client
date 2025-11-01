@@ -25,7 +25,6 @@ jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
 
 describe('CardContent', () => {
     let mockOnChange: jest.Mock;
-    let mockOnDescriptionBlur: jest.Mock;
     let mockOnDescriptionValidate: jest.Mock;
     let mockSetImageError: jest.Mock;
     let mockSetIsPublishButtonActive: jest.Mock;
@@ -53,7 +52,6 @@ describe('CardContent', () => {
                 style: { width: '200px' },
                 subText: '200x200',
             },
-            onDescriptionBlur: mockOnDescriptionBlur,
             onDescriptionValidate: mockOnDescriptionValidate,
             descriptionError: null,
             imageError: null,
@@ -65,7 +63,6 @@ describe('CardContent', () => {
 
     beforeEach(() => {
         mockOnChange = jest.fn();
-        mockOnDescriptionBlur = jest.fn();
         mockSetImageError = jest.fn();
         mockSetIsPublishButtonActive = jest.fn();
         mockOnDescriptionValidate = jest.fn();
@@ -85,7 +82,7 @@ describe('CardContent', () => {
         expect(screen.queryByText('This is an image error message.')).not.toBeInTheDocument();
     });
 
-    it('should call onChange, setIsPublishButtonActive on description change, and onBlur on blur', () => {
+    it('should call onChange, onDescriptionValidate on change, and onDescriptionValidate on blur', () => {
         renderComponent();
         const textarea = screen.getByTestId('mock-textarea');
         const newDescription = 'New description text';
@@ -95,10 +92,10 @@ describe('CardContent', () => {
             ...baseContent,
             description: newDescription,
         });
-        expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
+        expect(mockOnDescriptionValidate).toHaveBeenCalled();
 
         fireEvent.blur(textarea);
-        expect(mockOnDescriptionBlur).toHaveBeenCalled();
+        expect(mockOnDescriptionValidate).toHaveBeenCalled();
     });
 
     it('should call onChange, setIsPublishButtonActive on image change, and call setImageError', () => {

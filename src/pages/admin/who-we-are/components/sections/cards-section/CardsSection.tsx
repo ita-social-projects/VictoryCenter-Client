@@ -53,11 +53,6 @@ export const CardsSection = ({
         setIsPublishButtonActive(true);
     };
 
-    const handleDescriptionBlur = (id: number, value: string) => {
-        handleDescriptionValidate(id, value);
-        setIsPublishButtonActive(true);
-    };
-
     const handleSetImageError = (id: number, value: string | null) => {
         setErrors((prev) => {
             const cardErrors = prev[id] || { image: null, description: null };
@@ -87,7 +82,6 @@ export const CardsSection = ({
                             key={c.id}
                             content={c}
                             onChange={onChange}
-                            onDescriptionBlur={(value) => handleDescriptionBlur(c.id, value.target.value)}
                             onDescriptionValidate={(value) => handleDescriptionValidate(c.id, value.target.value)}
                             descriptionError={errors[c.id]?.description ?? null}
                             imageError={errors[c.id]?.image}

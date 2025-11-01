@@ -10,7 +10,7 @@ jest.mock('../../card-content/CardContent', () => ({
     CardContent: ({
         content,
         onChange,
-        onDescriptionBlur,
+        onDescriptionValidate,
         descriptionError,
         imageError,
         setImageError,
@@ -21,9 +21,9 @@ jest.mock('../../card-content/CardContent', () => ({
                 data-testid={`mock-textarea-${content.id}`}
                 onChange={(e) => {
                     onChange({ ...content, description: e.target.value });
-                    setIsPublishButtonActive(true);
+                    onDescriptionValidate(e);
                 }}
-                onBlur={onDescriptionBlur}
+                onBlur={onDescriptionValidate}
                 value={content.description}
             />
             {descriptionError && <span data-testid={`desc-error-${content.id}`}>{descriptionError}</span>}

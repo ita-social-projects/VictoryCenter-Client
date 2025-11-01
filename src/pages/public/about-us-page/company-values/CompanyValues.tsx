@@ -5,10 +5,7 @@ import { Swiper } from '../../../../components/public/swiper/Swiper';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { ValueCard } from './components/value-card/ValueCard';
 
-export interface ValueItem {
-    name: string;
-    description: string;
-}
+export type ValueItem = Record<string, string>;
 
 const chunk = <T,>(arr: T[], size: number): T[][] => {
     const result: T[][] = [];
@@ -39,11 +36,11 @@ export const CompanyValues = () => {
     const isTablet = useMediaQuery('(min-width:768px) and (max-width:1024px)');
     const { t } = useTranslation('aboutUsPage');
 
-    const date = useMemo<Record<string, string>[]>(() => {
+    const data = useMemo<Record<string, string>[]>(() => {
         return t('VALUE_ITEMS', { returnObjects: true }) as Record<string, string>[];
     }, [t]);
 
-    const valueItems = useMemo<ValueItem[]>(() => toCamelCaseValues(date), [date]);
+    const valueItems = useMemo<ValueItem[]>(() => toCamelCaseValues(data), [data]);
 
     const chunkedValues = useMemo(() => {
         if (isTablet) {

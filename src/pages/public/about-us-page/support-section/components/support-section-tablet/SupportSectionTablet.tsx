@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
+import { ABOUT_US_DATA } from '../../../../../../const/public/about-us-page';
+import { SupportCard } from '../support-card/SupportCard';
 import { useTranslation } from 'react-i18next';
 import { AboutUsContent } from '../../../../../../types/public/about-us-page';
-import { SupportCard } from '../support-card/SupportCard';
 
 export interface SupportSectionTabletProps {
     content: AboutUsContent[] | null;
@@ -11,27 +13,33 @@ export const SupportSectionTablet = ({ content }: SupportSectionTabletProps) => 
 
     if (!content) return null;
 
-    const leftColumn = content.filter((_, i) => i % 2 === 0);
-    const rightColumn = content.filter((_, i) => i % 2 === 1);
+    const [leftColumn, rightColumn] = useMemo(() => {
+        const allItemsWithIndex = content.map((item, index) => ({
+            ...item,
+            originalIndex: index,
+        }));
+        const left = allItemsWithIndex.filter((item) => item.originalIndex % 2 === 0);
+        const right = allItemsWithIndex.filter((item) => item.originalIndex % 2 === 1);
+        return [left, right];
+    }, [content]);
 
     return (
-        <>
+        <div className="support-block">
             <div className="main-values-title">
                 <h2 className="support-title">{t('SUPPORT_TITLE')}</h2>
             </div>
-
             <div className="support-columns">
                 <div className="support-col left">
-                    {leftColumn.map((item, index) => (
-                        <SupportCard card={item} index={index * 2} />
+                    {leftColumn.map((item, originalIndex) => (
+                        <SupportCard key={item.id} card={item} index={originalIndex} />
                     ))}
                 </div>
                 <div className="support-col right">
-                    {rightColumn.map((item, index) => (
-                        <SupportCard card={item} index={index * 2 + 1} />
+                    {rightColumn.map((item, originalIndex) => (
+                        <SupportCard key={item.id} card={item} index={originalIndex} />
                     ))}
                 </div>
             </div>
-        </>
+        </div>
     );
 };

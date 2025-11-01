@@ -130,6 +130,10 @@
                     stroke: colors.$blue-900;
                 }
             }
+
+            &:disabled {
+                display: none;
+            }
         }
 
         .arrow-left {
@@ -170,10 +174,6 @@
 
             &.card-2 {
                 margin-top: 0rem;
-            }
-
-            &.card-3 {
-                margin-top: 11.125rem;
             }
         }
 

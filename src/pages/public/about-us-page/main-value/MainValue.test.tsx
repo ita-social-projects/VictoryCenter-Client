@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MainValues } from './MainValue';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import { ContentType } from '../../../../types/common/about-us';
@@ -6,16 +6,14 @@ import { AboutUsContent } from '../../../../types/public/about-us-page';
 import { checkForSubstrings } from '../../../../utils/functions/test-helpers/test-helpers';
 import { aboutUsPageUk } from '../../../../locales/uk';
 
-jest.mock('../../../../components/public/swiper/CustomSwiper', () => ({
-    CustomSwiper: ({ items, renderItem }: any) => (
+jest.mock('../../../../components/public/swiper/Swiper', () => ({
+    Swiper: ({ items, renderItem }: any) => (
         <div data-testid="custom-swiper">
-            {items
-                ? items.map((item: any, index: number) => (
-                      <div key={index} data-testid="swiper-item">
-                          {renderItem(item, index)}
-                      </div>
-                  ))
-                : null}
+            {items.map((item: any, index: number) => (
+                <div key={index} data-testid="swiper-item">
+                    {renderItem(item, index)}
+                </div>
+            ))}
         </div>
     ),
 }));
@@ -94,9 +92,7 @@ describe('MainValues component', () => {
     });
 
     it('should render summary block with correct lines', () => {
-        render(<MainValues content={null} />);
-        checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS.FIRST_LINE']);
-        checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS.SECOND_LINE']);
-        checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS.THIRD_LINE']);
+		 render(<MainValues content={ null} />);
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS']);
     });
 });

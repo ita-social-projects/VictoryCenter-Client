@@ -109,6 +109,10 @@
                     stroke: colors.$blue-900;
                 }
             }
+
+            &:disabled {
+                display: none;
+            }
         }
 
         .arrow-left {
@@ -153,13 +157,19 @@
                     gap: 0.5rem;
 
                     img {
-                        height: 27rem;
+                        height: 26.875rem;
                     }
 
-                    &.card-1,
-                    &.card-2,
-                    &.card-3 {
+                    &.card-1 {
                         margin-top: 5.625rem;
+                    }
+
+                    &.card-2 {
+                        margin-top: 23.3125rem;
+                    }
+
+                    &.card-3 {
+                        margin-top: 8.0625rem;
                     }
 
                     .support-description {
@@ -168,10 +178,6 @@
                         line-height: 1.75rem;
                     }
                 }
-            }
-
-            .right {
-                margin-top: 17.5rem;
             }
         }
 
@@ -189,9 +195,6 @@
 
 @media (max-width: 768px) {
     .support-block {
-        padding-top: 3.75rem;
-        padding-bottom: 0rem;
-
         .main-values-title {
             padding: 0 4rem;
             width: auto;
@@ -211,10 +214,7 @@
                         height: 22.5rem;
                     }
 
-                    &.card-1 {
-                        margin-top: 5.625rem;
-                    }
-
+                    &.card-1,
                     &.card-2 {
                         margin-top: 5.625rem;
                     }

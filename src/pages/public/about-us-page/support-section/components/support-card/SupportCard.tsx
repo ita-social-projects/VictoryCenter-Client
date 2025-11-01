@@ -4,10 +4,10 @@ import { AboutUsContent } from '../../../../../../types/public/about-us-page';
 
 interface SupportCardProps {
     card: AboutUsContent;
-    index?: number;
+    index: number;
 }
 
-export function SupportCard({ card, index = 0 }: SupportCardProps) {
+export function SupportCard({ card, index }: SupportCardProps) {
     const { t } = useTranslation('aboutUsPage');
     const supportData = t('SUPPORT_DATA', { returnObjects: true });
 
@@ -16,7 +16,7 @@ export function SupportCard({ card, index = 0 }: SupportCardProps) {
     const description = card.description;
 
     return (
-        <div key={index} className={`support-card card-${index + 1}`}>
+        <div className={`support-card card-${index + 1}`}>
             <img src={imageUrl} alt={altText} />
             <p className="support-description">{description}</p>
         </div>

@@ -38,6 +38,10 @@
             "DESCRIPTION": "We adhere to the principles of openness, transparency, and ethics in our activities and beyond."
         }
     ],
+    "INTRO_TITLE.FIRST_HIGHLIGHT": "A space",
+    "INTRO_TITLE.MIDDLE_PART": " of trust, care, and your ",
+    "INTRO_TITLE.SECOND_HIGHLIGHT": "inner strength",
+    "INTRO_DETAILS": "Victory Center is not about terms or numbers. It’s about feelings. Here you stop in the moment, where tension disappears and healing begins. Through community, nature, and contact with horses you return to your true self. We don’t change people. We help them remember who they are.",
     "PEOPLE_DATA": [
         {
             "ALT": "Men and horse"
@@ -52,13 +56,11 @@
             "ALT": "Woman and horse"
         }
     ],
-    "MAIN_VALUE.FIRST_PART": "The main ",
+    "MAIN_VALUE.FIRST_PART": "The main",
     "MAIN_VALUE.FIRST_HIGHLIGHT": "value",
-    "MAIN_VALUE.MIDDLE_PART": " of Victory Center ",
+    "MAIN_VALUE.MIDDLE_PART": "of Victory Center",
     "MAIN_VALUE.SECOND_HIGHLIGHT": "is people",
-    "MAIN_VALUE_DETAILS.FIRST_LINE": "We believe in the power of community, where every voice ",
-    "MAIN_VALUE_DETAILS.SECOND_LINE": "matters, and every step brings us closer to a shared ",
-    "MAIN_VALUE_DETAILS.THIRD_LINE": "victory.",
+    "MAIN_VALUE_DETAILS": "We believe in the power of community, where every voice matters, and every step brings us closer to a shared victory.",
     "SUPPORT_TITLE": "Who we can support",
     "SUPPORT_DATA": [
         {
@@ -78,7 +80,5 @@
     "WHAT_WE_DO": "What we do",
     "GO_TO_PROGRAMS": "Go to programs",
     "GO_TO_TEAM": "Meet the team",
-    "TEAM_DETAILS.FIRST_PART": "Victory Center is the joint work of psychologists, facilitators, coordinators, volunteers, and partner ranches, united by the goal of creating a safe environment for recovery.",
-    "TEAM_DETAILS.SECOND_PART": "Our team works with servicemen/veterans, children, and their families, undergoes regular training, adheres to the ethical code, values and supports each person.",
-    "DOWNLOAD_ERROR": "The page data could not be loaded. Please try again later."
+    "TEAM_DETAILS": "Victory Center is the joint work of psychologists, facilitators, coordinators, volunteers, and partner ranches, united by the goal of creating a safe environment for recovery. Our team works with servicemen/veterans, children, and their families, undergoes regular training, adheres to the ethical code, values and supports each person."
 }

@@ -21,7 +21,7 @@ export const OurTeam = ({ content }: OurTeamProps) => {
             <img src={imageUrl} alt="Our Team" className="our-team-image" />
             <div className="team-info">
                 <p className="team-description">{description}</p>
-                <NavLink to={PUBLIC_ROUTES.TEAM.FULL} className="link-ro-team">
+                <NavLink to={PUBLIC_ROUTES.TEAM.FULL} className="link-to-team">
                     {t('GO_TO_TEAM')}
                 </NavLink>
             </div>

@@ -44,6 +44,10 @@
                     stroke: colors.$blue-900;
                 }
             }
+
+            &:disabled {
+                display: none;
+            }
         }
 
         .arrow-left {
@@ -56,10 +60,18 @@
     }
 }
 
+.swiper-loader {
+    width: 70%;
+    position: relative;
+    margin: 8rem auto 4rem;
+}
+
 .error-message {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: red;
+    margin-bottom: 1rem;
 }
 
 .scrollbar-block {

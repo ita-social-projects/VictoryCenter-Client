@@ -17,33 +17,33 @@ describe('SupportCard component', () => {
         title: null,
     };
 
-    test('renders image with correct src and alt', () => {
-        render(<SupportCard card={card} />);
+    const defaultProps = {
+        card: card,
+        index: 0,
+    };
+
+    it('renders image with correct src and alt', () => {
+        render(<SupportCard {...defaultProps} />);
         const image = screen.getByRole('img');
         expect(image).toBeInTheDocument();
         expect(image).toHaveAttribute('src', card.image!.url);
         expect(image).toHaveAttribute('alt', aboutUsPageUk.SUPPORT_DATA[0].ALT);
     });
 
-    test('renders description text', () => {
-        render(<SupportCard card={card} />);
+    it('renders description text', () => {
+        render(<SupportCard {...defaultProps} />);
         expect(screen.getByText(card.description!)).toBeInTheDocument();
     });
 
-    test('applies correct class based on index', () => {
-        render(<SupportCard card={card} />);
-        const div = screen.getByRole('img').closest('div');
-        expect(div).toHaveClass('support-card');
-        expect(div).toHaveClass(`card-1`);
-    });
-
-    test('renders correctly for multiple indexes', () => {
-        const { rerender } = render(<SupportCard card={card} index={1} />);
-        const card2 = screen.getByRole('img').closest('div');
-        expect(card2).toHaveClass('card-2');
+    it('renders correct classes for multiple indexes', () => {
+        const { rerender } = render(<SupportCard card={card} index={0} />);
+        const card1 = screen.getByRole('img').closest('div');
+        expect(card1).toHaveClass('support-card');
+        expect(card1).toHaveClass('card-1');
 
         rerender(<SupportCard card={card} index={2} />);
-        const card4 = screen.getByRole('img').closest('div');
-        expect(card4).toHaveClass('card-3');
+        const card3 = screen.getByRole('img').closest('div');
+        expect(card3).toHaveClass('support-card');
+        expect(card3).toHaveClass('card-3');
     });
 });

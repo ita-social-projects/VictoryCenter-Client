@@ -64,12 +64,10 @@ export const ProgramsSection: React.FC = () => {
                     </div>
                 )}
                 {isLoading ? (
-                    <div>
-                        <LinearProgress />
-                    </div>
+                    <LinearProgress />
                 ) : (
-                    programsByCategory?.map((item, index) => (
-                        <ProgramCard key={index} program={item} className={'program-page-card'} />
+                    programsByCategory?.map((item) => (
+                        <ProgramCard key={item.id} program={item} className={'program-page-card'} />
                     ))
                 )}
             </div>

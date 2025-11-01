@@ -30,7 +30,7 @@ export const CardsSection = ({
     isPublishButtonActive,
     setIsPublishButtonActive,
 }: CardsSectionProps) => {
-    const [errors, setErrors] = useState<Record<number, { image: string | null; description?: string | null }>>({});
+    const [errors, setErrors] = useState<Record<number, { image: string | null; description: string | null }>>({});
 
     if (!content) return null;
 
@@ -45,7 +45,7 @@ export const CardsSection = ({
                 ...prev,
                 [id]: {
                     ...cardErrors,
-                    description: error || undefined,
+                    description: error || null,
                 },
             };
         });
@@ -82,7 +82,7 @@ export const CardsSection = ({
                             onChange={onChange}
                             onDescriptionValidate={(value) => handleDescriptionValidate(c.id, value.target.value)}
                             descriptionError={errors[c.id]?.description ?? null}
-                            imageError={errors[c.id]?.image}
+                            imageError={errors[c.id]?.image ?? null}
                             setImageError={(value) => handleSetImageError(c.id, value)}
                             descriptionLimit={descriptionLimit}
                             imageInputProps={{ ...(cardImageConfigs[index] || {}) }}

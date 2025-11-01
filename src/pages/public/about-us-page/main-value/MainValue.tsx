@@ -2,8 +2,13 @@ import { useTranslation } from 'react-i18next';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import './MainValue.scss';
 import { Swiper } from '../../../../components/public/swiper/Swiper';
+import { AboutUsContent } from '../../../../types/public/about-us-page';
 
-export const MainValues = () => {
+export interface MainValuesProps {
+    content: AboutUsContent[] | null;
+}
+
+export const MainValues = ({ content }: MainValuesProps) => {
     const { t } = useTranslation('aboutUsPage');
     const peopleData = t('PEOPLE_DATA', { returnObjects: true });
 
@@ -20,19 +25,25 @@ export const MainValues = () => {
 
             <div className="people-block">
                 <Swiper
-                    items={peopleData}
+                    items={content}
                     slidesPerView={1}
                     breakpoints={{
                         568: { slidesPerView: 2 },
                         768: { slidesPerView: 2 },
                         1025: { slidesPerView: 4 },
                     }}
-                    renderItem={(person, index) => (
-                        <div className={`people-card card-${index + 1}`}>
-                            <img src={ABOUT_US_DATA.PEOPLE_DATA[index].IMG} alt={person.ALT} />
-                            <p className="people-info">{person.INFO}</p>
-                        </div>
-                    )}
+                    renderItem={(person, index) => {
+                        const imageUrl = person.image?.url ?? ABOUT_US_DATA.PEOPLE_DATA[index].IMG;
+                        const altText = peopleData[index].ALT;
+                        const description = person.description;
+
+                        return (
+                            <div className={`people-card card-${index + 1}`}>
+                                <img src={imageUrl} alt={altText} />
+                                <p className="people-info">{description}</p>
+                            </div>
+                        );
+                    }}
                 />
             </div>
             <div className="summary-block">

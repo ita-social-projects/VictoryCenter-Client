@@ -33,4 +33,9 @@ export const API_ROUTES = {
         REORDER: 'faq/reorder',
         PAGES: 'faq/pages',
     },
+    WHO_WE_ARE: {
+        BASE: 'WhoWeAre',
+        PREVIEWS: 'WhoWeAre/previews',
+        PUBLIC: 'WhoWeArePage',
+    },
 };

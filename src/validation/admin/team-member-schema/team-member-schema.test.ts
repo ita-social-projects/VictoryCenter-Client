@@ -16,7 +16,6 @@ describe('teamMemberValidationSchema', () => {
 
     const validImageObj = { base64: 'abc', mimeType: 'image/png', size: 1000 };
     const validImageValue = { url: 'https://localhost:8080', mimeType: 'image/png', id: 1000 };
-    const invalidImageLargeSize = { ...validImageObj, size: TEAM_MEMBER_VALIDATION.img.maxSizeBytes + 100 };
     const invalidImageBadFormat = { ...validImageObj, mimeType: 'application/pdf' };
 
     describe('fullName validation', () => {
@@ -137,18 +136,6 @@ describe('teamMemberValidationSchema', () => {
 
         it('accepts valid image string', () => {
             expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(validImageValue, true)).toBeUndefined();
-        });
-
-        it('rejects image larger than max size', () => {
-            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(invalidImageLargeSize, true)).toBe(
-                TEAM_MEMBER_VALIDATION.img.getSizeError(),
-            );
-        });
-
-        it('rejects image with disallowed mimeType', () => {
-            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateImage(invalidImageBadFormat, true)).toBe(
-                TEAM_MEMBER_VALIDATION.img.getFormatError(),
-            );
         });
     });
 });

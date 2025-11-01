@@ -11,8 +11,8 @@ jest.mock('../../../../../../const/public/about-us-page', () => ({
 
 describe('ValueCard Component', () => {
     const mockGroup = [
-        { name: 'Емпатія', description: 'Ми розуміємо почуття інших.' },
-        { name: 'Різноманіття', description: 'Ми цінуємо унікальність кожного.' },
+        { name: 'Empathy', description: "We understand others' feelings." },
+        { name: 'Diversity', description: "We value everyone's uniqueness." },
     ];
 
     it('should render the title only for the first group (groupIndex === 0)', () => {
@@ -37,10 +37,10 @@ describe('ValueCard Component', () => {
     it('should render correct text for each value item', () => {
         render(<ValueCard group={mockGroup} groupIndex={0} />);
 
-        expect(screen.getByRole('heading', { name: 'Емпатія' })).toBeInTheDocument();
-        expect(screen.getByText('Ми розуміємо почуття інших.')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Empathy' })).toBeInTheDocument();
+        expect(screen.getByText("We understand others' feelings.")).toBeInTheDocument();
 
-        expect(screen.getByRole('heading', { name: 'Різноманіття' })).toBeInTheDocument();
-        expect(screen.getByText('Ми цінуємо унікальність кожного.')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Diversity' })).toBeInTheDocument();
+        expect(screen.getByText("We value everyone's uniqueness.")).toBeInTheDocument();
     });
 });

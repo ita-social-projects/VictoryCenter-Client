@@ -44,20 +44,16 @@
     "INTRO_DETAILS": "Victory Center is not about terms or numbers. It’s about feelings. Here you stop in the moment, where tension disappears and healing begins. Through community, nature, and contact with horses you return to your true self. We don’t change people. We help them remember who they are.",
     "PEOPLE_DATA": [
         {
-            "ALT": "Men and horse",
-            "INFO": "Participants who believe and trust"
+            "ALT": "Men and horse"
         },
         {
-            "ALT": "Girl and horse",
-            "INFO": "Partners who share our dreams and values"
+            "ALT": "Girl and horse"
         },
         {
-            "ALT": "Old man and horse",
-            "INFO": "Volunteers who are there to support"
+            "ALT": "Old man and horse"
         },
         {
-            "ALT": "Woman and horse",
-            "INFO": "Donors who help bring ideas to life"
+            "ALT": "Woman and horse"
         }
     ],
     "MAIN_VALUE.FIRST_PART": "The main",
@@ -68,16 +64,13 @@
     "SUPPORT_TITLE": "Who we can support",
     "SUPPORT_DATA": [
         {
-            "ALT": "Support of veterans",
-            "DESCRIPTION": "Veterans who returned from the frontlines or captivity and strive to restore contact with themselves, their bodies, and their loved ones."
+            "ALT": "Support of veterans"
         },
         {
-            "ALT": "Support of volunteers",
-            "DESCRIPTION": "Volunteers and civilians who feel the need for emotional recovery and want to continue supporting others."
+            "ALT": "Support of volunteers"
         },
         {
-            "ALT": "Support of children",
-            "DESCRIPTION": "Children affected by war who have experienced loss, fear, or displacement. Through play therapy, group interaction, and contact with animals, we help restore trust and a sense of safety."
+            "ALT": "Support of children"
         }
     ],
     "DONATE_TITLE": "You can always support us",
@@ -85,8 +78,8 @@
     "DONATE": "Donate",
     "BECOME_PARTNER": "Become a partner",
     "WHAT_WE_DO": "What we do",
-    "WHAT_WE_DO_DETAILS": "We create therapeutic programs that combine interaction with horses, body practices, contact with nature, psychological support, and a supportive community. Each program is adapted to the individual needs of participants.",
     "GO_TO_PROGRAMS": "Go to programs",
     "GO_TO_TEAM": "Meet the team",
-    "TEAM_DETAILS": "Victory Center is the joint work of psychologists, facilitators, coordinators, volunteers, and partner ranches, united by the goal of creating a safe environment for recovery. Our team works with servicemen/veterans, children, and their families, undergoes regular training, adheres to the ethical code, values and supports each person."
+    "TEAM_DETAILS": "Victory Center is the joint work of psychologists, facilitators, coordinators, volunteers, and partner ranches, united by the goal of creating a safe environment for recovery. Our team works with servicemen/veterans, children, and their families, undergoes regular training, adheres to the ethical code, values and supports each person.",
+    "DOWNLOAD_ERROR": "The page data could not be loaded. Please try again later."
 }

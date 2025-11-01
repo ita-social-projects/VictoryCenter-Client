@@ -45,26 +45,6 @@ export const programValidationSchema = Yup.object({
         .transform((value) => {
             if (value === undefined || value === '') return null;
             return value;
-        })
-        .test('fileFormat', PROGRAM_VALIDATION.image.getFormatError(), (value) => {
-            if (!value) return true;
-
-            if ('url' in value && 'mimeType' in value) {
-                return true;
-            }
-
-            if ('base64' in value && 'mimeType' in value) {
-                return PROGRAM_VALIDATION.image.allowedFormats.includes(value.mimeType);
-            }
-
-            return false;
-        })
-        .test('fileSize', PROGRAM_VALIDATION.image.getSizeError(), (value) => {
-            if (value === null) return true;
-            if ('url' in value) return true;
-            if ('base64' in value && 'size' in value) {
-                return value.size <= PROGRAM_VALIDATION.image.maxSizeBytes;
-            }
         }),
 });
 

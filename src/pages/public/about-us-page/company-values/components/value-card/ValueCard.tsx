@@ -1,9 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { ValueItem } from '../../CompanyValues';
+
 interface ValueGroupProps {
     group: ValueItem[];
     groupIndex: number;
 }
+
 export function ValueCard({ group, groupIndex }: ValueGroupProps) {
     const { t } = useTranslation('aboutUsPage');
     return (

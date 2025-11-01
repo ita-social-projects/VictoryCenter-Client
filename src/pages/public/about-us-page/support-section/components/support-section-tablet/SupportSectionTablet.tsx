@@ -1,21 +1,28 @@
 import { useMemo } from 'react';
-import { ABOUT_US_DATA } from '../../../../../../const/public/about-us-page';
 import { SupportCard } from '../support-card/SupportCard';
 import { useTranslation } from 'react-i18next';
+import { AboutUsContent } from '../../../../../../types/public/about-us-page';
 
-export const SupportSectionTablet = () => {
+export interface SupportSectionTabletProps {
+    content: AboutUsContent[] | null;
+}
+
+export const SupportSectionTablet = ({ content }: SupportSectionTabletProps) => {
     const { t } = useTranslation('aboutUsPage');
-    const supportData = t('SUPPORT_DATA', { returnObjects: true });
 
     const [leftColumn, rightColumn] = useMemo(() => {
-        const allItemsWithIndex = supportData.map((item, index) => ({
-            ...item,
+        if (!content) return [[], []];
+
+        const allItemsWithIndex = content.map((item, index) => ({
+            card: item,
             originalIndex: index,
         }));
         const left = allItemsWithIndex.filter((item) => item.originalIndex % 2 === 0);
         const right = allItemsWithIndex.filter((item) => item.originalIndex % 2 === 1);
         return [left, right];
-    }, [supportData]);
+    }, [content]);
+
+    if (!content) return null;
 
     return (
         <div className="support-block">
@@ -24,25 +31,13 @@ export const SupportSectionTablet = () => {
             </div>
             <div className="support-columns">
                 <div className="support-col left">
-                    {leftColumn.map(({ ALT, DESCRIPTION, originalIndex }) => (
-                        <SupportCard
-                            key={ABOUT_US_DATA.SUPPORT_DATA[originalIndex].IMG}
-                            img={ABOUT_US_DATA.SUPPORT_DATA[originalIndex].IMG}
-                            alt={ALT}
-                            description={DESCRIPTION}
-                            index={originalIndex}
-                        />
+                    {leftColumn.map(({ card, originalIndex }) => (
+                        <SupportCard key={card.id} card={card} index={originalIndex} />
                     ))}
                 </div>
                 <div className="support-col right">
-                    {rightColumn.map(({ ALT, DESCRIPTION, originalIndex }) => (
-                        <SupportCard
-                            key={ABOUT_US_DATA.SUPPORT_DATA[originalIndex].IMG}
-                            img={ABOUT_US_DATA.SUPPORT_DATA[originalIndex].IMG}
-                            alt={ALT}
-                            description={DESCRIPTION}
-                            index={originalIndex}
-                        />
+                    {rightColumn.map(({ card, originalIndex }) => (
+                        <SupportCard key={card.id} card={card} index={originalIndex} />
                     ))}
                 </div>
             </div>

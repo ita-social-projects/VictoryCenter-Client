@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MainValues } from './MainValue';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import { ContentType } from '../../../../types/common/about-us';
@@ -9,11 +9,12 @@ import { aboutUsPageUk } from '../../../../locales/uk';
 jest.mock('../../../../components/public/swiper/Swiper', () => ({
     Swiper: ({ items, renderItem }: any) => (
         <div data-testid="custom-swiper">
-            {items.map((item: any, index: number) => (
-                <div key={index} data-testid="swiper-item">
-                    {renderItem(item, index)}
-                </div>
-            ))}
+            {items &&
+                items.map((item: any, index: number) => (
+                    <div key={index} data-testid="swiper-item">
+                        {renderItem(item, index)}
+                    </div>
+                ))}
         </div>
     ),
 }));
@@ -92,7 +93,7 @@ describe('MainValues component', () => {
     });
 
     it('should render summary block with correct lines', () => {
-		 render(<MainValues content={ null} />);
+        render(<MainValues content={null} />);
         checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS']);
     });
 });

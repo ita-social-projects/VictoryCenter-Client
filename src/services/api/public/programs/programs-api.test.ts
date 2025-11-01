@@ -1,6 +1,5 @@
 import { programPageDataFetch } from './programs-api';
 import { axiosInstance } from '../../axios';
-import { MockQuestions } from '../../../../utils/mock-data/public/programs-page';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import { PublishedProgramDto } from '../../../../types/public/programs-page';
 

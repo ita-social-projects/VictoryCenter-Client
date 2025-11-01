@@ -25,7 +25,7 @@ export const OurMission = ({ content, description, className, navigate = true }:
             <ArrowIcon className="arrow-icon" />
         </div>
     );
-	 
+
     return (
         <div className={classNames('our-mission-block', className)}>
             <div className="what-we-do">

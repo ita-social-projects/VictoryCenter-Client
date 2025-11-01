@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ImageSection, ImageSectionProps } from './ImageBlockSection';
 import { ContentType } from '../../../../../../types/common/about-us';

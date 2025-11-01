@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { ABOUT_US_DATA } from '../../../../../../const/public/about-us-page';
 import { SupportCard } from '../support-card/SupportCard';
 import { useTranslation } from 'react-i18next';
 import { AboutUsContent } from '../../../../../../types/public/about-us-page';
@@ -11,17 +10,19 @@ export interface SupportSectionTabletProps {
 export const SupportSectionTablet = ({ content }: SupportSectionTabletProps) => {
     const { t } = useTranslation('aboutUsPage');
 
-    if (!content) return null;
-
     const [leftColumn, rightColumn] = useMemo(() => {
+        if (!content) return [[], []];
+
         const allItemsWithIndex = content.map((item, index) => ({
-            ...item,
+            card: item,
             originalIndex: index,
         }));
         const left = allItemsWithIndex.filter((item) => item.originalIndex % 2 === 0);
         const right = allItemsWithIndex.filter((item) => item.originalIndex % 2 === 1);
         return [left, right];
     }, [content]);
+
+    if (!content) return null;
 
     return (
         <div className="support-block">
@@ -30,13 +31,13 @@ export const SupportSectionTablet = ({ content }: SupportSectionTabletProps) => 
             </div>
             <div className="support-columns">
                 <div className="support-col left">
-                    {leftColumn.map((item, originalIndex) => (
-                        <SupportCard key={item.id} card={item} index={originalIndex} />
+                    {leftColumn.map(({ card, originalIndex }) => (
+                        <SupportCard key={card.id} card={card} index={originalIndex} />
                     ))}
                 </div>
                 <div className="support-col right">
-                    {rightColumn.map((item, originalIndex) => (
-                        <SupportCard key={item.id} card={item} index={originalIndex} />
+                    {rightColumn.map(({ card, originalIndex }) => (
+                        <SupportCard key={card.id} card={card} index={originalIndex} />
                     ))}
                 </div>
             </div>

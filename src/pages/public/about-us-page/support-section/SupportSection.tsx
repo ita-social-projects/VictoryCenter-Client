@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import { SupportSectionTablet } from './components/support-section-tablet/SupportSectionTablet';
 import { Swiper } from '../../../../components/public/swiper/Swiper';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -33,7 +32,7 @@ export const SupportSection = ({ content }: SupportSectionProps) => {
                                 <h2 className="support-title">{t('SUPPORT_TITLE')}</h2>
                             </div>
                         )}
-							 <SupportCard card={item} index={index} />
+                        <SupportCard card={item} index={index} />
                     </>
                 )}
             />

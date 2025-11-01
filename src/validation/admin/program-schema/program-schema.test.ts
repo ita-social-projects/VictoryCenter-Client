@@ -10,12 +10,6 @@ const createMockFile = (type = 'image/jpeg', size = 1024) => {
     return image;
 };
 
-const mockImage: Image = {
-    id: 1,
-    url: 'https://imagepath.com',
-    mimeType: 'image/png',
-};
-
 const mockCategory = {
     id: 1,
     name: 'Test Category',
@@ -130,39 +124,6 @@ describe('Program Validation Schema', () => {
         it.each(invalidPublishCases)('should fail when description $description', async ({ data, expectedError }) => {
             await expectValidationToFail(data, expectedError, publishContext);
         });
-    });
-
-    describe('Image validation', () => {
-        const invalidImageCases = [
-            {
-                description: 'is required for publishing but is null',
-                data: getValidData({ image: null }),
-                context: { isPublishing: true },
-                expectedError: PROGRAM_VALIDATION.image.getRequiredWhenPublishingError(),
-            },
-            {
-                description: 'has invalid file format (GIF)',
-                data: getValidData({ image: createMockFile('image/gifs') }),
-                context: undefined,
-                expectedError: PROGRAM_VALIDATION.image.getFormatError(),
-            },
-            {
-                description: 'is too large',
-                data: getValidData({ image: createMockFile('image/jpeg', PROGRAM_VALIDATION.image.maxSizeBytes + 1) }),
-                context: undefined,
-                expectedError: PROGRAM_VALIDATION.image.getSizeError(),
-            },
-        ];
-
-        const validImageCases: [string, any, ProgramValidationContext | undefined][] = [
-            ['is null in draft mode', getValidData({ image: null }), { isPublishing: false }],
-            ['is a valid Image type in publish mode', getValidData({ image: mockImage }), { isPublishing: true }],
-            [
-                'is a valid ImageValue type in publish mode',
-                getValidData({ image: createMockFile() }),
-                { isPublishing: true },
-            ],
-        ];
     });
 
     describe('Image transform function', () => {

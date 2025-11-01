@@ -191,7 +191,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                         <>
                             {!isChildForm && (
                                 <div className="empty-state">
-                                    <img src={NotFoundIcon} alt={COMMON_TEXT_ADMIN.ALT.NOT_FOUND} />
+                                    <img src={NotFoundIcon} alt={COMMON_TEXT_ADMIN.LIST.NOT_FOUND} />
                                     <p>{notFoundText}</p>
                                 </div>
                             )}

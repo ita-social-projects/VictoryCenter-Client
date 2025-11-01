@@ -47,7 +47,7 @@ export const SupportOptionsForm = ({
         <div className="support-options-container">
             {shouldShowNotFound ? (
                 <div className="support-options-form not-found" data-testid="support-options-not-found">
-                    <img src={NotFoundIcon} alt={COMMON_TEXT_ADMIN.ALT.NOT_FOUND} />
+                    <img src={NotFoundIcon} alt={COMMON_TEXT_ADMIN.LIST.NOT_FOUND} />
                     <p>{DONATE_TEXT.SUPPORT_OPTIONS.NOT_FOUND}</p>
                     <Button className="btn-add" onClick={() => setIsAdding(true)} buttonStyle="secondary">
                         {DONATE_TEXT.SUPPORT_OPTIONS.ADD_FIRST}

@@ -33,6 +33,35 @@ describe('BankDetailsFactory', () => {
         expect(validator).toHaveBeenCalledWith(value);
     };
 
+    const createDefaultProps = (overrides = {}) => ({
+        initialMode: 'create' as const,
+        onSubmit: jest.fn(),
+        onClose: jest.fn(),
+        ...overrides,
+    });
+
+    const renderFormWithRef = (FormComponent: any, initialData: any, mode = 'edit') => {
+        const testRef = React.createRef<any>();
+        render(
+            React.createElement(FormComponent, {
+                ref: testRef,
+                initialData,
+                ...createDefaultProps({ initialMode: mode }),
+            }),
+        );
+        return testRef;
+    };
+
+    const createUahData = (overrides = {}) => ({
+        id: 1,
+        name: 'Test',
+        receiver: 'Receiver',
+        edrpou: '12345678',
+        iban: 'UA123',
+        paymentPurpose: 'Purpose',
+        ...overrides,
+    });
+
     it('creates form for USD', () => {
         const Form = createBankDetailsForm('USD');
         expect(Form).toBeTruthy();
@@ -71,6 +100,28 @@ describe('BankDetailsFactory', () => {
                 BANK_DETAILS_VALIDATION_FUNCTIONS.validatePaymentPurpose as any,
                 'Test Purpose',
             );
+        });
+
+        it('validates form with different data types in initialData', () => {
+            const view = renderFormWithRef(createBankDetailsForm('UAH'), createUahData({ edrpou: 12345678 }));
+
+            view.current?.isValid();
+            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateEdrpou).toHaveBeenCalledWith('12345678');
+        });
+
+        it('validates form with Date type in initialData', () => {
+            const testDate = new Date('2025-01-01T00:00:00.000Z');
+            const view = renderFormWithRef(createBankDetailsForm('UAH'), createUahData({ name: testDate }));
+
+            view.current?.isValid();
+            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateName).toHaveBeenCalledWith('2025-01-01T00:00:00.000Z');
+        });
+
+        it('validates form with object type in initialData', () => {
+            const view = renderFormWithRef(createBankDetailsForm('UAH'), createUahData({ name: { nested: 'object' } }));
+
+            view.current?.isValid();
+            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateName).toHaveBeenCalledWith('');
         });
     });
 

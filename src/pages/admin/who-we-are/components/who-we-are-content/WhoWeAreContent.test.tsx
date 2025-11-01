@@ -11,6 +11,10 @@ import { ToastType } from '../../../../../types/admin/toast';
 import { ContentType, SectionType } from '../../../../../types/common/about-us';
 import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
 
+jest.mock('../../../../../components/common/inline-loader/InlineLoader', () => ({
+    InlineLoader: () => <div data-testid="inline-loader" />,
+}));
+
 jest.mock('../../../../../services/api/admin/who-we-are/who-we-are-api');
 const mockedWhoWeAreApi = WhoWeAreApi as jest.Mocked<typeof WhoWeAreApi>;
 
@@ -230,5 +234,33 @@ describe('WhoWeAreContent Component', () => {
         await waitFor(() => {
             expect(publishButton).toBeDisabled();
         });
+    });
+
+    it('should display the loader while categories are loading', () => {
+        mockedWhoWeAreApi.getPreviews.mockReturnValue(new Promise(() => {}));
+
+        mockedWhoWeAreApi.getByType.mockReturnValue(new Promise(() => {}));
+
+        render(<WhoWeAreContent />);
+
+        expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
+
+        expect(screen.queryByText('Main')).not.toBeInTheDocument();
+        expect(screen.queryByText(WHO_WE_ARE_TEXT.FAIL_TO_FETCH_PREVIEWS)).not.toBeInTheDocument();
+    });
+
+    it('should display the loader while the selected section is loading', async () => {
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
+
+        mockedWhoWeAreApi.getByType.mockReturnValue(new Promise(() => {}));
+
+        render(<WhoWeAreContent />);
+
+        expect(await screen.findByText('Main')).toBeInTheDocument();
+
+        expect(await screen.findByTestId('inline-loader')).toBeInTheDocument();
+
+        expect(screen.queryByText('What we do')).not.toBeInTheDocument();
+        expect(screen.queryByText(WHO_WE_ARE_TEXT.FAIL_TO_FETCH_SECTION)).not.toBeInTheDocument();
     });
 });

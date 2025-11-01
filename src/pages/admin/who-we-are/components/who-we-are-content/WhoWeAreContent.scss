@@ -8,10 +8,36 @@
         gap: 5.25rem;
         padding: 2.5rem;
 
+        &--pending {
+            gap: 1rem;
+        }
+
         &-error-message {
             padding: 1rem;
             color: colors.$error;
             text-align: center;
+
+            .retry-link {
+                background: none;
+                border: none;
+                padding: 0;
+                font-size: 16px;
+                color: colors.$blue-900;
+                text-decoration: underline;
+                text-decoration-color: colors.$blue-900;
+                cursor: pointer;
+
+                &:hover {
+                    font-weight: 600;
+                }
+            }
+        }
+
+        &-loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
         }
     }
 }

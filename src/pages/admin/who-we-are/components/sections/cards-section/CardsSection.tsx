@@ -64,8 +64,6 @@ export const CardsSection = ({
                 },
             };
         });
-
-        setIsPublishButtonActive(true);
     };
 
     if (cardContents.length === 0) {
@@ -101,8 +99,7 @@ export const CardsSection = ({
                     onClick={onPublish}
                     type="submit"
                     disabled={
-                        Object.values(errors).some((error) => error.image !== null || error.description != null) ||
-                        !isPublishButtonActive
+                        Object.values(errors).some((error) => error.description != null) || !isPublishButtonActive
                     }
                 >
                     {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}

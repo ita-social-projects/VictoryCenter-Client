@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { WhoWeAreApi } from '../../../../../services/api/admin/who-we-are/who-we-are-api';
 import { Content, WhoWeAreCategory, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
@@ -13,6 +13,8 @@ import { ToastContainer } from '../../../../../components/admin/toast/toast-cont
 import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
 import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
 import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
+import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
+import classNames from 'classnames';
 
 interface ErrorState {
     message: string | null;
@@ -25,7 +27,6 @@ function isExistingImage(image: any): image is Image {
 
 export const WhoWeAreContent = () => {
     const client = useAdminClient();
-    const [error, setError] = useState<ErrorState>({ message: null, type: null });
     const [selectedCategory, setSelectedCategory] = useState<WhoWeAreCategory | null>(null);
     const [selectedSection, setSelectedSection] = useState<WhoWeAreSection | null>(null);
     const [updatedSection, setUpdatedSection] = useState<WhoWeAreSection | null>(null);
@@ -45,13 +46,23 @@ export const WhoWeAreContent = () => {
         return section;
     }, [client, selectedCategory]);
 
-    const { data: categories, error: categoryError } = useDataFetch<WhoWeAreCategory[]>({
+    const {
+        data: categories,
+        error: categoryError,
+        isLoading: isCategoriesLoading,
+        refetch: refetchCategories,
+    } = useDataFetch<WhoWeAreCategory[]>({
         initialData: [],
         fetchHandler: getCategories,
         autoFetchDependencies: [getCategories],
     });
 
-    const { data: fetchedSection, error: sectionError } = useDataFetch<WhoWeAreSection | null>({
+    const {
+        data: fetchedSection,
+        error: sectionError,
+        isLoading: isSectionLoading,
+        refetch: refetchSection,
+    } = useDataFetch<WhoWeAreSection | null>({
         initialData: null,
         fetchHandler: getSection,
         autoFetchDependencies: [getSection],
@@ -69,18 +80,6 @@ export const WhoWeAreContent = () => {
             setUpdatedSection(fetchedSection);
         }
     }, [fetchedSection]);
-
-    useEffect(() => {
-        if (categoryError) {
-            setError({ message: WHO_WE_ARE_TEXT.FAIL_TO_FETCH_PREVIEWS, type: 'categories' });
-        }
-    }, [categoryError]);
-
-    useEffect(() => {
-        if (sectionError) {
-            setError({ message: WHO_WE_ARE_TEXT.FAIL_TO_FETCH_SECTION, type: 'entity' });
-        }
-    }, [sectionError]);
 
     const handleCategorySelect = useCallback((category: WhoWeAreCategory) => {
         setSelectedCategory(category);
@@ -136,9 +135,61 @@ export const WhoWeAreContent = () => {
         handlePublishChange();
     }, [handlePublishChange]);
 
+    const error = useMemo<ErrorState>(() => {
+        if (categoryError) {
+            return { message: WHO_WE_ARE_TEXT.FAIL_TO_FETCH_PREVIEWS, type: 'categories' };
+        }
+        if (sectionError) {
+            return { message: WHO_WE_ARE_TEXT.FAIL_TO_FETCH_SECTION, type: 'entity' };
+        }
+        return { message: null, type: null };
+    }, [categoryError, sectionError]);
+
+    const handleRetry = useCallback(() => {
+        if (error.type === 'categories') {
+            refetchCategories();
+        } else if (error.type === 'entity') {
+            refetchSection();
+        }
+    }, [error.type, refetchCategories, refetchSection]);
+
+    const isLoading = isCategoriesLoading || isSectionLoading;
+    const isPending = isLoading || !!error.message;
+
+    const renderContent = () => {
+        if (isLoading) {
+            return (
+                <div className="who-we-are-main-box-loader">
+                    <InlineLoader size={3} />
+                </div>
+            );
+        }
+
+        if (error.message) {
+            return (
+                <div className="who-we-are-main-box-error-message">
+                    <p>{error.message}</p>
+                    <button onClick={handleRetry} type="button" className="retry-link">
+                        {COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN}
+                    </button>
+                </div>
+            );
+        }
+
+        return (
+            <SectionsWrapper
+                section={updatedSection}
+                onChange={handleContentChange}
+                onPublish={() => setConfirmationModalOpen(true)}
+                setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
+                isPublishButtonActive={isPublishButtonActive}
+            />
+        );
+    };
+
     return (
         <>
-            <div className="who-we-are-main-box">
+            <div className={classNames('who-we-are-main-box', { 'who-we-are-main-box--pending': isPending })}>
                 <CategoryBar<WhoWeAreCategory>
                     categories={categories}
                     selectedCategory={selectedCategory}
@@ -147,19 +198,7 @@ export const WhoWeAreContent = () => {
                     onCategorySelect={handleCategorySelect}
                 />
 
-                {error.message && (
-                    <div className="who-we-are-main-box-error-message">
-                        <p>{error.message}</p>
-                    </div>
-                )}
-
-                <SectionsWrapper
-                    section={updatedSection}
-                    onChange={handleContentChange}
-                    onPublish={() => setConfirmationModalOpen(true)}
-                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
-                    isPublishButtonActive={isPublishButtonActive}
-                />
+                {renderContent()}
             </div>
             <ConfirmationModal
                 isOpen={isConfirmationModalOpen}

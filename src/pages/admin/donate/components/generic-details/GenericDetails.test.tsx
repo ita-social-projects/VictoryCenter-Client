@@ -203,3 +203,177 @@ describe('GenericDetails', () => {
         });
     });
 });
+
+describe('GenericDetails - Additional Coverage', () => {
+    it('toggles items expanded state via Space key', () => {
+        render(<GenericDetails {...defaultProps} />);
+        const header = screen.getByText('Test Title');
+
+        expect(screen.getByText('Item 1')).toBeInTheDocument();
+
+        fireEvent.keyDown(header, { key: ' ' });
+
+        expect(screen.queryByText('Item 1')).not.toBeInTheDocument();
+    });
+
+    it('shows loader when loading with no items and no add form', () => {
+        render(<GenericDetails {...defaultProps} items={[]} isLoading />);
+
+        expect(screen.getByText('Test Title')).toBeInTheDocument();
+        expect(document.querySelector('.generic-details-loader')).toBeInTheDocument();
+    });
+
+    it('does not show loader when loading but has items', () => {
+        render(<GenericDetails {...defaultProps} isLoading />);
+
+        expect(screen.getByText('Item 1')).toBeInTheDocument();
+        expect(document.querySelector('.generic-details-loader')).not.toBeInTheDocument();
+    });
+
+    it('does not show loader when add form is visible', () => {
+        const { rerender } = render(<GenericDetails {...defaultProps} items={[]} isLoading={false} />);
+
+        fireEvent.click(screen.getByText('Add New'));
+
+        rerender(<GenericDetails {...defaultProps} items={[]} isLoading />);
+
+        expect(document.querySelector('.generic-details-loader')).not.toBeInTheDocument();
+        expect(screen.getByTestId('mock-form-new')).toBeInTheDocument();
+    });
+
+    it('adds item with generated ID when no onSubmit and not isChildForm', async () => {
+        const onChangeItems = jest.fn();
+
+        render(<GenericDetails {...defaultProps} items={[]} onChangeItems={onChangeItems} />);
+
+        fireEvent.click(screen.getByText('Add New'));
+        fireEvent.click(screen.getByText('Submit'));
+
+        await waitFor(() => {
+            expect(onChangeItems).toHaveBeenCalled();
+        });
+
+        const updaterFunction = onChangeItems.mock.calls[0][0];
+        const newItems = updaterFunction([]);
+
+        expect(newItems.length).toBe(1);
+        expect(newItems[0]).toHaveProperty('id');
+        expect(typeof newItems[0].id).toBe('number');
+    });
+
+    it('adds item without ID modification when isChildForm', async () => {
+        const onChangeItems = jest.fn();
+
+        render(<GenericDetails {...defaultProps} items={[]} isChildForm onChangeItems={onChangeItems} />);
+
+        fireEvent.click(screen.getByText('Add New'));
+        fireEvent.click(screen.getByText('Submit'));
+
+        await waitFor(() => {
+            expect(onChangeItems).toHaveBeenCalled();
+        });
+
+        const updaterFunction = onChangeItems.mock.calls[0][0];
+        const newItems = updaterFunction([]);
+
+        expect(newItems.length).toBe(1);
+    });
+
+    it('shows disabled class on add button when form is visible', () => {
+        render(<GenericDetails {...defaultProps} />);
+
+        const addButton = screen.getByText('Add New');
+        expect(addButton.parentElement).not.toHaveClass('disabled');
+
+        fireEvent.click(addButton);
+
+        const buttons = screen.getAllByText('Add New');
+        const addButtonAfter = buttons.find((btn) => btn.parentElement?.classList.contains('btn-add-new'));
+
+        expect(addButtonAfter?.parentElement).toHaveClass('disabled');
+    });
+
+    it('handles item update without onUpdate callback', async () => {
+        const onChangeItems = jest.fn();
+        const items = [{ id: 1, name: 'Item 1' }];
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { rerender } = render(<GenericDetails {...defaultProps} items={items} onChangeItems={onChangeItems} />);
+
+        fireEvent.click(screen.getByText('Submit'));
+
+        await waitFor(() => {
+            expect(onChangeItems).toHaveBeenCalled();
+        });
+
+        const updaterFunction = onChangeItems.mock.calls[0][0];
+        const updatedItems = updaterFunction(items);
+
+        expect(updatedItems[0].name).toBeDefined();
+    });
+
+    it('handles item delete without onDelete callback', async () => {
+        const onChangeItems = jest.fn();
+        const items = [
+            { id: 1, name: 'Item 1' },
+            { id: 2, name: 'Item 2' },
+        ];
+
+        render(<GenericDetails {...defaultProps} items={items} onChangeItems={onChangeItems} />);
+
+        const deleteButtons = screen.getAllByText('Delete');
+        fireEvent.click(deleteButtons[0]);
+
+        await waitFor(() => {
+            expect(onChangeItems).toHaveBeenCalled();
+        });
+
+        const updaterFunction = onChangeItems.mock.calls[0][0];
+        const newItems = updaterFunction(items);
+
+        expect(newItems.length).toBe(1);
+        expect(newItems[0].id).toBe(2);
+    });
+
+    it('renders without title', () => {
+        render(<GenericDetails {...defaultProps} title={undefined} />);
+
+        expect(screen.queryByRole('button', { name: /Test Title/i })).not.toBeInTheDocument();
+        expect(screen.getByText('Item 1')).toBeInTheDocument();
+    });
+
+    it('initializes with collapsed state when initialIsItemsExpanded is false', () => {
+        render(<GenericDetails {...defaultProps} initialIsItemsExpanded={false} />);
+
+        expect(screen.queryByText('Item 1')).not.toBeInTheDocument();
+
+        const header = screen.getByText('Test Title');
+        fireEvent.click(header);
+
+        expect(screen.getByText('Item 1')).toBeInTheDocument();
+    });
+
+    it('does not render children when children prop is undefined', () => {
+        render(<GenericDetails {...defaultProps} children={undefined} />);
+
+        expect(screen.getByText('Item 1')).toBeInTheDocument();
+    });
+
+    it('handles delete without id (falsy id case)', async () => {
+        const onChangeItems = jest.fn();
+        const items = [{ id: 0, name: 'Item Zero' }];
+
+        render(<GenericDetails {...defaultProps} items={items} onChangeItems={onChangeItems} />);
+
+        fireEvent.click(screen.getByText('Delete'));
+
+        await waitFor(() => {
+            expect(onChangeItems).toHaveBeenCalled();
+        });
+
+        const updaterFunction = onChangeItems.mock.calls[0][0];
+        const newItems = updaterFunction(items);
+
+        expect(newItems.length).toBe(0);
+    });
+});

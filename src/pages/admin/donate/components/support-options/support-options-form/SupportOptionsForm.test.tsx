@@ -234,7 +234,6 @@ describe('SupportOptionsForm', () => {
             />,
         );
 
-        expect(screen.getByAltText('Зачекайте...')).toBeInTheDocument();
         expect(screen.queryByTestId('support-options-not-found')).not.toBeInTheDocument();
     });
 

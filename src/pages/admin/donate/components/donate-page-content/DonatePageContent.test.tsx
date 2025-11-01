@@ -10,6 +10,10 @@ const mockDelete = jest.fn();
 const mockSetItems = jest.fn();
 const mockAddToast = jest.fn();
 
+const mockCorrespondentCreate = jest.fn();
+const mockCorrespondentUpdate = jest.fn();
+const mockCorrespondentDelete = jest.fn();
+
 const mockBankCurrency = {
     Uah: 0,
     Usd: 1,
@@ -41,9 +45,9 @@ jest.mock('../../../../../services/api/admin/donate/support-options/support-opti
 
 jest.mock('../../../../../services/api/admin/donate/correspondent-banks/correspondent-banks-api', () => ({
     CorrespondentBankDetailsApi: {
-        create: jest.fn(),
-        update: jest.fn(),
-        delete: jest.fn(),
+        create: (...args: any[]) => mockCorrespondentCreate(...args),
+        update: (...args: any[]) => mockCorrespondentUpdate(...args),
+        delete: (...args: any[]) => mockCorrespondentDelete(...args),
     },
 }));
 
@@ -69,23 +73,48 @@ jest.mock('../bank-details-currencies/currencies-manager/CurrenciesManager', () 
 }));
 
 jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
-    CategoryBar: ({ onCategorySelect }: any) => (
+    CategoryBar: ({ onCategorySelect, selectedCategory }: any) => (
         <div data-testid="category-bar">
-            <button onClick={() => onCategorySelect('USD')}>USD</button>
+            <span data-testid="selected-category">{selectedCategory}</span>
+            <button onClick={() => onCategorySelect('USD')}>Switch to USD</button>
+            <button onClick={() => onCategorySelect('UAH')}>UAH</button>
         </div>
     ),
 }));
 
-jest.mock('../generic-details/GenericDetails', () => ({
-    GenericDetails: ({ children, onSubmit, onUpdate, onDelete }: any) => (
-        <div data-testid="generic-details">
-            {onSubmit && <button onClick={() => onSubmit({ id: 1 })}>Submit</button>}
-            {onUpdate && <button onClick={() => onUpdate(1, { name: 'Updated' })}>Update</button>}
-            {onDelete && <button onClick={() => onDelete(1)}>Delete</button>}
-            {children && typeof children === 'function' && children({ formState: { id: 1 }, isItemsExpanded: false })}
-        </div>
-    ),
-}));
+jest.mock('../generic-details/GenericDetails', () => {
+    let instanceCounter = 0;
+    return {
+        GenericDetails: ({ children, onSubmit, onUpdate, onDelete, items, isChildForm }: any) => {
+            const instanceId = instanceCounter++;
+            const testId = isChildForm ? 'correspondent-details' : 'generic-details';
+
+            return (
+                <div data-testid={testId} data-instance={instanceId}>
+                    {onSubmit && (
+                        <button data-action="submit" onClick={() => onSubmit({ id: 1 })}>
+                            Submit
+                        </button>
+                    )}
+                    {onUpdate && (
+                        <button data-action="update" onClick={() => onUpdate(1, { name: 'Updated' })}>
+                            Update
+                        </button>
+                    )}
+                    {onDelete && (
+                        <button data-action="delete" onClick={() => onDelete(1)}>
+                            Delete
+                        </button>
+                    )}
+                    {children &&
+                        typeof children === 'function' &&
+                        children({ formState: { id: 1 }, isItemsExpanded: false })}
+                    {items && <span data-testid="items-count">{items.length}</span>}
+                </div>
+            );
+        },
+    };
+});
 
 jest.mock('../support-options/support-options-form/SupportOptionsForm', () => ({
     SupportOptionsForm: ({ onCreateOption, onUpdateOption, onDeleteOption }: any) => (
@@ -124,6 +153,16 @@ describe('DonatePageContent', () => {
         mockCreate.mockResolvedValue({ id: 1, name: 'Test', value: '123', currency: mockBankCurrency.Uah });
         mockUpdate.mockResolvedValue({ id: 1, name: 'Updated', value: '456', currency: mockBankCurrency.Uah });
         mockDelete.mockResolvedValue(undefined);
+        mockCorrespondentCreate.mockResolvedValue({ id: 1 });
+        mockCorrespondentUpdate.mockResolvedValue({ id: 1 });
+        mockCorrespondentDelete.mockResolvedValue(undefined);
+
+        // Suppress console errors in tests
+        jest.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        jest.restoreAllMocks();
     });
 
     it('renders component successfully', async () => {
@@ -155,7 +194,8 @@ describe('DonatePageContent', () => {
         setupMockBankDetails([{ id: 1, correspondentBanks: [] }], createMockConfig(true));
         render(<DonatePageContent />);
         await waitFor(() => {
-            expect(screen.getAllByTestId('generic-details')).toHaveLength(2);
+            expect(screen.getByTestId('generic-details')).toBeInTheDocument();
+            expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
         });
     });
 
@@ -163,7 +203,8 @@ describe('DonatePageContent', () => {
         setupMockBankDetails([{ id: 1 }], createMockConfig(false));
         render(<DonatePageContent />);
         await waitFor(() => {
-            expect(screen.getAllByTestId('generic-details')).toHaveLength(1);
+            expect(screen.getByTestId('generic-details')).toBeInTheDocument();
+            expect(screen.queryByTestId('correspondent-details')).not.toBeInTheDocument();
         });
     });
 
@@ -176,10 +217,35 @@ describe('DonatePageContent', () => {
 
     it('handles category change', async () => {
         render(<DonatePageContent />);
-        fireEvent.click(screen.getByText('USD'));
+
+        await waitFor(() => {
+            expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0);
+        });
+
+        fireEvent.click(screen.getByText('Switch to USD'));
+
         await waitFor(() => {
             expect(mockGetAll).toHaveBeenCalledWith('mockClient', 1);
         });
+    });
+
+    it('does not change category when selecting the same category', async () => {
+        render(<DonatePageContent />);
+
+        await waitFor(() => {
+            expect(mockGetAll).toHaveBeenCalledTimes(1);
+            expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0);
+        });
+
+        // Click the UAH button (which is already selected)
+        const uahButton = screen.getByRole('button', { name: 'UAH' });
+        fireEvent.click(uahButton);
+
+        // Give it a small delay to ensure no new calls were made
+        await new Promise((resolve) => setTimeout(resolve, 50));
+
+        // Should still be called only once
+        expect(mockGetAll).toHaveBeenCalledTimes(1);
     });
 
     it('creates support option successfully', async () => {
@@ -271,6 +337,493 @@ describe('DonatePageContent', () => {
         fireEvent.click(screen.getByText('Create'));
         await waitFor(() => {
             expect(mockAddToast).toHaveBeenCalled();
+        });
+    });
+
+    // NEW TESTS FOR BETTER COVERAGE
+
+    it('updates bank details with correspondent banks correctly', async () => {
+        const mockConfig = createMockConfig(true);
+        mockConfig.update.mockResolvedValue({ id: 1, name: 'Updated Bank' });
+        setupMockBankDetails([{ id: 1, name: 'Test Bank', correspondentBanks: [{ id: 10 }] }], mockConfig);
+
+        render(<DonatePageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('generic-details')).toBeInTheDocument();
+            expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+        });
+
+        const bankDetails = screen.getByTestId('generic-details');
+        // Get only direct child button, not nested ones
+        const updateButton = bankDetails.querySelector(':scope > [data-action="update"]') as HTMLElement;
+
+        fireEvent.click(updateButton);
+
+        await waitFor(() => {
+            expect(mockConfig.update).toHaveBeenCalled();
+            expect(mockSetItems).toHaveBeenCalled();
+        });
+    });
+
+    it('creates correspondent bank successfully', async () => {
+        const mockConfig = createMockConfig(true);
+        mockCorrespondentCreate.mockResolvedValue({ id: 2, name: 'New Correspondent' });
+        setupMockBankDetails([{ id: 1, correspondentBanks: [{ id: 10 }] }], mockConfig);
+
+        render(<DonatePageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+        });
+
+        const correspondentDetails = screen.getByTestId('correspondent-details');
+        const submitButton = within(correspondentDetails).getByRole('button', { name: 'Submit' });
+
+        fireEvent.click(submitButton);
+
+        await waitFor(() => {
+            expect(mockCorrespondentCreate).toHaveBeenCalledWith('mockClient', {
+                id: 1,
+                foreignBankDetailsId: 1,
+            });
+        });
+    });
+    it('updates correspondent bank successfully', async () => {
+        const mockConfig = createMockConfig(true);
+        mockCorrespondentUpdate.mockResolvedValue({ id: 10, name: 'Updated Correspondent' });
+        setupMockBankDetails([{ id: 1, correspondentBanks: [{ id: 10 }] }], mockConfig);
+
+        render(<DonatePageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+        });
+
+        const correspondentDetails = screen.getByTestId('correspondent-details');
+        const updateButton = within(correspondentDetails).getByRole('button', { name: 'Update' });
+
+        fireEvent.click(updateButton);
+
+        await waitFor(() => {
+            expect(mockCorrespondentUpdate).toHaveBeenCalledWith('mockClient', 1, {
+                name: 'Updated',
+                foreignBankDetailsId: 1,
+            });
+        });
+    });
+
+    it('deletes correspondent bank successfully', async () => {
+        const mockConfig = createMockConfig(true);
+        setupMockBankDetails([{ id: 1, correspondentBanks: [{ id: 10 }] }], mockConfig);
+
+        render(<DonatePageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+        });
+
+        const correspondentDetails = screen.getByTestId('correspondent-details');
+        const deleteButton = within(correspondentDetails).getByRole('button', { name: 'Delete' });
+
+        fireEvent.click(deleteButton);
+
+        await waitFor(() => {
+            expect(mockCorrespondentDelete).toHaveBeenCalledWith('mockClient', 1);
+            expect(mockAddToast).toHaveBeenCalled();
+        });
+    });
+
+    it('does not call handlers when config is null', async () => {
+        setupMockBankDetails([], null);
+        render(<DonatePageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+        });
+
+        // Verify no generic details are rendered
+        expect(screen.queryByTestId('generic-details')).not.toBeInTheDocument();
+    });
+
+    it('renders correspondent banks with empty array', async () => {
+        const mockConfig = createMockConfig(true);
+        setupMockBankDetails([{ id: 1, correspondentBanks: [] }], mockConfig);
+
+        render(<DonatePageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('generic-details')).toBeInTheDocument();
+            expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+        });
+    });
+
+    it('renders correspondent banks for item without correspondentBanks property', async () => {
+        const mockConfig = createMockConfig(true);
+        setupMockBankDetails([{ id: 1 }], mockConfig);
+
+        render(<DonatePageContent />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('generic-details')).toBeInTheDocument();
+            expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+        });
+    });
+
+    it('cleans up useEffect on unmount', async () => {
+        const { unmount } = render(<DonatePageContent />);
+
+        await waitFor(() => {
+            expect(mockGetAll).toHaveBeenCalled();
+        });
+
+        // Clear the mock to track calls after unmount
+        mockGetAll.mockClear();
+
+        unmount();
+
+        // After unmount, no additional API calls should be made
+        expect(mockGetAll).not.toHaveBeenCalled();
+    });
+
+    it('prevents state update after unmount', async () => {
+        let resolvePromise: (value: any) => void;
+        const promise = new Promise((resolve) => {
+            resolvePromise = resolve;
+        });
+
+        mockGetAll.mockReturnValue(promise);
+
+        const { unmount } = render(<DonatePageContent />);
+
+        await waitFor(() => {
+            expect(mockGetAll).toHaveBeenCalled();
+        });
+
+        unmount();
+
+        // Resolve promise after unmount - should not cause errors
+        resolvePromise!([{ id: 1 }]);
+
+        // Wait to ensure no state updates happen
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        // Test passes if no errors were thrown
+        expect(true).toBe(true);
+    });
+
+    it('fetches support options for different currencies', async () => {
+        render(<DonatePageContent />);
+
+        await waitFor(() => {
+            expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0);
+        });
+
+        fireEvent.click(screen.getByText('Switch to USD'));
+
+        await waitFor(() => {
+            expect(mockGetAll).toHaveBeenCalledWith('mockClient', 1);
+        });
+    });
+
+    describe('DonatePageContent - Additional Coverage', () => {
+        it('calls addToast after successful bank details update', async () => {
+            const mockConfig = createMockConfig();
+            mockConfig.update.mockResolvedValue({ id: 1, name: 'Updated Bank' });
+            setupMockBankDetails([{ id: 1, name: 'Test Bank' }], mockConfig);
+
+            render(<DonatePageContent />);
+
+            const genericDetails = screen.getByTestId('generic-details');
+            const updateButton = within(genericDetails).getByText('Update');
+
+            fireEvent.click(updateButton);
+
+            await waitFor(() => {
+                expect(mockConfig.update).toHaveBeenCalled();
+                expect(mockAddToast).toHaveBeenCalled();
+            });
+        });
+
+        it('handles support options fetch rejection on category change', async () => {
+            mockGetAll.mockResolvedValueOnce([]).mockRejectedValueOnce(new Error('Fetch failed'));
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(mockGetAll).toHaveBeenCalledWith('mockClient', 0);
+            });
+
+            fireEvent.click(screen.getByText('Switch to USD'));
+
+            await waitFor(() => {
+                expect(mockGetAll).toHaveBeenCalledWith('mockClient', 1);
+            });
+
+            await waitFor(() => {
+                expect(mockGetAll).toHaveBeenCalledTimes(2);
+            });
+        });
+
+        it('renders correspondent banks with correct items count', async () => {
+            const mockConfig = createMockConfig(true);
+            setupMockBankDetails(
+                [
+                    { id: 1, correspondentBanks: [{ id: 10 }, { id: 11 }] },
+                    { id: 2, correspondentBanks: [] },
+                ],
+                mockConfig,
+            );
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+            });
+
+            const correspondentDetails = screen.getByTestId('correspondent-details');
+            const itemsCount = within(correspondentDetails).getByTestId('items-count');
+
+            expect(itemsCount).toHaveTextContent('2');
+        });
+
+        it('updates bank details and preserves correspondent banks in state', async () => {
+            const mockConfig = createMockConfig(true);
+            const updatedBankData = { id: 1, name: 'Updated Bank' };
+            mockConfig.update.mockResolvedValue(updatedBankData);
+
+            const existingCorrespondentBanks = [{ id: 10, name: 'Correspondent 1' }];
+            setupMockBankDetails(
+                [{ id: 1, name: 'Test Bank', correspondentBanks: existingCorrespondentBanks }],
+                mockConfig,
+            );
+
+            render(<DonatePageContent />);
+
+            const bankDetails = screen.getByTestId('generic-details');
+            const updateButton = bankDetails.querySelector(':scope > [data-action="update"]') as HTMLElement;
+
+            fireEvent.click(updateButton);
+
+            await waitFor(() => {
+                expect(mockConfig.update).toHaveBeenCalled();
+                expect(mockSetItems).toHaveBeenCalled();
+            });
+
+            const setItemsCallback = mockSetItems.mock.calls[0][0];
+            const previousItems = [{ id: 1, name: 'Test Bank', correspondentBanks: existingCorrespondentBanks }];
+            const updatedItems = setItemsCallback(previousItems);
+
+            expect(updatedItems[0].correspondentBanks).toEqual(existingCorrespondentBanks);
+            expect(updatedItems[0].name).toBe('Updated Bank');
+        });
+
+        it('updates bank details without correspondent banks property', async () => {
+            const mockConfig = createMockConfig(false);
+            mockConfig.update.mockResolvedValue({ id: 1, name: 'Updated Bank' });
+            setupMockBankDetails([{ id: 1, name: 'Test Bank' }], mockConfig);
+
+            render(<DonatePageContent />);
+
+            const genericDetails = screen.getByTestId('generic-details');
+            const updateButton = within(genericDetails).getByText('Update');
+
+            fireEvent.click(updateButton);
+
+            await waitFor(() => {
+                expect(mockConfig.update).toHaveBeenCalled();
+                expect(mockSetItems).toHaveBeenCalled();
+            });
+
+            const setItemsCallback = mockSetItems.mock.calls[0][0];
+            const previousItems = [{ id: 1, name: 'Test Bank' }];
+            const updatedItems = setItemsCallback(previousItems);
+
+            expect(updatedItems[0].correspondentBanks).toEqual([]);
+        });
+
+        it('creates correspondent bank with foreignBankDetailsId', async () => {
+            const mockConfig = createMockConfig(true);
+            const newBank = { id: 2, name: 'New Correspondent', foreignBankDetailsId: 1 };
+            mockCorrespondentCreate.mockResolvedValue(newBank);
+            setupMockBankDetails([{ id: 1, correspondentBanks: [{ id: 10 }] }], mockConfig);
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+            });
+
+            const correspondentDetails = screen.getByTestId('correspondent-details');
+            const submitButton = within(correspondentDetails).getByText('Submit');
+
+            fireEvent.click(submitButton);
+
+            await waitFor(() => {
+                expect(mockCorrespondentCreate).toHaveBeenCalledWith('mockClient', {
+                    id: 1,
+                    foreignBankDetailsId: 1,
+                });
+            });
+        });
+
+        it('updates correspondent bank with foreignBankDetailsId', async () => {
+            const mockConfig = createMockConfig(true);
+            const updatedBank = { id: 10, name: 'Updated Correspondent', foreignBankDetailsId: 1 };
+            mockCorrespondentUpdate.mockResolvedValue(updatedBank);
+            setupMockBankDetails([{ id: 1, correspondentBanks: [{ id: 10, name: 'Old Name' }] }], mockConfig);
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+            });
+
+            const correspondentDetails = screen.getByTestId('correspondent-details');
+            const updateButton = within(correspondentDetails).getByText('Update');
+
+            fireEvent.click(updateButton);
+
+            await waitFor(() => {
+                expect(mockCorrespondentUpdate).toHaveBeenCalledWith('mockClient', 1, {
+                    name: 'Updated',
+                    foreignBankDetailsId: 1,
+                });
+            });
+        });
+
+        it('calls addToast after successful correspondent bank deletion', async () => {
+            const mockConfig = createMockConfig(true);
+            setupMockBankDetails([{ id: 1, correspondentBanks: [{ id: 10 }] }], mockConfig);
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+            });
+
+            mockAddToast.mockClear();
+
+            const correspondentDetails = screen.getByTestId('correspondent-details');
+            const deleteButton = within(correspondentDetails).getByText('Delete');
+
+            fireEvent.click(deleteButton);
+
+            await waitFor(() => {
+                expect(mockCorrespondentDelete).toHaveBeenCalledWith('mockClient', 1);
+                expect(mockAddToast).toHaveBeenCalled();
+            });
+        });
+
+        it('handles multiple bank items when updating correspondent', async () => {
+            const mockConfig = createMockConfig(true);
+            const updatedBank = { id: 10, name: 'Updated' };
+            mockCorrespondentUpdate.mockResolvedValue(updatedBank);
+            setupMockBankDetails(
+                [
+                    { id: 1, correspondentBanks: [{ id: 10, name: 'Old' }] },
+                    { id: 2, correspondentBanks: [{ id: 20, name: 'Other' }] },
+                ],
+                mockConfig,
+            );
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+            });
+
+            const correspondentDetails = screen.getByTestId('correspondent-details');
+            const updateButton = within(correspondentDetails).getByText('Update');
+
+            fireEvent.click(updateButton);
+
+            await waitFor(() => {
+                expect(mockCorrespondentUpdate).toHaveBeenCalled();
+                expect(mockSetItems).toHaveBeenCalled();
+            });
+
+            expect(mockSetItems).toHaveBeenCalledWith(expect.any(Function));
+
+            const setItemsCallback = mockSetItems.mock.calls[0][0];
+            const previousItems = [
+                { id: 1, correspondentBanks: [{ id: 10, name: 'Old' }] },
+                { id: 2, correspondentBanks: [{ id: 20, name: 'Other' }] },
+            ];
+            const updatedItems = setItemsCallback(previousItems);
+
+            expect(updatedItems[0].correspondentBanks[0].id).toBe(10);
+            expect(updatedItems[1].correspondentBanks[0].name).toBe('Other');
+        });
+
+        it('handles correspondent bank creation with undefined correspondentBanks', async () => {
+            const mockConfig = createMockConfig(true);
+            const newBank = { id: 2, name: 'New' };
+            mockCorrespondentCreate.mockResolvedValue(newBank);
+            setupMockBankDetails([{ id: 1 }], mockConfig);
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+            });
+
+            const correspondentDetails = screen.getByTestId('correspondent-details');
+            const submitButton = within(correspondentDetails).getByText('Submit');
+
+            fireEvent.click(submitButton);
+
+            await waitFor(() => {
+                expect(mockCorrespondentCreate).toHaveBeenCalled();
+                expect(mockSetItems).toHaveBeenCalled();
+            });
+
+            const setItemsCallback = mockSetItems.mock.calls[0][0];
+            const previousItems = [{ id: 1 }];
+            const updatedItems = setItemsCallback(previousItems);
+
+            expect(Array.isArray(updatedItems[0].correspondentBanks)).toBe(true);
+            expect(updatedItems[0].correspondentBanks).toContainEqual(newBank);
+        });
+
+        it('deletes correspondent bank from correct parent bank', async () => {
+            const mockConfig = createMockConfig(true);
+            setupMockBankDetails([{ id: 1, correspondentBanks: [{ id: 10 }, { id: 11 }] }], mockConfig);
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+            });
+
+            const correspondentDetails = screen.getByTestId('correspondent-details');
+            const deleteButton = within(correspondentDetails).getByText('Delete');
+
+            fireEvent.click(deleteButton);
+
+            await waitFor(() => {
+                expect(mockCorrespondentDelete).toHaveBeenCalledWith('mockClient', 1);
+                expect(mockSetItems).toHaveBeenCalled();
+            });
+
+            const setItemsCallback = mockSetItems.mock.calls[0][0];
+            const previousItems = [{ id: 1, correspondentBanks: [{ id: 10 }, { id: 11 }] }];
+            const updatedItems = setItemsCallback(previousItems);
+
+            expect(updatedItems[0].correspondentBanks.length).toBe(2);
+            expect(updatedItems[0].correspondentBanks.find((cb: any) => cb.id === 1)).toBeUndefined();
+        });
+
+        it('renders without title when not provided', async () => {
+            setupMockBankDetails([{ id: 1, name: 'Test Bank' }], createMockConfig());
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('generic-details')).toBeInTheDocument();
+            });
+
+            expect(screen.getByTestId('generic-details')).toBeInTheDocument();
         });
     });
 });

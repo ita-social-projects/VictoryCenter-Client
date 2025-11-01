@@ -24,8 +24,7 @@ describe('OurTeam component', () => {
 
     it('should render the team description', () => {
         render(<OurTeam />, { wrapper: MemoryRouter });
-        checkForSubstrings(aboutUsPageUk['TEAM_DETAILS.FIRST_PART']);
-        checkForSubstrings(aboutUsPageUk['TEAM_DETAILS.SECOND_PART']);
+        checkForSubstrings(aboutUsPageUk['TEAM_DETAILS']);
     });
 
     it('should render the link to team page', () => {

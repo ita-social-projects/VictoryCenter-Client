@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { AboutUsPage } from './AboutUsPage';
 
 jest.mock('./intro-section/IntroSection', () => ({
-    AboutUsIntro: () => <div data-testid="intro-section">Intro Section</div>,
+    AboutUsIntro: () => <div data-testid="intro-section">About Us Intro</div>,
 }));
 jest.mock('./our-mission/OurMission', () => ({
     OurMission: () => <div data-testid="mission-section">Mission Section</div>,
@@ -22,6 +22,9 @@ jest.mock('./main-value/MainValue', () => ({
 jest.mock('./donate-section/DonateSection', () => ({
     DonateSection: () => <div data-testid="donate-section">Donate Section</div>,
 }));
+jest.mock('./scrollable-frame/ScrollableFrame', () => ({
+    ScrollableFrame: () => <div data-testid="scrollable-frame">Scrollable Frame</div>,
+}));
 
 describe('AboutUsPage', () => {
     it('should render IntroSection', () => {
@@ -33,5 +36,6 @@ describe('AboutUsPage', () => {
         expect(screen.getByTestId('team-section')).toBeInTheDocument();
         expect(screen.getByTestId('main-values-section')).toBeInTheDocument();
         expect(screen.getByTestId('donate-section')).toBeInTheDocument();
+        expect(screen.getByTestId('scrollable-frame')).toBeInTheDocument();
     });
 });

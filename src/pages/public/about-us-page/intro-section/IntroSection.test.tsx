@@ -25,11 +25,7 @@ describe('AboutUsIntro', () => {
 
     it('should render title details correctly', () => {
         render(<AboutUsIntro />);
-        prepareAndFindTitleDetails(aboutUsPageUk['INTRO_DETAILS.FIRST_LINE']);
-        prepareAndFindTitleDetails(aboutUsPageUk['INTRO_DETAILS.SECOND_LINE']);
-        prepareAndFindTitleDetails(aboutUsPageUk['INTRO_DETAILS.THIRD_LINE']);
-        prepareAndFindTitleDetails(aboutUsPageUk['INTRO_DETAILS.FOURTH_LINE']);
-        prepareAndFindTitleDetails(aboutUsPageUk['INTRO_DETAILS.FIFTH_LINE']);
+        prepareAndFindTitleDetails(aboutUsPageUk['INTRO_DETAILS']);
     });
 });
 

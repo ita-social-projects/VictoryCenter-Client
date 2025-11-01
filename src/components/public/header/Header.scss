@@ -152,6 +152,9 @@
 
 @media (max-width: 568px) {
     .header-block {
+        padding-left: 1rem;
+        padding-right: 0.5rem;
+
         .button-container {
             .contact-us-button {
                 display: none;
@@ -164,7 +167,7 @@
             display: none;
         }
     }
-    
+
     .mobile-menu {
         .mobile-language-switcher {
             display: flex;

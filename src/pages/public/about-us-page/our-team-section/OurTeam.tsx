@@ -11,13 +11,8 @@ export const OurTeam = () => {
         <div className="our-team-block">
             <img src={ourTeam} alt="Our Team" className="our-team-image" />
             <div className="team-info">
-                <p className="team-description">
-                    {t('TEAM_DETAILS.FIRST_PART')}
-                    <br />
-                    <br />
-                    {t('TEAM_DETAILS.SECOND_PART')}
-                </p>
-                <NavLink to={PUBLIC_ROUTES.TEAM.FULL} className="link-ro-team">
+                <p className="team-description">{t('TEAM_DETAILS')}</p>
+                <NavLink to={PUBLIC_ROUTES.TEAM.FULL} className="link-to-team">
                     {t('GO_TO_TEAM')}
                 </NavLink>
             </div>

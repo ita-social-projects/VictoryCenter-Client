@@ -94,16 +94,18 @@ export const Input = ({
     const hasValue = value && value !== prefix;
 
     return (
-        <div className={`input ${isTitle ? 'input-title' : ''} ${hasEdited ? 'input-changed' : ''} ${className ?? ''}`}>
+        <div
+            className={`donate-input ${isTitle ? 'donate-input-title' : ''} ${hasEdited ? 'donate-input-changed' : ''} ${className ?? ''}`}
+        >
             {label && (
-                <div className={isTitle ? 'input-title-label' : 'input-label'}>
-                    {isRequired && editable && <span className="input-required">*</span>}
+                <div className={isTitle ? 'donate-input-title-label' : 'donate-input-label'}>
+                    {isRequired && editable && <span className="donate-input-required">*</span>}
                     {label}
                 </div>
             )}
 
-            <div className={isTitle ? 'input-title-body' : 'input-body'}>
-                {isTitle && editable && isRequired && <span className="input-required">*</span>}
+            <div className={isTitle ? 'donate-input-title-body' : 'donate-input-body'}>
+                {isTitle && editable && isRequired && <span className="donate-input-required">*</span>}
 
                 <textarea
                     ref={textAreaRef}
@@ -117,7 +119,7 @@ export const Input = ({
                         handleBlur?.(e);
                     }}
                     readOnly={!editable}
-                    className="input-textarea"
+                    className="donate-input-textarea"
                     inputMode={onlyNumbers ? 'numeric' : undefined}
                     maxLength={maxLength}
                 />
@@ -128,7 +130,7 @@ export const Input = ({
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={handleClear}
                         aria-label="Clear input"
-                        className="input-clear-button"
+                        className="donate-input-clear-button"
                     ></button>
                 )}
             </div>

@@ -104,8 +104,8 @@ const mockCategoriesWithMembers: TeamCategory[] = [
 ];
 
 const mockCategoriesNoMembers: TeamCategory[] = [
-    { id: 1, name: 'Empty Category 1', description: 'Description 1', teamMembersCount: 0 },
-    { id: 2, name: 'Empty Category 2', description: 'Description 2', teamMembersCount: 0 },
+    { id: 10, name: 'Empty Category 1', description: 'Description 1', teamMembersCount: 0 },
+    { id: 20, name: 'Empty Category 2', description: 'Description 2', teamMembersCount: 0 },
 ];
 
 const mockClient = {

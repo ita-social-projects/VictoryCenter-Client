@@ -148,8 +148,8 @@ describe('CategoryBar', () => {
         );
 
         // Categories container should still exist with updated selection
-        const container = screen.getByText('Category 2').parentElement;
-        expect(container).toBeInTheDocument();
+        const selectedButton = screen.getByRole('button', { name: 'Category 2' });
+        expect(selectedButton).toHaveClass('category-bar-button-selected');
     });
 
     it('handles scroll left correctly', () => {
@@ -173,6 +173,8 @@ describe('CategoryBar', () => {
         Object.defineProperty(categoriesDiv, 'clientWidth', { value: 800, writable: true });
 
         fireEvent.scroll(categoriesDiv);
+
+        expect(container.querySelector('.category-bar-arrow-left')).toBeInTheDocument();
     });
 
     it('cleans up ResizeObserver on unmount', () => {
@@ -202,7 +204,8 @@ describe('CategoryBar', () => {
 
             unmount();
 
-            expect(mockResizeObserver).toHaveBeenCalled();
+            expect(mockResizeObserver).toHaveBeenCalledTimes(1);
+            expect(disconnectSpy).toHaveBeenCalledTimes(1);
         } finally {
             globalThis.ResizeObserver = originalResizeObserver;
         }

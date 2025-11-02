@@ -20,6 +20,11 @@ pnpm-lock.yaml
 .babelrc*
 .gitattributes
 .editorconfig
+.github
+.coderabbit.yaml
+.prettierrc
+craco.config.js
+jest.config.js
 
 # Markdown files that might contain code blocks that prettier shouldn't format
 # (e.g., if you use code blocks for different languages or specific tools)
@@ -38,3 +43,5 @@ yarn-error.log*
 *.patch
 .coverage/
 .cache/
+
+/public/

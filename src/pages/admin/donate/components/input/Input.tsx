@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import './Input.scss';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
+import './Input.scss';
 
 interface InputProps {
     label?: string;
@@ -96,7 +96,7 @@ export const Input = ({
     return (
         <div className={`input ${isTitle ? 'input-title' : ''} ${hasEdited ? 'input-changed' : ''} ${className ?? ''}`}>
             {label && (
-                <div className={isTitle ? 'input-title-label' : 'input-label'}>
+                <div className={isTitle ? 'input-title-label' : 'donate-label'}>
                     {isRequired && editable && <span className="input-required">*</span>}
                     {label}
                 </div>

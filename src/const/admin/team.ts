@@ -71,11 +71,7 @@ export const TEAM_MEMBER_VALIDATION = {
         getRequiredError: () => "Категорія обов'язкова",
     },
     img: {
-        maxSizeBytes: 3 * 1024 * 1024,
-        allowedFormats: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
         getRequiredWhenPublishingError: () => "Фото обов'язкове при публікації",
-        getFormatError: () => 'Невірний формат фото, дозволено jpeg, jpg, png, webp',
-        getSizeError: () => `Фото не більше ${TEAM_MEMBER_VALIDATION.img.maxSizeBytes / (1024 * 1024)} MB`,
     },
 };
 

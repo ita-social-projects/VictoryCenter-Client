@@ -265,12 +265,13 @@ describe('TeamCategoryModal', () => {
             const props = createAddProps();
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
             const descriptionTextarea = screen.getByTestId('textarea-description');
             const submitButton = screen.getByTestId('button');
 
-            userEvent.type(nameInput, 'New Category');
-            userEvent.type(descriptionTextarea, 'New Description');
+            await user.type(nameInput, 'New Category');
+            await user.type(descriptionTextarea, 'New Description');
 
             fireEvent.click(submitButton);
 
@@ -322,11 +323,12 @@ describe('TeamCategoryModal', () => {
             const props = createEditProps();
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
             const submitButton = screen.getByTestId('button');
 
-            userEvent.clear(nameInput);
-            userEvent.type(nameInput, 'Updated Name');
+            await user.clear(nameInput);
+            await user.type(nameInput, 'Updated Name');
 
             fireEvent.click(submitButton);
 
@@ -338,11 +340,12 @@ describe('TeamCategoryModal', () => {
             const props = createEditProps();
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
             const submitButton = screen.getByTestId('button');
 
-            userEvent.clear(nameInput);
-            userEvent.type(nameInput, 'Updated Category');
+            await user.clear(nameInput);
+            await user.type(nameInput, 'Updated Category');
 
             fireEvent.click(submitButton);
 
@@ -365,11 +368,12 @@ describe('TeamCategoryModal', () => {
             const props = createEditProps();
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
             const submitButton = screen.getByTestId('button');
 
-            userEvent.clear(nameInput);
-            userEvent.type(nameInput, 'Updated Category');
+            await user.clear(nameInput);
+            await user.type(nameInput, 'Updated Category');
 
             fireEvent.click(submitButton);
 
@@ -444,11 +448,12 @@ describe('TeamCategoryModal', () => {
             const props = createAddProps();
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
             const descriptionTextarea = screen.getByTestId('textarea-description');
 
-            userEvent.type(nameInput, 'Category 1');
-            userEvent.type(descriptionTextarea, 'Some description');
+            await user.type(nameInput, 'Category 1');
+            await user.type(descriptionTextarea, 'Some description');
 
             const submitButton = screen.getByTestId('button');
             expect(submitButton).toBeDisabled();
@@ -478,8 +483,9 @@ describe('TeamCategoryModal', () => {
             const props = createAddProps();
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
-            userEvent.type(nameInput, 'Some text');
+            await user.type(nameInput, 'Some text');
 
             const closeButton = screen.getByTestId('modal-close');
             fireEvent.click(closeButton);
@@ -494,8 +500,9 @@ describe('TeamCategoryModal', () => {
             const props = createAddProps();
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
-            userEvent.type(nameInput, 'Some text');
+            await user.type(nameInput, 'Some text');
 
             const closeButton = screen.getByTestId('modal-close');
             fireEvent.click(closeButton);
@@ -510,8 +517,9 @@ describe('TeamCategoryModal', () => {
             const props = createAddProps();
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
-            userEvent.type(nameInput, 'Some text');
+            await user.type(nameInput, 'Some text');
 
             const closeButton = screen.getByTestId('modal-close');
             fireEvent.click(closeButton);
@@ -531,12 +539,13 @@ describe('TeamCategoryModal', () => {
             const props = createAddProps();
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
             const descriptionTextarea = screen.getByTestId('textarea-description');
             const submitButton = screen.getByTestId('button');
 
-            userEvent.type(nameInput, 'New Category');
-            userEvent.type(descriptionTextarea, 'New Description');
+            await user.type(nameInput, 'New Category');
+            await user.type(descriptionTextarea, 'New Description');
 
             fireEvent.click(submitButton);
 
@@ -570,11 +579,12 @@ describe('TeamCategoryModal', () => {
             const props = createEditProps();
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
             const submitButton = screen.getByTestId('button');
 
-            userEvent.clear(nameInput);
-            userEvent.type(nameInput, 'Updated Name');
+            await user.clear(nameInput);
+            await user.type(nameInput, 'Updated Name');
 
             fireEvent.click(submitButton);
 
@@ -588,8 +598,9 @@ describe('TeamCategoryModal', () => {
             const props = createAddProps();
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
-            userEvent.type(nameInput, 'Some text');
+            await user.type(nameInput, 'Some text');
 
             const closeButton = screen.getByTestId('modal-close');
             fireEvent.click(closeButton);
@@ -612,10 +623,11 @@ describe('TeamCategoryModal', () => {
             const props = createAddProps();
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
 
             // Enter name with different case
-            userEvent.type(nameInput, 'CATEGORY 1');
+            await user.type(nameInput, 'CATEGORY 1');
 
             await waitFor(() => {
                 expect(screen.getByTestId('hint-box')).toBeInTheDocument();
@@ -626,12 +638,13 @@ describe('TeamCategoryModal', () => {
             const props = createAddProps();
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
             const descriptionTextarea = screen.getByTestId('textarea-description');
             const submitButton = screen.getByTestId('button');
 
-            userEvent.type(nameInput, 'New Category');
-            userEvent.type(descriptionTextarea, 'New Description');
+            await user.type(nameInput, 'New Category');
+            await user.type(descriptionTextarea, 'New Description');
 
             fireEvent.click(submitButton);
             fireEvent.click(submitButton);
@@ -646,12 +659,13 @@ describe('TeamCategoryModal', () => {
             const props = createEditProps({ categories: [] });
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
             const descriptionTextarea = screen.getByTestId('textarea-description');
             const submitButton = screen.getByTestId('button');
 
-            userEvent.type(nameInput, 'Some Name');
-            userEvent.type(descriptionTextarea, 'Some Description');
+            await user.type(nameInput, 'Some Name');
+            await user.type(descriptionTextarea, 'Some Description');
 
             fireEvent.click(submitButton);
 
@@ -678,12 +692,13 @@ describe('TeamCategoryModal', () => {
             const props = createAddProps();
             render(<TeamCategoryModal {...props} />);
 
+            const user = userEvent.setup();
             const nameInput = screen.getByTestId('input-name');
             const descriptionTextarea = screen.getByTestId('textarea-description');
             const submitButton = screen.getByTestId('button');
 
-            userEvent.type(nameInput, 'Bad Name');
-            userEvent.type(descriptionTextarea, 'Some Description');
+            await user.type(nameInput, 'Bad Name');
+            await user.type(descriptionTextarea, 'Some Description');
 
             fireEvent.click(submitButton);
 

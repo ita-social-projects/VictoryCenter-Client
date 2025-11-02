@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
-import { ProgramCard } from './program-card/ProgramCard';
 import { ProgramCategoryDto, ProgramsPageData } from '../../../../types/public/programs-page';
 import classNames from 'classnames';
 import { LinearProgress } from '@mui/material';
 import { useDataFetch } from '../../../../hooks/common/use-data-fetch/useDataFetch';
 import { useTranslation } from 'react-i18next';
 import './ProgramsSection.scss';
+import { ProgramCard } from '../../../../components/public/program-card/ProgramCard';
 
 export const ProgramsSection: React.FC = () => {
     const { t } = useTranslation(['programsPage', 'footer']);
@@ -64,11 +64,11 @@ export const ProgramsSection: React.FC = () => {
                     </div>
                 )}
                 {isLoading ? (
-                    <div>
-                        <LinearProgress></LinearProgress>
-                    </div>
+                    <LinearProgress />
                 ) : (
-                    programsByCategory?.map((item, index) => <ProgramCard key={index} program={item} />)
+                    programsByCategory?.map((item) => (
+                        <ProgramCard key={item.id} program={item} className={'program-page-card'} />
+                    ))
                 )}
             </div>
         </div>

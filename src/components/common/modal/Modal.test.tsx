@@ -306,4 +306,29 @@ describe('Modal Component', () => {
         fireEvent.keyDown(modalContainer, { key: 'Tab' });
         expect(modalContainer).toBeInTheDocument();
     });
+
+    test('traps focus backward: shift-tabbing from the first element moves focus to the last', async () => {
+        const user = userEvent.setup();
+
+        render(
+            <Modal {...defaultProps}>
+                <Modal.Content>
+                    <input data-testid="input1" />
+                    <button data-testid="button1">Button 1</button>
+                </Modal.Content>
+                <Modal.Actions>
+                    <button data-testid="button2">OK</button>
+                </Modal.Actions>
+            </Modal>,
+        );
+
+        const firstFocusableElement = screen.getByLabelText('Close modal');
+        const lastFocusableElement = screen.getByTestId('button2');
+
+        expect(firstFocusableElement).toHaveFocus();
+
+        await user.tab({ shift: true });
+
+        expect(lastFocusableElement).toHaveFocus();
+    });
 });

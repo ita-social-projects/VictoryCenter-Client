@@ -27,7 +27,6 @@ export const useDataFetch = <TResult>({
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<any | null>(null);
     const abortControllerRef = useRef<AbortController | null>(null);
-    const isInitialMountRef = useRef(true);
 
     const fetchData = useCallback(async () => {
         abortControllerRef.current?.abort();
@@ -58,11 +57,6 @@ export const useDataFetch = <TResult>({
     }, [fetchHandler]);
 
     useEffect(() => {
-        if (isInitialMountRef.current) {
-            isInitialMountRef.current = false;
-            return;
-        }
-
         if (autoFetchDisabled) {
             return;
         }

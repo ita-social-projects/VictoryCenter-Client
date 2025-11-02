@@ -15,6 +15,7 @@ $public-layout: (
     header: 5,
     about-us-page-main-value-text: 1,
     about-us-page-main-value-background: -1,
+    about-us-page-loader: 10,
     programs-page-intro-section-text: 1,
     programs-page-intro-section-background: -1,
     team-page-members-loader: 10,
@@ -29,6 +30,8 @@ $admin-layout: (
     multi-select-input: 10,
     search-bar-suggestions: 10,
     select: 10,
+    who-we-are-page-image-preview: 1,
+    who-we-are-page-delete-button: 2,
 );
 
 @function public($key) {

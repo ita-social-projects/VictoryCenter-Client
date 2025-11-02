@@ -13,6 +13,7 @@ export interface InputWithCharacterLimitProps {
     disabled?: boolean;
     type?: 'text' | 'email' | 'password' | 'number';
     placeholder?: string;
+    className?: string;
 }
 
 export const InputWithCharacterLimit = ({
@@ -26,6 +27,7 @@ export const InputWithCharacterLimit = ({
     disabled = false,
     type = 'text',
     placeholder,
+    className,
 }: InputWithCharacterLimitProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const currentLength = value?.length ?? 0;
@@ -50,7 +52,7 @@ export const InputWithCharacterLimit = ({
             })}
         >
             <input
-                className="char-limit-input__field"
+                className={classNames('char-limit-input__field', className)}
                 value={value}
                 onChange={onChange}
                 maxLength={maxLength}

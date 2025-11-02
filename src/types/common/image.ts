@@ -7,5 +7,4 @@ export interface Image {
 export interface ImageValues {
     base64: string;
     mimeType: string;
-    size: number;
 }

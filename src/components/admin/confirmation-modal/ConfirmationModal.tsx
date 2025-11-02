@@ -7,8 +7,8 @@ export interface ConfirmationModalProps {
     onClose: () => void;
     title: string;
     content?: string | null;
-    confirmText: string;
-    cancelText: string;
+    confirmText?: string;
+    cancelText?: string;
     onConfirm: () => void;
     onCancel: () => void;
     isButtonsDisabled?: boolean;

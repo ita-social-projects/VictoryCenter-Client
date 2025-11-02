@@ -1,0 +1,106 @@
+import { useRef, useState, useCallback, useMemo } from 'react';
+import { Swiper as SwiperReact, SwiperSlide, SwiperClass } from 'swiper/react';
+import { Navigation, Pagination, Scrollbar } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/scrollbar';
+
+import { ReactComponent as ArrowRight } from '../../../assets/icons/arrow-right.svg';
+import { ReactComponent as ArrowLeft } from '../../../assets/icons/arrow-left.svg';
+
+interface SwiperProps<T> {
+    items: T[] | null;
+    renderItem: (item: T, index: number) => React.ReactNode;
+    slidesPerView?: number;
+    breakpoints?: Record<number, { slidesPerView: number }>;
+    showScrollbar?: boolean;
+}
+
+export function Swiper<T>({
+    items,
+    renderItem,
+    slidesPerView = 1,
+    breakpoints = {},
+    showScrollbar = false,
+}: SwiperProps<T>) {
+    const swiperRef = useRef<SwiperClass | null>(null);
+    const [isPrevEnabled, setIsPrevEnabled] = useState(false);
+    const [isNextEnabled, setIsNextEnabled] = useState(true);
+
+    const handlePrev = useCallback(() => {
+        swiperRef.current?.slidePrev();
+    }, []);
+    const handleNext = useCallback(() => {
+        swiperRef.current?.slideNext();
+    }, []);
+
+    const handleInit = useCallback((swiper: SwiperClass) => {
+        swiperRef.current = swiper;
+        setIsPrevEnabled(!swiper.isBeginning);
+        setIsNextEnabled(!swiper.isEnd);
+    }, []);
+
+    const handleResize = useCallback((swiper: SwiperClass) => {
+        setIsPrevEnabled(!swiper.isBeginning);
+        setIsNextEnabled(!swiper.isEnd);
+    }, []);
+
+    const handleReachBeginning = useCallback(() => setIsPrevEnabled(false), []);
+
+    const handleReachEnd = useCallback(() => setIsNextEnabled(false), []);
+
+    const handleFromEdge = useCallback(() => {
+        setIsPrevEnabled(true);
+        setIsNextEnabled(true);
+    }, []);
+
+    const swiperModules = useMemo(() => {
+        const modules = [Navigation, Pagination];
+        if (showScrollbar) {
+            modules.push(Scrollbar);
+        }
+        return modules;
+    }, [showScrollbar]);
+
+    if (!items || items.length === 0) {
+        return null;
+    }
+
+    return (
+        <>
+            <SwiperReact
+                modules={swiperModules}
+                onInit={handleInit}
+                onResize={handleResize}
+                onReachBeginning={handleReachBeginning}
+                onReachEnd={handleReachEnd}
+                onFromEdge={handleFromEdge}
+                slidesPerView={slidesPerView}
+                scrollbar={{ draggable: true, el: '.custom-scrollbar' }}
+                breakpoints={breakpoints}
+            >
+                {items.map((item, index) => (
+                    <SwiperSlide key={index}>{renderItem(item, index)}</SwiperSlide>
+                ))}
+            </SwiperReact>
+            <div className="button-container">
+                <button
+                    type="button"
+                    onClick={handlePrev}
+                    className="arrow-button arrow-left"
+                    disabled={!isPrevEnabled}
+                >
+                    <ArrowLeft className="arrow-icon" />
+                </button>
+                <button
+                    type="button"
+                    onClick={handleNext}
+                    className="arrow-button arrow-right"
+                    disabled={!isNextEnabled}
+                >
+                    <ArrowRight className="arrow-icon" />
+                </button>
+            </div>
+        </>
+    );
+}

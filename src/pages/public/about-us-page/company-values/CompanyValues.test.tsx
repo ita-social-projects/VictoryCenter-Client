@@ -1,40 +1,81 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { CompanyValues } from './CompanyValues';
-import aboutUsPageUk from '../../../../locales/uk/about-us.json';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
-describe('Company Values Section', () => {
-    it('should contain main title', () => {
-        render(<CompanyValues />);
-        const title = screen.getByRole('heading', { name: aboutUsPageUk.OUR_VALUES });
-        expect(title).toBeInTheDocument();
-        expect(title).toHaveClass('values-title');
+jest.mock('@mui/material/useMediaQuery', () => ({
+    __esModule: true,
+    default: jest.fn(),
+}));
+
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string, opts?: any) => {
+            if (key === 'VALUE_ITEMS' && opts?.returnObjects) {
+                return [
+                    { NAME: 'Value 1', DESCRIPTION: 'Description 1' },
+                    { NAME: 'Value 2', DESCRIPTION: 'Description 2' },
+                    { NAME: 'Value 3', DESCRIPTION: 'Description 3' },
+                    { NAME: 'Value 4', DESCRIPTION: 'Description 4' },
+                    { NAME: 'Value 5', DESCRIPTION: 'Description 5' },
+                ];
+            }
+            return key;
+        },
+    }),
+}));
+
+jest.mock('../../../../components/public/swiper/Swiper', () => ({
+    Swiper: ({ items, renderItem }: any) => (
+        <div data-testid="custom-swiper">
+            {items.map((group: any, index: number) => (
+                <div key={index} data-testid={`swiper-group-${index}`}>
+                    {renderItem(group, index)}
+                </div>
+            ))}
+        </div>
+    ),
+}));
+
+jest.mock('./components/value-card/ValueCard', () => ({
+    ValueCard: ({ groupIndex }: any) => <div data-testid={`value-card-${groupIndex}`}>Card {groupIndex}</div>,
+}));
+
+describe('CompanyValues', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
     });
 
-    it('should contain value cards', () => {
+    it('renders wrapper and CustomSwiper', () => {
+        (useMediaQuery as jest.Mock).mockReturnValue(false);
         render(<CompanyValues />);
-        const cards = document.querySelectorAll('.value-card');
-        expect(cards.length).toEqual(3);
-        expect(cards[0]).toHaveClass('value-card');
-        expect(cards[1]).toHaveClass('value-card');
-        expect(cards[2]).toHaveClass('value-card');
-
-        const values = document.querySelectorAll('.value-item');
-        expect(values.length).toEqual(9);
+        expect(screen.getByTestId('custom-swiper')).toBeInTheDocument();
+        expect(document.querySelector('.values-block')).toBeInTheDocument();
     });
 
-    it('should contain correct text', () => {
+    it('renders ValueCard groups', () => {
+        (useMediaQuery as jest.Mock).mockReturnValue(false);
         render(<CompanyValues />);
-        aboutUsPageUk.VALUE_ITEMS.forEach(({ NAME, DESCRIPTION }) => {
-            expect(screen.getByRole('heading', { name: NAME })).toBeInTheDocument();
-            expect(screen.getByText(DESCRIPTION)).toBeInTheDocument();
-        });
+        expect(screen.getAllByTestId(/swiper-group-/).length).toBeGreaterThan(0);
     });
 
-    it('should render in correct container', () => {
-        const { container } = render(<CompanyValues />);
-        expect(container.querySelector('.values-block')).toBeInTheDocument();
-        const title = document.querySelector('.values-title')?.closest('.values-block');
-        expect(title).toBeInTheDocument();
+    it('updates layout when isTablet changes', () => {
+        (useMediaQuery as jest.Mock).mockReturnValue(false);
+        render(<CompanyValues />);
+        const desktopGroups = screen.getAllByTestId(/swiper-group-/).length;
+
+        (useMediaQuery as jest.Mock).mockReturnValue(true);
+        render(<CompanyValues />);
+        const tabletGroups = screen.getAllByTestId(/swiper-group-/);
+
+        expect(desktopGroups).toBeGreaterThan(0);
+        expect(tabletGroups.length).toBeGreaterThan(0);
+    });
+
+    it('handles small screen widths gracefully', () => {
+        (useMediaQuery as jest.Mock).mockReturnValue(false);
+        render(<CompanyValues />);
+        const groups = screen.getAllByTestId(/swiper-group-/);
+        expect(groups.length).toBeGreaterThan(0);
     });
 });

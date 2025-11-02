@@ -160,11 +160,6 @@ export const ProgramsPageContent = () => {
         }
     }, [searchProgramError, setErrorState]);
 
-    // Init + Auto-selection
-    useEffect(() => {
-        refetchCategories();
-    }, [refetchCategories]);
-
     useEffect(() => {
         if (!selectedCategory && categories && categories.length > 0) {
             setSelectedCategory(categories[0]);

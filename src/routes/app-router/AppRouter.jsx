@@ -18,6 +18,7 @@ import { AdminHomePage } from '../../pages/admin/home/AdminHomePage';
 import { TeamPage } from '../../pages/public/team-page/TeamPage';
 import { FaqPanel } from '../../pages/admin/faq/FaqPanel';
 import { PartnersPage } from '../../pages/public/partners-page/PartnersPage';
+import { WhoWeArePageAdmin } from '../../pages/admin/who-we-are/WhoWeArePageAdmin';
 
 export const AppRouter = () => (
     <BrowserRouter>
@@ -44,6 +45,7 @@ export const AppRouter = () => (
                         <Route path={ADMIN_ROUTES.PROGRAMS.PATH} element={<ProgramsPageAdmin />} />
                         <Route path={ADMIN_ROUTES.DONATE.PATH} element={<DonatePageAdmin />} />
                         <Route path={ADMIN_ROUTES.FAQ.PATH} element={<FaqPanel />} />
+                        <Route path={ADMIN_ROUTES.WHO_WE_ARE.PATH} element={<WhoWeArePageAdmin />} />
                     </Route>
                 </Route>
             </Route>

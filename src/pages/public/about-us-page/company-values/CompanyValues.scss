@@ -1,41 +1,60 @@
 @use '../../../../assets/sass/variables/colors';
 @use '../../../../assets/sass/variables/fonts';
+@use '../../../../assets/sass/variables/z-index';
 
 .values-block * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
 }
+.values-block:hover .button-container {
+    opacity: 1;
+    transition: opacity 1s ease;
+}
 .values-block {
+    display: flex;
+    flex-wrap: wrap;
     position: relative;
-    min-height: 78rem;
+    width: 100%;
+    height: auto;
+
+    .swiper {
+        width: 100%;
+    }
 
     .values-title {
-        font-family: fonts.$mulish-regular-font;
-        font-weight: 700;
-        font-size: 2rem;
-        line-height: 2.5rem;
-        letter-spacing: -0.02rem;
-        text-transform: uppercase;
+        width: 100%;
+        display: flex;
         position: absolute;
-        top: 2.75rem;
-        left: 3.5rem;
+        padding-top: 2.75rem;
+        padding-left: 3.531rem;
+
+        h2 {
+            font-family: fonts.$mulish-regular-font;
+            font-weight: 700;
+            font-size: 2rem;
+            line-height: 2.5rem;
+            letter-spacing: -0.02rem;
+            text-transform: uppercase;
+        }
     }
 
     .value-card {
-        position: absolute;
+        position: relative;
         background-color: colors.$light-blue-50;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
         justify-content: flex-start;
         gap: 2rem;
+        padding: 4rem 3.5rem;
 
         .value-item {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
             gap: 0.75rem;
+            width: 85%;
 
             .value-name {
                 width: 100%;
@@ -57,37 +76,218 @@
                 color: colors.$blue-900;
             }
         }
-    }
 
-    .value-card:nth-of-type(1) {
-        width: 34%;
-        top: 8.75rem;
-        padding: 4rem 3.5rem;
+        &.card-1 {
+            margin-top: 8.75rem;
+        }
 
-        .value-item {
-            width: 20rem;
+        &.card-2 {
+            margin-top: 17.5rem;
+        }
+
+        &.card-3 {
+            margin-top: 21.5rem;
         }
     }
 
-    .value-card:nth-of-type(2) {
-        width: 31%;
-        top: 17rem;
-        left: 34%;
-        padding: 4rem 1rem;
+    .button-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: absolute;
+        width: 100%;
+        top: 50%;
+        z-index: z-index.$scrollable-frame-arrows;
+        padding: 0 2rem;
+        transition: opacity 2s ease;
+        opacity: 0;
 
-        .value-item {
-            width: 19.75rem;
+        .arrow-button {
+            background-color: colors.$blue-900;
+            position: absolute;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            transition: all 0.4s ease;
+            cursor: pointer;
+
+            .arrow-icon {
+                position: absolute;
+                top: 0.5rem;
+                right: 0.5rem;
+                width: 1.5rem;
+                height: 1.5rem;
+
+                path {
+                    stroke: colors.$grey-50;
+                }
+            }
+
+            &:hover {
+                background-color: colors.$yellow-500;
+
+                .arrow-icon path {
+                    stroke: colors.$blue-900;
+                }
+            }
+
+            &:disabled {
+                display: none;
+            }
+        }
+
+        .arrow-left {
+            left: 1.75rem;
+        }
+
+        .arrow-right {
+            right: 1.75rem;
         }
     }
+}
 
-    .value-card:nth-of-type(3) {
-        width: 35%;
-        top: 21rem;
-        left: 65%;
-        padding: 4rem 1rem;
+@media (max-width: 1024px) {
+    .values-block {
+        padding: 3.75rem 0;
 
-        .value-item {
-            width: 20rem;
+        .swiper {
+            width: 100%;
+        }
+
+        .values-title {
+            width: 100%;
+            padding-top: 4rem;
+            padding-left: 3.375rem;
+        }
+
+        .value-card {
+            padding: 4rem 3.375rem;
+            padding-right: 1rem;
+
+            .value-item {
+                width: 100%;
+            }
+
+            &.card-1 {
+                margin-top: 11.125rem;
+            }
+
+            &.card-2 {
+                margin-top: 0rem;
+            }
+        }
+
+        .button-container {
+            .arrow-left {
+                left: 1rem;
+            }
+
+            .arrow-right {
+                right: 1rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .values-block {
+        padding: 3.75rem 0;
+
+        .swiper {
+            width: 100%;
+        }
+
+        .values-title {
+            width: 14.5rem;
+            padding-top: 4rem;
+            padding-left: 3.375rem;
+
+            h2 {
+                font-family: fonts.$mulish-regular-font;
+                font-weight: 700;
+                font-size: 2rem;
+                line-height: 2.5rem;
+                letter-spacing: -0.02rem;
+                text-transform: uppercase;
+            }
+        }
+
+        .value-card {
+            padding: 4rem 0rem;
+            padding-left: 3.375rem;
+            padding-right: 1rem;
+
+            .value-item {
+                width: 100%;
+            }
+
+            &.card-1 {
+                margin-top: 13.7rem;
+            }
+
+            &.card-2 {
+                margin-top: 0rem;
+            }
+
+            &.card-3 {
+                margin-top: 13.7rem;
+            }
+        }
+
+        .button-container {
+            .arrow-left {
+                left: 1rem;
+            }
+
+            .arrow-right {
+                right: 1rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 568px) {
+    .values-block {
+        padding: 3.75rem 0;
+
+        .swiper {
+            width: 100%;
+        }
+
+        .values-title {
+            width: 100%;
+            padding-top: 4rem;
+            padding-left: 1rem;
+        }
+
+        .value-card {
+            padding: 4rem 1rem;
+
+            .value-item {
+                width: 100%;
+            }
+
+            &.card-1 {
+                margin-top: 11.125rem;
+            }
+
+            &.card-2 {
+                margin-top: 3.7rem;
+            }
+
+            &.card-3 {
+                margin-top: 11.125rem;
+            }
+        }
+
+        .button-container {
+            .arrow-left {
+                left: 0.25rem;
+            }
+
+            .arrow-right {
+                right: 0.25rem;
+            }
         }
     }
 }

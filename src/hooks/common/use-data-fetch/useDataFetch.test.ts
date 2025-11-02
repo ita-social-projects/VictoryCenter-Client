@@ -159,11 +159,11 @@ describe('useDataFetch', () => {
         );
 
         // Initial auto fetch
-        await waitFor(() => expect(fetchHandler).toHaveBeenCalledTimes(0));
+        await waitFor(() => expect(fetchHandler).toHaveBeenCalledTimes(1));
 
         rerender({ deps: 'changed' });
 
-        await waitFor(() => expect(fetchHandler).toHaveBeenCalledTimes(1));
+        await waitFor(() => expect(fetchHandler).toHaveBeenCalledTimes(2));
     });
 
     it('should not refetch when autoFetch disabled and dependencies change', async () => {

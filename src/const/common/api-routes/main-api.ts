@@ -39,4 +39,9 @@ export const API_ROUTES = {
         BANK_DETAILS_FOREIGN: 'ForeignBankDetails',
         CORRESPONDENT_BANK_DETAILS: 'CorrespondentBankDetails',
     },
+    WHO_WE_ARE: {
+        BASE: 'WhoWeAre',
+        PREVIEWS: 'WhoWeAre/previews',
+        PUBLIC: 'WhoWeArePage',
+    },
 };

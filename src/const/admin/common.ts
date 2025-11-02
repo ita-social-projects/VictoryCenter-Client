@@ -4,6 +4,7 @@ export const COMMON_TEXT_ADMIN = {
         PROGRAMS: 'Програми',
         DONATE: 'Донати',
         FAQ: 'Часті питання',
+        WHO_WE_ARE: 'Хто ми',
     },
 
     ALT: {
@@ -50,6 +51,11 @@ export const COMMON_TEXT_ADMIN = {
         PUBLISH_CHANGES: 'Опублікувати зміни?',
     },
 
+    MESSAGE: {
+        SUCCESSFULLY_PUBLISHED: 'успішно опубліковано',
+        FAIL_TO_PUBLISH_CHANGES: 'Не вдалося опублікувати зміни',
+    },
+
     BUTTON: {
         YES: 'Так',
         NO: 'Ні',
@@ -60,6 +66,15 @@ export const COMMON_TEXT_ADMIN = {
         SAVE_AS_PUBLISHED: 'Опублікувати',
         TRY_AGAIN: 'Спробувати ще раз',
         EXIT: 'Вихід',
+    },
+    TYPE: {
+        DESCRIPTION: 'Опис',
+        TITLE: 'Заголовок',
+    },
+
+    VALIDATION_MESSAGE: {
+        FIELD_REQUIRED: "Поле обов'язкове",
+        getMinError: (min: number) => `Не менше ${min} символів`,
     },
 };
 

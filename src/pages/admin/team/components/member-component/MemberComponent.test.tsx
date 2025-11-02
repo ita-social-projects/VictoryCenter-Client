@@ -44,7 +44,7 @@ describe('MemberComponent', () => {
 
     it('renders valid data', () => {
         renderComponent({
-            image: { id: 10, url: 'https://superSecretStorage.com/image.png', mimeType: 'image/png', size: 1234 },
+            image: { id: 10, url: 'https://superSecretStorage.com/image.png', mimeType: 'image/png' },
         });
 
         const img = screen.getByRole('img');

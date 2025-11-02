@@ -1,5 +1,5 @@
 import './PublicLayout.scss';
-import { useLocation, Outlet } from 'react-router';
+import { useLocation, Outlet } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Header } from '../../components/public/header/Header';
 import { Footer } from '../../components/public/footer/Footer';

@@ -1,5 +1,5 @@
 import ourTeam from '../../../../assets/images/public/about-us-page/our-team.jpg';
-import { NavLink } from 'react-router';
+import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PUBLIC_ROUTES } from '../../../../const/public/routes';
 import './OurTeam.scss';

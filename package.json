@@ -53,29 +53,6 @@
             "typescript": "^5.9.2"
         }
     },
-    "eslintConfig": {
-        "extends": [
-            "react-app",
-            "react-app/jest",
-            "plugin:prettier/recommended"
-        ],
-        "rules": {
-            "no-console": 1,
-            "no-unused-vars": "off",
-            "@typescript-eslint/no-unused-vars": [
-                "warn",
-                {
-                    "varsIgnorePattern": "^_",
-                    "argsIgnorePattern": "^_",
-                    "caughtErrorsIgnorePattern": "^_",
-                    "destructuredArrayIgnorePattern": "^_"
-                }
-            ],
-            "testing-library/no-wait-for-multiple-assertions": 0,
-            "testing-library/no-container": 0,
-            "testing-library/no-node-access": 0
-        }
-    },
     "browserslist": {
         "production": [
             ">0.2%",

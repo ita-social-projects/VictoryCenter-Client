@@ -5,6 +5,7 @@ import { AdminLayout } from '../../layouts/admin-layout/AdminLayout';
 import { PublicLayout } from '../../layouts/public-layout/PublicLayout';
 import { TeamPageAdmin } from '../../pages/admin/team/TeamPage';
 import { ProgramsPageAdmin } from '../../pages/admin/programs/ProgramsPageAdmin';
+import { DonatePageAdmin } from '../../pages/admin/donate/DonatePageAdmin';
 import { AdminContextWrapper } from '../../components/admin/admin-context-wrapper/AdminContextWrapper';
 import { PUBLIC_ROUTES } from '../../const/public/routes';
 import { ADMIN_ROUTES } from '../../const/admin/routes';
@@ -42,6 +43,7 @@ export const AppRouter = () => (
                         <Route index element={<AdminHomePage />} />
                         <Route path={ADMIN_ROUTES.TEAM.PATH} element={<TeamPageAdmin />} />
                         <Route path={ADMIN_ROUTES.PROGRAMS.PATH} element={<ProgramsPageAdmin />} />
+                        <Route path={ADMIN_ROUTES.DONATE.PATH} element={<DonatePageAdmin />} />
                         <Route path={ADMIN_ROUTES.FAQ.PATH} element={<FaqPanel />} />
                         <Route path={ADMIN_ROUTES.WHO_WE_ARE.PATH} element={<WhoWeArePageAdmin />} />
                     </Route>

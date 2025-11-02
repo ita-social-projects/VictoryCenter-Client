@@ -1,0 +1,85 @@
+@use '../../../../../assets/sass/variables/colors.scss';
+@use '../../../../../assets/sass/variables/fonts.scss';
+
+.input {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+
+    &-body {
+        position: relative;
+    }
+
+    &-required {
+        font-size: 1.5rem;
+        color: colors.$error;
+    }
+
+    textarea {
+        font-family: fonts.$mulish-regular-font;
+        overflow: hidden;
+        width: 100%;
+        min-height: 3rem;
+        height: 3rem;
+        resize: none;
+        padding: 0.75rem 2rem 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 16px;
+        border: 1px solid colors.$grey-700;
+        line-height: 1.4;
+    }
+
+    textarea[readonly] {
+        pointer-events: none;
+        cursor: default;
+        caret-color: transparent;
+    }
+
+    button,
+    .input-clear-button {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        width: 1.5rem;
+        height: 1.5rem;
+        background: url('../../../../../assets/icons/remove-query.svg');
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    &-label {
+        color: colors.$blue-900;
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    &-title {
+        position: relative;
+
+        gap: 0px;
+
+        &-body {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        min-height: 62px;
+
+        textarea {
+            min-height: 62px;
+            height: 62px;
+            font-size: 32px;
+            font-weight: bold;
+            line-height: 1.2;
+
+            &::placeholder {
+                color: colors.$blue-900;
+            }
+        }
+    }
+}

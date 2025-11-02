@@ -2,6 +2,7 @@ export const COMMON_TEXT_ADMIN = {
     TAB: {
         TEAM_MEMBERS: 'Команда',
         PROGRAMS: 'Програми',
+        DONATE: 'Донати',
         FAQ: 'Часті питання',
         WHO_WE_ARE: 'Хто ми',
     },

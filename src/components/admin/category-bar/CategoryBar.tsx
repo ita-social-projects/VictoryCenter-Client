@@ -100,21 +100,16 @@ export const CategoryBar = <T,>({
                 </button>
             )}
             <div ref={categoriesContainerRef} className="category-bar-categories" onScroll={checkScroll}>
-                {categories.map((category) => {
-                    const key = getCategoryKey(category);
-                    const name = getCategoryDisplayName(category);
-                    const selected = !!selectedCategory && key === getCategoryKey(selectedCategory);
-
-                    return (
-                        <CategoryButton
-                            key={key}
-                            category={category}
-                            isSelected={selected}
-                            name={name}
-                            onSelect={onCategorySelect}
-                        />
-                    );
-                })}
+                {categories.map((category) => (
+                    <CategoryButton
+                        key={getCategoryKey(category)}
+                        category={category}
+                        selectedCategory={selectedCategory}
+                        getCategoryKey={getCategoryKey}
+                        getCategoryDisplayName={getCategoryDisplayName}
+                        onSelect={onCategorySelect}
+                    />
+                ))}
             </div>
             {showRightArrow && (
                 <button

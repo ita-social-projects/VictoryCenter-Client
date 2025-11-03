@@ -47,7 +47,6 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
     const isViewMode = mode === SupportOptionItemMode.View;
     const isCreateMode = mode === SupportOptionItemMode.Create;
     const editable = !isViewMode;
-    const hasErrors = !!errors.name || !!errors.value;
     const hasEmptyFields = !name.trim() || !value.trim();
     const hasChanges = name !== (data?.name ?? '') || value !== (data?.value ?? '');
 

@@ -90,13 +90,19 @@ export const Input = ({
     };
 
     const showClearButton = isFocused && value.length > prefix.length;
-
     const hasValue = value && value !== prefix;
 
+    const containerMods = [
+        isTitle ? 'donate-input-title' : '',
+        hasEdited ? 'donate-input-changed' : '',
+        isTitle && name === 'name' ? 'donate-input-title-create' : '',
+        className ?? '',
+    ]
+        .filter(Boolean)
+        .join(' ');
+
     return (
-        <div
-            className={`donate-input ${isTitle ? 'donate-input-title' : ''} ${hasEdited ? 'donate-input-changed' : ''} ${className ?? ''}`}
-        >
+        <div className={`donate-input ${containerMods}`}>
             {label && (
                 <div className={isTitle ? 'donate-input-title-label' : 'donate-input-label'}>
                     {isRequired && editable && <span className="donate-input-required">*</span>}

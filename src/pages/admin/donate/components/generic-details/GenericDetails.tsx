@@ -180,7 +180,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             buttonStyle="primary"
                         >
                             <div>{addNewText}</div>
-                            <PlusIcon />
+                            <PlusIcon className="plus-icon" />
                         </Button>
                     )}
                 </div>
@@ -202,7 +202,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                                 buttonStyle={primaryAddButton ? 'primary' : 'secondary'}
                             >
                                 <div>{addNewText}</div>
-                                <PlusIcon />
+                                <PlusIcon className="plus-icon" />
                             </Button>
                         </>
                     }

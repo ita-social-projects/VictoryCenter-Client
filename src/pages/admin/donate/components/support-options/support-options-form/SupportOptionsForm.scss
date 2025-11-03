@@ -19,6 +19,12 @@
         &.not-found {
             border: none;
             height: 100%;
+
+            .plus-icon {
+                path {
+                    stroke: colors.$blue-500;
+                }
+            }
         }
 
         &.title {

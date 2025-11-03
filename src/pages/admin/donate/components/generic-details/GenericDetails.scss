@@ -32,7 +32,6 @@
             }
         }
     }
-
     .child {
         .generic-details {
             &.header {
@@ -79,5 +78,13 @@
         justify-content: center;
         align-items: center;
         min-height: 200px;
+    }
+
+    &.not-found {
+        .btn-secondary .plus-icon {
+            path {
+                stroke: colors.$blue-500;
+            }
+        }
     }
 }

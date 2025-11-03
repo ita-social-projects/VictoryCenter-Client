@@ -9,9 +9,8 @@ import { Select } from '../../../../../../components/common/select/Select';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { ReactComponent as TranslateIcon } from '../../../../../../assets/icons/translate-grey.svg';
-import './TranslateMemberForm.scss';
 import { useTeamMemberForm } from '../use-team-member-form/useTeamMemberForm';
-
+import './TranslateMemberForm.scss';
 export interface TranslateTeamMemberFormValues {
     fullName: string;
     description: string;

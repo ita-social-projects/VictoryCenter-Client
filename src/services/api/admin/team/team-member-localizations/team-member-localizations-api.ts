@@ -3,6 +3,7 @@ import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
 import {
     TeamMemberLocalizationUpdateRequest,
     TeamMemberLocalizationCreateRequest,
+    TeamMemberLocalization,
 } from '../../../../../types/admin/localization/team-members';
 import { TeamMember } from '../../../../../types/admin/team-members';
 
@@ -15,19 +16,19 @@ export const TeamMemberLocalizationsApi = {
         client: AxiosInstance,
         id: number,
         localization: TeamMemberLocalizationUpdateRequest,
-    ): Promise<TeamMember> => {
+    ): Promise<TeamMemberLocalization> => {
         const response = await client.put(`${API_ROUTES.TEAM_LOCALIZATIONS.BASE}/${id}`, {
             fullName: localization.fullName,
             description: localization.description,
         });
 
-        return response.data as TeamMember;
+        return response.data as TeamMemberLocalization;
     },
 
     postMemberLocalization: async (
         client: AxiosInstance,
         localization: TeamMemberLocalizationCreateRequest,
-    ): Promise<TeamMember> => {
+    ): Promise<TeamMemberLocalization> => {
         const response = await client.post(`${API_ROUTES.TEAM_LOCALIZATIONS.BASE}`, {
             fullName: localization.fullName,
             description: localization.description,
@@ -35,6 +36,6 @@ export const TeamMemberLocalizationsApi = {
             languageId: localization.languageId,
         });
 
-        return response.data as TeamMember;
+        return response.data as TeamMemberLocalization;
     },
 };

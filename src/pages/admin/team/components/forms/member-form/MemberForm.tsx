@@ -9,9 +9,8 @@ import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../../con
 import { InputWithCharacterLimit } from '../../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { ImageInput } from '../../../../../../components/admin/image-input/ImageInput';
-import { useFormManager } from '../../../../../../hooks/admin/use-form-manager/useFormManager';
-import './MemberForm.scss';
 import { useTeamMemberForm } from '../use-team-member-form/useTeamMemberForm';
+import './MemberForm.scss';
 
 export interface TeamMemberFormValues {
     categoryId: number | null;

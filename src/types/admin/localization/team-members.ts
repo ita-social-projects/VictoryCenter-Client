@@ -9,7 +9,6 @@ export type TeamMemberLocalization = {
 };
 
 export interface TeamMemberLocalizationCreateRequest {
-    id: number | null;
     fullName: string;
     description: string;
     teamMemberId: number;

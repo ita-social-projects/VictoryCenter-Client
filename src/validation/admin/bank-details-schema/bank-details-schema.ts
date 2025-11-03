@@ -18,8 +18,8 @@ export const BankDetailsValidationSchema = Yup.object({
     swift: Yup.string()
         .trim()
         .required(DONATE_VALIDATION.swift.getRequiredError())
-        .min(DONATE_VALIDATION.swift.count, DONATE_VALIDATION.swift.getMinError())
-        .max(DONATE_VALIDATION.swift.count, DONATE_VALIDATION.swift.getMaxError()),
+        .min(DONATE_VALIDATION.swift.minLength, DONATE_VALIDATION.swift.getMinError())
+        .max(DONATE_VALIDATION.swift.maxLength, DONATE_VALIDATION.swift.getMaxError()),
     address: Yup.string().trim().required(DONATE_VALIDATION.address.getRequiredError()),
     account: Yup.string().trim().required(DONATE_VALIDATION.account.getRequiredError()),
 });

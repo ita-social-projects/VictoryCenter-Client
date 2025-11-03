@@ -48,12 +48,29 @@ export const useGenericModal = <
     const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
     const [pendingFormData, setPendingFormData] = useState<TFormValues | null>(null);
     const [isFormValid, setIsFormValid] = useState(false);
+    const [buttonStates, setButtonStates] = useState({
+        draftValid: false,
+        publishValid: false,
+    });
 
     const isEditMode = mode === ModalMode.Edit;
 
-    const handleFormValidationChange = useCallback((isValid: boolean) => {
-        setIsFormValid(isValid);
+    const updateButtonStates = useCallback((currentIsValid: boolean) => {
+        const api = formRef.current;
+
+        setButtonStates({
+            draftValid: api?.isValid?.(false) ?? currentIsValid,
+            publishValid: api?.isValid?.(true) ?? currentIsValid,
+        });
     }, []);
+
+    const handleFormValidationChange = useCallback(
+        (isValid: boolean) => {
+            setIsFormValid(isValid);
+            updateButtonStates(isValid);
+        },
+        [updateButtonStates],
+    );
 
     useEffect(() => {
         if (!isOpen) return;
@@ -166,6 +183,7 @@ export const useGenericModal = <
         isEditMode,
         formKey,
         formConfirmTitle,
+        buttonStates,
 
         handleFormValidationChange,
         handleFormSubmit,

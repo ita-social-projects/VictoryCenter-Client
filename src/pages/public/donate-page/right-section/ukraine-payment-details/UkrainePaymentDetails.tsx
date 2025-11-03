@@ -1,10 +1,10 @@
 import './UkrainePaymentDetails.scss';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
 import { UKRAINE_PAYMENT_DETAILS, PAYMENT_DETAILS_COMMON } from '../../../../../const/public/donate-page';
-import { PublicUahBankDetailsDto } from '../../../../../types/public/donate-page';
+import { PublishedUahBankDetailsDto } from '../../../../../types/public/donate-page';
 
 interface UkrainePaymentDetailsProps {
-    bankDetails: PublicUahBankDetailsDto[];
+    bankDetails: PublishedUahBankDetailsDto[];
 }
 
 export const UkrainePaymentDetails = ({ bankDetails }: UkrainePaymentDetailsProps) => {

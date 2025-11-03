@@ -6,7 +6,7 @@ import { AbroadPaymentDetails } from './abroad-payment-details/AbroadPaymentDeta
 import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSupportWays';
 import { Tabs } from '../../../../components/common/tabs/Tabs';
 import { UkrainePaymentDetails } from './ukraine-payment-details/UkrainePaymentDetails';
-import { Currency, DonatePageData, BankCurrency } from '../../../../types/public/donate-page';
+import { Currency, DonatePageData } from '../../../../types/public/donate-page';
 import { CURRENCY_TABS } from '../../../../const/public/donate-page';
 import { donatePageDataFetch } from '../../../../services/api/public/donate/donate-api';
 import { useDataFetch } from '../../../../hooks/common/use-data-fetch/useDataFetch';
@@ -34,18 +34,14 @@ export const RightSection = () => {
                 return (
                     <AbroadPaymentDetails
                         currency={activeTab}
-                        foreignBankDetails={donateData.foreignBankDetails.filter(
-                            (b) => b.currency === BankCurrency.Usd,
-                        )}
+                        foreignBankDetails={donateData.foreignBankDetails.filter((b) => b.currency === Currency.USD)}
                     />
                 );
             case Currency.EUR:
                 return (
                     <AbroadPaymentDetails
                         currency={activeTab}
-                        foreignBankDetails={donateData.foreignBankDetails.filter(
-                            (b) => b.currency === BankCurrency.Eur,
-                        )}
+                        foreignBankDetails={donateData.foreignBankDetails.filter((b) => b.currency === Currency.EUR)}
                     />
                 );
         }
@@ -84,7 +80,7 @@ export const RightSection = () => {
             </div>
             <div className="donatePaymentDetails">
                 {paymentDetails()}
-                <AlternativeSupportWays supportOptions={donateData?.supportOptions || []} />
+                <AlternativeSupportWays supportOptions={donateData?.supportOptions || []} currentCurrency={activeTab} />
             </div>
         </div>
     );

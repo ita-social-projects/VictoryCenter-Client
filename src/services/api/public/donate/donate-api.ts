@@ -1,22 +1,14 @@
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import {
-    PublicUahBankDetailsDto,
-    PublicForeignBankDetailsDto,
-    PublicSupportOptionsDto,
-    BankCurrency,
+    PublishedUahBankDetailsDto,
+    PublishedForeignBankDetailsDto,
+    PublishedSupportOptionsDto,
+    Currency,
     DonatePageData,
 } from '../../../../types/public/donate-page';
 import { axiosInstance } from '../../axios';
 
-// TODO:
-const TEMP_PUBLIC_ROUTES = {
-    BANK_DETAILS_UAH: 'api/public/donate/bank-details-uah', // TODO:
-    BANK_DETAILS_FOREIGN: 'api/public/donate/bank-details-foreign', // TODO:
-    SUPPORT_OPTIONS: 'api/public/donate/support-options', // TODO:
-};
-
 export const donatePageDataFetch = async (): Promise<DonatePageData> => {
-    // TODO:
     const [
         uahBankDetailsResponse,
         usdForeignResponse,
@@ -25,21 +17,26 @@ export const donatePageDataFetch = async (): Promise<DonatePageData> => {
         usdSupportResponse,
         eurSupportResponse,
     ] = await Promise.all([
-        axiosInstance.get<PublicUahBankDetailsDto[]>(TEMP_PUBLIC_ROUTES.BANK_DETAILS_UAH),
-        axiosInstance.get<PublicForeignBankDetailsDto[]>(TEMP_PUBLIC_ROUTES.BANK_DETAILS_FOREIGN, {
-            params: { currency: BankCurrency.Usd },
+        axiosInstance.get<PublishedUahBankDetailsDto[]>(API_ROUTES.DONATE.PUBLIC.UAH_BANK_DETAILS),
+
+        axiosInstance.get<PublishedForeignBankDetailsDto[]>(API_ROUTES.DONATE.PUBLIC.FOREIGN_BANK_DETAILS, {
+            params: { currency: Currency.USD },
         }),
-        axiosInstance.get<PublicForeignBankDetailsDto[]>(TEMP_PUBLIC_ROUTES.BANK_DETAILS_FOREIGN, {
-            params: { currency: BankCurrency.Eur },
+
+        axiosInstance.get<PublishedForeignBankDetailsDto[]>(API_ROUTES.DONATE.PUBLIC.FOREIGN_BANK_DETAILS, {
+            params: { currency: Currency.EUR },
         }),
-        axiosInstance.get<PublicSupportOptionsDto[]>(TEMP_PUBLIC_ROUTES.SUPPORT_OPTIONS, {
-            params: { currency: BankCurrency.Uah },
+
+        axiosInstance.get<PublishedSupportOptionsDto[]>(API_ROUTES.DONATE.PUBLIC.SUPPORT_OPTIONS, {
+            params: { currency: Currency.UAH },
         }),
-        axiosInstance.get<PublicSupportOptionsDto[]>(TEMP_PUBLIC_ROUTES.SUPPORT_OPTIONS, {
-            params: { currency: BankCurrency.Usd },
+
+        axiosInstance.get<PublishedSupportOptionsDto[]>(API_ROUTES.DONATE.PUBLIC.SUPPORT_OPTIONS, {
+            params: { currency: Currency.USD },
         }),
-        axiosInstance.get<PublicSupportOptionsDto[]>(TEMP_PUBLIC_ROUTES.SUPPORT_OPTIONS, {
-            params: { currency: BankCurrency.Eur },
+
+        axiosInstance.get<PublishedSupportOptionsDto[]>(API_ROUTES.DONATE.PUBLIC.SUPPORT_OPTIONS, {
+            params: { currency: Currency.EUR },
         }),
     ]);
 

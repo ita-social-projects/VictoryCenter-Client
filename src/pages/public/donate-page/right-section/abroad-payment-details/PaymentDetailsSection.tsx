@@ -35,24 +35,42 @@ export const PaymentDetailsSection = ({
                 value={swift || ABROAD_PAYMENT_DETAILS.SWIFT_CODE_VALUE_LABEL}
                 copyValue={swift || ABROAD_PAYMENT_DETAILS.SWIFT_CODE_VALUE_LABEL}
             />
-            <MultiFieldLabelWithCopy
-                label={ABROAD_PAYMENT_DETAILS.BANK_RECEIVER_LABEL}
-                values={[
-                    bankName || ABROAD_PAYMENT_DETAILS.BANK_NAME_TRANSLITERATED_LABEL,
-                    ABROAD_PAYMENT_DETAILS.BANK_STREET_TRANSLITERATED_LABEL,
-                    ABROAD_PAYMENT_DETAILS.BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL,
-                ]}
-                copyValue={
-                    (bankName || ABROAD_PAYMENT_DETAILS.BANK_NAME_TRANSLITERATED_LABEL) +
-                    ABROAD_PAYMENT_DETAILS.BANK_STREET_TRANSLITERATED_LABEL +
-                    ABROAD_PAYMENT_DETAILS.BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL
-                }
-            />
-            <MultiFieldLabelWithCopy
-                label={ABROAD_PAYMENT_DETAILS.ADDRESS_LABEL}
-                values={[address || ABROAD_PAYMENT_DETAILS.COUNTRY_LABEL, ABROAD_PAYMENT_DETAILS.CITY_LABEL]}
-                copyValue={(address || ABROAD_PAYMENT_DETAILS.COUNTRY_LABEL) + ABROAD_PAYMENT_DETAILS.CITY_LABEL}
-            />
+
+            {bankName ? (
+                <PaymentLabelWithCopy
+                    label={ABROAD_PAYMENT_DETAILS.BANK_RECEIVER_LABEL}
+                    value={bankName}
+                    copyValue={bankName}
+                />
+            ) : (
+                <MultiFieldLabelWithCopy
+                    label={ABROAD_PAYMENT_DETAILS.BANK_RECEIVER_LABEL}
+                    values={[
+                        ABROAD_PAYMENT_DETAILS.BANK_NAME_TRANSLITERATED_LABEL,
+                        ABROAD_PAYMENT_DETAILS.BANK_STREET_TRANSLITERATED_LABEL,
+                        ABROAD_PAYMENT_DETAILS.BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL,
+                    ]}
+                    copyValue={
+                        ABROAD_PAYMENT_DETAILS.BANK_NAME_TRANSLITERATED_LABEL +
+                        ABROAD_PAYMENT_DETAILS.BANK_STREET_TRANSLITERATED_LABEL +
+                        ABROAD_PAYMENT_DETAILS.BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL
+                    }
+                />
+            )}
+
+            {address ? (
+                <PaymentLabelWithCopy
+                    label={ABROAD_PAYMENT_DETAILS.ADDRESS_LABEL}
+                    value={address}
+                    copyValue={address}
+                />
+            ) : (
+                <MultiFieldLabelWithCopy
+                    label={ABROAD_PAYMENT_DETAILS.ADDRESS_LABEL}
+                    values={[ABROAD_PAYMENT_DETAILS.COUNTRY_LABEL, ABROAD_PAYMENT_DETAILS.CITY_LABEL]}
+                    copyValue={ABROAD_PAYMENT_DETAILS.COUNTRY_LABEL + ABROAD_PAYMENT_DETAILS.CITY_LABEL}
+                />
+            )}
         </div>
     </div>
 );

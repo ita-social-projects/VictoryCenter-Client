@@ -4,13 +4,13 @@ import { PaymentDetailsSection } from './PaymentDetailsSection';
 import { Currency } from '../../../../../types/public/donate-page';
 import { ABROAD_PAYMENT_DETAILS } from '../../../../../const/public/donate-page';
 import { currencyToString } from '../../../../../utils/functions/mappers/public/donate';
-import { PublicForeignBankDetailsDto } from '../../../../../types/public/donate-page';
+import { PublishedForeignBankDetailsDto } from '../../../../../types/public/donate-page';
 
 type AbroadCurrency = 'USD' | 'EUR';
 
 interface AbroadPaymentDetailsProps {
     currency: Exclude<Currency, Currency.UAH>;
-    foreignBankDetails: PublicForeignBankDetailsDto[];
+    foreignBankDetails: PublishedForeignBankDetailsDto[];
 }
 
 export const AbroadPaymentDetails = ({ currency, foreignBankDetails }: AbroadPaymentDetailsProps) => {
@@ -33,7 +33,7 @@ export const AbroadPaymentDetails = ({ currency, foreignBankDetails }: AbroadPay
                 address={primary?.address}
             />
 
-            <CorrespondentBanksSection currency={currency} />
+            <CorrespondentBanksSection correspondentBanks={primary?.correspondentBanks || []} />
         </div>
     );
 };

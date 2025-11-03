@@ -405,9 +405,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                           })
                                             }
                                             buttonStyle="primary"
-                                            disabled={
-                                                isSubmitting || hasEmptyRequiredFields || hasErrors || !isChanged()
-                                            }
+                                            disabled={isSubmitting || hasEmptyRequiredFields || !isChanged()}
                                         >
                                             {DONATE_TEXT.BUTTON.PUBLISH}
                                         </Button>

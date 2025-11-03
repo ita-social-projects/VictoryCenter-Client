@@ -192,7 +192,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                         type="button"
                         onClick={handleSaveClick}
                         buttonStyle="primary"
-                        disabled={isSubmitting || hasEmptyFields || !hasChanges || hasErrors}
+                        disabled={isSubmitting || hasEmptyFields || !hasChanges}
                     >
                         {DONATE_TEXT.BUTTON.PUBLISH}
                     </Button>

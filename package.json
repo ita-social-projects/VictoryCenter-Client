@@ -5,6 +5,17 @@
     "engines": {
         "node": ">=20"
     },
+    "scripts": {
+        "start": "react-scripts start",
+        "start-with-cert": "node scripts/start-in-dev-over-https.mjs",
+        "build": "react-scripts build",
+        "eject": "react-scripts eject",
+        "test": "craco test",
+        "test:cover": "npm test -- --coverage --watchAll=false",
+        "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --max-warnings 10",
+        "lint:fix": "eslint --fix",
+        "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,scss,md,json}' --config ./.prettierrc"
+    },
     "dependencies": {
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.1",
@@ -14,13 +25,13 @@
         "@testing-library/dom": "^10.4.0",
         "@testing-library/jest-dom": "^6.6.3",
         "@testing-library/react": "^16.3.0",
-        "@testing-library/user-event": "^13.5.0",
+        "@testing-library/user-event": "^14.6.1",
         "@types/jest": "^27.5.2",
         "@types/node": "^16.18.126",
         "axios": "^1.10.0",
         "classnames": "^2.5.1",
         "http-proxy-middleware": "^3.0.5",
-        "i18next": "^23.16.8",
+        "i18next": "^25.5.3",
         "i18next-browser-languagedetector": "^8.2.0",
         "prop-types": "^15.8.1",
         "react": "^19.1.0",
@@ -41,17 +52,6 @@
         "react-scripts": {
             "typescript": "^5.9.2"
         }
-    },
-    "scripts": {
-        "start": "react-scripts start",
-        "start-with-cert": "node scripts/start-in-dev-over-https.mjs",
-        "build": "react-scripts build",
-        "test": "craco test",
-        "eject": "react-scripts eject",
-        "test:cover": "npm test -- --coverage --watchAll=false",
-        "lint": "eslint ./src --ext .js,.jsx,.ts,.tsx --ignore-path .gitignore --max-warnings 10",
-        "lint:fix": "eslint --fix",
-        "format": "prettier --write './**/*.{js,jsx,ts,tsx,css,scss,md,json}' --config ./.prettierrc"
     },
     "eslintConfig": {
         "extends": [
@@ -96,7 +96,8 @@
             "^swiper/css$": "<rootDir>/src/__mocks__/styleMock.js",
             "^swiper/css/navigation$": "<rootDir>/src/__mocks__/styleMock.js",
             "^swiper/css/pagination$": "<rootDir>/src/__mocks__/styleMock.js",
-            "^swiper/css/scrollbar$": "<rootDir>/src/__mocks__/styleMock.js"
+            "^swiper/css/scrollbar$": "<rootDir>/src/__mocks__/styleMock.js",
+            "^react-router-dom$": "<rootDir>/src/__mocks__/reactRouterDomMock.js"
         },
         "transformIgnorePatterns": [
             "node_modules/(?!axios)/"

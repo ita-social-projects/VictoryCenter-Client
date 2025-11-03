@@ -1,6 +1,6 @@
 import './LoginForm.scss';
 import React, { useState } from 'react';
-import { NavLink } from 'react-router';
+import { NavLink } from 'react-router-dom';
 import { ReactComponent as Logo } from '../../../../assets/icons/logo-with-text.svg';
 import { ReactComponent as EyeOpened } from '../../../../assets/icons/eye-opened.svg';
 import { ReactComponent as EyeClosed } from '../../../../assets/icons/eye-closed.svg';

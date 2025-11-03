@@ -1,5 +1,5 @@
 import background from '../../../../assets/images/public/about-us-page/donate-background.jpg';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '../../../../const/public/routes';
 import { useTranslation } from 'react-i18next';
 import './DonateSection.scss';

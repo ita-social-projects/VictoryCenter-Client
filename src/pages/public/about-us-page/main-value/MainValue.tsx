@@ -1,8 +1,14 @@
 import { useTranslation } from 'react-i18next';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import './MainValue.scss';
+import { Swiper } from '../../../../components/public/swiper/Swiper';
+import { AboutUsContent } from '../../../../types/public/about-us-page';
 
-export const MainValues = () => {
+export interface MainValuesProps {
+    content: AboutUsContent[] | null;
+}
+
+export const MainValues = ({ content }: MainValuesProps) => {
     const { t } = useTranslation('aboutUsPage');
     const peopleData = t('PEOPLE_DATA', { returnObjects: true });
 
@@ -12,27 +18,36 @@ export const MainValues = () => {
                 <h2>
                     {t('MAIN_VALUE.FIRST_PART')}
                     <span>{t('MAIN_VALUE.FIRST_HIGHLIGHT')}</span>
-                    {t('MAIN_VALUE.MIDDLE_PART')} <br />
+                    {t('MAIN_VALUE.MIDDLE_PART')}
                     <span>{t('MAIN_VALUE.SECOND_HIGHLIGHT')}</span>
                 </h2>
             </div>
+
             <div className="people-block">
-                {peopleData.map(({ ALT, INFO }, index) => (
-                    <div
-                        key={`${ALT}-${index}`}
-                        className={`people-card ${ABOUT_US_DATA.PEOPLE_DATA[index].CARD_CLASS}`}
-                    >
-                        <img src={ABOUT_US_DATA.PEOPLE_DATA[index].IMG} alt={ALT} />
-                        <p className="people-info">{INFO}</p>
-                    </div>
-                ))}
+                <Swiper
+                    items={content}
+                    slidesPerView={1}
+                    breakpoints={{
+                        568: { slidesPerView: 2 },
+                        768: { slidesPerView: 2 },
+                        1025: { slidesPerView: 4 },
+                    }}
+                    renderItem={(person, index) => {
+                        const imageUrl = person.image?.url ?? ABOUT_US_DATA.PEOPLE_DATA[index].IMG;
+                        const altText = peopleData[index].ALT;
+                        const description = person.description;
+
+                        return (
+                            <div className={`people-card card-${index + 1}`}>
+                                <img src={imageUrl} alt={altText} />
+                                <p className="people-info">{description}</p>
+                            </div>
+                        );
+                    }}
+                />
             </div>
             <div className="summary-block">
-                <h3 className="summary-text">
-                    {t('MAIN_VALUE_DETAILS.FIRST_LINE')} <br />
-                    {t('MAIN_VALUE_DETAILS.SECOND_LINE')} <br />
-                    {t('MAIN_VALUE_DETAILS.THIRD_LINE')}
-                </h3>
+                <h3 className="summary-text">{t('MAIN_VALUE_DETAILS')}</h3>
             </div>
         </div>
     );

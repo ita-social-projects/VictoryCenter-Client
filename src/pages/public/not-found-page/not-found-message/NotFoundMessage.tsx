@@ -3,7 +3,7 @@ import './NotFoundMessage.scss';
 import { DESCRIPTION, TEXT, GO_BACK_BUTTON } from '../../../../const/public/notfound-page';
 import { ReactComponent as ArrowIcon } from '../../../../assets/icons/arrow-up-right.svg';
 import { PUBLIC_ROUTES } from '../../../../const/public/routes';
-import { NavLink } from 'react-router';
+import { NavLink } from 'react-router-dom';
 
 export const NotFoundMessage = () => {
     return (

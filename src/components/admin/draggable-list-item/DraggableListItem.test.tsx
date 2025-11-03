@@ -87,13 +87,13 @@ describe('DraggableListItem', () => {
         const onReorder = jest.fn();
         render(<DraggableListItem {...defaultProps} onEntitiesReordered={onReorder} />);
 
-        const wrapper = screen.getByText('Entity 1').closest('.draggable-item-wrapper')!;
+        const item = screen.getByText('Entity 1').closest('.draggable-item')!;
 
         const dataTransferMock = {
             getData: jest.fn(() => '3'),
         };
 
-        fireEvent.drop(wrapper, { dataTransfer: dataTransferMock, preventDefault: jest.fn() });
+        fireEvent.drop(item, { dataTransfer: dataTransferMock, preventDefault: jest.fn() });
 
         expect(onReorder).toHaveBeenCalledWith([
             { id: 3, name: 'Entity 3' },
@@ -106,25 +106,25 @@ describe('DraggableListItem', () => {
         const onReorder = jest.fn();
         render(<DraggableListItem {...defaultProps} onEntitiesReordered={onReorder} />);
 
-        const wrapper = screen.getByText('Entity 1').closest('.draggable-item-wrapper')!;
+        const item = screen.getByText('Entity 1').closest('.draggable-item')!;
 
         const dataTransferMock = {
             getData: jest.fn(() => '1'),
         };
 
-        fireEvent.drop(wrapper, { dataTransfer: dataTransferMock, preventDefault: jest.fn() });
+        fireEvent.drop(item, { dataTransfer: dataTransferMock, preventDefault: jest.fn() });
 
         expect(onReorder).not.toHaveBeenCalled();
     });
 
     it('prevents default on dragOver', () => {
         render(<DraggableListItem {...defaultProps} />);
-        const wrapper = screen.getByText('Entity 1').closest('.draggable-item-wrapper')!;
+        const item = screen.getByText('Entity 1').closest('.draggable-item')!;
 
-        const dragOverEvent = createEvent.dragOver(wrapper);
+        const dragOverEvent = createEvent.dragOver(item);
         dragOverEvent.preventDefault = jest.fn();
 
-        fireEvent(wrapper, dragOverEvent);
+        fireEvent(item, dragOverEvent);
         expect(dragOverEvent.preventDefault).toHaveBeenCalled();
     });
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { SupportOptionsType } from '../../../../../../types/admin/donate';
 import { InlineLoader } from '../../../../../../components/common/inline-loader/InlineLoader';
+import { ReactComponent as PlusIcon } from '../../../../../../assets/icons/plus.svg';
 import './SupportOptionsForm.scss';
 import { SupportOptionItem } from '../support-option-item/SupportOptionItem';
 import NotFoundIcon from '../../../../../../assets/icons/not-found.svg';
@@ -51,7 +52,7 @@ export const SupportOptionsForm = ({
                     <p>{DONATE_TEXT.SUPPORT_OPTIONS.NOT_FOUND}</p>
                     <Button className="btn-add" onClick={() => setIsAdding(true)} buttonStyle="secondary">
                         {DONATE_TEXT.SUPPORT_OPTIONS.ADD_FIRST}
-                        <div className="plus-icon"></div>
+                        <PlusIcon className="plus-icon" />
                     </Button>
                 </div>
             ) : (
@@ -78,7 +79,7 @@ export const SupportOptionsForm = ({
                             disabled={isLoading}
                         >
                             {DONATE_TEXT.SUPPORT_OPTIONS.ADD_NEW}
-                            <div className="plus-icon"></div>
+                            <PlusIcon className="plus-icon" />
                         </Button>
                     )}
                 </div>

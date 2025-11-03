@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import './Input.scss';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
+import classNames from 'classnames';
 
 interface InputProps {
     label?: string;
@@ -92,17 +93,18 @@ export const Input = ({
     const showClearButton = isFocused && value.length > prefix.length;
     const hasValue = value && value !== prefix;
 
-    const containerMods = [
-        isTitle ? 'donate-input-title' : '',
-        hasEdited ? 'donate-input-changed' : '',
-        isTitle && name === 'name' ? 'donate-input-title-create' : '',
-        className ?? '',
-    ]
-        .filter(Boolean)
-        .join(' ');
-
     return (
-        <div className={`donate-input ${containerMods}`}>
+        <div
+            className={classNames(
+                'donate-input',
+                {
+                    'donate-input-title': isTitle,
+                    'donate-input-changed': hasEdited,
+                    'donate-input-title-create': isTitle && name === 'name',
+                },
+                className,
+            )}
+        >
             {label && (
                 <div className={isTitle ? 'donate-input-title-label' : 'donate-input-label'}>
                     {isRequired && editable && <span className="donate-input-required">*</span>}

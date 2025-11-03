@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { RightSection } from './RightSection';
 import { Currency } from '../../../../types/public/donate-page';

@@ -44,6 +44,20 @@ describe('donatePageDataFetch', () => {
         },
     ];
 
+    const testApiError = async (failAtIndex: number, errorMessage: string) => {
+        const error = new Error(errorMessage);
+
+        for (let i = 0; i < 6; i++) {
+            if (i === failAtIndex) {
+                mockAxiosInstance.get.mockRejectedValueOnce(error);
+            } else {
+                mockAxiosInstance.get.mockResolvedValueOnce({ data: [] });
+            }
+        }
+
+        await expect(donatePageDataFetch()).rejects.toThrow(errorMessage);
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
@@ -80,25 +94,19 @@ describe('donatePageDataFetch', () => {
             await donatePageDataFetch();
 
             expect(mockAxiosInstance.get).toHaveBeenCalledTimes(6);
-
             expect(mockAxiosInstance.get).toHaveBeenNthCalledWith(1, API_ROUTES.DONATE.PUBLIC.UAH_BANK_DETAILS);
-
             expect(mockAxiosInstance.get).toHaveBeenNthCalledWith(2, API_ROUTES.DONATE.PUBLIC.FOREIGN_BANK_DETAILS, {
                 params: { currency: Currency.USD },
             });
-
             expect(mockAxiosInstance.get).toHaveBeenNthCalledWith(3, API_ROUTES.DONATE.PUBLIC.FOREIGN_BANK_DETAILS, {
                 params: { currency: Currency.EUR },
             });
-
             expect(mockAxiosInstance.get).toHaveBeenNthCalledWith(4, API_ROUTES.DONATE.PUBLIC.SUPPORT_OPTIONS, {
                 params: { currency: Currency.UAH },
             });
-
             expect(mockAxiosInstance.get).toHaveBeenNthCalledWith(5, API_ROUTES.DONATE.PUBLIC.SUPPORT_OPTIONS, {
                 params: { currency: Currency.USD },
             });
-
             expect(mockAxiosInstance.get).toHaveBeenNthCalledWith(6, API_ROUTES.DONATE.PUBLIC.SUPPORT_OPTIONS, {
                 params: { currency: Currency.EUR },
             });
@@ -142,38 +150,27 @@ describe('donatePageDataFetch', () => {
 
     describe('API error handling', () => {
         it('throws error when UAH bank details request fails', async () => {
-            const error = new Error('UAH API Error');
-            mockAxiosInstance.get.mockRejectedValueOnce(error);
-
-            await expect(donatePageDataFetch()).rejects.toThrow('UAH API Error');
+            await testApiError(0, 'UAH API Error');
         });
 
         it('throws error when USD foreign bank details request fails', async () => {
-            const error = new Error('USD API Error');
-            mockAxiosInstance.get.mockResolvedValueOnce({ data: [] }).mockRejectedValueOnce(error);
-
-            await expect(donatePageDataFetch()).rejects.toThrow('USD API Error');
+            await testApiError(1, 'USD API Error');
         });
 
         it('throws error when EUR foreign bank details request fails', async () => {
-            const error = new Error('EUR API Error');
-            mockAxiosInstance.get
-                .mockResolvedValueOnce({ data: [] })
-                .mockResolvedValueOnce({ data: [] })
-                .mockRejectedValueOnce(error);
-
-            await expect(donatePageDataFetch()).rejects.toThrow('EUR API Error');
+            await testApiError(2, 'EUR API Error');
         });
 
-        it('throws error when support options request fails', async () => {
-            const error = new Error('Support Options API Error');
-            mockAxiosInstance.get
-                .mockResolvedValueOnce({ data: [] })
-                .mockResolvedValueOnce({ data: [] })
-                .mockResolvedValueOnce({ data: [] })
-                .mockRejectedValueOnce(error);
+        it('throws error when UAH support options request fails', async () => {
+            await testApiError(3, 'UAH Support API Error');
+        });
 
-            await expect(donatePageDataFetch()).rejects.toThrow('Support Options API Error');
+        it('throws error when USD support options request fails', async () => {
+            await testApiError(4, 'USD Support API Error');
+        });
+
+        it('throws error when EUR support options request fails', async () => {
+            await testApiError(5, 'EUR Support API Error');
         });
 
         it('throws error when multiple requests fail', async () => {

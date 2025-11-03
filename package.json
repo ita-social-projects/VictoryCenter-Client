@@ -9,6 +9,7 @@
         "start": "craco start",
         "start-with-cert": "node scripts/start-in-dev-over-https.mjs",
         "build": "craco build",
+        "eject": "craco eject",
         "test": "craco test",
         "test:cover": "npm test -- --coverage --watchAll=false",
         "lint": "eslint src --ext .js,.jsx,.ts,.tsx --max-warnings 10",

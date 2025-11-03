@@ -4,7 +4,7 @@ import { ProgramsPageContent } from './ProgramsPageContent';
 import { Program, ProgramCategory } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
+import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { ProgramsApi, ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 
@@ -274,7 +274,7 @@ describe('ProgramsPageContent', () => {
         render(<ProgramsPageContent />);
 
         await waitFor(() => {
-            expect(screen.getByText(PROGRAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES)).toBeInTheDocument();
+            expect(screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES)).toBeInTheDocument();
             expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN)).toBeInTheDocument();
         });
 

@@ -11,8 +11,10 @@ export const API_ROUTES = {
         BASE: 'TeamMembers',
         SEARCH: 'TeamMembers/search',
         REORDER: 'TeamMembers/reorder',
-        CATEGORIES: 'teamcategories',
         PUBLISHED: 'team/published',
+    },
+    TEAM_CATEGORIES: {
+        BASE: 'TeamCategories',
     },
     PROGRAMS: {
         BASE: 'HippotherapyPrograms',

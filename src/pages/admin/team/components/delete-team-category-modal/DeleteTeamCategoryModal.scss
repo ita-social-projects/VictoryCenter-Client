@@ -1,0 +1,16 @@
+@use '../../../../../assets/sass/variables/colors';
+
+.team-category-modal-error-container {
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+    width: 100%;
+    margin: 0.5rem;
+    color: colors.$error;
+}
+
+.delete-category-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4375rem;
+}

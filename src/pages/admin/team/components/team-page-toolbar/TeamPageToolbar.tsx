@@ -6,7 +6,8 @@ import { StatusFilterDropdown } from '../../../../../components/admin/status-fil
 import { Button } from '../../../../../components/admin/button/Button';
 import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
 import './TeamPageToolbar.scss';
-import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
+import { TeamMember } from '../../../../../types/admin/team-members';
+import { TeamCategory } from '../../../../../types/admin/team-category';
 import { TeamMemberSearchItem } from '../../../../../components/admin/search-bar/team-member-search-item/TeamMemberSearchItem';
 import { forwardRef, useMemo } from 'react';
 import {

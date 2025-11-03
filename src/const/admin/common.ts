@@ -98,6 +98,7 @@ export const COMMON_TEXT_ADMIN = {
             },
         },
     },
+
     TYPE: {
         DESCRIPTION: 'Опис',
         TITLE: 'Заголовок',

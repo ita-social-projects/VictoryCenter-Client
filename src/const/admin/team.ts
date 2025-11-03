@@ -1,3 +1,5 @@
+import { COMMON_TEXT_ADMIN } from './common';
+
 export const TEAM_MEMBERS_TEXT = {
     SEARCH: {
         INPUT_FULLNAME: "Введіть ім'я та прізвище",
@@ -83,9 +85,6 @@ export const TEAM_CATEGORY_TEXT = {
             CATEGORY: 'Категорія',
         },
     },
-    MESSAGE: {
-        FAIL_TO_FETCH_CATEGORIES: 'Виникла помилка, не вдалось завантажити категорії',
-    },
 };
 
 export const TEAM_CATEGORY_VALIDATION = {
@@ -95,7 +94,7 @@ export const TEAM_CATEGORY_VALIDATION = {
         getRequiredError: () => 'Назва обов’язкова',
         getMinError: () => `Не менше ${TEAM_CATEGORY_VALIDATION.name.min} символів`,
         getMaxError: () => `Не більше ${TEAM_CATEGORY_VALIDATION.name.max} символів`,
-        getDuplicateNameError: () => 'Категорія з такою назвою вже існує',
+        getDuplicateNameError: () => COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.ALREADY_CONTAIN_CATEGORY_WITH_NAME,
     },
     description: {
         min: 10,

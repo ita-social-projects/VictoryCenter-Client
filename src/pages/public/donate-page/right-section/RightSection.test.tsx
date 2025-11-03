@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { RightSection } from './RightSection';
 import { Currency } from '../../../../types/public/donate-page';
@@ -109,6 +110,19 @@ describe('RightSection', () => {
     const queryUkrainePaymentSection = () => screen.queryByTestId('ukraine-payment');
     const queryAbroadPaymentSection = () => screen.queryByTestId('abroad-payment');
 
+    const testForeignCurrencySwitch = async (currency: 'USD' | 'EUR') => {
+        render(<RightSection />);
+
+        fireEvent.click(getTabByLabel(currency));
+
+        await waitFor(() => {
+            expect(getAbroadPaymentSection()).toBeInTheDocument();
+            expect(getAbroadPaymentSection()).toHaveTextContent(currency);
+            expect(queryUkrainePaymentSection()).not.toBeInTheDocument();
+            expect(getTabByLabel(currency)).toHaveClass('active');
+        });
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
@@ -159,29 +173,11 @@ describe('RightSection', () => {
         });
 
         it('switches to USD tab and shows AbroadPaymentDetails', async () => {
-            render(<RightSection />);
-
-            fireEvent.click(getTabByLabel('USD'));
-
-            await waitFor(() => {
-                expect(getAbroadPaymentSection()).toBeInTheDocument();
-                expect(getAbroadPaymentSection()).toHaveTextContent('USD');
-                expect(queryUkrainePaymentSection()).not.toBeInTheDocument();
-                expect(getTabByLabel('USD')).toHaveClass('active');
-            });
+            await testForeignCurrencySwitch('USD');
         });
 
         it('switches to EUR tab and shows AbroadPaymentDetails', async () => {
-            render(<RightSection />);
-
-            fireEvent.click(getTabByLabel('EUR'));
-
-            await waitFor(() => {
-                expect(getAbroadPaymentSection()).toBeInTheDocument();
-                expect(getAbroadPaymentSection()).toHaveTextContent('EUR');
-                expect(queryUkrainePaymentSection()).not.toBeInTheDocument();
-                expect(getTabByLabel('EUR')).toHaveClass('active');
-            });
+            await testForeignCurrencySwitch('EUR');
         });
 
         it('switches between all tabs correctly', async () => {

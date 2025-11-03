@@ -1,6 +1,7 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { SearchItemContentRef, SearchItemContentRenderProps } from '../search-item-wrapper/SearchItemWrapper';
-import { TeamMember, TeamCategory } from '../../../../types/admin/team-members';
+import { TeamMember } from '../../../../types/admin/team-members';
+import { TeamCategory } from '../../../../types/admin/team-category';
 import { generateInitials } from '../../../../utils/functions/formatters/text-formatters';
 import './TeamMemberSearchItem.scss';
 

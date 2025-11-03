@@ -39,7 +39,7 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
             setCategoryId(0);
             onClose();
         } catch {
-            setError(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
+            setError(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
         } finally {
             setIsSubmitting(false);
         }
@@ -69,7 +69,7 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
 
     return (
         <Modal isOpen={isOpen} onClose={handleClose}>
-            <Modal.Title>{PROGRAM_CATEGORY_TEXT.FORM.TITLE.DELETE_CATEGORY}</Modal.Title>
+            <Modal.Title>{COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY}</Modal.Title>
             <Modal.Content>
                 <div className="program-form-main">
                     <SingleSelectInputGroup

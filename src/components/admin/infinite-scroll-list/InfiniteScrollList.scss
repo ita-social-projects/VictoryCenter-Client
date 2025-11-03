@@ -6,6 +6,9 @@
     flex-direction: column;
     height: 100%;
     overflow: hidden;
+    padding: 0.25rem;
+    padding-top: 0.5rem;
+    margin: -0.25rem;
 }
 
 .infinite-scroll-list {
@@ -18,6 +21,8 @@
     overflow-x: hidden;
     overflow-y: auto;
     scroll-behavior: smooth;
+    padding: 0.25rem;
+    margin: -0.25rem;
 
     &-loader-container {
         display: flex;

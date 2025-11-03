@@ -3,29 +3,61 @@
 .category-bar {
     min-height: 3.75rem;
     display: flex;
+    position: relative;
     border-bottom: 1px solid colors.$grey-700;
     font-size: 24px;
     font-weight: 600;
     background: colors.$grey-50;
 
-    &-button {
+    &-categories {
+        display: flex;
+        flex: 1;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    &-arrow {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        padding: 0 0.5rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0.9375rem;
+        background-color: colors.$blue-900;
         border: none;
-        background: transparent;
-        font-size: 24px;
-        text-align: center;
-        transition: background-color 0.2s;
+        cursor: pointer;
+        transition: all 0.8s ease;
 
-        &-selected {
-            border-bottom: 1px solid colors.$blue-900;
+        svg {
+            width: 1.5rem;
+            height: 1.5rem;
+
+            path {
+                stroke: colors.$grey-50;
+            }
         }
 
         &:hover {
-            cursor: pointer;
-            background-color: rgba(colors.$blue-50, 0.15);
+            background-color: colors.$yellow-500;
+
+            svg path {
+                stroke: colors.$blue-900;
+            }
+        }
+
+        &-left {
+            left: 1.5rem;
+        }
+
+        &-right {
+            right: 0;
         }
     }
 }

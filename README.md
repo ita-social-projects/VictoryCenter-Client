@@ -71,7 +71,6 @@ victory-center-client
 │   │   │   ├───search-bar
 │   │   │   │   ├───search-item-wrapper
 │   │   │   │   └───text-search-item
-│   │   │   ├───select
 │   │   │   ├───status-filter-dropdown
 │   │   │   ├───textarea-with-character-limit
 │   │   │   ├───toast
@@ -84,6 +83,7 @@ victory-center-client
 │   │   │   ├───modal
 │   │   │   ├───page-loader
 │   │   │   ├───partners
+│   │   │   ├───select
 │   │   │   ├───single-select-input
 │   │   │   └───tabs
 │   │   └───public
@@ -91,7 +91,8 @@ victory-center-client
 │   │       ├───faq-section
 │   │       │   └───faq-card
 │   │       ├───footer
-│   │       └───header
+│   │       ├───header
+│   │       └───language-switcher
 │   ├───const
 │   │   ├───admin
 │   │   ├───common
@@ -107,7 +108,6 @@ victory-center-client
 │   ├───hooks
 │   │   ├───admin
 │   │   │   ├───fetch
-│   │   │   │   ├───use-data-fetch
 │   │   │   │   └───use-data-pagination-fetch
 │   │   │   ├───use-admin-client
 │   │   │   ├───use-categories-counter
@@ -116,6 +116,7 @@ victory-center-client
 │   │   │   └───use-modals-state
 │   │   └───common
 │   │       ├───use-container-size-from-children
+│   │       ├───use-data-fetch
 │   │       ├───use-debounced-value-callback
 │   │       ├───use-observe-element-size
 │   │       ├───use-on-click-outside
@@ -125,6 +126,9 @@ victory-center-client
 │   ├───layouts
 │   │   ├───admin-layout
 │   │   └───public-layout
+│   ├───locales
+│   │   ├───en
+│   │   └───uk
 │   ├───pages
 │   │   ├───admin
 │   │   │   ├───faq
@@ -146,17 +150,20 @@ victory-center-client
 │   │   │   │       ├───program-list-item
 │   │   │   │       ├───program-search-item
 │   │   │   │       ├───programs-page-content
-│   │   │   │       └───programs-page-modals
-│   │   │   │           ├───delete-program-modal
-│   │   │   │           └───program-modal
+│   │   │   │       ├───programs-page-modals
+│   │   │   │       │   ├───delete-program-modal
+│   │   │   │       │   └───program-modal
+│   │   │   │       └───programs-page-toolbar
 │   │   │   └───team
 │   │   │       └───components
+│   │   │           ├───delete-team-category-modal
+│   │   │           ├───delete-team-member-modal
 │   │   │           ├───member-component
 │   │   │           ├───member-form
-│   │   │           ├───team-member-modals
-│   │   │           │   ├───delete-team-member-modal
-│   │   │           │   └───team-member-modal
+│   │   │           ├───team-category-modal
+│   │   │           ├───team-member-modal
 │   │   │           ├───team-page-content
+│   │   │           ├───team-page-modals
 │   │   │           └───team-page-toolbar
 │   │   └───public
 │   │       ├───about-us-page
@@ -217,10 +224,11 @@ victory-center-client
 │   ├───utils
 │   │   ├───functions
 │   │   │   ├───get-env-variable
-│   │   │   └───mappers
-│   │   │       ├───admin
-│   │   │       ├───common
-│   │   │       └───public
+│   │   │   ├───mappers
+│   │   │   │   ├───admin
+│   │   │   │   ├───common
+│   │   │   │   └───public
+│   │   │   └───test-helpers
 │   │   └───mock-data
 │   │       ├───admin
 │   │       └───public
@@ -229,6 +237,7 @@ victory-center-client
 │   │   │   ├───faq-schema
 │   │   │   ├───program-category-schema
 │   │   │   ├───program-schema
+│   │   │   ├───team-category-schema
 │   │   │   └───team-member-schema
 │   │   └───public
 │   ├───index.tsx                           # Entry point (ReactDOM.createRoot)

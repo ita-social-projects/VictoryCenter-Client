@@ -8,7 +8,7 @@ import { ProgramListItem } from '../program-list-item/ProgramListItem';
 import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
 import { useCategoriesCounter } from '../../../../../hooks/admin/use-categories-counter/useCategoriesCounter';
 import { ProgramsApi, ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
-import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
+import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
 import {
@@ -144,7 +144,7 @@ export const ProgramsPageContent = () => {
 
     useEffect(() => {
         if (categoriesError) {
-            setErrorState(PROGRAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
+            setErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
         }
     }, [categoriesError, setErrorState]);
 
@@ -348,9 +348,9 @@ export const ProgramsPageContent = () => {
     // Context menu handlers
     const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
         () => [
-            { id: 'add', name: PROGRAM_CATEGORY_TEXT.BUTTON.ADD_CATEGORY },
-            { id: 'edit', name: PROGRAM_CATEGORY_TEXT.BUTTON.EDIT_CATEGORY },
-            { id: 'delete', name: PROGRAM_CATEGORY_TEXT.BUTTON.DELETE_CATEGORY },
+            { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
+            { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
+            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
         ],
         [],
     );

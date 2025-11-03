@@ -134,8 +134,8 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
             } catch {
                 const errorMessage =
                     mode === 'add'
-                        ? PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY
-                        : PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY;
+                        ? COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY
+                        : COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY;
                 setError(errorMessage);
             } finally {
                 setIsSubmitting(false);
@@ -229,8 +229,8 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
 
     const getTitle = () => {
         return mode === 'add'
-            ? PROGRAM_CATEGORY_TEXT.FORM.TITLE.ADD_CATEGORY
-            : PROGRAM_CATEGORY_TEXT.FORM.TITLE.EDIT_CATEGORY;
+            ? COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.ADD_CATEGORY
+            : COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.EDIT_CATEGORY;
     };
 
     const getFormId = () => {

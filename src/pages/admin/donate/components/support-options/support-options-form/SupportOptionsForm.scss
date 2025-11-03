@@ -19,33 +19,28 @@
         &.not-found {
             border: none;
             height: 100%;
+
+            .plus-icon {
+                path {
+                    stroke: colors.$blue-500;
+                }
+            }
         }
 
         &.title {
             padding: 0;
             border: 0;
-            font-size: 2rem;
+            font-size: 32px;
             font-weight: 700;
         }
 
         .btn-add {
             display: flex;
             gap: 0.5rem;
+            align-items: center;
 
             &.new {
                 height: 2.5rem;
-            }
-
-            .plus-icon {
-                background: url('../../../../../../assets/icons/plus.svg') no-repeat center;
-                width: 1.5rem;
-                height: 1.5rem;
-            }
-
-            &.btn-primary {
-                .plus-icon {
-                    background: url('../../../../../../assets/icons/plus-white.svg') no-repeat center;
-                }
             }
         }
     }

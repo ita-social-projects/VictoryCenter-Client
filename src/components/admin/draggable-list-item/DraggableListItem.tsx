@@ -95,26 +95,21 @@ export const DraggableListItem = <TEntity,>({
     };
 
     return (
-        <>
-            <DragPreview
-                entity={entity}
-                dragPreview={dragPreview}
-                renderEntityComponent={renderEntityComponent}
-            ></DragPreview>
-            <div
-                className={'draggable-item-wrapper'}
-                onDragOver={handleDragOver}
-                onDrop={(e) => handleDrop(e, id)}
-                onDragEnd={handleDragEnd}
-                key={id}
-            >
+        <div
+            className="draggable-item-wrapper"
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, id)}
+            onDragEnd={handleDragEnd}
+        >
+            <DragPreview entity={entity} dragPreview={dragPreview} renderEntityComponent={renderEntityComponent} />
+            <div className={'draggable-item'} key={id}>
                 <div
                     className="dragger"
                     draggable
                     onDragStart={(e) => handleDragStart(e, id)}
                     onDrag={handleDrag}
                     onDragEnd={handleDragEnd}
-                    role={'button'}
+                    role="button"
                     aria-label={ariaLabel}
                     tabIndex={0}
                 >
@@ -122,6 +117,6 @@ export const DraggableListItem = <TEntity,>({
                 </div>
                 <div className="item-data">{renderEntityComponent(entity)}</div>
             </div>
-        </>
+        </div>
     );
 };

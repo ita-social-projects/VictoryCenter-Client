@@ -1,6 +1,5 @@
 import React, { forwardRef, useCallback, useMemo } from 'react';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import { TeamCategory } from '../../../../../types/admin/team-members';
 import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/team-member-schema/team-member-schema';
 import { ImageValues, Image } from '../../../../../types/common/image';
 import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
@@ -11,6 +10,7 @@ import { TextAreaWithCharacterLimit } from '../../../../../components/admin/text
 import { ImageInput } from '../../../../../components/admin/image-input/ImageInput';
 import './MemberForm.scss';
 import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
+import { TeamCategory } from '../../../../../types/admin/team-category';
 export interface TeamMemberFormValues {
     categoryId: number | null;
     fullName: string;

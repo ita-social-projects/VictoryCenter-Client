@@ -120,7 +120,7 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
                 onConfirm={onConfirmClose}
                 onCancel={onCancelClose}
-                onClose={onClose}
+                onClose={onCancelClose}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />

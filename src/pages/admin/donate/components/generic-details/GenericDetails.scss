@@ -15,21 +15,7 @@
             display: flex;
             flex-direction: row;
             gap: 0.5rem;
-
-            .plus-icon {
-                width: 1.5rem;
-                height: 1.5rem;
-            }
-            &.btn-primary {
-                .plus-icon {
-                    background: url('../../../../../assets/icons/plus-white.svg') no-repeat center;
-                }
-            }
-            &.btn-secondary {
-                .plus-icon {
-                    background: url('../../../../../assets/icons/plus.svg') no-repeat center;
-                }
-            }
+            align-items: center;
 
             &-new {
                 display: flex;
@@ -37,21 +23,7 @@
                 gap: 0.5rem;
                 width: 100%;
                 height: 2.5rem;
-
-                .plus-icon {
-                    width: 1.5rem;
-                    height: 1.5rem;
-                }
-                &.btn-primary {
-                    .plus-icon {
-                        background: url('../../../../../assets/icons/plus-white.svg') no-repeat center;
-                    }
-                }
-                &.btn-secondary {
-                    .plus-icon {
-                        background: url('../../../../../assets/icons/plus.svg') no-repeat center;
-                    }
-                }
+                align-items: center;
 
                 &.disabled {
                     cursor: default;
@@ -60,7 +32,6 @@
             }
         }
     }
-
     .child {
         .generic-details {
             &.header {
@@ -102,10 +73,19 @@
             }
         }
     }
-        &-loader {
+
+    &-loader {
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 200px;
+    }
+
+    &.not-found {
+        .btn-secondary .plus-icon {
+            path {
+                stroke: colors.$blue-500;
+            }
+        }
     }
 }

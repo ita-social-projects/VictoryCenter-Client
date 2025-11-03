@@ -251,10 +251,6 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 });
             }, [formState]);
 
-            const hasErrors = useMemo(() => {
-                return Object.values(errors).some(Boolean);
-            }, [errors]);
-
             if (!isOpen) return null;
 
             return (

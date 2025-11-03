@@ -27,14 +27,16 @@
     &__field {
         flex: 1;
         padding: 0;
-        min-height: 5rem;
         border: none;
         outline: none;
         resize: none;
         background: none;
         color: colors.$blue-900;
         font-family: inherit;
-        font-size: 16px;
+        font-size: 1.125rem;
+        font-weight: 400;
+        line-height: 1.75rem;
+        letter-spacing: -0.0225rem;
 
         &::placeholder {
             color: colors.$grey-700;

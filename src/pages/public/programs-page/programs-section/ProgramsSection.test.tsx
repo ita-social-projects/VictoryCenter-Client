@@ -4,7 +4,7 @@ import { useDataFetch } from '../../../../hooks/common/use-data-fetch/useDataFet
 import { mockPrograms } from '../../../../utils/mock-data/public/programs-page';
 import programsPageUk from '../../../../locales/uk/programs.json';
 
-jest.mock('./program-card/ProgramCard', () => ({
+jest.mock('../../../../components/public/program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: any) => <div data-testid="program-card">{program.name}</div>,
 }));
 

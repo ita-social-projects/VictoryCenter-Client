@@ -36,4 +36,15 @@ export const API_ROUTES = {
         REORDER: 'faq/reorder',
         PAGES: 'faq/pages',
     },
+    DONATE: {
+        SUPPORT_OPTIONS: 'SupportOptions',
+        BANK_DETAILS_UAH: 'UahBankDetails',
+        BANK_DETAILS_FOREIGN: 'ForeignBankDetails',
+        CORRESPONDENT_BANK_DETAILS: 'CorrespondentBankDetails',
+    },
+    WHO_WE_ARE: {
+        BASE: 'WhoWeAre',
+        PREVIEWS: 'WhoWeAre/previews',
+        PUBLIC: 'WhoWeArePage',
+    },
 };

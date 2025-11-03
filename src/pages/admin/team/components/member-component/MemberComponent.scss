@@ -25,10 +25,11 @@
         }
 
         p {
+            width: 60%;
             margin: 0;
             display: -webkit-box;
             font-size: 18px;
-            -webkit-line-clamp: 4;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             overflow-wrap: break-word;
@@ -45,7 +46,7 @@
             font-size: 18px;
             padding-right: 2.5rem;
             display: -webkit-box;
-            -webkit-line-clamp: 4;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             overflow-wrap: break-word;
@@ -58,7 +59,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        width: 33%;
+        width: 40%;
     }
 
     &-actions {
@@ -66,7 +67,7 @@
         height: 1.5rem;
         display: flex;
         justify-content: end;
-        gap: 0.125rem;
+        gap: 0.625rem;
 
         button {
             border: none;

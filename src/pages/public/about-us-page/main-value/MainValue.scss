@@ -7,27 +7,33 @@
     padding: 0;
     box-sizing: border-box;
 }
+
 .main-values-block {
-    height: 117.75rem;
     color: colors.$blue-900;
     font-family: fonts.$mulish-regular-font;
+    position: relative;
+    margin-top: 16rem;
+    overflow: hidden;
 
     .main-values-title {
-        height: 29rem;
         width: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
+        position: relative;
+        overflow: hidden;
 
         h2 {
             width: 51.35rem;
-            font-weight: 400;
+            font-weight: 500;
             font-style: normal;
             font-size: 4rem;
             line-height: 4.5rem;
             letter-spacing: 0;
             text-align: center;
             text-transform: uppercase;
+            position: relative;
+            z-index: z-index.public(about-us-page-main-value-text);
         }
 
         span {
@@ -37,44 +43,81 @@
             line-height: 4.5rem;
             text-align: center;
             text-transform: uppercase;
-            z-index: z-index.public(about-us-page-main-value-text);
-        }
-
-        span:nth-child(3) {
-            background: colors.$light-blue-200;
             position: relative;
-        }
-
-        span:nth-child(3):before {
-            content: '';
-            width: 100vw;
-            height: 5rem;
-            background: colors.$light-blue-200;
-            position: absolute;
-            top: 0;
-            transform: translateX(-100%);
         }
 
         span:nth-child(1) {
             background: colors.$yellow-300;
-            position: relative;
+            padding: 0 0.5rem;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 100%;
+                width: 100vw;
+                height: 100%;
+                background: colors.$yellow-300;
+                z-index: z-index.public(about-us-page-main-value-background);
+            }
         }
 
-        span:nth-child(1):before {
-            content: '';
-            width: 48.65vw;
-            height: 5rem;
-            background: colors.$yellow-300;
-            position: absolute;
-            top: 0;
-            z-index: z-index.public(about-us-page-main-value-background);
+        span:nth-child(2) {
+            background: colors.$light-blue-200;
+            padding: 0 0.5rem;
+            display: inline-block;
+
+            &::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 100%;
+                width: 100vw;
+                height: 100%;
+                background: colors.$light-blue-200;
+                z-index: z-index.public(about-us-page-main-value-background);
+            }
         }
     }
+
     .people-block {
+        display: flex;
+        flex-wrap: wrap;
         position: relative;
+        width: 100%;
+        margin-top: 6.9rem;
         height: 65rem;
 
+        .swiper {
+            width: 100%;
+        }
+
         .people-card {
+            display: flex;
+            flex-direction: column;
+
+            &.card-1 {
+                transform: translateY(10rem);
+            }
+
+            &.card-2 {
+                transform: translateY(25rem);
+            }
+
+            &.card-3 {
+                transform: translateY(2.5rem);
+            }
+
+            &.card-4 {
+                transform: translateY(26rem);
+            }
+
+            img {
+                width: 100%;
+                height: 27rem;
+                object-fit: cover;
+            }
+
             p {
                 font-weight: 500;
                 font-style: normal;
@@ -85,70 +128,328 @@
             }
         }
 
-        .aside-card {
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             position: absolute;
-            width: 26%;
-            img {
-                width: 100%;
-                height: 26.875rem;
-                object-fit: cover;
+            width: 100%;
+            top: 50%;
+            z-index: z-index.$scrollable-frame-arrows;
+            padding: 0 2rem;
+            transition: opacity 2s ease;
+            opacity: 0;
+
+            .arrow-button {
+                background-color: colors.$blue-900;
+                position: absolute;
+                width: 2.5rem;
+                height: 2.5rem;
+                border: none;
+                transition: all 0.4s ease;
+                cursor: pointer;
+
+                .arrow-icon {
+                    position: absolute;
+                    top: 0.5rem;
+                    right: 0.5rem;
+                    width: 1.5rem;
+                    height: 1.5rem;
+
+                    path {
+                        stroke: colors.$grey-50;
+                    }
+                }
+
+                &:hover {
+                    background-color: colors.$yellow-500;
+
+                    .arrow-icon path {
+                        stroke: colors.$blue-900;
+                    }
+                }
+
+                &:disabled {
+                    display: none;
+                }
             }
-        }
-        div:nth-child(1) {
-            top: 10rem;
 
-            .people-info {
-                text-align: center;
+            .arrow-left {
+                left: 1.75rem;
             }
-        }
-        div:nth-child(4) {
-            left: 74%;
-            top: 26rem;
-        }
 
-        .middle-card {
-            position: absolute;
-            width: 24%;
-            img {
-                width: 100%;
-                height: 26.875rem;
-                object-fit: cover;
-            }
-        }
-
-        div:nth-child(2) {
-            left: 26%;
-            top: 25rem;
-        }
-
-        div:nth-child(3) {
-            left: 50%;
-            top: 2.5rem;
-
-            img {
-                object-position: top right;
+            .arrow-right {
+                right: 1.75rem;
             }
         }
     }
+
     .summary-block {
-        padding-top: 1rem;
-        height: 23.25rem;
         position: relative;
         width: 100%;
         display: flex;
         justify-content: center;
-        align-items: flex-start;
+        align-items: center;
+        border-top: 2px solid colors.$main-value-summary-text;
+        max-width: 41rem;
+        margin: 0 auto;
 
         .summary-text {
             padding-top: 2rem;
-            width: 41rem;
-            height: 6.75rem;
-            border-top: 2px solid colors.$main-value-summary-text;
+            max-width: 39rem;
             font-weight: 500;
             font-size: 1.5rem;
             line-height: 2.25rem;
             letter-spacing: -0.02em;
             text-align: center;
+
+            h3 {
+                max-width: 35rem;
+                margin: 1rem auto 0;
+            }
+        }
+    }
+}
+.people-block:hover .button-container {
+    opacity: 1;
+    transition: opacity 1s ease;
+}
+
+@media (max-width: 1024px) {
+    .main-values-block {
+        margin-top: 11.25rem;
+
+        .main-values-title {
+            margin-top: 4.6rem;
+
+            h2 {
+                width: 41rem;
+                font-size: 4rem;
+                line-height: 4.5rem;
+            }
+
+            span {
+                font-size: 4rem;
+                line-height: 4.5rem;
+            }
+
+            br:first-of-type {
+                display: inline;
+            }
+
+            span:nth-child(1) {
+                padding: 0 1.5rem;
+                display: inline-block;
+
+                &::after {
+                    display: none;
+                }
+
+                &::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    right: 100%;
+                    width: 100vw;
+                    height: 100%;
+                    background: colors.$yellow-300;
+                    z-index: z-index.public(about-us-page-main-value-background);
+                }
+            }
+
+            span:nth-child(2) {
+                &::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 100%;
+                    width: 100vw;
+                    height: 100%;
+                    background: colors.$light-blue-200;
+                    z-index: z-index.public(about-us-page-main-value-background);
+                }
+            }
+        }
+
+        .people-block {
+            margin-top: 11rem;
+            height: 45.25rem;
+
+            .people-card {
+                &.card-1 {
+                    transform: translateY(0rem);
+                }
+
+                &.card-2 {
+                    transform: translateY(8rem);
+                }
+
+                &.card-3 {
+                    transform: translateY(0rem);
+                }
+
+                &.card-4 {
+                    transform: translateY(8rem);
+                }
+
+                img {
+                    height: 26.875rem;
+                }
+
+                p {
+                    padding: 0.9rem 1.125rem;
+                }
+            }
+
+            .button-container {
+                top: 45%;
+
+                .arrow-left {
+                    left: 1rem;
+                }
+
+                .arrow-right {
+                    right: 1rem;
+                }
+            }
+        }
+
+        .summary-block,
+        .summary-text {
+            max-width: 41rem;
+        }
+    }
+}
+@media (max-width: 768px) {
+    .main-values-block {
+        margin-top: 0rem;
+
+        .main-values-title {
+            h2 {
+                width: 27rem;
+                font-size: 3rem;
+                line-height: 3.375rem;
+            }
+
+            span {
+                font-size: 3rem;
+                line-height: 3.375rem;
+            }
+        }
+
+        .people-block {
+            margin-top: 6.75rem;
+            height: 45.25rem;
+
+            .people-card {
+                &.card-1 {
+                    transform: translateY(0rem);
+                }
+
+                &.card-2 {
+                    transform: translateY(7rem);
+                }
+
+                &.card-3 {
+                    transform: translateY(0rem);
+                }
+
+                &.card-4 {
+                    transform: translateY(7rem);
+                }
+
+                img {
+                    height: 26.875rem;
+                }
+
+                p {
+                    padding: 0.9rem 1.125rem;
+                }
+            }
+
+            .button-container {
+                top: 45%;
+
+                .arrow-left {
+                    left: 1rem;
+                }
+
+                .arrow-right {
+                    right: 1rem;
+                }
+            }
+        }
+
+        .summary-block,
+        .summary-text {
+            max-width: 27rem;
+        }
+    }
+}
+
+@media (max-width: 568px) {
+    .main-values-block {
+        margin-top: 4.6875rem;
+
+        .main-values-title {
+            h2 {
+                width: 21rem;
+                font-size: 2.5rem;
+                line-height: 3rem;
+            }
+
+            span {
+                font-size: 2.5rem;
+                line-height: 3rem;
+            }
+        }
+
+        .people-block {
+            margin-top: 5.4rem;
+            height: 37rem;
+
+            .people-card {
+                &.card-1 {
+                    transform: translateY(0rem);
+                }
+
+                &.card-2 {
+                    transform: translateY(3.3rem);
+                }
+
+                &.card-3 {
+                    transform: translateY(0rem);
+                }
+
+                &.card-4 {
+                    transform: translateY(3.3rem);
+                }
+
+                img {
+                    height: 26.875rem;
+                }
+
+                p {
+                    padding: 0.9rem 1.125rem;
+                }
+            }
+
+            .button-container {
+                top: 41%;
+
+                .arrow-left {
+                    left: 0.25rem;
+                }
+
+                .arrow-right {
+                    right: 0.25rem;
+                }
+            }
+        }
+
+        .summary-block,
+        .summary-text {
+            max-width: 20.813rem;
         }
     }
 }

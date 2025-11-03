@@ -1,0 +1,111 @@
+@use '../../../../../assets/sass/variables/colors';
+
+.generic-details {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 1.5rem;
+
+    &-item {
+        width: 100%;
+    }
+
+    .btn {
+        &-add {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
+
+            .plus-icon {
+                width: 1.5rem;
+                height: 1.5rem;
+            }
+            &.btn-primary {
+                .plus-icon {
+                    background: url('../../../../../assets/icons/plus-white.svg') no-repeat center;
+                }
+            }
+            &.btn-secondary {
+                .plus-icon {
+                    background: url('../../../../../assets/icons/plus.svg') no-repeat center;
+                }
+            }
+
+            &-new {
+                display: flex;
+                flex-direction: row;
+                gap: 0.5rem;
+                width: 100%;
+                height: 2.5rem;
+
+                .plus-icon {
+                    width: 1.5rem;
+                    height: 1.5rem;
+                }
+                &.btn-primary {
+                    .plus-icon {
+                        background: url('../../../../../assets/icons/plus-white.svg') no-repeat center;
+                    }
+                }
+                &.btn-secondary {
+                    .plus-icon {
+                        background: url('../../../../../assets/icons/plus.svg') no-repeat center;
+                    }
+                }
+
+                &.disabled {
+                    cursor: default;
+                    background-color: colors.$grey-700;
+                }
+            }
+        }
+    }
+
+    .child {
+        .generic-details {
+            &.header {
+                font-size: 2rem;
+                font-weight: 700;
+                display: inline;
+                cursor: pointer;
+
+                .arrow {
+                    display: inline-block;
+                    margin-left: 0.25rem;
+                    background: url('../../../../../assets/icons/chevron-down.svg') no-repeat center;
+                    width: 1.5rem;
+                    height: 1.5rem;
+                    transition: transform 0.2s ease;
+                }
+
+                .arrow.expanded {
+                    transform: rotate(180deg);
+                }
+            }
+
+            .form-name-actions {
+                display: none;
+            }
+
+            .btn-add {
+                width: 100%;
+            }
+        }
+    }
+
+    .edit {
+        .child {
+            .generic-details-item {
+                .form-name-actions {
+                    display: flex;
+                }
+            }
+        }
+    }
+        &-loader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+    }
+}

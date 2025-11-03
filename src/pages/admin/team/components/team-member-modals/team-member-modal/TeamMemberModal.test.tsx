@@ -154,7 +154,7 @@ const baseMember: TeamMember = {
     description: 'Existing desc',
     status: VisibilityStatus.Draft,
     categoryId: 1,
-    image: { id: 7, base64: 'x', mimeType: 'image/png', size: 100 },
+    image: { id: 7, base64: 'x', mimeType: 'image/png' },
     localizations: [],
 };
 

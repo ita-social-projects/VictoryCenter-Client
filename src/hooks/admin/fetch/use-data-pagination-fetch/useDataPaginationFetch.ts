@@ -45,7 +45,6 @@ export const useDataPaginationFetch = <TResult>({
     const [error, setError] = useState<any | null>(null);
     const currentPageRef = useRef(0);
     const abortControllerRef = useRef<AbortController | null>(null);
-    const isInitialMountRef = useRef(true);
 
     const resetList = useCallback(() => {
         setData([]);
@@ -125,11 +124,6 @@ export const useDataPaginationFetch = <TResult>({
     }, [fetchData]);
 
     useEffect(() => {
-        if (isInitialMountRef.current) {
-            isInitialMountRef.current = false;
-            return;
-        }
-
         if (autoFetchDisabled) {
             return;
         }

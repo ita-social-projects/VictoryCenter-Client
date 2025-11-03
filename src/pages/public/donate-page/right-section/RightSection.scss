@@ -65,3 +65,11 @@
 .donatePaymentDetails {
     padding-top: 1.5rem;
 }
+
+.donate-loader {
+    padding: 24px;
+}
+
+.donate-error-message {
+    color: colors.$error;
+}

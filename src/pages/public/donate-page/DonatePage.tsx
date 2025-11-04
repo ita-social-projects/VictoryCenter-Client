@@ -13,7 +13,9 @@ export const DonatePage = () => {
                 <div className="stickyBlock">
                     <DonateSection />
                 </div>
-                <RightSection />
+                <div className="rightSectionContainer">
+                    <RightSection />
+                </div>
             </div>
             <FaqSection slug={PAGE_SLUGS.DONATE} />
         </div>

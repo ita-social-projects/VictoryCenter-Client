@@ -7,6 +7,10 @@ export const CorrespondentBanksSection = ({
 }: {
     correspondentBanks?: PublishedCorrespondentBankDetailsDto[];
 }) => {
+    if (correspondentBanks.length === 0) {
+        return null;
+    }
+
     const banks = correspondentBanks.map((apiBank) => ({
         title: apiBank.name,
         fields: [

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './RightSection.scss';
 import { LinearProgress } from '@mui/material';
 
@@ -12,8 +12,6 @@ import { donatePageDataFetch } from '../../../../services/api/public/donate/dona
 import { useDataFetch } from '../../../../hooks/common/use-data-fetch/useDataFetch';
 
 export const RightSection = () => {
-    const [activeTab, setActiveTab] = useState<Currency>(Currency.UAH);
-
     const {
         data: donateData,
         isLoading,
@@ -23,6 +21,42 @@ export const RightSection = () => {
         fetchHandler: donatePageDataFetch,
         autoFetchDependencies: [],
     });
+
+    const getAvailableCurrencies = () => {
+        if (!donateData) return [];
+
+        const availableCurrencies: Currency[] = [];
+
+        if (
+            donateData.uahBankDetails.length > 0 ||
+            donateData.supportOptions.some((s) => s.currency === Currency.UAH)
+        ) {
+            availableCurrencies.push(Currency.UAH);
+        }
+
+        const usdBankDetails = donateData.foreignBankDetails.filter((b) => b.currency === Currency.USD);
+        const usdSupportOptions = donateData.supportOptions.filter((s) => s.currency === Currency.USD);
+        if (usdBankDetails.length > 0 || usdSupportOptions.length > 0) {
+            availableCurrencies.push(Currency.USD);
+        }
+
+        const eurBankDetails = donateData.foreignBankDetails.filter((b) => b.currency === Currency.EUR);
+        const eurSupportOptions = donateData.supportOptions.filter((s) => s.currency === Currency.EUR);
+        if (eurBankDetails.length > 0 || eurSupportOptions.length > 0) {
+            availableCurrencies.push(Currency.EUR);
+        }
+
+        return availableCurrencies;
+    };
+
+    const availableCurrencies = getAvailableCurrencies();
+    const [activeTab, setActiveTab] = useState<Currency>(availableCurrencies[0] || Currency.UAH);
+
+    useEffect(() => {
+        if (availableCurrencies.length > 0 && !availableCurrencies.includes(activeTab)) {
+            setActiveTab(availableCurrencies[0]);
+        }
+    }, [availableCurrencies, activeTab]);
 
     const paymentDetails = () => {
         if (!donateData) return null;
@@ -63,19 +97,20 @@ export const RightSection = () => {
         );
     }
 
+    if (availableCurrencies.length === 0) {
+        return null;
+    }
+
+    const tabs = availableCurrencies.map((currency) => ({
+        id: currency,
+        label: CURRENCY_TABS[Currency[currency] as keyof typeof CURRENCY_TABS],
+    }));
+
     return (
         <div className="rightSection">
             <div className="locationToggleContainer">
                 <div className="switch">
-                    <Tabs
-                        activeTab={activeTab}
-                        setActiveTab={setActiveTab}
-                        tabs={[
-                            { id: Currency.UAH, label: CURRENCY_TABS.UAH },
-                            { id: Currency.USD, label: CURRENCY_TABS.USD },
-                            { id: Currency.EUR, label: CURRENCY_TABS.EUR },
-                        ]}
-                    />
+                    <Tabs activeTab={activeTab} setActiveTab={setActiveTab} tabs={tabs} />
                 </div>
             </div>
             <div className="donatePaymentDetails">

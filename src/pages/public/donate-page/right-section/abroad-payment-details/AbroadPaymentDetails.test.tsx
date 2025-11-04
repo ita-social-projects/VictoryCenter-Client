@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { AbroadPaymentDetails } from './AbroadPaymentDetails';
-import { Currency } from '../../../../../types/public/donate-page';
 import {
+    Currency,
     PublishedForeignBankDetailsDto,
     PublishedCorrespondentBankDetailsDto,
 } from '../../../../../types/public/donate-page';
@@ -12,10 +12,10 @@ jest.mock('./PaymentDetailsSection', () => ({
             <div data-testid="title">{title}</div>
             <div data-testid="iban-label">{ibanLabel}</div>
             <div data-testid="iban-value">{ibanValue}</div>
-            <div data-testid="receiver-name">{receiverName || 'fallback-receiver'}</div>
-            <div data-testid="bank-name">{bankName || 'fallback-bank'}</div>
-            <div data-testid="swift">{swift || 'fallback-swift'}</div>
-            <div data-testid="address">{address || 'fallback-address'}</div>
+            <div data-testid="receiver-name">{receiverName}</div>
+            <div data-testid="bank-name">{bankName}</div>
+            <div data-testid="swift">{swift}</div>
+            <div data-testid="address">{address}</div>
         </div>
     ),
 }));
@@ -43,8 +43,6 @@ jest.mock('../../../../../const/public/donate-page', () => ({
         EUR_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в EUR',
         IBAN_USD_LABEL: 'IBAN (USD)',
         IBAN_EUR_LABEL: 'IBAN (EUR)',
-        IBAN_USD_NUMBER_LABEL: 'US29NWBK60161331926819',
-        IBAN_EUR_NUMBER_LABEL: 'GB29NWBK60161331926819',
     },
 }));
 
@@ -117,20 +115,6 @@ describe('AbroadPaymentDetails', () => {
             expectElementToHaveTestId('correspondent-banks-count', '1');
             expectElementToHaveTestId('correspondent-bank', 'Test Correspondent Bank');
         });
-
-        it('renders USD payment details with fallback constants when no API data', () => {
-            render(<AbroadPaymentDetails currency={Currency.USD} foreignBankDetails={[]} />);
-
-            expectElementToHaveTestId('title', 'Реквізити для донатів в USD');
-            expectElementToHaveTestId('iban-label', 'IBAN (USD)');
-            expectElementToHaveTestId('iban-value', 'US29NWBK60161331926819');
-            expectElementToHaveTestId('receiver-name', 'fallback-receiver');
-            expectElementToHaveTestId('bank-name', 'fallback-bank');
-            expectElementToHaveTestId('swift', 'fallback-swift');
-            expectElementToHaveTestId('address', 'fallback-address');
-
-            expectElementToHaveTestId('correspondent-banks-count', '0');
-        });
     });
 
     describe('EUR currency', () => {
@@ -157,36 +141,37 @@ describe('AbroadPaymentDetails', () => {
             expect(correspondentBanks[0]).toHaveTextContent('EUR Correspondent 1');
             expect(correspondentBanks[1]).toHaveTextContent('EUR Correspondent 2');
         });
+    });
 
-        it('renders EUR payment details with fallback constants when no API data', () => {
-            render(<AbroadPaymentDetails currency={Currency.EUR} foreignBankDetails={[]} />);
+    describe('no data scenarios', () => {
+        it('returns null when no API data provided', () => {
+            const { container } = render(<AbroadPaymentDetails currency={Currency.USD} foreignBankDetails={[]} />);
 
-            expectElementToHaveTestId('title', 'Реквізити для донатів в EUR');
-            expectElementToHaveTestId('iban-label', 'IBAN (EUR)');
-            expectElementToHaveTestId('iban-value', 'GB29NWBK60161331926819');
+            expect(container.firstChild).toBeNull();
+        });
+
+        it('returns null when foreignBankDetails is empty array', () => {
+            const { container } = render(<AbroadPaymentDetails currency={Currency.EUR} foreignBankDetails={[]} />);
+
+            expect(container.firstChild).toBeNull();
         });
     });
 
     describe('edge cases', () => {
-        it('handles partial API data with some null values', () => {
+        it('handles foreign bank without correspondent banks', () => {
             const mockForeignBankDetails = [
                 createMockForeignBankDetails({
-                    receiver: null as any,
-                    name: undefined as any,
-                    address: '',
                     correspondentBanks: [],
                 }),
             ];
 
             render(<AbroadPaymentDetails currency={Currency.USD} foreignBankDetails={mockForeignBankDetails} />);
 
-            expectElementToHaveTestId('receiver-name', 'fallback-receiver');
-            expectElementToHaveTestId('bank-name', 'fallback-bank');
-            expectElementToHaveTestId('address', '');
+            expectElementToHaveTestId('correspondent-banks-section');
             expectElementToHaveTestId('correspondent-banks-count', '0');
         });
 
-        it('handles multiple foreign banks but uses only first one primary', () => {
+        it('handles multiple foreign banks but uses only first one', () => {
             const mockForeignBankDetails = [
                 createMockForeignBankDetails({ name: 'Primary Bank', receiver: 'Primary Receiver' }),
                 createMockForeignBankDetails({ name: 'Secondary Bank', receiver: 'Secondary Receiver' }),
@@ -198,10 +183,10 @@ describe('AbroadPaymentDetails', () => {
             expectElementToHaveTestId('bank-name', 'Primary Bank');
         });
 
-        it('handles foreign bank without correspondent banks', () => {
+        it('handles foreign bank with undefined correspondent banks', () => {
             const mockForeignBankDetails = [
                 createMockForeignBankDetails({
-                    correspondentBanks: [],
+                    correspondentBanks: undefined as any,
                 }),
             ];
 

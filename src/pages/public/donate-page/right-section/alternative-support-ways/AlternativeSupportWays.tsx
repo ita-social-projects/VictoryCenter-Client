@@ -13,46 +13,23 @@ interface AlternativeSupportWaysProps {
 export const AlternativeSupportWays = ({ supportOptions, currentCurrency }: AlternativeSupportWaysProps) => {
     const currentCurrencyOptions = supportOptions.filter((option) => option.currency === currentCurrency);
 
+    if (currentCurrencyOptions.length === 0) {
+        return null;
+    }
+
     return (
         <div className="alternativeSupportWays">
             <h2>{ALTERNATIVE_SUPPORT_WAYS.ALTERNATIVE_SUPPORT_WAYS_LABEL}</h2>
 
-            {currentCurrencyOptions.length > 0 ? (
-                currentCurrencyOptions.map((option) => (
-                    <div key={option.id} className="labelContainer">
-                        <h3>{option.name}</h3>
-                        <div className="labelWithCopyButton">
-                            <span className="label">{option.value}</span>
-                            <CopyTextButton textToCopy={option.value} />
-                        </div>
+            {currentCurrencyOptions.map((option) => (
+                <div key={option.id} className="labelContainer">
+                    <h3>{option.name}</h3>
+                    <div className="labelWithCopyButton">
+                        <span className="label">{option.value}</span>
+                        <CopyTextButton textToCopy={option.value} />
                     </div>
-                ))
-            ) : (
-                <>
-                    <div className="labelContainer">
-                        <h3>{ALTERNATIVE_SUPPORT_WAYS.PAY_PAL_LABEL}</h3>
-                        <div className="labelWithCopyButton">
-                            <span className="label">{ALTERNATIVE_SUPPORT_WAYS.PAY_PAL_EMAIL_LABEL}</span>
-                            <CopyTextButton textToCopy={ALTERNATIVE_SUPPORT_WAYS.PAY_PAL_EMAIL_LABEL} />
-                        </div>
-                    </div>
-
-                    <div className="labelContainer">
-                        <h3>{ALTERNATIVE_SUPPORT_WAYS.MONOBANK_JAR_LABEL}</h3>
-                        <div className="labelWithCopyButton">
-                            <a
-                                className="label"
-                                href={ALTERNATIVE_SUPPORT_WAYS.MONOBANK_JAR_LINK_LABEL}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                {ALTERNATIVE_SUPPORT_WAYS.MONOBANK_JAR_LINK_LABEL}
-                            </a>
-                            <CopyTextButton textToCopy={ALTERNATIVE_SUPPORT_WAYS.MONOBANK_JAR_LINK_LABEL} />
-                        </div>
-                    </div>
-                </>
-            )}
+                </div>
+            ))}
 
             <div className="buttonsContainer">
                 <button className="downloadPaymentDetailsButton">

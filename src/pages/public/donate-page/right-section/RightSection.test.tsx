@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { RightSection } from './RightSection';
 import { Currency } from '../../../../types/public/donate-page';
 
@@ -102,23 +103,16 @@ describe('RightSection', () => {
         });
     };
 
-    const getTabByLabel = (label: string) => screen.getByTestId(`tab-${label.toLowerCase()}`);
-    const getUkrainePaymentSection = () => screen.getByTestId('ukraine-payment');
-    const getAbroadPaymentSection = () => screen.getByTestId('abroad-payment');
-    const getAlternativeSupportSection = () => screen.getByTestId('alt-support');
-    const queryUkrainePaymentSection = () => screen.queryByTestId('ukraine-payment');
-    const queryAbroadPaymentSection = () => screen.queryByTestId('abroad-payment');
-
     const testForeignCurrencySwitch = async (currency: 'USD' | 'EUR') => {
         render(<RightSection />);
 
-        fireEvent.click(getTabByLabel(currency));
+        fireEvent.click(screen.getByTestId(`tab-${currency.toLowerCase()}`));
 
         await waitFor(() => {
-            expect(getAbroadPaymentSection()).toBeInTheDocument();
-            expect(getAbroadPaymentSection()).toHaveTextContent(currency);
-            expect(queryUkrainePaymentSection()).not.toBeInTheDocument();
-            expect(getTabByLabel(currency)).toHaveClass('active');
+            expect(screen.getByTestId('abroad-payment')).toBeInTheDocument();
+            expect(screen.getByTestId('abroad-payment')).toHaveTextContent(currency);
+            expect(screen.queryByTestId('ukraine-payment')).not.toBeInTheDocument();
+            expect(screen.getByTestId(`tab-${currency.toLowerCase()}`)).toHaveClass('active');
         });
     };
 
@@ -127,13 +121,13 @@ describe('RightSection', () => {
     });
 
     describe('loading state', () => {
-        it('shows loading state when data is being fetched', async () => {
+        it('shows loading state when data is being fetched', () => {
             mockUseDataFetchLoading();
 
             render(<RightSection />);
 
             expect(screen.getByRole('progressbar')).toBeInTheDocument();
-            expect(queryUkrainePaymentSection()).not.toBeInTheDocument();
+            expect(screen.queryByTestId('ukraine-payment')).not.toBeInTheDocument();
         });
     });
 
@@ -146,11 +140,11 @@ describe('RightSection', () => {
             const errorElement = screen.getByRole('alert');
             expect(errorElement).toBeInTheDocument();
             expect(errorElement).toHaveTextContent('Не вдалося завантажити реквізити');
-            expect(queryUkrainePaymentSection()).not.toBeInTheDocument();
+            expect(screen.queryByTestId('ukraine-payment')).not.toBeInTheDocument();
         });
     });
 
-    describe('successful data loading', () => {
+    describe('with available currencies', () => {
         beforeEach(() => {
             mockUseDataFetchSuccess();
         });
@@ -158,17 +152,17 @@ describe('RightSection', () => {
         it('renders with default UAH tab and UkrainePaymentDetails', () => {
             render(<RightSection />);
 
-            expect(getUkrainePaymentSection()).toBeInTheDocument();
-            expect(getTabByLabel('UAH')).toHaveClass('active');
-            expect(getAlternativeSupportSection()).toBeInTheDocument();
+            expect(screen.getByTestId('ukraine-payment')).toBeInTheDocument();
+            expect(screen.getByTestId('tab-uah')).toHaveClass('active');
+            expect(screen.getByTestId('alt-support')).toBeInTheDocument();
         });
 
-        it('renders all currency tabs', () => {
+        it('renders all available currency tabs', () => {
             render(<RightSection />);
 
-            expect(getTabByLabel('UAH')).toBeInTheDocument();
-            expect(getTabByLabel('USD')).toBeInTheDocument();
-            expect(getTabByLabel('EUR')).toBeInTheDocument();
+            expect(screen.getByTestId('tab-uah')).toBeInTheDocument();
+            expect(screen.getByTestId('tab-usd')).toBeInTheDocument();
+            expect(screen.getByTestId('tab-eur')).toBeInTheDocument();
         });
 
         it('switches to USD tab and shows AbroadPaymentDetails', async () => {
@@ -182,117 +176,62 @@ describe('RightSection', () => {
         it('switches between all tabs correctly', async () => {
             render(<RightSection />);
 
-            expect(getUkrainePaymentSection()).toBeInTheDocument();
-            expect(getTabByLabel('UAH')).toHaveClass('active');
+            expect(screen.getByTestId('ukraine-payment')).toBeInTheDocument();
+            expect(screen.getByTestId('tab-uah')).toHaveClass('active');
 
-            fireEvent.click(getTabByLabel('USD'));
+            fireEvent.click(screen.getByTestId('tab-usd'));
             await waitFor(() => {
-                expect(getAbroadPaymentSection()).toBeInTheDocument();
-                expect(getTabByLabel('USD')).toHaveClass('active');
-                expect(getTabByLabel('UAH')).not.toHaveClass('active');
+                expect(screen.getByTestId('abroad-payment')).toBeInTheDocument();
+                expect(screen.getByTestId('tab-usd')).toHaveClass('active');
+                expect(screen.getByTestId('tab-uah')).not.toHaveClass('active');
             });
 
-            fireEvent.click(getTabByLabel('EUR'));
+            fireEvent.click(screen.getByTestId('tab-eur'));
             await waitFor(() => {
-                expect(getAbroadPaymentSection()).toBeInTheDocument();
-                expect(getTabByLabel('EUR')).toHaveClass('active');
-                expect(getTabByLabel('USD')).not.toHaveClass('active');
+                expect(screen.getByTestId('abroad-payment')).toBeInTheDocument();
+                expect(screen.getByTestId('tab-eur')).toHaveClass('active');
+                expect(screen.getByTestId('tab-usd')).not.toHaveClass('active');
             });
 
-            fireEvent.click(getTabByLabel('UAH'));
+            fireEvent.click(screen.getByTestId('tab-uah'));
             await waitFor(() => {
-                expect(getUkrainePaymentSection()).toBeInTheDocument();
-                expect(getTabByLabel('UAH')).toHaveClass('active');
-                expect(getTabByLabel('EUR')).not.toHaveClass('active');
+                expect(screen.getByTestId('ukraine-payment')).toBeInTheDocument();
+                expect(screen.getByTestId('tab-uah')).toHaveClass('active');
+                expect(screen.getByTestId('tab-eur')).not.toHaveClass('active');
             });
         });
 
         it('always renders AlternativeSupportWays with current currency', async () => {
             render(<RightSection />);
 
-            expect(getAlternativeSupportSection()).toHaveTextContent('Alternative Support - 0');
+            expect(screen.getByTestId('alt-support')).toHaveTextContent('Alternative Support - 0');
 
-            fireEvent.click(getTabByLabel('USD'));
+            fireEvent.click(screen.getByTestId('tab-usd'));
             await waitFor(() => {
-                expect(getAlternativeSupportSection()).toHaveTextContent('Alternative Support - 1');
+                expect(screen.getByTestId('alt-support')).toHaveTextContent('Alternative Support - 1');
             });
 
-            fireEvent.click(getTabByLabel('EUR'));
+            fireEvent.click(screen.getByTestId('tab-eur'));
             await waitFor(() => {
-                expect(getAlternativeSupportSection()).toHaveTextContent('Alternative Support - 2');
+                expect(screen.getByTestId('alt-support')).toHaveTextContent('Alternative Support - 2');
             });
         });
-    });
 
-    describe('data filtering', () => {
-        it('filters foreign bank details by currency for USD', async () => {
-            mockUseDataFetchSuccess();
+        it('filters foreign bank details by currency correctly', async () => {
             render(<RightSection />);
 
-            fireEvent.click(getTabByLabel('USD'));
-
+            fireEvent.click(screen.getByTestId('tab-usd'));
             await waitFor(() => {
-                const abroadSection = getAbroadPaymentSection();
-                expect(abroadSection).toHaveTextContent('USD (1 items)');
+                expect(screen.getByTestId('abroad-payment')).toHaveTextContent('USD (1 items)');
             });
-        });
 
-        it('filters foreign bank details by currency for EUR', async () => {
-            mockUseDataFetchSuccess();
-            render(<RightSection />);
-
-            fireEvent.click(getTabByLabel('EUR'));
-
+            fireEvent.click(screen.getByTestId('tab-eur'));
             await waitFor(() => {
-                const abroadSection = getAbroadPaymentSection();
-                expect(abroadSection).toHaveTextContent('EUR (1 items)');
+                expect(screen.getByTestId('abroad-payment')).toHaveTextContent('EUR (1 items)');
             });
         });
 
-        it('passes support options to AlternativeSupportWays', () => {
-            mockUseDataFetchSuccess();
-            render(<RightSection />);
-
-            expect(getAlternativeSupportSection()).toHaveTextContent('(2 options)');
-        });
-    });
-
-    describe('edge cases', () => {
-        it('handles empty data gracefully', () => {
-            mockUseDataFetchSuccess({
-                uahBankDetails: [],
-                foreignBankDetails: [],
-                supportOptions: [],
-            });
-
-            render(<RightSection />);
-
-            expect(getUkrainePaymentSection()).toHaveTextContent('(0 items)');
-            expect(getAlternativeSupportSection()).toHaveTextContent('(0 options)');
-        });
-
-        it('handles null data gracefully', () => {
-            mockUseDataFetch.mockReturnValue({
-                data: null,
-                isLoading: false,
-                error: null,
-            });
-
-            render(<RightSection />);
-
-            expect(queryUkrainePaymentSection()).not.toBeInTheDocument();
-            expect(queryAbroadPaymentSection()).not.toBeInTheDocument();
-
-            expect(getAlternativeSupportSection()).toHaveTextContent('(0 options)');
-        });
-    });
-
-    describe('DOM structure', () => {
-        beforeEach(() => {
-            mockUseDataFetchSuccess();
-        });
-
-        it('has correct CSS classes and structure', () => {
+        it('renders correct DOM structure', () => {
             render(<RightSection />);
 
             const rightSection = screen.getByTestId('tabs-container').closest('.rightSection');
@@ -304,12 +243,59 @@ describe('RightSection', () => {
             const donatePaymentDetails = rightSection?.querySelector('.donatePaymentDetails');
             expect(donatePaymentDetails).toBeInTheDocument();
         });
+    });
 
-        it('renders tabs container with switch class', () => {
+    describe('no available currencies scenarios', () => {
+        it('returns null when no data available for any currency', () => {
+            mockUseDataFetchSuccess({
+                uahBankDetails: [],
+                foreignBankDetails: [],
+                supportOptions: [],
+            });
+
+            const { container } = render(<RightSection />);
+
+            expect(container.firstChild).toBeNull();
+        });
+
+        it('returns null when data is null', () => {
+            mockUseDataFetch.mockReturnValue({
+                data: null,
+                isLoading: false,
+                error: null,
+            });
+
+            const { container } = render(<RightSection />);
+
+            expect(container.firstChild).toBeNull();
+        });
+
+        it('shows only UAH tab when only UAH bank details available', () => {
+            mockUseDataFetchSuccess({
+                uahBankDetails: [{ id: 1, name: 'UAH Bank' }],
+                foreignBankDetails: [],
+                supportOptions: [],
+            });
+
             render(<RightSection />);
 
-            const switchContainer = screen.getByTestId('tabs-container').closest('.switch');
-            expect(switchContainer).toBeInTheDocument();
+            expect(screen.getByTestId('tab-uah')).toBeInTheDocument();
+            expect(screen.queryByTestId('tab-usd')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('tab-eur')).not.toBeInTheDocument();
+        });
+
+        it('shows only USD tab when only USD support options available', () => {
+            mockUseDataFetchSuccess({
+                uahBankDetails: [],
+                foreignBankDetails: [],
+                supportOptions: [{ id: 1, currency: Currency.USD }],
+            });
+
+            render(<RightSection />);
+
+            expect(screen.getByTestId('tab-usd')).toBeInTheDocument();
+            expect(screen.queryByTestId('tab-uah')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('tab-eur')).not.toBeInTheDocument();
         });
     });
 });

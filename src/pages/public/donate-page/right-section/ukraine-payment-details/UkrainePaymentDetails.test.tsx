@@ -1,23 +1,26 @@
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { UkrainePaymentDetails } from './UkrainePaymentDetails';
 import { PublishedUahBankDetailsDto } from '../../../../../types/public/donate-page';
-import { UKRAINE_PAYMENT_DETAILS, PAYMENT_DETAILS_COMMON } from '../../../../../const/public/donate-page';
+
+jest.mock('../../copy-text-button/CopyTextButton', () => ({
+    CopyTextButton: ({ textToCopy }: { textToCopy: string }) => (
+        <button data-testid="copy-button" data-copy-text={textToCopy}>
+            Copy
+        </button>
+    ),
+}));
 
 jest.mock('../../../../../const/public/donate-page', () => ({
     UKRAINE_PAYMENT_DETAILS: {
         UKRAINE_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в Україні',
         UIDSREOU_LABEL: 'ЄДРПОУ',
-        UIDSREOU_NUMBER_LABEL: '45262516',
         BANK_LABEL: 'Банк',
-        BANK_NAME_LABEL: 'АТ КБ «ПРИВАТБАНК»',
         IBAN_UAH_LABEL: 'IBAN (UAH)',
-        IBAN_UAH_NUMBER_LABEL: 'UA463052990000026000040142147',
         PAYMENT_DESTINATION_LABEL: 'Призначення платежу',
-        PAYMENT_DESTINATION_NAME_LABEL: 'Благодійна допомога на статутну діяльність',
     },
     PAYMENT_DETAILS_COMMON: {
         RECIPIENT_LABEL: 'Одержувач',
-        RECIPIENT_NAME_LABEL: 'ГО «ЦЕНТР ПЕРЕМОГИ»',
     },
 }));
 
@@ -36,100 +39,60 @@ describe('UkrainePaymentDetails', () => {
         },
     ];
 
-    const expectElementsToBeInDocument = (texts: string[]) => {
-        texts.forEach((text) => {
-            expect(screen.getByText(text)).toBeInTheDocument();
-        });
-    };
-
-    const expectCopyButtonsCount = (expectedCount: number) => {
-        const copyButtons = screen.getAllByRole('button');
-        expect(copyButtons).toHaveLength(expectedCount);
-    };
-
-    describe('with API data', () => {
-        it('renders all payment labels with API data', () => {
+    describe('with bank details data', () => {
+        it('renders all payment details with API data', () => {
             const mockBankDetails = createMockBankDetails();
 
             render(<UkrainePaymentDetails bankDetails={mockBankDetails} />);
 
-            expect(screen.getByText(UKRAINE_PAYMENT_DETAILS.UKRAINE_PAYMENT_DETAILS_LABEL)).toBeInTheDocument();
+            expect(screen.getByText('Реквізити для донатів в Україні')).toBeInTheDocument();
 
-            expectElementsToBeInDocument([
-                PAYMENT_DETAILS_COMMON.RECIPIENT_LABEL,
-                UKRAINE_PAYMENT_DETAILS.UIDSREOU_LABEL,
-                UKRAINE_PAYMENT_DETAILS.BANK_LABEL,
-                UKRAINE_PAYMENT_DETAILS.IBAN_UAH_LABEL,
-                UKRAINE_PAYMENT_DETAILS.PAYMENT_DESTINATION_LABEL,
-            ]);
+            expect(screen.getByText('Одержувач')).toBeInTheDocument();
+            expect(screen.getByText('ЄДРПОУ')).toBeInTheDocument();
+            expect(screen.getByText('Банк')).toBeInTheDocument();
+            expect(screen.getByText('IBAN (UAH)')).toBeInTheDocument();
+            expect(screen.getByText('Призначення платежу')).toBeInTheDocument();
 
-            expectElementsToBeInDocument([
-                'Test Receiver',
-                '12345678',
-                'Test Bank',
-                'UA123456789012345678901234567',
-                'Test Payment Purpose',
-            ]);
+            expect(screen.getByText('Test Receiver')).toBeInTheDocument();
+            expect(screen.getByText('12345678')).toBeInTheDocument();
+            expect(screen.getByText('Test Bank')).toBeInTheDocument();
+            expect(screen.getByText('UA123456789012345678901234567')).toBeInTheDocument();
+            expect(screen.getByText('Test Payment Purpose')).toBeInTheDocument();
 
-            expectCopyButtonsCount(5);
+            const copyButtons = screen.getAllByTestId('copy-button');
+            expect(copyButtons).toHaveLength(5);
+            expect(copyButtons[0]).toHaveAttribute('data-copy-text', 'Test Receiver');
+            expect(copyButtons[1]).toHaveAttribute('data-copy-text', '12345678');
+            expect(copyButtons[2]).toHaveAttribute('data-copy-text', 'Test Bank');
+            expect(copyButtons[3]).toHaveAttribute('data-copy-text', 'UA123456789012345678901234567');
+            expect(copyButtons[4]).toHaveAttribute('data-copy-text', 'Test Payment Purpose');
         });
 
-        it('handles partial API data with fallbacks', () => {
+        it('renders with multiple banks but uses only first one primary', () => {
+            const mockBankDetails = [
+                createMockBankDetails()[0],
+                {
+                    id: 2,
+                    name: 'Secondary Bank',
+                    receiver: 'Secondary Receiver',
+                    edrpou: '87654321',
+                    iban: 'UA987654321098765432109876543',
+                    paymentPurpose: 'Secondary Purpose',
+                },
+            ];
+
+            render(<UkrainePaymentDetails bankDetails={mockBankDetails} />);
+
+            expect(screen.getByText('Test Receiver')).toBeInTheDocument();
+            expect(screen.getByText('Test Bank')).toBeInTheDocument();
+            expect(screen.queryByText('Secondary Receiver')).not.toBeInTheDocument();
+            expect(screen.queryByText('Secondary Bank')).not.toBeInTheDocument();
+        });
+
+        it('handles bank details with empty string values', () => {
             const mockBankDetails = createMockBankDetails({
                 name: '',
                 receiver: '',
-            });
-
-            render(<UkrainePaymentDetails bankDetails={mockBankDetails} />);
-
-            expect(screen.getByText(PAYMENT_DETAILS_COMMON.RECIPIENT_NAME_LABEL)).toBeInTheDocument();
-            expect(screen.getByText(UKRAINE_PAYMENT_DETAILS.BANK_NAME_LABEL)).toBeInTheDocument();
-
-            expectElementsToBeInDocument(['12345678', 'UA123456789012345678901234567', 'Test Payment Purpose']);
-        });
-    });
-
-    describe('with empty array fallback to constants', () => {
-        it('renders all payment labels with fallback constants', () => {
-            render(<UkrainePaymentDetails bankDetails={[]} />);
-
-            expect(screen.getByText(UKRAINE_PAYMENT_DETAILS.UKRAINE_PAYMENT_DETAILS_LABEL)).toBeInTheDocument();
-
-            expectElementsToBeInDocument([
-                PAYMENT_DETAILS_COMMON.RECIPIENT_LABEL,
-                UKRAINE_PAYMENT_DETAILS.UIDSREOU_LABEL,
-                UKRAINE_PAYMENT_DETAILS.BANK_LABEL,
-                UKRAINE_PAYMENT_DETAILS.IBAN_UAH_LABEL,
-                UKRAINE_PAYMENT_DETAILS.PAYMENT_DESTINATION_LABEL,
-            ]);
-
-            expectElementsToBeInDocument([
-                PAYMENT_DETAILS_COMMON.RECIPIENT_NAME_LABEL,
-                UKRAINE_PAYMENT_DETAILS.UIDSREOU_NUMBER_LABEL,
-                UKRAINE_PAYMENT_DETAILS.BANK_NAME_LABEL,
-                UKRAINE_PAYMENT_DETAILS.IBAN_UAH_NUMBER_LABEL,
-                UKRAINE_PAYMENT_DETAILS.PAYMENT_DESTINATION_NAME_LABEL,
-            ]);
-
-            expectCopyButtonsCount(5);
-        });
-    });
-
-    describe('edge cases', () => {
-        it('handles undefined values in API data', () => {
-            const mockBankDetails = createMockBankDetails({
-                name: undefined as any,
-                receiver: null as any,
-            });
-
-            render(<UkrainePaymentDetails bankDetails={mockBankDetails} />);
-
-            expect(screen.getByText(PAYMENT_DETAILS_COMMON.RECIPIENT_NAME_LABEL)).toBeInTheDocument();
-            expect(screen.getByText(UKRAINE_PAYMENT_DETAILS.BANK_NAME_LABEL)).toBeInTheDocument();
-        });
-
-        it('handles empty string values in API data', () => {
-            const mockBankDetails = createMockBankDetails({
                 edrpou: '',
                 iban: '',
                 paymentPurpose: '',
@@ -137,9 +100,42 @@ describe('UkrainePaymentDetails', () => {
 
             render(<UkrainePaymentDetails bankDetails={mockBankDetails} />);
 
-            expect(screen.getByText(UKRAINE_PAYMENT_DETAILS.UIDSREOU_NUMBER_LABEL)).toBeInTheDocument();
-            expect(screen.getByText(UKRAINE_PAYMENT_DETAILS.IBAN_UAH_NUMBER_LABEL)).toBeInTheDocument();
-            expect(screen.getByText(UKRAINE_PAYMENT_DETAILS.PAYMENT_DESTINATION_NAME_LABEL)).toBeInTheDocument();
+            expect(screen.getByText('Реквізити для донатів в Україні')).toBeInTheDocument();
+
+            const spans = screen.getAllByText('');
+            expect(spans.length).toBeGreaterThan(0);
+
+            const copyButtons = screen.getAllByTestId('copy-button');
+            expect(copyButtons[0]).toHaveAttribute('data-copy-text', '');
+            expect(copyButtons[1]).toHaveAttribute('data-copy-text', '');
+        });
+
+        it('handles bank details with null undefined values', () => {
+            const mockBankDetails = createMockBankDetails({
+                name: null as any,
+                receiver: undefined as any,
+            });
+
+            render(<UkrainePaymentDetails bankDetails={mockBankDetails} />);
+
+            expect(screen.getByText('Реквізити для донатів в Україні')).toBeInTheDocument();
+
+            const copyButtons = screen.getAllByTestId('copy-button');
+            expect(copyButtons).toHaveLength(5);
+        });
+    });
+
+    describe('no bank details scenarios', () => {
+        it('returns null when no bank details provided', () => {
+            const { container } = render(<UkrainePaymentDetails bankDetails={[]} />);
+
+            expect(container.firstChild).toBeNull();
+        });
+
+        it('returns null when bankDetails array is empty', () => {
+            const { container } = render(<UkrainePaymentDetails bankDetails={[]} />);
+
+            expect(container.firstChild).toBeNull();
         });
     });
 });

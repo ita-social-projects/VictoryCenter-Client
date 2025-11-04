@@ -20,4 +20,16 @@
             height: 100%;
         }
     }
+
+    &-loader {
+        width: 70%;
+        position: relative;
+        margin: 8rem auto 4rem;
+    }
+
+    &-error-message {
+        color: colors.$error;
+        margin-top: 8rem;
+        text-align: center;
+    }
 }

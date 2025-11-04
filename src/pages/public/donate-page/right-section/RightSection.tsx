@@ -1,27 +1,19 @@
 import { useState, useEffect } from 'react';
 import './RightSection.scss';
-import { LinearProgress } from '@mui/material';
 
 import { AbroadPaymentDetails } from './abroad-payment-details/AbroadPaymentDetails';
 import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSupportWays';
 import { Tabs } from '../../../../components/common/tabs/Tabs';
 import { UkrainePaymentDetails } from './ukraine-payment-details/UkrainePaymentDetails';
 import { Currency, DonatePageData } from '../../../../types/public/donate-page';
-import { CURRENCY_TABS } from '../../../../const/public/donate-page';
-import { donatePageDataFetch } from '../../../../services/api/public/donate/donate-api';
-import { useDataFetch } from '../../../../hooks/common/use-data-fetch/useDataFetch';
+import { CURRENCY_TABS, ERROR_MESSAGES } from '../../../../const/public/donate-page';
 
-export const RightSection = () => {
-    const {
-        data: donateData,
-        isLoading,
-        error,
-    } = useDataFetch<DonatePageData | null>({
-        initialData: null,
-        fetchHandler: donatePageDataFetch,
-        autoFetchDependencies: [],
-    });
+interface RightSectionProps {
+    donateData: DonatePageData | null;
+    error?: string | null;
+}
 
+export const RightSection = ({ donateData, error }: RightSectionProps) => {
     const getAvailableCurrencies = () => {
         if (!donateData) return [];
 
@@ -81,18 +73,10 @@ export const RightSection = () => {
         }
     };
 
-    if (isLoading) {
-        return (
-            <div className="donate-loader">
-                <LinearProgress />
-            </div>
-        );
-    }
-
     if (error) {
         return (
             <div className="donate-error-message" role="alert">
-                Не вдалося завантажити реквізити
+                {ERROR_MESSAGES.LOADING_ERROR}
             </div>
         );
     }

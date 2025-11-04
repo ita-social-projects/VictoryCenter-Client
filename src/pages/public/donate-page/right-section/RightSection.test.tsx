@@ -1,16 +1,29 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { RightSection } from './RightSection';
-import { Currency } from '../../../../types/public/donate-page';
+import {
+    Currency,
+    DonatePageData,
+    PublishedUahBankDetailsDto,
+    PublishedForeignBankDetailsDto,
+    PublishedSupportOptionsDto,
+} from '../../../../types/public/donate-page';
+import { ERROR_MESSAGES } from '../../../../const/public/donate-page';
 
 jest.mock('./ukraine-payment-details/UkrainePaymentDetails', () => ({
-    UkrainePaymentDetails: ({ bankDetails }: { bankDetails: any[] }) => (
+    UkrainePaymentDetails: ({ bankDetails }: { bankDetails: PublishedUahBankDetailsDto[] }) => (
         <div data-testid="ukraine-payment">Ukraine Payment Details ({bankDetails.length} items)</div>
     ),
 }));
 
 jest.mock('./abroad-payment-details/AbroadPaymentDetails', () => ({
-    AbroadPaymentDetails: ({ currency, foreignBankDetails }: { currency: number; foreignBankDetails: any[] }) => (
+    AbroadPaymentDetails: ({
+        currency,
+        foreignBankDetails,
+    }: {
+        currency: number;
+        foreignBankDetails: PublishedForeignBankDetailsDto[];
+    }) => (
         <div data-testid="abroad-payment">
             Abroad Payment Details - {currency === 1 ? 'USD' : 'EUR'} ({foreignBankDetails.length} items)
         </div>
@@ -22,7 +35,7 @@ jest.mock('./alternative-support-ways/AlternativeSupportWays', () => ({
         supportOptions,
         currentCurrency,
     }: {
-        supportOptions: any[];
+        supportOptions: PublishedSupportOptionsDto[];
         currentCurrency: number;
     }) => (
         <div data-testid="alt-support">
@@ -39,7 +52,7 @@ jest.mock('../../../../components/common/tabs/Tabs', () => ({
                     key={tab.id}
                     className={activeTab === tab.id ? 'active tab' : 'tab'}
                     onClick={() => setActiveTab(tab.id)}
-                    data-testid={`tab-${tab.label.toLowerCase()}`}
+                    data-testid={`tab-${tab.label.toLowerCase().split(' / ')[0]}`}
                 >
                     {tab.label}
                 </button>
@@ -48,65 +61,66 @@ jest.mock('../../../../components/common/tabs/Tabs', () => ({
     ),
 }));
 
-jest.mock('../../../../const/public/donate-page', () => ({
-    CURRENCY_TABS: {
-        UAH: 'UAH',
-        USD: 'USD',
-        EUR: 'EUR',
-    },
-}));
-
-jest.mock('../../../../hooks/common/use-data-fetch/useDataFetch', () => ({
-    useDataFetch: jest.fn(),
-}));
-
-jest.mock('../../../../services/api/public/donate/donate-api', () => ({
-    donatePageDataFetch: jest.fn(),
-}));
-
-const mockUseDataFetch = require('../../../../hooks/common/use-data-fetch/useDataFetch').useDataFetch;
-
 describe('RightSection', () => {
-    const createMockDonateData = () => ({
-        uahBankDetails: [{ id: 1, name: 'UAH Bank', iban: 'UA123', receiver: 'UAH Receiver' }],
-        foreignBankDetails: [
-            { id: 1, currency: Currency.USD, name: 'USD Bank', iban: 'US123' },
-            { id: 2, currency: Currency.EUR, name: 'EUR Bank', iban: 'EU123' },
-        ],
-        supportOptions: [
-            { id: 1, name: 'PayPal', value: 'test@paypal.com', currency: Currency.UAH },
-            { id: 2, name: 'Stripe', value: 'test@stripe.com', currency: Currency.USD },
-        ],
+    const createMockUahBankDetails = (): PublishedUahBankDetailsDto[] => [
+        {
+            id: 1,
+            name: 'UAH Bank',
+            iban: 'UA123456789012345678901234567',
+            receiver: 'UAH Receiver',
+            edrpou: '12345678',
+            paymentPurpose: 'Donation purpose',
+        },
+    ];
+
+    const createMockForeignBankDetails = (): PublishedForeignBankDetailsDto[] => [
+        {
+            id: 1,
+            currency: Currency.USD,
+            name: 'USD Bank',
+            iban: 'US123456789012345678901234567',
+            receiver: 'USD Receiver',
+            swift: 'USDBANK',
+            address: 'USD Bank Address',
+            correspondentBanks: [],
+        },
+        {
+            id: 2,
+            currency: Currency.EUR,
+            name: 'EUR Bank',
+            iban: 'EU123456789012345678901234567',
+            receiver: 'EUR Receiver',
+            swift: 'EURBANK',
+            address: 'EUR Bank Address',
+            correspondentBanks: [],
+        },
+    ];
+
+    const createMockSupportOptions = (): PublishedSupportOptionsDto[] => [
+        {
+            id: 1,
+            name: 'PayPal',
+            value: 'test@paypal.com',
+            currency: Currency.UAH,
+        },
+        {
+            id: 2,
+            name: 'Stripe',
+            value: 'test@stripe.com',
+            currency: Currency.USD,
+        },
+    ];
+
+    const createMockDonateData = (): DonatePageData => ({
+        uahBankDetails: createMockUahBankDetails(),
+        foreignBankDetails: createMockForeignBankDetails(),
+        supportOptions: createMockSupportOptions(),
     });
-
-    const mockUseDataFetchSuccess = (data: any = createMockDonateData()) => {
-        mockUseDataFetch.mockReturnValue({
-            data,
-            isLoading: false,
-            error: null,
-        });
-    };
-
-    const mockUseDataFetchLoading = () => {
-        mockUseDataFetch.mockReturnValue({
-            data: null,
-            isLoading: true,
-            error: null,
-        });
-    };
-
-    const mockUseDataFetchError = () => {
-        mockUseDataFetch.mockReturnValue({
-            data: null,
-            isLoading: false,
-            error: 'Test error',
-        });
-    };
 
     const testTabSwitch = async (
         tabName: string,
-        expectedContent: string,
         expectedPaymentType: 'ukraine-payment' | 'abroad-payment',
+        expectedContent?: string,
         previousTab?: string,
     ) => {
         fireEvent.click(screen.getByTestId(`tab-${tabName}`));
@@ -125,119 +139,99 @@ describe('RightSection', () => {
         });
     };
 
-    const testForeignCurrencySwitch = async (currency: 'USD' | 'EUR') => {
-        render(<RightSection />);
-
-        fireEvent.click(screen.getByTestId(`tab-${currency.toLowerCase()}`));
-
-        await waitFor(() => {
-            expect(screen.getByTestId('abroad-payment')).toBeInTheDocument();
-            expect(screen.getByTestId('abroad-payment')).toHaveTextContent(currency);
-            expect(screen.queryByTestId('ukraine-payment')).not.toBeInTheDocument();
-            expect(screen.getByTestId(`tab-${currency.toLowerCase()}`)).toHaveClass('active');
-        });
-    };
-
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    describe('loading state', () => {
-        it('shows loading state when data is being fetched', () => {
-            mockUseDataFetchLoading();
-
-            render(<RightSection />);
-
-            expect(screen.getByRole('progressbar')).toBeInTheDocument();
-            expect(screen.queryByTestId('ukraine-payment')).not.toBeInTheDocument();
-        });
-    });
-
     describe('error state', () => {
-        it('shows error message when data fetch fails', () => {
-            mockUseDataFetchError();
+        it('shows error message when error prop provided', () => {
+            const mockData = createMockDonateData();
 
-            render(<RightSection />);
+            render(<RightSection donateData={mockData} error="Test error" />);
 
             const errorElement = screen.getByRole('alert');
             expect(errorElement).toBeInTheDocument();
-            expect(errorElement).toHaveTextContent('Не вдалося завантажити реквізити');
+            expect(errorElement).toHaveTextContent(ERROR_MESSAGES.LOADING_ERROR);
             expect(screen.queryByTestId('ukraine-payment')).not.toBeInTheDocument();
         });
     });
 
     describe('with available currencies', () => {
-        beforeEach(() => {
-            mockUseDataFetchSuccess();
-        });
+        const mockData = createMockDonateData();
 
         it('renders with default UAH tab and UkrainePaymentDetails', () => {
-            render(<RightSection />);
+            render(<RightSection donateData={mockData} />);
 
             expect(screen.getByTestId('ukraine-payment')).toBeInTheDocument();
-            expect(screen.getByTestId('tab-uah')).toHaveClass('active');
+            expect(screen.getByTestId('tab-гривня')).toHaveClass('active');
             expect(screen.getByTestId('alt-support')).toBeInTheDocument();
         });
 
         it('renders all available currency tabs', () => {
-            render(<RightSection />);
+            render(<RightSection donateData={mockData} />);
 
-            expect(screen.getByTestId('tab-uah')).toBeInTheDocument();
-            expect(screen.getByTestId('tab-usd')).toBeInTheDocument();
-            expect(screen.getByTestId('tab-eur')).toBeInTheDocument();
+            expect(screen.getByTestId('tab-гривня')).toBeInTheDocument();
+            expect(screen.getByTestId('tab-долар')).toBeInTheDocument();
+            expect(screen.getByTestId('tab-євро')).toBeInTheDocument();
         });
 
         it('switches to USD tab and shows AbroadPaymentDetails', async () => {
-            await testForeignCurrencySwitch('USD');
+            render(<RightSection donateData={mockData} />);
+
+            await testTabSwitch('долар', 'abroad-payment', 'USD');
+            expect(screen.queryByTestId('ukraine-payment')).not.toBeInTheDocument();
         });
 
         it('switches to EUR tab and shows AbroadPaymentDetails', async () => {
-            await testForeignCurrencySwitch('EUR');
+            render(<RightSection donateData={mockData} />);
+
+            await testTabSwitch('євро', 'abroad-payment', 'EUR');
+            expect(screen.queryByTestId('ukraine-payment')).not.toBeInTheDocument();
         });
 
         it('switches between all tabs correctly', async () => {
-            render(<RightSection />);
+            render(<RightSection donateData={mockData} />);
 
             expect(screen.getByTestId('ukraine-payment')).toBeInTheDocument();
-            expect(screen.getByTestId('tab-uah')).toHaveClass('active');
+            expect(screen.getByTestId('tab-гривня')).toHaveClass('active');
 
-            await testTabSwitch('usd', 'USD', 'abroad-payment', 'uah');
-            await testTabSwitch('eur', 'EUR', 'abroad-payment', 'usd');
-            await testTabSwitch('uah', '', 'ukraine-payment', 'eur');
+            await testTabSwitch('долар', 'abroad-payment', 'USD', 'гривня');
+            await testTabSwitch('євро', 'abroad-payment', 'EUR', 'долар');
+            await testTabSwitch('гривня', 'ukraine-payment', undefined, 'євро');
         });
 
         it('always renders AlternativeSupportWays with current currency', async () => {
-            render(<RightSection />);
+            render(<RightSection donateData={mockData} />);
 
-            expect(screen.getByTestId('alt-support')).toHaveTextContent('Alternative Support - 0');
+            expect(screen.getByTestId('alt-support')).toHaveTextContent(`Alternative Support - ${Currency.UAH}`);
 
-            fireEvent.click(screen.getByTestId('tab-usd'));
+            fireEvent.click(screen.getByTestId('tab-долар'));
             await waitFor(() => {
-                expect(screen.getByTestId('alt-support')).toHaveTextContent('Alternative Support - 1');
+                expect(screen.getByTestId('alt-support')).toHaveTextContent(`Alternative Support - ${Currency.USD}`);
             });
 
-            fireEvent.click(screen.getByTestId('tab-eur'));
+            fireEvent.click(screen.getByTestId('tab-євро'));
             await waitFor(() => {
-                expect(screen.getByTestId('alt-support')).toHaveTextContent('Alternative Support - 2');
+                expect(screen.getByTestId('alt-support')).toHaveTextContent(`Alternative Support - ${Currency.EUR}`);
             });
         });
 
         it('filters foreign bank details by currency correctly', async () => {
-            render(<RightSection />);
+            render(<RightSection donateData={mockData} />);
 
-            fireEvent.click(screen.getByTestId('tab-usd'));
+            fireEvent.click(screen.getByTestId('tab-долар'));
             await waitFor(() => {
                 expect(screen.getByTestId('abroad-payment')).toHaveTextContent('USD (1 items)');
             });
 
-            fireEvent.click(screen.getByTestId('tab-eur'));
+            fireEvent.click(screen.getByTestId('tab-євро'));
             await waitFor(() => {
                 expect(screen.getByTestId('abroad-payment')).toHaveTextContent('EUR (1 items)');
             });
         });
 
         it('renders correct DOM structure', () => {
-            render(<RightSection />);
+            render(<RightSection donateData={mockData} />);
 
             const rightSection = screen.getByTestId('tabs-container').closest('.rightSection');
             expect(rightSection).toBeInTheDocument();
@@ -252,55 +246,49 @@ describe('RightSection', () => {
 
     describe('no available currencies scenarios', () => {
         it('returns null when no data available for any currency', () => {
-            mockUseDataFetchSuccess({
+            const emptyData: DonatePageData = {
                 uahBankDetails: [],
                 foreignBankDetails: [],
                 supportOptions: [],
-            });
+            };
 
-            const { container } = render(<RightSection />);
+            const { container } = render(<RightSection donateData={emptyData} />);
 
             expect(container.firstChild).toBeNull();
         });
 
         it('returns null when data is null', () => {
-            mockUseDataFetch.mockReturnValue({
-                data: null,
-                isLoading: false,
-                error: null,
-            });
-
-            const { container } = render(<RightSection />);
+            const { container } = render(<RightSection donateData={null} />);
 
             expect(container.firstChild).toBeNull();
         });
 
         it('shows only UAH tab when only UAH bank details available', () => {
-            mockUseDataFetchSuccess({
-                uahBankDetails: [{ id: 1, name: 'UAH Bank' }],
+            const uahOnlyData: DonatePageData = {
+                uahBankDetails: createMockUahBankDetails(),
                 foreignBankDetails: [],
                 supportOptions: [],
-            });
+            };
 
-            render(<RightSection />);
+            render(<RightSection donateData={uahOnlyData} />);
 
-            expect(screen.getByTestId('tab-uah')).toBeInTheDocument();
-            expect(screen.queryByTestId('tab-usd')).not.toBeInTheDocument();
-            expect(screen.queryByTestId('tab-eur')).not.toBeInTheDocument();
+            expect(screen.getByTestId('tab-гривня')).toBeInTheDocument();
+            expect(screen.queryByTestId('tab-долар')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('tab-євро')).not.toBeInTheDocument();
         });
 
         it('shows only USD tab when only USD support options available', () => {
-            mockUseDataFetchSuccess({
+            const usdOnlyData: DonatePageData = {
                 uahBankDetails: [],
                 foreignBankDetails: [],
-                supportOptions: [{ id: 1, currency: Currency.USD }],
-            });
+                supportOptions: [{ id: 1, name: 'PayPal', value: 'test@paypal.com', currency: Currency.USD }],
+            };
 
-            render(<RightSection />);
+            render(<RightSection donateData={usdOnlyData} />);
 
-            expect(screen.getByTestId('tab-usd')).toBeInTheDocument();
-            expect(screen.queryByTestId('tab-uah')).not.toBeInTheDocument();
-            expect(screen.queryByTestId('tab-eur')).not.toBeInTheDocument();
+            expect(screen.getByTestId('tab-долар')).toBeInTheDocument();
+            expect(screen.queryByTestId('tab-гривня')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('tab-євро')).not.toBeInTheDocument();
         });
     });
 });

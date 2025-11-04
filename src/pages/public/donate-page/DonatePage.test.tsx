@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { DonatePage } from './DonatePage';
 
 jest.mock('./donate-page-intro/DonatePageIntro', () => ({
@@ -26,8 +27,8 @@ jest.mock('./donate-section/DonateSection', () => ({
 }));
 
 jest.mock('./right-section/RightSection', () => ({
-    RightSection: () => (
-        <div data-testid="right-section">
+    RightSection: ({ donateData, error }: { donateData: any; error?: string | null }) => (
+        <div data-testid="right-section" data-has-data={!!donateData} data-has-error={!!error}>
             <div>Реквізити для донатів в Україні</div>
             <div>Інші варіанти підтримки</div>
         </div>
@@ -48,7 +49,43 @@ jest.mock('../../../const/public/faq', () => ({
     },
 }));
 
+jest.mock('../../../hooks/common/use-data-fetch/useDataFetch', () => ({
+    useDataFetch: jest.fn(),
+}));
+
+jest.mock('../../../services/api/public/donate/donate-api', () => ({
+    donatePageDataFetch: jest.fn(),
+}));
+
+const mockUseDataFetch = require('../../../hooks/common/use-data-fetch/useDataFetch').useDataFetch;
+
 describe('DonatePage', () => {
+    const mockUseDataFetchSuccess = (
+        data: any = { uahBankDetails: [], foreignBankDetails: [], supportOptions: [] },
+    ) => {
+        mockUseDataFetch.mockReturnValue({
+            data,
+            isLoading: false,
+            error: null,
+        });
+    };
+
+    const mockUseDataFetchLoading = () => {
+        mockUseDataFetch.mockReturnValue({
+            data: null,
+            isLoading: true,
+            error: null,
+        });
+    };
+
+    const mockUseDataFetchError = () => {
+        mockUseDataFetch.mockReturnValue({
+            data: null,
+            isLoading: false,
+            error: 'Test error',
+        });
+    };
+
     const expectMainSectionsToBeInDocument = () => {
         expect(screen.getByTestId('donate-page-intro')).toBeInTheDocument();
         expect(screen.getByTestId('donate-section')).toBeInTheDocument();
@@ -68,7 +105,36 @@ describe('DonatePage', () => {
         expect(stickyBlock).toContainElement(screen.getByTestId('donate-section'));
     };
 
-    describe('component rendering', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    describe('loading state', () => {
+        it('shows loading state when data is being fetched', () => {
+            mockUseDataFetchLoading();
+
+            render(<DonatePage />);
+
+            expect(screen.getByRole('progressbar')).toBeInTheDocument();
+            expect(screen.queryByTestId('donate-page-intro')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('right-section')).not.toBeInTheDocument();
+        });
+
+        it('shows loading with correct CSS class', () => {
+            mockUseDataFetchLoading();
+
+            render(<DonatePage />);
+
+            const loaderContainer = screen.getByRole('progressbar').closest('.donate-page-loader');
+            expect(loaderContainer).toBeInTheDocument();
+        });
+    });
+
+    describe('successful data loading', () => {
+        beforeEach(() => {
+            mockUseDataFetchSuccess();
+        });
+
         it('renders all main components in correct order', () => {
             render(<DonatePage />);
 
@@ -111,9 +177,44 @@ describe('DonatePage', () => {
             expect(faqSection).toBeInTheDocument();
             expect(faqSection).toHaveAttribute('data-slug', 'donate-page');
         });
+
+        it('passes data to RightSection', () => {
+            render(<DonatePage />);
+
+            const rightSection = screen.getByTestId('right-section');
+            expect(rightSection).toHaveAttribute('data-has-data', 'true');
+            expect(rightSection).toHaveAttribute('data-has-error', 'false');
+        });
+    });
+
+    describe('error handling', () => {
+        it('passes error to RightSection when fetch fails', () => {
+            mockUseDataFetchError();
+
+            render(<DonatePage />);
+
+            const rightSection = screen.getByTestId('right-section');
+            expect(rightSection).toHaveAttribute('data-has-error', 'true');
+            expect(rightSection).toHaveAttribute('data-has-data', 'false');
+        });
+
+        it('still renders all other components when error occurs', () => {
+            mockUseDataFetchError();
+
+            render(<DonatePage />);
+
+            expect(screen.getByTestId('donate-page-intro')).toBeInTheDocument();
+            expect(screen.getByTestId('donate-section')).toBeInTheDocument();
+            expect(screen.getByTestId('right-section')).toBeInTheDocument();
+            expect(screen.getByTestId('faq-section')).toBeInTheDocument();
+        });
     });
 
     describe('section content', () => {
+        beforeEach(() => {
+            mockUseDataFetchSuccess();
+        });
+
         it('renders all expected text content', () => {
             render(<DonatePage />);
 
@@ -145,6 +246,10 @@ describe('DonatePage', () => {
     });
 
     describe('DOM structure', () => {
+        beforeEach(() => {
+            mockUseDataFetchSuccess();
+        });
+
         it('has correct CSS classes and structure', () => {
             render(<DonatePage />);
 
@@ -159,20 +264,23 @@ describe('DonatePage', () => {
             expect(stickyBlock?.parentElement).toHaveClass('donatePageContent');
         });
 
-        it('places RightSection alongside sticky block', () => {
+        it('places RightSection in rightSectionContainer', () => {
             render(<DonatePage />);
 
             const rightSection = screen.getByTestId('right-section');
-            const donatePageContent = rightSection.closest('.donatePageContent');
-            expect(donatePageContent).toBeInTheDocument();
+            const rightSectionContainer = rightSection.closest('.rightSectionContainer');
+            expect(rightSectionContainer).toBeInTheDocument();
 
-            const stickyBlock = donatePageContent?.querySelector('.stickyBlock');
-            expect(stickyBlock).toBeInTheDocument();
-            expect(donatePageContent).toContainElement(rightSection);
+            const donatePageContent = rightSectionContainer?.closest('.donatePageContent');
+            expect(donatePageContent).toBeInTheDocument();
         });
     });
 
     describe('component integration', () => {
+        beforeEach(() => {
+            mockUseDataFetchSuccess();
+        });
+
         it('renders all headings with proper hierarchy', () => {
             render(<DonatePage />);
 
@@ -194,18 +302,31 @@ describe('DonatePage', () => {
         });
     });
 
-    describe('component props', () => {
-        it('passes correct slug to FaqSection', () => {
+    describe('data fetching', () => {
+        it('calls useDataFetch with correct parameters', () => {
+            mockUseDataFetchSuccess();
+
             render(<DonatePage />);
 
-            const faqSection = screen.getByTestId('faq-section');
-            expect(faqSection).toHaveAttribute('data-slug', 'donate-page');
+            expect(mockUseDataFetch).toHaveBeenCalledWith({
+                initialData: null,
+                fetchHandler: expect.any(Function),
+                autoFetchDependencies: [],
+            });
         });
 
-        it('renders without any required props', () => {
-            expect(() => render(<DonatePage />)).not.toThrow();
+        it('handles different data states correctly', () => {
+            mockUseDataFetch.mockReturnValue({
+                data: null,
+                isLoading: false,
+                error: null,
+            });
 
-            expectMainSectionsToBeInDocument();
+            render(<DonatePage />);
+
+            const rightSection = screen.getByTestId('right-section');
+            expect(rightSection).toHaveAttribute('data-has-data', 'false');
+            expect(rightSection).toHaveAttribute('data-has-error', 'false');
         });
     });
 });

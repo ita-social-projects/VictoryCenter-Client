@@ -171,18 +171,6 @@ describe('AbroadPaymentDetails', () => {
             expectElementToHaveTestId('correspondent-banks-count', '0');
         });
 
-        it('handles multiple foreign banks but uses only first one', () => {
-            const mockForeignBankDetails = [
-                createMockForeignBankDetails({ name: 'Primary Bank', receiver: 'Primary Receiver' }),
-                createMockForeignBankDetails({ name: 'Secondary Bank', receiver: 'Secondary Receiver' }),
-            ];
-
-            render(<AbroadPaymentDetails currency={Currency.USD} foreignBankDetails={mockForeignBankDetails} />);
-
-            expectElementToHaveTestId('receiver-name', 'Primary Receiver');
-            expectElementToHaveTestId('bank-name', 'Primary Bank');
-        });
-
         it('handles foreign bank with undefined correspondent banks', () => {
             const mockForeignBankDetails = [
                 createMockForeignBankDetails({

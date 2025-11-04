@@ -42,8 +42,8 @@ export const API_ROUTES = {
         CORRESPONDENT_BANK_DETAILS: 'CorrespondentBankDetails',
 
         PUBLIC: {
-            UAH_BANK_DETAILS: 'UahBankDetails/published',
-            FOREIGN_BANK_DETAILS: 'ForeignBankDetails/published',
+            BANK_DETAILS_UAH: 'UahBankDetails/published',
+            BANK_DETAILS_FOREIGN: 'ForeignBankDetails/published',
             SUPPORT_OPTIONS: 'SupportOptions/published',
         },
     },

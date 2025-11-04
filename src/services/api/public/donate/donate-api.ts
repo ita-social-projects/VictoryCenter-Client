@@ -17,13 +17,13 @@ export const donatePageDataFetch = async (): Promise<DonatePageData> => {
         usdSupportResponse,
         eurSupportResponse,
     ] = await Promise.all([
-        axiosInstance.get<PublishedUahBankDetailsDto[]>(API_ROUTES.DONATE.PUBLIC.UAH_BANK_DETAILS),
+        axiosInstance.get<PublishedUahBankDetailsDto[]>(API_ROUTES.DONATE.PUBLIC.BANK_DETAILS_UAH),
 
-        axiosInstance.get<PublishedForeignBankDetailsDto[]>(API_ROUTES.DONATE.PUBLIC.FOREIGN_BANK_DETAILS, {
+        axiosInstance.get<PublishedForeignBankDetailsDto[]>(API_ROUTES.DONATE.PUBLIC.BANK_DETAILS_FOREIGN, {
             params: { currency: Currency.USD },
         }),
 
-        axiosInstance.get<PublishedForeignBankDetailsDto[]>(API_ROUTES.DONATE.PUBLIC.FOREIGN_BANK_DETAILS, {
+        axiosInstance.get<PublishedForeignBankDetailsDto[]>(API_ROUTES.DONATE.PUBLIC.BANK_DETAILS_FOREIGN, {
             params: { currency: Currency.EUR },
         }),
 

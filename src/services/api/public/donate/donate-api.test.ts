@@ -94,11 +94,11 @@ describe('donatePageDataFetch', () => {
             await donatePageDataFetch();
 
             expect(mockAxiosInstance.get).toHaveBeenCalledTimes(6);
-            expect(mockAxiosInstance.get).toHaveBeenNthCalledWith(1, API_ROUTES.DONATE.PUBLIC.UAH_BANK_DETAILS);
-            expect(mockAxiosInstance.get).toHaveBeenNthCalledWith(2, API_ROUTES.DONATE.PUBLIC.FOREIGN_BANK_DETAILS, {
+            expect(mockAxiosInstance.get).toHaveBeenNthCalledWith(1, API_ROUTES.DONATE.PUBLIC.BANK_DETAILS_UAH);
+            expect(mockAxiosInstance.get).toHaveBeenNthCalledWith(2, API_ROUTES.DONATE.PUBLIC.BANK_DETAILS_FOREIGN, {
                 params: { currency: Currency.USD },
             });
-            expect(mockAxiosInstance.get).toHaveBeenNthCalledWith(3, API_ROUTES.DONATE.PUBLIC.FOREIGN_BANK_DETAILS, {
+            expect(mockAxiosInstance.get).toHaveBeenNthCalledWith(3, API_ROUTES.DONATE.PUBLIC.BANK_DETAILS_FOREIGN, {
                 params: { currency: Currency.EUR },
             });
             expect(mockAxiosInstance.get).toHaveBeenNthCalledWith(4, API_ROUTES.DONATE.PUBLIC.SUPPORT_OPTIONS, {

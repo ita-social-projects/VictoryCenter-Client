@@ -38,49 +38,46 @@ describe('CorrespondentBanksSection', () => {
         ...overrides,
     });
 
+    const expectBasicBankElements = () => {
+        expect(screen.getByText('Кореспондентські банки')).toBeInTheDocument();
+        expect(screen.getByTestId('bank-block')).toBeInTheDocument();
+    };
+
+    const expectBankFields = (expectedFields: string[], expectedCount: number) => {
+        const bankFields = screen.getAllByTestId('bank-field');
+        expect(bankFields).toHaveLength(expectedCount);
+        expectedFields.forEach((expectedContent, index) => {
+            expect(bankFields[index]).toHaveTextContent(expectedContent);
+        });
+    };
+
+    const renderAndExpectBasics = (mockBanks: PublishedCorrespondentBankDetailsDto[], expectedTitle: string) => {
+        render(<CorrespondentBanksSection correspondentBanks={mockBanks} />);
+        expectBasicBankElements();
+        expect(screen.getByTestId('bank-title')).toHaveTextContent(expectedTitle);
+    };
+
     describe('with correspondent banks data', () => {
         it('renders correspondent banks with all fields including IBAN', () => {
             const mockBanks = [createMockCorrespondentBank()];
 
-            render(<CorrespondentBanksSection correspondentBanks={mockBanks} />);
-
-            expect(screen.getByText('Кореспондентські банки')).toBeInTheDocument();
-            expect(screen.getByTestId('bank-block')).toBeInTheDocument();
-            expect(screen.getByTestId('bank-title')).toHaveTextContent('Test Bank USD');
-
-            const bankFields = screen.getAllByTestId('bank-field');
-            expect(bankFields).toHaveLength(3);
-            expect(bankFields[0]).toHaveTextContent('SWIFT: TEST123');
-            expect(bankFields[1]).toHaveTextContent('Account: 123456789');
-            expect(bankFields[2]).toHaveTextContent('IBAN: US29NWBK60161331926819');
+            renderAndExpectBasics(mockBanks, 'Test Bank USD');
+            expectBankFields(['SWIFT: TEST123', 'Account: 123456789', 'IBAN: US29NWBK60161331926819'], 3);
         });
 
         it('renders correspondent banks without IBAN when not provided', () => {
             const mockBanks = [createMockCorrespondentBank({ iban: undefined })];
 
-            render(<CorrespondentBanksSection correspondentBanks={mockBanks} />);
-
-            expect(screen.getByText('Кореспондентські банки')).toBeInTheDocument();
-            expect(screen.getByTestId('bank-block')).toBeInTheDocument();
-            expect(screen.getByTestId('bank-title')).toHaveTextContent('Test Bank USD');
-
-            const bankFields = screen.getAllByTestId('bank-field');
-            expect(bankFields).toHaveLength(2);
-            expect(bankFields[0]).toHaveTextContent('SWIFT: TEST123');
-            expect(bankFields[1]).toHaveTextContent('Account: 123456789');
+            renderAndExpectBasics(mockBanks, 'Test Bank USD');
+            expectBankFields(['SWIFT: TEST123', 'Account: 123456789'], 2);
         });
 
         it('renders correspondent banks with empty IBAN when provided but empty', () => {
             const mockBanks = [createMockCorrespondentBank({ iban: '' })];
 
             render(<CorrespondentBanksSection correspondentBanks={mockBanks} />);
-
             expect(screen.getByText('Кореспондентські банки')).toBeInTheDocument();
-
-            const bankFields = screen.getAllByTestId('bank-field');
-            expect(bankFields).toHaveLength(2);
-            expect(bankFields[0]).toHaveTextContent('SWIFT: TEST123');
-            expect(bankFields[1]).toHaveTextContent('Account: 123456789');
+            expectBankFields(['SWIFT: TEST123', 'Account: 123456789'], 2);
         });
 
         it('renders multiple correspondent banks', () => {
@@ -114,29 +111,16 @@ describe('CorrespondentBanksSection', () => {
                 }),
             ];
 
-            render(<CorrespondentBanksSection correspondentBanks={mockBanks} />);
-
-            expect(screen.getByText('Кореспондентські банки')).toBeInTheDocument();
-            expect(screen.getByTestId('bank-block')).toBeInTheDocument();
-            expect(screen.getByTestId('bank-title')).toHaveTextContent('');
-
-            const bankFields = screen.getAllByTestId('bank-field');
-            expect(bankFields).toHaveLength(2);
-            expect(bankFields[0]).toHaveTextContent('SWIFT:');
-            expect(bankFields[1]).toHaveTextContent('Account:');
+            renderAndExpectBasics(mockBanks, '');
+            expectBankFields(['SWIFT:', 'Account:'], 2);
         });
 
         it('handles banks with null IBAN value', () => {
             const mockBanks = [createMockCorrespondentBank({ iban: null as any })];
 
             render(<CorrespondentBanksSection correspondentBanks={mockBanks} />);
-
             expect(screen.getByText('Кореспондентські банки')).toBeInTheDocument();
-
-            const bankFields = screen.getAllByTestId('bank-field');
-            expect(bankFields).toHaveLength(2);
-            expect(bankFields[0]).toHaveTextContent('SWIFT: TEST123');
-            expect(bankFields[1]).toHaveTextContent('Account: 123456789');
+            expectBankFields(['SWIFT: TEST123', 'Account: 123456789'], 2);
         });
     });
 

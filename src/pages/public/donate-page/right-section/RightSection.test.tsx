@@ -103,6 +103,28 @@ describe('RightSection', () => {
         });
     };
 
+    const testTabSwitch = async (
+        tabName: string,
+        expectedContent: string,
+        expectedPaymentType: 'ukraine-payment' | 'abroad-payment',
+        previousTab?: string,
+    ) => {
+        fireEvent.click(screen.getByTestId(`tab-${tabName}`));
+
+        await waitFor(() => {
+            expect(screen.getByTestId(expectedPaymentType)).toBeInTheDocument();
+            expect(screen.getByTestId(`tab-${tabName}`)).toHaveClass('active');
+
+            if (previousTab) {
+                expect(screen.getByTestId(`tab-${previousTab}`)).not.toHaveClass('active');
+            }
+
+            if (expectedContent && expectedPaymentType === 'abroad-payment') {
+                expect(screen.getByTestId('abroad-payment')).toHaveTextContent(expectedContent);
+            }
+        });
+    };
+
     const testForeignCurrencySwitch = async (currency: 'USD' | 'EUR') => {
         render(<RightSection />);
 
@@ -179,26 +201,9 @@ describe('RightSection', () => {
             expect(screen.getByTestId('ukraine-payment')).toBeInTheDocument();
             expect(screen.getByTestId('tab-uah')).toHaveClass('active');
 
-            fireEvent.click(screen.getByTestId('tab-usd'));
-            await waitFor(() => {
-                expect(screen.getByTestId('abroad-payment')).toBeInTheDocument();
-                expect(screen.getByTestId('tab-usd')).toHaveClass('active');
-                expect(screen.getByTestId('tab-uah')).not.toHaveClass('active');
-            });
-
-            fireEvent.click(screen.getByTestId('tab-eur'));
-            await waitFor(() => {
-                expect(screen.getByTestId('abroad-payment')).toBeInTheDocument();
-                expect(screen.getByTestId('tab-eur')).toHaveClass('active');
-                expect(screen.getByTestId('tab-usd')).not.toHaveClass('active');
-            });
-
-            fireEvent.click(screen.getByTestId('tab-uah'));
-            await waitFor(() => {
-                expect(screen.getByTestId('ukraine-payment')).toBeInTheDocument();
-                expect(screen.getByTestId('tab-uah')).toHaveClass('active');
-                expect(screen.getByTestId('tab-eur')).not.toHaveClass('active');
-            });
+            await testTabSwitch('usd', 'USD', 'abroad-payment', 'uah');
+            await testTabSwitch('eur', 'EUR', 'abroad-payment', 'usd');
+            await testTabSwitch('uah', '', 'ukraine-payment', 'eur');
         });
 
         it('always renders AlternativeSupportWays with current currency', async () => {

@@ -1,13 +1,24 @@
-import { ABROAD_PAYMENT_DETAILS, CORRESPONDENT_BANKS } from '../../../../../const/public/donate-page';
+import { ABROAD_PAYMENT_DETAILS } from '../../../../../const/public/donate-page';
 import { CorrespondentBankBlock } from './CorrespondentBankBlock';
-import { Currency } from '../../../../../types/public/donate-page';
-import { currencyToString } from '../../../../../utils/functions/mappers/public/donate';
+import { PublishedCorrespondentBankDetailsDto } from '../../../../../types/public/donate-page';
 
-type CorrespondentBankCurrency = keyof typeof CORRESPONDENT_BANKS;
+export const CorrespondentBanksSection = ({
+    correspondentBanks = [],
+}: {
+    correspondentBanks?: PublishedCorrespondentBankDetailsDto[];
+}) => {
+    if (correspondentBanks.length === 0) {
+        return null;
+    }
 
-export const CorrespondentBanksSection = ({ currency }: { currency: Currency }) => {
-    const currencyString = currencyToString(currency) as CorrespondentBankCurrency;
-    const banks = CORRESPONDENT_BANKS[currencyString] || [];
+    const banks = correspondentBanks.map((apiBank) => ({
+        title: apiBank.name,
+        fields: [
+            { label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL, value: apiBank.swift },
+            { label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL, value: apiBank.account },
+            ...(apiBank.iban ? [{ label: ABROAD_PAYMENT_DETAILS.IBAN_LABEL, value: apiBank.iban }] : []),
+        ],
+    }));
 
     return (
         <div className="abroadPaymentDetailsBlock">

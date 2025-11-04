@@ -1,34 +1,40 @@
-import { DonatePageIntro } from './donate-page-intro/DonatePageIntro';
-import { DonateSection } from './donate-section/DonateSection';
-import './DonatePage.scss';
-import { RightSection } from './right-section/RightSection';
-import { PAGE_SLUGS } from '../../../const/public/faq';
-import { FaqSection } from '../../../components/public/faq-section/FaqSection';
+import { useEffect, useState } from 'react';
+import { LinearProgress } from '@mui/material';
 import { useDataFetch } from '../../../hooks/common/use-data-fetch/useDataFetch';
 import { donatePageDataFetch } from '../../../services/api/public/donate/donate-api';
 import { DonatePageData } from '../../../types/public/donate-page';
-import { LinearProgress } from '@mui/material';
+import { PAGE_SLUGS } from '../../../const/public/faq';
+import { FaqSection } from '../../../components/public/faq-section/FaqSection';
+import { DonatePageIntro } from './donate-page-intro/DonatePageIntro';
+import { DonateSection } from './donate-section/DonateSection';
+import { RightSection } from './right-section/RightSection';
+import './DonatePage.scss';
 
 export const DonatePage = () => {
-    const {
-        data: donateData,
-        isLoading,
-        error,
-    } = useDataFetch<DonatePageData | null>({
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+    const { data: donateData, error } = useDataFetch<DonatePageData | null>({
         initialData: null,
         fetchHandler: donatePageDataFetch,
         autoFetchDependencies: [],
     });
 
-    if (isLoading) {
-        return (
+    useEffect(() => {
+        if (donateData !== null || error) {
+            setIsDataLoaded(true);
+        }
+    }, [donateData, error]);
+
+    const renderLoader = () => (
+        <div className="donatePage">
+            <DonatePageIntro />
             <div className="donate-page-loader">
                 <LinearProgress />
             </div>
-        );
-    }
+        </div>
+    );
 
-    return (
+    const renderContent = () => (
         <div className="donatePage">
             <DonatePageIntro />
             <div className="donatePageContent">
@@ -42,4 +48,6 @@ export const DonatePage = () => {
             <FaqSection slug={PAGE_SLUGS.DONATE} />
         </div>
     );
+
+    return !isDataLoaded ? renderLoader() : renderContent();
 };

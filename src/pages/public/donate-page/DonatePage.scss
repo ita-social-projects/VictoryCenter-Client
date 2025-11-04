@@ -4,32 +4,31 @@
     background-color: colors.$light-blue-50;
     padding-top: 4.125rem;
 
-    .donatePageContent {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        gap: 7.94rem;
-        padding-top: 6rem;
-        padding-bottom: 6rem;
-        padding-left: 12.5rem;
-
-        .stickyBlock {
-            position: sticky;
-            top: 2rem;
-            display: flex;
-            height: 100%;
-        }
-    }
-
     &-loader {
         width: 70%;
-        position: relative;
         margin: 8rem auto 4rem;
+
+        .MuiLinearProgress-root {
+            height: 4px;
+        }
     }
 
     &-error-message {
         color: colors.$error;
         margin-top: 8rem;
         text-align: center;
+    }
+}
+
+.donatePageContent {
+    display: flex;
+    justify-content: center;
+    gap: 7.94rem;
+    padding: 6rem 0 6rem 12.5rem;
+
+    .stickyBlock {
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
     }
 }

@@ -13,9 +13,7 @@ interface AbroadPaymentDetailsProps {
 }
 
 export const AbroadPaymentDetails = ({ currency, foreignBankDetails }: AbroadPaymentDetailsProps) => {
-    const primary = foreignBankDetails[0];
-
-    if (!primary) {
+    if (!foreignBankDetails.length) {
         return null;
     }
 
@@ -25,17 +23,21 @@ export const AbroadPaymentDetails = ({ currency, foreignBankDetails }: AbroadPay
 
     return (
         <div className="abroadPaymentDetails">
-            <PaymentDetailsSection
-                title={title}
-                ibanLabel={ibanLabel}
-                ibanValue={primary.iban}
-                receiverName={primary.receiver}
-                bankName={primary.name}
-                swift={primary.swift}
-                address={primary.address}
-            />
+            {foreignBankDetails.map((bank, index) => (
+                <div key={bank.id} className={`bankGroup ${index > 0 ? 'separated' : ''}`}>
+                    <PaymentDetailsSection
+                        title={index === 0 ? title : ''}
+                        ibanLabel={ibanLabel}
+                        ibanValue={bank.iban}
+                        receiverName={bank.receiver}
+                        bankName={bank.name}
+                        swift={bank.swift}
+                        address={bank.address}
+                    />
 
-            <CorrespondentBanksSection correspondentBanks={primary.correspondentBanks || []} />
+                    <CorrespondentBanksSection correspondentBanks={bank.correspondentBanks || []} />
+                </div>
+            ))}
         </div>
     );
 };

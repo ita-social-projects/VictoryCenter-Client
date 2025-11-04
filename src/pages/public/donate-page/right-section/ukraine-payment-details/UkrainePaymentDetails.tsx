@@ -8,52 +8,52 @@ interface UkrainePaymentDetailsProps {
 }
 
 export const UkrainePaymentDetails = ({ bankDetails }: UkrainePaymentDetailsProps) => {
-    const primaryBank = bankDetails[0];
-
-    if (!primaryBank) {
+    if (!bankDetails.length) {
         return null;
     }
 
     return (
         <div className="UkrainePaymentDetails">
             <h2>{UKRAINE_PAYMENT_DETAILS.UKRAINE_PAYMENT_DETAILS_LABEL}</h2>
-            <div className="paymentDetails">
-                <div className="paymentLabel">
-                    <h3>{PAYMENT_DETAILS_COMMON.RECIPIENT_LABEL}</h3>
-                    <div className="labelWithCopyButton">
-                        <span className="label">{primaryBank.receiver}</span>
-                        <CopyTextButton textToCopy={primaryBank.receiver} />
+            {bankDetails.map((bank, index) => (
+                <div key={bank.id} className={`paymentDetails ${index > 0 ? 'separated' : ''}`}>
+                    <div className="paymentLabel">
+                        <h3>{PAYMENT_DETAILS_COMMON.RECIPIENT_LABEL}</h3>
+                        <div className="labelWithCopyButton">
+                            <span className="label">{bank.receiver}</span>
+                            <CopyTextButton textToCopy={bank.receiver} />
+                        </div>
+                    </div>
+                    <div className="paymentLabel">
+                        <h3>{UKRAINE_PAYMENT_DETAILS.UIDSREOU_LABEL}</h3>
+                        <div className="labelWithCopyButton">
+                            <span className="label">{bank.edrpou}</span>
+                            <CopyTextButton textToCopy={bank.edrpou} />
+                        </div>
+                    </div>
+                    <div className="paymentLabel">
+                        <h3>{UKRAINE_PAYMENT_DETAILS.BANK_LABEL}</h3>
+                        <div className="labelWithCopyButton">
+                            <span className="label">{bank.name}</span>
+                            <CopyTextButton textToCopy={bank.name} />
+                        </div>
+                    </div>
+                    <div className="paymentLabel">
+                        <h3>{UKRAINE_PAYMENT_DETAILS.IBAN_UAH_LABEL}</h3>
+                        <div className="labelWithCopyButton">
+                            <span className="label">{bank.iban}</span>
+                            <CopyTextButton textToCopy={bank.iban} />
+                        </div>
+                    </div>
+                    <div className="paymentLabel">
+                        <h3>{UKRAINE_PAYMENT_DETAILS.PAYMENT_DESTINATION_LABEL}</h3>
+                        <div className="labelWithCopyButton">
+                            <span className="label">{bank.paymentPurpose}</span>
+                            <CopyTextButton textToCopy={bank.paymentPurpose} />
+                        </div>
                     </div>
                 </div>
-                <div className="paymentLabel">
-                    <h3>{UKRAINE_PAYMENT_DETAILS.UIDSREOU_LABEL}</h3>
-                    <div className="labelWithCopyButton">
-                        <span className="label">{primaryBank.edrpou}</span>
-                        <CopyTextButton textToCopy={primaryBank.edrpou} />
-                    </div>
-                </div>
-                <div className="paymentLabel">
-                    <h3>{UKRAINE_PAYMENT_DETAILS.BANK_LABEL}</h3>
-                    <div className="labelWithCopyButton">
-                        <span className="label">{primaryBank.name}</span>
-                        <CopyTextButton textToCopy={primaryBank.name} />
-                    </div>
-                </div>
-                <div className="paymentLabel">
-                    <h3>{UKRAINE_PAYMENT_DETAILS.IBAN_UAH_LABEL}</h3>
-                    <div className="labelWithCopyButton">
-                        <span className="label">{primaryBank.iban}</span>
-                        <CopyTextButton textToCopy={primaryBank.iban} />
-                    </div>
-                </div>
-                <div className="paymentLabel">
-                    <h3>{UKRAINE_PAYMENT_DETAILS.PAYMENT_DESTINATION_LABEL}</h3>
-                    <div className="labelWithCopyButton">
-                        <span className="label">{primaryBank.paymentPurpose}</span>
-                        <CopyTextButton textToCopy={primaryBank.paymentPurpose} />
-                    </div>
-                </div>
-            </div>
+            ))}
         </div>
     );
 };

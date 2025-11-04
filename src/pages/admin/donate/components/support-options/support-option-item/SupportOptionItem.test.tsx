@@ -181,7 +181,7 @@ describe('SupportOptionItem', () => {
         expect(screen.getByText('Name too short')).toBeInTheDocument();
     });
 
-    it('disables publish button when validation errors exist', () => {
+    it('enables publish button even when validation errors exist', () => {
         render(<SupportOptionItem data={defaultData} initialMode={SupportOptionItemMode.Edit} />);
 
         const nameInput = screen.getByTestId('input-name');
@@ -189,7 +189,8 @@ describe('SupportOptionItem', () => {
         fireEvent.blur(nameInput);
 
         const publishButton = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH);
-        expect(publishButton).toBeDisabled();
+        expect(publishButton).not.toBeDisabled();
+        expect(screen.getByText('Name too short')).toBeInTheDocument();
     });
 
     it('updates state when data prop changes', () => {

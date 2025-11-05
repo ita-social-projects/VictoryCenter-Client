@@ -2,103 +2,228 @@ import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import { ImageApi } from '../image/image-api';
 import {
-    PartnerBannerDto,
     PartnerBannerUpdateRequest,
-    PartnersSectionDto,
     PartnersSectionCreateRequest,
     PartnerSection,
     Partner,
+    PartnerBanner,
+    PartnersPageData,
+    PartnersSectionUpdateRequest,
 } from '../../../../types/admin/partners';
+import { RequestOptions } from '../../../../types/common/api';
+import { Image } from '../../../../types/common/image';
 
+// DTO Payloads (Internal Request Body Types)
+interface CreatePartnerDto {
+    description: string;
+    imageId: number;
+}
+
+interface CreatePartnersSectionDto {
+    title: string;
+    description: string;
+    partners: CreatePartnerDto[];
+}
+
+interface UpdatePartnerDto {
+    id: number;
+    description: string;
+    imageId: number;
+}
+
+interface UpdatePartnersSectionDto {
+    title: string;
+    description: string;
+    partnersToCreate: CreatePartnerDto[];
+    partnersToUpdate: UpdatePartnerDto[];
+    partnerIdsToDelete: number[];
+}
+
+interface UpdatePartnerBannerDto {
+    title: string;
+    description: string;
+    imageId: number;
+}
+
+// Response DTO
+export interface PartnerBannerDto {
+    id: number;
+    title: string;
+    description: string;
+    image: Image | null;
+}
+
+export interface PartnerDto {
+    id: number;
+    description: string;
+    image: Image;
+}
+
+export interface PartnersSectionDto {
+    id: number;
+    title: string;
+    description: string;
+    partners: PartnerDto[];
+}
+
+export interface PartnersPageDataDto {
+    banner: PartnerBannerDto;
+    sections: PartnersSectionDto[];
+}
+
+// DTO to Domain Mappers
+const mapPartnerDtoToPartner = (dto: PartnerDto): Partner => ({
+    id: dto.id,
+    description: dto.description,
+    image: dto.image,
+    imageId: dto.image?.id || null,
+});
+
+const mapSectionDtoToSection = (dto: PartnersSectionDto): PartnerSection => ({
+    id: dto.id,
+    title: dto.title,
+    description: dto.description,
+    partners: dto.partners.map(mapPartnerDtoToPartner),
+});
+
+const mapBannerDtoToBanner = (dto: PartnerBannerDto): PartnerBanner => ({
+    title: dto.title,
+    description: dto.description,
+    image: dto.image,
+    imageId: dto.image?.id || null,
+});
+
+const mapPartnerPageDataDtoToPageData = (dto: PartnersPageDataDto): PartnersPageData => ({
+    banner: mapBannerDtoToBanner(dto.banner),
+    sections: dto.sections.map(mapSectionDtoToSection),
+});
+
+// Api Service
 export const PartnersApi = {
-    getBanner: async (client: AxiosInstance): Promise<PartnerBannerDto> => {
+    getBanner: async (client: AxiosInstance): Promise<PartnerBanner> => {
         const response = await client.get<PartnerBannerDto>(API_ROUTES.PARTNERS.BANNER);
-        return response.data;
+        return mapBannerDtoToBanner(response.data);
     },
 
-    updateBanner: async (client: AxiosInstance, banner: PartnerBannerUpdateRequest): Promise<PartnerBannerDto> => {
+    updateBanner: async (client: AxiosInstance, banner: PartnerBannerUpdateRequest): Promise<PartnerBanner> => {
         const { finalImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(client, banner.image, banner.imageId);
 
-        const response = await client.put<PartnerBannerDto>(API_ROUTES.PARTNERS.BANNER, {
+        const updateBannerDto: UpdatePartnerBannerDto = {
             title: banner.title,
             description: banner.description,
-            imageId: finalImageId,
-        });
+            imageId: finalImageId ?? 0,
+        };
+
+        const response = await client.put<PartnerBannerDto>(API_ROUTES.PARTNERS.BANNER, updateBannerDto);
 
         if (imageIdToDelete && imageIdToDelete !== finalImageId) {
             await ImageApi.delete(client, imageIdToDelete);
         }
 
-        return response.data;
+        return mapBannerDtoToBanner(response.data);
     },
 
-    deleteSection: async (client: AxiosInstance, id: number) => {
-        await client.delete(`${API_ROUTES.PARTNERS.BASE}/${id}`);
+    getPageData: async (client: AxiosInstance): Promise<PartnersPageData> => {
+        const response = await client.get<PartnersPageDataDto>(API_ROUTES.PARTNERS.PAGE);
+        return mapPartnerPageDataDtoToPageData(response.data);
     },
 
-    getAll: async (
-        client: AxiosInstance,
-    ): Promise<{ banner: PartnerBannerDto | null; section: PartnersSectionDto[] }> => {
-        const response = await client.get<{
-            banner: PartnerBannerDto | null;
-            section: PartnersSectionDto[];
-        }>(API_ROUTES.PARTNERS.BASE);
-        return response.data;
+    getSections: async (client: AxiosInstance, options: RequestOptions): Promise<PartnerSection[]> => {
+        const response = await client.get<PartnersSectionDto[]>(API_ROUTES.PARTNERS.SECTIONS, {
+            signal: options.cancellationSignal,
+        });
+        return response.data.map(mapSectionDtoToSection);
+    },
+
+    deleteSection: async (client: AxiosInstance, id: number): Promise<void> => {
+        await client.delete(`${API_ROUTES.PARTNERS.SECTIONS}/${id}`);
     },
 
     postSection: async (client: AxiosInstance, section: PartnersSectionCreateRequest): Promise<PartnerSection> => {
-        await Promise.all(
+        // Upload images for new partners and get their IDs
+        const partnersPayload = await Promise.all(
             section.partners.map(async (partner) => {
-                if (partner.image && 'base64' in partner.image) {
-                    const imageId = await ImageApi.post(client, partner.image);
-                }
+                const { finalImageId } = await ImageApi.getUpdateImageId(client, partner.image, null);
+                const partnerDto: CreatePartnerDto = {
+                    description: partner.description,
+                    imageId: finalImageId ?? 0,
+                };
+                return partnerDto;
             }),
         );
 
-        const createdPartners: Partner[] = [];
-
-        for (const partner of section.partners) {
-            const response = await client.post<Partner>(`${API_ROUTES.PARTNERS.BASE}/partner`, {
-                description: partner.description,
-                imageId: partner.imageId,
-            });
-            createdPartners.push(response.data);
-        }
-
-        const sectionResponse = await client.post<PartnerSection>(API_ROUTES.PARTNERS.BASE, {
+        // Build the final DTO for the section
+        const createDto: CreatePartnersSectionDto = {
             title: section.title,
             description: section.description,
-            partners: createdPartners.map((p) => p.id),
-        });
+            partners: partnersPayload,
+        };
 
-        return sectionResponse.data as PartnerSection;
+        const response = await client.post<PartnersSectionDto>(API_ROUTES.PARTNERS.SECTIONS, createDto);
+
+        // Map DTO response back to a domain type
+        return mapSectionDtoToSection(response.data);
     },
 
-    updatePartnerSection: async (client: AxiosInstance, section: PartnerSection): Promise<PartnerSection> => {
+    updateSection: async (
+        client: AxiosInstance,
+        sectionId: number,
+        section: PartnersSectionUpdateRequest,
+    ): Promise<PartnerSection> => {
         const imagesToDelete: number[] = [];
+        const partnersToCreate: CreatePartnerDto[] = [];
+        const partnersToUpdate: UpdatePartnerDto[] = [];
 
+        // Process all partners (create/update images and sort into lists)
         await Promise.all(
-            section.partners.map(async (partner) => {
-                if (partner.image || partner.imageId) {
-                    const { finalImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(
-                        client,
-                        partner.image,
-                        partner.imageId,
-                    );
+            section.partnersToUpdate.map(async (partner) => {
+                const { finalImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(
+                    client,
+                    partner.image || null,
+                    partner.imageId || null,
+                );
 
-                    partner.imageId = finalImageId;
+                if (imageIdToDelete) {
+                    imagesToDelete.push(imageIdToDelete);
+                }
 
-                    if (imageIdToDelete) {
-                        imagesToDelete.push(imageIdToDelete);
-                    }
+                const partnerId = partner.id;
+
+                if (partnerId === null) {
+                    // This is a new partner (Create)
+                    partnersToCreate.push({
+                        description: partner.description,
+                        imageId: finalImageId ?? 0,
+                    });
+                } else {
+                    // This is an existing partner (Update)
+                    partnersToUpdate.push({
+                        id: partnerId,
+                        description: partner.description,
+                        imageId: finalImageId ?? 0,
+                    });
                 }
             }),
         );
 
-        const response = await client.put<PartnerSection>(`${API_ROUTES.PARTNERS.BASE}/${section.id}`, section);
+        // Build the final DTO for the update
+        const updateDto: UpdatePartnersSectionDto = {
+            title: section.title,
+            description: section.description,
+            partnersToCreate: partnersToCreate,
+            partnersToUpdate: partnersToUpdate,
+            partnerIdsToDelete: section.partnerIdsToDelete,
+        };
 
-        await Promise.all(imagesToDelete.map((imageId) => ImageApi.delete(client, imageId)));
+        const response = await client.put<PartnersSectionDto>(
+            `${API_ROUTES.PARTNERS.SECTIONS}/${sectionId}`,
+            updateDto,
+        );
 
-        return response.data;
+        // Clean up deleted images
+        await Promise.all(imagesToDelete.map((id) => ImageApi.delete(client, id)));
+
+        // Map DTO response back to a domain type
+        return mapSectionDtoToSection(response.data);
     },
 };

@@ -1,12 +1,11 @@
-.toolbar {
-    height: 88px;
+@use '../../../../../assets/sass/variables/colors';
+
+.partner-page-toolbar {
+    height: 90px;
     display: flex;
     align-items: center;
     justify-content: end;
     padding: 8px 24px 8px 24px;
-    width: 1609px;
-}
-
-.par-toolbar {
-    border-bottom: 1px solid;
+    width: 100%;
+    border-bottom: 1px solid colors.$grey-50;
 }

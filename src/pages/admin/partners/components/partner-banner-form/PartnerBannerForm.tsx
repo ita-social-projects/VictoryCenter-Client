@@ -158,15 +158,15 @@ export const PartnerBanner = () => {
     const isDisabled = isPublishing;
 
     return (
-        <div className="partner-banner">
+        <div className="partner-banner-form">
             {isLoadingData && (
-                <div className="partner-banner__loader">
+                <div className="partner-banner-form__loader">
                     <InlineLoader size={2} />
                 </div>
             )}
 
             {fetchError && !isLoadingData && (
-                <div className="partner-banner__error">
+                <div className="partner-banner-form__error">
                     <p>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER}</p>
                     <Button onClick={refetchBanner} buttonStyle="primary">
                         Спробувати ще
@@ -175,8 +175,8 @@ export const PartnerBanner = () => {
             )}
 
             {!isLoadingData && !fetchError && values && (
-                <div className="partner-banner__content">
-                    <div className="partner-banner__image">
+                <div className="partner-banner-form__content">
+                    <div className="partner-banner-form__image">
                         <PhotoInputGroup
                             label={PARTNERS_TEXT.FORM.LABEL.IMAGE}
                             value={values.image}
@@ -190,8 +190,8 @@ export const PartnerBanner = () => {
                         />
                     </div>
 
-                    <div className="partner-banner__main">
-                        <div className="partner-banner__fields">
+                    <div className="partner-banner-form__main">
+                        <div className="partner-banner-form__fields">
                             <InputWithCharacterLimitGroup
                                 label={PARTNERS_TEXT.FORM.LABEL.TITLE}
                                 value={values.title}
@@ -218,7 +218,7 @@ export const PartnerBanner = () => {
                             />
                         </div>
 
-                        <div className="partner-banner__actions">
+                        <div className="partner-banner-form__actions">
                             <Button
                                 type="button"
                                 buttonStyle="primary"

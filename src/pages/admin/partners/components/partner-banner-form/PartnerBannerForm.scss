@@ -1,56 +1,75 @@
 @use '../../../../../assets/sass/variables/colors';
 
-.partner-banner {
+.partner-banner-form {
     width: 100%;
-}
+    border-bottom: 1px solid colors.$grey-700;
 
-.partner-banner__content {
-    display: flex;
-    flex-direction: row;
-    gap: 48px;
+    &__content {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        min-height: 400px;
+        justify-content: space-between;
 
-    @media (max-width: 992px) {
-        flex-direction: column;
+        @media (max-width: 992px) {
+            flex-direction: column;
+            gap: 32px;
+        }
     }
-}
 
-.partner-banner__image {
-    flex-basis: 400px;
-    flex-shrink: 0;
+    &__image {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-    @media (max-width: 992px) {
-        flex-basis: auto;
+        > * {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    &__main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: stretch;
+        padding: 0 32px;
+        box-sizing: border-box;
+        gap: 32px;
+
+        @media (max-width: 992px) {
+            padding: 0;
+        }
+    }
+
+    &__fields {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
         width: 100%;
     }
-}
 
-.partner-banner__main {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-    flex-grow: 1;
-    width: 100%;
-}
+    &__actions {
+        display: flex;
+        justify-content: flex-end;
+        width: 100%;
 
-.partner-banner__fields {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
+        button {
+            width: 100%;
+        }
+    }
 
-.partner-banner__actions {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.partner-banner__loader,
-.partner-banner__error {
-    width: 100%;
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    padding: 20px;
+    &__loader,
+    &__error {
+        width: 100%;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 20px;
+    }
 }

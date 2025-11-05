@@ -1,14 +1,15 @@
 ﻿import React, { useCallback, memo } from 'react';
-import { PARTNER_SECTION_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/partner-schema/partner-schema';
+import {
+    PARTNER_SECTION_VALIDATION_FUNCTIONS,
+    PARTNER_VALIDATION_FUNCTIONS,
+} from '../../../../../validation/admin/partner-schema/partner-schema';
 import { PARTNER_SECTION_VALIDATION, PARTNERS_TEXT } from '../../../../../const/admin/partners';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PartnerForm, PartnerFormErrors, PartnerFormValues } from '../partner-form/PartnerForm';
 import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
 import { Button } from '../../../../../components/admin/button/Button';
 import './PartnerSectionForm.scss';
-import {
-    TextAreaWithCharacterLimitGroup
-} from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 
 export interface PartnerSectionFormValues {
     localId: string;
@@ -45,6 +46,7 @@ const PartnerSectionComponent = ({
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             const newTitle = e.target.value;
+            console.log(`Partner Section: ${value.localId} Title: ${newTitle}`);
             const error = PARTNER_SECTION_VALIDATION_FUNCTIONS.validateTitle(newTitle);
 
             onChange({ ...value, title: newTitle }, { ...errors, title: error });
@@ -55,6 +57,7 @@ const PartnerSectionComponent = ({
     const handleDescriptionChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             const newDescription = e.target.value;
+            console.log(`Partner Section: ${value.localId} Description: ${newDescription}`);
             const error = PARTNER_SECTION_VALIDATION_FUNCTIONS.validateDescription(newDescription);
 
             onChange({ ...value, description: newDescription }, { ...errors, description: error });
@@ -126,13 +129,18 @@ const PartnerSectionComponent = ({
     }, [onPublish, value.localId]);
 
     const isFormValid = (): boolean => {
-        if (errors.title || errors.description) {
+        if (PARTNER_SECTION_VALIDATION_FUNCTIONS.validateTitle(value.title)) {
+            return false;
+        }
+        if (PARTNER_SECTION_VALIDATION_FUNCTIONS.validateDescription(value.description)) {
             return false;
         }
 
-        const hasPartnerErrors = errors.partners.some((partnerError) =>
-            Object.values(partnerError).some((errorValue) => !!errorValue),
-        );
+        const hasPartnerErrors = value.partners.some((partner) => {
+            const descError = PARTNER_VALIDATION_FUNCTIONS.validateDescription(partner.description);
+            const imgError = PARTNER_VALIDATION_FUNCTIONS.validateImage(partner.image);
+            return !!descError || !!imgError;
+        });
 
         return !hasPartnerErrors;
     };

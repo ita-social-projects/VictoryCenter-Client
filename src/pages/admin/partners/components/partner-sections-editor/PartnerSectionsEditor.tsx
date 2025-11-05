@@ -5,22 +5,22 @@ import {
     PartnerSectionFormValues,
 } from '../partner-section/PartnerSectionForm';
 import { RequestOptions } from '../../../../../types/common/api';
-import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
-import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '../../../../../types/admin/toast';
 import { PARTNERS_TEXT } from '../../../../../const/admin/partners';
-import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
 import axios from 'axios';
 import { PartnerFormValues } from '../partner-form/PartnerForm';
 import { PartnersApi } from '../../../../../services/api/admin/partners/partners-api';
+import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
+import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
+import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
 import { Button } from '../../../../../components/admin/button/Button';
 import {
     PartnerSection,
     PartnersSectionCreateRequest,
     PartnersSectionUpdateRequest,
 } from '../../../../../types/admin/partners';
-import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 
 const isPartnerEmpty = (partner: PartnerFormValues): boolean => {
     return !partner.description && !partner.image;
@@ -48,12 +48,30 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
     const [isPublishing, setIsPublishing] = useState<boolean>(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [sectionToDeleteId, setSectionToDeleteId] = useState<string | null>(null);
+    const [localSections, setLocalSections] = useState<PartnerSectionFormValues[]>([]);
 
-    const fetchSectionsWithLocalId = useCallback(
-        async (options: RequestOptions): Promise<PartnerSectionFormValues[]> => {
-            const sectionsFromApi = await PartnersApi.getSections(client, options);
+    const fetchSectionsHandler = useCallback(
+        async (options: RequestOptions): Promise<PartnerSection[]> => {
+            return await PartnersApi.getSections(client, options);
+        },
+        [client],
+    );
 
-            return sectionsFromApi.map((section: PartnerSection) => ({
+    const {
+        data: fetchedSections,
+        isLoading: isSectionsLoading,
+        error: sectionsFetchError,
+        refetch: refetchSections,
+    } = useDataFetch<PartnerSection[]>({
+        initialData: [],
+        fetchHandler: fetchSectionsHandler,
+        autoFetchDisabled: false,
+    });
+
+    useEffect(() => {
+        setErrors(fetchedSections.map(() => ({ partners: [] })));
+        setLocalSections(
+            fetchedSections.map((section: PartnerSection) => ({
                 localId: crypto.randomUUID(),
                 sectionId: section.id,
                 title: section.title,
@@ -66,64 +84,46 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
                     image: p.image,
                     imageId: p.imageId,
                 })),
-            }));
-        },
-        [client],
-    );
-
-    const {
-        data: sections,
-        isLoading: isSectionsLoading,
-        error: sectionsError,
-        setData: setSections,
-        refetch: refetchSections,
-    } = useDataFetch<PartnerSectionFormValues[]>({
-        initialData: [],
-        fetchHandler: fetchSectionsWithLocalId,
-        autoFetchDisabled: false,
-    });
+            })),
+        );
+    }, [fetchedSections]);
 
     useEffect(() => {
-        setErrors(sections.map(() => ({ partners: [] })));
-    }, [sections]);
-
-    useEffect(() => {
-        if (sectionsError) {
+        if (sectionsFetchError) {
             if (
-                axios.isCancel?.(sectionsError) ||
-                sectionsError.name === 'CanceledError' ||
-                sectionsError.name === 'AbortError'
+                axios.isCancel?.(sectionsFetchError) ||
+                sectionsFetchError.name === 'CanceledError' ||
+                sectionsFetchError.name === 'AbortError'
             ) {
                 return;
             }
             addToast(PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_PARTNERS, ToastType.Error);
         }
-    }, [sectionsError, addToast]);
+    }, [sectionsFetchError, addToast]);
 
     const handleChange = useCallback(
         (updatedSection: PartnerSectionFormValues, sectionErrors: PartnerSectionErrors) => {
-            setSections((currentSections) =>
+            setLocalSections((currentSections) =>
                 currentSections.map((s) => (s.localId === updatedSection.localId ? updatedSection : s)),
             );
 
             setErrors((currentErrors) => {
-                const index = sections.findIndex((s) => s.localId === updatedSection.localId);
+                const index = localSections.findIndex((s) => s.localId === updatedSection.localId);
                 if (index === -1) return currentErrors;
 
                 const newErrors = [...currentErrors];
                 newErrors[index] = sectionErrors;
-                console.log(newErrors);
                 return newErrors;
             });
         },
-        [sections, setSections],
+        [localSections, setLocalSections],
     );
 
     const handlePublish = useCallback(
         async (localId: string) => {
             setIsPublishing(true);
             try {
-                const sectionToPublish = sections.find((s) => s.localId === localId);
+                const sectionToPublish = localSections.find((s) => s.localId === localId);
                 if (!sectionToPublish) return;
 
                 let savedSection: PartnerSection;
@@ -158,7 +158,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
                     addToast(PARTNERS_TEXT.MESSAGE.SECTION_PUBLISHED, ToastType.Success);
                 }
 
-                setSections((currentSections) =>
+                setLocalSections((currentSections) =>
                     currentSections.map((s) => {
                         if (s.localId === localId) {
                             return {
@@ -188,7 +188,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
                 setIsPublishing(false);
             }
         },
-        [sections, addToast, client, setSections],
+        [localSections, addToast, client, setLocalSections],
     );
 
     const handleDeleteRequest = useCallback((localId: string) => {
@@ -208,14 +208,14 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
         setIsModalOpen(false);
 
         try {
-            const sectionToDelete = sections.find((s) => s.localId === sectionToDeleteId);
+            const sectionToDelete = localSections.find((s) => s.localId === sectionToDeleteId);
 
             if (sectionToDelete && sectionToDelete.sectionId) {
                 await PartnersApi.deleteSection(client, sectionToDelete.sectionId);
             }
 
-            const indexToDelete = sections.findIndex((s) => s.localId === sectionToDeleteId);
-            setSections((current) => current.filter((s) => s.localId !== sectionToDeleteId));
+            const indexToDelete = localSections.findIndex((s) => s.localId === sectionToDeleteId);
+            setLocalSections((current) => current.filter((s) => s.localId !== sectionToDeleteId));
             setErrors((current) => current.filter((_, i) => i !== indexToDelete));
 
             addToast(PARTNERS_TEXT.MESSAGE.SECTION_DELETED, ToastType.Success);
@@ -228,14 +228,14 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
             setIsPublishing(false);
             setSectionToDeleteId(null);
         }
-    }, [sections, client, setSections, sectionToDeleteId, addToast]);
+    }, [localSections, client, setLocalSections, sectionToDeleteId, addToast]);
 
     const addSection = useCallback(() => {
         if (isPublishing || isSectionsLoading) {
             return;
         }
-        if (sections.length > 0) {
-            const lastSection = sections[sections.length - 1];
+        if (localSections.length > 0) {
+            const lastSection = localSections[localSections.length - 1];
             if (isSectionEmpty(lastSection)) {
                 return;
             }
@@ -258,9 +258,9 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
             deletedPartnerIds: [],
         };
 
-        setSections((current) => [...current, newSection]);
+        setLocalSections((current) => [...current, newSection]);
         setErrors((current) => [...current, { partners: [] }]);
-    }, [isPublishing, isSectionsLoading, sections, setSections, setErrors]);
+    }, [isPublishing, isSectionsLoading, localSections, setLocalSections, setErrors]);
 
     useImperativeHandle(
         ref,
@@ -270,7 +270,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
         [addSection],
     );
 
-    if (isSectionsLoading && sections.length === 0) {
+    if (isSectionsLoading && localSections.length === 0) {
         return (
             <div className="partner-section__loader">
                 <InlineLoader size={2} />
@@ -278,7 +278,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
         );
     }
 
-    if (sectionsError && sections.length === 0) {
+    if (sectionsFetchError && localSections.length === 0) {
         return (
             <div className="partner-sections-editor__error">
                 <p>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_PARTNERS}</p>
@@ -291,7 +291,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
 
     return (
         <div className="partner-sections-editor">
-            {sections.map((section, index) => (
+            {localSections.map((section, index) => (
                 <PartnerSectionForm
                     key={section.localId}
                     value={section}

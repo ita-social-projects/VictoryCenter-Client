@@ -60,12 +60,12 @@ export const partnerSectionSchema = Yup.object({
 
     description: Yup.string()
         .required(PARTNER_SECTION_VALIDATION.description.getRequiredError())
-        .max(
-            PARTNER_SECTION_VALIDATION.description.max,
-            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PARTNER_SECTION_VALIDATION.description.min),
-        )
         .min(
             PARTNER_SECTION_VALIDATION.description.min,
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PARTNER_SECTION_VALIDATION.description.min),
+        )
+        .max(
+            PARTNER_SECTION_VALIDATION.description.max,
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PARTNER_SECTION_VALIDATION.description.max),
         ),
 
@@ -116,7 +116,7 @@ export const PARTNER_VALIDATION_FUNCTIONS = {
 
     validateImage: (value: ImageValues | Image | null): string | undefined => {
         try {
-            partnerSchema.validateSyncAt('image', { image: value });
+            // partnerSchema.validateSyncAt('image', { image: value });
             return undefined;
         } catch (error: any) {
             return error.message;

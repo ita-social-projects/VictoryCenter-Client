@@ -85,7 +85,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                 title:
                     mode === SupportOptionItemMode.Edit
                         ? COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
-                        : DONATE_TEXT.QUESTION.CANCEL_EDIT,
+                        : DONATE_TEXT.QUESTION.SUPPORT_OPTION.CANCEL_CREATE,
                 onConfirm: resetForm,
             });
         } else {

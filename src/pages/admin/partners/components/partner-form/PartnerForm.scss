@@ -1,0 +1,43 @@
+﻿.partner-form {
+    width: 210px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &__header {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: end;
+    }
+
+    &__delete-button {
+        width: 1.5rem;
+        height: 1.5rem;
+        border: none;
+        cursor: pointer;
+        background-size: cover;
+        background: url('../../../../../assets/icons/delete-default.svg');
+
+        &:hover:not(:disabled) {
+            background: url('../../../../../assets/icons/delete-hover.svg');
+        }
+
+        &:active:not(:disabled) {
+            background: url('../../../../../assets/icons/delete-pressed.svg');
+        }
+
+        &:disabled {
+            background: url('../../../../../assets/icons/delete-disabled.svg');
+            cursor: not-allowed;
+        }
+    }
+
+    &__content {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+}

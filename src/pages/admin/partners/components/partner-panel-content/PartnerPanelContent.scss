@@ -1,0 +1,28 @@
+﻿.partner-panel-content {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.partner-panel-content__toolbar {
+    flex-shrink: 0;
+    border-bottom: 1px solid #e0e0e0;
+    background: #ffffff;
+    z-index: 10;
+}
+
+.partner-panel-content__scrollable-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 24px 32px;
+}
+
+.partner-panel-content__banner {
+    margin-bottom: 48px;
+}
+
+.partner-panel-content__sections {
+    // Цей контейнер просто тримає PartnerSectionsEditor,
+    // який вже має свою логіку (наприклад, 'gap' між секціями)
+}

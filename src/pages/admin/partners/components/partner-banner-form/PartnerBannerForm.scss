@@ -1,253 +1,56 @@
 @use '../../../../../assets/sass/variables/colors';
 
-.partner-banner-form__upload-area,
-.image-wrapper {
-    width: 840px;
-    height: 530px;
+.partner-banner {
+    width: 100%;
+}
+
+.partner-banner__content {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: colors.$blue-50;
-    
-    .image-input-wrapper {
+    flex-direction: row;
+    gap: 48px;
+
+    @media (max-width: 992px) {
+        flex-direction: column;
+    }
+}
+
+.partner-banner__image {
+    flex-basis: 400px;
+    flex-shrink: 0;
+
+    @media (max-width: 992px) {
+        flex-basis: auto;
         width: 100%;
-        height: 100%;
-        padding: 0;
-    }
-    
-    .image-placeholder {
-        width: 100%;
-        height: 100%;
-        background-image: url('../../../../../assets/images/admin/partners/partner-banner-default-image.png');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        opacity: 0.3;
-        position: relative;
-        
-        .placeholder-icon {
-            width: 155px;
-            height: 128px;
-            z-index: 1;
-        }
-        
-        span {
-            color: #333;
-            font-size: 16px;
-            font-weight: 500;
-            margin-top: 16px;
-            z-index: 1;
-        }
-        
-        &::after {
-            content: 'Розмір: 840x530';
-            display: block;
-            margin-top: 8px;
-            color: #555;
-            font-size: 14px;
-            z-index: 1;
-        }
-    }
-    
-    .image-preview {
-        .preview-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
     }
 }
 
-.partner-banner-form__container {
-    padding: 48px 34px 32px 20px;
-    border-bottom: 1px solid;
-    display: flex;
-    align-items: center;
-    gap: 56px;
-    width: 1533px;
-}
-
-.partner-banner-form__right {
-    flex: 1;
-    width: 608px;
-    height: 270px;
+.partner-banner__main {
     display: flex;
     flex-direction: column;
+    gap: 32px;
+    flex-grow: 1;
+    width: 100%;
 }
 
-.partner-banner-form__submit-btn {
-    width: 608px;
-    height: 40px;
-    border: none;
-    background-color: colors.$blue-500;
-    color: colors.$grey-50;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    
-    &:hover:not(:disabled) {
-        background-color: colors.$yellow-500;
-        color: colors.$grey-900;
-    }
-    
-    &:active:not(:disabled) {
-        background-color: colors.$blue-900;
-    }
-    
-    &:disabled {
-        background-color: colors.$grey-600;
-        cursor: not-allowed;
-    }
+.partner-banner__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-p .error {
-    color: colors.$error;
-    font-weight: 400;
-    font-size: 0.875rem;
-    line-height: 20px;
+.partner-banner__actions {
+    display: flex;
+    justify-content: flex-end;
 }
 
-.form-group {
-    textarea {
-        height: 24px !important;
-        min-height: 24px !important;
-    }
-}
-
-.inp1 {
-    margin-bottom: 24px;
-    position: relative;
-}
-
-.title-error {
-    position: absolute;
-    bottom: -45px;
-    color: colors.$error;
-}
-
-.inp2 {
-    position: relative;
-    margin-bottom: 24px;
-}
-
-.description-error {
-    position: absolute;
-    bottom: -15px;
-    color: colors.$error;
-}
-
-.partner-banner-form__upload-area {
-    position: relative;
-    border: 2px dashed #ccc;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    overflow: hidden;
-
-    &--dragging {
-        border-color: #007bff;
-        background-color: rgba(0, 123, 255, 0.05);
-    }
-
-    &:hover {
-        border-color: #999;
-    }
-
-    &--has-image {
-        border: none;
-    }
-}
-
-.partner-banner-form__upload-area {
-    position: relative;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    overflow: hidden;
-
-    &--dragging {
-        border-color: #007bff;
-        background-color: rgba(0, 123, 255, 0.05);
-    }
-
-    &:hover {
-        border-color: #999;
-    }
-
-    &--has-image {
-        border: none;
-    }
-}
-
-.partner-banner-form__file-input {
-    display: none;
-}
-
-.partner-banner-form__upload-label {
+.partner-banner__loader,
+.partner-banner__error {
+    width: 100%;
+    min-height: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-    padding: 40px;
-}
-
-.partner-banner-form__preview-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.partner-banner-form__upload-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.7);
-    transition: opacity 0.3s ease;
-    cursor: pointer;
-    opacity: 0;
-
-    &--visible {
-        opacity: 1;
-    }
-
-    .partner-banner-form__upload-area:hover & {
-        opacity: 1;
-    }
-}
-
-.partner-banner-form__upload-icon {
-    width: 155px;
-    height: 128px;
-    margin-bottom: 16px;
-    color: #333; // темний колір для іконки
-}
-
-.partner-banner-form__upload-text,
-.partner-banner-form__upload-size {
-    margin: 0;
-    color: #333; // темний текст на світлому фоні
-}
-
-.partner-banner-form__upload-text {
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 8px;
-}
-
-.partner-banner-form__upload-size {
-    font-size: 14px;
-    color: #555;
+    gap: 16px;
+    padding: 20px;
 }

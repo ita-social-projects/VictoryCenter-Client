@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DonateSection } from './DonateSection';
 import { Currency } from '../../../../types/public/donate-page';
+import { DONATION_AMOUNTS } from '../../../../const/public/donate-page';
 
 describe('DonateSection', () => {
     it('renders input, currency selector, and quick amount buttons', () => {
@@ -30,13 +31,18 @@ describe('DonateSection', () => {
     it('increments donation amount with quick buttons', () => {
         render(<DonateSection />);
         const input = screen.getByPlaceholderText('0');
-        const [btn10, btn50, btn100] = screen.getAllByRole('button', { name: /\+/ });
-        fireEvent.click(btn10);
-        expect(input).toHaveValue('10');
-        fireEvent.click(btn50);
-        expect(input).toHaveValue('60');
-        fireEvent.click(btn100);
-        expect(input).toHaveValue('160');
+        const [btnSmall, btnMedium, btnLarge] = screen.getAllByRole('button', { name: /\+/ });
+
+        const uahSmall = DONATION_AMOUNTS[Currency.UAH].small;
+        const uahMedium = DONATION_AMOUNTS[Currency.UAH].medium;
+        const uahLarge = DONATION_AMOUNTS[Currency.UAH].large;
+
+        fireEvent.click(btnSmall);
+        expect(input).toHaveValue(`${uahSmall}`);
+        fireEvent.click(btnMedium);
+        expect(input).toHaveValue(`${uahSmall + uahMedium}`);
+        fireEvent.click(btnLarge);
+        expect(input).toHaveValue(`${uahSmall + uahMedium + uahLarge}`);
     });
 
     it('changes currency', () => {
@@ -46,6 +52,29 @@ describe('DonateSection', () => {
         expect(select).toHaveValue(`${Currency.USD}`);
         fireEvent.change(select, { target: { value: Currency.EUR } });
         expect(select).toHaveValue(`${Currency.EUR}`);
+    });
+
+    it('updates quick button amounts when currency changes', () => {
+        render(<DonateSection />);
+        const input = screen.getByPlaceholderText('0');
+        const select = screen.getByRole('combobox');
+        const [btnSmall, btnMedium, btnLarge] = screen.getAllByRole('button', { name: /\+/ });
+
+        fireEvent.change(select, { target: { value: Currency.USD } });
+        const usdSmall = DONATION_AMOUNTS[Currency.USD].small;
+        const usdMedium = DONATION_AMOUNTS[Currency.USD].medium;
+
+        fireEvent.click(btnSmall);
+        expect(input).toHaveValue(`${usdSmall}`);
+        fireEvent.click(btnMedium);
+        expect(input).toHaveValue(`${usdSmall + usdMedium}`);
+
+        fireEvent.change(select, { target: { value: Currency.EUR } });
+        const eurLarge = DONATION_AMOUNTS[Currency.EUR].large;
+
+        fireEvent.change(input, { target: { value: '0' } });
+        fireEvent.click(btnLarge);
+        expect(input).toHaveValue(`${eurLarge}`);
     });
 
     it('shows correct submit button label for one-time and subscription tabs', () => {

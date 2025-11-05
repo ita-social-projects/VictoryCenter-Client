@@ -1,9 +1,23 @@
+import { Currency } from '../../types/public/donate-page';
+
 export const PAGE_TITLE = 'МИ ВДЯЧНІ | ЗА КОЖЕН ДОНАТ';
 
-export const DONATION_SIZE = {
-    10: '+10 ',
-    50: '+50 ',
-    100: '+100 ',
+export const DONATION_AMOUNTS = {
+    [Currency.UAH]: {
+        small: 100,
+        medium: 200,
+        large: 500,
+    },
+    [Currency.USD]: {
+        small: 10,
+        medium: 50,
+        large: 100,
+    },
+    [Currency.EUR]: {
+        small: 10,
+        medium: 50,
+        large: 100,
+    },
 };
 
 export const DONATE_SECTION = {

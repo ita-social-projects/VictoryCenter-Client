@@ -98,15 +98,18 @@
         .form-head-container {
             display: flex;
             flex-direction: row;
+            justify-content: space-between
         }
 
         .form-name {
             font-size: 1.5rem;
             font-weight: 600;
-
-            &-actions {
-                gap: 0.5rem;
-            }
+        }
+        
+        .form-name-actions {
+            display: flex;         // <-- ДОБАВЛЕНО
+            flex-direction: row;   // <-- ДОБАВЛЕНО
+            gap: 0.5rem;
         }
 
         .body {

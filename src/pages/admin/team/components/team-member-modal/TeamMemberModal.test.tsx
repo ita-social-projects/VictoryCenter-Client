@@ -65,7 +65,7 @@ jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal'
 }));
 
 // Mock MemberForm with named export and inline factory (avoid TDZ issues)
-jest.mock('../../forms/member-form/MemberForm', () => {
+jest.mock('../forms/member-form/MemberForm', () => {
     const React = require('react');
     return {
         MemberForm: React.forwardRef((props: any, ref: any) => {

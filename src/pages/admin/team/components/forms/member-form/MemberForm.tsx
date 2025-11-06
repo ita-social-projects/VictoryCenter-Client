@@ -1,6 +1,5 @@
 import React, { forwardRef, useCallback, useMemo } from 'react';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
-import { TeamCategory } from '../../../../../../types/admin/team-members';
 import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/team-member-schema/team-member-schema';
 import { ImageValues, Image } from '../../../../../../types/common/image';
 import { InputLabel } from '../../../../../../components/admin/input-label/InputLabel';
@@ -10,7 +9,7 @@ import { InputWithCharacterLimit } from '../../../../../../components/admin/inpu
 import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { ImageInput } from '../../../../../../components/admin/image-input/ImageInput';
 import { useTeamMemberForm } from '../use-team-member-form/useTeamMemberForm';
-import { TeamCategory } from '../../../../../types/admin/team-category';
+import { TeamCategory } from '../../../../../../types/admin/team-category';
 import './MemberForm.scss';
 
 export interface TeamMemberFormValues {

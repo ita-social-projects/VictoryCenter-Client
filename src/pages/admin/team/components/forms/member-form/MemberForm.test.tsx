@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemberForm, TeamMemberFormRef, TeamMemberFormValues } from './MemberForm';
 import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
-import { TeamCategory } from '../../../../../types/admin/team-category';
+import { TeamCategory } from '../../../../../../types/admin/team-category';
 
 // Mock SingleSelectInput to a native select for deterministic interaction
 jest.mock('../../../../../../components/common/single-select-input/SingleSelectInput', () => ({

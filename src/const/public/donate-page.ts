@@ -195,3 +195,7 @@ export const CORRESPONDENT_BANKS = {
         },
     ],
 };
+
+export const ERROR_MESSAGES = {
+    LOADING_ERROR: 'Не вдалося завантажити реквізити',
+};

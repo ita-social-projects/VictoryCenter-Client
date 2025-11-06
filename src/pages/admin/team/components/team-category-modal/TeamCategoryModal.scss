@@ -1,0 +1,22 @@
+@use '../../../../../assets/sass/variables/colors';
+
+.team-category {
+    &-modal-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+    }
+
+    &-modal-error-container {
+        font-size: 14px;
+        text-align: center;
+        line-height: 20px;
+        width: 100%;
+        margin: 0.5rem;
+        color: colors.$error;
+    }
+
+    &-modal-save-button {
+        width: 100% !important;
+    }
+}

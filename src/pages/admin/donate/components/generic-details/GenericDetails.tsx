@@ -6,6 +6,7 @@ import './GenericDetails.scss';
 import { FieldValues } from 'react-hook-form';
 import { GenericFormMode, GenericFormProps, GenericFormRef } from '../generic-form/GenericForm';
 import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
+import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
 
 export interface GenericDetailsProps<T extends FieldValues> {
     title?: string;
@@ -179,7 +180,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             buttonStyle="primary"
                         >
                             <div>{addNewText}</div>
-                            <div className="plus-icon"></div>
+                            <PlusIcon className="plus-icon" />
                         </Button>
                     )}
                 </div>
@@ -201,7 +202,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                                 buttonStyle={primaryAddButton ? 'primary' : 'secondary'}
                             >
                                 <div>{addNewText}</div>
-                                <div className="plus-icon"></div>
+                                <PlusIcon className="plus-icon" />
                             </Button>
                         </>
                     }

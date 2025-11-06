@@ -32,15 +32,3 @@ export interface TeamMemberCreateUpdateRequest {
     status: VisibilityStatus;
     imageId: number | null;
 }
-
-export type TeamCategory = {
-    id: number;
-    name: string;
-    description: string;
-};
-
-export interface TeamCategoryDto {
-    id: number;
-    name: string;
-    description: string;
-}

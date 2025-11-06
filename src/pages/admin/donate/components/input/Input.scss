@@ -1,7 +1,7 @@
 @use '../../../../../assets/sass/variables/colors.scss';
 @use '../../../../../assets/sass/variables/fonts.scss';
 
-.input {
+.donate-input {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -16,7 +16,7 @@
         color: colors.$error;
     }
 
-    textarea {
+    &-textarea {
         font-family: fonts.$mulish-regular-font;
         overflow: hidden;
         width: 100%;
@@ -25,19 +25,18 @@
         resize: none;
         padding: 0.75rem 2rem 0.75rem 1rem;
         border-radius: 8px;
-        font-size: 16px;
+        font-size: 18px;
         border: 1px solid colors.$grey-700;
         line-height: 1.4;
+
+        &[readonly] {
+            pointer-events: none;
+            cursor: default;
+            caret-color: transparent;
+        }
     }
 
-    textarea[readonly] {
-        pointer-events: none;
-        cursor: default;
-        caret-color: transparent;
-    }
-
-    button,
-    .input-clear-button {
+    &-clear-button {
         position: absolute;
         right: 1rem;
         top: 50%;
@@ -60,7 +59,6 @@
 
     &-title {
         position: relative;
-
         gap: 0px;
 
         &-body {
@@ -70,11 +68,25 @@
 
         min-height: 62px;
 
-        textarea {
-            min-height: 62px;
-            height: 62px;
+        .donate-input-textarea {
+            min-height: 3rem;
+            height: 3rem;
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 1.2;
+
+            &::placeholder {
+                color: colors.$grey-700;
+            }
+        }
+    }
+
+    &-title-create {
+        .donate-input-textarea {
+            min-height: 3.875rem;
+            height: 3.875rem;
             font-size: 32px;
-            font-weight: bold;
+            font-weight: 700;
             line-height: 1.2;
 
             &::placeholder {

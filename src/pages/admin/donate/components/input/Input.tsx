@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import './Input.scss';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
+import classNames from 'classnames';
 
 interface InputProps {
     label?: string;
@@ -90,20 +91,29 @@ export const Input = ({
     };
 
     const showClearButton = isFocused && value.length > prefix.length;
-
     const hasValue = value && value !== prefix;
 
     return (
-        <div className={`input ${isTitle ? 'input-title' : ''} ${hasEdited ? 'input-changed' : ''} ${className ?? ''}`}>
+        <div
+            className={classNames(
+                'donate-input',
+                {
+                    'donate-input-title': isTitle,
+                    'donate-input-changed': hasEdited,
+                    'donate-input-title-create': isTitle && name === 'name',
+                },
+                className,
+            )}
+        >
             {label && (
-                <div className={isTitle ? 'input-title-label' : 'input-label'}>
-                    {isRequired && editable && <span className="input-required">*</span>}
+                <div className={isTitle ? 'donate-input-title-label' : 'donate-input-label'}>
+                    {isRequired && editable && <span className="donate-input-required">*</span>}
                     {label}
                 </div>
             )}
 
-            <div className={isTitle ? 'input-title-body' : 'input-body'}>
-                {isTitle && editable && isRequired && <span className="input-required">*</span>}
+            <div className={isTitle ? 'donate-input-title-body' : 'donate-input-body'}>
+                {isTitle && editable && isRequired && <span className="donate-input-required">*</span>}
 
                 <textarea
                     ref={textAreaRef}
@@ -117,7 +127,7 @@ export const Input = ({
                         handleBlur?.(e);
                     }}
                     readOnly={!editable}
-                    className="input-textarea"
+                    className="donate-input-textarea"
                     inputMode={onlyNumbers ? 'numeric' : undefined}
                     maxLength={maxLength}
                 />
@@ -128,7 +138,7 @@ export const Input = ({
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={handleClear}
                         aria-label="Clear input"
-                        className="input-clear-button"
+                        className="donate-input-clear-button"
                     ></button>
                 )}
             </div>

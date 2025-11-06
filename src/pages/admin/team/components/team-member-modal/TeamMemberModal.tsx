@@ -8,6 +8,7 @@ import { GenericModalWrapper } from '../../../../../../components/admin/modal-wr
 import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
 import { VisibilityStatus, PendingAction, ModalMode } from '../../../../../../types/admin/common';
 import { TeamMemberFormValues, TeamMemberFormRef, MemberForm } from '../../forms/member-form/MemberForm';
+import { TeamCategory } from '../../../../../types/admin/team-category';
 
 interface TeamMemberModalProps {
     mode: ModalMode;

@@ -66,6 +66,8 @@ export const DONATE_TEXT = {
         NOT_FOUND: 'Ще немає варіантів підтримки',
         ADD_FIRST: 'Додати варіант підтримки',
         ADD_NEW: 'Додати варіант',
+        NAME: 'Назва',
+        VALUE: 'Реквізити',
     },
     QUESTION: {
         CANCEL_EDIT: 'Зміни будуть втрачені. Бажаєте продовжити?',
@@ -103,10 +105,10 @@ export const DONATE_TEXT = {
     },
 };
 
-const VALIDATION_PARAMS = {
+export const VALIDATION_PARAMS = {
     edrpou: { count: 8 },
     iban: { count: 29, errorLength: 27 },
-    swift: { count: 11 },
+    swift: { minLength: 8, maxLength: 11 },
 };
 
 export const DONATE_VALIDATION = {
@@ -133,9 +135,10 @@ export const DONATE_VALIDATION = {
         getRequiredError: () => getRequiredError(DONATE_TEXT.BANK_DETAILS.PAYMENT_PURPOSE.TITLE),
     },
     swift: {
-        count: VALIDATION_PARAMS.swift.count,
-        getMinError: () => getMinSymbolsError(VALIDATION_PARAMS.swift.count),
-        getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.swift.count),
+        minLength: VALIDATION_PARAMS.swift.minLength,
+        maxLength: VALIDATION_PARAMS.swift.maxLength,
+        getMinError: () => getMinSymbolsError(VALIDATION_PARAMS.swift.minLength),
+        getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.swift.maxLength),
         getRequiredError: () => getRequiredError(COMMON_TEXT.TITLE_SWIFT),
     },
     address: {
@@ -146,10 +149,10 @@ export const DONATE_VALIDATION = {
     },
     supportOptions: {
         name: {
-            getRequiredError: () => getRequiredError('Name'),
+            getRequiredError: () => getRequiredError(DONATE_TEXT.SUPPORT_OPTIONS.NAME),
         },
         value: {
-            getRequiredError: () => getRequiredError('Value'),
+            getRequiredError: () => getRequiredError(DONATE_TEXT.SUPPORT_OPTIONS.VALUE),
         },
     },
 };

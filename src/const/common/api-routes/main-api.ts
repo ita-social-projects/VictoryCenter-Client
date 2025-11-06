@@ -11,8 +11,10 @@ export const API_ROUTES = {
         BASE: 'TeamMembers',
         SEARCH: 'TeamMembers/search',
         REORDER: 'TeamMembers/reorder',
-        CATEGORIES: 'teamcategories',
         PUBLISHED: 'team/published',
+    },
+    TEAM_CATEGORIES: {
+        BASE: 'TeamCategories',
     },
     TEAM_LOCALIZATIONS: {
         BASE: 'TeamMemberLocalizations',
@@ -41,6 +43,12 @@ export const API_ROUTES = {
         BANK_DETAILS_UAH: 'UahBankDetails',
         BANK_DETAILS_FOREIGN: 'ForeignBankDetails',
         CORRESPONDENT_BANK_DETAILS: 'CorrespondentBankDetails',
+
+        PUBLIC: {
+            BANK_DETAILS_UAH: 'UahBankDetails/published',
+            BANK_DETAILS_FOREIGN: 'ForeignBankDetails/published',
+            SUPPORT_OPTIONS: 'SupportOptions/published',
+        },
     },
     WHO_WE_ARE: {
         BASE: 'WhoWeAre',

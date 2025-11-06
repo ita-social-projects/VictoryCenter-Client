@@ -5,6 +5,17 @@
     display: flex;
     flex-direction: column;
     gap: 4rem;
+
+    .bankGroup {
+        display: flex;
+        flex-direction: column;
+        gap: 4rem;
+
+        &.separated {
+            padding-top: 1.5rem;
+            border-top: 1px solid colors.$blue-900;
+        }
+    }
 }
 
 .abroadPaymentDetailsBlock {

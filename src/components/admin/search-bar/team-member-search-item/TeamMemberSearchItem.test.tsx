@@ -2,11 +2,19 @@ import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { TeamMemberSearchItem } from './TeamMemberSearchItem';
 import { SearchItemContentRef } from '../search-item-wrapper/SearchItemWrapper';
-import { TeamCategory, TeamMember } from '../../../../types/admin/team-members';
+import { TeamMember } from '../../../../types/admin/team-members';
+import { TeamCategory } from '../../../../types/admin/team-category';
 import { VisibilityStatus } from '../../../../types/admin/common';
 
 describe('TeamMemberSearchItem', () => {
-    const categories: TeamCategory[] = [{ id: 1, name: 'Category A', description: '' }];
+    const categories: TeamCategory[] = [
+        {
+            id: 1,
+            name: 'Category A',
+            description: '',
+            teamMembersCount: 1,
+        },
+    ];
 
     const makeMember = (overrides: Partial<TeamMember> = {}): TeamMember => ({
         id: 1,

@@ -69,6 +69,38 @@ export const COMMON_TEXT_ADMIN = {
         TRY_AGAIN: 'Спробувати ще раз',
         EXIT: 'Вихід',
     },
+
+    CATEGORIES: {
+        MESSAGE: {
+            FAIL_TO_FETCH_CATEGORIES: 'Виникла помилка, не вдалось завантажити категорії',
+        },
+
+        BUTTON: {
+            ADD_CATEGORY: 'Додати категорію',
+            EDIT_CATEGORY: 'Редагувати',
+            DELETE_CATEGORY: 'Видалити',
+        },
+
+        FORM: {
+            TITLE: {
+                ADD_CATEGORY: 'Додати категорію',
+                EDIT_CATEGORY: 'Редагувати категорію',
+                DELETE_CATEGORY: 'Видалити категорію',
+            },
+            MESSAGE: {
+                ALREADY_CONTAIN_CATEGORY_WITH_NAME: 'Категорія з такою назвою вже існує',
+                FAIL_TO_CREATE_CATEGORY: 'Виникла помилка під час додавання категорії',
+                FAIL_TO_UPDATE_CATEGORY: 'Виникла помилка під час оновлення категорії',
+                FAIL_TO_DELETE_CATEGORY: 'Виникла помилка під час видалення категорії',
+            },
+            LABEL: {
+                NAME: 'Назва',
+                EDIT_NAME: 'Редагувати назву',
+                CATEGORY: 'Категорія',
+            },
+        },
+    },
+
     TYPE: {
         DESCRIPTION: 'Опис',
         TITLE: 'Заголовок',

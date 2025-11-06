@@ -251,10 +251,6 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 });
             }, [formState]);
 
-            const hasErrors = useMemo(() => {
-                return Object.values(errors).some(Boolean);
-            }, [errors]);
-
             if (!isOpen) return null;
 
             return (
@@ -357,7 +353,6 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                         handleValueChange(f.name, cleanValue)
                                                     }
                                                     onlyNumbers={f.onlyNumbers}
-                                                    maxLength={f.maxLength}
                                                 />
                                                 {touchedFields.has(f.name) && errors[f.name] && (
                                                     <span className="error">{errors[f.name]}</span>
@@ -406,9 +401,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                           })
                                             }
                                             buttonStyle="primary"
-                                            disabled={
-                                                isSubmitting || hasEmptyRequiredFields || hasErrors || !isChanged()
-                                            }
+                                            disabled={isSubmitting || hasEmptyRequiredFields || !isChanged()}
                                         >
                                             {DONATE_TEXT.BUTTON.PUBLISH}
                                         </Button>

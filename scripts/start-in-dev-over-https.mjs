@@ -10,9 +10,7 @@ import { getCerts } from 'https-localhost/certs.js';
         // Safety check to ensure we're in the project directory
         const packageJsonPath = path.join(process.cwd(), 'package.json');
         await fs.access(packageJsonPath).catch(() => {
-            throw new Error(
-                'package.json not found. Please run this script from the project root.'
-            );
+            throw new Error('package.json not found. Please run this script from the project root.');
         });
         await fs.rm(certDir, { recursive: true, force: true });
         await fs.mkdir(certDir, { recursive: true });

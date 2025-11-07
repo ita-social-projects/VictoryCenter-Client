@@ -1,6 +1,6 @@
 import './DonateSection.scss';
 import React, { useState } from 'react';
-import { DONATE_SECTION, DONATION_SIZE } from '../../../../const/public/donate-page';
+import { DONATE_SECTION, DONATION_AMOUNTS } from '../../../../const/public/donate-page';
 import { DonateTab, PaymentSystem, Currency } from '../../../../types/public/donate-page';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import { getEnvVariable } from '../../../../utils/functions/get-env-variable/get-env-variable';
@@ -86,16 +86,28 @@ export const DonateSection = () => {
                 </div>
             </div>
             <div className="fastDonateOptionsSection">
-                <button className="donateFastOptionButton" onClick={() => handleQuickAmountChange(10)} type="button">
-                    <span className="donateFastValueText">{DONATION_SIZE[10]}</span>
+                <button
+                    className="donateFastOptionButton"
+                    onClick={() => handleQuickAmountChange(DONATION_AMOUNTS[currency].small)}
+                    type="button"
+                >
+                    <span className="donateFastValueText">+{DONATION_AMOUNTS[currency].small} </span>
                     {currencyString}
                 </button>
-                <button className="donateFastOptionButton" onClick={() => handleQuickAmountChange(50)} type="button">
-                    <span className="donateFastValueText">{DONATION_SIZE[50]}</span>
+                <button
+                    className="donateFastOptionButton"
+                    onClick={() => handleQuickAmountChange(DONATION_AMOUNTS[currency].medium)}
+                    type="button"
+                >
+                    <span className="donateFastValueText">+{DONATION_AMOUNTS[currency].medium} </span>
                     {currencyString}
                 </button>
-                <button className="donateFastOptionButton" onClick={() => handleQuickAmountChange(100)} type="button">
-                    <span className="donateFastValueText">{DONATION_SIZE[100]}</span>
+                <button
+                    className="donateFastOptionButton"
+                    onClick={() => handleQuickAmountChange(DONATION_AMOUNTS[currency].large)}
+                    type="button"
+                >
+                    <span className="donateFastValueText">+{DONATION_AMOUNTS[currency].large} </span>
                     {currencyString}
                 </button>
             </div>

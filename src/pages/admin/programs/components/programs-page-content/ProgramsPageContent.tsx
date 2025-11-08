@@ -76,6 +76,21 @@ export const ProgramsPageContent = () => {
         return ProgramsApi.fetchProgramById(searchProgramId, client);
     }, [searchProgramId, client]);
 
+    const getProgramSearchItems = useCallback(
+        async (
+            searchTerm: string,
+            requestOptions: PaginationRequestParams,
+        ): Promise<PaginationResult<ProgramSearchItemData>> => {
+            return ProgramsApi.fetchProgramSearchItems(
+                client,
+                searchTerm,
+                requestOptions.offset as number,
+                requestOptions.limit as number,
+            );
+        },
+        [client],
+    );
+
     const getProgramId = useCallback((program: Program) => program.id, []);
 
     // Data fetching hooks
@@ -390,14 +405,7 @@ export const ProgramsPageContent = () => {
                 <AdminPanelToolbar<ProgramSearchItemData>
                     getSearchItemKey={(item) => item.id}
                     getSearchItemLabel={(item) => item.name}
-                    fetchSearchItems={(searchTerm, requestOptions) =>
-                        ProgramsApi.fetchProgramSearchItems(
-                            client,
-                            searchTerm,
-                            requestOptions.offset as number,
-                            requestOptions.limit as number,
-                        )
-                    }
+                    fetchSearchItems={getProgramSearchItems}
                     renderSearchItemComponent={ProgramSearchItem}
                     placeholder={PROGRAMS_TEXT.PLACEHOLDER.SEARCH_PROGRAMS}
                     onSearchClear={handleSearchClear}

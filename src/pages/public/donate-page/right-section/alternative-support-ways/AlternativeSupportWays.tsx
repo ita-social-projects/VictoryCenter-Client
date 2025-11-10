@@ -1,7 +1,5 @@
 import './AlternativeSupportWays.scss';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
-import { ReactComponent as ArrowUpRight } from '../../../../../assets/icons/arrow-up-right.svg';
-import { ReactComponent as ShareForwardArrow } from '../../../../../assets/icons/forward.svg';
 import { ALTERNATIVE_SUPPORT_WAYS } from '../../../../../const/public/donate-page';
 import { PublishedSupportOptionsDto, Currency } from '../../../../../types/public/donate-page';
 
@@ -30,16 +28,6 @@ export const AlternativeSupportWays = ({ supportOptions, currentCurrency }: Alte
                     </div>
                 </div>
             ))}
-
-            <div className="buttonsContainer">
-                <button className="downloadPaymentDetailsButton">
-                    {ALTERNATIVE_SUPPORT_WAYS.DOWNLOAD_PAYMENT_DETAILS_BUTTON_LABEL}
-                    <ArrowUpRight />
-                </button>
-                <button className="shareButton">
-                    <ShareForwardArrow />
-                </button>
-            </div>
         </div>
     );
 };

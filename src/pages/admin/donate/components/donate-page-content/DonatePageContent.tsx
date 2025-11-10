@@ -107,7 +107,7 @@ export const DonatePageContent = () => {
                 setIsSupportOptionsLoading(false);
             }
         },
-        [client],
+        [client, addToast],
     );
 
     // Bank Details handlers

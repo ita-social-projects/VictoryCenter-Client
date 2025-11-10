@@ -1,6 +1,8 @@
-﻿.partner-form {
-    width: 210px;
-    height: 400px;
+﻿@use '../../../../../assets/sass/variables/colors.scss';
+
+.partner-form {
+    width: 208px;
+    height: 404px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -39,5 +41,81 @@
         display: flex;
         flex-direction: column;
         gap: 8px;
+    }
+
+    &__image {
+        width: 200px;
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .input-group {
+            width: 200px;
+            height: 200px;
+        }
+
+        .input-label {
+            display: none;
+        }
+
+        .partner-form__image-input {
+            width: 200px;
+            height: 200px;
+        }
+
+        .image-input-wrapper {
+            width: 200px !important;
+            height: 200px !important;
+            padding: 15px;
+            padding-bottom: 20px;
+            box-sizing: border-box;
+            position: relative;
+
+            .image-placeholder,
+            .image-preview {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 12px;
+
+                .placeholder-icon {
+                    width: 56px;
+                    height: 56px;
+                    transform: translateY(-30px);
+                }
+
+                span {
+                    display: none;
+                }
+            }
+
+            &::after {
+                display: none;
+            }
+        }
+
+        &::before,
+        &::after {
+            display: none;
+        }
+    }
+
+    .partner-form__description {
+        position: relative;
+        width: 208px;
+        height: 156px;
+
+
+        .input-error {
+            position: absolute;
+            left: 0;
+            bottom: 0px;
+            font-size: 12px;
+            line-height: 16px;
+        }
     }
 }

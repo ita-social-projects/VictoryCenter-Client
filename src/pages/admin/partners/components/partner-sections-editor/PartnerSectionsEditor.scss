@@ -1,0 +1,20 @@
+@use '../../../../../assets/sass/variables/colors';
+
+.partner-sections-editor__error-text{
+    color: colors.$error;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    .partner-sections-editor__error-text-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: colors.$blue-500;
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 600;
+        text-decoration: underline;
+    }
+}

@@ -59,31 +59,37 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
                 <button type="button" className="partner-form__delete-button" onClick={handleDelete} />
             </div>
             <div className="partner-form__content">
-                <PhotoInputGroup
-                    label={''}
-                    value={values.image}
-                    error={errors.image}
-                    id={`partner-form-image-${cardHtmlId}`}
-                    name={`partner-form-image-${cardHtmlId}`}
-                    onChange={handleImageChange}
-                    setError={setErrorhandler}
-                    isRequired={true}
-                    disabled={disabled}
-                />
+                <div className="partner-form__image">
+                    <PhotoInputGroup
+                        className="partner-form__image-input"
+                        label={''}
+                        value={values.image}
+                        error={errors.image}
+                        id={`partner-form-image-${cardHtmlId}`}
+                        name={`partner-form-image-${cardHtmlId}`}
+                        onChange={handleImageChange}
+                        setError={setErrorhandler}
+                        isRequired={true}
+                        disabled={disabled}
+                        subText={PARTNERS_TEXT.FORM.IMAGE.SIZE_DESCRIPTION}
+                    />
+                </div>
 
-                <TextAreaWithCharacterLimitGroup
-                    label={PARTNERS_TEXT.PARTNER.DESCRIPTION_LABEL}
-                    placeholder={PARTNERS_TEXT.PARTNER.DESCRIPTION_PLACEHOLDER}
-                    value={values.description}
-                    error={errors.description}
-                    onChange={handleDescriptionChange}
-                    name={`partner-form-description-${cardHtmlId}`}
-                    id={`partner-form-description-${cardHtmlId}`}
-                    maxLength={PARTNER_VALIDATION.description.max}
-                    isRequired={true}
-                    disabled={disabled}
-                    rows={3}
-                />
+                <div className="partner-form__description">
+                    <TextAreaWithCharacterLimitGroup
+                        label={PARTNERS_TEXT.PARTNER.DESCRIPTION_LABEL}
+                        placeholder={PARTNERS_TEXT.PARTNER.DESCRIPTION_PLACEHOLDER}
+                        value={values.description}
+                        error={errors.description}
+                        onChange={handleDescriptionChange}
+                        name={`partner-form-description-${cardHtmlId}`}
+                        id={`partner-form-description-${cardHtmlId}`}
+                        maxLength={PARTNER_VALIDATION.description.max}
+                        isRequired={true}
+                        disabled={disabled}
+                        rows={3}
+                    />
+                </div>
             </div>
         </div>
     );

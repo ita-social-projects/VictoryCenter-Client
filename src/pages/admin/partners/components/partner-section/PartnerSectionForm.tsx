@@ -148,33 +148,36 @@ const PartnerSectionComponent = ({
     return (
         <div className="partner-section-form">
             <div className="partner-section-form__inputs">
-                <TextAreaWithCharacterLimitGroup
-                    label={PARTNERS_TEXT.FORM.LABEL.TITLE}
-                    value={value.title}
-                    error={errors.title}
-                    onChange={handleTitleChange}
-                    name={`partner-section-title-${value.localId}`}
-                    id={`partner-section-title-${value.localId}`}
-                    isRequired={true}
-                    disabled={disabled}
-                    placeholder={PARTNERS_TEXT.SECTION.TITLE_PLACEHOLDER}
-                    maxLength={PARTNER_SECTION_VALIDATION.title.max}
-                    rows={3}
-                />
-
-                <TextAreaWithCharacterLimitGroup
-                    label={PARTNERS_TEXT.FORM.LABEL.DESCRIPTION}
-                    value={value.description}
-                    error={errors.description}
-                    onChange={handleDescriptionChange}
-                    name={`partner-section-description-${value.localId}`}
-                    id={`partner-section-description-${value.localId}`}
-                    isRequired={true}
-                    disabled={disabled}
-                    placeholder={PARTNERS_TEXT.SECTION.DESCRIPTION_PLACEHOLDER}
-                    maxLength={PARTNER_SECTION_VALIDATION.description.max}
-                    rows={3}
-                />
+                <div className="partner-section-form__title-group">
+                    <TextAreaWithCharacterLimitGroup
+                        label={PARTNERS_TEXT.FORM.LABEL.TITLE}
+                        value={value.title}
+                        error={errors.title}
+                        onChange={handleTitleChange}
+                        name={`partner-section-title-${value.localId}`}
+                        id={`partner-section-title-${value.localId}`}
+                        isRequired={true}
+                        disabled={disabled}
+                        placeholder={PARTNERS_TEXT.SECTION.TITLE_PLACEHOLDER}
+                        maxLength={PARTNER_SECTION_VALIDATION.title.max}
+                        rows={3}
+                    />
+                </div>
+                <div className="partner-section-form__description-group">
+                    <TextAreaWithCharacterLimitGroup
+                        label={PARTNERS_TEXT.FORM.LABEL.DESCRIPTION}
+                        value={value.description}
+                        error={errors.description}
+                        onChange={handleDescriptionChange}
+                        name={`partner-section-description-${value.localId}`}
+                        id={`partner-section-description-${value.localId}`}
+                        isRequired={true}
+                        disabled={disabled}
+                        placeholder={PARTNERS_TEXT.SECTION.DESCRIPTION_PLACEHOLDER}
+                        maxLength={PARTNER_SECTION_VALIDATION.description.max}
+                        rows={3}
+                    />
+                </div>
             </div>
 
             <div className="partner-section-form__partners-grid">

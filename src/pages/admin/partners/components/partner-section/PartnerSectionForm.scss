@@ -6,13 +6,58 @@
     display: flex;
     flex-direction: column;
     gap: 32px;
+    padding: 84px 56px;
     border-bottom: 1px solid colors.$grey-700;
 
     &__inputs {
-        width: 100%;
         display: flex;
         flex-direction: row;
-        gap: 160px;
+        gap: 457px;
+
+        .partner-section-form__title-group,
+        .partner-section-form__description-group {
+            flex: 1;
+            position: relative;
+        }
+
+        .partner-section-form__title-group {
+            .char-limit-textarea{
+                width: 460px !important;
+            }
+            .input-group{
+                width: 460px;
+                height: 160px;
+            }
+            
+            .char-limit-textarea__field {
+                font-size: 32px !important;
+            }
+            
+            .input-error {
+                position: absolute;
+                left: 0;
+                bottom: 0px;
+                font-size: 12px;
+                line-height: 16px;
+            }
+        }
+
+        .partner-section-form__description-group {
+            .char-limit-textarea{
+                width: 504px !important;
+            }
+
+            .char-limit-textarea__field {
+                font-size: 20px !important;
+            }
+            .input-error {
+                position: absolute;
+                left: 0;
+                bottom: 0px;
+                font-size: 12px;
+                line-height: 16px;
+            }
+        }
     }
 
     &__inputs > * {

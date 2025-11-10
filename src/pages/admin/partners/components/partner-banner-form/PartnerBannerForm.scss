@@ -2,6 +2,7 @@
 
 .partner-banner-form {
     width: 100%;
+    padding-bottom: 84px;
     border-bottom: 1px solid colors.$grey-700;
 
     &__content {
@@ -71,5 +72,30 @@
         justify-content: center;
         gap: 16px;
         padding: 20px;
+    }
+
+
+    .partner-banner-form__image{
+        width: 840px !important;
+        height: 530px;
+    }
+
+    .partner-banner-form__main{
+        width: 608px !important;
+        height: 270px !important;
+    }
+
+    .partner-banner-form__title-group,
+    .partner-banner-form__description-group {
+        position: relative;
+    }
+
+    .partner-banner-form__title-group .input-error,
+    .partner-banner-form__description-group .input-error {
+        position: absolute;
+        left: 0;
+        bottom: -20px;
+        font-size: 12px;
+        line-height: 16px;
     }
 }

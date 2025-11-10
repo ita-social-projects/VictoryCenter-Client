@@ -21,6 +21,7 @@ import {
     PartnersSectionCreateRequest,
     PartnersSectionUpdateRequest,
 } from '../../../../../types/admin/partners';
+import './PartnerSectionsEditor.scss';
 
 const isPartnerEmpty = (partner: PartnerFormValues): boolean => {
     return !partner.description && !partner.image;
@@ -281,10 +282,10 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
     if (sectionsFetchError && localSections.length === 0) {
         return (
             <div className="partner-sections-editor__error">
-                <p>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_PARTNERS}</p>
-                <Button onClick={refetchSections} buttonStyle="primary">
-                    Спробувати ще
-                </Button>
+                <p className="partner-sections-editor__error-text">{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_PARTNERS}</p>
+                <button onClick={refetchSections} className="partner-sections-editor__error-text-button">
+                    {PARTNERS_TEXT.BUTTON.TRY_AGAIN}
+                </button>
             </div>
         );
     }

@@ -149,7 +149,7 @@ export const PartnerBanner = () => {
             <div className="partner-banner__error">
                 <p>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER}</p>
                 <Button onClick={refetchBanner} buttonStyle="primary">
-                    Спробувати ще
+                    {PARTNERS_TEXT.BUTTON.TRY_AGAIN}
                 </Button>
             </div>
         );
@@ -169,7 +169,7 @@ export const PartnerBanner = () => {
                 <div className="partner-banner-form__error">
                     <p>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER}</p>
                     <Button onClick={refetchBanner} buttonStyle="primary">
-                        Спробувати ще
+                        {PARTNERS_TEXT.BUTTON.TRY_AGAIN}
                     </Button>
                 </div>
             )}

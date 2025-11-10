@@ -75,7 +75,7 @@ export const DonatePageContent = () => {
                 const newOption = await SupportOptionsApi.create(client, { name, value, currency: bankCurrency });
                 setSupportOptions((prev) => [...prev, newOption]);
 
-                addToast(DONATE_TEXT.MESSAGE.SUPPORT_OPTION_PUBLISHED, ToastType.Info);
+                addToast(DONATE_TEXT.MESSAGE.SUPPORT_OPTIONS.PUBLISHED, ToastType.Info);
             } finally {
                 setIsSupportOptionsLoading(false);
             }
@@ -102,6 +102,7 @@ export const DonatePageContent = () => {
             try {
                 await SupportOptionsApi.delete(client, id);
                 setSupportOptions((prev) => prev.filter((option) => option.id !== id));
+                addToast(DONATE_TEXT.MESSAGE.SUPPORT_OPTIONS.DELETED, ToastType.Info);
             } finally {
                 setIsSupportOptionsLoading(false);
             }

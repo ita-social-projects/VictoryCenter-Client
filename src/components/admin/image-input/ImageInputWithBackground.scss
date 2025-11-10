@@ -99,7 +99,8 @@
             z-index: 2;
         }
 
-        .delete-button, .crop-button {
+        .delete-button,
+        .crop-button {
             display: none; // Повтор для надійності
             align-items: center;
             justify-content: center;
@@ -116,13 +117,13 @@
                 opacity: 1;
             }
 
-            .delete-icon, .crop-icon {
+            .delete-icon,
+            .crop-icon {
                 width: 55%;
                 height: 55%;
                 color: colors.$grey-50;
             }
         }
-
 
         &:hover {
             // Цей селектор покаже кнопки, ЯКЩО вони лежать всередині .preview-actions

@@ -1,118 +1,116 @@
 @use '../../../assets/sass/variables/colors';
 
 .ReactCrop {
-  --ReactCrop-overlay-color: rgba(0, 0, 0, 0.7);
-  --ReactCrop-line-color: none;
-  --ReactCrop-crop-selection-border-color: transparent !important;
+    --ReactCrop-overlay-color: rgba(0, 0, 0, 0.7);
+    --ReactCrop-line-color: none;
+    --ReactCrop-crop-selection-border-color: transparent !important;
 }
 
 .ReactCrop__crop-selection {
-  .ReactCrop__crop-selection::before {
-    border: none !important;
-    box-shadow: none !important;
-  }
+    .ReactCrop__crop-selection::before {
+        border: none !important;
+        box-shadow: none !important;
+    }
 
-  border: 2px solid colors.$grey-600 !important; /* будь-який колір */
-  animation: none !important; /* зупиняє рух */
-  background: transparent !important;
+    border: 2px solid colors.$grey-600 !important; /* будь-який колір */
+    animation: none !important; /* зупиняє рух */
+    background: transparent !important;
 }
 
 .ReactCrop__drag-handle {
-  width: 59px;
-  height: 55px;
-  background: colors.$grey-600;
-  position: absolute;
+    width: 59px;
+    height: 55px;
+    background: colors.$grey-600;
+    position: absolute;
 
-  /* Виносимо назовні на половину розміру */
-  transform: translate(-50%, -50%);
+    /* Виносимо назовні на половину розміру */
+    transform: translate(-50%, -50%);
 }
 
 /* Для кожного напрямку поправляємо позицію */
 
 .ReactCrop__drag-handle.ord-nw {
-  top: 0;
-  left: 0;
-  transform: translate(-15%, -15%);
-  clip-path: polygon(100% 0, 100% 15%, 15% 15%, 15% 100%, 0 100%, 0 0);
+    top: 0;
+    left: 0;
+    transform: translate(-15%, -15%);
+    clip-path: polygon(100% 0, 100% 15%, 15% 15%, 15% 100%, 0 100%, 0 0);
 }
 
 .ReactCrop__drag-handle.ord-ne {
-  top: 0;
-  right: 0;
-  transform: translate(15%, -15%);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 85% 100%, 85% 15%, 0 15%);
+    top: 0;
+    right: 0;
+    transform: translate(15%, -15%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 85% 100%, 85% 15%, 0 15%);
 }
 
 .ReactCrop__drag-handle.ord-sw {
-  bottom: 0;
-  left: 0;
-  transform: translate(-15%, 15%);
-  clip-path: polygon(15% 0, 15% 85%, 100% 85%, 100% 100%, 0 100%, 0 0);
+    bottom: 0;
+    left: 0;
+    transform: translate(-15%, 15%);
+    clip-path: polygon(15% 0, 15% 85%, 100% 85%, 100% 100%, 0 100%, 0 0);
 }
 
 .ReactCrop__drag-handle.ord-se {
-  bottom: 0;
-  right: 0;
-  transform: translate(15%, 15%);
-  clip-path: polygon(85% 0, 100% 0, 100% 100%, 0 100%, 0 85%, 85% 85%);
+    bottom: 0;
+    right: 0;
+    transform: translate(15%, 15%);
+    clip-path: polygon(85% 0, 100% 0, 100% 100%, 0 100%, 0 85%, 85% 85%);
 }
 
 /* --- ВИПРАВЛЕНІ СТИЛІ ДЛЯ БІЧНИХ РУЧОК --- */
 
 .ReactCrop__drag-handle.ord-n,
 .ReactCrop__drag-handle.ord-s {
-  width: 59px;
-  height: 8px;
-  clip-path: none;
+    width: 59px;
+    height: 8px;
+    clip-path: none;
 }
 
 .ReactCrop__drag-handle.ord-e,
 .ReactCrop__drag-handle.ord-w {
-  width: 8px;
-  height: 59px;
-  clip-path: none;
+    width: 8px;
+    height: 59px;
+    clip-path: none;
 }
 
 .ReactCrop__drag-handle.ord-n {
-  top: 0;
-  left: 50%;
-  transform: translate(-50%, -100%); // винесе повністю над рамку
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -100%); // винесе повністю над рамку
 }
 
 .ReactCrop__drag-handle.ord-s {
-  bottom: 0;
-  left: 50%;
-  transform: translate(-50%, 100%); // винесе повністю під рамку
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 100%); // винесе повністю під рамку
 }
 
 .ReactCrop__drag-handle.ord-w {
-  top: 50%;
-  left: 0;
-  transform: translate(-100%, -50%); // винесе ліворуч
+    top: 50%;
+    left: 0;
+    transform: translate(-100%, -50%); // винесе ліворуч
 }
 
 .ReactCrop__drag-handle.ord-e {
-  top: 50%;
-  right: 0;
-  transform: translate(100%, -50%); // винесе праворуч
+    top: 50%;
+    right: 0;
+    transform: translate(100%, -50%); // винесе праворуч
 }
 
-
 .cropper-container {
-  width: 100%;       // Завжди займати 100% ширини Modal.Content
-  max-width: 100%;  // Гарантія, що не вилізе за межі
-  position: relative;
+    width: 100%; // Завжди займати 100% ширини Modal.Content
+    max-width: 100%; // Гарантія, що не вилізе за межі
+    position: relative;
 
+    img {
+        width: 100%; // Масштабувати зображення по ширині
+        height: auto; // Зберегти пропорції зображення
+        display: block; // Прибирає зайві відступи під зображенням
 
-  img {
-    width: 100%;       // Масштабувати зображення по ширині
-    height: auto;      // Зберегти пропорції зображення
-    display: block;    // Прибирає зайві відступи під зображенням
-
-    /* * Обмеження, щоб дуже високі зображення
+        /* * Обмеження, щоб дуже високі зображення
      * не розтягували модалку по вертикалі.
      * Можете налаштувати це значення (напр. 60vh, 80vh).
      */
-    max-height: 70vh;
-  }
+        max-height: 70vh;
+    }
 }

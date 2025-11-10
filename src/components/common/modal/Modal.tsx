@@ -127,7 +127,7 @@ export const Modal = ({ children, isOpen, onClose, maxWidth }: ModalProps) => {
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
                 tabIndex={-1}
-                style = {{maxWidth: maxWidth}}
+                style={{ maxWidth: maxWidth }}
             >
                 <div className="modal-header">
                     <div className="close-icon">

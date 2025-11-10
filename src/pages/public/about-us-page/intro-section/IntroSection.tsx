@@ -2,26 +2,32 @@ import background from '../../../../assets/images/public/about-us-page/backgroun
 import './IntroSection.scss';
 import { ContentType } from '../../../../types/common/about-us';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
+import { useTranslation } from 'react-i18next';
 
 export interface AboutUsIntroProps {
     content?: AboutUsContent[] | null;
 }
 
 export const AboutUsIntro = ({ content }: AboutUsIntroProps) => {
+    const { t } = useTranslation('aboutUsPage');
+
+    // TODO: Replace with real title when rich text component is implemented
+    // const title = content?.find((x) => x.contentType === ContentType.Title)?.title;
     const imageUrl = content?.find((x) => x.contentType === ContentType.Image)?.image?.url ?? background;
-    const title = content?.find((x) => x.contentType === ContentType.Title)?.title ?? '';
-    const description = content?.find((x) => x.contentType === ContentType.Description)?.description ?? '';
+    const description = content?.find((x) => x.contentType === ContentType.Description)?.description;
 
     return (
-        <div className="about-us-block">
+        <section className="about-us-block">
             <img src={imageUrl} className="background-img" alt="Men and Horse" />
             <img src={imageUrl} className="color-overlay" alt="Men and Horse" />
             <div className="about-us-info">
-                <h1 className="about-us-main-title">{title}</h1>
-                <div className="title-details">
-                    <p>{description}</p>
-                </div>
+                <h1 className="about-us-main-title">
+                    <span className="highlighted">{t('INTRO_TITLE.FIRST_HIGHLIGHT')}</span>
+                    {t('INTRO_TITLE.MIDDLE_PART')}
+                    <span className="highlighted">{t('INTRO_TITLE.SECOND_HIGHLIGHT')}</span>
+                </h1>
+                <p className="title-details">{description}</p>
             </div>
-        </div>
+        </section>
     );
 };

@@ -1,9 +1,10 @@
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 import { OurTeam } from './OurTeam';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
 import { ContentType } from '../../../../types/common/about-us';
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
+import { aboutUsPageUk } from '../../../../locales/uk';
+import defaultOurTeamImage from '../../../../assets/images/public/about-us-page/our-team.jpg';
 
 jest.mock('../../../../const/public/routes', () => ({
     PUBLIC_ROUTES: {
@@ -44,7 +45,7 @@ describe('OurTeam component', () => {
 
         const img = screen.getByRole('img');
         expect(img).toBeInTheDocument();
-        expect(img).toHaveAttribute('src', `${ABOUT_US_DATA.TEAM_DETAILS.IMG}`);
+        expect(img).toHaveAttribute('src', `${defaultOurTeamImage}`);
     });
 
     it('should render the custom image', () => {
@@ -76,7 +77,7 @@ describe('OurTeam component', () => {
             </MemoryRouter>,
         );
 
-        const link = screen.getByRole('link', { name: ABOUT_US_DATA.GO_TO_TEAM });
+        const link = screen.getByRole('link', { name: aboutUsPageUk.GO_TO_TEAM });
         expect(link).toBeInTheDocument();
         expect(link).toHaveAttribute('href', '/team');
     });

@@ -1,101 +1,91 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Routes, Route, Link } from 'react-router';
-import userEvent from '@testing-library/user-event';
 import { PublicLayout } from './PublicLayout';
+import { useLocation } from 'react-router-dom';
 
 jest.mock('../../components/public/header/Header', () => ({
-    Header: () => <header>Mock Header</header>,
+    Header: () => <div>Mocked Header</div>,
 }));
-
 jest.mock('../../components/public/footer/Footer', () => ({
-    Footer: () => <footer>Mock Footer</footer>,
+    Footer: () => <div>Mocked Footer</div>,
 }));
 
-const scrollToSpy = jest.fn();
+const mockScrollTo = jest.fn();
 Object.defineProperty(window, 'scrollTo', {
+    value: mockScrollTo,
     writable: true,
-    value: scrollToSpy,
 });
 
-describe('PublicLayout Component', () => {
-    beforeEach(() => {
-        scrollToSpy.mockClear();
+const mockedUseLocation = useLocation as jest.Mock;
+
+beforeEach(() => {
+    jest.clearAllMocks();
+
+    mockedUseLocation.mockReturnValue({
+        pathname: '/',
+        search: '',
+        hash: '',
+        state: null,
+        key: 'testKey',
+    });
+});
+
+describe('PublicLayout', () => {
+    test('should render Header, Outlet, and Footer correctly', () => {
+        render(<PublicLayout />);
+
+        expect(screen.getByText('Mocked Header')).toBeInTheDocument();
+        expect(screen.getByText('Mocked Footer')).toBeInTheDocument();
+        expect(screen.getByText('Mocked Outlet')).toBeInTheDocument();
     });
 
-    const HomePage = () => <div>Home Page Content</div>;
-    const AboutPage = () => <div>About Page Content</div>;
+    test('should call window.scrollTo with behavior: "auto" on initial render', () => {
+        render(<PublicLayout />);
 
-    test('should render Header, Footer, and the page content via Outlet', () => {
-        render(
-            <MemoryRouter initialEntries={['/']}>
-                <Routes>
-                    <Route path="/" element={<PublicLayout />}>
-                        <Route index element={<HomePage />} />
-                    </Route>
-                </Routes>
-            </MemoryRouter>,
-        );
-
-        expect(screen.getByText('Mock Header')).toBeInTheDocument();
-        expect(screen.getByText('Mock Footer')).toBeInTheDocument();
-
-        expect(screen.getByText('Home Page Content')).toBeInTheDocument();
-    });
-
-    test('should scroll to top on initial render with default "auto" behavior', () => {
-        render(
-            <MemoryRouter initialEntries={['/']}>
-                <PublicLayout />
-            </MemoryRouter>,
-        );
-
-        expect(scrollToSpy).toHaveBeenCalledTimes(1);
-
-        expect(scrollToSpy).toHaveBeenCalledWith({
+        expect(mockScrollTo).toHaveBeenCalledTimes(1);
+        expect(mockScrollTo).toHaveBeenCalledWith({
             top: 0,
             behavior: 'auto',
         });
     });
 
-    test('should scroll to top with "smooth" behavior when prop is provided', () => {
-        render(
-            <MemoryRouter initialEntries={['/']}>
-                <PublicLayout behavior="smooth" />
-            </MemoryRouter>,
-        );
+    test('should call window.scrollTo with behavior: "smooth" when prop is passed', () => {
+        render(<PublicLayout behavior="smooth" />);
 
-        expect(scrollToSpy).toHaveBeenCalledTimes(1);
-
-        expect(scrollToSpy).toHaveBeenCalledWith({
+        expect(mockScrollTo).toHaveBeenCalledTimes(1);
+        expect(mockScrollTo).toHaveBeenCalledWith({
             top: 0,
             behavior: 'smooth',
         });
     });
 
-    test('should scroll to top again when the route changes', async () => {
-        render(
-            <MemoryRouter initialEntries={['/']}>
-                <nav>
-                    <Link to="/">Home</Link>
-                    <Link to="/about">About</Link>
-                </nav>
-                <Routes>
-                    <Route path="/" element={<PublicLayout />}>
-                        <Route index element={<HomePage />} />
-                        <Route path="about" element={<AboutPage />} />
-                    </Route>
-                </Routes>
-            </MemoryRouter>,
-        );
+    test('should call window.scrollTo again when pathname changes', () => {
+        mockedUseLocation.mockReturnValue({ pathname: '/page1' });
 
-        expect(screen.getByText('Home Page Content')).toBeInTheDocument();
-        expect(scrollToSpy).toHaveBeenCalledTimes(1);
-        expect(scrollToSpy).toHaveBeenCalledWith({ top: 0, behavior: 'auto' });
+        const { rerender } = render(<PublicLayout />);
 
-        const aboutLink = screen.getByRole('link', { name: /about/i });
-        await userEvent.click(aboutLink);
+        expect(mockScrollTo).toHaveBeenCalledTimes(1);
+        expect(mockScrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'auto' });
 
-        expect(screen.getByText('About Page Content')).toBeInTheDocument();
-        expect(scrollToSpy).toHaveBeenCalledTimes(2);
+        mockScrollTo.mockClear();
+
+        mockedUseLocation.mockReturnValue({ pathname: '/page2' });
+
+        rerender(<PublicLayout />);
+
+        expect(mockScrollTo).toHaveBeenCalledTimes(1);
+        expect(mockScrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'auto' });
+    });
+
+    test('should not call window.scrollTo again if pathname has not changed', () => {
+        mockedUseLocation.mockReturnValue({ pathname: '/page1' });
+        const { rerender } = render(<PublicLayout />);
+
+        expect(mockScrollTo).toHaveBeenCalledTimes(1);
+        mockScrollTo.mockClear();
+
+        rerender(<PublicLayout />);
+
+        expect(mockScrollTo).not.toHaveBeenCalled();
     });
 });

@@ -9,7 +9,7 @@ describe('text validation', () => {
         );
     });
 
-    it('rejects too short text fullName', () => {
+    it('rejects too short text', () => {
         expect(WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText('abc')).toBe(
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(WHO_WE_ARE_TEXT.MIN_LENGTH),
         );

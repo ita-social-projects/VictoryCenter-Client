@@ -1,8 +1,9 @@
+import { useTranslation } from 'react-i18next';
+import { SupportSectionTablet } from './components/support-section-tablet/SupportSectionTablet';
+import { Swiper } from '../../../../components/public/swiper/Swiper';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { SupportCard } from './components/support-card/SupportCard';
 import './SupportSection.scss';
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
-import { useState, useEffect } from 'react';
-import { SupportSectionResponsive } from './responsive/SupportSectionResponsive';
-import { CustomSwiper } from '../../../../components/public/swiper/CustomSwiper';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
 
 export interface SupportSectionProps {
@@ -10,51 +11,31 @@ export interface SupportSectionProps {
 }
 
 export const SupportSection = ({ content }: SupportSectionProps) => {
-    const [isVisible, setIsVisible] = useState(false);
-    useEffect(() => {
-        const checkWidth = () => {
-            const width = window.innerWidth;
-            setIsVisible(width >= 568 && width <= 912);
-        };
-        checkWidth();
-        window.addEventListener('resize', checkWidth);
-        return () => window.removeEventListener('resize', checkWidth);
-    }, []);
+    const { t } = useTranslation('aboutUsPage');
+
+    const isTablet = useMediaQuery('(min-width:768px) and (max-width:1024px)');
+
+    if (isTablet) return <SupportSectionTablet content={content} />;
 
     return (
-        <>
-            {isVisible ? (
-                <SupportSectionResponsive content={content} />
-            ) : (
-                <div className="support-block">
-                    <CustomSwiper
-                        items={content}
-                        slidesPerView={1}
-                        breakpoints={{
-                            912: { slidesPerView: 3 },
-                        }}
-                        renderItem={(item, index) => {
-                            const imageUrl = item.image?.url ?? ABOUT_US_DATA.SUPPORT_DATA[index].IMG;
-                            const altText = ABOUT_US_DATA.SUPPORT_DATA[index].ALT;
-                            const description = item.description;
-
-                            return (
-                                <>
-                                    {index === 0 && (
-                                        <div className="main-values-title">
-                                            <h2 className="support-title">{ABOUT_US_DATA.SUPPORT_TITLE}</h2>
-                                        </div>
-                                    )}
-                                    <div className={`support-card card-${index + 1}`}>
-                                        <img src={imageUrl} alt={altText} />
-                                        <p className="support-description">{description}</p>
-                                    </div>
-                                </>
-                            );
-                        }}
-                    />
-                </div>
-            )}
-        </>
+        <div className="support-block">
+            <Swiper
+                items={content}
+                slidesPerView={1}
+                breakpoints={{
+                    1025: { slidesPerView: 3 },
+                }}
+                renderItem={(item, index) => (
+                    <>
+                        {index === 0 && (
+                            <div className="main-values-title">
+                                <h2 className="support-title">{t('SUPPORT_TITLE')}</h2>
+                            </div>
+                        )}
+                        <SupportCard card={item} index={index} />
+                    </>
+                )}
+            />
+        </div>
     );
 };

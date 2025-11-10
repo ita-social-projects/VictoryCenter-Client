@@ -9,33 +9,50 @@ import './CardContent.scss';
 
 interface CardContentProps {
     content: Content;
-    onImageChange: (value: ImageValues | null) => void;
-    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    onChange: (data: Content) => void;
     descriptionLimit: number;
     rows?: number;
     imageInputProps: Omit<ImageInputProps, 'className' | 'value' | 'onChange' | 'setError'>;
-    onDescriptionBlur: (value: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    onDescriptionValidate: (value: React.ChangeEvent<HTMLTextAreaElement>) => void;
     descriptionError: string | null;
     imageError: string | null;
     setImageError: (value: string | null) => void;
+    setIsPublishButtonActive: (value: boolean) => void;
 }
+
 export const CardContent = ({
     content,
-    onImageChange,
     onChange,
     descriptionLimit,
     rows,
     imageInputProps,
-    onDescriptionBlur,
+    onDescriptionValidate,
     descriptionError,
     imageError,
     setImageError,
+    setIsPublishButtonActive,
 }: CardContentProps) => {
+    const handleImageChange = (value: ImageValues | null) => {
+        onChange({
+            ...content,
+            image: value,
+        });
+        setIsPublishButtonActive(true);
+    };
+
+    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        onChange({
+            ...content,
+            description: e.target.value,
+        });
+        onDescriptionValidate(e);
+    };
+
     return (
         <div style={{ width: imageInputProps.style?.width }} className="card-content">
             <ImageInput
                 value={content?.image ?? null}
-                onChange={(image) => onImageChange(image ?? null)}
+                onChange={handleImageChange}
                 label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
                 className="who-we-are-image-input-wrapper"
                 setError={setImageError}
@@ -45,13 +62,13 @@ export const CardContent = ({
             <div className="card-content-description-wrapper">
                 <span className="card-content-description-wrapper-label">{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
                 <TextAreaWithCharacterLimit
-                    onChange={(e) => onChange(e)}
+                    onChange={handleDescriptionChange}
                     value={content.description ?? ''}
                     maxLength={descriptionLimit}
                     name={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     id={content.id.toString()}
                     rows={rows}
-                    onBlur={onDescriptionBlur}
+                    onBlur={onDescriptionValidate}
                 />
                 {descriptionError && <p className="error">{descriptionError}</p>}
             </div>

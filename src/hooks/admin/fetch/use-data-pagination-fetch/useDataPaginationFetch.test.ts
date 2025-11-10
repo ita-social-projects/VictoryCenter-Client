@@ -40,6 +40,7 @@ const defaultProps: useDataPaginationFetchProps<TestItem> = {
     initialData: [],
     fetchHandler: jest.fn(),
     pageSize: 10,
+    autoFetchDisabled: false,
 };
 
 const renderPaginationHook = (props: Partial<useDataPaginationFetchProps<TestItem>> = {}) =>
@@ -51,8 +52,8 @@ describe('useDataPaginationFetch', () => {
         mockedAxios.isCancel.mockReturnValue(false);
     });
 
-    it('initializes with default values', () => {
-        const { result } = renderPaginationHook();
+    it('initializes with default values (when autoFetch is disabled)', () => {
+        const { result } = renderPaginationHook({ autoFetchDisabled: true });
 
         expect(result.current.data).toEqual([]);
         expect(result.current.isLoading).toBe(false);
@@ -60,30 +61,39 @@ describe('useDataPaginationFetch', () => {
         expect(result.current.error).toBeNull();
     });
 
-    it('initializes with provided initial data', () => {
+    it('initializes with provided initial data (when autoFetch is disabled)', () => {
         const initialData: TestItem[] = [{ id: 1, name: 'Initial Item' }];
-        const { result } = renderPaginationHook({ initialData });
+        const { result } = renderPaginationHook({ initialData, autoFetchDisabled: true });
 
         expect(result.current.data).toEqual(initialData);
     });
 
-    it('fetches first page successfully', async () => {
+    it('fetches first page automatically on mount', async () => {
         const mockData = [createTestItems(1, 10)];
         const mockFetchHandler = createMockFetchHandler(mockData);
         const { result } = renderPaginationHook({ fetchHandler: mockFetchHandler });
 
-        await act(async () => {
-            result.current.fetchFromStart();
+        expect(result.current.isLoading).toBe(true);
+
+        await waitFor(() => {
+            expect(result.current.isLoading).toBe(false);
         });
 
+        expect(mockFetchHandler).toHaveBeenCalledTimes(1);
         expect(mockFetchHandler).toHaveBeenCalledWith({
             offset: 0,
             limit: 10,
             requestOptions: { cancellationSignal: expect.any(AbortSignal) },
         });
         expect(result.current.data).toHaveLength(10);
-        expect(result.current.isLoading).toBe(false);
         expect(result.current.hasMore).toBe(true);
+    });
+
+    it('should not call fetch function when autoFetchDisabled is true', () => {
+        const mockFetchHandler = createMockFetchHandler([]);
+        renderPaginationHook({ fetchHandler: mockFetchHandler, autoFetchDisabled: true });
+
+        expect(mockFetchHandler).not.toHaveBeenCalled();
     });
 
     it('fetches more pages and appends data', async () => {
@@ -91,14 +101,16 @@ describe('useDataPaginationFetch', () => {
         const mockFetchHandler = createMockFetchHandler(mockData);
         const { result } = renderPaginationHook({ fetchHandler: mockFetchHandler });
 
-        await act(async () => {
-            result.current.fetchFromStart();
+        await waitFor(() => {
+            expect(result.current.data).toHaveLength(10);
         });
+        expect(mockFetchHandler).toHaveBeenCalledTimes(1);
 
         await act(async () => {
             result.current.fetchMore();
         });
 
+        expect(mockFetchHandler).toHaveBeenCalledTimes(2);
         expect(result.current.data).toHaveLength(20);
         expect(result.current.data[0].id).toBe(1);
         expect(result.current.data[19].id).toBe(20);
@@ -109,11 +121,12 @@ describe('useDataPaginationFetch', () => {
         const mockFetchHandler = createMockFetchHandler(mockData, 5);
         const { result } = renderPaginationHook({ fetchHandler: mockFetchHandler });
 
-        await act(async () => {
-            result.current.fetchFromStart();
+        await waitFor(() => {
+            expect(result.current.isLoading).toBe(false);
         });
 
         expect(result.current.hasMore).toBe(false);
+        expect(mockFetchHandler).toHaveBeenCalledTimes(1);
     });
 
     it('prevents fetchMore when hasMore is false', async () => {
@@ -121,46 +134,49 @@ describe('useDataPaginationFetch', () => {
         const mockFetchHandler = createMockFetchHandler(mockData, 10);
         const { result } = renderPaginationHook({ fetchHandler: mockFetchHandler });
 
-        await act(async () => {
-            result.current.fetchFromStart();
+        await waitFor(() => {
+            expect(result.current.hasMore).toBe(false);
         });
 
         const callCount = mockFetchHandler.mock.calls.length;
+        expect(callCount).toBe(1);
 
         act(() => {
             result.current.fetchMore();
         });
 
         expect(mockFetchHandler).toHaveBeenCalledTimes(callCount);
+        expect(result.current.isLoading).toBe(false);
     });
 
-    it('handles fetch errors', async () => {
+    it('handles fetch errors on auto-fetch', async () => {
         const mockFetchHandler = createMockFetchHandler([], 0, true);
         const { result } = renderPaginationHook({ fetchHandler: mockFetchHandler });
 
-        await act(async () => {
-            result.current.fetchFromStart();
+        await waitFor(() => {
+            expect(result.current.isLoading).toBe(false);
         });
 
         expect(result.current.error).toEqual(new Error('Network error'));
         expect(result.current.isLoading).toBe(false);
     });
 
-    it('ignores cancelled requests', async () => {
+    it('ignores cancelled requests on auto-fetch', async () => {
         mockedAxios.isCancel.mockReturnValue(true);
         const mockFetchHandler = jest.fn().mockRejectedValue(new Error('Cancelled'));
         const { result } = renderPaginationHook({ fetchHandler: mockFetchHandler });
 
-        await act(async () => {
-            result.current.fetchFromStart();
+        await waitFor(() => {
+            expect(result.current.isLoading).toBe(false);
         });
 
         expect(result.current.error).toBeNull();
     });
 
-    it('resets list correctly', () => {
+    it('resets list correctly (after auto-fetch)', async () => {
         const initialData: TestItem[] = [{ id: 1, name: 'Item' }];
-        const { result } = renderPaginationHook({ initialData });
+        const { result } = renderPaginationHook({ initialData, autoFetchDisabled: true });
+        expect(result.current.data).toEqual(initialData);
 
         act(() => {
             result.current.resetList();
@@ -172,7 +188,7 @@ describe('useDataPaginationFetch', () => {
     });
 
     it('updates data using setData', () => {
-        const { result } = renderPaginationHook();
+        const { result } = renderPaginationHook({ autoFetchDisabled: true });
         const newData: TestItem[] = [{ id: 1, name: 'New Item' }];
 
         act(() => {
@@ -182,7 +198,7 @@ describe('useDataPaginationFetch', () => {
         expect(result.current.data).toEqual(newData);
     });
 
-    it('uses custom pageSize', async () => {
+    it('uses custom pageSize on auto-fetch', async () => {
         const mockData = [createTestItems(1, 5)];
         const mockFetchHandler = createMockFetchHandler(mockData);
         const { result } = renderPaginationHook({
@@ -190,10 +206,11 @@ describe('useDataPaginationFetch', () => {
             pageSize: 5,
         });
 
-        await act(async () => {
-            result.current.fetchFromStart();
+        await waitFor(() => {
+            expect(result.current.isLoading).toBe(false);
         });
 
+        expect(mockFetchHandler).toHaveBeenCalledTimes(1);
         expect(mockFetchHandler).toHaveBeenCalledWith({
             offset: 0,
             limit: 5,
@@ -220,15 +237,17 @@ describe('useDataPaginationFetch', () => {
             getUniqueId,
         });
 
-        await act(async () => {
-            result.current.fetchFromStart();
+        await waitFor(() => {
+            expect(result.current.data).toHaveLength(2);
         });
 
         await act(async () => {
             result.current.fetchMore();
         });
+        await waitFor(() => {
+            expect(result.current.data).toHaveLength(3);
+        });
 
-        expect(result.current.data).toHaveLength(3);
         expect(result.current.data.map((item) => item.id)).toEqual([1, 2, 3]);
     });
 
@@ -245,16 +264,18 @@ describe('useDataPaginationFetch', () => {
             { initialProps: { dependency: 'initial' } },
         );
 
-        expect(mockFetchHandler).not.toHaveBeenCalled();
+        await waitFor(() => {
+            expect(mockFetchHandler).toHaveBeenCalledTimes(1);
+        });
 
         rerender({ dependency: 'changed' });
 
         await waitFor(() => {
-            expect(mockFetchHandler).toHaveBeenCalledTimes(1);
+            expect(mockFetchHandler).toHaveBeenCalledTimes(2);
         });
     });
 
-    it('does not auto-fetch when disabled', async () => {
+    it('does not auto-fetch when disabled [on dependency change]', async () => {
         const mockFetchHandler = createMockFetchHandler([createTestItems(1, 10)]);
         const { rerender } = renderPaginationHook({
             fetchHandler: mockFetchHandler,
@@ -262,12 +283,16 @@ describe('useDataPaginationFetch', () => {
             autoFetchDependencies: ['dep1'],
         });
 
+        expect(mockFetchHandler).not.toHaveBeenCalled();
+
         rerender({
             fetchHandler: mockFetchHandler,
             autoFetchDisabled: true,
             autoFetchDependencies: ['dep2'],
-            initialData: [],
-            pageSize: 10,
+        });
+
+        await act(async () => {
+            await new Promise((r) => setTimeout(r, 0));
         });
 
         expect(mockFetchHandler).not.toHaveBeenCalled();

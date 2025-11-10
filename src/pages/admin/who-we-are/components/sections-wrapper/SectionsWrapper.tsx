@@ -10,14 +10,19 @@ import {
     WhoWeSupportCardsProps,
 } from '../sections/SectionsProps';
 import { SectionType } from '../../../../../types/common/about-us';
+import React from 'react';
 
 interface MainSectionProps {
     section: WhoWeAreSection | null;
-
     onChange: (data: Content) => void;
     onPublish: () => void;
     isPublishButtonActive: boolean;
     setIsPublishButtonActive: (value: boolean) => void;
+}
+
+interface SectionConfig {
+    component: React.ComponentType<any>;
+    additionalProps: Record<string, any>;
 }
 
 export const SectionsWrapper = ({
@@ -31,74 +36,48 @@ export const SectionsWrapper = ({
         return null;
     }
 
-    let renderedContent;
+    const commonProps = {
+        content: section.contents,
+        onChange,
+        onPublish,
+        setIsPublishButtonActive,
+        isPublishButtonActive,
+    };
 
-    switch (section.sectionType) {
-        case SectionType.WhatWeDo:
-            renderedContent = (
-                <DescriptionSection
-                    content={section.contents}
-                    onChange={onChange}
-                    onPublish={onPublish}
-                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
-                    isPublishButtonActive={isPublishButtonActive}
-                    {...WhatWeDoPageProps}
-                />
-            );
-            break;
-        case SectionType.WhoWeSupport:
-            renderedContent = (
-                <CardsSection
-                    content={section.contents}
-                    onPublish={onPublish}
-                    onChange={onChange}
-                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
-                    isPublishButtonActive={isPublishButtonActive}
-                    {...WhoWeSupportCardsProps}
-                />
-            );
-            break;
-        case SectionType.People:
-            renderedContent = (
-                <CardsSection
-                    content={section.contents}
-                    onPublish={onPublish}
-                    onChange={onChange}
-                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
-                    isPublishButtonActive={isPublishButtonActive}
-                    {...PeopleCardsProps}
-                />
-            );
-            break;
-        case SectionType.Main:
-            renderedContent = (
-                <ImageSection
-                    content={section.contents}
-                    onPublish={onPublish}
-                    onChange={onChange}
-                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
-                    isPublishButtonActive={isPublishButtonActive}
-                    {...MainPageProps}
-                />
-            );
-            break;
+    const contentConfigs: Record<SectionType, SectionConfig> = {
+        [SectionType.Main]: {
+            component: ImageSection,
+            additionalProps: MainPageProps,
+        },
+        [SectionType.WhatWeDo]: {
+            component: DescriptionSection,
+            additionalProps: WhatWeDoPageProps,
+        },
+        [SectionType.WhoWeSupport]: {
+            component: CardsSection,
+            additionalProps: WhoWeSupportCardsProps,
+        },
+        [SectionType.People]: {
+            component: CardsSection,
+            additionalProps: PeopleCardsProps,
+        },
+        [SectionType.Team]: {
+            component: ImageSection,
+            additionalProps: TeamPageProps,
+        },
+    };
 
-        case SectionType.Team:
-            renderedContent = (
-                <ImageSection
-                    content={section.contents}
-                    onChange={onChange}
-                    onPublish={onPublish}
-                    setIsPublishButtonActive={(value) => setIsPublishButtonActive(value)}
-                    isPublishButtonActive={isPublishButtonActive}
-                    {...TeamPageProps}
-                />
-            );
-            break;
-        // Додайте інші case-и, якщо вони є
-        default:
-            renderedContent = null;
+    const config = contentConfigs[section.sectionType];
+
+    if (!config) {
+        return null;
     }
 
-    return <div className="who-we-are-main-section">{renderedContent}</div>;
+    const { component: Component, additionalProps } = config;
+
+    return (
+        <div className="who-we-are-main-section">
+            <Component {...commonProps} {...additionalProps} />
+        </div>
+    );
 };

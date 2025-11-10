@@ -1,17 +1,19 @@
 import './OurTeam.scss';
-import { NavLink } from 'react-router';
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
+import { NavLink } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '../../../../const/public/routes';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
 import { ContentType } from '../../../../types/common/about-us';
+import { useTranslation } from 'react-i18next';
+import defaultOurTeamImage from '../../../../assets/images/public/about-us-page/our-team.jpg';
 
 export interface OurTeamProps {
     content?: AboutUsContent[] | null;
 }
 
 export const OurTeam = ({ content }: OurTeamProps) => {
-    const imageUrl =
-        content?.find((x) => x.contentType === ContentType.Image)?.image?.url ?? ABOUT_US_DATA.TEAM_DETAILS.IMG;
+    const { t } = useTranslation('aboutUsPage');
+
+    const imageUrl = content?.find((x) => x.contentType === ContentType.Image)?.image?.url ?? defaultOurTeamImage;
     const description = content?.find((x) => x.contentType === ContentType.Description)?.description ?? '';
 
     return (
@@ -19,8 +21,8 @@ export const OurTeam = ({ content }: OurTeamProps) => {
             <img src={imageUrl} alt="Our Team" className="our-team-image" />
             <div className="team-info">
                 <p className="team-description">{description}</p>
-                <NavLink to={PUBLIC_ROUTES.TEAM.FULL} className="link-ro-team">
-                    {ABOUT_US_DATA.GO_TO_TEAM}
+                <NavLink to={PUBLIC_ROUTES.TEAM.FULL} className="link-to-team">
+                    {t('GO_TO_TEAM')}
                 </NavLink>
             </div>
         </div>

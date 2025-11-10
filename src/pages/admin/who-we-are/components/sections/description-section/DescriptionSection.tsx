@@ -26,23 +26,28 @@ export const DescriptionSection = ({
     isPublishButtonActive,
 }: DescriptionSectionProps) => {
     const [descriptionError, setDescriptionError] = useState<string | null>(null);
-    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        if (descriptionContent?.id || descriptionContent) {
-            onChange({
-                ...descriptionContent,
-                description: e.target.value,
-            });
-        }
-        setIsPublishButtonActive(true);
-    };
 
-    if (!content) return null;
-
-    const descriptionContent = content.find((item) => item.contentType === ContentType.Description);
+    const descriptionContent = content?.find((item) => item.contentType === ContentType.Description);
 
     if (!descriptionContent) {
         return null;
     }
+
+    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        onChange({
+            ...descriptionContent,
+            description: e.target.value,
+        });
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+        setDescriptionError(error || null);
+
+        setIsPublishButtonActive(true);
+    };
+
+    const handleBlur = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
+        setDescriptionError(error || null);
+    };
 
     return (
         <div className="description-section">
@@ -60,10 +65,7 @@ export const DescriptionSection = ({
                     id={descriptionContent.id.toString()}
                     maxLength={descriptionLimit}
                     rows={5}
-                    onBlur={(e) => {
-                        const error = WHO_WE_ARE_VALIDATION_FUNCTIONS.validateText(e.target.value);
-                        setDescriptionError(error || null);
-                    }}
+                    onBlur={handleBlur}
                 />
                 {descriptionError && <p className="error">{descriptionError}</p>}
                 <Button

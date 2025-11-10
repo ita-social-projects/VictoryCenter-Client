@@ -1,75 +1,66 @@
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import './CompanyValues.scss';
-import { CustomSwiper } from '../../../../components/public/swiper/CustomSwiper';
+import { Swiper } from '../../../../components/public/swiper/Swiper';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { ValueCard } from './components/value-card/ValueCard';
+
+export type ValueItem = Record<string, string>;
+
+const chunk = <T,>(arr: T[], size: number): T[][] => {
+    const result: T[][] = [];
+    for (let i = 0; i < arr.length; i += size) {
+        result.push(arr.slice(i, i + size));
+    }
+    return result;
+};
+
+const chunkStaggered = (values: ValueItem[]): ValueItem[][] => {
+    const result: ValueItem[][] = [];
+    let i = 0;
+    while (i < values.length) {
+        const size = result.length % 2 === 0 ? 4 : 5;
+        result.push(values.slice(i, i + size));
+        i += size;
+    }
+    return result;
+};
+
+const toCamelCaseValues = (items: Record<string, string>[]): ValueItem[] =>
+    items.map(({ NAME, DESCRIPTION }) => ({
+        name: NAME,
+        description: DESCRIPTION,
+    }));
 
 export const CompanyValues = () => {
-    const [chunkedValues, setChunkedValues] = useState<(typeof ABOUT_US_DATA.VALUE_ITEMS)[]>([]);
+    const isTablet = useMediaQuery('(min-width:768px) and (max-width:1024px)');
+    const { t } = useTranslation('aboutUsPage');
 
-    const chunkValues = (width: number) => {
-        if (width >= 768 && width <= 911) {
-            return ABOUT_US_DATA.VALUE_ITEMS.reduce(
-                (acc, _, i) => {
-                    if (i === 0 || i === acc.flat().length) {
-                        const isFour = acc.length % 2 === 0;
-                        const size = isFour ? 4 : 5;
-                        acc.push(ABOUT_US_DATA.VALUE_ITEMS.slice(i, i + size));
-                    }
-                    return acc;
-                },
-                [] as (typeof ABOUT_US_DATA.VALUE_ITEMS)[],
-            );
-        } else {
-            return ABOUT_US_DATA.VALUE_ITEMS.reduce(
-                (acc, _, i) => {
-                    if (i % 3 === 0) acc.push(ABOUT_US_DATA.VALUE_ITEMS.slice(i, i + 3));
-                    return acc;
-                },
-                [] as (typeof ABOUT_US_DATA.VALUE_ITEMS)[],
-            );
+    const data = useMemo<Record<string, string>[]>(() => {
+        return t('VALUE_ITEMS', { returnObjects: true }) as Record<string, string>[];
+    }, [t]);
+
+    const valueItems = useMemo<ValueItem[]>(() => toCamelCaseValues(data), [data]);
+
+    const chunkedValues = useMemo(() => {
+        if (isTablet) {
+            return chunkStaggered(valueItems);
         }
-    };
-
-    useEffect(() => {
-        const checkWidth = () => {
-            const width = window.innerWidth;
-            setChunkedValues(chunkValues(width));
-        };
-        checkWidth();
-        window.addEventListener('resize', checkWidth);
-        return () => window.removeEventListener('resize', checkWidth);
-    }, []);
+        return chunk(valueItems, 3);
+    }, [isTablet, valueItems]);
 
     return (
-        <>
-            <div className="values-block">
-                <CustomSwiper
-                    items={chunkedValues}
-                    slidesPerView={1}
-                    breakpoints={{
-                        568: { slidesPerView: 2 },
-                        768: { slidesPerView: 2 },
-                        912: { slidesPerView: 3 },
-                    }}
-                    renderItem={(group, groupIndex) => (
-                        <>
-                            {groupIndex === 0 && (
-                                <div className="values-title">
-                                    <h2>{ABOUT_US_DATA.OUR_VALUES}</h2>
-                                </div>
-                            )}
-                            <div className={`value-card card-${groupIndex + 1}`}>
-                                {group.map((val, index) => (
-                                    <div className="value-item" key={`${val.NAME}-${index}`}>
-                                        <h3 className="value-name">{val.NAME}</h3>
-                                        <div className="value-description">{val.DESCRIPTION}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </>
-                    )}
-                />
-            </div>
-        </>
+        <div className="values-block">
+            <Swiper
+                items={chunkedValues}
+                slidesPerView={1}
+                breakpoints={{
+                    568: { slidesPerView: 2 },
+                    768: { slidesPerView: 2 },
+                    1025: { slidesPerView: 3 },
+                }}
+                renderItem={(group, groupIndex) => <ValueCard key={groupIndex} group={group} groupIndex={groupIndex} />}
+            />
+        </div>
     );
 };

@@ -1,8 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramsSection } from './ProgramsSection';
-import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
 import { useDataFetch } from '../../../../hooks/common/use-data-fetch/useDataFetch';
 import { mockPrograms } from '../../../../utils/mock-data/public/programs-page';
+import programsPageUk from '../../../../locales/uk/programs.json';
 
 jest.mock('../../../../components/public/program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: any) => <div data-testid="program-card">{program.name}</div>,
@@ -43,7 +43,7 @@ describe('ProgramsSection', () => {
 
         expect(screen.getByText('Category 1')).toBeInTheDocument();
         expect(screen.getByText('Category 2')).toBeInTheDocument();
-        expect(screen.getByText('Усі')).toBeInTheDocument();
+        expect(screen.getByText(programsPageUk['PROGRAMS_ALL'])).toBeInTheDocument();
     });
 
     it('filters programs by category', async () => {
@@ -63,7 +63,7 @@ describe('ProgramsSection', () => {
         expect(screen.queryByText('Program B')).not.toBeInTheDocument();
     });
 
-    it('resets filter when clicking "Усі"', async () => {
+    it('resets filter when selecting all programs', async () => {
         (useDataFetch as jest.Mock).mockReturnValue({
             data: mockPrograms,
             isLoading: false,
@@ -78,7 +78,7 @@ describe('ProgramsSection', () => {
         expect(screen.getByText('Program B')).toBeInTheDocument();
         expect(screen.queryByText('Program A')).not.toBeInTheDocument();
 
-        fireEvent.click(screen.getByText('Усі'));
+        fireEvent.click(screen.getByText(programsPageUk['PROGRAMS_ALL']));
         expect(screen.getByText('Program A')).toBeInTheDocument();
         expect(screen.getByText('Program B')).toBeInTheDocument();
     });
@@ -87,11 +87,11 @@ describe('ProgramsSection', () => {
         (useDataFetch as jest.Mock).mockReturnValue({
             data: mockPrograms,
             isLoading: false,
-            error: FAILED_TO_LOAD_THE_PROGRAMS,
+            error: programsPageUk['FAILED_TO_LOAD_THE_PROGRAMS'],
         });
 
         render(<ProgramsSection />);
 
-        expect(await screen.findByRole('alert')).toHaveTextContent(FAILED_TO_LOAD_THE_PROGRAMS);
+        expect(await screen.findByRole('alert')).toHaveTextContent(programsPageUk['FAILED_TO_LOAD_THE_PROGRAMS']);
     });
 });

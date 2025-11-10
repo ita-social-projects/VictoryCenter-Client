@@ -3,17 +3,18 @@ import { MainValues } from './MainValue';
 import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import { ContentType } from '../../../../types/common/about-us';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
+import { checkForSubstrings } from '../../../../utils/functions/test-helpers/test-helpers';
+import { aboutUsPageUk } from '../../../../locales/uk';
 
-jest.mock('../../../../components/public/swiper/CustomSwiper', () => ({
-    CustomSwiper: ({ items, renderItem }: any) => (
+jest.mock('../../../../components/public/swiper/Swiper', () => ({
+    Swiper: ({ items, renderItem }: any) => (
         <div data-testid="custom-swiper">
-            {items
-                ? items.map((item: any, index: number) => (
-                      <div key={index} data-testid="swiper-item">
-                          {renderItem(item, index)}
-                      </div>
-                  ))
-                : null}
+            {items &&
+                items.map((item: any, index: number) => (
+                    <div key={index} data-testid="swiper-item">
+                        {renderItem(item, index)}
+                    </div>
+                ))}
         </div>
     ),
 }));
@@ -57,10 +58,10 @@ describe('MainValues component', () => {
 
     it('should render main title with correct parts and highlights', () => {
         render(<MainValues content={null} />);
-        expect(screen.getByText(/Головна /i)).toBeInTheDocument();
-        expect(screen.getByText(/цінність/i)).toBeInTheDocument();
-        expect(screen.getByText(/Victory Center/i)).toBeInTheDocument();
-        expect(screen.getByText(/це люди/i)).toBeInTheDocument();
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE.FIRST_PART']);
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE.FIRST_HIGHLIGHT']);
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE.MIDDLE_PART']);
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE.SECOND_HIGHLIGHT']);
     });
 
     it('should render correct default people cards', () => {
@@ -72,7 +73,7 @@ describe('MainValues component', () => {
         expect(items).toHaveLength(contentWithoutImages.length);
 
         for (let i = 0; i < items.length; i++) {
-            const image = screen.getByAltText(ABOUT_US_DATA.PEOPLE_DATA[i].ALT);
+            const image = screen.getByAltText(aboutUsPageUk.PEOPLE_DATA[i].ALT);
             expect(image).toHaveAttribute('src', ABOUT_US_DATA.PEOPLE_DATA[i].IMG);
         }
     });
@@ -83,7 +84,7 @@ describe('MainValues component', () => {
         expect(items.length).toBe(Content.length);
 
         for (let i = 0; i < items.length; i++) {
-            const image = screen.getByAltText(ABOUT_US_DATA.PEOPLE_DATA[i].ALT);
+            const image = screen.getByAltText(aboutUsPageUk.PEOPLE_DATA[i].ALT);
             const description = screen.getByText(`${Content[i].description}`);
 
             expect(image).toHaveAttribute('src', Content[i].image?.url);
@@ -93,8 +94,6 @@ describe('MainValues component', () => {
 
     it('should render summary block with correct lines', () => {
         render(<MainValues content={null} />);
-        expect(screen.getByText(/Ми віримо в силу спільноти, в якій кожен голос /i)).toBeInTheDocument();
-        expect(screen.getByText(/важливий, а кожен крок - наближує до спільної /i)).toBeInTheDocument();
-        expect(screen.getByText(/перемоги./i)).toBeInTheDocument();
+        checkForSubstrings(aboutUsPageUk['MAIN_VALUE_DETAILS']);
     });
 });

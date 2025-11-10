@@ -68,7 +68,6 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
         }
     }, [src]);
 
-    // Calculate aspect ratio from props. This is the desired output ratio.
     const aspectRatio = width / height;
 
     const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -132,6 +131,7 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
         );
     }
 
+
     return (
         <Modal isOpen={isOpen} onClose={onCancel} maxWidth={`600 px`}>
             <Modal.Title>Редагувати фото</Modal.Title>
@@ -142,7 +142,9 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
                         crop={crop}
                         onChange={(c) => setCrop(c)}
                         onComplete={(c) => setCompletedCrop(c)}
-                        minHeight={50}
+                        minHeight={height}
+                        minWidth={width}
+                        aspect={aspectRatio}
                     >
                         <img ref={imgRef} src={displaySrc} onLoad={onImageLoad} />
                     </ReactCrop>

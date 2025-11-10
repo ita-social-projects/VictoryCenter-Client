@@ -46,7 +46,7 @@
             position: relative;
         }
 
-        span:nth-child(2) {
+        span:nth-child(1) {
             background: colors.$yellow-300;
             padding: 0 0.5rem;
 
@@ -62,15 +62,12 @@
             }
         }
 
-        br:first-of-type {
-            display: none;
-        }
-
-        span:nth-child(5) {
+        span:nth-child(2) {
             background: colors.$light-blue-200;
             padding: 0 0.5rem;
+            display: inline-block;
 
-            &::before {
+            &::after {
                 content: '';
                 position: absolute;
                 top: 0;
@@ -171,6 +168,10 @@
                         stroke: colors.$blue-900;
                     }
                 }
+
+                &:disabled {
+                    display: none;
+                }
             }
 
             .arrow-left {
@@ -214,7 +215,7 @@
     transition: opacity 1s ease;
 }
 
-@media (max-width: 912px) {
+@media (max-width: 1024px) {
     .main-values-block {
         margin-top: 11.25rem;
 
@@ -236,8 +237,9 @@
                 display: inline;
             }
 
-            span:nth-child(2) {
+            span:nth-child(1) {
                 padding: 0 1.5rem;
+                display: inline-block;
 
                 &::after {
                     display: none;
@@ -255,11 +257,7 @@
                 }
             }
 
-            span:nth-child(5) {
-                &::before {
-                    display: none;
-                }
-
+            span:nth-child(2) {
                 &::after {
                     content: '';
                     position: absolute;
@@ -337,46 +335,6 @@
                 font-size: 3rem;
                 line-height: 3.375rem;
             }
-
-            br:first-of-type {
-                display: inline;
-            }
-
-            span:nth-child(2) {
-                padding: 0 1.5rem;
-
-                &::after {
-                    display: none;
-                }
-
-                &::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    right: 100%;
-                    width: 100vw;
-                    height: 100%;
-                    background: colors.$yellow-300;
-                    z-index: z-index.public(about-us-page-main-value-background);
-                }
-            }
-
-            span:nth-child(5) {
-                &::before {
-                    display: none;
-                }
-
-                &::after {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 100%;
-                    width: 100vw;
-                    height: 100%;
-                    background: colors.$light-blue-200;
-                    z-index: z-index.public(about-us-page-main-value-background);
-                }
-            }
         }
 
         .people-block {
@@ -431,7 +389,7 @@
 
 @media (max-width: 568px) {
     .main-values-block {
-        margin-top: 4.688rem;
+        margin-top: 4.6875rem;
 
         .main-values-title {
             h2 {
@@ -443,46 +401,6 @@
             span {
                 font-size: 2.5rem;
                 line-height: 3rem;
-            }
-
-            br:first-of-type {
-                display: inline;
-            }
-
-            span:nth-child(2) {
-                padding: 0 1.5rem;
-
-                &::after {
-                    display: none;
-                }
-
-                &::before {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    right: 100%;
-                    width: 100vw;
-                    height: 100%;
-                    background: colors.$yellow-300;
-                    z-index: z-index.public(about-us-page-main-value-background);
-                }
-            }
-
-            span:nth-child(5) {
-                &::before {
-                    display: none;
-                }
-
-                &::after {
-                    content: '';
-                    position: absolute;
-                    top: 0;
-                    left: 100%;
-                    width: 100vw;
-                    height: 100%;
-                    background: colors.$light-blue-200;
-                    z-index: z-index.public(about-us-page-main-value-background);
-                }
             }
         }
 

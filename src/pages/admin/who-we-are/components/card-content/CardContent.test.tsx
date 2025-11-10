@@ -24,46 +24,48 @@ jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
 }));
 
 describe('CardContent', () => {
-    let mockOnImageChange: jest.Mock;
     let mockOnChange: jest.Mock;
-    let mockOnDescriptionBlur: jest.Mock;
+    let mockOnDescriptionValidate: jest.Mock;
     let mockSetImageError: jest.Mock;
+    let mockSetIsPublishButtonActive: jest.Mock;
     const descriptionLimit = 250;
+
+    const baseContent = {
+        id: 1,
+        contentType: ContentType.Card,
+        description: 'Initial description',
+        image: {
+            id: 1,
+            url: 'https://example.com/card/1',
+            mimeType: 'image/png',
+        } as Image,
+        title: null,
+        imageId: 10,
+    };
 
     const renderComponent = (props = {}) => {
         const baseProps = {
-            content: {
-                id: 1,
-                contentType: ContentType.Card,
-                description: 'Initial description',
-                image: {
-                    id: 1,
-                    url: 'https://example.com/card/1',
-                    mimeType: 'image/png',
-                } as Image,
-                title: null,
-                imageId: 10,
-            },
-            onImageChange: mockOnImageChange,
+            content: baseContent,
             onChange: mockOnChange,
             descriptionLimit,
             imageInputProps: {
                 style: { width: '200px' },
                 subText: '200x200',
             },
-            onDescriptionBlur: mockOnDescriptionBlur,
+            onDescriptionValidate: mockOnDescriptionValidate,
             descriptionError: null,
             imageError: null,
             setImageError: mockSetImageError,
+            setIsPublishButtonActive: mockSetIsPublishButtonActive,
         };
         return render(<CardContent {...baseProps} {...props} />);
     };
 
     beforeEach(() => {
-        mockOnImageChange = jest.fn();
         mockOnChange = jest.fn();
-        mockOnDescriptionBlur = jest.fn();
         mockSetImageError = jest.fn();
+        mockSetIsPublishButtonActive = jest.fn();
+        mockOnDescriptionValidate = jest.fn();
     });
 
     it('should render the component with initial values and no errors', () => {
@@ -80,19 +82,23 @@ describe('CardContent', () => {
         expect(screen.queryByText('This is an image error message.')).not.toBeInTheDocument();
     });
 
-    it('should call onChange and onBlur for the description textarea', () => {
+    it('should call onChange, onDescriptionValidate on change, and onDescriptionValidate on blur', () => {
         renderComponent();
         const textarea = screen.getByTestId('mock-textarea');
         const newDescription = 'New description text';
 
         fireEvent.change(textarea, { target: { value: newDescription } });
-        expect(mockOnChange).toHaveBeenCalled();
+        expect(mockOnChange).toHaveBeenCalledWith({
+            ...baseContent,
+            description: newDescription,
+        });
+        expect(mockOnDescriptionValidate).toHaveBeenCalled();
 
         fireEvent.blur(textarea);
-        expect(mockOnDescriptionBlur).toHaveBeenCalled();
+        expect(mockOnDescriptionValidate).toHaveBeenCalled();
     });
 
-    it('should call onImageChange and setImageError for the image input', () => {
+    it('should call onChange, setIsPublishButtonActive on image change, and call setImageError', () => {
         renderComponent();
         const imageInputButton = screen.getByText('Set Error');
 
@@ -101,8 +107,14 @@ describe('CardContent', () => {
 
         const file = new File(['dummy content'], 'test.png', { type: 'image/png' });
         const input = screen.getByTestId('mock-image-input-file');
+
         fireEvent.change(input, { target: { files: [file] } });
-        expect(mockOnImageChange).toHaveBeenCalledWith(file);
+
+        expect(mockOnChange).toHaveBeenCalledWith({
+            ...baseContent,
+            image: file,
+        });
+        expect(mockSetIsPublishButtonActive).toHaveBeenCalledWith(true);
     });
 
     it('should display description error message when prop is provided', () => {
@@ -121,11 +133,10 @@ describe('CardContent', () => {
 
     it('should handle a null image prop gracefully', () => {
         const contentWithNullImage = {
+            ...baseContent,
             id: 2,
-            contentType: ContentType.Card,
             description: 'No image card',
             image: null,
-            title: null,
             imageId: null,
         };
 
@@ -137,16 +148,9 @@ describe('CardContent', () => {
 
     it('should handle a null or undefined description prop and render an empty string', () => {
         const contentWithNullDescription = {
+            ...baseContent,
             id: 3,
-            contentType: ContentType.Card,
             description: null,
-            image: {
-                id: 1,
-                url: 'https://example.com/card/1',
-                mimeType: 'image/png',
-            } as Image,
-            title: null,
-            imageId: 1,
         };
 
         renderComponent({ content: contentWithNullDescription });

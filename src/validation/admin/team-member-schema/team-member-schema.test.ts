@@ -49,10 +49,14 @@ describe('teamMemberValidationSchema', () => {
     });
 
     describe('description validation', () => {
-        it('rejects description too short when not publishing but has content', () => {
-            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(invalidDescriptionShort, false)).toBe(
-                TEAM_MEMBER_VALIDATION.description.getMinError(),
-            );
+        it('accepts short description when not publishing', () => {
+            expect(
+                TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(invalidDescriptionShort, false),
+            ).toBeUndefined();
+        });
+
+        it('accepts empty description when not publishing', () => {
+            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription('', false)).toBeUndefined();
         });
 
         it('rejects description with multiple spaces when not publishing', () => {

@@ -55,9 +55,7 @@ export function CustomSwiper<T>({
                             swiper.on('fromEdge', updateState);
                         }}
                         slidesPerView={slidesPerView}
-                        navigation={false}
                         scrollbar={{ draggable: true, el: '.custom-scrollbar' }}
-                        loop={false}
                         breakpoints={breakpoints}
                     >
                         {items.map((item, index) => (

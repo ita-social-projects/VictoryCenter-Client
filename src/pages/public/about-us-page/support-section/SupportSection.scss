@@ -9,7 +9,7 @@
     padding-top: 6.25rem;
     width: 100%;
     height: auto;
-    padding-bottom: 4rem;
+    padding-bottom: 1.875rem;
     color: colors.$blue-900;
 
     .swiper {
@@ -37,8 +37,6 @@
     .support-card {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
         gap: 1rem;
         position: relative;
 
@@ -63,7 +61,6 @@
         .support-description {
             font-family: fonts.$mulish-regular-font;
             padding: 0 1rem;
-            font-weight: 400;
             font-size: 1.125rem;
             line-height: 1.75rem;
             letter-spacing: -0.02em;
@@ -110,6 +107,10 @@
                     stroke: colors.$blue-900;
                 }
             }
+
+            &:disabled {
+                display: none;
+            }
         }
 
         .arrow-left {
@@ -127,7 +128,7 @@
     transition: opacity 1s ease;
 }
 
-@media (max-width: 912px) {
+@media (max-width: 1024px) {
     .support-block {
         width: 100%;
         padding-top: 3.75rem;
@@ -154,7 +155,7 @@
                     gap: 0.5rem;
 
                     img {
-                        height: 27rem;
+                        height: 26.875rem;
                     }
 
                     &.card-1 {
@@ -162,7 +163,11 @@
                     }
 
                     &.card-2 {
-                        margin-top: 5.625rem;
+                        margin-top: 23.3125rem;
+                    }
+
+                    &.card-3 {
+                        margin-top: 8.0625rem;
                     }
 
                     .support-description {
@@ -171,10 +176,6 @@
                         line-height: 1.75rem;
                     }
                 }
-            }
-
-            .right {
-                margin-top: 17.5rem;
             }
         }
 
@@ -192,9 +193,6 @@
 
 @media (max-width: 768px) {
     .support-block {
-        padding-top: 3.75rem;
-        padding-bottom: 0rem;
-
         .main-values-title {
             padding: 0 4rem;
             width: auto;
@@ -214,10 +212,7 @@
                         height: 22.5rem;
                     }
 
-                    &.card-1 {
-                        margin-top: 5.625rem;
-                    }
-
+                    &.card-1,
                     &.card-2 {
                         margin-top: 5.625rem;
                     }

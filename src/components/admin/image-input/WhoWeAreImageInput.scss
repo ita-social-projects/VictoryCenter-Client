@@ -1,7 +1,5 @@
 @use '../../../assets/sass/variables/colors';
-
-// Загальні стилі для обгортки ImageInput, які застосовуються до всіх її варіантів.
-// Ці стилі служать "базою" і допомагають уникнути дублювання коду.
+@use '../../../assets/sass/variables/z-index.scss';
 
 .who-we-are-image-input-wrapper {
     background-size: cover;
@@ -12,7 +10,6 @@
     align-items: center;
     border: 1px solid colors.$grey-700;
 
-    // Стилі для станів (фокус, вимкнений)
     &-focused {
         background-color: colors.$grey-700;
         border-color: rgba(colors.$grey-900, 0.8);
@@ -22,18 +19,6 @@
         background-color: colors.$grey-600;
     }
 
-    .overlay {
-        position: absolute;
-        top: 0;
-        right: 0; /* відступ від правого краю компонента */
-        width: 200px; /* ширина overlay */
-        height: 150px; /* або фіксовану висоту */
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 10; /* поверх усіх інших елементів */
-        border-radius: 8px;
-    }
-
-    // Стилі для елемента-заглушки, який відображається, коли немає зображення.
     .image-placeholder {
         display: flex;
         flex-direction: column;
@@ -47,7 +32,7 @@
         font-weight: 600;
         text-align: center;
         line-height: 28px;
-        letter-spacing: -2%;
+        letter-spacing: 0.02rem;
 
         .placeholder-icon {
             width: 4rem;
@@ -56,7 +41,6 @@
         }
     }
 
-    // Стилі для елемента, який відображає завантажене зображення.
     .image-preview {
         position: relative;
         width: 100%;
@@ -80,28 +64,28 @@
             background: colors.$grey-50;
             opacity: 0;
             transition: opacity 0.3s ease;
-            z-index: 1;
+            z-index: z-index.admin('who-we-are-page-image-preview');
             cursor: pointer;
         }
 
         &:hover::after {
-            opacity: 0.78; // регулюй, наскільки сильно перекриває
+            opacity: 0.78;
         }
 
         .preview-actions {
             position: absolute;
             inset: 0;
-            margin: auto; // Центрує саму обгортку
-            display: flex; // Розміщує кнопки в ряд
-            gap: 0.5rem; // Відстань між кнопками
-            width: fit-content; // Ширина по вмісту
-            height: fit-content; // Висота по вмісту
+            margin: auto;
+            display: flex;
+            gap: 0.5rem;
+            width: fit-content;
+            height: fit-content;
             z-index: 2;
         }
 
         .delete-button,
         .crop-button {
-            display: none; // Повтор для надійності
+            display: none;
             align-items: center;
             justify-content: center;
             width: 5rem;
@@ -111,6 +95,7 @@
             border-radius: 8px;
             background: colors.$grey-900;
             opacity: 0.8;
+            z-index: z-index.admin('who-we-are-page-delete-button');
             cursor: pointer;
 
             &:hover {
@@ -126,8 +111,6 @@
         }
 
         &:hover {
-            // Цей селектор покаже кнопки, ЯКЩО вони лежать всередині .preview-actions
-            // (як у JSX з минулої відповіді)
             .preview-actions {
                 .delete-button,
                 .crop-button {

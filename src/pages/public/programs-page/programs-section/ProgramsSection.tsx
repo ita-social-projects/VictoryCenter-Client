@@ -1,15 +1,16 @@
-import { useMemo, useState } from 'react';
-import './ProgramsSection.scss';
-import { PROGRAMS } from '../../../../const/public/footer';
+import React, { useMemo, useState } from 'react';
 import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
 import { ProgramCategoryDto, ProgramsPageData } from '../../../../types/public/programs-page';
 import classNames from 'classnames';
 import { LinearProgress } from '@mui/material';
 import { useDataFetch } from '../../../../hooks/common/use-data-fetch/useDataFetch';
-import { FAILED_TO_LOAD_THE_PROGRAMS } from '../../../../const/public/programs-page';
+import { useTranslation } from 'react-i18next';
+import './ProgramsSection.scss';
 import { ProgramCard } from '../../../../components/public/program-card/ProgramCard';
 
-export const ProgramsSection = () => {
+export const ProgramsSection: React.FC = () => {
+    const { t } = useTranslation(['programsPage', 'footer']);
+
     const [programCategory, setProgramCategory] = useState<ProgramCategoryDto | null>(null);
     const { data, isLoading, error } = useDataFetch<ProgramsPageData | null>({
         initialData: null,
@@ -31,7 +32,7 @@ export const ProgramsSection = () => {
     return (
         <div className="program-block">
             <div className="menu-block">
-                <h2>{PROGRAMS}</h2>
+                <h2>{t('PROGRAMS')}</h2>
                 <div className="button-block">
                     {data?.programsCategories.map((pc) => (
                         <button
@@ -52,23 +53,21 @@ export const ProgramsSection = () => {
                             'black-button': programCategory === null,
                         })}
                     >
-                        Усі
+                        {t('PROGRAMS_ALL')}
                     </button>
                 </div>
             </div>
             <div className="cards-block">
                 {error && (
                     <div className="error-message" role="alert" style={{ color: 'red' }}>
-                        {FAILED_TO_LOAD_THE_PROGRAMS}
+                        {t('FAILED_TO_LOAD_THE_PROGRAMS')}
                     </div>
                 )}
                 {isLoading ? (
-                    <div>
-                        <LinearProgress></LinearProgress>
-                    </div>
+                    <LinearProgress />
                 ) : (
-                    programsByCategory?.map((item, index) => (
-                        <ProgramCard key={index} program={item} className={'program-page-card'} />
+                    programsByCategory?.map((item) => (
+                        <ProgramCard key={item.id} program={item} className={'program-page-card'} />
                     ))
                 )}
             </div>

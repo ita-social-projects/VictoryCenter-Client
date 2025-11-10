@@ -1,3 +1,4 @@
+import React from 'react';
 import { ContentType, SectionType } from '../common/about-us';
 import { Image, ImageValues } from '../common/image';
 
@@ -22,3 +23,8 @@ export type Content = {
     description: string | null;
     title: string | null;
 };
+
+export interface CardImageConfig {
+    style: React.CSSProperties;
+    subText: string;
+}

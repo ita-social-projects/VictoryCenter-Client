@@ -4,7 +4,7 @@ import { ReactComponent as UploadIcon } from '../../../assets/icons/cloud-downlo
 import { ReactComponent as CropIcon } from '../../../assets/icons/crop.svg';
 import classNames from 'classnames';
 import './ImageInput.scss';
-import './ImageInputWithBackground.scss';
+import './WhoWeAreImageInput.scss';
 import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
@@ -40,8 +40,8 @@ export const ImageInput = ({
     name,
     disabled = false,
     style,
-    height = 9,
-    width = 16,
+    height = 1080,
+    width = 1920,
 }: ImageInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
@@ -55,9 +55,9 @@ export const ImageInput = ({
 
     const handleFile = useCallback(
         async (file: File) => {
-            if (!file.type.startsWith('image/')) return;
             setError(null);
-            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file, width, height);
+            if (!file.type.startsWith('image/')) return;
+            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file);
 
             if (error) {
                 setError(error);
@@ -160,7 +160,6 @@ export const ImageInput = ({
                     type="file"
                     accept="image/*"
                     onChange={handleInputChange}
-                    onBlur={onBlur}
                     style={{ display: 'none' }}
                     disabled={disabled}
                     data-testid="image-input-hidden"
@@ -170,11 +169,11 @@ export const ImageInput = ({
                 />
 
                 {previewImage ? (
-                    <div className={classNames('image-preview')}>
+                    <div className="image-preview">
                         <img
                             src={getImageSrc(previewImage)}
                             alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
-                            className={classNames('preview-image')}
+                            className="preview-image"
                             data-testid="preview-image"
                         />
                         {!disabled && (
@@ -207,8 +206,8 @@ export const ImageInput = ({
                         )}
                     </div>
                 ) : (
-                    <div className={classNames('image-placeholder')}>
-                        <UploadIcon className={classNames('placeholder-icon')} />
+                    <div className="image-placeholder">
+                        <UploadIcon className="placeholder-icon" />
                         <span>{label}</span>
                         <span>{subText}</span>
                     </div>

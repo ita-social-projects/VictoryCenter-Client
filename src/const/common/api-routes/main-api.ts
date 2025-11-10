@@ -9,16 +9,17 @@ export const API_ROUTES = {
     },
     TEAM: {
         BASE: 'TeamMembers',
+        SEARCH: 'TeamMembers/search',
         REORDER: 'TeamMembers/reorder',
-        CATEGORIES: 'Categories',
+        CATEGORIES: 'teamcategories',
         PUBLISHED: 'team/published',
     },
     PROGRAMS: {
-        BASE: 'Programs',
-        PUBLISHED: 'Programs/published',
+        BASE: 'HippotherapyPrograms',
+        PUBLISHED: 'HippotherapyPrograms/published',
     },
     PROGRAMCATEGORY: {
-        BASE: 'ProgramCategory',
+        BASE: 'HippotherapyProgramCategories',
     },
     PAYMENTS: {
         DONATE: 'payments/donate',
@@ -34,6 +35,7 @@ export const API_ROUTES = {
     },
     WHO_WE_ARE: {
         BASE: 'WhoWeAre',
+        PREVIEWS: 'WhoWeAre/previews',
         PUBLIC: 'WhoWeArePage',
     },
 };

@@ -21,7 +21,7 @@ jest.mock('../../../../../../components/admin/textarea-with-character-limit/Text
 }));
 
 jest.mock('../../../../../public/about-us-page/our-mission/OurMission', () => ({
-    OurMission: ({ description, className, navigate }: any) => (
+    OurMission: ({ description, className }: any) => (
         <div data-testid="mock-our-mission" className={className}>
             <p>{description}</p>
         </div>
@@ -76,7 +76,7 @@ describe('DescriptionSection', () => {
         const textarea = screen.getByTestId('mock-textarea');
         expect(textarea).toHaveValue(initialDescription);
         expect(textarea).toHaveAttribute('maxLength', descriptionLimit.toString());
-        const publishButton = screen.getByRole('button', { name: 'Опублікувати' });
+        const publishButton = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
         expect(publishButton).toBeInTheDocument();
         expect(publishButton).toBeDisabled();
     });

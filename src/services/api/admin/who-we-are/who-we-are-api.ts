@@ -5,8 +5,8 @@ import { ImageApi } from '../image/image-api';
 import { SectionType } from '../../../../types/common/about-us';
 
 export const WhoWeAreApi = {
-    getAll: async (client: AxiosInstance): Promise<WhoWeAreCategory[]> => {
-        const response = await client.get(`${API_ROUTES.WHO_WE_ARE.BASE}`);
+    getPreviews: async (client: AxiosInstance): Promise<WhoWeAreCategory[]> => {
+        const response = await client.get(`${API_ROUTES.WHO_WE_ARE.PREVIEWS}`);
         return response.data as WhoWeAreCategory[];
     },
     getByType: async (client: AxiosInstance, type: SectionType): Promise<WhoWeAreSection> => {

@@ -39,7 +39,7 @@ export const COMMON_TEXT_ADMIN = {
         },
         CATEGORY: {
             CATEGORY_LABEL: 'Категорія',
-            SELECT_CATEGORY: 'Виберіть категорію',
+            SELECT_CATEGORY: 'Оберіть категорію',
         },
     },
 
@@ -52,6 +52,7 @@ export const COMMON_TEXT_ADMIN = {
 
     MESSAGE: {
         SUCCESSFULLY_PUBLISHED: 'успішно опубліковано',
+        FAIL_TO_PUBLISH_CHANGES: 'Не вдалося опублікувати зміни',
     },
 
     BUTTON: {

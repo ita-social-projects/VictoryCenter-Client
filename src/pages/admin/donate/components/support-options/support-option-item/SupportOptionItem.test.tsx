@@ -219,7 +219,7 @@ describe('SupportOptionItem', () => {
 
     it('calls onModeChange when mode changes', () => {
         const mockOnModeChange = jest.fn();
-        render(<SupportOptionItem data={defaultData} onModeChange={mockOnModeChange} />); // 1. Hook вызывается при первой загрузке
+        render(<SupportOptionItem data={defaultData} onModeChange={mockOnModeChange} />);
         expect(mockOnModeChange).toHaveBeenLastCalledWith(SupportOptionItemMode.View);
         mockOnModeChange.mockClear();
 

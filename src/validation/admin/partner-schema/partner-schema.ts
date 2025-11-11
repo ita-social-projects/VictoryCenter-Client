@@ -5,7 +5,6 @@ import {
     PARTNER_VALIDATION,
 } from '../../../const/admin/partners';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { Image, ImageValues } from '../../../types/common/image';
 
 export const partnerBannerSchema = Yup.object({
     title: Yup.string()
@@ -99,15 +98,6 @@ export const PARTNER_VALIDATION_FUNCTIONS = {
     validateDescription: (value: string): string | undefined => {
         try {
             partnerSchema.validateSyncAt('description', { description: value });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
-
-    validateImage: (value: ImageValues | Image | null): string | undefined => {
-        try {
-            // partnerSchema.validateSyncAt('image', { image: value });
             return undefined;
         } catch (error: any) {
             return error.message;

@@ -1,6 +1,6 @@
-﻿import React, { forwardRef, useCallback, useImperativeHandle, useState, useEffect } from 'react';
+import React, { forwardRef, useCallback, useImperativeHandle, useState, useEffect } from 'react';
 import {
-    PartnerSectionForm as PartnerSectionForm,
+    PartnerSectionForm,
     PartnerSectionErrors,
     PartnerSectionFormValues,
 } from '../partner-section/PartnerSectionForm';
@@ -15,7 +15,6 @@ import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useData
 import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
-import { Button } from '../../../../../components/admin/button/Button';
 import {
     PartnerSection,
     PartnersSectionCreateRequest,

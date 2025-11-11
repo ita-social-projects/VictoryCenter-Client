@@ -454,9 +454,7 @@ describe('PartnerSectionsEditor', () => {
 
         expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
 
-        await act(async () => {
-            fireEvent.click(screen.getByTestId('confirm-delete'));
-        });
+        fireEvent.click(screen.getByTestId('confirm-delete'));
 
         await waitFor(() => {
             expect(mockedPartnersApi.deleteSection).toHaveBeenCalledWith('mock-client', 5);
@@ -491,9 +489,7 @@ describe('PartnerSectionsEditor', () => {
         await act(async () => {
             latestProps.onDelete(latestProps.value.localId);
         });
-        await act(async () => {
-            fireEvent.click(screen.getByTestId('confirm-delete'));
-        });
+        fireEvent.click(screen.getByTestId('confirm-delete'));
 
         expect(mockedPartnersApi.deleteSection).not.toHaveBeenCalled();
         expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.SECTION_DELETED, ToastType.Success);

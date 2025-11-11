@@ -1,9 +1,11 @@
-﻿import React, { memo, useCallback } from 'react';
+import React, { memo, useCallback } from 'react';
 import { Image, ImageValues } from '../../../../../types/common/image';
-import { PhotoInputGroup } from '../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup';
+import { ImageInput } from '../../../../../components/admin/image-input/ImageInput';
+import { InputError } from '../../../../../components/admin/input-error/InputError';
 import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PARTNER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/partner-schema/partner-schema';
 import { PARTNER_VALIDATION, PARTNERS_TEXT } from '../../../../../const/admin/partners';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './PartnerForm.scss';
 
 export interface PartnerFormValues {
@@ -39,13 +41,17 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
 
     const handleImageChange = useCallback(
         (value: ImageValues | null) => {
-            const error = PARTNER_VALIDATION_FUNCTIONS.validateImage(value);
-            onValuesChange({ ...values, image: value }, { ...errors, image: error });
+            onValuesChange({ ...values, image: value, imageId: value ? values.imageId : null }, { ...errors });
         },
         [onValuesChange, values, errors],
     );
 
-    const setErrorhandler = useCallback((error: string | null) => {}, []);
+    const handleImageError = useCallback(
+        (error: string | null) => {
+            onValuesChange({ ...values }, { ...errors, image: error ? error : undefined });
+        },
+        [onValuesChange, values, errors],
+    );
 
     const handleDelete = useCallback(() => {
         onDelete(values.localId);
@@ -60,19 +66,20 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
             </div>
             <div className="partner-form__content">
                 <div className="partner-form__image">
-                    <PhotoInputGroup
-                        className="partner-form__image-input"
-                        label={''}
+                    <ImageInput
                         value={values.image}
-                        error={errors.image}
                         id={`partner-form-image-${cardHtmlId}`}
                         name={`partner-form-image-${cardHtmlId}`}
                         onChange={handleImageChange}
-                        setError={setErrorhandler}
-                        isRequired={true}
+                        setError={handleImageError}
                         disabled={disabled}
-                        subText={PARTNERS_TEXT.FORM.IMAGE.SIZE_DESCRIPTION}
+                        label={PARTNERS_TEXT.PARTNER.IMAGE_LABEL}
+                        subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                            PARTNER_VALIDATION.image.height,
+                            PARTNER_VALIDATION.image.width,
+                        )}
                     />
+                    <InputError error={errors.image} />
                 </div>
 
                 <div className="partner-form__description">

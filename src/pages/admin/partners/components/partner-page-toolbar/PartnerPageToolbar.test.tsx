@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PartnerPageToolbar, PartnerPageToolbarProps } from './PartnerPageToolbar';
-import { PARTNERS_TEXT } from '../../../../../const/admin/partners';
 
 jest.mock('../../../../../components/admin/button/Button', () => ({
     Button: ({ children, onClick, buttonStyle }: any) => (

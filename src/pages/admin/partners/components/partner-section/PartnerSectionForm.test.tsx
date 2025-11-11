@@ -8,11 +8,21 @@ import {
     PARTNER_SECTION_VALIDATION_FUNCTIONS,
     PARTNER_VALIDATION_FUNCTIONS,
 } from '../../../../../validation/admin/partner-schema/partner-schema';
+import { TextAreaWithCharacterLimitGroupProps } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { PartnerFormProps } from '../partner-form/PartnerForm';
+import { ButtonProps } from '../../../../../components/admin/button/Button';
 
 jest.mock(
     '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
-        TextAreaWithCharacterLimitGroup: ({ label, value, onChange, disabled, name, placeholder }: any) => (
+        TextAreaWithCharacterLimitGroup: ({
+            label,
+            value,
+            onChange,
+            disabled,
+            name,
+            placeholder,
+        }: TextAreaWithCharacterLimitGroupProps) => (
             <label>
                 <span>{label}</span>
                 <textarea
@@ -28,7 +38,7 @@ jest.mock(
 );
 
 jest.mock('../partner-form/PartnerForm', () => ({
-    PartnerForm: ({ values, errors, disabled, onValuesChange, onDelete }: any) => (
+    PartnerForm: ({ values, errors, disabled, onValuesChange, onDelete }: PartnerFormProps) => (
         <div data-testid={`mock-partner-${values.localId}`}>
             <span>{values.description}</span>
             <button
@@ -61,7 +71,11 @@ jest.mock('../../../../../components/common/inline-loader/InlineLoader', () => (
 }));
 
 jest.mock('../../../../../components/admin/button/Button', () => ({
-    Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+    Button: ({ children, onClick, disabled, type, ...props }: ButtonProps) => (
+        <button onClick={onClick} disabled={disabled} type={type} {...props}>
+            {children}
+        </button>
+    ),
 }));
 
 jest.mock('../../../../../validation/admin/partner-schema/partner-schema', () => ({
@@ -78,7 +92,6 @@ jest.mock('../../../../../validation/admin/partner-schema/partner-schema', () =>
 const mockValidateSectionTitle = PARTNER_SECTION_VALIDATION_FUNCTIONS.validateTitle as jest.Mock;
 const mockValidateSectionDescription = PARTNER_SECTION_VALIDATION_FUNCTIONS.validateDescription as jest.Mock;
 const mockValidatePartnerDescription = PARTNER_VALIDATION_FUNCTIONS.validateDescription as jest.Mock;
-const mockValidatePartnerImage = PARTNER_VALIDATION_FUNCTIONS.validateImage as jest.Mock;
 
 const defaultPartner = {
     localId: 'partner-1',
@@ -118,7 +131,6 @@ beforeEach(() => {
     mockValidateSectionTitle.mockImplementation(() => undefined);
     mockValidateSectionDescription.mockImplementation(() => undefined);
     mockValidatePartnerDescription.mockImplementation(() => undefined);
-    mockValidatePartnerImage.mockImplementation(() => undefined);
 });
 
 describe('PartnerSectionForm', () => {

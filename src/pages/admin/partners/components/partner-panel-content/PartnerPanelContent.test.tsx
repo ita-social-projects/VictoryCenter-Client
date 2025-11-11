@@ -4,8 +4,6 @@ import '@testing-library/jest-dom';
 import { PartnerPanelContent } from './PartnerPanelContent';
 import { PartnerSectionsEditorRef } from '../partner-sections-editor/PartnerSectionsEditor';
 
-const mockAddSection = jest.fn();
-
 jest.mock('../partner-page-toolbar/PartnerPageToolbar', () => ({
     PartnerPageToolbar: ({ onAddSection }: { onAddSection: () => void }) => (
         <div data-testid="partner-page-toolbar">

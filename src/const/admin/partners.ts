@@ -17,8 +17,7 @@ export const PARTNERS_TEXT = {
             FAIL_TO_DELETE_PARTNER_SECTION: 'Виникла помилка під час видалення секції партнерів',
         },
         IMAGE: {
-            SIZE_DESCRIPTION: 'Розмір: 208x208',
-            ADD_FILE_DESCRIPTION: 'Додайте файл сюди',
+            ADD_IMAGE_HERE: 'Додайте файл сюди',
         },
     },
     BANNER: {

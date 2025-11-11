@@ -1,4 +1,4 @@
-﻿import React, { useCallback, memo } from 'react';
+import React, { useCallback, memo } from 'react';
 import {
     PARTNER_SECTION_VALIDATION_FUNCTIONS,
     PARTNER_VALIDATION_FUNCTIONS,
@@ -46,7 +46,6 @@ const PartnerSectionComponent = ({
     const handleTitleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             const newTitle = e.target.value;
-            console.log(`Partner Section: ${value.localId} Title: ${newTitle}`);
             const error = PARTNER_SECTION_VALIDATION_FUNCTIONS.validateTitle(newTitle);
 
             onChange({ ...value, title: newTitle }, { ...errors, title: error });
@@ -57,7 +56,6 @@ const PartnerSectionComponent = ({
     const handleDescriptionChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             const newDescription = e.target.value;
-            console.log(`Partner Section: ${value.localId} Description: ${newDescription}`);
             const error = PARTNER_SECTION_VALIDATION_FUNCTIONS.validateDescription(newDescription);
 
             onChange({ ...value, description: newDescription }, { ...errors, description: error });
@@ -136,10 +134,11 @@ const PartnerSectionComponent = ({
             return false;
         }
 
-        const hasPartnerErrors = value.partners.some((partner) => {
+        const hasPartnerErrors = value.partners.some((partner, index) => {
             const descError = PARTNER_VALIDATION_FUNCTIONS.validateDescription(partner.description);
-            const imgError = PARTNER_VALIDATION_FUNCTIONS.validateImage(partner.image);
-            return !!descError || !!imgError;
+            const hasImage = !!partner.image;
+            const imageError = errors.partners?.[index]?.image;
+            return !!descError || !hasImage || !!imageError;
         });
 
         return !hasPartnerErrors;

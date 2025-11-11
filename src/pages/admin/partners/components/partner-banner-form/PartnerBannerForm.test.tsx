@@ -10,21 +10,25 @@ import { PARTNERS_TEXT } from '../../../../../const/admin/partners';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { PARTNER_BANNER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/partner-schema/partner-schema';
 import { ToastType } from '../../../../../types/admin/toast';
+import { ButtonProps } from '../../../../../components/admin/button/Button';
+import { ImageInputProps } from '../../../../../components/admin/image-input/ImageInput';
+import { InputErrorProps } from '../../../../../components/admin/input-error/InputError';
+import { InputWithCharacterLimitGroupProps } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 
 jest.mock('../../../../../components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: ({ size }: { size: number }) => <div data-testid="inline-loader">Loader size {size}</div>,
 }));
 
 jest.mock('../../../../../components/admin/button/Button', () => ({
-    Button: ({ children, onClick, disabled, type, buttonStyle, ...props }: any) => (
-        <button onClick={onClick} disabled={disabled} type={type} {...props}>
+    Button: ({ children, onClick, type, formId, disabled }: ButtonProps) => (
+        <button onClick={onClick} type={type} form={formId} disabled={disabled}>
             {children}
         </button>
     ),
 }));
 
 jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ label, value, onChange, disabled, setError, id }: any) => (
+    ImageInput: ({ label, value, onChange, disabled, id }: ImageInputProps) => (
         <div data-testid={`${id}-container`}>
             <span>{label}</span>
             <button
@@ -43,13 +47,13 @@ jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
 }));
 
 jest.mock('../../../../../components/admin/input-error/InputError', () => ({
-    InputError: ({ error }: any) => (error ? <span data-testid="input-error">{error}</span> : null),
+    InputError: ({ error }: InputErrorProps) => (error ? <span data-testid="input-error">{error}</span> : null),
 }));
 
 jest.mock(
     '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
     () => ({
-        InputWithCharacterLimitGroup: ({ label, value, onChange, disabled, name, id }: any) => (
+        InputWithCharacterLimitGroup: ({ label, value, onChange, disabled, id }: InputWithCharacterLimitGroupProps) => (
             <label>
                 {label}
                 <input data-testid={`${id}-input`} value={value} disabled={disabled} onChange={onChange} />
@@ -100,7 +104,6 @@ describe('PartnerBanner', () => {
     const getChangeImageButton = () => screen.getByRole('button', { name: 'Change image' });
     const getRemoveImageButton = () => screen.getByRole('button', { name: 'Remove image' });
     const getPublishButton = () => screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH });
-    const getInputError = () => screen.queryByTestId('input-error');
 
     // Helper functions for actions
     const changeTitleValue = (value: string) => {
@@ -318,7 +321,7 @@ describe('PartnerBanner', () => {
 
     it('disables all inputs while publishing', async () => {
         mockedPartnersApi.updateBanner.mockImplementation(
-            () => new Promise((resolve) => setTimeout(() => resolve(defaultBannerData), 100))
+            () => new Promise((resolve) => setTimeout(() => resolve(defaultBannerData), 100)),
         );
 
         render(<PartnerBanner />);

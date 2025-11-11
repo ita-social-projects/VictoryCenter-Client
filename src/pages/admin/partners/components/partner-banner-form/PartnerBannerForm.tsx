@@ -32,6 +32,19 @@ export interface PartnerBannerErrorState {
     [key: string]: string | undefined;
 }
 
+const isFormValid = (values: PartnerBannerValues, errors: PartnerBannerErrorState) => {
+    if (!values) return false;
+
+    if (Object.values(errors).some((err) => !!err)) {
+        return false;
+    }
+
+    const titleError = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateTitle(values.title);
+    const descError = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateDescription(values.description);
+
+    return !titleError && !descError && !errors.image;
+};
+
 export const PartnerBanner = () => {
     const client = useAdminClient();
     const { addToast } = useToast();
@@ -100,23 +113,10 @@ export const PartnerBanner = () => {
             ...prev,
             image: error ? error : undefined,
         }));
-    }, [])
-
-    const isFormValid = (): boolean => {
-        if (!values) return false;
-
-        if (Object.values(errors).some((err) => !!err)) {
-            return false;
-        }
-
-        const titleError = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateTitle(values.title);
-        const descError = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateDescription(values.description);
-
-        return !titleError && !descError && !errors.image;
-    };
+    }, []);
 
     const handlePublish = useCallback(async () => {
-        if (!values || !isFormValid()) return;
+        if (!values || !isFormValid(values, errors)) return;
 
         setIsPublishing(true);
         try {
@@ -137,7 +137,7 @@ export const PartnerBanner = () => {
         } finally {
             setIsPublishing(false);
         }
-    }, [values, client, addToast]);
+    }, [values, errors, client, addToast]);
 
     if (isLoadingData) {
         return (
@@ -239,7 +239,7 @@ export const PartnerBanner = () => {
                                 type="button"
                                 buttonStyle="primary"
                                 onClick={handlePublish}
-                                disabled={isDisabled || !isFormValid()}
+                                disabled={isDisabled || !isFormValid(values, errors)}
                             >
                                 {COMMON_TEXT_ADMIN.BUTTON.PUBLISH}
                             </Button>

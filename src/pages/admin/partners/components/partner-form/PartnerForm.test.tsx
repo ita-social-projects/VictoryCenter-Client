@@ -4,25 +4,41 @@ import '@testing-library/jest-dom';
 import { PartnerForm, PartnerFormValues, PartnerFormErrors } from './PartnerForm';
 import { PARTNERS_TEXT } from '../../../../../const/admin/partners';
 import { PARTNER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/partner-schema/partner-schema';
+import { InputErrorProps } from '../../../../../components/admin/input-error/InputError';
+import { ImageInputProps } from '../../../../../components/admin/image-input/ImageInput';
+import { TextAreaWithCharacterLimitGroupProps } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 
-jest.mock('../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup', () => ({
-    PhotoInputGroup: ({ onChange, disabled, name }: any) => (
+jest.mock('../../../../../components/admin/input-error/InputError', () => ({
+    InputError: ({ error }: InputErrorProps) => (error ? <div data-testid="input-error">{error}</div> : null),
+}));
+
+jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
+    ImageInput: ({ onChange, setError, disabled, id, label }: ImageInputProps) => (
         <div>
+            <label htmlFor={id}>{label}</label>
             <button
                 type="button"
-                data-testid={`${name}-change`}
+                data-testid={`${id}-change`}
                 onClick={() =>
                     onChange({
-                        base64: 'base64-image',
+                        base64: 'new-base64-image',
                         mimeType: 'image/png',
                     })
                 }
                 disabled={disabled}
             >
-                Change image
+                Change Image
             </button>
-            <button type="button" data-testid={`${name}-remove`} onClick={() => onChange(null)} disabled={disabled}>
-                Remove image
+            <button type="button" data-testid={`${id}-remove`} onClick={() => onChange(null)} disabled={disabled}>
+                Remove Image
+            </button>
+            <button
+                type="button"
+                data-testid={`${id}-set-error`}
+                onClick={() => setError('Test image error')}
+                disabled={disabled}
+            >
+                Set Error
             </button>
         </div>
     ),
@@ -31,16 +47,28 @@ jest.mock('../../../../../components/admin/input-groups/photo-input-group/PhotoI
 jest.mock(
     '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
-        TextAreaWithCharacterLimitGroup: ({ label, value, onChange, disabled, name, placeholder }: any) => (
-            <label>
+        TextAreaWithCharacterLimitGroup: ({
+            label,
+            value,
+            onChange,
+            disabled,
+            name,
+            id,
+            placeholder,
+            error,
+        }: TextAreaWithCharacterLimitGroupProps) => (
+            <label htmlFor={id}>
                 <span>{label}</span>
                 <textarea
-                    data-testid={`${name}-textarea`}
+                    data-testid={`${id}-textarea`}
+                    id={id}
                     value={value}
                     onChange={onChange}
                     disabled={disabled}
                     placeholder={placeholder}
+                    name={name}
                 />
+                {error && <div data-testid={`${id}-error`}>{error}</div>}
             </label>
         ),
     }),
@@ -49,12 +77,10 @@ jest.mock(
 jest.mock('../../../../../validation/admin/partner-schema/partner-schema', () => ({
     PARTNER_VALIDATION_FUNCTIONS: {
         validateDescription: jest.fn(),
-        validateImage: jest.fn(),
     },
 }));
 
 const mockValidateDescription = PARTNER_VALIDATION_FUNCTIONS.validateDescription as jest.Mock;
-const mockValidateImage = PARTNER_VALIDATION_FUNCTIONS.validateImage as jest.Mock;
 
 const defaultValues: PartnerFormValues = {
     localId: 'local-1',
@@ -73,51 +99,72 @@ const defaultErrors: PartnerFormErrors = {
     image: undefined,
 };
 
+const cardHtmlId = defaultValues.localId;
+const descriptionTestId = `partner-form-description-${cardHtmlId}`;
+const imageTestId = `partner-form-image-${cardHtmlId}`;
+
 describe('PartnerForm', () => {
+    let onValuesChange: jest.Mock;
+    let onDelete: jest.Mock;
+    let container: HTMLElement;
+
+    const getDescriptionTextarea = () => screen.getByTestId(`${descriptionTestId}-textarea`);
+    const getImageChangeButton = () => screen.getByTestId(`${imageTestId}-change`);
+    const getImageRemoveButton = () => screen.getByTestId(`${imageTestId}-remove`);
+    const getImageSetErrorButton = () => screen.getByTestId(`${imageTestId}-set-error`);
+    const getDeleteButton = () => container.querySelector('.partner-form__delete-button');
+    const getDescriptionError = () => screen.queryByTestId(`${descriptionTestId}-error`);
+    const getImageError = () => screen.queryByTestId('input-error');
+
+    const changeDescription = (value: string) => {
+        fireEvent.change(getDescriptionTextarea(), { target: { value } });
+    };
+    const clickImageChange = () => fireEvent.click(getImageChangeButton());
+    const clickImageRemove = () => fireEvent.click(getImageRemoveButton());
+    const clickImageSetError = () => fireEvent.click(getImageSetErrorButton());
+    const clickDelete = () => {
+        const button = getDeleteButton();
+        if (button) fireEvent.click(button);
+    };
+
+    const renderComponent = (props: Partial<React.ComponentProps<typeof PartnerForm>>) => {
+        const view = render(
+            <PartnerForm
+                values={defaultValues}
+                errors={defaultErrors}
+                disabled={false}
+                onValuesChange={onValuesChange}
+                onDelete={onDelete}
+                {...props}
+            />,
+        );
+        container = view.container;
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
+        onValuesChange = jest.fn();
+        onDelete = jest.fn();
+        mockValidateDescription.mockReturnValue(undefined);
     });
 
     it('renders form with provided values and labels', () => {
-        const onValuesChange = jest.fn();
-        const onDelete = jest.fn();
+        renderComponent({});
 
-        render(
-            <PartnerForm
-                values={defaultValues}
-                errors={defaultErrors}
-                disabled={false}
-                onValuesChange={onValuesChange}
-                onDelete={onDelete}
-            />,
-        );
-
-        expect(screen.getByTestId(`partner-form-${defaultValues.localId}`)).toBeInTheDocument();
+        expect(screen.getByTestId(`partner-form-${cardHtmlId}`)).toBeInTheDocument();
         expect(screen.getByText(PARTNERS_TEXT.PARTNER.DESCRIPTION_LABEL)).toBeInTheDocument();
+        expect(screen.getByText(PARTNERS_TEXT.PARTNER.IMAGE_LABEL)).toBeInTheDocument();
         expect(screen.getByPlaceholderText(PARTNERS_TEXT.PARTNER.DESCRIPTION_PLACEHOLDER)).toBeInTheDocument();
+        expect(getDescriptionTextarea()).toHaveValue(defaultValues.description);
     });
 
     it('validates and propagates description changes', () => {
-        const onValuesChange = jest.fn();
-        const onDelete = jest.fn();
         const newDescription = 'Updated description';
         const validationError = 'Some description error';
-
         mockValidateDescription.mockReturnValueOnce(validationError);
 
-        render(
-            <PartnerForm
-                values={defaultValues}
-                errors={defaultErrors}
-                disabled={false}
-                onValuesChange={onValuesChange}
-                onDelete={onDelete}
-            />,
-        );
-
-        fireEvent.change(screen.getByTestId(`partner-form-description-${defaultValues.localId}-textarea`), {
-            target: { value: newDescription },
-        });
+        renderComponent({});
+        changeDescription(newDescription);
 
         expect(mockValidateDescription).toHaveBeenCalledWith(newDescription);
         expect(onValuesChange).toHaveBeenCalledWith(
@@ -126,86 +173,68 @@ describe('PartnerForm', () => {
         );
     });
 
-    it('validates and propagates image changes', () => {
-        const onValuesChange = jest.fn();
-        const onDelete = jest.fn();
-        const imageValues = {
-            base64: 'new-base64',
+    it('propagates image changes from ImageInput', () => {
+        renderComponent({});
+        clickImageChange();
+
+        const newImage = {
+            base64: 'new-base64-image',
             mimeType: 'image/png',
         };
-        const validationError = 'Image error';
 
-        mockValidateImage.mockReturnValueOnce(validationError);
-
-        render(
-            <PartnerForm
-                values={defaultValues}
-                errors={defaultErrors}
-                disabled={false}
-                onValuesChange={onValuesChange}
-                onDelete={onDelete}
-            />,
+        expect(onValuesChange).toHaveBeenCalledWith(
+            { ...defaultValues, image: newImage, imageId: defaultValues.imageId },
+            { ...defaultErrors },
         );
+    });
 
-        fireEvent.click(screen.getByTestId(`partner-form-image-${defaultValues.localId}-change`));
+    it('propagates image removal from ImageInput and nullifies imageId', () => {
+        renderComponent({});
+        clickImageRemove();
 
-        expect(mockValidateImage).toHaveBeenCalledWith({
-            base64: 'base64-image',
-            mimeType: 'image/png',
+        expect(onValuesChange).toHaveBeenCalledWith(
+            { ...defaultValues, image: null, imageId: null },
+            { ...defaultErrors },
+        );
+    });
+
+    it('propagates image errors from ImageInput', () => {
+        const errorToSet = 'Test image error';
+        renderComponent({
+            errors: { ...defaultErrors, image: undefined },
         });
-        expect(onValuesChange).toHaveBeenCalledWith(
-            { ...defaultValues, image: { base64: 'base64-image', mimeType: 'image/png' } },
-            { ...defaultErrors, image: validationError },
-        );
 
-        mockValidateImage.mockReturnValueOnce('Image required');
+        clickImageSetError();
 
-        fireEvent.click(screen.getByTestId(`partner-form-image-${defaultValues.localId}-remove`));
+        expect(onValuesChange).toHaveBeenCalledWith({ ...defaultValues }, { ...defaultErrors, image: errorToSet });
+    });
 
-        expect(mockValidateImage).toHaveBeenCalledWith(null);
-        expect(onValuesChange).toHaveBeenCalledWith(
-            { ...defaultValues, image: null },
-            { ...defaultErrors, image: 'Image required' },
-        );
+    it('renders errors when provided', () => {
+        const errors: PartnerFormErrors = {
+            description: 'Description is required',
+            image: 'Image is required',
+        };
+
+        renderComponent({ errors });
+
+        expect(getDescriptionError()).toHaveTextContent(errors.description!);
+        expect(getImageError()).toHaveTextContent(errors.image!);
     });
 
     it('invokes onDelete with local id', () => {
-        const onValuesChange = jest.fn();
-        const onDelete = jest.fn();
+        renderComponent({});
+        clickDelete();
 
-        const { container } = render(
-            <PartnerForm
-                values={defaultValues}
-                errors={defaultErrors}
-                disabled={false}
-                onValuesChange={onValuesChange}
-                onDelete={onDelete}
-            />,
-        );
-
-        const deleteButton = container.querySelector('.partner-form__delete-button');
-        expect(deleteButton).not.toBeNull();
-
-        fireEvent.click(deleteButton as Element);
-
+        expect(getDeleteButton()).not.toBeNull();
         expect(onDelete).toHaveBeenCalledWith(defaultValues.localId);
     });
 
-    it('disables image and description inputs when form is disabled', () => {
-        const onValuesChange = jest.fn();
-        const onDelete = jest.fn();
+    it('disables all inputs when form is disabled', () => {
+        renderComponent({ disabled: true });
 
-        render(
-            <PartnerForm
-                values={defaultValues}
-                errors={defaultErrors}
-                disabled={true}
-                onValuesChange={onValuesChange}
-                onDelete={onDelete}
-            />,
-        );
-
-        expect(screen.getByTestId(`partner-form-image-${defaultValues.localId}-change`)).toBeDisabled();
-        expect(screen.getByTestId(`partner-form-description-${defaultValues.localId}-textarea`)).toBeDisabled();
+        expect(getImageChangeButton()).toBeDisabled();
+        expect(getImageRemoveButton()).toBeDisabled();
+        expect(getImageSetErrorButton()).toBeDisabled();
+        expect(getDescriptionTextarea()).toBeDisabled();
     });
 });

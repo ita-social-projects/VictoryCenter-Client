@@ -70,7 +70,6 @@ export const DONATE_TEXT = {
         VALUE: 'Реквізити',
     },
     QUESTION: {
-        CANCEL_EDIT: 'Зміни будуть втрачені. Бажаєте продовжити?',
         BANK_DETAILS: {
             ADD: 'Додати нові реквізити?',
             CANCEL_CREATE: 'Відмінити додавання реквізитів?',
@@ -83,6 +82,7 @@ export const DONATE_TEXT = {
         SUPPORT_OPTION: {
             ADD: 'Опублікувати новий варіант підтримки?',
             DELETE: 'Видалити варіант підтримки?',
+            CANCEL_CREATE: 'Відмінити додавання варіанту підтримки?',
         },
         CORRESPONDENT_BANKS: {
             DELETE: 'Видалити банк-кореспондент?',

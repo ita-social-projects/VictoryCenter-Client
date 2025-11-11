@@ -27,6 +27,7 @@ export interface GenericFormProps<T extends FieldValues> {
     onDelete?: (id: number) => void;
     isChildForm?: boolean;
     children?: (form: { formState: T; isItemsExpanded: boolean }) => React.ReactNode;
+    onModeChange?: (mode: GenericFormMode) => void;
 }
 
 export enum GenericFormMode {
@@ -62,6 +63,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 onDelete,
                 isChildForm = false,
                 children,
+                onModeChange,
             },
             ref,
         ) => {
@@ -83,6 +85,10 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
             const titleField = useMemo(() => fields.find((f) => f.isTitle), []);
             const titleFieldName = titleField?.name;
+
+            useEffect(() => {
+                onModeChange?.(mode);
+            }, [mode, onModeChange]);
 
             useEffect(() => {
                 const newState: FormState = { ...(initialData ?? ({} as FormState)) };
@@ -273,6 +279,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                         className={`edit-btn ${mode}`}
                                         aria-label="edit-btn"
                                         onClick={handleEditClick}
+                                        disabled={mode === GenericFormMode.Edit}
                                     />
                                     <button
                                         className={`delete-btn ${mode}`}
@@ -366,6 +373,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                         aria-label="edit-btn"
                                                         className={`edit-btn ${mode}`}
                                                         onClick={handleEditClick}
+                                                        disabled={true}
                                                     />
                                                     <button
                                                         type="button"

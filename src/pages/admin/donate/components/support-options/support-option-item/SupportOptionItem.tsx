@@ -25,9 +25,17 @@ export interface SupportOptionItemProps {
     onSave?: (name: string, value: string) => Promise<void>;
     onCancel?: () => void;
     onDelete?: () => Promise<void>;
+    onModeChange?: (mode: SupportOptionItemMode) => void;
 }
 
-export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelete }: SupportOptionItemProps) => {
+export const SupportOptionItem = ({
+    data,
+    initialMode,
+    onSave,
+    onCancel,
+    onDelete,
+    onModeChange,
+}: SupportOptionItemProps) => {
     const [mode, setMode] = useState<SupportOptionItemMode>(
         initialMode ?? (data ? SupportOptionItemMode.View : SupportOptionItemMode.Create),
     );
@@ -36,6 +44,10 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [modalConfig, setModalConfig] = useState<ModalConfig | null>(null);
     const [errors, setErrors] = useState<{ name?: string; value?: string }>({});
+
+    useEffect(() => {
+        onModeChange?.(mode);
+    }, [mode, onModeChange]);
 
     useEffect(() => {
         setName(data?.name ?? '');
@@ -132,7 +144,10 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                         <button
                             aria-label="edit-btn"
                             className={`edit-btn ${editable ? 'edit' : ''}`}
-                            onClick={() => setMode(SupportOptionItemMode.Edit)}
+                            onClick={() => {
+                                if (editable) return;
+                                setMode(SupportOptionItemMode.Edit);
+                            }}
                             disabled={isSubmitting}
                         />
                         <button

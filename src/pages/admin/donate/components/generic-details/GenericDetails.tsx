@@ -46,6 +46,15 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
     const addformRef = useRef<GenericFormRef>(null);
     const [isAddFormVisible, setIsAddFormVisible] = useState(false);
     const [isItemsExpanded, setIsItemsExpanded] = useState(initialIsItemsExpanded);
+    const [editingItemId, setEditingItemId] = useState<number | null>(null);
+
+    const handleItemModeChange = (id: number, mode: GenericFormMode) => {
+        if (mode === GenericFormMode.Edit) {
+            setEditingItemId(id);
+        } else if (editingItemId === id) {
+            setEditingItemId(null);
+        }
+    };
 
     const updateItems = useCallback(
         (updater: React.SetStateAction<T[]>) => {
@@ -154,6 +163,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                                         onClose={handleClose}
                                         onDelete={() => handleItemDelete(item.id)}
                                         isChildForm={isChildForm}
+                                        onModeChange={(mode: GenericFormMode) => handleItemModeChange(item.id, mode)}
                                     >
                                         {(formProps) => <>{children && children(formProps)}</>}
                                     </FormComponent>
@@ -175,9 +185,10 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                     )}
                     {!showNotFound && (
                         <Button
-                            className={`generic-details btn-add-new ${isAddFormVisible ? 'disabled' : ''}`}
+                            className={`generic-details btn-add-new ${isAddFormVisible || editingItemId !== null ? 'disabled' : ''}`}
                             onClick={handleAdd}
                             buttonStyle="primary"
+                            disabled={isAddFormVisible || editingItemId !== null}
                         >
                             <div>{addNewText}</div>
                             <PlusIcon className="plus-icon" />

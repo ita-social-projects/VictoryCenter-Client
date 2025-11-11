@@ -32,6 +32,7 @@
 
     &-options {
         display: block;
+        box-sizing: content-box;
         position: absolute;
         top: 2.625rem;
         left: -0.0625rem;

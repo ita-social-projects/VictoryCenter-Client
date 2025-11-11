@@ -1,11 +1,11 @@
 ﻿@use '../../../../../assets/sass/variables/colors.scss';
 
 .partner-form {
-    width: 13rem; // 208px
-    height: 25.25rem; // 404px
+    width: 13rem;
+    height: 25.25rem;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem; // 8px
+    gap: 0.5rem;
 
     &__header {
         width: 100%;
@@ -40,7 +40,7 @@
         width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 0.5rem; // 8px
+        gap: 0.5rem;
     }
 
     &__image {
@@ -80,15 +80,15 @@
 
     &__description {
         position: relative;
-        width: 13rem; // 208px
-        height: 9.75rem; // 156px
+        width: 13rem;
+        height: 9.75rem;
 
         .input-error {
             position: absolute;
             left: 0;
             bottom: 0px;
-            font-size: 0.75rem; // 12px
-            line-height: 1rem; // 16px
+            font-size: 0.75rem;
+            line-height: 1rem;
         }
     }
 }

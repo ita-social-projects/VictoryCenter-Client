@@ -1,0 +1,15 @@
+@use '../../../assets/sass/variables/colors';
+
+.partners-page {
+    &-loader {
+        width: 70%;
+        position: relative;
+        margin: 8rem auto 4rem;
+    }
+
+    &-error-message {
+        color: colors.$error;
+        text-align: center;
+        margin-top: 8rem;
+    }
+}

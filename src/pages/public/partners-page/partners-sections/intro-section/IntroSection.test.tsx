@@ -2,87 +2,81 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { IntroSection } from './IntroSection';
+import { PartnersBanner } from '../../../../../types/public/partners-page';
 
-jest.mock('../../../../../assets/images/public/partners-page/horses.png', () => 'mocked-horses-image');
-
-jest.mock('../../../../../const/public/partners-page.ts', () => ({
-    PARTNERS_PAGE_SUBTITLE: 'Mocked subtitle text',
-    PARTNERS_PAGE_TITLE: {
-        FIRST_LINE: {
-            REGULAR: 'МИ',
-            BOLD: ' НЕ ОДНІ.',
-        },
-        SECOND_LINE: {
-            BOLD_START: 'І ЦЕ',
-            REGULAR: ' НАША ',
-            BOLD_END: ' СИЛА ',
-        },
-    },
-}));
-
-const renderComponent = () => {
-    return render(<IntroSection />);
-};
+jest.mock('../../../../../assets/images/public/partners-page/horses.png', () => 'fallback-background-image.png');
 
 describe('IntroSection', () => {
-    it('renders without crashing', () => {
-        renderComponent();
-        const introBlock = screen.getByRole('img', { name: /horses/i });
-        expect(introBlock).toBeInTheDocument();
-    });
+    describe('when banner prop is provided', () => {
+        const mockBanner: PartnersBanner = {
+            title: 'Test Title',
+            description: 'Test Description',
+            image: {
+                id: 1,
+                url: 'http://example.com/banner-image.jpg',
+                mimeType: 'image/jpeg',
+            },
+        };
 
-    it('displays the correct main title text', () => {
-        renderComponent();
-        expect(screen.getByText('МИ')).toBeInTheDocument();
-        expect(screen.getByText('НЕ ОДНІ.')).toBeInTheDocument();
-        expect(screen.getByText('І ЦЕ')).toBeInTheDocument();
-        expect(screen.getByText('НАША')).toBeInTheDocument();
-        expect(screen.getByText('СИЛА')).toBeInTheDocument();
-    });
+        it('should render the title and description from props', () => {
+            render(<IntroSection banner={mockBanner} />);
 
-    it('displays the subtitle from constants', () => {
-        renderComponent();
-        expect(screen.getByText('Mocked subtitle text')).toBeInTheDocument();
-    });
+            expect(screen.getByText('Test Title')).toBeInTheDocument();
+            expect(screen.getByText('Test Description')).toBeInTheDocument();
+        });
 
-    it('renders the background image with correct attributes', () => {
-        renderComponent();
-        const backgroundImage = screen.getByRole('img', { name: /horses/i });
-        expect(backgroundImage).toHaveAttribute('src', 'mocked-horses-image');
-        expect(backgroundImage).toHaveClass('background-img-partners');
-    });
+        it('should render the image from the banner prop', () => {
+            render(<IntroSection banner={mockBanner} />);
 
-    it('has the correct structure with required CSS classes', () => {
-        renderComponent();
-        const container = document.querySelector('.partners-intro-block');
-        expect(container).toBeInTheDocument();
+            const image = screen.getByRole('img', { name: /Horses/i });
+            expect(image).toHaveAttribute('src', 'http://example.com/banner-image.jpg');
+        });
 
-        const mainTitle = document.querySelector('.main-title');
-        expect(mainTitle).toBeInTheDocument();
+        it('should use fallback image if banner.image is not provided', () => {
+            const bannerWithoutImage: PartnersBanner = {
+                title: 'Title',
+                description: 'Description',
+            };
 
-        const subtitle = document.querySelector('.subtitle');
-        expect(subtitle).toBeInTheDocument();
-    });
+            render(<IntroSection banner={bannerWithoutImage} />);
 
-    it('has bold text styling applied correctly', () => {
-        renderComponent();
-        const boldElements = document.querySelectorAll('.bold-text');
-        expect(boldElements).toHaveLength(3);
-        expect(boldElements[0]).toHaveTextContent('НЕ ОДНІ.');
-        expect(boldElements[1]).toHaveTextContent('І ЦЕ');
-        expect(boldElements[2]).toHaveTextContent('СИЛА');
-    });
+            const image = screen.getByRole('img');
+            expect(image).toHaveAttribute('src', 'fallback-background-image.png');
+        });
 
-    it('has title lines with correct structure', () => {
-        renderComponent();
-        const titleLines = document.querySelectorAll('.title-line');
-        expect(titleLines).toHaveLength(2);
-    });
+        //   it('should render empty title and description when banner is null', () => {
+        //       render(<IntroSection banner={null} />);
 
-    it('renders subtitle with correct content', () => {
-        renderComponent();
-        const subtitle = screen.getByText('Mocked subtitle text');
-        expect(subtitle).toHaveClass('subtitle');
-        expect(subtitle.tagName).toBe('P');
+        //       const heading = screen.getByRole('heading', { level: 1 });
+        //       expect(heading).toBeInTheDocument();
+        //       expect(heading.textContent).toBe('');
+
+        //       const paragraph = document.querySelector('.subtitle');
+        //       expect(paragraph).toBeInTheDocument();
+        //       expect(paragraph?.textContent).toBe('');
+        //   });
+
+        it('should render the fallback background image', () => {
+            render(<IntroSection banner={null} />);
+
+            const image = screen.getByRole('img', { name: /Horses/i });
+            expect(image).toHaveAttribute('src', 'fallback-background-image.png');
+        });
+
+        it('should have the correct base CSS classes', () => {
+            render(<IntroSection banner={null} />);
+
+            const container = document.querySelector('.partners-intro-block');
+            expect(container).toBeInTheDocument();
+
+            const image = screen.getByRole('img', { name: /Horses/i });
+            expect(image).toHaveClass('background-img-partners');
+
+            const title = document.querySelector('.main-title');
+            expect(title).toBeInTheDocument();
+
+            const subtitle = document.querySelector('.subtitle');
+            expect(subtitle).toBeInTheDocument();
+        });
     });
 });

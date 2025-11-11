@@ -93,15 +93,6 @@ export const PARTNER_BANNER_VALIDATION_FUNCTIONS = {
             return error.message;
         }
     },
-
-    validateImage: (value: ImageValues | Image | null): string | undefined => {
-        try {
-            partnerBannerSchema.validateSyncAt('image', { image: value });
-            return undefined;
-        } catch (error: any) {
-            return error.message;
-        }
-    },
 };
 
 export const PARTNER_VALIDATION_FUNCTIONS = {

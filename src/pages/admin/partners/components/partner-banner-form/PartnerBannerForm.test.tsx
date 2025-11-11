@@ -12,20 +12,20 @@ import { PARTNER_BANNER_VALIDATION_FUNCTIONS } from '../../../../../validation/a
 import { ToastType } from '../../../../../types/admin/toast';
 
 jest.mock('../../../../../components/common/inline-loader/InlineLoader', () => ({
-    InlineLoader: ({ size }: { size: number }) => (
-        <div data-testid="inline-loader">Loader size {size}</div>
-    ),
+    InlineLoader: ({ size }: { size: number }) => <div data-testid="inline-loader">Loader size {size}</div>,
 }));
 
 jest.mock('../../../../../components/admin/button/Button', () => ({
-    Button: ({ children, ...props }: any) => (
-        <button {...props}>{children}</button>
+    Button: ({ children, onClick, disabled, type, buttonStyle, ...props }: any) => (
+        <button onClick={onClick} disabled={disabled} type={type} {...props}>
+            {children}
+        </button>
     ),
 }));
 
-jest.mock('../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup', () => ({
-    PhotoInputGroup: ({ label, value, onChange, error, disabled, name }: any) => (
-        <div>
+jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
+    ImageInput: ({ label, value, onChange, disabled, setError, id }: any) => (
+        <div data-testid={`${id}-container`}>
             <span>{label}</span>
             <button
                 type="button"
@@ -37,41 +37,22 @@ jest.mock('../../../../../components/admin/input-groups/photo-input-group/PhotoI
             <button type="button" onClick={() => onChange(null)} disabled={disabled}>
                 Remove image
             </button>
-            {value ? <span data-testid={`${name}-value`}>Image selected</span> : null}
-            {error ? <span data-testid={`${name}-error`}>{error}</span> : null}
+            {value ? <span data-testid={`${id}-value`}>Image selected</span> : null}
         </div>
     ),
+}));
+
+jest.mock('../../../../../components/admin/input-error/InputError', () => ({
+    InputError: ({ error }: any) => (error ? <span data-testid="input-error">{error}</span> : null),
 }));
 
 jest.mock(
     '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
     () => ({
-        InputWithCharacterLimitGroup: ({ label, value, onChange, disabled, name }: any) => (
+        InputWithCharacterLimitGroup: ({ label, value, onChange, disabled, name, id }: any) => (
             <label>
                 {label}
-                <input
-                    data-testid={`${name}-input`}
-                    value={value}
-                    disabled={disabled}
-                    onChange={onChange}
-                />
-            </label>
-        ),
-    }),
-);
-
-jest.mock(
-    '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
-    () => ({
-        TextAreaWithCharacterLimitGroup: ({ label, value, onChange, disabled, name }: any) => (
-            <label>
-                {label}
-                <textarea
-                    data-testid={`${name}-textarea`}
-                    value={value}
-                    disabled={disabled}
-                    onChange={onChange}
-                />
+                <input data-testid={`${id}-input`} value={value} disabled={disabled} onChange={onChange} />
             </label>
         ),
     }),
@@ -85,7 +66,6 @@ jest.mock('../../../../../validation/admin/partner-schema/partner-schema', () =>
     PARTNER_BANNER_VALIDATION_FUNCTIONS: {
         validateTitle: jest.fn(),
         validateDescription: jest.fn(),
-        validateImage: jest.fn(),
     },
 }));
 
@@ -96,7 +76,6 @@ const mockedUseToast = useToast as jest.Mock;
 
 const mockValidateTitle = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateTitle as jest.Mock;
 const mockValidateDescription = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateDescription as jest.Mock;
-const mockValidateImage = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateImage as jest.Mock;
 
 describe('PartnerBanner', () => {
     const mockRefetch = jest.fn();
@@ -108,6 +87,45 @@ describe('PartnerBanner', () => {
         description: 'Initial Description',
         image: { id: 1, url: 'initial.jpg', mimeType: 'image/jpeg' },
         imageId: 1,
+    };
+
+    // Helper functions for getting elements
+    const getLoader = () => screen.queryByTestId('inline-loader');
+    const getErrorMessage = () => screen.queryByText(PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER);
+    const getTryAgainButton = () => screen.queryByRole('button', { name: PARTNERS_TEXT.BUTTON.TRY_AGAIN });
+    const getTitleInput = () => screen.getByTestId('title-input');
+    const getDescriptionInput = () => screen.getByTestId('description-input');
+    const getImageContainer = () => screen.queryByTestId('banner-image-container');
+    const getImageValue = () => screen.queryByTestId('banner-image-value');
+    const getChangeImageButton = () => screen.getByRole('button', { name: 'Change image' });
+    const getRemoveImageButton = () => screen.getByRole('button', { name: 'Remove image' });
+    const getPublishButton = () => screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH });
+    const getInputError = () => screen.queryByTestId('input-error');
+
+    // Helper functions for actions
+    const changeTitleValue = (value: string) => {
+        fireEvent.change(getTitleInput(), { target: { value } });
+    };
+
+    const changeDescriptionValue = (value: string) => {
+        fireEvent.change(getDescriptionInput(), { target: { value } });
+    };
+
+    const clickChangeImage = () => {
+        fireEvent.click(getChangeImageButton());
+    };
+
+    const clickRemoveImage = () => {
+        fireEvent.click(getRemoveImageButton());
+    };
+
+    const clickPublish = () => {
+        fireEvent.click(getPublishButton());
+    };
+
+    const clickTryAgain = () => {
+        const button = getTryAgainButton();
+        if (button) fireEvent.click(button);
     };
 
     beforeEach(() => {
@@ -122,15 +140,8 @@ describe('PartnerBanner', () => {
             setData: mockSetData,
         });
 
-        mockValidateTitle.mockImplementation((value: string) =>
-            value ? undefined : 'Title is required',
-        );
-        mockValidateDescription.mockImplementation((value: string) =>
-            value ? undefined : 'Description is required',
-        );
-        mockValidateImage.mockImplementation((value: unknown) =>
-            value ? undefined : 'Image is required',
-        );
+        mockValidateTitle.mockImplementation((value: string) => (value ? undefined : 'Title is required'));
+        mockValidateDescription.mockImplementation((value: string) => (value ? undefined : 'Description is required'));
     });
 
     it('renders loader while banner data is loading', () => {
@@ -144,7 +155,7 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
-        expect(screen.getByTestId('inline-loader')).toBeInTheDocument();
+        expect(getLoader()).toBeInTheDocument();
     });
 
     it('shows error message and allows retry when banner fetch fails', () => {
@@ -159,56 +170,74 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
-        expect(
-            screen.getByText(PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER),
-        ).toBeInTheDocument();
+        expect(getErrorMessage()).toBeInTheDocument();
+        expect(getTryAgainButton()).toBeInTheDocument();
 
-        fireEvent.click(screen.getByRole('button', { name: 'Спробувати ще' }));
+        clickTryAgain();
         expect(refetchMock).toHaveBeenCalledTimes(1);
     });
 
     it('renders banner form with fetched data and validates field updates', async () => {
         render(<PartnerBanner />);
 
-        const titleInput = await screen.findByTestId('title-input');
-        const descriptionTextarea = screen.getByTestId('description-textarea');
+        const titleInput = getTitleInput();
+        const descriptionInput = getDescriptionInput();
 
         expect(titleInput).toHaveValue(defaultBannerData.title);
-        expect(descriptionTextarea).toHaveValue(defaultBannerData.description);
-        expect(screen.getByText(PARTNERS_TEXT.FORM.LABEL.IMAGE)).toBeInTheDocument();
+        expect(descriptionInput).toHaveValue(defaultBannerData.description);
+        expect(getImageContainer()).toBeInTheDocument();
 
-        fireEvent.change(titleInput, { target: { value: 'Updated Title' } });
+        changeTitleValue('Updated Title');
         expect(mockValidateTitle).toHaveBeenCalledWith('Updated Title');
 
         await waitFor(() => {
             expect(titleInput).toHaveValue('Updated Title');
         });
 
-        fireEvent.change(descriptionTextarea, { target: { value: 'Updated Description' } });
+        changeDescriptionValue('Updated Description');
         expect(mockValidateDescription).toHaveBeenCalledWith('Updated Description');
 
-        fireEvent.click(screen.getByRole('button', { name: 'Change image' }));
-        expect(mockValidateImage).toHaveBeenCalledWith({ base64: 'base64-image', mimeType: 'image/png' });
+        await waitFor(() => {
+            expect(descriptionInput).toHaveValue('Updated Description');
+        });
+    });
+
+    it('handles image change', async () => {
+        render(<PartnerBanner />);
+
+        clickChangeImage();
+
+        await waitFor(() => {
+            expect(getImageValue()).toBeInTheDocument();
+        });
+    });
+
+    it('handles image removal', async () => {
+        render(<PartnerBanner />);
+
+        clickRemoveImage();
+
+        await waitFor(() => {
+            expect(getImageValue()).not.toBeInTheDocument();
+        });
     });
 
     it('disables publish button when validation fails and re-enables when corrected', async () => {
+        mockValidateTitle.mockImplementation((value: string) => (value ? undefined : 'Title is required'));
+
         render(<PartnerBanner />);
 
-        const titleInput = await screen.findByTestId('title-input');
-        const publishButton = await screen.findByRole('button', {
-            name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH,
-        });
-
+        const publishButton = getPublishButton();
         expect(publishButton).toBeEnabled();
 
-        fireEvent.change(titleInput, { target: { value: '' } });
+        changeTitleValue('');
 
         await waitFor(() => {
             expect(mockValidateTitle).toHaveBeenCalledWith('');
             expect(publishButton).toBeDisabled();
         });
 
-        fireEvent.change(titleInput, { target: { value: 'Valid Title' } });
+        changeTitleValue('Valid Title');
 
         await waitFor(() => {
             expect(mockValidateTitle).toHaveBeenCalledWith('Valid Title');
@@ -226,16 +255,10 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
-        const titleInput = await screen.findByTestId('title-input');
-        const descriptionTextarea = screen.getByTestId('description-textarea');
-        const publishButton = await screen.findByRole('button', {
-            name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH,
-        });
+        changeTitleValue(updatedBanner.title);
+        changeDescriptionValue(updatedBanner.description);
 
-        fireEvent.change(titleInput, { target: { value: updatedBanner.title } });
-        fireEvent.change(descriptionTextarea, { target: { value: updatedBanner.description } });
-
-        fireEvent.click(publishButton);
+        clickPublish();
 
         await waitFor(() => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalledWith('mock-client', {
@@ -247,15 +270,12 @@ describe('PartnerBanner', () => {
         });
 
         await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith(
-                PARTNERS_TEXT.MESSAGE.BANNER_SAVED,
-                ToastType.Success,
-            );
+            expect(mockAddToast).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.BANNER_SAVED, ToastType.Success);
         });
 
         await waitFor(() => {
-            expect(titleInput).toHaveValue(updatedBanner.title);
-            expect(descriptionTextarea).toHaveValue(updatedBanner.description);
+            expect(getTitleInput()).toHaveValue(updatedBanner.title);
+            expect(getDescriptionInput()).toHaveValue(updatedBanner.description);
         });
     });
 
@@ -264,11 +284,7 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
-        const publishButton = await screen.findByRole('button', {
-            name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH,
-        });
-
-        fireEvent.click(publishButton);
+        clickPublish();
 
         await waitFor(() => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalledWith('mock-client', {
@@ -280,11 +296,39 @@ describe('PartnerBanner', () => {
         });
 
         await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith(
-                PARTNERS_TEXT.MESSAGE.FAIL_TO_UPDATE_BANNER,
-                ToastType.Error,
-            );
+            expect(mockAddToast).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_UPDATE_BANNER, ToastType.Error);
+        });
+    });
+
+    it('does not call updateBanner if form is invalid', async () => {
+        mockValidateTitle.mockReturnValue('Title is required');
+
+        render(<PartnerBanner />);
+
+        changeTitleValue('');
+
+        await waitFor(() => {
+            expect(getPublishButton()).toBeDisabled();
+        });
+
+        clickPublish();
+
+        expect(mockedPartnersApi.updateBanner).not.toHaveBeenCalled();
+    });
+
+    it('disables all inputs while publishing', async () => {
+        mockedPartnersApi.updateBanner.mockImplementation(
+            () => new Promise((resolve) => setTimeout(() => resolve(defaultBannerData), 100))
+        );
+
+        render(<PartnerBanner />);
+
+        clickPublish();
+
+        await waitFor(() => {
+            expect(getTitleInput()).toBeDisabled();
+            expect(getDescriptionInput()).toBeDisabled();
+            expect(getPublishButton()).toBeDisabled();
         });
     });
 });
-

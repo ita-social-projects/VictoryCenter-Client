@@ -21,12 +21,7 @@ jest.mock('../../../../../components/admin/input-groups/photo-input-group/PhotoI
             >
                 Change image
             </button>
-            <button
-                type="button"
-                data-testid={`${name}-remove`}
-                onClick={() => onChange(null)}
-                disabled={disabled}
-            >
+            <button type="button" data-testid={`${name}-remove`} onClick={() => onChange(null)} disabled={disabled}>
                 Remove image
             </button>
         </div>
@@ -36,14 +31,7 @@ jest.mock('../../../../../components/admin/input-groups/photo-input-group/PhotoI
 jest.mock(
     '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
-        TextAreaWithCharacterLimitGroup: ({
-            label,
-            value,
-            onChange,
-            disabled,
-            name,
-            placeholder,
-        }: any) => (
+        TextAreaWithCharacterLimitGroup: ({ label, value, onChange, disabled, name, placeholder }: any) => (
             <label>
                 <span>{label}</span>
                 <textarea
@@ -106,9 +94,7 @@ describe('PartnerForm', () => {
 
         expect(screen.getByTestId(`partner-form-${defaultValues.localId}`)).toBeInTheDocument();
         expect(screen.getByText(PARTNERS_TEXT.PARTNER.DESCRIPTION_LABEL)).toBeInTheDocument();
-        expect(
-            screen.getByPlaceholderText(PARTNERS_TEXT.PARTNER.DESCRIPTION_PLACEHOLDER),
-        ).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(PARTNERS_TEXT.PARTNER.DESCRIPTION_PLACEHOLDER)).toBeInTheDocument();
     });
 
     it('validates and propagates description changes', () => {
@@ -129,10 +115,9 @@ describe('PartnerForm', () => {
             />,
         );
 
-        fireEvent.change(
-            screen.getByTestId(`partner-form-description-${defaultValues.localId}-textarea`),
-            { target: { value: newDescription } },
-        );
+        fireEvent.change(screen.getByTestId(`partner-form-description-${defaultValues.localId}-textarea`), {
+            target: { value: newDescription },
+        });
 
         expect(mockValidateDescription).toHaveBeenCalledWith(newDescription);
         expect(onValuesChange).toHaveBeenCalledWith(
@@ -220,12 +205,7 @@ describe('PartnerForm', () => {
             />,
         );
 
-        expect(
-            screen.getByTestId(`partner-form-image-${defaultValues.localId}-change`),
-        ).toBeDisabled();
-        expect(
-            screen.getByTestId(`partner-form-description-${defaultValues.localId}-textarea`),
-        ).toBeDisabled();
+        expect(screen.getByTestId(`partner-form-image-${defaultValues.localId}-change`)).toBeDisabled();
+        expect(screen.getByTestId(`partner-form-description-${defaultValues.localId}-textarea`)).toBeDisabled();
     });
 });
-

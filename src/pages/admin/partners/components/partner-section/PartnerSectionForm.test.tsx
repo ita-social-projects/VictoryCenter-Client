@@ -9,20 +9,23 @@ import {
     PARTNER_VALIDATION_FUNCTIONS,
 } from '../../../../../validation/admin/partner-schema/partner-schema';
 
-jest.mock('../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup', () => ({
-    TextAreaWithCharacterLimitGroup: ({ label, value, onChange, disabled, name, placeholder }: any) => (
-        <label>
-            <span>{label}</span>
-            <textarea
-                data-testid={name}
-                value={value}
-                onChange={onChange}
-                disabled={disabled}
-                placeholder={placeholder}
-            />
-        </label>
-    ),
-}));
+jest.mock(
+    '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
+    () => ({
+        TextAreaWithCharacterLimitGroup: ({ label, value, onChange, disabled, name, placeholder }: any) => (
+            <label>
+                <span>{label}</span>
+                <textarea
+                    data-testid={name}
+                    value={value}
+                    onChange={onChange}
+                    disabled={disabled}
+                    placeholder={placeholder}
+                />
+            </label>
+        ),
+    }),
+);
 
 jest.mock('../partner-form/PartnerForm', () => ({
     PartnerForm: ({ values, errors, disabled, onValuesChange, onDelete }: any) => (
@@ -134,9 +137,9 @@ describe('PartnerSectionForm', () => {
         expect(screen.getByTestId(`partner-section-title-${defaultSectionValue.localId}`)).toHaveValue(
             defaultSectionValue.title,
         );
-        expect(
-            screen.getByTestId(`partner-section-description-${defaultSectionValue.localId}`),
-        ).toHaveValue(defaultSectionValue.description);
+        expect(screen.getByTestId(`partner-section-description-${defaultSectionValue.localId}`)).toHaveValue(
+            defaultSectionValue.description,
+        );
         expect(screen.getByText(PARTNERS_TEXT.BUTTON.ADD_PARTNER)).toBeInTheDocument();
         expect(screen.getByText(defaultPartner.description)).toBeInTheDocument();
     });
@@ -182,10 +185,9 @@ describe('PartnerSectionForm', () => {
             />,
         );
 
-        fireEvent.change(
-            screen.getByTestId(`partner-section-description-${defaultSectionValue.localId}`),
-            { target: { value: 'New description' } },
-        );
+        fireEvent.change(screen.getByTestId(`partner-section-description-${defaultSectionValue.localId}`), {
+            target: { value: 'New description' },
+        });
 
         expect(mockValidateSectionDescription).toHaveBeenCalledWith('New description');
         expect(onChange).toHaveBeenCalledWith(
@@ -302,9 +304,7 @@ describe('PartnerSectionForm', () => {
             />,
         );
 
-        expect(
-            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH }),
-        ).toBeDisabled();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH })).toBeDisabled();
     });
 
     it('enables publish button when validation passes', () => {
@@ -319,9 +319,7 @@ describe('PartnerSectionForm', () => {
             />,
         );
 
-        expect(
-            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH }),
-        ).toBeEnabled();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH })).toBeEnabled();
     });
 
     it('shows loader and disables actions when form is disabled', () => {
@@ -338,9 +336,7 @@ describe('PartnerSectionForm', () => {
 
         expect(screen.getByTestId('inline-loader-2')).toBeInTheDocument();
         expect(screen.getByText(PARTNERS_TEXT.SECTION.DELETE_SECTION)).toBeDisabled();
-        expect(
-            screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH }),
-        ).toBeDisabled();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH })).toBeDisabled();
     });
 
     it('handles delete and publish button clicks', () => {
@@ -365,4 +361,3 @@ describe('PartnerSectionForm', () => {
         expect(onPublish).toHaveBeenCalledWith(defaultSectionValue.localId);
     });
 });
-

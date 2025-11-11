@@ -9,13 +9,14 @@ import { useToast } from '../../../../../contexts/admin/toast-context-provider/T
 import { ToastType } from '../../../../../types/admin/toast';
 import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
 import { Button } from '../../../../../components/admin/button/Button';
-import { PhotoInputGroup } from '../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import axios from 'axios';
 import { PartnerBanner as PartnerBannerType } from '../../../../../types/admin/partners';
 import { PARTNER_BANNER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/partner-schema/partner-schema';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { ImageInput } from '../../../../../components/admin/image-input/ImageInput';
+import { InputError } from '../../../../../components/admin/input-error/InputError';
+import BannerImage from '../../../../../assets/images/public/partners-page/horses.png';
 
 export interface PartnerBannerValues {
     title: string;
@@ -81,7 +82,7 @@ export const PartnerBanner = () => {
         }));
     }, []);
 
-    const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value;
         setValues((prev) => (prev ? { ...prev, description: newValue } : null));
         setErrors((prev) => ({
@@ -92,11 +93,14 @@ export const PartnerBanner = () => {
 
     const handleImageChange = useCallback((value: ImageValues | null) => {
         setValues((prev) => (prev ? { ...prev, image: value, imageId: value ? prev.imageId : null } : null));
+    }, []);
+
+    const handleImageError = useCallback((error: string | null) => {
         setErrors((prev) => ({
             ...prev,
-            image: PARTNER_BANNER_VALIDATION_FUNCTIONS.validateImage(value),
+            image: error ? error : undefined,
         }));
-    }, []);
+    }, [])
 
     const isFormValid = (): boolean => {
         if (!values) return false;
@@ -107,9 +111,8 @@ export const PartnerBanner = () => {
 
         const titleError = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateTitle(values.title);
         const descError = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateDescription(values.description);
-        const imgError = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateImage(values.image);
 
-        return !titleError && !descError && !imgError;
+        return !titleError && !descError && !errors.image;
     };
 
     const handlePublish = useCallback(async () => {
@@ -177,17 +180,31 @@ export const PartnerBanner = () => {
             {!isLoadingData && !fetchError && values && (
                 <div className="partner-banner-form__content">
                     <div className="partner-banner-form__image">
-                        <PhotoInputGroup
-                            label={PARTNERS_TEXT.FORM.LABEL.IMAGE}
+                        <ImageInput
+                            label={PARTNERS_TEXT.BANNER.ADD_IMAGE_HERE}
+                            subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                                PARTNER_BANNER_VALIDATION.image.height,
+                                PARTNER_BANNER_VALIDATION.image.width,
+                            )}
                             value={values.image}
-                            error={errors.image}
                             onChange={handleImageChange}
                             id="banner-image"
                             name="banner-image"
                             disabled={isDisabled}
-                            isRequired={true}
-                            setError={() => {}}
+                            setError={handleImageError}
+                            className="image-input-featured"
+                            style={{
+                                width: '52.5625rem',
+                                height: '33.125rem',
+                                backgroundImage: `
+                                linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
+                                url(${BannerImage})
+                              `,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
+                            }}
                         />
+                        <InputError error={errors.image} />
                     </div>
 
                     <div className="partner-banner-form__main">
@@ -204,7 +221,7 @@ export const PartnerBanner = () => {
                                 isRequired={true}
                             />
 
-                            <TextAreaWithCharacterLimitGroup
+                            <InputWithCharacterLimitGroup
                                 label={PARTNERS_TEXT.FORM.LABEL.DESCRIPTION}
                                 value={values.description}
                                 error={errors.description}
@@ -213,7 +230,6 @@ export const PartnerBanner = () => {
                                 name="description"
                                 disabled={isDisabled}
                                 maxLength={PARTNER_BANNER_VALIDATION.description.max}
-                                rows={2}
                                 isRequired={true}
                             />
                         </div>

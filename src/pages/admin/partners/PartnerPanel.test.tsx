@@ -14,4 +14,3 @@ describe('PartnerPanel', () => {
         expect(screen.getByTestId('partner-panel-content')).toBeInTheDocument();
     });
 });
-

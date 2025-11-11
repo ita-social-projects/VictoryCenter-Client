@@ -21,6 +21,9 @@ export const PARTNERS_TEXT = {
             ADD_FILE_DESCRIPTION: 'Додайте файл сюди',
         },
     },
+    BANNER: {
+        ADD_IMAGE_HERE: 'Додайте файл сюди',
+    },
     SECTION: {
         TITLE_PLACEHOLDER: 'Введіть заголовок секції',
         DESCRIPTION_PLACEHOLDER: 'Введіть опис секції',

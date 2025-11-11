@@ -60,4 +60,3 @@ describe('PartnerPanelContent', () => {
         expect(mockPartnerSectionsEditor).toHaveBeenCalledTimes(1);
     });
 });
-

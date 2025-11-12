@@ -17,6 +17,7 @@ interface InputProps {
     onValueChange?: (val: string) => void;
     onlyNumbers?: boolean;
     maxLength?: number;
+    showCharCounter?: boolean;
     className?: string;
 }
 
@@ -34,6 +35,7 @@ export const Input = ({
     onValueChange,
     onlyNumbers = false,
     maxLength,
+    showCharCounter = false,
     className,
 }: InputProps) => {
     const computedInitialValue =
@@ -142,6 +144,11 @@ export const Input = ({
                     ></button>
                 )}
             </div>
+            {showCharCounter && maxLength && (
+                <div className="donate-input-char-counter">
+                    {value.length}/{maxLength}
+                </div>
+            )}
         </div>
     );
 };

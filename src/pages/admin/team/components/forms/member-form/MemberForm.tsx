@@ -11,6 +11,7 @@ import { ImageInput } from '../../../../../../components/admin/image-input/Image
 import { useTeamMemberForm } from '../use-team-member-form/useTeamMemberForm';
 import { TeamCategory } from '../../../../../../types/admin/team-category';
 import './MemberForm.scss';
+import { CommonMemberFields } from '../common-member-fields/CommonMemberFields';
 
 export interface TeamMemberFormValues {
     categoryId: number | null;
@@ -138,33 +139,16 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                     {errors.category && <p className="error">{errors.category}</p>}
                 </div>
 
-                <div className="form-group">
-                    <InputLabel htmlFor={'fullName'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.FULLNAME} isRequired />
-                    <InputWithCharacterLimit
-                        value={formState.fullName}
-                        onChange={handleFullNameChange}
-                        onBlur={handleFullNameBlur}
-                        id="fullName"
-                        name="fullName"
-                        maxLength={TEAM_MEMBER_VALIDATION.fullName.max}
-                        disabled={isSubmitting || formDisabled}
-                    />
-                    {errors.fullName && <p className="error">{errors.fullName}</p>}
-                </div>
-                <div className="form-group">
-                    <InputLabel htmlFor={'description'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.DESCRIPTION} />
-                    <TextAreaWithCharacterLimit
-                        value={formState.description}
-                        onChange={handleDescriptionChange}
-                        onBlur={handleDescriptionBlur}
-                        id="description"
-                        name="description"
-                        rows={8}
-                        disabled={isSubmitting || formDisabled}
-                        maxLength={TEAM_MEMBER_VALIDATION.description.max}
-                    />
-                    {errors.description && <span className="error desc-error">{errors.description}</span>}
-                </div>
+                <CommonMemberFields
+                    formState={formState}
+                    errors={errors}
+                    isSubmitting={isSubmitting}
+                    formDisabled={formDisabled}
+                    handleFullNameChange={handleFullNameChange}
+                    handleFullNameBlur={handleFullNameBlur}
+                    handleDescriptionChange={handleDescriptionChange}
+                    handleDescriptionBlur={handleDescriptionBlur}
+                />
                 <div className="form-group">
                     <InputLabel htmlFor={'image'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO} />
                     <ImageInput

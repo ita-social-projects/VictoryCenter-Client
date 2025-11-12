@@ -3,12 +3,12 @@ import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../../validation/a
 import { useFormManager } from '../../../../../../hooks/admin/use-form-manager/useFormManager';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
 
-type CommonFields = {
+export type CommonFields = {
     fullName: string;
     description: string;
 };
 
-type CommonErrors = {
+export type CommonErrors = {
     fullName?: string;
     description?: string;
     [key: string]: string | undefined;

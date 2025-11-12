@@ -49,10 +49,21 @@ describe('ProgramsPageModals', () => {
         onDeleteCategory: jest.fn(),
     };
 
+    const mockOpenModalActions = {
+        openAddItemModal: jest.fn(),
+        openEditItemModal: jest.fn(),
+        openDeleteItemModal: jest.fn(),
+        openTranslateItemModal: jest.fn(),
+        openAddCategoryModal: jest.fn(),
+        openEditCategoryModal: jest.fn(),
+        openDeleteCategoryModal: jest.fn(),
+    }
+
     const mockCloseModalActions = {
         closeAddItemModal: jest.fn(),
         closeEditItemModal: jest.fn(),
         closeDeleteItemModal: jest.fn(),
+        closeTranslateItemModal: jest.fn(),
         closeAddCategoryModal: jest.fn(),
         closeEditCategoryModal: jest.fn(),
         closeDeleteCategoryModal: jest.fn(),
@@ -63,20 +74,14 @@ describe('ProgramsPageModals', () => {
             isAddModalOpen: false,
             itemToDelete: null,
             itemToEdit: null,
+            itemToTranslate: null,
             isAddCategoryModalOpen: false,
             isEditCategoryModalOpen: false,
             isDeleteCategoryModalOpen: false,
             ...overrides,
         },
         closeModalActions: mockCloseModalActions,
-        openModalActions: {
-            openAddItemModal: jest.fn(),
-            openEditItemModal: jest.fn(),
-            openDeleteItemModal: jest.fn(),
-            openAddCategoryModal: jest.fn(),
-            openEditCategoryModal: jest.fn(),
-            openDeleteCategoryModal: jest.fn(),
-        },
+        openModalActions: mockOpenModalActions,
         isAnyModalOpened: false,
     });
 

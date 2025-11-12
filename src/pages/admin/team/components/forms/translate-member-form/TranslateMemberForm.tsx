@@ -1,16 +1,13 @@
-import React, { forwardRef, useCallback, useMemo } from 'react';
+import { forwardRef, useMemo } from 'react';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
 import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/team-member-schema/team-member-schema';
-import { InputLabel } from '../../../../../../components/admin/input-label/InputLabel';
-import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
-import { InputWithCharacterLimit } from '../../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { Select } from '../../../../../../components/common/select/Select';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { ReactComponent as TranslateIcon } from '../../../../../../assets/icons/translate-grey.svg';
 import { useTeamMemberForm } from '../use-team-member-form/useTeamMemberForm';
 import './TranslateMemberForm.scss';
+import { CommonMemberFields } from '../common-member-fields/CommonMemberFields';
 export interface TranslateTeamMemberFormValues {
     fullName: string;
     description: string;
@@ -89,33 +86,16 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
                     </Button>
                 </div>
 
-                <div className="form-group">
-                    <InputLabel htmlFor={'fullName'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.FULLNAME} isRequired />
-                    <InputWithCharacterLimit
-                        value={formState.fullName}
-                        onChange={handleFullNameChange}
-                        onBlur={handleFullNameBlur}
-                        id="fullName"
-                        name="fullName"
-                        maxLength={TEAM_MEMBER_VALIDATION.fullName.max}
-                        disabled={isSubmitting || formDisabled}
-                    />
-                    {errors.fullName && <p className="error">{errors.fullName}</p>}
-                </div>
-                <div className="form-group">
-                    <InputLabel htmlFor={'description'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.DESCRIPTION} />
-                    <TextAreaWithCharacterLimit
-                        value={formState.description}
-                        onChange={handleDescriptionChange}
-                        onBlur={handleDescriptionBlur}
-                        id="description"
-                        name="description"
-                        rows={8}
-                        disabled={isSubmitting || formDisabled}
-                        maxLength={TEAM_MEMBER_VALIDATION.description.max}
-                    />
-                    {errors.description && <span className="error desc-error">{errors.description}</span>}
-                </div>
+                <CommonMemberFields
+                    formState={formState}
+                    errors={errors}
+                    isSubmitting={isSubmitting}
+                    formDisabled={formDisabled}
+                    handleFullNameChange={handleFullNameChange}
+                    handleFullNameBlur={handleFullNameBlur}
+                    handleDescriptionChange={handleDescriptionChange}
+                    handleDescriptionBlur={handleDescriptionBlur}
+                />
             </form>
         );
     },

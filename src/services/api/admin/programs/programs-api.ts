@@ -98,7 +98,7 @@ export const ProgramsApi = {
         const params = {
             SearchQuery: searchTerm,
             offset: offset,
-            limit: Math.floor(limit),
+            limit: limit,
         };
 
         const response = await client.get<PaginationResult<Program>>(`${API_ROUTES.PROGRAMS.SEARCH}`, {

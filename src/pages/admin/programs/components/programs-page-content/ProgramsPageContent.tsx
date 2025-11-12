@@ -79,15 +79,15 @@ export const ProgramsPageContent = () => {
     const getProgramSearchItems = useCallback(
         async (
             searchTerm: string,
-            requestOptions: PaginationRequestParams,
-        ): Promise<PaginationResult<ProgramSearchItemData>> => {
-            return ProgramsApi.fetchProgramSearchItems(
+            paginationRequest: PaginationRequestParams,
+        ): Promise<PaginationResult<ProgramSearchItemData>> =>
+            ProgramsApi.fetchProgramSearchItems(
                 client,
                 searchTerm,
-                requestOptions.offset as number,
-                requestOptions.limit as number,
-            );
-        },
+                paginationRequest.offset as number,
+                paginationRequest.limit as number,
+                paginationRequest.requestOptions?.cancellationSignal,
+            ),
         [client],
     );
 

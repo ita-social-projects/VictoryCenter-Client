@@ -9,6 +9,7 @@ describe('useModalsState', () => {
             isAddModalOpen: false,
             itemToDelete: null,
             itemToEdit: null,
+            itemToTranslate: null,
             isAddCategoryModalOpen: false,
             isEditCategoryModalOpen: false,
             isDeleteCategoryModalOpen: false,

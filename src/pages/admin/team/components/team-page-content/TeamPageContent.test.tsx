@@ -340,6 +340,8 @@ const mockNewMember: TeamMember = {
     localizations: [],
 };
 
+const mockClient = {};
+
 describe('TeamPageContent', () => {
     const renderTeamPageContent = () => render(<TeamPageContent />);
 

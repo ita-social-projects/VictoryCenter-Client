@@ -94,6 +94,7 @@ const mockTeamMember: TeamMember = {
     description: 'Test member',
     status: VisibilityStatus.Published,
     categoryId: 1,
+    localizations: []
 };
 
 const mockTeamCategory: TeamCategory = {
@@ -120,6 +121,7 @@ const createMockModalsStateControl = (
         isAddModalOpen: false,
         itemToDelete: null,
         itemToEdit: null,
+        itemToTranslate: null,
         isAddCategoryModalOpen: false,
         isEditCategoryModalOpen: false,
         isDeleteCategoryModalOpen: false,
@@ -129,6 +131,7 @@ const createMockModalsStateControl = (
         closeAddItemModal: jest.fn(),
         closeEditItemModal: jest.fn(),
         closeDeleteItemModal: jest.fn(),
+        closeTranslateItemModal: jest.fn(),
         closeAddCategoryModal: jest.fn(),
         closeEditCategoryModal: jest.fn(),
         closeDeleteCategoryModal: jest.fn(),
@@ -137,6 +140,7 @@ const createMockModalsStateControl = (
         openAddItemModal: jest.fn(),
         openEditItemModal: jest.fn(),
         openDeleteItemModal: jest.fn(),
+        openTranslateItemModal: jest.fn(),
         openAddCategoryModal: jest.fn(),
         openEditCategoryModal: jest.fn(),
         openDeleteCategoryModal: jest.fn(),
@@ -152,6 +156,7 @@ const createDefaultProps = (
     onAddTeamMember: jest.fn(),
     onEditTeamMember: jest.fn(),
     onDeleteTeamMember: jest.fn(),
+    onTranslateTeamMember: jest.fn(),
     onAddTeamCategory: jest.fn(),
     onEditTeamCategory: jest.fn(),
     onDeleteTeamCategory: jest.fn(),

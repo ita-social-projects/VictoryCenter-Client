@@ -261,6 +261,14 @@ export const TeamPageContent = () => {
         [selectedCategory, resetMembersState],
     );
 
+    const handleTranslateMemberModalOpen = useCallback(
+        (member: TeamMember) => {
+            if (isAnyModalOpened) return;
+            openModalActions.openTranslateItemModal(member);
+        },
+        [isAnyModalOpened, openModalActions],
+    );
+
     const handleDeleteTeamMemberModalOpen = useCallback(
         (member: TeamMember) => {
             if (isAnyModalOpened) return;
@@ -406,6 +414,15 @@ export const TeamPageContent = () => {
         [closeModalActions],
     );
 
+    const handleTranslateMember = useCallback(
+        (memberToTranslate: TeamMember) => {
+            setHasMore(true);
+            hasMoreRef.current = true;
+            closeModalActions.closeDeleteItemModal();
+        },
+        [closeModalActions],
+    );
+
     const handleAddCategory = useCallback((newCategory: TeamCategory) => {
         setCategories((prevCategories) => [...prevCategories, newCategory]);
     }, []);
@@ -534,6 +551,7 @@ export const TeamPageContent = () => {
                 onAddTeamMember={handleAddMember}
                 onEditTeamMember={handleEditMember}
                 onDeleteTeamMember={handleDeleteMember}
+                onTranslateTeamMember={handleTranslateMember}
                 onAddTeamCategory={handleAddCategory}
                 onEditTeamCategory={handleEditCategory}
                 onDeleteTeamCategory={handleDeleteCategory}

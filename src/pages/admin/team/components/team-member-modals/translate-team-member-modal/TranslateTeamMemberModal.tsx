@@ -11,23 +11,24 @@ interface TranslateTeamMemberModalProps {
     isOpen: boolean;
     onClose: () => void;
     onTranslateMember: (memberData: TeamMember) => void;
-    memberToEdit: TeamMember;
+    memberToTranslate: TeamMember | null;
 }
 
 export const TranslateTeamMemberModal = ({
     isOpen,
     onClose,
     onTranslateMember,
-    memberToEdit,
+    memberToTranslate,
 }: TranslateTeamMemberModalProps) => {
-    const client = useAdminClient();
+    // const client = useAdminClient();
+    const client = {};
 
     const modalConfig = useMemo(
         () => ({
             mode: ModalMode.Add,
             isOpen,
             onClose,
-            entity: memberToEdit,
+            entity: memberToTranslate,
             onSuccess: onTranslateMember || (() => {}),
             apiCall: () => {},
             getConfirmTitle: () => {},
@@ -35,7 +36,7 @@ export const TranslateTeamMemberModal = ({
             getFormKey: () => {},
             transformFormData: () => {},
         }),
-        [isOpen, onClose, memberToEdit, onTranslateMember, client],
+        [isOpen, onClose, memberToTranslate, onTranslateMember, client],
     );
 
     const modalHookData = useGenericModal<TranslateTeamMemberModalProps, TeamMember, TranslateTeamMemberFormRef>(

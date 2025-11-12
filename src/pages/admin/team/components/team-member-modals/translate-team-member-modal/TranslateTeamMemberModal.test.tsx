@@ -111,7 +111,7 @@ describe('TranslateTeamMemberModal', () => {
                 isOpen={true}
                 onClose={jest.fn()}
                 onTranslateMember={jest.fn()}
-                memberToEdit={memberToEdit}
+                memberToTranslate={memberToEdit}
             />,
         );
 
@@ -126,7 +126,7 @@ describe('TranslateTeamMemberModal', () => {
                 isOpen={true}
                 onClose={jest.fn()}
                 onTranslateMember={jest.fn()}
-                memberToEdit={memberToEdit}
+                memberToTranslate={memberToEdit}
             />,
         );
 
@@ -140,7 +140,7 @@ describe('TranslateTeamMemberModal', () => {
                 isOpen={true}
                 onClose={jest.fn()}
                 onTranslateMember={jest.fn()}
-                memberToEdit={memberToEdit}
+                memberToTranslate={memberToEdit}
             />,
         );
 
@@ -154,7 +154,7 @@ describe('TranslateTeamMemberModal', () => {
                 isOpen={false}
                 onClose={jest.fn()}
                 onTranslateMember={jest.fn()}
-                memberToEdit={memberToEdit}
+                memberToTranslate={memberToEdit}
             />,
         );
         expect(screen.queryByTestId('wrapper')).not.toBeInTheDocument();

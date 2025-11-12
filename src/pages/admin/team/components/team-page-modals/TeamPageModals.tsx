@@ -6,6 +6,7 @@ import { TeamMemberModal } from '../team-member-modal/TeamMemberModal';
 import { DeleteTeamMemberModal } from '../delete-team-member-modal/DeleteTeamMemberModal';
 import { TeamCategoryModal } from '../team-category-modal/TeamCategoryModal';
 import { DeleteTeamCategoryModal } from '../delete-team-category-modal/DeleteTeamCategoryModal';
+import { TranslateTeamMemberModal } from '../team-member-modals/translate-team-member-modal/TranslateTeamMemberModal';
 
 export interface TeamPageModalsProps {
     modalsStateControl: UseModalsStateResult<TeamMember>;
@@ -13,6 +14,7 @@ export interface TeamPageModalsProps {
     onAddTeamMember: (addedMember: TeamMember) => void;
     onEditTeamMember: (updatedMember: TeamMember) => void;
     onDeleteTeamMember: (member: TeamMember) => void;
+    onTranslateTeamMember: (member: TeamMember) => void;
     onAddTeamCategory: (newCategory: TeamCategory) => void;
     onEditTeamCategory: (updatedCategory: TeamCategory) => void;
     onDeleteTeamCategory: (categoryIdToDelete: number) => void;
@@ -24,6 +26,7 @@ export const TeamPageModals = ({
     onAddTeamMember,
     onEditTeamMember,
     onDeleteTeamMember,
+    onTranslateTeamMember,
     onAddTeamCategory,
     onEditTeamCategory,
     onDeleteTeamCategory,
@@ -55,6 +58,13 @@ export const TeamPageModals = ({
                 onClose={closeModalActions.closeDeleteItemModal}
                 memberToDelete={modalState.itemToDelete}
                 onDeleteMember={onDeleteTeamMember}
+            />
+
+            <TranslateTeamMemberModal
+                isOpen={!!modalState.itemToTranslate}
+                onClose={closeModalActions.closeTranslateItemModal}
+                onTranslateMember={onTranslateTeamMember}
+                memberToTranslate={modalState.itemToTranslate}
             />
 
             {/* Team Category Modals */}

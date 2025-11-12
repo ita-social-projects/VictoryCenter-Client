@@ -4,6 +4,7 @@ export interface BaseModalState<TEntity> {
     isAddModalOpen: boolean;
     itemToDelete: TEntity | null;
     itemToEdit: TEntity | null;
+    itemToTranslate: TEntity | null;
     isAddCategoryModalOpen: boolean;
     isEditCategoryModalOpen: boolean;
     isDeleteCategoryModalOpen: boolean;
@@ -13,6 +14,7 @@ export interface BaseCloseModalActions {
     closeAddItemModal: () => void;
     closeEditItemModal: () => void;
     closeDeleteItemModal: () => void;
+    closeTranslateItemModal: () => void;
     closeAddCategoryModal: () => void;
     closeEditCategoryModal: () => void;
     closeDeleteCategoryModal: () => void;
@@ -22,6 +24,7 @@ export interface BaseOpenModalActions<TEntity> {
     openAddItemModal: () => void;
     openEditItemModal: (item: TEntity) => void;
     openDeleteItemModal: (item: TEntity) => void;
+    openTranslateItemModal: (item: TEntity) => void;
     openAddCategoryModal: () => void;
     openEditCategoryModal: () => void;
     openDeleteCategoryModal: () => void;
@@ -37,6 +40,7 @@ export interface UseModalsStateResult<TEntity> {
 export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
     const [modalState, setModalState] = useState<BaseModalState<TEntity>>({
         isAddModalOpen: false,
+        itemToTranslate: null,
         itemToDelete: null,
         itemToEdit: null,
         isAddCategoryModalOpen: false,
@@ -57,6 +61,7 @@ export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
             closeAddItemModal: () => updateModalState({ isAddModalOpen: false }),
             closeEditItemModal: () => updateModalState({ itemToEdit: null }),
             closeDeleteItemModal: () => updateModalState({ itemToDelete: null }),
+            closeTranslateItemModal: () => updateModalState({ itemToTranslate: null }),
             closeAddCategoryModal: () => updateModalState({ isAddCategoryModalOpen: false }),
             closeEditCategoryModal: () => updateModalState({ isEditCategoryModalOpen: false }),
             closeDeleteCategoryModal: () => updateModalState({ isDeleteCategoryModalOpen: false }),
@@ -85,6 +90,12 @@ export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
                 setModalState((prev) => {
                     if (isAnyModalOpenedInState(prev)) return prev;
                     return { ...prev, itemToDelete: item };
+                });
+            },
+            openTranslateItemModal: (item: TEntity) => {
+                setModalState((prev) => {
+                    if (isAnyModalOpenedInState(prev)) return prev;
+                    return { ...prev, itemToTranslate: item };
                 });
             },
             openAddCategoryModal: () => {

@@ -2,5 +2,6 @@ import headerEn from './header.json';
 import footerEn from './footer.json';
 import aboutUsPageEn from './about-us.json';
 import programsPageEn from './programs.json';
+import donatePageEn from './donate-page.json';
 
-export { headerEn, footerEn, aboutUsPageEn, programsPageEn };
+export { headerEn, footerEn, aboutUsPageEn, programsPageEn, donatePageEn };

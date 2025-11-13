@@ -263,4 +263,42 @@ describe('WhoWeAreContent Component', () => {
         expect(screen.queryByText('What we do')).not.toBeInTheDocument();
         expect(screen.queryByText(WHO_WE_ARE_TEXT.FAIL_TO_FETCH_SECTION)).not.toBeInTheDocument();
     });
+
+    it('should call refetch when retrying after section fetch error', async () => {
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getByType.mockRejectedValueOnce(new Error('API Error'));
+
+        render(<WhoWeAreContent />);
+
+        expect(await screen.findByText('Main')).toBeInTheDocument();
+        const retryButton = await screen.findByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN });
+
+        mockedWhoWeAreApi.getByType.mockResolvedValueOnce(mockSection1);
+        fireEvent.click(retryButton);
+
+        await waitFor(() => {
+            expect(mockedWhoWeAreApi.getByType).toHaveBeenLastCalledWith({ client: 'mocked-client' }, SectionType.Main);
+        });
+    });
+
+    it('should show toast with error when publish fails', async () => {
+        mockedWhoWeAreApi.getPreviews.mockResolvedValue(mockCategories);
+        mockedWhoWeAreApi.getByType.mockResolvedValue(mockSection1);
+        mockedWhoWeAreApi.updateContent.mockRejectedValueOnce(new Error('Update failed'));
+
+        render(<WhoWeAreContent />);
+        const input = await screen.findByTestId('input-1');
+        const publishButton = await screen.findByRole('button', { name: 'Publish' });
+
+        fireEvent.change(input, { target: { value: 'Updated' } });
+        fireEvent.click(publishButton);
+
+        expect(await screen.findByText(COMMON_TEXT_ADMIN.QUESTION.PUBLISH_CHANGES)).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+        await waitFor(() => {
+            expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
+        });
+    });
 });

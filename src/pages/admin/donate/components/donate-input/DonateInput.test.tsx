@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { DonateInput } from './DonateInput';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
 
-describe('Input component', () => {
+describe('DonateInput component', () => {
     test('renders with label and placeholder', () => {
         render(<DonateInput label="Name" name="name" placeholder="Enter name" />);
         expect(screen.getByText('Name')).toBeInTheDocument();

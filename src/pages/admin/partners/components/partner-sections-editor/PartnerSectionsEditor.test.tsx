@@ -95,7 +95,8 @@ beforeEach(() => {
     jest.clearAllMocks();
     mockPartnerSectionFormRender.mockClear();
 
-    uuidMock.mockImplementation(() => `uuid-${Math.random().toString(16).slice(2, 10)}`);
+    let counter = 0;
+    uuidMock.mockImplementation(() => `uuid-${++counter}`);
 
     mockedUseAdminClient.mockReturnValue('mock-client');
     mockedUseToast.mockReturnValue({ addToast: addToastMock });

@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { Button } from '../../../../../components/admin/button/Button';
-import { Input } from '../input/Input';
+import { DonateInput } from '../donate-input/DonateInput';
 import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './GenericForm.scss';
@@ -340,7 +340,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                             className={`form-field ${isTitleField ? 'form-field-title-row' : ''}`}
                                         >
                                             <div className="form-field-content">
-                                                <Input
+                                                <DonateInput
                                                     name={String(f.name)}
                                                     label={f.label}
                                                     isRequired={mode === GenericFormMode.Create && f.isRequired}

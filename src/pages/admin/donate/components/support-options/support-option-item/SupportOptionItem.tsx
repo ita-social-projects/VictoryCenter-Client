@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../../../../../../components/admin/button/Button';
-import { Input } from '../../input/Input';
+import { DonateInput } from '../../donate-input/DonateInput';
 import './SupportOptionItem.scss';
 import { SupportOptionsType } from '../../../../../../types/admin/donate';
 import { ConfirmationModal } from '../../../../../../components/admin/confirmation-modal/ConfirmationModal';
@@ -154,7 +154,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
             <div className="support-option-fields">
                 {!isViewMode && (
                     <div className="support-option-field">
-                        <Input
+                        <DonateInput
                             name="name"
                             isTitle={true}
                             value={name}
@@ -170,7 +170,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                     </div>
                 )}
                 <div className="support-option-field">
-                    <Input
+                    <DonateInput
                         name="value"
                         isTitle={true}
                         placeholder={DONATE_TEXT.PLACEHOLDER.SUPPORT_OPTION}

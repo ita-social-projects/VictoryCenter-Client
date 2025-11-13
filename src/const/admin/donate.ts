@@ -3,6 +3,7 @@ const getMaxDigitsError = (count: number) => `Введено більше ${coun
 const getMinSymbolsError = (count: number) => `Введено менше ${count} символів`;
 const getMaxSymbolsError = (count: number) => `Введено більше ${count} символів`;
 const getRequiredError = (field: string) => `${field} є обов'язковим полем`;
+const getGenericRequiredError = () => `Поле обов'язкове`;
 
 const COMMON_TEXT = {
     TITLE_IBAN: 'IBAN',
@@ -152,10 +153,10 @@ export const DONATE_VALIDATION = {
     },
     supportOptions: {
         name: {
-            getRequiredError: () => getRequiredError(DONATE_TEXT.SUPPORT_OPTIONS.NAME),
+            getRequiredError: () => getGenericRequiredError(),
         },
         value: {
-            getRequiredError: () => getRequiredError(DONATE_TEXT.SUPPORT_OPTIONS.VALUE),
+            getRequiredError: () => getGenericRequiredError(),
         },
     },
 };

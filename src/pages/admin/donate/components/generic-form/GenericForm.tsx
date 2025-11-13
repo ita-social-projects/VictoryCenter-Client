@@ -301,13 +301,13 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                     {isChildForm && (
                                         <div className="form-name-actions">
                                             <button
-                                                className="edit-btn"
+                                                className={`edit-btn ${mode}`}
                                                 aria-label="edit-btn"
                                                 type="button"
                                                 onClick={handleEditClick}
                                             ></button>
                                             <button
-                                                className={`delete-btn delete-btn-icon ${isDeleting ? 'pressed' : ''}`}
+                                                className={`delete-btn delete-btn-icon ${mode} ${isDeleting ? 'pressed' : ''}`}
                                                 aria-label="delete-btn"
                                                 type="button"
                                                 onClick={handleDeleteClick}
@@ -358,23 +358,6 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                     <span className="error">{errors[f.name]}</span>
                                                 )}
                                             </div>
-
-                                            {isChildForm && isTitleField && mode === GenericFormMode.Edit && (
-                                                <div className={`title-actions`}>
-                                                    <button
-                                                        type="button"
-                                                        aria-label="edit-btn"
-                                                        className={`edit-btn ${mode}`}
-                                                        onClick={handleEditClick}
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        aria-label="delete-btn"
-                                                        className={`delete-btn delete-btn-icon ${isDeleting ? 'pressed' : ''}`}
-                                                        onClick={handleDeleteClick}
-                                                    />
-                                                </div>
-                                            )}
                                         </div>
                                     );
                                 })}

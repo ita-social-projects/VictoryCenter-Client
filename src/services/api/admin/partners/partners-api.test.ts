@@ -33,7 +33,7 @@ describe('PartnersApi (admin)', () => {
                 id: 10,
                 title: 'Banner title',
                 description: 'Banner description',
-                image: { id: 5, url: 'http://img', mimeType: 'image/png' },
+                image: { id: 5, url: 'https://img', mimeType: 'image/png' },
             };
 
             mockClient.get.mockResolvedValueOnce({ data: bannerDto });
@@ -66,7 +66,7 @@ describe('PartnersApi (admin)', () => {
                 id: 1,
                 title: request.title,
                 description: request.description,
-                image: { id: 7, url: 'http://new-image', mimeType: 'image/png' },
+                image: { id: 7, url: 'https://new-image', mimeType: 'image/png' },
             };
             mockClient.put.mockResolvedValueOnce({ data: responseDto });
 
@@ -120,7 +120,7 @@ describe('PartnersApi (admin)', () => {
                     id: 1,
                     title: 'Banner',
                     description: 'Desc',
-                    image: { id: 2, url: 'http://img', mimeType: 'image/png' },
+                    image: { id: 2, url: 'https://img', mimeType: 'image/png' },
                 },
                 sections: [
                     {
@@ -128,7 +128,7 @@ describe('PartnersApi (admin)', () => {
                         title: 'Section',
                         description: 'Section description',
                         partners: [
-                            { id: 4, description: 'Partner', image: { id: 5, url: 'http://partner', mimeType: 'image/png' } },
+                            { id: 4, description: 'Partner', image: { id: 5, url: 'https://partner', mimeType: 'image/png' } },
                         ],
                     },
                 ],
@@ -228,7 +228,7 @@ describe('PartnersApi (admin)', () => {
                     {
                         id: 20,
                         description: request.partners[0].description,
-                        image: { id: 11, url: 'http://img', mimeType: 'image/png' },
+                        image: { id: 11, url: 'https://img', mimeType: 'image/png' },
                     },
                 ],
             };
@@ -284,12 +284,12 @@ describe('PartnersApi (admin)', () => {
                     {
                         id: 1,
                         description: 'Existing',
-                        image: { id: 4, url: 'http://old', mimeType: 'image/png' },
+                        image: { id: 4, url: 'https://old', mimeType: 'image/png' },
                     },
                     {
                         id: 2,
                         description: 'New partner',
-                        image: { id: 12, url: 'http://new', mimeType: 'image/png' },
+                        image: { id: 12, url: 'https://new', mimeType: 'image/png' },
                     },
                 ],
             };

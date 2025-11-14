@@ -198,7 +198,7 @@ describe('GenericForm', () => {
                 name: 'name',
                 label: 'Name',
                 isTitle: true,
-                validate: (value) => ((value as string).length < 5 ? 'Назва надто коротка' : undefined),
+                validate: (value) => ((value as string).length < 5 ? 'Name is too short' : undefined),
             },
         ];
 
@@ -212,16 +212,16 @@ describe('GenericForm', () => {
             />,
         );
 
-        const input = screen.getByLabelText('Name');
+        const input = screen.getByDisplayValue('Valid Name');
+
         const publishButton = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH) as HTMLButtonElement;
 
         fireEvent.change(input, { target: { value: '123' } });
         fireEvent.blur(input);
 
-        expect(screen.getByText('Назва надто коротка')).toBeInTheDocument();
+        expect(screen.getByText('Name is too short')).toBeInTheDocument();
         expect(publishButton.disabled).toBe(true);
     });
-
     it('toggles expanded state on header click and keydown', () => {
         render(<GenericForm {...defaultProps} />);
         const header = screen.getByText('Test Name');

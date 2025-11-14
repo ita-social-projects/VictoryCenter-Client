@@ -94,12 +94,10 @@
             }
         }
     }
+}
 
-    &-character-counter {
-        font-family: fonts.$mulish-regular-font;
-        font-size: 14px;
-        color: colors.$grey-700;
-        text-align: right;
-        margin-top: 4px;
-    }
+.donate-input-character-counter {
+    color: colors.$grey-900;
+    text-align: right;
+    margin-top: 0.25rem;
 }

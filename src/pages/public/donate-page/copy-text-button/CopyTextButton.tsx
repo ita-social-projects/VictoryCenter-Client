@@ -18,14 +18,13 @@ export const CopyTextButton = ({ textToCopy }: CopyTextButtonProps) => {
     };
 
     return (
-        <div
-            role="button"
+        <button
             className={`copyTextButton ${copied ? 'copied' : ''}`}
             onClick={handleCopy}
             data-message={t('COPIED_MESSAGE')}
             onAnimationEnd={() => setCopied(false)}
         >
             {copied ? <CheckMark className="checkmark-icon" /> : <Copy className="checkmark-icon" />}
-        </div>
+        </button>
     );
 };

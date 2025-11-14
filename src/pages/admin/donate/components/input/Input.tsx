@@ -92,6 +92,8 @@ export const Input = ({
 
     const showClearButton = isFocused && value.length > prefix.length;
     const hasValue = value && value !== prefix;
+    const currentLength = value.length - prefix.length;
+    const showCharacterCounter = maxLength !== undefined;
 
     return (
         <div
@@ -129,7 +131,7 @@ export const Input = ({
                     readOnly={!editable}
                     className="donate-input-textarea"
                     inputMode={onlyNumbers ? 'numeric' : undefined}
-                    maxLength={maxLength}
+                    maxLength={maxLength ? prefix.length + maxLength : undefined}
                 />
 
                 {showClearButton && (
@@ -142,6 +144,12 @@ export const Input = ({
                     ></button>
                 )}
             </div>
+
+            {showCharacterCounter && (
+                <div className="donate-input-character-counter">
+                    {currentLength}/{maxLength}
+                </div>
+            )}
         </div>
     );
 };

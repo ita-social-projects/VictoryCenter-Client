@@ -162,6 +162,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                             onValueChange={setName}
                             handleBlur={() => validateField('name', name)}
                             isRequired={true}
+                            maxLength={50}
                         />
                         {errors.name && <span className="error">{errors.name}</span>}
                     </div>
@@ -177,6 +178,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                         onValueChange={setValue}
                         handleBlur={() => validateField('value', value)}
                         isRequired={true}
+                        maxLength={100}
                     />
                     {errors.value && <span className="error">{errors.value}</span>}
                 </div>

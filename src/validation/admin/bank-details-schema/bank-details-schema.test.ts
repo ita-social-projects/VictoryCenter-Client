@@ -1,4 +1,4 @@
-import { BANK_DETAILS_VALIDATION_FUNCTIONS } from './bank-details-schema';
+import { BANK_DETAILS_VALIDATION_FUNCTIONS, SUPPORT_OPTIONS_VALIDATION_FUNCTIONS } from './bank-details-schema';
 import { DONATE_VALIDATION } from '../../../const/admin/donate';
 
 describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
@@ -50,16 +50,34 @@ describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
 
     describe('validateIban', () => {
         it('return undefined if value is valid', () => {
-            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban('UA123456789012345678901234567')).toBeUndefined();
+            expect(
+                BANK_DETAILS_VALIDATION_FUNCTIONS.validateUkrainianIban('UA123456789012345678901234567'),
+            ).toBeUndefined();
+
+            expect(
+                BANK_DETAILS_VALIDATION_FUNCTIONS.validateForeignIban('EN12345678901234567890123456789012'),
+            ).toBeUndefined();
         });
 
         it('return error if value is too short', () => {
-            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban('UA12')).toBe(DONATE_VALIDATION.iban.getMinError());
+            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateUkrainianIban('UA12')).toBe(
+                DONATE_VALIDATION.ukrainianIban.getMinError(),
+            );
         });
 
         it('return error if value is too long', () => {
-            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban('UA' + '1'.repeat(100))).toBe(
-                DONATE_VALIDATION.iban.getMaxError(),
+            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateUkrainianIban('UA' + '1'.repeat(100))).toBe(
+                DONATE_VALIDATION.ukrainianIban.getMaxError(),
+            );
+
+            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateForeignIban('EN' + '1'.repeat(100))).toBe(
+                DONATE_VALIDATION.foreignIban.getMaxError(),
+            );
+        });
+
+        it('return error if foreignIban is empty', () => {
+            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateForeignIban('')).toBe(
+                DONATE_VALIDATION.foreignIban.getRequiredError(),
             );
         });
     });
@@ -86,6 +104,16 @@ describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
                 DONATE_VALIDATION.swift.getRequiredError(),
             );
         });
+
+        it('return error if value is too short', () => {
+            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift('123')).toBe(DONATE_VALIDATION.swift.getMinError());
+        });
+
+        it('return error if value is too long', () => {
+            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift('1234567890123')).toBe(
+                DONATE_VALIDATION.swift.getMaxError(),
+            );
+        });
     });
 
     describe('validateAddress', () => {
@@ -96,6 +124,65 @@ describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
         it('return error if value is empty', () => {
             expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateAddress('')).toBe(
                 DONATE_VALIDATION.address.getRequiredError(),
+            );
+        });
+    });
+
+    describe('validateAccount', () => {
+        it('return undefined if value is valid', () => {
+            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateAccount('1234567890')).toBeUndefined();
+        });
+
+        it('return error if value is empty', () => {
+            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateAccount('')).toBe(
+                DONATE_VALIDATION.account.getRequiredError(),
+            );
+        });
+
+        it('return error if value is too long', () => {
+            const longString = 'a'.repeat(DONATE_VALIDATION.account.maxLength + 1);
+            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateAccount(longString)).toBe(
+                DONATE_VALIDATION.account.getMaxError(),
+            );
+        });
+    });
+});
+
+describe('SUPPORT_OPTIONS_VALIDATION_FUNCTIONS', () => {
+    describe('validateName', () => {
+        it('return undefined if value is valid', () => {
+            expect(SUPPORT_OPTIONS_VALIDATION_FUNCTIONS.validateName('Valid Name')).toBeUndefined();
+        });
+
+        it('return error if value is empty', () => {
+            expect(SUPPORT_OPTIONS_VALIDATION_FUNCTIONS.validateName('')).toBe(
+                DONATE_VALIDATION.supportOptions.name.getRequiredError(),
+            );
+        });
+
+        it('return error if value is too long', () => {
+            const longString = 'a'.repeat(DONATE_VALIDATION.supportOptions.name.maxLength + 1);
+            expect(SUPPORT_OPTIONS_VALIDATION_FUNCTIONS.validateName(longString)).toBe(
+                DONATE_VALIDATION.supportOptions.name.getMaxError(),
+            );
+        });
+    });
+
+    describe('validateValue', () => {
+        it('return undefined if value is valid', () => {
+            expect(SUPPORT_OPTIONS_VALIDATION_FUNCTIONS.validateValue('Valid Value')).toBeUndefined();
+        });
+
+        it('return error if value is empty', () => {
+            expect(SUPPORT_OPTIONS_VALIDATION_FUNCTIONS.validateValue('')).toBe(
+                DONATE_VALIDATION.supportOptions.value.getRequiredError(),
+            );
+        });
+
+        it('return error if value is too long', () => {
+            const longString = 'a'.repeat(DONATE_VALIDATION.supportOptions.value.maxLength + 1);
+            expect(SUPPORT_OPTIONS_VALIDATION_FUNCTIONS.validateValue(longString)).toBe(
+                DONATE_VALIDATION.supportOptions.value.getMaxError(),
             );
         });
     });

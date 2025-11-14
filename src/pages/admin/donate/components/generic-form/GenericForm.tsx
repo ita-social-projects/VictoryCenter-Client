@@ -353,6 +353,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                         handleValueChange(f.name, cleanValue)
                                                     }
                                                     onlyNumbers={f.onlyNumbers}
+                                                    maxLength={f.maxLength}
                                                 />
                                                 {touchedFields.has(f.name) && errors[f.name] && (
                                                     <span className="error">{errors[f.name]}</span>
@@ -401,7 +402,12 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                           })
                                             }
                                             buttonStyle="primary"
-                                            disabled={isSubmitting || hasEmptyRequiredFields || !isChanged()}
+                                            disabled={
+                                                isSubmitting ||
+                                                hasEmptyRequiredFields ||
+                                                !isChanged() ||
+                                                Object.values(errors).some((e) => e !== undefined)
+                                            }
                                         >
                                             {DONATE_TEXT.BUTTON.PUBLISH}
                                         </Button>

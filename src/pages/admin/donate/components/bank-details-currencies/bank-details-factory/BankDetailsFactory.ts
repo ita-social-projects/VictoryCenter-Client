@@ -67,9 +67,11 @@ function createForeignFields(currency: 'USD' | 'EUR'): GenericFormField<ForeignB
         {
             name: 'iban',
             label: `${DONATE_TEXT.BANK_DETAILS.IBAN.TITLE} (${currency})`,
-            validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban),
+            prefix: 'UA',
+            onlyNumbers: true,
+            validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateUkrainianIban),
             isRequired: true,
-            maxLength: 29,
+            maxLength: 27,
         },
         {
             name: 'swift',
@@ -106,9 +108,9 @@ function createUahFields(): GenericFormField<UahBankDetails>[] {
             label: `${DONATE_TEXT.BANK_DETAILS.IBAN.TITLE} (UAH)`,
             prefix: 'UA',
             onlyNumbers: true,
-            validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban),
+            validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateUkrainianIban),
             isRequired: true,
-            maxLength: 29,
+            maxLength: 27,
         },
         {
             name: 'paymentPurpose',
@@ -136,6 +138,7 @@ const correspondentBanksFields: GenericFormField<CorrespondentBankDetails>[] = [
         isTitle: true,
         validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateName),
         isRequired: true,
+        maxLength: 200,
     },
     {
         name: 'swift',
@@ -156,9 +159,9 @@ const correspondentBanksFields: GenericFormField<CorrespondentBankDetails>[] = [
     {
         name: 'iban',
         label: DONATE_TEXT.CORRESPONDENT_BANKS.IBAN.TITLE,
-        validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban),
+        validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateForeignIban),
         placeholder: DONATE_TEXT.CORRESPONDENT_BANKS.DEFAULT_PLACEHOLDER,
-        maxLength: 29,
+        maxLength: 34,
     },
 ];
 

@@ -94,4 +94,12 @@
             }
         }
     }
+
+    &-character-counter {
+        font-family: fonts.$mulish-regular-font;
+        font-size: 14px;
+        color: colors.$grey-700;
+        text-align: right;
+        margin-top: 4px;
+    }
 }

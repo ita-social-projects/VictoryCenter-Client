@@ -10,6 +10,7 @@ const COMMON_TEXT = {
     TITLE_EDRPOU: 'ЄДРПОУ',
     PLACEHOLDER_CODE: 'Введіть код',
     PLACEHOLDER_BANK_NAME: 'Введіть назву банку',
+    BANK_NAME: 'Назва банку',
 };
 
 export const DONATE_TEXT = {
@@ -107,17 +108,31 @@ export const DONATE_TEXT = {
 
 export const VALIDATION_PARAMS = {
     edrpou: { count: 8 },
-    iban: { count: 29, errorLength: 27 },
+    ukrainianIban: { count: 29, errorLength: 27 },
+    foreignIban: { count: 34 },
     swift: { minLength: 8, maxLength: 11 },
+    name: { maxLength: 200 },
+    receiver: { maxLength: 200 },
+    address: { maxLength: 200 },
+    account: { maxLength: 34 },
+    paymentPurpose: { maxLength: 500 },
+    supportOptions: {
+        name: { maxLength: 50 },
+        value: { maxLength: 100 },
+    },
 };
 
 export const DONATE_VALIDATION = {
     getDigitsOnlyError: () => `Мають бути цифри`,
     name: {
-        getRequiredError: () => getRequiredError('Назва банку'),
+        maxLength: VALIDATION_PARAMS.name.maxLength,
+        getRequiredError: () => getRequiredError(COMMON_TEXT.BANK_NAME),
+        getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.name.maxLength),
     },
     receiver: {
+        maxLength: VALIDATION_PARAMS.receiver.maxLength,
         getRequiredError: () => getRequiredError(DONATE_TEXT.BANK_DETAILS.RECEIVER.TITLE),
+        getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.receiver.maxLength),
     },
     edrpou: {
         count: VALIDATION_PARAMS.edrpou.count,
@@ -125,14 +140,22 @@ export const DONATE_VALIDATION = {
         getMaxError: () => getMaxDigitsError(VALIDATION_PARAMS.edrpou.count),
         getRequiredError: () => getRequiredError(COMMON_TEXT.TITLE_EDRPOU),
     },
-    iban: {
-        count: VALIDATION_PARAMS.iban.count,
-        getMinError: () => getMinDigitsError(VALIDATION_PARAMS.iban.errorLength),
-        getMaxError: () => getMaxDigitsError(VALIDATION_PARAMS.iban.errorLength),
+    ukrainianIban: {
+        count: VALIDATION_PARAMS.ukrainianIban.count,
+        getMinError: () => getMinDigitsError(VALIDATION_PARAMS.ukrainianIban.errorLength),
+        getMaxError: () => getMaxDigitsError(VALIDATION_PARAMS.ukrainianIban.errorLength),
+        getRequiredError: () => getRequiredError(COMMON_TEXT.TITLE_IBAN),
+    },
+    foreignIban: {
+        count: VALIDATION_PARAMS.foreignIban.count,
+        getMinError: () => getMinSymbolsError(VALIDATION_PARAMS.foreignIban.count),
+        getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.foreignIban.count),
         getRequiredError: () => getRequiredError(COMMON_TEXT.TITLE_IBAN),
     },
     paymentPurpose: {
+        maxLength: VALIDATION_PARAMS.paymentPurpose.maxLength,
         getRequiredError: () => getRequiredError(DONATE_TEXT.BANK_DETAILS.PAYMENT_PURPOSE.TITLE),
+        getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.paymentPurpose.maxLength),
     },
     swift: {
         minLength: VALIDATION_PARAMS.swift.minLength,
@@ -142,17 +165,25 @@ export const DONATE_VALIDATION = {
         getRequiredError: () => getRequiredError(COMMON_TEXT.TITLE_SWIFT),
     },
     address: {
+        maxLength: VALIDATION_PARAMS.address.maxLength,
         getRequiredError: () => getRequiredError(DONATE_TEXT.BANK_DETAILS.ADDRESS.TITLE),
+        getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.address.maxLength),
     },
     account: {
+        maxLength: VALIDATION_PARAMS.account.maxLength,
         getRequiredError: () => getRequiredError(DONATE_TEXT.CORRESPONDENT_BANKS.ACCOUNT.TITLE),
+        getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.account.maxLength),
     },
     supportOptions: {
         name: {
+            maxLength: VALIDATION_PARAMS.supportOptions.name.maxLength,
             getRequiredError: () => getRequiredError(DONATE_TEXT.SUPPORT_OPTIONS.NAME),
+            getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.supportOptions.name.maxLength),
         },
         value: {
+            maxLength: VALIDATION_PARAMS.supportOptions.value.maxLength,
             getRequiredError: () => getRequiredError(DONATE_TEXT.SUPPORT_OPTIONS.VALUE),
+            getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.supportOptions.value.maxLength),
         },
     },
 };

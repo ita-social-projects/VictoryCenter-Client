@@ -8,6 +8,7 @@ interface ProgramCardProps {
     className: string;
 }
 export const ProgramCard = ({ program, className }: ProgramCardProps) => {
+    const programCategories = program.categories.map((categorie) => categorie.name).join(', ');
     return (
         <div className={`card-block ${className}`}>
             <img src={program.image?.url} alt={program.name} className="card-img" />
@@ -15,7 +16,7 @@ export const ProgramCard = ({ program, className }: ProgramCardProps) => {
                 <div className="subtitle-info">
                     <div className="subtitle-content">
                         <div className="subtitle-link">
-                            <p className="program-subtitle">{program.categories.map((x) => x.name).join(', ')}</p>
+                            <p className="program-subtitle">{programCategories}</p>
                             <h2 className="program-title">{program.name}</h2>
                         </div>
                         <div className="arrow-container">

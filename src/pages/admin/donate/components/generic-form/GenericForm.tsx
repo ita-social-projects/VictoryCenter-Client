@@ -373,7 +373,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                         aria-label="edit-btn"
                                                         className={`edit-btn ${mode}`}
                                                         onClick={handleEditClick}
-                                                        disabled={true}
+                                                        disabled
                                                     />
                                                     <button
                                                         type="button"

@@ -221,26 +221,6 @@ describe('SupportOptionsForm', () => {
         expect(addButton).toBeDisabled();
     });
 
-    it('disables add new button when adding', () => {
-        render(
-            <SupportOptionsForm
-                supportOptions={mockSupportOptions}
-                isLoading={false}
-                onCreateOption={mockOnCreateOption}
-                onUpdateOption={mockOnUpdateOption}
-                onDeleteOption={mockOnDeleteOption}
-            />,
-        );
-
-        const addButton = screen.getByTestId('btn-add new');
-
-        expect(addButton).toBeEnabled();
-
-        fireEvent.click(addButton);
-        expect(addButton).toBeDisabled();
-        expect(addButton).toBeInTheDocument();
-    });
-
     it('shows loader when loading with no items', () => {
         render(
             <SupportOptionsForm

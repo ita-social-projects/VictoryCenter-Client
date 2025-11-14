@@ -135,6 +135,11 @@ export const SupportOptionItem = ({
         }
     };
 
+    const handleEditClick = () => {
+        if (editable) return;
+        setMode(SupportOptionItemMode.Edit);
+    };
+
     return (
         <div className="support-option">
             <div className={`support-option-header ${editable ? 'editable' : ''}`}>
@@ -144,10 +149,7 @@ export const SupportOptionItem = ({
                         <button
                             aria-label="edit-btn"
                             className={`edit-btn ${editable ? 'edit' : ''}`}
-                            onClick={() => {
-                                if (editable) return;
-                                setMode(SupportOptionItemMode.Edit);
-                            }}
+                            onClick={handleEditClick}
                             disabled={isSubmitting}
                         />
                         <button

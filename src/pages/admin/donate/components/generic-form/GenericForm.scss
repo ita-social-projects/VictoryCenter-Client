@@ -98,15 +98,18 @@
         .form-head-container {
             display: flex;
             flex-direction: row;
+            justify-content: space-between;
         }
 
         .form-name {
             font-size: 1.5rem;
             font-weight: 600;
-
-            &-actions {
-                gap: 0.5rem;
-            }
+        }
+        
+        .form-name-actions {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
         }
 
         .body {
@@ -126,13 +129,6 @@
 
             .form-field-content {
                 flex: 1;
-            }
-
-            .title-actions {
-                display: flex;
-                flex-direction: row;
-                gap: 0.5rem;
-                flex-shrink: 0;
             }
         }
     }

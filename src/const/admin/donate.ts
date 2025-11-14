@@ -97,7 +97,10 @@ export const DONATE_TEXT = {
         SUPPORT_OPTION: 'Введіть реквізити',
     },
     MESSAGE: {
-        SUPPORT_OPTION_PUBLISHED: 'Варіант підтримки успішно опубліковано',
+        SUPPORT_OPTIONS: {
+            PUBLISHED: 'Варіант підтримки успішно опубліковано',
+            DELETED: 'Варіант підтримки видалено успішно',
+        },
         CHANGES_SAVED: 'Зміни успішно опубліковано',
         CORRESPONDENT_BANKS: {
             DELETED: 'Банк-кореспондент видалено успішно',

@@ -308,13 +308,13 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                     {isChildForm && (
                                         <div className="form-name-actions">
                                             <button
-                                                className="edit-btn"
+                                                className={`edit-btn ${mode}`}
                                                 aria-label="edit-btn"
                                                 type="button"
                                                 onClick={handleEditClick}
                                             ></button>
                                             <button
-                                                className={`delete-btn delete-btn-icon ${isDeleting ? 'pressed' : ''}`}
+                                                className={`delete-btn delete-btn-icon ${mode} ${isDeleting ? 'pressed' : ''}`}
                                                 aria-label="delete-btn"
                                                 type="button"
                                                 onClick={handleDeleteClick}

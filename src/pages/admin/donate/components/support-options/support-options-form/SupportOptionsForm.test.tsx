@@ -1,17 +1,30 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { SupportOptionsForm } from './SupportOptionsForm';
 import { DONATE_TEXT } from '../../../../../../const/admin/donate';
 import { BankCurrency } from '../../../../../../types/admin/donate';
 
 jest.mock('../support-option-item/SupportOptionItem', () => ({
-    SupportOptionItem: ({ data, onSave, onDelete, onCancel }: any) => (
-        <div data-testid={`support-option-${data?.id || 'new'}`}>
-            <span>{data?.name || 'New Option'}</span>
-            <button onClick={() => onSave?.('Test', '123')}>Save</button>
-            {onDelete && <button onClick={onDelete}>Delete</button>}
-            {onCancel && <button onClick={onCancel}>Cancel</button>}
-        </div>
-    ),
+    ...jest.requireActual('../support-option-item/SupportOptionItem'),
+
+    SupportOptionItem: ({ data, onSave, onDelete, onCancel, onModeChange }: any) => {
+        const { SupportOptionItemMode } = jest.requireActual('../support-option-item/SupportOptionItem');
+
+        return (
+            <div data-testid={`support-option-${data?.id || 'new'}`}>
+                <span>{data?.name || 'New Option'}</span>
+                <button onClick={() => onSave?.('Test', '123')}>Save</button>
+                {onDelete && <button onClick={onDelete}>Delete</button>}
+                {onCancel && <button onClick={onCancel}>Cancel</button>}
+
+                {onModeChange && (
+                    <>
+                        <button onClick={() => onModeChange(SupportOptionItemMode.Edit)}>Simulate Edit</button>
+                        <button onClick={() => onModeChange(SupportOptionItemMode.View)}>Simulate View</button>
+                    </>
+                )}
+            </div>
+        );
+    },
 }));
 
 jest.mock('../../../../../../components/admin/button/Button', () => ({
@@ -208,26 +221,6 @@ describe('SupportOptionsForm', () => {
         expect(addButton).toBeDisabled();
     });
 
-    it('disables add new button when adding', () => {
-        render(
-            <SupportOptionsForm
-                supportOptions={mockSupportOptions}
-                isLoading={false}
-                onCreateOption={mockOnCreateOption}
-                onUpdateOption={mockOnUpdateOption}
-                onDeleteOption={mockOnDeleteOption}
-            />,
-        );
-
-        const addButton = screen.getByTestId('btn-add new');
-
-        expect(addButton).toBeEnabled();
-
-        fireEvent.click(addButton);
-        expect(addButton).toBeDisabled();
-        expect(addButton).toBeInTheDocument();
-    });
-
     it('shows loader when loading with no items', () => {
         render(
             <SupportOptionsForm
@@ -272,5 +265,51 @@ describe('SupportOptionsForm', () => {
 
         expect(screen.queryByAltText('Завантаження...')).not.toBeInTheDocument();
         expect(screen.getByTestId('support-options-not-found')).toBeInTheDocument();
+    });
+
+    it('disables add new button when an item is in edit mode', () => {
+        render(
+            <SupportOptionsForm
+                supportOptions={mockSupportOptions}
+                isLoading={false}
+                onCreateOption={mockOnCreateOption}
+                onUpdateOption={mockOnUpdateOption}
+                onDeleteOption={mockOnDeleteOption}
+            />,
+        );
+
+        const addButton = screen.getByTestId('btn-add new');
+        expect(addButton).not.toBeDisabled();
+
+        const firstItem = screen.getByTestId('support-option-1');
+
+        const simulateEditButton = within(firstItem).getByText('Simulate Edit');
+        fireEvent.click(simulateEditButton);
+
+        expect(addButton).toBeDisabled();
+    });
+
+    it('re-enables add new button when an item exits edit mode', () => {
+        render(
+            <SupportOptionsForm
+                supportOptions={mockSupportOptions}
+                isLoading={false}
+                onCreateOption={mockOnCreateOption}
+                onUpdateOption={mockOnUpdateOption}
+                onDeleteOption={mockOnDeleteOption}
+            />,
+        );
+
+        const addButton = screen.getByTestId('btn-add new');
+
+        const firstItem = screen.getByTestId('support-option-1');
+        const simulateEditButton = within(firstItem).getByText('Simulate Edit');
+        const simulateViewButton = within(firstItem).getByText('Simulate View');
+
+        fireEvent.click(simulateEditButton);
+        expect(addButton).toBeDisabled();
+
+        fireEvent.click(simulateViewButton);
+        expect(addButton).not.toBeDisabled();
     });
 });

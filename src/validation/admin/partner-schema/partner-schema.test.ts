@@ -51,7 +51,7 @@ describe('partner-schema validations', () => {
                 const min = PARTNER_BANNER_VALIDATION.description.min;
                 const result = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateDescription('a'.repeat(min - 1));
                 expect(result).toBe(
-                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PARTNER_BANNER_VALIDATION.description.min),
+                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PARTNER_BANNER_VALIDATION.description.max),
                 );
             });
 
@@ -59,7 +59,7 @@ describe('partner-schema validations', () => {
                 const max = PARTNER_BANNER_VALIDATION.description.max;
                 const result = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateDescription('a'.repeat(max + 1));
                 expect(result).toBe(
-                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PARTNER_BANNER_VALIDATION.description.max),
+                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PARTNER_BANNER_VALIDATION.description.min),
                 );
             });
         });

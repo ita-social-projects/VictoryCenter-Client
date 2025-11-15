@@ -13,7 +13,15 @@ const mockedProgramsCategoriesApi = ProgramsCategoriesApi as jest.Mocked<typeof 
 
 // Simplify Modal rendering and expose structure hooks
 jest.mock('../../../../../components/common/modal/Modal', () => {
-    const ModalMock = ({ isOpen, children }: any) => (isOpen ? <div data-testid="modal">{children}</div> : null);
+    const ModalMock = ({ isOpen, children, onClose }: any) =>
+        isOpen ? (
+            <div data-testid="modal">
+                <button data-testid="modal-close" onClick={onClose}>
+                    CloseModal
+                </button>
+                {children}
+            </div>
+        ) : null;
     ModalMock.Title = ({ children }: { children: React.ReactNode }) => <h1 data-testid="modal-title">{children}</h1>;
     ModalMock.Content = ({ children }: { children: React.ReactNode }) => (
         <div data-testid="modal-content">{children}</div>
@@ -205,6 +213,34 @@ describe('ProgramCategoryModal - Add Mode', () => {
 
         expect(screen.queryByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY)).not.toBeInTheDocument();
     });
+
+    it('opens close confirmation when dirty and handles cancel/confirm', async () => {
+        const onClose = jest.fn();
+        renderModal({ onClose });
+
+        typeName('Dirty name');
+        fireEvent.click(screen.getByTestId('modal-close'));
+
+        expect(
+            screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+        ).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('No'));
+        expect(
+            screen.queryByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
+        ).not.toBeInTheDocument();
+        expect(onClose).not.toHaveBeenCalled();
+
+        fireEvent.click(screen.getByTestId('modal-close'));
+        fireEvent.click(screen.getByText('Yes'));
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('resets edit form to empty when there are no categories', () => {
+        renderModal({ mode: 'edit', categories: [], onEditCategory: jest.fn() } as any);
+        expect((getNameInput() as HTMLInputElement).value).toBe('');
+        expect(getSaveButton()).toBeDisabled();
+    });
 });
 
 describe('ProgramCategoryModal - Edit Mode', () => {
@@ -316,5 +352,17 @@ describe('ProgramCategoryModal - Edit Mode', () => {
         expect(
             screen.getByText(PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError()),
         ).toBeInTheDocument();
+    });
+
+    it('closes save confirmation without submitting when user cancels', async () => {
+        renderEdit();
+
+        typeName('Omega');
+        fireEvent.click(getSaveButton());
+        expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('No'));
+        expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+        expect(mockedProgramsCategoriesApi.editProgramCategory).not.toHaveBeenCalled();
     });
 });

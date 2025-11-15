@@ -428,9 +428,6 @@ describe('PartnerSectionForm', () => {
 
         fireEvent.click(screen.getByTestId(`partner-delete-${partnerWithoutId.localId}`));
 
-        expect(onChange).toHaveBeenCalledWith(
-            expect.objectContaining({ deletedPartnerIds: [] }),
-            expect.anything(),
-        );
+        expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ deletedPartnerIds: [] }), expect.anything());
     });
 });

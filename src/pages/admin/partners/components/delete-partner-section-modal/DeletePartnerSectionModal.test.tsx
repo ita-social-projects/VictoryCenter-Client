@@ -124,6 +124,7 @@ describe('DeletePartnerSectionModal', () => {
         fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
 
         expect(PartnersApi.deleteSection).not.toHaveBeenCalled();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES })).toBeDisabled();
 
         await waitFor(() => {
             expect(onDeleteSection).not.toHaveBeenCalled();
@@ -218,5 +219,44 @@ describe('DeletePartnerSectionModal', () => {
         await waitFor(() => {
             expect(onClose).toHaveBeenCalled();
         });
+    });
+
+    it('clears error after failure once modal is reopened', async () => {
+        (PartnersApi.deleteSection as jest.Mock).mockRejectedValue(new Error('Failed'));
+
+        const { rerender } = render(
+            <DeletePartnerSectionModal
+                isOpen={true}
+                onClose={onClose}
+                sectionToDelete={section}
+                onDeleteSection={onDeleteSection}
+            />,
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.YES }));
+
+        expect(await screen.findByText(PARTNERS_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_PARTNER_SECTION)).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.NO }));
+
+        rerender(
+            <DeletePartnerSectionModal
+                isOpen={false}
+                onClose={onClose}
+                sectionToDelete={section}
+                onDeleteSection={onDeleteSection}
+            />,
+        );
+
+        rerender(
+            <DeletePartnerSectionModal
+                isOpen={true}
+                onClose={onClose}
+                sectionToDelete={section}
+                onDeleteSection={onDeleteSection}
+            />,
+        );
+
+        expect(screen.queryByText(PARTNERS_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_PARTNER_SECTION)).not.toBeInTheDocument();
     });
 });

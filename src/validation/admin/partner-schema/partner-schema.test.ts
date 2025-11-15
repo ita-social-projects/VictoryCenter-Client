@@ -50,13 +50,17 @@ describe('partner-schema validations', () => {
             it('returns min length error', () => {
                 const min = PARTNER_BANNER_VALIDATION.description.min;
                 const result = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateDescription('a'.repeat(min - 1));
-                expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PARTNER_BANNER_VALIDATION.description.max));
+                expect(result).toBe(
+                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PARTNER_BANNER_VALIDATION.description.min),
+                );
             });
 
             it('returns max length error', () => {
                 const max = PARTNER_BANNER_VALIDATION.description.max;
                 const result = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateDescription('a'.repeat(max + 1));
-                expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PARTNER_BANNER_VALIDATION.description.min));
+                expect(result).toBe(
+                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PARTNER_BANNER_VALIDATION.description.max),
+                );
             });
         });
     });

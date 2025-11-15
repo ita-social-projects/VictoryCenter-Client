@@ -28,7 +28,7 @@ jest.mock('../../../../../components/admin/button/Button', () => ({
 }));
 
 jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ label, value, onChange, disabled, id }: ImageInputProps) => (
+    ImageInput: ({ label, value, onChange, disabled, id, setError }: ImageInputProps) => (
         <div data-testid={`${id}-container`}>
             <span>{label}</span>
             <button
@@ -40,6 +40,12 @@ jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
             </button>
             <button type="button" onClick={() => onChange(null)} disabled={disabled}>
                 Remove image
+            </button>
+            <button type="button" onClick={() => setError?.('Image invalid')} disabled={disabled}>
+                Trigger image error
+            </button>
+            <button type="button" onClick={() => setError?.(null)} disabled={disabled}>
+                Clear image error
             </button>
             {value ? <span data-testid={`${id}-value`}>Image selected</span> : null}
         </div>
@@ -332,6 +338,25 @@ describe('PartnerBanner', () => {
             expect(getTitleInput()).toBeDisabled();
             expect(getDescriptionInput()).toBeDisabled();
             expect(getPublishButton()).toBeDisabled();
+        });
+    });
+
+    it('shows image error and disables publish until resolved', async () => {
+        render(<PartnerBanner />);
+
+        const publishButton = getPublishButton();
+        expect(publishButton).toBeEnabled();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Trigger image error' }));
+
+        expect(await screen.findByTestId('input-error')).toHaveTextContent('Image invalid');
+        expect(publishButton).toBeDisabled();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Clear image error' }));
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('input-error')).not.toBeInTheDocument();
+            expect(publishButton).toBeEnabled();
         });
     });
 });

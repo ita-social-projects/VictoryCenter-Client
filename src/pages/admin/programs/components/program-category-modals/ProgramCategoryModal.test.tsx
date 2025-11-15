@@ -221,9 +221,7 @@ describe('ProgramCategoryModal - Add Mode', () => {
         typeName('Dirty name');
         fireEvent.click(screen.getByTestId('modal-close'));
 
-        expect(
-            screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
-        ).toBeInTheDocument();
+        expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
 
         fireEvent.click(screen.getByText('No'));
         expect(

@@ -94,7 +94,7 @@ const mockTeamMember: TeamMember = {
     description: 'Test member',
     status: VisibilityStatus.Published,
     categoryId: 1,
-    localizations: []
+    localizations: [],
 };
 
 const mockTeamCategory: TeamCategory = {

@@ -16,7 +16,7 @@ describe('updateCategoryMemberCounts', () => {
         description: 'Test member',
         status: 1,
         categoryId: 2,
-        localizations: []
+        localizations: [],
     };
 
     it('should decrement the selected category member count by 1', () => {

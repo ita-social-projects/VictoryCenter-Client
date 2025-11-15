@@ -57,7 +57,7 @@ describe('ProgramsPageModals', () => {
         openAddCategoryModal: jest.fn(),
         openEditCategoryModal: jest.fn(),
         openDeleteCategoryModal: jest.fn(),
-    }
+    };
 
     const mockCloseModalActions = {
         closeAddItemModal: jest.fn(),

@@ -19,9 +19,6 @@ export const TranslateTeamMemberModal = ({
     onTranslateMember,
     memberToTranslate,
 }: TranslateTeamMemberModalProps) => {
-    // const client = useAdminClient();
-    const client = {};
-
     const modalConfig = useMemo(
         () => ({
             mode: ModalMode.Add,

@@ -5,7 +5,7 @@ import './SupportOptionItem.scss';
 import { SupportOptionsType } from '../../../../../../types/admin/donate';
 import { ConfirmationModal } from '../../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
-import { DONATE_TEXT } from '../../../../../../const/admin/donate';
+import { DONATE_TEXT, VALIDATION_PARAMS } from '../../../../../../const/admin/donate';
 import { SUPPORT_OPTIONS_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/bank-details-schema/bank-details-schema';
 
 export enum SupportOptionItemMode {
@@ -162,7 +162,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                             onValueChange={setName}
                             handleBlur={() => validateField('name', name)}
                             isRequired={true}
-                            maxLength={50}
+                            maxLength={VALIDATION_PARAMS.supportOptions.name.maxLength}
                         />
                         {errors.name && <span className="error">{errors.name}</span>}
                     </div>
@@ -178,7 +178,7 @@ export const SupportOptionItem = ({ data, initialMode, onSave, onCancel, onDelet
                         onValueChange={setValue}
                         handleBlur={() => validateField('value', value)}
                         isRequired={true}
-                        maxLength={100}
+                        maxLength={VALIDATION_PARAMS.supportOptions.value.maxLength}
                     />
                     {errors.value && <span className="error">{errors.value}</span>}
                 </div>

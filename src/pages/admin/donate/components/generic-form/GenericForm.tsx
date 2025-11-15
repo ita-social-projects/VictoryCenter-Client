@@ -253,6 +253,12 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
             if (!isOpen) return null;
 
+            const isPublishingDisabled =
+                isSubmitting ||
+                hasEmptyRequiredFields ||
+                !isChanged() ||
+                Object.values(errors).some((e) => e !== undefined);
+
             return (
                 <div
                     className={`generic-form ${mode} ${isChildForm ? 'child' : ''}`}
@@ -402,12 +408,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                           })
                                             }
                                             buttonStyle="primary"
-                                            disabled={
-                                                isSubmitting ||
-                                                hasEmptyRequiredFields ||
-                                                !isChanged() ||
-                                                Object.values(errors).some((e) => e !== undefined)
-                                            }
+                                            disabled={isPublishingDisabled}
                                         >
                                             {DONATE_TEXT.BUTTON.PUBLISH}
                                         </Button>

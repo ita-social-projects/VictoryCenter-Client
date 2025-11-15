@@ -91,7 +91,6 @@ export const Input = ({
     };
 
     const showClearButton = isFocused && value.length > prefix.length;
-    const hasValue = value && value !== prefix;
     const currentLength = value.length - prefix.length;
     const showCharacterCounter = maxLength !== undefined;
 
@@ -121,7 +120,7 @@ export const Input = ({
                     <textarea
                         ref={textAreaRef}
                         name={name}
-                        placeholder={hasValue ? '' : placeholder}
+                        placeholder={placeholder}
                         value={value}
                         onChange={onChange}
                         onFocus={() => setIsFocused(true)}

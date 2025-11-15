@@ -74,12 +74,6 @@ describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
                 DONATE_VALIDATION.foreignIban.getMaxError(),
             );
         });
-
-        it('return error if foreignIban is empty', () => {
-            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateForeignIban('')).toBe(
-                DONATE_VALIDATION.foreignIban.getRequiredError(),
-            );
-        });
     });
 
     describe('validatePaymentPurpose', () => {

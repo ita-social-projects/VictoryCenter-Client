@@ -107,9 +107,9 @@ export const DONATE_TEXT = {
 };
 
 export const VALIDATION_PARAMS = {
-    edrpou: { count: 8 },
-    ukrainianIban: { count: 29, errorLength: 27 },
-    foreignIban: { count: 34 },
+    edrpou: { maxLength: 8 },
+    ukrainianIban: { maxLength: 29, maxLengthWithoutPrefix: 27 },
+    foreignIban: { maxLength: 34 },
     swift: { minLength: 8, maxLength: 11 },
     name: { maxLength: 200 },
     receiver: { maxLength: 200 },
@@ -135,22 +135,20 @@ export const DONATE_VALIDATION = {
         getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.receiver.maxLength),
     },
     edrpou: {
-        count: VALIDATION_PARAMS.edrpou.count,
-        getMinError: () => getMinDigitsError(VALIDATION_PARAMS.edrpou.count),
-        getMaxError: () => getMaxDigitsError(VALIDATION_PARAMS.edrpou.count),
+        maxLength: VALIDATION_PARAMS.edrpou.maxLength,
+        getMinError: () => getMinDigitsError(VALIDATION_PARAMS.edrpou.maxLength),
+        getMaxError: () => getMaxDigitsError(VALIDATION_PARAMS.edrpou.maxLength),
         getRequiredError: () => getRequiredError(COMMON_TEXT.TITLE_EDRPOU),
     },
     ukrainianIban: {
-        count: VALIDATION_PARAMS.ukrainianIban.count,
-        getMinError: () => getMinDigitsError(VALIDATION_PARAMS.ukrainianIban.errorLength),
-        getMaxError: () => getMaxDigitsError(VALIDATION_PARAMS.ukrainianIban.errorLength),
+        maxLength: VALIDATION_PARAMS.ukrainianIban.maxLength,
+        getMinError: () => getMinDigitsError(VALIDATION_PARAMS.ukrainianIban.maxLengthWithoutPrefix),
+        getMaxError: () => getMaxDigitsError(VALIDATION_PARAMS.ukrainianIban.maxLengthWithoutPrefix),
         getRequiredError: () => getRequiredError(COMMON_TEXT.TITLE_IBAN),
     },
     foreignIban: {
-        count: VALIDATION_PARAMS.foreignIban.count,
-        getMinError: () => getMinSymbolsError(VALIDATION_PARAMS.foreignIban.count),
-        getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.foreignIban.count),
-        getRequiredError: () => getRequiredError(COMMON_TEXT.TITLE_IBAN),
+        maxLength: VALIDATION_PARAMS.foreignIban.maxLength,
+        getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.foreignIban.maxLength),
     },
     paymentPurpose: {
         maxLength: VALIDATION_PARAMS.paymentPurpose.maxLength,

@@ -13,18 +13,17 @@ export const BankDetailsValidationSchema = Yup.object({
     edrpou: Yup.string()
         .trim()
         .matches(/^\d+$/, DONATE_VALIDATION.getDigitsOnlyError())
-        .min(DONATE_VALIDATION.edrpou.count, DONATE_VALIDATION.edrpou.getMinError())
-        .max(DONATE_VALIDATION.edrpou.count, DONATE_VALIDATION.edrpou.getMaxError())
+        .min(DONATE_VALIDATION.edrpou.maxLength, DONATE_VALIDATION.edrpou.getMinError())
+        .max(DONATE_VALIDATION.edrpou.maxLength, DONATE_VALIDATION.edrpou.getMaxError())
         .required(DONATE_VALIDATION.edrpou.getRequiredError()),
     ukrainianIban: Yup.string()
         .trim()
         .required(DONATE_VALIDATION.ukrainianIban.getRequiredError())
-        .min(DONATE_VALIDATION.ukrainianIban.count, DONATE_VALIDATION.ukrainianIban.getMinError())
-        .max(DONATE_VALIDATION.ukrainianIban.count, DONATE_VALIDATION.ukrainianIban.getMaxError()),
+        .min(DONATE_VALIDATION.ukrainianIban.maxLength, DONATE_VALIDATION.ukrainianIban.getMinError())
+        .max(DONATE_VALIDATION.ukrainianIban.maxLength, DONATE_VALIDATION.ukrainianIban.getMaxError()),
     foreignIban: Yup.string()
         .trim()
-        .required(DONATE_VALIDATION.foreignIban.getRequiredError())
-        .max(DONATE_VALIDATION.foreignIban.count, DONATE_VALIDATION.foreignIban.getMaxError()),
+        .max(DONATE_VALIDATION.foreignIban.maxLength, DONATE_VALIDATION.foreignIban.getMaxError()),
     paymentPurpose: Yup.string()
         .trim()
         .required(DONATE_VALIDATION.paymentPurpose.getRequiredError())

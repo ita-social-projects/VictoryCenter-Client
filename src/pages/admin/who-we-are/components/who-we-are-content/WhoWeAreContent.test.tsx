@@ -298,7 +298,10 @@ describe('WhoWeAreContent Component', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
         await waitFor(() => {
-            expect(mockAddToast).toHaveBeenCalledWith(COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES, ToastType.Error);
+            expect(mockAddToast).toHaveBeenCalledWith(
+                COMMON_TEXT_ADMIN.MESSAGE.FAIL_TO_PUBLISH_CHANGES,
+                ToastType.Error,
+            );
         });
     });
 });

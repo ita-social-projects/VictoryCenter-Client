@@ -411,6 +411,7 @@ describe('PartnerSectionsEditor', () => {
 
         render(<PartnerSectionsEditor />);
 
+        await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalled());
         const props = mockPartnerSectionFormRender.mock.calls[0][0];
 
         await act(async () => {
@@ -494,5 +495,171 @@ describe('PartnerSectionsEditor', () => {
 
         expect(mockedPartnersApi.deleteSection).not.toHaveBeenCalled();
         expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.SECTION_DELETED, ToastType.Success);
+    });
+
+    it('does not toast when fetch error is a cancellation', () => {
+        mockedUseDataFetch.mockReturnValue({
+            data: [],
+            isLoading: false,
+            error: { name: 'AbortError' },
+            refetch: jest.fn(),
+            setData: jest.fn(),
+        });
+
+        render(<PartnerSectionsEditor />);
+
+        expect(addToastMock).not.toHaveBeenCalled();
+    });
+
+    it('prevents adding a new section when last section has no partners', async () => {
+        mockedUseDataFetch.mockReturnValue({
+            data: [
+                {
+                    id: 1,
+                    title: '',
+                    description: '',
+                    partners: [],
+                },
+            ],
+            isLoading: false,
+            error: null,
+            refetch: jest.fn(),
+            setData: jest.fn(),
+        });
+
+        const ref = createRef<PartnerSectionsEditorRef>();
+        render(<PartnerSectionsEditor ref={ref} />);
+
+        await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalledTimes(1));
+
+        await act(async () => {
+            ref.current?.addSection();
+        });
+
+        expect(mockPartnerSectionFormRender).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not show toast when publish request is cancelled', async () => {
+        mockedPartnersApi.updateSection.mockRejectedValueOnce({ name: 'AbortError' } as any);
+
+        mockedUseDataFetch.mockReturnValue({
+            data: [
+                {
+                    id: 3,
+                    title: 'Existing',
+                    description: 'Desc',
+                    partners: [],
+                },
+            ],
+            isLoading: false,
+            error: null,
+            refetch: jest.fn(),
+            setData: jest.fn(),
+        });
+
+        render(<PartnerSectionsEditor />);
+
+        await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalled());
+        const props = mockPartnerSectionFormRender.mock.calls[0][0];
+
+        await act(async () => {
+            await props.onPublish(props.value.localId);
+        });
+
+        expect(addToastMock).not.toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_PUBLISH_SECTION, ToastType.Error);
+    });
+
+    it('closes the delete modal when cancel is clicked', async () => {
+        mockedUseDataFetch.mockReturnValue({
+            data: [
+                {
+                    id: 6,
+                    title: 'Cancelable',
+                    description: 'Desc',
+                    partners: [],
+                },
+            ],
+            isLoading: false,
+            error: null,
+            refetch: jest.fn(),
+            setData: jest.fn(),
+        });
+
+        render(<PartnerSectionsEditor />);
+
+        await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalled());
+        const props = mockPartnerSectionFormRender.mock.calls[0][0];
+
+        await act(async () => {
+            props.onDelete(props.value.localId);
+        });
+
+        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByTestId('cancel-delete'));
+
+        expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+        expect(mockedPartnersApi.deleteSection).not.toHaveBeenCalled();
+    });
+
+    it('shows error toast when deleting section fails', async () => {
+        mockedPartnersApi.deleteSection.mockRejectedValueOnce(new Error('delete fail'));
+
+        mockedUseDataFetch.mockReturnValue({
+            data: [
+                {
+                    id: 7,
+                    title: 'Delete me',
+                    description: 'Desc',
+                    partners: [],
+                },
+            ],
+            isLoading: false,
+            error: null,
+            refetch: jest.fn(),
+            setData: jest.fn(),
+        });
+
+        render(<PartnerSectionsEditor />);
+
+        const props = mockPartnerSectionFormRender.mock.calls[0][0];
+
+        await act(async () => {
+            props.onDelete(props.value.localId);
+        });
+
+        fireEvent.click(screen.getByTestId('confirm-delete'));
+
+        await waitFor(() => {
+            expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_DELETE_SECTION, ToastType.Error);
+        });
+    });
+
+    it('does not add section while sections are loading', async () => {
+        mockedUseDataFetch.mockReturnValue({
+            data: [
+                {
+                    id: 8,
+                    title: 'Loading title',
+                    description: 'Desc',
+                    partners: [],
+                },
+            ],
+            isLoading: true,
+            error: null,
+            refetch: jest.fn(),
+            setData: jest.fn(),
+        });
+
+        const ref = createRef<PartnerSectionsEditorRef>();
+        render(<PartnerSectionsEditor ref={ref} />);
+
+        await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalledTimes(1));
+
+        await act(async () => {
+            ref.current?.addSection();
+        });
+
+        expect(mockPartnerSectionFormRender).toHaveBeenCalledTimes(1);
     });
 });

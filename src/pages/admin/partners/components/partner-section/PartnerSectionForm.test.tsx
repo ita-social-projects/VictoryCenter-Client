@@ -334,6 +334,44 @@ describe('PartnerSectionForm', () => {
         expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH })).toBeEnabled();
     });
 
+    it('disables publish when partner description validation fails', () => {
+        mockValidatePartnerDescription.mockImplementation(() => 'desc error');
+
+        render(
+            <PartnerSectionForm
+                value={defaultSectionValue}
+                errors={defaultSectionErrors}
+                disabled={false}
+                onChange={jest.fn()}
+                onDelete={jest.fn()}
+                onPublish={jest.fn()}
+            />,
+        );
+
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH })).toBeDisabled();
+    });
+
+    it('disables publish when partner image missing or has error', () => {
+        const valueWithoutImage = {
+            ...defaultSectionValue,
+            partners: [{ ...defaultPartner, image: null, imageId: null }],
+        };
+        const errorsWithImageIssue = { ...defaultSectionErrors, partners: [{ image: 'Image required' }] };
+
+        render(
+            <PartnerSectionForm
+                value={valueWithoutImage}
+                errors={errorsWithImageIssue}
+                disabled={false}
+                onChange={jest.fn()}
+                onDelete={jest.fn()}
+                onPublish={jest.fn()}
+            />,
+        );
+
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH })).toBeDisabled();
+    });
+
     it('shows loader and disables actions when form is disabled', () => {
         render(
             <PartnerSectionForm
@@ -371,5 +409,28 @@ describe('PartnerSectionForm', () => {
 
         expect(onDelete).toHaveBeenCalledWith(defaultSectionValue.localId);
         expect(onPublish).toHaveBeenCalledWith(defaultSectionValue.localId);
+    });
+
+    it('does not push deleted id when partner has no persisted id', () => {
+        const partnerWithoutId = { ...defaultPartner, partnerId: null };
+        const onChange = jest.fn();
+
+        render(
+            <PartnerSectionForm
+                value={{ ...defaultSectionValue, partners: [partnerWithoutId] }}
+                errors={defaultSectionErrors}
+                disabled={false}
+                onChange={onChange}
+                onDelete={jest.fn()}
+                onPublish={jest.fn()}
+            />,
+        );
+
+        fireEvent.click(screen.getByTestId(`partner-delete-${partnerWithoutId.localId}`));
+
+        expect(onChange).toHaveBeenCalledWith(
+            expect.objectContaining({ deletedPartnerIds: [] }),
+            expect.anything(),
+        );
     });
 });

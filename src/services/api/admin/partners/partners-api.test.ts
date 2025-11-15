@@ -128,7 +128,11 @@ describe('PartnersApi (admin)', () => {
                         title: 'Section',
                         description: 'Section description',
                         partners: [
-                            { id: 4, description: 'Partner', image: { id: 5, url: 'https://partner', mimeType: 'image/png' } },
+                            {
+                                id: 4,
+                                description: 'Partner',
+                                image: { id: 5, url: 'https://partner', mimeType: 'image/png' },
+                            },
                         ],
                     },
                 ],
@@ -183,7 +187,9 @@ describe('PartnersApi (admin)', () => {
 
             const result = await PartnersApi.getSections(mockClient, options);
 
-            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PARTNERS.SECTIONS, { signal: options.cancellationSignal });
+            expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PARTNERS.SECTIONS, {
+                signal: options.cancellationSignal,
+            });
             const expected: PartnerSection[] = [
                 {
                     id: 1,
@@ -267,7 +273,12 @@ describe('PartnersApi (admin)', () => {
                 description: 'Updated desc',
                 partnersToUpdate: [
                     { id: 1, description: 'Existing', image: null, imageId: 4 },
-                    { id: null, description: 'New partner', image: { base64: 'data', mimeType: 'image/png' }, imageId: null },
+                    {
+                        id: null,
+                        description: 'New partner',
+                        image: { base64: 'data', mimeType: 'image/png' },
+                        imageId: null,
+                    },
                 ],
                 partnerIdsToDelete: [9],
             };
@@ -322,4 +333,3 @@ describe('PartnersApi (admin)', () => {
         });
     });
 });
-

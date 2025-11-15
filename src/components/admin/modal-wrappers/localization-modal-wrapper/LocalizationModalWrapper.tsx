@@ -1,4 +1,3 @@
-import { VisibilityStatus } from '../../../../types/admin/common';
 import React from 'react';
 import { COMMON_TEXT_ADMIN } from '../../../../const/admin/common';
 import { Modal } from '../../../common/modal/Modal';

@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
 import { TeamMember } from '../../../../../../types/admin/team-members';
-import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
 import { ModalMode } from '../../../../../../types/admin/common';
 import { LocalizationModalWrapper } from '../../../../../../components/admin/modal-wrappers/localization-modal-wrapper/LocalizationModalWrapper';
@@ -36,7 +35,7 @@ export const TranslateTeamMemberModal = ({
             getFormKey: () => {},
             transformFormData: () => {},
         }),
-        [isOpen, onClose, memberToTranslate, onTranslateMember, client],
+        [isOpen, onClose, memberToTranslate, onTranslateMember],
     );
 
     const modalHookData = useGenericModal<TranslateTeamMemberModalProps, TeamMember, TranslateTeamMemberFormRef>(

@@ -4,9 +4,7 @@ import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../../validation/a
 import { ImageValues, Image } from '../../../../../../types/common/image';
 import { InputLabel } from '../../../../../../components/admin/input-label/InputLabel';
 import { SingleSelectInput } from '../../../../../../components/common/single-select-input/SingleSelectInput';
-import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
-import { InputWithCharacterLimit } from '../../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
 import { ImageInput } from '../../../../../../components/admin/image-input/ImageInput';
 import { useTeamMemberForm } from '../use-team-member-form/useTeamMemberForm';
 import { TeamCategory } from '../../../../../../types/admin/team-category';

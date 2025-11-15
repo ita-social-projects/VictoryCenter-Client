@@ -1,7 +1,6 @@
 import { VisibilityStatus } from '../../../../types/admin/common';
 import React from 'react';
 import { COMMON_TEXT_ADMIN } from '../../../../const/admin/common';
-import { ConfirmationModal } from '../../confirmation-modal/ConfirmationModal';
 import { Modal } from '../../../common/modal/Modal';
 import { Button } from '../../button/Button';
 import { ConfirmationModals, ConfirmationModalsProps } from '../confirmation-modals/ConfirmationModals';
@@ -56,11 +55,6 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
     renderForm,
     categories,
 }: GenericModalWrapperProps<TFormValues, TFormRef>) => {
-    const handleCancel = () => {
-        onCancelConfirmation();
-        onClose();
-    };
-
     return (
         <>
             <Modal isOpen={isOpen} onClose={onClose}>

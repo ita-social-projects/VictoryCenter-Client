@@ -17,7 +17,6 @@ import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
 import { TeamPageModals } from '../team-page-modals/TeamPageModals';
 import { useTeamMemberSearch } from '../../../../../hooks/admin/team/useTeamMemberSearch';
-import { TranslateTeamMemberModal } from '../team-member-modals/translate-team-member-modal/TranslateTeamMemberModal';
 import './TeamPageContent.scss';
 import { TeamCategory } from '../../../../../types/admin/team-category';
 import { TeamMember } from '../../../../../types/admin/team-members';
@@ -415,9 +414,8 @@ export const TeamPageContent = () => {
     );
 
     const handleTranslateMember = useCallback(
-        (memberToTranslate: TeamMember) => {
-            setHasMore(true);
-            hasMoreRef.current = true;
+        //(memberToTranslate: TeamMember) => {
+        () => {
             closeModalActions.closeDeleteItemModal();
         },
         [closeModalActions],
@@ -494,7 +492,13 @@ export const TeamPageContent = () => {
                 onEntitiesReordered={handleEntitiesReordered}
             ></DraggableListItem>
         ),
-        [handleDeleteTeamMemberModalOpen, handleEditMemberModalOpen, handleEntitiesReordered, members],
+        [
+            handleTranslateMemberModalOpen,
+            handleDeleteTeamMemberModalOpen,
+            handleEditMemberModalOpen,
+            handleEntitiesReordered,
+            members,
+        ],
     );
 
     return (

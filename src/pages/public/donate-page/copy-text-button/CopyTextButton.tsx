@@ -9,7 +9,7 @@ interface CopyTextButtonProps {
 }
 
 export const CopyTextButton = ({ textToCopy }: CopyTextButtonProps) => {
-    const { t } = useTranslation('donatePage');
+    const { t } = useTranslation('global');
     const [copied, setCopied] = useState(false);
 
     const handleCopy = async () => {
@@ -21,10 +21,16 @@ export const CopyTextButton = ({ textToCopy }: CopyTextButtonProps) => {
         <button
             className={`copyTextButton ${copied ? 'copied' : ''}`}
             onClick={handleCopy}
-            data-message={t('COPIED_MESSAGE')}
             onAnimationEnd={() => setCopied(false)}
         >
-            {copied ? <CheckMark className="checkmark-icon" /> : <Copy className="checkmark-icon" />}
+            {copied ? (
+                <>
+                    <CheckMark className="checkmark-icon" />
+                    <span className="copyMessage">{t('COPIED_GLOBAL_MESSAGE')}</span>
+                </>
+            ) : (
+                <Copy className="checkmark-icon" />
+            )}
         </button>
     );
 };

@@ -3,13 +3,14 @@
 .copyTextButton {
     all: unset;
     position: relative;
+    display: inline-flex;
+    align-items: center;
     border: none;
     cursor: pointer;
     width: 1.25rem;
     height: 1.25rem;
     opacity: 0.6;
 }
-
 .copyTextButton:hover {
     opacity: 1;
 }
@@ -17,15 +18,18 @@
 .copyTextButton.copied {
     opacity: 1;
     color: colors.$green;
-}
 
-.copyTextButton.copied::after {
-    content: attr(data-message);
-    position: absolute;
-    top: 50%;
-    color: colors.$green;
-    font-family: fonts.$mulish-regular-font;
-    animation: fadeInOut 2s ease forwards;
+    .copyMessage {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        color: colors.$green;
+        font-family: fonts.$mulish-regular-font;
+        font-size: 1rem;
+        line-height: 1.5rem;
+        letter-spacing: -0.02em;
+        animation: fadeInOut 2s ease forwards;
+    }
 }
 
 @keyframes fadeInOut {

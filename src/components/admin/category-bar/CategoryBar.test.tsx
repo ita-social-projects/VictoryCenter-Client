@@ -272,5 +272,4 @@ describe('CategoryBar', () => {
 
         expect(scrollBySpy).toHaveBeenCalledWith({ left: 300, behavior: 'smooth' });
     });
-
 });

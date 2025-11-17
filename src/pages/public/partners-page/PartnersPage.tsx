@@ -1,37 +1,22 @@
-import { useState, useEffect } from 'react';
 import { IntroSection } from './partners-sections/intro-section/IntroSection';
 import { OutroSection } from './partners-sections/outro-section/OutroSection';
 import { PartnersSection } from './partners-sections/partners-section/PartnersSection';
 import { PartnerPage } from '../../../types/public/partners-page';
 import { PartnersApi } from '../../../services/api/public/partners/partners-api';
-import { axiosInstance } from '../../../services/api/axios';
 import { DOWNLOAD_ERROR } from '../../../const/public/partners-page';
 import { LinearProgress } from '@mui/material';
 import './PartnersPage.scss';
+import { useDataFetch } from '../../../hooks/common/use-data-fetch/useDataFetch';
 
 export const PartnersPage = () => {
-    const [partnersPageData, setPartnersPageData] = useState<PartnerPage | null>(null);
-    const [error, setError] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-
-    useEffect(() => {
-        setIsLoading(true);
-        const fetchPartnersPageData = async () => {
-            try {
-                setIsLoading(true);
-                const page = await PartnersApi.getPage(axiosInstance);
-                setPartnersPageData(page);
-                setError(null);
-            } catch (error) {
-                setError(DOWNLOAD_ERROR);
-                setPartnersPageData(null);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchPartnersPageData();
-    }, []);
+    const {
+        data: partnersPageData,
+        isLoading,
+        error,
+    } = useDataFetch<PartnerPage | null>({
+        initialData: null,
+        fetchHandler: PartnersApi.getPage,
+    });
 
     if (isLoading) {
         return (
@@ -42,7 +27,7 @@ export const PartnersPage = () => {
     }
 
     if (error) {
-        return <div className="partners-page-error-message">{error}</div>;
+        return <div className="partners-page-error-message">{DOWNLOAD_ERROR}</div>;
     }
 
     return (

@@ -112,6 +112,7 @@ describe('PartnerBanner', () => {
     const getPublishButton = () => screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH });
 
     // Helper functions for actions
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const changeTitleValue = (value: string) => {
         fireEvent.change(getTitleInput(), { target: { value } });
     };
@@ -186,22 +187,23 @@ describe('PartnerBanner', () => {
         expect(refetchMock).toHaveBeenCalledTimes(1);
     });
 
+    //TODO: Uncomment lines when rich text component is implemented
     it('renders banner form with fetched data and validates field updates', async () => {
         render(<PartnerBanner />);
 
-        const titleInput = getTitleInput();
+        //const titleInput = getTitleInput();
         const descriptionInput = getDescriptionInput();
 
-        expect(titleInput).toHaveValue(defaultBannerData.title);
+        //expect(titleInput).toHaveValue(defaultBannerData.title);
         expect(descriptionInput).toHaveValue(defaultBannerData.description);
         expect(getImageContainer()).toBeInTheDocument();
 
-        changeTitleValue('Updated Title');
-        expect(mockValidateTitle).toHaveBeenCalledWith('Updated Title');
+        //   changeTitleValue('Updated Title');
+        //   expect(mockValidateTitle).toHaveBeenCalledWith('Updated Title');
 
-        await waitFor(() => {
-            expect(titleInput).toHaveValue('Updated Title');
-        });
+        //   await waitFor(() => {
+        //       expect(titleInput).toHaveValue('Updated Title');
+        //   });
 
         changeDescriptionValue('Updated Description');
         expect(mockValidateDescription).toHaveBeenCalledWith('Updated Description');
@@ -239,39 +241,41 @@ describe('PartnerBanner', () => {
         const publishButton = getPublishButton();
         expect(publishButton).toBeEnabled();
 
-        changeTitleValue('');
+        changeDescriptionValue('');
 
         await waitFor(() => {
-            expect(mockValidateTitle).toHaveBeenCalledWith('');
+            expect(mockValidateDescription).toHaveBeenCalledWith('');
             expect(publishButton).toBeDisabled();
         });
 
-        changeTitleValue('Valid Title');
+        changeDescriptionValue('Valid Description');
 
         await waitFor(() => {
-            expect(mockValidateTitle).toHaveBeenCalledWith('Valid Title');
+            expect(mockValidateDescription).toHaveBeenCalledWith('Valid Description');
             expect(publishButton).toBeEnabled();
         });
     });
 
+    //TODO: Uncomment lines when rich text component is implemented
     it('publishes banner successfully and shows success toast', async () => {
         const updatedBanner = {
             ...defaultBannerData,
-            title: 'Published Title',
+            //title: 'Published Title',
             description: 'Published Description',
         };
         mockedPartnersApi.updateBanner.mockResolvedValue(updatedBanner);
 
         render(<PartnerBanner />);
 
-        changeTitleValue(updatedBanner.title);
+        //changeTitleValue(updatedBanner.title);
         changeDescriptionValue(updatedBanner.description);
 
         clickPublish();
 
         await waitFor(() => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalledWith('mock-client', {
-                title: updatedBanner.title,
+                //title : updatedBanner.title,
+                title: defaultBannerData.title,
                 description: updatedBanner.description,
                 image: defaultBannerData.image,
                 imageId: defaultBannerData.imageId,
@@ -283,7 +287,7 @@ describe('PartnerBanner', () => {
         });
 
         await waitFor(() => {
-            expect(getTitleInput()).toHaveValue(updatedBanner.title);
+            //expect(getTitleInput()).toHaveValue(updatedBanner.title);
             expect(getDescriptionInput()).toHaveValue(updatedBanner.description);
         });
     });
@@ -314,7 +318,7 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
-        changeTitleValue('');
+        changeDescriptionValue('');
 
         await waitFor(() => {
             expect(getPublishButton()).toBeDisabled();

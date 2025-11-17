@@ -25,11 +25,11 @@ export const CopyTextButton = ({ textToCopy }: CopyTextButtonProps) => {
         >
             {copied ? (
                 <>
-                    <CheckMark className="checkmark-icon" />
+                    <CheckMark />
                     <span className="copyMessage">{t('COPIED_GLOBAL_MESSAGE')}</span>
                 </>
             ) : (
-                <Copy className="checkmark-icon" />
+                <Copy />
             )}
         </button>
     );

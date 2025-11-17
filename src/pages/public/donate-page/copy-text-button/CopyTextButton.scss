@@ -53,17 +53,3 @@
         transform: translateY(-50%) translateX(-5px);
     }
 }
-
-@keyframes resetIcon {
-    0% {
-        background-image: url('../../../../assets/icons/checkmark.svg');
-    }
-
-    90% {
-        background-image: url('../../../../assets/icons/checkmark.svg');
-    }
-
-    100% {
-        background-image: url('../../../../assets/icons/copy.svg');
-    }
-}

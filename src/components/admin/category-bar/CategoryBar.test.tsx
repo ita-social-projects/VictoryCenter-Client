@@ -210,4 +210,67 @@ describe('CategoryBar', () => {
             globalThis.ResizeObserver = originalResizeObserver;
         }
     });
+
+    it('scrolls left when left arrow button is clicked', () => {
+        const mockOnCategorySelect = jest.fn();
+        const { container } = render(
+            <CategoryBar
+                categories={mockCategories}
+                selectedCategory={null}
+                getCategoryKey={getCategoryKey}
+                getCategoryDisplayName={getCategoryDisplayName}
+                onCategorySelect={mockOnCategorySelect}
+                scrollAmount={200}
+            />,
+        );
+
+        const categoriesDiv = container.querySelector('.category-bar-categories') as HTMLDivElement;
+        const scrollBySpy = jest.fn();
+        categoriesDiv.scrollBy = scrollBySpy;
+
+        Object.defineProperty(categoriesDiv, 'scrollLeft', { value: 100, writable: true });
+        Object.defineProperty(categoriesDiv, 'scrollWidth', { value: 1000, writable: true });
+        Object.defineProperty(categoriesDiv, 'clientWidth', { value: 800, writable: true });
+
+        fireEvent.scroll(categoriesDiv);
+
+        const leftArrowButton = container.querySelector('.category-bar-arrow-left') as HTMLButtonElement;
+        expect(leftArrowButton).toBeInTheDocument();
+
+        fireEvent.click(leftArrowButton);
+
+        expect(scrollBySpy).toHaveBeenCalledWith({ left: -200, behavior: 'smooth' });
+    });
+
+    it('scrolls right when right arrow button is clicked', () => {
+        const mockOnCategorySelect = jest.fn();
+        const { container } = render(
+            <CategoryBar
+                categories={mockCategories}
+                selectedCategory={null}
+                getCategoryKey={getCategoryKey}
+                getCategoryDisplayName={getCategoryDisplayName}
+                onCategorySelect={mockOnCategorySelect}
+                scrollAmount={300}
+            />,
+        );
+
+        const categoriesDiv = container.querySelector('.category-bar-categories') as HTMLDivElement;
+        const scrollBySpy = jest.fn();
+        categoriesDiv.scrollBy = scrollBySpy;
+
+        Object.defineProperty(categoriesDiv, 'scrollLeft', { value: 100, writable: true });
+        Object.defineProperty(categoriesDiv, 'scrollWidth', { value: 1000, writable: true });
+        Object.defineProperty(categoriesDiv, 'clientWidth', { value: 800, writable: true });
+
+        fireEvent.scroll(categoriesDiv);
+
+        const rightArrowButton = container.querySelector('.category-bar-arrow-right') as HTMLButtonElement;
+        expect(rightArrowButton).toBeInTheDocument();
+
+        fireEvent.click(rightArrowButton);
+
+        expect(scrollBySpy).toHaveBeenCalledWith({ left: 300, behavior: 'smooth' });
+    });
+
 });

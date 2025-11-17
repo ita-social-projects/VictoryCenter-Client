@@ -10,6 +10,12 @@ import {
 } from '../../../const/admin/partners';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 
+const createValidPartner = () => ({
+    description: 'Valid partner',
+});
+
+const buildPartnerArray = (length: number) => Array.from({ length }, createValidPartner);
+
 describe('partner-schema validations', () => {
     describe('PARTNER_BANNER_VALIDATION_FUNCTIONS', () => {
         describe('validateTitle', () => {
@@ -130,9 +136,7 @@ describe('partner-schema validations', () => {
 
         describe('validatePartners', () => {
             it('returns undefined when partners array is within range', () => {
-                const partners = Array.from({ length: PARTNER_SECTION_VALIDATION.partners.max }, () => ({
-                    description: 'Valid partner',
-                }));
+                const partners = buildPartnerArray(PARTNER_SECTION_VALIDATION.partners.max);
                 const result = PARTNER_SECTION_VALIDATION_FUNCTIONS.validatePartners(partners);
                 expect(result).toBeUndefined();
             });
@@ -143,9 +147,7 @@ describe('partner-schema validations', () => {
             });
 
             it('returns error when partners array exceeds max', () => {
-                const partners = Array.from({ length: PARTNER_SECTION_VALIDATION.partners.max + 1 }, () => ({
-                    description: 'Valid partner',
-                }));
+                const partners = buildPartnerArray(PARTNER_SECTION_VALIDATION.partners.max + 1);
                 const result = PARTNER_SECTION_VALIDATION_FUNCTIONS.validatePartners({ partners } as any);
                 expect(result).toBe(PARTNER_SECTION_VALIDATION.partners.getMaxError());
             });

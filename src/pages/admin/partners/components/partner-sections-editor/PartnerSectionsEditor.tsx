@@ -16,6 +16,7 @@ import { ConfirmationModal } from '../../../../../components/admin/confirmation-
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
 import {
+    Partner,
     PartnerSection,
     PartnersSectionCreateRequest,
     PartnersSectionUpdateRequest,
@@ -158,27 +159,29 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
                     addToast(PARTNERS_TEXT.MESSAGE.SECTION_PUBLISHED, ToastType.Success);
                 }
 
-                setLocalSections((currentSections) =>
-                    currentSections.map((s) => {
-                        if (s.localId === localId) {
-                            return {
-                                ...s,
-                                sectionId: savedSection.id,
-                                title: savedSection.title,
-                                description: savedSection.description,
-                                deletedPartnerIds: [],
-                                partners: savedSection.partners.map((p) => ({
-                                    localId: crypto.randomUUID(),
-                                    partnerId: p.id,
-                                    description: p.description,
-                                    image: p.image,
-                                    imageId: p.imageId,
-                                })),
-                            };
-                        }
-                        return s;
-                    }),
-                );
+                const mapPartnerToFormValue = (p: Partner) => ({
+                    localId: crypto.randomUUID(),
+                    partnerId: p.id,
+                    description: p.description,
+                    image: p.image,
+                    imageId: p.imageId,
+                });
+
+                const updateSectionInList = (s: PartnerSectionFormValues) => {
+                    if (s.localId === localId) {
+                        return {
+                            ...s,
+                            sectionId: savedSection.id,
+                            title: savedSection.title,
+                            description: savedSection.description,
+                            deletedPartnerIds: [],
+                            partners: savedSection.partners.map(mapPartnerToFormValue),
+                        };
+                    }
+                    return s;
+                };
+
+                setLocalSections((currentSections) => currentSections.map(updateSectionInList));
             } catch (error: any) {
                 if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                     return;

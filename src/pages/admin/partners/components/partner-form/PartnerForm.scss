@@ -20,18 +20,20 @@
         border: none;
         cursor: pointer;
         background-size: cover;
-        background: url('../../../../../assets/icons/delete-default.svg');
+        background-repeat: no-repeat;
+        background-position: center;
+        background-image: url('../../../../../assets/icons/delete-default.svg');
 
         &:hover:not(:disabled) {
-            background: url('../../../../../assets/icons/delete-hover.svg');
+            background-image: url('../../../../../assets/icons/delete-hover.svg');
         }
 
         &:active:not(:disabled) {
-            background: url('../../../../../assets/icons/delete-pressed.svg');
+            background-image: url('../../../../../assets/icons/delete-pressed.svg');
         }
 
         &:disabled {
-            background: url('../../../../../assets/icons/delete-disabled.svg');
+            background-image: url('../../../../../assets/icons/delete-disabled.svg');
             cursor: not-allowed;
         }
     }

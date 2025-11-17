@@ -326,9 +326,15 @@ describe('PartnerBanner', () => {
     });
 
     it('disables all inputs while publishing', async () => {
-        mockedPartnersApi.updateBanner.mockImplementation(
-            () => new Promise((resolve) => setTimeout(() => resolve(defaultBannerData), 100)),
-        );
+        const createDelayedPromise = () => {
+            return new Promise<typeof defaultBannerData>((resolve) => {
+                setTimeout(() => {
+                    resolve(defaultBannerData);
+                }, 100);
+            });
+        };
+
+        mockedPartnersApi.updateBanner.mockImplementation(createDelayedPromise as any);
 
         render(<PartnerBanner />);
 

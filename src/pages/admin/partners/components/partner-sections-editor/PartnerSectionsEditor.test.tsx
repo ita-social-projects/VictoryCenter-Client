@@ -391,38 +391,47 @@ describe('PartnerSectionsEditor', () => {
         expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.SECTION_PUBLISHED, ToastType.Success);
     });
 
-    it('shows error toast when publish fails', async () => {
-        mockedPartnersApi.updateSection.mockRejectedValueOnce(new Error('publish failed'));
+    it('handles publish errors: shows toast on failure, no toast on cancellation', async () => {
+        const setupAndPublish = async (rejectValue: Error | { name: string }) => {
+            mockedPartnersApi.updateSection.mockRejectedValueOnce(rejectValue);
+            mockedUseDataFetch.mockReturnValue({
+                data: [
+                    {
+                        id: 2,
+                        title: 'Test section',
+                        description: 'Test description',
+                        partners: [],
+                    },
+                ],
+                isLoading: false,
+                error: null,
+                refetch: jest.fn(),
+                setData: jest.fn(),
+            });
 
-        mockedUseDataFetch.mockReturnValue({
-            data: [
-                {
-                    id: 2,
-                    title: 'Fail section',
-                    description: 'Fail description',
-                    partners: [],
-                },
-            ],
-            isLoading: false,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
+            render(<PartnerSectionsEditor />);
+            await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalled());
+            const props = mockPartnerSectionFormRender.mock.calls[0][0];
 
-        render(<PartnerSectionsEditor />);
+            await act(async () => {
+                await props.onPublish(props.value.localId);
+            });
+        };
 
-        await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalled());
-        const props = mockPartnerSectionFormRender.mock.calls[0][0];
-
-        await act(async () => {
-            await props.onPublish(props.value.localId);
-        });
-
+        // Test error toast on regular failure
+        await setupAndPublish(new Error('publish failed'));
         expect(addToastMock).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_PUBLISH_SECTION, ToastType.Error);
-
-        const latestCall =
+        const latestCallAfterError =
             mockPartnerSectionFormRender.mock.calls[mockPartnerSectionFormRender.mock.calls.length - 1][0];
-        expect(latestCall.disabled).toBe(false);
+        expect(latestCallAfterError.disabled).toBe(false);
+
+        // Clear mocks for next test
+        jest.clearAllMocks();
+        mockPartnerSectionFormRender.mockClear();
+
+        // Test no toast on cancellation (AbortError)
+        await setupAndPublish({ name: 'AbortError' } as any);
+        expect(addToastMock).not.toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_PUBLISH_SECTION, ToastType.Error);
     });
 
     it('deletes a persisted section after confirmation', async () => {
@@ -539,35 +548,6 @@ describe('PartnerSectionsEditor', () => {
         expect(mockPartnerSectionFormRender).toHaveBeenCalledTimes(1);
     });
 
-    it('does not show toast when publish request is cancelled', async () => {
-        mockedPartnersApi.updateSection.mockRejectedValueOnce({ name: 'AbortError' } as any);
-
-        mockedUseDataFetch.mockReturnValue({
-            data: [
-                {
-                    id: 3,
-                    title: 'Existing',
-                    description: 'Desc',
-                    partners: [],
-                },
-            ],
-            isLoading: false,
-            error: null,
-            refetch: jest.fn(),
-            setData: jest.fn(),
-        });
-
-        render(<PartnerSectionsEditor />);
-
-        await waitFor(() => expect(mockPartnerSectionFormRender).toHaveBeenCalled());
-        const props = mockPartnerSectionFormRender.mock.calls[0][0];
-
-        await act(async () => {
-            await props.onPublish(props.value.localId);
-        });
-
-        expect(addToastMock).not.toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_PUBLISH_SECTION, ToastType.Error);
-    });
 
     it('closes the delete modal when cancel is clicked', async () => {
         mockedUseDataFetch.mockReturnValue({

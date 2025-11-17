@@ -4,8 +4,8 @@ import { DONATE_TEXT } from '../../../../../../const/admin/donate';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { BankCurrency } from '../../../../../../types/admin/donate';
 
-jest.mock('../../input/Input', () => ({
-    Input: ({ value, handleChange, handleBlur, name }: any) => (
+jest.mock('../../donate-input/DonateInput', () => ({
+    DonateInput: ({ value, handleChange, handleBlur, name }: any) => (
         <input value={value} onChange={handleChange} onBlur={handleBlur} data-testid={`input-${name}`} />
     ),
 }));

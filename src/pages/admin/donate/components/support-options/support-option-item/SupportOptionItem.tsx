@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../../../../../../components/admin/button/Button';
-import { Input } from '../../input/Input';
+import { DonateInput } from '../../donate-input/DonateInput';
 import './SupportOptionItem.scss';
 import { SupportOptionsType } from '../../../../../../types/admin/donate';
 import { ConfirmationModal } from '../../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { DONATE_TEXT } from '../../../../../../const/admin/donate';
+import { VALIDATION_PARAMS } from '../../../../../../const/admin/donate';
 import { SUPPORT_OPTIONS_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/bank-details-schema/bank-details-schema';
 
 export enum SupportOptionItemMode {
@@ -170,7 +171,7 @@ export const SupportOptionItem = ({
             <div className="support-option-fields">
                 {!isViewMode && (
                     <div className="support-option-field">
-                        <Input
+                        <DonateInput
                             name="name"
                             isTitle={true}
                             value={name}
@@ -179,12 +180,14 @@ export const SupportOptionItem = ({
                             onValueChange={setName}
                             handleBlur={() => validateField('name', name)}
                             isRequired={true}
+                            maxLength={VALIDATION_PARAMS.supportTitle.maxLength}
+                            showCharCounter={true}
                         />
                         {errors.name && <span className="error">{errors.name}</span>}
                     </div>
                 )}
                 <div className="support-option-field">
-                    <Input
+                    <DonateInput
                         name="value"
                         isTitle={true}
                         placeholder={DONATE_TEXT.PLACEHOLDER.SUPPORT_OPTION}
@@ -194,6 +197,8 @@ export const SupportOptionItem = ({
                         onValueChange={setValue}
                         handleBlur={() => validateField('value', value)}
                         isRequired={true}
+                        maxLength={VALIDATION_PARAMS.supportDescription.maxLength}
+                        showCharCounter={true}
                     />
                     {errors.value && <span className="error">{errors.value}</span>}
                 </div>

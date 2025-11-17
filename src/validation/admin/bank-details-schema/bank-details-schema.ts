@@ -25,8 +25,22 @@ export const BankDetailsValidationSchema = Yup.object({
 });
 
 export const SupportOptionsValidationSchema = Yup.object({
-    name: Yup.string().trim().required(DONATE_VALIDATION.supportOptions.name.getRequiredError()),
-    value: Yup.string().trim().required(DONATE_VALIDATION.supportOptions.value.getRequiredError()),
+    name: Yup.string()
+        .trim()
+        .required(DONATE_VALIDATION.supportOptions.name.getRequiredError())
+        .max(DONATE_VALIDATION.supportOptions.maxLengthTitle, DONATE_VALIDATION.supportOptions.name.getMaxError())
+        .min(DONATE_VALIDATION.supportOptions.minLengthTitle, DONATE_VALIDATION.supportOptions.name.getMinError()),
+    value: Yup.string()
+        .trim()
+        .required(DONATE_VALIDATION.supportOptions.value.getRequiredError())
+        .max(
+            DONATE_VALIDATION.supportOptions.maxLengthDescription,
+            DONATE_VALIDATION.supportOptions.value.getMaxError(),
+        )
+        .min(
+            DONATE_VALIDATION.supportOptions.minLengthDescription,
+            DONATE_VALIDATION.supportOptions.value.getMinError(),
+        ),
 });
 
 function createValidator<T extends Yup.AnyObjectSchema>(schema: T, field: keyof T['fields']) {

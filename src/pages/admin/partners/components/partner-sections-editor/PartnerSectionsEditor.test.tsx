@@ -548,7 +548,6 @@ describe('PartnerSectionsEditor', () => {
         expect(mockPartnerSectionFormRender).toHaveBeenCalledTimes(1);
     });
 
-
     it('closes the delete modal when cancel is clicked', async () => {
         mockedUseDataFetch.mockReturnValue({
             data: [

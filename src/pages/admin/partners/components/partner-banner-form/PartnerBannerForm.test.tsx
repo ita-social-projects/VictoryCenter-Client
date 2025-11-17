@@ -369,4 +369,137 @@ describe('PartnerBanner', () => {
             expect(publishButton).toBeEnabled();
         });
     });
+
+    //TODO: Remove this test when rich text component is implemented
+    it('renders title input as disabled', () => {
+        render(<PartnerBanner />);
+        expect(getTitleInput()).toBeDisabled();
+    });
+
+    it('shows toast for fetch error', () => {
+        const regularError = new Error('Network error');
+        mockedUseDataFetch.mockReturnValueOnce({
+            data: null,
+            isLoading: false,
+            error: regularError,
+            refetch: mockRefetch,
+            setData: mockSetData,
+        });
+
+        render(<PartnerBanner />);
+
+        expect(mockAddToast).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER, ToastType.Error);
+    });
+
+    it('does not call updateBanner when form has validation errors', async () => {
+        mockValidateDescription.mockReturnValue('Description is required');
+
+        render(<PartnerBanner />);
+
+        changeDescriptionValue('');
+
+        await waitFor(() => {
+            expect(getPublishButton()).toBeDisabled();
+        });
+
+        clickPublish();
+
+        expect(mockedPartnersApi.updateBanner).not.toHaveBeenCalled();
+    });
+
+    it('validates description on change and sets error correctly', async () => {
+        mockValidateDescription.mockReturnValue('Description too short');
+
+        render(<PartnerBanner />);
+
+        changeDescriptionValue('AB');
+
+        await waitFor(() => {
+            expect(mockValidateDescription).toHaveBeenCalledWith('AB');
+        });
+    });
+
+    it('clears image error when handleImageError is called with null', async () => {
+        render(<PartnerBanner />);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Trigger image error' }));
+
+        expect(await screen.findByTestId('input-error')).toHaveTextContent('Image invalid');
+
+        fireEvent.click(screen.getByRole('button', { name: 'Clear image error' }));
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('input-error')).not.toBeInTheDocument();
+        });
+    });
+
+    it('maintains imageId when image is changed', async () => {
+        render(<PartnerBanner />);
+
+        clickChangeImage();
+
+        await waitFor(() => {
+            expect(getImageValue()).toBeInTheDocument();
+        });
+
+        mockedPartnersApi.updateBanner.mockResolvedValue({
+            ...defaultBannerData,
+            image: { base64: 'base64-image', mimeType: 'image/png' },
+            imageId: 1,
+        });
+
+        clickPublish();
+
+        await waitFor(() => {
+            expect(mockedPartnersApi.updateBanner).toHaveBeenCalledWith('mock-client', {
+                title: defaultBannerData.title,
+                description: defaultBannerData.description,
+                image: { base64: 'base64-image', mimeType: 'image/png' },
+                imageId: 1,
+            });
+        });
+    });
+
+    it('renders error UI when data is null and there is a fetch error', () => {
+        mockedUseDataFetch.mockReturnValueOnce({
+            data: null,
+            isLoading: false,
+            error: new Error('Failed'),
+            refetch: mockRefetch,
+            setData: mockSetData,
+        });
+
+        render(<PartnerBanner />);
+
+        expect(getErrorMessage()).toBeInTheDocument();
+        expect(getTryAgainButton()).toBeInTheDocument();
+    });
+
+    it('prevents multiple simultaneous publish attempts', async () => {
+        const delayedPromise = new Promise<typeof defaultBannerData>((resolve) => {
+            setTimeout(() => resolve(defaultBannerData), 100);
+        });
+
+        mockedPartnersApi.updateBanner.mockReturnValue(delayedPromise as any);
+
+        render(<PartnerBanner />);
+
+        clickPublish();
+        clickPublish();
+
+        await waitFor(() => {
+            expect(mockedPartnersApi.updateBanner).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    it('keeps publish button enabled when all validations pass', async () => {
+        mockValidateTitle.mockReturnValue(undefined);
+        mockValidateDescription.mockReturnValue(undefined);
+
+        render(<PartnerBanner />);
+
+        await waitFor(() => {
+            expect(getPublishButton()).toBeEnabled();
+        });
+    });
 });

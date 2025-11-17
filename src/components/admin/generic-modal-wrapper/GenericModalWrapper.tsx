@@ -110,8 +110,6 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                 onConfirm={onConfirmAction}
                 onCancel={handleCancel}
                 onClose={onClose}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
 
             <ConfirmationModal
@@ -121,8 +119,6 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                 onConfirm={onConfirmClose}
                 onCancel={onCancelClose}
                 onClose={onCancelClose}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
         </>
     );

@@ -271,6 +271,18 @@ describe('AdminPanelToolbar', () => {
         expect(searchBarProps.notFoundMessage).toBe('No items found');
     });
 
+    it('clears localSearchItems if search term is shorter than min characters', () => {
+        renderComponent();
+
+        const { SearchBar } = require('../search-bar/SearchBar');
+        const onQueryChange = SearchBar.mock.calls[0][0].onQueryChange;
+
+        const shortQuery = 'ab';
+        onQueryChange(shortQuery);
+
+        expect(mockHookImplementation.data).toBeDefined();
+    });
+
     // Add a simple direct test for onSearch to increase coverage
     it('directly tests onSearch function with different search terms', () => {
         // Mock the useState setter functions

@@ -6,8 +6,9 @@ import { Button } from '../../../../../../components/admin/button/Button';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { ReactComponent as TranslateIcon } from '../../../../../../assets/icons/translate-grey.svg';
 import { useTeamMemberForm } from '../use-team-member-form/useTeamMemberForm';
-import './TranslateMemberForm.scss';
 import { CommonMemberFields } from '../common-member-fields/CommonMemberFields';
+import './TranslateMemberForm.scss';
+
 export interface TranslateTeamMemberFormValues {
     fullName: string;
     description: string;

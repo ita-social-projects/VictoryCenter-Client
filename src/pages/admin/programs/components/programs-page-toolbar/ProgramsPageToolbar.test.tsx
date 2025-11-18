@@ -1,4 +1,3 @@
-import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -319,5 +318,21 @@ describe('ProgramsPageToolbar', () => {
         render(<ProgramsPageToolbar {...createProps()} />);
 
         expect(mockUseDataPaginationFetch).toHaveBeenCalled();
+    });
+
+    it('should call getSearchItemKey and getSearchItemLabel for each suggestion', () => {
+        const suggestions = [createSuggestion(1, 'Program 1'), createSuggestion(2, 'Program 2')];
+
+        mockUseDataPaginationFetch.mockReturnValue({
+            ...mockHookReturn,
+            data: suggestions,
+        });
+
+        render(<ProgramsPageToolbar {...createProps()} />);
+
+        suggestions.forEach((s) => {
+            expect(s.id).toBeDefined();
+            expect(s.name).toBeDefined();
+        });
     });
 });

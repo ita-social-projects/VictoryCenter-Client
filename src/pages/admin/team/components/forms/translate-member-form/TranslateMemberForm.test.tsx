@@ -102,4 +102,16 @@ describe('TranslateMemberForm', () => {
         rerender(<TranslateMemberForm ref={ref} onSubmit={onSubmit} initialData={initialData} />);
         expect(ref.current?.isDirty()).toBe(false);
     });
+
+    it('prevents default form submission', () => {
+        render(<TranslateMemberForm onSubmit={jest.fn()} />);
+        const form = screen.getByTestId('test-form');
+
+        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+        const preventDefaultSpy = jest.spyOn(submitEvent, 'preventDefault');
+
+        form.dispatchEvent(submitEvent);
+
+        expect(preventDefaultSpy).toHaveBeenCalled();
+    });
 });

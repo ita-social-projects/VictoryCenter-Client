@@ -1,9 +1,10 @@
 import React, { createRef } from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemberForm, TeamMemberFormRef, TeamMemberFormValues } from './MemberForm';
 import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
 import { TeamCategory } from '../../../../../../types/admin/team-category';
+import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/team-member-schema/team-member-schema';
 
 // Mock SingleSelectInput to a native select for deterministic interaction
 jest.mock('../../../../../../components/common/single-select-input/SingleSelectInput', () => ({
@@ -71,7 +72,9 @@ describe('MemberForm', () => {
         expect(onValidationChange).toHaveBeenLastCalledWith(false);
 
         // Select category
-        fireEvent.change(screen.getByTestId('category-select'), { target: { value: '1' } });
+        const categorySelect = screen.getByTestId('category-select');
+        fireEvent.change(categorySelect, { target: { value: '1' } });
+        fireEvent.blur(categorySelect);
 
         // Fill full name
         const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
@@ -100,6 +103,24 @@ describe('MemberForm', () => {
         fireEvent.blur(fullNameInput);
 
         expect(screen.getByText(TEAM_MEMBER_VALIDATION.fullName.getPatternError())).toBeInTheDocument();
+    });
+
+    it('covers category blur error path', () => {
+        const onSubmit = jest.fn();
+        const ref = createRef<TeamMemberFormRef>();
+
+        render(<MemberForm ref={ref} categories={categories} onSubmit={onSubmit} />);
+
+        act(() => {
+            if (ref.current) {
+                ref.current.submit(VisibilityStatus.Draft);
+            }
+        });
+
+        const categorySelect = screen.getByTestId('category-select');
+        fireEvent.blur(categorySelect);
+
+        expect(screen.getByText(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateCategory(null, false)!)).toBeInTheDocument();
     });
 
     it('submit: calls onSubmit for Draft when valid, but blocks Published without image/description', async () => {
@@ -183,5 +204,20 @@ describe('MemberForm', () => {
 
         rerender(<MemberForm ref={ref} categories={categories} onSubmit={onSubmit} initialData={initialData} />);
         expect(ref.current?.isDirty()).toBe(false);
+    });
+
+    it('prevents default form submission', () => {
+        const onSubmit = jest.fn();
+        const ref = createRef<TeamMemberFormRef>();
+
+        render(<MemberForm ref={ref} categories={categories} onSubmit={onSubmit} />);
+        const form = screen.getByTestId('test-form');
+
+        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+        const preventDefaultSpy = jest.spyOn(submitEvent, 'preventDefault');
+
+        form.dispatchEvent(submitEvent);
+
+        expect(preventDefaultSpy).toHaveBeenCalled();
     });
 });

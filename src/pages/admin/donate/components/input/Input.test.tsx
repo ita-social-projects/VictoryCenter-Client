@@ -42,6 +42,7 @@ describe('Input component', () => {
         fireEvent.change(textarea, { target: { value: 'Hello' } });
         const clearButton = screen.getByRole('button');
         expect(clearButton).toBeInTheDocument();
+        fireEvent.mouseDown(clearButton);
         fireEvent.click(clearButton);
         expect(textarea).toHaveValue('');
     });
@@ -56,5 +57,22 @@ describe('Input component', () => {
         render(<Input label="Name" name="name" editable={false} />);
         const textarea = screen.getByRole('textbox');
         expect(textarea).toHaveAttribute('readOnly');
+    });
+
+    test('auto-resizes textarea when value height exceeds minHeight', () => {
+        render(<Input label="Name" name="name" />);
+
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+        jest.spyOn(window, 'getComputedStyle').mockReturnValue({
+            minHeight: '10px',
+            getPropertyValue: () => '10px',
+        } as any);
+
+        Object.defineProperty(textarea, 'scrollHeight', { value: 20, configurable: true });
+
+        fireEvent.change(textarea, { target: { value: 'Longer text' } });
+
+        expect(textarea.style.height).toBe('20px');
     });
 });

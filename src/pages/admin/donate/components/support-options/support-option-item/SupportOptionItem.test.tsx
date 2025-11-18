@@ -4,8 +4,8 @@ import { DONATE_TEXT } from '../../../../../../const/admin/donate';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { BankCurrency } from '../../../../../../types/admin/donate';
 
-jest.mock('../../input/Input', () => ({
-    Input: ({ value, handleChange, handleBlur, name }: any) => (
+jest.mock('../../donate-input/DonateInput', () => ({
+    DonateInput: ({ value, handleChange, handleBlur, name }: any) => (
         <input value={value} onChange={handleChange} onBlur={handleBlur} data-testid={`input-${name}`} />
     ),
 }));
@@ -215,5 +215,63 @@ describe('SupportOptionItem', () => {
         fireEvent.click(noButton);
 
         expect(screen.queryByTestId('confirmation-modal')).not.toBeInTheDocument();
+    });
+
+    it('calls onModeChange when mode changes', () => {
+        const mockOnModeChange = jest.fn();
+        render(<SupportOptionItem data={defaultData} onModeChange={mockOnModeChange} />);
+        expect(mockOnModeChange).toHaveBeenLastCalledWith(SupportOptionItemMode.View);
+        mockOnModeChange.mockClear();
+
+        const editButton = screen.getByRole('button', { name: 'edit-btn' });
+        fireEvent.click(editButton);
+
+        expect(mockOnModeChange).toHaveBeenLastCalledWith(SupportOptionItemMode.Edit);
+        mockOnModeChange.mockClear();
+
+        const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+        fireEvent.click(cancelButton);
+
+        expect(mockOnModeChange).toHaveBeenLastCalledWith(SupportOptionItemMode.View);
+    });
+
+    it('keeps modal open if onConfirm (delete) throws an error', async () => {
+        const mockOnDelete = jest.fn().mockRejectedValue(new Error('Delete failed'));
+        render(<SupportOptionItem data={defaultData} onDelete={mockOnDelete} />);
+
+        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
+        fireEvent.click(deleteButton);
+
+        const yesButton = await screen.findByText('Yes');
+        fireEvent.click(yesButton);
+
+        await waitFor(() => {
+            expect(mockOnDelete).toHaveBeenCalled();
+        });
+        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
+    });
+
+    it('does not do anything if edit button is clicked while already in edit mode', () => {
+        const mockOnModeChange = jest.fn();
+        render(<SupportOptionItem data={defaultData} onModeChange={mockOnModeChange} />);
+
+        const editButton = screen.getByRole('button', { name: 'edit-btn' });
+        fireEvent.click(editButton);
+
+        mockOnModeChange.mockClear();
+
+        fireEvent.click(editButton);
+
+        expect(mockOnModeChange).not.toHaveBeenCalled();
+    });
+
+    it('shows validation errors for value field on blur', () => {
+        render(<SupportOptionItem initialMode={SupportOptionItemMode.Create} />);
+
+        const valueInput = screen.getByTestId('input-value');
+        fireEvent.change(valueInput, { target: { value: 'A' } });
+        fireEvent.blur(valueInput);
+
+        expect(screen.getByText('Value too short')).toBeInTheDocument();
     });
 });

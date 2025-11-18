@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { Button } from '../../../../../components/admin/button/Button';
-import { Input } from '../input/Input';
+import { DonateInput } from '../donate-input/DonateInput';
 import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './GenericForm.scss';
@@ -27,6 +27,7 @@ export interface GenericFormProps<T extends FieldValues> {
     onDelete?: (id: number) => void;
     isChildForm?: boolean;
     children?: (form: { formState: T; isItemsExpanded: boolean }) => React.ReactNode;
+    onModeChange?: (mode: GenericFormMode) => void;
 }
 
 export enum GenericFormMode {
@@ -62,6 +63,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 onDelete,
                 isChildForm = false,
                 children,
+                onModeChange,
             },
             ref,
         ) => {
@@ -83,6 +85,10 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
             const titleField = useMemo(() => fields.find((f) => f.isTitle), []);
             const titleFieldName = titleField?.name;
+
+            useEffect(() => {
+                onModeChange?.(mode);
+            }, [mode, onModeChange]);
 
             useEffect(() => {
                 const newState: FormState = { ...(initialData ?? ({} as FormState)) };
@@ -273,6 +279,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                         className={`edit-btn ${mode}`}
                                         aria-label="edit-btn"
                                         onClick={handleEditClick}
+                                        disabled={mode === GenericFormMode.Edit}
                                     />
                                     <button
                                         className={`delete-btn ${mode}`}
@@ -340,7 +347,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                             className={`form-field ${isTitleField ? 'form-field-title-row' : ''}`}
                                         >
                                             <div className="form-field-content">
-                                                <Input
+                                                <DonateInput
                                                     name={String(f.name)}
                                                     label={f.label}
                                                     isRequired={mode === GenericFormMode.Create && f.isRequired}
@@ -358,6 +365,24 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                     <span className="error">{errors[f.name]}</span>
                                                 )}
                                             </div>
+
+                                            {isChildForm && isTitleField && mode === GenericFormMode.Edit && (
+                                                <div className={`title-actions`}>
+                                                    <button
+                                                        type="button"
+                                                        aria-label="edit-btn"
+                                                        className={`edit-btn ${mode}`}
+                                                        onClick={handleEditClick}
+                                                        disabled
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        aria-label="delete-btn"
+                                                        className={`delete-btn delete-btn-icon ${isDeleting ? 'pressed' : ''}`}
+                                                        onClick={handleDeleteClick}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
                                     );
                                 })}

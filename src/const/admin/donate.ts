@@ -113,6 +113,8 @@ export const VALIDATION_PARAMS = {
     edrpou: { count: 8 },
     iban: { count: 29, errorLength: 27 },
     swift: { minLength: 8, maxLength: 11 },
+    supportTitle: { minLength: 1, maxLength: 50 },
+    supportDescription: { minLength: 1, maxLength: 100 },
 };
 
 export const DONATE_VALIDATION = {
@@ -152,11 +154,19 @@ export const DONATE_VALIDATION = {
         getRequiredError: () => getRequiredError(DONATE_TEXT.CORRESPONDENT_BANKS.ACCOUNT.TITLE),
     },
     supportOptions: {
+        minLengthTitle: VALIDATION_PARAMS.supportTitle.minLength,
+        maxLengthTitle: VALIDATION_PARAMS.supportTitle.maxLength,
+        minLengthDescription: VALIDATION_PARAMS.supportDescription.minLength,
+        maxLengthDescription: VALIDATION_PARAMS.supportDescription.maxLength,
         name: {
             getRequiredError: () => getGenericRequiredError(),
+            getMinError: () => getMinSymbolsError(VALIDATION_PARAMS.supportTitle.minLength),
+            getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.supportTitle.maxLength),
         },
         value: {
             getRequiredError: () => getGenericRequiredError(),
+            getMinError: () => getMinSymbolsError(VALIDATION_PARAMS.supportDescription.minLength),
+            getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.supportDescription.maxLength),
         },
     },
 };

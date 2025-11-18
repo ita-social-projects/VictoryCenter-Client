@@ -69,6 +69,7 @@ function createForeignFields(currency: 'USD' | 'EUR'): GenericFormField<ForeignB
             label: `${DONATE_TEXT.BANK_DETAILS.IBAN.TITLE} (${currency})`,
             validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban),
             isRequired: true,
+            placeholder: DONATE_TEXT.BANK_DETAILS.IBAN.PLACEHOLDER,
             maxLength: 29,
         },
         {

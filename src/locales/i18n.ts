@@ -2,8 +2,8 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-import { headerUk, footerUk, aboutUsPageUk, programsPageUk } from './uk';
-import { headerEn, footerEn, aboutUsPageEn, programsPageEn } from './en';
+import { headerUk, footerUk, aboutUsPageUk, programsPageUk, globalUk } from './uk';
+import { headerEn, footerEn, aboutUsPageEn, programsPageEn, globalEn } from './en';
 import { DEFAULT_LOCALE, LOCALES } from '../const/common/locales';
 
 const resources = {
@@ -12,12 +12,14 @@ const resources = {
         footer: footerUk,
         aboutUsPage: aboutUsPageUk,
         programsPage: programsPageUk,
+        global: globalUk,
     },
     en: {
         header: headerEn,
         footer: footerEn,
         aboutUsPage: aboutUsPageEn,
         programsPage: programsPageEn,
+        global: globalEn,
     },
 };
 
@@ -31,7 +33,7 @@ i18n.use(initReactI18next).init({
     resources,
     supportedLngs: LOCALES,
     fallbackLng: DEFAULT_LOCALE,
-    ns: ['header', 'footer', 'aboutUsPage', 'programsPage'], // namespaces
+    ns: ['header', 'footer', 'aboutUsPage', 'programsPage', 'global'], // namespaces
     defaultNS: 'aboutUsPage',
     interpolation: {
         escapeValue: false, // leave it for React

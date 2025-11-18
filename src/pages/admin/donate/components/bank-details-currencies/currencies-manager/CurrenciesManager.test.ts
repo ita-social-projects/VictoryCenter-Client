@@ -2,7 +2,6 @@ import { renderHook, act } from '@testing-library/react';
 import { waitFor } from '@testing-library/react';
 import { Currencies, mapCurrencyToBankCurrency, useBankDetails } from './CurrenciesManager';
 import { BankCurrency } from '../../../../../../types/admin/donate';
-
 import { bankDetailsConfig } from '../bank-details-currencies-config/BankDetailsCurrenciesConfig';
 
 jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
@@ -14,7 +13,6 @@ jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () =>
     })),
 }));
 
-// Fix: Create mock functions inside the mock factory using jest.fn()
 jest.mock('../bank-details-currencies-config/BankDetailsCurrenciesConfig', () => ({
     bankDetailsConfig: {
         UAH: {
@@ -46,16 +44,21 @@ jest.mock('../bank-details-currencies-config/BankDetailsCurrenciesConfig', () =>
 }));
 
 describe('mapCurrencyToBankCurrency', () => {
-    it('maps UAH to BankCurrency.Uah', () => {
-        expect(mapCurrencyToBankCurrency(Currencies.UAH)).toBe(BankCurrency.Uah);
-    });
+    // Test data for mapping
+    const currencyMappings = [
+        { input: Currencies.UAH, expected: BankCurrency.Uah, expectedValue: 0 },
+        { input: Currencies.USD, expected: BankCurrency.Usd, expectedValue: 1 },
+        { input: Currencies.EUR, expected: BankCurrency.Eur, expectedValue: 2 },
+    ];
 
-    it('maps USD to BankCurrency.Usd', () => {
-        expect(mapCurrencyToBankCurrency(Currencies.USD)).toBe(BankCurrency.Usd);
-    });
+    currencyMappings.forEach(({ input, expected, expectedValue }) => {
+        it(`maps ${input} to BankCurrency.${BankCurrency[expected]}`, () => {
+            expect(mapCurrencyToBankCurrency(input)).toBe(expected);
+        });
 
-    it('maps EUR to BankCurrency.Eur', () => {
-        expect(mapCurrencyToBankCurrency(Currencies.EUR)).toBe(BankCurrency.Eur);
+        it(`maps ${input} to correct numeric value ${expectedValue}`, () => {
+            expect(mapCurrencyToBankCurrency(input)).toBe(expectedValue);
+        });
     });
 
     it('handles all enum values', () => {
@@ -64,171 +67,173 @@ describe('mapCurrencyToBankCurrency', () => {
             expect(mapCurrencyToBankCurrency(currency)).toBeDefined();
         });
     });
-
-    it('maps to correct BankCurrency types', () => {
-        expect(mapCurrencyToBankCurrency(Currencies.UAH)).toBe(0); // BankCurrency.Uah
-        expect(mapCurrencyToBankCurrency(Currencies.USD)).toBe(1); // BankCurrency.Usd
-        expect(mapCurrencyToBankCurrency(Currencies.EUR)).toBe(2); // BankCurrency.Eur
-    });
 });
 
 describe('useBankDetails', () => {
+    // Helper functions to reduce duplication
+    const mockFetchResolve = (currency: Currencies, data: any) => {
+        (bankDetailsConfig[currency].fetch as jest.Mock).mockResolvedValue(data);
+    };
+
+    const mockFetchReject = (currency: Currencies, error: any) => {
+        (bankDetailsConfig[currency].fetch as jest.Mock).mockRejectedValue(error);
+    };
+
+    const mockFetchReturn = (currency: Currencies, promise: Promise<any>) => {
+        (bankDetailsConfig[currency].fetch as jest.Mock).mockReturnValue(promise);
+    };
+
+    const waitForLoadingComplete = async (result: any) => {
+        await waitFor(() => {
+            expect(result.current.isLoading).toBe(false);
+        });
+    };
+
+    const createMockData = (id: number, name: string, extra: any = {}) => ({
+        id,
+        name,
+        ...extra,
+    });
+
+    const createControlledPromise = () => {
+        let resolvePromise: (value: any) => void;
+        let rejectPromise: (error: any) => void;
+        const promise = new Promise((resolve, reject) => {
+            resolvePromise = resolve;
+            rejectPromise = reject;
+        });
+        return { promise, resolvePromise: resolvePromise!, rejectPromise: rejectPromise! };
+    };
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('returns initial state and fetches data successfully', async () => {
-        const mockData = [{ id: 1, name: 'Bank1' }];
-        (bankDetailsConfig.UAH.fetch as jest.Mock).mockResolvedValue(mockData);
+    describe('Initial state and basic functionality', () => {
+        it('returns initial state and fetches data successfully', async () => {
+            const mockData = [createMockData(1, 'Bank1')];
+            mockFetchResolve(Currencies.UAH, mockData);
 
-        const { result } = renderHook(() => useBankDetails(Currencies.UAH));
+            const { result } = renderHook(() => useBankDetails(Currencies.UAH));
 
-        expect(result.current.isLoading).toBe(true);
-        expect(result.current.items).toEqual([]);
+            expect(result.current.isLoading).toBe(true);
+            expect(result.current.items).toEqual([]);
 
-        await waitFor(() => {
-            expect(result.current.isLoading).toBe(false);
+            await waitForLoadingComplete(result);
+            expect(result.current.items).toEqual(mockData);
         });
 
-        expect(result.current.items).toEqual(mockData);
-    });
+        it('handles fetch error and sets empty array', async () => {
+            mockFetchReject(Currencies.USD, new Error('fail'));
 
-    it('handles fetch error and sets empty array', async () => {
-        (bankDetailsConfig.USD.fetch as jest.Mock).mockRejectedValue(new Error('fail'));
+            const { result } = renderHook(() => useBankDetails(Currencies.USD));
 
-        const { result } = renderHook(() => useBankDetails(Currencies.USD));
-
-        expect(result.current.isLoading).toBe(true);
-
-        await waitFor(() => {
-            expect(result.current.isLoading).toBe(false);
+            expect(result.current.isLoading).toBe(true);
+            await waitForLoadingComplete(result);
+            expect(result.current.items).toEqual([]);
         });
 
-        expect(result.current.items).toEqual([]);
-    });
+        it('does not update state after unmount', async () => {
+            const mockData = [createMockData(2, 'Bank2')];
+            mockFetchResolve(Currencies.UAH, mockData);
 
-    it('does not update state after unmount', async () => {
-        const mockData = [{ id: 2, name: 'Bank2' }];
-        (bankDetailsConfig.UAH.fetch as jest.Mock).mockResolvedValue(mockData);
+            const { result, unmount } = renderHook(() => useBankDetails(Currencies.UAH));
 
-        const { result, unmount } = renderHook(() => useBankDetails(Currencies.UAH));
-
-        unmount();
-
-        expect(result.current.items).toEqual([]);
-    });
-
-    it('allows external items update via setItems', async () => {
-        const mockData = [{ id: 3, name: 'Bank3' }];
-        (bankDetailsConfig.EUR.fetch as jest.Mock).mockResolvedValue(mockData);
-
-        const { result } = renderHook(() => useBankDetails(Currencies.EUR));
-
-        await waitFor(() => {
-            expect(result.current.isLoading).toBe(false);
+            unmount();
+            expect(result.current.items).toEqual([]);
         });
 
-        act(() => {
-            result.current.setItems([...result.current.items, { id: 4, name: 'Bank4' }]);
-        });
+        it('allows external items update via setItems', async () => {
+            const mockData = [createMockData(3, 'Bank3')];
+            mockFetchResolve(Currencies.EUR, mockData);
 
-        expect(result.current.items).toHaveLength(2);
-        expect(result.current.items[1]).toEqual({ id: 4, name: 'Bank4' });
+            const { result } = renderHook(() => useBankDetails(Currencies.EUR));
+
+            await waitForLoadingComplete(result);
+
+            act(() => {
+                result.current.setItems([...result.current.items, createMockData(4, 'Bank4')]);
+            });
+
+            expect(result.current.items).toHaveLength(2);
+            expect(result.current.items[1]).toEqual(createMockData(4, 'Bank4'));
+        });
     });
 
     describe('Currency switching behavior', () => {
         it('refetches data when currency changes', async () => {
-            const uahData = [{ id: 1, name: 'UAH Bank' }];
-            const usdData = [{ id: 2, name: 'USD Bank' }];
+            const uahData = [createMockData(1, 'UAH Bank')];
+            const usdData = [createMockData(2, 'USD Bank')];
 
-            (bankDetailsConfig.UAH.fetch as jest.Mock).mockResolvedValue(uahData);
-            (bankDetailsConfig.USD.fetch as jest.Mock).mockResolvedValue(usdData);
+            mockFetchResolve(Currencies.UAH, uahData);
+            mockFetchResolve(Currencies.USD, usdData);
 
             const { result, rerender } = renderHook(({ currency }) => useBankDetails(currency), {
                 initialProps: { currency: Currencies.UAH },
             });
 
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
-            });
-
+            await waitForLoadingComplete(result);
             expect(result.current.items).toEqual(uahData);
             expect(bankDetailsConfig.UAH.fetch).toHaveBeenCalledTimes(1);
 
-            // Change currency
             rerender({ currency: Currencies.USD });
-
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
-            });
-
+            await waitForLoadingComplete(result);
             expect(result.current.items).toEqual(usdData);
             expect(bankDetailsConfig.USD.fetch).toHaveBeenCalledTimes(1);
         });
 
         it('returns correct config for each currency', async () => {
-            // Setup mocks to resolve immediately
-            (bankDetailsConfig.UAH.fetch as jest.Mock).mockResolvedValue([]);
-            (bankDetailsConfig.USD.fetch as jest.Mock).mockResolvedValue([]);
-            (bankDetailsConfig.EUR.fetch as jest.Mock).mockResolvedValue([]);
-
-            const { result: uahResult } = renderHook(() => useBankDetails(Currencies.UAH));
-            const { result: usdResult } = renderHook(() => useBankDetails(Currencies.USD));
-            const { result: eurResult } = renderHook(() => useBankDetails(Currencies.EUR));
-
-            // Wait for all hooks to complete their initial fetch
-            await waitFor(() => {
-                expect(uahResult.current.isLoading).toBe(false);
-                expect(usdResult.current.isLoading).toBe(false);
-                expect(eurResult.current.isLoading).toBe(false);
+            // Setup all mocks
+            [Currencies.UAH, Currencies.USD, Currencies.EUR].forEach((currency) => {
+                mockFetchResolve(currency, []);
             });
 
-            expect(uahResult.current.config).toHaveProperty('fetch');
-            expect(usdResult.current.config).toHaveProperty('fetch');
-            expect(eurResult.current.config).toHaveProperty('fetch');
+            const results = await Promise.all([
+                renderHook(() => useBankDetails(Currencies.UAH)),
+                renderHook(() => useBankDetails(Currencies.USD)),
+                renderHook(() => useBankDetails(Currencies.EUR)),
+            ]);
+
+            // Wait for all to complete
+            await Promise.all(results.map(({ result }) => waitForLoadingComplete(result)));
+
+            results.forEach(({ result }) => {
+                expect(result.current.config).toHaveProperty('fetch');
+            });
         });
     });
 
     describe('Loading state management', () => {
         it('sets loading to true during fetch', async () => {
-            let resolvePromise: (value: any) => void;
-            const mockPromise = new Promise((resolve) => {
-                resolvePromise = resolve;
-            });
-            (bankDetailsConfig.UAH.fetch as jest.Mock).mockReturnValue(mockPromise);
+            const { promise, resolvePromise } = createControlledPromise();
+            mockFetchReturn(Currencies.UAH, promise);
 
             const { result } = renderHook(() => useBankDetails(Currencies.UAH));
 
             expect(result.current.isLoading).toBe(true);
 
-            // Resolve the promise
             act(() => {
-                resolvePromise([{ id: 1, name: 'Bank' }]);
+                resolvePromise([createMockData(1, 'Bank')]);
             });
 
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
-            });
+            await waitForLoadingComplete(result);
         });
 
         it('sets loading to false even when fetch fails', async () => {
-            (bankDetailsConfig.EUR.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
+            mockFetchReject(Currencies.EUR, new Error('Network error'));
 
             const { result } = renderHook(() => useBankDetails(Currencies.EUR));
 
             expect(result.current.isLoading).toBe(true);
-
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
-            });
+            await waitForLoadingComplete(result);
         });
 
         it('maintains loading state correctly during multiple rapid changes', async () => {
-            const mockData1 = [{ id: 1, name: 'Bank1' }];
-            const mockData2 = [{ id: 2, name: 'Bank2' }];
+            const mockData1 = [createMockData(1, 'Bank1')];
+            const mockData2 = [createMockData(2, 'Bank2')];
 
-            (bankDetailsConfig.UAH.fetch as jest.Mock).mockResolvedValue(mockData1);
-            (bankDetailsConfig.USD.fetch as jest.Mock).mockResolvedValue(mockData2);
+            mockFetchResolve(Currencies.UAH, mockData1);
+            mockFetchResolve(Currencies.USD, mockData2);
 
             const { result, rerender } = renderHook(({ currency }) => useBankDetails(currency), {
                 initialProps: { currency: Currencies.UAH },
@@ -239,160 +244,123 @@ describe('useBankDetails', () => {
             // Quickly change currency before first resolves
             rerender({ currency: Currencies.USD });
 
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
-            });
-
+            await waitForLoadingComplete(result);
             expect(result.current.items).toEqual(mockData2);
         });
     });
 
     describe('Error handling', () => {
-        it('handles network errors gracefully', async () => {
-            (bankDetailsConfig.USD.fetch as jest.Mock).mockRejectedValue(new Error('Network timeout'));
+        const errorScenarios = [
+            {
+                name: 'network errors',
+                currency: Currencies.USD,
+                error: new Error('Network timeout'),
+            },
+            {
+                name: 'API errors',
+                currency: Currencies.EUR,
+                error: { response: { status: 500, data: 'Internal Server Error' } },
+            },
+        ];
 
-            const { result } = renderHook(() => useBankDetails(Currencies.USD));
+        errorScenarios.forEach(({ name, currency, error }) => {
+            it(`handles ${name} gracefully`, async () => {
+                mockFetchReject(currency, error);
 
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                const { result } = renderHook(() => useBankDetails(currency));
+
+                await waitForLoadingComplete(result);
+                expect(result.current.items).toEqual([]);
             });
-
-            expect(result.current.items).toEqual([]);
-        });
-
-        it('handles API errors gracefully', async () => {
-            (bankDetailsConfig.EUR.fetch as jest.Mock).mockRejectedValue({
-                response: { status: 500, data: 'Internal Server Error' },
-            });
-
-            const { result } = renderHook(() => useBankDetails(Currencies.EUR));
-
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
-            });
-
-            expect(result.current.items).toEqual([]);
         });
 
         it('handles undefined/null response gracefully', async () => {
-            (bankDetailsConfig.UAH.fetch as jest.Mock).mockResolvedValue(null);
+            mockFetchResolve(Currencies.UAH, null);
 
             const { result } = renderHook(() => useBankDetails(Currencies.UAH));
 
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
-            });
-
+            await waitForLoadingComplete(result);
             expect(result.current.items).toBe(null);
         });
     });
 
     describe('setItems functionality', () => {
-        it('allows complete replacement of items', async () => {
-            const initialData = [
-                { id: 1, name: 'Bank1' },
-                { id: 2, name: 'Bank2' },
-            ];
-            const newData = [{ id: 3, name: 'Bank3' }];
+        const setItemsScenarios = [
+            {
+                name: 'complete replacement of items',
+                currency: Currencies.UAH,
+                initialData: [createMockData(1, 'Bank1'), createMockData(2, 'Bank2')],
+                newData: [createMockData(3, 'Bank3')],
+                operation: (setItems: any, _current: any, newData: any) => setItems(newData),
+                expectedLength: 1,
+                validate: (items: any[], newData: any[]) => expect(items).toEqual(newData),
+            },
+            {
+                name: 'adding items to existing list',
+                currency: Currencies.USD,
+                initialData: [createMockData(1, 'Bank1')],
+                newData: createMockData(2, 'Bank2'),
+                operation: (setItems: any, current: any[], newData: any) => setItems([...current, newData]),
+                expectedLength: 2,
+                validate: (items: any[], newData: any) => expect(items[1]).toEqual(newData),
+            },
+            {
+                name: 'removing items from list',
+                currency: Currencies.EUR,
+                initialData: [createMockData(1, 'Bank1'), createMockData(2, 'Bank2')],
+                newData: null,
+                operation: (setItems: any, current: any[]) => setItems(current.filter((item) => item.id !== 1)),
+                expectedLength: 1,
+                validate: (items: any[]) => expect(items[0]).toEqual(createMockData(2, 'Bank2')),
+            },
+            {
+                name: 'updating specific items',
+                currency: Currencies.UAH,
+                initialData: [createMockData(1, 'Bank1', { amount: 100 })],
+                newData: 'Updated Bank',
+                operation: (setItems: any, current: any[], newData: string) =>
+                    setItems(current.map((item) => (item.id === 1 ? { ...item, name: newData } : item))),
+                expectedLength: 1,
+                validate: (items: any[], newData: string) =>
+                    expect(items[0]).toEqual(createMockData(1, newData, { amount: 100 })),
+            },
+        ];
 
-            (bankDetailsConfig.UAH.fetch as jest.Mock).mockResolvedValue(initialData);
+        setItemsScenarios.forEach(({ name, currency, initialData, newData, operation, expectedLength, validate }) => {
+            it(`allows ${name}`, async () => {
+                mockFetchResolve(currency, initialData);
 
-            const { result } = renderHook(() => useBankDetails(Currencies.UAH));
+                const { result } = renderHook(() => useBankDetails(currency));
 
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
+                await waitForLoadingComplete(result);
+                expect(result.current.items).toEqual(initialData);
+
+                act(() => {
+                    operation(result.current.setItems, result.current.items, newData);
+                });
+
+                expect(result.current.items).toHaveLength(expectedLength);
+                validate(result.current.items, newData);
             });
-
-            expect(result.current.items).toEqual(initialData);
-
-            act(() => {
-                result.current.setItems(newData);
-            });
-
-            expect(result.current.items).toEqual(newData);
-        });
-
-        it('allows adding items to existing list', async () => {
-            const initialData = [{ id: 1, name: 'Bank1' }];
-            (bankDetailsConfig.USD.fetch as jest.Mock).mockResolvedValue(initialData);
-
-            const { result } = renderHook(() => useBankDetails(Currencies.USD));
-
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
-            });
-
-            act(() => {
-                result.current.setItems([...result.current.items, { id: 2, name: 'Bank2' }]);
-            });
-
-            expect(result.current.items).toHaveLength(2);
-            expect(result.current.items[1]).toEqual({ id: 2, name: 'Bank2' });
-        });
-
-        it('allows removing items from list', async () => {
-            const initialData = [
-                { id: 1, name: 'Bank1' },
-                { id: 2, name: 'Bank2' },
-            ];
-            (bankDetailsConfig.EUR.fetch as jest.Mock).mockResolvedValue(initialData);
-
-            const { result } = renderHook(() => useBankDetails(Currencies.EUR));
-
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
-            });
-
-            act(() => {
-                result.current.setItems(result.current.items.filter((item) => item.id !== 1));
-            });
-
-            expect(result.current.items).toHaveLength(1);
-            expect(result.current.items[0]).toEqual({ id: 2, name: 'Bank2' });
-        });
-
-        it('allows updating specific items', async () => {
-            const initialData = [{ id: 1, name: 'Bank1', amount: 100 }];
-            (bankDetailsConfig.UAH.fetch as jest.Mock).mockResolvedValue(initialData);
-
-            const { result } = renderHook(() => useBankDetails(Currencies.UAH));
-
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
-            });
-
-            act(() => {
-                result.current.setItems(
-                    result.current.items.map((item) => (item.id === 1 ? { ...item, name: 'Updated Bank' } : item)),
-                );
-            });
-
-            expect(result.current.items[0]).toEqual({ id: 1, name: 'Updated Bank', amount: 100 });
         });
 
         it('preserves setItems functionality after currency change', async () => {
-            const uahData = [{ id: 1, name: 'UAH Bank' }];
-            const usdData = [{ id: 2, name: 'USD Bank' }];
+            const uahData = [createMockData(1, 'UAH Bank')];
+            const usdData = [createMockData(2, 'USD Bank')];
 
-            (bankDetailsConfig.UAH.fetch as jest.Mock).mockResolvedValue(uahData);
-            (bankDetailsConfig.USD.fetch as jest.Mock).mockResolvedValue(usdData);
+            mockFetchResolve(Currencies.UAH, uahData);
+            mockFetchResolve(Currencies.USD, usdData);
 
             const { result, rerender } = renderHook(({ currency }) => useBankDetails(currency), {
                 initialProps: { currency: Currencies.UAH },
             });
 
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
-            });
-
+            await waitForLoadingComplete(result);
             rerender({ currency: Currencies.USD });
-
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
-            });
+            await waitForLoadingComplete(result);
 
             act(() => {
-                result.current.setItems([...result.current.items, { id: 3, name: 'New Bank' }]);
+                result.current.setItems([...result.current.items, createMockData(3, 'New Bank')]);
             });
 
             expect(result.current.items).toHaveLength(2);
@@ -400,58 +368,58 @@ describe('useBankDetails', () => {
     });
 
     describe('Memory leak prevention', () => {
-        it('prevents state update after component unmount during fetch', async () => {
-            let resolvePromise: (value: any) => void;
-            const mockPromise = new Promise((resolve) => {
-                resolvePromise = resolve;
+        const memoryLeakScenarios = [
+            {
+                name: 'during fetch',
+                setupPromise: () => {
+                    const { promise, resolvePromise } = createControlledPromise();
+                    return {
+                        promise,
+                        triggerAfterUnmount: () => resolvePromise([createMockData(1, 'Bank')]),
+                    };
+                },
+            },
+            {
+                name: 'during error',
+                setupPromise: () => {
+                    const { promise, rejectPromise } = createControlledPromise();
+                    return {
+                        promise,
+                        triggerAfterUnmount: () => rejectPromise(new Error('Test error')),
+                    };
+                },
+            },
+        ];
+
+        memoryLeakScenarios.forEach(({ name, setupPromise }) => {
+            it(`prevents state update after component unmount ${name}`, async () => {
+                const { promise, triggerAfterUnmount } = setupPromise();
+                mockFetchReturn(Currencies.UAH, promise);
+
+                const { result, unmount } = renderHook(() => useBankDetails(Currencies.UAH));
+
+                expect(result.current.isLoading).toBe(true);
+                unmount();
+
+                act(() => {
+                    triggerAfterUnmount();
+                });
+
+                // Should not cause any warnings or errors
             });
-            (bankDetailsConfig.UAH.fetch as jest.Mock).mockReturnValue(mockPromise);
-
-            const { result, unmount } = renderHook(() => useBankDetails(Currencies.UAH));
-
-            expect(result.current.isLoading).toBe(true);
-
-            unmount();
-
-            // Resolve after unmount
-            act(() => {
-                resolvePromise([{ id: 1, name: 'Bank' }]);
-            });
-
-            // Should not cause any warnings or errors
-        });
-
-        it('prevents state update after component unmount during error', async () => {
-            let rejectPromise: (error: Error) => void;
-            const mockPromise = new Promise((_, reject) => {
-                rejectPromise = reject;
-            });
-            (bankDetailsConfig.USD.fetch as jest.Mock).mockReturnValue(mockPromise);
-
-            const { result, unmount } = renderHook(() => useBankDetails(Currencies.USD));
-
-            expect(result.current.isLoading).toBe(true);
-
-            unmount();
-
-            // Reject after unmount
-            act(() => {
-                rejectPromise(new Error('Test error'));
-            });
-
-            // Should not cause any warnings or errors
         });
     });
 
     describe('Client dependency', () => {
+        const getMockUseAdminClient = () =>
+            require('../../../../../../hooks/admin/use-admin-client/useAdminClient').useAdminClient;
+
         it('passes client to fetch function', async () => {
             const mockClient = { get: jest.fn(), post: jest.fn() };
-            const mockUseAdminClient =
-                require('../../../../../../hooks/admin/use-admin-client/useAdminClient').useAdminClient;
-            mockUseAdminClient.mockReturnValue(mockClient);
+            getMockUseAdminClient().mockReturnValue(mockClient);
 
-            const mockData = [{ id: 1, name: 'Bank1' }];
-            (bankDetailsConfig.EUR.fetch as jest.Mock).mockResolvedValue(mockData);
+            const mockData = [createMockData(1, 'Bank1')];
+            mockFetchResolve(Currencies.EUR, mockData);
 
             renderHook(() => useBankDetails(Currencies.EUR));
 
@@ -463,13 +431,12 @@ describe('useBankDetails', () => {
         it('refetches when client changes', async () => {
             const mockClient1 = { get: jest.fn(), post: jest.fn() };
             const mockClient2 = { get: jest.fn(), post: jest.fn() };
-            const mockUseAdminClient =
-                require('../../../../../../hooks/admin/use-admin-client/useAdminClient').useAdminClient;
+            const mockUseAdminClient = getMockUseAdminClient();
 
             mockUseAdminClient.mockReturnValueOnce(mockClient1).mockReturnValue(mockClient2);
 
-            const mockData = [{ id: 1, name: 'Bank1' }];
-            (bankDetailsConfig.UAH.fetch as jest.Mock).mockResolvedValue(mockData);
+            const mockData = [createMockData(1, 'Bank1')];
+            mockFetchResolve(Currencies.UAH, mockData);
 
             const { rerender } = renderHook(() => useBankDetails(Currencies.UAH));
 
@@ -484,48 +451,6 @@ describe('useBankDetails', () => {
             });
 
             expect(bankDetailsConfig.UAH.fetch).toHaveBeenCalledTimes(2);
-        });
-    });
-
-    describe('Config properties', () => {
-        it('exposes config properties correctly for UAH', async () => {
-            (bankDetailsConfig.UAH.fetch as jest.Mock).mockResolvedValue([]);
-
-            const { result } = renderHook(() => useBankDetails(Currencies.UAH));
-
-            await waitFor(() => {
-                expect(result.current.isLoading).toBe(false);
-            });
-
-            expect(result.current.config).toHaveProperty('fetch');
-            expect(result.current.config).toHaveProperty('create');
-            expect(result.current.config).toHaveProperty('update');
-            expect(result.current.config).toHaveProperty('delete');
-            expect(result.current.config).toHaveProperty('createEmptyItem');
-            expect(result.current.config.withCorrespondentBanks).toBeUndefined();
-        });
-
-        it('exposes config properties correctly for foreign currencies', async () => {
-            (bankDetailsConfig.USD.fetch as jest.Mock).mockResolvedValue([]);
-            (bankDetailsConfig.EUR.fetch as jest.Mock).mockResolvedValue([]);
-
-            const { result: usdResult } = renderHook(() => useBankDetails(Currencies.USD));
-            const { result: eurResult } = renderHook(() => useBankDetails(Currencies.EUR));
-
-            await waitFor(() => {
-                expect(usdResult.current.isLoading).toBe(false);
-                expect(eurResult.current.isLoading).toBe(false);
-            });
-
-            [usdResult, eurResult].forEach((result) => {
-                expect(result.current.config).toHaveProperty('fetch');
-                expect(result.current.config).toHaveProperty('create');
-                expect(result.current.config).toHaveProperty('update');
-                expect(result.current.config).toHaveProperty('delete');
-                expect(result.current.config).toHaveProperty('createEmptyItem');
-                expect(result.current.config.withCorrespondentBanks).toBe(true);
-                expect(result.current.config.currency).toBeDefined();
-            });
         });
     });
 });

@@ -50,9 +50,9 @@ describe('teamMemberValidationSchema', () => {
 
     describe('description validation', () => {
         it('rejects short description when not publishing', () => {
-            expect(
-                TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(invalidDescriptionShort, false),
-            ).toBe(TEAM_MEMBER_VALIDATION.description.getMinError());
+            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(invalidDescriptionShort, false)).toBe(
+                TEAM_MEMBER_VALIDATION.description.getMinError(),
+            );
         });
 
         it('rejects empty description when not publishing', () => {

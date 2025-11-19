@@ -220,6 +220,7 @@ export const ProgramsPageContent = () => {
         (programId: string | number) => {
             setIsSearchResultView(true);
             setSearchProgramId(typeof programId === 'string' ? parseInt(programId, 10) : programId);
+            setStatusFilter(undefined);
             resetProgramsList();
         },
         [resetProgramsList],
@@ -409,6 +410,7 @@ export const ProgramsPageContent = () => {
                     renderSearchItemComponent={ProgramSearchItem}
                     placeholder={PROGRAMS_TEXT.PLACEHOLDER.SEARCH_PROGRAMS}
                     onSearchClear={handleSearchClear}
+                    statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
                     onAddItem={openModalActions.openAddItemModal}
                     AddItemButtonText={PROGRAMS_TEXT.BUTTON.ADD_PROGRAM}

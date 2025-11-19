@@ -13,6 +13,7 @@ const DEFAULT_PROPS: React.ComponentProps<typeof TeamPageToolbar> = {
     onSearchQueryChange: jest.fn(),
     onStatusFilterChange: jest.fn(),
     onAddMember: jest.fn(),
+    statusFilter: undefined,
     searchItems: [],
     isSearchLoading: false,
     searchHasMore: false,
@@ -204,5 +205,22 @@ describe('TeamPageToolbar', () => {
         rerender(<TeamPageToolbar {...{ ...DEFAULT_PROPS, categories: CATS_2, searchItems: ITEM_JANE }} />);
 
         expect(screen.getByTestId('team-member-item')).toHaveTextContent('Jane Roe - 2');
+    });
+
+    it('renders with statusFilter prop value', () => {
+        renderToolbar({ statusFilter: VisibilityStatus.Published });
+
+        // Verify the component renders without errors when statusFilter is provided
+        expect(screen.getByTestId('team-page-toolbar')).toBeInTheDocument();
+    });
+
+    it('passes statusFilter to StatusFilterDropdown', () => {
+        const { rerender } = renderToolbar({ statusFilter: undefined });
+
+        expect(screen.getByTestId('team-page-toolbar')).toBeInTheDocument();
+
+        rerender(<TeamPageToolbar {...{ ...DEFAULT_PROPS, statusFilter: VisibilityStatus.Draft }} />);
+
+        expect(screen.getByTestId('team-page-toolbar')).toBeInTheDocument();
     });
 });

@@ -379,6 +379,7 @@ export const FaqPanelContent = () => {
                     renderSearchItemComponent={FaqSearchItem}
                     placeholder={FAQ_TEXT.PLACEHOLDER.SEARCH_FAQ}
                     onSearchClear={() => {}}
+                    statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
                     onAddItem={handleAddFaqModalOpen}
                     AddItemButtonText={FAQ_TEXT.BUTTON.ADD_FAQ}

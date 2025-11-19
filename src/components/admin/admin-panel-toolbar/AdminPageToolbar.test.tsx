@@ -103,18 +103,11 @@ describe('AdminPanelToolbar', () => {
                 Status Filter Mock
             </div>
         ));
-        Button.mockImplementation(
-            ({
-                children,
-                onClick,
-                buttonStyle,
-                ...props
-            }: ButtonProps) => (
-                <button data-testid="add-item-button" onClick={onClick} {...props}>
-                    {children}
-                </button>
-            ),
-        );
+        Button.mockImplementation(({ children, onClick, buttonStyle, ...props }: ButtonProps) => (
+            <button data-testid="add-item-button" onClick={onClick} {...props}>
+                {children}
+            </button>
+        ));
     });
 
     const renderComponent = (props = {}) => {

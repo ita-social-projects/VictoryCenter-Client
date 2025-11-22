@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/useOnClickOutside';
 import { ReactComponent as MenuIcon } from '../../../assets/icons/menu.svg';
 import classNames from 'classnames';
-import './ContextMenuButton.scss';
+import styles from './ContextMenuButton.module.scss';
 
 export interface ContextMenuButtonProps {
     children: React.ReactNode;
@@ -40,8 +40,8 @@ export const ContextMenuButton = ({ children, onOptionSelected }: ContextMenuBut
             role="menu"
             ref={menuRef}
             data-testid="context-menu"
-            className={classNames('context-menu-button', {
-                'context-menu-button-active': isOpen,
+            className={classNames(styles['context-menu-button'], {
+                [styles['context-menu-button-active']]: isOpen,
             })}
             tabIndex={0}
             onClick={handleToggle}
@@ -52,11 +52,11 @@ export const ContextMenuButton = ({ children, onOptionSelected }: ContextMenuBut
                 }
             }}
         >
-            <MenuIcon className="context-menu-button-icon" />
+            <MenuIcon className={styles['context-menu-button-icon']} />
 
             <div
-                className={classNames('context-menu-button-options', {
-                    'context-menu-button-options-visible': isOpen,
+                className={classNames(styles['context-menu-button-options'], {
+                    [styles['context-menu-button-options-visible']]: isOpen,
                 })}
             >
                 {React.Children.map(children, (child) => {
@@ -100,7 +100,7 @@ ContextMenuButton.Option = ({
     return (
         <button
             role="menuitem"
-            className={classNames('context-menu-button-option', className)}
+            className={classNames(styles['context-menu-button-option'], className)}
             onClick={handleClick}
             disabled={disabled}
         >

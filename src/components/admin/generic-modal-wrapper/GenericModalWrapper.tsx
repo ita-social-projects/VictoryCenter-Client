@@ -4,6 +4,7 @@ import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
 import { Modal } from '../../common/modal/Modal';
 import { Button } from '../button/Button';
+import styles from './GenericModalWrapper.module.scss';
 
 interface GenericModalWrapperProps<TFormValues, TFormRef> {
     isOpen: boolean;
@@ -83,7 +84,7 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                         onValidationChange: onFormValidationChange,
                         ...(categories && { categories }),
                     })}
-                    {error && <div className="modal-content-error-container">{error}</div>}
+                    {error && <div className={styles['modal-content-error-container']}>{error}</div>}
                 </Modal.Content>
                 <Modal.Actions>
                     <Button

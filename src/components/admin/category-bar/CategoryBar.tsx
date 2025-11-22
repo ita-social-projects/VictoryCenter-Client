@@ -3,7 +3,7 @@ import { ContextMenuButton } from '../context-menu-button/ContextMenuButton';
 import { CategoryButton } from '../category-button/CategoryButton';
 import { ReactComponent as ArrowLeftIcon } from '../../../assets/icons/arrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '../../../assets/icons/arrow-right.svg';
-import './CategoryBar.scss';
+import styles from './CategoryBar.module.scss';
 
 export interface ContextMenuOption {
     id: string;
@@ -80,7 +80,7 @@ export const CategoryBar = <T,>({
     };
 
     return (
-        <div className="category-bar">
+        <div className={styles['category-bar']}>
             {displayContextMenuButton && contextMenuOptions.length > 0 && (
                 <ContextMenuButton onOptionSelected={handleContextMenuOptionSelected}>
                     {contextMenuOptions.map((option) => (
@@ -92,14 +92,14 @@ export const CategoryBar = <T,>({
             )}
             {showLeftArrow && (
                 <button
-                    className="category-bar-arrow category-bar-arrow-left"
+                    className={styles['category-bar-arrow-left']}
                     onClick={() => handleScroll('left')}
                     type="button"
                 >
                     <ArrowLeftIcon />
                 </button>
             )}
-            <div ref={categoriesContainerRef} className="category-bar-categories" onScroll={checkScroll}>
+            <div ref={categoriesContainerRef} className={styles['category-bar-categories']} onScroll={checkScroll}>
                 {categories.map((category) => (
                     <CategoryButton
                         key={getCategoryKey(category)}
@@ -113,7 +113,7 @@ export const CategoryBar = <T,>({
             </div>
             {showRightArrow && (
                 <button
-                    className="category-bar-arrow category-bar-arrow-right"
+                    className={styles['category-bar-arrow-right']}
                     onClick={() => handleScroll('right')}
                     type="button"
                 >

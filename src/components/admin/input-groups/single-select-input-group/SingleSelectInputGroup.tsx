@@ -2,7 +2,7 @@ import React from 'react';
 import { InputLabel, InputLabelProps } from '../../input-label/InputLabel';
 import { InputError, InputErrorProps } from '../../input-error/InputError';
 import { SingleSelectInput, SingleSelectInputProps } from '../../../common/single-select-input/SingleSelectInput';
-import '../input-group.scss';
+import styles from '../input-group.module.scss';
 
 export interface SingleSelectInputGroupProps<T extends Record<string, any>> extends SingleSelectInputProps<T> {
     label: InputLabelProps['text'];

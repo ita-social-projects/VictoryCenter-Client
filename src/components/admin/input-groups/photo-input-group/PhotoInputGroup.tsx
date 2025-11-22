@@ -2,7 +2,7 @@ import React from 'react';
 import { InputLabel, InputLabelProps } from '../../input-label/InputLabel';
 import { InputError, InputErrorProps } from '../../input-error/InputError';
 import { ImageInput, ImageInputProps } from '../../image-input/ImageInput';
-import '../input-group.scss';
+import styles from '../input-group.module.scss';
 
 export interface PhotoInputGroupProps extends ImageInputProps {
     label: InputLabelProps['text'];
@@ -24,7 +24,7 @@ export const PhotoInputGroup = ({
     setError,
 }: PhotoInputGroupProps) => {
     return (
-        <div className="input-group">
+        <div className={styles['input-group']}>
             <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
             <ImageInput
                 id={id}

@@ -13,7 +13,7 @@ import { SearchBar } from '../search-bar/SearchBar';
 import { PaginationResult, VisibilityStatus } from '../../../types/admin/common';
 import { StatusFilterDropdown } from '../status-filter-dropdown/StatusFilterDropdown';
 import { Button } from '../button/Button';
-import './AdminPageToolbar.scss';
+import styles from './AdminPageToolbar.module.scss';
 
 const DEFAULT_PAGE_SIZE = 5;
 
@@ -101,8 +101,8 @@ export const AdminPanelToolbar = <T,>({
     }, [onSearchClear, resetSearchItemsList]);
 
     return (
-        <div className="admin-panel-toolbar">
-            <div className="admin-panel-toolbar-search">
+        <div className={styles['admin-panel-toolbar']}>
+            <div className={styles['admin-panel-toolbar-search']}>
                 <SearchBar<T>
                     searchItems={localSearchItems}
                     onSearchItemSelect={onSuggestionSelected}
@@ -121,7 +121,7 @@ export const AdminPanelToolbar = <T,>({
                 />
             </div>
 
-            <div className="admin-panel-toolbar-actions">
+            <div className={styles['admin-panel-toolbar-actions']}>
                 <StatusFilterDropdown onStatusFilterChange={onStatusFilterChange} />
                 <Button onClick={onAddItem} buttonStyle="primary">
                     {AddItemButtonText} <PlusIcon />

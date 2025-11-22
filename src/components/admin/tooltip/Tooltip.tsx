@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import classNames from 'classnames';
-import './Tooltip.scss';
+import styles from './Tooltip.module.scss';
 
 export type TooltipPosition = 'top' | 'bottom';
 
@@ -110,7 +110,7 @@ export const Tooltip = ({
             ref={tooltipRef}
             role="tooltip"
             onMouseDown={(e) => e.stopPropagation()}
-            className={classNames('tooltip-popup', `tooltip-popup--${position}`)}
+            className={classNames(styles['tooltip-popup'], styles[`tooltip-popup--${position}`])}
             style={{
                 top: `${tooltipPosition.top}px`,
                 left: `${tooltipPosition.left}px`,

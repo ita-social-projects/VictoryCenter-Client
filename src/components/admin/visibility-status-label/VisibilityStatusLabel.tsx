@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import './VisibilityStatusLabel.scss';
+import styles from './VisibilityStatusLabel.module.scss';
 import { VisibilityStatus } from '../../../types/admin/common';
 
 export interface VisibilityStatusLabelProps {
@@ -21,9 +21,9 @@ export const visibilityStatusToText = (statusType: VisibilityStatus) => {
 export const VisibilityStatusLabel = ({ status }: VisibilityStatusLabelProps) => {
     return (
         <div
-            className={classNames('status', {
-                'status-published': status === VisibilityStatus.Published,
-                'status-draft': status === VisibilityStatus.Draft,
+            className={classNames(styles['status'], {
+                [styles['status-published']]: status === VisibilityStatus.Published,
+                [styles['status-draft']]: status === VisibilityStatus.Draft,
             })}
         >
             <span>•</span>

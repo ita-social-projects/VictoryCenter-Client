@@ -1,10 +1,10 @@
 import { Toast } from '../../../../types/admin/toast';
-import './ToastItem.scss';
+import styles from './ToastItem.module.scss';
 import { ReactComponent as InfoIcon } from '../../../../assets/icons/info.svg';
 
 export const ToastItem = ({ toast }: { toast: Toast }) => {
     return (
-        <div className={`toast ${toast.type}`}>
+        <div className={`${styles['toast']} ${styles[toast.type]}`}>
             <InfoIcon />
             {toast.message}
         </div>

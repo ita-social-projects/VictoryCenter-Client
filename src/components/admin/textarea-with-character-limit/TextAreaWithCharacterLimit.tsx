@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import './TextAreaWithCharacterLimit.scss';
+import styles from './TextAreaWithCharacterLimit.module.scss';
 
 export interface TextAreaWithCharacterLimitProps {
     value: string;
@@ -43,15 +43,15 @@ export const TextAreaWithCharacterLimit = ({
     const countId = `${id}-character-count`;
 
     return (
-        <div className="char-limit-textarea">
+        <div className={styles['char-limit-textarea']}>
             <div
-                className={classNames('char-limit-textarea__wrapper', {
-                    'char-limit-textarea__wrapper--disabled': disabled,
-                    'char-limit-textarea__wrapper--focused': isFocused && !disabled,
+                className={classNames(styles['char-limit-textarea__wrapper'], {
+                    [styles['char-limit-textarea__wrapper--disabled']]: disabled,
+                    [styles['char-limit-textarea__wrapper--focused']]: isFocused && !disabled,
                 })}
             >
                 <textarea
-                    className="char-limit-textarea__field"
+                    className={styles['char-limit-textarea__field']}
                     value={value}
                     onChange={onChange}
                     onFocus={handleFocus}
@@ -66,8 +66,8 @@ export const TextAreaWithCharacterLimit = ({
                     aria-invalid={currentLength > maxLength}
                 />
             </div>
-            <div className="char-limit-textarea__counter-container">
-                <output className="char-limit-textarea__counter" id={countId} aria-live="polite">
+            <div className={styles['char-limit-textarea__counter-container']}>
+                <output className={styles['char-limit-textarea__counter']} id={countId} aria-live="polite">
                     {currentLength}/{maxLength}
                 </output>
             </div>

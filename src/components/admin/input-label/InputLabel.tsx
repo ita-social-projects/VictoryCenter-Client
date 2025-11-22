@@ -1,4 +1,4 @@
-import './InputLabel.scss';
+import styles from './InputLabel.module.scss';
 
 export interface InputLabelProps {
     htmlFor: string;
@@ -7,8 +7,8 @@ export interface InputLabelProps {
 }
 
 export const InputLabel = ({ htmlFor, text, isRequired }: InputLabelProps) => (
-    <label htmlFor={htmlFor} className="input-label">
-        {isRequired && <span className="required-field">*</span>}
+    <label htmlFor={htmlFor} className={styles['input-label']}>
+        {isRequired && <span className={styles['required-field']}>*</span>}
         {text}
     </label>
 );

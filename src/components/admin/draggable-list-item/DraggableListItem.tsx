@@ -1,6 +1,6 @@
 import { ReactComponent as DragIcon } from '../../../assets/icons/dragger.svg';
 import React, { useCallback, useState } from 'react';
-import './DraggableListItem.scss';
+import styles from './DraggableListItem.module.scss';
 import { DragPreviewModel } from '../../../types/admin/common';
 import { DragPreview } from '../drag-preview/DragPreview';
 
@@ -96,15 +96,15 @@ export const DraggableListItem = <TEntity,>({
 
     return (
         <div
-            className="draggable-item-wrapper"
+            className={styles['draggable-item-wrapper']}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, id)}
             onDragEnd={handleDragEnd}
         >
             <DragPreview entity={entity} dragPreview={dragPreview} renderEntityComponent={renderEntityComponent} />
-            <div className={'draggable-item'} key={id}>
+            <div className={styles['draggable-item']} key={id}>
                 <div
-                    className="dragger"
+                    className={styles['dragger']}
                     draggable
                     onDragStart={(e) => handleDragStart(e, id)}
                     onDrag={handleDrag}
@@ -115,7 +115,7 @@ export const DraggableListItem = <TEntity,>({
                 >
                     <DragIcon />
                 </div>
-                <div className="item-data">{renderEntityComponent(entity)}</div>
+                <div className={styles['item-data']}>{renderEntityComponent(entity)}</div>
             </div>
         </div>
     );

@@ -14,7 +14,7 @@ import {
     SearchItemWrapperRef,
     SearchItemContentRef,
 } from './search-item-wrapper/SearchItemWrapper';
-import './SearchBar.scss';
+import styles from './SearchBar.module.scss';
 
 export const TOOLTIP_WIDTH_MULTIPLY = 1.5;
 
@@ -230,14 +230,14 @@ export const SearchBar = <T,>({
     const isShowTooltip = !!tooltipState.positioner && tooltipState.isVisible && !!tooltipState.content;
 
     return (
-        <div className="search-bar" ref={searchContainerRef}>
-            <div className="search-bar__wrapper">
-                <div className="search-bar__content">
-                    <SearchIcon className="search-bar__icon" />
+        <div className={styles['search-bar']} ref={searchContainerRef}>
+            <div className={styles['search-bar__wrapper']}>
+                <div className={styles['search-bar__content']}>
+                    <SearchIcon className={styles['search-bar__icon']} />
                     <input
                         ref={inputRef}
                         type="text"
-                        className="search-bar__input"
+                        className={styles['search-bar__input']}
                         value={searchQuery}
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
@@ -247,23 +247,23 @@ export const SearchBar = <T,>({
                     />
                     {isShowClearButton && (
                         <button
-                            className="search-bar__icon search-bar__icon--clear"
+                            className={`${styles['search-bar__icon']} ${styles['search-bar__icon--clear']}`}
                             onClick={handleClear}
                             type="button"
                         >
-                            <ClearIcon className="search-bar__icon" />
+                            <ClearIcon className={styles['search-bar__icon']} />
                         </button>
                     )}
                 </div>
 
                 {isDropdownVisible && (
                     <div
-                        className="search-bar__suggestions"
+                        className={styles['search-bar__suggestions']}
                         onScroll={handleSuggestionsScroll}
                         style={{ maxHeight: dropdownMaxHeight ? `${dropdownMaxHeight}px` : 'none' }}
                     >
                         <ul
-                            className="search-bar__suggestions-list"
+                            className={styles['search-bar__suggestions-list']}
                             ref={suggestionsListRef}
                             onMouseLeave={handleMouseLeave}
                         >
@@ -286,9 +286,11 @@ export const SearchBar = <T,>({
                                 );
                             })}
                         </ul>
-                        {isShowNotFoundMessage && <div className="search-bar__not-found">{notFoundMessage}</div>}
+                        {isShowNotFoundMessage && (
+                            <div className={styles['search-bar__not-found']}>{notFoundMessage}</div>
+                        )}
                         {isLoading && (
-                            <div className="search-bar__loader-container">
+                            <div className={styles['search-bar__loader-container']}>
                                 <InlineLoader />
                             </div>
                         )}

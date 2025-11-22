@@ -3,7 +3,7 @@ import { SearchItemContentRef, SearchItemContentRenderProps } from '../search-it
 import { TeamMember } from '../../../../types/admin/team-members';
 import { TeamCategory } from '../../../../types/admin/team-category';
 import { generateInitials } from '../../../../utils/functions/formatters/text-formatters';
-import './TeamMemberSearchItem.scss';
+import styles from './TeamMemberSearchItem.module.scss';
 
 export type TeamMemberSearchItemProps = SearchItemContentRenderProps<TeamMember> & {
     categories: TeamCategory[];
@@ -34,10 +34,10 @@ export const TeamMemberSearchItem = forwardRef<SearchItemContentRef, TeamMemberS
 
             if (nameOverflow || subOverflow) {
                 return (
-                    <div className="team-member-search-item__tooltip">
-                        <div className="team-member-search-item__tooltip-name">{item.fullName}</div>
+                    <div className={styles['team-member-search-item__tooltip']}>
+                        <div className={styles['team-member-search-item__tooltip-name']}>{item.fullName}</div>
                         {categoryName && (
-                            <div className="team-member-search-item__tooltip-subtitle">{categoryName}</div>
+                            <div className={styles['team-member-search-item__tooltip-subtitle']}>{categoryName}</div>
                         )}
                     </div>
                 );
@@ -50,20 +50,24 @@ export const TeamMemberSearchItem = forwardRef<SearchItemContentRef, TeamMemberS
         }));
 
         return (
-            <div className="team-member-search-item" data-active={isSearchItemActive || isSearchItemHovered}>
-                <div className="team-member-search-item__avatar" aria-hidden="true">
+            <div className={styles['team-member-search-item']} data-active={isSearchItemActive || isSearchItemHovered}>
+                <div className={styles['team-member-search-item__avatar']} aria-hidden="true">
                     {imageUrl ? (
-                        <img src={imageUrl} alt="" className="team-member-search-item__img" />
+                        <img src={imageUrl} alt="" className={styles['team-member-search-item__img']} />
                     ) : (
-                        <span className="team-member-search-item__initials">{initials}</span>
+                        <span className={styles['team-member-search-item__initials']}>{initials}</span>
                     )}
                 </div>
-                <div className="team-member-search-item__info">
-                    <div ref={nameRef} className="team-member-search-item__name" title={item.fullName}>
+                <div className={styles['team-member-search-item__info']}>
+                    <div ref={nameRef} className={styles['team-member-search-item__name']} title={item.fullName}>
                         {item.fullName}
                     </div>
                     {categoryName && (
-                        <div ref={subtitleRef} className="team-member-search-item__subtitle" title={categoryName}>
+                        <div
+                            ref={subtitleRef}
+                            className={styles['team-member-search-item__subtitle']}
+                            title={categoryName}
+                        >
                             {categoryName}
                         </div>
                     )}

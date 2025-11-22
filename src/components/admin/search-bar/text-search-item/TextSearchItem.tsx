@@ -1,6 +1,6 @@
 import React, { useRef, useImperativeHandle, forwardRef } from 'react';
 import { SearchItemContentRef } from '../search-item-wrapper/SearchItemWrapper';
-import './TextSearchItem.scss';
+import styles from './TextSearchItem.module.scss';
 
 export interface TextSearchItemProps {
     label: string;
@@ -13,12 +13,14 @@ export const TextSearchItem = forwardRef<SearchItemContentRef, TextSearchItemPro
         getTooltipContent: () => {
             const element = textRef.current;
             const isLabelOverflowing = element && element.scrollWidth > element.clientWidth;
-            return isLabelOverflowing ? <div className="text-search-item-content__tooltip">{label}</div> : null;
+            return isLabelOverflowing ? (
+                <div className={styles['text-search-item-content__tooltip']}>{label}</div>
+            ) : null;
         },
     }));
 
     return (
-        <span ref={textRef} className="text-search-item-content">
+        <span ref={textRef} className={styles['text-search-item-content']}>
             {label}
         </span>
     );

@@ -1,7 +1,7 @@
 import React, { useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { TextSearchItem } from '../text-search-item/TextSearchItem';
 import classNames from 'classnames';
-import './SearchItemWrapper.scss';
+import styles from './SearchItemWrapper.module.scss';
 
 export interface SearchItemContentRef {
     getTooltipContent: () => React.ReactNode | null;
@@ -75,8 +75,8 @@ function SearchItemWrapperInner<T>(
     return (
         <li
             ref={liRef}
-            className={classNames('search-item-wrapper', {
-                'search-item-wrapper--active': isActive || isHovered,
+            className={classNames(styles['search-item-wrapper'], {
+                [styles['search-item-wrapper--active']]: isActive || isHovered,
             })}
             onClick={onSelect}
             onMouseDown={(e) => e.preventDefault()}

@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback, useId } from 'react';
 import { ReactComponent as InfoIcon } from '../../../assets/icons/info.svg';
 import { Tooltip, TooltipPosition } from '../tooltip/Tooltip';
 import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/useOnClickOutside';
-import './ButtonTooltip.scss';
+import styles from './ButtonTooltip.module.scss';
 
 export interface ButtonTooltipProps {
     children: React.ReactNode;
@@ -33,14 +33,14 @@ export const ButtonTooltip = ({ children, position = 'bottom' }: ButtonTooltipPr
         <button
             ref={wrapperRef}
             type="button"
-            className="button-tooltip-wrapper"
+            className={styles['button-tooltip-wrapper']}
             onClick={toggleTooltip}
             aria-haspopup="true"
             aria-expanded={isVisible}
             aria-label="Show additional information"
             aria-describedby={isVisible ? tooltipId : undefined}
         >
-            <InfoIcon className="button-tooltip-icon" />
+            <InfoIcon className={styles['button-tooltip-icon']} />
 
             {isVisible && (
                 <Tooltip

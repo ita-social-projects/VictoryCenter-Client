@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
-import './InputWithCharacterLimit.scss';
+import styles from './InputWithCharacterLimit.module.scss';
 
 export interface InputWithCharacterLimitProps {
     value: string;
@@ -46,13 +46,13 @@ export const InputWithCharacterLimit = ({
 
     return (
         <div
-            className={classNames('char-limit-input', {
-                'char-limit-input--disabled': disabled,
-                'char-limit-input--focused': isFocused && !disabled,
+            className={classNames(styles['char-limit-input'], {
+                [styles['char-limit-input--disabled']]: disabled,
+                [styles['char-limit-input--focused']]: isFocused && !disabled,
             })}
         >
             <input
-                className={classNames('char-limit-input__field', className)}
+                className={classNames(styles['char-limit-input__field'], className)}
                 value={value}
                 onChange={onChange}
                 maxLength={maxLength}
@@ -66,7 +66,7 @@ export const InputWithCharacterLimit = ({
                 aria-describedby={countId}
                 aria-invalid={currentLength > maxLength}
             />
-            <output htmlFor={id} className="char-limit-input__counter" id={countId}>
+            <output htmlFor={id} className={styles['char-limit-input__counter']} id={countId}>
                 {currentLength}/{maxLength}
             </output>
         </div>

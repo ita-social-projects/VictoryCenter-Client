@@ -26,7 +26,7 @@ export const SingleSelectInputGroup = <T extends Record<string, any>>({
     error,
 }: SingleSelectInputGroupProps<T>) => {
     return (
-        <div className="input-group">
+        <div className={styles['input-group']}>
             <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
             <SingleSelectInput
                 options={options}

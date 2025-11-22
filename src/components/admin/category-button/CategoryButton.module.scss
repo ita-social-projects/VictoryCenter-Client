@@ -1,4 +1,4 @@
-@use '../../../assets/sass/variables/colors';
+@import '../../../assets/sass/variables/colors.scss';
 
 .category-bar-button {
     display: flex;
@@ -14,10 +14,10 @@
     transition: background-color 0.2s;
 
     &-selected {
-        border-bottom: 1px solid colors.$blue-900;
+        border-bottom: 1px solid $blue-900;
     }
 
     &:hover {
-        background-color: rgba(colors.$blue-50, 0.15);
+        background-color: rgba($blue-50, 0.15);
     }
 }

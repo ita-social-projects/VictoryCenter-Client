@@ -12,11 +12,11 @@
     height: 1.5rem;
     border-radius: 50%;
     display: flex;
-}
 
-.button-tooltip-wrapper:hover,
-.button-tooltip-wrapper:focus {
-    background-color: $blue-50;
+    &:hover,
+    &:focus {
+        background-color: $blue-50;
+    }
 }
 
 .button-tooltip-icon {

@@ -8,56 +8,56 @@
     font-size: 24px;
     font-weight: 600;
     background: $grey-50;
-}
 
-.category-bar-categories {
-    display: flex;
-    flex: 1;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
+    &-categories {
+        display: flex;
+        flex: 1;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
 
-.category-bar-categories::-webkit-scrollbar {
-    display: none;
-}
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
 
-.category-bar-arrow {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    padding: 0 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: $blue-900;
-    border: none;
-    cursor: pointer;
-    transition: all 0.8s ease;
-}
+    &-arrow {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        padding: 0 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: $blue-900;
+        border: none;
+        cursor: pointer;
+        transition: all 0.8s ease;
 
-.category-bar-arrow svg {
-    width: 1.5rem;
-    height: 1.5rem;
-}
+        svg {
+            width: 1.5rem;
+            height: 1.5rem;
 
-.category-bar-arrow svg path {
-    stroke: $grey-50;
-}
+            path {
+                stroke: $grey-50;
+            }
+        }
 
-.category-bar-arrow:hover {
-    background-color: $yellow-500;
-}
+        &:hover {
+            background-color: $yellow-500;
 
-.category-bar-arrow:hover svg path {
-    stroke: $blue-900;
-}
+            svg path {
+                stroke: $blue-900;
+            }
+        }
 
-.category-bar-arrow-left {
-    left: 1.5rem;
-}
+        &-left {
+            left: 1.5rem;
+        }
 
-.category-bar-arrow-right {
-    right: 0;
+        &-right {
+            right: 0;
+        }
+    }
 }

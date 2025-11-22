@@ -1,5 +1,5 @@
 import React from 'react';
-import './Button.scss';
+import styles from './Button.module.scss';
 
 export type ButtonProps = {
     children: React.ReactNode;
@@ -14,9 +14,9 @@ export type ButtonProps = {
 const getBaseClassName = (buttonStyle?: 'primary' | 'secondary') => {
     switch (buttonStyle) {
         case 'primary':
-            return 'btn-primary';
+            return styles['btn-primary'];
         case 'secondary':
-            return 'btn-secondary';
+            return styles['btn-secondary'];
         default:
             return '';
     }
@@ -31,7 +31,8 @@ export const Button = ({
     disabled = false,
     className = '',
 }: ButtonProps) => {
-    const finalClassName = `${getBaseClassName(buttonStyle)} ${className}`.trim();
+    const baseClassName = getBaseClassName(buttonStyle);
+    const finalClassName = baseClassName ? `${baseClassName} ${className}`.trim() : className;
 
     return (
         <button form={formId} type={type} className={finalClassName} onClick={onClick} disabled={disabled}>

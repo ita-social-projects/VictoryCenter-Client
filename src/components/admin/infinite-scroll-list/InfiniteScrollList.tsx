@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ReactComponent as ArrowUpIcon } from '../../../assets/icons/arrow-up.svg';
 import { ReactComponent as NotFoundIcon } from '../../../assets/icons/not-found.svg';
-import './InfiniteScrollList.scss';
+import styles from './InfiniteScrollList.module.scss';
 import { InlineLoader } from '../../common/inline-loader/InlineLoader';
 
 const BOTTOM_REACH_THRESHOLD_IN_PIXELS = 5;
@@ -68,8 +68,8 @@ export const InfiniteScrollList = <T,>({
         content = items.map(renderItem);
     } else if (!isLoading) {
         content = (
-            <div className="infinite-scroll-list-not-found" data-testid="infinite-scroll-list-not-found">
-                <NotFoundIcon className="infinite-scroll-list-not-found-icon" />
+            <div className={styles['infinite-scroll-list-not-found']} data-testid="infinite-scroll-list-not-found">
+                <NotFoundIcon className={styles['infinite-scroll-list-not-found-icon']} />
                 <p>{emptyStateMessage}</p>
             </div>
         );
@@ -78,23 +78,23 @@ export const InfiniteScrollList = <T,>({
     }
 
     return (
-        <div className="infinite-scroll-list-container">
+        <div className={styles['infinite-scroll-list-container']}>
             <div
                 ref={listContainerRef}
                 onScroll={handleOnScroll}
                 data-testid="infinite-scroll-list"
-                className="infinite-scroll-list"
+                className={styles['infinite-scroll-list']}
             >
                 {content}
                 {isLoading && (
-                    <div className="infinite-scroll-list-loader-container">
+                    <div className={styles['infinite-scroll-list-loader-container']}>
                         <InlineLoader size={3} />
                     </div>
                 )}
             </div>
             {isMoveToTopVisible && (
-                <button onClick={moveToTop} className="infinite-scroll-list-to-top">
-                    <ArrowUpIcon className="infinite-scroll-list-to-top-icon" />
+                <button onClick={moveToTop} className={styles['infinite-scroll-list-to-top']}>
+                    <ArrowUpIcon className={styles['infinite-scroll-list-to-top-icon']} />
                 </button>
             )}
         </div>

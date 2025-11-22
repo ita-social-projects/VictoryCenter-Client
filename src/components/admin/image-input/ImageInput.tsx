@@ -2,8 +2,8 @@ import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { ReactComponent as DeleteIcon } from '../../../assets/icons/delete.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/cloud-download.svg';
 import classNames from 'classnames';
-import './ImageInput.scss';
-import './WhoWeAreImageInput.scss';
+import imageInputStyles from './ImageInput.module.scss';
+import whoWeAreImageInputStyles from './WhoWeAreImageInput.module.scss';
 import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
@@ -127,12 +127,19 @@ export const ImageInput = ({
         setShowConfirmModal(false);
     };
 
+    const getStylesModule = () => {
+        return className?.includes('who-we-are') ? whoWeAreImageInputStyles : imageInputStyles;
+    };
+
+    const styles = getStylesModule();
+    const wrapperClass = className?.includes('who-we-are') ? 'who-we-are-image-input-wrapper' : 'image-input-wrapper';
+
     return (
         <div>
             <div
-                className={classNames(className, {
-                    'image-input-wrapper-focused': isFocused && !disabled,
-                    'image-input-wrapper-disabled': disabled,
+                className={classNames(styles[wrapperClass], {
+                    [styles[`${wrapperClass}-focused`]]: isFocused && !disabled,
+                    [styles[`${wrapperClass}-disabled`]]: disabled,
                 })}
                 style={style}
                 onDrop={handleDrop}
@@ -162,31 +169,31 @@ export const ImageInput = ({
                 />
 
                 {previewImage ? (
-                    <div className="image-preview">
+                    <div className={styles['image-preview']}>
                         <img
                             src={getImageSrc(previewImage)}
                             alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
-                            className="preview-image"
+                            className={styles['preview-image']}
                             data-testid="preview-image"
                         />
                         {!disabled && (
                             <button
                                 data-testid="remove-photo-button"
                                 type="button"
-                                className="delete-button"
+                                className={styles['delete-button']}
                                 disabled={disabled}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setShowConfirmModal(true);
                                 }}
                             >
-                                <DeleteIcon className="delete-icon" />
+                                <DeleteIcon className={styles['delete-icon']} />
                             </button>
                         )}
                     </div>
                 ) : (
-                    <div className="image-placeholder">
-                        <UploadIcon className="placeholder-icon" />
+                    <div className={styles['image-placeholder']}>
+                        <UploadIcon className={styles['placeholder-icon']} />
                         <span>{label}</span>
                         <span>{subText}</span>
                     </div>
@@ -220,6 +227,7 @@ export const getImageSrc = (image: Image | ImageValues | null) => {
 
     return undefined;
 };
+
 export function convertFileToBase64(file: File): Promise<ImageValues> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();

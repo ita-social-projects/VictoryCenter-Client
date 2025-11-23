@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ReactComponent as ArrowDown } from '../../../assets/icons/chevron-down.svg';
 import { ReactComponent as ArrowUp } from '../../../assets/icons/chevron-up.svg';
 import classNames from 'classnames';
-import './SingleSelectInput.scss';
+import styles from './SingleSelectInput.module.scss';
 
 export interface SingleSelectInputProps<T extends Record<string, any>> {
     options: T[];
@@ -71,14 +71,14 @@ export const SingleSelectInput = <T extends Record<string, any>>({
 
     return (
         <div
-            className={classNames('singleselect', {
-                'singleselect-selected': isOpen,
+            className={classNames([styles['singleselect']], {
+                [styles['singleselect-selected']]: isOpen,
             })}
             ref={selectRef}
         >
             <button
                 type="button"
-                className={classNames('select-input', { 'select-input-disabled': disabled })}
+                className={classNames([styles['select-input']], {[styles['select-input-disabled']]: disabled })}
                 onClick={toggleDropdown}
                 disabled={disabled}
                 aria-haspopup="listbox"
@@ -87,20 +87,20 @@ export const SingleSelectInput = <T extends Record<string, any>>({
             >
                 <div
                     className={classNames(
-                        { 'option-value': displayLabel !== placeholder },
-                        { 'option-value-placeholder': displayLabel === placeholder },
+                        { [styles['option-value']]: displayLabel !== placeholder },
+                        { [styles['option-value-placeholder']]: displayLabel === placeholder },
                     )}
                 >
                     {displayLabel}
                 </div>
-                <div className="placeholder-arrow">
+                <div className={styles['placeholder-arrow']}>
                     {isOpen ? <ArrowUp className="icon-img" /> : <ArrowDown className="icon-img" />}
                 </div>
             </button>
 
             {isOpen && !disabled && (
                 <div
-                    className="singleselect-options"
+                    className={styles['singleselect-options']}
                     role="listbox"
                     aria-activedescendant={value ? `option-${String(getOptionId(value))}` : undefined}
                     tabIndex={0}
@@ -113,7 +113,7 @@ export const SingleSelectInput = <T extends Record<string, any>>({
                             <div
                                 key={id}
                                 id={`option-${String(id)}`}
-                                className={classNames('option', { 'option-selected': isSelected })}
+                                className={classNames([styles['option']], { [styles['option-selected']]: isSelected })}
                                 onClick={() => handleSelectOption(option)}
                                 onKeyDown={(e) => handleKeyDown(e, option)}
                                 role="option"

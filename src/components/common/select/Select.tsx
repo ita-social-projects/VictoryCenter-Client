@@ -3,7 +3,7 @@ import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ReactComponent as ArrowDown } from '../../../assets/icons/chevron-down.svg';
 import { ReactComponent as ArrowUp } from '../../../assets/icons/chevron-up.svg';
 import classNames from 'classnames';
-import './Select.scss';
+import styles from './Select.module.scss';
 
 export type SelectProps<TValue> = {
     children: React.ReactNode;
@@ -65,9 +65,9 @@ export const Select = <TValue,>({
             role={'toolbar'}
             ref={selectContainerRef}
             onClick={handleContainerClick}
-            className={classNames('select', className, {
-                'select-opened': isOpen,
-                'select-closed': !isOpen,
+            className={classNames([styles['select']], className, {
+                [styles['select-opened']]: isOpen,
+                [styles['select-closed']]: !isOpen,
             })}
             tabIndex={0}
             onKeyDown={(e) => {
@@ -77,22 +77,22 @@ export const Select = <TValue,>({
             }}
         >
             <span
-                className={classNames('empty', {
-                    'not-empty': selectedValue !== null && selectedValue !== undefined,
+                className={classNames([styles['empty']], {
+                    [styles['not-empty']]: selectedValue !== null && selectedValue !== undefined,
                 })}
             >
                 {selectedName ?? placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT}
             </span>
             {isOpen ? <ArrowUp /> : <ArrowDown />}
             {isOpen && (
-                <div className={'select-options'}>
+                <div className={styles['select-options']}>
                     {options.map((opt, index) => {
                         const { name, value: optValue } = opt.props;
                         return (
                             <button
                                 key={`${name}-${index}`}
                                 className={classNames({
-                                    'select-options-selected': !isAutocomplete && selectedValue === optValue,
+                                    [styles['select-options-selected']]: !isAutocomplete && selectedValue === optValue,
                                 })}
                                 onClick={(e) => handleOptionClick(e, optValue, name)}
                             >

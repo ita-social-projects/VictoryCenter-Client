@@ -1,21 +1,21 @@
 import { TabProps } from '../../../types/public/donate-page';
 import { NOT_AVAIBLE, CHECK_LATER } from '../../../const/public/tabs';
-import './Tabs.scss';
+import styles from './Tabs.module.scss';
 
 export const Tabs = ({ tabs, activeTab, setActiveTab }: TabProps) => {
     return (
-        <div className="tabsContainer">
+        <div className={styles['tabsContainer']}>
             {tabs.map(({ id, label, disabled }) => {
                 const isActive = activeTab === id;
                 const tabClass = `tab ${isActive ? 'active' : ''}`;
                 return disabled ? (
-                    <div key={id} className="tooltip-container top">
+                    <div key={id} className={styles['tooltip-container top']}>
                         <button className={tabClass} type="button" onClick={() => setActiveTab(id)} disabled>
                             {label}
                         </button>
-                        <span className="tooltip-text">
-                            <div className="text-center">
-                                <p className="font-semibold">{NOT_AVAIBLE}</p>
+                        <span className={styles['tooltip-text']}>
+                            <div className={styles['text-center']}>
+                                <p className={styles['font-semibold']}>{NOT_AVAIBLE}</p>
                                 <p>{CHECK_LATER}</p>
                             </div>
                         </span>

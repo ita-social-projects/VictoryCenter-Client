@@ -283,6 +283,35 @@ describe('editProgram', () => {
         const promise = ProgramsApi.editProgram({ ...programData, id: 999 }, mockClient);
         await expect(promise).rejects.toThrow('Program not found');
     });
+
+    it('should NOT delete image when imageIdToDelete equals finalImageId', async () => {
+        const programData: ProgramCreateUpdate = {
+            id: 1,
+            name: 'Program With Same Image',
+            description: 'Description',
+            status: VisibilityStatus.Published,
+            image: null,
+            imageId: 100,
+            categoryIds: [1],
+        };
+
+        const sameImageId = 100;
+        (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue({
+            finalImageId: sameImageId,
+            imageIdToDelete: sameImageId
+        });
+
+        mockClient.put.mockResolvedValueOnce({
+            data: {
+                ...programData,
+                categories: mockCategories.slice(0, 1),
+            },
+        });
+
+        await ProgramsApi.editProgram(programData, mockClient);
+
+        expect(ImageApi.delete).not.toHaveBeenCalled();
+    });
 });
 
 describe('deleteProgram', () => {

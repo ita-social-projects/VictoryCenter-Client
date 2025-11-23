@@ -1,5 +1,5 @@
 import React from 'react';
-import './PartnerSection.scss';
+import styles from './PartnerSection.module.scss';
 
 interface Partner {
     id: number;
@@ -21,23 +21,23 @@ interface PartnerSectionProps {
 
 export const PartnerSection = ({ title, description, partners }: PartnerSectionProps) => {
     return (
-        <section className="partners-content-section">
-            <div className="container">
-                <div className="partners-header">
+        <section className={styles['partners-content-section']}>
+            <div className={styles['container']}>
+                <div className={styles['partners-header']}>
                     <h2 className="section-title">
                         {title.FIRST_LINE}
                         {title.SECOND_LINE}
                     </h2>
-                    <p className="section-description">
+                    <p className={styles['section-description']}>
                         {description.FIRST_LINE}
                         {description.SECOND_LINE}
                     </p>
                 </div>
-                <div className="partners-logos">
+                <div className={styles['partners-logos']}>
                     {partners.map((partner) => (
-                        <div key={partner.id} className="partner-item">
-                            <img src={partner.logo} alt={`${partner.name} logo`} className="partner-logo" />
-                            <p className="partner-name">{partner.name}</p>
+                        <div key={partner.id} className={styles['partner-item']}>
+                            <img src={partner.logo} alt={`${partner.name} logo`} className={styles['partner-logo']} />
+                            <p className={styles['partner-name']}>{partner.name}</p>
                         </div>
                     ))}
                 </div>

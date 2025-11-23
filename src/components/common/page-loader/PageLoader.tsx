@@ -1,9 +1,9 @@
 import { ReactComponent as LoaderIcon } from '../../../assets/icons/load.svg';
-import './PageLoader.scss';
+import styles from './PageLoader.module.scss';
 
 export const PageLoader = () => {
     return (
-        <div className="full-page-loader">
+        <div className={styles['full-page-loader']}>
             <LoaderIcon className="loader-icon" />
         </div>
     );

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './Header.scss';
+import styles from './Header.module.scss';
 import { ReactComponent as VictoryCenterLogo } from '../../../assets/icons/logo-with-text.svg';
 import { PUBLIC_ROUTES } from '../../../const/public/routes';
 import { DropdownLink, DropdownMenu } from '../dropdown-menu/DropdownMenu';
@@ -31,53 +31,53 @@ export const Header = () => {
     };
 
     return (
-        <div className="header-block">
-            <div className="logo-container">
+        <div className={styles['header-block']}>
+            <div className={styles['logo-container']}>
                 <Link to="/">
-                    <VictoryCenterLogo className="logo" />
+                    <VictoryCenterLogo className={styles['logo']} />
                 </Link>
             </div>
 
-            <div className="link-container">
+            <div className={styles['link-container']}>
                 <nav>
                     <DropdownMenu mainText={t('ABOUT_US')} links={dropdownMenuLinks}></DropdownMenu>
                     <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{t('PROGRAMS')}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className={styles['disable']}>
                         {t('REPORTING')}
                     </Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className={styles['disable']}>
                         {t('HOW_TO_SUPPORT')}
                     </Link>
                 </nav>
             </div>
 
-            <div className="button-container">
-                <LanguageSwitcher className="language-switcher" />
-                <button className="contact-us-button" onClick={onContactUsClick}>
+            <div className={styles['button-container']}>
+                <LanguageSwitcher className={styles['language-switcher']} />
+                <button className={styles['contact-us-button']} onClick={onContactUsClick}>
                     {t('CONTACT_US')}
                 </button>
-                <Link to={PUBLIC_ROUTES.DONATE.FULL} className="button donate-button">
+                <Link to={PUBLIC_ROUTES.DONATE.FULL} className={styles['button donate-button']}>
                     {t('DONATE')}
                 </Link>
-                <button onClick={toggleMenu} className="burger-menu-icon">
+                <button onClick={toggleMenu} className={styles['burger-menu-icon']}>
                     <BurgerIcon />
                 </button>
             </div>
             {isMenuOpen && (
-                <div className="mobile-menu">
+                <div className={styles['mobile-menu']}>
                     <Link to={PUBLIC_ROUTES.ABOUT_US.FULL} onClick={toggleMenu}>
                         {t('ABOUT_US')}
                     </Link>
                     <Link to={PUBLIC_ROUTES.PROGRAMS.FULL} onClick={toggleMenu}>
                         {t('PROGRAMS')}
                     </Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className="disable">
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className={styles['disable']}>
                         {t('REPORTING')}
                     </Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className="disable">
+                    <Link to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className={styles['disable']}>
                         {t('HOW_TO_SUPPORT')}
                     </Link>
-                    <LanguageSwitcher onValueChange={toggleMenu} className="mobile-language-switcher" />
+                    <LanguageSwitcher onValueChange={toggleMenu} className={styles['mobile-language-switcher']} />
                 </div>
             )}
         </div>

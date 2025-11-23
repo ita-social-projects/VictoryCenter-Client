@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './DropdownMenu.scss';
+import styles from './DropdownMenu.module.scss';
 import { ReactComponent as ArrowUp } from '../../../assets/icons/chevron-up.svg';
 import { ReactComponent as ArrowDown } from '../../../assets/icons/chevron-down.svg';
 import { Link } from 'react-router-dom';
@@ -29,18 +29,18 @@ export const DropdownMenu = ({ links, mainText }: DropdownMenuProps) => {
     };
 
     return (
-        <div className="dropdown" onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
-            <button className="dropdown-button">
+        <div className={styles['dropdown']} onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
+            <button className={styles['dropdown-button']}>
                 {mainText} {isOpen ? <ArrowUp /> : <ArrowDown />}
             </button>
 
             {isOpen && (
-                <div className="dropdown-links">
+                <div className={styles['dropdown-links']}>
                     {links.map((option, index) => (
                         <Link
                             onClick={handleLinkClick}
                             key={index}
-                            className={classNames('dropdown-link', {
+                            className={classNames([styles['dropdown-link']], {
                                 disable: option.isDisabled,
                             })}
                             to={option.navigateTo}

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Select } from '../../common/select/Select';
 import { LOCALES } from '../../../const/common/locales';
 import classNames from 'classnames';
-import './LanguageSwitcher.scss';
+import styles from './LanguageSwitcher.module.scss';
 
 export interface LanguageSwitcherProps {
     onValueChange?: () => void;
@@ -23,7 +23,7 @@ export const LanguageSwitcher = ({ onValueChange, className }: LanguageSwitcherP
             value={i18n.language}
             onValueChange={changeLanguage}
             placeholder="lng"
-            className={classNames('language-switcher', className)}
+            className={classNames([styles['language-switcher']], className)}
             data-testid="language-switcher"
         >
             {LOCALES.map((lng) => (

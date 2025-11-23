@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useId, useRef } from 'react';
-import './Modal.scss';
+import styles from './Modal.module.scss';
 
 interface ModalProps {
     children?: ReactNode;
@@ -110,7 +110,7 @@ export const Modal = ({ children, isOpen, onClose }: ModalProps) => {
     return (
         <div
             data-testid="modal-overlay"
-            className="modal-overlay"
+            className={styles['modal-overlay']}
             onClick={handleOverlayClick}
             onMouseDown={handleMouseDownOverlay}
             tabIndex={0}
@@ -121,24 +121,24 @@ export const Modal = ({ children, isOpen, onClose }: ModalProps) => {
                 ref={modalRef}
                 role="button"
                 aria-labelledby={titleId}
-                className="modal-container"
+                className={styles['modal-container']}
                 onMouseDown={handleOnMouseDownModal}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
                 tabIndex={-1}
             >
-                <div className="modal-header">
-                    <div className="close-icon">
+                <div className={styles['modal-header']}>
+                    <div className={styles['close-icon']}>
                         <button onClick={onClose} aria-label="Close modal" type="button" />
                     </div>
-                    <div className="modal-title-wrapper">
-                        <span id={titleId} className="modal-header-text">
+                    <div className={styles['modal-title-wrapper']}>
+                        <span id={titleId} className={styles['modal-header-text']}>
                             {title}
                         </span>
                     </div>
                 </div>
-                <div className="modal-body">{content}</div>
-                <div className="modal-footer">{actions}</div>
+                <div className={styles['modal-body']}>{content}</div>
+                <div className={styles['modal-footer']}>{actions}</div>
             </div>
         </div>
     );

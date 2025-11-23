@@ -4,7 +4,7 @@ import { axiosInstance } from '../../../services/api/axios';
 import { FaqApi } from '../../../services/api/public/faq/faq-api';
 import { PublishedFaqQuestion } from '../../../types/public/faq-section';
 import { FaqCard } from './faq-card/FaqCard';
-import './FaqSection.scss';
+import styles from './FaqSection.module.scss';
 
 interface FaqSectionProps {
     slug: string;
@@ -31,8 +31,8 @@ export const FaqSection = ({ slug }: FaqSectionProps) => {
     }
 
     return (
-        <div className="faq-section">
-            <div className="faq-block">
+        <div className={styles['faq-section']}>
+            <div className={styles['faq-block']}>
                 <h2>{t('COMMON_QUESTIONS')}</h2>
                 <div>
                     {questions.map((item, _) => (

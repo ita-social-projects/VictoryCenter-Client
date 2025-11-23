@@ -1,4 +1,4 @@
-import './FaqCard.scss';
+import styles from './FaqCard.module.scss';
 import { ReactComponent as OpenIcon } from '../../../../assets/icons/arrow-down-right.svg';
 import { ReactComponent as CloseIcon } from '../../../../assets/icons/cross.svg';
 import { PublishedFaqQuestion } from '../../../../types/public/faq-section';
@@ -9,15 +9,15 @@ interface FaqCardProps {
 
 export const FaqCard = ({ faq }: FaqCardProps) => {
     return (
-        <details className="faq-item">
-            <summary className="question-block">
+        <details className={styles['faq-item']}>
+            <summary className={styles['question-block']}>
                 <p>{faq.questionText}</p>
-                <div className="button-icons">
-                    <OpenIcon className="faq-open" />
-                    <CloseIcon className="faq-close" />
+                <div className={styles['button-icons']}>
+                    <OpenIcon className={styles['faq-open']} />
+                    <CloseIcon className={styles['faq-close']} />
                 </div>
             </summary>
-            <div className="answer-block">{faq.answerText}</div>
+            <div className={styles['answer-block']}>{faq.answerText}</div>
         </details>
     );
 };

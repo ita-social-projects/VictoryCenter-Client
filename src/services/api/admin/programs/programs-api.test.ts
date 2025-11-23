@@ -298,7 +298,7 @@ describe('editProgram', () => {
         const sameImageId = 100;
         (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue({
             finalImageId: sameImageId,
-            imageIdToDelete: sameImageId
+            imageIdToDelete: sameImageId,
         });
 
         mockClient.put.mockResolvedValueOnce({

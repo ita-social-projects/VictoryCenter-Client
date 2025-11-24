@@ -9,13 +9,13 @@ export const Tabs = ({ tabs, activeTab, setActiveTab }: TabProps) => {
                 const isActive = activeTab === id;
                 const tabClass = `tab ${isActive ? 'active' : ''}`;
                 return disabled ? (
-                    <div key={id} className={styles['tooltip-container top']}>
+                    <div key={id} className="tooltip-container top">
                         <button className={tabClass} type="button" onClick={() => setActiveTab(id)} disabled>
                             {label}
                         </button>
-                        <span className={styles['tooltip-text']}>
-                            <div className={styles['text-center']}>
-                                <p className={styles['font-semibold']}>{NOT_AVAIBLE}</p>
+                        <span className="tooltip-text">
+                            <div className="text-center">
+                                <p className="font-semibold">{NOT_AVAIBLE}</p>
                                 <p>{CHECK_LATER}</p>
                             </div>
                         </span>

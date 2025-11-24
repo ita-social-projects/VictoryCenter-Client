@@ -78,7 +78,7 @@ export const SingleSelectInput = <T extends Record<string, any>>({
         >
             <button
                 type="button"
-                className={classNames([styles['select-input']], {[styles['select-input-disabled']]: disabled })}
+                className={classNames([styles['select-input']], { [styles['select-input-disabled']]: disabled })}
                 onClick={toggleDropdown}
                 disabled={disabled}
                 aria-haspopup="listbox"

@@ -58,7 +58,7 @@ export const Header = () => {
                 </button>
                 <Link to={PUBLIC_ROUTES.DONATE.FULL} className={styles['button donate-button']}>
                     {t('DONATE')}
-                </Link>w
+                </Link>
                 <button onClick={toggleMenu} className={styles['burger-menu-icon']}>
                     <BurgerIcon />
                 </button>

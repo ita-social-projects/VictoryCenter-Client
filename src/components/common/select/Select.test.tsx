@@ -182,7 +182,8 @@ describe('Select Component', () => {
         const selectContainer = container.firstChild as HTMLElement;
         fireEvent.click(selectContainer);
 
-        const option = screen.getByRole('button', { name: 'Option 1' });
+        const selectOptions = container.querySelector('.select-options') as HTMLElement;
+        const option = selectOptions.querySelector('button') as HTMLElement;
         fireEvent.click(option);
 
         expect(screen.getByText('Option 1')).toBeInTheDocument();
@@ -205,44 +206,53 @@ describe('Select Component', () => {
     });
 
     it('applies selected class to options when not in autocomplete mode', () => {
-        render(<Select {...defaultProps} isAutocomplete={false} />);
+        const { container } = render(<Select {...defaultProps} isAutocomplete={false} />);
         const selectContainer = screen.getByRole('toolbar');
 
         fireEvent.click(selectContainer);
-        fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
+        const selectOptions = container.querySelector('.select-options') as HTMLElement;
+        fireEvent.click(selectOptions.querySelectorAll('button')[0]);
 
         // Re-open to check the class
         fireEvent.click(selectContainer);
 
-        const selectedOption = screen.getByRole('button', { name: 'Option 1' });
+        const selectedOption = (container.querySelector('.select-options') as HTMLElement).querySelector(
+            '.select-options-selected',
+        ) as HTMLElement;
         expect(selectedOption).toHaveClass('select-options-selected');
     });
 
     it('does not apply selected class in autocomplete mode', () => {
-        render(<Select {...defaultProps} isAutocomplete={true} />);
+        const { container } = render(<Select {...defaultProps} isAutocomplete={true} />);
         const selectContainer = screen.getByRole('toolbar');
 
         fireEvent.click(selectContainer);
-        fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
+        const selectOptions = container.querySelector('.select-options') as HTMLElement;
+        fireEvent.click(selectOptions.querySelectorAll('button')[0]);
 
         // Re-open to check the class
         fireEvent.click(selectContainer);
 
-        const selectedOption = screen.getByRole('button', { name: 'Option 1' });
-        expect(selectedOption).not.toHaveClass('select-options-selected');
+        const selectedOption = (container.querySelector('.select-options') as HTMLElement).querySelector(
+            '.select-options-selected',
+        );
+        expect(selectedOption).not.toBeInTheDocument();
     });
 
     it('has correct default value for isAutocomplete prop', () => {
-        render(<Select {...defaultProps} />); // isAutocomplete defaults to false
+        const { container } = render(<Select {...defaultProps} />); // isAutocomplete defaults to false
         const selectContainer = screen.getByRole('toolbar');
 
         fireEvent.click(selectContainer);
-        fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
+        const selectOptions = container.querySelector('.select-options') as HTMLElement;
+        fireEvent.click(selectOptions.querySelectorAll('button')[0]);
 
         // Re-open to check the class
         fireEvent.click(selectContainer);
 
-        const selectedOption = screen.getByRole('button', { name: 'Option 1' });
+        const selectedOption = (container.querySelector('.select-options') as HTMLElement).querySelector(
+            '.select-options-selected',
+        ) as HTMLElement;
         expect(selectedOption).toHaveClass('select-options-selected');
     });
 

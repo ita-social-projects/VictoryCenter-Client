@@ -9,9 +9,13 @@ describe('LanguageSwitcher', () => {
         const selectContainer = container.firstChild as HTMLElement;
         fireEvent.click(selectContainer);
 
-        LOCALES.forEach((locale) => {
-            expect(screen.getByRole('button', { name: locale.toUpperCase() })).toBeInTheDocument();
-        });
+        const selectOptions = container.querySelector('.select-options') as HTMLElement;
+        const buttons = Array.from(selectOptions.querySelectorAll('button'));
+
+        for (const locale of LOCALES) {
+            const button = buttons.find((btn) => btn.textContent?.includes(locale.toUpperCase()));
+            expect(button).toBeInTheDocument();
+        }
     });
 
     it('shows current language as selected', () => {

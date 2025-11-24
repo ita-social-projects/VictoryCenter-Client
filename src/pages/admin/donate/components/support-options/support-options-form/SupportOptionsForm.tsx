@@ -25,15 +25,6 @@ export const SupportOptionsForm = ({
     onDeleteOption,
 }: SupportOptionsFormProps) => {
     const [isAdding, setIsAdding] = useState(false);
-    const [editingItemId, setEditingItemId] = useState<number | null>(null);
-
-    const handleItemModeChange = (id: number, mode: SupportOptionItemMode) => {
-        if (mode === SupportOptionItemMode.Edit) {
-            setEditingItemId(id);
-        } else if (editingItemId === id) {
-            setEditingItemId(null);
-        }
-    };
 
     const handleSaveNewOption = async (name: string, value: string) => {
         await onCreateOption(name, value);
@@ -73,7 +64,6 @@ export const SupportOptionsForm = ({
                             data={item}
                             onSave={(name, value) => onUpdateOption(item.id, name, value)}
                             onDelete={() => onDeleteOption(item.id)}
-                            onModeChange={(mode) => handleItemModeChange(item.id, mode)}
                         />
                     ))}
 

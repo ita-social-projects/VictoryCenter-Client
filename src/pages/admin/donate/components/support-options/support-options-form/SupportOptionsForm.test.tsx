@@ -316,31 +316,4 @@ describe('SupportOptionsForm', () => {
             expect(addButton).not.toBeDisabled();
         });
     });
-
-    it('handles item mode changes for edit and view on different items', () => {
-        render(
-            <SupportOptionsForm
-                supportOptions={mockSupportOptions}
-                isLoading={false}
-                onCreateOption={mockOnCreateOption}
-                onUpdateOption={mockOnUpdateOption}
-                onDeleteOption={mockOnDeleteOption}
-            />,
-        );
-
-        expect(screen.getByText(DONATE_TEXT.SUPPORT_OPTIONS.TITLE)).toBeInTheDocument();
-
-        const firstItem = screen.getByTestId('support-option-1');
-        const secondItem = screen.getByTestId('support-option-2');
-
-        const firstEditButton = within(firstItem).getByText(/simulate edit/i);
-        const firstViewButton = within(firstItem).getByText(/simulate view/i);
-        const secondViewButton = within(secondItem).getByText(/simulate view/i);
-
-        fireEvent.click(firstEditButton);
-
-        fireEvent.click(secondViewButton);
-
-        fireEvent.click(firstViewButton);
-    });
 });

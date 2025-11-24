@@ -56,7 +56,7 @@ export const Header = () => {
                 <button className={styles['contact-us-button']} onClick={onContactUsClick}>
                     {t('CONTACT_US')}
                 </button>
-                <Link to={PUBLIC_ROUTES.DONATE.FULL} className={styles['button donate-button']}>
+                <Link to={PUBLIC_ROUTES.DONATE.FULL} className={styles['donate-button']}>
                     {t('DONATE')}
                 </Link>
                 <button onClick={toggleMenu} className={styles['burger-menu-icon']}>

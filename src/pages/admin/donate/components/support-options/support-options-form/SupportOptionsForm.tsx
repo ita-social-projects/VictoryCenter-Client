@@ -4,7 +4,7 @@ import { SupportOptionsType } from '../../../../../../types/admin/donate';
 import { InlineLoader } from '../../../../../../components/common/inline-loader/InlineLoader';
 import { ReactComponent as PlusIcon } from '../../../../../../assets/icons/plus.svg';
 import './SupportOptionsForm.scss';
-import { SupportOptionItem, SupportOptionItemMode } from '../support-option-item/SupportOptionItem';
+import { SupportOptionItem } from '../support-option-item/SupportOptionItem';
 import NotFoundIcon from '../../../../../../assets/icons/not-found.svg';
 import { DONATE_TEXT } from '../../../../../../const/admin/donate';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';

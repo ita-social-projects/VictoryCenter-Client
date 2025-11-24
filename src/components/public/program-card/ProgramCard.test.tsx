@@ -24,21 +24,39 @@ describe('ProgramCard', () => {
     };
 
     it('renders program name, categories, and description', () => {
-        render(<ProgramCard program={program} className={''} />);
+        render(<ProgramCard program={program} className="about-us-page-card" />);
         expect(screen.getByText('Program A')).toBeInTheDocument();
         expect(screen.getByText('Category 1, Category 2')).toBeInTheDocument();
         expect(screen.getByText('Description A')).toBeInTheDocument();
     });
 
     it('renders program image using mapImageToBase64', () => {
-        render(<ProgramCard program={program} className={''} />);
+        render(<ProgramCard program={program} className="about-us-page-card" />);
         const img = screen.getByAltText('Program A') as HTMLImageElement;
         expect(img).toHaveAttribute('src', 'mocked-image');
     });
 
     it('renders arrow icons', () => {
-        render(<ProgramCard program={program} className={''} />);
+        render(<ProgramCard program={program} className="about-us-page-card" />);
         const arrows = screen.getAllByTestId('arrow-up-right');
         expect(arrows).toHaveLength(1);
+    });
+
+    // Add tests for both className variants
+    it('renders with program-page-card className', () => {
+        render(<ProgramCard program={program} className="program-page-card" />);
+        expect(screen.getByText('Program A')).toBeInTheDocument();
+    });
+
+    it('applies correct styling for about-us-page-card', () => {
+        const { container } = render(<ProgramCard program={program} className="about-us-page-card" />);
+        const cardElement = container.querySelector('.card-block--about-us-page');
+        expect(cardElement).toBeInTheDocument();
+    });
+
+    it('applies correct styling for program-page-card', () => {
+        const { container } = render(<ProgramCard program={program} className="program-page-card" />);
+        const cardElement = container.querySelector('.card-block--program-page');
+        expect(cardElement).toBeInTheDocument();
     });
 });

@@ -12,6 +12,8 @@ export type SelectProps<TValue> = {
     selectContainerRef?: RefObject<HTMLDivElement | null>;
     placeholder?: string;
     className?: string;
+    headClassName?: string;
+    optionClassName?: string;
     isAutocomplete?: boolean;
 };
 
@@ -21,6 +23,8 @@ export const Select = <TValue,>({
     value,
     selectContainerRef,
     className,
+    headClassName,
+    optionClassName,
     placeholder,
     isAutocomplete = false,
 }: SelectProps<TValue>) => {
@@ -76,14 +80,16 @@ export const Select = <TValue,>({
                 }
             }}
         >
-            <span
-                className={classNames('empty', {
-                    'not-empty': selectedValue !== null && selectedValue !== undefined,
-                })}
-            >
-                {selectedName ?? placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT}
-            </span>
-            {isOpen ? <ArrowUp /> : <ArrowDown />}
+            <button className={classNames('select-head', headClassName)}>
+                <span
+                    className={classNames('empty', {
+                        'not-empty': selectedValue !== null && selectedValue !== undefined,
+                    })}
+                >
+                    {selectedName ?? placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT}
+                </span>
+                {isOpen ? <ArrowUp /> : <ArrowDown />}
+            </button>
             {isOpen && (
                 <div className={'select-options'}>
                     {options.map((opt, index) => {
@@ -91,7 +97,7 @@ export const Select = <TValue,>({
                         return (
                             <button
                                 key={`${name}-${index}`}
-                                className={classNames({
+                                className={classNames(optionClassName, {
                                     'select-options-selected': !isAutocomplete && selectedValue === optValue,
                                 })}
                                 onClick={(e) => handleOptionClick(e, optValue, name)}

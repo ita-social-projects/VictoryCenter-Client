@@ -3,22 +3,10 @@
 
 .select {
     position: relative;
-    width: 11.1875rem;
-    height: 2.5rem;
     display: flex;
-    padding: 0 1rem;
-    align-items: center;
-    border: 1px solid colors.$blue-500;
-    background-color: white;
     cursor: pointer;
 
-    &-opened {
-        justify-content: space-between;
-    }
-
     &-closed {
-        justify-content: space-between;
-
         span {
             &.empty {
                 color: colors.$grey-900;
@@ -30,12 +18,28 @@
         }
     }
 
+    &-head {
+        border: 1px solid colors.$blue-500;
+        background-color: white;
+        padding: 0px 1rem;
+        justify-content: space-between;
+        display: flex;
+        align-items: center;
+        height: 2.5rem;
+        width: 181px;
+        cursor: pointer;
+        text-align: start;
+        font-size: 16px;
+
+        &:hover {
+            background-color: colors.$blue-50;
+        }
+    }
+
     &-options {
         display: block;
-        box-sizing: content-box;
         position: absolute;
         top: 2.625rem;
-        left: -0.0625rem;
         width: 100%;
         border: 1px solid colors.$blue-500;
         background-color: white;

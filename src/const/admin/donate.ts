@@ -97,7 +97,10 @@ export const DONATE_TEXT = {
         SUPPORT_OPTION: 'Введіть реквізити',
     },
     MESSAGE: {
-        SUPPORT_OPTION_PUBLISHED: 'Варіант підтримки успішно опубліковано',
+        SUPPORT_OPTIONS: {
+            PUBLISHED: 'Варіант підтримки успішно опубліковано',
+            DELETED: 'Варіант підтримки видалено успішно',
+        },
         CHANGES_SAVED: 'Зміни успішно опубліковано',
         CORRESPONDENT_BANKS: {
             DELETED: 'Банк-кореспондент видалено успішно',
@@ -109,6 +112,8 @@ export const VALIDATION_PARAMS = {
     edrpou: { count: 8 },
     iban: { count: 29, errorLength: 27 },
     swift: { minLength: 8, maxLength: 11 },
+    supportTitle: { minLength: 1, maxLength: 50 },
+    supportDescription: { minLength: 1, maxLength: 100 },
 };
 
 export const DONATE_VALIDATION = {
@@ -148,11 +153,19 @@ export const DONATE_VALIDATION = {
         getRequiredError: () => getRequiredError(DONATE_TEXT.CORRESPONDENT_BANKS.ACCOUNT.TITLE),
     },
     supportOptions: {
+        minLengthTitle: VALIDATION_PARAMS.supportTitle.minLength,
+        maxLengthTitle: VALIDATION_PARAMS.supportTitle.maxLength,
+        minLengthDescription: VALIDATION_PARAMS.supportDescription.minLength,
+        maxLengthDescription: VALIDATION_PARAMS.supportDescription.maxLength,
         name: {
             getRequiredError: () => getRequiredError(DONATE_TEXT.SUPPORT_OPTIONS.NAME),
+            getMinError: () => getMinSymbolsError(VALIDATION_PARAMS.supportTitle.minLength),
+            getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.supportTitle.maxLength),
         },
         value: {
             getRequiredError: () => getRequiredError(DONATE_TEXT.SUPPORT_OPTIONS.VALUE),
+            getMinError: () => getMinSymbolsError(VALIDATION_PARAMS.supportDescription.minLength),
+            getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.supportDescription.maxLength),
         },
     },
 };

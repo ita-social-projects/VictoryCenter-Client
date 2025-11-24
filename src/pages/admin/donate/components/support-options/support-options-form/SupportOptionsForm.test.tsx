@@ -267,11 +267,11 @@ describe('SupportOptionsForm', () => {
         expect(screen.getByTestId('support-options-not-found')).toBeInTheDocument();
     });
 
-    it('disables add new button when an item is in edit mode', () => {
+    it('disables add new button when form is loading', () => {
         render(
             <SupportOptionsForm
                 supportOptions={mockSupportOptions}
-                isLoading={false}
+                isLoading={true}
                 onCreateOption={mockOnCreateOption}
                 onUpdateOption={mockOnUpdateOption}
                 onDeleteOption={mockOnDeleteOption}
@@ -279,17 +279,45 @@ describe('SupportOptionsForm', () => {
         );
 
         const addButton = screen.getByTestId('btn-add new');
-        expect(addButton).not.toBeDisabled();
-
-        const firstItem = screen.getByTestId('support-option-1');
-
-        const simulateEditButton = within(firstItem).getByText('Simulate Edit');
-        fireEvent.click(simulateEditButton);
 
         expect(addButton).toBeDisabled();
     });
 
-    it('re-enables add new button when an item exits edit mode', () => {
+    it('disables add new button while adding a new option and re-enables it after save', async () => {
+        const mockOnCreateOptionResolved = jest.fn().mockResolvedValue(undefined);
+
+        render(
+            <SupportOptionsForm
+                supportOptions={mockSupportOptions}
+                isLoading={false}
+                onCreateOption={mockOnCreateOptionResolved}
+                onUpdateOption={mockOnUpdateOption}
+                onDeleteOption={mockOnDeleteOption}
+            />,
+        );
+
+        const addButton = screen.getByTestId('btn-add new');
+        expect(addButton).not.toBeDisabled();
+
+        fireEvent.click(addButton);
+        expect(addButton).toBeDisabled();
+
+        const newItem = screen.getByTestId('support-option-new');
+
+        const saveButton = within(newItem).getByRole('button', { name: /save/i });
+
+        fireEvent.click(saveButton);
+
+        await waitFor(() => {
+            expect(mockOnCreateOptionResolved).toHaveBeenCalledTimes(1);
+        });
+
+        await waitFor(() => {
+            expect(addButton).not.toBeDisabled();
+        });
+    });
+
+    it('handles item mode changes for edit and view on different items', () => {
         render(
             <SupportOptionsForm
                 supportOptions={mockSupportOptions}
@@ -300,16 +328,19 @@ describe('SupportOptionsForm', () => {
             />,
         );
 
-        const addButton = screen.getByTestId('btn-add new');
+        expect(screen.getByText(DONATE_TEXT.SUPPORT_OPTIONS.TITLE)).toBeInTheDocument();
 
         const firstItem = screen.getByTestId('support-option-1');
-        const simulateEditButton = within(firstItem).getByText('Simulate Edit');
-        const simulateViewButton = within(firstItem).getByText('Simulate View');
+        const secondItem = screen.getByTestId('support-option-2');
 
-        fireEvent.click(simulateEditButton);
-        expect(addButton).toBeDisabled();
+        const firstEditButton = within(firstItem).getByText(/simulate edit/i);
+        const firstViewButton = within(firstItem).getByText(/simulate view/i);
+        const secondViewButton = within(secondItem).getByText(/simulate view/i);
 
-        fireEvent.click(simulateViewButton);
-        expect(addButton).not.toBeDisabled();
+        fireEvent.click(firstEditButton);
+
+        fireEvent.click(secondViewButton);
+
+        fireEvent.click(firstViewButton);
     });
 });

@@ -81,17 +81,15 @@ export const SupportOptionsForm = ({
                         <SupportOptionItem key="new" onSave={handleSaveNewOption} onCancel={() => setIsAdding(false)} />
                     )}
 
-                    {!isAdding && (
-                        <Button
-                            className="btn-add new"
-                            onClick={() => setIsAdding(true)}
-                            buttonStyle="primary"
-                            disabled={isLoading || editingItemId !== null}
-                        >
-                            {DONATE_TEXT.SUPPORT_OPTIONS.ADD_NEW}
-                            <PlusIcon className="plus-icon" />
-                        </Button>
-                    )}
+                    <Button
+                        className="btn-add new"
+                        onClick={() => setIsAdding(true)}
+                        buttonStyle="primary"
+                        disabled={isLoading || isAdding}
+                    >
+                        {DONATE_TEXT.SUPPORT_OPTIONS.ADD_NEW}
+                        <PlusIcon className="plus-icon" />
+                    </Button>
                 </div>
             )}
         </div>

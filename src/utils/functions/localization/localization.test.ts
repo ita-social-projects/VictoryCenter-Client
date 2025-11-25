@@ -1,10 +1,5 @@
 import { returnDisplayedLocale } from './localization';
-import { EntityWithLocalizations, EntityLocalization } from '../../../types/common/language';
-
-enum TranslationStatus {
-    Outdated,
-    Relevant,
-}
+import { EntityWithLocalizations, EntityLocalization, TranslationStatus } from '../../../types/common/language';
 
 interface TestLocalization extends EntityLocalization {
     fullName?: string;

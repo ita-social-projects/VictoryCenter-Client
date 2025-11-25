@@ -12,11 +12,12 @@ interface TestLocalization extends EntityLocalization {
 }
 
 const createLocalization = (
+    id: number,
     code: string,
     status: TranslationStatus,
     extra?: Partial<TestLocalization>,
 ): TestLocalization => ({
-    language: { id: Math.random(), code },
+    language: { id, code },
     translationStatus: status,
     ...extra,
 });
@@ -28,8 +29,8 @@ const createEntity = (localizations: TestLocalization[]): EntityWithLocalization
 describe('returnDisplayedLocale', () => {
     it('should return localization for matching language code', () => {
         const entity = createEntity([
-            createLocalization('en', TranslationStatus.Relevant, { fullName: 'John EN' }),
-            createLocalization('ua', TranslationStatus.Relevant, { fullName: 'John UA' }),
+            createLocalization(2, 'en', TranslationStatus.Relevant, { fullName: 'John EN' }),
+            createLocalization(1, 'ua', TranslationStatus.Relevant, { fullName: 'John UA' }),
         ]);
 
         const result = returnDisplayedLocale(entity, 'ua');
@@ -40,7 +41,7 @@ describe('returnDisplayedLocale', () => {
     });
 
     it('should return null when language code not found', () => {
-        const entity = createEntity([createLocalization('en', TranslationStatus.Relevant)]);
+        const entity = createEntity([createLocalization(2, 'en', TranslationStatus.Relevant)]);
 
         const result = returnDisplayedLocale(entity, 'fr');
 

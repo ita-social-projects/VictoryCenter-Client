@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { LOCALIZATION_TEXT } from '../../../const/admin/localization';
 import { DEFAULT_LOCALE } from '../../../const/common/locales';
 import { Select } from '../../common/select/Select';
@@ -23,22 +23,27 @@ export const LocalizationToolkit = ({
         TranslationStatusFilter.All,
     );
 
-    const changeLanguage = (language: LocalizationLanguage) => {
-        setSelectedLanguage(language);
-        onLanguageChange(language);
-    };
+    const changeLanguage = useCallback(
+        (language: LocalizationLanguage) => {
+            setSelectedLanguage(language);
+            onLanguageChange(language);
+        },
+        [onLanguageChange],
+    );
 
-    const changeTranslationStatus = (translationFilter: TranslationStatusFilter) => {
-        setSelectedTranslationStatus(translationFilter);
-        onTranslationStatusFilterChange(translationFilter);
-    };
+    const changeTranslationStatus = useCallback(
+        (translationFilter: TranslationStatusFilter) => {
+            setSelectedTranslationStatus(translationFilter);
+            onTranslationStatusFilterChange(translationFilter);
+        },
+        [onTranslationStatusFilterChange],
+    );
 
     useEffect(() => {
         const defaultLanguage = languages.find((language) => language.code === DEFAULT_LOCALE) || languages[0];
         changeLanguage(defaultLanguage);
         changeTranslationStatus(TranslationStatusFilter.All);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [languages]);
+    }, [languages, changeLanguage, changeTranslationStatus]);
 
     return (
         <div className="toolkit" data-testid="localization-toolkit">

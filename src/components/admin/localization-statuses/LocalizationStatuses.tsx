@@ -18,7 +18,10 @@ export const LocalizationStatuses = <TLocalization extends EntityLocalization>({
     return (
         <div className="statuses" data-testId="localization-statuses">
             {languages.map((language) => (
-                <span className={`badge ${getLocalizationClassNameFromStatus(language, localizedEntity)}`}>
+                <span
+                    key={language.id}
+                    className={`badge ${getLocalizationClassNameFromStatus(language, localizedEntity)}`}
+                >
                     {language.code.toUpperCase()}
                 </span>
             ))}

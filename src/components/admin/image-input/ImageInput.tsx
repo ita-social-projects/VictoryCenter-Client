@@ -48,9 +48,14 @@ export const ImageInput = ({
     const inputRef = useRef<HTMLInputElement>(null);
     const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
     const [showCropperModal, setShowCropperModal] = useState<boolean>(false);
+    const [rawImage, setRawImage] = useState<ImageValues | Image | null>(null);
 
     useEffect(() => {
         setPreviewImage(value);
+        if (value && 'url' in value) {
+            setPreviewImage(value);
+            setRawImage(null);
+        }
     }, [value]);
 
     const handleFile = useCallback(
@@ -64,7 +69,9 @@ export const ImageInput = ({
                 return;
             }
             const imgItem = await convertFileToBase64(file);
-            onChange(imgItem);
+
+            setRawImage(imgItem);
+            setShowCropperModal(true);
         },
         [onChange, height, width, setError],
     );
@@ -190,6 +197,7 @@ export const ImageInput = ({
                                 >
                                     <DeleteIcon className={classNames('delete-icon')} />
                                 </button>
+                                {rawImage && "base64" in rawImage ?
                                 <button
                                     data-testid="crop-photo-button"
                                     type="button"
@@ -202,6 +210,7 @@ export const ImageInput = ({
                                 >
                                     <CropIcon className={classNames('crop-icon')} />
                                 </button>
+                                    : null}
                             </div>
                         )}
                     </div>
@@ -224,13 +233,17 @@ export const ImageInput = ({
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
-            {previewImage && showCropperModal && (
+            {showCropperModal && rawImage && "base64" in rawImage && (
                 <CropModal
-                    src={previewImage}
-                    onChange={setPreviewImage}
+                    data-testid="cropper"
+                    src={rawImage}
+                    onChange={onChange}
                     height={height}
                     width={width}
-                    onCancel={() => setShowCropperModal(false)}
+                    onCancel={() => {
+                        setShowCropperModal(false);
+                        setPreviewImage(rawImage);
+                    }}
                     isOpen={showCropperModal}
                 />
             )}

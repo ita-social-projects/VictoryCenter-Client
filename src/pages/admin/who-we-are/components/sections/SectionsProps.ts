@@ -21,6 +21,8 @@ export const MainPageProps: Omit<
     rows: 5,
     imageInputProps: {
         subText: '1440x860',
+        width: 1920,
+        height: 1080,
         style: {
             width: '52.5625rem',
             height: '33.125rem',
@@ -41,6 +43,8 @@ export const TeamPageProps: Omit<
     rows: 7,
     imageInputProps: {
         subText: '840x750',
+        width: 840,
+        height: 750,
         style: {
             width: '52.5625rem',
             height: '46.875rem',
@@ -80,6 +84,8 @@ export const WhoWeSupportCardsProps: Omit<
                 backgroundPosition: 'center',
             },
             subText: '500x430',
+            width: 500,
+            height: 430,
         },
         // second card
         {
@@ -93,6 +99,8 @@ export const WhoWeSupportCardsProps: Omit<
                 backgroundPosition: 'center',
             },
             subText: '500x430',
+            width: 500,
+            height: 430,
         },
         // third card
         {
@@ -106,6 +114,8 @@ export const WhoWeSupportCardsProps: Omit<
                 backgroundPosition: 'center',
             },
             subText: '500x430',
+            width: 500,
+            height: 430,
         },
     ],
 };
@@ -129,6 +139,8 @@ export const PeopleCardsProps: Omit<
                 backgroundPosition: 'center',
             },
             subText: '360x430',
+            width: 360,
+            height: 430,
         },
         // second card
         {
@@ -142,6 +154,8 @@ export const PeopleCardsProps: Omit<
                 backgroundPosition: 'center',
             },
             subText: '360x430',
+            width: 360,
+            height: 430,
         },
         // third card
         {
@@ -155,6 +169,8 @@ export const PeopleCardsProps: Omit<
                 backgroundPosition: 'right',
             },
             subText: '360x430',
+            width: 360,
+            height: 430,
         },
         // fourth card
         {
@@ -168,6 +184,8 @@ export const PeopleCardsProps: Omit<
                 backgroundPosition: 'center',
             },
             subText: '360x430',
+            width: 360,
+            height: 430,
         },
     ],
 };

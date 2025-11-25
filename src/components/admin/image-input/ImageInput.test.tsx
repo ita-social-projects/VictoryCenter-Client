@@ -33,6 +33,10 @@ jest.mock('../../../assets/icons/delete.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="delete-icon" />,
 }));
 
+jest.mock('../cropper-modal/CropperModal', () => ({
+    CropModal: ({ isOpen }: any) => (isOpen ? <div data-testid="cropper">Crop Modal Mock</div> : null),
+}));
+
 const MockImageValue: ImageValues = {
     base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAocB9eQ6vqoAAAAASUVORK5CYII=',
     mimeType: 'image/jpeg',
@@ -55,6 +59,18 @@ describe('ImageInput', () => {
         global.URL.revokeObjectURL = jest.fn();
 
         jest.clearAllMocks();
+        jest.spyOn(window, 'FileReader').mockImplementation(() => {
+            const mock = {
+                result: 'data:image/png;base64,MOCKED_BASE64',
+                onload: null as any,
+                readAsDataURL: jest.fn(() => {
+                    mock.onload?.({
+                        target: { result: mock.result },
+                    });
+                }),
+            };
+            return mock as unknown as FileReader;
+        });
     });
 
     it('renders placeholder when no image is selected', () => {
@@ -89,10 +105,7 @@ describe('ImageInput', () => {
         });
 
         await waitFor(() => {
-            expect(onChangeMock).toHaveBeenCalledWith({
-                base64: expect.any(String),
-                mimeType: 'image/png',
-            });
+            expect(screen.getByTestId('cropper')).toBeInTheDocument();
         });
     });
 
@@ -175,10 +188,7 @@ describe('ImageInput', () => {
         fireEvent.drop(dropZone, data as unknown as DragEvent);
 
         await waitFor(() => {
-            expect(onChangeMock).toHaveBeenCalledWith({
-                base64: expect.any(String),
-                mimeType: file.type,
-            });
+            expect(screen.getByTestId('cropper')).toBeInTheDocument();
         });
     });
 

@@ -317,6 +317,7 @@ const mockMembers: TeamMember[] = [
         status: VisibilityStatus.Published,
         categoryId: 1,
         image: { id: 1, url: 'test.jpg', mimeType: 'image/jpeg' } as any,
+        localizations: [],
     },
     {
         id: 2,
@@ -325,6 +326,7 @@ const mockMembers: TeamMember[] = [
         status: VisibilityStatus.Draft,
         categoryId: 1,
         image: null,
+        localizations: [],
     },
 ];
 

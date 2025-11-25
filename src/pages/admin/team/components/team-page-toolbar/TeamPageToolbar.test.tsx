@@ -20,6 +20,9 @@ const DEFAULT_PROPS: React.ComponentProps<typeof TeamPageToolbar> = {
     categories: [],
     onSearchItemSelect: jest.fn(),
     onSearchClear: jest.fn(),
+    languages: [],
+    onLanguageChange: jest.fn(),
+    onTranslationStatusFilterChange: jest.fn(),
 };
 
 const renderToolbar = (overrides: PartialProps = {}) => {

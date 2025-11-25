@@ -3,7 +3,7 @@ import { CorrespondentBanksSection } from './CorrespondentBanksSection';
 import { PaymentDetailsSection } from './PaymentDetailsSection';
 import { Currency, PublishedForeignBankDetailsDto } from '../../../../../types/public/donate-page';
 import { ABROAD_PAYMENT_DETAILS } from '../../../../../const/public/donate-page';
-import { currencyToString } from '../../../../../utils/functions/mappers/public/donate';
+import { currencyToString } from '../../../../../utils/functions/mappers/public/donate/donate';
 
 type AbroadCurrency = 'USD' | 'EUR';
 

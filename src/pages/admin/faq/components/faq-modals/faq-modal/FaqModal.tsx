@@ -8,7 +8,7 @@ import { FaqCreateUpdate, FaqQuestion, VisitorPage } from '../../../../../../typ
 import { FaqForm, FaqFormRef, FaqFormValues } from '../../faq-form/FaqForm';
 import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { mapFaqQuestionDtoToModel } from '../../../../../../utils/functions/mappers/admin/faq-mappers';
+import { mapFaqQuestionDtoToModel } from '../../../../../../utils/functions/mappers/admin/faq/faq-mappers';
 
 interface BaseProps {
     isOpen: boolean;

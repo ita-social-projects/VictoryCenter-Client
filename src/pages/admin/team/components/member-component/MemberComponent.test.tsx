@@ -3,6 +3,7 @@ import { MemberComponent, MemberComponentProps } from './MemberComponent';
 import '@testing-library/jest-dom';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { DEFAULT_LOCALE } from '../../../../../const/common/locales';
 
 jest.mock('../../../../../assets/icons/blank-user.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="blank-user-icon" />,
@@ -21,6 +22,7 @@ const baseMember = {
     description: 'Frontend Developer',
     status: VisibilityStatus.Published,
     categoryId: 5,
+    localizations: [],
 };
 
 describe('MemberComponent', () => {
@@ -37,6 +39,8 @@ describe('MemberComponent', () => {
         render(
             <MemberComponent
                 member={{ ...baseMember, ...override }}
+                language={{ id: 1, code: DEFAULT_LOCALE, name: 'Українська' }}
+                translationLanguages={[{ id: 1, code: 'en', name: 'Англійська' }]}
                 handleOnEditMember={handleOnEditMember}
                 handleOnDeleteMember={handleOnDeleteMember}
             />,

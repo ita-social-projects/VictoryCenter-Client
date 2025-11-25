@@ -19,7 +19,7 @@ import './FaqPanelContent.scss';
 import axios from 'axios';
 import { AdminPanelToolbar } from '../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { FaqSearchItem } from '../faq-search-item/FaqSearchItem';
-import { mapFaqQuestionDtoToModel } from '../../../../../utils/functions/mappers/admin/faq-mappers';
+import { mapFaqQuestionDtoToModel } from '../../../../../utils/functions/mappers/admin/faq/faq-mappers';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;

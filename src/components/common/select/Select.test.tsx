@@ -396,4 +396,12 @@ describe('Select Component', () => {
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).toBeInTheDocument();
     });
+
+    it('renders custom icon when icon prop is provided', () => {
+        const CustomIcon = (props: React.SVGProps<SVGSVGElement>) => <svg data-testid="custom-icon" {...props} />;
+
+        render(<Select {...defaultProps} icon={CustomIcon} />);
+
+        expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
+    });
 });

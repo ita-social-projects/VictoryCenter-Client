@@ -68,6 +68,14 @@ export const COMMON_TEXT_ADMIN = {
         EXIT: 'Вихід',
     },
 
+    LOCALIZATION: {
+        LANGUAGES: {
+            MESSAGE: {
+                FAILED_TO_FETCH_LANGUAGES: 'Виникла помилка, не вдалось завантажити мови',
+            },
+        },
+    },
+
     CATEGORIES: {
         MESSAGE: {
             FAIL_TO_FETCH_CATEGORIES: 'Виникла помилка, не вдалось завантажити категорії',

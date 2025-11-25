@@ -52,4 +52,14 @@ export const API_ROUTES = {
         PREVIEWS: 'WhoWeAre/previews',
         PUBLIC: 'WhoWeArePage',
     },
+    LOCALIZATION_LANGUAGE: {
+        BASE: 'LocalizationLanguage',
+    },
+    TEAM_MEMBER_LOCALIZATIONS: {
+        BASE: 'TeamMemberLocalizations',
+        PUBLIC: {
+            TEAM_MEMBER_ID: 'TeamMemberLocalizations/entityId',
+            LANGUAGE_ID: 'TeamMemberLocalizations/languageId',
+        },
+    },
 };

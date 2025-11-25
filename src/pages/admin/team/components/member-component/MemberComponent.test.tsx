@@ -17,7 +17,7 @@ jest.mock('../../../../../components/admin/visibility-status-label/VisibilitySta
 }));
 
 jest.mock('../../../../../utils/functions/localization/localization', () => ({
-    returnDisplayedLocale: jest.fn(),
+    returnDisplayedLocalization: jest.fn(),
 }));
 
 const baseMember = {

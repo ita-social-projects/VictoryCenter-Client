@@ -46,7 +46,7 @@ jest.mock('../../../../../const/public/donate-page', () => ({
     },
 }));
 
-jest.mock('../../../../../utils/functions/mappers/public/donate', () => ({
+jest.mock('../../../../../utils/functions/mappers/public/donate/donate', () => ({
     currencyToString: (currency: number) => {
         switch (currency) {
             case 1:

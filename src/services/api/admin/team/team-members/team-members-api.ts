@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/common';
-import { TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../types/admin/team-members';
+import { TeamMember, TeamMemberCreateUpdateRequest, TeamMemberDto } from '../../../../../types/admin/team-members';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
 import { ImageApi } from '../../image/image-api';
 
@@ -11,7 +11,7 @@ export const TeamMembersApi = {
         status?: VisibilityStatus | null,
         offset?: number,
         limit?: number,
-    ): Promise<PaginationResult<TeamMember>> => {
+    ): Promise<PaginationResult<TeamMemberDto>> => {
         const params: Record<string, any> = {};
 
         if (categoryId !== undefined && categoryId !== null) {
@@ -27,7 +27,7 @@ export const TeamMembersApi = {
             params.limit = Math.floor(limit);
         }
 
-        const response = await client.get<PaginationResult<TeamMember>>(`${API_ROUTES.TEAM.BASE}`, { params });
+        const response = await client.get<PaginationResult<TeamMemberDto>>(`${API_ROUTES.TEAM.BASE}`, { params });
         return response.data;
     },
 

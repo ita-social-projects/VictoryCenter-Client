@@ -9,7 +9,7 @@ interface StatusFilterDropdownProps {
 
 export const StatusFilterDropdown = ({ onStatusFilterChange }: StatusFilterDropdownProps) => {
     return (
-        <Select<VisibilityStatus | undefined> onValueChange={onStatusFilterChange}>
+        <Select<VisibilityStatus | undefined> onValueChange={onStatusFilterChange} data-testId="status-filter">
             {Object.entries(COMMON_TEXT_ADMIN.FILTER.STATUS).map(([, value], index) => (
                 <Select.Option key={index} value={mapLabelToStatus(value)} name={value} />
             ))}

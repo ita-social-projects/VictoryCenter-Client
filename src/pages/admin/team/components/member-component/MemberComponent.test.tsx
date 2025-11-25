@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { DEFAULT_LOCALE } from '../../../../../const/common/locales';
+import { returnDisplayedLocale } from '../../../../../utils/functions/localization/localization';
 
 jest.mock('../../../../../assets/icons/blank-user.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="blank-user-icon" />,
@@ -13,6 +14,10 @@ jest.mock('../../../../../components/admin/visibility-status-label/VisibilitySta
     VisibilityStatusLabel: ({ status }: { status: VisibilityStatus }) => (
         <div data-testid="visibility-label">{`Status: ${status}`}</div>
     ),
+}));
+
+jest.mock('../../../../../utils/functions/localization/localization', () => ({
+    returnDisplayedLocale: jest.fn(),
 }));
 
 const baseMember = {
@@ -80,5 +85,29 @@ describe('MemberComponent', () => {
         const deleteBtn = screen.getByRole('button', { name: TEAM_MEMBERS_TEXT.ACTIONS.DELETE });
         fireEvent.click(deleteBtn);
         expect(handleOnDeleteMember).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+    });
+
+    it('renders localized fullName and description when localization exists', () => {
+        (returnDisplayedLocale as jest.Mock).mockReturnValue({
+            fullName: 'Localized Name',
+            description: 'Localized Description',
+        });
+
+        renderComponent();
+
+        expect(screen.getByText('Localized Name')).toBeInTheDocument();
+        expect(screen.getByText('Localized Description')).toBeInTheDocument();
+    });
+
+    it('shows fallback icon when image fails to load', () => {
+        renderComponent({
+            image: { id: 10, url: 'broken-image-url.png', mimeType: 'image/png' },
+        });
+
+        const img = screen.getByRole('img');
+
+        fireEvent.error(img);
+
+        expect(screen.getByTestId('blank-user-icon')).toBeInTheDocument();
     });
 });

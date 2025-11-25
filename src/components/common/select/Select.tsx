@@ -13,6 +13,7 @@ export type SelectProps<TValue> = {
     placeholder?: string;
     className?: string;
     isAutocomplete?: boolean;
+    'data-testId'?: string;
     icon?: React.ElementType<React.SVGProps<SVGSVGElement>>;
 };
 
@@ -24,6 +25,7 @@ export const Select = <TValue,>({
     className,
     placeholder,
     isAutocomplete = false,
+    'data-testId': dataTestId,
     icon: Icon,
 }: SelectProps<TValue>) => {
     const options = React.Children.toArray(children).filter((child) => {
@@ -65,6 +67,7 @@ export const Select = <TValue,>({
     return (
         <div
             role={'toolbar'}
+            data-testId={dataTestId}
             ref={selectContainerRef}
             onClick={handleContainerClick}
             className={classNames('select', className, {

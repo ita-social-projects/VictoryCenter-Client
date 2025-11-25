@@ -5,7 +5,7 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './TeamPageContent.scss';
 import { TeamMember } from '../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { VisibilityStatus } from '../../../../../types/admin/common';
+import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/common';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
 import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/category-bar/CategoryBar';
@@ -21,13 +21,15 @@ import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useM
 import { TeamPageModals } from '../team-page-modals/TeamPageModals';
 import { useTeamMemberSearch } from '../../../../../hooks/admin/team/useTeamMemberSearch';
 import { updateCategoryMemberCounts } from '../../../../../utils/functions/update-category-member-counts/update-category-member-counts';
+import { useLocalizationToolkit } from '../../../../../hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { mapEntityWithLocalizations } from '../../../../../utils/functions/mappers/common/localization/localization-mappers';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
 
 interface ErrorState {
     message: string | null;
-    type: 'categories' | 'members' | null;
+    type: 'categories' | 'members' | 'languages' | null;
 }
 
 export const TeamPageContent = () => {
@@ -66,7 +68,7 @@ export const TeamPageContent = () => {
     const isCategoriesLoadingRef = useRef(false);
     const abortControllerRef = useRef<AbortController | null>(null);
 
-    const setErrorState = useCallback((message: string, type: 'categories' | 'members') => {
+    const setErrorState = useCallback((message: string, type: 'categories' | 'members' | 'languages') => {
         setError({ message, type });
     }, []);
 
@@ -95,6 +97,15 @@ export const TeamPageContent = () => {
         ],
         [],
     );
+
+    const {
+        allLanguages,
+        translationLanguages,
+        selectedLanguage,
+        onLanguageChange,
+        translationStatusFilter,
+        onTranslationStatusFilterChange,
+    } = useLocalizationToolkit({ client, setErrorState });
 
     const isSingleView = !!selectedSearchMember;
     const itemsToRender = useMemo(() => {
@@ -184,16 +195,21 @@ export const TeamPageContent = () => {
                     pageSize,
                 );
 
+                const mappedMembers: PaginationResult<TeamMember> = {
+                    items: fetchedMembers.items.map((item) => mapEntityWithLocalizations(item)),
+                    totalItemsCount: fetchedMembers.totalItemsCount,
+                };
+
                 if (abortController.signal.aborted) {
                     return;
                 }
 
                 setMembers((prev) => {
                     if (shouldResetList) {
-                        return [...fetchedMembers.items];
+                        return [...mappedMembers.items];
                     } else {
                         const existingIds = new Set(prev.map((m) => m.id));
-                        const uniqueFetchedMembers = fetchedMembers.items.filter((m) => !existingIds.has(m.id));
+                        const uniqueFetchedMembers = mappedMembers.items.filter((m) => !existingIds.has(m.id));
                         return [...prev, ...uniqueFetchedMembers];
                     }
                 });
@@ -201,13 +217,13 @@ export const TeamPageContent = () => {
                 currentPageRef.current = pageToFetch + 1;
 
                 if (shouldResetList) {
-                    currentItemsCountRef.current = fetchedMembers.items.length;
+                    currentItemsCountRef.current = mappedMembers.items.length;
                 } else {
-                    currentItemsCountRef.current += fetchedMembers.items.length;
+                    currentItemsCountRef.current += mappedMembers.items.length;
                 }
 
-                setHasMore(currentItemsCountRef.current < fetchedMembers.totalItemsCount);
-                hasMoreRef.current = currentItemsCountRef.current < fetchedMembers.totalItemsCount;
+                setHasMore(currentItemsCountRef.current < mappedMembers.totalItemsCount);
+                hasMoreRef.current = currentItemsCountRef.current < mappedMembers.totalItemsCount;
             } catch (error: any) {
                 if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                     return;
@@ -468,6 +484,8 @@ export const TeamPageContent = () => {
                         member={m}
                         handleOnDeleteMember={handleDeleteTeamMemberModalOpen}
                         handleOnEditMember={handleEditMemberModalOpen}
+                        language={selectedLanguage!}
+                        translationLanguages={translationLanguages}
                     />
                 )}
                 entities={members}
@@ -475,7 +493,13 @@ export const TeamPageContent = () => {
                 onEntitiesReordered={handleEntitiesReordered}
             ></DraggableListItem>
         ),
-        [handleDeleteTeamMemberModalOpen, handleEditMemberModalOpen, handleEntitiesReordered, members],
+        [
+            handleDeleteTeamMemberModalOpen,
+            handleEditMemberModalOpen,
+            handleEntitiesReordered,
+            members,
+            selectedLanguage,
+        ],
     );
 
     return (
@@ -492,6 +516,9 @@ export const TeamPageContent = () => {
                     categories={categories}
                     onSearchItemSelect={handleSearchItemSelect}
                     onSearchClear={handleSearchClearSelection}
+                    languages={allLanguages}
+                    onLanguageChange={onLanguageChange}
+                    onTranslationStatusFilterChange={onTranslationStatusFilterChange}
                 />
             </div>
 

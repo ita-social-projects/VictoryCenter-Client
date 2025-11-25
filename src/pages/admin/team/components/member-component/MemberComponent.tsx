@@ -3,7 +3,7 @@ import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { ReactComponent as BlankUserImage } from '../../../../../assets/icons/blank-user.svg';
 import { TeamMember, TeamMemberLocalizableFields } from '../../../../../types/admin/team-members';
 import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
-import { returnDisplayedLocale as returnDisplayedLocalization } from '../../../../../utils/functions/localization/localization';
+import { returnDisplayedLocalization } from '../../../../../utils/functions/localization/localization';
 import { LocalizationLanguage } from '../../../../../types/common/language';
 import { LocalizationStatuses } from '../../../../../components/admin/localization-statuses/LocalizationStatuses';
 import './MemberComponent.scss';

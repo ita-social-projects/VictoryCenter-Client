@@ -1,6 +1,6 @@
 import { EntityLocalization, EntityWithLocalizations } from '../../../types/common/language';
 
-export const returnDisplayedLocale = <TLocalization extends EntityLocalization>(
+export const returnDisplayedLocalization = <TLocalization extends EntityLocalization>(
     localizedEntity: EntityWithLocalizations<TLocalization>,
     languageCode: string,
 ): TLocalization | null => {

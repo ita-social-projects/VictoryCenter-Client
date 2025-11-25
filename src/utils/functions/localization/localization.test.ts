@@ -1,4 +1,4 @@
-import { returnDisplayedLocale } from './localization';
+import { returnDisplayedLocalization } from './localization';
 import { EntityWithLocalizations, EntityLocalization, TranslationStatus } from '../../../types/common/language';
 
 interface TestLocalization extends EntityLocalization {
@@ -28,7 +28,7 @@ describe('returnDisplayedLocale', () => {
             createLocalization(1, 'ua', TranslationStatus.Relevant, { fullName: 'John UA' }),
         ]);
 
-        const result = returnDisplayedLocale(entity, 'ua');
+        const result = returnDisplayedLocalization(entity, 'ua');
 
         expect(result).not.toBeNull();
         expect(result?.language.code).toBe('ua');
@@ -38,7 +38,7 @@ describe('returnDisplayedLocale', () => {
     it('should return null when language code not found', () => {
         const entity = createEntity([createLocalization(2, 'en', TranslationStatus.Relevant)]);
 
-        const result = returnDisplayedLocale(entity, 'fr');
+        const result = returnDisplayedLocalization(entity, 'fr');
 
         expect(result).toBeNull();
     });
@@ -46,7 +46,7 @@ describe('returnDisplayedLocale', () => {
     it('should return null when localizations array is empty', () => {
         const entity = createEntity([]);
 
-        const result = returnDisplayedLocale(entity, 'en');
+        const result = returnDisplayedLocalization(entity, 'en');
 
         expect(result).toBeNull();
     });

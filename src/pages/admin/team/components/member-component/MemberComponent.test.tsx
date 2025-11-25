@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { DEFAULT_LOCALE } from '../../../../../const/common/locales';
-import { returnDisplayedLocale } from '../../../../../utils/functions/localization/localization';
+import { returnDisplayedLocalization } from '../../../../../utils/functions/localization/localization';
 
 jest.mock('../../../../../assets/icons/blank-user.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="blank-user-icon" />,
@@ -88,7 +88,7 @@ describe('MemberComponent', () => {
     });
 
     it('renders localized fullName and description when localization exists', () => {
-        (returnDisplayedLocale as jest.Mock).mockReturnValue({
+        (returnDisplayedLocalization as jest.Mock).mockReturnValue({
             fullName: 'Localized Name',
             description: 'Localized Description',
         });

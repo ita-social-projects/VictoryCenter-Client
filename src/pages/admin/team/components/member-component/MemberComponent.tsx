@@ -33,14 +33,10 @@ export const MemberComponent = ({
 
     useEffect(() => {
         const displayedLocalization = returnDisplayedLocalization(member, language.code);
-        if (displayedLocalization) {
-            setTextFields({
-                fullName: displayedLocalization?.fullName || '',
-                description: displayedLocalization?.description || '',
-            });
-        } else {
-            setTextFields({ fullName: member.fullName, description: member.description });
-        }
+        setTextFields({
+            fullName: displayedLocalization?.fullName || member.fullName,
+            description: displayedLocalization?.description || member.description,
+        });
     }, [language, member]);
 
     const handleEditMember = () => {

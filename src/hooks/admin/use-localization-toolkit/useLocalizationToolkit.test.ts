@@ -12,7 +12,6 @@ jest.mock('axios');
 const mockedFetch = localizationLanguagesDataFetch as jest.MockedFunction<typeof localizationLanguagesDataFetch>;
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-const mockClient = {} as any;
 const mockSetErrorState = jest.fn();
 
 const languagesMock = [
@@ -30,7 +29,6 @@ describe('useLocalizationToolkit', () => {
     it('should initialize with default state', () => {
         const { result } = renderHook(() =>
             useLocalizationToolkit({
-                client: mockClient,
                 setErrorState: mockSetErrorState,
             }),
         );
@@ -46,7 +44,6 @@ describe('useLocalizationToolkit', () => {
 
         const { result } = renderHook(() =>
             useLocalizationToolkit({
-                client: mockClient,
                 setErrorState: mockSetErrorState,
             }),
         );
@@ -64,7 +61,6 @@ describe('useLocalizationToolkit', () => {
 
         renderHook(() =>
             useLocalizationToolkit({
-                client: mockClient,
                 setErrorState: mockSetErrorState,
             }),
         );
@@ -82,7 +78,6 @@ describe('useLocalizationToolkit', () => {
 
         renderHook(() =>
             useLocalizationToolkit({
-                client: mockClient,
                 setErrorState: mockSetErrorState,
             }),
         );
@@ -97,7 +92,6 @@ describe('useLocalizationToolkit', () => {
 
         const { result } = renderHook(() =>
             useLocalizationToolkit({
-                client: mockClient,
                 setErrorState: mockSetErrorState,
             }),
         );
@@ -114,7 +108,6 @@ describe('useLocalizationToolkit', () => {
     it('should update translation status filter via onTranslationStatusFilterChange', () => {
         const { result } = renderHook(() =>
             useLocalizationToolkit({
-                client: mockClient,
                 setErrorState: mockSetErrorState,
             }),
         );
@@ -134,7 +127,6 @@ describe('useLocalizationToolkit', () => {
 
         const { result } = renderHook(() =>
             useLocalizationToolkit({
-                client: mockClient,
                 setErrorState: mockSetErrorState,
             }),
         );

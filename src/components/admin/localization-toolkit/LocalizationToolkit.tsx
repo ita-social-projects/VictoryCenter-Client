@@ -37,6 +37,7 @@ export const LocalizationToolkit = ({
         const defaultLanguage = languages.find((language) => language.code === DEFAULT_LOCALE) || languages[0];
         changeLanguage(defaultLanguage);
         changeTranslationStatus(TranslationStatusFilter.All);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [languages]);
 
     return (

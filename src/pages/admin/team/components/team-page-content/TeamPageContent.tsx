@@ -98,14 +98,8 @@ export const TeamPageContent = () => {
         [],
     );
 
-    const {
-        allLanguages,
-        translationLanguages,
-        selectedLanguage,
-        onLanguageChange,
-        translationStatusFilter,
-        onTranslationStatusFilterChange,
-    } = useLocalizationToolkit({ client, setErrorState });
+    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, onTranslationStatusFilterChange } =
+        useLocalizationToolkit({ setErrorState });
 
     const isSingleView = !!selectedSearchMember;
     const itemsToRender = useMemo(() => {
@@ -499,6 +493,7 @@ export const TeamPageContent = () => {
             handleEntitiesReordered,
             members,
             selectedLanguage,
+            translationLanguages,
         ],
     );
 

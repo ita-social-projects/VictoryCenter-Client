@@ -41,7 +41,7 @@ export const MemberComponent = ({
         } else {
             setTextFields({ fullName: member.fullName, description: member.description });
         }
-    }, [language]);
+    }, [language, member]);
 
     const handleEditMember = () => {
         handleOnEditMember(member);

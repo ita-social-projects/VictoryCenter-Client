@@ -1,16 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import { LocalizationLanguage, TranslationStatusFilter } from '../../../types/common/language';
 import { localizationLanguagesDataFetch } from '../../../services/api/public/localization/languages/languages-api';
-import axios, { AxiosInstance } from 'axios';
+import axios from 'axios';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { DEFAULT_LOCALE } from '../../../const/common/locales';
 
 export interface UseLocalizationToolkitProps {
-    client: AxiosInstance;
     setErrorState: (message: string, type: any) => void;
 }
 
-export function useLocalizationToolkit({ client, setErrorState }: UseLocalizationToolkitProps) {
+export function useLocalizationToolkit({ setErrorState }: UseLocalizationToolkitProps) {
     const [allLanguages, setAllLanguages] = useState<LocalizationLanguage[]>([]);
     const [translationLanguages, setTranslationLanguages] = useState<LocalizationLanguage[]>([]);
     const [selectedLanguage, setSelectedLanguage] = useState<LocalizationLanguage>();
@@ -37,7 +36,7 @@ export function useLocalizationToolkit({ client, setErrorState }: UseLocalizatio
 
             setErrorState(COMMON_TEXT_ADMIN.LOCALIZATION.LANGUAGES.MESSAGE.FAILED_TO_FETCH_LANGUAGES, 'languages');
         }
-    }, [client]);
+    }, [setErrorState]);
 
     useEffect(() => {
         fetchLanguages();

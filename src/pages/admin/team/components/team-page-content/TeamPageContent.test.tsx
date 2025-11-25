@@ -68,7 +68,7 @@ jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
                     data-testid="translation-status-filter"
                     onChange={(e) => {
                         const value = e.target.value;
-                        props.onLanguageChange(value);
+                        props.onTranslationStatusFilterChange(value);
                     }}
                 >
                     <option value={TranslationStatusFilter.All}>All</option>

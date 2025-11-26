@@ -1,0 +1,72 @@
+@import "../../../../../assets/sass/variables/colors.scss";
+
+.root {
+  margin-top: 64px; // TODO: fix PublicLayout Header uses fixed position conflicting with main content (cover content)
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "collected"
+    "expenses"
+    "income"
+    "programs"
+    "lives";
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "collected expenses"
+      "income    programs"
+      "lives     lives";
+  }
+
+  @media (min-width: 1440px) {
+    grid-template-columns: 2.25fr 2fr 1fr;
+    grid-template-areas:
+      "collected expenses lives"
+      "income    programs lives";
+  }
+}
+
+.collected {
+  grid-area: collected;
+  height: 200px;
+  background: url('../../../../../assets/images/public/reports-page/collected.jpg') center/cover no-repeat;
+
+  @media (min-width: 768px) {
+    height: 485px;
+  }
+
+  @media (min-width: 1440px) {
+    height: 555px;
+  }
+}
+
+.expenses {
+  grid-area: expenses;
+  background-color: $light-blue-600;
+}
+
+.income {
+  grid-area: income;
+  background-color: $blue-500;
+}
+
+.programs {
+  grid-area: programs;
+  background-color: $yellow-300;
+}
+
+.lives {
+  grid-area: lives;
+  height: 200px;
+  background: url('../../../../../assets/images/public/reports-page/lives-changed.jpg') center/cover no-repeat;
+
+  @media (min-width: 768px) {
+    height: 240px;
+  }
+
+  @media (min-width: 1440px) {
+    height: auto;
+  }
+}

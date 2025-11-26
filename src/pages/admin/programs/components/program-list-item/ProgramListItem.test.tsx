@@ -1,179 +1,179 @@
-// import React from 'react';
-// import '@testing-library/jest-dom';
-// import { fireEvent, render, screen } from '@testing-library/react';
-// import { ProgramListItem } from './ProgramListItem';
-// import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-// import { VisibilityStatusLabelProps } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
-// import { VisibilityStatus } from '../../../../../types/admin/common';
-// import { Program } from '../../../../../types/admin/programs';
+import React from 'react';
+import '@testing-library/jest-dom';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { ProgramListItem } from './ProgramListItem';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { VisibilityStatusLabelProps } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
+import { VisibilityStatus } from '../../../../../types/admin/common';
+import { Program } from '../../../../../types/admin/programs';
 
-// jest.mock('../../../../../assets/icons/blank-image.svg', () => ({
-//     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="blank-image" className={className} />,
-// }));
+jest.mock('../../../../../assets/icons/blank-image.svg', () => ({
+    ReactComponent: ({ className }: { className?: string }) => <svg data-testid="blank-image" className={className} />,
+}));
 
-// jest.mock('../../../../../components/admin/button-tooltip/ButtonTooltip', () => ({
-//     ButtonTooltip: ({ children, position }: { children: React.ReactNode; position: string }) => {
-//         return (
-//             <div data-testid="tooltip-button" data-position={position}>
-//                 {children}
-//             </div>
-//         );
-//     },
-// }));
+jest.mock('../../../../../components/admin/button-tooltip/ButtonTooltip', () => ({
+    ButtonTooltip: ({ children, position }: { children: React.ReactNode; position: string }) => {
+        return (
+            <div data-testid="tooltip-button" data-position={position}>
+                {children}
+            </div>
+        );
+    },
+}));
 
-// jest.mock('../../../../../components/admin/visibility-status-label/VisibilityStatusLabel', () => {
-//     const { VisibilityStatus } = require('../../../../../types/admin/common');
-//     return {
-//         VisibilityStatusLabel: ({ status }: VisibilityStatusLabelProps) => {
-//             return <div data-testid="status">{VisibilityStatus[status]}</div>;
-//         },
-//     };
-// });
+jest.mock('../../../../../components/admin/visibility-status-label/VisibilityStatusLabel', () => {
+    const { VisibilityStatus } = require('../../../../../types/admin/common');
+    return {
+        VisibilityStatusLabel: ({ status }: VisibilityStatusLabelProps) => {
+            return <div data-testid="status">{VisibilityStatus[status]}</div>;
+        },
+    };
+});
 
-// describe('ProgramListItem', () => {
-//     const mockProgram: Program = {
-//         id: 1,
-//         name: 'Test Program',
-//         description: 'Test program description',
-//         status: VisibilityStatus.Published,
-//         image: null,
-//         categories: [
-//             { id: 1, name: 'Category 1', programsCount: 1 },
-//             { id: 2, name: 'Category 2', programsCount: 2 },
-//         ],
-//     };
+describe('ProgramListItem', () => {
+    const mockProgram: Program = {
+        id: 1,
+        name: 'Test Program',
+        description: 'Test program description',
+        status: VisibilityStatus.Published,
+        image: null,
+        categories: [
+            { id: 1, name: 'Category 1', programsCount: 1 },
+            { id: 2, name: 'Category 2', programsCount: 2 },
+        ],
+    };
 
-//     const mockHandleOnDeleteProgram = jest.fn();
-//     const mockHandleOnEditProgram = jest.fn();
+    const mockHandleOnDeleteProgram = jest.fn();
+    const mockHandleOnEditProgram = jest.fn();
 
-//     const defaultProps = {
-//         program: mockProgram,
-//         handleOnDeleteProgram: mockHandleOnDeleteProgram,
-//         handleOnEditProgram: mockHandleOnEditProgram,
-//     };
+    const defaultProps = {
+        program: mockProgram,
+        handleOnDeleteProgram: mockHandleOnDeleteProgram,
+        handleOnEditProgram: mockHandleOnEditProgram,
+    };
 
-//     const renderProgramListItem = (overrideProps: Partial<typeof defaultProps> = {}) =>
-//         render(<ProgramListItem {...defaultProps} {...overrideProps} />);
+    const renderProgramListItem = (overrideProps: Partial<typeof defaultProps> = {}) =>
+        render(<ProgramListItem {...defaultProps} {...overrideProps} />);
 
-//     const getProgramName = () => screen.getByText('Test Program');
-//     const getProgramDescription = () => screen.getByText('Test program description');
-//     const getProgramImage = () => screen.queryByAltText('Test Program-img');
-//     const getBlankImage = () => screen.getByTestId('blank-image');
-//     const getStatusComponent = () => screen.getByTestId('status');
-//     const getTooltipButton = () => screen.getByTestId('tooltip-button');
+    const getProgramName = () => screen.getByText('Test Program');
+    const getProgramDescription = () => screen.getByText('Test program description');
+    const getProgramImage = () => screen.queryByAltText('Test Program-img');
+    const getBlankImage = () => screen.getByTestId('blank-image');
+    const getStatusComponent = () => screen.getByTestId('status');
+    const getTooltipButton = () => screen.getByTestId('tooltip-button');
 
-//     const getPublishedTooltipText = () => screen.getByText(COMMON_TEXT_ADMIN.TOOLTIP.PUBLISHED_IN);
-//     const getDraftedTooltipText = () => screen.getByText(COMMON_TEXT_ADMIN.TOOLTIP.DRAFTED_IN);
-//     const getEditButton = () => document.querySelector('.edit-btn') as HTMLElement;
-//     const getDeleteButton = () => document.querySelector('.delete-btn') as HTMLElement;
+    const getPublishedTooltipText = () => screen.getByText(COMMON_TEXT_ADMIN.TOOLTIP.PUBLISHED_IN);
+    const getDraftedTooltipText = () => screen.getByText(COMMON_TEXT_ADMIN.TOOLTIP.DRAFTED_IN);
+    const getEditButton = () => document.querySelector('.edit-btn') as HTMLElement;
+    const getDeleteButton = () => document.querySelector('.delete-btn') as HTMLElement;
 
-//     const getProgramItem = () => document.querySelector('.program-item');
-//     const getProgramInfo = () => document.querySelector('.program-info');
-//     const getProgramActions = () => document.querySelector('.program-actions');
-//     const getProgramActionsButtons = () => document.querySelector('.program-actions-buttons');
+    const getProgramItem = () => document.querySelector('.program-item');
+    const getProgramInfo = () => document.querySelector('.program-info');
+    const getProgramActions = () => document.querySelector('.program-actions');
+    const getProgramActionsButtons = () => document.querySelector('.program-actions-buttons');
 
-//     const clickEditButton = () => fireEvent.click(getEditButton());
-//     const clickDeleteButton = () => fireEvent.click(getDeleteButton());
+    const clickEditButton = () => fireEvent.click(getEditButton());
+    const clickDeleteButton = () => fireEvent.click(getDeleteButton());
 
-//     const expectEditProgramCalled = () => {
-//         expect(mockHandleOnEditProgram).toHaveBeenCalledTimes(1);
-//         expect(mockHandleOnEditProgram).toHaveBeenCalledWith(mockProgram);
-//     };
+    const expectEditProgramCalled = () => {
+        expect(mockHandleOnEditProgram).toHaveBeenCalledTimes(1);
+        expect(mockHandleOnEditProgram).toHaveBeenCalledWith(mockProgram);
+    };
 
-//     const expectDeleteProgramCalled = () => {
-//         expect(mockHandleOnDeleteProgram).toHaveBeenCalledTimes(1);
-//         expect(mockHandleOnDeleteProgram).toHaveBeenCalledWith(mockProgram);
-//     };
+    const expectDeleteProgramCalled = () => {
+        expect(mockHandleOnDeleteProgram).toHaveBeenCalledTimes(1);
+        expect(mockHandleOnDeleteProgram).toHaveBeenCalledWith(mockProgram);
+    };
 
-//     it('renders program information correctly', () => {
-//         renderProgramListItem();
+    it('renders program information correctly', () => {
+        renderProgramListItem();
 
-//         expect(getProgramName()).toBeInTheDocument();
-//         expect(getProgramDescription()).toBeInTheDocument();
-//         expect(getBlankImage()).toBeInTheDocument();
-//     });
+        expect(getProgramName()).toBeInTheDocument();
+        expect(getProgramDescription()).toBeInTheDocument();
+        expect(getBlankImage()).toBeInTheDocument();
+    });
 
-//     it('uses blank image when program image is not provided', () => {
-//         const programWithoutImage = { ...mockProgram, img: null };
-//         renderProgramListItem({ program: programWithoutImage });
+    it('uses blank image when program image is not provided', () => {
+        const programWithoutImage = { ...mockProgram, img: null };
+        renderProgramListItem({ program: programWithoutImage });
 
-//         expect(getBlankImage()).toBeInTheDocument();
-//         expect(getBlankImage()).toHaveClass('program-info-identity-blank-image');
-//         expect(getProgramImage()).not.toBeInTheDocument();
-//     });
+        expect(getBlankImage()).toBeInTheDocument();
+        expect(getBlankImage()).toHaveClass('program-info-identity-blank-image');
+        expect(getProgramImage()).not.toBeInTheDocument();
+    });
 
-//     it('renders status component with correct status', () => {
-//         renderProgramListItem();
+    it('renders status component with correct status', () => {
+        renderProgramListItem();
 
-//         const statusComponent = getStatusComponent();
-//         expect(statusComponent).toHaveTextContent(VisibilityStatus[VisibilityStatus.Published]);
-//     });
+        const statusComponent = getStatusComponent();
+        expect(statusComponent).toHaveTextContent(VisibilityStatus[VisibilityStatus.Published]);
+    });
 
-//     it('displays published tooltip text and categories for published program', () => {
-//         renderProgramListItem();
+    it('displays published tooltip text and categories for published program', () => {
+        renderProgramListItem();
 
-//         expect(getPublishedTooltipText()).toBeInTheDocument();
-//         expect(screen.getByText('Category 1')).toBeInTheDocument();
-//         expect(screen.getByText('Category 2')).toBeInTheDocument();
-//     });
+        expect(getPublishedTooltipText()).toBeInTheDocument();
+        expect(screen.getByText('Category 1')).toBeInTheDocument();
+        expect(screen.getByText('Category 2')).toBeInTheDocument();
+    });
 
-//     it('displays drafted tooltip text for drafted program', () => {
-//         const draftProgram: Program = { ...mockProgram, status: VisibilityStatus.Draft };
-//         renderProgramListItem({ program: draftProgram });
+    it('displays drafted tooltip text for drafted program', () => {
+        const draftProgram: Program = { ...mockProgram, status: VisibilityStatus.Draft };
+        renderProgramListItem({ program: draftProgram });
 
-//         expect(getDraftedTooltipText()).toBeInTheDocument();
-//         expect(screen.getByText('Category 1')).toBeInTheDocument();
-//         expect(screen.getByText('Category 2')).toBeInTheDocument();
-//     });
+        expect(getDraftedTooltipText()).toBeInTheDocument();
+        expect(screen.getByText('Category 1')).toBeInTheDocument();
+        expect(screen.getByText('Category 2')).toBeInTheDocument();
+    });
 
-//     it('calls handleOnEditProgram when edit button is clicked', () => {
-//         renderProgramListItem();
+    it('calls handleOnEditProgram when edit button is clicked', () => {
+        renderProgramListItem();
 
-//         expect(getEditButton()).not.toBeNull();
+        expect(getEditButton()).not.toBeNull();
 
-//         clickEditButton();
+        clickEditButton();
 
-//         expectEditProgramCalled();
-//     });
+        expectEditProgramCalled();
+    });
 
-//     it('calls handleOnDeleteProgram when delete button is clicked', () => {
-//         renderProgramListItem();
+    it('calls handleOnDeleteProgram when delete button is clicked', () => {
+        renderProgramListItem();
 
-//         expect(getDeleteButton()).not.toBeNull();
+        expect(getDeleteButton()).not.toBeNull();
 
-//         clickDeleteButton();
+        clickDeleteButton();
 
-//         expectDeleteProgramCalled();
-//     });
+        expectDeleteProgramCalled();
+    });
 
-//     it('renders tooltip button with correct position and applies proper CSS classes', () => {
-//         renderProgramListItem();
+    it('renders tooltip button with correct position and applies proper CSS classes', () => {
+        renderProgramListItem();
 
-//         const tooltipButton = getTooltipButton();
-//         expect(tooltipButton).toHaveAttribute('data-position', 'bottom');
+        const tooltipButton = getTooltipButton();
+        expect(tooltipButton).toHaveAttribute('data-position', 'bottom');
 
-//         expect(getProgramItem()).toBeInTheDocument();
-//         expect(getProgramInfo()).toBeInTheDocument();
-//         expect(getProgramActions()).toBeInTheDocument();
-//         expect(getProgramActionsButtons()).toBeInTheDocument();
-//     });
+        expect(getProgramItem()).toBeInTheDocument();
+        expect(getProgramInfo()).toBeInTheDocument();
+        expect(getProgramActions()).toBeInTheDocument();
+        expect(getProgramActionsButtons()).toBeInTheDocument();
+    });
 
-//     it('displays image when program has an image and', () => {
-//         const programWithImage: Program = {
-//             ...mockProgram,
-//             image: {
-//                 id: 1,
-//                 url: 'test-base64',
-//                 mimeType: 'image/png',
-//             },
-//         };
+    it('displays image when program has an image and', () => {
+        const programWithImage: Program = {
+            ...mockProgram,
+            image: {
+                id: 1,
+                url: 'test-base64',
+                mimeType: 'image/png',
+            },
+        };
 
-//         renderProgramListItem({ program: programWithImage });
+        renderProgramListItem({ program: programWithImage });
 
-//         const imgElement = getProgramImage();
-//         expect(imgElement).toBeInTheDocument();
-//         expect(imgElement).toHaveAttribute('alt', 'Test Program-img');
-//         expect(imgElement).toHaveAttribute('src', 'test-base64');
-//         expect(screen.queryByTestId('blank-image')).not.toBeInTheDocument();
-//     });
-// });
+        const imgElement = getProgramImage();
+        expect(imgElement).toBeInTheDocument();
+        expect(imgElement).toHaveAttribute('alt', 'Test Program-img');
+        expect(imgElement).toHaveAttribute('src', 'test-base64');
+        expect(screen.queryByTestId('blank-image')).not.toBeInTheDocument();
+    });
+});

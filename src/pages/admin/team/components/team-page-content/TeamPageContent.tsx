@@ -98,8 +98,14 @@ export const TeamPageContent = () => {
         [],
     );
 
-    const { allLanguages, translationLanguages, selectedLanguage, onLanguageChange, onTranslationStatusFilterChange } =
-        useLocalizationToolkit({ setErrorState });
+    const {
+        allLanguages,
+        translationLanguages,
+        selectedLanguage,
+        onLanguageChange,
+        translationStatusFilter,
+        onTranslationStatusFilterChange,
+    } = useLocalizationToolkit({ setErrorState });
 
     const isSingleView = !!selectedSearchMember;
     const itemsToRender = useMemo(() => {
@@ -185,6 +191,7 @@ export const TeamPageContent = () => {
                     client,
                     searchCategoryId.id,
                     searchStatus,
+                    translationStatusFilter,
                     offset,
                     pageSize,
                 );
@@ -234,6 +241,7 @@ export const TeamPageContent = () => {
             setErrorState,
             pageSize,
             statusFilter,
+            translationStatusFilter,
             client,
             isSingleView,
             selectedCategory,

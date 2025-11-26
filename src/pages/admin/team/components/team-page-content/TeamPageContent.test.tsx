@@ -429,6 +429,7 @@ describe('TeamPageContent', () => {
                     mockCategories[0].id,
                     undefined,
                     0,
+                    0,
                     5,
                 );
             });
@@ -444,6 +445,7 @@ describe('TeamPageContent', () => {
                     mockClient,
                     mockCategories[1].id,
                     undefined,
+                    0,
                     0,
                     5,
                 );
@@ -481,7 +483,14 @@ describe('TeamPageContent', () => {
             changeStatusFilter(VisibilityStatus.Published.toString());
 
             await waitFor(() => {
-                expect(mockTeamMembersApi.getAll).toHaveBeenLastCalledWith(mockClient, mockCategories[0].id, '1', 0, 5);
+                expect(mockTeamMembersApi.getAll).toHaveBeenLastCalledWith(
+                    mockClient,
+                    mockCategories[0].id,
+                    '1',
+                    0,
+                    0,
+                    5,
+                );
             });
         });
 
@@ -1298,6 +1307,7 @@ describe('TeamPageContent', () => {
                         mockClient,
                         mockCategories[0].id,
                         undefined,
+                        0,
                         5,
                         5,
                     );

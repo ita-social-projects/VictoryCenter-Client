@@ -3,12 +3,14 @@ import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/c
 import { TeamMember, TeamMemberCreateUpdateRequest, TeamMemberDto } from '../../../../../types/admin/team-members';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
 import { ImageApi } from '../../image/image-api';
+import { TranslationStatusFilter } from '../../../../../types/common/language';
 
 export const TeamMembersApi = {
     getAll: async (
         client: AxiosInstance,
         categoryId?: number,
         status?: VisibilityStatus | null,
+        translationStatusFilter?: TranslationStatusFilter | null,
         offset?: number,
         limit?: number,
     ): Promise<PaginationResult<TeamMemberDto>> => {
@@ -19,6 +21,9 @@ export const TeamMembersApi = {
         }
         if (status !== undefined) {
             params.status = status;
+        }
+        if (translationStatusFilter !== undefined && translationStatusFilter !== null) {
+            params.translationStatusFilter = translationStatusFilter;
         }
         if (offset !== undefined && offset !== null) {
             params.offset = offset;

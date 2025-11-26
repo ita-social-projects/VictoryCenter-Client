@@ -52,9 +52,7 @@ export const Footer = () => {
 
                 <div className="menu">
                     <span className="title">{t('MENU')}</span>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
-                        {t('REPORTING')}
-                    </Link>
+                    <Link to={PUBLIC_ROUTES.REPORTS.FULL}>{t('REPORTING')}</Link>
                     <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {t('STORE')}
                     </Link>

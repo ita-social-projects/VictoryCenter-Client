@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
 import { Program, ProgramCategory, ProgramCreateUpdate } from '../../../../../../types/admin/programs';
 import { VisibilityStatus, PendingAction, ModalMode } from '../../../../../../types/admin/common';
@@ -35,6 +35,8 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const program = isEditMode ? props.programToEdit : undefined;
     const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
 
+    const [selectedLanguage, setSelectedLanguage] = useState<string>('Українська');
+
     const initialData = useMemo<ProgramFormValues | null>(() => {
         if (!isEditMode || !program) return null;
 
@@ -44,6 +46,12 @@ export const ProgramModal = (props: ProgramModalProps) => {
             categories: program.categories.map((c) => ({ ...c, programsCount: c.programsCount ?? 0 })),
             image: program.image,
             imageId: program.image && 'id' in program.image ? program.image.id : null,
+            location: program.location,
+            participantsCount: program.participantsCount,
+            meetingCount: program.meetingCount,
+            // backgroundImage: program.backgroundImage || null,
+            // backgroundImageId:
+            //     program.backgroundImage && 'id' in program.backgroundImage ? program.backgroundImage.id : null,
         };
     }, [program, isEditMode]);
 
@@ -93,6 +101,9 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 status: status,
                 categoryIds: formData.categories.map((x) => x.id),
                 imageId: initialData?.imageId ?? null,
+                location: formData.location,
+                participantsCount: formData.participantsCount,
+                meetingCount: formData.meetingCount,
             }),
         }),
         [isEditMode, isOpen, mode, onClose, onSuccess, program, client, initialData],
@@ -100,12 +111,17 @@ export const ProgramModal = (props: ProgramModalProps) => {
 
     const modalHookData = useGenericModal<ProgramFormValues, Program, ProgramFormRef>(modalConfig);
 
-    const title = isEditMode ? PROGRAMS_TEXT.FORM.TITLE.EDIT_PROGRAM : PROGRAMS_TEXT.FORM.TITLE.ADD_PROGRAM;
+    const handleLanguageChange = useCallback((language: string) => {
+        setSelectedLanguage(language);
+    }, []);
+
+    const handleAddNewSection = useCallback(() => {
+        // TODO: Implement add new section logic
+    }, []);
 
     return (
         <GenericModalWrapper
             isOpen={isOpen}
-            title={title}
             onClose={modalHookData.handleClose}
             onFormValidationChange={modalHookData.handleFormValidationChange}
             onFormSubmit={modalHookData.handleFormSubmit}
@@ -117,7 +133,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
             onCancelClose={modalHookData.handleCancelClose}
             {...modalHookData}
             initialData={initialData}
-            categories={categories}
+            fullScreen={true}
             renderForm={(props) => (
                 <ProgramForm
                     ref={modalHookData.formRef}
@@ -127,6 +143,9 @@ export const ProgramModal = (props: ProgramModalProps) => {
                     onSubmit={props.onSubmit}
                     categories={categories}
                     onValidationChange={props.onValidationChange}
+                    selectedLanguage={selectedLanguage}
+                    onLanguageChange={handleLanguageChange}
+                    onAddSection={handleAddNewSection}
                 />
             )}
         />

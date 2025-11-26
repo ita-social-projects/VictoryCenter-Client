@@ -46,6 +46,29 @@ export const programValidationSchema = Yup.object({
             if (value === undefined || value === '') return null;
             return value;
         }),
+    location: Yup.string()
+        .max(PROGRAM_VALIDATION.location.max, PROGRAM_VALIDATION.location.getMaxError())
+        .when('$isPublishing', ([isPublishing], schema) =>
+            isPublishing
+                ? schema.required(PROGRAM_VALIDATION.location.getRequiredWhenPublishingError())
+                : schema.notRequired(),
+        ),
+
+    participantsCount: Yup.string()
+        .max(PROGRAM_VALIDATION.participantsCount.max, PROGRAM_VALIDATION.participantsCount.getMaxError())
+        .when('$isPublishing', ([isPublishing], schema) =>
+            isPublishing
+                ? schema.required(PROGRAM_VALIDATION.participantsCount.getRequiredWhenPublishingError())
+                : schema.notRequired(),
+        ),
+
+    meetingCount: Yup.string()
+        .max(PROGRAM_VALIDATION.meetingCount.max, PROGRAM_VALIDATION.meetingCount.getMaxError())
+        .when('$isPublishing', ([isPublishing], schema) =>
+            isPublishing
+                ? schema.required(PROGRAM_VALIDATION.meetingCount.getRequiredWhenPublishingError())
+                : schema.notRequired(),
+        ),
 });
 
 export const PROGRAM_VALIDATION_FUNCTIONS = {
@@ -83,6 +106,36 @@ export const PROGRAM_VALIDATION_FUNCTIONS = {
         const context: ProgramValidationContext = { isPublishing };
         try {
             programValidationSchema.validateSyncAt('image', { image: value }, { context });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validateLocation: (value: string, isPublishing: boolean): string | undefined => {
+        const context: ProgramValidationContext = { isPublishing };
+        try {
+            programValidationSchema.validateSyncAt('location', { location: value }, { context });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validateParticipantsCount: (value: string, isPublishing: boolean): string | undefined => {
+        const context: ProgramValidationContext = { isPublishing };
+        try {
+            programValidationSchema.validateSyncAt('participantsCount', { participantsCount: value }, { context });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validateMeetingCount: (value: string, isPublishing: boolean): string | undefined => {
+        const context: ProgramValidationContext = { isPublishing };
+        try {
+            programValidationSchema.validateSyncAt('meetingCount', { meetingCount: value }, { context });
             return undefined;
         } catch (error: any) {
             return error.message;

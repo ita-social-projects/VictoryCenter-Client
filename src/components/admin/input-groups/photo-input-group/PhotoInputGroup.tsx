@@ -5,10 +5,11 @@ import { ImageInput, ImageInputProps } from '../../image-input/ImageInput';
 import '../input-group.scss';
 
 export interface PhotoInputGroupProps extends ImageInputProps {
-    label: InputLabelProps['text'];
+    label?: InputLabelProps['text'];
     isRequired?: InputLabelProps['isRequired'];
     error?: InputErrorProps['error'];
     id: string;
+    className?: string;
 }
 
 export const PhotoInputGroup = ({
@@ -22,10 +23,11 @@ export const PhotoInputGroup = ({
     disabled,
     error,
     setError,
+    className,
 }: PhotoInputGroupProps) => {
     return (
         <div className="input-group">
-            <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
+            {label && <InputLabel htmlFor={id} text={label} isRequired={isRequired} />}
             <ImageInput
                 id={id}
                 name={name}
@@ -34,6 +36,7 @@ export const PhotoInputGroup = ({
                 onBlur={onBlur}
                 disabled={disabled}
                 setError={setError}
+                className={className}
             />
             <InputError error={error} />
         </div>

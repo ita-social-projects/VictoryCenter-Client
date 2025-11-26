@@ -4,10 +4,11 @@ import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
 import { Modal } from '../../common/modal/Modal';
 import { Button } from '../button/Button';
+import { FullScreenModal } from '../../common/full-page-modal/FullScreenModal';
 
 interface GenericModalWrapperProps<TFormValues, TFormRef> {
     isOpen: boolean;
-    title: string;
+    title?: string;
     formRef: React.RefObject<TFormRef>;
     formKey: string | number;
     initialData: TFormValues | null;
@@ -38,6 +39,7 @@ interface GenericModalWrapperProps<TFormValues, TFormRef> {
         onValidationChange: (isValid: boolean) => void;
     }) => React.ReactElement;
     categories?: any[];
+    fullScreen?: boolean;
 }
 
 export const GenericModalWrapper = <TFormValues, TFormRef>({
@@ -63,12 +65,20 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
     onCancelClose,
     renderForm,
     categories,
+    fullScreen = false,
 }: GenericModalWrapperProps<TFormValues, TFormRef>) => {
+    const handleCancel = () => {
+        onCancelConfirmation();
+        onClose();
+    };
+
+    const ModalComponent = fullScreen ? FullScreenModal : Modal;
+
     return (
         <>
-            <Modal isOpen={isOpen} onClose={onClose}>
-                <Modal.Title>{title}</Modal.Title>
-                <Modal.Content>
+            <ModalComponent isOpen={isOpen} onClose={onClose}>
+                {title && <ModalComponent.Title>{title}</ModalComponent.Title>}
+                <ModalComponent.Content>
                     {renderForm({
                         ref: formRef,
                         key: formKey,
@@ -79,8 +89,8 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                         ...(categories && { categories }),
                     })}
                     {error && <div className="modal-content-error-container">{error}</div>}
-                </Modal.Content>
-                <Modal.Actions>
+                </ModalComponent.Content>
+                <ModalComponent.Actions>
                     <Button
                         buttonStyle="secondary"
                         onClick={onDraftSubmit}
@@ -95,16 +105,18 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                     >
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                     </Button>
-                </Modal.Actions>
-            </Modal>
+                </ModalComponent.Actions>
+            </ModalComponent>
 
             <ConfirmationModal
                 isOpen={showFormConfirmModal}
                 isButtonsDisabled={isSubmitting}
                 title={formConfirmTitle}
                 onConfirm={onConfirmAction}
-                onCancel={onCancelConfirmation}
-                onClose={onCancelConfirmation}
+                onCancel={handleCancel}
+                onClose={onClose}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
 
             <ConfirmationModal
@@ -113,7 +125,9 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
                 onConfirm={onConfirmClose}
                 onCancel={onCancelClose}
-                onClose={onCancelClose}
+                onClose={onClose}
+                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
+                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
         </>
     );

@@ -6,11 +6,13 @@ import {
     InputWithCharacterLimitProps,
 } from '../../input-with-character-limit/InputWithCharacterLimit';
 import '../input-group.scss';
+import classNames from 'classnames';
 
 export interface InputWithCharacterLimitGroupProps extends InputWithCharacterLimitProps {
     label: InputLabelProps['text'];
     isRequired?: InputLabelProps['isRequired'];
     error?: InputErrorProps['error'];
+    className?: string;
 }
 
 export const InputWithCharacterLimitGroup = ({
@@ -27,9 +29,10 @@ export const InputWithCharacterLimitGroup = ({
     disabled,
     placeholder,
     error,
+    className,
 }: InputWithCharacterLimitGroupProps) => {
     return (
-        <div className="input-group">
+        <div className={classNames('input-group', className)}>
             <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
             <InputWithCharacterLimit
                 id={id}

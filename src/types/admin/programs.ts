@@ -14,6 +14,11 @@ export interface Program {
     categories: ProgramCategory[];
     status: VisibilityStatus;
     image: Image | ImageValues | null;
+    location: string;
+    participantsCount: string;
+    meetingCount: string;
+    //  backgroundImage?: Image | ImageValues | null;
+    //  backgroundImageId?: number | null;
 }
 
 export interface ProgramSearchItemData {
@@ -30,6 +35,11 @@ export interface ProgramCreateUpdate {
     status: VisibilityStatus;
     image: ImageValues | null;
     imageId: number | null;
+    location: string;
+    participantsCount: string;
+    meetingCount: string;
+    //  backgroundImage?: ImageValues | null;
+    //  backgroundImageId?: number | null;
 }
 
 export interface ProgramCategoryCreateUpdate {

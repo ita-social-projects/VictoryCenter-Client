@@ -36,6 +36,9 @@ export const PROGRAMS_TEXT = {
             CATEGORY: 'Категорія',
             SELECT_CATEGORY: 'Оберіть категорію',
             PHOTO: 'Фото',
+            LOCATION: 'Локація',
+            PARTICIPANTS_COUNT: 'Кількість учасників',
+            MEETING_COUNT: 'Кількість зустрічей',
         },
     },
 };
@@ -53,14 +56,14 @@ export const PROGRAM_CATEGORY_TEXT = {
 export const PROGRAM_VALIDATION = {
     name: {
         min: 5,
-        max: 200,
+        max: 90,
         getRequiredError: () => 'Назва обов’язкова',
         getMinError: () => `Не менше ${PROGRAM_VALIDATION.name.min} символів`,
         getMaxError: () => `Не більше ${PROGRAM_VALIDATION.name.max} символів`,
     },
     description: {
         min: 10,
-        max: 1000,
+        max: 400,
         getRequiredWhenPublishingError: () => 'Опис обов’язковий при публікації',
         getMinError: () => `Не менше ${PROGRAM_VALIDATION.description.min} символів`,
         getMaxError: () => `Не більше ${PROGRAM_VALIDATION.description.max} символів`,
@@ -74,6 +77,21 @@ export const PROGRAM_VALIDATION = {
         getRequiredWhenPublishingError: () => 'Фото обов’язкове при публікації',
         getFormatError: () => 'Невірний формат фото, дозволено jpeg, jpg, png, webp',
         getSizeError: () => `Фото не більше ${PROGRAM_VALIDATION.image.maxSizeBytes / (1024 * 1024)} Mb`,
+    },
+    location: {
+        max: 55,
+        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.location.max} символів`,
+        getRequiredWhenPublishingError: () => 'Локація обов’язкова при публікації',
+    },
+    participantsCount: {
+        max: 55,
+        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.participantsCount.max} символів`,
+        getRequiredWhenPublishingError: () => 'Кількість учасників обов’язкова при публікації',
+    },
+    meetingCount: {
+        max: 55,
+        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.meetingCount.max} символів`,
+        getRequiredWhenPublishingError: () => 'Кількість зустрічей обов’язкова при публікації',
     },
 };
 

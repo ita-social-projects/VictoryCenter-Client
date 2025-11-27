@@ -210,7 +210,6 @@ describe('TeamPageToolbar', () => {
     it('renders with statusFilter prop value', () => {
         renderToolbar({ statusFilter: VisibilityStatus.Published });
 
-        // Verify the component renders without errors when statusFilter is provided
         expect(screen.getByTestId('team-page-toolbar')).toBeInTheDocument();
     });
 

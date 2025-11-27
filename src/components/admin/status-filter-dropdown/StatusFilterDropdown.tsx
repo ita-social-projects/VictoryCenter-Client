@@ -8,11 +8,16 @@ export interface StatusFilterDropdownProps {
     onStatusFilterChange: (statusFilter: VisibilityStatus | undefined) => void;
 }
 
+const STATUS_OPTIONS = Object.values(COMMON_TEXT_ADMIN.FILTER.STATUS).map((label) => ({
+    value: mapLabelToStatus(label),
+    name: label,
+}));
+
 export const StatusFilterDropdown = ({ value, onStatusFilterChange }: StatusFilterDropdownProps) => {
     return (
         <Select<VisibilityStatus | undefined> onValueChange={onStatusFilterChange} value={value}>
-            {Object.entries(COMMON_TEXT_ADMIN.FILTER.STATUS).map(([, label], index) => (
-                <Select.Option key={index} value={mapLabelToStatus(label)} name={label} />
+            {STATUS_OPTIONS.map((option) => (
+                <Select.Option key={String(option.value)} value={option.value} name={option.name} />
             ))}
         </Select>
     );

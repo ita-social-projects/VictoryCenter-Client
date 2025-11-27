@@ -41,7 +41,6 @@ const createItemRenderer = (categories: TeamCategory[]) =>
 export const TeamPageToolbar = ({
     onSearchQueryChange,
     onStatusFilterChange,
-
     onAddMember,
     searchItems,
     statusFilter,

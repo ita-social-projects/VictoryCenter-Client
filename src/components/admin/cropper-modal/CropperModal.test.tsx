@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { CropModal } from './CropperModal';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ImageValues } from '../../../types/common/image';
-import { Crop, PixelCrop } from 'react-image-crop';
+import { PixelCrop } from 'react-image-crop'; // Видалено невикористаний 'Crop'
 
 const mockCanvasContext = {
     drawImage: jest.fn(),
@@ -155,8 +155,9 @@ describe('CropModal', () => {
     });
 
     it('Does not render when isOpen=false', () => {
-        const { queryByText } = render(<CropModal {...defaultProps} isOpen={false} />);
-        expect(queryByText('Редагувати фото')).not.toBeInTheDocument();
+        // Виправлено: використовуємо screen замість деструктуризації
+        render(<CropModal {...defaultProps} isOpen={false} />);
+        expect(screen.queryByText('Редагувати фото')).not.toBeInTheDocument();
     });
 
     it('Renders title and buttons when isOpen=true', () => {
@@ -289,9 +290,7 @@ describe('CropModal', () => {
         const submitButton = screen.queryByText(COMMON_TEXT_ADMIN.BUTTON.YES);
 
         if (submitButton) {
-            await act(async () => {
-                fireEvent.click(submitButton);
-            });
+            fireEvent.click(submitButton);
         }
 
         expect(defaultProps.onChange).not.toHaveBeenCalled();
@@ -315,8 +314,8 @@ describe('CropModal', () => {
             height: 150,
         };
 
+        const reactCropElement = screen.getByTestId('react-crop-mock');
         act(() => {
-            const reactCropElement = screen.getByTestId('react-crop-mock');
             (reactCropElement as any).mockOnChange(newCrop);
         });
 
@@ -369,8 +368,8 @@ describe('CropModal', () => {
             height: 50,
         };
 
+        const reactCropElement = screen.getByTestId('react-crop-mock');
         act(() => {
-            const reactCropElement = screen.getByTestId('react-crop-mock');
             (reactCropElement as any).mockOnComplete(percentCrop);
         });
 

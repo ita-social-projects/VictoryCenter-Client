@@ -14,7 +14,7 @@ jest.mock('../../../../../components/admin/textarea-with-character-limit/TextAre
 }));
 
 jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ value, onChange, label, setError, ...rest }: any) => (
+    ImageInput: ({ onChange, label, setError }: any) => (
         <div data-testid="mock-image-input">
             <label>{label}</label>
             <input data-testid="mock-image-input-file" type="file" onChange={(e) => onChange(e.target.files?.[0])} />

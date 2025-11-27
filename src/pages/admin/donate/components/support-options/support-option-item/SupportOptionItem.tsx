@@ -140,6 +140,13 @@ export const SupportOptionItem = ({
         setMode(SupportOptionItemMode.Edit);
     };
 
+    const handleValueChange = (field: 'name' | 'value', val: string) => {
+        let setter = field === 'name' ? setName : setValue;
+        setter(val);
+
+        validateField(field, val);
+    };
+
     return (
         <div className="support-option">
             <div className={`support-option-header ${editable ? 'editable' : ''}`}>
@@ -175,9 +182,8 @@ export const SupportOptionItem = ({
                             isTitle={true}
                             value={name}
                             editable={editable}
-                            handleChange={(e) => setName(e.target.value)}
-                            onValueChange={setName}
-                            handleBlur={() => validateField('name', name)}
+                            onValueChange={(val) => handleValueChange('name', val)}
+                            onBlur={() => validateField('name', name)}
                             isRequired={true}
                             maxLength={VALIDATION_PARAMS.supportOptions.name.maxLength}
                         />
@@ -191,9 +197,8 @@ export const SupportOptionItem = ({
                         placeholder={DONATE_TEXT.PLACEHOLDER.SUPPORT_OPTION}
                         value={value}
                         editable={editable}
-                        handleChange={(e) => setValue(e.target.value)}
-                        onValueChange={setValue}
-                        handleBlur={() => validateField('value', value)}
+                        onValueChange={(val) => handleValueChange('value', val)}
+                        onBlur={() => validateField('value', value)}
                         isRequired={true}
                         maxLength={VALIDATION_PARAMS.supportOptions.value.maxLength}
                     />

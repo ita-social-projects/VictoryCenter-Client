@@ -2,7 +2,6 @@ const getMinDigitsError = (count: number) => `Введено менше ${count}
 const getMaxDigitsError = (count: number) => `Введено більше ${count} цифр`;
 const getMinSymbolsError = (count: number) => `Введено менше ${count} символів`;
 const getMaxSymbolsError = (count: number) => `Введено більше ${count} символів`;
-const getRequiredError = (field: string) => `${field} є обов'язковим полем`;
 const getGenericRequiredError = () => `Поле обов'язкове`;
 
 const COMMON_TEXT = {
@@ -130,25 +129,25 @@ export const DONATE_VALIDATION = {
     getDigitsOnlyError: () => `Мають бути цифри`,
     name: {
         maxLength: VALIDATION_PARAMS.name.maxLength,
-        getRequiredError: () => getRequiredError(COMMON_TEXT.BANK_NAME),
+        getRequiredError: () => getGenericRequiredError(),
         getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.name.maxLength),
     },
     receiver: {
         maxLength: VALIDATION_PARAMS.receiver.maxLength,
-        getRequiredError: () => getRequiredError(DONATE_TEXT.BANK_DETAILS.RECEIVER.TITLE),
+        getRequiredError: () => getGenericRequiredError(),
         getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.receiver.maxLength),
     },
     edrpou: {
         maxLength: VALIDATION_PARAMS.edrpou.maxLength,
         getMinError: () => getMinDigitsError(VALIDATION_PARAMS.edrpou.maxLength),
         getMaxError: () => getMaxDigitsError(VALIDATION_PARAMS.edrpou.maxLength),
-        getRequiredError: () => getRequiredError(COMMON_TEXT.TITLE_EDRPOU),
+        getRequiredError: () => getGenericRequiredError(),
     },
     ukrainianIban: {
         maxLength: VALIDATION_PARAMS.ukrainianIban.maxLength,
         getMinError: () => getMinDigitsError(VALIDATION_PARAMS.ukrainianIban.maxLengthWithoutPrefix),
         getMaxError: () => getMaxDigitsError(VALIDATION_PARAMS.ukrainianIban.maxLengthWithoutPrefix),
-        getRequiredError: () => getRequiredError(COMMON_TEXT.TITLE_IBAN),
+        getRequiredError: () => getGenericRequiredError(),
     },
     foreignIban: {
         maxLength: VALIDATION_PARAMS.foreignIban.maxLength,
@@ -156,7 +155,7 @@ export const DONATE_VALIDATION = {
     },
     paymentPurpose: {
         maxLength: VALIDATION_PARAMS.paymentPurpose.maxLength,
-        getRequiredError: () => getRequiredError(DONATE_TEXT.BANK_DETAILS.PAYMENT_PURPOSE.TITLE),
+        getRequiredError: () => getGenericRequiredError(),
         getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.paymentPurpose.maxLength),
     },
     swift: {
@@ -164,16 +163,16 @@ export const DONATE_VALIDATION = {
         maxLength: VALIDATION_PARAMS.swift.maxLength,
         getMinError: () => getMinSymbolsError(VALIDATION_PARAMS.swift.minLength),
         getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.swift.maxLength),
-        getRequiredError: () => getRequiredError(COMMON_TEXT.TITLE_SWIFT),
+        getRequiredError: () => getGenericRequiredError(),
     },
     address: {
         maxLength: VALIDATION_PARAMS.address.maxLength,
-        getRequiredError: () => getRequiredError(DONATE_TEXT.BANK_DETAILS.ADDRESS.TITLE),
+        getRequiredError: () => getGenericRequiredError(),
         getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.address.maxLength),
     },
     account: {
         maxLength: VALIDATION_PARAMS.account.maxLength,
-        getRequiredError: () => getRequiredError(DONATE_TEXT.CORRESPONDENT_BANKS.ACCOUNT.TITLE),
+        getRequiredError: () => getGenericRequiredError(),
         getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.account.maxLength),
     },
     supportOptions: {

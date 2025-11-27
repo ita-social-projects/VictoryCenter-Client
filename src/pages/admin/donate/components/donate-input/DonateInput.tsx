@@ -12,8 +12,7 @@ interface DonateInputProps {
     name: string;
     value?: string;
     editable?: boolean;
-    handleChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-    handleBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
+    onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
     onValueChange?: (val: string) => void;
     onlyNumbers?: boolean;
     maxLength?: number;
@@ -29,8 +28,7 @@ export const DonateInput = ({
     name,
     value: externalValue,
     editable = true,
-    handleChange,
-    handleBlur,
+    onBlur,
     onValueChange,
     onlyNumbers = false,
     maxLength,
@@ -80,8 +78,6 @@ export const DonateInput = ({
         if (!hasEdited && newValue !== initialValue) {
             setHasEdited(true);
         }
-
-        handleChange?.(e);
     };
 
     const handleClear = () => {
@@ -126,7 +122,7 @@ export const DonateInput = ({
                         onFocus={() => setIsFocused(true)}
                         onBlur={(e) => {
                             setIsFocused(false);
-                            handleBlur?.(e);
+                            onBlur?.(e);
                         }}
                         readOnly={!editable}
                         className="donate-input-textarea"

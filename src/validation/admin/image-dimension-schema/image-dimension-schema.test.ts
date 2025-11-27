@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { getImageDimensionSchema, IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from './image-dimension-schema'; // Змініть шлях
+import { getImageDimensionSchema, IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from './image-dimension-schema';
 import { ImageValues } from '../../../types/common/image';
 
 const originalImage = global.Image;

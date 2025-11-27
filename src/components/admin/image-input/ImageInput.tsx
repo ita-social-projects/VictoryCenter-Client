@@ -74,7 +74,7 @@ export const ImageInput = ({
             setRawImage(imgItem);
             setShowCropperModal(true);
         },
-        [onChange, height, width, setError],
+        [height, width, setError],
     );
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {

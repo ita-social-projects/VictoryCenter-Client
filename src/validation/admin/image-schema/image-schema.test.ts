@@ -76,18 +76,14 @@ describe('ImageValidationSchema', () => {
         mockImageDimensions(1919, 1080);
         const validFile = createTestFile(1000, 'image/jpeg');
 
-        await expect(validationSchema.validate(validFile)).rejects.toThrow(
-            `Неправильні розміри зображення. Мінімум ${MIN_WIDTH}x${MIN_HEIGHT}px`,
-        );
+        await expect(validationSchema.validate(validFile)).rejects.toThrow(IMAGE_VALIDATION.InvalidImageDimensions);
     });
 
     it('rejects an image with height smaller than minHeight', async () => {
         mockImageDimensions(1920, 1079);
         const validFile = createTestFile(1000, 'image/jpeg');
 
-        await expect(validationSchema.validate(validFile)).rejects.toThrow(
-            `Неправильні розміри зображення. Мінімум ${MIN_WIDTH}x${MIN_HEIGHT}px`,
-        );
+        await expect(validationSchema.validate(validFile)).rejects.toThrow(IMAGE_VALIDATION.InvalidImageDimensions);
     });
 
     it('rejects a file that fails to load as an image', async () => {

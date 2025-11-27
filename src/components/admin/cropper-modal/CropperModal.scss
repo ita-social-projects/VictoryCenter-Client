@@ -7,7 +7,7 @@
 }
 
 .ReactCrop__crop-selection {
-    .ReactCrop__crop-selection::before {
+    &::before {
         border: none !important;
         box-shadow: none !important;
     }

@@ -260,7 +260,7 @@ describe('CropModal', () => {
         });
     });
 
-    it('Calls onChange and onCancel when "Submit" is clicked with cropped image', async () => {
+    it('Calls onChange with cropped image data when "Submit" is clicked', async () => {
         render(<CropModal {...defaultProps} />);
         const imgElement = screen.getByAltText('Crop target');
 

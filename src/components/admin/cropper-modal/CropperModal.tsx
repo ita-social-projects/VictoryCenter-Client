@@ -6,6 +6,7 @@ import { Modal } from '../../common/modal/Modal';
 import { Button } from '../button/Button';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './CropperModal.scss';
+import { CROPPER_CONSTANTS } from '../../../const/admin/cropper';
 
 interface CropModalProps {
     src: ImageValues | null;
@@ -160,7 +161,6 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
         }
         if (newX < 0) newX = 0;
 
-        // Обмеження перетягування по вертикалі
         if (newY + fixedHeight > img.height) {
             newY = img.height - fixedHeight;
         }
@@ -177,7 +177,7 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
 
     return (
         <Modal isOpen={isOpen} onClose={onCancel} maxWidth={`${naturalWidth ? Math.min(1000, naturalWidth) : 1000}px`}>
-            <Modal.Title>Редагувати фото</Modal.Title>
+            <Modal.Title>{CROPPER_CONSTANTS.TITLE}</Modal.Title>
             <Modal.Content>
                 {!displaySrc ? (
                     <div>Loading image...</div>

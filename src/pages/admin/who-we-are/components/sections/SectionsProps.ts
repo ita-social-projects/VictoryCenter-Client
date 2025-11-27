@@ -21,8 +21,8 @@ export const MainPageProps: Omit<
     rows: 5,
     imageInputProps: {
         subText: '1440x860',
-        width: 1920,
-        height: 1080,
+        width: 1440,
+        height: 860,
         style: {
             width: '52.5625rem',
             height: '33.125rem',

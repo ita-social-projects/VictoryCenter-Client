@@ -88,6 +88,8 @@ export const PROGRAM_VALIDATION = {
         getAtLeastOneRequiredError: () => 'Потрібно обрати хоча б одну категорію',
     },
     image: {
+        width: 960,
+        height: 870,
         maxSizeBytes: 3 * 1024 * 1024,
         allowedFormats: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
         getRequiredWhenPublishingError: () => 'Фото обов’язкове при публікації',

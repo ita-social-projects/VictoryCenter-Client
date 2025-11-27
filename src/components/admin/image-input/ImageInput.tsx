@@ -11,6 +11,7 @@ import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
 import { COMMON_IMAGE_TEXT } from '../../../const/admin/image';
 import { IMAGE_VALIDATION_FUNCTIONS } from '../../../validation/admin/image-schema/image-schema';
 import { CropModal } from '../cropper-modal/CropperModal';
+import { IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from '../../../validation/admin/image-dimension-schema/image-dimension-schema';
 
 export interface ImageInputProps {
     value: ImageValues | Image | null;
@@ -62,7 +63,7 @@ export const ImageInput = ({
         async (file: File) => {
             setError(null);
             if (!file.type.startsWith('image/')) return;
-            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file);
+            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file, width, height);
 
             if (error) {
                 setError(error);
@@ -141,6 +142,23 @@ export const ImageInput = ({
         setShowConfirmModal(false);
     };
 
+    const handleCropCancel = async () => {
+        setShowCropperModal(false);
+
+        const imageToUse = previewImage || rawImage;
+
+        if (!previewImage) {
+            setPreviewImage(rawImage);
+        }
+
+        if (imageToUse && 'base64' in imageToUse) {
+            const error = await IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage(imageToUse, width, height);
+            if (error) {
+                setError(error);
+            }
+        }
+    };
+
     return (
         <div>
             <div
@@ -197,20 +215,20 @@ export const ImageInput = ({
                                 >
                                     <DeleteIcon className={classNames('delete-icon')} />
                                 </button>
-                                {rawImage && "base64" in rawImage ?
-                                <button
-                                    data-testid="crop-photo-button"
-                                    type="button"
-                                    className="crop-button"
-                                    disabled={disabled}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setShowCropperModal(true);
-                                    }}
-                                >
-                                    <CropIcon className={classNames('crop-icon')} />
-                                </button>
-                                    : null}
+                                {rawImage && 'base64' in rawImage ? (
+                                    <button
+                                        data-testid="crop-photo-button"
+                                        type="button"
+                                        className="crop-button"
+                                        disabled={disabled}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowCropperModal(true);
+                                        }}
+                                    >
+                                        <CropIcon className={classNames('crop-icon')} />
+                                    </button>
+                                ) : null}
                             </div>
                         )}
                     </div>
@@ -233,17 +251,18 @@ export const ImageInput = ({
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
-            {showCropperModal && rawImage && "base64" in rawImage && (
+            {showCropperModal && rawImage && 'base64' in rawImage && (
                 <CropModal
                     data-testid="cropper"
                     src={rawImage}
-                    onChange={onChange}
+                    onChange={(image: ImageValues) => {
+                        onChange(image);
+                        setError(null);
+                        setShowCropperModal(false);
+                    }}
                     height={height}
                     width={width}
-                    onCancel={() => {
-                        setShowCropperModal(false);
-                        setPreviewImage(rawImage);
-                    }}
+                    onCancel={handleCropCancel}
                     isOpen={showCropperModal}
                 />
             )}
@@ -264,6 +283,7 @@ export const getImageSrc = (image: Image | ImageValues | null) => {
 
     return undefined;
 };
+
 export function convertFileToBase64(file: File): Promise<ImageValues> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();

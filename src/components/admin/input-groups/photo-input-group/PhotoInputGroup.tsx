@@ -22,6 +22,8 @@ export const PhotoInputGroup = ({
     disabled,
     error,
     setError,
+    width,
+    height,
 }: PhotoInputGroupProps) => {
     return (
         <div className="input-group">
@@ -34,6 +36,8 @@ export const PhotoInputGroup = ({
                 onBlur={onBlur}
                 disabled={disabled}
                 setError={setError}
+                height={height}
+                width={width}
             />
             <InputError error={error} />
         </div>

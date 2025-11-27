@@ -8,7 +8,7 @@ import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './CropperModal.scss';
 
 interface CropModalProps {
-    src: ImageValues | Img | null;
+    src: ImageValues | null;
     onChange: (value: ImageValues) => void;
     height: number;
     width: number;
@@ -23,6 +23,7 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
     const imgRef = useRef<HTMLImageElement>(null);
     const [rawImage, setRawImage] = useState<ImageValues | Image | null>(null);
     const [naturalWidth, setNaturalWidth] = useState<number | null>(null);
+    const [renderedWidth, setRenderedWidth] = useState(0);
     const aspectRatio = width / height;
 
     useEffect(() => {
@@ -31,23 +32,66 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
             setDisplaySrc(null);
             return;
         }
-
-        if ('base64' in src) {
-            setRawImage(src);
-            setDisplaySrc(`data:${src.mimeType};base64,${src.base64}`);
-        } else {
-            setRawImage(src);
-            setDisplaySrc(src.url);
-        }
+        setRawImage(src);
+        setDisplaySrc(`data:${src.mimeType};base64,${src.base64}`);
 
         setCrop(undefined);
         setCompletedCrop(undefined);
     }, [src]);
 
+    const recalculateCrop = (img: HTMLImageElement) => {
+        if (!img) return;
+
+        const { naturalWidth, naturalHeight, width: currentRenderedWidth, height: currentRenderedHeight } = img;
+
+        setRenderedWidth(currentRenderedWidth);
+
+        const scaleX = currentRenderedWidth / naturalWidth;
+
+        const displayCropWidth = width * scaleX;
+        const displayCropHeight = height * scaleX;
+
+        const x = (currentRenderedWidth - displayCropWidth) / 2;
+        const y = (currentRenderedHeight - displayCropHeight) / 2;
+
+        const centeredCrop: PixelCrop = {
+            unit: 'px',
+            width: displayCropWidth,
+            height: displayCropHeight,
+            x: x > 0 ? x : 0,
+            y: y > 0 ? y : 0,
+        };
+
+        setCrop(centeredCrop);
+        setCompletedCrop(centeredCrop);
+    };
+
+    const onImageLoaded = (img: HTMLImageElement) => {
+        imgRef.current = img;
+        setNaturalWidth(img.naturalWidth);
+        recalculateCrop(img);
+    };
+
+    useEffect(() => {
+        const img = imgRef.current;
+        if (!img) return;
+
+        const handleResize = () => {
+            if (img.width !== renderedWidth) {
+                recalculateCrop(img);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, [renderedWidth, aspectRatio]);
+
     const getCroppedImageBase64 = () => {
         const image = imgRef.current;
         const cropToUse = completedCrop || crop;
-
         if (!image || !cropToUse) {
             return null;
         }
@@ -92,48 +136,18 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
             if (croppedImageBase64 && rawImage) {
                 const base64Part = croppedImageBase64.split(',')[1];
                 onChange({ base64: base64Part, mimeType: rawImage.mimeType });
-                onCancel();
             }
         } catch (e) {
             console.error('Error cropping image:', e);
         }
     };
 
-    const onImageLoaded = (img: HTMLImageElement) => {
-        imgRef.current = img;
-
-        const { naturalWidth, naturalHeight, width: renderedWidth, height: renderedHeight } = img;
-
-        setNaturalWidth(naturalWidth);
-
-
-
-        const scaleX = renderedWidth / naturalWidth;
-        const scaleY = renderedHeight / naturalHeight;
-
-        const displayCropWidth = width * scaleX;
-        const displayCropHeight = height * scaleY;
-
-        const x = (renderedWidth - displayCropWidth) / 2;
-        const y = (renderedHeight - displayCropHeight) / 2;
-
-        const centeredCrop: PixelCrop = {
-            unit: 'px',
-            width: displayCropWidth,
-            height: displayCropHeight,
-            x: x,
-            y: y,
-        };
-
-        setCrop(centeredCrop);
-        setCompletedCrop(centeredCrop);
-    };
-
     const onCropChange = (newCrop: PixelCrop) => {
-        if (!crop?.width || !crop?.height) return;
+        const currentCrop = crop as PixelCrop; // Поточний кріп завжди піксельний тут
+        if (!currentCrop?.width || !currentCrop?.height) return;
 
-        const fixedWidth = crop.width;
-        const fixedHeight = crop.height;
+        const fixedWidth = currentCrop.width;
+        const fixedHeight = currentCrop.height;
 
         const img = imgRef.current;
         if (!img) return;
@@ -146,6 +160,7 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
         }
         if (newX < 0) newX = 0;
 
+        // Обмеження перетягування по вертикалі
         if (newY + fixedHeight > img.height) {
             newY = img.height - fixedHeight;
         }
@@ -180,7 +195,6 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
                             maxHeight={crop?.height}
                             keepSelection
                             aspect={aspectRatio}
-
                         >
                             <img
                                 ref={imgRef}

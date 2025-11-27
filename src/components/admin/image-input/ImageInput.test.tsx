@@ -37,6 +37,18 @@ jest.mock('../cropper-modal/CropperModal', () => ({
     CropModal: ({ isOpen }: any) => (isOpen ? <div data-testid="cropper">Crop Modal Mock</div> : null),
 }));
 
+jest.mock('../../../validation/admin/image-schema/image-schema', () => ({
+    IMAGE_VALIDATION_FUNCTIONS: {
+        validateImage: jest.fn().mockResolvedValue(null), // null means no error
+    },
+}));
+
+jest.mock('../../../validation/admin/image-dimension-schema/image-dimension-schema', () => ({
+    IMAGE_DIMENSION_VALIDATION_FUNCTIONS: {
+        validateImage: jest.fn().mockResolvedValue(null),
+    },
+}));
+
 const MockImageValue: ImageValues = {
     base64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAocB9eQ6vqoAAAAASUVORK5CYII=',
     mimeType: 'image/jpeg',

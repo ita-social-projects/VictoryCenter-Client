@@ -101,7 +101,6 @@ export const ALTERNATIVE_SUPPORT_WAYS = {
     PAY_PAL_EMAIL_LABEL: 'victorycenterua@gmail.com',
     MONOBANK_JAR_LABEL: 'Monobank баночка',
     MONOBANK_JAR_LINK_LABEL: 'https://send.monobank.ua/jar/2JGG2F8rHQ',
-    DOWNLOAD_PAYMENT_DETAILS_BUTTON_LABEL: 'Завантажити реквізити PDF',
 };
 
 export const CORRESPONDENT_BANKS = {

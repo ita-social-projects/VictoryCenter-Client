@@ -140,6 +140,7 @@ const correspondentBanksFields: GenericFormField<CorrespondentBankDetails>[] = [
         validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateName),
         isRequired: true,
         maxLength: VALIDATION_PARAMS.name.maxLength,
+        placeholder: DONATE_TEXT.CORRESPONDENT_BANKS.NAME.PLACEHOLDER,
     },
     {
         name: 'swift',

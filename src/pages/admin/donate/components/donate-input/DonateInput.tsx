@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import './Input.scss';
+import './DonateInput.scss';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
 import classNames from 'classnames';
 
-interface InputProps {
+interface DonateInputProps {
     label?: string;
     isRequired?: boolean;
     placeholder?: string;
@@ -20,7 +20,7 @@ interface InputProps {
     className?: string;
 }
 
-export const Input = ({
+export const DonateInput = ({
     label,
     placeholder = DONATE_TEXT.PLACEHOLDER.DEFAULT,
     isTitle = false,
@@ -35,7 +35,7 @@ export const Input = ({
     onlyNumbers = false,
     maxLength,
     className,
-}: InputProps) => {
+}: DonateInputProps) => {
     const computedInitialValue =
         externalValue !== undefined && externalValue !== null ? prefix + externalValue.replace(prefix, '') : prefix;
 

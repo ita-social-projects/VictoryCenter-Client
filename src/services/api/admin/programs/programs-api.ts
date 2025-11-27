@@ -91,46 +91,31 @@ export const ProgramsApi = {
     fetchProgramSearchItems: async (
         client: AxiosInstance,
         searchTerm: string,
-        offset: number,
-        limit: number,
+        offset: number = 0,
+        limit: number = 5,
+        signal?: AbortSignal,
     ): Promise<PaginationResult<ProgramSearchItemData>> => {
-        const response = await client.get<Program[]>(API_ROUTES.PROGRAMS.BASE);
-        const filtered = response.data.filter((program) => {
-            const nameMatches = program.name.toLowerCase().includes(searchTerm.toLowerCase());
-            const categoryMatches = program.categories.some((cat) =>
-                cat.name.toLowerCase().includes(searchTerm.toLowerCase()),
-            );
-            return nameMatches || categoryMatches;
+        const params = {
+            SearchQuery: searchTerm,
+            offset: offset,
+            limit: limit,
+        };
+
+        const response = await client.get<PaginationResult<Program>>(`${API_ROUTES.PROGRAMS.SEARCH}`, {
+            params,
+            signal,
         });
 
-        const sorted = filtered.sort((a, b) => {
-            const aNameMatch = a.name.toLowerCase().includes(searchTerm.toLowerCase());
-            const bNameMatch = b.name.toLowerCase().includes(searchTerm.toLowerCase());
-
-            if (aNameMatch && !bNameMatch) return -1;
-            if (!aNameMatch && bNameMatch) return 1;
-
-            return a.name.localeCompare(b.name);
-        });
-
-        const start = offset;
-        const end = offset + limit;
-        const paginatedItems = sorted.slice(start, end);
-
-        const suggestions = paginatedItems.map(convertProgramToSuggestion);
+        const suggestions = response.data.items.map(convertProgramToSuggestion);
 
         return {
             items: suggestions,
-            totalItemsCount: filtered.length,
+            totalItemsCount: response.data.totalItemsCount,
         };
     },
 
     fetchProgramById: async (id: number, client: AxiosInstance): Promise<Program | null> => {
-        const response = await client.get<Program>(API_ROUTES.PROGRAMS.BASE, {
-            params: {
-                id,
-            },
-        });
+        const response = await client.get<Program>(`${API_ROUTES.PROGRAMS.BASE}/${id}`);
         return response.data;
     },
 

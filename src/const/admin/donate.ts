@@ -3,6 +3,7 @@ const getMaxDigitsError = (count: number) => `Введено більше ${coun
 const getMinSymbolsError = (count: number) => `Введено менше ${count} символів`;
 const getMaxSymbolsError = (count: number) => `Введено більше ${count} символів`;
 const getRequiredError = (field: string) => `${field} є обов'язковим полем`;
+const getGenericRequiredError = () => `Поле обов'язкове`;
 
 const COMMON_TEXT = {
     TITLE_IBAN: 'IBAN',
@@ -98,7 +99,10 @@ export const DONATE_TEXT = {
         SUPPORT_OPTION: 'Введіть реквізити',
     },
     MESSAGE: {
-        SUPPORT_OPTION_PUBLISHED: 'Варіант підтримки успішно опубліковано',
+        SUPPORT_OPTIONS: {
+            PUBLISHED: 'Варіант підтримки успішно опубліковано',
+            DELETED: 'Варіант підтримки видалено успішно',
+        },
         CHANGES_SAVED: 'Зміни успішно опубліковано',
         CORRESPONDENT_BANKS: {
             DELETED: 'Банк-кореспондент видалено успішно',
@@ -175,12 +179,12 @@ export const DONATE_VALIDATION = {
     supportOptions: {
         name: {
             maxLength: VALIDATION_PARAMS.supportOptions.name.maxLength,
-            getRequiredError: () => getRequiredError(DONATE_TEXT.SUPPORT_OPTIONS.NAME),
+            getRequiredError: () => getGenericRequiredError(),
             getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.supportOptions.name.maxLength),
         },
         value: {
             maxLength: VALIDATION_PARAMS.supportOptions.value.maxLength,
-            getRequiredError: () => getRequiredError(DONATE_TEXT.SUPPORT_OPTIONS.VALUE),
+            getRequiredError: () => getGenericRequiredError(),
             getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.supportOptions.value.maxLength),
         },
     },

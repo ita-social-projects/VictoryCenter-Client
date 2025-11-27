@@ -42,6 +42,10 @@
             &.new {
                 height: 2.5rem;
             }
+
+            &:disabled {
+                background-color: colors.$grey-700;
+            }
         }
     }
 

@@ -64,11 +64,6 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
     renderForm,
     categories,
 }: GenericModalWrapperProps<TFormValues, TFormRef>) => {
-    const handleCancel = () => {
-        onCancelConfirmation();
-        onClose();
-    };
-
     return (
         <>
             <Modal isOpen={isOpen} onClose={onClose}>
@@ -108,8 +103,8 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                 isButtonsDisabled={isSubmitting}
                 title={formConfirmTitle}
                 onConfirm={onConfirmAction}
-                onCancel={handleCancel}
-                onClose={onClose}
+                onCancel={onCancelConfirmation}
+                onClose={onCancelConfirmation}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
@@ -120,7 +115,7 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
                 onConfirm={onConfirmClose}
                 onCancel={onCancelClose}
-                onClose={onClose}
+                onClose={onCancelClose}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />

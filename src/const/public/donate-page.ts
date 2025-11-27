@@ -1,9 +1,23 @@
+import { Currency } from '../../types/public/donate-page';
+
 export const PAGE_TITLE = 'МИ ВДЯЧНІ | ЗА КОЖЕН ДОНАТ';
 
-export const DONATION_SIZE = {
-    10: '+10 ',
-    50: '+50 ',
-    100: '+100 ',
+export const DONATION_AMOUNTS = {
+    [Currency.UAH]: {
+        small: 100,
+        medium: 200,
+        large: 500,
+    },
+    [Currency.USD]: {
+        small: 10,
+        medium: 50,
+        large: 100,
+    },
+    [Currency.EUR]: {
+        small: 10,
+        medium: 50,
+        large: 100,
+    },
 };
 
 export const DONATE_SECTION = {
@@ -39,7 +53,7 @@ export const PAYMENT_DETAILS_COMMON = {
 export const ABROAD_PAYMENT_DETAILS = {
     USD_PAYMENT_DETAILS_LABEL: 'Для переказів в USD:',
     IBAN_EUR_LABEL: 'IBAN (EUR)',
-    IBAN_EUR_NUMBER_LABEL: 'UA81305299000002600103014088',
+    IBAN_EUR_NUMBER_LABEL: 'UA813052990000026001030140880',
     SWIFT_CODE_LABEL: 'SWIFT-код банку',
     SWIFT_CODE_VALUE_LABEL: 'PBANUA2X',
     BANK_RECEIVER_LABEL: 'Банк-отримувач',
@@ -87,7 +101,6 @@ export const ALTERNATIVE_SUPPORT_WAYS = {
     PAY_PAL_EMAIL_LABEL: 'victorycenterua@gmail.com',
     MONOBANK_JAR_LABEL: 'Monobank баночка',
     MONOBANK_JAR_LINK_LABEL: 'https://send.monobank.ua/jar/2JGG2F8rHQ',
-    DOWNLOAD_PAYMENT_DETAILS_BUTTON_LABEL: 'Завантажити реквізити PDF',
 };
 
 export const CORRESPONDENT_BANKS = {
@@ -194,4 +207,8 @@ export const CORRESPONDENT_BANKS = {
             ],
         },
     ],
+};
+
+export const ERROR_MESSAGES = {
+    LOADING_ERROR: 'Не вдалося завантажити реквізити',
 };

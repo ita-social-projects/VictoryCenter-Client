@@ -8,7 +8,7 @@ import { ProgramListItem } from '../program-list-item/ProgramListItem';
 import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
 import { useCategoriesCounter } from '../../../../../hooks/admin/use-categories-counter/useCategoriesCounter';
 import { ProgramsApi, ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
-import { PROGRAM_CATEGORY_TEXT, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
+import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
 import {
@@ -75,6 +75,21 @@ export const ProgramsPageContent = () => {
 
         return ProgramsApi.fetchProgramById(searchProgramId, client);
     }, [searchProgramId, client]);
+
+    const getProgramSearchItems = useCallback(
+        async (
+            searchTerm: string,
+            paginationRequest: PaginationRequestParams,
+        ): Promise<PaginationResult<ProgramSearchItemData>> =>
+            ProgramsApi.fetchProgramSearchItems(
+                client,
+                searchTerm,
+                paginationRequest.offset as number,
+                paginationRequest.limit as number,
+                paginationRequest.requestOptions?.cancellationSignal,
+            ),
+        [client],
+    );
 
     const getProgramId = useCallback((program: Program) => program.id, []);
 
@@ -144,7 +159,7 @@ export const ProgramsPageContent = () => {
 
     useEffect(() => {
         if (categoriesError) {
-            setErrorState(PROGRAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
+            setErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
         }
     }, [categoriesError, setErrorState]);
 
@@ -348,9 +363,9 @@ export const ProgramsPageContent = () => {
     // Context menu handlers
     const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
         () => [
-            { id: 'add', name: PROGRAM_CATEGORY_TEXT.BUTTON.ADD_CATEGORY },
-            { id: 'edit', name: PROGRAM_CATEGORY_TEXT.BUTTON.EDIT_CATEGORY },
-            { id: 'delete', name: PROGRAM_CATEGORY_TEXT.BUTTON.DELETE_CATEGORY },
+            { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
+            { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
+            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
         ],
         [],
     );
@@ -390,14 +405,7 @@ export const ProgramsPageContent = () => {
                 <AdminPanelToolbar<ProgramSearchItemData>
                     getSearchItemKey={(item) => item.id}
                     getSearchItemLabel={(item) => item.name}
-                    fetchSearchItems={(searchTerm, requestOptions) =>
-                        ProgramsApi.fetchProgramSearchItems(
-                            client,
-                            searchTerm,
-                            requestOptions.offset as number,
-                            requestOptions.limit as number,
-                        )
-                    }
+                    fetchSearchItems={getProgramSearchItems}
                     renderSearchItemComponent={ProgramSearchItem}
                     placeholder={PROGRAMS_TEXT.PLACEHOLDER.SEARCH_PROGRAMS}
                     onSearchClear={handleSearchClear}

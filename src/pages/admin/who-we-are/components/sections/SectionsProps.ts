@@ -68,7 +68,7 @@ export const WhoWeSupportCardsProps: Omit<
     CardsSectionProps,
     'content' | 'onChange' | 'onPublish' | 'setIsPublishButtonActive' | 'isPublishButtonActive'
 > = {
-    descriptionLimit: 400,
+    descriptionLimit: 300,
     titleText: WHO_WE_ARE_TEXT.WHO_WE_SUPPORT,
     rows: 6,
     cardImageConfigs: [

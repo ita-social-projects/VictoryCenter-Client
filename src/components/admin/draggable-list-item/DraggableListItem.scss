@@ -1,6 +1,11 @@
 @use '../../../assets/sass/variables/colors';
 
 .draggable-item-wrapper {
+    padding: 0.25rem;
+    margin: -0.25rem;
+}
+
+.draggable-item {
     padding: 0;
     border: none;
     width: 100%;
@@ -11,7 +16,7 @@
     align-items: center;
     box-sizing: border-box;
     background-color: white;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 1px 2.8px 0 rgba(colors.$bluish-black, 0.15);
     border-bottom: 0.3px solid rgba(colors.$blue-900, 0.35);
 
     .item-data {
@@ -29,7 +34,6 @@
     background: transparent;
     height: 100%;
     width: 3.75rem;
-    box-shadow: 0 0 4px rgba(black, 0.15);
     display: flex;
     justify-content: center;
     align-items: center;

@@ -1,3 +1,5 @@
+import { COMMON_TEXT_ADMIN } from './common';
+
 export const PROGRAMS_TEXT = {
     BUTTON: {
         ADD_PROGRAM: 'Додати програму',
@@ -39,28 +41,7 @@ export const PROGRAMS_TEXT = {
 };
 
 export const PROGRAM_CATEGORY_TEXT = {
-    MESSAGE: {
-        FAIL_TO_FETCH_CATEGORIES: 'Виникла помилка, не вдалось завантажити категорії',
-    },
-
-    BUTTON: {
-        ADD_CATEGORY: 'Додати категорію',
-        EDIT_CATEGORY: 'Редагувати',
-        DELETE_CATEGORY: 'Видалити',
-    },
-
     FORM: {
-        TITLE: {
-            ADD_CATEGORY: 'Додати категорію',
-            EDIT_CATEGORY: 'Редагувати категорію',
-            DELETE_CATEGORY: 'Видалити категорію',
-        },
-        MESSAGE: {
-            ALREADY_CONTAIN_CATEGORY_WITH_NAME: 'Категорія з такою назвою вже існує',
-            FAIL_TO_CREATE_CATEGORY: 'Виникла помилка під час додавання категорії',
-            FAIL_TO_UPDATE_CATEGORY: 'Виникла помилка під час оновлення категорії',
-            FAIL_TO_DELETE_CATEGORY: 'Виникла помилка під час видалення категорії',
-        },
         LABEL: {
             NAME: 'Назва',
             EDIT_NAME: 'Редагувати назву',
@@ -105,7 +86,8 @@ export const PROGRAM_CATEGORY_VALIDATION = {
         getRequiredError: () => 'Назва обов’язкова',
         getMinError: () => `Не менше ${PROGRAM_CATEGORY_VALIDATION.name.min} символи`,
         getMaxError: () => `Не більше ${PROGRAM_CATEGORY_VALIDATION.name.max} символів`,
-        getCategoryWithThisNameAlreadyExistsError: () => 'Категорія з такою назвою вже існує',
+        getCategoryWithThisNameAlreadyExistsError: () =>
+            COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.ALREADY_CONTAIN_CATEGORY_WITH_NAME,
     },
     programsCount: {
         getRelocationOrRemovalHint: () => 'Перенесіть їх в іншу категорію або видаліть, щоб продовжити',

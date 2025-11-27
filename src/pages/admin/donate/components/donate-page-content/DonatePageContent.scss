@@ -1,0 +1,108 @@
+@use '../../../../../assets/sass/variables/colors';
+
+.donate-page {
+    &-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 3.375rem;
+        width: 100%;
+        height: 100vh;
+        padding: 8.4rem 2.5rem 3.375rem 2.5rem;
+        box-sizing: border-box;
+        overflow-y: auto;
+    }
+
+    &-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 1.5rem;
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: visible;
+    }
+
+    &-item {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    &-support-options {
+        width: 100%;
+    }
+}
+
+.not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+    text-align: center;
+
+    img {
+        width: 14.375rem;
+        height: 14.375rem;
+    }
+
+    p {
+        width: 29.375rem;
+        font-size: 2.5rem;
+        font-weight: 600;
+        color: colors.$blue-900;
+    }
+
+    .btn {
+        &-add {
+            width: 26.75rem;
+            height: 2.5rem;
+        }
+    }
+}
+
+.edit-btn {
+    cursor: default;
+    transition: opacity 0.2s ease;
+    border: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: url('../../../../../assets/icons/edit.svg');
+
+    &.edit {
+        background: url('../../../../../assets/icons/edit-filled.svg');
+    }
+
+    &.view {
+        cursor: pointer;
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+}
+
+.delete-btn {
+    display: flex;
+    justify-self: flex-end;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    border: none;
+    gap: 0.25rem;
+    font-size: 1.125rem;
+
+    &:hover {
+        opacity: 0.7;
+    }
+
+    width: 1.5rem;
+    height: 1.5rem;
+    background: url('../../../../../assets/icons/delete.svg') no-repeat;
+
+    &.pressed {
+        background: url('../../../../../assets/icons/delete-filled.svg') no-repeat;
+    }
+}

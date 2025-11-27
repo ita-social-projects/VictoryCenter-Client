@@ -1,36 +1,29 @@
+import axios from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
-import { DeleteTeamMemberModal } from '../team-member-modals/delete-team-member-modal/DeleteTeamMemberModal';
-import { TeamMemberModal } from '../team-member-modals/team-member-modal/TeamMemberModal';
-import { TEAM_CATEGORY_TEXT, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import axios from 'axios';
 import './TeamPageContent.scss';
-import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
+import { TeamMember } from '../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { VisibilityStatus, ModalMode } from '../../../../../types/admin/common';
+import { VisibilityStatus } from '../../../../../types/admin/common';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
-import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
+import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/category-bar/CategoryBar';
 import { InfiniteScrollList } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
 import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '../../../../../types/admin/toast';
 import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
 import { DraggableListItem } from '../../../../../components/admin/draggable-list-item/DraggableListItem';
 import { MemberComponent } from '../member-component/MemberComponent';
+import { TeamCategory } from '../../../../../types/admin/team-category';
+import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
+import { TeamPageModals } from '../team-page-modals/TeamPageModals';
 import { useTeamMemberSearch } from '../../../../../hooks/admin/team/useTeamMemberSearch';
+import { updateCategoryMemberCounts } from '../../../../../utils/functions/update-category-member-counts/update-category-member-counts';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
-
-interface ModalState {
-    isAddMemberModalOpen: boolean;
-    memberToDelete: TeamMember | null;
-    memberToEdit: TeamMember | null;
-    isAddCategoryModalOpen: boolean;
-    isEditCategoryModalOpen: boolean;
-    isDeleteCategoryModalOpen: boolean;
-}
 
 interface ErrorState {
     message: string | null;
@@ -49,14 +42,9 @@ export const TeamPageContent = () => {
     const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState<VisibilityStatus | undefined>();
     const [error, setError] = useState<ErrorState>({ message: null, type: null });
-    const [modalState, setModalState] = useState<ModalState>({
-        isAddMemberModalOpen: false,
-        memberToDelete: null,
-        memberToEdit: null,
-        isAddCategoryModalOpen: false,
-        isEditCategoryModalOpen: false,
-        isDeleteCategoryModalOpen: false,
-    });
+    const modalsStateControl = useModalsState<TeamMember>();
+    const { isAnyModalOpened, openModalActions, closeModalActions } = modalsStateControl;
+
     const [selectedSearchMember, setSelectedSearchMember] = useState<TeamMember | null>(null);
 
     const {
@@ -86,21 +74,26 @@ export const TeamPageContent = () => {
         setError({ message: null, type: null });
     }, []);
 
-    const updateModalState = useCallback((updates: Partial<ModalState>) => {
-        setModalState((prev) => ({ ...prev, ...updates }));
-    }, []);
+    const onContextMenuOptionSelected = useCallback(
+        (id: string) => {
+            if (id === 'add') {
+                openModalActions.openAddCategoryModal();
+            } else if (id === 'edit') {
+                openModalActions.openEditCategoryModal();
+            } else if (id === 'delete') {
+                openModalActions.openDeleteCategoryModal();
+            }
+        },
+        [openModalActions],
+    );
 
-    const isAnyModalOpened = useMemo(() => {
-        return Object.values(modalState).some((value) => (typeof value === 'boolean' ? value : value !== null));
-    }, [modalState]);
-
-    const closeModalActions = useMemo(
-        () => ({
-            addMember: () => updateModalState({ isAddMemberModalOpen: false }),
-            editMember: () => updateModalState({ memberToEdit: null }),
-            deleteMember: () => updateModalState({ memberToDelete: null }),
-        }),
-        [updateModalState],
+    const categoryBarContextMenuOptions: ContextMenuOption[] = useMemo(
+        () => [
+            { id: 'add', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.ADD_CATEGORY },
+            { id: 'edit', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.EDIT_CATEGORY },
+            { id: 'delete', name: COMMON_TEXT_ADMIN.CATEGORIES.BUTTON.DELETE_CATEGORY },
+        ],
+        [],
     );
 
     const isSingleView = !!selectedSearchMember;
@@ -139,14 +132,14 @@ export const TeamPageContent = () => {
             setCategories(fetchedCategories);
 
             if (fetchedCategories.length > 0) {
-                setSelectedCategory((prevSelected) => prevSelected ?? fetchedCategories[0]);
+                setSelectedCategory((prevSelected: TeamCategory | null) => prevSelected ?? fetchedCategories[0]);
             }
         } catch (error: any) {
             if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                 return;
             }
 
-            setErrorState(TEAM_CATEGORY_TEXT.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
+            setErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES, 'categories');
         } finally {
             isCategoriesLoadingRef.current = false;
             setIsCategoriesLoading(false);
@@ -267,24 +260,20 @@ export const TeamPageContent = () => {
         [selectedCategory, resetMembersState],
     );
 
-    const handleAddMemberModalOpen = useCallback(() => {
-        updateModalState({ isAddMemberModalOpen: true });
-    }, [updateModalState]);
-
     const handleDeleteTeamMemberModalOpen = useCallback(
         (member: TeamMember) => {
             if (isAnyModalOpened) return;
-            updateModalState({ memberToDelete: member });
+            openModalActions.openDeleteItemModal(member);
         },
-        [isAnyModalOpened, updateModalState],
+        [isAnyModalOpened, openModalActions],
     );
 
     const handleEditMemberModalOpen = useCallback(
         (member: TeamMember) => {
             if (isAnyModalOpened) return;
-            updateModalState({ memberToEdit: member });
+            openModalActions.openEditItemModal(member);
         },
-        [isAnyModalOpened, updateModalState],
+        [isAnyModalOpened, openModalActions],
     );
 
     const handleEntitiesReordered = useCallback(
@@ -292,7 +281,7 @@ export const TeamPageContent = () => {
             try {
                 setMembers(members);
                 const orderedIds = members.map((m) => m.id);
-                const categoryId = selectedCategory?.id ?? 0;
+                const categoryId = selectedCategory!.id;
 
                 await TeamMembersApi.reorder(client, categoryId, orderedIds);
             } catch (error: any) {
@@ -303,7 +292,7 @@ export const TeamPageContent = () => {
                 setErrorState(TEAM_MEMBERS_TEXT.MESSAGE.FAIL_TO_REORDER_MEMBERS, 'members');
             }
         },
-        [client, selectedCategory?.id, setErrorState],
+        [client, selectedCategory, setErrorState],
     );
 
     const handleRetry = useCallback(() => {
@@ -359,15 +348,22 @@ export const TeamPageContent = () => {
                 }
                 return prevMembers;
             });
-
             currentItemsCountRef.current += 1;
 
-            updateModalState({ isAddMemberModalOpen: false });
+            setCategories((prevCategories) =>
+                prevCategories.map((category) =>
+                    category.id === member.categoryId
+                        ? { ...category, teamMembersCount: category.teamMembersCount + 1 }
+                        : category,
+                ),
+            );
+
+            closeModalActions.closeAddItemModal();
             if (member.status === VisibilityStatus.Published) {
                 addToast(TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER, ToastType.Info);
             }
         },
-        [updateModalState, pageSize, selectedCategory?.id, addToast],
+        [closeModalActions, pageSize, selectedCategory?.id, addToast],
     );
 
     const handleEditMember = useCallback(
@@ -378,20 +374,68 @@ export const TeamPageContent = () => {
                 prevMembers.map((member) => (member.id === updatedMember.id ? updatedMember : member)),
             );
 
-            updateModalState({ memberToEdit: null });
+            if (updatedMember.categoryId !== selectedCategory!.id) {
+                setMembers((prev) => prev.filter((m) => m.id !== updatedMember.id));
+                setCategories((prevCategories) =>
+                    updateCategoryMemberCounts(prevCategories, selectedCategory!.id, updatedMember),
+                );
+            }
+
+            closeModalActions.closeEditItemModal();
         },
-        [updateModalState],
+        [closeModalActions, selectedCategory],
     );
 
     const handleDeleteMember = useCallback(
         (memberToDelete: TeamMember) => {
             setMembers((prevMembers) => prevMembers.filter((member) => member.id !== memberToDelete.id));
-
             currentItemsCountRef.current -= 1;
+            setCategories((prevCategories) =>
+                prevCategories.map((category) =>
+                    category.id === memberToDelete.categoryId
+                        ? { ...category, teamMembersCount: category.teamMembersCount - 1 }
+                        : category,
+                ),
+            );
 
-            updateModalState({ memberToDelete: null });
+            setHasMore(true);
+            hasMoreRef.current = true;
+            closeModalActions.closeDeleteItemModal();
         },
-        [updateModalState],
+        [closeModalActions],
+    );
+
+    const handleAddCategory = useCallback((newCategory: TeamCategory) => {
+        setCategories((prevCategories) => [...prevCategories, newCategory]);
+    }, []);
+
+    const handleEditCategory = useCallback(
+        (updatedCategory: TeamCategory) => {
+            setCategories((prevCategories) =>
+                prevCategories.map((category) => (category.id === updatedCategory.id ? updatedCategory : category)),
+            );
+
+            if (selectedCategory?.id === updatedCategory.id) {
+                setSelectedCategory(updatedCategory);
+            }
+        },
+        [selectedCategory?.id],
+    );
+
+    const handleDeleteCategory = useCallback(
+        (categoryIdToDelete: number) => {
+            setCategories((prevCategories) => {
+                const updatedCategories = prevCategories.filter((category) => category.id !== categoryIdToDelete);
+
+                if (selectedCategory?.id === categoryIdToDelete && updatedCategories.length > 0) {
+                    setSelectedCategory(updatedCategories[0]);
+                } else if (updatedCategories.length === 0) {
+                    setSelectedCategory(null);
+                }
+                return updatedCategories;
+            });
+        },
+        [selectedCategory?.id],
     );
 
     const handleSearchItemSelect = useCallback(
@@ -440,7 +484,7 @@ export const TeamPageContent = () => {
                 <TeamPageToolbar
                     onSearchQueryChange={handleSearchQueryByName}
                     onStatusFilterChange={onStatusFilterChange}
-                    onAddMember={handleAddMemberModalOpen}
+                    onAddMember={openModalActions.openAddItemModal}
                     searchItems={searchSuggestions}
                     isSearchLoading={isSearchLoading}
                     searchHasMore={hasMoreSearch}
@@ -455,10 +499,12 @@ export const TeamPageContent = () => {
                 <CategoryBar<TeamCategory>
                     categories={categories}
                     selectedCategory={selectedCategory}
+                    displayContextMenuButton={true}
                     onCategorySelect={handleCategorySelect}
                     getCategoryDisplayName={(category) => category.name}
                     getCategoryKey={(category) => category.id}
-                    displayContextMenuButton={false}
+                    contextMenuOptions={categoryBarContextMenuOptions}
+                    onContextMenuOptionSelected={onContextMenuOptionSelected}
                 />
 
                 {error.message && (
@@ -480,28 +526,15 @@ export const TeamPageContent = () => {
                 />
             </div>
 
-            <TeamMemberModal
-                mode={ModalMode.Add}
-                isOpen={modalState.isAddMemberModalOpen}
-                onClose={closeModalActions.addMember}
-                onAddMember={handleAddMember}
+            <TeamPageModals
+                modalsStateControl={modalsStateControl}
                 categories={categories}
-            />
-
-            <TeamMemberModal
-                mode={ModalMode.Edit}
-                isOpen={!!modalState.memberToEdit}
-                onClose={closeModalActions.editMember}
-                memberToEdit={modalState.memberToEdit!}
-                onEditMember={handleEditMember}
-                categories={categories}
-            />
-
-            <DeleteTeamMemberModal
-                isOpen={!!modalState.memberToDelete}
-                onClose={closeModalActions.deleteMember}
-                memberToDelete={modalState.memberToDelete}
-                onDeleteMember={handleDeleteMember}
+                onAddTeamMember={handleAddMember}
+                onEditTeamMember={handleEditMember}
+                onDeleteTeamMember={handleDeleteMember}
+                onAddTeamCategory={handleAddCategory}
+                onEditTeamCategory={handleEditCategory}
+                onDeleteTeamCategory={handleDeleteCategory}
             />
 
             <ToastContainer />

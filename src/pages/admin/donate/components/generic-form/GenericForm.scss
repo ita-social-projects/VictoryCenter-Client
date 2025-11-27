@@ -1,0 +1,135 @@
+@use '../../../../../assets/sass/variables/colors';
+
+.generic-form {
+    display: flex;
+    flex-direction: column;
+    background: colors.$grey-50;
+    border-radius: 0.5rem;
+    border: 1px solid colors.$grey-700;
+    width: 100%;
+    gap: 1.875rem;
+    padding: 2.5rem 1.875rem;
+
+    .form-head-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.75rem;
+        width: 100%;
+
+        .form-header {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            flex-direction: row;
+        }
+
+        .form-name {
+            margin-bottom: 0.75rem;
+            font-size: 2rem;
+            font-weight: 700;
+            display: inline;
+            cursor: pointer;
+            word-break: break-word;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+
+            .arrow {
+                display: inline-block;
+                margin-left: 0.25rem;
+                background: url('../../../../../assets/icons/chevron-down.svg') no-repeat center;
+                width: 1.5rem;
+                height: 1.5rem;
+                transition: transform 0.2s ease;
+            }
+
+            .arrow.expanded {
+                transform: rotate(180deg);
+            }
+        }
+    }
+
+    .form-body {
+        display: flex;
+        flex-direction: column;
+        gap: 1.75rem;
+
+        .error {
+            font-size: 0.875rem;
+            font-weight: 400;
+            color: colors.$blue-500;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+
+            .form-field-content {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+
+                .error {
+                    margin-top: 0.25rem;
+                }
+            }
+        }
+    }
+
+    .actions {
+        display: flex;
+        gap: 3.125rem;
+
+        button {
+            width: 100%;
+            height: 2.5rem;
+
+            &:disabled {
+                background-color: colors.$grey-700;
+            }
+        }
+    }
+
+    .child {
+        padding: 0;
+        border: none;
+        gap: 1.875rem;
+
+        .form-head-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .form-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .form-name-actions {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
+        }
+
+        .body {
+            flex-direction: column-reverse;
+        }
+
+        .generic-form {
+            padding-top: 1.875rem;
+            border-radius: 0;
+            border-top: 1px solid colors.$grey-700;
+        }
+
+        .form-field-title-row {
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 0.5rem;
+
+            .form-field-content {
+                flex: 1;
+            }
+        }
+    }
+}

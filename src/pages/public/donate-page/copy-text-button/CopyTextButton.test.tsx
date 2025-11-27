@@ -19,12 +19,17 @@ describe('CopyTextButton', () => {
         expect(screen.getByRole('button')).toBeInTheDocument();
     });
 
-    it('copies text and shows alert on click', async () => {
+    it('resets copied state after animation ends', async () => {
         render(<CopyTextButton textToCopy="test123" />);
-        fireEvent.click(screen.getByRole('button'));
+        const button = screen.getByRole('button');
+
+        fireEvent.click(button);
+
         await waitFor(() => {
-            expect(navigator.clipboard.writeText).toHaveBeenCalledWith('test123');
-            expect(window.alert).toHaveBeenCalledWith('Copied!');
+            expect(button).toHaveClass('copied');
         });
+        fireEvent.animationEnd(button);
+
+        expect(button).not.toHaveClass('copied');
     });
 });

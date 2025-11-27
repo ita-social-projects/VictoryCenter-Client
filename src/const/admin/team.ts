@@ -1,3 +1,5 @@
+import { COMMON_TEXT_ADMIN } from './common';
+
 export const TEAM_MEMBERS_TEXT = {
     SEARCH: {
         INPUT_FULLNAME: "Введіть ім'я та прізвище",
@@ -44,12 +46,6 @@ export const TEAM_MEMBERS_TEXT = {
     },
 };
 
-export const TEAM_CATEGORY_TEXT = {
-    MESSAGE: {
-        FAIL_TO_FETCH_CATEGORIES: 'Виникла помилка, не вдалось завантажити категорії',
-    },
-};
-
 export const TEAM_SEARCH = {
     SUGGESTIONS_PAGE_SIZE: 5,
     MIN_CHARACTERS_TO_SEARCH: 2,
@@ -80,5 +76,37 @@ export const TEAM_MEMBER_VALIDATION = {
         getRequiredWhenPublishingError: () => "Фото обов'язкове при публікації",
         width: 960,
         height: 1200,
+    },
+};
+
+export const TEAM_CATEGORY_TEXT = {
+    FORM: {
+        LABEL: {
+            NAME: 'Назва',
+            DESCRIPTION: 'Опис',
+            CATEGORY: 'Категорія',
+        },
+    },
+};
+
+export const TEAM_CATEGORY_VALIDATION = {
+    name: {
+        min: 5,
+        max: 20,
+        getRequiredError: () => 'Назва обов’язкова',
+        getMinError: () => `Не менше ${TEAM_CATEGORY_VALIDATION.name.min} символів`,
+        getMaxError: () => `Не більше ${TEAM_CATEGORY_VALIDATION.name.max} символів`,
+        getDuplicateNameError: () => COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.ALREADY_CONTAIN_CATEGORY_WITH_NAME,
+    },
+    description: {
+        min: 10,
+        max: 200,
+        getRequiredError: () => 'Опис обов’язковий',
+        getMinError: () => `Не менше ${TEAM_CATEGORY_VALIDATION.description.min} символів`,
+        getMaxError: () => `Не більше ${TEAM_CATEGORY_VALIDATION.description.max} символів`,
+    },
+    teamMembersCount: {
+        getHasTeamMembersCountError: (count: number) => `Категорія містить ${count} членів команди`,
+        getRelocationOrRemovalHint: () => 'Перенесіть їх в іншу категорію або видаліть, щоб продовжити',
     },
 };

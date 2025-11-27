@@ -1,0 +1,77 @@
+@use '../../../../../assets/sass/variables/colors';
+
+.generic-details {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 1.5rem;
+
+    &-item {
+        width: 100%;
+    }
+
+    .btn {
+        &-add {
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
+            align-items: center;
+
+            &-new {
+                display: flex;
+                flex-direction: row;
+                gap: 0.5rem;
+                width: 100%;
+                height: 2.5rem;
+                align-items: center;
+
+                &.disabled {
+                    cursor: default;
+                    background-color: colors.$grey-700;
+                }
+            }
+        }
+    }
+    .child {
+        .generic-details {
+            &.header {
+                font-size: 2rem;
+                font-weight: 700;
+                display: inline;
+                cursor: pointer;
+
+                .arrow {
+                    display: inline-block;
+                    margin-left: 0.25rem;
+                    background: url('../../../../../assets/icons/chevron-down.svg') no-repeat center;
+                    width: 1.5rem;
+                    height: 1.5rem;
+                    transition: transform 0.2s ease;
+                }
+
+                .arrow.expanded {
+                    transform: rotate(180deg);
+                }
+            }
+
+            .btn-add {
+                width: 100%;
+            }
+        }
+    }
+
+    &-loader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+    }
+
+    &.not-found {
+        .btn-secondary .plus-icon {
+            path {
+                stroke: colors.$blue-500;
+            }
+        }
+    }
+}

@@ -12,10 +12,10 @@ export const BankDetailsValidationSchema = Yup.object({
         .max(DONATE_VALIDATION.receiver.maxLength, DONATE_VALIDATION.receiver.getMaxError()),
     edrpou: Yup.string()
         .trim()
+        .required(DONATE_VALIDATION.edrpou.getRequiredError())
         .matches(/^\d+$/, DONATE_VALIDATION.getDigitsOnlyError())
         .min(DONATE_VALIDATION.edrpou.maxLength, DONATE_VALIDATION.edrpou.getMinError())
-        .max(DONATE_VALIDATION.edrpou.maxLength, DONATE_VALIDATION.edrpou.getMaxError())
-        .required(DONATE_VALIDATION.edrpou.getRequiredError()),
+        .max(DONATE_VALIDATION.edrpou.maxLength, DONATE_VALIDATION.edrpou.getMaxError()),
     ukrainianIban: Yup.string()
         .trim()
         .required(DONATE_VALIDATION.ukrainianIban.getRequiredError())
@@ -37,10 +37,7 @@ export const BankDetailsValidationSchema = Yup.object({
         .trim()
         .required(DONATE_VALIDATION.address.getRequiredError())
         .max(DONATE_VALIDATION.address.maxLength, DONATE_VALIDATION.address.getMaxError()),
-    account: Yup.string()
-        .trim()
-        .required(DONATE_VALIDATION.account.getRequiredError())
-        .max(DONATE_VALIDATION.account.maxLength, DONATE_VALIDATION.account.getMaxError()),
+    account: Yup.string().trim().max(DONATE_VALIDATION.account.maxLength, DONATE_VALIDATION.account.getMaxError()),
 });
 
 export const SupportOptionsValidationSchema = Yup.object({

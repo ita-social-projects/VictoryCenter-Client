@@ -117,7 +117,7 @@ export const VALIDATION_PARAMS = {
     name: { maxLength: 200 },
     receiver: { maxLength: 200 },
     address: { maxLength: 200 },
-    account: { maxLength: 34 },
+    account: { maxLength: 20 },
     paymentPurpose: { maxLength: 500 },
     supportOptions: {
         name: { maxLength: 50 },
@@ -172,7 +172,6 @@ export const DONATE_VALIDATION = {
     },
     account: {
         maxLength: VALIDATION_PARAMS.account.maxLength,
-        getRequiredError: () => getGenericRequiredError(),
         getMaxError: () => getMaxSymbolsError(VALIDATION_PARAMS.account.maxLength),
     },
     supportOptions: {

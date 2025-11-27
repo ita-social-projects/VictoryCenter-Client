@@ -133,12 +133,6 @@ describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
             expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateAccount('1234567890')).toBeUndefined();
         });
 
-        it('return error if value is empty', () => {
-            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateAccount('')).toBe(
-                DONATE_VALIDATION.account.getRequiredError(),
-            );
-        });
-
         it('return error if value is too long', () => {
             const longString = 'a'.repeat(DONATE_VALIDATION.account.maxLength + 1);
             expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateAccount(longString)).toBe(

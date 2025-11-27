@@ -15,7 +15,7 @@ describe('BankDetailsUahApi', () => {
         id: 1,
         name: 'ПриватБанк',
         receiver: 'ТОВ "Тест"',
-        iban: '1234567890123456789012345678',
+        ukrainianIban: '1234567890123456789012345678',
         edrpou: '12345678',
         paymentPurpose: 'Благодійна допомога',
     };
@@ -50,7 +50,7 @@ describe('BankDetailsUahApi', () => {
         const bankDetailsWithoutId: Omit<UahBankDetailsType, 'id'> = {
             name: 'Новий банк',
             receiver: 'ТОВ "Новий"',
-            iban: '1111222233334444555566667777',
+            ukrainianIban: '1111222233334444555566667777',
             edrpou: '11112222',
             paymentPurpose: 'Благодійність',
         };

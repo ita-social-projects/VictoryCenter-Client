@@ -64,7 +64,7 @@ describe('CorrespondentBankDetailsApi', () => {
             const result = await CorrespondentBankDetailsApi.create(mockClient, bankDetails);
 
             expect(mockClient.post).toHaveBeenCalledWith(API_ROUTES.DONATE.CORRESPONDENT_BANK_DETAILS, bankDetails);
-            expect(result.iban).toBeUndefined();
+            expect(result.foreignIban).toBeUndefined();
         });
     });
 

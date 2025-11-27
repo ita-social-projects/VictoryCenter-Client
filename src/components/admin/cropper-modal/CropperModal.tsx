@@ -1,7 +1,7 @@
-import ReactCrop, { centerCrop, Crop, makeAspectCrop, PixelCrop } from 'react-image-crop';
+import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import { useEffect, useRef, useState } from 'react';
-import { Image, Image as Img, ImageValues } from '../../../types/common/image';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Image, ImageValues } from '../../../types/common/image';
 import { Modal } from '../../common/modal/Modal';
 import { Button } from '../button/Button';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
@@ -40,32 +40,35 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
         setCompletedCrop(undefined);
     }, [src]);
 
-    const recalculateCrop = (img: HTMLImageElement) => {
-        if (!img) return;
+    const recalculateCrop = useCallback(
+        (img: HTMLImageElement) => {
+            if (!img) return;
 
-        const { naturalWidth, naturalHeight, width: currentRenderedWidth, height: currentRenderedHeight } = img;
+            const { naturalWidth, width: currentRenderedWidth, height: currentRenderedHeight } = img;
 
-        setRenderedWidth(currentRenderedWidth);
+            setRenderedWidth(currentRenderedWidth);
 
-        const scaleX = currentRenderedWidth / naturalWidth;
+            const scaleX = currentRenderedWidth / naturalWidth;
 
-        const displayCropWidth = width * scaleX;
-        const displayCropHeight = height * scaleX;
+            const displayCropWidth = width * scaleX;
+            const displayCropHeight = height * scaleX;
 
-        const x = (currentRenderedWidth - displayCropWidth) / 2;
-        const y = (currentRenderedHeight - displayCropHeight) / 2;
+            const x = (currentRenderedWidth - displayCropWidth) / 2;
+            const y = (currentRenderedHeight - displayCropHeight) / 2;
 
-        const centeredCrop: PixelCrop = {
-            unit: 'px',
-            width: displayCropWidth,
-            height: displayCropHeight,
-            x: x > 0 ? x : 0,
-            y: y > 0 ? y : 0,
-        };
+            const centeredCrop: PixelCrop = {
+                unit: 'px',
+                width: displayCropWidth,
+                height: displayCropHeight,
+                x: x > 0 ? x : 0,
+                y: y > 0 ? y : 0,
+            };
 
-        setCrop(centeredCrop);
-        setCompletedCrop(centeredCrop);
-    };
+            setCrop(centeredCrop);
+            setCompletedCrop(centeredCrop);
+        },
+        [width, height],
+    );
 
     const onImageLoaded = (img: HTMLImageElement) => {
         imgRef.current = img;
@@ -88,7 +91,7 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
         return () => {
             window.removeEventListener('resize', handleResize);
         };
-    }, [renderedWidth, aspectRatio]);
+    }, [renderedWidth, aspectRatio, recalculateCrop]);
 
     const getCroppedImageBase64 = () => {
         const image = imgRef.current;
@@ -132,14 +135,10 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
     };
 
     const handleSubmit = () => {
-        try {
-            const croppedImageBase64 = getCroppedImageBase64();
-            if (croppedImageBase64 && rawImage) {
-                const base64Part = croppedImageBase64.split(',')[1];
-                onChange({ base64: base64Part, mimeType: rawImage.mimeType });
-            }
-        } catch (e) {
-            console.error('Error cropping image:', e);
+        const croppedImageBase64 = getCroppedImageBase64();
+        if (croppedImageBase64 && rawImage) {
+            const base64Part = croppedImageBase64.split(',')[1];
+            onChange({ base64: base64Part, mimeType: rawImage.mimeType });
         }
     };
 

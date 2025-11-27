@@ -7,7 +7,7 @@ export interface BaseBankDetails {
     id?: number;
     name: string;
     receiver: string;
-    iban: string;
+    ukrainianIban: string;
 }
 
 export interface ForeignBankDetails extends BaseBankDetails {
@@ -26,7 +26,7 @@ export interface CorrespondentBankDetails {
     name: string;
     swift: string;
     account: string;
-    iban?: string;
+    foreignIban?: string;
 }
 
 type Validatable = string | number | boolean | Date | null | undefined;
@@ -66,7 +66,7 @@ function createForeignFields(currency: 'USD' | 'EUR'): GenericFormField<ForeignB
     return [
         ...baseFields,
         {
-            name: 'iban',
+            name: 'ukrainianIban',
             label: `${DONATE_TEXT.BANK_DETAILS.IBAN.TITLE} (${currency})`,
             prefix: 'UA',
             onlyNumbers: true,
@@ -105,7 +105,7 @@ function createUahFields(): GenericFormField<UahBankDetails>[] {
             maxLength: VALIDATION_PARAMS.edrpou.maxLength,
         },
         {
-            name: 'iban',
+            name: 'ukrainianIban',
             label: `${DONATE_TEXT.BANK_DETAILS.IBAN.TITLE} (UAH)`,
             prefix: 'UA',
             onlyNumbers: true,
@@ -158,7 +158,7 @@ const correspondentBanksFields: GenericFormField<CorrespondentBankDetails>[] = [
         maxLength: VALIDATION_PARAMS.account.maxLength,
     },
     {
-        name: 'iban',
+        name: 'foreignIban',
         label: DONATE_TEXT.CORRESPONDENT_BANKS.IBAN.TITLE,
         validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateForeignIban),
         placeholder: DONATE_TEXT.CORRESPONDENT_BANKS.DEFAULT_PLACEHOLDER,

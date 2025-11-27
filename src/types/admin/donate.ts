@@ -3,7 +3,7 @@ export interface UahBankDetailsType {
     name: string;
     receiver: string;
     edrpou: string;
-    iban: string;
+    ukrainianIban: string;
     paymentPurpose: string;
 }
 
@@ -36,7 +36,7 @@ export interface CorrespondentBankDetailsType {
     name: string;
     swift: string;
     account: string;
-    iban?: string;
+    foreignIban?: string;
     foreignBankDetailsId: number;
 }
 
@@ -44,7 +44,7 @@ export interface ForeignBankDetailsType {
     id: number;
     name: string;
     receiver: string;
-    iban: string;
+    ukrainianIban: string;
     swift: string;
     address: string;
     currency: BankCurrency;

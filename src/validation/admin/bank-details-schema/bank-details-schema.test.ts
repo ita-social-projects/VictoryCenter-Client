@@ -48,14 +48,10 @@ describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
         });
     });
 
-    describe('validateIban', () => {
+    describe('validateUkrainianIban', () => {
         it('return undefined if value is valid', () => {
             expect(
                 BANK_DETAILS_VALIDATION_FUNCTIONS.validateUkrainianIban('UA123456789012345678901234567'),
-            ).toBeUndefined();
-
-            expect(
-                BANK_DETAILS_VALIDATION_FUNCTIONS.validateForeignIban('EN12345678901234567890123456789012'),
             ).toBeUndefined();
         });
 
@@ -69,7 +65,17 @@ describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
             expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateUkrainianIban('UA' + '1'.repeat(100))).toBe(
                 DONATE_VALIDATION.ukrainianIban.getMaxError(),
             );
+        });
+    });
 
+    describe('validateForeignIban', () => {
+        it('return undefined if value is valid', () => {
+            expect(
+                BANK_DETAILS_VALIDATION_FUNCTIONS.validateForeignIban('EN12345678901234567890123456789012'),
+            ).toBeUndefined();
+        });
+
+        it('return error if value is too long', () => {
             expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateForeignIban('EN' + '1'.repeat(100))).toBe(
                 DONATE_VALIDATION.foreignIban.getMaxError(),
             );

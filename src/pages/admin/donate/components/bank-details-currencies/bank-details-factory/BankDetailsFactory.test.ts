@@ -87,7 +87,7 @@ describe('BankDetailsFactory', () => {
         });
 
         it('renders all fields right', () => {
-            ['name', 'receiver', 'edrpou', 'iban', 'paymentPurpose'].forEach((name) => {
+            ['name', 'receiver', 'edrpou', 'ukrainianIban', 'paymentPurpose'].forEach((name) => {
                 expect(getTextareaByName(name)).toBeInTheDocument();
             });
         });
@@ -97,7 +97,7 @@ describe('BankDetailsFactory', () => {
             testFieldValidation('receiver', BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver as any, 'Test Receiver');
             testFieldValidation('edrpou', BANK_DETAILS_VALIDATION_FUNCTIONS.validateEdrpou as any, '12345678');
             testFieldValidation(
-                'iban',
+                'ukrainianIban',
                 BANK_DETAILS_VALIDATION_FUNCTIONS.validateUkrainianIban as any,
                 'UA123456789012345678',
             );
@@ -146,7 +146,7 @@ describe('BankDetailsFactory', () => {
                 });
 
                 it('renders all fields', () => {
-                    ['name', 'receiver', 'iban', 'swift', 'address'].forEach((name) => {
+                    ['name', 'receiver', 'ukrainianIban', 'swift', 'address'].forEach((name) => {
                         expect(getTextareaByName(name)).toBeInTheDocument();
                     });
                 });
@@ -159,7 +159,7 @@ describe('BankDetailsFactory', () => {
                         'Test Receiver',
                     );
                     testFieldValidation(
-                        'iban',
+                        'ukrainianIban',
                         BANK_DETAILS_VALIDATION_FUNCTIONS.validateUkrainianIban as any,
                         'UA9876543210',
                     );
@@ -187,7 +187,7 @@ describe('BankDetailsFactory', () => {
         });
 
         it('contains all fields', () => {
-            ['name', 'swift', 'account', 'iban'].forEach((name) => {
+            ['name', 'swift', 'account', 'foreignIban'].forEach((name) => {
                 expect(getTextareaByName(name)).toBeInTheDocument();
             });
         });
@@ -206,7 +206,7 @@ describe('BankDetailsFactory', () => {
             testFieldValidation('name', BANK_DETAILS_VALIDATION_FUNCTIONS.validateName as any, 'Test Bank');
             testFieldValidation('swift', BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift as any, 'SWIFT123');
             testFieldValidation('account', BANK_DETAILS_VALIDATION_FUNCTIONS.validateAccount as any, 'ACC123');
-            testFieldValidation('iban', BANK_DETAILS_VALIDATION_FUNCTIONS.validateForeignIban as any, 'IBAN456');
+            testFieldValidation('foreignIban', BANK_DETAILS_VALIDATION_FUNCTIONS.validateForeignIban as any, 'IBAN456');
         });
     });
 

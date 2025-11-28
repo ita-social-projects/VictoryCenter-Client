@@ -10,7 +10,7 @@ import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '../../../../../validation
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import './ProgramCategoryModal.scss';
+import styles from './ProgramCategoryModal.module.scss';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 interface ProgramCategoryFormValues {
@@ -302,7 +302,7 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                             />
                         )}
 
-                        {error && <div className="program-category-modal-error-container">{error}</div>}
+                        {error && <div className={styles['program-category-modal-error-container']}>{error}</div>}
                     </form>
                 </Modal.Content>
                 <Modal.Actions>

@@ -7,7 +7,7 @@ import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { ProgramCategory } from '../../../../../types/admin/programs';
-import './ProgramCategoryModal.scss';
+import styles from './ProgramCategoryModal.module.scss';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 interface DeleteCategoryModalProps {
@@ -92,7 +92,7 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
                             text={PROGRAM_CATEGORY_VALIDATION.programsCount.getRelocationOrRemovalHint()}
                         />
                     )}
-                    {error && <div className="program-category-modal-error-container">{error}</div>}
+                    {error && <div className={styles['program-category-modal-error-container']}>{error}</div>}
                 </div>
             </Modal.Content>
             <Modal.Actions>

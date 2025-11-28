@@ -10,7 +10,7 @@ import { TEAM_CATEGORY_VALIDATION_FUNCTIONS } from '../../../../../validation/ad
 import { TEAM_CATEGORY_TEXT, TEAM_CATEGORY_VALIDATION } from '../../../../../const/admin/team';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import './TeamCategoryModal.scss';
+import styles from './TeamCategoryModal.module.scss';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { ModalMode } from '../../../../../types/admin/common';
@@ -274,7 +274,11 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
             <Modal isOpen={isOpen} onClose={handleClose}>
                 <Modal.Title>{getTitle()}</Modal.Title>
                 <Modal.Content>
-                    <form onSubmit={(e) => e.preventDefault()} className="team-category-modal-form" id={getFormId()}>
+                    <form
+                        onSubmit={(e) => e.preventDefault()}
+                        className={styles['team-category-modal-form']}
+                        id={getFormId()}
+                    >
                         {mode === ModalMode.Edit && (
                             <SingleSelectInputGroup
                                 id={getFieldId('select')}
@@ -320,7 +324,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
 
                         {isDuplicateName && <HintBox title={TEAM_CATEGORY_VALIDATION.name.getDuplicateNameError()} />}
 
-                        {error && <div className="team-category-modal-error-container">{error}</div>}
+                        {error && <div className={styles['team-category-modal-error-container']}>{error}</div>}
                     </form>
                 </Modal.Content>
                 <Modal.Actions>
@@ -328,7 +332,7 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
                         type="button"
                         onClick={handleSubmitClick}
                         buttonStyle="primary"
-                        className="team-category-modal-save-button"
+                        className={styles['team-category-modal-save-button']}
                         disabled={isSubmitDisabled()}
                     >
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE}

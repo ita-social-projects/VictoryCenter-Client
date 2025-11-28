@@ -15,7 +15,7 @@ import {
     PaginationRequestParams,
     useDataPaginationFetch,
 } from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
-import './ProgramsPageContent.scss';
+import styles from './ProgramsPageContent.module.scss';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { AdminPanelToolbar } from '../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { ProgramSearchItem } from '../program-search-item/ProgramSearchItem';
@@ -400,8 +400,8 @@ export const ProgramsPageContent = () => {
     const displayItems = isSearchResultView ? (fetchedSearchProgram ? [fetchedSearchProgram] : []) : fetchedPrograms;
 
     return (
-        <div className="programs-page-wrapper" data-testid="programs-page-content">
-            <div className="programs-page-toolbar-container">
+        <div className={styles['programs-page-wrapper']} data-testid="programs-page-content">
+            <div className={styles['programs-page-toolbar-container']}>
                 <AdminPanelToolbar<ProgramSearchItemData>
                     getSearchItemKey={(item) => item.id}
                     getSearchItemLabel={(item) => item.name}
@@ -416,7 +416,7 @@ export const ProgramsPageContent = () => {
                 />
             </div>
 
-            <div className="programs-page-list-container" ref={listContainerRef}>
+            <div className={styles['programs-page-list-container']} ref={listContainerRef}>
                 <CategoryBar<ProgramCategory>
                     categories={categories}
                     selectedCategory={selectedCategory}
@@ -429,9 +429,9 @@ export const ProgramsPageContent = () => {
                 />
 
                 {error.message && (
-                    <div className="programs-page-error-container" data-testid="programs-error-container">
+                    <div className={styles['programs-page-error-container']} data-testid="programs-error-container">
                         <span>{error.message}</span>
-                        <button onClick={handleRetry} type="button" className="retry-link">
+                        <button onClick={handleRetry} type="button" className={styles['retry-link']}>
                             {COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN}
                         </button>
                     </div>

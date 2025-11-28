@@ -6,7 +6,7 @@ import { ProgramsApi } from '../../../../../../services/api/admin/programs/progr
 import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
-import './DeleteProgramModal.scss';
+import styles from './DeleteProgramModal.module.scss';
 
 export interface DeleteProgramModalProps {
     isOpen: boolean;
@@ -46,7 +46,9 @@ export const DeleteProgramModal = ({ isOpen, onClose, onDeleteProgram, programTo
     return (
         <Modal isOpen={isOpen} onClose={handleClose} data-testid="delete-program-modal">
             <Modal.Title>{PROGRAMS_TEXT.FORM.TITLE.DELETE_PROGRAM}</Modal.Title>
-            <Modal.Content>{error && <div className="delete-program-error-container">{error}</div>}</Modal.Content>
+            <Modal.Content>
+                {error && <div className={styles['delete-program-error-container']}>{error}</div>}
+            </Modal.Content>
             <Modal.Actions>
                 <Button onClick={handleClose} buttonStyle="secondary" disabled={isSubmitting}>
                     {COMMON_TEXT_ADMIN.BUTTON.CANCEL}

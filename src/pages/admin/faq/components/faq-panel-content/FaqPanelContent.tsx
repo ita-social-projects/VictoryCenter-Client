@@ -15,7 +15,7 @@ import { ToastContainer } from '../../../../../components/admin/toast/toast-cont
 import { DeleteFaqModal } from '../faq-modals/delete-faq-modal/DeleteFaqModal';
 import { FaqComponent } from '../faq-component/FaqComponent';
 import { useVisitorPages } from '../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider';
-import './FaqPanelContent.scss';
+import styles from './FaqPanelContent.module.scss';
 import axios from 'axios';
 import { AdminPanelToolbar } from '../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { FaqSearchItem } from '../faq-search-item/FaqSearchItem';
@@ -357,7 +357,7 @@ export const FaqPanelContent = () => {
                     onEntitiesReordered={handleEntitiesReordered}
                 ></DraggableListItem>
             ) : (
-                <div className="nondraggable-faq-item-wrapper">
+                <div className={styles['nondraggable-faq-item-wrapper']}>
                     <FaqComponent
                         key={faq.id}
                         faq={faq}
@@ -370,8 +370,8 @@ export const FaqPanelContent = () => {
     );
 
     return (
-        <div className="faq-panel-wrapper" data-testid="faq-panel-content">
-            <div className="faq-panel-toolbar-container">
+        <div className={styles['faq-panel-wrapper']} data-testid="faq-panel-content">
+            <div className={styles['faq-panel-toolbar-container']}>
                 <AdminPanelToolbar<FaqSearchItemData>
                     getSearchItemKey={(item) => item.id}
                     getSearchItemLabel={(item) => item.question}
@@ -386,7 +386,7 @@ export const FaqPanelContent = () => {
                 />
             </div>
 
-            <div className="faq-panel-list-container" ref={listContainerRef}>
+            <div className={styles['faq-panel-list-container']} ref={listContainerRef}>
                 <CategoryBar<VisitorPage>
                     categories={visitorPages}
                     selectedCategory={selectedVisitorPage}
@@ -397,7 +397,7 @@ export const FaqPanelContent = () => {
                 />
 
                 {error.message && (
-                    <div className="faq-panel-error-container" data-testid="faq-error-container">
+                    <div className={styles['faq-panel-error-container']} data-testid="faq-error-container">
                         <span>{error.message}</span>
                         <button onClick={handleRetry} type="button" className="retry-link">
                             {COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN}

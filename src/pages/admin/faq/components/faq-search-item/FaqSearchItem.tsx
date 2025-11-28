@@ -1,6 +1,6 @@
 import { useRef, useMemo, useImperativeHandle, forwardRef } from 'react';
 import { SearchItemContentRef } from '../../../../../components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
-import './FaqSearchItem.scss';
+import styles from './FaqSearchItem.module.scss';
 import { FaqSearchItemData } from '../../../../../types/admin/faq';
 
 export interface FaqSearchItemProps {
@@ -15,9 +15,9 @@ export const FaqSearchItem = forwardRef<SearchItemContentRef, FaqSearchItemProps
 
     const tooltipContent = useMemo(
         () => (
-            <div className="faq-search-item-tooltip">
-                <div className="faq-search-item-tooltip__name">{item.question}</div>
-                <div className="faq-search-item-tooltip__pages">{pagesText}</div>
+            <div className={styles['faq-search-item-tooltip']}>
+                <div className={styles['faq-search-item-tooltip__name']}>{item.question}</div>
+                <div className={styles['faq-search-item-tooltip__pages']}>{pagesText}</div>
             </div>
         ),
         [item.question, pagesText],
@@ -37,11 +37,11 @@ export const FaqSearchItem = forwardRef<SearchItemContentRef, FaqSearchItemProps
     }));
 
     return (
-        <div className="faq-search-item">
-            <span ref={nameRef} className="faq-search-item__name">
+        <div className={styles['faq-search-item']}>
+            <span ref={nameRef} className={styles['faq-search-item__name']}>
                 {item.question}
             </span>
-            <span ref={pagesRef} className="faq-search-item__pages">
+            <span ref={pagesRef} className={styles['faq-search-item__pages']}>
                 {pagesText}
             </span>
         </div>

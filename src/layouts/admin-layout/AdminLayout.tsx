@@ -1,13 +1,13 @@
-import './AdminLayout.scss';
+import styles from './AdminLayout.module.scss';
 import { Outlet } from 'react-router-dom';
 import { AdminNavigation } from '../../components/admin/admin-navigation/AdminNavigation';
 
 export const AdminLayout = () => (
-    <div className="admin">
-        <div className="admin__navigation">
+    <div className={styles['admin']}>
+        <div className={styles['admin__navigation']}>
             <AdminNavigation />
         </div>
-        <div className="admin__page">
+        <div className={styles['admin__page']}>
             <Outlet />
         </div>
     </div>

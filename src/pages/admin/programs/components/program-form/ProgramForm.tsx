@@ -9,7 +9,7 @@ import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useF
 import { Image, ImageValues } from '../../../../../types/common/image';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import './ProgramForm.scss';
+import styles from './ProgramForm.module.scss';
 
 export interface ProgramFormValues {
     name: string;
@@ -128,7 +128,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
 
         return (
-            <form className="program-form-main" data-testid="test-form" noValidate>
+            <form className={styles['program-form-main']} data-testid="test-form" noValidate>
                 {/* Categories Field */}
                 <MultiSelectInputGroup
                     label={PROGRAMS_TEXT.FORM.LABEL.CATEGORY}

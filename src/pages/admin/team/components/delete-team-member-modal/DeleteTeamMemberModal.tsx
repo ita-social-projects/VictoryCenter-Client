@@ -6,7 +6,7 @@ import { TeamMember } from '../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
 import { Button } from '../../../../../components/admin/button/Button';
-import './DeleteTeamMemberModal.scss';
+import styles from './DeleteTeamMemberModal.module.scss';
 
 interface DeleteTeamMemberModalProps {
     isOpen: boolean;
@@ -51,7 +51,9 @@ export const DeleteTeamMemberModal = ({
     return (
         <Modal isOpen={isOpen} onClose={handleClose}>
             <Modal.Title>{TEAM_MEMBERS_TEXT.FORM.TITLE.DELETE_MEMBER}</Modal.Title>
-            <Modal.Content>{error && <div className="delete-team-member-error-container">{error}</div>}</Modal.Content>
+            <Modal.Content>
+                {error && <div className={styles['delete-team-member-error-container']}>{error}</div>}
+            </Modal.Content>
             <Modal.Actions>
                 <Button onClick={handleClose} buttonStyle="secondary" disabled={isSubmitting}>
                     {COMMON_TEXT_ADMIN.BUTTON.NO}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import './MemberComponent.scss';
+import styles from './MemberComponent.module.scss';
 import { ReactComponent as BlankUserImage } from '../../../../../assets/icons/blank-user.svg';
 import { TeamMember } from '../../../../../types/admin/team-members';
 import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
@@ -27,10 +27,10 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
         handleOnDeleteMember(member);
     };
     return (
-        <div className="members-item">
-            <div className="members-profile">
+        <div className={styles['members-item']}>
+            <div className={styles['members-profile']}>
                 {error || !imageUrl ? (
-                    <BlankUserImage className="member-icon" />
+                    <BlankUserImage className={styles['member-icon']} />
                 ) : (
                     <img
                         src={imageUrl}
@@ -40,25 +40,25 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
                 )}
                 <p>{member.fullName}</p>
             </div>
-            <div className="members-position">
+            <div className={styles['members-position']}>
                 <p>{member.description}</p>
             </div>
-            <div className="members-controls">
-                <div className="program-info-status">
+            <div className={styles['members-controls']}>
+                <div className={styles['program-info-status']}>
                     <VisibilityStatusLabel status={member.status} />
                 </div>
-                <div className="members-actions">
+                <div className={styles['members-actions']}>
                     <button
                         aria-label={TEAM_MEMBERS_TEXT.ACTIONS.EDIT}
                         type="button"
                         onClick={handleEditMember}
-                        className="members-actions-edit"
+                        className={styles['members-actions-edit']}
                     />
                     <button
                         aria-label={TEAM_MEMBERS_TEXT.ACTIONS.DELETE}
                         type="button"
                         onClick={handleDeleteMember}
-                        className="members-actions-delete"
+                        className={styles['members-actions-delete']}
                     />
                 </div>
             </div>

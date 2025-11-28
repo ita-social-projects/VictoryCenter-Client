@@ -8,7 +8,7 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { TeamCategory } from '../../../../../types/admin/team-category';
 import { TEAM_CATEGORY_VALIDATION } from '../../../../../const/admin/team';
 import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
-import './DeleteTeamCategoryModal.scss';
+import styles from './DeleteTeamCategoryModal.module.scss';
 
 interface DeleteTeamCategoryModalProps {
     isOpen: boolean;
@@ -68,7 +68,7 @@ export const DeleteTeamCategoryModal = ({ isOpen, onClose, onConfirm, categories
         <Modal isOpen={isOpen} onClose={handleClose}>
             <Modal.Title>{COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY}</Modal.Title>
             <Modal.Content>
-                <div className="delete-category-modal-content">
+                <div className={styles['delete-category-modal-content']}>
                     <SingleSelectInputGroup
                         id="delete-category-select"
                         label={COMMON_TEXT_ADMIN.CATEGORIES.FORM.LABEL.CATEGORY}
@@ -89,7 +89,7 @@ export const DeleteTeamCategoryModal = ({ isOpen, onClose, onConfirm, categories
                             text={TEAM_CATEGORY_VALIDATION.teamMembersCount.getRelocationOrRemovalHint()}
                         />
                     )}
-                    {error && <div className="team-category-modal-error-container">{error}</div>}
+                    {error && <div className={styles['team-category-modal-error-container']}>{error}</div>}
                 </div>
             </Modal.Content>
             <Modal.Actions>

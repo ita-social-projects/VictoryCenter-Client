@@ -5,7 +5,7 @@ import { ImageInput, ImageInputProps } from '../../../../../components/admin/ima
 import { Content } from '../../../../../types/admin/who-we-are';
 import { ImageValues } from '../../../../../types/common/image';
 import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
-import './CardContent.scss';
+import styles from './CardContent.module.scss';
 
 interface CardContentProps {
     content: Content;
@@ -49,7 +49,7 @@ export const CardContent = ({
     };
 
     return (
-        <div style={{ width: imageInputProps.style?.width }} className="card-content">
+        <div style={{ width: imageInputProps.style?.width }} className={styles['card-content']}>
             <ImageInput
                 value={content?.image ?? null}
                 onChange={handleImageChange}
@@ -58,9 +58,11 @@ export const CardContent = ({
                 setError={setImageError}
                 {...imageInputProps}
             />
-            {imageError && <p className="error">{imageError}</p>}
-            <div className="card-content-description-wrapper">
-                <span className="card-content-description-wrapper-label">{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
+            {imageError && <p className={styles['error']}>{imageError}</p>}
+            <div className={styles['card-content-description-wrapper']}>
+                <span className={styles['card-content-description-wrapper-label']}>
+                    {COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                </span>
                 <TextAreaWithCharacterLimit
                     onChange={handleDescriptionChange}
                     value={content.description ?? ''}
@@ -70,7 +72,7 @@ export const CardContent = ({
                     rows={rows}
                     onBlur={onDescriptionValidate}
                 />
-                {descriptionError && <p className="error">{descriptionError}</p>}
+                {descriptionError && <p className={styles['error']}>{descriptionError}</p>}
             </div>
         </div>
     );

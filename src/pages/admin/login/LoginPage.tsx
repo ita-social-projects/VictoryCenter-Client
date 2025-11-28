@@ -1,4 +1,4 @@
-import './LoginPage.scss';
+import styles from './LoginPage.module.scss';
 import { useState } from 'react';
 import { LoginForm } from './login-form/LoginForm';
 import { Button } from '../../../components/admin/button/Button';
@@ -10,7 +10,7 @@ export const LoginPage = () => {
     const onClickHandler = () => setShowModal(false);
 
     return (
-        <div className="page-layout">
+        <div className={styles['page-layout']}>
             <LoginForm setShowErrorModal={setShowModal} />
 
             <Modal isOpen={showModal} onClose={onClickHandler}>

@@ -2,7 +2,7 @@ import { Content } from '../../../../../../types/admin/who-we-are';
 import React, { useState } from 'react';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import './DescriptionSection.scss';
+import styles from './DescriptionSection.module.scss';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { OurMission } from '../../../../../public/about-us-page/our-mission/OurMission';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
@@ -50,14 +50,16 @@ export const DescriptionSection = ({
     };
 
     return (
-        <div className="description-section">
+        <div className={styles['description-section']}>
             <OurMission
                 description={descriptionContent.description ?? ''}
-                className="description-section-show-block"
+                className={styles['description-section-show-block']}
                 navigate={false}
             />
-            <div className="description-section-textarea">
-                <span className="description-section-textarea-label">{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
+            <div className={styles['description-section-textarea']}>
+                <span className={styles['description-section-textarea-label']}>
+                    {COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
+                </span>
                 <TextAreaWithCharacterLimit
                     onChange={handleDescriptionChange}
                     value={descriptionContent.description ?? ''}
@@ -67,7 +69,7 @@ export const DescriptionSection = ({
                     rows={5}
                     onBlur={handleBlur}
                 />
-                {descriptionError && <p className="error">{descriptionError}</p>}
+                {descriptionError && <p className={styles['error']}>{descriptionError}</p>}
                 <Button
                     className="button"
                     buttonStyle={'primary'}

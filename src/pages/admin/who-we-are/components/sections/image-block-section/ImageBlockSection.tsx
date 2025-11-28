@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { ImageValues } from '../../../../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
-import './ImageBlockSection.scss';
+import styles from './ImageBlockSection.module.scss';
 import { InputWithCharacterLimit } from '../../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { ContentType } from '../../../../../../types/common/about-us';
@@ -93,7 +93,7 @@ export const ImageSection = ({
     };
 
     return (
-        <div className="image-section">
+        <div className={styles['image-section']}>
             <div className="image-wrapper">
                 <ImageInput
                     setError={setImageError}
@@ -104,16 +104,16 @@ export const ImageSection = ({
                     {...imageInputProps}
                 />
                 {imageError && (
-                    <p data-testid="image-error" className="error">
+                    <p data-testid="image-error" className={styles['error']}>
                         {imageError}
                     </p>
                 )}
             </div>
 
-            <div className="content-wrapper">
+            <div className={styles['content-wrapper']}>
                 {titleContent && (
-                    <div className="content-wrapper-title">
-                        <label htmlFor={titleContent.id.toString()} className="content-wrapper-title-label">
+                    <div className={styles['content-wrapper-title']}>
+                        <label htmlFor={titleContent.id.toString()} className={styles['content-wrapper-title-label']}>
                             {COMMON_TEXT_ADMIN.TYPE.TITLE}
                         </label>
                         <InputWithCharacterLimit
@@ -122,12 +122,12 @@ export const ImageSection = ({
                             name={COMMON_TEXT_ADMIN.TYPE.TITLE}
                             id={titleContent.id.toString()}
                             maxLength={titleLimit}
-                            className="content-wrapper-title-field"
+                            className={styles['content-wrapper-title-field']}
                             onBlur={handleTitleBlur}
                             disabled={true}
                         />
                         {titleError && (
-                            <p data-testid="title-error" className="error">
+                            <p data-testid="title-error" className={styles['error']}>
                                 {titleError}
                             </p>
                         )}
@@ -135,8 +135,11 @@ export const ImageSection = ({
                 )}
 
                 {descriptionContent && (
-                    <div className="content-wrapper-description">
-                        <label htmlFor={descriptionContent.id.toString()} className="content-wrapper-description-label">
+                    <div className={styles['content-wrapper-description']}>
+                        <label
+                            htmlFor={descriptionContent.id.toString()}
+                            className={styles['content-wrapper-description-label']}
+                        >
                             {COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                         </label>
                         <TextAreaWithCharacterLimit
@@ -149,7 +152,7 @@ export const ImageSection = ({
                             onBlur={handleDescriptionBlur}
                         />
                         {descriptionError && (
-                            <p data-testid="description-error" className="error">
+                            <p data-testid="description-error" className={styles['error']}>
                                 {descriptionError}
                             </p>
                         )}

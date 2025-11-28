@@ -1,4 +1,4 @@
-import './LoginForm.scss';
+import styles from './LoginForm.module.scss';
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { ReactComponent as Logo } from '../../../../assets/icons/logo-with-text.svg';
@@ -34,12 +34,12 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="login-form" spellCheck={false}>
+        <form onSubmit={handleSubmit} className={styles['login-form']} spellCheck={false}>
             <NavLink to={PUBLIC_ROUTES.ROOT}>
                 <Logo />
             </NavLink>
-            <h2 className="login-form-title">{LOGIN_CONST.FORM.TITLE}</h2>
-            <div className="login-form-group">
+            <h2 className={styles['login-form-title']}>{LOGIN_CONST.FORM.TITLE}</h2>
+            <div className={styles['login-form-group']}>
                 <label htmlFor="email">{LOGIN_CONST.FORM.EMAIL_FIELD_LABEL}</label>
                 <input
                     id="email"
@@ -51,9 +51,9 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
                     required
                 />
             </div>
-            <div className="login-form-group">
+            <div className={styles['login-form-group']}>
                 <label htmlFor="password">{LOGIN_CONST.FORM.PASSWORD_FIELD_LABEL}</label>
-                <div className="password-input-container">
+                <div className={styles['password-input-container']}>
                     <input
                         id="password"
                         name="password"
@@ -65,7 +65,7 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
                     />
                     <button
                         type="button"
-                        className="visibility-toggle"
+                        className={styles['visibility-toggle']}
                         data-testid="visibility-toggle-button"
                         onClick={handleVisibilityChange}
                     >
@@ -73,8 +73,8 @@ export const LoginForm = ({ setShowErrorModal }: LoginFormProps) => {
                     </button>
                 </div>
             </div>
-            <div className="login-form-group">
-                <Button type="submit" buttonStyle="primary" className="submit-button">
+            <div className={styles['login-form-group']}>
+                <Button type="submit" buttonStyle="primary" className={styles['submit-button']}>
                     {LOGIN_CONST.FORM.SUBMIT_BUTTON}
                 </Button>
             </div>

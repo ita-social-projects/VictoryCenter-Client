@@ -183,7 +183,9 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                         disabled={isSubmitting || formDisabled}
                         maxLength={TEAM_MEMBER_VALIDATION.description.max}
                     />
-                    {errors.description && <span className={`${styles.error} desc-error`}>{errors.description}</span>}
+                    {errors.description && (
+                        <span className={`${styles.error} ${styles['desc-error']}`}>{errors.description}</span>
+                    )}
                 </div>
                 <div className={styles['form-group']}>
                     <InputLabel htmlFor={'image'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO} />

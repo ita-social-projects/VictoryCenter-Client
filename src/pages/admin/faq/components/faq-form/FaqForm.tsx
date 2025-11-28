@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useMemo } from 'react';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { VisitorPage } from '../../../../../types/admin/faq';
-import './FaqForm.scss';
+import styles from './FaqForm.module.scss';
 import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
 import { MultiSelectInputGroup } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
 import { FAQ_TEXT, FAQ_VALIDATION } from '../../../../../const/admin/faq';
@@ -108,7 +108,7 @@ export const FaqForm = forwardRef<FaqFormRef, FaqFormProps>(
         }, [formState.pages, setErrors]);
 
         return (
-            <form className="faq-form-main" data-testid="test-form" noValidate autoComplete="off">
+            <form className={styles['faq-form-main']} data-testid="test-form" noValidate autoComplete="off">
                 {/* Pages Field */}
                 <MultiSelectInputGroup
                     label={FAQ_TEXT.FORM.LABEL.PAGE}

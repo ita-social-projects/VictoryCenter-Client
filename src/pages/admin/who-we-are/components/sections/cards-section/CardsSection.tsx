@@ -1,7 +1,7 @@
 import { CardImageConfig, Content } from '../../../../../../types/admin/who-we-are';
 import { useState } from 'react';
 import { CardContent } from '../../card-content/CardContent';
-import './CardsSection.scss';
+import styles from './CardsSection.module.scss';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { ContentType } from '../../../../../../types/common/about-us';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
@@ -72,9 +72,9 @@ export const CardsSection = ({
 
     return (
         <>
-            <div className="cards-section-wrapper">
-                {titleText && <span className="cards-section-wrapper-title">{titleText}</span>}
-                <div className="cards-section-wrapper-cards">
+            <div className={styles['cards-section-wrapper']}>
+                {titleText && <span className={styles['cards-section-wrapper-title']}>{titleText}</span>}
+                <div className={styles['cards-section-wrapper-cards']}>
                     {cardContents.map((c: Content, index: number) => (
                         <CardContent
                             key={c.id}
@@ -92,7 +92,7 @@ export const CardsSection = ({
                     ))}
                 </div>
             </div>
-            <div className="button-section">
+            <div className={styles['button-section']}>
                 <Button
                     className="button"
                     buttonStyle="primary"

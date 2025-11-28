@@ -8,7 +8,7 @@ import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../const/
 import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
 import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { ImageInput } from '../../../../../components/admin/image-input/ImageInput';
-import './MemberForm.scss';
+import styles from './MemberForm.module.scss';
 import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
 import { TeamCategory } from '../../../../../types/admin/team-category';
 export interface TeamMemberFormValues {
@@ -139,11 +139,11 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
         return (
             <form
                 onSubmit={(e) => e.preventDefault()}
-                className="team-member-form-main"
+                className={styles['team-member-form-main']}
                 data-testid="test-form"
                 noValidate
             >
-                <div className="form-group">
+                <div className={styles['form-group']}>
                     <InputLabel htmlFor={'category'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.CATEGORY} isRequired />
                     <SingleSelectInput
                         disabled={isSubmitting || formDisabled}
@@ -155,10 +155,10 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                         getOptionName={(c: TeamCategory) => c.name}
                         placeholder={TEAM_MEMBERS_TEXT.FORM.LABEL.SELECT_CATEGORY}
                     />
-                    {errors.category && <p className="error">{errors.category}</p>}
+                    {errors.category && <p className={styles['error']}>{errors.category}</p>}
                 </div>
 
-                <div className="form-group">
+                <div className={styles['form-group']}>
                     <InputLabel htmlFor={'fullName'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.FULLNAME} isRequired />
                     <InputWithCharacterLimit
                         value={formState.fullName}
@@ -169,9 +169,9 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                         maxLength={TEAM_MEMBER_VALIDATION.fullName.max}
                         disabled={isSubmitting || formDisabled}
                     />
-                    {errors.fullName && <p className="error">{errors.fullName}</p>}
+                    {errors.fullName && <p className={styles['error']}>{errors.fullName}</p>}
                 </div>
-                <div className="form-group">
+                <div className={styles['form-group']}>
                     <InputLabel htmlFor={'description'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.DESCRIPTION} />
                     <TextAreaWithCharacterLimit
                         value={formState.description}
@@ -183,9 +183,9 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                         disabled={isSubmitting || formDisabled}
                         maxLength={TEAM_MEMBER_VALIDATION.description.max}
                     />
-                    {errors.description && <span className="error desc-error">{errors.description}</span>}
+                    {errors.description && <span className={`${styles.error} desc-error`}>{errors.description}</span>}
                 </div>
-                <div className="form-group">
+                <div className={styles['form-group']}>
                     <InputLabel htmlFor={'image'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO} />
                     <ImageInput
                         value={formState.image}
@@ -200,7 +200,7 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                             }))
                         }
                     />
-                    {errors.image && <span className="error">{errors.image}</span>}
+                    {errors.image && <span className={styles['error']}>{errors.image}</span>}
                 </div>
             </form>
         );

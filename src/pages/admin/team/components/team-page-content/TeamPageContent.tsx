@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import './TeamPageContent.scss';
+import styles from './TeamPageContent.module.scss';
 import { TeamMember } from '../../../../../types/admin/team-members';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { VisibilityStatus } from '../../../../../types/admin/common';
@@ -479,8 +479,8 @@ export const TeamPageContent = () => {
     );
 
     return (
-        <div className="team-page-wrapper" data-testid="team-page-content">
-            <div className="team-page-toolbar-container">
+        <div className={styles['team-page-wrapper']} data-testid="team-page-content">
+            <div className={styles['team-page-toolbar-container']}>
                 <TeamPageToolbar
                     onSearchQueryChange={handleSearchQueryByName}
                     onStatusFilterChange={onStatusFilterChange}
@@ -495,7 +495,7 @@ export const TeamPageContent = () => {
                 />
             </div>
 
-            <div className="team-page-list-container" ref={listContainerRef}>
+            <div className={styles['team-page-list-container']} ref={listContainerRef}>
                 <CategoryBar<TeamCategory>
                     categories={categories}
                     selectedCategory={selectedCategory}
@@ -508,9 +508,9 @@ export const TeamPageContent = () => {
                 />
 
                 {error.message && (
-                    <div className="team-page-error-container" data-testid="team-error-container">
+                    <div className={styles['team-page-error-container']} data-testid="team-error-container">
                         <span>{error.message}</span>
-                        <button onClick={handleRetry} type="button" className="retry-link">
+                        <button onClick={handleRetry} type="button" className={styles['retry-link']}>
                             {COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN}
                         </button>
                     </div>

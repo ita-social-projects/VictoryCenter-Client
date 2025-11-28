@@ -3,7 +3,7 @@ import { VisibilityStatusLabel } from '../../../../../components/admin/visibilit
 import { FAQ_TEXT } from '../../../../../const/admin/faq';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { FaqQuestion } from '../../../../../types/admin/faq';
-import './FaqComponent.scss';
+import styles from './FaqComponent.module.scss';
 
 export interface FaqComponentProps {
     faq: FaqQuestion;
@@ -21,21 +21,21 @@ export const FaqComponent = ({ faq, handleOnDeleteFaq, handleOnEditFaq }: FaqCom
     };
 
     return (
-        <div className="admin-page_faq-item">
-            <div className="faq-info">
-                <div className="faq-info-question">
+        <div className={styles['admin-page_faq-item']}>
+            <div className={styles['faq-info']}>
+                <div className={styles['faq-info-question']}>
                     <p>{faq.questionText}</p>
                 </div>
-                <div className="faq-info-answer">
+                <div className={styles['faq-info-answer']}>
                     <p>{faq.answerText}</p>
                 </div>
-                <div className="faq-info-status">
+                <div className={styles['faq-info-status']}>
                     <VisibilityStatusLabel status={faq.status} />
                 </div>
             </div>
-            <div className="faq-actions">
+            <div className={styles['faq-actions']}>
                 <ButtonTooltip position="bottom">
-                    <div className="faq-actions-tooltip">
+                    <div className={styles['faq-actions-tooltip']}>
                         <b>
                             {faq.status === VisibilityStatus.Published
                                 ? FAQ_TEXT.TOOLTIP.PUBLISHED_IN
@@ -46,9 +46,9 @@ export const FaqComponent = ({ faq, handleOnDeleteFaq, handleOnEditFaq }: FaqCom
                         ))}
                     </div>
                 </ButtonTooltip>
-                <div className="faq-actions-buttons">
-                    <button type="button" onClick={handleEditFaq} className="faq-edit-btn" />
-                    <button type="button" onClick={handleDeleteFaq} className="faq-delete-btn" />
+                <div className={styles['faq-actions-buttons']}>
+                    <button type="button" onClick={handleEditFaq} className={styles['faq-edit-btn']} />
+                    <button type="button" onClick={handleDeleteFaq} className={styles['faq-delete-btn']} />
                 </div>
             </div>
         </div>

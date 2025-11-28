@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import './DonateInput.scss';
+import styles from './DonateInput.module.scss';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
 import classNames from 'classnames';
 
@@ -94,24 +94,24 @@ export const DonateInput = ({
         <>
             <div
                 className={classNames(
-                    'donate-input',
+                    styles['donate-input'],
                     {
-                        'donate-input-title': isTitle,
-                        'donate-input-changed': hasEdited,
-                        'donate-input-title-create': isTitle && name === 'name',
+                        [styles['donate-input-title']]: isTitle,
+                        [styles['donate-input-changed']]: hasEdited,
+                        [styles['donate-input-title-create']]: isTitle && name === 'name',
                     },
                     className,
                 )}
             >
                 {label && (
-                    <div className={isTitle ? 'donate-input-title-label' : 'donate-input-label'}>
-                        {isRequired && editable && <span className="donate-input-required">*</span>}
+                    <div className={isTitle ? styles['donate-input-title-label'] : styles['donate-input-label']}>
+                        {isRequired && editable && <span className={styles['donate-input-required']}>*</span>}
                         {label}
                     </div>
                 )}
 
-                <div className={isTitle ? 'donate-input-title-body' : 'donate-input-body'}>
-                    {isTitle && editable && isRequired && <span className="donate-input-required">*</span>}
+                <div className={isTitle ? styles['donate-input-title-body'] : styles['donate-input-body']}>
+                    {isTitle && editable && isRequired && <span className={styles['donate-input-required']}>*</span>}
 
                     <textarea
                         ref={textAreaRef}
@@ -125,7 +125,7 @@ export const DonateInput = ({
                             onBlur?.(e);
                         }}
                         readOnly={!editable}
-                        className="donate-input-textarea"
+                        className={styles['donate-input-textarea']}
                         inputMode={onlyNumbers ? 'numeric' : undefined}
                         maxLength={maxLength ? prefix.length + maxLength : undefined}
                     />
@@ -136,14 +136,14 @@ export const DonateInput = ({
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={handleClear}
                             aria-label="Clear input"
-                            className="donate-input-clear-button"
+                            className={styles['donate-input-clear-button']}
                         ></button>
                     )}
                 </div>
             </div>
 
             {showCharacterCounter && (
-                <div className="donate-input-character-counter">
+                <div className={styles['donate-input-character-counter']}>
                     {currentLength}/{maxLength}
                 </div>
             )}

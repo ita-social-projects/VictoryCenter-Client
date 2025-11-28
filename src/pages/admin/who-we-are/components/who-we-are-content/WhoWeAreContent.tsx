@@ -3,7 +3,7 @@ import { WhoWeAreApi } from '../../../../../services/api/admin/who-we-are/who-we
 import { Content, WhoWeAreCategory, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
-import './WhoWeAreContent.scss';
+import styles from './WhoWeAreContent.module.scss';
 import { SectionsWrapper } from '../sections-wrapper/SectionsWrapper';
 import { Image } from '../../../../../types/common/image';
 import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
@@ -159,7 +159,7 @@ export const WhoWeAreContent = () => {
     const renderContent = () => {
         if (isLoading) {
             return (
-                <div className="who-we-are-main-box-loader">
+                <div className={styles['who-we-are-main-box-loader']}>
                     <InlineLoader size={3} />
                 </div>
             );
@@ -167,9 +167,9 @@ export const WhoWeAreContent = () => {
 
         if (error.message) {
             return (
-                <div className="who-we-are-main-box-error-message">
+                <div className={styles['who-we-are-main-box-error-message']}>
                     <p>{error.message}</p>
-                    <button onClick={handleRetry} type="button" className="retry-link">
+                    <button onClick={handleRetry} type="button" className={styles['retry-link']}>
                         {COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN}
                     </button>
                 </div>
@@ -189,7 +189,11 @@ export const WhoWeAreContent = () => {
 
     return (
         <>
-            <div className={classNames('who-we-are-main-box', { 'who-we-are-main-box--pending': isPending })}>
+            <div
+                className={classNames([styles['who-we-are-main-box']], {
+                    [styles['who-we-are-main-box--pending']]: isPending,
+                })}
+            >
                 <CategoryBar<WhoWeAreCategory>
                     categories={categories}
                     selectedCategory={selectedCategory}

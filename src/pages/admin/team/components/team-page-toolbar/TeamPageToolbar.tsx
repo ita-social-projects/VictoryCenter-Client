@@ -5,7 +5,7 @@ import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar'
 import { StatusFilterDropdown } from '../../../../../components/admin/status-filter-dropdown/StatusFilterDropdown';
 import { Button } from '../../../../../components/admin/button/Button';
 import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
-import './TeamPageToolbar.scss';
+import styles from './TeamPageToolbar.module.scss';
 import { TeamMember } from '../../../../../types/admin/team-members';
 import { TeamCategory } from '../../../../../types/admin/team-category';
 import { TeamMemberSearchItem } from '../../../../../components/admin/search-bar/team-member-search-item/TeamMemberSearchItem';
@@ -52,8 +52,8 @@ export const TeamPageToolbar = ({
     const itemRenderer = useMemo(() => createItemRenderer(categories), [categories]);
 
     return (
-        <div className="toolbar" data-testid="team-page-toolbar">
-            <div className="toolbar-search">
+        <div className={styles['toolbar']} data-testid="team-page-toolbar">
+            <div className={styles['toolbar-search']}>
                 <SearchBar<TeamMember>
                     searchItems={searchItems}
                     isLoading={isSearchLoading}
@@ -71,7 +71,7 @@ export const TeamPageToolbar = ({
                     onClear={onSearchClear}
                 />
             </div>
-            <div className="toolbar-actions">
+            <div className={styles['toolbar-actions']}>
                 <StatusFilterDropdown onStatusFilterChange={onStatusFilterChange} />
                 <Button onClick={onAddMember} buttonStyle="primary">
                     {TEAM_MEMBERS_TEXT.BUTTON.ADD_MEMBER}

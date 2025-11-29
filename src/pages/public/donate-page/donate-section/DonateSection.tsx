@@ -1,4 +1,4 @@
-import './DonateSection.scss';
+import styles from './DonateSection.module.scss';
 import React, { useState } from 'react';
 import { DONATE_SECTION, DONATION_AMOUNTS } from '../../../../const/public/donate-page';
 import { DonateTab, PaymentSystem, Currency } from '../../../../types/public/donate-page';
@@ -47,7 +47,7 @@ export const DonateSection = () => {
 
     return (
         <form
-            className="donateSection"
+            className={styles['donateSection']}
             action={`${getEnvVariable('REACT_APP_BACKEND_URL')}/${API_ROUTES.PAYMENTS.DONATE}`}
             method="post"
             onSubmit={handleSubmit}
@@ -67,51 +67,51 @@ export const DonateSection = () => {
                     { id: DonateTab.subscription, label: DONATE_SECTION.SUBSCRIPTION, disabled: true },
                 ]}
             ></Tabs>
-            <div className="donateAmountSection">
+            <div className={styles['donateAmountSection']}>
                 <input
                     name="amount"
-                    className="donateAmountInput"
+                    className={styles['donateAmountInput']}
                     value={donationAmount || '0'}
                     onChange={handleDonateAmountChange}
                     placeholder="0"
                 />
-                <div className="currencySelector">
+                <div className={styles['currencySelector']}>
                     <select name="currency" value={currency} onChange={handleCurrencyChange}>
                         <option value={Currency.UAH}>{currencyToString(Currency.UAH)}</option>
                         <option value={Currency.USD}>{currencyToString(Currency.USD)}</option>
                         <option value={Currency.EUR}>{currencyToString(Currency.EUR)}</option>
                     </select>
-                    <span className="arrowIcon">▼</span>
-                    <span className="currencyText">{currencyString}</span>
+                    <span className={styles['arrowIcon']}>▼</span>
+                    <span className={styles['currencyText']}>{currencyString}</span>
                 </div>
             </div>
-            <div className="fastDonateOptionsSection">
+            <div className={styles['fastDonateOptionsSection']}>
                 <button
-                    className="donateFastOptionButton"
+                    className={styles['donateFastOptionButton']}
                     onClick={() => handleQuickAmountChange(DONATION_AMOUNTS[currency].small)}
                     type="button"
                 >
-                    <span className="donateFastValueText">+{DONATION_AMOUNTS[currency].small} </span>
+                    <span className={styles['donateFastValueText']}>+{DONATION_AMOUNTS[currency].small} </span>
                     {currencyString}
                 </button>
                 <button
-                    className="donateFastOptionButton"
+                    className={styles['donateFastOptionButton']}
                     onClick={() => handleQuickAmountChange(DONATION_AMOUNTS[currency].medium)}
                     type="button"
                 >
-                    <span className="donateFastValueText">+{DONATION_AMOUNTS[currency].medium} </span>
+                    <span className={styles['donateFastValueText']}>+{DONATION_AMOUNTS[currency].medium} </span>
                     {currencyString}
                 </button>
                 <button
-                    className="donateFastOptionButton"
+                    className={styles['donateFastOptionButton']}
                     onClick={() => handleQuickAmountChange(DONATION_AMOUNTS[currency].large)}
                     type="button"
                 >
-                    <span className="donateFastValueText">+{DONATION_AMOUNTS[currency].large} </span>
+                    <span className={styles['donateFastValueText']}>+{DONATION_AMOUNTS[currency].large} </span>
                     {currencyString}
                 </button>
             </div>
-            <button className="donateButton" type="submit">
+            <button className={styles['donateButton']} type="submit">
                 {activeTab === DonateTab.oneTime
                     ? DONATE_SECTION.ONE_TIME_DONATE_BUTTON_LABEL
                     : DONATE_SECTION.SUBSCRIPTION_BUTTON_LABEL}

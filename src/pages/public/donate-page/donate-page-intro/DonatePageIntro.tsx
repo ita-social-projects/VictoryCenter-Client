@@ -1,5 +1,5 @@
 import React from 'react';
-import './DonatePageIntro.scss';
+import styles from './DonatePageIntro.module.scss';
 import { PAGE_TITLE } from '../../../../const/public/donate-page';
 
 export const DonatePageIntro = () => {
@@ -7,14 +7,14 @@ export const DonatePageIntro = () => {
 
     if (titleParts.length < 2) {
         return (
-            <div className="donatePageIntro">
+            <div className={styles['donatePageIntro']}>
                 <h1>{PAGE_TITLE}</h1>
             </div>
         );
     }
 
     return (
-        <div className="donatePageIntro">
+        <div className={styles['donatePageIntro']}>
             <h1>
                 {titleParts.map((part, index) => {
                     return (

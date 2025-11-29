@@ -1,4 +1,4 @@
-import './CopyTextButton.scss';
+import styles from './CopyTextButton.module.scss';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReactComponent as CheckMark } from '../../../../assets/icons/checkmark.svg';
@@ -19,14 +19,14 @@ export const CopyTextButton = ({ textToCopy }: CopyTextButtonProps) => {
 
     return (
         <button
-            className={`copyTextButton ${copied ? 'copied' : ''}`}
+            className={`${styles['copyTextButton']} ${copied ? `${styles['copied']}` : ''}`}
             onClick={handleCopy}
             onAnimationEnd={() => setCopied(false)}
         >
             {copied ? (
                 <>
                     <CheckMark />
-                    <span className="copyMessage">{t('COPIED_GLOBAL_MESSAGE')}</span>
+                    <span className={styles['copyMessage']}>{t('COPIED_GLOBAL_MESSAGE')}</span>
                 </>
             ) : (
                 <Copy />

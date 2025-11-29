@@ -59,6 +59,7 @@ export const CompanyValues = () => {
                     768: { slidesPerView: 2 },
                     1025: { slidesPerView: 3 },
                 }}
+                stylesModule={styles}
                 renderItem={(group, groupIndex) => <ValueCard key={groupIndex} group={group} groupIndex={groupIndex} />}
             />
         </div>

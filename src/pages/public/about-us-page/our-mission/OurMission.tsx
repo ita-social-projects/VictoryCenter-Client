@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
 import { ContentType } from '../../../../types/common/about-us';
 import { useTranslation } from 'react-i18next';
-import './OurMission.scss';
+import styles from './OurMission.module.scss';
 
 export interface OurMissionProps {
     content?: AboutUsContent[] | null;
@@ -20,24 +20,24 @@ export const OurMission = ({ content, description, className, navigate = true }:
     const descriptionValue = content?.find((x) => x.contentType === ContentType.Description)?.description ?? '';
 
     const linkContent = (
-        <div className="link-block">
-            <span className="link-title">{t('GO_TO_PROGRAMS')}</span>
-            <ArrowIcon className="arrow-icon" />
+        <div className={styles['link-block']}>
+            <span className={styles['link-title']}>{t('GO_TO_PROGRAMS')}</span>
+            <ArrowIcon className={styles['arrow-icon']} />
         </div>
     );
 
     return (
-        <div className={classNames('our-mission-block', className)}>
-            <div className="what-we-do">
-                <h2 className="mission-title">{t('WHAT_WE_DO')}</h2>
-                <div className="details-block">
-                    <p className="mission-details">{description ?? descriptionValue}</p>
+        <div className={classNames([styles['our-mission-block']], className)}>
+            <div className={styles['what-we-do']}>
+                <h2 className={styles['mission-title']}>{t('WHAT_WE_DO')}</h2>
+                <div className={styles['details-block']}>
+                    <p className={styles['mission-details']}>{description ?? descriptionValue}</p>
                     {navigate ? (
-                        <NavLink to={PUBLIC_ROUTES.PROGRAMS.FULL} className="link-to-programs">
+                        <NavLink to={PUBLIC_ROUTES.PROGRAMS.FULL} className={styles['link-to-programs']}>
                             {linkContent}
                         </NavLink>
                     ) : (
-                        <span className="link-to-programs">{linkContent}</span>
+                        <span className={styles['link-to-programs']}>{linkContent}</span>
                     )}
                 </div>
             </div>

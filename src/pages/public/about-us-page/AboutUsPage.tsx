@@ -10,7 +10,7 @@ import { AboutUsApi } from '../../../services/api/public/about-us/about-us-api';
 import { AboutUsSection, AboutUsContent } from '../../../types/public/about-us-page';
 import { SectionType } from '../../../types/common/about-us';
 import { LinearProgress } from '@mui/material';
-import './AboutUsPage.scss';
+import styles from './AboutUsPage.module.scss';
 import { useDataFetch } from '../../../hooks/common/use-data-fetch/useDataFetch';
 import { useTranslation } from 'react-i18next';
 
@@ -38,7 +38,7 @@ export const AboutUsPage = () => {
 
     if (isLoading) {
         return (
-            <div className="about-us-loader">
+            <div className={styles['about-us-loader']}>
                 <LinearProgress />
             </div>
         );
@@ -46,7 +46,7 @@ export const AboutUsPage = () => {
 
     if (error) {
         return (
-            <div className="about-us-error-message" role="alert">
+            <div className={styles['about-us-error-message']} role="alert">
                 {t('DOWNLOAD_ERROR')}
             </div>
         );

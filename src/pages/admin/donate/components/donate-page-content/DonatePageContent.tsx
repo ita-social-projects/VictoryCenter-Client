@@ -15,7 +15,7 @@ import {
 import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '../../../../../types/admin/toast';
 import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
-import './DonatePageContent.scss';
+import styles from './DonatePageContent.module.scss';
 
 export const DonatePageContent = () => {
     const { addToast } = useToast();
@@ -262,7 +262,7 @@ export const DonatePageContent = () => {
     );
 
     return (
-        <div className="donate-page-wrapper">
+        <div className={styles['donate-page-wrapper']}>
             <CategoryBar<Currencies>
                 categories={currencyCategories}
                 selectedCategory={selectedCategory}
@@ -271,8 +271,8 @@ export const DonatePageContent = () => {
                 getCategoryKey={(currency) => currency}
                 displayContextMenuButton={true}
             />
-            <div className="donate-page-container">
-                <div className="donate-page-item">
+            <div className={styles['donate-page-container']}>
+                <div className={styles['donate-page-item']}>
                     {config && (
                         <GenericDetails
                             key={`bank-details-${selectedCategory}`}
@@ -290,7 +290,7 @@ export const DonatePageContent = () => {
                     )}
                 </div>
 
-                <div className="donate-page-item">
+                <div className={styles['donate-page-item']}>
                     <SupportOptionsForm
                         supportOptions={supportOptions}
                         isLoading={isSupportOptionsLoading}

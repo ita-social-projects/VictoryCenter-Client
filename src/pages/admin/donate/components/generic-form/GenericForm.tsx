@@ -3,7 +3,7 @@ import { Button } from '../../../../../components/admin/button/Button';
 import { DonateInput } from '../donate-input/DonateInput';
 import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import './GenericForm.scss';
+import styles from './GenericForm.module.scss';
 import { FieldValues } from 'react-hook-form';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
 
@@ -281,7 +281,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
             return (
                 <div
-                    className={`generic-form ${mode} ${isChildForm ? 'child' : ''}`}
+                    className={`${styles['generic-form']} ${mode} ${isChildForm ? `${styles['child']}` : ''}`}
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
@@ -292,17 +292,17 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                     onClick={(e) => e.stopPropagation()}
                 >
                     {mode !== GenericFormMode.Create && (
-                        <div className="form-head-container">
+                        <div className={styles['form-head-container']}>
                             {!isChildForm && (
-                                <div className="form-header">
+                                <div className={styles['form-header']}>
                                     <button
-                                        className={`edit-btn ${mode}`}
+                                        className={`${styles['edit-btn']} ${mode}`}
                                         aria-label="edit-btn"
                                         onClick={handleEditClick}
                                         disabled={mode === GenericFormMode.Edit}
                                     />
                                     <button
-                                        className={`delete-btn ${mode}`}
+                                        className={`${styles['delete-btn']} ${mode}`}
                                         aria-label="delete-btn"
                                         onClick={handleDeleteClick}
                                     ></button>
@@ -312,7 +312,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                             {mode === GenericFormMode.View && (
                                 <>
                                     <div
-                                        className="form-name"
+                                        className={styles['form-name']}
                                         role="button"
                                         tabIndex={0}
                                         onKeyDown={(e) => {
@@ -323,12 +323,14 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                         onClick={() => setIsExpanded((prev) => !prev)}
                                     >
                                         {titleFieldName ? String(formState[titleFieldName] ?? '') : ''}
-                                        <span className={`arrow ${isExpanded ? 'expanded' : ''}`}></span>
+                                        <span
+                                            className={`${styles['arrow']} ${isItemsExpanded ? `${styles['expanded']}` : ''}`}
+                                        ></span>
                                     </div>
                                     {isChildForm && (
-                                        <div className="form-name-actions">
+                                        <div className={styles['form-name-actions']}>
                                             <button
-                                                className={`edit-btn ${mode}`}
+                                                className={`${styles['edit-btn']} ${mode}`}
                                                 aria-label="edit-btn"
                                                 type="button"
                                                 onClick={handleEditClick}
@@ -347,7 +349,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                     )}
 
                     {isExpanded && (
-                        <div className="form-body">
+                        <div className={styles['form-body']}>
                             {fields
                                 .filter((f) => {
                                     if (mode === GenericFormMode.View) {
@@ -364,9 +366,9 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                     return (
                                         <div
                                             key={String(f.name)}
-                                            className={`form-field ${isTitleField ? 'form-field-title-row' : ''}`}
+                                            className={`${styles['form-field']} ${isTitleField ? `${styles['form-field-title-row']}` : ''}`}
                                         >
-                                            <div className="form-field-content">
+                                            <div className={styles['form-field-content']}>
                                                 <DonateInput
                                                     name={String(f.name)}
                                                     label={f.label}
@@ -384,7 +386,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                     maxLength={f.maxLength}
                                                 />
                                                 {touchedFields.has(f.name) && errors[f.name] && (
-                                                    <span className="error">{errors[f.name]}</span>
+                                                    <span className={styles['error']}>{errors[f.name]}</span>
                                                 )}
                                             </div>
 
@@ -393,7 +395,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                     <button
                                                         type="button"
                                                         aria-label="edit-btn"
-                                                        className={`edit-btn ${mode}`}
+                                                        className={`${styles['edit-btn']} ${mode}`}
                                                         onClick={handleEditClick}
                                                         disabled
                                                     />
@@ -410,8 +412,8 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                 })}
 
                             {editable && (
-                                <div className="form-footer">
-                                    <div className="actions">
+                                <div className={styles['form-footer']}>
+                                    <div className={styles['actions']}>
                                         <Button type="button" onClick={handleCancel} buttonStyle="secondary">
                                             {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                                         </Button>

@@ -2,7 +2,8 @@ import { useState, useCallback, useRef } from 'react';
 import { Button } from '../../../../../components/admin/button/Button';
 import NotFoundIcon from '../../../../../assets/icons/not-found.svg';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import './GenericDetails.scss';
+import stylesGeneric from './GenericDetails.module.scss';
+import stylesDonate from '../donate-page-content/DonatePageContent.module.scss';
 import { FieldValues } from 'react-hook-form';
 import { GenericFormMode, GenericFormProps, GenericFormRef } from '../generic-form/GenericForm';
 import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
@@ -116,15 +117,15 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
 
     if (shouldShowLoader) {
         return (
-            <div className={`generic-details ${isChildForm ? 'child' : ''}`}>
+            <div className={`${stylesGeneric['generic-details']} ${isChildForm ? `${stylesGeneric['child']}` : ''}`}>
                 {title && (
-                    <div className="generic-details header">
+                    <div className={`${stylesGeneric['generic-details']} ${stylesGeneric['body']}`}>
                         {title}
-                        <span className="arrow"></span>
+                        <span className={stylesGeneric['arrow']}></span>
                     </div>
                 )}
-                <div className="generic-details body">
-                    <div className="generic-details-loader">
+                <div className={`${stylesGeneric['generic-details']} ${stylesGeneric['body']}`}>
+                    <div className={stylesGeneric['generic-details-loader']}>
                         <InlineLoader size={3} />
                     </div>
                 </div>
@@ -133,7 +134,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
     }
 
     return (
-        <div className={`generic-details ${isChildForm ? 'child' : ''}`}>
+        <div className={`${stylesGeneric['generic-details']} ${isChildForm ? `${stylesGeneric['child']}` : ''}`}>
             {title && (
                 <div
                     role="button"
@@ -143,19 +144,21 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             setIsItemsExpanded((prev) => !prev);
                         }
                     }}
-                    className="generic-details header"
+                    className={`${stylesGeneric['generic-details']} ${stylesGeneric['header']}`}
                     onClick={() => setIsItemsExpanded((prev) => !prev)}
                 >
                     {title}
-                    <span className={`arrow ${isItemsExpanded ? 'expanded' : ''}`}></span>
+                    <span
+                        className={`${stylesGeneric['arrow']} ${isItemsExpanded ? `${stylesGeneric['expanded']}` : ''}`}
+                    ></span>
                 </div>
             )}
             {!showNotFound && (
-                <div className="generic-details body">
+                <div className={`${stylesGeneric['generic-details']} ${stylesGeneric['body']}`}>
                     {items.length > 0 && isItemsExpanded && (
                         <>
                             {items.map((item) => (
-                                <div className="generic-details-item" key={item.id}>
+                                <div className={stylesGeneric['generic-details-item']} key={item.id}>
                                     <FormComponent
                                         initialData={item}
                                         initialMode={GenericFormMode.View}
@@ -185,7 +188,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                     )}
                     {!showNotFound && (
                         <Button
-                            className={`generic-details btn-add-new ${isAddFormVisible || editingItemId !== null ? 'disabled' : ''}`}
+                            className={`${stylesGeneric['generic-details']} ${stylesGeneric['btn-add-new']}  ${isAddFormVisible || editingItemId !== null ? `${stylesGeneric['disabled']}` : ''}`}
                             onClick={handleAdd}
                             buttonStyle="primary"
                             disabled={isAddFormVisible || editingItemId !== null}
@@ -198,7 +201,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
             )}
 
             {showNotFound && (
-                <div className="generic-details not-found">
+                <div className={`${stylesGeneric['generic-details']} ${stylesDonate['not-found']}`}>
                     {
                         <>
                             {!isChildForm && (
@@ -208,12 +211,12 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                                 </div>
                             )}
                             <Button
-                                className="generic-details btn-add"
+                                className={`${stylesGeneric['generic-details']} ${stylesGeneric['btn-add']} ${stylesDonate['btn-add']}`}
                                 onClick={handleAdd}
                                 buttonStyle={primaryAddButton ? 'primary' : 'secondary'}
                             >
                                 <div>{addNewText}</div>
-                                <PlusIcon className="plus-icon" />
+                                <PlusIcon className={stylesGeneric['plus-icon']} />
                             </Button>
                         </>
                     }

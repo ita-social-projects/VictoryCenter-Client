@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { DonateInput } from '../../donate-input/DonateInput';
-import './SupportOptionItem.scss';
+import stylesSupport from './SupportOptionItem.module.scss';
+import stylesDonate from '../../donate-page-content/DonatePageContent.module.scss';
 import { SupportOptionsType } from '../../../../../../types/admin/donate';
 import { ConfirmationModal } from '../../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
@@ -148,20 +149,22 @@ export const SupportOptionItem = ({
     };
 
     return (
-        <div className="support-option">
-            <div className={`support-option-header ${editable ? 'editable' : ''}`}>
-                {isViewMode && <div className="support-option-header-title">{data?.name}</div>}
+        <div className={stylesSupport['support-option']}>
+            <div
+                className={`${stylesSupport['support-option-header']} ${editable ? `${stylesSupport['editable']}` : ''}`}
+            >
+                {isViewMode && <div className={stylesSupport['support-option-header-title']}>{data?.name}</div>}
                 {!isCreateMode && (
-                    <div className="support-option-header-actions">
+                    <div className={stylesSupport['support-option-header-actions']}>
                         <button
                             aria-label="edit-btn"
-                            className={`edit-btn ${editable ? 'edit' : ''}`}
+                            className={`${stylesDonate['edit-btn']} ${editable ? `${stylesDonate['edit']}` : ''}`}
                             onClick={handleEditClick}
                             disabled={isSubmitting}
                         />
                         <button
                             aria-label="delete-btn"
-                            className="delete-btn delete-btn-icon"
+                            className={`${stylesDonate['delete-btn']} ${stylesDonate['delete-btn-icon']}`}
                             onClick={() =>
                                 setModalConfig({
                                     title: DONATE_TEXT.QUESTION.SUPPORT_OPTION.DELETE,
@@ -174,9 +177,9 @@ export const SupportOptionItem = ({
                 )}
             </div>
 
-            <div className="support-option-fields">
+            <div className={stylesSupport['support-option-fields']}>
                 {!isViewMode && (
-                    <div className="support-option-field">
+                    <div className={stylesSupport['support-option-field']}>
                         <DonateInput
                             name="name"
                             isTitle={true}
@@ -187,10 +190,10 @@ export const SupportOptionItem = ({
                             isRequired={true}
                             maxLength={VALIDATION_PARAMS.supportOptions.name.maxLength}
                         />
-                        {errors.name && <span className="error">{errors.name}</span>}
+                        {errors.name && <span className={stylesSupport['error']}>{errors.name}</span>}
                     </div>
                 )}
-                <div className="support-option-field">
+                <div className={stylesSupport['support-option-field']}>
                     <DonateInput
                         name="value"
                         isTitle={true}
@@ -202,12 +205,12 @@ export const SupportOptionItem = ({
                         isRequired={true}
                         maxLength={VALIDATION_PARAMS.supportOptions.value.maxLength}
                     />
-                    {errors.value && <span className="error">{errors.value}</span>}
+                    {errors.value && <span className={stylesSupport['error']}>{errors.value}</span>}
                 </div>
             </div>
 
             {editable && (
-                <div className="support-option-actions">
+                <div className={stylesSupport['support-option-actions']}>
                     <Button type="button" onClick={handleCancel} buttonStyle="secondary" disabled={isSubmitting}>
                         {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
                     </Button>

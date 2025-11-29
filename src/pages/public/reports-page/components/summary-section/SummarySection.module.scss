@@ -1,4 +1,5 @@
-@import "../../../../../assets/sass/variables/colors.scss";
+@use "../../../../../assets/sass/variables/colors" as c;
+@use "../../../../../assets/sass/mixins/effects.mixins" as effects;
 
 .root {
   margin-top: 64px; // TODO: fix PublicLayout Header uses fixed position conflicting with main content (cover content)
@@ -31,8 +32,7 @@
 .collected {
   grid-area: collected;
   height: 200px;
-  background: url('../../../../../assets/images/public/reports-page/collected.jpg') center/cover no-repeat;
-  filter: grayscale(100%);
+  @include effects.grayscale-bg-image('../../images/public/reports-page/collected.jpg');
 
   @media (min-width: 768px) {
     height: 485px;
@@ -45,24 +45,23 @@
 
 .expenses {
   grid-area: expenses;
-  background-color: $light-blue-600;
+  background-color: c.$light-blue-600;
 }
 
 .income {
   grid-area: income;
-  background-color: $blue-500;
+  background-color: c.$blue-500;
 }
 
 .programs {
   grid-area: programs;
-  background-color: $yellow-300;
+  background-color: c.$yellow-300;
 }
 
 .lives {
   grid-area: lives;
   height: 200px;
-  background: url('../../../../../assets/images/public/reports-page/lives-changed.jpg') center/cover no-repeat;
-  filter: grayscale(100%);
+  @include effects.grayscale-bg-image('../../images/public/reports-page/lives-changed.jpg');
 
   @media (min-width: 768px) {
     height: 240px;

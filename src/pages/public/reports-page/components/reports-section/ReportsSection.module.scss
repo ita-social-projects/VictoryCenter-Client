@@ -1,0 +1,44 @@
+@use "../../../../../assets/sass/variables/colors" as c;
+@use "../../../../../assets/sass/mixins/typography.mixins" as type;
+
+.root {
+  display: grid;
+  grid-template-areas:
+    "text"
+    "list";
+  row-gap: 64px;
+
+  margin: 64px 16px 120px;
+
+  @media (min-width: 560px) {
+    margin: 96px 56px 120px;
+  }
+
+  @media (min-width: 1440px) {
+    grid-template-columns: 1fr 1.75fr;
+    grid-template-areas: "text list";
+    column-gap: 128px;
+    align-items: center;
+  }
+}
+
+.text {
+  grid-area: text;
+}
+
+.reportList {
+  grid-area: list;
+}
+
+.title {
+  @include type.h4-bold-uppercase;
+  margin-bottom: 16px;
+
+  @media (min-width: 560px) {
+    @include type.h3-bold-uppercase;
+  }
+}
+
+.description {
+  @include type.body-2-regular;
+}

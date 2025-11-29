@@ -1,4 +1,4 @@
-import './OurTeam.scss';
+import styles from './OurTeam.module.scss';
 import { NavLink } from 'react-router-dom';
 import { PUBLIC_ROUTES } from '../../../../const/public/routes';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
@@ -17,11 +17,11 @@ export const OurTeam = ({ content }: OurTeamProps) => {
     const description = content?.find((x) => x.contentType === ContentType.Description)?.description ?? '';
 
     return (
-        <div className="our-team-block">
-            <img src={imageUrl} alt="Our Team" className="our-team-image" />
-            <div className="team-info">
-                <p className="team-description">{description}</p>
-                <NavLink to={PUBLIC_ROUTES.TEAM.FULL} className="link-to-team">
+        <div className={styles['our-team-block']}>
+            <img src={imageUrl} alt="Our Team" className={styles['our-team-image']} />
+            <div className={styles['team-info']}>
+                <p className={styles['team-description']}>{description}</p>
+                <NavLink to={PUBLIC_ROUTES.TEAM.FULL} className={styles['link-to-team']}>
                     {t('GO_TO_TEAM')}
                 </NavLink>
             </div>

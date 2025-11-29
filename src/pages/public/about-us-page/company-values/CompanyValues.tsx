@@ -7,6 +7,15 @@ import { ValueCard } from './components/value-card/ValueCard';
 
 export type ValueItem = Record<string, string>;
 
+const SWIPER_CONFIG = {
+    slidesPerView: 1,
+    breakpoints: {
+        568: { slidesPerView: 2 },
+        768: { slidesPerView: 2 },
+        1025: { slidesPerView: 3 },
+    },
+} as const;
+
 const chunk = <T,>(arr: T[], size: number): T[][] => {
     const result: T[][] = [];
     for (let i = 0; i < arr.length; i += size) {
@@ -53,14 +62,11 @@ export const CompanyValues = () => {
         <div className={styles['values-block']}>
             <Swiper
                 items={chunkedValues}
-                slidesPerView={1}
-                breakpoints={{
-                    568: { slidesPerView: 2 },
-                    768: { slidesPerView: 2 },
-                    1025: { slidesPerView: 3 },
-                }}
+                {...SWIPER_CONFIG}
                 stylesModule={styles}
-                renderItem={(group, groupIndex) => <ValueCard key={groupIndex} group={group} groupIndex={groupIndex} />}
+                renderItem={(group, groupIndex) => (
+                    <ValueCard key={groupIndex} group={group} groupIndex={groupIndex} stylesModule={styles} />
+                )}
             />
         </div>
     );

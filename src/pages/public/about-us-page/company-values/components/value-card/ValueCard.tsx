@@ -4,22 +4,24 @@ import { ValueItem } from '../../CompanyValues';
 interface ValueGroupProps {
     group: ValueItem[];
     groupIndex: number;
+    stylesModule: Record<string, string>;
 }
 
-export function ValueCard({ group, groupIndex }: ValueGroupProps) {
+export function ValueCard({ group, groupIndex, stylesModule }: ValueGroupProps) {
     const { t } = useTranslation('aboutUsPage');
+
     return (
         <>
             {groupIndex === 0 && (
-                <div className="values-title">
+                <div className={stylesModule['values-title']}>
                     <h2>{t('OUR_VALUES')}</h2>
                 </div>
             )}
-            <div className={`value-card card-${groupIndex + 1}`}>
+            <div className={`${stylesModule['value-card']} ${stylesModule[`card-${groupIndex + 1}`]}`}>
                 {group.map((val) => (
-                    <div className="value-item" key={val.name}>
-                        <h3 className="value-name">{val.name}</h3>
-                        <div className="value-description">{val.description}</div>
+                    <div className={stylesModule['value-item']} key={val.name}>
+                        <h3 className={stylesModule['value-name']}>{val.name}</h3>
+                        <div className={stylesModule['value-description']}>{val.description}</div>
                     </div>
                 ))}
             </div>

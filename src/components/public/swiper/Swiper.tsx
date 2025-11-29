@@ -14,6 +14,7 @@ interface SwiperProps<T> {
     slidesPerView?: number;
     breakpoints?: Record<number, { slidesPerView: number }>;
     showScrollbar?: boolean;
+    stylesModule?: Record<string, string>;
 }
 
 export function Swiper<T>({
@@ -22,6 +23,7 @@ export function Swiper<T>({
     slidesPerView = 1,
     breakpoints = {},
     showScrollbar = false,
+    stylesModule,
 }: SwiperProps<T>) {
     const swiperRef = useRef<SwiperClass | null>(null);
     const [isPrevEnabled, setIsPrevEnabled] = useState(false);
@@ -30,6 +32,7 @@ export function Swiper<T>({
     const handlePrev = useCallback(() => {
         swiperRef.current?.slidePrev();
     }, []);
+
     const handleNext = useCallback(() => {
         swiperRef.current?.slideNext();
     }, []);
@@ -66,6 +69,13 @@ export function Swiper<T>({
         return null;
     }
 
+    const getClassName = (baseClass: string): string => {
+        if (!stylesModule || !stylesModule[baseClass]) {
+            return baseClass;
+        }
+        return stylesModule[baseClass];
+    };
+
     return (
         <>
             <SwiperReact
@@ -83,22 +93,22 @@ export function Swiper<T>({
                     <SwiperSlide key={index}>{renderItem(item, index)}</SwiperSlide>
                 ))}
             </SwiperReact>
-            <div className="button-container">
+            <div className={getClassName('button-container')}>
                 <button
                     type="button"
                     onClick={handlePrev}
-                    className="arrow-button arrow-left"
+                    className={`${getClassName('arrow-button')} ${getClassName('arrow-left')}`}
                     disabled={!isPrevEnabled}
                 >
-                    <ArrowLeft className="arrow-icon" />
+                    <ArrowLeft className={getClassName('arrow-icon')} />
                 </button>
                 <button
                     type="button"
                     onClick={handleNext}
-                    className="arrow-button arrow-right"
+                    className={`${getClassName('arrow-button')} ${getClassName('arrow-right')}`}
                     disabled={!isNextEnabled}
                 >
-                    <ArrowRight className="arrow-icon" />
+                    <ArrowRight className={getClassName('arrow-icon')} />
                 </button>
             </div>
         </>

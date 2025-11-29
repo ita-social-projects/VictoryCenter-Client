@@ -5,7 +5,7 @@ import classNames from 'classnames';
 import { LinearProgress } from '@mui/material';
 import { useDataFetch } from '../../../../hooks/common/use-data-fetch/useDataFetch';
 import { useTranslation } from 'react-i18next';
-import './ProgramsSection.scss';
+import styles from './ProgramsSection.module.scss';
 import { ProgramCard } from '../../../../components/public/program-card/ProgramCard';
 
 export const ProgramsSection: React.FC = () => {
@@ -30,17 +30,17 @@ export const ProgramsSection: React.FC = () => {
     };
 
     return (
-        <div className="program-block">
-            <div className="menu-block">
+        <div className={styles['program-block']}>
+            <div className={styles['menu-block']}>
                 <h2>{t('PROGRAMS')}</h2>
-                <div className="button-block">
+                <div className={styles['button-block']}>
                     {data?.programsCategories.map((pc) => (
                         <button
                             onClick={() => handleProgramCategoryChange(pc)}
                             key={pc.id}
                             className={classNames({
-                                'white-button': programCategory?.id !== pc.id,
-                                'black-button': programCategory?.id === pc.id,
+                                [styles['white-button']]: programCategory?.id !== pc.id,
+                                [styles['black-button']]: programCategory?.id === pc.id,
                             })}
                         >
                             {pc.name}
@@ -49,17 +49,17 @@ export const ProgramsSection: React.FC = () => {
                     <button
                         onClick={() => handleProgramCategoryChange(null)}
                         className={classNames({
-                            'white-button': programCategory !== null,
-                            'black-button': programCategory === null,
+                            [styles['white-button']]: programCategory !== null,
+                            [styles['black-button']]: programCategory === null,
                         })}
                     >
                         {t('PROGRAMS_ALL')}
                     </button>
                 </div>
             </div>
-            <div className="cards-block">
+            <div className={styles['cards-block']}>
                 {error && (
-                    <div className="error-message" role="alert" style={{ color: 'red' }}>
+                    <div className={styles['error-message']} role="alert" style={{ color: 'red' }}>
                         {t('FAILED_TO_LOAD_THE_PROGRAMS')}
                     </div>
                 )}

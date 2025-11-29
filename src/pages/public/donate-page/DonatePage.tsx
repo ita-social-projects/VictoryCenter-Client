@@ -8,7 +8,7 @@ import { FaqSection } from '../../../components/public/faq-section/FaqSection';
 import { DonatePageIntro } from './donate-page-intro/DonatePageIntro';
 import { DonateSection } from './donate-section/DonateSection';
 import { RightSection } from './right-section/RightSection';
-import './DonatePage.scss';
+import styles from './DonatePage.module.scss';
 
 export const DonatePage = () => {
     const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -26,22 +26,22 @@ export const DonatePage = () => {
     }, [donateData, error]);
 
     const renderLoader = () => (
-        <div className="donatePage">
+        <div className={styles['donatePage']}>
             <DonatePageIntro />
-            <div className="donate-page-loader">
+            <div className={styles['donate-page-loader']}>
                 <LinearProgress />
             </div>
         </div>
     );
 
     const renderContent = () => (
-        <div className="donatePage">
+        <div className={styles['donatePage']}>
             <DonatePageIntro />
-            <div className="donatePageContent">
-                <div className="stickyBlock">
+            <div className={styles['donatePageContent']}>
+                <div className={styles['stickyBlock']}>
                     <DonateSection />
                 </div>
-                <div className="rightSectionContainer">
+                <div className={styles['rightSectionContainer']}>
                     <RightSection donateData={donateData} error={error} />
                 </div>
             </div>

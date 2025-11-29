@@ -1,4 +1,4 @@
-import './AlternativeSupportWays.scss';
+import styles from './AlternativeSupportWays.module.scss';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
 import { ALTERNATIVE_SUPPORT_WAYS } from '../../../../../const/public/donate-page';
 import { PublishedSupportOptionsDto, Currency } from '../../../../../types/public/donate-page';
@@ -16,14 +16,14 @@ export const AlternativeSupportWays = ({ supportOptions, currentCurrency }: Alte
     }
 
     return (
-        <div className="alternativeSupportWays">
+        <div className={styles['alternativeSupportWays']}>
             <h2>{ALTERNATIVE_SUPPORT_WAYS.ALTERNATIVE_SUPPORT_WAYS_LABEL}</h2>
 
             {currentCurrencyOptions.map((option) => (
-                <div key={option.id} className="labelContainer">
+                <div key={option.id} className={styles['labelContainer']}>
                     <h3>{option.name}</h3>
-                    <div className="labelWithCopyButton">
-                        <span className="label">{option.value}</span>
+                    <div className={styles['labelWithCopyButton']}>
+                        <span className={styles['label']}>{option.value}</span>
                         <CopyTextButton textToCopy={option.value} />
                     </div>
                 </div>

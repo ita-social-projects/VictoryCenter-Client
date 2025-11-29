@@ -1,4 +1,4 @@
-import './AbroadPaymentDetails.scss';
+import styles from './AbroadPaymentDetails.module.scss';
 import { CorrespondentBanksSection } from './CorrespondentBanksSection';
 import { PaymentDetailsSection } from './PaymentDetailsSection';
 import { Currency, PublishedForeignBankDetailsDto } from '../../../../../types/public/donate-page';
@@ -22,9 +22,9 @@ export const AbroadPaymentDetails = ({ currency, foreignBankDetails }: AbroadPay
     const ibanLabel = ABROAD_PAYMENT_DETAILS[`IBAN_${currencyString}_LABEL`];
 
     return (
-        <div className="abroadPaymentDetails">
+        <div className={styles['abroadPaymentDetails']}>
             {foreignBankDetails.map((bank, index) => (
-                <div key={bank.id} className={`bankGroup ${index > 0 ? 'separated' : ''}`}>
+                <div key={bank.id} className={`${styles['bankGroup']} ${index > 0 ? styles['separated'] : ''}`}>
                     <PaymentDetailsSection
                         title={index === 0 ? title : ''}
                         ibanLabel={ibanLabel}

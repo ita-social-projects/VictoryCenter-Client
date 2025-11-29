@@ -11,10 +11,17 @@ jest.mock('../../copy-text-button/CopyTextButton', () => ({
 }));
 
 describe('PaymentLabelWithCopy', () => {
+    const mockStylesModule = {
+        'paymentLabel': 'paymentLabel',
+        'labelWithCopyButton': 'labelWithCopyButton',
+        'label': 'label',
+    };
+
     const createProps = (overrides = {}) => ({
         label: 'Test Label',
         value: 'Test Value',
         copyValue: 'Copy Text',
+        stylesModule: mockStylesModule,
         ...overrides,
     });
 

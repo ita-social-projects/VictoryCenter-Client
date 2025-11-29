@@ -1,3 +1,4 @@
+import styles from './AbroadPaymentDetails.module.scss';
 import { PaymentLabelWithCopy } from './PaymentLabelWithCopy';
 import { MultiFieldLabelWithCopy } from './MultiFieldLabelWithCopy';
 import { PAYMENT_DETAILS_COMMON, ABROAD_PAYMENT_DETAILS } from '../../../../../const/public/donate-page';
@@ -21,19 +22,21 @@ export const PaymentDetailsSection = ({
     swift,
     address,
 }: PaymentDetailsSectionProps) => (
-    <div className="abroadPaymentDetailsBlock">
+    <div className={styles['abroadPaymentDetailsBlock']}>
         <h2>{title}</h2>
-        <div className="abroadPaymentDetailsContent">
+        <div className={styles['abroadPaymentDetailsContent']}>
             <PaymentLabelWithCopy
                 label={PAYMENT_DETAILS_COMMON.RECIPIENT_LABEL}
                 value={receiverName || PAYMENT_DETAILS_COMMON.RECIPIENT_NAME_LABEL}
                 copyValue={receiverName || PAYMENT_DETAILS_COMMON.RECIPIENT_NAME_LABEL}
+                stylesModule={styles}
             />
-            <PaymentLabelWithCopy label={ibanLabel} value={ibanValue} copyValue={ibanValue} />
+            <PaymentLabelWithCopy label={ibanLabel} value={ibanValue} copyValue={ibanValue} stylesModule={styles} />
             <PaymentLabelWithCopy
                 label={ABROAD_PAYMENT_DETAILS.SWIFT_CODE_LABEL}
                 value={swift || ABROAD_PAYMENT_DETAILS.SWIFT_CODE_VALUE_LABEL}
                 copyValue={swift || ABROAD_PAYMENT_DETAILS.SWIFT_CODE_VALUE_LABEL}
+                stylesModule={styles}
             />
 
             {bankName ? (
@@ -41,6 +44,7 @@ export const PaymentDetailsSection = ({
                     label={ABROAD_PAYMENT_DETAILS.BANK_RECEIVER_LABEL}
                     value={bankName}
                     copyValue={bankName}
+                    stylesModule={styles}
                 />
             ) : (
                 <MultiFieldLabelWithCopy
@@ -55,6 +59,7 @@ export const PaymentDetailsSection = ({
                         ABROAD_PAYMENT_DETAILS.BANK_STREET_TRANSLITERATED_LABEL +
                         ABROAD_PAYMENT_DETAILS.BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL
                     }
+                    stylesModule={styles}
                 />
             )}
 
@@ -63,12 +68,14 @@ export const PaymentDetailsSection = ({
                     label={ABROAD_PAYMENT_DETAILS.ADDRESS_LABEL}
                     value={address}
                     copyValue={address}
+                    stylesModule={styles}
                 />
             ) : (
                 <MultiFieldLabelWithCopy
                     label={ABROAD_PAYMENT_DETAILS.ADDRESS_LABEL}
                     values={[ABROAD_PAYMENT_DETAILS.COUNTRY_LABEL, ABROAD_PAYMENT_DETAILS.CITY_LABEL]}
                     copyValue={ABROAD_PAYMENT_DETAILS.COUNTRY_LABEL + ABROAD_PAYMENT_DETAILS.CITY_LABEL}
+                    stylesModule={styles}
                 />
             )}
         </div>

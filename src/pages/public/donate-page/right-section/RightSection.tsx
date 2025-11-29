@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import './RightSection.scss';
+import styles from './RightSection.module.scss';
 
 import { AbroadPaymentDetails } from './abroad-payment-details/AbroadPaymentDetails';
 import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSupportWays';
@@ -75,7 +75,7 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
 
     if (error) {
         return (
-            <div className="donate-error-message" role="alert">
+            <div className={styles['donate-error-message']} role="alert">
                 {ERROR_MESSAGES.LOADING_ERROR}
             </div>
         );
@@ -91,13 +91,13 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
     }));
 
     return (
-        <div className="rightSection">
-            <div className="locationToggleContainer">
-                <div className="switch">
+        <div className={styles['rightSection']}>
+            <div className={styles['locationToggleContainer']}>
+                <div className={styles['switch']}>
                     <Tabs activeTab={activeTab} setActiveTab={setActiveTab} tabs={tabs} />
                 </div>
             </div>
-            <div className="donatePaymentDetails">
+            <div className={styles['donatePaymentDetails']}>
                 {paymentDetails()}
                 <AlternativeSupportWays supportOptions={donateData?.supportOptions || []} currentCurrency={activeTab} />
             </div>

@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 
 interface TeamMemberProps {
     member: MemberCard;
+    stylesModule: Record<string, string>;
 }
 
-export const TeamMemberCard = ({ member }: TeamMemberProps) => {
+export const TeamMemberCard = ({ member, stylesModule }: TeamMemberProps) => {
     const [error, setError] = useState(false);
 
     useEffect(() => {
@@ -14,15 +15,20 @@ export const TeamMemberCard = ({ member }: TeamMemberProps) => {
     }, [member.photo]);
 
     return (
-        <div className="team-member">
+        <div className={stylesModule['team-member']}>
             {error || !member.photo ? (
-                <DefaultTeamMemberIcon className="member-photo" />
+                <DefaultTeamMemberIcon className={stylesModule['member-photo']} />
             ) : (
-                <img src={member.photo} alt={member.name} className="member-photo" onError={() => setError(true)} />
+                <img
+                    src={member.photo}
+                    alt={member.name}
+                    className={stylesModule['member-photo']}
+                    onError={() => setError(true)}
+                />
             )}
             <div>
-                <p className="member-name">{member.name}</p>
-                <p className="member-role">{member.role}</p>
+                <p className={stylesModule['member-name']}>{member.name}</p>
+                <p className={stylesModule['member-role']}>{member.role}</p>
             </div>
         </div>
     );

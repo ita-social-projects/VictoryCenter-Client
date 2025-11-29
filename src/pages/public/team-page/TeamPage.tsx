@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './TeamPage.scss';
+import styles from './TeamPage.module.scss';
 import horseVideo from '../../../assets/videos/public/team-page/quote_background.mp4';
 import classNames from 'classnames';
 import {
@@ -41,31 +41,33 @@ export const TeamPage: React.FC = () => {
     }, []);
 
     return (
-        <div className="team-page-container">
+        <div className={styles['team-page-container']}>
             {error && (
-                <div className="error-message" role="alert" style={{ color: 'red', marginBottom: '1rem' }}>
+                <div className={styles['error-message']} role="alert">
                     {error}
                 </div>
             )}
 
             {loading ? (
-                <div className="team-loader">
+                <div className={styles['team-loader']}>
                     <LinearProgress />
                 </div>
             ) : (
                 teamData.map((team, index) => (
                     <div
                         key={index}
-                        className={classNames('team-section', { 'last-section': index === teamData.length - 1 })}
+                        className={classNames(styles['team-section'], {
+                            [styles['last-section']]: index === teamData.length - 1,
+                        })}
                     >
-                        <div className="team_info">
-                            <div className="members-grid">
-                                <div className="team_description">
+                        <div className={styles['team_info']}>
+                            <div className={styles['members-grid']}>
+                                <div className={styles['team_description']}>
                                     <h2>{team.title}</h2>
                                     <p>{team.description}</p>
                                 </div>
                                 {team.members.map((member) => (
-                                    <TeamMemberCard key={member.id} member={member} />
+                                    <TeamMemberCard key={member.id} member={member} stylesModule={styles} />
                                 ))}
                             </div>
                         </div>
@@ -73,19 +75,19 @@ export const TeamPage: React.FC = () => {
                 ))
             )}
 
-            <div className="video-background-container">
-                <video autoPlay muted loop playsInline className="background-video">
+            <div className={styles['video-background-container']}>
+                <video autoPlay muted loop playsInline className={styles['background-video']}>
                     <source src={horseVideo} type="video/mp4" />
                 </video>
 
-                <div className="quote-overlay">
-                    <p className="video-text">{VIDEO_TEXT_STRING1}</p>
-                    <p className="video-text">{VIDEO_TEXT_STRING2}</p>
-                    <p className="video-text">{VIDEO_TEXT_STRING3}</p>
-                    <p className="video-text">{VIDEO_TEXT_STRING4}</p>
-                    <p className="video-text">{VIDEO_TEXT_STRING5}</p>
+                <div className={styles['quote-overlay']}>
+                    <p className={styles['video-text']}>{VIDEO_TEXT_STRING1}</p>
+                    <p className={styles['video-text']}>{VIDEO_TEXT_STRING2}</p>
+                    <p className={styles['video-text']}>{VIDEO_TEXT_STRING3}</p>
+                    <p className={styles['video-text']}>{VIDEO_TEXT_STRING4}</p>
+                    <p className={styles['video-text']}>{VIDEO_TEXT_STRING5}</p>
 
-                    <p className="author">{VIDEO_TEXT_AUTHOR}</p>
+                    <p className={styles['author']}>{VIDEO_TEXT_AUTHOR}</p>
                 </div>
             </div>
         </div>

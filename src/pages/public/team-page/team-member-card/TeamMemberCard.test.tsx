@@ -14,8 +14,15 @@ describe('TeamMemberCard component', () => {
         photo: 'https://via.placeholder.com/200x250?text=Іван',
     };
 
+    const mockStylesModule = {
+        'team-member': 'team-member',
+        'member-photo': 'member-photo',
+        'member-name': 'member-name',
+        'member-role': 'member-role',
+    };
+
     it("should render the member's name, role, and photo correctly", () => {
-        render(<TeamMemberCard member={mockMember} />);
+        render(<TeamMemberCard member={mockMember} stylesModule={mockStylesModule} />);
         const nameElement = screen.getByText(mockMember.name);
         expect(nameElement).toBeInTheDocument();
         expect(nameElement).toHaveClass('member-name');
@@ -31,7 +38,7 @@ describe('TeamMemberCard component', () => {
     });
 
     it('should render the container with the correct class', () => {
-        render(<TeamMemberCard member={mockMember} />);
+        render(<TeamMemberCard member={mockMember} stylesModule={mockStylesModule} />);
         const container = screen.getByText(mockMember.name).closest('.team-member');
         expect(container).toBeInTheDocument();
     });
@@ -44,13 +51,13 @@ describe('TeamMemberCard component', () => {
             photo: null,
         };
 
-        render(<TeamMemberCard member={memberWithoutPhoto} />);
+        render(<TeamMemberCard member={memberWithoutPhoto} stylesModule={mockStylesModule} />);
 
         expect(screen.getByTestId('default-member-icon')).toBeInTheDocument();
     });
 
     it('renders default icon when image fails to load', () => {
-        render(<TeamMemberCard member={mockMember} />);
+        render(<TeamMemberCard member={mockMember} stylesModule={mockStylesModule} />);
 
         const imgElement = screen.getByAltText(mockMember.name);
         expect(imgElement).toBeInTheDocument();

@@ -1,5 +1,5 @@
 import background from '../../../../assets/images/public/about-us-page/background.jpg';
-import './IntroSection.scss';
+import styles from './IntroSection.module.scss';
 import { ContentType } from '../../../../types/common/about-us';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
 import { useTranslation } from 'react-i18next';
@@ -17,16 +17,16 @@ export const AboutUsIntro = ({ content }: AboutUsIntroProps) => {
     const description = content?.find((x) => x.contentType === ContentType.Description)?.description;
 
     return (
-        <section className="about-us-block">
-            <img src={imageUrl} className="background-img" alt="Men and Horse" />
-            <img src={imageUrl} className="color-overlay" alt="Men and Horse" />
-            <div className="about-us-info">
-                <h1 className="about-us-main-title">
-                    <span className="highlighted">{t('INTRO_TITLE.FIRST_HIGHLIGHT')}</span>
+        <section className={styles['about-us-block']}>
+            <img src={imageUrl} className={styles['background-img']} alt="Men and Horse" />
+            <img src={imageUrl} className={styles['color-overlay']} alt="Men and Horse" />
+            <div className={styles['about-us-info']}>
+                <h1 className={styles['about-us-main-title']}>
+                    <span className={styles['highlighted']}>{t('INTRO_TITLE.FIRST_HIGHLIGHT')}</span>
                     {t('INTRO_TITLE.MIDDLE_PART')}
-                    <span className="highlighted">{t('INTRO_TITLE.SECOND_HIGHLIGHT')}</span>
+                    <span className={styles['highlighted']}>{t('INTRO_TITLE.SECOND_HIGHLIGHT')}</span>
                 </h1>
-                <p className="title-details">{description}</p>
+                <p className={styles['title-details']}>{description}</p>
             </div>
         </section>
     );

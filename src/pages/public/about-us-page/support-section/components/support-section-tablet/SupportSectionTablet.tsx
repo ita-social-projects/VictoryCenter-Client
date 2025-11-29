@@ -5,9 +5,10 @@ import { AboutUsContent } from '../../../../../../types/public/about-us-page';
 
 export interface SupportSectionTabletProps {
     content: AboutUsContent[] | null;
+    stylesModule: Record<string, string>;
 }
 
-export const SupportSectionTablet = ({ content }: SupportSectionTabletProps) => {
+export const SupportSectionTablet = ({ content, stylesModule }: SupportSectionTabletProps) => {
     const { t } = useTranslation('aboutUsPage');
 
     const [leftColumn, rightColumn] = useMemo(() => {
@@ -25,19 +26,19 @@ export const SupportSectionTablet = ({ content }: SupportSectionTabletProps) => 
     if (!content) return null;
 
     return (
-        <div className="support-block">
-            <div className="main-values-title">
-                <h2 className="support-title">{t('SUPPORT_TITLE')}</h2>
+        <div className={stylesModule['support-block']}>
+            <div className={stylesModule['main-values-title']}>
+                <h2>{t('SUPPORT_TITLE')}</h2>
             </div>
-            <div className="support-columns">
-                <div className="support-col left">
+            <div className={stylesModule['support-columns']}>
+                <div className={`${stylesModule['support-col']} ${stylesModule['left']}`}>
                     {leftColumn.map(({ card, originalIndex }) => (
-                        <SupportCard key={card.id} card={card} index={originalIndex} />
+                        <SupportCard key={card.id} card={card} index={originalIndex} stylesModule={stylesModule} />
                     ))}
                 </div>
-                <div className="support-col right">
+                <div className={`${stylesModule['support-col']} ${stylesModule['right']}`}>
                     {rightColumn.map(({ card, originalIndex }) => (
-                        <SupportCard key={card.id} card={card} index={originalIndex} />
+                        <SupportCard key={card.id} card={card} index={originalIndex} stylesModule={stylesModule} />
                     ))}
                 </div>
             </div>

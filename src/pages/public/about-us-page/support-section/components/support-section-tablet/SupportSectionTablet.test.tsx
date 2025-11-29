@@ -53,13 +53,27 @@ describe('SupportSectionTablet component', () => {
         },
     ];
 
+    const mockStylesModule = {
+        'support-block': 'support-block',
+        'main-values-title': 'main-values-title',
+        'support-columns': 'support-columns',
+        'support-col': 'support-col',
+        left: 'left',
+        right: 'right',
+        'support-card': 'support-card',
+        'card-1': 'card-1',
+        'card-2': 'card-2',
+        'card-3': 'card-3',
+        'support-description': 'support-description',
+    };
+
     it('should render main support title', () => {
-        render(<SupportSectionTablet content={content} />);
+        render(<SupportSectionTablet content={content} stylesModule={mockStylesModule} />);
         expect(screen.getByText(aboutUsPageUk.SUPPORT_TITLE)).toBeInTheDocument();
     });
 
     it('renders all images with correct alt and src attributes', () => {
-        render(<SupportSectionTablet content={content} />);
+        render(<SupportSectionTablet content={content} stylesModule={mockStylesModule} />);
 
         aboutUsPageUk.SUPPORT_DATA.forEach((data, index) => {
             const image = screen.getByAltText(data.ALT);
@@ -69,7 +83,7 @@ describe('SupportSectionTablet component', () => {
 
     it('renders fallback images when image is null', () => {
         const contentWithoutImages = content.map((item) => ({ ...item, image: null }));
-        render(<SupportSectionTablet content={contentWithoutImages} />);
+        render(<SupportSectionTablet content={contentWithoutImages} stylesModule={mockStylesModule} />);
 
         aboutUsPageUk.SUPPORT_DATA.forEach((data, index) => {
             const image = screen.getByAltText(data.ALT);
@@ -78,21 +92,21 @@ describe('SupportSectionTablet component', () => {
     });
 
     it('should render support card descriptions correctly', () => {
-        render(<SupportSectionTablet content={content} />);
+        render(<SupportSectionTablet content={content} stylesModule={mockStylesModule} />);
         content.forEach((card) => {
             expect(screen.getByText(card.description!)).toBeInTheDocument();
         });
     });
 
     it('renders all descriptions correctly', () => {
-        render(<SupportSectionTablet content={content} />);
+        render(<SupportSectionTablet content={content} stylesModule={mockStylesModule} />);
         content.forEach((item) => {
             expect(screen.getByText(item.description!)).toBeInTheDocument();
         });
     });
 
     it('renders nothing when content is null', () => {
-        const { container } = render(<SupportSectionTablet content={null} />);
+        const { container } = render(<SupportSectionTablet content={null} stylesModule={mockStylesModule} />);
         expect(container.firstChild).toBeNull();
     });
 });

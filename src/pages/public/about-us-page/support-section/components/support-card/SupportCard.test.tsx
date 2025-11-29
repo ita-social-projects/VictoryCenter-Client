@@ -17,9 +17,18 @@ describe('SupportCard component', () => {
         title: null,
     };
 
+    const mockStylesModule = {
+        'support-card': 'support-card',
+        'card-1': 'card-1',
+        'card-2': 'card-2',
+        'card-3': 'card-3',
+        'support-description': 'support-description',
+    };
+
     const defaultProps = {
         card: card,
         index: 0,
+        stylesModule: mockStylesModule,
     };
 
     it('renders image with correct src and alt', () => {
@@ -36,12 +45,12 @@ describe('SupportCard component', () => {
     });
 
     it('renders correct classes for multiple indexes', () => {
-        const { rerender } = render(<SupportCard card={card} index={0} />);
+        const { rerender } = render(<SupportCard card={card} index={0} stylesModule={mockStylesModule} />);
         const card1 = screen.getByRole('img').closest('div');
         expect(card1).toHaveClass('support-card');
         expect(card1).toHaveClass('card-1');
 
-        rerender(<SupportCard card={card} index={2} />);
+        rerender(<SupportCard card={card} index={2} stylesModule={mockStylesModule} />);
         const card3 = screen.getByRole('img').closest('div');
         expect(card3).toHaveClass('support-card');
         expect(card3).toHaveClass('card-3');

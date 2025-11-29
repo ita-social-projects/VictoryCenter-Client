@@ -1,4 +1,4 @@
-import './PublicLayout.scss';
+import styles from './PublicLayout.module.scss';
 import { useLocation, Outlet } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Header } from '../../components/public/header/Header';
@@ -16,7 +16,7 @@ export const PublicLayout = ({ behavior = 'auto' }: { behavior?: 'auto' | 'smoot
     }, [pathname, behavior]);
 
     return (
-        <div className="public-layout">
+        <div className={styles['public-layout']}>
             <div className="header-container">
                 <Header />
             </div>

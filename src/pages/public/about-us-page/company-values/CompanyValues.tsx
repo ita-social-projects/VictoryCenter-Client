@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import './CompanyValues.scss';
+import styles from './CompanyValues.module.scss';
 import { Swiper } from '../../../../components/public/swiper/Swiper';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { ValueCard } from './components/value-card/ValueCard';
@@ -50,7 +50,7 @@ export const CompanyValues = () => {
     }, [isTablet, valueItems]);
 
     return (
-        <div className="values-block">
+        <div className={styles['values-block']}>
             <Swiper
                 items={chunkedValues}
                 slidesPerView={1}

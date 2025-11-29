@@ -49,7 +49,8 @@ export const SupportOptionsForm = ({
         <div className={stylesSupport['support-options-container']}>
             {shouldShowNotFound ? (
                 <div
-                    className={`${stylesSupport['support-options-form']} ${stylesSupport['not-found']} ${stylesDonate['not-found']} data-testid="support-options-not-found`}
+                    className={`${stylesSupport['support-options-form']} ${stylesSupport['not-found']} ${stylesDonate['not-found']}`}
+                    data-testid="support-options-not-found"
                 >
                     <img src={NotFoundIcon} alt={COMMON_TEXT_ADMIN.LIST.NOT_FOUND} />
                     <p>{DONATE_TEXT.SUPPORT_OPTIONS.NOT_FOUND}</p>

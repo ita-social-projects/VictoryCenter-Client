@@ -281,7 +281,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
             return (
                 <div
-                    className={`${styles['generic-form']} ${mode} ${isChildForm ? `${styles['child']}` : ''}`}
+                    className={`${styles['generic-form']} ${mode} ${isChildForm ? styles['child'] : ''}`}
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
@@ -315,6 +315,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                         className={styles['form-name']}
                                         role="button"
                                         tabIndex={0}
+                                        data-testid="form-name-toggle"
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter' || e.key === ' ') {
                                                 setIsExpanded((prev) => !prev);
@@ -324,7 +325,8 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                     >
                                         {titleFieldName ? String(formState[titleFieldName] ?? '') : ''}
                                         <span
-                                            className={`${styles['arrow']} ${isItemsExpanded ? `${styles['expanded']}` : ''}`}
+                                            className={`${styles['arrow']} ${isExpanded ? styles['expanded'] : ''}`}
+                                            data-testid="arrow-icon"
                                         ></span>
                                     </div>
                                     {isChildForm && (
@@ -366,7 +368,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                     return (
                                         <div
                                             key={String(f.name)}
-                                            className={`${styles['form-field']} ${isTitleField ? `${styles['form-field-title-row']}` : ''}`}
+                                            className={`${styles['form-field']} ${isTitleField ? styles['form-field-title-row'] : ''}`}
                                         >
                                             <div className={styles['form-field-content']}>
                                                 <DonateInput

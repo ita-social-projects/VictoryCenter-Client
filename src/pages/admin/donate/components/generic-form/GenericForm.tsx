@@ -281,7 +281,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
             return (
                 <div
-                    className={`${styles['generic-form']} ${mode} ${isChildForm ? styles['child'] : ''}`}
+                    className={`${styles['generic-form']} ${styles[mode]} ${isChildForm ? styles['child'] : ''}`}
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {

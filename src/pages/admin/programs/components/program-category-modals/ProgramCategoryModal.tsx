@@ -10,7 +10,8 @@ import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '../../../../../validation
 import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import styles from './ProgramCategoryModal.module.scss';
+import stylesCategoryModal from './ProgramCategoryModal.module.scss';
+import stylesProgramForm from '../program-form/ProgramForm.module.scss';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 interface ProgramCategoryFormValues {
@@ -262,7 +263,11 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
             <Modal isOpen={isOpen} onClose={handleClose}>
                 <Modal.Title>{getTitle()}</Modal.Title>
                 <Modal.Content>
-                    <form onSubmit={(e) => e.preventDefault()} className="program-form-main" id={getFormId()}>
+                    <form
+                        onSubmit={(e) => e.preventDefault()}
+                        className={stylesProgramForm['program-form-main']}
+                        id={getFormId()}
+                    >
                         {mode === 'edit' && (
                             <SingleSelectInputGroup
                                 id={getFieldId('select')}
@@ -302,7 +307,9 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
                             />
                         )}
 
-                        {error && <div className={styles['program-category-modal-error-container']}>{error}</div>}
+                        {error && (
+                            <div className={stylesCategoryModal['program-category-modal-error-container']}>{error}</div>
+                        )}
                     </form>
                 </Modal.Content>
                 <Modal.Actions>

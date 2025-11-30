@@ -71,7 +71,6 @@ export const DescriptionSection = ({
                 />
                 {descriptionError && <p className={styles['error']}>{descriptionError}</p>}
                 <Button
-                    className="button"
                     buttonStyle={'primary'}
                     onClick={onPublish}
                     type={'submit'}

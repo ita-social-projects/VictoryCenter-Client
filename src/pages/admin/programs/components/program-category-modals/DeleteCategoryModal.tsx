@@ -7,7 +7,8 @@ import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { ProgramCategory } from '../../../../../types/admin/programs';
-import styles from './ProgramCategoryModal.module.scss';
+import stylesCategoryModal from './ProgramCategoryModal.module.scss';
+import stylesProgramForm from '../program-form/ProgramForm.module.scss';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 
 interface DeleteCategoryModalProps {
@@ -71,7 +72,7 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
         <Modal isOpen={isOpen} onClose={handleClose}>
             <Modal.Title>{COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY}</Modal.Title>
             <Modal.Content>
-                <div className="program-form-main">
+                <div className={stylesProgramForm['program-form-main']}>
                     <SingleSelectInputGroup
                         id="delete-category-select"
                         label={PROGRAM_CATEGORY_TEXT.FORM.LABEL.CATEGORY}
@@ -92,7 +93,9 @@ export const DeleteCategoryModal = ({ isOpen, onClose, onDeleteCategory, categor
                             text={PROGRAM_CATEGORY_VALIDATION.programsCount.getRelocationOrRemovalHint()}
                         />
                     )}
-                    {error && <div className={styles['program-category-modal-error-container']}>{error}</div>}
+                    {error && (
+                        <div className={stylesCategoryModal['program-category-modal-error-container']}>{error}</div>
+                    )}
                 </div>
             </Modal.Content>
             <Modal.Actions>

@@ -399,7 +399,7 @@ export const FaqPanelContent = () => {
                 {error.message && (
                     <div className={styles['faq-panel-error-container']} data-testid="faq-error-container">
                         <span>{error.message}</span>
-                        <button onClick={handleRetry} type="button" className="retry-link">
+                        <button onClick={handleRetry} type="button" className={styles['retry-link']}>
                             {COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN}
                         </button>
                     </div>

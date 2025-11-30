@@ -1,13 +1,13 @@
-@import '../../../assets/sass/variables/colors.scss';
+@use '../../../assets/sass/variables/colors';
 
 .category-bar {
     min-height: 3.75rem;
     display: flex;
     position: relative;
-    border-bottom: 1px solid $grey-700;
+    border-bottom: 1px solid colors.$grey-700;
     font-size: 24px;
     font-weight: 600;
-    background: $grey-50;
+    background: colors.$grey-50;
 
     &-categories {
         display: flex;
@@ -30,7 +30,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: $blue-900;
+        background-color: colors.$blue-900;
         border: none;
         cursor: pointer;
         transition: all 0.8s ease;
@@ -40,15 +40,15 @@
             height: 1.5rem;
 
             path {
-                stroke: $grey-50;
+                stroke: colors.$grey-50;
             }
         }
 
         &:hover {
-            background-color: $yellow-500;
+            background-color: colors.$yellow-500;
 
             svg path {
-                stroke: $blue-900;
+                stroke: colors.$blue-900;
             }
         }
 

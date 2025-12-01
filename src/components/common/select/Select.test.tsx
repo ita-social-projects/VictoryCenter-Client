@@ -182,7 +182,7 @@ describe('Select Component', () => {
     });
 
     it('updates displayed value when option is selected', () => {
-        const { container } = render(<Select {...defaultProps} />);
+        render(<Select {...defaultProps} />);
         const selectButton = getSelectButton();
         fireEvent.click(selectButton);
 

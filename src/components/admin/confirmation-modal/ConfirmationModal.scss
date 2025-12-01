@@ -1,0 +1,34 @@
+@use '../../../assets/sass/variables/colors';
+
+.confirmation-btn {
+    &.btn-primary {
+        &:hover {
+            background-color: colors.$blue-500;
+            color: colors.$grey-50;
+
+            svg path {
+                stroke: colors.$grey-50;
+            }
+        }
+
+        &:active {
+            background-color: colors.$blue-900;
+            color: colors.$grey-50;
+
+            svg path {
+                stroke: colors.$grey-50;
+            }
+        }
+    }
+
+    &.btn-secondary {
+        &:hover {
+            color: colors.$blue-900;
+            border-color: colors.$blue-500;
+        }
+
+        &:active {
+            background-color: colors.$blue-50;
+        }
+    }
+}

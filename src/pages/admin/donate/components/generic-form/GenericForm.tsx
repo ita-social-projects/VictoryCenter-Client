@@ -451,8 +451,6 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                         }}
                         onCancel={handleModalCancelOrClose}
                         onClose={handleModalCancelOrClose}
-                        confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                        cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                     />
 
                     {!isChildForm && <>{children && children({ formState, isItemsExpanded })}</>}

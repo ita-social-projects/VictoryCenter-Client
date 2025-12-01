@@ -1,5 +1,12 @@
 .language-switcher {
     width: 5.25rem;
-    border: none;
-    background-color: transparent;
+    &-head {
+        width: 5.25rem;
+        border: none;
+        background-color: transparent;
+
+        &:hover {
+            background-color: transparent;
+        }
+    }
 }

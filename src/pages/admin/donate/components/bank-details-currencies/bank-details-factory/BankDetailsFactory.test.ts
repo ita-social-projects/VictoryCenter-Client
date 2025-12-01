@@ -8,10 +8,12 @@ jest.mock('../../../../../../validation/admin/bank-details-schema/bank-details-s
         validateName: jest.fn(),
         validateReceiver: jest.fn(),
         validateEdrpou: jest.fn(),
-        validateIban: jest.fn(),
+        validateUkrainianIban: jest.fn(),
+        validateForeignIban: jest.fn(),
         validatePaymentPurpose: jest.fn(),
         validateSwift: jest.fn(),
         validateAddress: jest.fn(),
+        validateAccount: jest.fn(),
     },
 }));
 
@@ -85,7 +87,7 @@ describe('BankDetailsFactory', () => {
         });
 
         it('renders all fields right', () => {
-            ['name', 'receiver', 'edrpou', 'iban', 'paymentPurpose'].forEach((name) => {
+            ['name', 'receiver', 'edrpou', 'ukrainianIban', 'paymentPurpose'].forEach((name) => {
                 expect(getTextareaByName(name)).toBeInTheDocument();
             });
         });
@@ -94,7 +96,11 @@ describe('BankDetailsFactory', () => {
             testFieldValidation('name', BANK_DETAILS_VALIDATION_FUNCTIONS.validateName as any, 'Test Name');
             testFieldValidation('receiver', BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver as any, 'Test Receiver');
             testFieldValidation('edrpou', BANK_DETAILS_VALIDATION_FUNCTIONS.validateEdrpou as any, '12345678');
-            testFieldValidation('iban', BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban as any, 'UA123456789012345678');
+            testFieldValidation(
+                'ukrainianIban',
+                BANK_DETAILS_VALIDATION_FUNCTIONS.validateUkrainianIban as any,
+                'UA123456789012345678',
+            );
             testFieldValidation(
                 'paymentPurpose',
                 BANK_DETAILS_VALIDATION_FUNCTIONS.validatePaymentPurpose as any,
@@ -140,14 +146,23 @@ describe('BankDetailsFactory', () => {
                 });
 
                 it('renders all fields', () => {
-                    ['name', 'iban', 'swift', 'address'].forEach((name) => {
+                    ['name', 'receiver', 'ukrainianIban', 'swift', 'address'].forEach((name) => {
                         expect(getTextareaByName(name)).toBeInTheDocument();
                     });
                 });
 
                 it('calls validators for all fields', () => {
                     testFieldValidation('name', BANK_DETAILS_VALIDATION_FUNCTIONS.validateName as any, 'Bank Name');
-                    testFieldValidation('iban', BANK_DETAILS_VALIDATION_FUNCTIONS.validateIban as any, 'UA9876543210');
+                    testFieldValidation(
+                        'receiver',
+                        BANK_DETAILS_VALIDATION_FUNCTIONS.validateReceiver as any,
+                        'Test Receiver',
+                    );
+                    testFieldValidation(
+                        'ukrainianIban',
+                        BANK_DETAILS_VALIDATION_FUNCTIONS.validateUkrainianIban as any,
+                        'UA9876543210',
+                    );
                     testFieldValidation('swift', BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift as any, 'SWIFT123');
                     testFieldValidation(
                         'address',
@@ -172,7 +187,7 @@ describe('BankDetailsFactory', () => {
         });
 
         it('contains all fields', () => {
-            ['name', 'swift', 'account', 'iban'].forEach((name) => {
+            ['name', 'swift', 'account', 'foreignIban'].forEach((name) => {
                 expect(getTextareaByName(name)).toBeInTheDocument();
             });
         });
@@ -185,6 +200,13 @@ describe('BankDetailsFactory', () => {
             const swiftInput = getTextareaByName('swift');
             fireEvent.change(swiftInput, { target: { value: 'TESTSWIFT' } });
             expect(swiftInput).toHaveValue('TESTSWIFT');
+        });
+
+        it('calls validators for all fields', () => {
+            testFieldValidation('name', BANK_DETAILS_VALIDATION_FUNCTIONS.validateName as any, 'Test Bank');
+            testFieldValidation('swift', BANK_DETAILS_VALIDATION_FUNCTIONS.validateSwift as any, 'SWIFT123');
+            testFieldValidation('account', BANK_DETAILS_VALIDATION_FUNCTIONS.validateAccount as any, 'ACC123');
+            testFieldValidation('foreignIban', BANK_DETAILS_VALIDATION_FUNCTIONS.validateForeignIban as any, 'IBAN456');
         });
     });
 

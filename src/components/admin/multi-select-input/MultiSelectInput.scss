@@ -18,13 +18,17 @@
         padding: 0.625rem 1rem;
         box-sizing: border-box;
         background: white;
-        border: 1px solid colors.$blue-500;
+        border: 1px solid colors.$grey-700;
         border-radius: 0.5rem;
-        box-shadow: 1px 2px rgba(colors.$bluish-black, 0.05);
+        box-shadow: 0 1px 2px 0 rgba(colors.$blue-900, 0.05);
         cursor: pointer;
 
+        &:hover {
+            background-color: colors.$blue-50;
+        }
+
         &--opened {
-            border-color: colors.$grey-700;
+            border-color: colors.$blue-500;
         }
 
         &--disabled {
@@ -91,8 +95,9 @@
             background: colors.$blue-50;
         }
 
-        &--selected {
-            background: colors.$blue-50;
+        &--selected,
+        &--selected:hover {
+            background-color: colors.$blue-100;
         }
     }
 

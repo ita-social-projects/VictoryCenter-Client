@@ -140,8 +140,7 @@ describe('TeamPageToolbar', () => {
         const onStatusFilterChange = jest.fn();
         renderToolbar({ onStatusFilterChange });
 
-        const statusSelect = screen.getByTestId('status-filter');
-
+        const statusSelect = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.STATUS.DEFAULT });
         fireEvent.click(statusSelect);
 
         const dropdown = within(statusSelect);

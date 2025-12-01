@@ -339,8 +339,6 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
             <ConfirmationModal
                 isOpen={showSaveConfirmModal}
                 title={COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                 onClose={handleSaveConfirmModalClose}
                 onCancel={handleSaveConfirmModalClose}
                 onConfirm={onSubmit}
@@ -349,8 +347,6 @@ export const TeamCategoryModal = (props: TeamCategoryModalProps) => {
             <ConfirmationModal
                 isOpen={showCloseConfirmModal}
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                 onClose={handleCloseConfirmModalClose}
                 onCancel={handleCloseConfirmModalClose}
                 onConfirm={handleConfirmClose}

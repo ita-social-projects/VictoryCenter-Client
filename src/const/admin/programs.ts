@@ -6,6 +6,10 @@ export const PROGRAMS_TEXT = {
     },
     PLACEHOLDER: {
         SEARCH_PROGRAMS: 'Шукати програми...',
+        INSERT_PROGRAM_NAME: 'Введіть назву програми',
+        INSERT_PROGRAM_LOCATION: 'Введіть місце проведення',
+        INSERT_PROGRAM_MEETINGS_COUNT: 'Введіть кількість учасників',
+        INSERT_PROGRAM_PARTICIPANTS_COUNT: 'Введіть кількість зустрічей',
     },
 
     MESSAGE: {
@@ -35,7 +39,7 @@ export const PROGRAMS_TEXT = {
             DESCRIPTION: 'Опис',
             CATEGORY: 'Категорія',
             SELECT_CATEGORY: 'Оберіть категорію',
-            PHOTO: 'Фото',
+            PREVIEW_IMAGE: 'Фото-прев’ю',
             LOCATION: 'Локація',
             PARTICIPANTS_COUNT: 'Кількість учасників',
             MEETING_COUNT: 'Кількість зустрічей',
@@ -58,15 +62,11 @@ export const PROGRAM_VALIDATION = {
         min: 5,
         max: 90,
         getRequiredError: () => 'Назва обов’язкова',
-        getMinError: () => `Не менше ${PROGRAM_VALIDATION.name.min} символів`,
-        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.name.max} символів`,
     },
     description: {
         min: 10,
         max: 400,
         getRequiredWhenPublishingError: () => 'Опис обов’язковий при публікації',
-        getMinError: () => `Не менше ${PROGRAM_VALIDATION.description.min} символів`,
-        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.description.max} символів`,
     },
     categories: {
         getAtLeastOneRequiredError: () => 'Потрібно обрати хоча б одну категорію',
@@ -77,6 +77,14 @@ export const PROGRAM_VALIDATION = {
         getRequiredWhenPublishingError: () => 'Фото обов’язкове при публікації',
         getFormatError: () => 'Невірний формат фото, дозволено jpeg, jpg, png, webp',
         getSizeError: () => `Фото не більше ${PROGRAM_VALIDATION.image.maxSizeBytes / (1024 * 1024)} Mb`,
+    },
+    previewImage: {
+        width: 440,
+        height: 480,
+    },
+    backgroundImage: {
+        width: 1440,
+        height: 860,
     },
     location: {
         max: 55,
@@ -100,8 +108,6 @@ export const PROGRAM_CATEGORY_VALIDATION = {
         min: 5,
         max: 20,
         getRequiredError: () => 'Назва обов’язкова',
-        getMinError: () => `Не менше ${PROGRAM_CATEGORY_VALIDATION.name.min} символи`,
-        getMaxError: () => `Не більше ${PROGRAM_CATEGORY_VALIDATION.name.max} символів`,
         getCategoryWithThisNameAlreadyExistsError: () =>
             COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.ALREADY_CONTAIN_CATEGORY_WITH_NAME,
     },

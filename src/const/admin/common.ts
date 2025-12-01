@@ -107,6 +107,7 @@ export const COMMON_TEXT_ADMIN = {
     VALIDATION_MESSAGE: {
         FIELD_REQUIRED: "Поле обов'язкове",
         getMinError: (min: number) => `Не менше ${min} символів`,
+        getMaxError: (max: number) => `Не більше ${max} символів`,
     },
 };
 

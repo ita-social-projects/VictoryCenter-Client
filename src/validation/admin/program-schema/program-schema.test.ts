@@ -1,6 +1,8 @@
 import { programValidationSchema, ProgramValidationContext } from './program-schema';
 import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
-import { Image, ImageValues } from '../../../types/common/image';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { ImageValues } from '../../../types/common/image';
+import { Program } from '../../../types/admin/programs';
 
 const createMockFile = (type = 'image/jpeg', size = 1024) => {
     const image: ImageValues = {
@@ -16,11 +18,15 @@ const mockCategory = {
     programsCount: 5,
 };
 
-const getValidData = (overrides?: any) => ({
+const getValidData = (overrides?: Partial<Program>): Partial<Program> => ({
     name: 'Valid Program Name',
     categories: [mockCategory],
     description: 'This is a valid description with enough characters.',
-    image: createMockFile(),
+    participantsCount: 'Some participants 123',
+    meetingCount: 'Some meetings count 123',
+    backgroundImage: createMockFile(),
+    previewImage: createMockFile(),
+    location: 'Location 123',
     ...overrides,
 });
 
@@ -43,12 +49,12 @@ describe('Program Validation Schema', () => {
             {
                 description: 'is too short',
                 data: getValidData({ name: 'A' }),
-                expectedError: PROGRAM_VALIDATION.name.getMinError(),
+                expectedError: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_VALIDATION.name.min),
             },
             {
                 description: 'is too long',
                 data: getValidData({ name: 'A'.repeat(PROGRAM_VALIDATION.name.max + 1) }),
-                expectedError: PROGRAM_VALIDATION.name.getMaxError(),
+                expectedError: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.name.max),
             },
         ];
 
@@ -70,7 +76,7 @@ describe('Program Validation Schema', () => {
             },
             {
                 description: 'is null',
-                data: getValidData({ categories: null }),
+                data: getValidData({ categories: null! }),
                 expectedError: PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError(),
             },
         ];
@@ -91,13 +97,16 @@ describe('Program Validation Schema', () => {
 
         it('should fail when description exceeds max length', async () => {
             const data = getValidData({ description: 'A'.repeat(PROGRAM_VALIDATION.description.max + 1) });
-            await expectValidationToFail(data, PROGRAM_VALIDATION.description.getMaxError());
+            await expectValidationToFail(
+                data,
+                COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.description.max),
+            );
         });
     });
 
     describe('Description validation (Publish mode)', () => {
         const publishContext = { isPublishing: true };
-        const validDataForPublish = getValidData({ image: createMockFile() });
+        const validDataForPublish = getValidData({ previewImage: createMockFile(), backgroundImage: createMockFile() });
 
         const invalidPublishCases = [
             {
@@ -108,12 +117,12 @@ describe('Program Validation Schema', () => {
             {
                 description: 'is too short',
                 data: { ...validDataForPublish, description: 'Short' },
-                expectedError: PROGRAM_VALIDATION.description.getMinError(),
+                expectedError: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_VALIDATION.description.min),
             },
             {
                 description: 'is too long',
                 data: { ...validDataForPublish, description: 'A'.repeat(PROGRAM_VALIDATION.description.max + 1) },
-                expectedError: PROGRAM_VALIDATION.description.getMaxError(),
+                expectedError: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.description.max),
             },
         ];
 
@@ -123,19 +132,6 @@ describe('Program Validation Schema', () => {
 
         it.each(invalidPublishCases)('should fail when description $description', async ({ data, expectedError }) => {
             await expectValidationToFail(data, expectedError, publishContext);
-        });
-    });
-
-    describe('Image transform function', () => {
-        const transformCases = [
-            { description: 'an empty string', value: '' },
-            { description: 'undefined', value: undefined },
-        ];
-
-        it.each(transformCases)('should transform $description to null', async ({ value }) => {
-            const data = getValidData({ image: value });
-            const result = await programValidationSchema.validate(data);
-            expect(result.image).toBeNull();
         });
     });
 });

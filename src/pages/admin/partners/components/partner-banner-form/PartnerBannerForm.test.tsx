@@ -112,6 +112,7 @@ describe('PartnerBanner', () => {
     const getPublishButton = () => screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
 
     // Helper functions for actions
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const changeTitleValue = (value: string) => {
         fireEvent.change(getTitleInput(), { target: { value } });
     };
@@ -186,22 +187,23 @@ describe('PartnerBanner', () => {
         expect(refetchMock).toHaveBeenCalledTimes(1);
     });
 
+    //TODO: Uncomment lines when rich text component is implemented
     it('renders banner form with fetched data and validates field updates', async () => {
         render(<PartnerBanner />);
 
-        const titleInput = getTitleInput();
+        //const titleInput = getTitleInput();
         const descriptionInput = getDescriptionInput();
 
-        expect(titleInput).toHaveValue(defaultBannerData.title);
+        //expect(titleInput).toHaveValue(defaultBannerData.title);
         expect(descriptionInput).toHaveValue(defaultBannerData.description);
         expect(getImageContainer()).toBeInTheDocument();
 
-        changeTitleValue('Updated Title');
-        expect(mockValidateTitle).toHaveBeenCalledWith('Updated Title');
+        //   changeTitleValue('Updated Title');
+        //   expect(mockValidateTitle).toHaveBeenCalledWith('Updated Title');
 
-        await waitFor(() => {
-            expect(titleInput).toHaveValue('Updated Title');
-        });
+        //   await waitFor(() => {
+        //       expect(titleInput).toHaveValue('Updated Title');
+        //   });
 
         changeDescriptionValue('Updated Description');
         expect(mockValidateDescription).toHaveBeenCalledWith('Updated Description');
@@ -239,39 +241,41 @@ describe('PartnerBanner', () => {
         const publishButton = getPublishButton();
         expect(publishButton).toBeEnabled();
 
-        changeTitleValue('');
+        changeDescriptionValue('');
 
         await waitFor(() => {
-            expect(mockValidateTitle).toHaveBeenCalledWith('');
+            expect(mockValidateDescription).toHaveBeenCalledWith('');
             expect(publishButton).toBeDisabled();
         });
 
-        changeTitleValue('Valid Title');
+        changeDescriptionValue('Valid Description');
 
         await waitFor(() => {
-            expect(mockValidateTitle).toHaveBeenCalledWith('Valid Title');
+            expect(mockValidateDescription).toHaveBeenCalledWith('Valid Description');
             expect(publishButton).toBeEnabled();
         });
     });
 
+    //TODO: Uncomment lines when rich text component is implemented
     it('publishes banner successfully and shows success toast', async () => {
         const updatedBanner = {
             ...defaultBannerData,
-            title: 'Published Title',
+            //title: 'Published Title',
             description: 'Published Description',
         };
         mockedPartnersApi.updateBanner.mockResolvedValue(updatedBanner);
 
         render(<PartnerBanner />);
 
-        changeTitleValue(updatedBanner.title);
+        //changeTitleValue(updatedBanner.title);
         changeDescriptionValue(updatedBanner.description);
 
         clickPublish();
 
         await waitFor(() => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalledWith('mock-client', {
-                title: updatedBanner.title,
+                //title : updatedBanner.title,
+                title: defaultBannerData.title,
                 description: updatedBanner.description,
                 image: defaultBannerData.image,
                 imageId: defaultBannerData.imageId,
@@ -283,7 +287,7 @@ describe('PartnerBanner', () => {
         });
 
         await waitFor(() => {
-            expect(getTitleInput()).toHaveValue(updatedBanner.title);
+            //expect(getTitleInput()).toHaveValue(updatedBanner.title);
             expect(getDescriptionInput()).toHaveValue(updatedBanner.description);
         });
     });
@@ -314,7 +318,7 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
-        changeTitleValue('');
+        changeDescriptionValue('');
 
         await waitFor(() => {
             expect(getPublishButton()).toBeDisabled();
@@ -363,6 +367,139 @@ describe('PartnerBanner', () => {
         await waitFor(() => {
             expect(screen.queryByTestId('input-error')).not.toBeInTheDocument();
             expect(publishButton).toBeEnabled();
+        });
+    });
+
+    //TODO: Remove this test when rich text component is implemented
+    it('renders title input as disabled', () => {
+        render(<PartnerBanner />);
+        expect(getTitleInput()).toBeDisabled();
+    });
+
+    it('shows toast for fetch error', () => {
+        const regularError = new Error('Network error');
+        mockedUseDataFetch.mockReturnValueOnce({
+            data: null,
+            isLoading: false,
+            error: regularError,
+            refetch: mockRefetch,
+            setData: mockSetData,
+        });
+
+        render(<PartnerBanner />);
+
+        expect(mockAddToast).toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER, ToastType.Error);
+    });
+
+    it('does not call updateBanner when form has validation errors', async () => {
+        mockValidateDescription.mockReturnValue('Description is required');
+
+        render(<PartnerBanner />);
+
+        changeDescriptionValue('');
+
+        await waitFor(() => {
+            expect(getPublishButton()).toBeDisabled();
+        });
+
+        clickPublish();
+
+        expect(mockedPartnersApi.updateBanner).not.toHaveBeenCalled();
+    });
+
+    it('validates description on change and sets error correctly', async () => {
+        mockValidateDescription.mockReturnValue('Description too short');
+
+        render(<PartnerBanner />);
+
+        changeDescriptionValue('AB');
+
+        await waitFor(() => {
+            expect(mockValidateDescription).toHaveBeenCalledWith('AB');
+        });
+    });
+
+    it('clears image error when handleImageError is called with null', async () => {
+        render(<PartnerBanner />);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Trigger image error' }));
+
+        expect(await screen.findByTestId('input-error')).toHaveTextContent('Image invalid');
+
+        fireEvent.click(screen.getByRole('button', { name: 'Clear image error' }));
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('input-error')).not.toBeInTheDocument();
+        });
+    });
+
+    it('maintains imageId when image is changed', async () => {
+        render(<PartnerBanner />);
+
+        clickChangeImage();
+
+        await waitFor(() => {
+            expect(getImageValue()).toBeInTheDocument();
+        });
+
+        mockedPartnersApi.updateBanner.mockResolvedValue({
+            ...defaultBannerData,
+            image: { base64: 'base64-image', mimeType: 'image/png' },
+            imageId: 1,
+        });
+
+        clickPublish();
+
+        await waitFor(() => {
+            expect(mockedPartnersApi.updateBanner).toHaveBeenCalledWith('mock-client', {
+                title: defaultBannerData.title,
+                description: defaultBannerData.description,
+                image: { base64: 'base64-image', mimeType: 'image/png' },
+                imageId: 1,
+            });
+        });
+    });
+
+    it('renders error UI when data is null and there is a fetch error', () => {
+        mockedUseDataFetch.mockReturnValueOnce({
+            data: null,
+            isLoading: false,
+            error: new Error('Failed'),
+            refetch: mockRefetch,
+            setData: mockSetData,
+        });
+
+        render(<PartnerBanner />);
+
+        expect(getErrorMessage()).toBeInTheDocument();
+        expect(getTryAgainButton()).toBeInTheDocument();
+    });
+
+    it('prevents multiple simultaneous publish attempts', async () => {
+        const delayedPromise = new Promise<typeof defaultBannerData>((resolve) => {
+            setTimeout(() => resolve(defaultBannerData), 100);
+        });
+
+        mockedPartnersApi.updateBanner.mockReturnValue(delayedPromise as any);
+
+        render(<PartnerBanner />);
+
+        clickPublish();
+        clickPublish();
+
+        await waitFor(() => {
+            expect(mockedPartnersApi.updateBanner).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    it('keeps publish button enabled when all validations pass', async () => {
+        mockValidateTitle.mockReturnValue(undefined);
+        mockValidateDescription.mockReturnValue(undefined);
+
+        render(<PartnerBanner />);
+
+        await waitFor(() => {
+            expect(getPublishButton()).toBeEnabled();
         });
     });
 });

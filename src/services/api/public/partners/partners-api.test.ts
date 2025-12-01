@@ -1,12 +1,11 @@
 import { PartnersApi } from './partners-api';
 import { PartnerPage } from '../../../../types/public/partners-page';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
+import { axiosInstance } from '../../axios';
+
+jest.mock('../../axios');
 
 describe('PartnersApi', () => {
-    const mockClient = {
-        get: jest.fn(),
-    } as any;
-
     afterEach(() => {
         jest.clearAllMocks();
     });
@@ -42,26 +41,26 @@ describe('PartnersApi', () => {
             ],
         };
 
-        mockClient.get.mockResolvedValueOnce({ data: mockPageData });
+        (axiosInstance.get as jest.Mock).mockResolvedValueOnce({ data: mockPageData });
 
-        const result = await PartnersApi.getPage(mockClient);
+        const result = await PartnersApi.getPage();
 
-        expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PARTNERS.PAGE);
+        expect(axiosInstance.get).toHaveBeenCalledWith(API_ROUTES.PARTNERS.PAGE);
         expect(result).toEqual(mockPageData);
     });
 
     it('should handle a null response', async () => {
-        mockClient.get.mockResolvedValueOnce({ data: null });
+        (axiosInstance.get as jest.Mock).mockResolvedValueOnce({ data: null });
 
-        const result = await PartnersApi.getPage(mockClient);
+        const result = await PartnersApi.getPage();
 
         expect(result).toBeNull();
     });
 
     it('should propagate errors from axios', async () => {
         const error = new Error('Network error');
-        mockClient.get.mockRejectedValueOnce(error);
+        (axiosInstance.get as jest.Mock).mockRejectedValueOnce(error);
 
-        await expect(PartnersApi.getPage(mockClient)).rejects.toThrow('Network error');
+        await expect(PartnersApi.getPage()).rejects.toThrow('Network error');
     });
 });

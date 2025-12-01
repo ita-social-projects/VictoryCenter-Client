@@ -213,7 +213,7 @@ export const PartnerBanner = () => {
                                 name="title"
                                 id="title"
                                 maxLength={PARTNER_BANNER_VALIDATION.title.max}
-                                disabled={isDisabled}
+                                disabled={true}
                                 isRequired={true}
                             />
 

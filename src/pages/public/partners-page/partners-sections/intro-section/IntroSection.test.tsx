@@ -6,6 +6,17 @@ import { PartnersBanner } from '../../../../../types/public/partners-page';
 
 jest.mock('../../../../../assets/images/public/partners-page/horses.png', () => 'fallback-background-image.png');
 
+jest.mock('../../../../../const/public/partners-page', () => ({
+    PARTNERS_PAGE_TITLE: {
+        FIRST_LINE: { REGULAR: 'Test First Regular ', BOLD: 'Test First Bold' },
+        SECOND_LINE: {
+            BOLD_START: 'Test Second BoldStart ',
+            REGULAR: 'Test Second Regular ',
+            BOLD_END: 'Test Second BoldEnd',
+        },
+    },
+}));
+
 describe('IntroSection', () => {
     describe('when banner prop is provided', () => {
         const mockBanner: PartnersBanner = {
@@ -21,7 +32,11 @@ describe('IntroSection', () => {
         it('should render the title and description from props', () => {
             render(<IntroSection banner={mockBanner} />);
 
-            expect(screen.getByText('Test Title')).toBeInTheDocument();
+            // TODO: Replace with: "expect(screen.getByText('Test Title')).toBeInTheDocument();" when rich text component is implemented
+            const title = screen.getByRole('heading', { level: 1 });
+            expect(title).toHaveTextContent('Test First Regular Test First Bold');
+            expect(title).toHaveTextContent('Test Second BoldStart Test Second Regular Test Second BoldEnd');
+
             expect(screen.getByText('Test Description')).toBeInTheDocument();
         });
 
@@ -44,17 +59,18 @@ describe('IntroSection', () => {
             expect(image).toHaveAttribute('src', 'fallback-background-image.png');
         });
 
-        //   it('should render empty title and description when banner is null', () => {
-        //       render(<IntroSection banner={null} />);
+        it('should render empty title and description when banner is null', () => {
+            render(<IntroSection banner={null} />);
 
-        //       const heading = screen.getByRole('heading', { level: 1 });
-        //       expect(heading).toBeInTheDocument();
-        //       expect(heading.textContent).toBe('');
+            //TODO: Uncomment when rich text component is implemented
+            // const heading = screen.getByRole('heading', { level: 1 });
+            // expect(heading).toBeInTheDocument();
+            // expect(heading.textContent).toBe('');
 
-        //       const paragraph = document.querySelector('.subtitle');
-        //       expect(paragraph).toBeInTheDocument();
-        //       expect(paragraph?.textContent).toBe('');
-        //   });
+            const paragraph = document.querySelector('.subtitle');
+            expect(paragraph).toBeInTheDocument();
+            expect(paragraph?.textContent).toBe('');
+        });
 
         it('should render the fallback background image', () => {
             render(<IntroSection banner={null} />);

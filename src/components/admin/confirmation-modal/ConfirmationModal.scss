@@ -1,6 +1,6 @@
 @use '../../../assets/sass/variables/colors';
 
-.no-hover {
+.confirmation-btn {
     &.btn-primary {
         &:hover {
             background-color: colors.$blue-500;

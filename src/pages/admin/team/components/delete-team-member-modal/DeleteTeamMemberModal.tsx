@@ -53,13 +53,13 @@ export const DeleteTeamMemberModal = ({
             <Modal.Title>{TEAM_MEMBERS_TEXT.FORM.TITLE.DELETE_MEMBER}</Modal.Title>
             <Modal.Content>{error && <div className="delete-team-member-error-container">{error}</div>}</Modal.Content>
             <Modal.Actions>
-                <Button onClick={handleClose} buttonStyle="secondary" className="no-hover" disabled={isSubmitting}>
+                <Button onClick={handleClose} buttonStyle="secondary" className="confirmation-btn" disabled={isSubmitting}>
                     {COMMON_TEXT_ADMIN.BUTTON.NO}
                 </Button>
                 <Button
                     onClick={handleConfirmDelete}
                     buttonStyle="primary"
-                    className="no-hover"
+                    className="confirmation-btn"
                     disabled={isSubmitting || !memberToDelete}
                 >
                     {COMMON_TEXT_ADMIN.BUTTON.YES}

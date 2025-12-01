@@ -31,10 +31,20 @@ export const ConfirmationModal = ({
             <Modal.Title>{title}</Modal.Title>
             <Modal.Content>{content && <p>{content}</p>}</Modal.Content>
             <Modal.Actions>
-                <Button onClick={onCancel} buttonStyle="secondary" disabled={isButtonsDisabled} className="confirmation-btn">
+                <Button
+                    onClick={onCancel}
+                    buttonStyle="secondary"
+                    disabled={isButtonsDisabled}
+                    className="confirmation-btn"
+                >
                     {cancelText || COMMON_TEXT_ADMIN.BUTTON.NO}
                 </Button>
-                <Button onClick={onConfirm} buttonStyle="primary" disabled={isButtonsDisabled} className="confirmation-btn">
+                <Button
+                    onClick={onConfirm}
+                    buttonStyle="primary"
+                    disabled={isButtonsDisabled}
+                    className="confirmation-btn"
+                >
                     {confirmText || COMMON_TEXT_ADMIN.BUTTON.YES}
                 </Button>
             </Modal.Actions>

@@ -80,6 +80,13 @@
     .partner-banner-form__image {
         width: 52.5625rem !important;
         height: 33.125rem;
+
+        .image-input-featured {
+            width: 52.5625rem;
+            height: 33.125rem;
+            background-size: cover;
+            background-position: center;
+        }
     }
 
     .partner-banner-form__title-group,

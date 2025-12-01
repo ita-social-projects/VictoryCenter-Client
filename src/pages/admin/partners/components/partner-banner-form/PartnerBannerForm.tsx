@@ -194,14 +194,10 @@ export const PartnerBanner = () => {
                             setError={handleImageError}
                             className="image-input-featured"
                             style={{
-                                width: '52.5625rem',
-                                height: '33.125rem',
                                 backgroundImage: `
                                 linear-gradient(rgba(245, 245, 245, 0.85), rgba(245, 245, 245, 0.85)),
                                 url(${BannerImage})
                               `,
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center',
                             }}
                         />
                         <InputError error={errors.image} />
@@ -241,7 +237,7 @@ export const PartnerBanner = () => {
                                 onClick={handlePublish}
                                 disabled={isDisabled || !isFormValid(values, errors)}
                             >
-                                {COMMON_TEXT_ADMIN.BUTTON.PUBLISH}
+                                {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                             </Button>
                         </div>
                     </div>

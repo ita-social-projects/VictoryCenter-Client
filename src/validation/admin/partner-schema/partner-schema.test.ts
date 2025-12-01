@@ -57,7 +57,7 @@ describe('partner-schema validations', () => {
                 const min = PARTNER_BANNER_VALIDATION.description.min;
                 const result = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateDescription('a'.repeat(min - 1));
                 expect(result).toBe(
-                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PARTNER_BANNER_VALIDATION.description.max),
+                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PARTNER_BANNER_VALIDATION.description.min),
                 );
             });
 
@@ -65,7 +65,7 @@ describe('partner-schema validations', () => {
                 const max = PARTNER_BANNER_VALIDATION.description.max;
                 const result = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateDescription('a'.repeat(max + 1));
                 expect(result).toBe(
-                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PARTNER_BANNER_VALIDATION.description.min),
+                    COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PARTNER_BANNER_VALIDATION.description.max),
                 );
             });
         });
@@ -142,13 +142,13 @@ describe('partner-schema validations', () => {
             });
 
             it('returns error when partners array is empty', () => {
-                const result = PARTNER_SECTION_VALIDATION_FUNCTIONS.validatePartners({ partners: [] } as any);
+                const result = PARTNER_SECTION_VALIDATION_FUNCTIONS.validatePartners([]);
                 expect(result).toBe(PARTNER_SECTION_VALIDATION.partners.getAtLeastOnePartnerRequiredError());
             });
 
             it('returns error when partners array exceeds max', () => {
                 const partners = buildPartnerArray(PARTNER_SECTION_VALIDATION.partners.max + 1);
-                const result = PARTNER_SECTION_VALIDATION_FUNCTIONS.validatePartners({ partners } as any);
+                const result = PARTNER_SECTION_VALIDATION_FUNCTIONS.validatePartners(partners);
                 expect(result).toBe(PARTNER_SECTION_VALIDATION.partners.getMaxError());
             });
         });

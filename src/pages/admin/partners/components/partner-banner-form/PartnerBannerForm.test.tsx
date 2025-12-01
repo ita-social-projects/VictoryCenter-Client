@@ -109,7 +109,7 @@ describe('PartnerBanner', () => {
     const getImageValue = () => screen.queryByTestId('banner-image-value');
     const getChangeImageButton = () => screen.getByRole('button', { name: 'Change image' });
     const getRemoveImageButton = () => screen.getByRole('button', { name: 'Remove image' });
-    const getPublishButton = () => screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH });
+    const getPublishButton = () => screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
 
     // Helper functions for actions
     const changeTitleValue = (value: string) => {

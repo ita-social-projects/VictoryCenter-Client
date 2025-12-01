@@ -212,7 +212,7 @@ const PartnerSectionComponent = ({
                     {PARTNERS_TEXT.SECTION.DELETE_SECTION}
                 </Button>
                 <Button buttonStyle="primary" onClick={handlePublish} disabled={disabled || !isFormValid()}>
-                    {COMMON_TEXT_ADMIN.BUTTON.PUBLISH}
+                    {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                 </Button>
             </div>
         </div>

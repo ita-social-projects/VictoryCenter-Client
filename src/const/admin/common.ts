@@ -65,7 +65,6 @@ export const COMMON_TEXT_ADMIN = {
         CANCEL: 'Відмінити',
         SAVE_AS_DRAFT: 'Зберегти як чернетку',
         SAVE_AS_PUBLISHED: 'Опублікувати',
-        PUBLISH: 'Опублікувати',
         TRY_AGAIN: 'Спробувати ще раз',
         EXIT: 'Вихід',
     },

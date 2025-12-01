@@ -316,7 +316,7 @@ describe('PartnerSectionForm', () => {
             />,
         );
 
-        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH })).toBeDisabled();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
     });
 
     it('enables publish button when validation passes', () => {
@@ -331,7 +331,7 @@ describe('PartnerSectionForm', () => {
             />,
         );
 
-        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH })).toBeEnabled();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeEnabled();
     });
 
     it('disables publish when partner description validation fails', () => {
@@ -348,7 +348,7 @@ describe('PartnerSectionForm', () => {
             />,
         );
 
-        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH })).toBeDisabled();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
     });
 
     it('disables publish when partner image missing or has error', () => {
@@ -369,7 +369,7 @@ describe('PartnerSectionForm', () => {
             />,
         );
 
-        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH })).toBeDisabled();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
     });
 
     it('shows loader and disables actions when form is disabled', () => {
@@ -386,7 +386,7 @@ describe('PartnerSectionForm', () => {
 
         expect(screen.getByTestId('inline-loader-2')).toBeInTheDocument();
         expect(screen.getByText(PARTNERS_TEXT.SECTION.DELETE_SECTION)).toBeDisabled();
-        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH })).toBeDisabled();
+        expect(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED })).toBeDisabled();
     });
 
     it('handles delete and publish button clicks', () => {
@@ -405,7 +405,7 @@ describe('PartnerSectionForm', () => {
         );
 
         fireEvent.click(screen.getByText(PARTNERS_TEXT.SECTION.DELETE_SECTION));
-        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.PUBLISH }));
+        fireEvent.click(screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED }));
 
         expect(onDelete).toHaveBeenCalledWith(defaultSectionValue.localId);
         expect(onPublish).toHaveBeenCalledWith(defaultSectionValue.localId);

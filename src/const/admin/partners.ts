@@ -27,7 +27,6 @@ export const PARTNERS_TEXT = {
         TITLE_PLACEHOLDER: 'Введіть заголовок секції',
         DESCRIPTION_PLACEHOLDER: 'Введіть опис секції',
         EMPTY_MESSAGE: 'Додайте хоча б одного партнера до секції',
-        MAX_PARTNERS: 'Максимальна кількість партнерів: 10',
         ADD_PARTNER: 'Додати партнера',
         DELETE_SECTION: 'Видалити секцію',
     },
@@ -49,7 +48,7 @@ export const PARTNERS_TEXT = {
         FAIL_TO_CREATE_SECTION: 'Виникла помилка під час створення секції',
         FAIL_TO_PUBLISH_SECTION: 'Виникла помилка під час публікації секції',
         FAIL_TO_DELETE_SECTION: 'Виникла помилка під час видалення секції',
-        FAIL_TO_LOAD_BANNER: 'Виникла проблема завантажити банер',
+        FAIL_TO_LOAD_BANNER: 'Виникла помилка під час завантаження банеру',
     },
 };
 

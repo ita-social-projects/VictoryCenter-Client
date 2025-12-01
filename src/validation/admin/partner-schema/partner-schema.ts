@@ -22,11 +22,11 @@ export const partnerBannerSchema = Yup.object({
         .required(PARTNER_BANNER_VALIDATION.description.getRequiredError())
         .max(
             PARTNER_BANNER_VALIDATION.description.max,
-            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PARTNER_BANNER_VALIDATION.description.min),
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PARTNER_BANNER_VALIDATION.description.max),
         )
         .min(
             PARTNER_BANNER_VALIDATION.description.min,
-            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PARTNER_BANNER_VALIDATION.description.max),
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PARTNER_BANNER_VALIDATION.description.min),
         ),
 });
 
@@ -126,7 +126,7 @@ export const PARTNER_SECTION_VALIDATION_FUNCTIONS = {
 
     validatePartners: (partners: { description: string }[]): string | undefined => {
         try {
-            partnerSectionSchema.validateSyncAt('partners', partners);
+            partnerSectionSchema.validateSyncAt('partners', { partners });
             return undefined;
         } catch (error: any) {
             return error.message;

@@ -221,7 +221,7 @@ export const PartnersApi = {
         );
 
         // Clean up deleted images
-        await Promise.all(imagesToDelete.map((id) => ImageApi.delete(client, id)));
+        await Promise.allSettled(imagesToDelete.map((id) => ImageApi.delete(client, id)));
 
         // Map DTO response back to a domain type
         return mapSectionDtoToSection(response.data);

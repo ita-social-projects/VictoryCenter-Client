@@ -55,10 +55,6 @@ export const Select = <TValue,>({
         setIsOpen(false);
     };
 
-    const handleContainerClick = () => {
-        handleOpenSelect();
-    };
-
     const handleOptionClick = (e: React.MouseEvent, value: TValue, name: string) => {
         e.stopPropagation();
         handleSelect(value, name);
@@ -66,21 +62,23 @@ export const Select = <TValue,>({
 
     return (
         <div
-            role={'toolbar'}
             ref={selectContainerRef}
-            onClick={handleContainerClick}
             className={classNames('select', className, {
                 'select-opened': isOpen,
                 'select-closed': !isOpen,
             })}
-            tabIndex={0}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    handleOpenSelect();
-                }
-            }}
         >
-            <button className={classNames('select-head', headClassName)}>
+            <button
+                type="button"
+                className={classNames('select-head', headClassName)}
+                onClick={handleOpenSelect}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleOpenSelect();
+                    }
+                }}
+            >
                 <span
                     className={classNames('empty', {
                         'not-empty': selectedValue !== null && selectedValue !== undefined,

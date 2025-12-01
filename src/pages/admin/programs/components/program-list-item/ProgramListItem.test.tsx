@@ -6,13 +6,14 @@ import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { VisibilityStatusLabelProps } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
 import { VisibilityStatus } from '../../../../../types/admin/common';
 import { Program } from '../../../../../types/admin/programs';
+import { ButtonTooltipProps } from '../../../../../components/admin/button-tooltip/ButtonTooltip';
 
 jest.mock('../../../../../assets/icons/blank-image.svg', () => ({
     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="blank-image" className={className} />,
 }));
 
 jest.mock('../../../../../components/admin/button-tooltip/ButtonTooltip', () => ({
-    ButtonTooltip: ({ children, position }: { children: React.ReactNode; position: string }) => {
+    ButtonTooltip: ({ children, position }: ButtonTooltipProps) => {
         return (
             <div data-testid="tooltip-button" data-position={position}>
                 {children}
@@ -36,7 +37,11 @@ describe('ProgramListItem', () => {
         name: 'Test Program',
         description: 'Test program description',
         status: VisibilityStatus.Published,
-        image: null,
+        participantsCount: 'Well I am not sure',
+        meetingCount: 'What I suppose to write here',
+        location: 'Somewhere in the world',
+        previewImage: null,
+        backgroundImage: null,
         categories: [
             { id: 1, name: 'Category 1', programsCount: 1 },
             { id: 2, name: 'Category 2', programsCount: 2 },
@@ -161,7 +166,7 @@ describe('ProgramListItem', () => {
     it('displays image when program has an image and', () => {
         const programWithImage: Program = {
             ...mockProgram,
-            image: {
+            previewImage: {
                 id: 1,
                 url: 'test-base64',
                 mimeType: 'image/png',

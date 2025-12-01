@@ -4,7 +4,7 @@ import { SupportOptionsType } from '../../../../../../types/admin/donate';
 import { InlineLoader } from '../../../../../../components/common/inline-loader/InlineLoader';
 import { ReactComponent as PlusIcon } from '../../../../../../assets/icons/plus.svg';
 import './SupportOptionsForm.scss';
-import { SupportOptionItem, SupportOptionItemMode } from '../support-option-item/SupportOptionItem';
+import { SupportOptionItem } from '../support-option-item/SupportOptionItem';
 import NotFoundIcon from '../../../../../../assets/icons/not-found.svg';
 import { DONATE_TEXT } from '../../../../../../const/admin/donate';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
@@ -25,15 +25,6 @@ export const SupportOptionsForm = ({
     onDeleteOption,
 }: SupportOptionsFormProps) => {
     const [isAdding, setIsAdding] = useState(false);
-    const [editingItemId, setEditingItemId] = useState<number | null>(null);
-
-    const handleItemModeChange = (id: number, mode: SupportOptionItemMode) => {
-        if (mode === SupportOptionItemMode.Edit) {
-            setEditingItemId(id);
-        } else if (editingItemId === id) {
-            setEditingItemId(null);
-        }
-    };
 
     const handleSaveNewOption = async (name: string, value: string) => {
         await onCreateOption(name, value);
@@ -73,7 +64,6 @@ export const SupportOptionsForm = ({
                             data={item}
                             onSave={(name, value) => onUpdateOption(item.id, name, value)}
                             onDelete={() => onDeleteOption(item.id)}
-                            onModeChange={(mode) => handleItemModeChange(item.id, mode)}
                         />
                     ))}
 
@@ -81,17 +71,15 @@ export const SupportOptionsForm = ({
                         <SupportOptionItem key="new" onSave={handleSaveNewOption} onCancel={() => setIsAdding(false)} />
                     )}
 
-                    {!isAdding && (
-                        <Button
-                            className="btn-add new"
-                            onClick={() => setIsAdding(true)}
-                            buttonStyle="primary"
-                            disabled={isLoading || editingItemId !== null}
-                        >
-                            {DONATE_TEXT.SUPPORT_OPTIONS.ADD_NEW}
-                            <PlusIcon className="plus-icon" />
-                        </Button>
-                    )}
+                    <Button
+                        className="btn-add new"
+                        onClick={() => setIsAdding(true)}
+                        buttonStyle="primary"
+                        disabled={isLoading || isAdding}
+                    >
+                        {DONATE_TEXT.SUPPORT_OPTIONS.ADD_NEW}
+                        <PlusIcon className="plus-icon" />
+                    </Button>
                 </div>
             )}
         </div>

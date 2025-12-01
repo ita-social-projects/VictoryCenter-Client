@@ -5,8 +5,7 @@ import './SupportOptionItem.scss';
 import { SupportOptionsType } from '../../../../../../types/admin/donate';
 import { ConfirmationModal } from '../../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
-import { DONATE_TEXT } from '../../../../../../const/admin/donate';
-import { VALIDATION_PARAMS } from '../../../../../../const/admin/donate';
+import { DONATE_TEXT, VALIDATION_PARAMS } from '../../../../../../const/admin/donate';
 import { SUPPORT_OPTIONS_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/bank-details-schema/bank-details-schema';
 
 export enum SupportOptionItemMode {
@@ -141,6 +140,13 @@ export const SupportOptionItem = ({
         setMode(SupportOptionItemMode.Edit);
     };
 
+    const handleValueChange = (field: 'name' | 'value', val: string) => {
+        let setter = field === 'name' ? setName : setValue;
+        setter(val);
+
+        validateField(field, val);
+    };
+
     return (
         <div className="support-option">
             <div className={`support-option-header ${editable ? 'editable' : ''}`}>
@@ -176,12 +182,10 @@ export const SupportOptionItem = ({
                             isTitle={true}
                             value={name}
                             editable={editable}
-                            handleChange={(e) => setName(e.target.value)}
-                            onValueChange={setName}
-                            handleBlur={() => validateField('name', name)}
+                            onValueChange={(val) => handleValueChange('name', val)}
+                            onBlur={() => validateField('name', name)}
                             isRequired={true}
-                            maxLength={VALIDATION_PARAMS.supportTitle.maxLength}
-                            showCharCounter={true}
+                            maxLength={VALIDATION_PARAMS.supportOptions.name.maxLength}
                         />
                         {errors.name && <span className="error">{errors.name}</span>}
                     </div>
@@ -193,12 +197,10 @@ export const SupportOptionItem = ({
                         placeholder={DONATE_TEXT.PLACEHOLDER.SUPPORT_OPTION}
                         value={value}
                         editable={editable}
-                        handleChange={(e) => setValue(e.target.value)}
-                        onValueChange={setValue}
-                        handleBlur={() => validateField('value', value)}
+                        onValueChange={(val) => handleValueChange('value', val)}
+                        onBlur={() => validateField('value', value)}
                         isRequired={true}
-                        maxLength={VALIDATION_PARAMS.supportDescription.maxLength}
-                        showCharCounter={true}
+                        maxLength={VALIDATION_PARAMS.supportOptions.value.maxLength}
                     />
                     {errors.value && <span className="error">{errors.value}</span>}
                 </div>

@@ -15,7 +15,7 @@ describe('ForeignBankDetailsApi', () => {
         id: 1,
         name: 'Test Bank',
         receiver: 'Test Receiver',
-        iban: 'UA123456789012345678901234567',
+        ukrainianIban: 'UA123456789012345678901234567',
         swift: 'TESTBK12',
         address: 'Test Address',
         currency: BankCurrency.Usd,

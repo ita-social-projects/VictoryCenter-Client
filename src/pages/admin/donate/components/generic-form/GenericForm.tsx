@@ -152,6 +152,20 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 [fields],
             );
 
+            const handleBlur = useCallback(
+                (field: keyof T) => {
+                    setTouchedFields((prev) => new Set(prev).add(field));
+
+                    const validator = fields.find((f) => f.name === field)?.validate;
+                    if (validator) {
+                        const error = validator(formState[field] as any);
+                        setErrors((prev) => ({ ...prev, [field]: error }));
+                    }
+                },
+                // eslint-disable-next-line react-hooks/exhaustive-deps
+                [fields, formState],
+            );
+
             const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
                 e.preventDefault();
                 if (mode === GenericFormMode.Edit) return;
@@ -259,6 +273,12 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
             if (!isOpen) return null;
 
+            const isPublishingDisabled =
+                isSubmitting ||
+                hasEmptyRequiredFields ||
+                !isChanged() ||
+                Object.values(errors).some((e) => e !== undefined);
+
             return (
                 <div
                     className={`generic-form ${mode} ${isChildForm ? 'child' : ''}`}
@@ -359,7 +379,9 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                     onValueChange={(cleanValue) =>
                                                         handleValueChange(f.name, cleanValue)
                                                     }
+                                                    onBlur={() => handleBlur(f.name)}
                                                     onlyNumbers={f.onlyNumbers}
+                                                    maxLength={f.maxLength}
                                                 />
                                                 {touchedFields.has(f.name) && errors[f.name] && (
                                                     <span className="error">{errors[f.name]}</span>
@@ -409,7 +431,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                           })
                                             }
                                             buttonStyle="primary"
-                                            disabled={isSubmitting || hasEmptyRequiredFields || !isChanged()}
+                                            disabled={isPublishingDisabled}
                                         >
                                             {DONATE_TEXT.BUTTON.PUBLISH}
                                         </Button>

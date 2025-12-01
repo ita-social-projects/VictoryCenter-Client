@@ -79,7 +79,6 @@ export const Select = <TValue,>({
                 }
             }}
         >
-            {Icon && <Icon />}
             <button
                 type="button"
                 className={classNames('select-head', headClassName)}
@@ -91,6 +90,7 @@ export const Select = <TValue,>({
                     }
                 }}
             >
+                {Icon && <Icon />}
                 <span
                     className={classNames('empty', {
                         'not-empty': selectedValue !== null && selectedValue !== undefined,

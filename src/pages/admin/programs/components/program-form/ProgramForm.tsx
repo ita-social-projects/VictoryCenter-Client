@@ -8,17 +8,19 @@ import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useF
 import { Image, ImageValues } from '../../../../../types/common/image';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import './ProgramForm.scss';
 import { MultiSelectInputGroup } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
-import { Select } from '../../../../../components/common/select/Select';
 import { Button } from '../../../../../components/admin/button/Button';
+import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
+import './ProgramForm.scss';
 
 export interface ProgramFormValues {
     name: string;
     categories: ProgramCategory[];
     description: string;
-    image: Image | ImageValues | null;
-    imageId: number | null;
+    previewImage: Image | ImageValues | null;
+    previewImageId: number | null;
+    backgroundImage: Image | ImageValues | null;
+    backgroundImageId: number | null;
     location: string;
     participantsCount: string;
     meetingCount: string;
@@ -28,7 +30,8 @@ export interface ProgramFormErrors {
     name?: string;
     categories?: string;
     description?: string;
-    image?: string;
+    previewImage?: string;
+    backgroundImage?: string;
     location?: string;
     participantsCount?: string;
     meetingCount?: string;
@@ -57,7 +60,8 @@ const validateForm = (formState: ProgramFormValues, isPublishing: boolean): Prog
         name: PROGRAM_VALIDATION_FUNCTIONS.validateName(formState.name, isPublishing),
         categories: PROGRAM_VALIDATION_FUNCTIONS.validateCategories(formState.categories, isPublishing),
         description: PROGRAM_VALIDATION_FUNCTIONS.validateDescription(formState.description, isPublishing),
-        image: PROGRAM_VALIDATION_FUNCTIONS.validateImage(formState.image, isPublishing),
+        previewImage: PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(formState.previewImage, isPublishing),
+        backgroundImage: PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(formState.backgroundImage, isPublishing),
         location: PROGRAM_VALIDATION_FUNCTIONS.validateLocation(formState.location, isPublishing),
         participantsCount: PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount(
             formState.participantsCount,
@@ -86,10 +90,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 name: '',
                 categories: [],
                 description: '',
-                image: null,
-                imageId: 0,
-                //  backgroundImage: null,
-                //  backgroundImageId: 0,
+                previewImage: null,
+                previewImageId: 0,
+                backgroundImage: null,
+                backgroundImageId: 0,
                 location: '',
                 participantsCount: '',
                 meetingCount: '',
@@ -109,11 +113,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             ref,
         });
 
-        // Name handlers
         const handleNameChange = useCallback(
             (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                const value = e.target.value;
-                setFormState((prev) => ({ ...prev, name: value }));
+                setFormState((prev) => ({ ...prev, name: e.target.value }));
             },
             [setFormState],
         );
@@ -123,7 +125,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             setErrors((prev) => ({ ...prev, name: error }));
         }, [formState.name, setErrors]);
 
-        // Categories handlers
         const handleCategoriesChange = useCallback(
             (selectedCategories: ProgramCategory[]) => {
                 setFormState((prev) => ({ ...prev, categories: selectedCategories }));
@@ -136,11 +137,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             setErrors((prev) => ({ ...prev, categories: error }));
         }, [formState.categories, setErrors]);
 
-        // Location handlers
         const handleLocationChange = useCallback(
             (e: React.ChangeEvent<HTMLInputElement>) => {
-                const value = e.target.value;
-                setFormState((prev) => ({ ...prev, location: value }));
+                setFormState((prev) => ({ ...prev, location: e.target.value }));
             },
             [setFormState],
         );
@@ -150,11 +149,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             setErrors((prev) => ({ ...prev, location: error }));
         }, [formState.location, setErrors]);
 
-        // ParticipantsCount handlers
         const handleParticipantsCountChange = useCallback(
             (e: React.ChangeEvent<HTMLInputElement>) => {
-                const value = e.target.value;
-                setFormState((prev) => ({ ...prev, participantsCount: value }));
+                setFormState((prev) => ({ ...prev, participantsCount: e.target.value }));
             },
             [setFormState],
         );
@@ -164,11 +161,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             setErrors((prev) => ({ ...prev, participantsCount: error }));
         }, [formState.participantsCount, setErrors]);
 
-        // MeetingCount handlers
         const handleMeetingCountChange = useCallback(
             (e: React.ChangeEvent<HTMLInputElement>) => {
-                const value = e.target.value;
-                setFormState((prev) => ({ ...prev, meetingCount: value }));
+                setFormState((prev) => ({ ...prev, meetingCount: e.target.value }));
             },
             [setFormState],
         );
@@ -178,11 +173,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             setErrors((prev) => ({ ...prev, meetingCount: error }));
         }, [formState.meetingCount, setErrors]);
 
-        // Description handlers
         const handleDescriptionChange = useCallback(
             (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                const value = e.target.value;
-                setFormState((prev) => ({ ...prev, description: value }));
+                setFormState((prev) => ({ ...prev, description: e.target.value }));
             },
             [setFormState],
         );
@@ -192,31 +185,39 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             setErrors((prev) => ({ ...prev, description: error }));
         }, [formState.description, setErrors]);
 
-        // Image handlers
-        const handleImageChange = useCallback(
+        const handlePreviewImageChange = useCallback(
             (file: ImageValues | null) => {
-                const image = file;
-                setFormState((prev) => ({ ...prev, image: image }));
-                const error = PROGRAM_VALIDATION_FUNCTIONS.validateImage(image, false);
+                setFormState((prev) => ({ ...prev, image: file }));
+                const error = PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(file, false);
                 setErrors((prev) => ({ ...prev, image: error }));
             },
             [setErrors, setFormState],
         );
 
-        //   const handleBackgroundImageChange = useCallback(
-        //       (file: ImageValues | null) => {
-        //           const image = file;
-        //           setFormState((prev) => ({ ...prev, backgroundImage: image }));
-        //           const error = PROGRAM_VALIDATION_FUNCTIONS.validateImage(image, false);
-        //           setErrors((prev) => ({ ...prev, backgroundImage: error }));
-        //       },
-        //       [setErrors, setFormState],
-        //   );
+        const handleSetPreviewImageError = useCallback(
+            (error: string | null) => setErrors((prev) => ({ ...prev, image: error || undefined })),
+            [setErrors],
+        );
+
+        const handleBackgroundImageChange = useCallback(
+            (file: ImageValues | null) => {
+                setFormState((prev) => ({ ...prev, backgroundImage: file }));
+                const error = PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(file, false);
+                setErrors((prev) => ({ ...prev, backgroundImage: error }));
+            },
+            [setErrors, setFormState],
+        );
+
+        const handleSetBackgroundImageError = useCallback(
+            (error: string | null) => setErrors((prev) => ({ ...prev, backgroundImage: error || undefined })),
+            [setErrors],
+        );
 
         return (
-            <form className="program-form-main" noValidate>
-                <div className="program-form-layout">
-                    <div className="program-form-toolbar">
+            <form className="program-form" noValidate>
+                {/* Header Section */}
+                <div className="program-form__header">
+                    <div className="program-form__header-left">
                         <MultiSelectInputGroup
                             label={PROGRAMS_TEXT.FORM.LABEL.CATEGORY}
                             isRequired={true}
@@ -229,124 +230,116 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             getOptionId={(category: ProgramCategory) => category.id}
                             getOptionName={(category: ProgramCategory) => category.name}
                             error={errors.categories}
-                            className="program-form-toolbar-category-select"
                         />
-
-                        <div className="program-form-toolbar-right">
-                            <Select<string>
-                                value={selectedLanguage}
-                                className="program-form-toolbar-language-select"
-                                onValueChange={onLanguageChange || (() => {})}
-                            >
-                                <Select.Option key={1} value="Українська" name="Українська" />
-                                <Select.Option key={2} value="Англійська" name="Англійська" />
-                            </Select>
-
-                            <Button buttonStyle="primary" onClick={onAddSection || (() => {})}>
-                                Додати нову секцію
-                            </Button>
-                        </div>
                     </div>
-                    <div className="program-form-content">
-                        {/* <PhotoInputGroup
-                            id="img"
-                            isRequired={true}
-                            name="img"
-                            value={formState.backgroundImage}
-                            onChange={handleBackgroundImageChange}
-                            disabled={isSubmitting || isFormDisabled}
-                            error={errors.backgroundImage}
-                            setError={(error) =>
-                                setErrors((prev) => ({ ...prev, backgroundImage: error || undefined }))
-                            }
-                            className={`program-form-content-background-image ${formState.backgroundImage ? 'has-image' : ''}`}
-                        /> */}
-                        <div className="program-form-fields">
-                            <div className="program-form-left">
-                                <TextAreaWithCharacterLimitGroup
-                                    label={PROGRAMS_TEXT.FORM.LABEL.NAME}
-                                    isRequired={true}
-                                    id="name"
-                                    name="name"
-                                    value={formState.name}
-                                    onChange={handleNameChange}
-                                    onBlur={handleNameBlur}
-                                    maxLength={PROGRAM_VALIDATION.name.max}
-                                    disabled={isSubmitting || isFormDisabled}
-                                    error={errors.name}
-                                    className="program-form-left-textarea"
-                                />
 
-                                <InputWithCharacterLimitGroup
-                                    label={PROGRAMS_TEXT.FORM.LABEL.LOCATION}
-                                    id="location"
-                                    name="location"
-                                    value={formState.location}
-                                    onChange={handleLocationChange}
-                                    onBlur={handleLocationBlur}
-                                    maxLength={PROGRAM_VALIDATION.location.max}
-                                    disabled={isSubmitting || isFormDisabled}
-                                    error={errors.location}
-                                    className="program-form-left-input"
-                                />
+                    <div className="program-form__header-right">
+                        <Button
+                            onClick={onAddSection}
+                            buttonStyle="primary"
+                            data-testid="add-program-button"
+                            className="program-form__add-btn"
+                        >
+                            {PROGRAMS_TEXT.BUTTON.ADD_PROGRAM} <PlusIcon />
+                        </Button>
+                    </div>
+                </div>
 
-                                <InputWithCharacterLimitGroup
-                                    label={PROGRAMS_TEXT.FORM.LABEL.PARTICIPANTS_COUNT}
-                                    id="participantsCount"
-                                    name="participantsCount"
-                                    value={formState.participantsCount}
-                                    onChange={handleParticipantsCountChange}
-                                    onBlur={handleParticipantsCountBlur}
-                                    maxLength={PROGRAM_VALIDATION.participantsCount.max}
-                                    disabled={isSubmitting || isFormDisabled}
-                                    error={errors.participantsCount}
-                                    className="program-form-left-input"
-                                />
+                {/* Main Content Layout */}
+                <div className="program-form__body">
+                    <PhotoInputGroup
+                        label="Завантажте файл"
+                        id="backgroundImage"
+                        isRequired={true}
+                        name="backgroundImage"
+                        value={formState.backgroundImage}
+                        onChange={handleBackgroundImageChange}
+                        disabled={isSubmitting || isFormDisabled}
+                        error={errors.backgroundImage}
+                        setError={handleSetBackgroundImageError}
+                    />
+                    <div className="program-form__body__inputs">
+                        <div className="program-form__col-left">
+                            <TextAreaWithCharacterLimitGroup
+                                label={PROGRAMS_TEXT.FORM.LABEL.NAME}
+                                isRequired={true}
+                                id="name"
+                                name="name"
+                                value={formState.name}
+                                onChange={handleNameChange}
+                                onBlur={handleNameBlur}
+                                maxLength={PROGRAM_VALIDATION.name.max}
+                                disabled={isSubmitting || isFormDisabled}
+                                error={errors.name}
+                                placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_NAME}
+                            />
 
-                                <InputWithCharacterLimitGroup
-                                    label={PROGRAMS_TEXT.FORM.LABEL.MEETING_COUNT}
-                                    id="meetingCount"
-                                    name="meetingCount"
-                                    value={formState.meetingCount}
-                                    onChange={handleMeetingCountChange}
-                                    onBlur={handleMeetingCountBlur}
-                                    maxLength={PROGRAM_VALIDATION.meetingCount.max}
-                                    disabled={isSubmitting || isFormDisabled}
-                                    error={errors.meetingCount}
-                                    className="program-form-left-input"
-                                />
-                            </div>
+                            <InputWithCharacterLimitGroup
+                                label={PROGRAMS_TEXT.FORM.LABEL.LOCATION}
+                                id="location"
+                                name="location"
+                                value={formState.location}
+                                onChange={handleLocationChange}
+                                onBlur={handleLocationBlur}
+                                maxLength={PROGRAM_VALIDATION.location.max}
+                                disabled={isSubmitting || isFormDisabled}
+                                error={errors.location}
+                                placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_LOCATION}
+                            />
 
-                            <div className="program-form-right">
-                                <TextAreaWithCharacterLimitGroup
-                                    label={PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION}
-                                    id="description"
-                                    isRequired={true}
-                                    name="description"
-                                    value={formState.description}
-                                    onChange={handleDescriptionChange}
-                                    onBlur={handleDescriptionBlur}
-                                    rows={8}
-                                    disabled={isSubmitting || isFormDisabled}
-                                    maxLength={PROGRAM_VALIDATION.description.max}
-                                    error={errors.description}
-                                    className="program-form-right-textarea"
-                                />
+                            <InputWithCharacterLimitGroup
+                                label={PROGRAMS_TEXT.FORM.LABEL.PARTICIPANTS_COUNT}
+                                id="participantsCount"
+                                name="participantsCount"
+                                value={formState.participantsCount}
+                                onChange={handleParticipantsCountChange}
+                                onBlur={handleParticipantsCountBlur}
+                                maxLength={PROGRAM_VALIDATION.participantsCount.max}
+                                disabled={isSubmitting || isFormDisabled}
+                                error={errors.participantsCount}
+                                placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_PARTICIPANTS_COUNT}
+                            />
 
-                                <PhotoInputGroup
-                                    label={PROGRAMS_TEXT.FORM.LABEL.PHOTO}
-                                    id="img"
-                                    isRequired={true}
-                                    name="img"
-                                    value={formState.image}
-                                    onChange={handleImageChange}
-                                    disabled={isSubmitting || isFormDisabled}
-                                    error={errors.backgroundImage}
-                                    setError={(error) =>
-                                        setErrors((prev) => ({ ...prev, backgroundImage: error || undefined }))
-                                    }
-                                />
-                            </div>
+                            <InputWithCharacterLimitGroup
+                                label={PROGRAMS_TEXT.FORM.LABEL.MEETING_COUNT}
+                                id="meetingCount"
+                                name="meetingCount"
+                                value={formState.meetingCount}
+                                onChange={handleMeetingCountChange}
+                                onBlur={handleMeetingCountBlur}
+                                maxLength={PROGRAM_VALIDATION.meetingCount.max}
+                                disabled={isSubmitting || isFormDisabled}
+                                error={errors.meetingCount}
+                                placeholder={PROGRAMS_TEXT.PLACEHOLDER.INSERT_PROGRAM_MEETINGS_COUNT}
+                            />
+                        </div>
+
+                        <div className="program-form__col-right">
+                            <TextAreaWithCharacterLimitGroup
+                                label={PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION}
+                                id="description"
+                                isRequired={true}
+                                name="description"
+                                value={formState.description}
+                                onChange={handleDescriptionChange}
+                                onBlur={handleDescriptionBlur}
+                                rows={8}
+                                disabled={isSubmitting || isFormDisabled}
+                                maxLength={PROGRAM_VALIDATION.description.max}
+                                error={errors.description}
+                            />
+
+                            <PhotoInputGroup
+                                label={PROGRAMS_TEXT.FORM.LABEL.PREVIEW_IMAGE}
+                                id="previewImage"
+                                isRequired={true}
+                                name="previewImage"
+                                value={formState.previewImage}
+                                onChange={handlePreviewImageChange}
+                                disabled={isSubmitting || isFormDisabled}
+                                error={errors.image}
+                                setError={handleSetPreviewImageError}
+                            />
                         </div>
                     </div>
                 </div>
@@ -354,3 +347,5 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
     },
 );
+
+ProgramForm.displayName = 'ProgramForm';

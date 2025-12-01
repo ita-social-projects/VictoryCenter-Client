@@ -44,14 +44,14 @@ export const ProgramModal = (props: ProgramModalProps) => {
             name: program.name,
             description: program.description,
             categories: program.categories.map((c) => ({ ...c, programsCount: c.programsCount ?? 0 })),
-            image: program.image,
-            imageId: program.image && 'id' in program.image ? program.image.id : null,
+            previewImage: program.previewImage,
+            previewImageId: program.previewImage && 'id' in program.previewImage ? program.previewImage.id : null,
+            backgroundImage: program.backgroundImage || null,
+            backgroundImageId:
+                program.backgroundImage && 'id' in program.backgroundImage ? program.backgroundImage.id : null,
             location: program.location,
             participantsCount: program.participantsCount,
             meetingCount: program.meetingCount,
-            // backgroundImage: program.backgroundImage || null,
-            // backgroundImageId:
-            //     program.backgroundImage && 'id' in program.backgroundImage ? program.backgroundImage.id : null,
         };
     }, [program, isEditMode]);
 
@@ -97,10 +97,13 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 id: mode === ModalMode.Edit && program ? program.id : null,
                 name: formData.name,
                 description: formData.description,
-                image: formData.image && 'base64' in formData.image ? formData.image : null,
+                previewImage: formData.previewImage && 'base64' in formData.previewImage ? formData.previewImage : null,
+                backgroundImage:
+                    formData.backgroundImage && 'base64' in formData.backgroundImage ? formData.backgroundImage : null,
                 status: status,
                 categoryIds: formData.categories.map((x) => x.id),
-                imageId: initialData?.imageId ?? null,
+                previewImageId: initialData?.previewImageId ?? null,
+                backgroundImageId: initialData?.backgroundImageId ?? null,
                 location: formData.location,
                 participantsCount: formData.participantsCount,
                 meetingCount: formData.meetingCount,

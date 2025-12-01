@@ -27,7 +27,8 @@ const mapProgramEditToProgram = async (program: ProgramCreateUpdate, client: Axi
         description: program.description,
         categories: response.data,
         status: program.status,
-        image: program.image,
+        previewImage: program.previewImage,
+        backgroundImage: program.backgroundImage,
         location: program.location,
         participantsCount: program.participantsCount,
         meetingCount: program.meetingCount,
@@ -121,9 +122,13 @@ export const ProgramsApi = {
     },
 
     addProgram: async (client: AxiosInstance, program: ProgramCreateUpdate): Promise<Program> => {
-        if (program.image && 'base64' in program.image) {
-            const imageResult = await ImageApi.post(client, program.image);
-            program.imageId = imageResult.id;
+        if (program.previewImage && 'base64' in program.previewImage) {
+            const imageResult = await ImageApi.post(client, program.previewImage);
+            program.previewImageId = imageResult.id;
+        }
+        if (program.backgroundImage && 'base64' in program.backgroundImage) {
+            const imageResult = await ImageApi.post(client, program.backgroundImage);
+            program.backgroundImageId = imageResult.id;
         }
 
         const response = await client.post(API_ROUTES.PROGRAMS.BASE, program);
@@ -132,19 +137,23 @@ export const ProgramsApi = {
     },
 
     editProgram: async (program: ProgramCreateUpdate, client: AxiosInstance): Promise<Program> => {
-        const { finalImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(
-            client,
-            program.image,
-            program.imageId,
-        );
+        const { finalImageId: finalPreviewImageId, imageIdToDelete: previewImageIdToDelete } =
+            await ImageApi.getUpdateImageId(client, program.previewImage, program.previewImageId);
+        const { finalImageId: finalBackgroundImageId, imageIdToDelete: backgroundImageIdToDelete } =
+            await ImageApi.getUpdateImageId(client, program.backgroundImage, program.backgroundImageId);
 
-        program.imageId = finalImageId;
+        program.previewImageId = finalPreviewImageId;
+        program.backgroundImageId = finalBackgroundImageId;
 
         const response = await client.put(`${API_ROUTES.PROGRAMS.BASE}/${program.id}`, program);
 
-        if (imageIdToDelete && imageIdToDelete !== finalImageId) {
-            await ImageApi.delete(client, imageIdToDelete);
+        if (previewImageIdToDelete && previewImageIdToDelete !== finalPreviewImageId) {
+            await ImageApi.delete(client, previewImageIdToDelete);
         }
+        if (backgroundImageIdToDelete && backgroundImageIdToDelete !== finalBackgroundImageId) {
+            await ImageApi.delete(client, backgroundImageIdToDelete);
+        }
+
         return response.data;
     },
 

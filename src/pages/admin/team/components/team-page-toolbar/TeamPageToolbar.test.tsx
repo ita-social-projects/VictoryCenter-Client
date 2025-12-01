@@ -137,7 +137,7 @@ describe('TeamPageToolbar', () => {
         const onStatusFilterChange = jest.fn();
         renderToolbar({ onStatusFilterChange });
 
-        const statusSelect = screen.getByRole('toolbar');
+        const statusSelect = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.STATUS.DEFAULT });
         fireEvent.click(statusSelect);
 
         fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.ALL));

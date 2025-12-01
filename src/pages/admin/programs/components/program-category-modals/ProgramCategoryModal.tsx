@@ -322,8 +322,6 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
             <ConfirmationModal
                 isOpen={showSaveConfirmModal}
                 title={COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                 onClose={handleSaveConfirmClose}
                 onCancel={handleSaveConfirmCancel}
                 onConfirm={onSubmit}
@@ -333,8 +331,6 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
             <ConfirmationModal
                 isOpen={showCloseConfirmModal}
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                 onClose={handleCloseConfirmClose}
                 onCancel={handleCloseConfirmCancel}
                 onConfirm={handleConfirmClose}

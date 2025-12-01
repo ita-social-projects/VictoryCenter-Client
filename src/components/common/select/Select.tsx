@@ -12,6 +12,8 @@ export type SelectProps<TValue> = {
     selectContainerRef?: RefObject<HTMLDivElement | null>;
     placeholder?: string;
     className?: string;
+    headClassName?: string;
+    optionClassName?: string;
     isAutocomplete?: boolean;
 };
 
@@ -21,6 +23,8 @@ export const Select = <TValue,>({
     value,
     selectContainerRef,
     className,
+    headClassName,
+    optionClassName,
     placeholder,
     isAutocomplete = false,
 }: SelectProps<TValue>) => {
@@ -51,10 +55,6 @@ export const Select = <TValue,>({
         setIsOpen(false);
     };
 
-    const handleContainerClick = () => {
-        handleOpenSelect();
-    };
-
     const handleOptionClick = (e: React.MouseEvent, value: TValue, name: string) => {
         e.stopPropagation();
         handleSelect(value, name);
@@ -62,28 +62,32 @@ export const Select = <TValue,>({
 
     return (
         <div
-            role={'toolbar'}
             ref={selectContainerRef}
-            onClick={handleContainerClick}
             className={classNames('select', className, {
                 'select-opened': isOpen,
                 'select-closed': !isOpen,
             })}
-            tabIndex={0}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    handleOpenSelect();
-                }
-            }}
         >
-            <span
-                className={classNames('empty', {
-                    'not-empty': selectedValue !== null && selectedValue !== undefined,
-                })}
+            <button
+                type="button"
+                className={classNames('select-head', headClassName)}
+                onClick={handleOpenSelect}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleOpenSelect();
+                    }
+                }}
             >
-                {selectedName ?? placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT}
-            </span>
-            {isOpen ? <ArrowUp /> : <ArrowDown />}
+                <span
+                    className={classNames('empty', {
+                        'not-empty': selectedValue !== null && selectedValue !== undefined,
+                    })}
+                >
+                    {selectedName ?? placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT}
+                </span>
+                {isOpen ? <ArrowUp /> : <ArrowDown />}
+            </button>
             {isOpen && (
                 <div className={'select-options'}>
                     {options.map((opt, index) => {
@@ -91,7 +95,7 @@ export const Select = <TValue,>({
                         return (
                             <button
                                 key={`${name}-${index}`}
-                                className={classNames({
+                                className={classNames(optionClassName, {
                                     'select-options-selected': !isAutocomplete && selectedValue === optValue,
                                 })}
                                 onClick={(e) => handleOptionClick(e, optValue, name)}

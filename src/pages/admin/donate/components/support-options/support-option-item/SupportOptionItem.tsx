@@ -237,8 +237,6 @@ export const SupportOptionItem = ({
                 }}
                 onCancel={() => setModalConfig(null)}
                 onClose={() => setModalConfig(null)}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
         </div>
     );

@@ -28,6 +28,11 @@
             text-decoration: none;
             position: relative;
             padding: 0.9375rem 0.625rem 0.9375rem 2.5rem;
+            transition: background-color 0.2s;
+
+            &:hover:not(.admin-pages-selected) {
+                background-color: colors.$blue-50;
+            }
         }
 
         &-selected {

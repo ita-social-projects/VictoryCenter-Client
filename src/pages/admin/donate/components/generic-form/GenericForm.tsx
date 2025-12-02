@@ -370,7 +370,13 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                 <DonateInput
                                                     name={String(f.name)}
                                                     label={f.label}
-                                                    isRequired={mode === GenericFormMode.Create && f.isRequired}
+                                                    isRequired={
+                                                        (mode === GenericFormMode.Create && f.isRequired) ||
+                                                        (isChildForm &&
+                                                            mode === GenericFormMode.View &&
+                                                            f.isRequired) ||
+                                                        (isChildForm && mode === GenericFormMode.Edit && f.isRequired)
+                                                    }
                                                     isTitle={f.isTitle}
                                                     placeholder={f.placeholder}
                                                     prefix={f.prefix}

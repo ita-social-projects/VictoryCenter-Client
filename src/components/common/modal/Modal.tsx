@@ -2,13 +2,14 @@ import React, { ReactNode, useId } from 'react';
 import './Modal.scss';
 import { useModal } from '../../../hooks/admin/use-modal/UseModal';
 
-interface ModalProps {
+export interface ModalProps {
     children?: ReactNode;
     isOpen: boolean;
     onClose: () => void;
+    fullScreen?: boolean;
 }
 
-export const Modal = ({ children, isOpen, onClose }: ModalProps) => {
+export const Modal = ({ children, isOpen, onClose, fullScreen = false }: ModalProps) => {
     const titleId = useId();
 
     const { modalRef, handleOverlayClick, handleOnMouseDownModal, handleMouseDownOverlay } = useModal({
@@ -42,7 +43,7 @@ export const Modal = ({ children, isOpen, onClose }: ModalProps) => {
                 ref={modalRef}
                 role="button"
                 aria-labelledby={titleId}
-                className="modal-container"
+                className={`modal-container ${fullScreen ? 'fullscreen' : ''}`}
                 onMouseDown={handleOnMouseDownModal}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}

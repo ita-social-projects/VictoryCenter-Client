@@ -11,6 +11,11 @@ export interface GenericFormValues {
     [key: string]: any;
 }
 
+export interface ButtonValidationState {
+    isDraftValid: boolean;
+    isPublishValid: boolean;
+}
+
 export interface UseGenericModalConfig<TFormValues extends GenericFormValues, TEntity> {
     mode: ModalMode;
     isOpen: boolean;
@@ -48,9 +53,9 @@ export const useGenericModal = <
     const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
     const [pendingFormData, setPendingFormData] = useState<TFormValues | null>(null);
     const [isFormValid, setIsFormValid] = useState(false);
-    const [buttonStates, setButtonStates] = useState({
-        draftValid: false,
-        publishValid: false,
+    const [buttonStates, setButtonStates] = useState<ButtonValidationState>({
+        isDraftValid: false,
+        isPublishValid: false,
     });
 
     const isEditMode = mode === ModalMode.Edit;
@@ -59,8 +64,8 @@ export const useGenericModal = <
         const api = formRef.current;
 
         setButtonStates({
-            draftValid: api?.isValid?.(false) ?? currentIsValid,
-            publishValid: api?.isValid?.(true) ?? currentIsValid,
+            isDraftValid: api?.isValid?.(false) ?? currentIsValid,
+            isPublishValid: api?.isValid?.(true) ?? currentIsValid,
         });
     }, []);
 

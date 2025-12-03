@@ -107,13 +107,20 @@ export const FaqModal = (props: FaqModalProps) => {
             onFormSubmit={modalHookData.handleFormSubmit}
             onDraftSubmit={modalHookData.handleDraftSubmit}
             onPublishSubmit={modalHookData.handlePublishSubmit}
-            onConfirmAction={modalHookData.handleConfirmAction}
-            onCancelConfirmation={modalHookData.handleCancelConfirmation}
-            onConfirmClose={modalHookData.handleConfirmClose}
-            onCancelClose={modalHookData.handleCancelClose}
-            {...modalHookData}
-            initialData={initialData}
+            onActionConfirm={modalHookData.handleConfirmAction}
+            onActionCancel={modalHookData.handleCancelConfirmation}
+            onExitConfirm={modalHookData.handleConfirmClose}
+            onExitCancel={modalHookData.handleCancelClose}
+            buttonStates={modalHookData.buttonStates}
+            formRef={modalHookData.formRef}
+            isSubmitting={modalHookData.isSubmitting}
+            error={modalHookData.error}
+            isActionConfirmationOpen={modalHookData.showFormConfirmModal}
+            isExitConfirmationOpen={modalHookData.showCloseConfirmModal}
+            formKey={modalHookData.formKey}
+            actionConfirmationTitle={modalHookData.formConfirmTitle}
             categories={pages}
+            initialData={initialData}
             renderForm={(props) => (
                 <FaqForm
                     ref={modalHookData.formRef}

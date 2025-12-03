@@ -9,18 +9,18 @@ import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal
 import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
 
-interface BaseProps {
+export interface BaseProgramModalProps {
     isOpen: boolean;
     onClose: () => void;
     categories: ProgramCategory[];
 }
 
-interface AddModalProps extends BaseProps {
+interface AddModalProps extends BaseProgramModalProps {
     mode: ModalMode.Add;
     onAddProgram: (program: Program) => void;
 }
 
-interface EditModalProps extends BaseProps {
+interface EditModalProps extends BaseProgramModalProps {
     mode: ModalMode.Edit;
     programToEdit: Program;
     onEditProgram: (program: Program) => void;
@@ -130,11 +130,19 @@ export const ProgramModal = (props: ProgramModalProps) => {
             onFormSubmit={modalHookData.handleFormSubmit}
             onDraftSubmit={modalHookData.handleDraftSubmit}
             onPublishSubmit={modalHookData.handlePublishSubmit}
-            onConfirmAction={modalHookData.handleConfirmAction}
-            onCancelConfirmation={modalHookData.handleCancelConfirmation}
-            onConfirmClose={modalHookData.handleConfirmClose}
-            onCancelClose={modalHookData.handleCancelClose}
-            {...modalHookData}
+            onActionConfirm={modalHookData.handleConfirmAction}
+            onActionCancel={modalHookData.handleCancelConfirmation}
+            onExitConfirm={modalHookData.handleConfirmClose}
+            onExitCancel={modalHookData.handleCancelClose}
+            buttonStates={modalHookData.buttonStates}
+            formRef={modalHookData.formRef}
+            isSubmitting={modalHookData.isSubmitting}
+            error={modalHookData.error}
+            isActionConfirmationOpen={modalHookData.showFormConfirmModal}
+            isExitConfirmationOpen={modalHookData.showCloseConfirmModal}
+            formKey={modalHookData.formKey}
+            actionConfirmationTitle={modalHookData.formConfirmTitle}
+            categories={categories}
             initialData={initialData}
             fullScreen={true}
             renderForm={(props) => (

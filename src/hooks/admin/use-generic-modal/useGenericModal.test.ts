@@ -67,8 +67,8 @@ describe('useGenericModal', () => {
 
         expect(mockIsValid).toHaveBeenCalledWith(false);
         expect(mockIsValid).toHaveBeenCalledWith(true);
-        expect(result.current.buttonStates.draftValid).toBe(true);
-        expect(result.current.buttonStates.publishValid).toBe(false);
+        expect(result.current.buttonStates.isDraftValid).toBe(true);
+        expect(result.current.buttonStates.isPublishValid).toBe(false);
     });
 
     it('updateButtonStates respects different isValid results for draft vs publish', () => {
@@ -279,15 +279,15 @@ describe('useGenericModal', () => {
             isValid: jest.fn((isPublishing) => !isPublishing),
         });
 
-        expect(result.current.buttonStates.draftValid).toBe(false);
-        expect(result.current.buttonStates.publishValid).toBe(false);
+        expect(result.current.buttonStates.isDraftValid).toBe(false);
+        expect(result.current.buttonStates.isPublishValid).toBe(false);
 
         act(() => {
             result.current.handleFormValidationChange(true);
         });
 
-        expect(result.current.buttonStates.draftValid).toBe(true);
-        expect(result.current.buttonStates.publishValid).toBe(false);
+        expect(result.current.buttonStates.isDraftValid).toBe(true);
+        expect(result.current.buttonStates.isPublishValid).toBe(false);
     });
 
     it('buttonStates should work without form api', () => {
@@ -299,7 +299,7 @@ describe('useGenericModal', () => {
             result.current.handleFormValidationChange(true);
         });
 
-        expect(result.current.buttonStates.draftValid).toBe(true);
-        expect(result.current.buttonStates.publishValid).toBe(true);
+        expect(result.current.buttonStates.isDraftValid).toBe(true);
+        expect(result.current.buttonStates.isPublishValid).toBe(true);
     });
 });

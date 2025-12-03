@@ -108,12 +108,18 @@ export const TeamMemberModal = ({
             onFormSubmit={modalHookData.handleFormSubmit}
             onDraftSubmit={modalHookData.handleDraftSubmit}
             onPublishSubmit={modalHookData.handlePublishSubmit}
-            onConfirmAction={modalHookData.handleConfirmAction}
-            onCancelConfirmation={modalHookData.handleCancelConfirmation}
-            onConfirmClose={modalHookData.handleConfirmClose}
-            onCancelClose={modalHookData.handleCancelClose}
-            {...modalHookData}
-            title={title}
+            onActionConfirm={modalHookData.handleConfirmAction}
+            onActionCancel={modalHookData.handleCancelConfirmation}
+            onExitConfirm={modalHookData.handleConfirmClose}
+            onExitCancel={modalHookData.handleCancelClose}
+            buttonStates={modalHookData.buttonStates}
+            formRef={modalHookData.formRef}
+            isSubmitting={modalHookData.isSubmitting}
+            error={modalHookData.error}
+            isActionConfirmationOpen={modalHookData.showFormConfirmModal}
+            isExitConfirmationOpen={modalHookData.showCloseConfirmModal}
+            formKey={modalHookData.formKey}
+            actionConfirmationTitle={modalHookData.formConfirmTitle}
             initialData={initialData}
             categories={categories}
             renderForm={(props) => (

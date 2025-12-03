@@ -1,6 +1,6 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { ProgramModal, ProgramModalProps } from './ProgramModal';
+import { BaseProgramModalProps, ProgramModal, ProgramModalProps } from './ProgramModal';
 import { Program, ProgramCategory } from '../../../../../../types/admin/programs';
 import { ModalMode } from '../../../../../../types/admin/common';
 import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
@@ -8,6 +8,9 @@ import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { ModalProps } from '../../../../../../components/common/modal/Modal';
+import { ButtonProps } from '../../../../../../components/admin/button/Button';
+import { ConfirmationModalProps } from '../../../../../../components/admin/confirmation-modal/ConfirmationModal';
 
 jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -40,11 +43,7 @@ jest.mock('../../../../../../components/common/modal/Modal', () => {
         isOpen,
         children,
         onClose,
-    }: {
-        isOpen: boolean;
-        children: React.ReactNode;
-        onClose: () => void;
-    }) => {
+    }: ModalProps) => {
         if (!isOpen) return null;
         return (
             <div data-testid="modal">
@@ -71,12 +70,7 @@ jest.mock('../../../../../../components/admin/button/Button', () => ({
         disabled,
         children,
         buttonStyle,
-    }: {
-        onClick?: () => void;
-        disabled?: boolean;
-        children: React.ReactNode;
-        buttonStyle?: string;
-    }) => (
+    }: ButtonProps) => (
         <button
             onClick={onClick}
             disabled={disabled}
@@ -93,12 +87,7 @@ jest.mock('../../../../../../components/admin/confirmation-modal/ConfirmationMod
         title,
         onConfirm,
         onCancel,
-    }: {
-        isOpen: boolean;
-        title: string;
-        onConfirm: () => void;
-        onCancel: () => void;
-    }) =>
+    }: ConfirmationModalProps) =>
         isOpen ? (
             <div data-testid="question-modal">
                 <div data-testid="question-title">{title}</div>
@@ -136,7 +125,11 @@ const mockProgram: Program = {
     description: 'Test Description',
     categories: [{ id: 1, name: 'Category 1', programsCount: 1 }],
     status: VisibilityStatus.Draft,
-    image: null,
+    previewImage: null,
+    backgroundImage: null,
+    participantsCount: '',
+    meetingCount: '',
+    location: ''
 };
 
 const mockCategories: ProgramCategory[] = [
@@ -156,7 +149,7 @@ describe('ProgramModal', () => {
     const mockOnAddProgram = jest.fn();
     const mockOnEditProgram = jest.fn();
 
-    const baseProps = {
+    const baseProps: BaseProgramModalProps = {
         isOpen: true,
         onClose: mockOnClose,
         categories: mockCategories,
@@ -175,8 +168,8 @@ describe('ProgramModal', () => {
         onEditProgram: mockOnEditProgram,
     };
 
-    const getModal = () => screen.queryByTestId('modal');
     const getDraftButton = () => screen.getByTestId('draft-button');
+    const getModal = () => screen.queryByTestId('modal');
     const getPublishButton = () => screen.getByTestId('publish-button');
     const getQuestionModal = () => screen.queryByTestId('question-modal');
     const getQuestionTitle = () => screen.getByTestId('question-title');

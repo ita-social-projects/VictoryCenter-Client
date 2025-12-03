@@ -1,35 +1,21 @@
-import { VisibilityStatus } from '../../../types/admin/common';
 import React from 'react';
+import { VisibilityStatus } from '../../../types/admin/common';
+import { ButtonValidationState } from '../../../hooks/admin/use-generic-modal/useGenericModal';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
 import { Modal } from '../../common/modal/Modal';
 import { Button } from '../button/Button';
-import { FullScreenModal } from '../../common/full-page-modal/FullScreenModal';
 
 interface GenericModalWrapperProps<TFormValues, TFormRef> {
+    // Main Modal Props
     isOpen: boolean;
+    onClose: () => void;
     title?: string;
+    fullScreen?: boolean;
+    // Form Props
     formRef: React.RefObject<TFormRef>;
     formKey: string | number;
     initialData: TFormValues | null;
-    isSubmitting: boolean;
-    error: string;
-    showFormConfirmModal: boolean;
-    showCloseConfirmModal: boolean;
-    formConfirmTitle: string;
-    buttonStates: {
-        draftValid: boolean;
-        publishValid: boolean;
-    };
-    onClose: () => void;
-    onFormValidationChange: (isValid: boolean) => void;
-    onFormSubmit: (data: TFormValues, status: VisibilityStatus) => void;
-    onDraftSubmit: () => void;
-    onPublishSubmit: () => void;
-    onConfirmAction: () => void;
-    onCancelConfirmation: () => void;
-    onConfirmClose: () => void;
-    onCancelClose: () => void;
     renderForm: (props: {
         ref: React.RefObject<TFormRef>;
         key: string | number;
@@ -39,7 +25,24 @@ interface GenericModalWrapperProps<TFormValues, TFormRef> {
         onValidationChange: (isValid: boolean) => void;
     }) => React.ReactElement;
     categories?: any[];
-    fullScreen?: boolean;
+    // State & Validation
+    isSubmitting: boolean;
+    error: string;
+    buttonStates: ButtonValidationState;
+    // User Intent Triggers (Buttons inside the form)
+    onDraftSubmit: () => void;
+    onPublishSubmit: () => void;
+    onFormSubmit: (data: TFormValues, status: VisibilityStatus) => void;
+    onFormValidationChange: (isValid: boolean) => void;
+    // Action Confirmation (Save/Publish)
+    isActionConfirmationOpen: boolean;
+    actionConfirmationTitle: string;
+    onActionConfirm: () => void;
+    onActionCancel: () => void;
+    // Exit Confirmation (Unsaved Changes)
+    isExitConfirmationOpen: boolean;
+    onExitConfirm: () => void;
+    onExitCancel: () => void;
 }
 
 export const GenericModalWrapper = <TFormValues, TFormRef>({
@@ -50,35 +53,28 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
     initialData,
     isSubmitting,
     error,
-    showFormConfirmModal,
-    showCloseConfirmModal,
-    formConfirmTitle,
+    isActionConfirmationOpen,
+    isExitConfirmationOpen,
+    actionConfirmationTitle,
     buttonStates,
     onClose,
     onFormValidationChange,
     onFormSubmit,
     onDraftSubmit,
     onPublishSubmit,
-    onConfirmAction,
-    onCancelConfirmation,
-    onConfirmClose,
-    onCancelClose,
+    onActionConfirm,
+    onActionCancel,
+    onExitConfirm,
+    onExitCancel,
     renderForm,
     categories,
     fullScreen = false,
 }: GenericModalWrapperProps<TFormValues, TFormRef>) => {
-    const handleCancel = () => {
-        onCancelConfirmation();
-        onClose();
-    };
-
-    const ModalComponent = fullScreen ? FullScreenModal : Modal;
-
     return (
         <>
-            <ModalComponent isOpen={isOpen} onClose={onClose}>
-                {title && <ModalComponent.Title>{title}</ModalComponent.Title>}
-                <ModalComponent.Content>
+            <Modal isOpen={isOpen} onClose={onClose} fullScreen={fullScreen}>
+                {title && <Modal.Title>{title}</Modal.Title>}
+                <Modal.Content>
                     {renderForm({
                         ref: formRef,
                         key: formKey,
@@ -89,43 +85,45 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                         ...(categories && { categories }),
                     })}
                     {error && <div className="modal-content-error-container">{error}</div>}
-                </ModalComponent.Content>
-                <ModalComponent.Actions>
+                </Modal.Content>
+                <Modal.Actions>
                     <Button
                         buttonStyle="secondary"
                         onClick={onDraftSubmit}
-                        disabled={isSubmitting || !buttonStates.draftValid}
+                        disabled={isSubmitting || !buttonStates.isDraftValid}
                     >
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_DRAFT}
                     </Button>
                     <Button
                         buttonStyle="primary"
                         onClick={onPublishSubmit}
-                        disabled={isSubmitting || !buttonStates.publishValid}
+                        disabled={isSubmitting || !buttonStates.isPublishValid}
                     >
                         {COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED}
                     </Button>
-                </ModalComponent.Actions>
-            </ModalComponent>
+                </Modal.Actions>
+            </Modal>
 
+            {/* ACTION CONFIRMATION (Publish/Draft) */}
             <ConfirmationModal
-                isOpen={showFormConfirmModal}
+                isOpen={isActionConfirmationOpen}
+                title={actionConfirmationTitle}
                 isButtonsDisabled={isSubmitting}
-                title={formConfirmTitle}
-                onConfirm={onConfirmAction}
-                onCancel={handleCancel}
-                onClose={onClose}
+                onConfirm={onActionConfirm}
+                onCancel={onActionCancel}
+                onClose={onActionCancel}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
 
+            {/* EXIT CONFIRMATION (Discard Changes) */}
             <ConfirmationModal
-                isOpen={showCloseConfirmModal}
-                isButtonsDisabled={false}
+                isOpen={isExitConfirmationOpen}
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
-                onConfirm={onConfirmClose}
-                onCancel={onCancelClose}
-                onClose={onClose}
+                isButtonsDisabled={false}
+                onConfirm={onExitConfirm}
+                onCancel={onExitCancel}
+                onClose={onExitCancel}
                 confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />

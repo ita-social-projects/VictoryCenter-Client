@@ -1,10 +1,11 @@
 import * as Yup from 'yup';
 import { ImageValues } from '../../../types/common/image';
+import { IMAGE_VALIDATION } from '../../../const/admin/image';
 
 export const getImageDimensionSchema = (width: number, height: number) => {
     return Yup.mixed<ImageValues>().test(
         'base64Dimensions',
-        `Зображення завелике. Це може вплинути на якість. Обріжте до рекомендованного.`,
+        IMAGE_VALIDATION.ImageDimensionsTooLargeError,
         (image: ImageValues | undefined) =>
             new Promise((resolve) => {
                 if (!image) {
@@ -45,7 +46,7 @@ export const IMAGE_DIMENSION_VALIDATION_FUNCTIONS = {
             if (err instanceof Yup.ValidationError) {
                 return err.message;
             }
-            return 'Несподівана помилка валідації зображення.';
+            return IMAGE_VALIDATION.UnexpectedError();
         }
     },
 };

@@ -7,6 +7,7 @@ import { Button } from '../button/Button';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './CropperModal.scss';
 import { CROPPER_CONSTANTS } from '../../../const/admin/cropper';
+import { InlineLoader } from '../../common/inline-loader/InlineLoader';
 
 interface CropModalProps {
     src: ImageValues | null;
@@ -178,10 +179,8 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
         <Modal isOpen={isOpen} onClose={onCancel} maxWidth={`${naturalWidth ? Math.min(1000, naturalWidth) : 1000}px`}>
             <Modal.Title>{CROPPER_CONSTANTS.TITLE}</Modal.Title>
             <Modal.Content>
-                {!displaySrc ? (
-                    <div>Loading image...</div>
-                ) : (
-                    <div className="cropper-container" style={{ display: 'flex', justifyContent: 'center' }}>
+                <div className="cropper-container" style={{ display: 'flex', justifyContent: 'center' }}>
+                    {displaySrc ? (
                         <ReactCrop
                             crop={crop}
                             onChange={onCropChange}
@@ -204,8 +203,10 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
                                 style={{ maxWidth: '100%', maxHeight: '70vh' }}
                             />
                         </ReactCrop>
-                    </div>
-                )}
+                    ) : (
+                        <InlineLoader size={8} />
+                    )}
+                </div>
             </Modal.Content>
             <Modal.Actions>
                 <Button onClick={onCancel} buttonStyle="secondary">

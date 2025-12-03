@@ -12,7 +12,7 @@ export const getImageValidationSchema = (minWidth: number, minHeight: number) =>
 
         .test(
             'fileDimensions',
-            IMAGE_VALIDATION.InvalidImageDimensions,
+            IMAGE_VALIDATION.ImageDimensionsTooSmallError,
             (file) =>
                 new Promise((resolve) => {
                     if (!file) return resolve(false);

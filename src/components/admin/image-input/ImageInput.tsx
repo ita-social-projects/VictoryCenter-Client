@@ -47,14 +47,13 @@ export const ImageInput = ({
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
-    const [showCropperModal, setShowCropperModal] = useState<boolean>(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showCropperModal, setShowCropperModal] = useState(false);
     const [rawImage, setRawImage] = useState<ImageValues | Image | null>(null);
 
     useEffect(() => {
         setPreviewImage(value);
         if (value && 'url' in value) {
-            setPreviewImage(value);
             setRawImage(null);
         }
     }, [value]);
@@ -145,14 +144,10 @@ export const ImageInput = ({
     const handleCropCancel = async () => {
         setShowCropperModal(false);
 
-        const imageToUse = previewImage || rawImage;
+        if (!previewImage) setPreviewImage(rawImage);
 
-        if (!previewImage) {
-            setPreviewImage(rawImage);
-        }
-
-        if (imageToUse && 'base64' in imageToUse) {
-            const error = await IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage(imageToUse, width, height);
+        if (previewImage && 'base64' in previewImage) {
+            const error = await IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage(previewImage, width, height);
             if (error) {
                 setError(error);
             }
@@ -176,7 +171,7 @@ export const ImageInput = ({
                 onKeyDown={handleKeyDown}
                 onFocus={handleFocus}
                 onBlur={handleBlurEvent}
-                aria-label={COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || COMMON_TEXT_ADMIN.INPUT.UPLOAD_IMAGE}
+                aria-label={COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER}
                 tabIndex={disabled ? -1 : 0}
                 role="button"
             >

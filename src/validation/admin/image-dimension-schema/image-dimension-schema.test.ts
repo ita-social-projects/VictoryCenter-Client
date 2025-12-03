@@ -1,13 +1,13 @@
 import * as Yup from 'yup';
 import { getImageDimensionSchema, IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from './image-dimension-schema';
 import { ImageValues } from '../../../types/common/image';
+import { IMAGE_VALIDATION } from '../../../const/admin/image';
 
-const originalImage = global.Image;
+const originalImage = globalThis.Image;
 
 describe('Image Dimension Validation', () => {
     const TARGET_WIDTH = 500;
     const TARGET_HEIGHT = 300;
-    const ERROR_MSG = `Зображення завелике. Це може вплинути на якість. Обріжте до рекомендованного.`;
 
     beforeAll(() => {
         class MockImage {
@@ -24,7 +24,7 @@ describe('Image Dimension Validation', () => {
                     if (value.includes('ERROR_LOAD')) {
                         if (this.onerror) this.onerror();
                     } else if (value.includes('WRONG_SIZE')) {
-                        this.width = 100; // Якесь неправильне число
+                        this.width = 100;
                         this.height = 100;
                         if (this.onload) this.onload();
                     } else {
@@ -40,11 +40,11 @@ describe('Image Dimension Validation', () => {
             }
         }
 
-        global.Image = MockImage as any;
+        globalThis.Image = MockImage as any;
     });
 
     afterAll(() => {
-        global.Image = originalImage;
+        globalThis.Image = originalImage;
     });
 
     describe('getImageDimensionSchema', () => {
@@ -65,7 +65,7 @@ describe('Image Dimension Validation', () => {
                 mimeType: 'image/jpeg',
             };
 
-            await expect(schema.validate(invalidImage)).rejects.toThrow(ERROR_MSG);
+            await expect(schema.validate(invalidImage)).rejects.toThrow(IMAGE_VALIDATION.ImageDimensionsTooLargeError);
         });
 
         it('should fail validation when image fails to load (onerror)', async () => {
@@ -75,7 +75,7 @@ describe('Image Dimension Validation', () => {
                 mimeType: 'image/jpeg',
             };
 
-            await expect(schema.validate(brokenImage)).rejects.toThrow(ERROR_MSG);
+            await expect(schema.validate(brokenImage)).rejects.toThrow(IMAGE_VALIDATION.ImageDimensionsTooLargeError);
         });
 
         it('should fail immediately if image object is undefined', async () => {
@@ -126,7 +126,7 @@ describe('Image Dimension Validation', () => {
                 TARGET_HEIGHT,
             );
 
-            expect(result).toBe(ERROR_MSG);
+            expect(result).toBe(IMAGE_VALIDATION.ImageDimensionsTooLargeError);
         });
 
         it('should return error message when generic validation error occurs', async () => {
@@ -141,18 +141,18 @@ describe('Image Dimension Validation', () => {
                 TARGET_HEIGHT,
             );
 
-            expect(result).toBe(ERROR_MSG);
+            expect(result).toBe(IMAGE_VALIDATION.ImageDimensionsTooLargeError);
         });
 
         it('should handle non-Yup errors gracefully', async () => {
             const schemaSpy = jest.spyOn(Yup, 'mixed').mockImplementation(() => {
-                throw new Error('Some unexpected system error');
+                throw new Error('Some unexpected error');
             });
 
             const image: ImageValues = { base64: 'data', mimeType: 'image/png' };
             const result = await IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage(image, 100, 100);
 
-            expect(result).toBe('Несподівана помилка валідації зображення.');
+            expect(result).toBe(IMAGE_VALIDATION.UnexpectedError());
 
             schemaSpy.mockRestore();
         });

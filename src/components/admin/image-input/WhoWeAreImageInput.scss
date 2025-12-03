@@ -80,7 +80,7 @@
             gap: 0.5rem;
             width: fit-content;
             height: fit-content;
-            z-index: 2;
+            z-index: z-index.admin('image-input-action-buttons');
         }
 
         .delete-button,
@@ -95,7 +95,7 @@
             border-radius: 8px;
             background: colors.$grey-900;
             opacity: 0.8;
-            z-index: z-index.admin('who-we-are-page-delete-button');
+            z-index: z-index.admin('image-input-action-buttons');
             cursor: pointer;
 
             &:hover {

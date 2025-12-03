@@ -1,6 +1,7 @@
 import React, { forwardRef, useCallback, useMemo } from 'react';
 import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-schema';
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PhotoInputGroup } from '../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup';
@@ -187,9 +188,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
         const handlePreviewImageChange = useCallback(
             (file: ImageValues | null) => {
-                setFormState((prev) => ({ ...prev, image: file }));
+                setFormState((prev) => ({ ...prev, previewImage: file }));
                 const error = PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(file, false);
-                setErrors((prev) => ({ ...prev, image: error }));
+                setErrors((prev) => ({ ...prev, previewImage: error }));
             },
             [setErrors, setFormState],
         );
@@ -339,6 +340,11 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.image}
                                 setError={handleSetPreviewImageError}
+                                imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                                imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                                    PROGRAM_VALIDATION.previewImage.height,
+                                    PROGRAM_VALIDATION.previewImage.width,
+                                )}
                             />
                         </div>
                     </div>

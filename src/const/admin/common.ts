@@ -14,6 +14,8 @@ export const COMMON_TEXT_ADMIN = {
     INPUT: {
         IMAGE_PLACEHOLDER: 'Перетягніть файл сюди або натисніть для завантаження',
         UPLOAD_IMAGE: 'Upload image',
+        DRAG_AND_DROP_FILE_HERE: 'Перетягніть файл сюди',
+        getImageSizeSubText: (height: number, width: number) => `Розмір:${width}x${height}`,
     },
 
     STATUS: {

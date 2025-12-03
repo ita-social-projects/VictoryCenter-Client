@@ -167,9 +167,10 @@ describe('CropModal', () => {
         expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES)).toBeInTheDocument();
     });
 
-    it('Renders "Loading image..." when src=null', () => {
+    it('Renders loader when src=null', () => {
         render(<CropModal {...defaultProps} src={null} />);
-        expect(screen.getByText('Loading image...')).toBeInTheDocument();
+        const loader = document.querySelector('.cropper-container .loader');
+        expect(loader).toBeInTheDocument();
     });
 
     it('Renders ReactCrop and img with correct src when image is present', () => {

@@ -20,6 +20,7 @@ export interface GenericDetailsProps<T extends FieldValues> {
     notFoundText?: string;
     addNewText: string;
     isChildForm?: boolean;
+    isDisabled?: boolean;
     children?: (form: { formState: T; isItemsExpanded: boolean }) => React.ReactNode;
     onChangeItems?: React.Dispatch<React.SetStateAction<T[]>>;
     onSubmit?: (data: T) => Promise<void>;
@@ -37,6 +38,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
     notFoundText,
     addNewText,
     isChildForm = false,
+    isDisabled = false,
     children,
     onChangeItems,
     onSubmit,
@@ -163,6 +165,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                                         onClose={handleClose}
                                         onDelete={() => handleItemDelete(item.id)}
                                         isChildForm={isChildForm}
+                                        isDisabled={isDisabled}
                                         onModeChange={(mode: GenericFormMode) => handleItemModeChange(item.id, mode)}
                                     >
                                         {(formProps) => <>{children && children(formProps)}</>}
@@ -179,6 +182,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             onClose={handleClose}
                             initialMode={GenericFormMode.Create}
                             isChildForm={isChildForm}
+                            isDisabled={isDisabled}
                         >
                             {(formProps) => <>{children && children(formProps)}</>}
                         </FormComponent>

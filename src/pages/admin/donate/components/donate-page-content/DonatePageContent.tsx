@@ -246,6 +246,7 @@ export const DonatePageContent = () => {
                 primaryAddButton={true}
                 addNewText={DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW}
                 isChildForm={true}
+                isDisabled={!formState.id}
                 onSubmit={(data) => handleCreateCorrespondentBank(formState.id, data)}
                 onUpdate={(id, data) => handleUpdateCorrespondentBank(formState.id, id, data)}
                 onDelete={(id) => handleDeleteCorrespondentBank(formState.id, id)}

@@ -213,6 +213,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                             setErrors({});
                             setTouchedFields(new Set());
                             setMode(GenericFormMode.View);
+                            setIsExpanded(false);
                         },
                     });
                 } else {
@@ -220,6 +221,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                     setErrors({});
                     setTouchedFields(new Set());
                     setMode(GenericFormMode.View);
+                    setIsExpanded(false);
                 }
             };
 

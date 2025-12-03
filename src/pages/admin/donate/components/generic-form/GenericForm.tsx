@@ -168,29 +168,9 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
             const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
                 e.preventDefault();
-                if (!isExpanded) {
-                    setIsExpanded(true);
-                    setMode(GenericFormMode.Edit);
-                } else if (mode === GenericFormMode.View) {
-                    setMode(GenericFormMode.Edit);
-                } else {
-                    // Exiting edit mode, check for unsaved changes
-                    if (isChanged()) {
-                        setModalConfig({
-                            title: COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
-                            onConfirm: () => {
-                                setFormState(initialFormState);
-                                setErrors({});
-                                setTouchedFields(new Set());
-                                setMode(GenericFormMode.View);
-                                setIsExpanded(false);
-                            },
-                        });
-                    } else {
-                        setMode(GenericFormMode.View);
-                        setIsExpanded(false);
-                    }
-                }
+                if (mode === GenericFormMode.Edit) return;
+                setMode((prev) => (prev === GenericFormMode.View ? GenericFormMode.Edit : GenericFormMode.View));
+                setIsExpanded(true);
             };
 
             const handleCreateCancel = () => {
@@ -213,7 +193,6 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                             setErrors({});
                             setTouchedFields(new Set());
                             setMode(GenericFormMode.View);
-                            setIsExpanded(false);
                         },
                     });
                 } else {
@@ -221,13 +200,11 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                     setErrors({});
                     setTouchedFields(new Set());
                     setMode(GenericFormMode.View);
-                    setIsExpanded(false);
                 }
             };
 
             const handleViewCancel = () => {
                 setIsExpanded(false);
-                setMode(GenericFormMode.View);
             };
 
             const handleCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -322,6 +299,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                         className={`edit-btn ${mode}`}
                                         aria-label="edit-btn"
                                         onClick={handleEditClick}
+                                        disabled={mode === GenericFormMode.Edit}
                                     />
                                     <button
                                         className={`delete-btn ${mode}`}

@@ -282,7 +282,7 @@ export const DonatePageContent = () => {
                             isLoading={isLoading}
                             FormComponent={config.form}
                             notFoundText={DONATE_TEXT.BANK_DETAILS.NOT_FOUND}
-                            addNewText={DONATE_TEXT.BANK_DETAILS.ADD_FIRST}
+                            addNewText={DONATE_TEXT.BANK_DETAILS.ADD_NEW}
                             onSubmit={handleCreateBankDetails}
                             onUpdate={handleUpdateBankDetails}
                             onDelete={handleDeleteBankDetails}

@@ -67,7 +67,7 @@
 
 .edit-btn {
     cursor: default;
-    transition: opacity 0.2s ease;
+    transition: background-image 0.2s ease;
     border: none;
     width: 1.5rem;
     height: 1.5rem;
@@ -81,7 +81,6 @@
         cursor: pointer;
         &:hover {
             background: url('../../../../../assets/icons/edit-hover.svg');
-            transition: opacity 0.2s ease;
         }
     }
 }

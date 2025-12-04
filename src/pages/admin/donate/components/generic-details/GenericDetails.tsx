@@ -28,13 +28,12 @@ export interface GenericDetailsProps<T extends FieldValues> {
     }) => React.ReactNode;
     isParentCreating?: boolean;
 
-    onChangeItems?: React.Dispatch<React.SetStateAction<T[]>>;
     onSubmit?: (data: T) => Promise<void>;
     onUpdate?: (id: number, data: T) => Promise<void>;
     onDelete?: (id: number) => Promise<void>;
-    onLocalSubmit?: (data: T) => Promise<void>;
-    onLocalUpdate?: (id: number, data: T) => Promise<void>;
-    onLocalDelete?: (id: number) => Promise<void>;
+    onLocalSubmit?: (data: T) => void;
+    onLocalUpdate?: (id: number, data: T) => void;
+    onLocalDelete?: (id: number) => void;
 }
 
 export function GenericDetails<T extends { id: number } & FieldValues>({
@@ -49,7 +48,6 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
     isChildForm = false,
     children,
     isParentCreating = false,
-    onChangeItems,
     onSubmit,
     onUpdate,
     onDelete,
@@ -70,13 +68,6 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
         }
     };
 
-    const updateItems = useCallback(
-        (updater: React.SetStateAction<T[]>) => {
-            onChangeItems?.(updater);
-        },
-        [onChangeItems],
-    );
-
     const handleAdd = () => {
         setIsAddFormVisible(true);
     };
@@ -88,7 +79,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
     const handleSubmit = useCallback(
         async (data: T) => {
             if (isParentCreating && isChildForm && onLocalSubmit) {
-                await onLocalSubmit(data);
+                onLocalSubmit(data);
                 setIsAddFormVisible(false);
                 return;
             }
@@ -97,50 +88,39 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                 await onSubmit(data);
                 setIsAddFormVisible(false);
                 return;
-            } else {
-                onChangeItems?.((prevItems) => [...prevItems, data]);
-                setIsAddFormVisible(false);
             }
         },
-        [isParentCreating, isChildForm, onLocalSubmit, onSubmit, onChangeItems],
+        [isParentCreating, isChildForm, onLocalSubmit, onSubmit],
     );
 
     const handleItemUpdate = useCallback(
         async (item: T, updated: T, index?: number) => {
-            if (isParentCreating) {
-                if (onLocalUpdate && index != null) {
-                    await onLocalUpdate(index, updated);
-                }
+            if (isParentCreating && onLocalUpdate && index != null) {
+                onLocalUpdate(index, updated);
                 return;
             }
 
             if (onUpdate && item.id) {
                 await onUpdate(item.id, updated);
                 return;
-            } else {
-                updateItems((prevItems) => prevItems.map((i) => (i.id === item.id ? { ...i, ...updated } : i)));
             }
         },
-        [isParentCreating, onUpdate, onLocalUpdate, updateItems],
+        [isParentCreating, onUpdate, onLocalUpdate],
     );
 
     const handleItemDelete = useCallback(
         async (id: number, index?: number) => {
-            if (isParentCreating) {
-                if (onLocalDelete && index != null) {
-                    await onLocalDelete(index);
-                }
+            if (isParentCreating && onLocalDelete && index != null) {
+                onLocalDelete(index);
                 return;
             }
 
             if (onDelete && id) {
                 await onDelete(id);
                 return;
-            } else {
-                updateItems((prevItems) => prevItems.filter((i) => i.id !== id));
             }
         },
-        [isParentCreating, onDelete, onLocalDelete, updateItems],
+        [isParentCreating, onDelete, onLocalDelete],
     );
 
     const showNotFound = !isLoading && !isAddFormVisible && items.length === 0;

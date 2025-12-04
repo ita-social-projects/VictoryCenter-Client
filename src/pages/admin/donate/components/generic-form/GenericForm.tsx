@@ -473,7 +473,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                     );
                                 })}
 
-                            {editable && (!isChildForm ? mode !== GenericFormMode.Create : true) && renderFormButtons()}
+                            {editable && (isChildForm || mode !== GenericFormMode.Create) && renderFormButtons()}
                         </div>
                     )}
 

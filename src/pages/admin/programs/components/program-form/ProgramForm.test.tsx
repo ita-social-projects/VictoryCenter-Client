@@ -1,32 +1,44 @@
-/*
-import { createRef } from 'react';
+import React from 'react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { ProgramForm, ProgramFormRef, ProgramFormValues } from './ProgramForm';
-import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
-import { ProgramCategory } from '../../../../../types/admin/programs';
-import { Image } from '../../../../../types/common/image';
+import { ProgramForm, ProgramFormProps, ProgramFormRef, ProgramFormValues } from './ProgramForm';
+import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-schema';
 import { VisibilityStatus } from '../../../../../types/admin/common';
+import { ProgramCategory } from '../../../../../types/admin/programs';
+import { InputWithCharacterLimitGroupProps } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { TextAreaWithCharacterLimitGroupProps } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { MultiSelectInputGroupProps } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
+import { PhotoInputGroupProps } from '../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup';
+import { ButtonProps } from '@mui/material';
+
+jest.mock('../../../../../validation/admin/program-schema/program-schema', () => ({
+    PROGRAM_VALIDATION_FUNCTIONS: {
+        validateName: jest.fn(),
+        validateCategories: jest.fn(),
+        validateDescription: jest.fn(),
+        validatePreviewImage: jest.fn(),
+        validateBackgroundImage: jest.fn(),
+        validateLocation: jest.fn(),
+        validateParticipantsCount: jest.fn(),
+        validateMeetingCount: jest.fn(),
+    },
+}));
 
 jest.mock(
     '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
     () => ({
-        InputWithCharacterLimitGroup: (props: any) => (
-            <div data-testid={`input-group-${props.id}`}>
-                <label htmlFor={props.id}>
-                    {props.label} {props.isRequired && '*'}
-                </label>
-                <input
-                    id={props.id}
-                    name={props.name}
-                    value={props.value}
-                    onChange={props.onChange}
-                    onBlur={props.onBlur}
-                    disabled={props.disabled}
-                    maxLength={props.maxLength}
-                    data-testid={`input-${props.name}`}
-                />
-                {props.error && <div data-testid={`error-${props.id}`}>{props.error}</div>}
+        InputWithCharacterLimitGroup: ({
+            label,
+            value,
+            onChange,
+            onBlur,
+            error,
+            id,
+        }: InputWithCharacterLimitGroupProps) => (
+            <div data-testid={`group-${id}`}>
+                <label htmlFor={id}>{label}</label>
+                <input id={id} data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
+                {error && <span data-testid={`error-${id}`}>{error}</span>}
             </div>
         ),
     }),
@@ -35,295 +47,268 @@ jest.mock(
 jest.mock(
     '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
-        TextAreaWithCharacterLimitGroup: (props: any) => (
-            <div data-testid={`textarea-group-${props.id}`}>
-                <label htmlFor={props.id}>
-                    {props.label} {props.isRequired && '*'}
-                </label>
-                <textarea
-                    id={props.id}
-                    name={props.name}
-                    value={props.value}
-                    onChange={props.onChange}
-                    onBlur={props.onBlur}
-                    disabled={props.disabled}
-                    maxLength={props.maxLength}
-                    rows={props.rows}
-                    data-testid={`textarea-${props.name}`}
-                />
-                {props.error && <div data-testid={`error-${props.id}`}>{props.error}</div>}
+        TextAreaWithCharacterLimitGroup: ({
+            label,
+            value,
+            onChange,
+            onBlur,
+            error,
+            id,
+        }: TextAreaWithCharacterLimitGroupProps) => (
+            <div data-testid={`group-${id}`}>
+                <label htmlFor={id}>{label}</label>
+                <textarea id={id} data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
+                {error && <span data-testid={`error-${id}`}>{error}</span>}
             </div>
         ),
     }),
 );
 
 jest.mock('../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup', () => ({
-    MultiSelectInputGroup: (props: any) => (
-        <div data-testid={`multiselect-group-${props.id}`}>
-            <label htmlFor={props.id}>
-                {props.label} {props.isRequired && '*'}
-            </label>
-            <select
-                multiple
-                id={props.id}
-                data-testid="categories-select"
-                value={props.value.map((v: any) => v.id)}
-                onChange={(e) => {
-                    const selectedIds = Array.from(e.target.selectedOptions, (option) => Number(option.value));
-                    const selectedOptions = props.options.filter((opt: any) => selectedIds.includes(opt.id));
-                    props.onChange(selectedOptions);
-                }}
-                onBlur={props.onBlur}
-                disabled={props.disabled}
-            >
-                <option value="">{props.placeholder}</option>
-                {props.options.map((opt: any) => (
-                    <option key={props.getOptionId(opt)} value={props.getOptionId(opt)}>
-                        {props.getOptionName(opt)}
-                    </option>
-                ))}
-            </select>
-            {props.error && <div data-testid={`error-${props.id}`}>{props.error}</div>}
+    MultiSelectInputGroup: ({
+        label,
+        value,
+        onChange,
+        onBlur,
+        error,
+        id,
+        options,
+    }: MultiSelectInputGroupProps<ProgramCategory>) => (
+        <div data-testid={`group-${id}`}>
+            <label>{label}</label>
+            <div data-testid={`select-${id}`} onClick={() => onChange && onChange([options[0]])}>
+                {value?.map((v) => v.name).join(', ')}
+            </div>
+            {onBlur && (
+                <button type="button" data-testid={`blur-${id}`} onClick={onBlur}>
+                    Blur
+                </button>
+            )}
+            {error && <span data-testid={`error-${id}`}>{error}</span>}
         </div>
     ),
 }));
 
 jest.mock('../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup', () => ({
-    PhotoInputGroup: (props: any) => (
-        <div data-testid={`photo-group-${props.id}`}>
-            <label htmlFor={props.id}>
-                {props.label} {props.isRequired && '*'}
-            </label>
-            <input
-                type="file"
-                id={props.id}
-                name={props.name}
-                data-testid="img-input"
-                onChange={(e) => props.onChange(e.target.files?.[0])}
-                disabled={props.disabled}
-            />
-            {props.error && <div data-testid={`error-${props.id}`}>{props.error}</div>}
+    PhotoInputGroup: ({ id, value, onChange, error, setError }: PhotoInputGroupProps) => (
+        <div data-testid={`group-${id}`}>
+            <span data-testid={`value-${id}`}>{value ? 'HasImage' : 'NoImage'}</span>
+            <button
+                type="button"
+                data-testid={`upload-${id}`}
+                onClick={() => onChange({ base64: 'test-base64', mimeType: 'image/png' })}
+            >
+                Upload
+            </button>
+            <button
+                type="button"
+                data-testid={`error-trigger-${id}`}
+                onClick={() => setError && setError('Manual Error')}
+            >
+                Set Error
+            </button>
+            {error && <span data-testid={`error-${id}`}>{error}</span>}
         </div>
     ),
 }));
 
+jest.mock('../../../../../components/admin/button/Button', () => ({
+    Button: ({ children, onClick, disabled }: ButtonProps) => (
+        <button type="button" onClick={onClick} disabled={disabled} data-testid="add-section-btn">
+            {children}
+        </button>
+    ),
+}));
+
+jest.mock('../../../../../assets/icons/plus.svg', () => ({
+    ReactComponent: () => <svg>PlusIcon</svg>,
+}));
+
 describe('ProgramForm', () => {
+    const mockOnSubmit = jest.fn();
+    const mockOnAddSection = jest.fn();
+    const mockOnValidationChange = jest.fn();
+
     const mockCategories: ProgramCategory[] = [
-        { id: 1, name: 'Ветеранські', programsCount: 1 },
-        { id: 2, name: 'Дитячі', programsCount: 1 },
+        { id: 1, name: 'Tech', programsCount: 5 },
+        { id: 2, name: 'Art', programsCount: 2 },
     ];
 
-    const mockFile: Image = {
-        id: 1,
-        url: 'https://localhost:8080',
-        mimeType: 'image/jpg',
+    const defaultProps: ProgramFormProps = {
+        onSubmit: mockOnSubmit,
+        categories: mockCategories,
+        onAddSection: mockOnAddSection,
+        onValidationChange: mockOnValidationChange,
+        isFormDisabled: false,
     };
 
-    const mockInitialData: ProgramFormValues = {
-        name: 'Існуюча програма',
-        description: 'Існуючий опис',
-        categories: [mockCategories[0]],
-        image: mockFile,
-        imageId: 1,
+    const renderProgramForm = (props: Partial<ProgramFormProps> = {}, ref?: React.Ref<ProgramFormRef>) => {
+        return render(<ProgramForm {...defaultProps} {...props} ref={ref} />);
     };
-
-    const formRef = createRef<ProgramFormRef>();
-    const mockOnSubmit = jest.fn();
 
     beforeEach(() => {
         jest.clearAllMocks();
     });
 
-    it('should render empty form and fetch categories on initial load', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
+    describe('Rendering', () => {
+        it('should render all input fields with empty initial values', () => {
+            renderProgramForm();
 
-        expect(screen.getByTestId('input-name')).toHaveValue('');
-        expect(screen.getByTestId('textarea-description')).toHaveValue('');
-        expect(screen.getByTestId('categories-select')).toHaveValue([]);
-    });
+            expect(screen.getByTestId('input-name')).toHaveValue('');
+            expect(screen.getByTestId('input-location')).toHaveValue('');
+            expect(screen.getByTestId('input-participantsCount')).toHaveValue('');
+            expect(screen.getByTestId('input-meetingCount')).toHaveValue('');
+            expect(screen.getByTestId('input-description')).toHaveValue('');
+            expect(screen.getByTestId('value-backgroundImage')).toHaveTextContent('NoImage');
+            expect(screen.getByTestId('value-previewImage')).toHaveTextContent('NoImage');
+        });
 
-    it('should render form with pre-filled initialData', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} initialData={mockInitialData} />);
+        it('should render with initial data when provided', () => {
+            const initialData: ProgramFormValues = {
+                name: 'Initial Name',
+                categories: [mockCategories[0]],
+                description: 'Initial Desc',
+                previewImage: { base64: 'prev', mimeType: 'img/png' },
+                previewImageId: 1,
+                backgroundImage: { base64: 'bg', mimeType: 'img/png' },
+                backgroundImageId: 2,
+                location: 'Kyiv',
+                participantsCount: '10',
+                meetingCount: '5',
+            };
 
-        await waitFor(() => {
-            expect(screen.getByTestId('input-name')).toHaveValue(mockInitialData.name);
-            expect(screen.getByTestId('textarea-description')).toHaveValue(mockInitialData.description);
-            expect(screen.getByTestId('categories-select')).toHaveValue([String(mockInitialData.categories[0].id)]);
+            renderProgramForm({ initialData });
+
+            expect(screen.getByTestId('input-name')).toHaveValue('Initial Name');
+            expect(screen.getByTestId('input-location')).toHaveValue('Kyiv');
+            expect(screen.getByTestId('value-backgroundImage')).toHaveTextContent('HasImage');
+        });
+
+        it('should call onAddSection when the add button is clicked', () => {
+            renderProgramForm();
+            fireEvent.click(screen.getByTestId('add-section-btn'));
+            expect(mockOnAddSection).toHaveBeenCalled();
         });
     });
 
-    it('should disable all form fields if formDisabled is true', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} isFormDisabled={true} />);
+    describe('Interactions and State Updates', () => {
+        it('should update text fields on change', () => {
+            renderProgramForm();
 
-        await waitFor(() => {
-            expect(screen.getByTestId('input-name')).toBeDisabled();
-            expect(screen.getByTestId('textarea-description')).toBeDisabled();
-            expect(screen.getByTestId('categories-select')).toBeDisabled();
-            expect(screen.getByTestId('img-input')).toBeDisabled();
+            const nameInput = screen.getByTestId('input-name');
+            fireEvent.change(nameInput, { target: { value: 'New Program' } });
+
+            expect(nameInput).toHaveValue('New Program');
+        });
+
+        it('should update categories on change', () => {
+            renderProgramForm();
+            const selectDiv = screen.getByTestId('select-toolbar-categories');
+
+            fireEvent.click(selectDiv);
+
+            expect(selectDiv).toHaveTextContent('Tech');
+        });
+
+        it('should update images on upload', () => {
+            renderProgramForm();
+            const uploadBtn = screen.getByTestId('upload-backgroundImage');
+
+            fireEvent.click(uploadBtn);
+
+            expect(screen.getByTestId('value-backgroundImage')).toHaveTextContent('HasImage');
         });
     });
 
-    it('should reset form fields when initialData prop changes', async () => {
-        const { rerender } = render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
-        await waitFor(() => expect(screen.getByTestId('input-name')).toHaveValue(''));
+    describe('Validation Wiring', () => {
+        it('should trigger validation and show error on blur for text fields', () => {
+            (PROGRAM_VALIDATION_FUNCTIONS.validateName as jest.Mock).mockReturnValue('Name Error');
+            renderProgramForm();
 
-        rerender(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} initialData={mockInitialData} />);
-        await waitFor(() => expect(screen.getByTestId('input-name')).toHaveValue(mockInitialData.name));
+            const nameInput = screen.getByTestId('input-name');
+            fireEvent.blur(nameInput);
 
-        rerender(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} initialData={null} />);
-        await waitFor(() => expect(screen.getByTestId('input-name')).toHaveValue(''));
-    });
-
-    it('should show required errors for name and categories when saving as draft', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
-
-        await act(async () => {
-            formRef.current?.submit(VisibilityStatus.Draft);
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateName).toHaveBeenCalled();
+            expect(screen.getByTestId('error-name')).toHaveTextContent('Name Error');
         });
 
-        expect(await screen.findByTestId('error-name')).toHaveTextContent(PROGRAM_VALIDATION.name.getRequiredError());
-        expect(await screen.findByTestId('error-categories')).toHaveTextContent(
-            PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError(),
-        );
-        expect(mockOnSubmit).not.toHaveBeenCalled();
-    });
+        it('should trigger validation for categories on blur', () => {
+            (PROGRAM_VALIDATION_FUNCTIONS.validateCategories as jest.Mock).mockReturnValue('Category Error');
+            renderProgramForm();
 
-    it('should show required errors for all fields when publishing', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
+            fireEvent.click(screen.getByTestId('blur-toolbar-categories'));
 
-        await act(async () => {
-            formRef.current?.submit(VisibilityStatus.Published);
+            expect(screen.getByTestId('error-toolbar-categories')).toHaveTextContent('Category Error');
         });
 
-        expect(await screen.findByTestId('error-name')).toHaveTextContent(PROGRAM_VALIDATION.name.getRequiredError());
-        expect(await screen.findByTestId('error-categories')).toHaveTextContent(
-            PROGRAM_VALIDATION.categories.getAtLeastOneRequiredError(),
-        );
-        expect(await screen.findByTestId('error-description')).toHaveTextContent(
-            PROGRAM_VALIDATION.description.getRequiredWhenPublishingError(),
-        );
-        expect(await screen.findByTestId('error-img')).toHaveTextContent(
-            PROGRAM_VALIDATION.image.getRequiredWhenPublishingError(),
-        );
-        expect(mockOnSubmit).not.toHaveBeenCalled();
+        it('should allow manual error setting for images via child component props', () => {
+            renderProgramForm();
+            fireEvent.click(screen.getByTestId('error-trigger-previewImage'));
+            expect(screen.getByTestId('error-previewImage')).toHaveTextContent('Manual Error');
+        });
     });
 
-    it('should show max length error for name', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
-        const nameInput = screen.getByTestId('input-name');
+    describe('Ref Methods (submit, isDirty, isValid)', () => {
+        it('should return true for isDirty when form is changed', () => {
+            const ref = React.createRef<ProgramFormRef>();
+            renderProgramForm({}, ref);
 
-        fireEvent.change(nameInput, { target: { value: 'a'.repeat(PROGRAM_VALIDATION.name.max + 1) } });
-        fireEvent.blur(nameInput);
+            expect(ref.current?.isDirty()).toBe(false);
 
-        // Змінив селектор помилки для групи компонентів
-        expect(await screen.findByTestId('error-name')).toHaveTextContent(PROGRAM_VALIDATION.name.getMaxError());
-    });
+            fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Changed' } });
 
-    it('should show max length error for description', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
-        const descriptionInput = screen.getByTestId('textarea-description');
-
-        fireEvent.change(descriptionInput, { target: { value: 'a'.repeat(PROGRAM_VALIDATION.description.max + 1) } });
-        fireEvent.blur(descriptionInput);
-
-        expect(await screen.findByTestId('error-description')).toHaveTextContent(
-            PROGRAM_VALIDATION.description.getMaxError(),
-        );
-    });
-
-    it('should successfully submit valid data in "Draft" mode', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} categories={mockCategories} />);
-
-        fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Нова чернетка' } });
-        fireEvent.change(screen.getByTestId('categories-select'), { target: { value: ['1'] } });
-
-        await act(async () => {
-            formRef.current?.submit(VisibilityStatus.Draft);
+            expect(ref.current?.isDirty()).toBe(true);
         });
 
-        await waitFor(() => {
+        it('should call onSubmit with correct data when submit is called via ref and form is valid', async () => {
+            const ref = React.createRef<ProgramFormRef>();
+            renderProgramForm({}, ref);
+
+            Object.values(PROGRAM_VALIDATION_FUNCTIONS).forEach((fn) => (fn as jest.Mock).mockReturnValue(undefined));
+
+            fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Valid Name' } });
+
+            await act(async () => {
+                await ref.current?.submit(VisibilityStatus.Published);
+            });
+
             expect(mockOnSubmit).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    name: 'Нова чернетка',
-                    categories: [mockCategories[0]],
-                }),
-                VisibilityStatus.Draft,
-            );
-        });
-    });
-
-    it('should successfully submit valid data in "Published" mode', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} categories={mockCategories} />);
-
-        fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Нова публікація' } });
-        fireEvent.change(screen.getByTestId('categories-select'), { target: { value: ['2'] } });
-        fireEvent.change(screen.getByTestId('textarea-description'), { target: { value: 'Дуже важливий опис' } });
-        fireEvent.change(screen.getByTestId('img-input'), { target: { files: [mockFile] } });
-
-        await act(async () => {
-            formRef.current?.submit(VisibilityStatus.Published);
-        });
-
-        await waitFor(() => {
-            expect(mockOnSubmit).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    name: 'Нова публікація',
-                    categories: [mockCategories[1]],
-                    description: 'Дуже важливий опис',
-                    image: mockFile,
-                }),
+                expect.objectContaining({ name: 'Valid Name' }),
                 VisibilityStatus.Published,
             );
         });
-    });
 
-    it('should not submit if validation fails', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
+        it('should NOT call onSubmit if validation fails during submit', async () => {
+            const ref = React.createRef<ProgramFormRef>();
+            renderProgramForm({}, ref);
 
-        await act(async () => {
-            formRef.current?.submit(VisibilityStatus.Published);
-        });
+            (PROGRAM_VALIDATION_FUNCTIONS.validateName as jest.Mock).mockReturnValue('Required');
 
-        await waitFor(() => {
+            await act(async () => {
+                await ref.current?.submit(VisibilityStatus.Published);
+            });
+
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateName).toHaveBeenCalled();
             expect(mockOnSubmit).not.toHaveBeenCalled();
-        });
-    });
-
-    it('should expose `isDirty` state via ref', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} />);
-
-        // Initially not dirty
-        expect(formRef.current?.isDirty()).toBe(false);
-
-        // Change a field
-        fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'some change' } });
-
-        // Now it should be dirty
-        await waitFor(() => {
-            expect(formRef.current?.isDirty()).toBe(true);
-        });
-    });
-
-    it('should not be dirty if initialData is provided and no changes are made', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} initialData={mockInitialData} />);
-
-        await waitFor(() => {
-            expect(formRef.current?.isDirty()).toBe(false);
-        });
-    });
-
-    it('should be dirty if initialData is provided and a change is made', async () => {
-        render(<ProgramForm ref={formRef} onSubmit={mockOnSubmit} initialData={mockInitialData} />);
-
-        await waitFor(() => {
-            expect(formRef.current?.isDirty()).toBe(false);
+            expect(screen.getByTestId('error-name')).toHaveTextContent('Required');
         });
 
-        fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Нова зміна' } });
+        it('isValid should return false if validation functions return errors', () => {
+            const ref = React.createRef<ProgramFormRef>();
+            renderProgramForm({}, ref);
 
-        await waitFor(() => {
-            expect(formRef.current?.isDirty()).toBe(true);
+            (PROGRAM_VALIDATION_FUNCTIONS.validateName as jest.Mock).mockReturnValue('Error');
+
+            expect(ref.current?.isValid(false)).toBe(false);
+        });
+
+        it('isValid should return true if validation functions return no errors', () => {
+            const ref = React.createRef<ProgramFormRef>();
+            renderProgramForm({}, ref);
+
+            Object.values(PROGRAM_VALIDATION_FUNCTIONS).forEach((fn) => (fn as jest.Mock).mockReturnValue(undefined));
+
+            expect(ref.current?.isValid(false)).toBe(true);
         });
     });
 });
-*/

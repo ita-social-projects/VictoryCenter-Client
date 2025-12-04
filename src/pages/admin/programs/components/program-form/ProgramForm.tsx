@@ -4,13 +4,13 @@ import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/pr
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { MultiSelectInputGroup } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
 import { PhotoInputGroup } from '../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
+import { Button } from '../../../../../components/admin/button/Button';
 import { Image, ImageValues } from '../../../../../types/common/image';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../types/admin/common';
-import { MultiSelectInputGroup } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
-import { Button } from '../../../../../components/admin/button/Button';
 import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
 import './ProgramForm.scss';
 
@@ -40,7 +40,7 @@ export interface ProgramFormErrors {
 }
 
 export interface ProgramFormRef {
-    submit: (status: VisibilityStatus) => void;
+    submit: (status: VisibilityStatus) => Promise<void>;
     isValid: (isPublishing?: boolean) => boolean;
     isDirty: () => boolean;
 }
@@ -81,8 +81,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             categories = [],
             onValidationChange,
             onAddSection,
-            selectedLanguage,
-            onLanguageChange,
         }: ProgramFormProps,
         ref,
     ) => {
@@ -196,7 +194,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
 
         const handleSetPreviewImageError = useCallback(
-            (error: string | null) => setErrors((prev) => ({ ...prev, image: error || undefined })),
+            (error: string | null) => setErrors((prev) => ({ ...prev, previewImage: error || undefined })),
             [setErrors],
         );
 
@@ -249,7 +247,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 {/* Main Content Layout */}
                 <div className="program-form__body">
                     <PhotoInputGroup
-                        label="Завантажте файл"
                         id="backgroundImage"
                         isRequired={true}
                         name="backgroundImage"
@@ -257,7 +254,13 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         onChange={handleBackgroundImageChange}
                         disabled={isSubmitting || isFormDisabled}
                         error={errors.backgroundImage}
+                        className="program-background-image-input"
                         setError={handleSetBackgroundImageError}
+                        imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                        imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                            PROGRAM_VALIDATION.backgroundImage.height,
+                            PROGRAM_VALIDATION.backgroundImage.width,
+                        )}
                     />
                     <div className="program-form__body__inputs">
                         <div className="program-form__col-left">
@@ -338,7 +341,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 value={formState.previewImage}
                                 onChange={handlePreviewImageChange}
                                 disabled={isSubmitting || isFormDisabled}
-                                error={errors.image}
+                                error={errors.previewImage}
                                 setError={handleSetPreviewImageError}
                                 imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
                                 imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(

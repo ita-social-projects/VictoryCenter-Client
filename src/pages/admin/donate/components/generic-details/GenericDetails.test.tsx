@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { GenericDetails, GenericDetailsProps } from './GenericDetails';
-import { GenericFormRef } from '../generic-form/GenericForm';
+import { GenericFormMode, GenericFormRef } from '../generic-form/GenericForm';
 import { forwardRef, useImperativeHandle } from 'react';
 
 interface Item {
@@ -67,7 +67,15 @@ describe('GenericDetails', () => {
             return newItems;
         });
 
-        const { rerender } = render(<GenericDetails {...defaultProps} items={[]} onChangeItems={onChangeItems} />);
+        const { rerender } = render(
+            <GenericDetails
+                {...defaultProps}
+                items={[]}
+                onChangeItems={onChangeItems}
+                isParentCreating={true}
+                isChildForm={true}
+            />,
+        );
 
         fireEvent.click(screen.getByText('Add New'));
         fireEvent.click(screen.getByText('Submit'));
@@ -79,7 +87,15 @@ describe('GenericDetails', () => {
         const updaterFunction = onChangeItems.mock.calls[0][0];
         const newItems = updaterFunction([]);
 
-        rerender(<GenericDetails {...defaultProps} items={newItems} onChangeItems={onChangeItems} />);
+        rerender(
+            <GenericDetails
+                {...defaultProps}
+                items={newItems}
+                onChangeItems={onChangeItems}
+                isParentCreating={true}
+                isChildForm={true}
+            />,
+        );
 
         await waitFor(() => {
             expect(screen.getByText('New Item')).toBeInTheDocument();
@@ -92,11 +108,16 @@ describe('GenericDetails', () => {
         expect(screen.getByText('Add New')).toBeInTheDocument();
     });
 
-    test('calls onChangeItems when items update', () => {
-        const onChangeItems = jest.fn();
-        render(<GenericDetails {...defaultProps} onChangeItems={onChangeItems} />);
-        fireEvent.click(screen.getByText('Submit'));
-        expect(onChangeItems).toHaveBeenCalled();
+    test('calls onLocalUpdate when updating an item', async () => {
+        const onLocalUpdate = jest.fn();
+        render(<GenericDetails {...defaultProps} onLocalUpdate={onLocalUpdate} isParentCreating={true} />);
+
+        const submitButtons = screen.getAllByText('Submit');
+        fireEvent.click(submitButtons[0]);
+
+        await waitFor(() => {
+            expect(onLocalUpdate).toHaveBeenCalledWith(0, expect.any(Object));
+        });
     });
 
     it('toggles items expanded state via keydown', () => {
@@ -131,19 +152,31 @@ describe('GenericDetails', () => {
 
     test('removes item on delete', () => {
         const onChangeItems = jest.fn();
-        const { rerender } = render(<GenericDetails {...defaultProps} onChangeItems={onChangeItems} />);
+        const onLocalDelete = jest.fn();
+        const { rerender } = render(
+            <GenericDetails
+                {...defaultProps}
+                onChangeItems={onChangeItems}
+                onLocalDelete={onLocalDelete}
+                isParentCreating={true}
+            />,
+        );
 
         expect(screen.getByText('Item 1')).toBeInTheDocument();
 
         fireEvent.click(screen.getByText('Delete'));
 
-        expect(onChangeItems).toHaveBeenCalled();
+        expect(onLocalDelete).toHaveBeenCalled();
 
-        const updaterFunction = onChangeItems.mock.calls[0][0];
-        const newItems = updaterFunction([{ id: 1, name: 'Item 1' }]);
-        expect(newItems).toEqual([]);
-
-        rerender(<GenericDetails {...defaultProps} items={[]} onChangeItems={onChangeItems} />);
+        rerender(
+            <GenericDetails
+                {...defaultProps}
+                items={[]}
+                onChangeItems={onChangeItems}
+                onLocalDelete={onLocalDelete}
+                isParentCreating={true}
+            />,
+        );
 
         expect(screen.queryByText('Item 1')).not.toBeInTheDocument();
     });
@@ -244,7 +277,15 @@ describe('GenericDetails - Additional Coverage', () => {
     it('adds item with generated ID when no onSubmit and not isChildForm', async () => {
         const onChangeItems = jest.fn();
 
-        render(<GenericDetails {...defaultProps} items={[]} onChangeItems={onChangeItems} />);
+        render(
+            <GenericDetails
+                {...defaultProps}
+                items={[]}
+                onChangeItems={onChangeItems}
+                isParentCreating={true}
+                isChildForm={true}
+            />,
+        );
 
         fireEvent.click(screen.getByText('Add New'));
         fireEvent.click(screen.getByText('Submit'));
@@ -264,7 +305,15 @@ describe('GenericDetails - Additional Coverage', () => {
     it('adds item without ID modification when isChildForm', async () => {
         const onChangeItems = jest.fn();
 
-        render(<GenericDetails {...defaultProps} items={[]} isChildForm onChangeItems={onChangeItems} />);
+        render(
+            <GenericDetails
+                {...defaultProps}
+                items={[]}
+                isChildForm
+                onChangeItems={onChangeItems}
+                isParentCreating={true}
+            />,
+        );
 
         fireEvent.click(screen.getByText('Add New'));
         fireEvent.click(screen.getByText('Submit'));
@@ -297,9 +346,7 @@ describe('GenericDetails - Additional Coverage', () => {
         const onChangeItems = jest.fn();
         const items = [{ id: 1, name: 'Item 1' }];
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { rerender } = render(<GenericDetails {...defaultProps} items={items} onChangeItems={onChangeItems} />);
-
+        render(<GenericDetails {...defaultProps} items={items} onChangeItems={onChangeItems} />);
         fireEvent.click(screen.getByText('Submit'));
 
         await waitFor(() => {
@@ -375,5 +422,235 @@ describe('GenericDetails - Additional Coverage', () => {
         const newItems = updaterFunction(items);
 
         expect(newItems.length).toBe(0);
+    });
+
+    it('sets editingItemId when mode changes to Edit', () => {
+        const MockFormWithModeChange = forwardRef<GenericFormRef, any>(
+            ({ onModeChange, initialData, onSubmit, onClose, onDelete }, ref) => {
+                useImperativeHandle(ref, () => ({
+                    submit: async () => {},
+                    isChanged: () => false,
+                    isValid: () => true,
+                }));
+
+                return (
+                    <div data-testid={`mock-form-${initialData?.id}`}>
+                        <p>{initialData?.name}</p>
+                        <button onClick={() => onModeChange?.(GenericFormMode.Edit)}>Enter Edit Mode</button>
+                        <button onClick={() => onModeChange?.(GenericFormMode.View)}>Enter View Mode</button>
+                        <button onClick={() => onSubmit({ ...initialData })}>Submit</button>
+                        <button onClick={onClose}>Close</button>
+                        <button onClick={() => onDelete?.(initialData?.id)}>Delete</button>
+                    </div>
+                );
+            },
+        );
+
+        render(
+            <GenericDetails
+                {...defaultProps}
+                items={[
+                    { id: 1, name: 'Item 1' },
+                    { id: 2, name: 'Item 2' },
+                ]}
+                FormComponent={MockFormWithModeChange}
+            />,
+        );
+
+        const editButtons = screen.getAllByText('Enter Edit Mode');
+        fireEvent.click(editButtons[0]);
+
+        const addButton = screen.getByText('Add New').closest('button');
+        expect(addButton).toBeDisabled();
+        expect(addButton).toHaveClass('disabled');
+    });
+
+    it('clears editingItemId when mode changes from Edit to View', () => {
+        const MockFormWithModeChange = forwardRef<GenericFormRef, any>(
+            ({ onModeChange, initialData, onSubmit, onClose, onDelete }, ref) => {
+                useImperativeHandle(ref, () => ({
+                    submit: async () => {},
+                    isChanged: () => false,
+                    isValid: () => true,
+                }));
+
+                return (
+                    <div data-testid={`mock-form-${initialData?.id}`}>
+                        <p>{initialData?.name}</p>
+                        <button onClick={() => onModeChange?.(GenericFormMode.Edit)}>Enter Edit Mode</button>
+                        <button onClick={() => onModeChange?.(GenericFormMode.View)}>Enter View Mode</button>
+                        <button onClick={() => onSubmit({ ...initialData })}>Submit</button>
+                        <button onClick={onClose}>Close</button>
+                        <button onClick={() => onDelete?.(initialData?.id)}>Delete</button>
+                    </div>
+                );
+            },
+        );
+
+        render(<GenericDetails {...defaultProps} FormComponent={MockFormWithModeChange} />);
+
+        const editButton = screen.getByText('Enter Edit Mode');
+        fireEvent.click(editButton);
+
+        let addButton = screen.getByText('Add New').closest('button');
+        expect(addButton).toBeDisabled();
+
+        const viewButton = screen.getByText('Enter View Mode');
+        fireEvent.click(viewButton);
+
+        addButton = screen.getByText('Add New').closest('button');
+        expect(addButton).not.toBeDisabled();
+        expect(addButton).not.toHaveClass('disabled');
+    });
+
+    it('disables add button when any item is in edit mode', () => {
+        const MockFormWithModeChange = forwardRef<GenericFormRef, any>(
+            ({ onModeChange, initialData, onSubmit, onClose, onDelete }, ref) => {
+                useImperativeHandle(ref, () => ({
+                    submit: async () => {},
+                    isChanged: () => false,
+                    isValid: () => true,
+                }));
+
+                return (
+                    <div data-testid={`mock-form-${initialData?.id}`}>
+                        <p>{initialData?.name}</p>
+                        <button onClick={() => onModeChange?.(GenericFormMode.Edit)}>Edit {initialData?.name}</button>
+                        <button onClick={() => onSubmit({ ...initialData })}>Submit</button>
+                        <button onClick={onClose}>Close</button>
+                        <button onClick={() => onDelete?.(initialData?.id)}>Delete</button>
+                    </div>
+                );
+            },
+        );
+
+        render(
+            <GenericDetails
+                {...defaultProps}
+                items={[
+                    { id: 1, name: 'Item 1' },
+                    { id: 2, name: 'Item 2' },
+                ]}
+                FormComponent={MockFormWithModeChange}
+            />,
+        );
+
+        let addButton = screen.getByText('Add New').closest('button');
+        expect(addButton).not.toBeDisabled();
+
+        const editItem2Button = screen.getByText('Edit Item 2');
+        fireEvent.click(editItem2Button);
+
+        addButton = screen.getByText('Add New').closest('button');
+        expect(addButton).toBeDisabled();
+        expect(addButton).toHaveClass('disabled');
+    });
+
+    it('does not clear editingItemId when different item mode changes', () => {
+        const MockFormWithModeChange = forwardRef<GenericFormRef, any>(
+            ({ onModeChange, initialData, onSubmit, onClose, onDelete }, ref) => {
+                useImperativeHandle(ref, () => ({
+                    submit: async () => {},
+                    isChanged: () => false,
+                    isValid: () => true,
+                }));
+
+                return (
+                    <div data-testid={`mock-form-${initialData?.id}`}>
+                        <p>{initialData?.name}</p>
+                        <button onClick={() => onModeChange?.(GenericFormMode.Edit)}>Edit {initialData?.name}</button>
+                        <button onClick={() => onModeChange?.(GenericFormMode.Create)}>Create</button>
+                        <button onClick={() => onSubmit({ ...initialData })}>Submit</button>
+                        <button onClick={onClose}>Close</button>
+                        <button onClick={() => onDelete?.(initialData?.id)}>Delete</button>
+                    </div>
+                );
+            },
+        );
+
+        render(
+            <GenericDetails
+                {...defaultProps}
+                items={[
+                    { id: 1, name: 'Item 1' },
+                    { id: 2, name: 'Item 2' },
+                ]}
+                FormComponent={MockFormWithModeChange}
+            />,
+        );
+
+        const editItem1 = screen.getByText('Edit Item 1');
+        fireEvent.click(editItem1);
+
+        const addButton = screen.getByText('Add New').closest('button');
+        expect(addButton).toBeDisabled();
+
+        const createButtons = screen.getAllByText('Create');
+        fireEvent.click(createButtons[1]);
+
+        expect(screen.getByText('Add New').closest('button')).toBeDisabled();
+    });
+
+    it('calls onLocalSubmit when parent is creating and isChildForm is true', async () => {
+        const onLocalSubmit = jest.fn().mockResolvedValue(undefined);
+
+        render(
+            <GenericDetails
+                {...defaultProps}
+                items={[]}
+                isParentCreating={true}
+                isChildForm={true}
+                onLocalSubmit={onLocalSubmit}
+            />,
+        );
+
+        fireEvent.click(screen.getByText('Add New'));
+
+        expect(screen.getByTestId('mock-form-new')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('Submit'));
+
+        await waitFor(() => {
+            expect(onLocalSubmit).toHaveBeenCalledWith(expect.objectContaining({ name: 'New Item' }));
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('mock-form-new')).not.toBeInTheDocument();
+        });
+    });
+
+    it('handles item update via onLocalUpdate when parent is creating', async () => {
+        const onLocalUpdate = jest.fn().mockResolvedValue(undefined);
+        const items = [{ id: 1, name: 'Item 1' }];
+
+        render(
+            <GenericDetails {...defaultProps} items={items} isParentCreating={true} onLocalUpdate={onLocalUpdate} />,
+        );
+
+        const submitButton = screen.getByText('Submit');
+        fireEvent.click(submitButton);
+
+        await waitFor(() => {
+            expect(onLocalUpdate).toHaveBeenCalledWith(0, expect.objectContaining({ name: 'Item 1' }));
+        });
+    });
+
+    it('handles item delete via onLocalDelete when parent is creating', async () => {
+        const onLocalDelete = jest.fn().mockResolvedValue(undefined);
+        const items = [
+            { id: 1, name: 'Item 1' },
+            { id: 2, name: 'Item 2' },
+        ];
+
+        render(
+            <GenericDetails {...defaultProps} items={items} isParentCreating={true} onLocalDelete={onLocalDelete} />,
+        );
+
+        const deleteButtons = screen.getAllByText('Delete');
+        fireEvent.click(deleteButtons[0]);
+
+        await waitFor(() => {
+            expect(onLocalDelete).toHaveBeenCalledWith(0);
+        });
     });
 });

@@ -20,11 +20,21 @@ export interface GenericDetailsProps<T extends FieldValues> {
     notFoundText?: string;
     addNewText: string;
     isChildForm?: boolean;
-    children?: (form: { formState: T; isItemsExpanded: boolean }) => React.ReactNode;
+
+    children?: (form: {
+        formState: T;
+        isItemsExpanded: boolean;
+        setFormState: React.Dispatch<React.SetStateAction<T>>;
+    }) => React.ReactNode;
+    isParentCreating?: boolean;
+
     onChangeItems?: React.Dispatch<React.SetStateAction<T[]>>;
     onSubmit?: (data: T) => Promise<void>;
     onUpdate?: (id: number, data: T) => Promise<void>;
     onDelete?: (id: number) => Promise<void>;
+    onLocalSubmit?: (data: T) => Promise<void>;
+    onLocalUpdate?: (id: number, data: T) => Promise<void>;
+    onLocalDelete?: (id: number) => Promise<void>;
 }
 
 export function GenericDetails<T extends { id: number } & FieldValues>({
@@ -38,10 +48,14 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
     addNewText,
     isChildForm = false,
     children,
+    isParentCreating = false,
     onChangeItems,
     onSubmit,
     onUpdate,
     onDelete,
+    onLocalSubmit,
+    onLocalUpdate,
+    onLocalDelete,
 }: GenericDetailsProps<T>) {
     const addformRef = useRef<GenericFormRef>(null);
     const [isAddFormVisible, setIsAddFormVisible] = useState(false);
@@ -50,7 +64,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
 
     const handleItemModeChange = (id: number, mode: GenericFormMode) => {
         if (mode === GenericFormMode.Edit) {
-            setEditingItemId(id);
+            setEditingItemId(id ?? null);
         } else if (editingItemId === id) {
             setEditingItemId(null);
         }
@@ -73,42 +87,60 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
 
     const handleSubmit = useCallback(
         async (data: T) => {
+            if (isParentCreating && isChildForm && onLocalSubmit) {
+                await onLocalSubmit(data);
+                setIsAddFormVisible(false);
+                return;
+            }
+
             if (onSubmit) {
                 await onSubmit(data);
                 setIsAddFormVisible(false);
-            } else if (isChildForm) {
-                onChangeItems?.((prevItems) => [...prevItems, data]);
-                setIsAddFormVisible(false);
+                return;
             } else {
-                const newItemWithId = { ...data, id: data.id || Date.now() };
-
-                onChangeItems?.((prevItems) => [...prevItems, newItemWithId]);
+                onChangeItems?.((prevItems) => [...prevItems, data]);
                 setIsAddFormVisible(false);
             }
         },
-        [onSubmit, isChildForm, onChangeItems],
+        [isParentCreating, isChildForm, onLocalSubmit, onSubmit, onChangeItems],
     );
 
     const handleItemUpdate = useCallback(
-        async (item: T, updated: T) => {
-            if (onUpdate) {
+        async (item: T, updated: T, index?: number) => {
+            if (isParentCreating) {
+                if (onLocalUpdate && index != null) {
+                    await onLocalUpdate(index, updated);
+                }
+                return;
+            }
+
+            if (onUpdate && item.id) {
                 await onUpdate(item.id, updated);
+                return;
             } else {
                 updateItems((prevItems) => prevItems.map((i) => (i.id === item.id ? { ...i, ...updated } : i)));
             }
         },
-        [onUpdate, updateItems],
+        [isParentCreating, onUpdate, onLocalUpdate, updateItems],
     );
 
     const handleItemDelete = useCallback(
-        async (id: number) => {
+        async (id: number, index?: number) => {
+            if (isParentCreating) {
+                if (onLocalDelete && index != null) {
+                    await onLocalDelete(index);
+                }
+                return;
+            }
+
             if (onDelete && id) {
                 await onDelete(id);
+                return;
             } else {
                 updateItems((prevItems) => prevItems.filter((i) => i.id !== id));
             }
         },
-        [onDelete, updateItems],
+        [isParentCreating, onDelete, onLocalDelete, updateItems],
     );
 
     const showNotFound = !isLoading && !isAddFormVisible && items.length === 0;
@@ -154,15 +186,16 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                 <div className="generic-details body">
                     {items.length > 0 && isItemsExpanded && (
                         <>
-                            {items.map((item) => (
-                                <div className="generic-details-item" key={item.id}>
+                            {items.map((item, index) => (
+                                <div className="generic-details-item" key={item.id || `${item.name}${index}`}>
                                     <FormComponent
                                         initialData={item}
                                         initialMode={GenericFormMode.View}
-                                        onSubmit={(updated) => handleItemUpdate(item, updated)}
+                                        onSubmit={(updated) => handleItemUpdate(item, updated, index)}
                                         onClose={handleClose}
-                                        onDelete={() => handleItemDelete(item.id)}
+                                        onDelete={() => handleItemDelete(item.id, index)}
                                         isChildForm={isChildForm}
+                                        isParentCreating={isParentCreating}
                                         onModeChange={(mode: GenericFormMode) => handleItemModeChange(item.id, mode)}
                                     >
                                         {(formProps) => <>{children && children(formProps)}</>}
@@ -179,6 +212,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             onClose={handleClose}
                             initialMode={GenericFormMode.Create}
                             isChildForm={isChildForm}
+                            isParentCreating={isParentCreating}
                         >
                             {(formProps) => <>{children && children(formProps)}</>}
                         </FormComponent>

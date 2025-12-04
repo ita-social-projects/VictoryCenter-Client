@@ -340,6 +340,32 @@ describe('DonatePageContent', () => {
             render(<DonatePageContent />);
             await clickButtonAndWaitForCall('Create', mockAddToast);
         });
+        it('sets loading state during support options operations', async () => {
+            let resolveCreate: (value: any) => void;
+            const createPromise = new Promise((resolve) => {
+                resolveCreate = resolve;
+            });
+
+            mockCreate.mockReturnValue(createPromise);
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('support-options-form')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByText('Create'));
+
+            await waitFor(() => {
+                expect(mockCreate).toHaveBeenCalled();
+            });
+
+            resolveCreate!({ id: 1, name: 'Test', value: '123', currency: 0 });
+
+            await waitFor(() => {
+                expect(mockAddToast).toHaveBeenCalled();
+            });
+        });
     });
 
     describe('Category Management', () => {

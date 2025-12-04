@@ -1,13 +1,26 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { StatCard } from './components/stat-card/StatCard';
+import { SUMMARY_DATA } from '../../../../../utils/mock-data/public/reports-page';
 import styles from './SummarySection.module.scss';
 
+// WIP; DO NOT REVIEW :)
 export const SummarySection: React.FC = () => {
+    const { t, i18n } = useTranslation('reportsPage');
+
+    const isUa = i18n.language === 'uk';
+    const collectedValue = isUa ? SUMMARY_DATA.collected.uah : SUMMARY_DATA.collected.usd;
+    const currencyCode = isUa ? 'UAH' : 'USD';
+
     return (
         <section className={styles.root}>
-            <div className={styles.collected}>
-                <div>1 249 854,09 грн</div>
-                <div>Зібрано</div>
-            </div>
+            <StatCard
+                className={styles.collected}
+                value={collectedValue}
+                currency={currencyCode}
+                label={t('summary.collected')}
+                color="blue"
+            />
 
             <div className={styles.expenses}>
                 <div>Основні витрати</div>
@@ -21,10 +34,12 @@ export const SummarySection: React.FC = () => {
                 <div>Розподіл коштів по програмах</div>
             </div>
 
-            <div className={styles.lives}>
-                <div>205</div>
-                <div>Змінених життів</div>
-            </div>
+            <StatCard
+                className={styles.lives}
+                value={SUMMARY_DATA.livesChanged}
+                label={t('summary.lives')}
+                color="yellow"
+            />
         </section>
     );
 };

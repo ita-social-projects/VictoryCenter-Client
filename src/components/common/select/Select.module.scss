@@ -5,6 +5,7 @@
     position: relative;
     display: flex;
     cursor: pointer;
+    border: none;
 
     &-closed {
         span {
@@ -30,10 +31,7 @@
         cursor: pointer;
         text-align: start;
         font-size: 16px;
-
-        &:hover {
-            background-color: colors.$blue-50;
-        }
+        border:none;
     }
 
     &-options {

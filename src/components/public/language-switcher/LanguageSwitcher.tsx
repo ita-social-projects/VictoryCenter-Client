@@ -24,7 +24,7 @@ export const LanguageSwitcher = ({ onValueChange, className }: LanguageSwitcherP
             onValueChange={changeLanguage}
             placeholder="lng"
             className={classNames([styles['language-switcher']], className)}
-            headClassName="language-switcher-head"
+            headClassName={styles['language-switcher-head']}
             data-testid="language-switcher"
         >
             {LOCALES.map((lng) => (

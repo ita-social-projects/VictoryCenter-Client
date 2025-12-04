@@ -34,12 +34,10 @@ export const Select = <TValue,>({
 
     const [isOpen, setIsOpen] = useState(false);
 
-    // Контроль стану ззовні - обчислюємо selectedOption на основі value prop
     const selectedOption = options.find((opt) => opt.props.value === value);
-    const displayLabel = selectedOption
-        ? selectedOption.props.name
-        : (placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT);
     const hasValue = value !== null && value !== undefined;
+    const displayLabel =
+        hasValue && selectedOption ? selectedOption.props.name : (placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT);
 
     const handleOpenSelect = () => {
         setIsOpen(!isOpen);

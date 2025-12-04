@@ -220,7 +220,9 @@ describe('Select Component', () => {
 
         fireEvent.click(selectButton);
 
-        const selectedOption = screen.getByRole('button', { name: 'Option 1' });
+        const buttons = screen.getAllByRole('button', { name: 'Option 1' });
+        const selectedOption = buttons.find((btn) => !btn.classList.contains('select-head'));
+
         expect(selectedOption).toHaveClass('select-options-selected');
     });
 
@@ -230,17 +232,21 @@ describe('Select Component', () => {
 
         fireEvent.click(selectButton);
 
-        const selectedOption = screen.getByRole('button', { name: 'Option 1' });
+        const buttons = screen.getAllByRole('button', { name: 'Option 1' });
+        const selectedOption = buttons.find((btn) => !btn.classList.contains('select-head'));
+
         expect(selectedOption).not.toHaveClass('select-options-selected');
     });
 
     it('has correct default value for isAutocomplete prop', () => {
-        const { container } = render(<Select {...defaultProps} value="option1" />); // isAutocomplete defaults to false
+        const { container } = render(<Select {...defaultProps} value="option1" />);
         const selectButton = container.querySelector('.select-head') as HTMLElement;
 
         fireEvent.click(selectButton);
 
-        const selectedOption = screen.getByRole('button', { name: 'Option 1' });
+        const buttons = screen.getAllByRole('button', { name: 'Option 1' });
+        const selectedOption = buttons.find((btn) => !btn.classList.contains('select-head'));
+
         expect(selectedOption).toHaveClass('select-options-selected');
     });
 
@@ -424,9 +430,9 @@ describe('Select Component', () => {
         fireEvent.click(selectButton);
 
         const options = screen.getAllByRole('button');
-        const optionButtons = options.filter(btn => btn !== selectButton);
+        const optionButtons = options.filter((btn) => btn !== selectButton);
 
-        optionButtons.forEach(option => {
+        optionButtons.forEach((option) => {
             expect(option).toHaveClass('custom-option');
         });
     });

@@ -138,18 +138,27 @@ describe('TeamPageToolbar', () => {
         const onStatusFilterChange = jest.fn();
         renderToolbar({ onStatusFilterChange });
 
-        const statusSelect = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.STATUS.DEFAULT });
+        const statusSelect = screen.getByRole('button', { name: /Статус/i });
+
         fireEvent.click(statusSelect);
 
-        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.ALL));
+        const optionAll = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.ALL });
+        fireEvent.click(optionAll);
+
         expect(onStatusFilterChange).toHaveBeenCalledWith(undefined);
 
         fireEvent.click(statusSelect);
-        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED));
+
+        const optionPublished = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED });
+        fireEvent.click(optionPublished);
+
         expect(onStatusFilterChange).toHaveBeenCalledWith(VisibilityStatus.Published);
 
         fireEvent.click(statusSelect);
-        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT));
+
+        const optionDraft = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT });
+        fireEvent.click(optionDraft);
+
         expect(onStatusFilterChange).toHaveBeenCalledWith(VisibilityStatus.Draft);
     });
 

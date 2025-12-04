@@ -29,7 +29,7 @@ jest.mock('../bank-details-currencies-config/BankDetailsCurrenciesConfig', () =>
             delete: jest.fn(),
             createEmptyItem: jest.fn(),
             withCorrespondentBanks: true,
-            currency: 1, // BankCurrency.Usd
+            currency: 1,
         },
         EUR: {
             fetch: jest.fn(),
@@ -38,13 +38,12 @@ jest.mock('../bank-details-currencies-config/BankDetailsCurrenciesConfig', () =>
             delete: jest.fn(),
             createEmptyItem: jest.fn(),
             withCorrespondentBanks: true,
-            currency: 2, // BankCurrency.Eur
+            currency: 2,
         },
     },
 }));
 
 describe('mapCurrencyToBankCurrency', () => {
-    // Test data for mapping
     const currencyMappings = [
         { input: Currencies.UAH, expected: BankCurrency.Uah, expectedValue: 0 },
         { input: Currencies.USD, expected: BankCurrency.Usd, expectedValue: 1 },
@@ -70,7 +69,6 @@ describe('mapCurrencyToBankCurrency', () => {
 });
 
 describe('useBankDetails', () => {
-    // Helper functions to reduce duplication
     const mockFetchResolve = (currency: Currencies, data: any) => {
         (bankDetailsConfig[currency].fetch as jest.Mock).mockResolvedValue(data);
     };
@@ -183,7 +181,6 @@ describe('useBankDetails', () => {
         });
 
         it('returns correct config for each currency', async () => {
-            // Setup all mocks
             [Currencies.UAH, Currencies.USD, Currencies.EUR].forEach((currency) => {
                 mockFetchResolve(currency, []);
             });
@@ -194,7 +191,6 @@ describe('useBankDetails', () => {
                 renderHook(() => useBankDetails(Currencies.EUR)),
             ]);
 
-            // Wait for all to complete
             await Promise.all(results.map(({ result }) => waitForLoadingComplete(result)));
 
             results.forEach(({ result }) => {
@@ -241,7 +237,6 @@ describe('useBankDetails', () => {
 
             expect(result.current.isLoading).toBe(true);
 
-            // Quickly change currency before first resolves
             rerender({ currency: Currencies.USD });
 
             await waitForLoadingComplete(result);
@@ -280,7 +275,7 @@ describe('useBankDetails', () => {
             const { result } = renderHook(() => useBankDetails(Currencies.UAH));
 
             await waitForLoadingComplete(result);
-            expect(result.current.items).toBe(null);
+            expect(result.current.items).toBe([]);
         });
     });
 
@@ -404,8 +399,6 @@ describe('useBankDetails', () => {
                 act(() => {
                     triggerAfterUnmount();
                 });
-
-                // Should not cause any warnings or errors
             });
         });
     });

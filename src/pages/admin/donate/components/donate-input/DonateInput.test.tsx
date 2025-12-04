@@ -21,7 +21,7 @@ describe('DonateInput component', () => {
 
     test('updates value on change', () => {
         const handleChange = jest.fn();
-        render(<DonateInput label="Name" name="name" handleChange={handleChange} />);
+        render(<DonateInput label="Name" name="name" onValueChange={handleChange} />);
         const textarea = screen.getByRole('textbox');
         fireEvent.change(textarea, { target: { value: 'Test' } });
         expect(textarea).toHaveValue('Test');

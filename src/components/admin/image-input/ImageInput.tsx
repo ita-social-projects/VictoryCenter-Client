@@ -207,8 +207,6 @@ export const ImageInput = ({
                 onConfirm={handleRemove}
                 onCancel={() => setShowConfirmModal(false)}
                 onClose={() => setShowConfirmModal(false)}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
         </div>
     );

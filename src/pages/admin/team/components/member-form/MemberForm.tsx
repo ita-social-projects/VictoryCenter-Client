@@ -78,12 +78,8 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
         const handleFullNameChange = useCallback(
             (e: React.ChangeEvent<HTMLInputElement>) => {
                 setFormState((prev) => ({ ...prev, fullName: e.target.value }));
-                setErrors((prev) => ({
-                    ...prev,
-                    fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false),
-                }));
             },
-            [formState.fullName, setErrors, setFormState],
+            [setFormState],
         );
 
         const handleNameBlur = useCallback(() => {

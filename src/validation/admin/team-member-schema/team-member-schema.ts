@@ -14,6 +14,7 @@ export const teamMemberValidationSchema = Yup.object({
         .matches(TEAM_MEMBER_VALIDATION.fullName.pattern, TEAM_MEMBER_VALIDATION.fullName.getPatternError()),
 
     description: Yup.string()
+        .min(TEAM_MEMBER_VALIDATION.description.min, TEAM_MEMBER_VALIDATION.description.getMinError())
         .max(TEAM_MEMBER_VALIDATION.description.max, TEAM_MEMBER_VALIDATION.description.getMaxError())
         .test('no-multiple-spaces', TEAM_MEMBER_VALIDATION.description.getMultipleSpacesError(), (value) => {
             if (!value) return true;

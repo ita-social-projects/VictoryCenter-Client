@@ -19,6 +19,7 @@ export interface TeamPageToolbarProps {
     onSearchQueryChange: (query: string) => void;
     onStatusFilterChange: (status: VisibilityStatus | undefined) => void;
     onAddMember: () => void;
+    statusFilter: VisibilityStatus | undefined;
     searchItems: TeamMember[];
     isSearchLoading: boolean;
     searchHasMore: boolean;
@@ -42,6 +43,7 @@ export const TeamPageToolbar = ({
     onStatusFilterChange,
     onAddMember,
     searchItems,
+    statusFilter,
     isSearchLoading,
     searchHasMore,
     onSearchLoadMore,
@@ -72,7 +74,7 @@ export const TeamPageToolbar = ({
                 />
             </div>
             <div className="toolbar-actions">
-                <StatusFilterDropdown onStatusFilterChange={onStatusFilterChange} />
+                <StatusFilterDropdown value={statusFilter} onStatusFilterChange={onStatusFilterChange} />
                 <Button onClick={onAddMember} buttonStyle="primary">
                     {TEAM_MEMBERS_TEXT.BUTTON.ADD_MEMBER}
                     <PlusIcon />

@@ -1,11 +1,11 @@
-import { VisibilityStatus, PaginationResult } from '../../../../types/admin/common';
+import { PaginationResult, VisibilityStatus } from '../../../../types/admin/common';
 
 import {
-    ProgramCategory,
-    ProgramCreateUpdate,
-    ProgramCategoryCreateUpdate,
-    ProgramSearchItemData,
     Program,
+    ProgramCategory,
+    ProgramCategoryCreateUpdate,
+    ProgramCreateUpdate,
+    ProgramSearchItemData,
 } from '../../../../types/admin/programs';
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
@@ -38,13 +38,12 @@ const mapProgramEditToProgram = async (program: ProgramCreateUpdate, client: Axi
 export const ProgramsCategoriesApi = {
     fetchProgramCategories: async (client: AxiosInstance): Promise<ProgramCategory[]> => {
         const response = await client.get<ProgramCategory[]>(API_ROUTES.PROGRAMCATEGORY.BASE);
-        const result = response.data.map((category: any) => {
+        return response.data.map((category: any) => {
             return {
                 ...category,
                 programsCount: category.programs.length,
             };
         });
-        return result;
     },
 
     addProgramCategory: async (
@@ -123,12 +122,12 @@ export const ProgramsApi = {
 
     addProgram: async (client: AxiosInstance, program: ProgramCreateUpdate): Promise<Program> => {
         if (program.previewImage && 'base64' in program.previewImage) {
-            const imageResult = await ImageApi.post(client, program.previewImage);
-            program.previewImageId = imageResult.id;
+            const previewImageResult = await ImageApi.post(client, program.previewImage);
+            program.previewImageId = previewImageResult.id;
         }
         if (program.backgroundImage && 'base64' in program.backgroundImage) {
-            const imageResult = await ImageApi.post(client, program.backgroundImage);
-            program.backgroundImageId = imageResult.id;
+            const backgroundImageResult = await ImageApi.post(client, program.backgroundImage);
+            program.backgroundImageId = backgroundImageResult.id;
         }
 
         const response = await client.post(API_ROUTES.PROGRAMS.BASE, program);

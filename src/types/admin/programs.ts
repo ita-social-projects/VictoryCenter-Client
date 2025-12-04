@@ -32,9 +32,9 @@ export interface ProgramCreateUpdate {
     description: string;
     categoryIds: number[];
     status: VisibilityStatus;
-    previewImage: ImageValues | null;
+    previewImage: Image | ImageValues | null;
     previewImageId: number | null;
-    backgroundImage: ImageValues | null;
+    backgroundImage: Image | ImageValues | null;
     backgroundImageId: number | null;
     location: string;
     participantsCount: string;

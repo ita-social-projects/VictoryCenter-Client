@@ -32,7 +32,7 @@ export function useBankDetails<T extends keyof typeof bankDetailsConfig>(currenc
         config
             .fetch(client)
             .then((data: any[]) => {
-                if (alive) setItems(data);
+                if (alive) setItems(data ?? []);
             })
             .catch(() => {
                 if (alive) setItems([]);

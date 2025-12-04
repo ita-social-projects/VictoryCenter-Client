@@ -275,7 +275,8 @@ describe('useBankDetails', () => {
             const { result } = renderHook(() => useBankDetails(Currencies.UAH));
 
             await waitForLoadingComplete(result);
-            expect(result.current.items).toBe([]);
+
+            expect(result.current.items).toEqual([]);
         });
     });
 

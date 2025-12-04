@@ -49,7 +49,7 @@ export const programValidationSchema = Yup.object({
         .default(null)
         .when('$isPublishing', ([isPublishing], schema) =>
             isPublishing
-                ? schema.required(PROGRAM_VALIDATION.image.getRequiredWhenPublishingError())
+                ? schema.required(PROGRAM_VALIDATION.previewImage.getRequiredWhenPublishingError())
                 : schema.notRequired(),
         )
         .transform((value) => {
@@ -62,7 +62,7 @@ export const programValidationSchema = Yup.object({
         .default(null)
         .when('$isPublishing', ([isPublishing], schema) =>
             isPublishing
-                ? schema.required(PROGRAM_VALIDATION.image.getRequiredWhenPublishingError())
+                ? schema.required(PROGRAM_VALIDATION.backgroundImage.getRequiredWhenPublishingError())
                 : schema.notRequired(),
         )
         .transform((value) => {
@@ -138,7 +138,7 @@ export const PROGRAM_VALIDATION_FUNCTIONS = {
     validatePreviewImage: (value: Image | ImageValues | null, isPublishing: boolean): string | undefined => {
         const context: ProgramValidationContext = { isPublishing };
         try {
-            programValidationSchema.validateSyncAt('previewImage', { image: value }, { context });
+            programValidationSchema.validateSyncAt('previewImage', { previewImage: value }, { context });
             return undefined;
         } catch (error: any) {
             return error.message;
@@ -148,7 +148,7 @@ export const PROGRAM_VALIDATION_FUNCTIONS = {
     validateBackgroundImage: (value: Image | ImageValues | null, isPublishing: boolean): string | undefined => {
         const context: ProgramValidationContext = { isPublishing };
         try {
-            programValidationSchema.validateSyncAt('backgroundImage', { image: value }, { context });
+            programValidationSchema.validateSyncAt('backgroundImage', { backgroundImage: value }, { context });
             return undefined;
         } catch (error: any) {
             return error.message;

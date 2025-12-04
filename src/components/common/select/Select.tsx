@@ -63,7 +63,7 @@ export const Select = <TValue,>({
         >
             <button
                 type="button"
-                className={classNames('select-head', headClassName)}
+                className={classNames([styles['select-head']], headClassName)}
                 onClick={handleOpenSelect}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
@@ -73,8 +73,8 @@ export const Select = <TValue,>({
                 }}
             >
                 <span
-                    className={classNames('empty', {
-                        'not-empty': hasValue,
+                    className={classNames([styles['empty']], {
+                        [styles['not-empty']]: hasValue,
                     })}
                 >
                     {displayLabel}

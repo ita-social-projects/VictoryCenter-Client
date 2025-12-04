@@ -1,4 +1,4 @@
-@import '../../../assets/sass/variables/colors.scss';
+@use '../../../assets/sass/variables/colors.scss' as c;
 
 .button-tooltip-wrapper {
     position: relative;
@@ -15,7 +15,7 @@
 
     &:hover,
     &:focus {
-        background-color: $blue-50;
+        background-color: c.$blue-50;
     }
 }
 

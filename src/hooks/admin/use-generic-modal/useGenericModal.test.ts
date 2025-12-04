@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useGenericModal, GenericFormRef } from './useGenericModal';
+import { useGenericModal, GenericFormRef, ButtonValidationState } from './useGenericModal';
 import { VisibilityStatus, ModalMode } from '../../../types/admin/common';
 
 describe('useGenericModal', () => {
@@ -80,9 +80,9 @@ describe('useGenericModal', () => {
 
         act(() => result.current.handleFormValidationChange(false));
 
-        expect(result.current.buttonStates).toEqual({
-            draftValid: true,
-            publishValid: false,
+        expect(result.current.buttonStates).toEqual<ButtonValidationState>({
+            isDraftValid: true,
+            isPublishValid: false,
         });
     });
 

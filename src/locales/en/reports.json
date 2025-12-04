@@ -1,0 +1,17 @@
+{
+    "summary": {
+        "collected": "Collected",
+        "expenses": "Main Expenses",
+        "income": "Where Funds Came From",
+        "programs": "Funds Distribution by Program",
+        "lives": "Lives Changed"
+    },
+    "reports": {
+        "title": "Results in Reports",
+        "description": "To see detailed information, please download the report for a specific year. If you are interested in something else or want to know more, please contact us.",
+        "itemLabel": "Annual Report {{ year }}"
+    },
+    "actions": {
+        "downloadPdf": "Download PDF"
+    }
+}

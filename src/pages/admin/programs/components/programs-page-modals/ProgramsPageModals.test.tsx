@@ -16,7 +16,8 @@ jest.mock('./program-modal/ProgramModal', () => ({
 }));
 
 jest.mock('./delete-program-modal/DeleteProgramModal', () => ({
-    DeleteProgramModal: ({ isOpen }: DeleteProgramModalProps) => (isOpen ? <div data-testid="delete-program-modal" /> : null),
+    DeleteProgramModal: ({ isOpen }: DeleteProgramModalProps) =>
+        isOpen ? <div data-testid="delete-program-modal" /> : null,
 }));
 
 jest.mock('../program-category-modals/ProgramCategoryModal', () => ({
@@ -25,7 +26,8 @@ jest.mock('../program-category-modals/ProgramCategoryModal', () => ({
 }));
 
 jest.mock('../program-category-modals/DeleteCategoryModal', () => ({
-    DeleteCategoryModal: ({ isOpen }: DeleteCategoryModalProps) => (isOpen ? <div data-testid="delete-category-modal" /> : null),
+    DeleteCategoryModal: ({ isOpen }: DeleteCategoryModalProps) =>
+        isOpen ? <div data-testid="delete-category-modal" /> : null,
 }));
 
 describe('ProgramsPageModals', () => {
@@ -39,7 +41,7 @@ describe('ProgramsPageModals', () => {
         backgroundImage: null,
         location: '',
         meetingCount: '',
-        participantsCount: ''
+        participantsCount: '',
     };
 
     const mockCategories: ProgramCategory[] = [
@@ -65,7 +67,9 @@ describe('ProgramsPageModals', () => {
         closeDeleteCategoryModal: jest.fn(),
     };
 
-    const createMockModalsState = (overrides: Partial<BaseModalState<Program>> = {}): UseModalsStateResult<Program> => ({
+    const createMockModalsState = (
+        overrides: Partial<BaseModalState<Program>> = {},
+    ): UseModalsStateResult<Program> => ({
         modalState: {
             isAddModalOpen: false,
             itemToDelete: null,

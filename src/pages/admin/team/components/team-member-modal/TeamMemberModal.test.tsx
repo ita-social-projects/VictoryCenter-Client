@@ -8,6 +8,9 @@ import { TeamMembersApi } from '../../../../../services/api/admin/team/team-memb
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { TeamMemberModal } from './TeamMemberModal';
 import { TeamCategory } from '../../../../../types/admin/team-category';
+import { ModalProps } from '../../../../../components/common/modal/Modal';
+import { ButtonProps } from '../../../../../components/admin/button/Button';
+import { ConfirmationModalProps } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 
 // Mock data-fetch API
 jest.mock('../../../../../services/api/admin/team/team-members/team-members-api', () => ({
@@ -26,7 +29,7 @@ jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
 // Lightweight Modal mock with named export and slot components
 jest.mock('../../../../../components/common/modal/Modal', () => {
     const React = require('react');
-    const Modal = ({ children, isOpen, onClose }: any) =>
+    const Modal = ({ children, isOpen, onClose }: ModalProps) =>
         isOpen
             ? React.createElement(
                   'div',
@@ -45,7 +48,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
 
 // Lightweight Button mock with named export
 jest.mock('../../../../../components/admin/button/Button', () => ({
-    Button: ({ children, onClick, disabled }: any) => (
+    Button: ({ children, onClick, disabled }: ButtonProps) => (
         <button onClick={onClick} disabled={disabled}>
             {children}
         </button>
@@ -54,7 +57,7 @@ jest.mock('../../../../../components/admin/button/Button', () => ({
 
 // Lightweight QuestionModal mock with named export
 jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel, isButtonsDisabled }: any) =>
+    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel, isButtonsDisabled }: ConfirmationModalProps) =>
         isOpen ? (
             <div data-testid="question-modal">
                 <div data-testid="modal-title">{title}</div>

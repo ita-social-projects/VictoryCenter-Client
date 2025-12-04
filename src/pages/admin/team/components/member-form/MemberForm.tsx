@@ -11,6 +11,7 @@ import { ImageInput } from '../../../../../components/admin/image-input/ImageInp
 import './MemberForm.scss';
 import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
 import { TeamCategory } from '../../../../../types/admin/team-category';
+
 export interface TeamMemberFormValues {
     categoryId: number | null;
     fullName: string;
@@ -28,7 +29,7 @@ export interface TeamMemberFormErrorState {
 }
 
 export interface TeamMemberFormRef {
-    submit: (status: VisibilityStatus) => void;
+    submit: (status: VisibilityStatus) => Promise<void>;
     isValid: (isPublishing?: boolean) => boolean;
     isDirty: () => boolean;
 }

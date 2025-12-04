@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
 import { Program, ProgramCategory, ProgramCreateUpdate } from '../../../../../../types/admin/programs';
 import { VisibilityStatus, PendingAction, ModalMode } from '../../../../../../types/admin/common';
@@ -34,8 +34,6 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const isEditMode = mode === ModalMode.Edit;
     const program = isEditMode ? props.programToEdit : undefined;
     const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
-
-    const [selectedLanguage, setSelectedLanguage] = useState<string>('Українська');
 
     const initialData = useMemo<ProgramFormValues | null>(() => {
         if (!isEditMode || !program) return null;
@@ -97,9 +95,8 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 id: mode === ModalMode.Edit && program ? program.id : null,
                 name: formData.name,
                 description: formData.description,
-                previewImage: formData.previewImage && 'base64' in formData.previewImage ? formData.previewImage : null,
-                backgroundImage:
-                    formData.backgroundImage && 'base64' in formData.backgroundImage ? formData.backgroundImage : null,
+                previewImage: formData.previewImage,
+                backgroundImage: formData.backgroundImage,
                 status: status,
                 categoryIds: formData.categories.map((x) => x.id),
                 previewImageId: initialData?.previewImageId ?? null,
@@ -115,16 +112,19 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const modalHookData = useGenericModal<ProgramFormValues, Program, ProgramFormRef>(modalConfig);
 
     const handleLanguageChange = useCallback((language: string) => {
-        setSelectedLanguage(language);
+        // TODO: Implement language selection
     }, []);
 
     const handleAddNewSection = useCallback(() => {
         // TODO: Implement add new section logic
     }, []);
 
+    const title = isEditMode ? PROGRAMS_TEXT.FORM.TITLE.EDIT_PROGRAM : PROGRAMS_TEXT.FORM.TITLE.ADD_PROGRAM;
+
     return (
         <GenericModalWrapper
             isOpen={isOpen}
+            title={title}
             onClose={modalHookData.handleClose}
             onFormValidationChange={modalHookData.handleFormValidationChange}
             onFormSubmit={modalHookData.handleFormSubmit}
@@ -154,7 +154,6 @@ export const ProgramModal = (props: ProgramModalProps) => {
                     onSubmit={props.onSubmit}
                     categories={categories}
                     onValidationChange={props.onValidationChange}
-                    selectedLanguage={selectedLanguage}
                     onLanguageChange={handleLanguageChange}
                     onAddSection={handleAddNewSection}
                 />

@@ -4,6 +4,7 @@ import { ReactComponent as UploadIcon } from '../../../assets/icons/cloud-downlo
 import classNames from 'classnames';
 import './ImageInput.scss';
 import './WhoWeAreImageInput.scss';
+import './ProgramImageInput.scss';
 import { Image, ImageValues } from '../../../types/common/image';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';

@@ -9,6 +9,7 @@ import { Program } from '../../../../../../types/admin/programs';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
 import { ModalProps } from '../../../../../../components/common/modal/Modal';
 import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { ButtonProps } from '../../../../../../components/admin/button/Button';
 
 jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -52,7 +53,7 @@ jest.mock('../../../../../../components/common/modal/Modal', () => {
 });
 
 jest.mock('../../../../../../components/admin/button/Button', () => ({
-    Button: ({ children, onClick, disabled }: any) => (
+    Button: ({ children, onClick, disabled }: ButtonProps) => (
         <button onClick={onClick} disabled={disabled}>
             {children}
         </button>
@@ -70,7 +71,7 @@ describe('DeleteProgramModal', () => {
         categories: [],
         location: '',
         meetingCount: '',
-        participantsCount: ''
+        participantsCount: '',
     };
 
     const defaultProps: DeleteProgramModalProps = {

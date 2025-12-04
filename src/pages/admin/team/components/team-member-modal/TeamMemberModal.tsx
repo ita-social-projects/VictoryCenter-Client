@@ -122,6 +122,7 @@ export const TeamMemberModal = ({
             actionConfirmationTitle={modalHookData.formConfirmTitle}
             initialData={initialData}
             categories={categories}
+            title={title}
             renderForm={(props) => (
                 <MemberForm
                     ref={modalHookData.formRef}

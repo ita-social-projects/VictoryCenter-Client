@@ -111,7 +111,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
 
     const modalHookData = useGenericModal<ProgramFormValues, Program, ProgramFormRef>(modalConfig);
 
-    const handleLanguageChange = useCallback((language: string) => {
+    const handleLanguageChange = useCallback((_: string) => {
         // TODO: Implement language selection
     }, []);
 

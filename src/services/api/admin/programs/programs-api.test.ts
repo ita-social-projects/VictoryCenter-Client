@@ -63,7 +63,7 @@ const mockPrograms: Program[] = [
     },
 ];
 
-const createMockFile = (filename: string = 'test.png'): { base64: string; mimeType: string } => ({
+const createMockFile = (): { base64: string; mimeType: string } => ({
     base64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
     mimeType: 'image/png',
 });

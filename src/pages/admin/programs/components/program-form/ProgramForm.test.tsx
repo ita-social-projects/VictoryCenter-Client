@@ -9,7 +9,7 @@ import { InputWithCharacterLimitGroupProps } from '../../../../../components/adm
 import { TextAreaWithCharacterLimitGroupProps } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { MultiSelectInputGroupProps } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
 import { PhotoInputGroupProps } from '../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup';
-import { ButtonProps } from '@mui/material';
+import { ButtonProps } from '../../../../../components/admin/button/Button';
 
 jest.mock('../../../../../validation/admin/program-schema/program-schema', () => ({
     PROGRAM_VALIDATION_FUNCTIONS: {
@@ -24,6 +24,7 @@ jest.mock('../../../../../validation/admin/program-schema/program-schema', () =>
     },
 }));
 
+// Mock Child Components using Props
 jest.mock(
     '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
     () => ({
@@ -79,11 +80,9 @@ jest.mock('../../../../../components/admin/input-groups/multi-select-input-group
             <div data-testid={`select-${id}`} onClick={() => onChange && onChange([options[0]])}>
                 {value?.map((v) => v.name).join(', ')}
             </div>
-            {onBlur && (
-                <button type="button" data-testid={`blur-${id}`} onClick={onBlur}>
-                    Blur
-                </button>
-            )}
+            <button type="button" data-testid={`blur-${id}`} onClick={onBlur}>
+                Blur
+            </button>
             {error && <span data-testid={`error-${id}`}>{error}</span>}
         </div>
     ),
@@ -124,6 +123,8 @@ jest.mock('../../../../../assets/icons/plus.svg', () => ({
     ReactComponent: () => <svg>PlusIcon</svg>,
 }));
 
+// --- Tests ---
+
 describe('ProgramForm', () => {
     const mockOnSubmit = jest.fn();
     const mockOnAddSection = jest.fn();
@@ -150,7 +151,7 @@ describe('ProgramForm', () => {
         jest.clearAllMocks();
     });
 
-    describe('Rendering', () => {
+    describe('Rendering and Initialization', () => {
         it('should render all input fields with empty initial values', () => {
             renderProgramForm();
 
@@ -181,7 +182,11 @@ describe('ProgramForm', () => {
 
             expect(screen.getByTestId('input-name')).toHaveValue('Initial Name');
             expect(screen.getByTestId('input-location')).toHaveValue('Kyiv');
+            expect(screen.getByTestId('input-participantsCount')).toHaveValue('10');
+            expect(screen.getByTestId('input-meetingCount')).toHaveValue('5');
+            expect(screen.getByTestId('input-description')).toHaveValue('Initial Desc');
             expect(screen.getByTestId('value-backgroundImage')).toHaveTextContent('HasImage');
+            expect(screen.getByTestId('value-previewImage')).toHaveTextContent('HasImage');
         });
 
         it('should call onAddSection when the add button is clicked', () => {
@@ -191,94 +196,185 @@ describe('ProgramForm', () => {
         });
     });
 
-    describe('Interactions and State Updates', () => {
-        it('should update text fields on change', () => {
-            renderProgramForm();
-
-            const nameInput = screen.getByTestId('input-name');
-            fireEvent.change(nameInput, { target: { value: 'New Program' } });
-
-            expect(nameInput).toHaveValue('New Program');
-        });
-
-        it('should update categories on change', () => {
-            renderProgramForm();
-            const selectDiv = screen.getByTestId('select-toolbar-categories');
-
-            fireEvent.click(selectDiv);
-
-            expect(selectDiv).toHaveTextContent('Tech');
-        });
-
-        it('should update images on upload', () => {
-            renderProgramForm();
-            const uploadBtn = screen.getByTestId('upload-backgroundImage');
-
-            fireEvent.click(uploadBtn);
-
-            expect(screen.getByTestId('value-backgroundImage')).toHaveTextContent('HasImage');
-        });
-    });
-
-    describe('Validation Wiring', () => {
-        it('should trigger validation and show error on blur for text fields', () => {
+    describe('Field Interactions and Validation Wiring', () => {
+        // --- Name ---
+        it('should handle name input changes and blur validation', () => {
             (PROGRAM_VALIDATION_FUNCTIONS.validateName as jest.Mock).mockReturnValue('Name Error');
             renderProgramForm();
 
-            const nameInput = screen.getByTestId('input-name');
-            fireEvent.blur(nameInput);
+            const input = screen.getByTestId('input-name');
+            fireEvent.change(input, { target: { value: 'New Name' } });
+            fireEvent.blur(input);
 
+            expect(input).toHaveValue('New Name');
             expect(PROGRAM_VALIDATION_FUNCTIONS.validateName).toHaveBeenCalled();
             expect(screen.getByTestId('error-name')).toHaveTextContent('Name Error');
         });
 
-        it('should trigger validation for categories on blur', () => {
+        // --- Location ---
+        it('should handle location input changes and blur validation', () => {
+            (PROGRAM_VALIDATION_FUNCTIONS.validateLocation as jest.Mock).mockReturnValue('Location Error');
+            renderProgramForm();
+
+            const input = screen.getByTestId('input-location');
+            fireEvent.change(input, { target: { value: 'Lviv' } });
+            fireEvent.blur(input);
+
+            expect(input).toHaveValue('Lviv');
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateLocation).toHaveBeenCalled();
+            expect(screen.getByTestId('error-location')).toHaveTextContent('Location Error');
+        });
+
+        // --- Participants Count ---
+        it('should handle participants count input changes and blur validation', () => {
+            (PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount as jest.Mock).mockReturnValue('Count Error');
+            renderProgramForm();
+
+            const input = screen.getByTestId('input-participantsCount');
+            fireEvent.change(input, { target: { value: '100' } });
+            fireEvent.blur(input);
+
+            expect(input).toHaveValue('100');
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount).toHaveBeenCalled();
+            expect(screen.getByTestId('error-participantsCount')).toHaveTextContent('Count Error');
+        });
+
+        // --- Meeting Count ---
+        it('should handle meeting count input changes and blur validation', () => {
+            (PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount as jest.Mock).mockReturnValue('Meeting Error');
+            renderProgramForm();
+
+            const input = screen.getByTestId('input-meetingCount');
+            fireEvent.change(input, { target: { value: '5' } });
+            fireEvent.blur(input);
+
+            expect(input).toHaveValue('5');
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount).toHaveBeenCalled();
+            expect(screen.getByTestId('error-meetingCount')).toHaveTextContent('Meeting Error');
+        });
+
+        // --- Description ---
+        it('should handle description input changes and blur validation', () => {
+            (PROGRAM_VALIDATION_FUNCTIONS.validateDescription as jest.Mock).mockReturnValue('Description Error');
+            renderProgramForm();
+
+            const input = screen.getByTestId('input-description');
+            fireEvent.change(input, { target: { value: 'Detailed desc' } });
+            fireEvent.blur(input);
+
+            expect(input).toHaveValue('Detailed desc');
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateDescription).toHaveBeenCalled();
+            expect(screen.getByTestId('error-description')).toHaveTextContent('Description Error');
+        });
+
+        // --- Categories ---
+        it('should handle categories changes and blur validation', () => {
             (PROGRAM_VALIDATION_FUNCTIONS.validateCategories as jest.Mock).mockReturnValue('Category Error');
             renderProgramForm();
 
-            fireEvent.click(screen.getByTestId('blur-toolbar-categories'));
+            const selectDiv = screen.getByTestId('select-toolbar-categories');
+            fireEvent.click(selectDiv); // Mock triggers onChange
+            fireEvent.click(screen.getByTestId('blur-toolbar-categories')); // Trigger blur
 
+            expect(selectDiv).toHaveTextContent('Tech');
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateCategories).toHaveBeenCalled();
             expect(screen.getByTestId('error-toolbar-categories')).toHaveTextContent('Category Error');
         });
+    });
 
-        it('should allow manual error setting for images via child component props', () => {
+    describe('Image Handling', () => {
+        // --- Background Image ---
+        it('should handle background image upload and validation', () => {
+            (PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage as jest.Mock).mockReturnValue('Bg Error');
+            renderProgramForm();
+
+            fireEvent.click(screen.getByTestId('upload-backgroundImage'));
+
+            expect(screen.getByTestId('value-backgroundImage')).toHaveTextContent('HasImage');
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage).toHaveBeenCalled();
+            expect(screen.getByTestId('error-backgroundImage')).toHaveTextContent('Bg Error');
+        });
+
+        it('should handle background image manual error setting', () => {
+            renderProgramForm();
+            fireEvent.click(screen.getByTestId('error-trigger-backgroundImage'));
+            expect(screen.getByTestId('error-backgroundImage')).toHaveTextContent('Manual Error');
+        });
+
+        // --- Preview Image ---
+        it('should handle preview image upload and validation', () => {
+            (PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage as jest.Mock).mockReturnValue('Preview Error');
+            renderProgramForm();
+
+            fireEvent.click(screen.getByTestId('upload-previewImage'));
+
+            expect(screen.getByTestId('value-previewImage')).toHaveTextContent('HasImage');
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage).toHaveBeenCalled();
+            expect(screen.getByTestId('error-previewImage')).toHaveTextContent('Preview Error');
+        });
+
+        it('should handle preview image manual error setting', () => {
             renderProgramForm();
             fireEvent.click(screen.getByTestId('error-trigger-previewImage'));
             expect(screen.getByTestId('error-previewImage')).toHaveTextContent('Manual Error');
         });
     });
 
-    describe('Ref Methods (submit, isDirty, isValid)', () => {
-        it('should return true for isDirty when form is changed', () => {
+    describe('Form Submission & Ref Methods', () => {
+        it('should return true for isDirty when any field is changed', () => {
             const ref = React.createRef<ProgramFormRef>();
             renderProgramForm({}, ref);
 
             expect(ref.current?.isDirty()).toBe(false);
-
-            fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Changed' } });
-
+            fireEvent.change(screen.getByTestId('input-location'), { target: { value: 'Changed' } });
             expect(ref.current?.isDirty()).toBe(true);
         });
 
-        it('should call onSubmit with correct data when submit is called via ref and form is valid', async () => {
+        it('should return false for isValid if validation fails', () => {
+            const ref = React.createRef<ProgramFormRef>();
+            renderProgramForm({}, ref);
+            (PROGRAM_VALIDATION_FUNCTIONS.validateName as jest.Mock).mockReturnValue('Error');
+            expect(ref.current?.isValid(false)).toBe(false);
+        });
+
+        it('should return true for isValid if validation passes', () => {
+            const ref = React.createRef<ProgramFormRef>();
+            renderProgramForm({}, ref);
+            Object.values(PROGRAM_VALIDATION_FUNCTIONS).forEach((fn) => (fn as jest.Mock).mockReturnValue(undefined));
+            expect(ref.current?.isValid(false)).toBe(true);
+        });
+
+        it('should submit form when valid and call validateForm for all fields', async () => {
             const ref = React.createRef<ProgramFormRef>();
             renderProgramForm({}, ref);
 
+            // Ensure validation returns no errors
             Object.values(PROGRAM_VALIDATION_FUNCTIONS).forEach((fn) => (fn as jest.Mock).mockReturnValue(undefined));
 
-            fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Valid Name' } });
+            // Fill minimal data
+            fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Program A' } });
 
             await act(async () => {
                 await ref.current?.submit(VisibilityStatus.Published);
             });
 
+            // Ensure all validators were called inside `validateForm`
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateName).toHaveBeenCalled();
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateCategories).toHaveBeenCalled();
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateDescription).toHaveBeenCalled();
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage).toHaveBeenCalled();
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage).toHaveBeenCalled();
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateLocation).toHaveBeenCalled();
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateParticipantsCount).toHaveBeenCalled();
+            expect(PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount).toHaveBeenCalled();
+
             expect(mockOnSubmit).toHaveBeenCalledWith(
-                expect.objectContaining({ name: 'Valid Name' }),
+                expect.objectContaining({ name: 'Program A' }),
                 VisibilityStatus.Published,
             );
         });
 
-        it('should NOT call onSubmit if validation fails during submit', async () => {
+        it('should NOT submit form when validation fails', async () => {
             const ref = React.createRef<ProgramFormRef>();
             renderProgramForm({}, ref);
 
@@ -288,27 +384,8 @@ describe('ProgramForm', () => {
                 await ref.current?.submit(VisibilityStatus.Published);
             });
 
-            expect(PROGRAM_VALIDATION_FUNCTIONS.validateName).toHaveBeenCalled();
             expect(mockOnSubmit).not.toHaveBeenCalled();
             expect(screen.getByTestId('error-name')).toHaveTextContent('Required');
-        });
-
-        it('isValid should return false if validation functions return errors', () => {
-            const ref = React.createRef<ProgramFormRef>();
-            renderProgramForm({}, ref);
-
-            (PROGRAM_VALIDATION_FUNCTIONS.validateName as jest.Mock).mockReturnValue('Error');
-
-            expect(ref.current?.isValid(false)).toBe(false);
-        });
-
-        it('isValid should return true if validation functions return no errors', () => {
-            const ref = React.createRef<ProgramFormRef>();
-            renderProgramForm({}, ref);
-
-            Object.values(PROGRAM_VALIDATION_FUNCTIONS).forEach((fn) => (fn as jest.Mock).mockReturnValue(undefined));
-
-            expect(ref.current?.isValid(false)).toBe(true);
         });
     });
 });

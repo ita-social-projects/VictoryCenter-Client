@@ -12,12 +12,10 @@ interface DonateInputProps {
     name: string;
     value?: string;
     editable?: boolean;
-    handleChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-    handleBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
+    onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
     onValueChange?: (val: string) => void;
     onlyNumbers?: boolean;
     maxLength?: number;
-    showCharCounter?: boolean;
     className?: string;
 }
 
@@ -30,12 +28,10 @@ export const DonateInput = ({
     name,
     value: externalValue,
     editable = true,
-    handleChange,
-    handleBlur,
+    onBlur,
     onValueChange,
     onlyNumbers = false,
     maxLength,
-    showCharCounter = false,
     className,
 }: DonateInputProps) => {
     const computedInitialValue =
@@ -82,8 +78,6 @@ export const DonateInput = ({
         if (!hasEdited && newValue !== initialValue) {
             setHasEdited(true);
         }
-
-        handleChange?.(e);
     };
 
     const handleClear = () => {
@@ -93,62 +87,66 @@ export const DonateInput = ({
     };
 
     const showClearButton = isFocused && value.length > prefix.length;
-    const hasValue = value && value !== prefix;
+    const currentLength = value.length - prefix.length;
+    const showCharacterCounter = maxLength !== undefined;
 
     return (
-        <div
-            className={classNames(
-                'donate-input',
-                {
-                    'donate-input-title': isTitle,
-                    'donate-input-changed': hasEdited,
-                    'donate-input-title-create': isTitle && name === 'name',
-                },
-                className,
-            )}
-        >
-            {label && (
-                <div className={isTitle ? 'donate-input-title-label' : 'donate-input-label'}>
-                    {isRequired && editable && <span className="donate-input-required">*</span>}
-                    {label}
-                </div>
-            )}
-
-            <div className={isTitle ? 'donate-input-title-body' : 'donate-input-body'}>
-                {isTitle && editable && isRequired && <span className="donate-input-required">*</span>}
-
-                <textarea
-                    ref={textAreaRef}
-                    name={name}
-                    placeholder={hasValue ? '' : placeholder}
-                    value={value}
-                    onChange={onChange}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={(e) => {
-                        setIsFocused(false);
-                        handleBlur?.(e);
-                    }}
-                    readOnly={!editable}
-                    className="donate-input-textarea"
-                    inputMode={onlyNumbers ? 'numeric' : undefined}
-                    maxLength={maxLength}
-                />
-
-                {showClearButton && (
-                    <button
-                        type="button"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={handleClear}
-                        aria-label="Clear input"
-                        className="donate-input-clear-button"
-                    ></button>
+        <>
+            <div
+                className={classNames(
+                    'donate-input',
+                    {
+                        'donate-input-title': isTitle,
+                        'donate-input-changed': hasEdited,
+                        'donate-input-title-create': isTitle && name === 'name',
+                    },
+                    className,
                 )}
+            >
+                {label && (
+                    <div className={isTitle ? 'donate-input-title-label' : 'donate-input-label'}>
+                        {isRequired && editable && <span className="donate-input-required">*</span>}
+                        {label}
+                    </div>
+                )}
+
+                <div className={isTitle ? 'donate-input-title-body' : 'donate-input-body'}>
+                    {isTitle && editable && isRequired && <span className="donate-input-required">*</span>}
+
+                    <textarea
+                        ref={textAreaRef}
+                        name={name}
+                        placeholder={placeholder}
+                        value={value}
+                        onChange={onChange}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={(e) => {
+                            setIsFocused(false);
+                            onBlur?.(e);
+                        }}
+                        readOnly={!editable}
+                        className="donate-input-textarea"
+                        inputMode={onlyNumbers ? 'numeric' : undefined}
+                        maxLength={maxLength ? prefix.length + maxLength : undefined}
+                    />
+
+                    {showClearButton && (
+                        <button
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={handleClear}
+                            aria-label="Clear input"
+                            className="donate-input-clear-button"
+                        ></button>
+                    )}
+                </div>
             </div>
-            {showCharCounter && maxLength && (
-                <div className="donate-input-char-counter">
-                    {value.length}/{maxLength}
+
+            {showCharacterCounter && (
+                <div className="donate-input-character-counter">
+                    {currentLength}/{maxLength}
                 </div>
             )}
-        </div>
+        </>
     );
 };

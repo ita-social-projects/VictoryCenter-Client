@@ -13,6 +13,7 @@ const DEFAULT_PROPS: React.ComponentProps<typeof TeamPageToolbar> = {
     onSearchQueryChange: jest.fn(),
     onStatusFilterChange: jest.fn(),
     onAddMember: jest.fn(),
+    statusFilter: undefined,
     searchItems: [],
     isSearchLoading: false,
     searchHasMore: false,
@@ -137,18 +138,27 @@ describe('TeamPageToolbar', () => {
         const onStatusFilterChange = jest.fn();
         renderToolbar({ onStatusFilterChange });
 
-        const statusSelect = screen.getByRole('toolbar');
+        const statusSelect = screen.getByRole('button', { name: /Статус/i });
+
         fireEvent.click(statusSelect);
 
-        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.ALL));
+        const optionAll = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.ALL });
+        fireEvent.click(optionAll);
+
         expect(onStatusFilterChange).toHaveBeenCalledWith(undefined);
 
         fireEvent.click(statusSelect);
-        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED));
+
+        const optionPublished = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED });
+        fireEvent.click(optionPublished);
+
         expect(onStatusFilterChange).toHaveBeenCalledWith(VisibilityStatus.Published);
 
         fireEvent.click(statusSelect);
-        fireEvent.click(screen.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT));
+
+        const optionDraft = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT });
+        fireEvent.click(optionDraft);
+
         expect(onStatusFilterChange).toHaveBeenCalledWith(VisibilityStatus.Draft);
     });
 
@@ -204,5 +214,21 @@ describe('TeamPageToolbar', () => {
         rerender(<TeamPageToolbar {...{ ...DEFAULT_PROPS, categories: CATS_2, searchItems: ITEM_JANE }} />);
 
         expect(screen.getByTestId('team-member-item')).toHaveTextContent('Jane Roe - 2');
+    });
+
+    it('renders with statusFilter prop value', () => {
+        renderToolbar({ statusFilter: VisibilityStatus.Published });
+
+        expect(screen.getByTestId('team-page-toolbar')).toBeInTheDocument();
+    });
+
+    it('passes statusFilter to StatusFilterDropdown', () => {
+        const { rerender } = renderToolbar({ statusFilter: undefined });
+
+        expect(screen.getByTestId('team-page-toolbar')).toBeInTheDocument();
+
+        rerender(<TeamPageToolbar {...{ ...DEFAULT_PROPS, statusFilter: VisibilityStatus.Draft }} />);
+
+        expect(screen.getByTestId('team-page-toolbar')).toBeInTheDocument();
     });
 });

@@ -30,7 +30,7 @@ describe('UkrainePaymentDetails', () => {
         name: 'Test Bank',
         receiver: 'Test Receiver',
         edrpou: '12345678',
-        iban: 'UA123456789012345678901234567',
+        ukrainianIban: 'UA123456789012345678901234567',
         paymentPurpose: 'Test Payment Purpose',
         ...overrides,
     });
@@ -42,7 +42,7 @@ describe('UkrainePaymentDetails', () => {
                 name: `Test Bank ${index + 1}`,
                 receiver: `Test Receiver ${index + 1}`,
                 edrpou: `1234567${index}`,
-                iban: `UA12345678901234567890123456${index}`,
+                ukrainianIban: `UA12345678901234567890123456${index}`,
                 paymentPurpose: `Test Payment Purpose ${index + 1}`,
             }),
         );
@@ -60,7 +60,7 @@ describe('UkrainePaymentDetails', () => {
         expect(screen.getByText(bank.receiver)).toBeInTheDocument();
         expect(screen.getByText(bank.edrpou)).toBeInTheDocument();
         expect(screen.getByText(bank.name)).toBeInTheDocument();
-        expect(screen.getByText(bank.iban)).toBeInTheDocument();
+        expect(screen.getByText(bank.ukrainianIban)).toBeInTheDocument();
         expect(screen.getByText(bank.paymentPurpose)).toBeInTheDocument();
     };
 
@@ -74,7 +74,7 @@ describe('UkrainePaymentDetails', () => {
             expect(copyButtons[startIndex]).toHaveAttribute('data-copy-text', bank.receiver);
             expect(copyButtons[startIndex + 1]).toHaveAttribute('data-copy-text', bank.edrpou);
             expect(copyButtons[startIndex + 2]).toHaveAttribute('data-copy-text', bank.name);
-            expect(copyButtons[startIndex + 3]).toHaveAttribute('data-copy-text', bank.iban);
+            expect(copyButtons[startIndex + 3]).toHaveAttribute('data-copy-text', bank.ukrainianIban);
             expect(copyButtons[startIndex + 4]).toHaveAttribute('data-copy-text', bank.paymentPurpose);
         });
     };
@@ -132,7 +132,7 @@ describe('UkrainePaymentDetails', () => {
                 name: '',
                 receiver: '',
                 edrpou: '',
-                iban: '',
+                ukrainianIban: '',
                 paymentPurpose: '',
             });
 
@@ -147,7 +147,7 @@ describe('UkrainePaymentDetails', () => {
                 name: null as any,
                 receiver: undefined as any,
                 edrpou: null as any,
-                iban: undefined as any,
+                ukrainianIban: undefined as any,
                 paymentPurpose: null as any,
             });
 

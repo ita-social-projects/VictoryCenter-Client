@@ -26,6 +26,7 @@ export const DonatePageContent = () => {
     const [supportOptions, setSupportOptions] = useState<SupportOptionsType[]>([]);
     const [isSupportOptionsLoading, setIsSupportOptionsLoading] = useState(false);
 
+    const [isCorrespondentBankFormVisible, setIsCorrespondentBankFormVisible] = useState(false);
     useEffect(() => {
         let isAlive = true;
         const bankCurrency = mapCurrencyToBankCurrency(selectedCategory);
@@ -249,6 +250,7 @@ export const DonatePageContent = () => {
                 onSubmit={(data) => handleCreateCorrespondentBank(formState.id, data)}
                 onUpdate={(id, data) => handleUpdateCorrespondentBank(formState.id, id, data)}
                 onDelete={(id) => handleDeleteCorrespondentBank(formState.id, id)}
+                onAddFormVisibilityChange={setIsCorrespondentBankFormVisible}
             />
         ),
         [
@@ -280,10 +282,11 @@ export const DonatePageContent = () => {
                             isLoading={isLoading}
                             FormComponent={config.form}
                             notFoundText={DONATE_TEXT.BANK_DETAILS.NOT_FOUND}
-                            addNewText={DONATE_TEXT.BANK_DETAILS.ADD_FIRST}
+                            addNewText={DONATE_TEXT.BANK_DETAILS.ADD_NEW}
                             onSubmit={handleCreateBankDetails}
                             onUpdate={handleUpdateBankDetails}
                             onDelete={handleDeleteBankDetails}
+                            isParentAddFormVisible={isCorrespondentBankFormVisible}
                         >
                             {config.withCorrespondentBanks ? renderCorrespondentBanks : () => null}
                         </GenericDetails>

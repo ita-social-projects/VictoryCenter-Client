@@ -4,6 +4,9 @@ import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
 import { ContentType } from '../../../../types/common/about-us';
 import { AboutUsContent } from '../../../../types/public/about-us-page';
 import aboutUsPageUk from '../../../../locales/uk/about-us.json';
+import useMediaQuery from '@mui/material/useMediaQuery';
+
+jest.mock('@mui/material/useMediaQuery');
 
 describe('SupportSection component', () => {
     const Content: AboutUsContent[] = [
@@ -72,5 +75,11 @@ describe('SupportSection component', () => {
             expect(image).toHaveAttribute('src', Content[i].image?.url);
             expect(description).toBeInTheDocument();
         }
+    });
+
+    it('renders tablet layout when media query matches tablet breakpoint', () => {
+        (useMediaQuery as jest.Mock).mockReturnValue(true);
+
+        render(<SupportSection content={Content} />);
     });
 });

@@ -57,106 +57,113 @@ describe('Select Component', () => {
         expect(ref.current).toHaveClass('select');
     });
 
-    it('opens select when clicked', () => {
+    it('opens select when button is clicked', () => {
         const { container } = render(<Select {...defaultProps} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
         const selectContainer = container.firstChild as HTMLElement;
 
-        fireEvent.click(selectContainer);
+        fireEvent.click(selectButton);
 
         expect(selectContainer).toHaveClass('select-opened');
         const icon = screen.getByTestId('chevron-up-icon');
         expect(icon).toBeInTheDocument();
     });
 
-    it('closes select when clicked again', () => {
+    it('closes select when button is clicked again', () => {
         const { container } = render(<Select {...defaultProps} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
         const selectContainer = container.firstChild as HTMLElement;
 
-        fireEvent.click(selectContainer);
+        fireEvent.click(selectButton);
         expect(selectContainer).toHaveClass('select-opened');
 
-        fireEvent.click(selectContainer);
+        fireEvent.click(selectButton);
         expect(selectContainer).toHaveClass('select-closed');
         expect(screen.getByTestId('chevron-down-icon')).toBeInTheDocument();
     });
 
     it('opens select when Space or Enter is pressed', () => {
         const { container } = render(<Select {...defaultProps} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
         const selectContainer = container.firstChild as HTMLElement;
 
-        fireEvent.keyDown(selectContainer, { key: ' ', code: 'Space', charCode: 32 });
+        fireEvent.keyDown(selectButton, { key: ' ', code: 'Space', charCode: 32 });
         expect(selectContainer).toHaveClass('select-opened');
         expect(screen.getByTestId('chevron-up-icon')).toBeInTheDocument();
 
-        fireEvent.click(selectContainer);
+        fireEvent.click(selectButton);
 
-        fireEvent.keyDown(selectContainer, { key: 'Enter', code: 'Enter', charCode: 13 });
+        fireEvent.keyDown(selectButton, { key: 'Enter', code: 'Enter', charCode: 13 });
         expect(selectContainer).toHaveClass('select-opened');
         expect(screen.getByTestId('chevron-up-icon')).toBeInTheDocument();
     });
 
     it('does not open select when a non-Space/Enter key is pressed', () => {
         const { container } = render(<Select {...defaultProps} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
         const selectContainer = container.firstChild as HTMLElement;
 
-        fireEvent.keyDown(selectContainer, { key: 'a', code: 'KeyA', charCode: 65 });
+        fireEvent.keyDown(selectButton, { key: 'a', code: 'KeyA', charCode: 65 });
         expect(selectContainer).toHaveClass('select-closed');
         expect(screen.getByTestId('chevron-down-icon')).toBeInTheDocument();
     });
 
     it('closes select when Space or Enter is pressed again', () => {
         const { container } = render(<Select {...defaultProps} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
         const selectContainer = container.firstChild as HTMLElement;
 
-        fireEvent.keyDown(selectContainer, { key: ' ', code: 'Space', charCode: 32 });
+        fireEvent.keyDown(selectButton, { key: ' ', code: 'Space', charCode: 32 });
         expect(selectContainer).toHaveClass('select-opened');
 
-        fireEvent.keyDown(selectContainer, { key: ' ', code: 'Space', charCode: 32 });
+        fireEvent.keyDown(selectButton, { key: ' ', code: 'Space', charCode: 32 });
         expect(selectContainer).toHaveClass('select-closed');
         expect(screen.getByTestId('chevron-down-icon')).toBeInTheDocument();
 
-        fireEvent.keyDown(selectContainer, { key: 'Enter', code: 'Enter', charCode: 13 });
+        fireEvent.keyDown(selectButton, { key: 'Enter', code: 'Enter', charCode: 13 });
         expect(selectContainer).toHaveClass('select-opened');
 
-        fireEvent.keyDown(selectContainer, { key: 'Enter', code: 'Enter', charCode: 13 });
+        fireEvent.keyDown(selectButton, { key: 'Enter', code: 'Enter', charCode: 13 });
         expect(selectContainer).toHaveClass('select-closed');
         expect(screen.getByTestId('chevron-down-icon')).toBeInTheDocument();
     });
 
     it('does not close select when a non-Space/Enter key is pressed', () => {
         const { container } = render(<Select {...defaultProps} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
         const selectContainer = container.firstChild as HTMLElement;
 
-        fireEvent.click(selectContainer);
+        fireEvent.click(selectButton);
         expect(selectContainer).toHaveClass('select-opened');
         expect(screen.getByTestId('chevron-up-icon')).toBeInTheDocument();
 
-        fireEvent.keyDown(selectContainer, { key: 'a', code: 'KeyA', charCode: 65 });
+        fireEvent.keyDown(selectButton, { key: 'a', code: 'KeyA', charCode: 65 });
         expect(selectContainer).toHaveClass('select-opened');
         expect(screen.getByTestId('chevron-up-icon')).toBeInTheDocument();
     });
 
     it('toggles select state multiple times', () => {
         const { container } = render(<Select {...defaultProps} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
         const selectContainer = container.firstChild as HTMLElement;
 
         expect(selectContainer).toHaveClass('select-closed');
 
-        fireEvent.click(selectContainer);
+        fireEvent.click(selectButton);
         expect(selectContainer).toHaveClass('select-opened');
 
-        fireEvent.click(selectContainer);
+        fireEvent.click(selectButton);
         expect(selectContainer).toHaveClass('select-closed');
 
-        fireEvent.click(selectContainer);
+        fireEvent.click(selectButton);
         expect(selectContainer).toHaveClass('select-opened');
     });
 
     it('renders all options when opened', () => {
         const { container } = render(<Select {...defaultProps} />);
-        const selectContainer = container.firstChild as HTMLElement;
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
 
-        fireEvent.click(selectContainer);
+        fireEvent.click(selectButton);
 
         expect(screen.getByText('Option 1')).toBeInTheDocument();
         expect(screen.getByText('Option 2')).toBeInTheDocument();
@@ -166,9 +173,9 @@ describe('Select Component', () => {
     it('calls onValueChange when option is selected', () => {
         const mockOnValueChange = jest.fn();
         const { container } = render(<Select {...defaultProps} onValueChange={mockOnValueChange} />);
-        const selectContainer = container.firstChild as HTMLElement;
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
 
-        fireEvent.click(selectContainer);
+        fireEvent.click(selectButton);
 
         const option = screen.getByText('Option 2');
         fireEvent.click(option);
@@ -178,71 +185,68 @@ describe('Select Component', () => {
     });
 
     it('updates displayed value when option is selected', () => {
-        const { container } = render(<Select {...defaultProps} />);
-        const selectContainer = container.firstChild as HTMLElement;
-        fireEvent.click(selectContainer);
+        const mockOnValueChange = jest.fn();
+        const { container, rerender } = render(<Select {...defaultProps} onValueChange={mockOnValueChange} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
 
+        fireEvent.click(selectButton);
         const option = screen.getByRole('button', { name: 'Option 1' });
         fireEvent.click(option);
+
+        expect(mockOnValueChange).toHaveBeenCalledWith('option1');
+
+        // Rerender with the new value to simulate parent component updating
+        rerender(<Select {...defaultProps} value="option1" onValueChange={mockOnValueChange} />);
 
         expect(screen.getByText('Option 1')).toBeInTheDocument();
         expect(screen.queryByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).not.toBeInTheDocument();
     });
 
     it('changes text color when value is selected', () => {
-        const { container } = render(<Select {...defaultProps} />);
-        const selectContainer = container.firstChild as HTMLElement;
+        const { container, rerender } = render(<Select {...defaultProps} />);
         const span = container.querySelector('span');
 
         expect(span).toHaveClass('empty');
 
-        fireEvent.click(selectContainer);
-
-        const option = screen.getByText('Option 1');
-        fireEvent.click(option);
+        // Rerender with value prop
+        rerender(<Select {...defaultProps} value="option1" />);
 
         expect(span).toHaveClass('not-empty');
     });
 
     it('applies selected class to options when not in autocomplete mode', () => {
-        render(<Select {...defaultProps} isAutocomplete={false} />);
-        const selectContainer = screen.getByRole('toolbar');
+        const { container } = render(<Select {...defaultProps} value="option1" isAutocomplete={false} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
 
-        fireEvent.click(selectContainer);
-        fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
+        fireEvent.click(selectButton);
 
-        // Re-open to check the class
-        fireEvent.click(selectContainer);
+        const buttons = screen.getAllByRole('button', { name: 'Option 1' });
+        const selectedOption = buttons.find((btn) => !btn.classList.contains('select-head'));
 
-        const selectedOption = screen.getByRole('button', { name: 'Option 1' });
         expect(selectedOption).toHaveClass('select-options-selected');
     });
 
     it('does not apply selected class in autocomplete mode', () => {
-        render(<Select {...defaultProps} isAutocomplete={true} />);
-        const selectContainer = screen.getByRole('toolbar');
+        const { container } = render(<Select {...defaultProps} value="option1" isAutocomplete={true} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
 
-        fireEvent.click(selectContainer);
-        fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
+        fireEvent.click(selectButton);
 
-        // Re-open to check the class
-        fireEvent.click(selectContainer);
+        const buttons = screen.getAllByRole('button', { name: 'Option 1' });
+        const selectedOption = buttons.find((btn) => !btn.classList.contains('select-head'));
 
-        const selectedOption = screen.getByRole('button', { name: 'Option 1' });
         expect(selectedOption).not.toHaveClass('select-options-selected');
     });
 
     it('has correct default value for isAutocomplete prop', () => {
-        render(<Select {...defaultProps} />); // isAutocomplete defaults to false
-        const selectContainer = screen.getByRole('toolbar');
+        const { container } = render(<Select {...defaultProps} value="option1" />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
 
-        fireEvent.click(selectContainer);
-        fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
+        fireEvent.click(selectButton);
 
-        // Re-open to check the class
-        fireEvent.click(selectContainer);
+        const buttons = screen.getAllByRole('button', { name: 'Option 1' });
+        const selectedOption = buttons.find((btn) => !btn.classList.contains('select-head'));
 
-        const selectedOption = screen.getByRole('button', { name: 'Option 1' });
         expect(selectedOption).toHaveClass('select-options-selected');
     });
 
@@ -251,14 +255,18 @@ describe('Select Component', () => {
         const numericProps: SelectProps<number> = {
             children: [<Select.Option key="1" value={1} name="One" />, <Select.Option key="2" value={2} name="Two" />],
             onValueChange: mockOnValueChange,
+            value: 1,
         };
         const { container } = render(<Select {...numericProps} />);
-        const selectContainer = container.firstChild as HTMLElement;
-        fireEvent.click(selectContainer);
-        const option = screen.getByRole('button', { name: 'One' });
-        fireEvent.click(option);
-        expect(mockOnValueChange).toHaveBeenCalledWith(1);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
+
         expect(screen.getByText('One')).toBeInTheDocument();
+
+        fireEvent.click(selectButton);
+        const option = screen.getByRole('button', { name: 'Two' });
+        fireEvent.click(option);
+
+        expect(mockOnValueChange).toHaveBeenCalledWith(2);
     });
 
     it('handles boolean values', () => {
@@ -269,15 +277,18 @@ describe('Select Component', () => {
                 <Select.Option key="2" value={false} name="False" />,
             ],
             onValueChange: mockOnValueChange,
+            value: true,
         };
-        render(<Select {...booleanProps} />);
+        const { container } = render(<Select {...booleanProps} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
 
-        fireEvent.click(screen.getByRole('toolbar'));
-        fireEvent.click(screen.getByRole('button', { name: 'True' }));
-
-        expect(mockOnValueChange).toHaveBeenCalledWith(true);
         expect(screen.getByText('True')).toBeInTheDocument();
         expect(screen.queryByText('true')).not.toBeInTheDocument();
+
+        fireEvent.click(selectButton);
+        fireEvent.click(screen.getByRole('button', { name: 'False' }));
+
+        expect(mockOnValueChange).toHaveBeenCalledWith(false);
     });
 
     it('handles empty children array', () => {
@@ -287,9 +298,9 @@ describe('Select Component', () => {
         };
 
         const { container } = render(<Select {...emptyProps} />);
-        const selectContainer = container.firstChild as HTMLElement;
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
 
-        fireEvent.click(selectContainer);
+        fireEvent.click(selectButton);
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).toBeInTheDocument();
         expect(container.querySelector('.select-options')).toBeInTheDocument();
@@ -307,9 +318,9 @@ describe('Select Component', () => {
         };
 
         const { container } = render(<Select {...mixedProps} />);
-        const selectContainer = container.firstChild as HTMLElement;
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
 
-        fireEvent.click(selectContainer);
+        fireEvent.click(selectButton);
 
         expect(screen.getByText('Option 1')).toBeInTheDocument();
         expect(screen.getByText('Option 2')).toBeInTheDocument();
@@ -319,14 +330,15 @@ describe('Select Component', () => {
 
     it('handles option selection with multiple clicks', () => {
         const mockOnValueChange = jest.fn();
-        render(<Select {...defaultProps} onValueChange={mockOnValueChange} />);
+        const { container } = render(<Select {...defaultProps} onValueChange={mockOnValueChange} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
 
         // First selection
-        fireEvent.click(screen.getByRole('toolbar'));
+        fireEvent.click(selectButton);
         fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
 
         // Second selection
-        fireEvent.click(screen.getByRole('toolbar'));
+        fireEvent.click(selectButton);
         fireEvent.click(screen.getByRole('button', { name: 'Option 2' }));
 
         expect(mockOnValueChange).toHaveBeenCalledTimes(2);
@@ -336,24 +348,31 @@ describe('Select Component', () => {
 
     it('handles complete user interaction flow', () => {
         const mockOnValueChange = jest.fn();
-        render(<Select {...defaultProps} onValueChange={mockOnValueChange} />);
-        const selectContainer = screen.getByRole('toolbar');
+        const { container, rerender } = render(<Select {...defaultProps} onValueChange={mockOnValueChange} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
+        const selectContainer = container.firstChild as HTMLElement;
 
         expect(selectContainer).toHaveClass('select-closed');
         expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).toBeInTheDocument();
 
         // Open and select Option 1
-        fireEvent.click(selectContainer);
+        fireEvent.click(selectButton);
         expect(selectContainer).toHaveClass('select-opened');
         fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
         expect(mockOnValueChange).toHaveBeenCalledWith('option1');
-        expect(screen.getByText('Option 1')).toBeInTheDocument();
         expect(selectContainer).toHaveClass('select-closed');
 
+        // Rerender with new value
+        rerender(<Select {...defaultProps} value="option1" onValueChange={mockOnValueChange} />);
+        expect(screen.getByText('Option 1')).toBeInTheDocument();
+
         // Open and select Option 2
-        fireEvent.click(selectContainer);
+        fireEvent.click(selectButton);
         fireEvent.click(screen.getByRole('button', { name: 'Option 2' }));
         expect(mockOnValueChange).toHaveBeenCalledWith('option2');
+
+        // Rerender with new value
+        rerender(<Select {...defaultProps} value="option2" onValueChange={mockOnValueChange} />);
         expect(screen.getByText('Option 2')).toBeInTheDocument();
     });
 
@@ -367,13 +386,13 @@ describe('Select Component', () => {
 
     it('provides access to container element through ref', () => {
         const ref = React.createRef<HTMLDivElement>();
-        render(<Select {...defaultProps} selectContainerRef={ref} />);
+        const { container } = render(<Select {...defaultProps} selectContainerRef={ref} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
 
         expect(ref.current).toBeTruthy();
         expect(ref.current?.tagName).toBe('DIV');
 
-        // @ts-ignore
-        fireEvent.click(ref.current);
+        fireEvent.click(selectButton);
         expect(ref.current).toHaveClass('select-opened');
     });
 
@@ -395,5 +414,38 @@ describe('Select Component', () => {
         render(<Select {...defaultProps} value="nonexistent-option" onValueChange={mockOnValueChange} />);
 
         expect(screen.getByText(COMMON_TEXT_ADMIN.STATUS.DEFAULT)).toBeInTheDocument();
+    });
+
+    it('applies custom headClassName to select button', () => {
+        const { container } = render(<Select {...defaultProps} headClassName="custom-head" />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
+
+        expect(selectButton).toHaveClass('custom-head');
+    });
+
+    it('applies custom optionClassName to option buttons', () => {
+        const { container } = render(<Select {...defaultProps} optionClassName="custom-option" />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
+
+        fireEvent.click(selectButton);
+
+        const options = screen.getAllByRole('button');
+        const optionButtons = options.filter((btn) => btn !== selectButton);
+
+        optionButtons.forEach((option) => {
+            expect(option).toHaveClass('custom-option');
+        });
+    });
+
+    it('closes select automatically after option selection', () => {
+        const { container } = render(<Select {...defaultProps} />);
+        const selectButton = container.querySelector('.select-head') as HTMLElement;
+        const selectContainer = container.firstChild as HTMLElement;
+
+        fireEvent.click(selectButton);
+        expect(selectContainer).toHaveClass('select-opened');
+
+        fireEvent.click(screen.getByRole('button', { name: 'Option 1' }));
+        expect(selectContainer).toHaveClass('select-closed');
     });
 });

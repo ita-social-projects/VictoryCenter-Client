@@ -1,4 +1,4 @@
-import React, { RefObject, useState, useEffect } from 'react';
+import React, { RefObject, useState } from 'react';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ReactComponent as ArrowDown } from '../../../assets/icons/chevron-down.svg';
 import { ReactComponent as ArrowUp } from '../../../assets/icons/chevron-up.svg';
@@ -12,6 +12,8 @@ export type SelectProps<TValue> = {
     selectContainerRef?: RefObject<HTMLDivElement | null>;
     placeholder?: string;
     className?: string;
+    headClassName?: string;
+    optionClassName?: string;
     isAutocomplete?: boolean;
 };
 
@@ -21,6 +23,8 @@ export const Select = <TValue,>({
     value,
     selectContainerRef,
     className,
+    headClassName,
+    optionClassName,
     placeholder,
     isAutocomplete = false,
 }: SelectProps<TValue>) => {
@@ -29,61 +33,54 @@ export const Select = <TValue,>({
     }) as React.ReactElement<SelectOptionProps<TValue>>[];
 
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedValue, setSelectedValue] = useState<TValue | null>(null);
-    const [selectedName, setSelectedName] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (value !== undefined) {
-            const selectedOption = options.find((opt) => opt.props.value === value);
-            setSelectedValue(value);
-            setSelectedName(selectedOption ? selectedOption.props.name : null);
-        }
-    }, [value, options]);
+    const selectedOption = options.find((opt) => opt.props.value === value);
+    const hasValue = value !== null && value !== undefined;
+    const displayLabel =
+        hasValue && selectedOption ? selectedOption.props.name : (placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT);
 
     const handleOpenSelect = () => {
         setIsOpen(!isOpen);
     };
 
-    const handleSelect = (value: TValue, name: string) => {
-        setSelectedValue(value);
-        setSelectedName(name);
-        onValueChange(value);
+    const handleSelect = (newValue: TValue) => {
+        onValueChange(newValue);
         setIsOpen(false);
     };
 
-    const handleContainerClick = () => {
-        handleOpenSelect();
-    };
-
-    const handleOptionClick = (e: React.MouseEvent, value: TValue, name: string) => {
+    const handleOptionClick = (e: React.MouseEvent, val: TValue) => {
         e.stopPropagation();
-        handleSelect(value, name);
+        handleSelect(val);
     };
 
     return (
         <div
-            role={'toolbar'}
             ref={selectContainerRef}
-            onClick={handleContainerClick}
             className={classNames([styles['select']], className, {
                 [styles['select-opened']]: isOpen,
                 [styles['select-closed']]: !isOpen,
             })}
-            tabIndex={0}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    handleOpenSelect();
-                }
-            }}
         >
-            <span
-                className={classNames([styles['empty']], {
-                    [styles['not-empty']]: selectedValue !== null && selectedValue !== undefined,
-                })}
+            <button
+                type="button"
+                className={classNames('select-head', headClassName)}
+                onClick={handleOpenSelect}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleOpenSelect();
+                    }
+                }}
             >
-                {selectedName ?? placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT}
-            </span>
-            {isOpen ? <ArrowUp /> : <ArrowDown />}
+                <span
+                    className={classNames('empty', {
+                        'not-empty': hasValue,
+                    })}
+                >
+                    {displayLabel}
+                </span>
+                {isOpen ? <ArrowUp /> : <ArrowDown />}
+            </button>
             {isOpen && (
                 <div className={styles['select-options']}>
                     {options.map((opt, index) => {
@@ -91,10 +88,10 @@ export const Select = <TValue,>({
                         return (
                             <button
                                 key={`${name}-${index}`}
-                                className={classNames({
-                                    [styles['select-options-selected']]: !isAutocomplete && selectedValue === optValue,
+                                className={classNames(optionClassName, {
+                                    [styles['select-options-selected']]: !isAutocomplete && value === optValue,
                                 })}
-                                onClick={(e) => handleOptionClick(e, optValue, name)}
+                                onClick={(e) => handleOptionClick(e, optValue)}
                             >
                                 <span>{name}</span>
                             </button>

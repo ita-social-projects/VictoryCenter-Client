@@ -71,6 +71,7 @@ function createForeignFields(currency: 'USD' | 'EUR'): GenericFormField<ForeignB
             onlyNumbers: true,
             validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateUkrainianIban),
             isRequired: true,
+            placeholder: DONATE_TEXT.BANK_DETAILS.IBAN.PLACEHOLDER,
             maxLength: VALIDATION_PARAMS.ukrainianIban.maxLengthWithoutPrefix,
         },
         {

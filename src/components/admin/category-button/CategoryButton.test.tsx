@@ -183,7 +183,7 @@ describe('CategoryButton', () => {
             );
 
             const button = screen.getByRole('button');
-            expect(button).toHaveTextContent('');
+            expect(button.textContent).toBe('');
             expect(button).toBeInTheDocument();
         });
 

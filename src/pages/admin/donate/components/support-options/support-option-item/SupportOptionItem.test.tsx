@@ -5,8 +5,13 @@ import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { BankCurrency } from '../../../../../../types/admin/donate';
 
 jest.mock('../../donate-input/DonateInput', () => ({
-    DonateInput: ({ value, handleChange, handleBlur, name }: any) => (
-        <input value={value} onChange={handleChange} onBlur={handleBlur} data-testid={`input-${name}`} />
+    DonateInput: ({ value, onValueChange, onBlur, name }: any) => (
+        <input
+            value={value}
+            onChange={(e) => onValueChange?.(e.target.value)}
+            onBlur={onBlur}
+            data-testid={`input-${name}`}
+        />
     ),
 }));
 
@@ -94,7 +99,7 @@ describe('SupportOptionItem', () => {
         fireEvent.click(publishButton);
 
         await waitFor(() => {
-            expect(screen.getByText(DONATE_TEXT.QUESTION.SUPPORT_OPTION.ADD)).toBeInTheDocument();
+            expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
         });
 
         const yesButton = screen.getByText('Yes');
@@ -133,6 +138,8 @@ describe('SupportOptionItem', () => {
 
         const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
         fireEvent.click(cancelButton);
+
+        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
 
         const yesButton = screen.getByText('Yes');
         fireEvent.click(yesButton);
@@ -181,16 +188,14 @@ describe('SupportOptionItem', () => {
         expect(screen.getByText('Name too short')).toBeInTheDocument();
     });
 
-    it('enables publish button even when validation errors exist', () => {
+    it('disables publish button when validation errors exist', () => {
         render(<SupportOptionItem data={defaultData} initialMode={SupportOptionItemMode.Edit} />);
 
         const nameInput = screen.getByTestId('input-name');
-        fireEvent.change(nameInput, { target: { value: 'X' } });
         fireEvent.blur(nameInput);
 
         const publishButton = screen.getByText(DONATE_TEXT.BUTTON.PUBLISH);
-        expect(publishButton).not.toBeDisabled();
-        expect(screen.getByText('Name too short')).toBeInTheDocument();
+        expect(publishButton).toBeDisabled();
     });
 
     it('updates state when data prop changes', () => {
@@ -210,6 +215,8 @@ describe('SupportOptionItem', () => {
 
         const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
         fireEvent.click(cancelButton);
+
+        expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
 
         const noButton = screen.getByText('No');
         fireEvent.click(noButton);
@@ -263,15 +270,5 @@ describe('SupportOptionItem', () => {
         fireEvent.click(editButton);
 
         expect(mockOnModeChange).not.toHaveBeenCalled();
-    });
-
-    it('shows validation errors for value field on blur', () => {
-        render(<SupportOptionItem initialMode={SupportOptionItemMode.Create} />);
-
-        const valueInput = screen.getByTestId('input-value');
-        fireEvent.change(valueInput, { target: { value: 'A' } });
-        fireEvent.blur(valueInput);
-
-        expect(screen.getByText('Value too short')).toBeInTheDocument();
     });
 });

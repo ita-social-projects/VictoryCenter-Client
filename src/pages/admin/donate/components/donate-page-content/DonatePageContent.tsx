@@ -25,6 +25,7 @@ export const DonatePageContent = () => {
     const { items, config, setItems, isLoading } = useBankDetails(selectedCategory);
     const [supportOptions, setSupportOptions] = useState<SupportOptionsType[]>([]);
     const [isSupportOptionsLoading, setIsSupportOptionsLoading] = useState(false);
+    const [isChildEditing, setIsChildEditing] = useState(false);
 
     useEffect(() => {
         let isAlive = true;
@@ -249,6 +250,7 @@ export const DonatePageContent = () => {
                 onSubmit={(data) => handleCreateCorrespondentBank(formState.id, data)}
                 onUpdate={(id, data) => handleUpdateCorrespondentBank(formState.id, id, data)}
                 onDelete={(id) => handleDeleteCorrespondentBank(formState.id, id)}
+                onEditingStateChange={setIsChildEditing}
             />
         ),
         [
@@ -258,6 +260,7 @@ export const DonatePageContent = () => {
             handleCreateCorrespondentBank,
             handleUpdateCorrespondentBank,
             handleDeleteCorrespondentBank,
+            setIsChildEditing,
         ],
     );
 
@@ -284,6 +287,7 @@ export const DonatePageContent = () => {
                             onSubmit={handleCreateBankDetails}
                             onUpdate={handleUpdateBankDetails}
                             onDelete={handleDeleteBankDetails}
+                            isAddButtonDisabled={isChildEditing}
                         >
                             {config.withCorrespondentBanks ? renderCorrespondentBanks : () => null}
                         </GenericDetails>

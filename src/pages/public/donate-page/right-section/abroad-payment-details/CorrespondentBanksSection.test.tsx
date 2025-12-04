@@ -80,6 +80,18 @@ describe('CorrespondentBanksSection', () => {
             expectBankFields(['SWIFT: TEST123', 'Account: 123456789'], 2);
         });
 
+        it('renders correspondent banks without Account when not provided', () => {
+            const mockBanks = [createMockCorrespondentBank({ account: undefined })];
+            renderAndExpectBasics(mockBanks, 'Test Bank USD');
+            expectBankFields(['SWIFT: TEST123', 'IBAN: US29NWBK60161331926819'], 2);
+        });
+
+        it('renders correspondent banks with empty Account when provided but empty', () => {
+            const mockBanks = [createMockCorrespondentBank({ account: '' })];
+            render(<CorrespondentBanksSection correspondentBanks={mockBanks} />);
+            expect(screen.getByText('Кореспондентські банки')).toBeInTheDocument();
+            expectBankFields(['SWIFT: TEST123', 'IBAN: US29NWBK60161331926819'], 2);
+        });
         it('renders multiple correspondent banks', () => {
             const mockBanks = [
                 createMockCorrespondentBank({ name: 'Bank 1', swift: 'BANK1' }),
@@ -106,13 +118,13 @@ describe('CorrespondentBanksSection', () => {
                 createMockCorrespondentBank({
                     name: '',
                     swift: '',
-                    account: '',
+                    account: null as any,
                     foreignIban: null as any,
                 }),
             ];
 
             renderAndExpectBasics(mockBanks, '');
-            expectBankFields(['SWIFT:', 'Account:'], 2);
+            expectBankFields(['SWIFT:'], 1);
         });
 
         it('handles banks with null IBAN value', () => {
@@ -121,6 +133,18 @@ describe('CorrespondentBanksSection', () => {
             render(<CorrespondentBanksSection correspondentBanks={mockBanks} />);
             expect(screen.getByText('Кореспондентські банки')).toBeInTheDocument();
             expectBankFields(['SWIFT: TEST123', 'Account: 123456789'], 2);
+        });
+        it('handles banks with null Account value', () => {
+            const mockBanks = [createMockCorrespondentBank({ account: null as any })];
+            render(<CorrespondentBanksSection correspondentBanks={mockBanks} />);
+            expect(screen.getByText('Кореспондентські банки')).toBeInTheDocument();
+            expectBankFields(['SWIFT: TEST123', 'IBAN: US29NWBK60161331926819'], 2);
+        });
+        it('handles banks with both Account and IBAN as null', () => {
+            const mockBanks = [createMockCorrespondentBank({ account: null as any, foreignIban: null as any })];
+            render(<CorrespondentBanksSection correspondentBanks={mockBanks} />);
+            expect(screen.getByText('Кореспондентські банки')).toBeInTheDocument();
+            expectBankFields(['SWIFT: TEST123'], 1);
         });
     });
 

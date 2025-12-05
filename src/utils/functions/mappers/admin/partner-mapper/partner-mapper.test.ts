@@ -4,7 +4,12 @@ import {
     mapBannerDtoToBanner,
     mapPartnerPageDataDtoToPageData,
 } from './partner-mapper';
-import { PartnerBannerDto, PartnerDto, PartnersPageDataDto, PartnersSectionDto } from '../../../../../services/api/admin/partners/partners-api';
+import {
+    PartnerBannerDto,
+    PartnerDto,
+    PartnersPageDataDto,
+    PartnersSectionDto,
+} from '../../../../../services/api/admin/partners/partners-api';
 import { Image } from '../../../../../types/common/image';
 
 describe('partner-mapper', () => {
@@ -316,4 +321,3 @@ describe('partner-mapper', () => {
         });
     });
 });
-

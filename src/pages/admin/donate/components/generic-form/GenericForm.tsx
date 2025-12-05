@@ -26,6 +26,7 @@ export interface GenericFormProps<T extends FieldValues> {
     onClose: () => void;
     onDelete?: (id: number) => void;
     isChildForm?: boolean;
+    isDisabled?: boolean;
     children?: (form: { formState: T; isItemsExpanded: boolean }) => React.ReactNode;
     onModeChange?: (mode: GenericFormMode) => void;
 }
@@ -62,6 +63,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 onSubmit,
                 onDelete,
                 isChildForm = false,
+                isDisabled = false,
                 children,
                 onModeChange,
             },
@@ -288,7 +290,8 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 isSubmitting ||
                 hasEmptyRequiredFields ||
                 !isChanged() ||
-                Object.values(errors).some((e) => e !== undefined);
+                Object.values(errors).some((e) => e !== undefined) ||
+                isDisabled;
 
             return (
                 <div

@@ -1,11 +1,16 @@
-import { PartnerBannerDto, PartnerDto, PartnersPageDataDto, PartnersSectionDto } from "../../../../../services/api/admin/partners/partners-api";
-import { PartnerBanner, PartnersPageData, Partner, PartnerSection } from "../../../../../types/admin/partners";
+import {
+    PartnerBannerDto,
+    PartnerDto,
+    PartnersPageDataDto,
+    PartnersSectionDto,
+} from '../../../../../services/api/admin/partners/partners-api';
+import { PartnerBanner, PartnersPageData, Partner, PartnerSection } from '../../../../../types/admin/partners';
 
 export const mapPartnerDtoToPartner = (dto: PartnerDto): Partner => ({
     id: dto.id,
     description: dto.description,
     image: dto.image,
-    imageId: dto.image?.id || null,
+    imageId: dto.image?.id ?? null,
 });
 
 export const mapSectionDtoToSection = (dto: PartnersSectionDto): PartnerSection => ({
@@ -19,7 +24,7 @@ export const mapBannerDtoToBanner = (dto: PartnerBannerDto): PartnerBanner => ({
     title: dto.title,
     description: dto.description,
     image: dto.image,
-    imageId: dto.image?.id || null,
+    imageId: dto.image?.id ?? null,
 });
 
 export const mapPartnerPageDataDtoToPageData = (dto: PartnersPageDataDto): PartnersPageData => ({

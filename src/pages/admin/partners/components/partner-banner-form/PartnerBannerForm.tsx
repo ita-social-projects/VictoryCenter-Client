@@ -141,7 +141,7 @@ export const PartnerBanner = () => {
 
     if (isLoadingData) {
         return (
-            <div className="partner-banner__loader">
+            <div className="partner-banner-form__loader">
                 <InlineLoader size={2} />
             </div>
         );
@@ -149,7 +149,7 @@ export const PartnerBanner = () => {
 
     if (fetchError || !values) {
         return (
-            <div className="partner-banner__error">
+            <div className="partner-banner-form__error">
                 <p>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER}</p>
                 <Button onClick={refetchBanner} buttonStyle="primary">
                     {PARTNERS_TEXT.BUTTON.TRY_AGAIN}
@@ -213,7 +213,7 @@ export const PartnerBanner = () => {
                                 name="title"
                                 id="title"
                                 maxLength={PARTNER_BANNER_VALIDATION.title.max}
-                                disabled={true}
+                                disabled={isDisabled}
                                 isRequired={true}
                             />
 

@@ -5,14 +5,17 @@ import {
     PartnerBannerUpdateRequest,
     PartnersSectionCreateRequest,
     PartnerSection,
-    Partner,
     PartnerBanner,
     PartnersPageData,
     PartnersSectionUpdateRequest,
 } from '../../../../types/admin/partners';
 import { RequestOptions } from '../../../../types/common/api';
 import { Image } from '../../../../types/common/image';
-import { mapBannerDtoToBanner, mapPartnerPageDataDtoToPageData, mapSectionDtoToSection } from '../../../../utils/functions/mappers/admin/partner-mapper/partner-mapper';
+import {
+    mapBannerDtoToBanner,
+    mapPartnerPageDataDtoToPageData,
+    mapSectionDtoToSection,
+} from '../../../../utils/functions/mappers/admin/partner-mapper/partner-mapper';
 
 // DTO Payloads (Internal Request Body Types)
 interface CreatePartnerDto {

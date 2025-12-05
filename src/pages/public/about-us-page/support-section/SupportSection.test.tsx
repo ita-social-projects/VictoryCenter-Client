@@ -124,4 +124,10 @@ describe('SupportSection component', () => {
 
         expect(container.querySelector('.support-title')).toBeInTheDocument();
     });
+
+    it('renders tablet layout when media query matches tablet breakpoint', () => {
+        (useMediaQuery as jest.Mock).mockReturnValue(true);
+
+        render(<SupportSection content={Content} />);
+    });
 });

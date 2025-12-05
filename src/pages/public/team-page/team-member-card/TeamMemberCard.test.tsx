@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemberCard } from '../../../../types/public/team-page';
 import { TeamMemberCard } from './TeamMemberCard';
 
@@ -47,5 +47,17 @@ describe('TeamMemberCard component', () => {
         render(<TeamMemberCard member={memberWithoutPhoto} />);
 
         expect(screen.getByTestId('default-member-icon')).toBeInTheDocument();
+    });
+
+    it('renders default icon when image fails to load', () => {
+        render(<TeamMemberCard member={mockMember} />);
+
+        const imgElement = screen.getByAltText(mockMember.name);
+        expect(imgElement).toBeInTheDocument();
+
+        fireEvent.error(imgElement);
+
+        expect(screen.getByTestId('default-member-icon')).toBeInTheDocument();
+        expect(screen.queryByAltText(mockMember.name)).not.toBeInTheDocument();
     });
 });

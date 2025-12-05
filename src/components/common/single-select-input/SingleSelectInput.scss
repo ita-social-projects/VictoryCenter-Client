@@ -4,15 +4,15 @@
 .singleselect {
     width: 100%;
     position: relative;
-    border: 1px solid colors.$blue-500;
+    border: 1px solid colors.$grey-700;
     border-radius: 8px;
-    box-shadow: 0 1px 2px 0 rgba(10, 13, 18, 0.05);
+    box-shadow: 0 1px 2px 0 rgba(colors.$blue-900, 0.05);
     background-color: white;
     cursor: pointer;
     transition: border-color 0.2s;
 
     &-selected {
-        border-color: colors.$grey-700;
+        border-color: colors.$blue-500;
     }
 
     .select-input {
@@ -28,6 +28,10 @@
         border: none;
         border-radius: 8px;
         cursor: pointer;
+
+        &:hover {
+            background-color: colors.$blue-50;
+        }
 
         &-disabled {
             background: colors.$grey-600;
@@ -58,14 +62,14 @@
             border: none;
             background: white;
 
-            &:hover,
-            &:focus {
-                background-color: white;
+            &:hover {
+                background-color: colors.$blue-50;
                 outline: none;
             }
 
-            &-selected {
-                background-color: colors.$blue-50;
+            &-selected,
+            &-selected:hover {
+                background-color: colors.$blue-100;
             }
         }
     }
@@ -79,6 +83,7 @@
 
         &-placeholder {
             color: colors.$grey-700;
+            min-height: 1.5rem;
         }
     }
 

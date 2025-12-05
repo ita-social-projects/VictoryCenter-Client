@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { DeleteCategoryModal } from './DeleteCategoryModal';
 import { ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
 import { InputLabelProps } from '../../../../../components/admin/input-label/InputLabel';
-import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
+import { PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import { ProgramCategory } from '../../../../../types/admin/programs';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
@@ -80,11 +80,11 @@ describe('DeleteCategoryModal', () => {
         render(<DeleteCategoryModal {...defaultProps} {...overrideProps} />);
 
     const getModal = () => screen.queryByTestId('modal');
-    const getTitle = () => screen.queryByText(PROGRAM_CATEGORY_TEXT.FORM.TITLE.DELETE_CATEGORY);
+    const getTitle = () => screen.queryByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.DELETE_CATEGORY);
     const getCancelButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
     const getDeleteButton = () => screen.getByText(COMMON_TEXT_ADMIN.BUTTON.DELETE);
     const getHintBox = () => screen.queryByTestId('hint-box');
-    const getErrorMessage = () => screen.queryByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
+    const getErrorMessage = () => screen.queryByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
     const getHasProgramsError = (programsCount: number) =>
         screen.queryByText(PROGRAM_CATEGORY_VALIDATION.programsCount.getHasProgramsCountError(programsCount));
 
@@ -172,7 +172,9 @@ describe('DeleteCategoryModal', () => {
 
         clickDeleteButton();
 
-        expect(await screen.findByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY)).toBeInTheDocument();
+        expect(
+            await screen.findByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY),
+        ).toBeInTheDocument();
         expectCategoryNotDeleted();
         expectModalNotClosed();
     });
@@ -230,7 +232,7 @@ describe('DeleteCategoryModal', () => {
         const { rerender } = renderDeleteCategoryModal();
 
         clickDeleteButton();
-        await screen.findByText(PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
+        await screen.findByText(COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_DELETE_CATEGORY);
 
         rerender(<DeleteCategoryModal {...defaultProps} isOpen={false} />);
         rerender(<DeleteCategoryModal {...defaultProps} isOpen={true} />);

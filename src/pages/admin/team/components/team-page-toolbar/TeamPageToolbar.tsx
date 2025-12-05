@@ -6,7 +6,8 @@ import { StatusFilterDropdown } from '../../../../../components/admin/status-fil
 import { Button } from '../../../../../components/admin/button/Button';
 import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
 import './TeamPageToolbar.scss';
-import { TeamCategory, TeamMember } from '../../../../../types/admin/team-members';
+import { TeamMember } from '../../../../../types/admin/team-members';
+import { TeamCategory } from '../../../../../types/admin/team-category';
 import { TeamMemberSearchItem } from '../../../../../components/admin/search-bar/team-member-search-item/TeamMemberSearchItem';
 import { forwardRef, useMemo } from 'react';
 import {
@@ -18,6 +19,7 @@ export interface TeamPageToolbarProps {
     onSearchQueryChange: (query: string) => void;
     onStatusFilterChange: (status: VisibilityStatus | undefined) => void;
     onAddMember: () => void;
+    statusFilter: VisibilityStatus | undefined;
     searchItems: TeamMember[];
     isSearchLoading: boolean;
     searchHasMore: boolean;
@@ -41,6 +43,7 @@ export const TeamPageToolbar = ({
     onStatusFilterChange,
     onAddMember,
     searchItems,
+    statusFilter,
     isSearchLoading,
     searchHasMore,
     onSearchLoadMore,
@@ -71,7 +74,7 @@ export const TeamPageToolbar = ({
                 />
             </div>
             <div className="toolbar-actions">
-                <StatusFilterDropdown onStatusFilterChange={onStatusFilterChange} />
+                <StatusFilterDropdown value={statusFilter} onStatusFilterChange={onStatusFilterChange} />
                 <Button onClick={onAddMember} buttonStyle="primary">
                     {TEAM_MEMBERS_TEXT.BUTTON.ADD_MEMBER}
                     <PlusIcon />

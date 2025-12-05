@@ -93,7 +93,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
         async (item: T, updated: T, index?: number) => {
             if (isParentCreating && onLocalUpdate && index != null) {
                 onLocalUpdate(index, updated);
-            } else if (onUpdate && item.id) {
+            } else if (onUpdate && item.id != null) {
                 await onUpdate(item.id, updated);
             }
         },

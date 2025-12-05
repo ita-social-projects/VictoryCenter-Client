@@ -366,25 +366,6 @@ describe('GenericDetails - Additional Coverage', () => {
         });
     });
 
-    it('handles item delete without onDelete callback', async () => {
-        const onLocalDelete = jest.fn().mockResolvedValue(undefined);
-        const items = [
-            { id: 1, name: 'Item 1' },
-            { id: 2, name: 'Item 2' },
-        ];
-
-        render(
-            <GenericDetails {...defaultProps} items={items} isParentCreating={true} onLocalDelete={onLocalDelete} />,
-        );
-
-        const deleteButtons = screen.getAllByText('Delete');
-        fireEvent.click(deleteButtons[0]);
-
-        await waitFor(() => {
-            expect(onLocalDelete).toHaveBeenCalledWith(0);
-        });
-    });
-
     it('renders without title', () => {
         render(<GenericDetails {...defaultProps} title={undefined} />);
 

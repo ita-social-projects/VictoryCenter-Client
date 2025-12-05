@@ -117,6 +117,17 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 [formState],
             );
 
+            const getIsFieldRequired = useCallback(
+                (f: GenericFormField<T>) => {
+                    return (
+                        (mode === GenericFormMode.Create && f.isRequired) ||
+                        (isChildForm && mode === GenericFormMode.View && f.isRequired) ||
+                        (isChildForm && mode === GenericFormMode.Edit && f.isRequired)
+                    );
+                },
+                [mode, isChildForm],
+            );
+
             const submit = useCallback(async () => {
                 if (isSubmitting || !onSubmit) return;
                 setIsSubmitting(true);
@@ -370,7 +381,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                 <DonateInput
                                                     name={String(f.name)}
                                                     label={f.label}
-                                                    isRequired={mode === GenericFormMode.Create && f.isRequired}
+                                                    isRequired={getIsFieldRequired(f)}
                                                     isTitle={f.isTitle}
                                                     placeholder={f.placeholder}
                                                     prefix={f.prefix}

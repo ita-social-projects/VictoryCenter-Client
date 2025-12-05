@@ -10,17 +10,6 @@ export type TeamMember = {
     categoryId: number;
 };
 
-export interface TeamMemberDto {
-    id: number;
-    fullName: string;
-    categoryId: number;
-    priority: number;
-    status: number;
-    description: string;
-    image: Image;
-    email: string;
-}
-
 export interface TeamMemberCreateUpdateRequest {
     id: number | null;
     fullName: string;
@@ -29,16 +18,4 @@ export interface TeamMemberCreateUpdateRequest {
     categoryId: number | null;
     status: VisibilityStatus;
     imageId: number | null;
-}
-
-export type TeamCategory = {
-    id: number;
-    name: string;
-    description: string;
-};
-
-export interface TeamCategoryDto {
-    id: number;
-    name: string;
-    description: string;
 }

@@ -6,13 +6,14 @@
     justify-content: center;
     gap: 0.5rem;
     padding: 0.625rem;
-    border: 1px solid colors.$blue-500;
+    border: 1px solid colors.$grey-700;
     border-radius: 8px;
-    box-shadow: 0 1px 2px 0 rgba(colors.$blue-900, 0.051);
+    box-shadow: 0 1px 2px 0 rgba(colors.$blue-900, 0.05);
     font-size: 16px;
+    background-color: white;
 
     &--focused {
-        border-color: colors.$grey-700;
+        border-color: colors.$blue-500;
     }
 
     &--disabled {

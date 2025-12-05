@@ -134,8 +134,8 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
             } catch {
                 const errorMessage =
                     mode === 'add'
-                        ? PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY
-                        : PROGRAM_CATEGORY_TEXT.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY;
+                        ? COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_CREATE_CATEGORY
+                        : COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.FAIL_TO_UPDATE_CATEGORY;
                 setError(errorMessage);
             } finally {
                 setIsSubmitting(false);
@@ -229,8 +229,8 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
 
     const getTitle = () => {
         return mode === 'add'
-            ? PROGRAM_CATEGORY_TEXT.FORM.TITLE.ADD_CATEGORY
-            : PROGRAM_CATEGORY_TEXT.FORM.TITLE.EDIT_CATEGORY;
+            ? COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.ADD_CATEGORY
+            : COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.EDIT_CATEGORY;
     };
 
     const getFormId = () => {
@@ -322,8 +322,6 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
             <ConfirmationModal
                 isOpen={showSaveConfirmModal}
                 title={COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                 onClose={handleSaveConfirmClose}
                 onCancel={handleSaveConfirmCancel}
                 onConfirm={onSubmit}
@@ -333,8 +331,6 @@ export const ProgramCategoryModal = (props: ProgramCategoryModalProps) => {
             <ConfirmationModal
                 isOpen={showCloseConfirmModal}
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}
-                confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                 onClose={handleCloseConfirmClose}
                 onCancel={handleCloseConfirmCancel}
                 onConfirm={handleConfirmClose}

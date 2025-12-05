@@ -1,4 +1,4 @@
-import { TeamCategory } from '../admin/team-members';
+import { TeamCategory } from '../admin/team-category';
 import { Image } from '../common/image';
 
 export interface MemberCard {

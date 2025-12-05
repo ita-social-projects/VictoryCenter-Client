@@ -1,14 +1,24 @@
+const customJestConfig = require('./jest.config.js');
+
 module.exports = {
     jest: {
-        configure: (jestConfig) => {
-            const newTransform = {
-                '\\.svg$': '<rootDir>/src/jest/svgTransformer.js',
-                ...jestConfig.transform,
+        configure: (defaultJestConfig) => {
+            const mergedConfig = {
+                ...defaultJestConfig,
+                ...customJestConfig,
+
+                moduleNameMapper: {
+                    ...defaultJestConfig.moduleNameMapper,
+                    ...customJestConfig.moduleNameMapper,
+                },
             };
 
-            jestConfig.transform = newTransform;
+            mergedConfig.transform = {
+                '\\.svg$': '<rootDir>/src/jest/svgTransformer.js',
+                ...mergedConfig.transform,
+            };
 
-            return jestConfig;
+            return mergedConfig;
         },
     },
 };

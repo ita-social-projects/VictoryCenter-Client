@@ -1,0 +1,58 @@
+@use '../../../../../../assets/sass/variables/colors.scss';
+
+.support-options {
+    &-container {
+        height: 100%;
+    }
+
+    &-form {
+        display: flex;
+        flex-direction: column;
+        background: colors.$grey-50;
+        border-radius: 0.5rem;
+        border: 1px solid colors.$grey-700;
+        width: 100%;
+        height: fit-content;
+        gap: 1.875rem;
+        padding: 2.5rem 1.875rem;
+
+        &.not-found {
+            border: none;
+            height: 100%;
+
+            .plus-icon {
+                path {
+                    stroke: colors.$blue-500;
+                }
+            }
+        }
+
+        &.title {
+            padding: 0;
+            border: 0;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .btn-add {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+
+            &.new {
+                height: 2.5rem;
+            }
+
+            &:disabled {
+                background-color: colors.$grey-700;
+            }
+        }
+    }
+
+    &-loader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+    }
+}

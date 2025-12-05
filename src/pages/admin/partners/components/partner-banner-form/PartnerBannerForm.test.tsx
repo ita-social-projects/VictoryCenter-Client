@@ -353,9 +353,9 @@ describe('PartnerBanner', () => {
         });
     });
 
-    it('renders title input as disabled', () => {
+    it('renders title input as enabled', () => {
         render(<PartnerBanner />);
-        expect(getTitleInput()).toBeDisabled();
+        expect(getTitleInput()).toBeEnabled();
     });
 
     it('shows toast for fetch error', () => {

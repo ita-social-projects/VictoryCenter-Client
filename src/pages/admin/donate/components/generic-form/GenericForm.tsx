@@ -24,7 +24,8 @@ export interface GenericFormProps<T extends FieldValues> {
     initialMode: GenericFormMode;
     onSubmit: (data: T) => void;
     onClose: () => void;
-    onDelete?: (id: number) => void;
+    onDelete?: (id: number | null, index?: number) => void;
+    itemIndex?: number;
     isChildForm?: boolean;
     children?: (form: {
         formState: T;
@@ -66,6 +67,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 onClose,
                 onSubmit,
                 onDelete,
+                itemIndex,
                 isChildForm = false,
                 children,
                 isParentCreating = false,
@@ -265,23 +267,18 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
             };
 
             const handleDelete = async () => {
-                if (isChildForm && isParentCreating) {
-                    if (onDelete) {
-                        await onDelete(initialData?.id!);
-                    }
-                    onClose?.();
-                    handleModalCancelOrClose();
+                if (!onDelete) {
                     return;
                 }
-
-                if (!initialData?.id || !onDelete) {
-                    return;
-                }
-
                 try {
-                    await onDelete(initialData.id);
-                    onClose?.();
+                    const id = initialData?.id ?? null;
+                    if (itemIndex !== undefined) {
+                        await onDelete(id, itemIndex);
+                    } else if (id !== null) {
+                        await onDelete(id);
+                    }
                 } finally {
+                    onClose?.();
                     handleModalCancelOrClose();
                 }
             };
@@ -306,7 +303,6 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
             const handlePublishClick = () => {
                 if (isCorrespondentInParentCreation) {
                     submit();
-                    return;
                 } else if (mode === GenericFormMode.Edit) {
                     setModalConfig({
                         title: DONATE_TEXT.QUESTION.BANK_DETAILS.UPDATE,
@@ -491,7 +487,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
                     {!isChildForm && (
                         <>
-                            {children && children({ formState, isItemsExpanded, setFormState })}
+                            {children?.({ formState, isItemsExpanded, setFormState })}
                             {mode === GenericFormMode.Create && <div className="divider">{renderFormButtons()}</div>}
                         </>
                     )}

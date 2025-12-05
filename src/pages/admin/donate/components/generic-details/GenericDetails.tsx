@@ -32,8 +32,8 @@ export interface GenericDetailsProps<T extends FieldValues> {
     onUpdate?: (id: number, data: T) => Promise<void>;
     onDelete?: (id: number) => Promise<void>;
     onLocalSubmit?: (data: T) => void;
-    onLocalUpdate?: (id: number, data: T) => void;
-    onLocalDelete?: (id: number) => void;
+    onLocalUpdate?: (index: number, data: T) => void;
+    onLocalDelete?: (index: number) => void;
 }
 
 export function GenericDetails<T extends { id: number } & FieldValues>({
@@ -81,13 +81,9 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
             if (isParentCreating && isChildForm && onLocalSubmit) {
                 onLocalSubmit(data);
                 setIsAddFormVisible(false);
-                return;
-            }
-
-            if (onSubmit) {
+            } else if (onSubmit) {
                 await onSubmit(data);
                 setIsAddFormVisible(false);
-                return;
             }
         },
         [isParentCreating, isChildForm, onLocalSubmit, onSubmit],
@@ -97,27 +93,19 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
         async (item: T, updated: T, index?: number) => {
             if (isParentCreating && onLocalUpdate && index != null) {
                 onLocalUpdate(index, updated);
-                return;
-            }
-
-            if (onUpdate && item.id) {
+            } else if (onUpdate && item.id) {
                 await onUpdate(item.id, updated);
-                return;
             }
         },
         [isParentCreating, onUpdate, onLocalUpdate],
     );
 
     const handleItemDelete = useCallback(
-        async (id: number, index?: number) => {
-            if (isParentCreating && onLocalDelete && index != null) {
+        async (id: number | null, index?: number) => {
+            if (isParentCreating && onLocalDelete && index !== undefined) {
                 onLocalDelete(index);
-                return;
-            }
-
-            if (onDelete && id) {
+            } else if (onDelete && id !== null) {
                 await onDelete(id);
-                return;
             }
         },
         [isParentCreating, onDelete, onLocalDelete],
@@ -173,7 +161,8 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                                         initialMode={GenericFormMode.View}
                                         onSubmit={(updated) => handleItemUpdate(item, updated, index)}
                                         onClose={handleClose}
-                                        onDelete={() => handleItemDelete(item.id, index)}
+                                        onDelete={(id, index) => handleItemDelete(id, index)}
+                                        itemIndex={index}
                                         isChildForm={isChildForm}
                                         isParentCreating={isParentCreating}
                                         onModeChange={(mode: GenericFormMode) => handleItemModeChange(item.id, mode)}

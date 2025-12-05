@@ -8,7 +8,7 @@ interface Item {
     name: string;
 }
 
-const MockForm = forwardRef<GenericFormRef, any>(({ onSubmit, onClose, initialData, onDelete }, ref) => {
+const MockForm = forwardRef<GenericFormRef, any>(({ onSubmit, onClose, initialData, onDelete, itemIndex }, ref) => {
     useImperativeHandle(ref, () => ({
         submit: async () => {},
         isChanged: () => false,
@@ -26,13 +26,13 @@ const MockForm = forwardRef<GenericFormRef, any>(({ onSubmit, onClose, initialDa
                 Submit
             </button>
             <button onClick={onClose}>Close</button>
-            <button onClick={() => onDelete?.(initialData?.id || 1)}>Delete</button>
+            <button onClick={() => onDelete?.(initialData?.id ?? null, itemIndex)}>Delete</button>
         </div>
     );
 });
 
 const MockFormWithModeChange = forwardRef<GenericFormRef, any>((props, ref) => {
-    const { onModeChange, initialData, onSubmit, onClose, onDelete } = props;
+    const { onModeChange, initialData, onSubmit, onClose, onDelete, itemIndex } = props;
 
     const submit = async () => {};
     const isChanged = () => false;
@@ -45,14 +45,16 @@ const MockFormWithModeChange = forwardRef<GenericFormRef, any>((props, ref) => {
     }));
 
     const handleEdit = () => onModeChange?.(GenericFormMode.Edit);
+    const handleView = () => onModeChange?.(GenericFormMode.View);
     const handleCreate = () => onModeChange?.(GenericFormMode.Create);
     const handleSubmit = () => onSubmit({ ...initialData });
-    const handleDelete = () => onDelete?.(initialData?.id);
+    const handleDelete = () => onDelete?.(initialData?.id ?? null, itemIndex);
 
     return (
         <div data-testid={`mock-form-${initialData?.id}`}>
             <p>{initialData?.name}</p>
             <button onClick={handleEdit}>Edit {initialData?.name}</button>
+            <button onClick={handleView}>View {initialData?.name}</button>
             <button onClick={handleCreate}>Create</button>
             <button onClick={handleSubmit}>Submit</button>
             <button onClick={onClose}>Close</button>
@@ -420,85 +422,6 @@ describe('GenericDetails - Additional Coverage', () => {
         await waitFor(() => {
             expect(onLocalDelete).toHaveBeenCalledWith(0);
         });
-    });
-
-    it('sets editingItemId when mode changes to Edit', () => {
-        const MockFormWithModeChange = forwardRef<GenericFormRef, any>(
-            ({ onModeChange, initialData, onSubmit, onClose, onDelete }, ref) => {
-                useImperativeHandle(ref, () => ({
-                    submit: async () => {},
-                    isChanged: () => false,
-                    isValid: () => true,
-                }));
-
-                return (
-                    <div data-testid={`mock-form-${initialData?.id}`}>
-                        <p>{initialData?.name}</p>
-                        <button onClick={() => onModeChange?.(GenericFormMode.Edit)}>Enter Edit Mode</button>
-                        <button onClick={() => onModeChange?.(GenericFormMode.View)}>Enter View Mode</button>
-                        <button onClick={() => onSubmit({ ...initialData })}>Submit</button>
-                        <button onClick={onClose}>Close</button>
-                        <button onClick={() => onDelete?.(initialData?.id)}>Delete</button>
-                    </div>
-                );
-            },
-        );
-
-        render(
-            <GenericDetails
-                {...defaultProps}
-                items={[
-                    { id: 1, name: 'Item 1' },
-                    { id: 2, name: 'Item 2' },
-                ]}
-                FormComponent={MockFormWithModeChange}
-            />,
-        );
-
-        const editButtons = screen.getAllByText('Enter Edit Mode');
-        fireEvent.click(editButtons[0]);
-
-        const addButton = screen.getByText('Add New').closest('button');
-        expect(addButton).toBeDisabled();
-        expect(addButton).toHaveClass('disabled');
-    });
-
-    it('clears editingItemId when mode changes from Edit to View', () => {
-        const MockFormWithModeChange = forwardRef<GenericFormRef, any>(
-            ({ onModeChange, initialData, onSubmit, onClose, onDelete }, ref) => {
-                useImperativeHandle(ref, () => ({
-                    submit: async () => {},
-                    isChanged: () => false,
-                    isValid: () => true,
-                }));
-
-                return (
-                    <div data-testid={`mock-form-${initialData?.id}`}>
-                        <p>{initialData?.name}</p>
-                        <button onClick={() => onModeChange?.(GenericFormMode.Edit)}>Enter Edit Mode</button>
-                        <button onClick={() => onModeChange?.(GenericFormMode.View)}>Enter View Mode</button>
-                        <button onClick={() => onSubmit({ ...initialData })}>Submit</button>
-                        <button onClick={onClose}>Close</button>
-                        <button onClick={() => onDelete?.(initialData?.id)}>Delete</button>
-                    </div>
-                );
-            },
-        );
-
-        render(<GenericDetails {...defaultProps} FormComponent={MockFormWithModeChange} />);
-
-        const editButton = screen.getByText('Enter Edit Mode');
-        fireEvent.click(editButton);
-
-        let addButton = screen.getByText('Add New').closest('button');
-        expect(addButton).toBeDisabled();
-
-        const viewButton = screen.getByText('Enter View Mode');
-        fireEvent.click(viewButton);
-
-        addButton = screen.getByText('Add New').closest('button');
-        expect(addButton).not.toBeDisabled();
-        expect(addButton).not.toHaveClass('disabled');
     });
 
     it('disables add button when any item is in edit mode', () => {

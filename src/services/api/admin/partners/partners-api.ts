@@ -12,6 +12,7 @@ import {
 } from '../../../../types/admin/partners';
 import { RequestOptions } from '../../../../types/common/api';
 import { Image } from '../../../../types/common/image';
+import { mapBannerDtoToBanner, mapPartnerPageDataDtoToPageData, mapSectionDtoToSection } from '../../../../utils/functions/mappers/admin/partner-mapper/partner-mapper';
 
 // DTO Payloads (Internal Request Body Types)
 interface CreatePartnerDto {
@@ -70,33 +71,6 @@ export interface PartnersPageDataDto {
     banner: PartnerBannerDto;
     sections: PartnersSectionDto[];
 }
-
-// DTO to Domain Mappers
-const mapPartnerDtoToPartner = (dto: PartnerDto): Partner => ({
-    id: dto.id,
-    description: dto.description,
-    image: dto.image,
-    imageId: dto.image?.id || null,
-});
-
-const mapSectionDtoToSection = (dto: PartnersSectionDto): PartnerSection => ({
-    id: dto.id,
-    title: dto.title,
-    description: dto.description,
-    partners: dto.partners.map(mapPartnerDtoToPartner),
-});
-
-const mapBannerDtoToBanner = (dto: PartnerBannerDto): PartnerBanner => ({
-    title: dto.title,
-    description: dto.description,
-    image: dto.image,
-    imageId: dto.image?.id || null,
-});
-
-const mapPartnerPageDataDtoToPageData = (dto: PartnersPageDataDto): PartnersPageData => ({
-    banner: mapBannerDtoToBanner(dto.banner),
-    sections: dto.sections.map(mapSectionDtoToSection),
-});
 
 // Api Service
 export const PartnersApi = {

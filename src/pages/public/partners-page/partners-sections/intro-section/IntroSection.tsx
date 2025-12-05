@@ -8,8 +8,6 @@ export interface IntroSectionProps {
 }
 
 export const IntroSection = ({ banner }: IntroSectionProps) => {
-    // TODO: Replace with real title when rich text component is implemented
-    //const title = banner?.title || '';
     const description = banner?.description || '';
     const imageUrl = banner?.image?.url || background;
 

@@ -111,8 +111,6 @@ describe('PartnerBanner', () => {
     const getRemoveImageButton = () => screen.getByRole('button', { name: 'Remove image' });
     const getPublishButton = () => screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
 
-    // Helper functions for actions
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const changeTitleValue = (value: string) => {
         fireEvent.change(getTitleInput(), { target: { value } });
     };
@@ -187,23 +185,13 @@ describe('PartnerBanner', () => {
         expect(refetchMock).toHaveBeenCalledTimes(1);
     });
 
-    //TODO: Uncomment lines when rich text component is implemented
     it('renders banner form with fetched data and validates field updates', async () => {
         render(<PartnerBanner />);
 
-        //const titleInput = getTitleInput();
         const descriptionInput = getDescriptionInput();
 
-        //expect(titleInput).toHaveValue(defaultBannerData.title);
         expect(descriptionInput).toHaveValue(defaultBannerData.description);
         expect(getImageContainer()).toBeInTheDocument();
-
-        //   changeTitleValue('Updated Title');
-        //   expect(mockValidateTitle).toHaveBeenCalledWith('Updated Title');
-
-        //   await waitFor(() => {
-        //       expect(titleInput).toHaveValue('Updated Title');
-        //   });
 
         changeDescriptionValue('Updated Description');
         expect(mockValidateDescription).toHaveBeenCalledWith('Updated Description');
@@ -256,25 +244,21 @@ describe('PartnerBanner', () => {
         });
     });
 
-    //TODO: Uncomment lines when rich text component is implemented
     it('publishes banner successfully and shows success toast', async () => {
         const updatedBanner = {
             ...defaultBannerData,
-            //title: 'Published Title',
             description: 'Published Description',
         };
         mockedPartnersApi.updateBanner.mockResolvedValue(updatedBanner);
 
         render(<PartnerBanner />);
 
-        //changeTitleValue(updatedBanner.title);
         changeDescriptionValue(updatedBanner.description);
 
         clickPublish();
 
         await waitFor(() => {
             expect(mockedPartnersApi.updateBanner).toHaveBeenCalledWith('mock-client', {
-                //title : updatedBanner.title,
                 title: defaultBannerData.title,
                 description: updatedBanner.description,
                 image: defaultBannerData.image,
@@ -287,7 +271,6 @@ describe('PartnerBanner', () => {
         });
 
         await waitFor(() => {
-            //expect(getTitleInput()).toHaveValue(updatedBanner.title);
             expect(getDescriptionInput()).toHaveValue(updatedBanner.description);
         });
     });
@@ -370,7 +353,6 @@ describe('PartnerBanner', () => {
         });
     });
 
-    //TODO: Remove this test when rich text component is implemented
     it('renders title input as disabled', () => {
         render(<PartnerBanner />);
         expect(getTitleInput()).toBeDisabled();

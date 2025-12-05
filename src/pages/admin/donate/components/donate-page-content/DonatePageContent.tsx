@@ -157,11 +157,12 @@ export const DonatePageContent = () => {
             try {
                 await config.delete(client, id);
                 setItems((prev: any) => prev.filter((item: any) => item.id !== id));
+                addToast(DONATE_TEXT.MESSAGE.BANK_DETAILS.DELETE, ToastType.Info);
             } catch (error) {
                 throw error;
             }
         },
-        [client, config, setItems],
+        [client, config, setItems, addToast],
     );
 
     // Correspondent Bank Details handlers

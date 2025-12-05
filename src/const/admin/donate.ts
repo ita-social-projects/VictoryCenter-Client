@@ -105,6 +105,9 @@ export const DONATE_TEXT = {
             DELETED: 'Варіант підтримки видалено успішно',
         },
         CHANGES_SAVED: 'Зміни успішно опубліковано',
+        BANK_DETAILS: {
+            DELETE: 'Реквізити успішно видалено',
+        },
         CORRESPONDENT_BANKS: {
             DELETED: 'Банк-кореспондент видалено успішно',
         },

@@ -92,6 +92,7 @@ export const CategoryBar = <T,>({
             )}
             {showLeftArrow && (
                 <button
+                    title="Scroll Left"
                     className="category-bar-arrow category-bar-arrow-left"
                     onClick={() => handleScroll('left')}
                     type="button"
@@ -113,6 +114,7 @@ export const CategoryBar = <T,>({
             </div>
             {showRightArrow && (
                 <button
+                    title="Scroll Right"
                     className="category-bar-arrow category-bar-arrow-right"
                     onClick={() => handleScroll('right')}
                     type="button"

@@ -62,8 +62,8 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
                 unit: 'px',
                 width: displayCropWidth,
                 height: displayCropHeight,
-                x: x > 0 ? x : 0,
-                y: y > 0 ? y : 0,
+                x: Math.max(x, 0),
+                y: Math.max(y, 0),
             };
 
             setCrop(centeredCrop);

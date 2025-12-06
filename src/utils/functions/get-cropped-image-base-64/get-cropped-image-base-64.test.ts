@@ -2,11 +2,9 @@ import { getCroppedImageBase64 } from './get-cropped-image-base-64';
 import { ImageValues } from '../../../types/common/image';
 import { PixelCrop, Crop } from 'react-image-crop';
 
-const mockCanvasContext = {
-    drawImage: jest.fn(),
-    imageSmoothingQuality: '',
-};
+const originalCreateElement = document.createElement;
 
+const mockCanvasContext = { drawImage: jest.fn(), imageSmoothingQuality: '' };
 const mockCanvas = {
     getContext: jest.fn((contextType: string) => (contextType === '2d' ? mockCanvasContext : null)),
     toDataURL: jest.fn(() => 'data:image/jpeg;base64,MOCKED_CROPPED_BASE64'),
@@ -14,13 +12,9 @@ const mockCanvas = {
     height: 0,
 };
 
-const originalCreateElement = document.createElement;
-
 beforeAll(() => {
     document.createElement = (tagName: keyof HTMLElementTagNameMap | string) => {
-        if (tagName === 'canvas') {
-            return mockCanvas as unknown as HTMLCanvasElement;
-        }
+        if (tagName === 'canvas') return mockCanvas as unknown as HTMLCanvasElement;
         return originalCreateElement.call(document, tagName);
     };
 });
@@ -32,6 +26,17 @@ afterAll(() => {
 const MockImageValue: ImageValues = {
     base64: 'iVBORw0goAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAocB9eQ6vqoAAAAASUVORK5CYII=',
     mimeType: 'image/jpeg',
+};
+
+const createMockImage = (naturalWidth = 600, naturalHeight = 400, width = 450, height = 300): HTMLImageElement => {
+    const mockImage = document.createElement('img');
+    Object.defineProperties(mockImage, {
+        naturalWidth: { value: naturalWidth, writable: true },
+        naturalHeight: { value: naturalHeight, writable: true },
+        width: { value: width, writable: true },
+        height: { value: height, writable: true },
+    });
+    return mockImage;
 };
 
 describe('getCroppedImageBase64', () => {
@@ -63,20 +68,13 @@ describe('getCroppedImageBase64', () => {
     });
 
     it('returns null when cropToUse is undefined', () => {
-        const mockImage = document.createElement('img');
+        const mockImage = createMockImage();
         const result = getCroppedImageBase64(mockImage, undefined, 300, 200, MockImageValue);
         expect(result).toBeNull();
     });
 
     it('draws image with pixel crop coordinates', () => {
-        const mockImage = document.createElement('img');
-        Object.defineProperties(mockImage, {
-            naturalWidth: { value: 600, writable: true },
-            naturalHeight: { value: 400, writable: true },
-            width: { value: 450, writable: true },
-            height: { value: 300, writable: true },
-        });
-
+        const mockImage = createMockImage();
         const crop: PixelCrop = {
             unit: 'px',
             x: 150,
@@ -87,28 +85,11 @@ describe('getCroppedImageBase64', () => {
 
         getCroppedImageBase64(mockImage, crop, 300, 200, MockImageValue);
 
-        expect(mockCanvasContext.drawImage).toHaveBeenCalledWith(
-            mockImage,
-            200,
-            160,
-            120,
-            100,
-            0,
-            0,
-            300,
-            200,
-        );
+        expect(mockCanvasContext.drawImage).toHaveBeenCalledWith(mockImage, 200, 160, 120, 100, 0, 0, 300, 200);
     });
 
     it('draws image with percentage crop coordinates', () => {
-        const mockImage = document.createElement('img');
-        Object.defineProperties(mockImage, {
-            naturalWidth: { value: 600, writable: true },
-            naturalHeight: { value: 400, writable: true },
-            width: { value: 450, writable: true },
-            height: { value: 300, writable: true },
-        });
-
+        const mockImage = createMockImage();
         const crop: Crop = {
             unit: '%',
             x: 10,
@@ -123,14 +104,7 @@ describe('getCroppedImageBase64', () => {
     });
 
     it('returns data URL with correct mime type', () => {
-        const mockImage = document.createElement('img');
-        Object.defineProperties(mockImage, {
-            naturalWidth: { value: 600, writable: true },
-            naturalHeight: { value: 400, writable: true },
-            width: { value: 450, writable: true },
-            height: { value: 300, writable: true },
-        });
-
+        const mockImage = createMockImage();
         const crop: PixelCrop = {
             unit: 'px',
             x: 0,
@@ -146,14 +120,7 @@ describe('getCroppedImageBase64', () => {
     });
 
     it('returns data URL with default mime type when rawImage is null', () => {
-        const mockImage = document.createElement('img');
-        Object.defineProperties(mockImage, {
-            naturalWidth: { value: 600, writable: true },
-            naturalHeight: { value: 400, writable: true },
-            width: { value: 450, writable: true },
-            height: { value: 300, writable: true },
-        });
-
+        const mockImage = createMockImage();
         const crop: PixelCrop = {
             unit: 'px',
             x: 0,
@@ -169,14 +136,7 @@ describe('getCroppedImageBase64', () => {
     });
 
     it('throws error when canvas 2d context is not available', () => {
-        const mockImage = document.createElement('img');
-        Object.defineProperties(mockImage, {
-            naturalWidth: { value: 600, writable: true },
-            naturalHeight: { value: 400, writable: true },
-            width: { value: 450, writable: true },
-            height: { value: 300, writable: true },
-        });
-
+        const mockImage = createMockImage();
         mockGetContext.mockImplementation(() => null);
 
         const crop: PixelCrop = {

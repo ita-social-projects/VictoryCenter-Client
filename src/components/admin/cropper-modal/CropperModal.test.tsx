@@ -211,9 +211,7 @@ describe('CropModal', () => {
         mockImageLoad(imgElement as HTMLImageElement);
 
         await waitFor(() => {
-            expect(JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!)).toHaveProperty(
-                'width',
-            );
+            expect(JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!)).toHaveProperty('width');
         });
 
         const cropChangeButton = screen.getByTestId('mock-crop-change');
@@ -234,9 +232,7 @@ describe('CropModal', () => {
         mockImageLoad(imgElement as HTMLImageElement);
 
         await waitFor(() => {
-            expect(JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!)).toHaveProperty(
-                'width',
-            );
+            expect(JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!)).toHaveProperty('width');
         });
 
         const cropCompleteButton = screen.getByTestId('mock-crop-complete');

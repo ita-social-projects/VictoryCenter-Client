@@ -20,11 +20,14 @@ export interface GenericDetailsProps<T extends FieldValues> {
     notFoundText?: string;
     addNewText: string;
     isChildForm?: boolean;
+    isDisabled?: boolean;
     children?: (form: { formState: T; isItemsExpanded: boolean }) => React.ReactNode;
     onChangeItems?: React.Dispatch<React.SetStateAction<T[]>>;
     onSubmit?: (data: T) => Promise<void>;
     onUpdate?: (id: number, data: T) => Promise<void>;
     onDelete?: (id: number) => Promise<void>;
+    onAddFormVisibilityChange?: (isVisible: boolean) => void;
+    isParentAddFormVisible?: boolean;
 }
 
 export function GenericDetails<T extends { id: number } & FieldValues>({
@@ -37,11 +40,14 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
     notFoundText,
     addNewText,
     isChildForm = false,
+    isDisabled = false,
     children,
     onChangeItems,
     onSubmit,
     onUpdate,
     onDelete,
+    onAddFormVisibilityChange,
+    isParentAddFormVisible = false,
 }: GenericDetailsProps<T>) {
     const addformRef = useRef<GenericFormRef>(null);
     const [isAddFormVisible, setIsAddFormVisible] = useState(false);
@@ -65,10 +71,12 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
 
     const handleAdd = () => {
         setIsAddFormVisible(true);
+        onAddFormVisibilityChange?.(true);
     };
 
     const handleClose = () => {
         setIsAddFormVisible(false);
+        onAddFormVisibilityChange?.(false);
     };
 
     const handleSubmit = useCallback(
@@ -76,17 +84,20 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
             if (onSubmit) {
                 await onSubmit(data);
                 setIsAddFormVisible(false);
+                onAddFormVisibilityChange?.(false);
             } else if (isChildForm) {
                 onChangeItems?.((prevItems) => [...prevItems, data]);
                 setIsAddFormVisible(false);
+                onAddFormVisibilityChange?.(false);
             } else {
                 const newItemWithId = { ...data, id: data.id || Date.now() };
 
                 onChangeItems?.((prevItems) => [...prevItems, newItemWithId]);
                 setIsAddFormVisible(false);
+                onAddFormVisibilityChange?.(false);
             }
         },
-        [onSubmit, isChildForm, onChangeItems],
+        [onSubmit, isChildForm, onChangeItems, onAddFormVisibilityChange],
     );
 
     const handleItemUpdate = useCallback(
@@ -163,6 +174,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                                         onClose={handleClose}
                                         onDelete={() => handleItemDelete(item.id)}
                                         isChildForm={isChildForm}
+                                        isDisabled={isDisabled}
                                         onModeChange={(mode: GenericFormMode) => handleItemModeChange(item.id, mode)}
                                     >
                                         {(formProps) => <>{children && children(formProps)}</>}
@@ -179,6 +191,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             onClose={handleClose}
                             initialMode={GenericFormMode.Create}
                             isChildForm={isChildForm}
+                            isDisabled={isDisabled}
                         >
                             {(formProps) => <>{children && children(formProps)}</>}
                         </FormComponent>
@@ -188,7 +201,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             className={`generic-details btn-add-new ${isAddFormVisible || editingItemId !== null ? 'disabled' : ''}`}
                             onClick={handleAdd}
                             buttonStyle="primary"
-                            disabled={isAddFormVisible || editingItemId !== null}
+                            disabled={isAddFormVisible || editingItemId !== null || isParentAddFormVisible}
                         >
                             <div>{addNewText}</div>
                             <PlusIcon className="plus-icon" />

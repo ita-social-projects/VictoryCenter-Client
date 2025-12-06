@@ -41,8 +41,8 @@ export const UkrainePaymentDetails = ({ bankDetails }: UkrainePaymentDetailsProp
                     <div className="paymentLabel">
                         <h3>{UKRAINE_PAYMENT_DETAILS.IBAN_UAH_LABEL}</h3>
                         <div className="labelWithCopyButton">
-                            <span className="label">{bank.iban}</span>
-                            <CopyTextButton textToCopy={bank.iban} />
+                            <span className="label">{bank.ukrainianIban}</span>
+                            <CopyTextButton textToCopy={bank.ukrainianIban} />
                         </div>
                     </div>
                     <div className="paymentLabel">

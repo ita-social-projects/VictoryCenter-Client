@@ -26,6 +26,7 @@ export const DonatePageContent = () => {
     const [supportOptions, setSupportOptions] = useState<SupportOptionsType[]>([]);
     const [isSupportOptionsLoading, setIsSupportOptionsLoading] = useState(false);
 
+    const [isCorrespondentBankFormVisible, setIsCorrespondentBankFormVisible] = useState(false);
     useEffect(() => {
         let isAlive = true;
         const bankCurrency = mapCurrencyToBankCurrency(selectedCategory);
@@ -156,11 +157,12 @@ export const DonatePageContent = () => {
             try {
                 await config.delete(client, id);
                 setItems((prev: any) => prev.filter((item: any) => item.id !== id));
+                addToast(DONATE_TEXT.MESSAGE.BANK_DETAILS.DELETE, ToastType.Info);
             } catch (error) {
                 throw error;
             }
         },
-        [client, config, setItems],
+        [client, config, setItems, addToast],
     );
 
     // Correspondent Bank Details handlers
@@ -246,9 +248,11 @@ export const DonatePageContent = () => {
                 primaryAddButton={true}
                 addNewText={DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW}
                 isChildForm={true}
+                isDisabled={!formState.id}
                 onSubmit={(data) => handleCreateCorrespondentBank(formState.id, data)}
                 onUpdate={(id, data) => handleUpdateCorrespondentBank(formState.id, id, data)}
                 onDelete={(id) => handleDeleteCorrespondentBank(formState.id, id)}
+                onAddFormVisibilityChange={setIsCorrespondentBankFormVisible}
             />
         ),
         [
@@ -280,10 +284,11 @@ export const DonatePageContent = () => {
                             isLoading={isLoading}
                             FormComponent={config.form}
                             notFoundText={DONATE_TEXT.BANK_DETAILS.NOT_FOUND}
-                            addNewText={DONATE_TEXT.BANK_DETAILS.ADD_FIRST}
+                            addNewText={DONATE_TEXT.BANK_DETAILS.ADD_NEW}
                             onSubmit={handleCreateBankDetails}
                             onUpdate={handleUpdateBankDetails}
                             onDelete={handleDeleteBankDetails}
+                            isParentAddFormVisible={isCorrespondentBankFormVisible}
                         >
                             {config.withCorrespondentBanks ? renderCorrespondentBanks : () => null}
                         </GenericDetails>

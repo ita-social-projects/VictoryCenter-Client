@@ -15,8 +15,8 @@ export const CorrespondentBanksSection = ({
         title: apiBank.name,
         fields: [
             { label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL, value: apiBank.swift },
-            { label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL, value: apiBank.account },
-            ...(apiBank.iban ? [{ label: ABROAD_PAYMENT_DETAILS.IBAN_LABEL, value: apiBank.iban }] : []),
+            ...(apiBank.account ? [{ label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL, value: apiBank.account }] : []),
+            ...(apiBank.foreignIban ? [{ label: ABROAD_PAYMENT_DETAILS.IBAN_LABEL, value: apiBank.foreignIban }] : []),
         ],
     }));
 

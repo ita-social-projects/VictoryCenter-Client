@@ -28,7 +28,7 @@ export interface SupportOptionsDto {
 
 export interface CreateSupportOptionsDto extends Omit<SupportOptionsDto, 'id'> {}
 
-export interface UpdateSupportOptionsDto extends Omit<SupportOptionsDto, 'id'> {}
+export interface UpdateSupportOptionsDto extends Omit<SupportOptionsDto, 'id' | 'currency'> {}
 
 // Correspondent Bank Details
 export interface CorrespondentBankDetailsDto {

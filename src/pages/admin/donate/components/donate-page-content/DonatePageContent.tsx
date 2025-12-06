@@ -92,20 +92,18 @@ export const DonatePageContent = () => {
 
     const handleUpdateSupportOption = useCallback(
         async (id: number, name: string, value: string) => {
-            const bankCurrency = mapCurrencyToBankCurrency(selectedCategory);
             setIsSupportOptionsLoading(true);
             try {
                 const updatedOption = await SupportOptionsApi.update(client, id, {
                     name,
                     value,
-                    currency: bankCurrency,
                 });
                 setSupportOptions((prev) => prev.map((option) => (option.id === id ? updatedOption : option)));
             } finally {
                 setIsSupportOptionsLoading(false);
             }
         },
-        [client, selectedCategory],
+        [client],
     );
 
     const handleDeleteSupportOption = useCallback(

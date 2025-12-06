@@ -296,7 +296,6 @@ describe('DonatePageContent', () => {
                 expect(mockUpdate).toHaveBeenCalledWith('mockClient', 1, {
                     name: 'Updated',
                     value: '456',
-                    currency: 0,
                 });
             });
         });

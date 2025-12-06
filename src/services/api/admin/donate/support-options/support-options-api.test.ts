@@ -125,7 +125,6 @@ describe('SupportOptionsApi', () => {
             const supportOption = {
                 name: 'Updated Option',
                 value: 'Updated Value',
-                currency: BankCurrency.Uah,
             };
 
             const result = await SupportOptionsApi.update(mockClient, 5, supportOption);
@@ -148,7 +147,6 @@ describe('SupportOptionsApi', () => {
             const supportOption = {
                 name: 'First Updated',
                 value: 'First Updated Value',
-                currency: BankCurrency.Eur,
             };
 
             const result = await SupportOptionsApi.update(mockClient, 1, supportOption);
@@ -171,7 +169,6 @@ describe('SupportOptionsApi', () => {
             const supportOption = {
                 name: 'Large ID',
                 value: 'Large ID Value',
-                currency: BankCurrency.Uah,
             };
 
             const result = await SupportOptionsApi.update(mockClient, 9999, supportOption);

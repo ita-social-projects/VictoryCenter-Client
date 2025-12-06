@@ -127,9 +127,7 @@ describe('IMAGE_VALIDATION_FUNCTIONS', () => {
         const validFile = createTestFile(1000, 'image/jpeg');
         const result = await IMAGE_VALIDATION_FUNCTIONS.validateImage(validFile);
 
-        const expectedError = IMAGE_VALIDATION.UnexpectedError
-            ? IMAGE_VALIDATION.UnexpectedError()
-            : 'Unexpected error';
+        const expectedError = IMAGE_VALIDATION.UnexpectedError();
         expect(result).toBe(expectedError);
 
         (Yup.mixed.prototype.validate as jest.Mock).mockRestore();

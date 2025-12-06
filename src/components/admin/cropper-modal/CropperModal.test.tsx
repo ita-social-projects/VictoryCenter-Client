@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { CropModal } from './CropperModal';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { ImageValues } from '../../../types/common/image';
-import { PixelCrop } from 'react-image-crop'; // Видалено невикористаний 'Crop'
+import { PixelCrop } from 'react-image-crop';
 
 const mockCanvasContext = {
     drawImage: jest.fn(),
@@ -196,7 +196,7 @@ describe('CropModal', () => {
 
         await waitFor(() => {
             const cropMock = screen.getByTestId('react-crop-mock');
-            const cropData = JSON.parse(cropMock.getAttribute('data-crop')!);
+            const cropData = JSON.parse(cropMock.dataset.crop!);
 
             expect(cropData.unit).toBe('px');
             expect(cropData.width).toBeCloseTo(225);
@@ -212,7 +212,7 @@ describe('CropModal', () => {
         mockImageLoad(imgElement as HTMLImageElement);
 
         await waitFor(() => {
-            expect(JSON.parse(screen.getByTestId('react-crop-mock').getAttribute('data-crop')!)).toHaveProperty(
+            expect(JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!)).toHaveProperty(
                 'width',
             );
         });
@@ -221,7 +221,7 @@ describe('CropModal', () => {
         fireEvent.click(cropChangeButton);
 
         await waitFor(() => {
-            const cropData = JSON.parse(screen.getByTestId('react-crop-mock').getAttribute('data-crop')!);
+            const cropData = JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!);
             expect(cropData.x).toBe(10);
             expect(cropData.y).toBe(10);
             expect(cropData.width).toBe(225);
@@ -235,7 +235,7 @@ describe('CropModal', () => {
         mockImageLoad(imgElement as HTMLImageElement);
 
         await waitFor(() => {
-            expect(JSON.parse(screen.getByTestId('react-crop-mock').getAttribute('data-crop')!)).toHaveProperty(
+            expect(JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!)).toHaveProperty(
                 'width',
             );
         });
@@ -269,7 +269,7 @@ describe('CropModal', () => {
         mockImageLoad(imgElement as HTMLImageElement);
 
         await waitFor(() => {
-            expect(JSON.parse(screen.getByTestId('react-crop-mock').getAttribute('data-crop')!)).toHaveProperty('x');
+            expect(JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!)).toHaveProperty('x');
         });
 
         const submitButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES);
@@ -304,7 +304,7 @@ describe('CropModal', () => {
         mockImageLoad(imgElement as HTMLImageElement);
 
         await waitFor(() => {
-            expect(JSON.parse(screen.getByTestId('react-crop-mock').getAttribute('data-crop')!).x).toBeCloseTo(112.5);
+            expect(JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!).x).toBeCloseTo(112.5);
         });
 
         const newCrop: PixelCrop = {
@@ -321,7 +321,7 @@ describe('CropModal', () => {
         });
 
         await waitFor(() => {
-            const cropData = JSON.parse(screen.getByTestId('react-crop-mock').getAttribute('data-crop')!);
+            const cropData = JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!);
             expect(cropData.x).toBeCloseTo(225);
             expect(cropData.y).toBeCloseTo(150);
         });
@@ -334,7 +334,7 @@ describe('CropModal', () => {
         mockImageLoad(imgElement as HTMLImageElement);
 
         await waitFor(() => {
-            const cropData = JSON.parse(screen.getByTestId('react-crop-mock').getAttribute('data-crop')!);
+            const cropData = JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!);
             expect(cropData.x).toBeCloseTo(112.5);
         });
 
@@ -346,7 +346,7 @@ describe('CropModal', () => {
         fireEvent.resize(window);
 
         await waitFor(() => {
-            const cropData = JSON.parse(screen.getByTestId('react-crop-mock').getAttribute('data-crop')!);
+            const cropData = JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!);
             expect(cropData.width).toBeCloseTo(150);
             expect(cropData.x).toBeCloseTo(75);
         });
@@ -358,7 +358,7 @@ describe('CropModal', () => {
         mockImageLoad(imgElement as HTMLImageElement);
 
         await waitFor(() => {
-            expect(JSON.parse(screen.getByTestId('react-crop-mock').getAttribute('data-crop')!).x).toBeCloseTo(112.5);
+            expect(JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!).x).toBeCloseTo(112.5);
         });
 
         const percentCrop = {

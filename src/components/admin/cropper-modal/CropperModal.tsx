@@ -144,7 +144,7 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
     };
 
     const onCropChange = (newCrop: PixelCrop) => {
-        const currentCrop = crop as PixelCrop; // Поточний кріп завжди піксельний тут
+        const currentCrop = crop as PixelCrop;
         if (!currentCrop?.width || !currentCrop?.height) return;
 
         const fixedWidth = currentCrop.width;

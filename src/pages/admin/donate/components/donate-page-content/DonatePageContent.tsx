@@ -2,7 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { SupportOptionsApi } from '../../../../../services/api/admin/donate/support-options/support-options-api';
 import { CorrespondentBankDetailsApi } from '../../../../../services/api/admin/donate/correspondent-banks/correspondent-banks-api';
-import { ForeignBankDetailsType, SupportOptionsType, UahBankDetailsType } from '../../../../../types/admin/donate';
+import {
+    ForeignBankDetailsDto,
+    SupportOptionsDto,
+    UahBankDetailsDto,
+    CreateCorrespondentBankDetails,
+    UpdateCorrespondentBankDetails,
+} from '../../../../../types/admin/donate';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
 import { GenericDetails } from '../generic-details/GenericDetails';
@@ -23,7 +29,7 @@ export const DonatePageContent = () => {
     const currencyCategories = Object.values(Currencies);
     const [selectedCategory, setSelectedCategory] = useState<Currencies>(Currencies.UAH);
     const { items, config, setItems, isLoading } = useBankDetails(selectedCategory);
-    const [supportOptions, setSupportOptions] = useState<SupportOptionsType[]>([]);
+    const [supportOptions, setSupportOptions] = useState<SupportOptionsDto[]>([]);
     const [isSupportOptionsLoading, setIsSupportOptionsLoading] = useState(false);
 
     const [isCorrespondentBankFormVisible, setIsCorrespondentBankFormVisible] = useState(false);
@@ -86,15 +92,20 @@ export const DonatePageContent = () => {
 
     const handleUpdateSupportOption = useCallback(
         async (id: number, name: string, value: string) => {
+            const bankCurrency = mapCurrencyToBankCurrency(selectedCategory);
             setIsSupportOptionsLoading(true);
             try {
-                const updatedOption = await SupportOptionsApi.update(client, id, { name, value });
+                const updatedOption = await SupportOptionsApi.update(client, id, {
+                    name,
+                    value,
+                    currency: bankCurrency,
+                });
                 setSupportOptions((prev) => prev.map((option) => (option.id === id ? updatedOption : option)));
             } finally {
                 setIsSupportOptionsLoading(false);
             }
         },
-        [client],
+        [client, selectedCategory],
     );
 
     const handleDeleteSupportOption = useCallback(
@@ -113,12 +124,14 @@ export const DonatePageContent = () => {
 
     // Bank Details handlers
     const handleCreateBankDetails = useCallback(
-        async (data: Omit<UahBankDetailsType | ForeignBankDetailsType, 'correspondentBanks'>) => {
+        async (data: UahBankDetailsDto | ForeignBankDetailsDto) => {
             if (!config) return;
             try {
-                const newItem = await config.create(client, data);
+                // Remove fields that shouldn't be sent to API (id, currency, correspondentBanks)
+                const { id, currency, correspondentBanks, ...cleanData } = data as ForeignBankDetailsDto;
+                const newItem = await config.create(client, cleanData);
 
-                setItems((prev: (UahBankDetailsType | ForeignBankDetailsType)[]) => [...prev, newItem]);
+                setItems((prev: (UahBankDetailsDto | ForeignBankDetailsDto)[]) => [...prev, newItem]);
             } catch (error) {
                 throw error;
             }
@@ -127,12 +140,14 @@ export const DonatePageContent = () => {
     );
 
     const handleUpdateBankDetails = useCallback(
-        async (id: number, data: UahBankDetailsType | ForeignBankDetailsType) => {
+        async (id: number, data: UahBankDetailsDto | ForeignBankDetailsDto) => {
             if (!config) return;
             try {
-                const updatedItem = await config.update(client, id, data);
+                // Remove fields that shouldn't be sent to API (id, currency, correspondentBanks)
+                const { id: _id, currency, correspondentBanks, ...cleanData } = data as ForeignBankDetailsDto;
+                const updatedItem = await config.update(client, id, cleanData);
 
-                setItems((prev: (UahBankDetailsType | ForeignBankDetailsType)[]) =>
+                setItems((prev: (UahBankDetailsDto | ForeignBankDetailsDto)[]) =>
                     prev.map((item) => {
                         if (item.id === id) {
                             return {
@@ -167,12 +182,9 @@ export const DonatePageContent = () => {
 
     // Correspondent Bank Details handlers
     const handleCreateCorrespondentBank = useCallback(
-        async (foreignBankId: number, data: any) => {
+        async (foreignBankId: number, data: CreateCorrespondentBankDetails) => {
             try {
-                const newBank = await CorrespondentBankDetailsApi.create(client, {
-                    ...data,
-                    foreignBankDetailsId: foreignBankId,
-                });
+                const newBank = await CorrespondentBankDetailsApi.create(client, data);
                 setItems((prev: any) =>
                     prev.map((item: any) =>
                         item.id === foreignBankId
@@ -188,12 +200,9 @@ export const DonatePageContent = () => {
     );
 
     const handleUpdateCorrespondentBank = useCallback(
-        async (foreignBankId: number, id: number, data: any) => {
+        async (foreignBankId: number, id: number, data: UpdateCorrespondentBankDetails) => {
             try {
-                const updatedBank = await CorrespondentBankDetailsApi.update(client, id, {
-                    ...data,
-                    foreignBankDetailsId: foreignBankId,
-                });
+                const updatedBank = await CorrespondentBankDetailsApi.update(client, id, data);
                 setItems((prev: any) =>
                     prev.map((item: any) =>
                         item.id === foreignBankId

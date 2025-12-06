@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { DonateInput } from '../../donate-input/DonateInput';
 import './SupportOptionItem.scss';
-import { SupportOptionsType } from '../../../../../../types/admin/donate';
+import { SupportOptionsDto } from '../../../../../../types/admin/donate';
 import { ConfirmationModal } from '../../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { DONATE_TEXT, VALIDATION_PARAMS } from '../../../../../../const/admin/donate';
@@ -20,7 +20,7 @@ interface ModalConfig {
 }
 
 export interface SupportOptionItemProps {
-    data?: SupportOptionsType;
+    data?: SupportOptionsDto;
     initialMode?: SupportOptionItemMode;
     onSave?: (name: string, value: string) => Promise<void>;
     onCancel?: () => void;

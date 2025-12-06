@@ -155,7 +155,6 @@ describe('CropModal', () => {
     });
 
     it('Does not render when isOpen=false', () => {
-        // Виправлено: використовуємо screen замість деструктуризації
         render(<CropModal {...defaultProps} isOpen={false} />);
         expect(screen.queryByText('Редагувати фото')).not.toBeInTheDocument();
     });
@@ -349,36 +348,6 @@ describe('CropModal', () => {
             const cropData = JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!);
             expect(cropData.width).toBeCloseTo(150);
             expect(cropData.x).toBeCloseTo(75);
-        });
-    });
-
-    it('Handles crop with unit=% in getCroppedImageBase64', async () => {
-        render(<CropModal {...defaultProps} />);
-        const imgElement = screen.getByAltText('Crop target');
-        mockImageLoad(imgElement as HTMLImageElement);
-
-        await waitFor(() => {
-            expect(JSON.parse(screen.getByTestId('react-crop-mock').dataset.crop!).x).toBeCloseTo(112.5);
-        });
-
-        const percentCrop = {
-            unit: '%',
-            x: 10,
-            y: 10,
-            width: 50,
-            height: 50,
-        };
-
-        const reactCropElement = screen.getByTestId('react-crop-mock');
-        act(() => {
-            (reactCropElement as any).mockOnComplete(percentCrop);
-        });
-
-        const submitButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES);
-        fireEvent.click(submitButton);
-
-        await waitFor(() => {
-            expect(mockCanvasContext.drawImage).toHaveBeenCalledWith(imgElement, 60, 40, 300, 200, 0, 0, 300, 200);
         });
     });
 });

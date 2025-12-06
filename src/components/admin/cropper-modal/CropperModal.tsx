@@ -8,6 +8,7 @@ import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import './CropperModal.scss';
 import { CROPPER_CONSTANTS } from '../../../const/admin/cropper';
 import { InlineLoader } from '../../common/inline-loader/InlineLoader';
+import { getCroppedImageBase64 } from '../../../utils/functions/get-cropped-image-base-64/get-cropped-image-base-64';
 
 interface CropModalProps {
     src: ImageValues | null;
@@ -94,49 +95,9 @@ export const CropModal = ({ src, onChange, width, height, onCancel, isOpen }: Cr
         };
     }, [renderedWidth, aspectRatio, recalculateCrop]);
 
-    const getCroppedImageBase64 = () => {
-        const image = imgRef.current;
-        const cropToUse = completedCrop || crop;
-        if (!image || !cropToUse) {
-            return null;
-        }
-
-        const canvas = document.createElement('canvas');
-
-        canvas.width = width;
-        canvas.height = height;
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-            throw new Error('No 2d context');
-        }
-
-        const scaleX = image.naturalWidth / image.width;
-        const scaleY = image.naturalHeight / image.height;
-
-        let sourceX, sourceY, sourceWidth, sourceHeight;
-
-        if (cropToUse.unit === '%') {
-            sourceX = (cropToUse.x / 100) * image.naturalWidth;
-            sourceY = (cropToUse.y / 100) * image.naturalHeight;
-            sourceWidth = (cropToUse.width / 100) * image.naturalWidth;
-            sourceHeight = (cropToUse.height / 100) * image.naturalHeight;
-        } else {
-            sourceX = cropToUse.x * scaleX;
-            sourceY = cropToUse.y * scaleY;
-            sourceWidth = cropToUse.width * scaleX;
-            sourceHeight = cropToUse.height * scaleY;
-        }
-
-        ctx.imageSmoothingQuality = 'high';
-
-        ctx.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, width, height);
-
-        return canvas.toDataURL(rawImage?.mimeType || 'image/jpeg');
-    };
-
     const handleSubmit = () => {
-        const croppedImageBase64 = getCroppedImageBase64();
+        const cropToUse = completedCrop || crop;
+        const croppedImageBase64 = getCroppedImageBase64(imgRef.current, cropToUse, width, height, rawImage);
         if (croppedImageBase64 && rawImage) {
             const base64Part = croppedImageBase64.split(',')[1];
             onChange({ base64: base64Part, mimeType: rawImage.mimeType });

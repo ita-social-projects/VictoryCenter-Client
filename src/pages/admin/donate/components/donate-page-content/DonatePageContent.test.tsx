@@ -296,6 +296,7 @@ describe('DonatePageContent', () => {
                 expect(mockUpdate).toHaveBeenCalledWith('mockClient', 1, {
                     name: 'Updated',
                     value: '456',
+                    currency: 0,
                 });
             });
         });
@@ -399,7 +400,7 @@ describe('DonatePageContent', () => {
 
             fireEvent.click(within(genericDetails).getByText('Submit'));
             await waitFor(() => {
-                expect(mockConfig.create).toHaveBeenCalledWith('mockClient', { id: 1 });
+                expect(mockConfig.create).toHaveBeenCalledWith('mockClient', {});
             });
 
             fireEvent.click(within(genericDetails).getByText('Update'));
@@ -492,7 +493,7 @@ describe('DonatePageContent', () => {
 
             await testCorrespondentOperation('Submit', mockCorrespondentCreate, [
                 'mockClient',
-                { id: 1, foreignBankDetailsId: 1 },
+                { id: 1 },
             ]);
         });
 
@@ -504,7 +505,7 @@ describe('DonatePageContent', () => {
             await testCorrespondentOperation('Update', mockCorrespondentUpdate, [
                 'mockClient',
                 1,
-                { name: 'Updated', foreignBankDetailsId: 1 },
+                { name: 'Updated' },
             ]);
         });
 
@@ -523,7 +524,7 @@ describe('DonatePageContent', () => {
 
             await testCorrespondentOperation('Submit', mockCorrespondentCreate, [
                 'mockClient',
-                { id: 1, foreignBankDetailsId: 1 },
+                { id: 1 },
             ]);
         });
 
@@ -535,7 +536,7 @@ describe('DonatePageContent', () => {
             await testCorrespondentOperation('Update', mockCorrespondentUpdate, [
                 'mockClient',
                 1,
-                { name: 'Updated', foreignBankDetailsId: 1 },
+                { name: 'Updated' },
             ]);
         });
 

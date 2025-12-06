@@ -11,6 +11,7 @@ jest.mock('../../donate-input/DonateInput', () => ({
             onChange={(e) => onValueChange?.(e.target.value)}
             onBlur={onBlur}
             data-testid={`input-${name}`}
+            placeholder={name}
         />
     ),
 }));

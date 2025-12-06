@@ -8,6 +8,12 @@ import {
     UahBankDetailsDto,
     CreateCorrespondentBankDetails,
     UpdateCorrespondentBankDetails,
+    CreateUahBankDetails,
+    UpdateUahBankDetails,
+    CreateForeignBankDetails,
+    UpdateForeignBankDetails,
+    CreateSupportOptionsDto,
+    UpdateSupportOptionsDto,
 } from '../../../../../types/admin/donate';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
@@ -79,7 +85,8 @@ export const DonatePageContent = () => {
             const bankCurrency = mapCurrencyToBankCurrency(selectedCategory);
             setIsSupportOptionsLoading(true);
             try {
-                const newOption = await SupportOptionsApi.create(client, { name, value, currency: bankCurrency });
+                const createData: CreateSupportOptionsDto = { name, value, currency: bankCurrency };
+                const newOption = await SupportOptionsApi.create(client, createData);
                 setSupportOptions((prev) => [...prev, newOption]);
 
                 addToast(DONATE_TEXT.MESSAGE.SUPPORT_OPTIONS.PUBLISHED, ToastType.Info);
@@ -94,10 +101,8 @@ export const DonatePageContent = () => {
         async (id: number, name: string, value: string) => {
             setIsSupportOptionsLoading(true);
             try {
-                const updatedOption = await SupportOptionsApi.update(client, id, {
-                    name,
-                    value,
-                });
+                const updateData: UpdateSupportOptionsDto = { name, value };
+                const updatedOption = await SupportOptionsApi.update(client, id, updateData);
                 setSupportOptions((prev) => prev.map((option) => (option.id === id ? updatedOption : option)));
             } finally {
                 setIsSupportOptionsLoading(false);

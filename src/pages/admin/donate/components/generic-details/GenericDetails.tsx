@@ -52,7 +52,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
     isAddButtonDisabled = false,
     onAddFormVisibilityChange,
     isParentAddFormVisible = false,
-}: GenericDetailsProps<T>) {
+}: Readonly<GenericDetailsProps<T>>) {
     const addformRef = useRef<GenericFormRef>(null);
     const [isAddFormVisible, setIsAddFormVisible] = useState(false);
     const [isItemsExpanded, setIsItemsExpanded] = useState(initialIsItemsExpanded);
@@ -91,9 +91,6 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
         async (data: T) => {
             if (onSubmit) {
                 await onSubmit(data);
-            } else if (isChildForm) {
-                onChangeItems?.((prevItems) => [...prevItems, data]);
-                onAddFormVisibilityChange?.(false);
             } else if (isChildForm) {
                 onChangeItems?.((prevItems) => [...prevItems, data]);
                 onAddFormVisibilityChange?.(false);

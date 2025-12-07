@@ -1,4 +1,4 @@
-import { TEAM_MEMBER_VALIDATION } from '../../../const/admin/team';
+import { TEAM_MEMBER_VALIDATION } from '@const/admin/team';
 import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from './team-member-schema';
 
 describe('teamMemberValidationSchema', () => {

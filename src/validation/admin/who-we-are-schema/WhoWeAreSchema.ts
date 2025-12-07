@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { WHO_WE_ARE_TEXT } from '../../../const/admin/who-we-are';
+import { COMMON_TEXT_ADMIN } from '@const/admin/common';
+import { WHO_WE_ARE_TEXT } from '@const/admin/who-we-are';
 
 export const WhoWeAreValidationSchema = Yup.object({
     text: Yup.string()

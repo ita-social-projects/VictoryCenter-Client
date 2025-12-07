@@ -1,6 +1,6 @@
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from './WhoWeAreSchema';
-import { WHO_WE_ARE_TEXT } from '../../../const/admin/who-we-are';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { WHO_WE_ARE_TEXT } from '@const/admin/who-we-are';
+import { COMMON_TEXT_ADMIN } from '@const/admin/common';
 
 describe('text validation', () => {
     it('reject null value', () => {

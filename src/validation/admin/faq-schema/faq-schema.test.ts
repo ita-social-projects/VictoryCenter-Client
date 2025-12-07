@@ -1,4 +1,4 @@
-import { FAQ_VALIDATION } from '../../../const/admin/faq';
+import { FAQ_VALIDATION } from '@const/admin/faq';
 import { FAQ_VALIDATION_FUNCTIONS } from './faq-schema';
 
 describe('FAQ_VALIDATION_FUNCTIONS', () => {

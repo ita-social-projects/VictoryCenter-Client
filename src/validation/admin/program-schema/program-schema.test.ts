@@ -1,6 +1,6 @@
 import { programValidationSchema, ProgramValidationContext } from './program-schema';
-import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
-import { Image, ImageValues } from '../../../types/common/image';
+import { PROGRAM_VALIDATION } from '@const/admin/programs';
+import { Image, ImageValues } from '@app-types/common/image';
 
 const createMockFile = (type = 'image/jpeg', size = 1024) => {
     const image: ImageValues = {

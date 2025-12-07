@@ -1,7 +1,7 @@
 import React from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { ToastProvider, useToast } from './ToastContextProvider';
-import { ToastType } from '../../../types/admin/toast';
+import { ToastType } from '@app-types/admin/toast';
 
 describe('ToastProvider', () => {
     beforeEach(() => {

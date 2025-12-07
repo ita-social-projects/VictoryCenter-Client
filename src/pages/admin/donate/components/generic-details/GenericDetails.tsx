@@ -106,8 +106,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
             setIsAddFormVisible(false);
             onEditingStateChange?.(false);
         },
-        [onSubmit, isChildForm, onChangeItems, onEditingStateChange],
-        [onSubmit, isChildForm, onChangeItems, onAddFormVisibilityChange],
+        [onSubmit, isChildForm, onChangeItems, onEditingStateChange, onAddFormVisibilityChange],
     );
 
     const handleItemUpdate = useCallback(
@@ -211,7 +210,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             className={`generic-details btn-add-new ${isAddFormVisible || editingItemId !== null ? 'disabled' : ''}`}
                             onClick={handleAdd}
                             buttonStyle="primary"
-                            disabled={isAddButtonDisabled}
+                            disabled={isAddButtonDisabled || isParentAddFormVisible}
                         >
                             <div>{addNewText}</div>
                             <PlusIcon className="plus-icon" />

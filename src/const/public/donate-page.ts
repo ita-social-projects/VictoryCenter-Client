@@ -1,4 +1,4 @@
-import { Currency } from '../../types/public/donate-page';
+import { Currency } from '@app-types/public/donate-page';
 
 export const PAGE_TITLE = 'МИ ВДЯЧНІ | ЗА КОЖЕН ДОНАТ';
 

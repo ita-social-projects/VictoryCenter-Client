@@ -1,0 +1,134 @@
+@use "../variables/typography" as t;
+
+@mixin _text($weight, $size, $lh, $ls, $transform: none) {
+  font-family: t.$font-family-base;
+  font-weight: $weight;
+  font-size: $size;
+  line-height: $lh;
+  letter-spacing: $ls;
+  text-transform: $transform;
+}
+
+@mixin h1-bold {
+  @include _text(t.$fw-bold, t.$h1-size, t.$h1-height, t.$h1-spacing);
+}
+
+@mixin h1-bold-uppercase {
+  @include _text(t.$fw-bold, t.$h1-size, t.$h1-height, t.$h1-spacing, uppercase);
+}
+
+@mixin h2-bold {
+  @include _text(t.$fw-bold, t.$h2-size, t.$h2-height, t.$h2-spacing);
+}
+
+@mixin h2-bold-uppercase {
+  @include _text(t.$fw-bold, t.$h2-size, t.$h2-height, t.$h2-spacing, uppercase);
+}
+
+@mixin h3-semibold {
+  @include _text(t.$fw-semibold, t.$h3-size, t.$h3-height, t.$h3-spacing);
+}
+
+@mixin h3-semibold-uppercase {
+  @include _text(t.$fw-semibold, t.$h3-size, t.$h3-height, t.$h3-spacing, uppercase);
+}
+
+@mixin h3-bold {
+  @include _text(t.$fw-bold, t.$h3-size, t.$h3-height, t.$h3-spacing);
+}
+
+@mixin h3-bold-uppercase {
+  @include _text(t.$fw-bold, t.$h3-size, t.$h3-height, t.$h3-spacing, uppercase);
+}
+
+@mixin h4-semibold {
+  @include _text(t.$fw-semibold, t.$h4-size, t.$h4-height, t.$h4-spacing);
+}
+
+@mixin h4-semibold-uppercase {
+  @include _text(t.$fw-semibold, t.$h4-size, t.$h4-height, t.$h4-spacing, uppercase);
+}
+
+@mixin h4-bold {
+  @include _text(t.$fw-bold, t.$h4-size, t.$h4-height, t.$h4-spacing);
+}
+
+@mixin h4-bold-uppercase {
+  @include _text(t.$fw-bold, t.$h4-size, t.$h4-height, t.$h4-spacing, uppercase);
+}
+
+@mixin subtitle-1-medium {
+  @include _text(t.$fw-medium, t.$sub1-size, t.$sub1-height, t.$sub1-spacing);
+}
+
+@mixin subtitle-1-semibold {
+  @include _text(t.$fw-semibold, t.$sub1-size, t.$sub1-height, t.$sub1-spacing);
+}
+
+@mixin subtitle-1-bold {
+  @include _text(t.$fw-bold, t.$sub1-size, t.$sub1-height, t.$sub1-spacing);
+}
+
+@mixin subtitle-2-medium {
+  @include _text(t.$fw-medium, t.$sub2-size, t.$sub2-height, t.$sub2-spacing);
+}
+
+@mixin subtitle-2-semibold {
+  @include _text(t.$fw-semibold, t.$sub2-size, t.$sub2-height, t.$sub2-spacing);
+}
+
+@mixin subtitle-2-bold {
+  @include _text(t.$fw-bold, t.$sub2-size, t.$sub2-height, t.$sub2-spacing);
+}
+
+@mixin body-1-light {
+  @include _text(t.$fw-light, t.$body1-size, t.$body1-height, t.$body1-spacing);
+}
+
+@mixin body-1-regular {
+  @include _text(t.$fw-regular, t.$body1-size, t.$body1-height, t.$body1-spacing);
+}
+
+@mixin body-1-medium {
+  @include _text(t.$fw-medium, t.$body1-size, t.$body1-height, t.$body1-spacing);
+}
+
+@mixin body-1-bold {
+  @include _text(t.$fw-bold, t.$body1-size, t.$body1-height, t.$body1-spacing);
+}
+
+@mixin body-2-light {
+  @include _text(t.$fw-light, t.$body2-size, t.$body2-height, t.$body2-spacing);
+}
+
+@mixin body-2-regular {
+  @include _text(t.$fw-regular, t.$body2-size, t.$body2-height, t.$body2-spacing);
+}
+
+@mixin body-2-medium {
+  @include _text(t.$fw-medium, t.$body2-size, t.$body2-height, t.$body2-spacing);
+}
+
+@mixin body-2-semibold {
+  @include _text(t.$fw-semibold, t.$body2-size, t.$body2-height, t.$body2-spacing);
+}
+
+@mixin body-2-bold {
+  @include _text(t.$fw-bold, t.$body2-size, t.$body2-height, t.$body2-spacing);
+}
+
+@mixin small-text-light {
+  @include _text(t.$fw-light, t.$small-size, t.$small-height, t.$small-spacing);
+}
+
+@mixin small-text-regular {
+  @include _text(t.$fw-regular, t.$small-size, t.$small-height, t.$small-spacing);
+}
+
+@mixin small-text-medium {
+  @include _text(t.$fw-medium, t.$small-size, t.$small-height, t.$small-spacing);
+}
+
+@mixin small-text-bold {
+  @include _text(t.$fw-bold, t.$small-size, t.$small-height, t.$small-spacing);
+}

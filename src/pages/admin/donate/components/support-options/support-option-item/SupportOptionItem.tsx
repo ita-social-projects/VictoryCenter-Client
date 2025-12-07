@@ -155,7 +155,7 @@ export const SupportOptionItem = ({
                     <div className="support-option-header-actions">
                         <button
                             aria-label="edit-btn"
-                            className={`edit-btn ${editable ? 'edit' : ''}`}
+                            className={`edit-btn ${editable ? 'edit' : 'view'}`}
                             onClick={handleEditClick}
                             disabled={isSubmitting}
                         />

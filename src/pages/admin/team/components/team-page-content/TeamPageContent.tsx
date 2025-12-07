@@ -484,6 +484,7 @@ export const TeamPageContent = () => {
                 <TeamPageToolbar
                     onSearchQueryChange={handleSearchQueryByName}
                     onStatusFilterChange={onStatusFilterChange}
+                    statusFilter={statusFilter}
                     onAddMember={openModalActions.openAddItemModal}
                     searchItems={searchSuggestions}
                     isSearchLoading={isSearchLoading}

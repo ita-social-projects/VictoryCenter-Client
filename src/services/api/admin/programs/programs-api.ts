@@ -95,14 +95,12 @@ export const ProgramsApi = {
         limit: number = 5,
         signal?: AbortSignal,
     ): Promise<PaginationResult<ProgramSearchItemData>> => {
-        const params = {
-            SearchQuery: searchTerm,
-            offset: offset,
-            limit: limit,
-        };
-
         const response = await client.get<PaginationResult<Program>>(`${API_ROUTES.PROGRAMS.SEARCH}`, {
-            params,
+            params: {
+                SearchQuery: searchTerm,
+                offset: offset,
+                limit: limit,
+            },
             signal,
         });
 

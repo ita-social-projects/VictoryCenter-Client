@@ -26,6 +26,7 @@ export interface GenericFormProps<T extends FieldValues> {
     onClose: () => void;
     onDelete?: (id: number) => void;
     isChildForm?: boolean;
+    isDisabled?: boolean;
     children?: (form: { formState: T; isItemsExpanded: boolean }) => React.ReactNode;
     onModeChange?: (mode: GenericFormMode) => void;
 }
@@ -62,6 +63,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 onSubmit,
                 onDelete,
                 isChildForm = false,
+                isDisabled = false,
                 children,
                 onModeChange,
             },
@@ -115,6 +117,17 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                     return !Object.values(newErrors).some((e) => e !== undefined);
                 },
                 [formState],
+            );
+
+            const getIsFieldRequired = useCallback(
+                (f: GenericFormField<T>) => {
+                    return (
+                        (mode === GenericFormMode.Create && f.isRequired) ||
+                        (isChildForm && mode === GenericFormMode.View && f.isRequired) ||
+                        (isChildForm && mode === GenericFormMode.Edit && f.isRequired)
+                    );
+                },
+                [mode, isChildForm],
             );
 
             const submit = useCallback(async () => {
@@ -277,7 +290,8 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 isSubmitting ||
                 hasEmptyRequiredFields ||
                 !isChanged() ||
-                Object.values(errors).some((e) => e !== undefined);
+                Object.values(errors).some((e) => e !== undefined) ||
+                isDisabled;
 
             return (
                 <div
@@ -370,7 +384,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                 <DonateInput
                                                     name={String(f.name)}
                                                     label={f.label}
-                                                    isRequired={mode === GenericFormMode.Create && f.isRequired}
+                                                    isRequired={getIsFieldRequired(f)}
                                                     isTitle={f.isTitle}
                                                     placeholder={f.placeholder}
                                                     prefix={f.prefix}

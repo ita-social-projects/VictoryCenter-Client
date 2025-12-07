@@ -25,7 +25,9 @@ export const DonatePageContent = () => {
     const { items, config, setItems, isLoading } = useBankDetails(selectedCategory);
     const [supportOptions, setSupportOptions] = useState<SupportOptionsType[]>([]);
     const [isSupportOptionsLoading, setIsSupportOptionsLoading] = useState(false);
+    const [isChildEditing, setIsChildEditing] = useState(false);
 
+    const [isCorrespondentBankFormVisible, setIsCorrespondentBankFormVisible] = useState(false);
     useEffect(() => {
         let isAlive = true;
         const bankCurrency = mapCurrencyToBankCurrency(selectedCategory);
@@ -156,11 +158,12 @@ export const DonatePageContent = () => {
             try {
                 await config.delete(client, id);
                 setItems((prev: any) => prev.filter((item: any) => item.id !== id));
+                addToast(DONATE_TEXT.MESSAGE.BANK_DETAILS.DELETE, ToastType.Info);
             } catch (error) {
                 throw error;
             }
         },
-        [client, config, setItems],
+        [client, config, setItems, addToast],
     );
 
     // Correspondent Bank Details handlers
@@ -246,9 +249,12 @@ export const DonatePageContent = () => {
                 primaryAddButton={true}
                 addNewText={DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW}
                 isChildForm={true}
+                isDisabled={!formState.id}
                 onSubmit={(data) => handleCreateCorrespondentBank(formState.id, data)}
                 onUpdate={(id, data) => handleUpdateCorrespondentBank(formState.id, id, data)}
                 onDelete={(id) => handleDeleteCorrespondentBank(formState.id, id)}
+                onEditingStateChange={setIsChildEditing}
+                onAddFormVisibilityChange={setIsCorrespondentBankFormVisible}
             />
         ),
         [
@@ -258,6 +264,7 @@ export const DonatePageContent = () => {
             handleCreateCorrespondentBank,
             handleUpdateCorrespondentBank,
             handleDeleteCorrespondentBank,
+            setIsChildEditing,
         ],
     );
 
@@ -286,6 +293,8 @@ export const DonatePageContent = () => {
                             onSubmit={handleCreateBankDetails}
                             onUpdate={handleUpdateBankDetails}
                             onDelete={handleDeleteBankDetails}
+                            isAddButtonDisabled={isChildEditing}
+                            isParentAddFormVisible={isCorrespondentBankFormVisible}
                         >
                             {config.withCorrespondentBanks ? renderCorrespondentBanks : () => null}
                         </GenericDetails>

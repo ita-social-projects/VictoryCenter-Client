@@ -2,15 +2,21 @@ import { createRef } from 'react';
 import '@testing-library/jest-dom';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from './ProgramForm';
-import { PROGRAM_VALIDATION } from '../../../../../const/admin/programs';
-import { ProgramCategory } from '../../../../../types/admin/programs';
-import { Image } from '../../../../../types/common/image';
-import { VisibilityStatus } from '../../../../../types/admin/common';
+import { PROGRAM_VALIDATION } from '@const/admin/programs';
+import { ProgramCategory } from '@app-types/admin/programs';
+import { Image } from '@app-types/common/image';
+import { VisibilityStatus } from '@app-types/admin/common';
+import {
+    InputWithCharacterLimitGroupProps
+} from '@components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import {
+    TextAreaWithCharacterLimitGroupProps
+} from '@components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 
 jest.mock(
-    '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
+    '@components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
     () => ({
-        InputWithCharacterLimitGroup: (props: any) => (
+        InputWithCharacterLimitGroup: (props: InputWithCharacterLimitGroupProps) => (
             <div data-testid={`input-group-${props.id}`}>
                 <label htmlFor={props.id}>
                     {props.label} {props.isRequired && '*'}
@@ -32,9 +38,9 @@ jest.mock(
 );
 
 jest.mock(
-    '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
+    '@components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
-        TextAreaWithCharacterLimitGroup: (props: any) => (
+        TextAreaWithCharacterLimitGroup: (props: TextAreaWithCharacterLimitGroupProps) => (
             <div data-testid={`textarea-group-${props.id}`}>
                 <label htmlFor={props.id}>
                     {props.label} {props.isRequired && '*'}
@@ -56,7 +62,7 @@ jest.mock(
     }),
 );
 
-jest.mock('../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup', () => ({
+jest.mock('@components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup', () => ({
     MultiSelectInputGroup: (props: any) => (
         <div data-testid={`multiselect-group-${props.id}`}>
             <label htmlFor={props.id}>
@@ -87,7 +93,7 @@ jest.mock('../../../../../components/admin/input-groups/multi-select-input-group
     ),
 }));
 
-jest.mock('../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup', () => ({
+jest.mock('@components/admin/input-groups/photo-input-group/PhotoInputGroup', () => ({
     PhotoInputGroup: (props: any) => (
         <div data-testid={`photo-group-${props.id}`}>
             <label htmlFor={props.id}>

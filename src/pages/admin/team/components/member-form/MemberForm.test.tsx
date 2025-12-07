@@ -1,12 +1,11 @@
 import React, { createRef } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemberForm, TeamMemberFormRef, TeamMemberFormValues } from './MemberForm';
-import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { TeamCategory } from '../../../../../types/admin/team-category';
+import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '@const/admin/team';
+import { VisibilityStatus } from '@app-types/admin/common';
+import { TeamCategory } from '@app-types/admin/team-category';
 
-// Mock SingleSelectInput to a native select for deterministic interaction
-jest.mock('../../../../../components/common/single-select-input/SingleSelectInput', () => ({
+jest.mock('@components/common/single-select-input/SingleSelectInput', () => ({
     SingleSelectInput: ({ options, value, onChange, placeholder, getOptionId, getOptionName, disabled }: any) => {
         return (
             <select
@@ -32,7 +31,7 @@ jest.mock('../../../../../components/common/single-select-input/SingleSelectInpu
     },
 }));
 
-jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
+jest.mock('@components/admin/image-input/ImageInput', () => ({
     ImageInput: ({ onChange, disabled }: any) => (
         <div>
             <button

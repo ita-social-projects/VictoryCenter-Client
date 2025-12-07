@@ -2,24 +2,29 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { SectionsWrapper } from './SectionsWrapper';
-import { ContentType, SectionType } from '../../../../../types/common/about-us';
-import { Content } from '../../../../../types/admin/who-we-are';
-import { Image } from '../../../../../types/common/image';
+import { ContentType, SectionType } from '@app-types/common/about-us';
+import { Content } from '@app-types/admin/who-we-are';
+import { Image } from '@app-types/common/image';
+import { CardsSectionProps } from '@pages/admin/who-we-are/components/sections/cards-section/CardsSection';
+import {
+    DescriptionSectionProps
+} from '@pages/admin/who-we-are/components/sections/description-section/DescriptionSection';
+import { ImageSectionProps } from '@pages/admin/who-we-are/components/sections/image-block-section/ImageBlockSection';
 
 jest.mock('../sections/cards-section/CardsSection', () => ({
-    CardsSection: (props: any) => {
+    CardsSection: (props: CardsSectionProps) => {
         props.setIsPublishButtonActive(true);
         return <div data-testid="cards-section" data-props={JSON.stringify(props)} />;
     },
 }));
 jest.mock('../sections/description-section/DescriptionSection', () => ({
-    DescriptionSection: (props: any) => {
+    DescriptionSection: (props: DescriptionSectionProps) => {
         props.setIsPublishButtonActive(true);
         return <div data-testid="description-section" data-props={JSON.stringify(props)} />;
     },
 }));
 jest.mock('../sections/image-block-section/ImageBlockSection', () => ({
-    ImageSection: (props: any) => {
+    ImageSection: (props: ImageSectionProps) => {
         props.setIsPublishButtonActive(true);
         return <div data-testid="image-section" data-props={JSON.stringify(props)} />;
     },

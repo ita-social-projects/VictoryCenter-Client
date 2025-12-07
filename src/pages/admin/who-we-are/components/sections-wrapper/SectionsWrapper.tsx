@@ -1,4 +1,4 @@
-import { Content, WhoWeAreSection } from '../../../../../types/admin/who-we-are';
+import { Content, WhoWeAreSection } from '@app-types/admin/who-we-are';
 import { CardsSection } from '../sections/cards-section/CardsSection';
 import { DescriptionSection } from '../sections/description-section/DescriptionSection';
 import { ImageSection } from '../sections/image-block-section/ImageBlockSection';
@@ -9,10 +9,10 @@ import {
     WhatWeDoPageProps,
     WhoWeSupportCardsProps,
 } from '../sections/SectionsProps';
-import { SectionType } from '../../../../../types/common/about-us';
+import { SectionType } from '@app-types/common/about-us';
 import React from 'react';
 
-interface MainSectionProps {
+export interface MainSectionProps {
     section: WhoWeAreSection | null;
     onChange: (data: Content) => void;
     onPublish: () => void;

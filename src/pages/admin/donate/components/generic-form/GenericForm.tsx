@@ -1,11 +1,11 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
-import { Button } from '../../../../../components/admin/button/Button';
+import { Button } from '@components/admin/button/Button';
 import { DonateInput } from '../donate-input/DonateInput';
-import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { ConfirmationModal } from '@components/admin/confirmation-modal/ConfirmationModal';
+import { COMMON_TEXT_ADMIN } from '@const/admin/common';
 import './GenericForm.scss';
 import { FieldValues } from 'react-hook-form';
-import { DONATE_TEXT } from '../../../../../const/admin/donate';
+import { DONATE_TEXT } from '@const/admin/donate';
 
 interface ModalConfig {
     title: string;

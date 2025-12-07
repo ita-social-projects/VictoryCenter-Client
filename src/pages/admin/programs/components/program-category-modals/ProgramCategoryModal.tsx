@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { Modal } from '../../../../../components/common/modal/Modal';
-import { Button } from '../../../../../components/admin/button/Button';
-import { HintBox } from '../../../../../components/admin/hint-box/HintBox';
-import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
-import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import { SingleSelectInputGroup } from '../../../../../components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
-import { ProgramCategory, ProgramCategoryCreateUpdate } from '../../../../../types/admin/programs';
-import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-category-schema/program-category-schema';
-import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
-import { ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { Modal } from '@components/common/modal/Modal';
+import { Button } from '@components/admin/button/Button';
+import { HintBox } from '@components/admin/hint-box/HintBox';
+import { ConfirmationModal } from '@components/admin/confirmation-modal/ConfirmationModal';
+import { InputWithCharacterLimitGroup } from '@components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { SingleSelectInputGroup } from '@components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
+import { ProgramCategory, ProgramCategoryCreateUpdate } from '@app-types/admin/programs';
+import { PROGRAM_CATEGORY_VALIDATION_FUNCTIONS } from '@validation/admin/program-category-schema/program-category-schema';
+import { PROGRAM_CATEGORY_TEXT, PROGRAM_CATEGORY_VALIDATION } from '@const/admin/programs';
+import { ProgramsCategoriesApi } from '@api/admin/programs/programs-api';
+import { COMMON_TEXT_ADMIN } from '@const/admin/common';
 import './ProgramCategoryModal.scss';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
 
 interface ProgramCategoryFormValues {
     name: string;

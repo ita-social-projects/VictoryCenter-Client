@@ -1,14 +1,14 @@
 import { ImageSectionProps } from './image-block-section/ImageBlockSection';
-import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
-import MainPageImage from '../../../../../assets/images/public/about-us-page/background.jpg';
-import TeamPageImage from '../../../../../assets/images/public/about-us-page/our-team.jpg';
-import SupportVeterans from '../../../../../assets/images/public/about-us-page/support-veterans.jpg';
-import SupportVolunteers from '../../../../../assets/images/public/about-us-page/support-volunteers.jpg';
-import SupportChildren from '../../../../../assets/images/public/about-us-page/support-children.jpg';
-import ManAndHorse from '../../../../../assets/images/public/about-us-page/man-horse.jpg';
-import GirlAndHorse from '../../../../../assets/images/public/about-us-page/girl-horse.jpg';
-import OldManAndHorse from '../../../../../assets/images/public/about-us-page/old-man-horse.jpg';
-import WomanAndHorse from '../../../../../assets/images/public/about-us-page/woman-horse.jpg';
+import { WHO_WE_ARE_TEXT } from '@const/admin/who-we-are';
+import MainPageImage from '@assets/images/public/about-us-page/background.jpg';
+import TeamPageImage from '@assets/images/public/about-us-page/our-team.jpg';
+import SupportVeterans from '@assets/images/public/about-us-page/support-veterans.jpg';
+import SupportVolunteers from '@assets/images/public/about-us-page/support-volunteers.jpg';
+import SupportChildren from '@assets/images/public/about-us-page/support-children.jpg';
+import ManAndHorse from '@assets/images/public/about-us-page/man-horse.jpg';
+import GirlAndHorse from '@assets/images/public/about-us-page/girl-horse.jpg';
+import OldManAndHorse from '@assets/images/public/about-us-page/old-man-horse.jpg';
+import WomanAndHorse from '@assets/images/public/about-us-page/woman-horse.jpg';
 import { DescriptionSectionProps } from './description-section/DescriptionSection';
 import { CardsSectionProps } from './cards-section/CardsSection';
 

@@ -1,7 +1,7 @@
 import { useRef, useMemo, useImperativeHandle, forwardRef } from 'react';
-import { SearchItemContentRef } from '../../../../../components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
+import { SearchItemContentRef } from '@components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
 import './FaqSearchItem.scss';
-import { FaqSearchItemData } from '../../../../../types/admin/faq';
+import { FaqSearchItemData } from '@app-types/admin/faq';
 
 export interface FaqSearchItemProps {
     item: FaqSearchItemData;

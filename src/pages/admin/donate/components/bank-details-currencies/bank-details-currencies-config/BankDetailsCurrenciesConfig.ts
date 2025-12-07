@@ -7,12 +7,12 @@ import {
     CreateForeignBankDetails,
     UpdateForeignBankDetails,
     BankCurrency,
-} from '../../../../../../types/admin/donate';
+} from '@/types/admin/donate';
 import { GenericFormProps, GenericFormRef } from '../../generic-form/GenericForm';
 import { FieldValues } from 'react-hook-form';
 import { CorrespondentBankDetailsForm, createBankDetailsForm } from '../bank-details-factory/BankDetailsFactory';
-import { BankDetailsUahApi } from '../../../../../../services/api/admin/donate/bank-details-uah/bank-details-uah-api';
-import { ForeignBankDetailsApi } from '../../../../../../services/api/admin/donate/bank-details-foreign/bank-details-foreign-api';
+import { BankDetailsUahApi } from '@/services/api/admin/donate/bank-details-uah/bank-details-uah-api';
+import { ForeignBankDetailsApi } from '@/services/api/admin/donate/bank-details-foreign/bank-details-foreign-api';
 import { AxiosInstance } from 'axios';
 
 export interface BankDetailsConfig<TItem extends FieldValues, TCreate = any, TUpdate = any> {

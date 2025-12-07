@@ -1,19 +1,19 @@
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { TEAM_MEMBERS_TEXT, TEAM_SEARCH } from '../../../../../const/admin/team';
-import { COMMON_TEXT_ADMIN, UI_CONFIG } from '../../../../../const/admin/common';
-import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
-import { StatusFilterDropdown } from '../../../../../components/admin/status-filter-dropdown/StatusFilterDropdown';
-import { Button } from '../../../../../components/admin/button/Button';
-import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
+import { VisibilityStatus } from '@app-types/admin/common';
+import { TEAM_MEMBERS_TEXT, TEAM_SEARCH } from '@const/admin/team';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@const/admin/common';
+import { SearchBar } from '@components/admin/search-bar/SearchBar';
+import { StatusFilterDropdown } from '@components/admin/status-filter-dropdown/StatusFilterDropdown';
+import { Button } from '@components/admin/button/Button';
+import { ReactComponent as PlusIcon } from '@assets/icons/plus.svg';
 import './TeamPageToolbar.scss';
-import { TeamMember } from '../../../../../types/admin/team-members';
-import { TeamCategory } from '../../../../../types/admin/team-category';
-import { TeamMemberSearchItem } from '../../../../../components/admin/search-bar/team-member-search-item/TeamMemberSearchItem';
+import { TeamMember } from '@app-types/admin/team-members';
+import { TeamCategory } from '@app-types/admin/team-category';
+import { TeamMemberSearchItem } from '@components/admin/search-bar/team-member-search-item/TeamMemberSearchItem';
 import { forwardRef, useMemo } from 'react';
 import {
     SearchItemContentRef,
     SearchItemContentRenderProps,
-} from '../../../../../components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
+} from '@components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
 
 export interface TeamPageToolbarProps {
     onSearchQueryChange: (query: string) => void;
@@ -28,6 +28,7 @@ export interface TeamPageToolbarProps {
     onSearchItemSelect: (item: TeamMember) => void;
     onSearchClear: () => void;
 }
+
 const TeamMemberItemRenderer = forwardRef<
     SearchItemContentRef,
     SearchItemContentRenderProps<TeamMember> & { categories: TeamCategory[] }

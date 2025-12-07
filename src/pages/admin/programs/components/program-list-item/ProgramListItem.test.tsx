@@ -2,17 +2,18 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ProgramListItem } from './ProgramListItem';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { VisibilityStatusLabelProps } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { Program } from '../../../../../types/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@const/admin/common';
+import { VisibilityStatusLabelProps } from '@components/admin/visibility-status-label/VisibilityStatusLabel';
+import { VisibilityStatus } from '@app-types/admin/common';
+import { Program } from '@app-types/admin/programs';
+import { ButtonTooltipProps } from '@components/admin/button-tooltip/ButtonTooltip';
 
-jest.mock('../../../../../assets/icons/blank-image.svg', () => ({
+jest.mock('@assets/icons/blank-image.svg', () => ({
     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="blank-image" className={className} />,
 }));
 
-jest.mock('../../../../../components/admin/button-tooltip/ButtonTooltip', () => ({
-    ButtonTooltip: ({ children, position }: { children: React.ReactNode; position: string }) => {
+jest.mock('@components/admin/button-tooltip/ButtonTooltip', () => ({
+    ButtonTooltip: ({ children, position }: ButtonTooltipProps) => {
         return (
             <div data-testid="tooltip-button" data-position={position}>
                 {children}
@@ -21,8 +22,8 @@ jest.mock('../../../../../components/admin/button-tooltip/ButtonTooltip', () => 
     },
 }));
 
-jest.mock('../../../../../components/admin/visibility-status-label/VisibilityStatusLabel', () => {
-    const { VisibilityStatus } = require('../../../../../types/admin/common');
+jest.mock('@components/admin/visibility-status-label/VisibilityStatusLabel', () => {
+    const { VisibilityStatus } = require('@app-types/admin/common');
     return {
         VisibilityStatusLabel: ({ status }: VisibilityStatusLabelProps) => {
             return <div data-testid="status">{VisibilityStatus[status]}</div>;

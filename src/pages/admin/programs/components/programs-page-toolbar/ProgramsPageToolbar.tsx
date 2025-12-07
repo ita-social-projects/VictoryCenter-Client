@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
-import { Button } from '../../../../../components/admin/button/Button';
-import { Select } from '../../../../../components/common/select/Select';
-import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
+import { ReactComponent as PlusIcon } from '@assets/icons/plus.svg';
+import { Button } from '@components/admin/button/Button';
+import { Select } from '@components/common/select/Select';
+import { SearchBar } from '@components/admin/search-bar/SearchBar';
 import { ProgramSearchItem } from '../program-search-item/ProgramSearchItem';
-import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { COMMON_TEXT_ADMIN, UI_CONFIG } from '../../../../../const/admin/common';
-import { ProgramsApi } from '../../../../../services/api/admin/programs/programs-api';
-import { ProgramSearchItemData } from '../../../../../types/admin/programs';
-import { VisibilityStatus } from '../../../../../types/admin/common';
+import { PROGRAMS_TEXT } from '@const/admin/programs';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@const/admin/common';
+import { ProgramsApi } from '@api/admin/programs/programs-api';
+import { ProgramSearchItemData } from '@app-types/admin/programs';
+import { VisibilityStatus } from '@app-types/admin/common';
 import {
     PaginationRequestParams,
     useDataPaginationFetch,
-} from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
+} from '@hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import './ProgramsPageToolbar.scss';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
 
 const SUGGESTIONS_PAGE_SIZE = 5;
 

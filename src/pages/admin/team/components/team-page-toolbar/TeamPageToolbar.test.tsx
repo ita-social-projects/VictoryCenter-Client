@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent, act, within } from '@testing-library/react';
 import { TeamPageToolbar } from './TeamPageToolbar';
-import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
-import { ProgramSearchItemData } from '../../../../../types/admin/programs';
+import { TEAM_MEMBERS_TEXT } from '@const/admin/team';
+import { COMMON_TEXT_ADMIN } from '@const/admin/common';
+import { VisibilityStatus } from '@app-types/admin/common';
+import { SearchBarProps } from '@components/admin/search-bar/SearchBar';
+import { ProgramSearchItemData } from '@app-types/admin/programs';
 
 type PartialProps = Partial<React.ComponentProps<typeof TeamPageToolbar>>;
 
@@ -33,11 +33,11 @@ const CATS_2 = [...CATS_1, { id: 'c2', name: 'Category 2' } as any];
 const ITEM_JOHN = [{ id: '1', fullName: 'John Doe' } as any];
 const ITEM_JANE = [{ id: '1', fullName: 'Jane Roe' } as any];
 
-jest.mock('../../../../../assets/icons/plus.svg', () => ({
+jest.mock('@assets/icons/plus.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="plus-icon" />,
 }));
 
-jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
+jest.mock('@components/admin/search-bar/SearchBar', () => ({
     SearchBar: (props: SearchBarProps<ProgramSearchItemData>) => {
         const {
             onQueryChange,
@@ -92,7 +92,7 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
     },
 }));
 
-jest.mock('../../../../../components/admin/search-bar/team-member-search-item/TeamMemberSearchItem', () => {
+jest.mock('@components/admin/search-bar/team-member-search-item/TeamMemberSearchItem', () => {
     const ReactActual = jest.requireActual('react');
     return {
         TeamMemberSearchItem: ReactActual.forwardRef(({ item, categories }: any, ref: any) => (

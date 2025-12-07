@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { SupportOptionsApi } from '../../../../../services/api/admin/donate/support-options/support-options-api';
-import { CorrespondentBankDetailsApi } from '../../../../../services/api/admin/donate/correspondent-banks/correspondent-banks-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { SupportOptionsApi } from '@/services/api/admin/donate/support-options/support-options-api';
+import { CorrespondentBankDetailsApi } from '@/services/api/admin/donate/correspondent-banks/correspondent-banks-api';
 import {
     ForeignBankDetailsDto,
     SupportOptionsDto,
@@ -13,9 +13,9 @@ import {
     CreateSupportOptionsDto,
     UpdateSupportOptionsDto,
     CorrespondentBankDetailsDto,
-} from '../../../../../types/admin/donate';
-import { DONATE_TEXT } from '../../../../../const/admin/donate';
-import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
+} from '@/types/admin/donate';
+import { DONATE_TEXT } from '@/const/admin/donate';
+import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import { GenericDetails } from '../generic-details/GenericDetails';
 import { SupportOptionsForm } from '../support-options/support-options-form/SupportOptionsForm';
 import {
@@ -23,9 +23,9 @@ import {
     useBankDetails,
     mapCurrencyToBankCurrency,
 } from '../bank-details-currencies/currencies-manager/CurrenciesManager';
-import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
-import { ToastType } from '../../../../../types/admin/toast';
-import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import {
     mapToCreateUahBankDetails,
     mapToUpdateUahBankDetails,

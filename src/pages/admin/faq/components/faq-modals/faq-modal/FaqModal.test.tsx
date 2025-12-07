@@ -1,19 +1,19 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
-import { VisibilityStatus, ModalMode } from '../../../../../../types/admin/common';
-import { FaqQuestion, VisitorPage } from '../../../../../../types/admin/faq';
+import { COMMON_TEXT_ADMIN } from '@const/admin/common';
+import { VisibilityStatus, ModalMode } from '@app-types/admin/common';
+import { FaqQuestion, VisitorPage } from '@app-types/admin/faq';
 import { FaqModal, FaqModalProps } from './FaqModal';
-import { FAQ_TEXT } from '../../../../../../const/admin/faq';
-import { FaqApi } from '../../../../../../services/api/admin/faq/faq-api';
+import { FAQ_TEXT } from '@const/admin/faq';
+import { FaqApi } from '@api/admin/faq/faq-api';
 
-jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn().mockReturnValue({
         // Add any properties the client should have
         defaults: { headers: { common: {} } },
     }),
 }));
 
-jest.mock('../../../../../../services/api/admin/faq/faq-api', () => {
+jest.mock('@api/admin/faq/faq-api', () => {
     return {
         FaqApi: {
             post: jest.fn(),
@@ -30,7 +30,7 @@ const mockFormRef = {
     isValid: jest.fn(() => true),
 };
 
-jest.mock('../../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
+jest.mock('@components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({
         title,
         isOpen,
@@ -55,7 +55,7 @@ jest.mock('../../../../../../components/admin/confirmation-modal/ConfirmationMod
         ) : null,
 }));
 
-jest.mock('../../../../../../components/admin/button/Button', () => ({
+jest.mock('@components/admin/button/Button', () => ({
     Button: ({
         onClick,
         disabled,
@@ -77,7 +77,7 @@ jest.mock('../../../../../../components/admin/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../../components/common/modal/Modal', () => {
+jest.mock('@components/common/modal/Modal', () => {
     const MockModal = ({
         onClose,
         children,

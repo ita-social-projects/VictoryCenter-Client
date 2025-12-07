@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, useImperativeHandle, forwardRef } from 'react';
-import { ProgramSearchItemData } from '../../../../../types/admin/programs';
-import { SearchItemContentRef } from '../../../../../components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
+import { ProgramSearchItemData } from '@app-types/admin/programs';
+import { SearchItemContentRef } from '@components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
 import './ProgramSearchItem.scss';
 
 export interface ProgramSearchItemProps {

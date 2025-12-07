@@ -1,14 +1,14 @@
 import React, { forwardRef, useCallback, useMemo } from 'react';
-import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-schema';
-import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { MultiSelectInputGroup } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
-import { PhotoInputGroup } from '../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup';
-import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
-import { Image, ImageValues } from '../../../../../types/common/image';
-import { ProgramCategory } from '../../../../../types/admin/programs';
-import { VisibilityStatus } from '../../../../../types/admin/common';
+import { PROGRAM_VALIDATION_FUNCTIONS } from '@validation/admin/program-schema/program-schema';
+import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '@const/admin/programs';
+import { InputWithCharacterLimitGroup } from '@components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { TextAreaWithCharacterLimitGroup } from '@components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { MultiSelectInputGroup } from '@components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
+import { PhotoInputGroup } from '@components/admin/input-groups/photo-input-group/PhotoInputGroup';
+import { useFormManager } from '@hooks/admin/use-form-manager/useFormManager';
+import { Image, ImageValues } from '@app-types/common/image';
+import { ProgramCategory } from '@app-types/admin/programs';
+import { VisibilityStatus } from '@app-types/admin/common';
 import './ProgramForm.scss';
 
 export interface ProgramFormValues {

@@ -1,12 +1,12 @@
 import { useState, useCallback, useRef } from 'react';
-import { Button } from '../../../../../components/admin/button/Button';
-import NotFoundIcon from '../../../../../assets/icons/not-found.svg';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { Button } from '@components/admin/button/Button';
+import NotFoundIcon from '@assets/icons/not-found.svg';
+import { COMMON_TEXT_ADMIN } from '@const/admin/common';
 import './GenericDetails.scss';
 import { FieldValues } from 'react-hook-form';
 import { GenericFormMode, GenericFormProps, GenericFormRef } from '../generic-form/GenericForm';
-import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
-import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
+import { InlineLoader } from '@components/common/inline-loader/InlineLoader';
+import { ReactComponent as PlusIcon } from '@assets/icons/plus.svg';
 
 export interface GenericDetailsProps<T extends FieldValues> {
     title?: string;

@@ -1,4 +1,4 @@
-@use '../../../../../assets/sass/variables/colors';
+@use '~@assets/sass/variables/colors';
 
 .generic-details {
     display: flex;
@@ -43,7 +43,7 @@
                 .arrow {
                     display: inline-block;
                     margin-left: 0.25rem;
-                    background: url('../../../../../assets/icons/chevron-down.svg') no-repeat center;
+                    background: url('~@assets/icons/chevron-down.svg') no-repeat center;
                     width: 1.5rem;
                     height: 1.5rem;
                     transition: transform 0.2s ease;

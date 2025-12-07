@@ -1,23 +1,23 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DeleteTeamCategoryModal } from './DeleteTeamCategoryModal';
-import { TeamCategory } from '../../../../../types/admin/team-category';
-import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { TEAM_CATEGORY_VALIDATION } from '../../../../../const/admin/team';
+import { TeamCategory } from '@app-types/admin/team-category';
+import { TeamCategoriesApi } from '@api/admin/team/team-categories/team-categories-api';
+import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
+import { COMMON_TEXT_ADMIN } from '@const/admin/common';
+import { TEAM_CATEGORY_VALIDATION } from '@const/admin/team';
 
-jest.mock('../../../../../services/api/admin/team/team-categories/team-categories-api', () => ({
+jest.mock('@api/admin/team/team-categories/team-categories-api', () => ({
     TeamCategoriesApi: {
         delete: jest.fn(),
     },
 }));
 
-jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
-jest.mock('../../../../../components/common/modal/Modal', () => {
+jest.mock('@components/common/modal/Modal', () => {
     const Modal = ({ children, isOpen, onClose }: any) =>
         isOpen ? (
             <div data-testid="modal">
@@ -35,7 +35,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     return { Modal };
 });
 
-jest.mock('../../../../../components/admin/button/Button', () => ({
+jest.mock('@components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled, buttonStyle }: any) => (
         <button
             data-testid={buttonStyle === 'secondary' ? 'cancel-button' : 'delete-button'}
@@ -47,7 +47,7 @@ jest.mock('../../../../../components/admin/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/admin/input-groups/single-select-input-group/SingleSelectInputGroup', () => ({
+jest.mock('@components/admin/input-groups/single-select-input-group/SingleSelectInputGroup', () => ({
     SingleSelectInputGroup: ({
         label,
         options,
@@ -87,7 +87,7 @@ jest.mock('../../../../../components/admin/input-groups/single-select-input-grou
     ),
 }));
 
-jest.mock('../../../../../components/admin/hint-box/HintBox', () => ({
+jest.mock('@components/admin/hint-box/HintBox', () => ({
     HintBox: ({ title, text }: any) => (
         <div data-testid="hint-box">
             <div data-testid="hint-title">{title}</div>

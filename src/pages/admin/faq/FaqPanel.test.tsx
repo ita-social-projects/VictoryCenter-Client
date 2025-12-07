@@ -5,7 +5,7 @@ jest.mock('./components/faq-panel-content/FaqPanelContent', () => ({
     FaqPanelContent: () => <div data-testid="faq-panel-content">Faq Panel Content</div>,
 }));
 
-jest.mock('../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider', () => ({
+jest.mock('@contexts/admin/visitor-pages-provider/VisitorPagesProvider', () => ({
     VisitorPagesProvider: ({ children }: any) => <div data-testid="visitor-pages-provider">{children}</div>,
 }));
 

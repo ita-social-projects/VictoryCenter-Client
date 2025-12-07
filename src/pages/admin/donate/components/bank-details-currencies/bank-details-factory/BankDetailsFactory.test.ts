@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { createBankDetailsForm, CorrespondentBankDetailsForm } from './BankDetailsFactory';
-import { BANK_DETAILS_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/bank-details-schema/bank-details-schema';
+import { BANK_DETAILS_VALIDATION_FUNCTIONS } from '@validation/admin/bank-details-schema/bank-details-schema';
 
-jest.mock('../../../../../../validation/admin/bank-details-schema/bank-details-schema', () => ({
+jest.mock('@validation/admin/bank-details-schema/bank-details-schema', () => ({
     BANK_DETAILS_VALIDATION_FUNCTIONS: {
         validateName: jest.fn(),
         validateReceiver: jest.fn(),

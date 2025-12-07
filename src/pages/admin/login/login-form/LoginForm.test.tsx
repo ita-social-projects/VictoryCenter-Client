@@ -1,19 +1,19 @@
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import * as AdminContext from '../../../../contexts/admin/admin-context-provider/AdminContextProvider';
+import * as AdminContext from '@contexts/admin/admin-context-provider/AdminContextProvider';
 import { LoginForm } from './LoginForm';
 import { MemoryRouter } from 'react-router-dom';
-import { LOGIN_CONST } from '../../../../const/admin/login';
+import { LOGIN_CONST } from '@const/admin/login';
 
-jest.mock('../../../../assets/icons/logo-with-text.svg', () => ({
+jest.mock('@assets/icons/logo-with-text.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="logo-icon" />,
 }));
 
-jest.mock('../../../../assets/icons/eye-opened.svg', () => ({
+jest.mock('@assets/icons/eye-opened.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="eye-opened-icon" />,
 }));
 
-jest.mock('../../../../assets/icons/eye-closed.svg', () => ({
+jest.mock('@assets/icons/eye-closed.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="eye-closed-icon" />,
 }));
 

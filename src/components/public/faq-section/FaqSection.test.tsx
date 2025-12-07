@@ -1,8 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { FaqSection } from './FaqSection';
-import { FaqApi } from '../../../services/api/public/faq/faq-api';
+import { FaqApi } from '@api/public/faq/faq-api';
 
-jest.mock('../../../services/api/public/faq/faq-api', () => ({
+jest.mock('@api/public/faq/faq-api', () => ({
     FaqApi: {
         getBySlug: jest.fn(),
     },

@@ -1,5 +1,5 @@
-import { PublishedProgramDto } from '../../../types/public/programs-page';
-import { ReactComponent as ArrowIcon } from '../../../assets/icons/arrow-up-right.svg';
+import { PublishedProgramDto } from '@app-types/public/programs-page';
+import { ReactComponent as ArrowIcon } from '@assets/icons/arrow-up-right.svg';
 import './ProgramCardProgramsPage.scss';
 import './ProgramCardAboutUsPage.scss';
 

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import i18n from '../../../locales/i18n';
-import { LOCALES } from '../../../const/common/locales';
+import i18n from '@locales/i18n';
+import { LOCALES } from '@const/common/locales';
 
 describe('LanguageSwitcher', () => {
     it('renders all language options', () => {

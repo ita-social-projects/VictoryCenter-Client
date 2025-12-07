@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './DropdownMenu.scss';
-import { ReactComponent as ArrowUp } from '../../../assets/icons/chevron-up.svg';
-import { ReactComponent as ArrowDown } from '../../../assets/icons/chevron-down.svg';
+import { ReactComponent as ArrowUp } from '@assets/icons/chevron-up.svg';
+import { ReactComponent as ArrowDown } from '@assets/icons/chevron-down.svg';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 export interface DropdownLink {

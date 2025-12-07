@@ -1,7 +1,7 @@
-@use '../../../assets/sass/variables/colors';
-@use '../../../assets/sass/variables/fonts';
-@use '../../../assets/sass/mixins/utilits.mixins';
-@use '../../../assets/sass/variables/z-index';
+@use '~@assets/sass/variables/colors';
+@use '~@assets/sass/variables/fonts';
+@use '~@assets/sass/mixins/utilits.mixins';
+@use '~@assets/sass/variables/z-index';
 
 .header-block {
     display: flex;

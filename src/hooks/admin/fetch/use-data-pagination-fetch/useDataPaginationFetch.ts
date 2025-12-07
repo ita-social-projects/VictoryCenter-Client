@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect, Dispatch, SetStateAction } from 'react';
-import { RequestOptions } from '../../../../types/common/api';
-import { PaginationResult } from '../../../../types/admin/common';
+import { RequestOptions } from '@app-types/common/api';
+import { PaginationResult } from '@app-types/admin/common';
 import axios from 'axios';
 
 export interface PaginationRequestParams {

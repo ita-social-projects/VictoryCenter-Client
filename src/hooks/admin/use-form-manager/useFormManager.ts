@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { VisibilityStatus } from '../../../types/admin/common';
+import { VisibilityStatus } from '@app-types/admin/common';
 
 export function useFormManager<TFormValues, TFormErrors extends Record<string, unknown>>({
     defaultFormState,

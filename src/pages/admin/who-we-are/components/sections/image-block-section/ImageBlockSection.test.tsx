@@ -7,9 +7,7 @@ import { COMMON_TEXT_ADMIN } from '@const/admin/common';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { Image } from '@app-types/common/image';
 import { InputWithCharacterLimitProps } from '@components/admin/input-with-character-limit/InputWithCharacterLimit';
-import {
-    TextAreaWithCharacterLimitProps
-} from '@components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { TextAreaWithCharacterLimitProps } from '@components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 
 jest.mock('@components/admin/image-input/ImageInput', () => ({
     ImageInput: ({ onChange, label, setError }: any) => (

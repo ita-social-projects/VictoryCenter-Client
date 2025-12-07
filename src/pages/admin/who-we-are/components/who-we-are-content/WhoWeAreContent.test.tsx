@@ -38,7 +38,13 @@ jest.mock('@components/admin/category-bar/CategoryBar', () => ({
 }));
 
 jest.mock('../sections-wrapper/SectionsWrapper', () => ({
-    SectionsWrapper: ({ section, onChange, onPublish, setIsPublishButtonActive, isPublishButtonActive }: MainSectionProps) => (
+    SectionsWrapper: ({
+        section,
+        onChange,
+        onPublish,
+        setIsPublishButtonActive,
+        isPublishButtonActive,
+    }: MainSectionProps) => (
         <div>
             <h2>{section?.title}</h2>
             {section?.contents.map((content: Content) => (

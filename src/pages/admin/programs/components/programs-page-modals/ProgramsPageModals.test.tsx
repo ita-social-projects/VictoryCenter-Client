@@ -4,12 +4,8 @@ import { Program, ProgramCategory } from '@app-types/admin/programs';
 import { UseModalsStateResult } from '@hooks/admin/use-modals-state/useModalsState';
 import { VisibilityStatus } from '@app-types/admin/common';
 import { ProgramModalProps } from '@pages/admin/programs/components/programs-page-modals/program-modal/ProgramModal';
-import {
-    DeleteProgramModalProps
-} from '@pages/admin/programs/components/programs-page-modals/delete-program-modal/DeleteProgramModal';
-import {
-    ProgramCategoryModalProps
-} from '@pages/admin/programs/components/program-category-modals/ProgramCategoryModal';
+import { DeleteProgramModalProps } from '@pages/admin/programs/components/programs-page-modals/delete-program-modal/DeleteProgramModal';
+import { ProgramCategoryModalProps } from '@pages/admin/programs/components/program-category-modals/ProgramCategoryModal';
 
 jest.mock('./program-modal/ProgramModal', () => ({
     ProgramModal: ({ isOpen, mode }: ProgramModalProps) => {
@@ -19,7 +15,8 @@ jest.mock('./program-modal/ProgramModal', () => ({
 }));
 
 jest.mock('./delete-program-modal/DeleteProgramModal', () => ({
-    DeleteProgramModal: ({ isOpen }: DeleteProgramModalProps) => (isOpen ? <div data-testid="delete-program-modal" /> : null),
+    DeleteProgramModal: ({ isOpen }: DeleteProgramModalProps) =>
+        isOpen ? <div data-testid="delete-program-modal" /> : null,
 }));
 
 jest.mock('../program-category-modals/ProgramCategoryModal', () => ({
@@ -28,7 +25,8 @@ jest.mock('../program-category-modals/ProgramCategoryModal', () => ({
 }));
 
 jest.mock('../program-category-modals/DeleteCategoryModal', () => ({
-    DeleteCategoryModal: ({ isOpen }: DeleteProgramModalProps) => (isOpen ? <div data-testid="delete-category-modal" /> : null),
+    DeleteCategoryModal: ({ isOpen }: DeleteProgramModalProps) =>
+        isOpen ? <div data-testid="delete-category-modal" /> : null,
 }));
 
 describe('ProgramsPageModals', () => {

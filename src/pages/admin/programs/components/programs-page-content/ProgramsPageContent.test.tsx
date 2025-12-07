@@ -81,7 +81,14 @@ jest.mock('@components/admin/category-bar/CategoryBar', () => ({
 }));
 
 jest.mock('@components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
-    InfiniteScrollList: ({ items, renderItem, isLoading, hasMore, onLoadMore, emptyStateMessage }: InfiniteScrollListProps<Program>) => (
+    InfiniteScrollList: ({
+        items,
+        renderItem,
+        isLoading,
+        hasMore,
+        onLoadMore,
+        emptyStateMessage,
+    }: InfiniteScrollListProps<Program>) => (
         <div data-testid="infinite-scroll-list">
             {isLoading && <div data-testid="loader">Loading</div>}
             {!isLoading && items.length === 0 && <div data-testid="empty">{emptyStateMessage}</div>}

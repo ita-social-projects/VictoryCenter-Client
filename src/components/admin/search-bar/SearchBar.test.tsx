@@ -74,11 +74,9 @@ describe('SearchBar', () => {
         require('@hooks/common/use-scroll-handler/useScrollHandler').useScrollHandler.mockReturnValue({
             handleScroll: jest.fn(),
         });
-        require('@hooks/common/use-observe-element-size/useObserveElementSize').useObserveElementSize.mockReturnValue(
-            {
-                width: 300,
-            },
-        );
+        require('@hooks/common/use-observe-element-size/useObserveElementSize').useObserveElementSize.mockReturnValue({
+            width: 300,
+        });
         require('@hooks/common/use-container-size-from-children/useContainerSizeFromChildren').useContainerSizeFromChildren.mockReturnValue(
             {
                 calculatedSize: 200,

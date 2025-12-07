@@ -6,36 +6,29 @@ import { PROGRAM_VALIDATION } from '@const/admin/programs';
 import { ProgramCategory } from '@app-types/admin/programs';
 import { Image } from '@app-types/common/image';
 import { VisibilityStatus } from '@app-types/admin/common';
-import {
-    InputWithCharacterLimitGroupProps
-} from '@components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import {
-    TextAreaWithCharacterLimitGroupProps
-} from '@components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { InputWithCharacterLimitGroupProps } from '@components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { TextAreaWithCharacterLimitGroupProps } from '@components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 
-jest.mock(
-    '@components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
-    () => ({
-        InputWithCharacterLimitGroup: (props: InputWithCharacterLimitGroupProps) => (
-            <div data-testid={`input-group-${props.id}`}>
-                <label htmlFor={props.id}>
-                    {props.label} {props.isRequired && '*'}
-                </label>
-                <input
-                    id={props.id}
-                    name={props.name}
-                    value={props.value}
-                    onChange={props.onChange}
-                    onBlur={props.onBlur}
-                    disabled={props.disabled}
-                    maxLength={props.maxLength}
-                    data-testid={`input-${props.name}`}
-                />
-                {props.error && <div data-testid={`error-${props.id}`}>{props.error}</div>}
-            </div>
-        ),
-    }),
-);
+jest.mock('@components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
+    InputWithCharacterLimitGroup: (props: InputWithCharacterLimitGroupProps) => (
+        <div data-testid={`input-group-${props.id}`}>
+            <label htmlFor={props.id}>
+                {props.label} {props.isRequired && '*'}
+            </label>
+            <input
+                id={props.id}
+                name={props.name}
+                value={props.value}
+                onChange={props.onChange}
+                onBlur={props.onBlur}
+                disabled={props.disabled}
+                maxLength={props.maxLength}
+                data-testid={`input-${props.name}`}
+            />
+            {props.error && <div data-testid={`error-${props.id}`}>{props.error}</div>}
+        </div>
+    ),
+}));
 
 jest.mock(
     '@components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',

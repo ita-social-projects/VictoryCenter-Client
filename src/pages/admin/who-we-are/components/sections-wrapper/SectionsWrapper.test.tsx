@@ -6,9 +6,7 @@ import { ContentType, SectionType } from '@app-types/common/about-us';
 import { Content } from '@app-types/admin/who-we-are';
 import { Image } from '@app-types/common/image';
 import { CardsSectionProps } from '@pages/admin/who-we-are/components/sections/cards-section/CardsSection';
-import {
-    DescriptionSectionProps
-} from '@pages/admin/who-we-are/components/sections/description-section/DescriptionSection';
+import { DescriptionSectionProps } from '@pages/admin/who-we-are/components/sections/description-section/DescriptionSection';
 import { ImageSectionProps } from '@pages/admin/who-we-are/components/sections/image-block-section/ImageBlockSection';
 
 jest.mock('../sections/cards-section/CardsSection', () => ({

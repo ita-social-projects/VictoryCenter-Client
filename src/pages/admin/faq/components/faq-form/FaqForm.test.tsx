@@ -23,23 +23,20 @@ jest.mock('@components/admin/input-groups/multi-select-input-group/MultiSelectIn
     },
 }));
 
-jest.mock(
-    '@components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
-    () => ({
-        InputWithCharacterLimitGroup: (props: any) => (
-            <div data-testid="input-with-char-limit">
-                <input
-                    data-testid="question-input"
-                    value={props.value}
-                    onChange={props.onChange}
-                    onBlur={props.onBlur}
-                    disabled={props.disabled}
-                />
-                {props.error && <span data-testid="question-error">{props.error}</span>}
-            </div>
-        ),
-    }),
-);
+jest.mock('@components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
+    InputWithCharacterLimitGroup: (props: any) => (
+        <div data-testid="input-with-char-limit">
+            <input
+                data-testid="question-input"
+                value={props.value}
+                onChange={props.onChange}
+                onBlur={props.onBlur}
+                disabled={props.disabled}
+            />
+            {props.error && <span data-testid="question-error">{props.error}</span>}
+        </div>
+    ),
+}));
 
 jest.mock(
     '@components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',

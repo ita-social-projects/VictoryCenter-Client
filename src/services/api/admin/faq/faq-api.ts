@@ -1,12 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { PaginationResult, VisibilityStatus } from '@app-types/admin/common';
-import {
-    FaqCreateUpdate,
-    FaqQuestionDto,
-    FaqSearchItemData,
-    ReorderFaq,
-    VisitorPage,
-} from '@app-types/admin/faq';
+import { FaqCreateUpdate, FaqQuestionDto, FaqSearchItemData, ReorderFaq, VisitorPage } from '@app-types/admin/faq';
 import { API_ROUTES } from '@const/common/api-routes/main-api';
 import { PaginationRequestParams } from '@hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 

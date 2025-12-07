@@ -6,12 +6,18 @@ import { ModalMode, VisibilityStatus } from '@app-types/admin/common';
 import { TeamCategory } from '@app-types/admin/team-category';
 import { TeamMember } from '@app-types/admin/team-members';
 import { TeamMemberModalProps } from '@pages/admin/team/components/team-member-modal/TeamMemberModal';
-import {
-    DeleteTeamMemberModalProps
-} from '@pages/admin/team/components/delete-team-member-modal/DeleteTeamMemberModal';
+import { DeleteTeamMemberModalProps } from '@pages/admin/team/components/delete-team-member-modal/DeleteTeamMemberModal';
 
 jest.mock('../team-member-modal/TeamMemberModal', () => ({
-    TeamMemberModal: ({ mode, isOpen, onClose, onAddMember, onEditMember, memberToEdit, categories }: TeamMemberModalProps) => (
+    TeamMemberModal: ({
+        mode,
+        isOpen,
+        onClose,
+        onAddMember,
+        onEditMember,
+        memberToEdit,
+        categories,
+    }: TeamMemberModalProps) => (
         <div data-testid="team-member-modal">
             <span data-testid="modal-mode">{mode}</span>
             <span data-testid="modal-is-open">{isOpen.toString()}</span>

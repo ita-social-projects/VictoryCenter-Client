@@ -12,9 +12,7 @@ import { ModalProps } from '@components/common/modal/Modal';
 import { ButtonProps } from '@components/admin/button/Button';
 import { HintBoxProps } from '@components/admin/hint-box/HintBox';
 import { ConfirmationModalProps } from '@components/admin/confirmation-modal/ConfirmationModal';
-import {
-    TextAreaWithCharacterLimitGroupProps
-} from '@components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { TextAreaWithCharacterLimitGroupProps } from '@components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 
 jest.mock('@hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -79,40 +77,37 @@ jest.mock('@components/admin/confirmation-modal/ConfirmationModal', () => ({
         ) : null,
 }));
 
-jest.mock(
-    '@components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
-    () => ({
-        InputWithCharacterLimitGroup: ({
-            label,
-            error,
-            value,
-            onChange,
-            onBlur,
-            name,
-            id,
-            maxLength,
-            disabled,
-            isRequired,
-        }: any) => (
-            <div data-testid={`input-group-${name}`}>
-                <label data-testid={`label-${name}`}>
-                    {label} {isRequired && '*'}
-                </label>
-                <input
-                    data-testid={`input-${name}`}
-                    value={value}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    name={name}
-                    id={id}
-                    maxLength={maxLength}
-                    disabled={disabled}
-                />
-                {error && <div data-testid={`error-${name}`}>{error}</div>}
-            </div>
-        ),
-    }),
-);
+jest.mock('@components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
+    InputWithCharacterLimitGroup: ({
+        label,
+        error,
+        value,
+        onChange,
+        onBlur,
+        name,
+        id,
+        maxLength,
+        disabled,
+        isRequired,
+    }: any) => (
+        <div data-testid={`input-group-${name}`}>
+            <label data-testid={`label-${name}`}>
+                {label} {isRequired && '*'}
+            </label>
+            <input
+                data-testid={`input-${name}`}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                name={name}
+                id={id}
+                maxLength={maxLength}
+                disabled={disabled}
+            />
+            {error && <div data-testid={`error-${name}`}>{error}</div>}
+        </div>
+    ),
+}));
 
 jest.mock(
     '@components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',

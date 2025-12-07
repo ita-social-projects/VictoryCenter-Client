@@ -6,9 +6,7 @@ import { ContentType } from '@app-types/common/about-us';
 import { COMMON_TEXT_ADMIN } from '@const/admin/common';
 import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@validation/admin/who-we-are-schema/WhoWeAreSchema';
 import { OurMissionProps } from '@pages/public/about-us-page/our-mission/OurMission';
-import {
-    TextAreaWithCharacterLimitProps
-} from '@components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { TextAreaWithCharacterLimitProps } from '@components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 
 jest.mock('@components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
     TextAreaWithCharacterLimit: ({ onChange, value, maxLength, onBlur, name, id }: TextAreaWithCharacterLimitProps) => (

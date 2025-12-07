@@ -4,6 +4,8 @@ import {
     CreateUahBankDetails,
     UpdateUahBankDetails,
     ForeignBankDetailsDto,
+    CreateForeignBankDetails,
+    UpdateForeignBankDetails,
     BankCurrency,
 } from '../../../../../../types/admin/donate';
 import { GenericFormProps, GenericFormRef } from '../../generic-form/GenericForm';
@@ -13,13 +15,13 @@ import { BankDetailsUahApi } from '../../../../../../services/api/admin/donate/b
 import { ForeignBankDetailsApi } from '../../../../../../services/api/admin/donate/bank-details-foreign/bank-details-foreign-api';
 import { AxiosInstance } from 'axios';
 
-export interface BankDetailsConfig<TItem extends FieldValues> {
+export interface BankDetailsConfig<TItem extends FieldValues, TCreate = any, TUpdate = any> {
     form: ForwardRefExoticComponent<GenericFormProps<TItem> & RefAttributes<GenericFormRef>>;
     createEmptyItem: (data: Partial<TItem>) => TItem;
     withCorrespondentBanks?: boolean;
     fetch: (client: AxiosInstance, currency?: BankCurrency) => Promise<TItem[]>;
-    create: (client: AxiosInstance, data: any) => Promise<TItem>;
-    update: (client: AxiosInstance, id: number, data: any) => Promise<TItem>;
+    create: (client: AxiosInstance, data: TCreate) => Promise<TItem>;
+    update: (client: AxiosInstance, id: number, data: TUpdate) => Promise<TItem>;
     delete: (client: AxiosInstance, id: number) => Promise<void>;
     correspondentForm?: ForwardRefExoticComponent<GenericFormProps<any> & RefAttributes<GenericFormRef>>;
     currency?: BankCurrency;
@@ -47,9 +49,9 @@ export const bankDetailsConfig: Record<string, BankDetailsConfig<any>> = {
         correspondentForm: CorrespondentBankDetailsForm,
         currency: BankCurrency.Usd,
         fetch: (client: AxiosInstance) => ForeignBankDetailsApi.getAll(client, BankCurrency.Usd),
-        create: (client: AxiosInstance, data: Omit<ForeignBankDetailsDto, 'id'>) =>
+        create: (client: AxiosInstance, data: CreateForeignBankDetails) =>
             ForeignBankDetailsApi.create(client, { ...data, currency: BankCurrency.Usd }),
-        update: (client: AxiosInstance, id: number, data: Partial<ForeignBankDetailsDto>) =>
+        update: (client: AxiosInstance, id: number, data: UpdateForeignBankDetails) =>
             ForeignBankDetailsApi.update(client, id, data),
         delete: (client: AxiosInstance, id: number) => ForeignBankDetailsApi.delete(client, id),
     },
@@ -65,9 +67,9 @@ export const bankDetailsConfig: Record<string, BankDetailsConfig<any>> = {
         correspondentForm: CorrespondentBankDetailsForm,
         currency: BankCurrency.Eur,
         fetch: (client: AxiosInstance) => ForeignBankDetailsApi.getAll(client, BankCurrency.Eur),
-        create: (client: AxiosInstance, data: Omit<ForeignBankDetailsDto, 'id'>) =>
+        create: (client: AxiosInstance, data: CreateForeignBankDetails) =>
             ForeignBankDetailsApi.create(client, { ...data, currency: BankCurrency.Eur }),
-        update: (client: AxiosInstance, id: number, data: Partial<ForeignBankDetailsDto>) =>
+        update: (client: AxiosInstance, id: number, data: UpdateForeignBankDetails) =>
             ForeignBankDetailsApi.update(client, id, data),
         delete: (client: AxiosInstance, id: number) => ForeignBankDetailsApi.delete(client, id),
     },

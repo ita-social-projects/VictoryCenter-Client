@@ -1,6 +1,11 @@
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { ForeignBankDetailsDto, BankCurrency } from '../../../../../types/admin/donate';
+import {
+    ForeignBankDetailsDto,
+    BankCurrency,
+    CreateForeignBankDetails,
+    UpdateForeignBankDetails,
+} from '../../../../../types/admin/donate';
 
 export const ForeignBankDetailsApi = {
     getAll: async (client: AxiosInstance, currency: BankCurrency): Promise<ForeignBankDetailsDto[]> => {
@@ -10,10 +15,7 @@ export const ForeignBankDetailsApi = {
         return response.data;
     },
 
-    create: async (
-        client: AxiosInstance,
-        bankDetails: Omit<ForeignBankDetailsDto, 'id'>,
-    ): Promise<ForeignBankDetailsDto> => {
+    create: async (client: AxiosInstance, bankDetails: CreateForeignBankDetails): Promise<ForeignBankDetailsDto> => {
         const response = await client.post<ForeignBankDetailsDto>(API_ROUTES.DONATE.BANK_DETAILS_FOREIGN, bankDetails);
         return response.data;
     },
@@ -21,7 +23,7 @@ export const ForeignBankDetailsApi = {
     update: async (
         client: AxiosInstance,
         id: number,
-        bankDetails: Partial<ForeignBankDetailsDto>,
+        bankDetails: UpdateForeignBankDetails,
     ): Promise<ForeignBankDetailsDto> => {
         const response = await client.put<ForeignBankDetailsDto>(
             `${API_ROUTES.DONATE.BANK_DETAILS_FOREIGN}/${id}`,

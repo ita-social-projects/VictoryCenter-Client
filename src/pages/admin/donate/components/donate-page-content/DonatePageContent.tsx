@@ -6,14 +6,13 @@ import {
     ForeignBankDetailsDto,
     SupportOptionsDto,
     UahBankDetailsDto,
-    CreateCorrespondentBankDetails,
-    UpdateCorrespondentBankDetails,
     CreateUahBankDetails,
     UpdateUahBankDetails,
     CreateForeignBankDetails,
     UpdateForeignBankDetails,
     CreateSupportOptionsDto,
     UpdateSupportOptionsDto,
+    CorrespondentBankDetailsDto,
 } from '../../../../../types/admin/donate';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
@@ -27,6 +26,14 @@ import {
 import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '../../../../../types/admin/toast';
 import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
+import {
+    mapToCreateUahBankDetails,
+    mapToUpdateUahBankDetails,
+    mapToCreateForeignBankDetails,
+    mapToUpdateForeignBankDetails,
+    mapToCreateCorrespondentBankDetails,
+    mapToUpdateCorrespondentBankDetails,
+} from '../../../../../utils/functions/mappers/admin/donate-mappers';
 import './DonatePageContent.scss';
 
 export const DonatePageContent = () => {
@@ -130,9 +137,11 @@ export const DonatePageContent = () => {
         async (data: UahBankDetailsDto | ForeignBankDetailsDto) => {
             if (!config) return;
             try {
-                // Remove fields that shouldn't be sent to API (id, currency, correspondentBanks)
-                const { id, currency, correspondentBanks, ...cleanData } = data as ForeignBankDetailsDto;
-                const newItem = await config.create(client, cleanData);
+                const createData: CreateUahBankDetails | CreateForeignBankDetails =
+                    'correspondentBanks' in data
+                        ? mapToCreateForeignBankDetails(data)
+                        : mapToCreateUahBankDetails(data);
+                const newItem = await config.create(client, createData);
 
                 setItems((prev: (UahBankDetailsDto | ForeignBankDetailsDto)[]) => [...prev, newItem]);
             } catch (error) {
@@ -146,9 +155,11 @@ export const DonatePageContent = () => {
         async (id: number, data: UahBankDetailsDto | ForeignBankDetailsDto) => {
             if (!config) return;
             try {
-                // Remove fields that shouldn't be sent to API (id, currency, correspondentBanks)
-                const { id: _id, currency, correspondentBanks, ...cleanData } = data as ForeignBankDetailsDto;
-                const updatedItem = await config.update(client, id, cleanData);
+                const updateData: UpdateUahBankDetails | UpdateForeignBankDetails =
+                    'correspondentBanks' in data
+                        ? mapToUpdateForeignBankDetails(data)
+                        : mapToUpdateUahBankDetails(data);
+                const updatedItem = await config.update(client, id, updateData);
 
                 setItems((prev: (UahBankDetailsDto | ForeignBankDetailsDto)[]) =>
                     prev.map((item) => {
@@ -185,9 +196,10 @@ export const DonatePageContent = () => {
 
     // Correspondent Bank Details handlers
     const handleCreateCorrespondentBank = useCallback(
-        async (foreignBankId: number, data: CreateCorrespondentBankDetails) => {
+        async (foreignBankId: number, data: CorrespondentBankDetailsDto) => {
             try {
-                const newBank = await CorrespondentBankDetailsApi.create(client, data);
+                const createData = mapToCreateCorrespondentBankDetails(data, foreignBankId);
+                const newBank = await CorrespondentBankDetailsApi.create(client, createData);
                 setItems((prev: any) =>
                     prev.map((item: any) =>
                         item.id === foreignBankId
@@ -203,9 +215,10 @@ export const DonatePageContent = () => {
     );
 
     const handleUpdateCorrespondentBank = useCallback(
-        async (foreignBankId: number, id: number, data: UpdateCorrespondentBankDetails) => {
+        async (foreignBankId: number, id: number, data: CorrespondentBankDetailsDto) => {
             try {
-                const updatedBank = await CorrespondentBankDetailsApi.update(client, id, data);
+                const updateData = mapToUpdateCorrespondentBankDetails(data);
+                const updatedBank = await CorrespondentBankDetailsApi.update(client, id, updateData);
                 setItems((prev: any) =>
                     prev.map((item: any) =>
                         item.id === foreignBankId

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ContextMenuButton } from '../context-menu-button/ContextMenuButton';
 import { CategoryButton } from '../category-button/CategoryButton';
-import { ReactComponent as ArrowLeftIcon } from '../../../assets/icons/arrow-left.svg';
-import { ReactComponent as ArrowRightIcon } from '../../../assets/icons/arrow-right.svg';
+import { ReactComponent as ArrowLeftIcon } from '@assets/icons/arrow-left.svg';
+import { ReactComponent as ArrowRightIcon } from '@assets/icons/arrow-right.svg';
 import './CategoryBar.scss';
 
 export interface ContextMenuOption {

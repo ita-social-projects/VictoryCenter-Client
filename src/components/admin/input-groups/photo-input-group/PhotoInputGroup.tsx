@@ -1,7 +1,7 @@
 import React from 'react';
-import { InputLabel, InputLabelProps } from '../../input-label/InputLabel';
-import { InputError, InputErrorProps } from '../../input-error/InputError';
-import { ImageInput, ImageInputProps } from '../../image-input/ImageInput';
+import { InputLabel, InputLabelProps } from '@components/admin/input-label/InputLabel';
+import { InputError, InputErrorProps } from '@components/admin/input-error/InputError';
+import { ImageInput, ImageInputProps } from '@components/admin/image-input/ImageInput';
 import '../input-group.scss';
 
 export interface PhotoInputGroupProps extends ImageInputProps {

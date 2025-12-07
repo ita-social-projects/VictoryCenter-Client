@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ReactComponent as SearchIcon } from '../../../assets/icons/la_search.svg';
-import { ReactComponent as ClearIcon } from '../../../assets/icons/remove-query.svg';
-import { Tooltip } from '../tooltip/Tooltip';
-import { InlineLoader } from '../../common/inline-loader/InlineLoader';
-import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/useOnClickOutside';
-import { useScrollHandler } from '../../../hooks/common/use-scroll-handler/useScrollHandler';
-import { useDebouncedValueCallback } from '../../../hooks/common/use-debounced-value-callback/useDebouncedValueCallback';
-import { useObserveElementSize } from '../../../hooks/common/use-observe-element-size/useObserveElementSize';
-import { useContainerSizeFromChildren } from '../../../hooks/common/use-container-size-from-children/useContainerSizeFromChildren';
+import { ReactComponent as SearchIcon } from '@assets/icons/la_search.svg';
+import { ReactComponent as ClearIcon } from '@assets/icons/remove-query.svg';
+import { Tooltip } from '@components/admin/tooltip/Tooltip';
+import { InlineLoader } from '@components/common/inline-loader/InlineLoader';
+import { useOnClickOutside } from '@hooks/common/use-on-click-outside/useOnClickOutside';
+import { useScrollHandler } from '@hooks/common/use-scroll-handler/useScrollHandler';
+import { useDebouncedValueCallback } from '@hooks/common/use-debounced-value-callback/useDebouncedValueCallback';
+import { useObserveElementSize } from '@hooks/common/use-observe-element-size/useObserveElementSize';
+import { useContainerSizeFromChildren } from '@hooks/common/use-container-size-from-children/useContainerSizeFromChildren';
 import {
     SearchItemWrapper,
     SearchItemContentRenderProps,

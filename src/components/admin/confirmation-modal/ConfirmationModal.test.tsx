@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ConfirmationModal, ConfirmationModalProps } from './ConfirmationModal';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { COMMON_TEXT_ADMIN } from '@const/admin/common';
 
 describe('ConfirmationModal', () => {
     const defaultProps: ConfirmationModalProps = {

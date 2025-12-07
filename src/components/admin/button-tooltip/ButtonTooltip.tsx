@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useId } from 'react';
-import { ReactComponent as InfoIcon } from '../../../assets/icons/info.svg';
+import { ReactComponent as InfoIcon } from '@assets/icons/info.svg';
 import { Tooltip, TooltipPosition } from '../tooltip/Tooltip';
-import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/useOnClickOutside';
+import { useOnClickOutside } from '@hooks/common/use-on-click-outside/useOnClickOutside';
 import './ButtonTooltip.scss';
 
 export interface ButtonTooltipProps {

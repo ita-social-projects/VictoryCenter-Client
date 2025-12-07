@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ContextMenuButton } from './ContextMenuButton';
 
-jest.mock('../../../assets/icons/menu.svg', () => ({
+jest.mock('@assets/icons/menu.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="menu-icon" />,
 }));
 

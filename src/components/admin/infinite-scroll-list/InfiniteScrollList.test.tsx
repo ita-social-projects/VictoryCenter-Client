@@ -2,14 +2,14 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { InfiniteScrollList, InfiniteScrollListProps } from './InfiniteScrollList';
 
-jest.mock('../../../assets/icons/not-found.svg', () => ({
+jest.mock('@assets/icons/not-found.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="not-found-icon" />,
 }));
-jest.mock('../../../assets/icons/arrow-up.svg', () => ({
+jest.mock('@assets/icons/arrow-up.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="arrow-up-icon" />,
 }));
 
-jest.mock('../../common/inline-loader/InlineLoader', () => ({
+jest.mock('@components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: (props: any) => <svg {...props} data-testid="loader-icon" />,
 }));
 

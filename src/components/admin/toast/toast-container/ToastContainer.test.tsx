@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ToastContainer } from './ToastContainer';
-import { useToast } from '../../../../contexts/admin/toast-context-provider/ToastContextProvider';
-import { Toast } from '../../../../types/admin/toast';
+import { useToast } from '@contexts/admin/toast-context-provider/ToastContextProvider';
+import { Toast } from '@app-types/admin/toast';
 
-jest.mock('../../../../contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+jest.mock('@contexts/admin/toast-context-provider/ToastContextProvider', () => ({
     useToast: jest.fn(),
 }));
 

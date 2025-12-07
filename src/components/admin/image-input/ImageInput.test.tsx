@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { convertFileToBase64, ImageInput, getImageSrc } from './ImageInput';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { Image, ImageValues } from '../../../types/common/image';
+import { COMMON_TEXT_ADMIN } from '@const/admin/common';
+import { Image, ImageValues } from '@app-types/common/image';
 
-jest.mock('../confirmation-modal/ConfirmationModal', () => ({
+jest.mock('@components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, onConfirm, onCancel, onClose }: any) => {
         if (!isOpen) return null;
         return (
@@ -25,11 +25,11 @@ jest.mock('../confirmation-modal/ConfirmationModal', () => ({
 
 const createImageFile = () => new File(['dummy content'], 'example.png', { type: 'image/png' });
 
-jest.mock('../../../assets/icons/cloud-download.svg', () => ({
+jest.mock('@assets/icons/cloud-download.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="upload-icon" />,
 }));
 
-jest.mock('../../../assets/icons/delete.svg', () => ({
+jest.mock('@assets/icons/delete.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="delete-icon" />,
 }));
 

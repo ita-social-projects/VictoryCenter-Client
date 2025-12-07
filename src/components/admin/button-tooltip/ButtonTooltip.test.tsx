@@ -3,8 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ButtonTooltip, ButtonTooltipProps } from './ButtonTooltip';
 import { TooltipProps } from '../tooltip/Tooltip';
 
-// Mock the SVG as a React component instead of a string
-jest.mock('../../../assets/icons/info.svg', () => ({
+jest.mock('@assets/icons/info.svg', () => ({
     ReactComponent: ({ className, ...props }: any) => (
         <svg className={className} data-testid="info-icon" {...props}>
             <title>Info Icon</title>

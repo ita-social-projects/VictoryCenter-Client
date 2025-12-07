@@ -1,6 +1,6 @@
-import { Toast } from '../../../../types/admin/toast';
+import { Toast } from '@app-types/admin/toast';
+import { ReactComponent as InfoIcon } from '@assets/icons/info.svg';
 import './ToastItem.scss';
-import { ReactComponent as InfoIcon } from '../../../../assets/icons/info.svg';
 
 export const ToastItem = ({ toast }: { toast: Toast }) => {
     return (

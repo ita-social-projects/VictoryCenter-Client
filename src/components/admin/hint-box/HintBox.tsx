@@ -1,4 +1,4 @@
-import { ReactComponent as InfoIcon } from '../../../assets/icons/info.svg';
+import { ReactComponent as InfoIcon } from '@assets/icons/info.svg';
 import './HintBox.scss';
 
 export interface HintBoxProps {

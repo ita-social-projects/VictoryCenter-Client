@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { CorrespondentBankDetailsApi } from './correspondent-banks-api';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
+import { API_ROUTES } from '@const/common/api-routes/main-api';
 
 describe('CorrespondentBankDetailsApi', () => {
     const mockClient = {

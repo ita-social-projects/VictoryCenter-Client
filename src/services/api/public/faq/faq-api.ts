@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
-import { PublishedFaqQuestion } from '../../../../types/public/faq-section';
+import { API_ROUTES } from '@const/common/api-routes/main-api';
+import { PublishedFaqQuestion } from '@app-types/public/faq-section';
 
 export const FaqApi = {
     getBySlug: async (client: AxiosInstance, slug: string): Promise<PublishedFaqQuestion[]> => {

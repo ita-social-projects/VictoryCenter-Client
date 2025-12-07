@@ -1,6 +1,6 @@
-import { axiosInstance } from '../../axios';
-import { ProgramsPageData, PublishedProgramDto } from '../../../../types/public/programs-page';
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
+import { axiosInstance } from '@api/axios';
+import { ProgramsPageData, PublishedProgramDto } from '@app-types/public/programs-page';
+import { API_ROUTES } from '@const/common/api-routes/main-api';
 
 export const programPageDataFetch = async (): Promise<ProgramsPageData> => {
     const response = await axiosInstance.get<PublishedProgramDto[]>(API_ROUTES.PROGRAMS.PUBLISHED);

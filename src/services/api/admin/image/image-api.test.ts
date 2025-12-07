@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
-import { Image, ImageValues } from '../../../../types/common/image';
+import { Image, ImageValues } from '@app-types/common/image';
 import { ImageApi } from './image-api';
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
+import { API_ROUTES } from '@const/common/api-routes/main-api';
 
 const mockClient = {
     get: jest.fn(),

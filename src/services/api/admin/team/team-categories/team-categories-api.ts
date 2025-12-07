@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { TeamCategory, TeamCategoryCreateUpdate } from '../../../../../types/admin/team-category';
+import { API_ROUTES } from '@const/common/api-routes/main-api';
+import { TeamCategory, TeamCategoryCreateUpdate } from '@app-types/admin/team-category';
 
 type TeamCategoryPayload = Omit<TeamCategoryCreateUpdate, 'id'>;
 const toPayload = (category: TeamCategoryCreateUpdate): TeamCategoryPayload => {

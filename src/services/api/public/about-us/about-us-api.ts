@@ -1,6 +1,6 @@
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
-import { AboutUsSection } from '../../../../types/public/about-us-page';
-import { axiosInstance } from '../../axios';
+import { API_ROUTES } from '@const/common/api-routes/main-api';
+import { AboutUsSection } from '@app-types/public/about-us-page';
+import { axiosInstance } from '@api/axios';
 
 export const AboutUsApi = {
     get: async (): Promise<AboutUsSection[]> => {

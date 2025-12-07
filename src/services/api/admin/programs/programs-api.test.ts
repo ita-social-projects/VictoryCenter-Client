@@ -1,15 +1,15 @@
-import { VisibilityStatus } from '../../../../types/admin/common';
-import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '../../../../types/admin/programs';
-import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin/programs';
+import { VisibilityStatus } from '@app-types/admin/common';
+import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '@app-types/admin/programs';
+import { mockCategories, mockPrograms } from '@utils/mock-data/admin/programs';
 import { ProgramsApi, ProgramsCategoriesApi } from './programs-api';
-import { useAdminClient } from '../../../../hooks/admin/use-admin-client/useAdminClient';
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
-import { ImageApi } from '../image/image-api';
+import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
+import { API_ROUTES } from '@const/common/api-routes/main-api';
+import { ImageApi } from '@api/admin/image/image-api';
 
-jest.mock('../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
-jest.mock('../image/image-api');
+jest.mock('@api/admin/image/image-api');
 
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 

@@ -1,11 +1,11 @@
 import { AxiosInstance } from 'axios';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
+import { API_ROUTES } from '@const/common/api-routes/main-api';
 import {
     ForeignBankDetailsDto,
     BankCurrency,
     CreateForeignBankDetails,
     UpdateForeignBankDetails,
-} from '../../../../../types/admin/donate';
+} from '@app-types/admin/donate';
 
 export const ForeignBankDetailsApi = {
     getAll: async (client: AxiosInstance, currency: BankCurrency): Promise<ForeignBankDetailsDto[]> => {

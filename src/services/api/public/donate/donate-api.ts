@@ -1,12 +1,12 @@
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
+import { API_ROUTES } from '@const/common/api-routes/main-api';
 import {
     PublishedUahBankDetailsDto,
     PublishedForeignBankDetailsDto,
     PublishedSupportOptionsDto,
     Currency,
     DonatePageData,
-} from '../../../../types/public/donate-page';
-import { axiosInstance } from '../../axios';
+} from '@app-types/public/donate-page';
+import { axiosInstance } from '@api/axios';
 
 export const donatePageDataFetch = async (): Promise<DonatePageData> => {
     const [

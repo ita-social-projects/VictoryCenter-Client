@@ -1,10 +1,10 @@
 import { programPageDataFetch } from './programs-api';
-import { axiosInstance } from '../../axios';
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
-import { PublishedProgramDto } from '../../../../types/public/programs-page';
+import { axiosInstance } from '@api/axios';
+import { API_ROUTES } from '@const/common/api-routes/main-api';
+import { PublishedProgramDto } from '@app-types/public/programs-page';
 
-jest.mock('../../axios');
-jest.mock('../../../../utils/mock-data/public/programs-page', () => ({
+jest.mock('@api/axios');
+jest.mock('@utils/mock-data/public/programs-page', () => ({
     MockQuestions: [{ id: 1, question: 'Test Question' }],
 }));
 

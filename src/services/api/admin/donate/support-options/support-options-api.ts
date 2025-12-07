@@ -1,11 +1,11 @@
 import { AxiosInstance } from 'axios';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
+import { API_ROUTES } from '@const/common/api-routes/main-api';
 import {
     BankCurrency,
     CreateSupportOptionsDto,
     SupportOptionsDto,
     UpdateSupportOptionsDto,
-} from '../../../../../types/admin/donate';
+} from '@app-types/admin/donate';
 
 export const SupportOptionsApi = {
     getAll: async (client: AxiosInstance, currency: BankCurrency): Promise<SupportOptionsDto[]> => {

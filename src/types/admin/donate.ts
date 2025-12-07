@@ -42,7 +42,8 @@ export interface CorrespondentBankDetailsDto {
 
 export interface CreateCorrespondentBankDetails extends Omit<CorrespondentBankDetailsDto, 'id'> {}
 
-export interface UpdateCorrespondentBankDetails extends Omit<CorrespondentBankDetailsDto, 'id'> {}
+export interface UpdateCorrespondentBankDetails
+    extends Omit<CorrespondentBankDetailsDto, 'id' | 'foreignBankDetailsId'> {}
 
 // Foreign Bank Details
 export interface ForeignBankDetailsDto {
@@ -58,4 +59,5 @@ export interface ForeignBankDetailsDto {
 
 export interface CreateForeignBankDetails extends Omit<ForeignBankDetailsDto, 'id' | 'correspondentBanks'> {}
 
-export interface UpdateForeignBankDetails extends Omit<ForeignBankDetailsDto, 'id' | 'correspondentBanks'> {}
+export interface UpdateForeignBankDetails
+    extends Omit<ForeignBankDetailsDto, 'id' | 'correspondentBanks' | 'currency'> {}

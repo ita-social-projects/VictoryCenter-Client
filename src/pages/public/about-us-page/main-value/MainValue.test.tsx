@@ -1,12 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import { MainValues } from './MainValue';
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
-import { ContentType } from '../../../../types/common/about-us';
-import { AboutUsContent } from '../../../../types/public/about-us-page';
-import { checkForSubstrings } from '../../../../utils/functions/test-helpers/test-helpers';
-import { aboutUsPageUk } from '../../../../locales/uk';
+import { ABOUT_US_DATA } from '@const/public/about-us-page';
+import { ContentType } from '@app-types/common/about-us';
+import { AboutUsContent } from '@app-types/public/about-us-page';
+import { checkForSubstrings } from '@utils/functions/test-helpers/test-helpers';
+import { aboutUsPageUk } from '@locales/uk';
 
-jest.mock('../../../../components/public/swiper/Swiper', () => ({
+jest.mock('@components/public/swiper/Swiper', () => ({
     Swiper: ({ items, renderItem }: any) => (
         <div data-testid="custom-swiper">
             {items &&

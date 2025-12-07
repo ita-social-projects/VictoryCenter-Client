@@ -1,7 +1,7 @@
 import './AlternativeSupportWays.scss';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
-import { ALTERNATIVE_SUPPORT_WAYS } from '../../../../../const/public/donate-page';
-import { PublishedSupportOptionsDto, Currency } from '../../../../../types/public/donate-page';
+import { ALTERNATIVE_SUPPORT_WAYS } from '@const/public/donate-page';
+import { PublishedSupportOptionsDto, Currency } from '@app-types/public/donate-page';
 
 interface AlternativeSupportWaysProps {
     supportOptions: PublishedSupportOptionsDto[];

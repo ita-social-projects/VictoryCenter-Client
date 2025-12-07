@@ -1,8 +1,8 @@
 import './CopyTextButton.scss';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReactComponent as CheckMark } from '../../../../assets/icons/checkmark.svg';
-import { ReactComponent as Copy } from '../../../../assets/icons/copy.svg';
+import { ReactComponent as CheckMark } from '@assets/icons/checkmark.svg';
+import { ReactComponent as Copy } from '@assets/icons/copy.svg';
 
 interface CopyTextButtonProps {
     textToCopy: string;

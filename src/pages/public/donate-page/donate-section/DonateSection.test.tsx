@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DonateSection } from './DonateSection';
-import { Currency } from '../../../../types/public/donate-page';
-import { DONATION_AMOUNTS } from '../../../../const/public/donate-page';
+import { Currency } from '@app-types/public/donate-page';
+import { DONATION_AMOUNTS } from '@const/public/donate-page';
 
 describe('DonateSection', () => {
     it('renders input, currency selector, and quick amount buttons', () => {

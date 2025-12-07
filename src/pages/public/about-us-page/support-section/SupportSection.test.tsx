@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { SupportSection } from './SupportSection';
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
-import { ContentType } from '../../../../types/common/about-us';
-import { AboutUsContent } from '../../../../types/public/about-us-page';
-import aboutUsPageUk from '../../../../locales/uk/about-us.json';
+import { ABOUT_US_DATA } from '@const/public/about-us-page';
+import { ContentType } from '@app-types/common/about-us';
+import { AboutUsContent } from '@app-types/public/about-us-page';
+import aboutUsPageUk from '@locales/uk/about-us.json';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 jest.mock('@mui/material/useMediaQuery');

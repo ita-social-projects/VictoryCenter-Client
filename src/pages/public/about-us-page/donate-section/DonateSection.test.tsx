@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { DonateSection } from './DonateSection';
 import { MemoryRouter } from 'react-router-dom';
-import aboutUsPageUk from '../../../../locales/uk/about-us.json';
+import aboutUsPageUk from '@locales/uk/about-us.json';
 
 describe('DonateSection', () => {
     it('should render section with correct title', () => {

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { SupportCard } from '../support-card/SupportCard';
 import { useTranslation } from 'react-i18next';
-import { AboutUsContent } from '../../../../../../types/public/about-us-page';
+import { AboutUsContent } from '@app-types/public/about-us-page';
 
 export interface SupportSectionTabletProps {
     content: AboutUsContent[] | null;

@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { CorrespondentBanksSection } from './CorrespondentBanksSection';
-import { PublishedCorrespondentBankDetailsDto } from '../../../../../types/public/donate-page';
+import { PublishedCorrespondentBankDetailsDto } from '@app-types/public/donate-page';
 
-jest.mock('../../../../../const/public/donate-page', () => ({
+jest.mock('@const/public/donate-page', () => ({
     ABROAD_PAYMENT_DETAILS: {
         CORRESPONDENT_BANKS_LABEL: 'Кореспондентські банки',
         SWIFT_LABEL: 'SWIFT:',

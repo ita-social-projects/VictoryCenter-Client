@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
-import { ProgramCategoryDto, ProgramsPageData } from '../../../../types/public/programs-page';
+import { programPageDataFetch } from '@api/public/programs/programs-api';
+import { ProgramCategoryDto, ProgramsPageData } from '@app-types/public/programs-page';
 import classNames from 'classnames';
 import { LinearProgress } from '@mui/material';
-import { useDataFetch } from '../../../../hooks/common/use-data-fetch/useDataFetch';
+import { useDataFetch } from '@hooks/common/use-data-fetch/useDataFetch';
 import { useTranslation } from 'react-i18next';
 import './ProgramsSection.scss';
-import { ProgramCard } from '../../../../components/public/program-card/ProgramCard';
+import { ProgramCard } from '@components/public/program-card/ProgramCard';
 
 export const ProgramsSection: React.FC = () => {
     const { t } = useTranslation(['programsPage', 'footer']);

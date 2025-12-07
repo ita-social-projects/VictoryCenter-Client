@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { LinearProgress } from '@mui/material';
-import { useDataFetch } from '../../../hooks/common/use-data-fetch/useDataFetch';
-import { donatePageDataFetch } from '../../../services/api/public/donate/donate-api';
-import { DonatePageData } from '../../../types/public/donate-page';
-import { PAGE_SLUGS } from '../../../const/public/faq';
-import { FaqSection } from '../../../components/public/faq-section/FaqSection';
+import { useDataFetch } from '@hooks/common/use-data-fetch/useDataFetch';
+import { donatePageDataFetch } from '@api/public/donate/donate-api';
+import { DonatePageData } from '@app-types/public/donate-page';
+import { PAGE_SLUGS } from '@const/public/faq';
+import { FaqSection } from '@components/public/faq-section/FaqSection';
 import { DonatePageIntro } from './donate-page-intro/DonatePageIntro';
 import { DonateSection } from './donate-section/DonateSection';
 import { RightSection } from './right-section/RightSection';

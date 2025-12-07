@@ -1,6 +1,6 @@
-import { ABROAD_PAYMENT_DETAILS } from '../../../../../const/public/donate-page';
+import { ABROAD_PAYMENT_DETAILS } from '@const/public/donate-page';
 import { CorrespondentBankBlock } from './CorrespondentBankBlock';
-import { PublishedCorrespondentBankDetailsDto } from '../../../../../types/public/donate-page';
+import { PublishedCorrespondentBankDetailsDto } from '@app-types/public/donate-page';
 
 export const CorrespondentBanksSection = ({
     correspondentBanks = [],

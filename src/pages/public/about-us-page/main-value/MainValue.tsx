@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { ABOUT_US_DATA } from '../../../../const/public/about-us-page';
+import { ABOUT_US_DATA } from '@const/public/about-us-page';
 import './MainValue.scss';
-import { Swiper } from '../../../../components/public/swiper/Swiper';
-import { AboutUsContent } from '../../../../types/public/about-us-page';
+import { Swiper } from '@components/public/swiper/Swiper';
+import { AboutUsContent } from '@app-types/public/about-us-page';
 
 export interface MainValuesProps {
     content: AboutUsContent[] | null;

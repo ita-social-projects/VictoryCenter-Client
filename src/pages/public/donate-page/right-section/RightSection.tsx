@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import './RightSection.scss';
-
 import { AbroadPaymentDetails } from './abroad-payment-details/AbroadPaymentDetails';
 import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSupportWays';
-import { Tabs } from '../../../../components/common/tabs/Tabs';
+import { Tabs } from '@components/common/tabs/Tabs';
 import { UkrainePaymentDetails } from './ukraine-payment-details/UkrainePaymentDetails';
-import { Currency, DonatePageData } from '../../../../types/public/donate-page';
-import { CURRENCY_TABS, ERROR_MESSAGES } from '../../../../const/public/donate-page';
+import { Currency, DonatePageData } from '@app-types/public/donate-page';
+import { CURRENCY_TABS, ERROR_MESSAGES } from '@const/public/donate-page';
 
 interface RightSectionProps {
     donateData: DonatePageData | null;

@@ -16,6 +16,7 @@ module.exports = {
             '@api': path.resolve(__dirname, 'src/services/api'),
             '@services': path.resolve(__dirname, 'src/services/'),
             '@locales': path.resolve(__dirname, 'src/locales/'),
+            '@layouts': path.resolve(__dirname, 'src/layouts/'),
         },
     },
     jest: {
@@ -40,6 +41,7 @@ module.exports = {
                     '^@api/(.*)$': '<rootDir>/src/services/api/$1',
                     '^@services/(.*)$': '<rootDir>/src/services/$1',
                     '^@locales/(.*)$': '<rootDir>/src/locales/$1',
+                    '^@layouts/(.*)$': '<rootDir>/src/layouts/$1',
                 },
             };
 

@@ -10,7 +10,6 @@ import {
     UpdateCorrespondentBankDetails,
 } from '../../../../types/admin/donate';
 
-// UAH Bank Details Mappers
 export function mapToCreateUahBankDetails(dto: UahBankDetailsDto): CreateUahBankDetails {
     const { id: _id, ...createData } = dto;
     return createData;
@@ -21,7 +20,6 @@ export function mapToUpdateUahBankDetails(dto: UahBankDetailsDto): UpdateUahBank
     return updateData;
 }
 
-// Foreign Bank Details Mappers
 export function mapToCreateForeignBankDetails(dto: ForeignBankDetailsDto): CreateForeignBankDetails {
     const { id: _id, correspondentBanks: _correspondentBanks, ...createData } = dto;
     return createData;
@@ -32,7 +30,6 @@ export function mapToUpdateForeignBankDetails(dto: ForeignBankDetailsDto): Updat
     return updateData;
 }
 
-// Correspondent Bank Details Mappers
 export function mapToCreateCorrespondentBankDetails(
     dto: CorrespondentBankDetailsDto,
     foreignBankDetailsId: number,

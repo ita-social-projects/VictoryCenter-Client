@@ -4,7 +4,6 @@ export enum BankCurrency {
     Eur = 2,
 }
 
-// UAH Bank Details
 export interface UahBankDetailsDto {
     id: number;
     name: string;
@@ -18,7 +17,6 @@ export interface CreateUahBankDetails extends Omit<UahBankDetailsDto, 'id'> {}
 
 export interface UpdateUahBankDetails extends Omit<UahBankDetailsDto, 'id'> {}
 
-// Support Options
 export interface SupportOptionsDto {
     id: number;
     name: string;
@@ -30,7 +28,6 @@ export interface CreateSupportOptionsDto extends Omit<SupportOptionsDto, 'id'> {
 
 export interface UpdateSupportOptionsDto extends Omit<SupportOptionsDto, 'id' | 'currency'> {}
 
-// Correspondent Bank Details
 export interface CorrespondentBankDetailsDto {
     id: number;
     name: string;
@@ -45,7 +42,6 @@ export interface CreateCorrespondentBankDetails extends Omit<CorrespondentBankDe
 export interface UpdateCorrespondentBankDetails
     extends Omit<CorrespondentBankDetailsDto, 'id' | 'foreignBankDetailsId'> {}
 
-// Foreign Bank Details
 export interface ForeignBankDetailsDto {
     id: number;
     name: string;

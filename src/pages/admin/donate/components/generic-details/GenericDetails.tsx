@@ -26,6 +26,8 @@ export interface GenericDetailsProps<T extends FieldValues> {
     onSubmit?: (data: T) => Promise<void>;
     onUpdate?: (id: number, data: T) => Promise<void>;
     onDelete?: (id: number) => Promise<void>;
+    onEditingStateChange?: (isEditing: boolean) => void;
+    isAddButtonDisabled?: boolean;
     onAddFormVisibilityChange?: (isVisible: boolean) => void;
     isParentAddFormVisible?: boolean;
 }
@@ -46,9 +48,11 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
     onSubmit,
     onUpdate,
     onDelete,
+    onEditingStateChange,
+    isAddButtonDisabled = false,
     onAddFormVisibilityChange,
     isParentAddFormVisible = false,
-}: GenericDetailsProps<T>) {
+}: Readonly<GenericDetailsProps<T>>) {
     const addformRef = useRef<GenericFormRef>(null);
     const [isAddFormVisible, setIsAddFormVisible] = useState(false);
     const [isItemsExpanded, setIsItemsExpanded] = useState(initialIsItemsExpanded);
@@ -57,8 +61,10 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
     const handleItemModeChange = (id: number, mode: GenericFormMode) => {
         if (mode === GenericFormMode.Edit) {
             setEditingItemId(id);
+            onEditingStateChange?.(true);
         } else if (editingItemId === id) {
             setEditingItemId(null);
+            onEditingStateChange?.(false);
         }
     };
 
@@ -71,11 +77,13 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
 
     const handleAdd = () => {
         setIsAddFormVisible(true);
+        onEditingStateChange?.(true);
         onAddFormVisibilityChange?.(true);
     };
 
     const handleClose = () => {
         setIsAddFormVisible(false);
+        onEditingStateChange?.(false);
         onAddFormVisibilityChange?.(false);
     };
 
@@ -83,21 +91,19 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
         async (data: T) => {
             if (onSubmit) {
                 await onSubmit(data);
-                setIsAddFormVisible(false);
-                onAddFormVisibilityChange?.(false);
             } else if (isChildForm) {
                 onChangeItems?.((prevItems) => [...prevItems, data]);
-                setIsAddFormVisible(false);
                 onAddFormVisibilityChange?.(false);
             } else {
                 const newItemWithId = { ...data, id: data.id || Date.now() };
 
                 onChangeItems?.((prevItems) => [...prevItems, newItemWithId]);
-                setIsAddFormVisible(false);
                 onAddFormVisibilityChange?.(false);
             }
+            setIsAddFormVisible(false);
+            onEditingStateChange?.(false);
         },
-        [onSubmit, isChildForm, onChangeItems, onAddFormVisibilityChange],
+        [onSubmit, isChildForm, onChangeItems, onEditingStateChange, onAddFormVisibilityChange],
     );
 
     const handleItemUpdate = useCallback(
@@ -201,7 +207,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             className={`generic-details btn-add-new ${isAddFormVisible || editingItemId !== null ? 'disabled' : ''}`}
                             onClick={handleAdd}
                             buttonStyle="primary"
-                            disabled={isAddFormVisible || editingItemId !== null || isParentAddFormVisible}
+                            disabled={isAddButtonDisabled || isParentAddFormVisible}
                         >
                             <div>{addNewText}</div>
                             <PlusIcon className="plus-icon" />

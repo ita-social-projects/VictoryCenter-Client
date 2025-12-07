@@ -3,10 +3,10 @@ import { render, screen } from '@testing-library/react';
 import { PublicLayout } from './PublicLayout';
 import { useLocation } from 'react-router-dom';
 
-jest.mock('../../components/public/header/Header', () => ({
+jest.mock('@components/public/header/Header', () => ({
     Header: () => <div>Mocked Header</div>,
 }));
-jest.mock('../../components/public/footer/Footer', () => ({
+jest.mock('@components/public/footer/Footer', () => ({
     Footer: () => <div>Mocked Footer</div>,
 }));
 

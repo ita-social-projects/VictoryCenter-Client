@@ -126,6 +126,33 @@ jest.mock('../support-options/support-options-form/SupportOptionsForm', () => ({
     ),
 }));
 
+jest.mock('../../../../../utils/functions/mappers/admin/donate-mappers', () => ({
+    mapToCreateUahBankDetails: (data: any) => {
+        const { id, ...rest } = data;
+        return rest;
+    },
+    mapToUpdateUahBankDetails: (data: any) => {
+        const { id, ...rest } = data;
+        return rest;
+    },
+    mapToCreateForeignBankDetails: (data: any) => {
+        const { id, correspondentBanks, currency, ...rest } = data;
+        return rest;
+    },
+    mapToUpdateForeignBankDetails: (data: any) => {
+        const { id, correspondentBanks, currency, ...rest } = data;
+        return rest;
+    },
+    mapToCreateCorrespondentBankDetails: (data: any, foreignBankDetailsId: number) => {
+        const { id, ...rest } = data;
+        return { ...rest, foreignBankDetailsId };
+    },
+    mapToUpdateCorrespondentBankDetails: (data: any) => {
+        const { id, foreignBankDetailsId, ...rest } = data;
+        return rest;
+    },
+}));
+
 describe('DonatePageContent', () => {
     const createMockConfig = (withCorrespondentBanks = false) => ({
         form: jest.fn(),
@@ -492,7 +519,7 @@ describe('DonatePageContent', () => {
 
             await testCorrespondentOperation('Submit', mockCorrespondentCreate, [
                 'mockClient',
-                { id: 1 },
+                { foreignBankDetailsId: 1 },
             ]);
         });
 
@@ -523,7 +550,7 @@ describe('DonatePageContent', () => {
 
             await testCorrespondentOperation('Submit', mockCorrespondentCreate, [
                 'mockClient',
-                { id: 1 },
+                { foreignBankDetailsId: 1 },
             ]);
         });
 

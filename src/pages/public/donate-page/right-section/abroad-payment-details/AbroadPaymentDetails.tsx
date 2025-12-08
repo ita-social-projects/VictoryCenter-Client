@@ -28,7 +28,7 @@ export const AbroadPaymentDetails = ({ currency, foreignBankDetails }: AbroadPay
                     <PaymentDetailsSection
                         title={index === 0 ? title : ''}
                         ibanLabel={ibanLabel}
-                        ibanValue={bank.iban}
+                        ibanValue={bank.ukrainianIban}
                         receiverName={bank.receiver}
                         bankName={bank.name}
                         swift={bank.swift}

@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { Button } from '../../../../../components/admin/button/Button';
-import { Input } from '../input/Input';
+import { DonateInput } from '../donate-input/DonateInput';
 import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 import './GenericForm.scss';
@@ -27,6 +27,7 @@ export interface GenericFormProps<T extends FieldValues> {
     onDelete?: (id: number) => void;
     isChildForm?: boolean;
     children?: (form: { formState: T; isItemsExpanded: boolean }) => React.ReactNode;
+    onModeChange?: (mode: GenericFormMode) => void;
 }
 
 export enum GenericFormMode {
@@ -62,6 +63,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 onDelete,
                 isChildForm = false,
                 children,
+                onModeChange,
             },
             ref,
         ) => {
@@ -83,6 +85,10 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
             const titleField = useMemo(() => fields.find((f) => f.isTitle), []);
             const titleFieldName = titleField?.name;
+
+            useEffect(() => {
+                onModeChange?.(mode);
+            }, [mode, onModeChange]);
 
             useEffect(() => {
                 const newState: FormState = { ...(initialData ?? ({} as FormState)) };
@@ -144,6 +150,20 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 },
                 // eslint-disable-next-line react-hooks/exhaustive-deps
                 [fields],
+            );
+
+            const handleBlur = useCallback(
+                (field: keyof T) => {
+                    setTouchedFields((prev) => new Set(prev).add(field));
+
+                    const validator = fields.find((f) => f.name === field)?.validate;
+                    if (validator) {
+                        const error = validator(formState[field] as any);
+                        setErrors((prev) => ({ ...prev, [field]: error }));
+                    }
+                },
+                // eslint-disable-next-line react-hooks/exhaustive-deps
+                [fields, formState],
             );
 
             const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -253,6 +273,12 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
             if (!isOpen) return null;
 
+            const isPublishingDisabled =
+                isSubmitting ||
+                hasEmptyRequiredFields ||
+                !isChanged() ||
+                Object.values(errors).some((e) => e !== undefined);
+
             return (
                 <div
                     className={`generic-form ${mode} ${isChildForm ? 'child' : ''}`}
@@ -273,6 +299,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                         className={`edit-btn ${mode}`}
                                         aria-label="edit-btn"
                                         onClick={handleEditClick}
+                                        disabled={mode === GenericFormMode.Edit}
                                     />
                                     <button
                                         className={`delete-btn ${mode}`}
@@ -301,13 +328,13 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                     {isChildForm && (
                                         <div className="form-name-actions">
                                             <button
-                                                className="edit-btn"
+                                                className={`edit-btn ${mode}`}
                                                 aria-label="edit-btn"
                                                 type="button"
                                                 onClick={handleEditClick}
                                             ></button>
                                             <button
-                                                className={`delete-btn delete-btn-icon ${isDeleting ? 'pressed' : ''}`}
+                                                className={`delete-btn delete-btn-icon ${mode} ${isDeleting ? 'pressed' : ''}`}
                                                 aria-label="delete-btn"
                                                 type="button"
                                                 onClick={handleDeleteClick}
@@ -340,7 +367,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                             className={`form-field ${isTitleField ? 'form-field-title-row' : ''}`}
                                         >
                                             <div className="form-field-content">
-                                                <Input
+                                                <DonateInput
                                                     name={String(f.name)}
                                                     label={f.label}
                                                     isRequired={mode === GenericFormMode.Create && f.isRequired}
@@ -352,7 +379,9 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                     onValueChange={(cleanValue) =>
                                                         handleValueChange(f.name, cleanValue)
                                                     }
+                                                    onBlur={() => handleBlur(f.name)}
                                                     onlyNumbers={f.onlyNumbers}
+                                                    maxLength={f.maxLength}
                                                 />
                                                 {touchedFields.has(f.name) && errors[f.name] && (
                                                     <span className="error">{errors[f.name]}</span>
@@ -366,6 +395,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                         aria-label="edit-btn"
                                                         className={`edit-btn ${mode}`}
                                                         onClick={handleEditClick}
+                                                        disabled
                                                     />
                                                     <button
                                                         type="button"
@@ -401,7 +431,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                           })
                                             }
                                             buttonStyle="primary"
-                                            disabled={isSubmitting || hasEmptyRequiredFields || !isChanged()}
+                                            disabled={isPublishingDisabled}
                                         >
                                             {DONATE_TEXT.BUTTON.PUBLISH}
                                         </Button>
@@ -421,8 +451,6 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                         }}
                         onCancel={handleModalCancelOrClose}
                         onClose={handleModalCancelOrClose}
-                        confirmText={COMMON_TEXT_ADMIN.BUTTON.YES}
-                        cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
                     />
 
                     {!isChildForm && <>{children && children({ formState, isItemsExpanded })}</>}

@@ -63,17 +63,10 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
             [],
         );
 
-        const {
-            formState,
-            setFormState,
-            setErrors,
-            errors,
-            isSubmitting,
-            handleFullNameChange,
-            handleFullNameBlur,
-            handleDescriptionChange,
-            handleDescriptionBlur,
-        } = useTeamMemberForm({
+        const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
+            TeamMemberFormValues,
+            TeamMemberFormErrorState
+        >({
             defaultFormState,
             initialData,
             validateForm,
@@ -81,6 +74,34 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
             onValidationChange,
             ref,
         });
+
+        const handleFullNameChange = useCallback(
+            (e: React.ChangeEvent<HTMLInputElement>) => {
+                setFormState((prev) => ({ ...prev, fullName: e.target.value }));
+            },
+            [setFormState],
+        );
+
+        const handleNameBlur = useCallback(() => {
+            setErrors((prev) => ({
+                ...prev,
+                fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false),
+            }));
+        }, [formState.fullName, setErrors]);
+
+        const handleDescriptionChange = useCallback(
+            (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                setFormState((prev) => ({ ...prev, description: e.target.value }));
+            },
+            [setFormState],
+        );
+
+        const handleDescriptionBlur = useCallback(() => {
+            setErrors((prev) => ({
+                ...prev,
+                description: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(formState.description, false),
+            }));
+        }, [formState.description, setErrors]);
 
         const handleImgChange = useCallback(
             (file: ImageValues | Image | null) => {

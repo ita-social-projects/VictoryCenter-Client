@@ -3,14 +3,6 @@ import '@testing-library/jest-dom';
 import { AlternativeSupportWays } from './AlternativeSupportWays';
 import { PublishedSupportOptionsDto, Currency } from '../../../../../types/public/donate-page';
 
-jest.mock('../../../../../assets/icons/arrow-up-right.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="arrow-up-right-icon" />,
-}));
-
-jest.mock('../../../../../assets/icons/forward.svg', () => ({
-    ReactComponent: (props: any) => <svg {...props} data-testid="forward-icon" />,
-}));
-
 jest.mock('../../copy-text-button/CopyTextButton', () => ({
     CopyTextButton: ({ textToCopy }: { textToCopy: string }) => (
         <button data-testid="copy-button" data-copy-text={textToCopy}>
@@ -22,7 +14,6 @@ jest.mock('../../copy-text-button/CopyTextButton', () => ({
 jest.mock('../../../../../const/public/donate-page', () => ({
     ALTERNATIVE_SUPPORT_WAYS: {
         ALTERNATIVE_SUPPORT_WAYS_LABEL: 'Інші варіанти підтримки',
-        DOWNLOAD_PAYMENT_DETAILS_BUTTON_LABEL: 'Завантажити реквізити',
     },
 }));
 
@@ -54,12 +45,8 @@ describe('AlternativeSupportWays', () => {
             expect(screen.getByText('api@paypal.com')).toBeInTheDocument();
             expect(screen.getByTestId('copy-button')).toHaveAttribute('data-copy-text', 'api@paypal.com');
 
-            expect(screen.getByText('Завантажити реквізити')).toBeInTheDocument();
-            expect(screen.getByTestId('arrow-up-right-icon')).toBeInTheDocument();
-            expect(screen.getByTestId('forward-icon')).toBeInTheDocument();
-
             const allButtons = screen.getAllByRole('button');
-            expect(allButtons).toHaveLength(3);
+            expect(allButtons).toHaveLength(1);
         });
 
         it('renders multiple support options for current currency', () => {
@@ -87,7 +74,7 @@ describe('AlternativeSupportWays', () => {
             expect(screen.getByText('usd@stripe.com')).toBeInTheDocument();
 
             const allButtons = screen.getAllByRole('button');
-            expect(allButtons).toHaveLength(4);
+            expect(allButtons).toHaveLength(2);
         });
 
         it('filters options by current currency correctly', () => {
@@ -149,22 +136,7 @@ describe('AlternativeSupportWays', () => {
             expect(screen.queryByText('Option 3')).not.toBeInTheDocument();
 
             const allButtons = screen.getAllByRole('button');
-            expect(allButtons).toHaveLength(4);
-        });
-
-        it('renders download and share buttons with correct icons', () => {
-            const supportOptions = [createMockSupportOption()];
-
-            render(<AlternativeSupportWays supportOptions={supportOptions} currentCurrency={Currency.UAH} />);
-
-            const downloadButton = screen.getByText('Завантажити реквізити').closest('button');
-            expect(downloadButton).toHaveClass('downloadPaymentDetailsButton');
-
-            const shareButton = screen.getByTestId('forward-icon').closest('button');
-            expect(shareButton).toHaveClass('shareButton');
-
-            expect(screen.getByTestId('arrow-up-right-icon')).toBeInTheDocument();
-            expect(screen.getByTestId('forward-icon')).toBeInTheDocument();
+            expect(allButtons).toHaveLength(2);
         });
     });
 

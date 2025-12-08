@@ -23,4 +23,21 @@
         position: absolute;
         bottom: 0px;
     }
+
+    .char-limit-input,
+    .char-limit-textarea__wrapper {
+        border: 1px solid colors.$grey-700;
+
+        &--focused {
+            border-color: colors.$blue-500;
+        }
+    }
+
+    .singleselect {
+        border: 1px solid colors.$grey-700;
+
+        &-selected {
+            border-color: colors.$blue-500;
+        }
+    }
 }

@@ -283,6 +283,35 @@ describe('editProgram', () => {
         const promise = ProgramsApi.editProgram({ ...programData, id: 999 }, mockClient);
         await expect(promise).rejects.toThrow('Program not found');
     });
+
+    it('should NOT delete image when imageIdToDelete equals finalImageId', async () => {
+        const programData: ProgramCreateUpdate = {
+            id: 1,
+            name: 'Program With Same Image',
+            description: 'Description',
+            status: VisibilityStatus.Published,
+            image: null,
+            imageId: 100,
+            categoryIds: [1],
+        };
+
+        const sameImageId = 100;
+        (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue({
+            finalImageId: sameImageId,
+            imageIdToDelete: sameImageId,
+        });
+
+        mockClient.put.mockResolvedValueOnce({
+            data: {
+                ...programData,
+                categories: mockCategories.slice(0, 1),
+            },
+        });
+
+        await ProgramsApi.editProgram(programData, mockClient);
+
+        expect(ImageApi.delete).not.toHaveBeenCalled();
+    });
 });
 
 describe('deleteProgram', () => {
@@ -369,88 +398,63 @@ describe('deleteCategory', () => {
 });
 
 describe('fetchProgramSearchItems', () => {
-    it('should prioritize direct name matches in sorting, then sort alphabetically', async () => {
-        const programWithNameMatch = {
-            id: 100,
-            name: 'Core Pilates Workout',
-            description: 'test',
-            status: VisibilityStatus.Published,
-            img: null,
-            categories: [{ id: 9, name: 'General', programsCount: 1 }],
-        };
-        const programWithCategoryMatch = {
-            id: 101,
-            name: 'Advanced Flexibility',
-            description: 'test',
-            status: VisibilityStatus.Published,
-            img: null,
-            categories: [{ id: 10, name: 'Pilates', programsCount: 1 }],
-        };
-
-        mockClient.get.mockResolvedValueOnce({
-            data: [...mockPrograms, programWithNameMatch, programWithCategoryMatch],
-        });
-        const searchTerm = 'Pilates';
-        const promise = ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);
-        const result = await promise;
-
-        const ids = result.items.map((i) => i.id);
-        const nameMatchIndex = ids.indexOf(programWithNameMatch.id);
-        const categoryMatchIndex = ids.indexOf(programWithCategoryMatch.id);
-
-        expect(nameMatchIndex).toBeGreaterThan(-1);
-        expect(categoryMatchIndex).toBeGreaterThan(-1);
-        expect(nameMatchIndex).toBeLessThan(categoryMatchIndex);
-    });
-
-    it('should handle pagination correctly', async () => {
+    it('should call API with correct search and pagination parameters and return mapped data', async () => {
         const searchTerm = 'program';
-        const limit = 2;
-        const offset = 2;
+        const limit = 5;
+        const offset = 10;
+        const mockSignal = new AbortController().signal;
 
-        mockClient.get.mockResolvedValueOnce({ data: mockPrograms });
-        const promise = ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, offset, limit);
-        const result = await promise;
+        const mockApiItems = mockPrograms.slice(0, 2);
+        const mockTotalCount = mockPrograms.length;
+        const mockApiResponse = {
+            items: mockApiItems,
+            totalItemsCount: mockTotalCount,
+        };
 
-        const fullResults = mockPrograms.filter(
-            (p) =>
-                p.name.toLowerCase().includes(searchTerm) ||
-                p.categories.some((c) => c.name.toLowerCase().includes(searchTerm)),
-        );
+        mockClient.get.mockResolvedValueOnce({ data: mockApiResponse });
 
-        expect(result.items).toHaveLength(Math.min(limit, Math.max(0, fullResults.length - offset)));
-        expect(result.totalItemsCount).toBe(fullResults.length);
+        const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, offset, limit, mockSignal);
+
+        expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PROGRAMS.SEARCH, {
+            params: {
+                SearchQuery: searchTerm,
+                offset: offset,
+                limit: limit,
+            },
+            signal: mockSignal,
+        });
+
+        expect(result.items).toHaveLength(mockApiItems.length);
+        expect(result.totalItemsCount).toBe(mockTotalCount);
+        expect(result.items[0].id).toBe(mockApiItems[0].id);
+        expect(result.items[1].name).toBe(mockApiItems[1].name);
     });
 
-    it('should return an empty result when no matches are found', async () => {
+    it('should return an empty result when the API finds no matches', async () => {
         const searchTerm = 'NonExistentProgramXYZ';
-        mockClient.get.mockResolvedValueOnce({ data: [] });
-        const promise = ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);
-        const result = await promise;
+        const offset = 0;
+        const limit = 10;
+
+        const mockApiResponse = {
+            items: [],
+            totalItemsCount: 0,
+        };
+
+        mockClient.get.mockResolvedValueOnce({ data: mockApiResponse });
+
+        const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, offset, limit);
+
+        expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PROGRAMS.SEARCH, {
+            params: {
+                SearchQuery: searchTerm,
+                offset: offset,
+                limit: limit,
+            },
+            signal: undefined,
+        });
 
         expect(result.items).toHaveLength(0);
         expect(result.totalItemsCount).toBe(0);
-    });
-
-    it('should sort matches alphabetically when match priority is the same', async () => {
-        const searchTerm = 'терапія';
-
-        const mockApiData = [
-            { id: 1, name: 'Психологічна терапія', categories: [] },
-            { id: 2, name: 'Фітнес для всіх', categories: [{ name: 'Реабілітаційна терапія' }] },
-            { id: 3, name: 'Арт-терапія', categories: [] }, // Збіг за назвою
-            { id: 4, name: 'Йога для спини', categories: [{ name: 'Фізична терапія' }] },
-        ];
-
-        mockClient.get.mockResolvedValueOnce({ data: mockApiData });
-
-        const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);
-
-        const expectedOrder = ['Арт-терапія', 'Психологічна терапія', 'Йога для спини', 'Фітнес для всіх'];
-
-        const actualNames = result.items.map((item) => item.name);
-
-        expect(actualNames).toEqual(expectedOrder);
     });
 });
 

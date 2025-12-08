@@ -21,6 +21,7 @@ export const API_ROUTES = {
     },
     PROGRAMS: {
         BASE: 'HippotherapyPrograms',
+        SEARCH: 'HippotherapyPrograms/search',
         PUBLISHED: 'HippotherapyPrograms/published',
     },
     PROGRAMCATEGORY: {

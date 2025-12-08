@@ -92,49 +92,47 @@ export const ProgramsPageToolbar = ({
     }, [onSearchClear, resetSearchItemsList]);
 
     return (
-        <>
-            <div className="programs-toolbar">
-                <div className="programs-toolbar-search">
-                    <SearchBar<ProgramSearchItemData>
-                        searchItems={localSearchItems}
-                        onSearchItemSelect={onSuggestionSelected}
-                        getSearchItemKey={(suggestion) => suggestion.id}
-                        getSearchItemLabel={(suggestion) => suggestion.name}
-                        renderSearchItemComponent={ProgramSearchItem}
-                        onLoadMore={fetchMoreSearchItems}
-                        hasMore={isHasMoreSearchItems}
-                        isLoading={isSearchItemsLoading}
-                        onQueryChange={onSearch}
-                        onClear={handleSearchClear}
-                        placeholder={PROGRAMS_TEXT.PLACEHOLDER.SEARCH_PROGRAMS}
-                        notFoundMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
-                        minCharactersToSearch={UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH}
-                        searchDelayMs={UI_CONFIG.SEARCH_BAR.SEARCH_DELAY_MS}
-                    />
-                </div>
-                <div className="programs-toolbar-actions">
-                    <Select<VisibilityStatus | undefined>
-                        value={statusFilterValue}
-                        onValueChange={onStatusFilterChange}
-                        data-testid="status-filter"
-                    >
-                        <Select.Option key={1} value={undefined} name={COMMON_TEXT_ADMIN.FILTER.STATUS.ALL} />
-                        <Select.Option<VisibilityStatus>
-                            key={2}
-                            value={VisibilityStatus.Published}
-                            name={COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED}
-                        />
-                        <Select.Option<VisibilityStatus>
-                            key={3}
-                            value={VisibilityStatus.Draft}
-                            name={COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT}
-                        />
-                    </Select>
-                    <Button onClick={onAddProgram} buttonStyle="primary" data-testid="add-program-button">
-                        {PROGRAMS_TEXT.BUTTON.ADD_PROGRAM} <PlusIcon />
-                    </Button>
-                </div>
+        <div className="programs-toolbar">
+            <div className="programs-toolbar-search">
+                <SearchBar<ProgramSearchItemData>
+                    searchItems={localSearchItems}
+                    onSearchItemSelect={onSuggestionSelected}
+                    getSearchItemKey={(suggestion) => suggestion.id}
+                    getSearchItemLabel={(suggestion) => suggestion.name}
+                    renderSearchItemComponent={ProgramSearchItem}
+                    onLoadMore={fetchMoreSearchItems}
+                    hasMore={isHasMoreSearchItems}
+                    isLoading={isSearchItemsLoading}
+                    onQueryChange={onSearch}
+                    onClear={handleSearchClear}
+                    placeholder={PROGRAMS_TEXT.PLACEHOLDER.SEARCH_PROGRAMS}
+                    notFoundMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
+                    minCharactersToSearch={UI_CONFIG.SEARCH_BAR.MIN_CHARACTERS_FOR_SEARCH}
+                    searchDelayMs={UI_CONFIG.SEARCH_BAR.SEARCH_DELAY_MS}
+                />
             </div>
-        </>
+            <div className="programs-toolbar-actions">
+                <Select<VisibilityStatus | undefined>
+                    value={statusFilterValue}
+                    onValueChange={onStatusFilterChange}
+                    data-testid="status-filter"
+                >
+                    <Select.Option key={1} value={undefined} name={COMMON_TEXT_ADMIN.FILTER.STATUS.ALL} />
+                    <Select.Option<VisibilityStatus>
+                        key={2}
+                        value={VisibilityStatus.Published}
+                        name={COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED}
+                    />
+                    <Select.Option<VisibilityStatus>
+                        key={3}
+                        value={VisibilityStatus.Draft}
+                        name={COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT}
+                    />
+                </Select>
+                <Button onClick={onAddProgram} buttonStyle="primary" data-testid="add-program-button">
+                    {PROGRAMS_TEXT.BUTTON.ADD_PROGRAM} <PlusIcon />
+                </Button>
+            </div>
+        </div>
     );
 };

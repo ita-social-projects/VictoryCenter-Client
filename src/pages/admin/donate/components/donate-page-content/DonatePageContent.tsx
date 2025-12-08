@@ -288,7 +288,7 @@ export const DonatePageContent = () => {
                     {config && (
                         <GenericDetails
                             key={`bank-details-${selectedCategory}`}
-                            items={items}
+                            items={[...items].sort((a, b) => a.id - b.id)}
                             isLoading={isLoading}
                             FormComponent={config.form}
                             notFoundText={DONATE_TEXT.BANK_DETAILS.NOT_FOUND}

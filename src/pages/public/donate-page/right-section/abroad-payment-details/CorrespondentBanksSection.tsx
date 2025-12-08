@@ -11,7 +11,8 @@ export const CorrespondentBanksSection = ({
         return null;
     }
 
-    const banks = correspondentBanks.map((apiBank) => ({
+    const sortedCorrespondentBanks = [...correspondentBanks].sort((a, b) => a.id - b.id);
+    const banks = sortedCorrespondentBanks.map((apiBank) => ({
         title: apiBank.name,
         fields: [
             { label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL, value: apiBank.swift },

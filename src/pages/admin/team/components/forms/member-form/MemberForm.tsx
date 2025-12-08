@@ -6,10 +6,10 @@ import { InputLabel } from '../../../../../../components/admin/input-label/Input
 import { SingleSelectInput } from '../../../../../../components/common/single-select-input/SingleSelectInput';
 import { TEAM_MEMBERS_TEXT } from '../../../../../../const/admin/team';
 import { ImageInput } from '../../../../../../components/admin/image-input/ImageInput';
-import { useTeamMemberForm } from '../use-team-member-form/useTeamMemberForm';
 import { TeamCategory } from '../../../../../../types/admin/team-category';
 import './MemberForm.scss';
 import { CommonMemberFields } from '../common-member-fields/CommonMemberFields';
+import { useFormManager } from '../../../../../../hooks/admin/use-form-manager/useFormManager';
 
 export interface TeamMemberFormValues {
     categoryId: number | null;
@@ -82,7 +82,7 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
             [setFormState],
         );
 
-        const handleNameBlur = useCallback(() => {
+        const handleFullNameBlur = useCallback(() => {
             setErrors((prev) => ({
                 ...prev,
                 fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false),

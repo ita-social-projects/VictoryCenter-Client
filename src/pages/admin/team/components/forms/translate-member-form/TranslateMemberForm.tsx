@@ -1,13 +1,13 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, useCallback, useMemo } from 'react';
 import { VisibilityStatus } from '../../../../../../types/admin/common';
 import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/team-member-schema/team-member-schema';
 import { Select } from '../../../../../../components/common/select/Select';
 import { Button } from '../../../../../../components/admin/button/Button';
 import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
 import { ReactComponent as TranslateIcon } from '../../../../../../assets/icons/translate-grey.svg';
-import { useTeamMemberForm } from '../use-team-member-form/useTeamMemberForm';
 import { CommonMemberFields } from '../common-member-fields/CommonMemberFields';
 import './TranslateMemberForm.scss';
+import { useFormManager } from '../../../../../../hooks/admin/use-form-manager/useFormManager';
 
 export interface TranslateTeamMemberFormValues {
     fullName: string;
@@ -53,15 +53,10 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
             [],
         );
 
-        const {
-            formState,
-            errors,
-            isSubmitting,
-            handleFullNameChange,
-            handleFullNameBlur,
-            handleDescriptionChange,
-            handleDescriptionBlur,
-        } = useTeamMemberForm({
+        const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
+            TranslateTeamMemberFormValues,
+            TranslateTeamMemberFormErrorState
+        >({
             defaultFormState,
             initialData,
             validateForm,
@@ -69,6 +64,34 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
             onValidationChange,
             ref,
         });
+
+        const handleFullNameChange = useCallback(
+            (e: React.ChangeEvent<HTMLInputElement>) => {
+                setFormState((prev) => ({ ...prev, fullName: e.target.value }));
+            },
+            [setFormState],
+        );
+
+        const handleFullNameBlur = useCallback(() => {
+            setErrors((prev) => ({
+                ...prev,
+                fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false),
+            }));
+        }, [formState.fullName, setErrors]);
+
+        const handleDescriptionChange = useCallback(
+            (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                setFormState((prev) => ({ ...prev, description: e.target.value }));
+            },
+            [setFormState],
+        );
+
+        const handleDescriptionBlur = useCallback(() => {
+            setErrors((prev) => ({
+                ...prev,
+                description: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(formState.description, false),
+            }));
+        }, [formState.description, setErrors]);
 
         return (
             <form

@@ -2,30 +2,30 @@ import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
 import {
     BankCurrency,
-    CreateSupportOptionsRequest,
-    SupportOptionsType,
-    UpdateSupportOptionsRequest,
+    CreateSupportOptionsDto,
+    SupportOptionsDto,
+    UpdateSupportOptionsDto,
 } from '../../../../../types/admin/donate';
 
 export const SupportOptionsApi = {
-    getAll: async (client: AxiosInstance, currency: BankCurrency): Promise<SupportOptionsType[]> => {
-        const response = await client.get<SupportOptionsType[]>(API_ROUTES.DONATE.SUPPORT_OPTIONS, {
+    getAll: async (client: AxiosInstance, currency: BankCurrency): Promise<SupportOptionsDto[]> => {
+        const response = await client.get<SupportOptionsDto[]>(API_ROUTES.DONATE.SUPPORT_OPTIONS, {
             params: { currency },
         });
         return response.data;
     },
 
-    create: async (client: AxiosInstance, supportOption: CreateSupportOptionsRequest): Promise<SupportOptionsType> => {
-        const response = await client.post<SupportOptionsType>(API_ROUTES.DONATE.SUPPORT_OPTIONS, supportOption);
+    create: async (client: AxiosInstance, supportOption: CreateSupportOptionsDto): Promise<SupportOptionsDto> => {
+        const response = await client.post<SupportOptionsDto>(API_ROUTES.DONATE.SUPPORT_OPTIONS, supportOption);
         return response.data;
     },
 
     update: async (
         client: AxiosInstance,
         id: number,
-        supportOption: UpdateSupportOptionsRequest,
-    ): Promise<SupportOptionsType> => {
-        const response = await client.put<SupportOptionsType>(
+        supportOption: UpdateSupportOptionsDto,
+    ): Promise<SupportOptionsDto> => {
+        const response = await client.put<SupportOptionsDto>(
             `${API_ROUTES.DONATE.SUPPORT_OPTIONS}/${id}`,
             supportOption,
         );

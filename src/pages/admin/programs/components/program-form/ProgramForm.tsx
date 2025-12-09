@@ -239,7 +239,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             data-testid="add-program-button"
                             className="program-form__add-btn"
                         >
-                            {PROGRAMS_TEXT.BUTTON.ADD_PROGRAM} <PlusIcon />
+                            {PROGRAMS_TEXT.BUTTON.ADD_NEW_SECTION} <PlusIcon />
                         </Button>
                     </div>
                 </div>

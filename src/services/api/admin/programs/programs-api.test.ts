@@ -513,8 +513,8 @@ describe('fetchProgramSearchItems', () => {
         mockClient.get.mockResolvedValueOnce({
             data: {
                 items: [...mockPrograms, programWithNameMatch, programWithCategoryMatch],
-                totalItemsCount: 5
-            }
+                totalItemsCount: 5,
+            },
         });
 
         const searchTerm = 'Pilates';
@@ -537,8 +537,8 @@ describe('fetchProgramSearchItems', () => {
         mockClient.get.mockResolvedValueOnce({
             data: {
                 items: mockPrograms,
-                totalItemsCount: mockPrograms.length
-            }
+                totalItemsCount: mockPrograms.length,
+            },
         });
 
         const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, offset, limit);
@@ -553,8 +553,8 @@ describe('fetchProgramSearchItems', () => {
         mockClient.get.mockResolvedValueOnce({
             data: {
                 items: [],
-                totalItemsCount: 0
-            }
+                totalItemsCount: 0,
+            },
         });
 
         const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);
@@ -619,18 +619,13 @@ describe('fetchProgramSearchItems', () => {
 
         const expectedOrder = ['Арт-терапія', 'Психологічна терапія', 'Йога для спини', 'Фітнес для всіх'];
 
-        const sortedMockData = [
-             mockApiData[2],
-             mockApiData[0],
-             mockApiData[3],
-             mockApiData[1]
-        ];
+        const sortedMockData = [mockApiData[2], mockApiData[0], mockApiData[3], mockApiData[1]];
 
         mockClient.get.mockResolvedValueOnce({
             data: {
                 items: sortedMockData,
-                totalItemsCount: 4
-            }
+                totalItemsCount: 4,
+            },
         });
 
         const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);

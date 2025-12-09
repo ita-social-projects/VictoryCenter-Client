@@ -3,6 +3,7 @@ import { COMMON_TEXT_ADMIN } from './common';
 export const PROGRAMS_TEXT = {
     BUTTON: {
         ADD_PROGRAM: 'Додати програму',
+        ADD_NEW_SECTION: 'Додати нову секцію',
     },
     PLACEHOLDER: {
         SEARCH_PROGRAMS: 'Шукати програми...',

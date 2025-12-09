@@ -17,13 +17,14 @@ export const AbroadPaymentDetails = ({ currency, foreignBankDetails }: AbroadPay
         return null;
     }
 
+    const sortedForeignBankDetails = [...foreignBankDetails].sort((a, b) => a.id - b.id);
     const currencyString = currencyToString(currency) as AbroadCurrency;
     const title = ABROAD_PAYMENT_DETAILS[`${currencyString}_PAYMENT_DETAILS_LABEL`];
     const ibanLabel = ABROAD_PAYMENT_DETAILS[`IBAN_${currencyString}_LABEL`];
 
     return (
         <div className="abroadPaymentDetails">
-            {foreignBankDetails.map((bank, index) => (
+            {sortedForeignBankDetails.map((bank, index) => (
                 <div key={bank.id} className={`bankGroup ${index > 0 ? 'separated' : ''}`}>
                     <PaymentDetailsSection
                         title={index === 0 ? title : ''}

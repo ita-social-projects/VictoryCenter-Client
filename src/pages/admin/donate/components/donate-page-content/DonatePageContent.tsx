@@ -263,25 +263,30 @@ export const DonatePageContent = () => {
     );
 
     const renderCorrespondentBanks = useCallback(
-        ({ formState, isItemsExpanded }: any) => (
-            <GenericDetails
-                key={`corr-${selectedCategory}-${formState.id}`}
-                title={DONATE_TEXT.CORRESPONDENT_BANKS.TITLE}
-                items={items.find((i) => i.id === formState.id)?.correspondentBanks ?? []}
-                isLoading={false}
-                FormComponent={config?.correspondentForm!}
-                initialIsItemsExpanded={isItemsExpanded}
-                primaryAddButton={true}
-                addNewText={DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW}
-                isChildForm={true}
-                isDisabled={!formState.id}
-                onSubmit={(data) => handleCreateCorrespondentBank(formState.id, data)}
-                onUpdate={(id, data) => handleUpdateCorrespondentBank(formState.id, id, data)}
-                onDelete={(id) => handleDeleteCorrespondentBank(formState.id, id)}
-                onEditingStateChange={setIsChildEditing}
-                onAddFormVisibilityChange={setIsCorrespondentBankFormVisible}
-            />
-        ),
+        ({ formState, isItemsExpanded }: any) => {
+            const correspondentBanks = items.find((i) => i.id === formState.id)?.correspondentBanks ?? [];
+            const sortedCorrespondentBanks = [...correspondentBanks].sort((a, b) => a.id - b.id);
+
+            return (
+                <GenericDetails
+                    key={`corr-${selectedCategory}-${formState.id}`}
+                    title={DONATE_TEXT.CORRESPONDENT_BANKS.TITLE}
+                    items={sortedCorrespondentBanks}
+                    isLoading={false}
+                    FormComponent={config?.correspondentForm!}
+                    initialIsItemsExpanded={isItemsExpanded}
+                    primaryAddButton={true}
+                    addNewText={DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW}
+                    isChildForm={true}
+                    isDisabled={!formState.id}
+                    onSubmit={(data) => handleCreateCorrespondentBank(formState.id, data)}
+                    onUpdate={(id, data) => handleUpdateCorrespondentBank(formState.id, id, data)}
+                    onDelete={(id) => handleDeleteCorrespondentBank(formState.id, id)}
+                    onEditingStateChange={setIsChildEditing}
+                    onAddFormVisibilityChange={setIsCorrespondentBankFormVisible}
+                />
+            );
+        },
         [
             selectedCategory,
             items,
@@ -308,7 +313,7 @@ export const DonatePageContent = () => {
                     {config && (
                         <GenericDetails
                             key={`bank-details-${selectedCategory}`}
-                            items={items}
+                            items={[...items].sort((a, b) => a.id - b.id)}
                             isLoading={isLoading}
                             FormComponent={config.form}
                             notFoundText={DONATE_TEXT.BANK_DETAILS.NOT_FOUND}

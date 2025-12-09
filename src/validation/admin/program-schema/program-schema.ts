@@ -92,7 +92,7 @@ export const programValidationSchema = Yup.object({
                 : schema.notRequired(),
         ),
 
-    meetingCount: Yup.string()
+    meetingsCount: Yup.string()
         .max(
             PROGRAM_VALIDATION.meetingCount.max,
             COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.meetingCount.max),
@@ -178,7 +178,7 @@ export const PROGRAM_VALIDATION_FUNCTIONS = {
     validateMeetingCount: (value: string, isPublishing: boolean): string | undefined => {
         const context: ProgramValidationContext = { isPublishing };
         try {
-            programValidationSchema.validateSyncAt('meetingCount', { meetingCount: value }, { context });
+            programValidationSchema.validateSyncAt('meetingsCount', { meetingsCount: value }, { context });
             return undefined;
         } catch (error: any) {
             return error.message;

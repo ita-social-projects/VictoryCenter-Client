@@ -115,7 +115,7 @@ const mockProgram: Program = {
     previewImage: null,
     backgroundImage: null,
     participantsCount: '',
-    meetingCount: '',
+    meetingsCount: '',
     location: '',
 };
 

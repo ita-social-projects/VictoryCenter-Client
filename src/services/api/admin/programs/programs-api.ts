@@ -31,7 +31,7 @@ const mapProgramEditToProgram = async (program: ProgramCreateUpdate, client: Axi
         backgroundImage: program.backgroundImage,
         location: program.location,
         participantsCount: program.participantsCount,
-        meetingCount: program.meetingCount,
+        meetingsCount: program.meetingsCount,
     };
 };
 

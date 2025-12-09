@@ -17,7 +17,7 @@ export interface Program {
     backgroundImage: Image | ImageValues | null;
     location: string;
     participantsCount: string;
-    meetingCount: string;
+    meetingsCount: string;
 }
 
 export interface ProgramSearchItemData {
@@ -38,7 +38,7 @@ export interface ProgramCreateUpdate {
     backgroundImageId: number | null;
     location: string;
     participantsCount: string;
-    meetingCount: string;
+    meetingsCount: string;
 }
 
 export interface ProgramCategoryCreateUpdate {

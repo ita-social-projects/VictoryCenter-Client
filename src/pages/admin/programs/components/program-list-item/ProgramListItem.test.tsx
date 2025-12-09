@@ -38,7 +38,7 @@ describe('ProgramListItem', () => {
         description: 'Test program description',
         status: VisibilityStatus.Published,
         participantsCount: 'Well I am not sure',
-        meetingCount: 'What I suppose to write here',
+        meetingsCount: 'What I suppose to write here',
         location: 'Somewhere in the world',
         previewImage: null,
         backgroundImage: null,

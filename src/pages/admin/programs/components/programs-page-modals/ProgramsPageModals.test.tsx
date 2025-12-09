@@ -40,7 +40,7 @@ describe('ProgramsPageModals', () => {
         previewImage: null,
         backgroundImage: null,
         location: '',
-        meetingCount: '',
+        meetingsCount: '',
         participantsCount: '',
     };
 

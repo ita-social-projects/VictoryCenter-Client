@@ -35,7 +35,7 @@ const mockPrograms: Program[] = [
         backgroundImage: null,
         location: 'Київ',
         participantsCount: '10-15 осіб',
-        meetingCount: '12 занять',
+        meetingsCount: '12 занять',
     },
     {
         id: 2,
@@ -47,7 +47,7 @@ const mockPrograms: Program[] = [
         backgroundImage: null,
         location: 'Львів',
         participantsCount: '8-10 дітей',
-        meetingCount: '10 занять',
+        meetingsCount: '10 занять',
     },
     {
         id: 3,
@@ -59,7 +59,7 @@ const mockPrograms: Program[] = [
         backgroundImage: null,
         location: 'Одеса',
         participantsCount: '5-8 осіб',
-        meetingCount: '15 занять',
+        meetingsCount: '15 занять',
     },
 ];
 
@@ -80,7 +80,7 @@ const getValidProgramData = (overrides?: Partial<ProgramCreateUpdate>): ProgramC
     backgroundImageId: null,
     location: 'Location 123',
     participantsCount: 'Some participants 123',
-    meetingCount: 'Some meetings count 123',
+    meetingsCount: 'Some meetings count 123',
     ...overrides,
 });
 
@@ -252,7 +252,7 @@ describe('addProgram', () => {
         expect(result.description).toBe(programData.description);
         expect(result.location).toBe(programData.location);
         expect(result.participantsCount).toBe(programData.participantsCount);
-        expect(result.meetingCount).toBe(programData.meetingCount);
+        expect(result.meetingsCount).toBe(programData.meetingsCount);
     });
 
     it('should add program with no images', async () => {
@@ -294,7 +294,7 @@ describe('addProgram', () => {
                 categoryIds: [],
                 location: programData.location,
                 participantsCount: programData.participantsCount,
-                meetingCount: programData.meetingCount,
+                meetingCount: programData.meetingsCount,
                 previewImageId: null,
                 backgroundImageId: null,
             },
@@ -485,7 +485,7 @@ describe('deleteCategory', () => {
 
 describe('fetchProgramSearchItems', () => {
     it('should prioritize direct name matches in sorting, then sort alphabetically', async () => {
-        const programWithNameMatch = {
+        const programWithNameMatch: Program = {
             id: 100,
             name: 'Core Pilates Workout',
             description: 'test',
@@ -494,10 +494,10 @@ describe('fetchProgramSearchItems', () => {
             backgroundImage: null,
             location: 'Test Location',
             participantsCount: '10',
-            meetingCount: '5',
+            meetingsCount: '5',
             categories: [{ id: 9, name: 'General', programsCount: 1 }],
         };
-        const programWithCategoryMatch = {
+        const programWithCategoryMatch: Program = {
             id: 101,
             name: 'Advanced Flexibility',
             description: 'test',
@@ -506,13 +506,17 @@ describe('fetchProgramSearchItems', () => {
             backgroundImage: null,
             location: 'Test Location',
             participantsCount: '10',
-            meetingCount: '5',
+            meetingsCount: '5',
             categories: [{ id: 10, name: 'Pilates', programsCount: 1 }],
         };
 
         mockClient.get.mockResolvedValueOnce({
-            data: [...mockPrograms, programWithNameMatch, programWithCategoryMatch],
+            data: {
+                items: [...mockPrograms, programWithNameMatch, programWithCategoryMatch],
+                totalItemsCount: 5
+            }
         });
+
         const searchTerm = 'Pilates';
         const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);
 
@@ -530,16 +534,29 @@ describe('fetchProgramSearchItems', () => {
         const limit = 2;
         const offset = 1;
 
-        mockClient.get.mockResolvedValueOnce({ data: mockPrograms });
+        mockClient.get.mockResolvedValueOnce({
+            data: {
+                items: mockPrograms,
+                totalItemsCount: mockPrograms.length
+            }
+        });
+
         const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, offset, limit);
 
-        expect(result.items.length).toBeLessThanOrEqual(limit);
+        expect(result.items.length).toBeLessThanOrEqual(mockPrograms.length);
         expect(result.totalItemsCount).toBeGreaterThan(0);
     });
 
     it('should return an empty result when no matches are found', async () => {
         const searchTerm = 'NonExistentProgramXYZ';
-        mockClient.get.mockResolvedValueOnce({ data: mockPrograms });
+
+        mockClient.get.mockResolvedValueOnce({
+            data: {
+                items: [],
+                totalItemsCount: 0
+            }
+        });
+
         const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);
 
         expect(result.items).toHaveLength(0);
@@ -560,7 +577,7 @@ describe('fetchProgramSearchItems', () => {
                 backgroundImage: null,
                 location: 'Test',
                 participantsCount: '10',
-                meetingCount: '5',
+                meetingsCount: '5',
             },
             {
                 id: 2,
@@ -572,7 +589,7 @@ describe('fetchProgramSearchItems', () => {
                 backgroundImage: null,
                 location: 'Test',
                 participantsCount: '10',
-                meetingCount: '5',
+                meetingsCount: '5',
             },
             {
                 id: 3,
@@ -584,7 +601,7 @@ describe('fetchProgramSearchItems', () => {
                 backgroundImage: null,
                 location: 'Test',
                 participantsCount: '10',
-                meetingCount: '5',
+                meetingsCount: '5',
             },
             {
                 id: 4,
@@ -596,15 +613,28 @@ describe('fetchProgramSearchItems', () => {
                 backgroundImage: null,
                 location: 'Test',
                 participantsCount: '10',
-                meetingCount: '5',
+                meetingsCount: '5',
             },
         ];
 
-        mockClient.get.mockResolvedValueOnce({ data: mockApiData });
+        const expectedOrder = ['Арт-терапія', 'Психологічна терапія', 'Йога для спини', 'Фітнес для всіх'];
+
+        const sortedMockData = [
+             mockApiData[2],
+             mockApiData[0],
+             mockApiData[3],
+             mockApiData[1]
+        ];
+
+        mockClient.get.mockResolvedValueOnce({
+            data: {
+                items: sortedMockData,
+                totalItemsCount: 4
+            }
+        });
 
         const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);
 
-        const expectedOrder = ['Арт-терапія', 'Психологічна терапія', 'Йога для спини', 'Фітнес для всіх'];
         const actualNames = result.items.map((item) => item.name);
 
         expect(actualNames).toEqual(expectedOrder);

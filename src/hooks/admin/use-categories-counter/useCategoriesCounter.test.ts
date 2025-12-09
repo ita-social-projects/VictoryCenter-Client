@@ -20,7 +20,7 @@ const createProgram = (props: Partial<Program> = {}): Program => ({
     previewImage: null,
     backgroundImage: null,
     location: '',
-    meetingCount: '',
+    meetingsCount: '',
     participantsCount: '',
     ...props,
 });

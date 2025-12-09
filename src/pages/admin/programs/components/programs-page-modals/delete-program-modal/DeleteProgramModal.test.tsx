@@ -70,7 +70,7 @@ describe('DeleteProgramModal', () => {
         backgroundImage: null,
         categories: [],
         location: '',
-        meetingCount: '',
+        meetingsCount: '',
         participantsCount: '',
     };
 

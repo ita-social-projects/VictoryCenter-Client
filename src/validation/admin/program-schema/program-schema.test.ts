@@ -26,7 +26,7 @@ const getValidData = (overrides?: Partial<Program>): Partial<Program> => ({
     categories: [mockCategory],
     description: 'This is a valid description with enough characters.',
     participantsCount: 'Some participants 123',
-    meetingCount: 'Some meetings count 123',
+    meetingsCount: 'Some meetings count 123',
     backgroundImage: createMockFile(),
     previewImage: createMockFile(),
     location: 'Location 123',
@@ -302,16 +302,16 @@ describe('Program Validation Schema', () => {
 
     describe('MeetingCount validation (Draft mode)', () => {
         it('should pass with empty meetingCount', async () => {
-            await expectValidationToPass(getValidData({ meetingCount: '' }));
+            await expectValidationToPass(getValidData({ meetingsCount: '' }));
         });
 
         it('should pass with valid meetingCount', async () => {
-            await expectValidationToPass(getValidData({ meetingCount: '10' }));
+            await expectValidationToPass(getValidData({ meetingsCount: '10' }));
         });
 
         it('should fail when meetingCount exceeds max length', async () => {
             await expectValidationToFail(
-                getValidData({ meetingCount: 'A'.repeat(PROGRAM_VALIDATION.meetingCount.max + 1) }),
+                getValidData({ meetingsCount: 'A'.repeat(PROGRAM_VALIDATION.meetingCount.max + 1) }),
                 COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.meetingCount.max),
             );
         });
@@ -322,19 +322,19 @@ describe('Program Validation Schema', () => {
 
         it('should fail with empty meetingCount', async () => {
             await expectValidationToFail(
-                getValidData({ meetingCount: '' }),
+                getValidData({ meetingsCount: '' }),
                 PROGRAM_VALIDATION.meetingCount.getRequiredWhenPublishingError(),
                 publishContext,
             );
         });
 
         it('should pass with valid meetingCount', async () => {
-            await expectValidationToPass(getValidData({ meetingCount: '10' }), publishContext);
+            await expectValidationToPass(getValidData({ meetingsCount: '10' }), publishContext);
         });
 
         it('should fail when meetingCount exceeds max length', async () => {
             await expectValidationToFail(
-                getValidData({ meetingCount: 'A'.repeat(PROGRAM_VALIDATION.meetingCount.max + 1) }),
+                getValidData({ meetingsCount: 'A'.repeat(PROGRAM_VALIDATION.meetingCount.max + 1) }),
                 COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_VALIDATION.meetingCount.max),
                 publishContext,
             );

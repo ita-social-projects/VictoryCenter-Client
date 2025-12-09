@@ -49,7 +49,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 program.backgroundImage && 'id' in program.backgroundImage ? program.backgroundImage.id : null,
             location: program.location,
             participantsCount: program.participantsCount,
-            meetingCount: program.meetingCount,
+            meetingCount: program.meetingsCount,
         };
     }, [program, isEditMode]);
 
@@ -103,7 +103,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 backgroundImageId: initialData?.backgroundImageId ?? null,
                 location: formData.location,
                 participantsCount: formData.participantsCount,
-                meetingCount: formData.meetingCount,
+                meetingsCount: formData.meetingCount,
             }),
         }),
         [isEditMode, isOpen, mode, onClose, onSuccess, program, client, initialData],

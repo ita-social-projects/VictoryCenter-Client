@@ -8,8 +8,8 @@ export const PROGRAMS_TEXT = {
         SEARCH_PROGRAMS: 'Шукати програми...',
         INSERT_PROGRAM_NAME: 'Введіть назву програми',
         INSERT_PROGRAM_LOCATION: 'Введіть місце проведення',
-        INSERT_PROGRAM_MEETINGS_COUNT: 'Введіть кількість учасників',
-        INSERT_PROGRAM_PARTICIPANTS_COUNT: 'Введіть кількість зустрічей',
+        INSERT_PROGRAM_PARTICIPANTS_COUNT: 'Введіть кількість учасників',
+        INSERT_PROGRAM_MEETINGS_COUNT: 'Введіть кількість зустрічей',
     },
 
     MESSAGE: {

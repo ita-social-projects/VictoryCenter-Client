@@ -7,12 +7,10 @@ import { Modal } from '../../common/modal/Modal';
 import { Button } from '../button/Button';
 
 interface GenericModalWrapperProps<TFormValues, TFormRef> {
-    // Main Modal Props
     isOpen: boolean;
     onClose: () => void;
     title?: string;
     fullScreen?: boolean;
-    // Form Props
     formRef: React.RefObject<TFormRef>;
     formKey: string | number;
     initialData: TFormValues | null;
@@ -25,21 +23,17 @@ interface GenericModalWrapperProps<TFormValues, TFormRef> {
         onValidationChange: (isValid: boolean) => void;
     }) => React.ReactElement;
     categories?: any[];
-    // State & Validation
     isSubmitting: boolean;
     error: string;
     buttonStates: ButtonValidationState;
-    // User Intent Triggers (Buttons inside the form)
     onDraftSubmit: () => void;
     onPublishSubmit: () => void;
     onFormSubmit: (data: TFormValues, status: VisibilityStatus) => void;
     onFormValidationChange: (isValid: boolean) => void;
-    // Action Confirmation (Save/Publish)
     isActionConfirmationOpen: boolean;
     actionConfirmationTitle: string;
     onActionConfirm: () => void;
     onActionCancel: () => void;
-    // Exit Confirmation (Unsaved Changes)
     isExitConfirmationOpen: boolean;
     onExitConfirm: () => void;
     onExitCancel: () => void;
@@ -104,7 +98,6 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                 </Modal.Actions>
             </Modal>
 
-            {/* ACTION CONFIRMATION (Publish/Draft) */}
             <ConfirmationModal
                 isOpen={isActionConfirmationOpen}
                 title={actionConfirmationTitle}
@@ -116,7 +109,6 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
                 cancelText={COMMON_TEXT_ADMIN.BUTTON.NO}
             />
 
-            {/* EXIT CONFIRMATION (Discard Changes) */}
             <ConfirmationModal
                 isOpen={isExitConfirmationOpen}
                 title={COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE}

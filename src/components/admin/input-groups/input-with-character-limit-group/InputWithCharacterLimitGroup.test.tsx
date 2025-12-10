@@ -7,7 +7,7 @@ jest.mock('@/components/admin/input-label/InputLabel', () => ({
 }));
 
 jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
-    InputWithCharacterLimit: () => <input data-testid="mock-input" />,
+    InputWithCharacterLimit: () => <input title="mock-input" data-testid="mock-input" />,
 }));
 
 jest.mock('@/components/admin/input-error/InputError', () => ({

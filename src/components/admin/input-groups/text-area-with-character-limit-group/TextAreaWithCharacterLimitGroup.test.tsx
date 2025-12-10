@@ -7,7 +7,7 @@ jest.mock('@/components/admin/input-label/InputLabel', () => ({
 }));
 
 jest.mock('@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
-    TextAreaWithCharacterLimit: () => <textarea data-testid="mock-input" />,
+    TextAreaWithCharacterLimit: () => <textarea title="mock-input" data-testid="mock-input" />,
 }));
 
 jest.mock('@/components/admin/input-error/InputError', () => ({

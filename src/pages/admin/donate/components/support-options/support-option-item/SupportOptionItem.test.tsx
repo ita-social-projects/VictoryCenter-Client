@@ -12,7 +12,7 @@ jest.mock('../../donate-input/DonateInput', () => ({
                 onChange={(e) => onValueChange?.(e.target.value)}
                 onBlur={onBlur}
                 data-testid={`input-${name}`}
-                aria-label={name}
+                placeholder={name}
             />
             {error && <span>{error}</span>}
         </div>

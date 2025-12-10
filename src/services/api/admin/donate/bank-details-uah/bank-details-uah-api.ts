@@ -1,24 +1,24 @@
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { UahBankDetailsType } from '../../../../../types/admin/donate';
+import { UahBankDetailsDto, CreateUahBankDetails, UpdateUahBankDetails } from '../../../../../types/admin/donate';
 
 export const BankDetailsUahApi = {
-    getAll: async (client: AxiosInstance): Promise<UahBankDetailsType[]> => {
-        const response = await client.get<UahBankDetailsType[]>(API_ROUTES.DONATE.BANK_DETAILS_UAH);
+    getAll: async (client: AxiosInstance): Promise<UahBankDetailsDto[]> => {
+        const response = await client.get<UahBankDetailsDto[]>(API_ROUTES.DONATE.BANK_DETAILS_UAH);
         return response.data;
     },
 
-    create: async (client: AxiosInstance, bankDetails: Omit<UahBankDetailsType, 'id'>): Promise<UahBankDetailsType> => {
-        const response = await client.post<UahBankDetailsType>(API_ROUTES.DONATE.BANK_DETAILS_UAH, bankDetails);
+    create: async (client: AxiosInstance, bankDetails: CreateUahBankDetails): Promise<UahBankDetailsDto> => {
+        const response = await client.post<UahBankDetailsDto>(API_ROUTES.DONATE.BANK_DETAILS_UAH, bankDetails);
         return response.data;
     },
 
     update: async (
         client: AxiosInstance,
         id: number,
-        bankDetails: Partial<UahBankDetailsType>,
-    ): Promise<UahBankDetailsType> => {
-        const response = await client.put<UahBankDetailsType>(
+        bankDetails: UpdateUahBankDetails,
+    ): Promise<UahBankDetailsDto> => {
+        const response = await client.put<UahBankDetailsDto>(
             `${API_ROUTES.DONATE.BANK_DETAILS_UAH}/${id}`,
             bankDetails,
         );

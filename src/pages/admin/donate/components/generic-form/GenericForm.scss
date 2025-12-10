@@ -103,7 +103,7 @@
         }
 
         .body {
-            flex-direction: column-reverse;
+            flex-direction: column;
         }
 
         .generic-form {
@@ -121,5 +121,11 @@
                 flex: 1;
             }
         }
+    }
+
+    .divider {
+        padding-top: 1.875rem;
+        border-radius: 0;
+        border-top: 1px solid colors.$grey-700;
     }
 }

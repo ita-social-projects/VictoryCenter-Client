@@ -80,7 +80,7 @@ describe('UAH Bank Details Mappers', () => {
 
 describe('Foreign Bank Details Mappers', () => {
     describe('mapToCreateForeignBankDetails', () => {
-        it('maps dto to create model by removing id and correspondentBanks', () => {
+        it('maps dto to create model by removing id and transforming correspondentBanks', () => {
             const dto: ForeignBankDetailsDto = {
                 id: 1,
                 name: 'Foreign Bank',
@@ -109,9 +109,20 @@ describe('Foreign Bank Details Mappers', () => {
                 swift: 'ABCDEFGH',
                 address: '123 Main St',
                 currency: BankCurrency.Usd,
+                correspondentBanks: [
+                    {
+                        name: 'Correspondent Bank',
+                        swift: 'CORRSWFT',
+                        account: '123456',
+                    },
+                ],
             });
             expect(result).not.toHaveProperty('id');
-            expect(result).not.toHaveProperty('correspondentBanks');
+            expect(result.correspondentBanks).toBeDefined();
+            result.correspondentBanks!.forEach((bank) => {
+                expect(bank).not.toHaveProperty('id');
+                expect(bank).not.toHaveProperty('foreignBankDetailsId');
+            });
         });
 
         it('handles empty correspondentBanks array', () => {

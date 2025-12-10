@@ -262,16 +262,49 @@ export const DonatePageContent = () => {
         [client, setItems, addToast],
     );
 
+    const handleLocalSubmit = useCallback(
+        (formState: any, setFormState: any, data: CorrespondentBankDetailsDto) => {
+            const updatedBanks = [...(formState.correspondentBanks || []), data];
+
+            setFormState({
+                ...formState,
+                correspondentBanks: updatedBanks,
+            });
+
+            addToast(DONATE_TEXT.MESSAGE.CORRESPONDENT_BANKS.ADD, ToastType.Info);
+        },
+        [addToast],
+    );
+
+    const handleLocalUpdate = useCallback(() => {
+        addToast(DONATE_TEXT.MESSAGE.CORRESPONDENT_BANKS.UPDATE, ToastType.Info);
+    }, [addToast]);
+
+    const handleLocalDelete = useCallback(
+        (formState: any, setFormState: any, index: number): void => {
+            const updatedBanks = [...(formState.correspondentBanks || [])];
+            updatedBanks.splice(index, 1);
+            setFormState({ ...formState, correspondentBanks: updatedBanks });
+            addToast(DONATE_TEXT.MESSAGE.CORRESPONDENT_BANKS.DELETED, ToastType.Info);
+        },
+        [addToast],
+    );
+
     const renderCorrespondentBanks = useCallback(
-        ({ formState, isItemsExpanded }: any) => {
-            const correspondentBanks = items.find((i) => i.id === formState.id)?.correspondentBanks ?? [];
-            const sortedCorrespondentBanks = [...correspondentBanks].sort((a, b) => a.id - b.id);
+        ({ formState, isItemsExpanded, setFormState }: any) => {
+            const isCreating = !formState.id;
+            const localBanks = formState.correspondentBanks || [];
+
+            const existingItem = items.find((i) => i.id === formState.id);
+            const banksToShow = isCreating
+                ? localBanks
+                : [...(existingItem?.correspondentBanks ?? [])].sort((a, b) => a.id - b.id);
 
             return (
                 <GenericDetails
                     key={`corr-${selectedCategory}-${formState.id}`}
                     title={DONATE_TEXT.CORRESPONDENT_BANKS.TITLE}
-                    items={sortedCorrespondentBanks}
+                    items={banksToShow}
                     isLoading={false}
                     FormComponent={config?.correspondentForm!}
                     initialIsItemsExpanded={isItemsExpanded}
@@ -279,9 +312,13 @@ export const DonatePageContent = () => {
                     addNewText={DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW}
                     isChildForm={true}
                     isDisabled={!formState.id}
+                    isParentCreating={isCreating}
                     onSubmit={(data) => handleCreateCorrespondentBank(formState.id, data)}
                     onUpdate={(id, data) => handleUpdateCorrespondentBank(formState.id, id, data)}
                     onDelete={(id) => handleDeleteCorrespondentBank(formState.id, id)}
+                    onLocalSubmit={(data) => handleLocalSubmit(formState, setFormState, data)}
+                    onLocalUpdate={handleLocalUpdate}
+                    onLocalDelete={(index) => handleLocalDelete(formState, setFormState, index)}
                     onEditingStateChange={setIsChildEditing}
                     onAddFormVisibilityChange={setIsCorrespondentBankFormVisible}
                 />
@@ -294,6 +331,9 @@ export const DonatePageContent = () => {
             handleCreateCorrespondentBank,
             handleUpdateCorrespondentBank,
             handleDeleteCorrespondentBank,
+            handleLocalSubmit,
+            handleLocalUpdate,
+            handleLocalDelete,
             setIsChildEditing,
         ],
     );

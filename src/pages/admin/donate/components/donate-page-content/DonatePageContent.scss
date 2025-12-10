@@ -80,7 +80,7 @@
     &.view {
         cursor: pointer;
         &:hover {
-            background: url('../../../../../assets/icons/edit-hover.svg');
+            background: url('~@/assets/icons/edit-hover.svg');
         }
     }
 }
@@ -95,7 +95,7 @@
     font-size: 1.125rem;
 
     &:hover {
-        background: url('../../../../../assets/icons/delete-hover.svg') no-repeat;
+        background: url('~@/assets/icons/delete-hover.svg') no-repeat;
     }
 
     width: 1.5rem;

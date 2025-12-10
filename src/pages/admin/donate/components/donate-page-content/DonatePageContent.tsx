@@ -33,7 +33,7 @@ import {
     mapToUpdateForeignBankDetails,
     mapToCreateCorrespondentBankDetails,
     mapToUpdateCorrespondentBankDetails,
-} from '../../../../../utils/functions/mappers/admin/donate-mappers';
+} from '@/utils/functions/mappers/admin/donate-mappers';
 import './DonatePageContent.scss';
 
 export const DonatePageContent = () => {

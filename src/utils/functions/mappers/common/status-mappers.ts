@@ -1,5 +1,5 @@
-import { COMMON_TEXT_ADMIN } from '../../../../const/admin/common';
-import { VisibilityStatus, StatusFilter } from '../../../../types/admin/common';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { VisibilityStatus, StatusFilter } from '@/types/admin/common';
 
 const VisibilityLabels = [COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT, COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED] as const;
 

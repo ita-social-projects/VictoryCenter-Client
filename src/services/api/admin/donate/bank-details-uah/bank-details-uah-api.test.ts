@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { BankDetailsUahApi } from './bank-details-uah-api';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { UahBankDetailsDto, CreateUahBankDetails } from '../../../../../types/admin/donate';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { UahBankDetailsDto, CreateUahBankDetails } from '@/types/admin/donate';
 
 describe('BankDetailsUahApi', () => {
     const mockClient = {

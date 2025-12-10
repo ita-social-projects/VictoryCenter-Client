@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
+import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
 import './MemberComponent.scss';
-import { ReactComponent as BlankUserImage } from '../../../../../assets/icons/blank-user.svg';
-import { TeamMember } from '../../../../../types/admin/team-members';
-import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
+import { ReactComponent as BlankUserImage } from '@/assets/icons/blank-user.svg';
+import { TeamMember } from '@/types/admin/team-members';
+import { VisibilityStatusLabel } from '@/components/admin/visibility-status-label/VisibilityStatusLabel';
 
 export interface MemberComponentProps {
     member: TeamMember;

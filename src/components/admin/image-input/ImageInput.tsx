@@ -1,14 +1,14 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { ReactComponent as DeleteIcon } from '../../../assets/icons/delete.svg';
-import { ReactComponent as UploadIcon } from '../../../assets/icons/cloud-download.svg';
+import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
+import { ReactComponent as UploadIcon } from '@/assets/icons/cloud-download.svg';
 import classNames from 'classnames';
 import './ImageInput.scss';
 import './WhoWeAreImageInput.scss';
-import { Image, ImageValues } from '../../../types/common/image';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
-import { COMMON_IMAGE_TEXT } from '../../../const/admin/image';
-import { IMAGE_VALIDATION_FUNCTIONS } from '../../../validation/admin/image-schema/image-schema';
+import { Image, ImageValues } from '@/types/common/image';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { COMMON_IMAGE_TEXT } from '@/const/admin/image';
+import { IMAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/image-schema/image-schema';
 
 export interface ImageInputProps {
     value: ImageValues | Image | null;

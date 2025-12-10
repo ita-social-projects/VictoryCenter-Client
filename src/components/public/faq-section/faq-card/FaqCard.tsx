@@ -1,7 +1,7 @@
 import './FaqCard.scss';
-import { ReactComponent as OpenIcon } from '../../../../assets/icons/arrow-down-right.svg';
-import { ReactComponent as CloseIcon } from '../../../../assets/icons/cross.svg';
-import { PublishedFaqQuestion } from '../../../../types/public/faq-section';
+import { ReactComponent as OpenIcon } from '@/assets/icons/arrow-down-right.svg';
+import { ReactComponent as CloseIcon } from '@/assets/icons/cross.svg';
+import { PublishedFaqQuestion } from '@/types/public/faq-section';
 
 interface FaqCardProps {
     faq: PublishedFaqQuestion;

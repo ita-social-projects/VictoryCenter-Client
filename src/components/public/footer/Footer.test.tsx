@@ -2,18 +2,18 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Footer } from './Footer';
 import { MemoryRouter } from 'react-router-dom';
-import { PUBLIC_ROUTES } from '../../../const/public/routes';
-import footerUk from '../../../locales/uk/footer.json';
+import { PUBLIC_ROUTES } from '@/const/public/routes';
+import footerUk from '@/locales/uk/footer.json';
 
-jest.mock('../../../assets/icons/arrow-up-right.svg', () => ({
+jest.mock('@/assets/icons/arrow-up-right.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="arrow-icon" />,
 }));
 
-jest.mock('../../../assets/icons/phone.svg', () => ({
+jest.mock('@/assets/icons/phone.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="phone-icon" />,
 }));
 
-jest.mock('../../../assets/icons/mail.svg', () => ({
+jest.mock('@/assets/icons/mail.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="mail-icon" />,
 }));
 

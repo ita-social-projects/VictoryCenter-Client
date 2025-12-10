@@ -1,4 +1,4 @@
-@use '../../../../../assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors';
 
 .program-item {
     display: flex;
@@ -131,18 +131,18 @@
             }
 
             .edit-btn {
-                background: url('../../../../../assets/icons/edit.svg');
+                background: url('~@/assets/icons/edit.svg');
 
                 &:active {
-                    background: url('../../../../../assets/icons/edit-filled.svg');
+                    background: url('~@/assets/icons/edit-filled.svg');
                 }
             }
 
             .delete-btn {
-                background: url('../../../../../assets/icons/delete.svg');
+                background: url('~@/assets/icons/delete.svg');
 
                 &:active {
-                    background: url('../../../../../assets/icons/delete-filled.svg');
+                    background: url('~@/assets/icons/delete-filled.svg');
                 }
             }
         }

@@ -1,6 +1,6 @@
-import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
-import { ProgramCategory } from '../../../types/admin/programs';
-import { Image, ImageValues } from '../../../types/common/image';
+import { PROGRAM_VALIDATION } from '@/const/admin/programs';
+import { ProgramCategory } from '@/types/admin/programs';
+import { Image, ImageValues } from '@/types/common/image';
 import * as Yup from 'yup';
 
 export interface ProgramValidationContext {

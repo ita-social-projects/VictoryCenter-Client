@@ -1,9 +1,9 @@
-import { VisibilityStatus } from '../../../types/admin/common';
+import { VisibilityStatus } from '@/types/admin/common';
 import React from 'react';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
-import { Modal } from '../../common/modal/Modal';
-import { Button } from '../button/Button';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { Modal } from '@/components/common/modal/Modal';
+import { Button } from '@/components/admin/button/Button';
 
 interface GenericModalWrapperProps<TFormValues, TFormRef> {
     isOpen: boolean;

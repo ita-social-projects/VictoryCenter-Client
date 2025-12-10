@@ -1,11 +1,11 @@
 import { AboutUsApi } from './about-us-api';
-import { axiosInstance } from '../../axios';
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
-import { AboutUsSection } from '../../../../types/public/about-us-page';
-import { ContentType, SectionType } from '../../../../types/common/about-us';
-import { Image } from '../../../../types/common/image';
+import { axiosInstance } from '@/services/api/axios';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { AboutUsSection } from '@/types/public/about-us-page';
+import { ContentType, SectionType } from '@/types/common/about-us';
+import { Image } from '@/types/common/image';
 
-jest.mock('../../axios');
+jest.mock('@/services/api/axios');
 
 describe('AboutUsApi', () => {
     afterEach(() => {

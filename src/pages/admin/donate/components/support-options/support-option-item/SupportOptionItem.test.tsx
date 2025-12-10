@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { SupportOptionItem, SupportOptionItemMode } from './SupportOptionItem';
-import { DONATE_TEXT } from '../../../../../../const/admin/donate';
-import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
-import { BankCurrency } from '../../../../../../types/admin/donate';
+import { DONATE_TEXT } from '@/const/admin/donate';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { BankCurrency } from '@/types/admin/donate';
 
 jest.mock('../../donate-input/DonateInput', () => ({
     DonateInput: ({ value, onValueChange, onBlur, name, error }: any) => (
@@ -19,7 +19,7 @@ jest.mock('../../donate-input/DonateInput', () => ({
     ),
 }));
 
-jest.mock('../../../../../../components/admin/button/Button', () => ({
+jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled }: any) => (
         <button onClick={onClick} disabled={disabled}>
             {children}
@@ -27,7 +27,7 @@ jest.mock('../../../../../../components/admin/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, title, onConfirm, onCancel }: any) =>
         isOpen ? (
             <div data-testid="confirmation-modal">
@@ -38,7 +38,7 @@ jest.mock('../../../../../../components/admin/confirmation-modal/ConfirmationMod
         ) : null,
 }));
 
-jest.mock('../../../../../../validation/admin/bank-details-schema/bank-details-schema', () => ({
+jest.mock('@/validation/admin/bank-details-schema/bank-details-schema', () => ({
     SUPPORT_OPTIONS_VALIDATION_FUNCTIONS: {
         validateName: (val: string) => (val.length < 2 ? 'Name too short' : undefined),
         validateValue: (val: string) => (val.length < 2 ? 'Value too short' : undefined),

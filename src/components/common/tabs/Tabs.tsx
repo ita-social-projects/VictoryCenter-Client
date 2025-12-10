@@ -1,5 +1,5 @@
-import { TabProps } from '../../../types/public/donate-page';
-import { NOT_AVAIBLE, CHECK_LATER } from '../../../const/public/tabs';
+import { TabProps } from '@/types/public/donate-page';
+import { NOT_AVAIBLE, CHECK_LATER } from '@/const/public/tabs';
 import './Tabs.scss';
 
 export const Tabs = ({ tabs, activeTab, setActiveTab }: TabProps) => {

@@ -1,16 +1,16 @@
 import { useMemo } from 'react';
 import { MemberForm, TeamMemberFormRef, TeamMemberFormValues } from '../member-form/MemberForm';
-import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../types/admin/team-members';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
-import { GenericModalWrapper } from '../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
-import { useGenericModal } from '../../../../../hooks/admin/use-generic-modal/useGenericModal';
-import { VisibilityStatus, PendingAction, ModalMode } from '../../../../../types/admin/common';
-import { TeamCategory } from '../../../../../types/admin/team-category';
+import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { TeamMember, TeamMemberCreateUpdateRequest } from '@/types/admin/team-members';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { TeamMembersApi } from '@/services/api/admin/team/team-members/team-members-api';
+import { GenericModalWrapper } from '@/components/admin/generic-modal-wrapper/GenericModalWrapper';
+import { useGenericModal } from '@/hooks/admin/use-generic-modal/useGenericModal';
+import { VisibilityStatus, PendingAction, ModalMode } from '@/types/admin/common';
+import { TeamCategory } from '@/types/admin/team-category';
 
-interface TeamMemberModalProps {
+export interface TeamMemberModalProps {
     mode: ModalMode;
     isOpen: boolean;
     onClose: () => void;

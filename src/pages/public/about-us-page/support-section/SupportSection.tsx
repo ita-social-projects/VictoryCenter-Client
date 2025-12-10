@@ -1,10 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { SupportSectionTablet } from './components/support-section-tablet/SupportSectionTablet';
-import { Swiper } from '../../../../components/public/swiper/Swiper';
+import { Swiper } from '@/components/public/swiper/Swiper';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { SupportCard } from './components/support-card/SupportCard';
 import './SupportSection.scss';
-import { AboutUsContent } from '../../../../types/public/about-us-page';
+import { AboutUsContent } from '@/types/public/about-us-page';
 
 export interface SupportSectionProps {
     content: AboutUsContent[] | null;

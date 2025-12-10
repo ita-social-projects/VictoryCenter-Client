@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { ForeignBankDetailsApi } from './bank-details-foreign-api';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { BankCurrency, ForeignBankDetailsDto } from '../../../../../types/admin/donate';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { BankCurrency, ForeignBankDetailsDto } from '@/types/admin/donate';
 
 describe('ForeignBankDetailsApi', () => {
     const mockClient = {

@@ -1,7 +1,7 @@
 import './UkrainePaymentDetails.scss';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
-import { UKRAINE_PAYMENT_DETAILS, PAYMENT_DETAILS_COMMON } from '../../../../../const/public/donate-page';
-import { PublishedUahBankDetailsDto } from '../../../../../types/public/donate-page';
+import { UKRAINE_PAYMENT_DETAILS, PAYMENT_DETAILS_COMMON } from '@/const/public/donate-page';
+import { PublishedUahBankDetailsDto } from '@/types/public/donate-page';
 
 interface UkrainePaymentDetailsProps {
     bankDetails: PublishedUahBankDetailsDto[];

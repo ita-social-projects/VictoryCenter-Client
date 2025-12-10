@@ -33,12 +33,17 @@
             color: colors.$blue-900;
             font-size: 1.125rem;
             font-weight: 400;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
         }
 
         .labelWithCopyButton {
             padding-top: 0.125rem;
             display: flex;
             gap: 0.5rem;
+            align-items: flex-start;
+            flex-wrap: wrap;
         }
     }
 }

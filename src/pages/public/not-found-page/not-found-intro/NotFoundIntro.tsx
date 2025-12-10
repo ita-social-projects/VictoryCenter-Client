@@ -1,6 +1,6 @@
 import React from 'react';
 import './NotFoundIntro.scss';
-import { ERROR_404 } from '../../../../const/public/notfound-page';
+import { ERROR_404 } from '@/const/public/notfound-page';
 
 export const NotFoundIntro = () => {
     return (

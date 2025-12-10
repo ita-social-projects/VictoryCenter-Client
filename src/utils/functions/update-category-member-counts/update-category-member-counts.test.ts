@@ -1,6 +1,6 @@
 import { updateCategoryMemberCounts } from './update-category-member-counts';
-import { TeamCategory } from '../../../types/admin/team-category';
-import { TeamMember } from '../../../types/admin/team-members';
+import { TeamCategory } from '@/types/admin/team-category';
+import { TeamMember } from '@/types/admin/team-members';
 
 describe('updateCategoryMemberCounts', () => {
     const mockCategories: TeamCategory[] = [

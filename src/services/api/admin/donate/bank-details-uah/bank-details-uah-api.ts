@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { UahBankDetailsDto, CreateUahBankDetails, UpdateUahBankDetails } from '../../../../../types/admin/donate';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { UahBankDetailsDto, CreateUahBankDetails, UpdateUahBankDetails } from '@/types/admin/donate';
 
 export const BankDetailsUahApi = {
     getAll: async (client: AxiosInstance): Promise<UahBankDetailsDto[]> => {

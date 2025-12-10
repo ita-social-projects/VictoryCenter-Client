@@ -5,8 +5,8 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
 
-import { ReactComponent as ArrowRight } from '../../../assets/icons/arrow-right.svg';
-import { ReactComponent as ArrowLeft } from '../../../assets/icons/arrow-left.svg';
+import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
+import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
 
 interface SwiperProps<T> {
     items: T[] | null;

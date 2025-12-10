@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useGenericModal, GenericFormRef } from './useGenericModal';
-import { VisibilityStatus, ModalMode } from '../../../types/admin/common';
+import { VisibilityStatus, ModalMode } from '@/types/admin/common';
 
 describe('useGenericModal', () => {
     const apiCall = jest.fn();

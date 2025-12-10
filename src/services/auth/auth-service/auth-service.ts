@@ -1,4 +1,4 @@
-import { JwtPayload } from '../../../types/admin/auth';
+import { JwtPayload } from '@/types/admin/auth';
 
 export function isAccessTokenValid(token: string): boolean {
     return hasValidStructure(token) && !isTokenExpired(token);

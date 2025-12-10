@@ -1,5 +1,5 @@
-@use '../../../assets/sass/variables/colors';
-@use '../../../assets/sass/variables/fonts';
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/fonts';
 
 .admin-page-content {
     display: flex;
@@ -9,8 +9,7 @@
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    background: rgba(colors.$grey-900, 0.4) url('../../../assets/images/admin/home/home-background.jpg') 50% / cover
-        no-repeat;
+    background: rgba(colors.$grey-900, 0.4) url('~@/assets/images/admin/home/home-background.jpg') 50% / cover no-repeat;
     background-blend-mode: multiply;
     position: relative;
 

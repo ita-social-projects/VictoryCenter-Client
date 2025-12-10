@@ -1,6 +1,12 @@
 const customJestConfig = require('./jest.config.js');
+const path = require('path');
 
 module.exports = {
+    webpack: {
+        alias: {
+            '@': path.resolve(__dirname, 'src'),
+        },
+    },
     jest: {
         configure: (defaultJestConfig) => {
             const mergedConfig = {
@@ -10,6 +16,8 @@ module.exports = {
                 moduleNameMapper: {
                     ...defaultJestConfig.moduleNameMapper,
                     ...customJestConfig.moduleNameMapper,
+
+                    '^@/(.*)$': '<rootDir>/src/$1',
                 },
             };
 

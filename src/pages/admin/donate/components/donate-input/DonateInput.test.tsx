@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DonateInput } from './DonateInput';
-import { DONATE_TEXT } from '../../../../../const/admin/donate';
+import { DONATE_TEXT } from '@/const/admin/donate';
 
 describe('DonateInput component', () => {
     test('renders with label and placeholder', () => {

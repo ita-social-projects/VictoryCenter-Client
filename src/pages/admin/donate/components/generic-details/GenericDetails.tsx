@@ -97,7 +97,6 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
         async (data: T) => {
             if (isParentCreating && isChildForm && onLocalSubmit) {
                 onLocalSubmit(data);
-                setIsAddFormVisible(false);
             } else if (onSubmit) {
                 await onSubmit(data);
             } else if (isChildForm) {
@@ -124,7 +123,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
 
     const handleItemDelete = useCallback(
         async (id: number | null, index?: number) => {
-            if (isParentCreating && onLocalDelete && index !== undefined) {
+            if (isParentCreating && onLocalDelete && index != null) {
                 onLocalDelete(index);
             } else if (onDelete && id !== null) {
                 await onDelete(id);
@@ -215,7 +214,12 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             className={`generic-details btn-add-new ${isAddFormVisible || editingItemId !== null ? 'disabled' : ''}`}
                             onClick={handleAdd}
                             buttonStyle="primary"
-                            disabled={isAddButtonDisabled || isParentAddFormVisible || editingItemId !== null}
+                            disabled={
+                                isAddButtonDisabled ||
+                                isParentAddFormVisible ||
+                                isAddFormVisible ||
+                                editingItemId !== null
+                            }
                         >
                             <div>{addNewText}</div>
                             <PlusIcon className="plus-icon" />

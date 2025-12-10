@@ -9,7 +9,7 @@ import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin
 import { PartnerForm, PartnerFormErrors, PartnerFormValues } from '../partner-form/PartnerForm';
 import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
 import { Button } from '../../../../../components/admin/button/Button';
-import './PartnerSectionForm.scss';
+import styles from './PartnerSectionForm.module.scss';
 
 export interface PartnerSectionFormValues {
     localId: string;
@@ -145,9 +145,9 @@ const PartnerSectionComponent = ({
     };
 
     return (
-        <div className="partner-section-form">
-            <div className="partner-section-form__inputs">
-                <div className="partner-section-form__title-group">
+        <div className={styles['partner-section-form']}>
+            <div className={styles['partner-section-form__inputs']}>
+                <div className={styles['partner-section-form__title-group']}>
                     <TextAreaWithCharacterLimitGroup
                         label={PARTNERS_TEXT.FORM.LABEL.TITLE}
                         value={value.title}
@@ -162,7 +162,7 @@ const PartnerSectionComponent = ({
                         rows={3}
                     />
                 </div>
-                <div className="partner-section-form__description-group">
+                <div className={styles['partner-section-form__description-group']}>
                     <TextAreaWithCharacterLimitGroup
                         label={PARTNERS_TEXT.FORM.LABEL.DESCRIPTION}
                         value={value.description}
@@ -179,7 +179,7 @@ const PartnerSectionComponent = ({
                 </div>
             </div>
 
-            <div className="partner-section-form__partners-grid">
+            <div className={styles['partner-section-form__partners-grid']}>
                 {value.partners.map((partner: PartnerFormValues, index: number) => (
                     <PartnerForm
                         key={partner.localId}
@@ -190,7 +190,7 @@ const PartnerSectionComponent = ({
                         onDelete={handlePartnerDelete}
                     />
                 ))}
-                <div className="partner-section-form__add-card">
+                <div className={styles['partner-section-form__add-card']}>
                     <button
                         type="button"
                         onClick={handleAddPartner}
@@ -202,12 +202,12 @@ const PartnerSectionComponent = ({
             </div>
 
             {disabled && (
-                <div className="partner-section-form__loader">
+                <div className={styles['partner-section-form__loader']}>
                     <InlineLoader size={2} />
                 </div>
             )}
 
-            <div className="partner-section-form__actions">
+            <div className={styles['partner-section-form__actions']}>
                 <Button buttonStyle="secondary" onClick={handleDelete} disabled={disabled}>
                     {PARTNERS_TEXT.SECTION.DELETE_SECTION}
                 </Button>

@@ -6,6 +6,7 @@ import { PARTNERS_TEXT } from '../../../../../const/admin/partners';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { Button } from '../../../../../components/admin/button/Button';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import styles from './DeletePartnerSectionModal.module.scss';
 
 interface DeletePartnerSectionModalProps {
     isOpen: boolean;
@@ -51,7 +52,7 @@ export const DeletePartnerSectionModal = ({
         <Modal isOpen={isOpen} onClose={handleClose}>
             <Modal.Title>{PARTNERS_TEXT.FORM.TITLE.DELETE_SECTION}</Modal.Title>
             <Modal.Content>
-                {error && <div className="delete-partner-section-error-container">{error}</div>}
+                {error && <div className={styles['delete-partner-section-error-container']}>{error}</div>}
             </Modal.Content>
             <Modal.Actions>
                 <Button onClick={handleClose} buttonStyle="secondary" disabled={isSubmitting}>
@@ -60,7 +61,7 @@ export const DeletePartnerSectionModal = ({
                 <Button
                     onClick={handleConfirmDelete}
                     buttonStyle="primary"
-                    className="btn-danger"
+                    className={styles['btn-danger']}
                     disabled={isSubmitting || !sectionToDelete}
                 >
                     {COMMON_TEXT_ADMIN.BUTTON.YES}

@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import { ImageValues, Image } from '../../../../../types/common/image';
-import './PartnerBannerForm.scss';
+import styles from './PartnerBannerForm.module.scss';
 import { PARTNER_BANNER_VALIDATION, PARTNERS_TEXT } from '../../../../../const/admin/partners';
 import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
 import { PartnersApi } from '../../../../../services/api/admin/partners/partners-api';
@@ -141,7 +141,7 @@ export const PartnerBanner = () => {
 
     if (isLoadingData) {
         return (
-            <div className="partner-banner-form__loader">
+            <div className={styles['partner-banner-form__loader']}>
                 <InlineLoader size={2} />
             </div>
         );
@@ -149,7 +149,7 @@ export const PartnerBanner = () => {
 
     if (fetchError || !values) {
         return (
-            <div className="partner-banner-form__error">
+            <div className={styles['partner-banner-form__error']}>
                 <p>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER}</p>
                 <Button onClick={refetchBanner} buttonStyle="primary">
                     {PARTNERS_TEXT.BUTTON.TRY_AGAIN}
@@ -161,15 +161,15 @@ export const PartnerBanner = () => {
     const isDisabled = isPublishing;
 
     return (
-        <div className="partner-banner-form">
+        <div className={styles['partner-banner-form']}>
             {isLoadingData && (
-                <div className="partner-banner-form__loader">
+                <div className={styles['partner-banner-form__loader']}>
                     <InlineLoader size={2} />
                 </div>
             )}
 
             {fetchError && !isLoadingData && (
-                <div className="partner-banner-form__error">
+                <div className={styles['partner-banner-form__error']}>
                     <p>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER}</p>
                     <Button onClick={refetchBanner} buttonStyle="primary">
                         {PARTNERS_TEXT.BUTTON.TRY_AGAIN}
@@ -178,8 +178,8 @@ export const PartnerBanner = () => {
             )}
 
             {!isLoadingData && !fetchError && values && (
-                <div className="partner-banner-form__content">
-                    <div className="partner-banner-form__image">
+                <div className={styles['partner-banner-form__content']}>
+                    <div className={styles['partner-banner-form__image']}>
                         <ImageInput
                             label={PARTNERS_TEXT.BANNER.ADD_IMAGE_HERE}
                             subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
@@ -203,8 +203,8 @@ export const PartnerBanner = () => {
                         <InputError error={errors.image} />
                     </div>
 
-                    <div className="partner-banner-form__main">
-                        <div className="partner-banner-form__fields">
+                    <div className={styles['partner-banner-form__main']}>
+                        <div className={styles['partner-banner-form__fields']}>
                             <InputWithCharacterLimitGroup
                                 label={PARTNERS_TEXT.FORM.LABEL.TITLE}
                                 value={values.title}
@@ -230,7 +230,7 @@ export const PartnerBanner = () => {
                             />
                         </div>
 
-                        <div className="partner-banner-form__actions">
+                        <div className={styles['partner-banner-form__actions']}>
                             <Button
                                 type="button"
                                 buttonStyle="primary"

@@ -6,7 +6,7 @@ import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin
 import { PARTNER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/partner-schema/partner-schema';
 import { PARTNER_VALIDATION, PARTNERS_TEXT } from '../../../../../const/admin/partners';
 import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import './PartnerForm.scss';
+import styles from './PartnerForm.module.scss';
 
 export interface PartnerFormValues {
     localId: string;
@@ -60,12 +60,12 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
     const cardHtmlId = values.localId;
 
     return (
-        <div className="partner-form" data-testid={`partner-form-${cardHtmlId}`}>
-            <div className="partner-form__header">
-                <button type="button" className="partner-form__delete-button" onClick={handleDelete} />
+        <div className={styles['partner-form']} data-testid={`partner-form-${cardHtmlId}`}>
+            <div className={styles['partner-form__header']}>
+                <button type="button" className={styles['partner-form__delete-button']} onClick={handleDelete} />
             </div>
-            <div className="partner-form__content">
-                <div className="partner-form__image">
+            <div className={styles['partner-form__content']}>
+                <div className={styles['partner-form__image']}>
                     <ImageInput
                         value={values.image}
                         id={`partner-form-image-${cardHtmlId}`}
@@ -82,7 +82,7 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
                     <InputError error={errors.image} />
                 </div>
 
-                <div className="partner-form__description">
+                <div className={styles['partner-form__description']}>
                     <TextAreaWithCharacterLimitGroup
                         label={PARTNERS_TEXT.PARTNER.DESCRIPTION_LABEL}
                         placeholder={PARTNERS_TEXT.PARTNER.DESCRIPTION_PLACEHOLDER}

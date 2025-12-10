@@ -51,27 +51,27 @@
         flex-direction: column;
         gap: 0.25rem;
 
-        .image-input-wrapper {
+        :global(.image-input-wrapper) {
             width: 13rem;
             height: 13rem;
 
-            .image-placeholder {
+            :global(.image-placeholder) {
                 width: 100%;
                 height: 100%;
 
-                .placeholder-icon {
+                :global(.placeholder-icon) {
                     width: 2.14rem;
                     height: 2.14rem;
                 }
             }
 
-            .image-preview {
-                .delete-button {
+            :global(.image-preview) {
+                :global(.delete-button) {
                     width: 3.92rem;
                     height: 3.92rem;
                     padding: 0.89rem;
 
-                    .delete-icon {
+                    :global(.delete-icon) {
                         width: 1.425rem;
                         height: 1.425rem;
                     }
@@ -85,7 +85,7 @@
         width: 13rem;
         height: 9.75rem;
 
-        .input-error {
+        :global(.input-error) {
             position: absolute;
             left: 0;
             bottom: 0px;

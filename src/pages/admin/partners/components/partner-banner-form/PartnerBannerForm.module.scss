@@ -31,6 +31,17 @@
             width: 100%;
             height: 100%;
         }
+
+        // Перевизначення для специфічних розмірів
+        width: 52.5625rem;
+        height: 33.125rem;
+
+        :global(.image-input-featured) {
+            width: 52.5625rem;
+            height: 33.125rem;
+            background-size: cover;
+            background-position: center;
+        }
     }
 
     &__main {
@@ -76,30 +87,19 @@
         gap: 1rem;
         padding: 1.25rem;
     }
+}
 
-    .partner-banner-form__image {
-        width: 52.5625rem;
-        height: 33.125rem;
+// Глобальні класи для стилізації помилок (використовуються всередині InputWithCharacterLimitGroup)
+:global(.partner-banner-form__title-group),
+:global(.partner-banner-form__description-group) {
+    position: relative;
+}
 
-        .image-input-featured {
-            width: 52.5625rem;
-            height: 33.125rem;
-            background-size: cover;
-            background-position: center;
-        }
-    }
-
-    .partner-banner-form__title-group,
-    .partner-banner-form__description-group {
-        position: relative;
-    }
-
-    .partner-banner-form__title-group .input-error,
-    .partner-banner-form__description-group .input-error {
-        position: absolute;
-        left: 0;
-        bottom: -1.25rem;
-        font-size: 0.75rem;
-        line-height: 1rem;
-    }
+:global(.partner-banner-form__title-group) :global(.input-error),
+:global(.partner-banner-form__description-group) :global(.input-error) {
+    position: absolute;
+    left: 0;
+    bottom: -1.25rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
 }

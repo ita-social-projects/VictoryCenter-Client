@@ -5,7 +5,7 @@ import { PartnerPage } from '../../../types/public/partners-page';
 import { PartnersApi } from '../../../services/api/public/partners/partners-api';
 import { DOWNLOAD_ERROR } from '../../../const/public/partners-page';
 import { LinearProgress } from '@mui/material';
-import './PartnersPage.scss';
+import styles from './PartnersPage.module.scss';
 import { useDataFetch } from '../../../hooks/common/use-data-fetch/useDataFetch';
 
 export const PartnersPage = () => {
@@ -20,14 +20,14 @@ export const PartnersPage = () => {
 
     if (isLoading) {
         return (
-            <div className="partners-page-loader">
+            <div className={styles['partners-page-loader']}>
                 <LinearProgress />
             </div>
         );
     }
 
     if (error) {
-        return <div className="partners-page-error-message">{DOWNLOAD_ERROR}</div>;
+        return <div className={styles['partners-page-error-message']}>{DOWNLOAD_ERROR}</div>;
     }
 
     return (

@@ -1,0 +1,46 @@
+@use '../../../../../assets/sass/variables/colors';
+
+.partner-section__loader {
+    width: 100%;
+    min-height: 12.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1.25rem;
+}
+
+.partner-sections-editor__error {
+    width: 100%;
+    min-height: 12.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1.25rem;
+}
+
+.partner-sections-editor__error-text {
+    color: colors.$error;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    &-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: colors.$blue-500;
+        font-size: 1rem;
+        line-height: 1.5rem;
+        font-weight: 600;
+        text-decoration: underline;
+    }
+}
+
+.partner-sections-editor {
+    width: 100%;
+}

@@ -4,5 +4,5 @@ export const returnDisplayedLocalization = <TLocalization extends EntityLocaliza
     localizedEntity: EntityWithLocalizations<TLocalization>,
     languageCode: string,
 ): TLocalization | null => {
-    return localizedEntity.localizations.find((l) => l.language.code === languageCode) ?? null;
+    return localizedEntity.localizations.find((l) => l.language?.code === languageCode) ?? null;
 };

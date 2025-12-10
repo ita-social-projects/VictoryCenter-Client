@@ -34,7 +34,7 @@ export function getLocalizationClassNameFromStatus<TLocalization extends EntityL
     localizedEntity: EntityWithLocalizations<TLocalization>,
 ) {
     const entityLocalization = localizedEntity.localizations.find(
-        (localization) => localization.language.code === language.code,
+        (localization) => localization.language?.code === language.code,
     );
 
     switch (entityLocalization?.translationStatus) {

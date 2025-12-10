@@ -312,7 +312,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 hasEmptyRequiredFields ||
                 !isChanged() ||
                 Object.values(errors).some((e) => e !== undefined) ||
-                isDisabled;
+                (isDisabled && !isCorrespondentInParentCreation);
 
             const handlePublishClick = () => {
                 if (isCorrespondentInParentCreation) {

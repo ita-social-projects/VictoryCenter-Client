@@ -65,8 +65,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
     onLocalSubmit,
     onLocalUpdate,
     onLocalDelete,
-    //Подумати чи забрати Readonly GenericDetailsProps<T>
-}: GenericDetailsProps<T>) {
+}: Readonly<GenericDetailsProps<T>>) {
     const addformRef = useRef<GenericFormRef>(null);
     const [isAddFormVisible, setIsAddFormVisible] = useState(false);
     const [isItemsExpanded, setIsItemsExpanded] = useState(initialIsItemsExpanded);

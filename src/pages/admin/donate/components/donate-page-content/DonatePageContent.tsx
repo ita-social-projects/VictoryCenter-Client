@@ -282,7 +282,7 @@ export const DonatePageContent = () => {
 
     const handleLocalDelete = useCallback(
         (formState: any, setFormState: any, index: number): void => {
-            const updatedBanks = [...formState.correspondentBanks];
+            const updatedBanks = [...(formState.correspondentBanks || [])];
             updatedBanks.splice(index, 1);
             setFormState({ ...formState, correspondentBanks: updatedBanks });
             addToast(DONATE_TEXT.MESSAGE.CORRESPONDENT_BANKS.DELETED, ToastType.Info);

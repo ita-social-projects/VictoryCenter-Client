@@ -28,7 +28,7 @@ import { getCerts } from 'https-localhost/certs.js';
         process.env.SSL_KEY_FILE = keyPath;
         process.env.SSL_CRT_FILE = certPath;
 
-        // Forwarding arguments to react-scripts start
+        // Forwarding arguments to craco start
         const args = ['start', ...process.argv.slice(2)];
         const child = spawn('craco', args, {
             stdio: 'inherit',

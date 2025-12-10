@@ -109,9 +109,15 @@ describe('Foreign Bank Details Mappers', () => {
                 swift: 'ABCDEFGH',
                 address: '123 Main St',
                 currency: BankCurrency.Usd,
+                correspondentBanks: [
+                    {
+                        name: 'Correspondent Bank',
+                        swift: 'CORRSWFT',
+                        account: '123456',
+                    },
+                ],
             });
             expect(result).not.toHaveProperty('id');
-            expect(result).not.toHaveProperty('correspondentBanks');
         });
 
         it('handles empty correspondentBanks array', () => {

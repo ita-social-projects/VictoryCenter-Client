@@ -215,7 +215,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             className={`generic-details btn-add-new ${isAddFormVisible || editingItemId !== null ? 'disabled' : ''}`}
                             onClick={handleAdd}
                             buttonStyle="primary"
-                            disabled={isAddButtonDisabled || isParentAddFormVisible}
+                            disabled={isAddButtonDisabled || isParentAddFormVisible || editingItemId !== null}
                         >
                             <div>{addNewText}</div>
                             <PlusIcon className="plus-icon" />

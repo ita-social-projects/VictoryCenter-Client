@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { createGenericForm, GenericFormField, GenericFormMode, GenericFormProps } from './GenericForm';
-import { DONATE_TEXT } from '@const/admin/donate';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
+import { DONATE_TEXT } from '@/const/admin/donate';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import React from 'react';
 
 interface Item {

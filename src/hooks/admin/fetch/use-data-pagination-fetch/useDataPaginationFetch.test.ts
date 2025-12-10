@@ -1,6 +1,6 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useDataPaginationFetch, useDataPaginationFetchProps, PaginationRequestParams } from './useDataPaginationFetch';
-import { PaginationResult } from '@app-types/admin/common';
+import { PaginationResult } from '@/types/admin/common';
 import axios from 'axios';
 
 jest.mock('axios', () => ({

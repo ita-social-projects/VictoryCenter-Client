@@ -2,15 +2,15 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { SingleSelectInputGroup } from './SingleSelectInputGroup';
 
-jest.mock('@components/admin/input-label/InputLabel', () => ({
+jest.mock('@/components/admin/input-label/InputLabel', () => ({
     InputLabel: ({ text }: { text: string }) => <div data-testid="mock-label">{text}</div>,
 }));
 
-jest.mock('@components/common/single-select-input/SingleSelectInput', () => ({
+jest.mock('@/components/common/single-select-input/SingleSelectInput', () => ({
     SingleSelectInput: () => <select data-testid="mock-select" />,
 }));
 
-jest.mock('@components/admin/input-error/InputError', () => ({
+jest.mock('@/components/admin/input-error/InputError', () => ({
     InputError: () => <div data-testid="mock-error">Error</div>,
 }));
 

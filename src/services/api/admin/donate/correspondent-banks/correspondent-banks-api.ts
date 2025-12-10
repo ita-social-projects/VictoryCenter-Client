@@ -1,10 +1,10 @@
 import { AxiosInstance } from 'axios';
-import { API_ROUTES } from '@const/common/api-routes/main-api';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import {
     CorrespondentBankDetailsDto,
     CreateCorrespondentBankDetails,
     UpdateCorrespondentBankDetails,
-} from '@app-types/admin/donate';
+} from '@/types/admin/donate';
 
 export const CorrespondentBankDetailsApi = {
     create: async (

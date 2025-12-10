@@ -1,10 +1,10 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useTeamMemberSearch } from './useTeamMemberSearch';
-import { TeamMembersApi } from '@api/admin/team/team-members/team-members-api';
-import { TEAM_SEARCH } from '@const/admin/team';
+import { TeamMembersApi } from '@/services/api/admin/team/team-members/team-members-api';
+import { TEAM_SEARCH } from '@/const/admin/team';
 import { AxiosInstance } from 'axios';
 
-jest.mock('@api/admin/team/team-members/team-members-api');
+jest.mock('@/services/api/admin/team/team-members/team-members-api');
 const mockTeamMembersApi = TeamMembersApi as jest.Mocked<typeof TeamMembersApi>;
 
 const mockClient = {} as AxiosInstance;

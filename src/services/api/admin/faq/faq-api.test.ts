@@ -1,7 +1,7 @@
 import { FaqApi } from './faq-api';
-import { API_ROUTES } from '@const/common/api-routes/main-api';
-import { FaqCreateUpdate, FaqQuestionDto, ReorderFaq, VisitorPage } from '@app-types/admin/faq';
-import { PaginationResult, VisibilityStatus } from '@app-types/admin/common';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { FaqCreateUpdate, FaqQuestionDto, ReorderFaq, VisitorPage } from '@/types/admin/faq';
+import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 
 describe('FaqApi', () => {
     const mockClient = {

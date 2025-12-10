@@ -2,15 +2,15 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { InputWithCharacterLimitGroup } from './InputWithCharacterLimitGroup';
 
-jest.mock('@components/admin/input-label/InputLabel', () => ({
+jest.mock('@/components/admin/input-label/InputLabel', () => ({
     InputLabel: ({ text }: { text: string }) => <div data-testid="mock-label">{text}</div>,
 }));
 
-jest.mock('@components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
+jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
     InputWithCharacterLimit: () => <input data-testid="mock-input" />,
 }));
 
-jest.mock('@components/admin/input-error/InputError', () => ({
+jest.mock('@/components/admin/input-error/InputError', () => ({
     InputError: () => <div data-testid="mock-error">Error</div>,
 }));
 

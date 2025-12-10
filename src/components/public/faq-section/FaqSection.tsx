@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { axiosInstance } from '@api/axios';
-import { FaqApi } from '@api/public/faq/faq-api';
-import { PublishedFaqQuestion } from '@app-types/public/faq-section';
+import { axiosInstance } from '@/services/api/axios';
+import { FaqApi } from '@/services/api/public/faq/faq-api';
+import { PublishedFaqQuestion } from '@/types/public/faq-section';
 import { FaqCard } from './faq-card/FaqCard';
 import './FaqSection.scss';
 

@@ -20,21 +20,21 @@ const mockBankCurrency = {
     Eur: 2,
 };
 
-jest.mock('@hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => mockUseAdminClient(),
 }));
 
-jest.mock('@contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
     useToast: () => ({
         addToast: mockAddToast,
     }),
 }));
 
-jest.mock('@components/admin/toast/toast-container/ToastContainer', () => ({
+jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
     ToastContainer: () => <div data-testid="toast-container" />,
 }));
 
-jest.mock('@api/admin/donate/support-options/support-options-api', () => ({
+jest.mock('@/services/api/admin/donate/support-options/support-options-api', () => ({
     SupportOptionsApi: {
         getAll: (...args: any[]) => mockGetAll(...args),
         create: (...args: any[]) => mockCreate(...args),
@@ -43,7 +43,7 @@ jest.mock('@api/admin/donate/support-options/support-options-api', () => ({
     },
 }));
 
-jest.mock('@api/admin/donate/correspondent-banks/correspondent-banks-api', () => ({
+jest.mock('@/services/api/admin/donate/correspondent-banks/correspondent-banks-api', () => ({
     CorrespondentBankDetailsApi: {
         create: (...args: any[]) => mockCorrespondentCreate(...args),
         update: (...args: any[]) => mockCorrespondentUpdate(...args),
@@ -72,7 +72,7 @@ jest.mock('../bank-details-currencies/currencies-manager/CurrenciesManager', () 
     },
 }));
 
-jest.mock('@components/admin/category-bar/CategoryBar', () => ({
+jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({ onCategorySelect, selectedCategory }: any) => (
         <div data-testid="category-bar">
             <span data-testid="selected-category">{selectedCategory}</span>

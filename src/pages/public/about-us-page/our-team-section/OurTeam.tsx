@@ -1,10 +1,10 @@
 import './OurTeam.scss';
 import { NavLink } from 'react-router-dom';
-import { PUBLIC_ROUTES } from '@const/public/routes';
-import { AboutUsContent } from '@app-types/public/about-us-page';
-import { ContentType } from '@app-types/common/about-us';
+import { PUBLIC_ROUTES } from '@/const/public/routes';
+import { AboutUsContent } from '@/types/public/about-us-page';
+import { ContentType } from '@/types/common/about-us';
 import { useTranslation } from 'react-i18next';
-import defaultOurTeamImage from '@assets/images/public/about-us-page/our-team.jpg';
+import defaultOurTeamImage from '@/assets/images/public/about-us-page/our-team.jpg';
 
 export interface OurTeamProps {
     content?: AboutUsContent[] | null;

@@ -1,5 +1,5 @@
 import { ProgramCategoryValidationSchema } from './program-category-schema';
-import { PROGRAM_CATEGORY_VALIDATION } from '@const/admin/programs';
+import { PROGRAM_CATEGORY_VALIDATION } from '@/const/admin/programs';
 
 describe('ProgramCategoryValidationSchema', () => {
     const expectValidationToPass = async (data: any) => {

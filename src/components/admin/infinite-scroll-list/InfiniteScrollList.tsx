@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ReactComponent as ArrowUpIcon } from '@assets/icons/arrow-up.svg';
-import { ReactComponent as NotFoundIcon } from '@assets/icons/not-found.svg';
-import { InlineLoader } from '@components/common/inline-loader/InlineLoader';
+import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up.svg';
+import { ReactComponent as NotFoundIcon } from '@/assets/icons/not-found.svg';
+import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import './InfiniteScrollList.scss';
 
 const BOTTOM_REACH_THRESHOLD_IN_PIXELS = 5;

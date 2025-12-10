@@ -1,5 +1,5 @@
-import { API_ROUTES } from '@const/common/api-routes/main-api';
-import { TeamCategory, TeamCategoryCreateUpdate } from '@app-types/admin/team-category';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { TeamCategory, TeamCategoryCreateUpdate } from '@/types/admin/team-category';
 import { TeamCategoriesApi } from './team-categories-api';
 
 describe('TeamCategoriesApi', () => {

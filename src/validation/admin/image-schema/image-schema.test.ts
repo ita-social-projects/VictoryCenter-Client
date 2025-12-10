@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { IMAGE_VALIDATION } from '@const/admin/image';
+import { IMAGE_VALIDATION } from '@/const/admin/image';
 import { getImageValidationSchema, IMAGE_VALIDATION_FUNCTIONS } from './image-schema';
 
 const createTestFile = (size: number, type: string = 'image/jpeg', name: string = 'test.jpg'): File => {

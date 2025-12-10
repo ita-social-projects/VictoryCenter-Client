@@ -1,10 +1,10 @@
 import { AxiosResponse } from 'axios';
-import { Credentials, AuthResponse } from '@app-types/admin/auth';
-import { AuthClient } from '@services/auth/auth-client';
+import { Credentials, AuthResponse } from '@/types/admin/auth';
+import { AuthClient } from '@/services/auth/auth-client';
 import { loginRequest, tokenRefreshRequest, logoutRequest } from './login-api';
-import { API_ROUTES } from '@const/common/api-routes/main-api';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
-jest.mock('@services/auth/auth-client', () => ({
+jest.mock('@/services/auth/auth-client', () => ({
     AuthClient: {
         post: jest.fn(),
     },

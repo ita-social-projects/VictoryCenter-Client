@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ReactComponent as ArrowDown } from '@assets/icons/chevron-down.svg';
-import { ReactComponent as ArrowUp } from '@assets/icons/chevron-up.svg';
+import { ReactComponent as ArrowDown } from '@/assets/icons/chevron-down.svg';
+import { ReactComponent as ArrowUp } from '@/assets/icons/chevron-up.svg';
 import classNames from 'classnames';
 import './SingleSelectInput.scss';
 

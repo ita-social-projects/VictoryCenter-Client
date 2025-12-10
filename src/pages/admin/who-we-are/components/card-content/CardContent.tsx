@@ -1,10 +1,10 @@
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { TextAreaWithCharacterLimit } from '@components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { TextAreaWithCharacterLimit } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import React from 'react';
-import { ImageInput, ImageInputProps } from '@components/admin/image-input/ImageInput';
-import { Content } from '@app-types/admin/who-we-are';
-import { ImageValues } from '@app-types/common/image';
-import { WHO_WE_ARE_TEXT } from '@const/admin/who-we-are';
+import { ImageInput, ImageInputProps } from '@/components/admin/image-input/ImageInput';
+import { Content } from '@/types/admin/who-we-are';
+import { ImageValues } from '@/types/common/image';
+import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import './CardContent.scss';
 
 export interface CardContentProps {

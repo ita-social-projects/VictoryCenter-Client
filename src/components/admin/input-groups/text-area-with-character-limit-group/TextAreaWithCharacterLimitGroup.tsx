@@ -1,10 +1,10 @@
 import React from 'react';
-import { InputLabel, InputLabelProps } from '@components/admin/input-label/InputLabel';
-import { InputError, InputErrorProps } from '@components/admin/input-error/InputError';
+import { InputLabel, InputLabelProps } from '@/components/admin/input-label/InputLabel';
+import { InputError, InputErrorProps } from '@/components/admin/input-error/InputError';
 import {
     TextAreaWithCharacterLimit,
     TextAreaWithCharacterLimitProps,
-} from '@components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+} from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import '../input-group.scss';
 
 export interface TextAreaWithCharacterLimitGroupProps extends TextAreaWithCharacterLimitProps {

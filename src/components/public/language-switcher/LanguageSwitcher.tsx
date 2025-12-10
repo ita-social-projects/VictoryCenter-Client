@@ -1,7 +1,7 @@
-import '@locales/i18n';
+import '@/locales/i18n';
 import { useTranslation } from 'react-i18next';
-import { Select } from '@components/common/select/Select';
-import { LOCALES } from '@const/common/locales';
+import { Select } from '@/components/common/select/Select';
+import { LOCALES } from '@/const/common/locales';
 import classNames from 'classnames';
 import './LanguageSwitcher.scss';
 

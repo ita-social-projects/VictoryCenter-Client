@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { TeamPage } from './TeamPage';
-import * as teamPageDataFetch from '@api/public/team/team-api';
-import { MemberCard, TeamItem } from '@app-types/public/team-page';
+import * as teamPageDataFetch from '@/services/api/public/team/team-api';
+import { MemberCard, TeamItem } from '@/types/public/team-page';
 
-jest.mock('@assets/videos/public/team-page/quote_background.mp4', () => 'mocked-video.mp4');
+jest.mock('@/assets/videos/public/team-page/quote_background.mp4', () => 'mocked-video.mp4');
 
 const spyTeamPageDataFetch = jest.spyOn(teamPageDataFetch, 'teamPageDataFetch');
 

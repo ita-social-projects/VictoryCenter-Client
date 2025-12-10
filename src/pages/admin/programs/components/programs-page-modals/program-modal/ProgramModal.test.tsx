@@ -1,15 +1,15 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ProgramModal, ProgramModalProps } from './ProgramModal';
-import { Program, ProgramCategory } from '@app-types/admin/programs';
-import { ModalMode } from '@app-types/admin/common';
-import { PROGRAMS_TEXT } from '@const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { ProgramsApi } from '@api/admin/programs/programs-api';
-import { VisibilityStatus } from '@app-types/admin/common';
-import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
+import { Program, ProgramCategory } from '@/types/admin/programs';
+import { ModalMode } from '@/types/admin/common';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
+import { VisibilityStatus } from '@/types/admin/common';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
-jest.mock('@hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
@@ -26,7 +26,7 @@ beforeEach(() => {
     });
 });
 
-jest.mock('@api/admin/programs/programs-api', () => ({
+jest.mock('@/services/api/admin/programs/programs-api', () => ({
     ProgramsApi: {
         addProgram: jest.fn(),
         editProgram: jest.fn(),
@@ -35,7 +35,7 @@ jest.mock('@api/admin/programs/programs-api', () => ({
 
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
-jest.mock('@components/common/modal/Modal', () => {
+jest.mock('@/components/common/modal/Modal', () => {
     const MockModal = ({
         isOpen,
         children,
@@ -65,7 +65,7 @@ jest.mock('@components/common/modal/Modal', () => {
     return { Modal: MockModal };
 });
 
-jest.mock('@components/admin/button/Button', () => ({
+jest.mock('@/components/admin/button/Button', () => ({
     Button: ({
         onClick,
         disabled,
@@ -87,7 +87,7 @@ jest.mock('@components/admin/button/Button', () => ({
     ),
 }));
 
-jest.mock('@components/admin/confirmation-modal/ConfirmationModal', () => ({
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({
         isOpen,
         title,

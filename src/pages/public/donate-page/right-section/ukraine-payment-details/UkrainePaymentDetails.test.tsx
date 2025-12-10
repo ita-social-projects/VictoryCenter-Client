@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { UkrainePaymentDetails } from './UkrainePaymentDetails';
-import { PublishedUahBankDetailsDto } from '@app-types/public/donate-page';
+import { PublishedUahBankDetailsDto } from '@/types/public/donate-page';
 
 jest.mock('../../copy-text-button/CopyTextButton', () => ({
     CopyTextButton: ({ textToCopy }: { textToCopy: string }) => (
@@ -11,7 +11,7 @@ jest.mock('../../copy-text-button/CopyTextButton', () => ({
     ),
 }));
 
-jest.mock('@const/public/donate-page', () => ({
+jest.mock('@/const/public/donate-page', () => ({
     UKRAINE_PAYMENT_DETAILS: {
         UKRAINE_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в Україні',
         UIDSREOU_LABEL: 'ЄДРПОУ',

@@ -1,11 +1,11 @@
 import { AxiosInstance } from 'axios';
 import { createContext, useContext, useMemo, ReactNode, useState, useCallback, useRef } from 'react';
-import { loginRequest, tokenRefreshRequest, logoutRequest } from '@api/admin/login/login-api';
-import { API_ROUTES } from '@const/common/api-routes/main-api';
-import { Credentials } from '@app-types/admin/auth';
-import { isAccessTokenValid } from '@services/auth/auth-service/auth-service';
-import { CreateAdminClient } from '@services/auth/create-admin-client/create-admin-client';
-import { useOnMountUnsafe } from '@hooks/common/use-on-mount-unsafe/useOnMountUnsafe';
+import { loginRequest, tokenRefreshRequest, logoutRequest } from '@/services/api/admin/login/login-api';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { Credentials } from '@/types/admin/auth';
+import { isAccessTokenValid } from '@/services/auth/auth-service/auth-service';
+import { CreateAdminClient } from '@/services/auth/create-admin-client/create-admin-client';
+import { useOnMountUnsafe } from '@/hooks/common/use-on-mount-unsafe/useOnMountUnsafe';
 
 type Props = {
     children: ReactNode;

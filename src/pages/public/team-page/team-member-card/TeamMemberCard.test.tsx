@@ -1,8 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { MemberCard } from '@app-types/public/team-page';
+import { MemberCard } from '@/types/public/team-page';
 import { TeamMemberCard } from './TeamMemberCard';
 
-jest.mock('@assets/icons/team-member-blank.svg', () => ({
+jest.mock('@/assets/icons/team-member-blank.svg', () => ({
     ReactComponent: () => <svg data-testid="default-member-icon" />,
 }));
 

@@ -1,7 +1,7 @@
-import { Select } from '@components/common/select/Select';
-import { VisibilityStatus } from '@app-types/admin/common';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { mapLabelToStatus } from '@utils/functions/mappers/common/status-mappers';
+import { Select } from '@/components/common/select/Select';
+import { VisibilityStatus } from '@/types/admin/common';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { mapLabelToStatus } from '@/utils/functions/mappers/common/status-mappers';
 
 export interface StatusFilterDropdownProps {
     value: VisibilityStatus | undefined;

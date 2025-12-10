@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { SupportOptionsForm } from './SupportOptionsForm';
-import { DONATE_TEXT } from '@const/admin/donate';
-import { BankCurrency } from '@app-types/admin/donate';
+import { DONATE_TEXT } from '@/const/admin/donate';
+import { BankCurrency } from '@/types/admin/donate';
 
 jest.mock('../support-option-item/SupportOptionItem', () => ({
     ...jest.requireActual('../support-option-item/SupportOptionItem'),
@@ -27,7 +27,7 @@ jest.mock('../support-option-item/SupportOptionItem', () => ({
     },
 }));
 
-jest.mock('@components/admin/button/Button', () => ({
+jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled, className }: any) => (
         <button onClick={onClick} disabled={disabled} data-testid={className}>
             {children}

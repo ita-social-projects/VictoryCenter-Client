@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ToastItem } from './ToastItem';
-import { Toast, ToastType } from '@app-types/admin/toast';
+import { Toast, ToastType } from '@/types/admin/toast';
 
-jest.mock('@assets/icons/info.svg', () => ({
+jest.mock('@/assets/icons/info.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="info-icon" />,
 }));
 

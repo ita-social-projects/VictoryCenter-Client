@@ -3,15 +3,15 @@ import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ProgramsPageToolbar } from './ProgramsPageToolbar';
-import { ProgramSearchItemData } from '@app-types/admin/programs';
-import { PROGRAMS_TEXT } from '@const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { ButtonProps } from '@components/admin/button/Button';
-import { SelectOptionProps, SelectProps } from '@components/common/select/Select';
-import { SearchBarProps } from '@components/admin/search-bar/SearchBar';
-import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
+import { ProgramSearchItemData } from '@/types/admin/programs';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ButtonProps } from '@/components/admin/button/Button';
+import { SelectOptionProps, SelectProps } from '@/components/common/select/Select';
+import { SearchBarProps } from '@/components/admin/search-bar/SearchBar';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
-jest.mock('@hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
@@ -28,11 +28,11 @@ beforeEach(() => {
     });
 });
 
-jest.mock('@assets/icons/plus.svg', () => ({
+jest.mock('@/assets/icons/plus.svg', () => ({
     ReactComponent: ({ ...props }: any) => <svg {...props} data-testid="plus-icon" />,
 }));
 
-jest.mock('@components/admin/button/Button', () => ({
+jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, onClick, type, formId }: ButtonProps) => (
         <button onClick={onClick} type={type} form={formId}>
             {children}
@@ -40,7 +40,7 @@ jest.mock('@components/admin/button/Button', () => ({
     ),
 }));
 
-jest.mock('@components/common/select/Select', () => ({
+jest.mock('@/components/common/select/Select', () => ({
     Select: Object.assign(
         ({ children, onValueChange, value, ...props }: SelectProps<any>) => (
             <div {...props}>
@@ -55,7 +55,7 @@ jest.mock('@components/common/select/Select', () => ({
     ),
 }));
 
-jest.mock('@components/admin/search-bar/SearchBar', () => ({
+jest.mock('@/components/admin/search-bar/SearchBar', () => ({
     SearchBar: ({
         onQueryChange,
         onClear,
@@ -93,15 +93,15 @@ jest.mock('@components/admin/search-bar/SearchBar', () => ({
     ),
 }));
 
-jest.mock('@hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch');
-jest.mock('@api/admin/programs/programs-api');
+jest.mock('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch');
+jest.mock('@/services/api/admin/programs/programs-api');
 jest.mock('../program-search-item/ProgramSearchItem.tsx', () => ({
     ProgramSuggestionItem: ({ item }: any) => <div data-testid="suggestion-item">{item.name}</div>,
 }));
 
 const mockUseDataPaginationFetch =
-    require('@hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
-const mockProgramsApi = require('@api/admin/programs/programs-api').ProgramsApi;
+    require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
+const mockProgramsApi = require('@/services/api/admin/programs/programs-api').ProgramsApi;
 
 // Helper functions
 const createSuggestion = (id: number, name: string): ProgramSearchItemData => ({

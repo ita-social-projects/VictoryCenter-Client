@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import './CompanyValues.scss';
-import { Swiper } from '@components/public/swiper/Swiper';
+import { Swiper } from '@/components/public/swiper/Swiper';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { ValueCard } from './components/value-card/ValueCard';
 

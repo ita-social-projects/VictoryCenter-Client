@@ -1,9 +1,9 @@
 import React, { useState, useRef, useMemo, useCallback } from 'react';
-import { useOnClickOutside } from '@hooks/common/use-on-click-outside/useOnClickOutside';
-import { ReactComponent as CheckedBox } from '@assets/icons/chevron-checked.svg';
-import { ReactComponent as UncheckedBox } from '@assets/icons/chevron-unchecked.svg';
-import { ReactComponent as ArrowDown } from '@assets/icons/chevron-down.svg';
-import { ReactComponent as ArrowUp } from '@assets/icons/chevron-up.svg';
+import { useOnClickOutside } from '@/hooks/common/use-on-click-outside/useOnClickOutside';
+import { ReactComponent as CheckedBox } from '@/assets/icons/chevron-checked.svg';
+import { ReactComponent as UncheckedBox } from '@/assets/icons/chevron-unchecked.svg';
+import { ReactComponent as ArrowDown } from '@/assets/icons/chevron-down.svg';
+import { ReactComponent as ArrowUp } from '@/assets/icons/chevron-up.svg';
 import classNames from 'classnames';
 import './MultiSelectInput.scss';
 

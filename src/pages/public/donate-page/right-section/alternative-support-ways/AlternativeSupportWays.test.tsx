@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AlternativeSupportWays } from './AlternativeSupportWays';
-import { PublishedSupportOptionsDto, Currency } from '@app-types/public/donate-page';
+import { PublishedSupportOptionsDto, Currency } from '@/types/public/donate-page';
 
 jest.mock('../../copy-text-button/CopyTextButton', () => ({
     CopyTextButton: ({ textToCopy }: { textToCopy: string }) => (
@@ -11,7 +11,7 @@ jest.mock('../../copy-text-button/CopyTextButton', () => ({
     ),
 }));
 
-jest.mock('@const/public/donate-page', () => ({
+jest.mock('@/const/public/donate-page', () => ({
     ALTERNATIVE_SUPPORT_WAYS: {
         ALTERNATIVE_SUPPORT_WAYS_LABEL: 'Інші варіанти підтримки',
     },

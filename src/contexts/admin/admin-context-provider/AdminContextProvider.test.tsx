@@ -1,22 +1,22 @@
 import '@testing-library/jest-dom';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { useAdminContext, AdminContextProvider } from './AdminContextProvider';
-import { loginRequest, tokenRefreshRequest, logoutRequest } from '@api/admin/login/login-api';
-import { isAccessTokenValid } from '@services/auth/auth-service/auth-service';
-import { CreateAdminClient } from '@services/auth/create-admin-client/create-admin-client';
+import { loginRequest, tokenRefreshRequest, logoutRequest } from '@/services/api/admin/login/login-api';
+import { isAccessTokenValid } from '@/services/auth/auth-service/auth-service';
+import { CreateAdminClient } from '@/services/auth/create-admin-client/create-admin-client';
 
-jest.mock('@api/admin/login/login-api', () => ({
+jest.mock('@/services/api/admin/login/login-api', () => ({
     loginRequest: jest.fn(),
     logoutRequest: jest.fn(),
     tokenRefreshRequest: jest.fn(),
 }));
-jest.mock('@services/auth/auth-service/auth-service', () => ({
+jest.mock('@/services/auth/auth-service/auth-service', () => ({
     isAccessTokenValid: jest.fn(),
 }));
-jest.mock('@services/auth/create-admin-client/create-admin-client', () => ({
+jest.mock('@/services/auth/create-admin-client/create-admin-client', () => ({
     CreateAdminClient: jest.fn(),
 }));
-jest.mock('@const/common/api-routes/main-api', () => ({
+jest.mock('@/const/common/api-routes/main-api', () => ({
     API_ROUTES: { BASE: '/base' },
 }));
 

@@ -1,10 +1,10 @@
 import { AxiosInstance } from 'axios';
 import { TeamMembersApi } from './team-members-api';
-import { VisibilityStatus } from '@app-types/admin/common';
-import { ImageApi } from '@api/admin/image/image-api';
-import { API_ROUTES } from '@const/common/api-routes/main-api';
+import { VisibilityStatus } from '@/types/admin/common';
+import { ImageApi } from '@/services/api/admin/image/image-api';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
-jest.mock('@api/admin/image/image-api');
+jest.mock('@/services/api/admin/image/image-api');
 
 describe('TeamMembersApi', () => {
     const mockClient = {

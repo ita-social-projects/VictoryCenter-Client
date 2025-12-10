@@ -1,12 +1,12 @@
-import { API_ROUTES } from '@const/common/api-routes/main-api';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import {
     PublicCategoryWithTeamMembersDto,
     PublicTeamMemberDto,
     MemberCard,
     TeamItem,
     TeamPageData,
-} from '@app-types/public/team-page';
-import { axiosInstance } from '@api/axios';
+} from '@/types/public/team-page';
+import { axiosInstance } from '@/services/api/axios';
 
 const isValidCategory = (category: PublicCategoryWithTeamMembersDto): boolean => {
     return Boolean(

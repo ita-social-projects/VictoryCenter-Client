@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { DragPreview, DragPreviewProps } from './DragPreview';
 
-jest.mock('@assets/icons/dragger.svg', () => ({
+jest.mock('@/assets/icons/dragger.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="drag-icon" />,
 }));
 

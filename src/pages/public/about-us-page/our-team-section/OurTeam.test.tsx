@@ -1,12 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { OurTeam } from './OurTeam';
-import { AboutUsContent } from '@app-types/public/about-us-page';
-import { ContentType } from '@app-types/common/about-us';
-import { aboutUsPageUk } from '@locales/uk';
-import defaultOurTeamImage from '@assets/images/public/about-us-page/our-team.jpg';
+import { AboutUsContent } from '@/types/public/about-us-page';
+import { ContentType } from '@/types/common/about-us';
+import { aboutUsPageUk } from '@/locales/uk';
+import defaultOurTeamImage from '@/assets/images/public/about-us-page/our-team.jpg';
 
-jest.mock('@const/public/routes', () => ({
+jest.mock('@/const/public/routes', () => ({
     PUBLIC_ROUTES: {
         TEAM: {
             FULL: '/team',

@@ -2,13 +2,13 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { DescriptionSection, DescriptionSectionProps } from './DescriptionSection';
 import '@testing-library/jest-dom';
-import { ContentType } from '@app-types/common/about-us';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@validation/admin/who-we-are-schema/WhoWeAreSchema';
-import { OurMissionProps } from '@pages/public/about-us-page/our-mission/OurMission';
-import { TextAreaWithCharacterLimitProps } from '@components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { ContentType } from '@/types/common/about-us';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
+import { OurMissionProps } from '@/pages/public/about-us-page/our-mission/OurMission';
+import { TextAreaWithCharacterLimitProps } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 
-jest.mock('@components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
+jest.mock('@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
     TextAreaWithCharacterLimit: ({ onChange, value, maxLength, onBlur, name, id }: TextAreaWithCharacterLimitProps) => (
         <textarea
             data-testid="mock-textarea"
@@ -22,7 +22,7 @@ jest.mock('@components/admin/textarea-with-character-limit/TextAreaWithCharacter
     ),
 }));
 
-jest.mock('@pages/public/about-us-page/our-mission/OurMission', () => ({
+jest.mock('@/pages/public/about-us-page/our-mission/OurMission', () => ({
     OurMission: ({ description, className }: OurMissionProps) => (
         <div data-testid="mock-our-mission" className={className}>
             <p>{description}</p>
@@ -30,7 +30,7 @@ jest.mock('@pages/public/about-us-page/our-mission/OurMission', () => ({
     ),
 }));
 
-jest.mock('@validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
+jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
     WHO_WE_ARE_VALIDATION_FUNCTIONS: {
         validateText: jest.fn(),
     },

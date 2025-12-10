@@ -2,30 +2,30 @@ import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { WhoWeAreContent } from './WhoWeAreContent';
-import { WhoWeAreApi } from '@api/admin/who-we-are/who-we-are-api';
-import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
-import { useToast } from '@contexts/admin/toast-context-provider/ToastContextProvider';
-import { WhoWeAreCategory, WhoWeAreSection, Content } from '@app-types/admin/who-we-are';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { ToastType } from '@app-types/admin/toast';
-import { ContentType, SectionType } from '@app-types/common/about-us';
-import { WHO_WE_ARE_TEXT } from '@const/admin/who-we-are';
-import { MainSectionProps } from '@pages/admin/who-we-are/components/sections-wrapper/SectionsWrapper';
+import { WhoWeAreApi } from '@/services/api/admin/who-we-are/who-we-are-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { WhoWeAreCategory, WhoWeAreSection, Content } from '@/types/admin/who-we-are';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ToastType } from '@/types/admin/toast';
+import { ContentType, SectionType } from '@/types/common/about-us';
+import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
+import { MainSectionProps } from '@/pages/admin/who-we-are/components/sections-wrapper/SectionsWrapper';
 
-jest.mock('@components/common/inline-loader/InlineLoader', () => ({
+jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: () => <div data-testid="inline-loader" />,
 }));
 
-jest.mock('@api/admin/who-we-are/who-we-are-api');
+jest.mock('@/services/api/admin/who-we-are/who-we-are-api');
 const mockedWhoWeAreApi = WhoWeAreApi as jest.Mocked<typeof WhoWeAreApi>;
 
-jest.mock('@hooks/admin/use-admin-client/useAdminClient');
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 
-jest.mock('@contexts/admin/toast-context-provider/ToastContextProvider');
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 const mockedUseToast = useToast as jest.Mock;
 
-jest.mock('@components/admin/category-bar/CategoryBar', () => ({
+jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({ categories, onCategorySelect, getCategoryDisplayName }: any) => (
         <div>
             {categories.map((cat: any) => (
@@ -68,7 +68,7 @@ jest.mock('../sections-wrapper/SectionsWrapper', () => ({
     ),
 }));
 
-jest.mock('@components/admin/confirmation-modal/ConfirmationModal', () => ({
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, onConfirm, onCancel, title }: any) =>
         isOpen ? (
             <div>
@@ -79,7 +79,7 @@ jest.mock('@components/admin/confirmation-modal/ConfirmationModal', () => ({
         ) : null,
 }));
 
-jest.mock('@components/admin/toast/toast-container/ToastContainer', () => ({
+jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
     ToastContainer: () => <div data-testid="toast-container" />,
 }));
 

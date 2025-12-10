@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { FaqQuestion } from '@app-types/admin/faq';
+import { FaqQuestion } from '@/types/admin/faq';
 import './DeleteFaqModal.scss';
-import { FaqApi } from '@api/admin/faq/faq-api';
-import { FAQ_TEXT } from '@const/admin/faq';
-import { Modal } from '@components/common/modal/Modal';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { Button } from '@components/admin/button/Button';
-import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
+import { FaqApi } from '@/services/api/admin/faq/faq-api';
+import { FAQ_TEXT } from '@/const/admin/faq';
+import { Modal } from '@/components/common/modal/Modal';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { Button } from '@/components/admin/button/Button';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
 export interface DeleteFaqModalProps {
     isOpen: boolean;

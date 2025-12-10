@@ -2,11 +2,11 @@ import React from 'react';
 import { createEvent, fireEvent, render, screen } from '@testing-library/react';
 import { DraggableListItem, DraggableListItemProps } from './DraggableListItem';
 
-jest.mock('@assets/icons/dragger.svg', () => ({
+jest.mock('@/assets/icons/dragger.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="drag-icon" />,
 }));
 
-jest.mock('@components/admin/drag-preview/DragPreview', () => ({
+jest.mock('@/components/admin/drag-preview/DragPreview', () => ({
     DragPreview: ({ dragPreview, dragAltText }: any) => (
         <div data-testid="drag-preview" data-visible={dragPreview.visible}>
             Preview Alt: {dragAltText}

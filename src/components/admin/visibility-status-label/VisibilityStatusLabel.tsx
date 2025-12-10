@@ -1,6 +1,6 @@
 import classNames from 'classnames';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { VisibilityStatus } from '@app-types/admin/common';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { VisibilityStatus } from '@/types/admin/common';
 import './VisibilityStatusLabel.scss';
 
 export interface VisibilityStatusLabelProps {

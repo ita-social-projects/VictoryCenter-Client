@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import './DonateInput.scss';
-import { DONATE_TEXT } from '@const/admin/donate';
+import { DONATE_TEXT } from '@/const/admin/donate';
 import classNames from 'classnames';
 
 interface DonateInputProps {

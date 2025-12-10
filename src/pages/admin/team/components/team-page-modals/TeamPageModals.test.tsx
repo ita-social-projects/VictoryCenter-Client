@@ -1,12 +1,12 @@
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TeamPageModals, TeamPageModalsProps } from './TeamPageModals';
-import { UseModalsStateResult } from '@hooks/admin/use-modals-state/useModalsState';
-import { ModalMode, VisibilityStatus } from '@app-types/admin/common';
-import { TeamCategory } from '@app-types/admin/team-category';
-import { TeamMember } from '@app-types/admin/team-members';
-import { TeamMemberModalProps } from '@pages/admin/team/components/team-member-modal/TeamMemberModal';
-import { DeleteTeamMemberModalProps } from '@pages/admin/team/components/delete-team-member-modal/DeleteTeamMemberModal';
+import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
+import { ModalMode, VisibilityStatus } from '@/types/admin/common';
+import { TeamCategory } from '@/types/admin/team-category';
+import { TeamMember } from '@/types/admin/team-members';
+import { TeamMemberModalProps } from '@/pages/admin/team/components/team-member-modal/TeamMemberModal';
+import { DeleteTeamMemberModalProps } from '@/pages/admin/team/components/delete-team-member-modal/DeleteTeamMemberModal';
 
 jest.mock('../team-member-modal/TeamMemberModal', () => ({
     TeamMemberModal: ({

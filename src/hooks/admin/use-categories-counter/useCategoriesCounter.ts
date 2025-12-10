@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Program, ProgramCategory } from '@app-types/admin/programs';
+import { Program, ProgramCategory } from '@/types/admin/programs';
 
 export const useCategoriesCounter = () => {
     const incrementCategoriesCount = useCallback(

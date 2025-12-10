@@ -1,4 +1,4 @@
-import { ReactComponent as LoaderIcon } from '@assets/icons/load.svg';
+import { ReactComponent as LoaderIcon } from '@/assets/icons/load.svg';
 import './InlineLoader.scss';
 
 type Props = {

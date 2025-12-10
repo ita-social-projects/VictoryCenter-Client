@@ -1,19 +1,19 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { Modal } from '@components/common/modal/Modal';
-import { Button } from '@components/admin/button/Button';
-import { HintBox } from '@components/admin/hint-box/HintBox';
-import { ConfirmationModal } from '@components/admin/confirmation-modal/ConfirmationModal';
-import { InputWithCharacterLimitGroup } from '@components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import { SingleSelectInputGroup } from '@components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
-import { TeamCategory } from '@app-types/admin/team-category';
-import { TEAM_CATEGORY_VALIDATION_FUNCTIONS } from '@validation/admin/team-category-schema/team-category-schema';
-import { TEAM_CATEGORY_TEXT, TEAM_CATEGORY_VALIDATION } from '@const/admin/team';
-import { TeamCategoriesApi } from '@api/admin/team/team-categories/team-categories-api';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
+import { Modal } from '@/components/common/modal/Modal';
+import { Button } from '@/components/admin/button/Button';
+import { HintBox } from '@/components/admin/hint-box/HintBox';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { SingleSelectInputGroup } from '@/components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
+import { TeamCategory } from '@/types/admin/team-category';
+import { TEAM_CATEGORY_VALIDATION_FUNCTIONS } from '@/validation/admin/team-category-schema/team-category-schema';
+import { TEAM_CATEGORY_TEXT, TEAM_CATEGORY_VALIDATION } from '@/const/admin/team';
+import { TeamCategoriesApi } from '@/services/api/admin/team/team-categories/team-categories-api';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './TeamCategoryModal.scss';
-import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
-import { TextAreaWithCharacterLimitGroup } from '@components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { ModalMode } from '@app-types/admin/common';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { ModalMode } from '@/types/admin/common';
 
 interface TeamCategoryFormValues {
     name: string;

@@ -6,12 +6,12 @@ import { OurTeam } from './our-team-section/OurTeam';
 import { MainValues } from './main-value/MainValue';
 import { DonateSection } from './donate-section/DonateSection';
 import { ScrollableFrame } from './scrollable-frame/ScrollableFrame';
-import { AboutUsApi } from '@api/public/about-us/about-us-api';
-import { AboutUsSection, AboutUsContent } from '@app-types/public/about-us-page';
-import { SectionType } from '@app-types/common/about-us';
+import { AboutUsApi } from '@/services/api/public/about-us/about-us-api';
+import { AboutUsSection, AboutUsContent } from '@/types/public/about-us-page';
+import { SectionType } from '@/types/common/about-us';
 import { LinearProgress } from '@mui/material';
 import './AboutUsPage.scss';
-import { useDataFetch } from '@hooks/common/use-data-fetch/useDataFetch';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { useTranslation } from 'react-i18next';
 
 const getContentBySection = (sections: AboutUsSection[] | null, sectionType: SectionType): AboutUsContent[] | null => {

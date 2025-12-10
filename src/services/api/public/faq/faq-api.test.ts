@@ -1,5 +1,5 @@
 import { FaqApi } from './faq-api';
-import { PublishedFaqQuestion } from '@app-types/public/faq-section';
+import { PublishedFaqQuestion } from '@/types/public/faq-section';
 
 describe('FaqApi', () => {
     const mockClient = {

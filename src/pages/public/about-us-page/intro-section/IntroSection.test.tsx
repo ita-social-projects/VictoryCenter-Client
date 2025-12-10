@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { AboutUsIntro } from './IntroSection';
-import { ContentType } from '@app-types/common/about-us';
-import { AboutUsContent } from '@app-types/public/about-us-page';
-import { aboutUsPageUk } from '@locales/uk';
+import { ContentType } from '@/types/common/about-us';
+import { AboutUsContent } from '@/types/public/about-us-page';
+import { aboutUsPageUk } from '@/locales/uk';
 
 describe('AboutUsIntro', () => {
     const Content: AboutUsContent[] = [

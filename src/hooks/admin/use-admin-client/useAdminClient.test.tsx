@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import * as AdminContextModule from '@contexts/admin/admin-context-provider/AdminContextProvider';
+import * as AdminContextModule from '@/contexts/admin/admin-context-provider/AdminContextProvider';
 import { useAdminClient } from './useAdminClient';
 import { AxiosInstance } from 'axios';
 

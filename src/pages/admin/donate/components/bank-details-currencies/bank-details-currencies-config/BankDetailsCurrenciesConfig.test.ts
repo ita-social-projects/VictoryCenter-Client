@@ -1,7 +1,7 @@
 import { bankDetailsConfig } from './BankDetailsCurrenciesConfig';
-import { UahBankDetailsDto, ForeignBankDetailsDto, BankCurrency } from '@app-types/admin/donate';
-import { BankDetailsUahApi } from '@api/admin/donate/bank-details-uah/bank-details-uah-api';
-import { ForeignBankDetailsApi } from '@api/admin/donate/bank-details-foreign/bank-details-foreign-api';
+import { UahBankDetailsDto, ForeignBankDetailsDto, BankCurrency } from '@/types/admin/donate';
+import { BankDetailsUahApi } from '@/services/api/admin/donate/bank-details-uah/bank-details-uah-api';
+import { ForeignBankDetailsApi } from '@/services/api/admin/donate/bank-details-foreign/bank-details-foreign-api';
 import { AxiosInstance } from 'axios';
 
 const mockClient = {
@@ -11,8 +11,8 @@ const mockClient = {
     delete: jest.fn(),
 } as unknown as AxiosInstance;
 
-jest.mock('@api/admin/donate/bank-details-uah/bank-details-uah-api');
-jest.mock('@api/admin/donate/bank-details-foreign/bank-details-foreign-api');
+jest.mock('@/services/api/admin/donate/bank-details-uah/bank-details-uah-api');
+jest.mock('@/services/api/admin/donate/bank-details-foreign/bank-details-foreign-api');
 
 describe('bankDetailsConfig', () => {
     describe('UAH config', () => {

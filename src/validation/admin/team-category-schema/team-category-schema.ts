@@ -1,4 +1,4 @@
-import { TEAM_CATEGORY_VALIDATION } from '@const/admin/team';
+import { TEAM_CATEGORY_VALIDATION } from '@/const/admin/team';
 import * as Yup from 'yup';
 
 export const TeamCategoryValidationSchema = Yup.object({

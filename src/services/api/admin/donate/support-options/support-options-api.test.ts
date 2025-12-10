@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { SupportOptionsApi } from './support-options-api';
-import { API_ROUTES } from '@const/common/api-routes/main-api';
-import { BankCurrency } from '@app-types/admin/donate';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { BankCurrency } from '@/types/admin/donate';
 
 describe('SupportOptionsApi', () => {
     const mockClient = {

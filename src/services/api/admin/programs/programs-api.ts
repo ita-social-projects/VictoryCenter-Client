@@ -1,4 +1,4 @@
-import { VisibilityStatus, PaginationResult } from '@app-types/admin/common';
+import { VisibilityStatus, PaginationResult } from '@/types/admin/common';
 
 import {
     ProgramCategory,
@@ -6,10 +6,10 @@ import {
     ProgramCategoryCreateUpdate,
     ProgramSearchItemData,
     Program,
-} from '@app-types/admin/programs';
+} from '@/types/admin/programs';
 import { AxiosInstance } from 'axios';
-import { API_ROUTES } from '@const/common/api-routes/main-api';
-import { ImageApi } from '@api/admin/image/image-api';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { ImageApi } from '@/services/api/admin/image/image-api';
 
 const convertProgramToSuggestion = (program: Program): ProgramSearchItemData => {
     return {

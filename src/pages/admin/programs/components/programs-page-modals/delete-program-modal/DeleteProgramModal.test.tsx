@@ -2,14 +2,14 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DeleteProgramModal, DeleteProgramModalProps } from './DeleteProgramModal';
-import { ProgramsApi } from '@api/admin/programs/programs-api';
-import { PROGRAMS_TEXT } from '@const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { Program } from '@app-types/admin/programs';
-import { VisibilityStatus } from '@app-types/admin/common';
-import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
+import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { Program } from '@/types/admin/programs';
+import { VisibilityStatus } from '@/types/admin/common';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
-jest.mock('@hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
@@ -26,10 +26,10 @@ beforeEach(() => {
     });
 });
 
-jest.mock('@services/api/admin/programs/programs-api');
+jest.mock('@/services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
-jest.mock('@components/common/modal/Modal', () => {
+jest.mock('@/components/common/modal/Modal', () => {
     const ModalMock = ({ isOpen, onClose, children, 'data-testid': dataTestId }: any) =>
         isOpen ? (
             <div data-testid={dataTestId}>
@@ -50,7 +50,7 @@ jest.mock('@components/common/modal/Modal', () => {
     };
 });
 
-jest.mock('@components/admin/button/Button', () => ({
+jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled }: any) => (
         <button onClick={onClick} disabled={disabled}>
             {children}

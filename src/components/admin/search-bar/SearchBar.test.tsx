@@ -2,18 +2,18 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { SearchBar, SearchBarProps } from './SearchBar';
 import { SearchItemWrapperProps } from './search-item-wrapper/SearchItemWrapper';
-import { TooltipProps } from '@components/admin/tooltip/Tooltip';
+import { TooltipProps } from '@/components/admin/tooltip/Tooltip';
 
 interface TestItem {
     id: number;
     name: string;
 }
 
-jest.mock('@hooks/common/use-on-click-outside/useOnClickOutside');
-jest.mock('@hooks/common/use-scroll-handler/useScrollHandler');
-jest.mock('@hooks/common/use-debounced-value-callback/useDebouncedValueCallback');
-jest.mock('@hooks/common/use-observe-element-size/useObserveElementSize');
-jest.mock('@hooks/common/use-container-size-from-children/useContainerSizeFromChildren');
+jest.mock('@/hooks/common/use-on-click-outside/useOnClickOutside');
+jest.mock('@/hooks/common/use-scroll-handler/useScrollHandler');
+jest.mock('@/hooks/common/use-debounced-value-callback/useDebouncedValueCallback');
+jest.mock('@/hooks/common/use-observe-element-size/useObserveElementSize');
+jest.mock('@/hooks/common/use-container-size-from-children/useContainerSizeFromChildren');
 
 // @ts-ignore
 jest.mock('./search-item-wrapper/SearchItemWrapper', () => ({
@@ -30,19 +30,19 @@ jest.mock('./search-item-wrapper/SearchItemWrapper', () => ({
     ),
 }));
 
-jest.mock('@components/common/inline-loader/InlineLoader', () => ({
+jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: () => <div data-testid="inline-loader" />,
 }));
 
-jest.mock('@components/admin/tooltip/Tooltip', () => ({
+jest.mock('@/components/admin/tooltip/Tooltip', () => ({
     Tooltip: ({ children }: Partial<TooltipProps>) => <div data-testid="tooltip">{children}</div>,
 }));
 
-jest.mock('@assets/icons/la_search.svg', () => ({
+jest.mock('@/assets/icons/la_search.svg', () => ({
     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="search-icon" className={className} />,
 }));
 
-jest.mock('@assets/icons/remove-query.svg', () => ({
+jest.mock('@/assets/icons/remove-query.svg', () => ({
     ReactComponent: ({ className }: { className?: string }) => <svg data-testid="clear-icon" className={className} />,
 }));
 
@@ -71,13 +71,13 @@ describe('SearchBar', () => {
     beforeEach(() => {
         jest.clearAllMocks();
 
-        require('@hooks/common/use-scroll-handler/useScrollHandler').useScrollHandler.mockReturnValue({
+        require('@/hooks/common/use-scroll-handler/useScrollHandler').useScrollHandler.mockReturnValue({
             handleScroll: jest.fn(),
         });
-        require('@hooks/common/use-observe-element-size/useObserveElementSize').useObserveElementSize.mockReturnValue({
+        require('@/hooks/common/use-observe-element-size/useObserveElementSize').useObserveElementSize.mockReturnValue({
             width: 300,
         });
-        require('@hooks/common/use-container-size-from-children/useContainerSizeFromChildren').useContainerSizeFromChildren.mockReturnValue(
+        require('@/hooks/common/use-container-size-from-children/useContainerSizeFromChildren').useContainerSizeFromChildren.mockReturnValue(
             {
                 calculatedSize: 200,
             },

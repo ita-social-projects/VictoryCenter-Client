@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import { AdminHomePage } from './AdminHomePage';
 import { MemoryRouter } from 'react-router-dom';
 
-jest.mock('@assets/icons/arrow-left.svg', () => ({
+jest.mock('@/assets/icons/arrow-left.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="admin-page-action-hint-icon" />,
 }));
 

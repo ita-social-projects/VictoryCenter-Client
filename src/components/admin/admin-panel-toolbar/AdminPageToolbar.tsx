@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ReactComponent as PlusIcon } from '@assets/icons/plus.svg';
+import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import {
     SearchItemContentRef,
     SearchItemContentRenderProps,
-} from '@components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
+} from '@/components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
 import {
     PaginationRequestParams,
     useDataPaginationFetch,
-} from '@hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
-import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@const/admin/common';
-import { SearchBar } from '@components/admin/search-bar/SearchBar';
-import { PaginationResult, VisibilityStatus } from '@app-types/admin/common';
-import { StatusFilterDropdown } from '@components/admin/status-filter-dropdown/StatusFilterDropdown';
-import { Button } from '@components/admin/button/Button';
+} from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
+import { SearchBar } from '@/components/admin/search-bar/SearchBar';
+import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
+import { StatusFilterDropdown } from '@/components/admin/status-filter-dropdown/StatusFilterDropdown';
+import { Button } from '@/components/admin/button/Button';
 import './AdminPageToolbar.scss';
 
 const DEFAULT_PAGE_SIZE = 5;

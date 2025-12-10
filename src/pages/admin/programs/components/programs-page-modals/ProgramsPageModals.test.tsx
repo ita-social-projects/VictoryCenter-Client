@@ -1,11 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { ProgramsPageModals } from './ProgramsPageModals';
-import { Program, ProgramCategory } from '@app-types/admin/programs';
-import { UseModalsStateResult } from '@hooks/admin/use-modals-state/useModalsState';
-import { VisibilityStatus } from '@app-types/admin/common';
-import { ProgramModalProps } from '@pages/admin/programs/components/programs-page-modals/program-modal/ProgramModal';
-import { DeleteProgramModalProps } from '@pages/admin/programs/components/programs-page-modals/delete-program-modal/DeleteProgramModal';
-import { ProgramCategoryModalProps } from '@pages/admin/programs/components/program-category-modals/ProgramCategoryModal';
+import { Program, ProgramCategory } from '@/types/admin/programs';
+import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
+import { VisibilityStatus } from '@/types/admin/common';
+import { ProgramModalProps } from '@/pages/admin/programs/components/programs-page-modals/program-modal/ProgramModal';
+import { DeleteProgramModalProps } from '@/pages/admin/programs/components/programs-page-modals/delete-program-modal/DeleteProgramModal';
+import { ProgramCategoryModalProps } from '@/pages/admin/programs/components/program-category-modals/ProgramCategoryModal';
 
 jest.mock('./program-modal/ProgramModal', () => ({
     ProgramModal: ({ isOpen, mode }: ProgramModalProps) => {

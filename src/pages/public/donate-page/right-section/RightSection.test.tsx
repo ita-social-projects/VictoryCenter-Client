@@ -7,8 +7,8 @@ import {
     PublishedUahBankDetailsDto,
     PublishedForeignBankDetailsDto,
     PublishedSupportOptionsDto,
-} from '@app-types/public/donate-page';
-import { ERROR_MESSAGES } from '@const/public/donate-page';
+} from '@/types/public/donate-page';
+import { ERROR_MESSAGES } from '@/const/public/donate-page';
 
 jest.mock('./ukraine-payment-details/UkrainePaymentDetails', () => ({
     UkrainePaymentDetails: ({ bankDetails }: { bankDetails: PublishedUahBankDetailsDto[] }) => (
@@ -44,7 +44,7 @@ jest.mock('./alternative-support-ways/AlternativeSupportWays', () => ({
     ),
 }));
 
-jest.mock('@components/common/tabs/Tabs', () => ({
+jest.mock('@/components/common/tabs/Tabs', () => ({
     Tabs: ({ activeTab, setActiveTab, tabs }: any) => (
         <div data-testid="tabs-container">
             {tabs.map((tab: any) => (

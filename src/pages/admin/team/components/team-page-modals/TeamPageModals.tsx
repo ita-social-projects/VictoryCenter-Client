@@ -1,7 +1,7 @@
-import { UseModalsStateResult } from '@hooks/admin/use-modals-state/useModalsState';
-import { ModalMode } from '@app-types/admin/common';
-import { TeamCategory } from '@app-types/admin/team-category';
-import { TeamMember } from '@app-types/admin/team-members';
+import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
+import { ModalMode } from '@/types/admin/common';
+import { TeamCategory } from '@/types/admin/team-category';
+import { TeamMember } from '@/types/admin/team-members';
 import { TeamMemberModal } from '../team-member-modal/TeamMemberModal';
 import { DeleteTeamMemberModal } from '../delete-team-member-modal/DeleteTeamMemberModal';
 import { TeamCategoryModal } from '../team-category-modal/TeamCategoryModal';

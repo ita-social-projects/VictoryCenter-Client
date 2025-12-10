@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { HintBox } from './HintBox';
 
-jest.mock('@assets/icons/info.svg', () => ({
+jest.mock('@/assets/icons/info.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="info-icon" />,
 }));
 

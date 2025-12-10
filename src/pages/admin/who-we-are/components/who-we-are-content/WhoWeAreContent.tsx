@@ -1,19 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { WhoWeAreApi } from '@api/admin/who-we-are/who-we-are-api';
-import { Content, WhoWeAreCategory, WhoWeAreSection } from '@app-types/admin/who-we-are';
-import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
-import { CategoryBar } from '@components/admin/category-bar/CategoryBar';
+import { WhoWeAreApi } from '@/services/api/admin/who-we-are/who-we-are-api';
+import { Content, WhoWeAreCategory, WhoWeAreSection } from '@/types/admin/who-we-are';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
 import './WhoWeAreContent.scss';
 import { SectionsWrapper } from '../sections-wrapper/SectionsWrapper';
-import { Image } from '@app-types/common/image';
-import { ConfirmationModal } from '@components/admin/confirmation-modal/ConfirmationModal';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { ToastType } from '@app-types/admin/toast';
-import { ToastContainer } from '@components/admin/toast/toast-container/ToastContainer';
-import { useToast } from '@contexts/admin/toast-context-provider/ToastContextProvider';
-import { useDataFetch } from '@hooks/common/use-data-fetch/useDataFetch';
-import { WHO_WE_ARE_TEXT } from '@const/admin/who-we-are';
-import { InlineLoader } from '@components/common/inline-loader/InlineLoader';
+import { Image } from '@/types/common/image';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ToastType } from '@/types/admin/toast';
+import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
+import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import classNames from 'classnames';
 
 interface ErrorState {

@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { CardsSection, CardsSectionProps } from './CardsSection';
 import '@testing-library/jest-dom';
-import { ContentType } from '@app-types/common/about-us';
-import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@validation/admin/who-we-are-schema/WhoWeAreSchema';
-import { Image, ImageValues } from '@app-types/common/image';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { CardContentProps } from '@pages/admin/who-we-are/components/card-content/CardContent';
+import { ContentType } from '@/types/common/about-us';
+import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
+import { Image, ImageValues } from '@/types/common/image';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { CardContentProps } from '@/pages/admin/who-we-are/components/card-content/CardContent';
 
 jest.mock('../../card-content/CardContent', () => ({
     CardContent: ({
@@ -42,7 +42,7 @@ jest.mock('../../card-content/CardContent', () => ({
     ),
 }));
 
-jest.mock('@validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
+jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
     WHO_WE_ARE_VALIDATION_FUNCTIONS: {
         validateText: jest.fn(),
     },

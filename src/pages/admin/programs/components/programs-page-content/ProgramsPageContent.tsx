@@ -1,23 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Program, ProgramCategory, ProgramSearchItemData } from '@app-types/admin/programs';
-import { PaginationResult, VisibilityStatus } from '@app-types/admin/common';
+import { Program, ProgramCategory, ProgramSearchItemData } from '@/types/admin/programs';
+import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { ProgramsPageModals } from '../programs-page-modals/ProgramsPageModals';
-import { InfiniteScrollList } from '@components/admin/infinite-scroll-list/InfiniteScrollList';
-import { CategoryBar, ContextMenuOption } from '@components/admin/category-bar/CategoryBar';
+import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
+import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
 import { ProgramListItem } from '../program-list-item/ProgramListItem';
-import { useModalsState } from '@hooks/admin/use-modals-state/useModalsState';
-import { useCategoriesCounter } from '@hooks/admin/use-categories-counter/useCategoriesCounter';
-import { ProgramsApi, ProgramsCategoriesApi } from '@api/admin/programs/programs-api';
-import { PROGRAMS_TEXT } from '@const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { useDataFetch } from '@hooks/common/use-data-fetch/useDataFetch';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { useCategoriesCounter } from '@/hooks/admin/use-categories-counter/useCategoriesCounter';
+import { ProgramsApi, ProgramsCategoriesApi } from '@/services/api/admin/programs/programs-api';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import {
     PaginationRequestParams,
     useDataPaginationFetch,
-} from '@hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
+} from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import './ProgramsPageContent.scss';
-import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
-import { AdminPanelToolbar } from '@components/admin/admin-panel-toolbar/AdminPageToolbar';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { ProgramSearchItem } from '../program-search-item/ProgramSearchItem';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;

@@ -1,14 +1,14 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemberComponent, MemberComponentProps } from './MemberComponent';
 import '@testing-library/jest-dom';
-import { VisibilityStatus } from '@app-types/admin/common';
-import { TEAM_MEMBERS_TEXT } from '@const/admin/team';
+import { VisibilityStatus } from '@/types/admin/common';
+import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
 
-jest.mock('@assets/icons/blank-user.svg', () => ({
+jest.mock('@/assets/icons/blank-user.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="blank-user-icon" />,
 }));
 
-jest.mock('@components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
+jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
     VisibilityStatusLabel: ({ status }: { status: VisibilityStatus }) => (
         <div data-testid="visibility-label">{`Status: ${status}`}</div>
     ),

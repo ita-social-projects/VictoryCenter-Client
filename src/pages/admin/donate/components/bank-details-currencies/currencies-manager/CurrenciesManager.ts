@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { bankDetailsConfig } from '../bank-details-currencies-config/BankDetailsCurrenciesConfig';
-import { BankCurrency } from '@app-types/admin/donate';
-import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
+import { BankCurrency } from '@/types/admin/donate';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
 export enum Currencies {
     UAH = 'UAH',

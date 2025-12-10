@@ -1,11 +1,11 @@
-import { CardImageConfig, Content } from '@app-types/admin/who-we-are';
+import { CardImageConfig, Content } from '@/types/admin/who-we-are';
 import { useState } from 'react';
 import { CardContent } from '../../card-content/CardContent';
 import './CardsSection.scss';
-import { Button } from '@components/admin/button/Button';
-import { ContentType } from '@app-types/common/about-us';
-import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@validation/admin/who-we-are-schema/WhoWeAreSchema';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
+import { Button } from '@/components/admin/button/Button';
+import { ContentType } from '@/types/common/about-us';
+import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 export interface CardsSectionProps {
     content: Content[] | undefined;

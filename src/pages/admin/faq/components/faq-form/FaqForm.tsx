@@ -1,13 +1,13 @@
 import { forwardRef, useCallback, useMemo } from 'react';
-import { VisibilityStatus } from '@app-types/admin/common';
-import { VisitorPage } from '@app-types/admin/faq';
+import { VisibilityStatus } from '@/types/admin/common';
+import { VisitorPage } from '@/types/admin/faq';
 import './FaqForm.scss';
-import { useFormManager } from '@hooks/admin/use-form-manager/useFormManager';
-import { MultiSelectInputGroup } from '@components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
-import { FAQ_TEXT, FAQ_VALIDATION } from '@const/admin/faq';
-import { InputWithCharacterLimitGroup } from '@components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import { FAQ_VALIDATION_FUNCTIONS } from '@validation/admin/faq-schema/faq-schema';
-import { TextAreaWithCharacterLimitGroup } from '@components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
+import { MultiSelectInputGroup } from '@/components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
+import { FAQ_TEXT, FAQ_VALIDATION } from '@/const/admin/faq';
+import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { FAQ_VALIDATION_FUNCTIONS } from '@/validation/admin/faq-schema/faq-schema';
+import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 
 export interface FaqFormValues {
     questionText: string;

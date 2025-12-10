@@ -1,5 +1,5 @@
 import React from 'react';
-import background from '@assets/videos/public/programs-page/contact_us_background.mp4';
+import background from '@/assets/videos/public/programs-page/contact_us_background.mp4';
 import { useTranslation } from 'react-i18next';
 import './ContactSection.scss';
 

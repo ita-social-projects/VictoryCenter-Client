@@ -1,14 +1,14 @@
 import { donatePageDataFetch } from './donate-api';
-import { API_ROUTES } from '@const/common/api-routes/main-api';
-import { Currency } from '@app-types/public/donate-page';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { Currency } from '@/types/public/donate-page';
 
-jest.mock('@api/axios', () => ({
+jest.mock('@/services/api/axios', () => ({
     axiosInstance: {
         get: jest.fn(),
     },
 }));
 
-const mockAxiosInstance = require('@api/axios').axiosInstance;
+const mockAxiosInstance = require('@/services/api/axios').axiosInstance;
 
 describe('donatePageDataFetch', () => {
     const createMockUahBankDetails = () => [

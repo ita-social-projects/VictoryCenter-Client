@@ -1,6 +1,6 @@
 import { PaymentLabelWithCopy } from './PaymentLabelWithCopy';
 import { MultiFieldLabelWithCopy } from './MultiFieldLabelWithCopy';
-import { PAYMENT_DETAILS_COMMON, ABROAD_PAYMENT_DETAILS } from '@const/public/donate-page';
+import { PAYMENT_DETAILS_COMMON, ABROAD_PAYMENT_DETAILS } from '@/const/public/donate-page';
 
 interface PaymentDetailsSectionProps {
     title: string;

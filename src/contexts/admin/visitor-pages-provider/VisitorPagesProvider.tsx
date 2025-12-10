@@ -1,8 +1,8 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import { VisitorPage } from '@app-types/admin/faq';
-import { useOnMountUnsafe } from '@hooks/common/use-on-mount-unsafe/useOnMountUnsafe';
-import { FaqApi } from '@api/admin/faq/faq-api';
-import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
+import { VisitorPage } from '@/types/admin/faq';
+import { useOnMountUnsafe } from '@/hooks/common/use-on-mount-unsafe/useOnMountUnsafe';
+import { FaqApi } from '@/services/api/admin/faq/faq-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
 // interface Props {
 // }

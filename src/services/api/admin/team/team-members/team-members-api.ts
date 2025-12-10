@@ -1,8 +1,8 @@
 import { AxiosInstance } from 'axios';
-import { PaginationResult, VisibilityStatus } from '@app-types/admin/common';
-import { TeamMember, TeamMemberCreateUpdateRequest } from '@app-types/admin/team-members';
-import { API_ROUTES } from '@const/common/api-routes/main-api';
-import { ImageApi } from '@api/admin/image/image-api';
+import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
+import { TeamMember, TeamMemberCreateUpdateRequest } from '@/types/admin/team-members';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { ImageApi } from '@/services/api/admin/image/image-api';
 
 export const TeamMembersApi = {
     getAll: async (

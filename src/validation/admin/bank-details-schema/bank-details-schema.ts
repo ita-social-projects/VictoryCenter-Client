@@ -1,4 +1,4 @@
-import { DONATE_VALIDATION } from '@const/admin/donate';
+import { DONATE_VALIDATION } from '@/const/admin/donate';
 import * as Yup from 'yup';
 
 export const BankDetailsValidationSchema = Yup.object({

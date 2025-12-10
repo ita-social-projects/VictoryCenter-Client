@@ -1,5 +1,5 @@
-import { DONATE_TEXT, VALIDATION_PARAMS } from '@const/admin/donate';
-import { BANK_DETAILS_VALIDATION_FUNCTIONS } from '@validation/admin/bank-details-schema/bank-details-schema';
+import { DONATE_TEXT, VALIDATION_PARAMS } from '@/const/admin/donate';
+import { BANK_DETAILS_VALIDATION_FUNCTIONS } from '@/validation/admin/bank-details-schema/bank-details-schema';
 import { createGenericForm, GenericFormField } from '../../generic-form/GenericForm';
 
 export interface BaseBankDetails {

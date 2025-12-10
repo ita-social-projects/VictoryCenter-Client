@@ -1,8 +1,8 @@
 import { AxiosInstance } from 'axios';
-import { API_ROUTES } from '@const/common/api-routes/main-api';
-import { Content, WhoWeAreCategory, WhoWeAreSection } from '@app-types/admin/who-we-are';
-import { ImageApi } from '@api/admin/image/image-api';
-import { SectionType } from '@app-types/common/about-us';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { Content, WhoWeAreCategory, WhoWeAreSection } from '@/types/admin/who-we-are';
+import { ImageApi } from '@/services/api/admin/image/image-api';
+import { SectionType } from '@/types/common/about-us';
 
 export const WhoWeAreApi = {
     getPreviews: async (client: AxiosInstance): Promise<WhoWeAreCategory[]> => {

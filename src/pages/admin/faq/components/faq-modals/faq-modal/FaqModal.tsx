@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { FAQ_TEXT } from '@const/admin/faq';
-import { useGenericModal } from '@hooks/admin/use-generic-modal/useGenericModal';
-import { FaqApi } from '@api/admin/faq/faq-api';
-import { VisibilityStatus, ModalMode, PendingAction } from '@app-types/admin/common';
-import { FaqCreateUpdate, FaqQuestion, VisitorPage } from '@app-types/admin/faq';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { FAQ_TEXT } from '@/const/admin/faq';
+import { useGenericModal } from '@/hooks/admin/use-generic-modal/useGenericModal';
+import { FaqApi } from '@/services/api/admin/faq/faq-api';
+import { VisibilityStatus, ModalMode, PendingAction } from '@/types/admin/common';
+import { FaqCreateUpdate, FaqQuestion, VisitorPage } from '@/types/admin/faq';
 import { FaqForm, FaqFormRef, FaqFormValues } from '../../faq-form/FaqForm';
-import { GenericModalWrapper } from '@components/admin/generic-modal-wrapper/GenericModalWrapper';
-import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
-import { mapFaqQuestionDtoToModel } from '@utils/functions/mappers/admin/faq-mappers';
+import { GenericModalWrapper } from '@/components/admin/generic-modal-wrapper/GenericModalWrapper';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { mapFaqQuestionDtoToModel } from '@/utils/functions/mappers/admin/faq-mappers';
 
 interface BaseProps {
     isOpen: boolean;

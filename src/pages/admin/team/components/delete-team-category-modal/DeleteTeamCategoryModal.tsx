@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Modal } from '@components/common/modal/Modal';
-import { Button } from '@components/admin/button/Button';
-import { SingleSelectInputGroup } from '@components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
-import { HintBox } from '@components/admin/hint-box/HintBox';
-import { useAdminClient } from '@hooks/admin/use-admin-client/useAdminClient';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { TeamCategory } from '@app-types/admin/team-category';
-import { TEAM_CATEGORY_VALIDATION } from '@const/admin/team';
-import { TeamCategoriesApi } from '@api/admin/team/team-categories/team-categories-api';
+import { Modal } from '@/components/common/modal/Modal';
+import { Button } from '@/components/admin/button/Button';
+import { SingleSelectInputGroup } from '@/components/admin/input-groups/single-select-input-group/SingleSelectInputGroup';
+import { HintBox } from '@/components/admin/hint-box/HintBox';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { TeamCategory } from '@/types/admin/team-category';
+import { TEAM_CATEGORY_VALIDATION } from '@/const/admin/team';
+import { TeamCategoriesApi } from '@/services/api/admin/team/team-categories/team-categories-api';
 import './DeleteTeamCategoryModal.scss';
 
 export interface DeleteTeamCategoryModalProps {

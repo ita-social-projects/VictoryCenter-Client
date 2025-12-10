@@ -1,11 +1,11 @@
-import { Button } from '@components/admin/button/Button';
-import { ReactComponent as ExitIcon } from '@assets/icons/exit-icon.svg';
-import { ReactComponent as Logo } from '@assets/icons/logo-with-text.svg';
-import { useAdminContext } from '@contexts/admin/admin-context-provider/AdminContextProvider';
+import { Button } from '@/components/admin/button/Button';
+import { ReactComponent as ExitIcon } from '@/assets/icons/exit-icon.svg';
+import { ReactComponent as Logo } from '@/assets/icons/logo-with-text.svg';
+import { useAdminContext } from '@/contexts/admin/admin-context-provider/AdminContextProvider';
 import classNames from 'classnames';
 import { NavLink } from 'react-router-dom';
-import { COMMON_TEXT_ADMIN } from '@const/admin/common';
-import { ADMIN_ROUTES } from '@const/admin/routes';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ADMIN_ROUTES } from '@/const/admin/routes';
 import './AdminNavigation.scss';
 
 export const AdminNavigation = () => {

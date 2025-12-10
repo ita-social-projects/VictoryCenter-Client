@@ -1,10 +1,10 @@
-import { Program, ProgramCategory } from '@app-types/admin/programs';
-import { UseModalsStateResult } from '@hooks/admin/use-modals-state/useModalsState';
+import { Program, ProgramCategory } from '@/types/admin/programs';
+import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
 import { ProgramModal } from './program-modal/ProgramModal';
 import { DeleteProgramModal } from './delete-program-modal/DeleteProgramModal';
 import { ProgramCategoryModal } from '../program-category-modals/ProgramCategoryModal';
 import { DeleteCategoryModal } from '../program-category-modals/DeleteCategoryModal';
-import { ModalMode } from '@app-types/admin/common';
+import { ModalMode } from '@/types/admin/common';
 
 export interface ProgramsPageModalsProps {
     modalsStateControl: UseModalsStateResult<Program>;

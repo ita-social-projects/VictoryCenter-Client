@@ -1,8 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
 import axios, { AxiosInstance } from 'axios';
-import { TEAM_SEARCH } from '@const/admin/team';
-import { TeamMember } from '@app-types/admin/team-members';
-import { TeamMembersApi } from '@api/admin/team/team-members/team-members-api';
+import { TEAM_SEARCH } from '@/const/admin/team';
+import { TeamMember } from '@/types/admin/team-members';
+import { TeamMembersApi } from '@/services/api/admin/team/team-members/team-members-api';
 
 export const useTeamMemberSearch = (client: AxiosInstance) => {
     const [searchSuggestions, setSearchSuggestions] = useState<TeamMember[]>([]);

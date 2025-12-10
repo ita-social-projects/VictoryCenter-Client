@@ -2,7 +2,18 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { SupportOptionsApi } from '../../../../../services/api/admin/donate/support-options/support-options-api';
 import { CorrespondentBankDetailsApi } from '../../../../../services/api/admin/donate/correspondent-banks/correspondent-banks-api';
-import { ForeignBankDetailsType, SupportOptionsType, UahBankDetailsType } from '../../../../../types/admin/donate';
+import {
+    ForeignBankDetailsDto,
+    SupportOptionsDto,
+    UahBankDetailsDto,
+    CreateUahBankDetails,
+    UpdateUahBankDetails,
+    CreateForeignBankDetails,
+    UpdateForeignBankDetails,
+    CreateSupportOptionsDto,
+    UpdateSupportOptionsDto,
+    CorrespondentBankDetailsDto,
+} from '../../../../../types/admin/donate';
 import { DONATE_TEXT } from '../../../../../const/admin/donate';
 import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
 import { GenericDetails } from '../generic-details/GenericDetails';
@@ -15,6 +26,14 @@ import {
 import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
 import { ToastType } from '../../../../../types/admin/toast';
 import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
+import {
+    mapToCreateUahBankDetails,
+    mapToUpdateUahBankDetails,
+    mapToCreateForeignBankDetails,
+    mapToUpdateForeignBankDetails,
+    mapToCreateCorrespondentBankDetails,
+    mapToUpdateCorrespondentBankDetails,
+} from '../../../../../utils/functions/mappers/admin/donate-mappers';
 import './DonatePageContent.scss';
 
 export const DonatePageContent = () => {
@@ -23,9 +42,11 @@ export const DonatePageContent = () => {
     const currencyCategories = Object.values(Currencies);
     const [selectedCategory, setSelectedCategory] = useState<Currencies>(Currencies.UAH);
     const { items, config, setItems, isLoading } = useBankDetails(selectedCategory);
-    const [supportOptions, setSupportOptions] = useState<SupportOptionsType[]>([]);
+    const [supportOptions, setSupportOptions] = useState<SupportOptionsDto[]>([]);
     const [isSupportOptionsLoading, setIsSupportOptionsLoading] = useState(false);
+    const [isChildEditing, setIsChildEditing] = useState(false);
 
+    const [isCorrespondentBankFormVisible, setIsCorrespondentBankFormVisible] = useState(false);
     useEffect(() => {
         let isAlive = true;
         const bankCurrency = mapCurrencyToBankCurrency(selectedCategory);
@@ -72,7 +93,8 @@ export const DonatePageContent = () => {
             const bankCurrency = mapCurrencyToBankCurrency(selectedCategory);
             setIsSupportOptionsLoading(true);
             try {
-                const newOption = await SupportOptionsApi.create(client, { name, value, currency: bankCurrency });
+                const createData: CreateSupportOptionsDto = { name, value, currency: bankCurrency };
+                const newOption = await SupportOptionsApi.create(client, createData);
                 setSupportOptions((prev) => [...prev, newOption]);
 
                 addToast(DONATE_TEXT.MESSAGE.SUPPORT_OPTIONS.PUBLISHED, ToastType.Info);
@@ -87,7 +109,8 @@ export const DonatePageContent = () => {
         async (id: number, name: string, value: string) => {
             setIsSupportOptionsLoading(true);
             try {
-                const updatedOption = await SupportOptionsApi.update(client, id, { name, value });
+                const updateData: UpdateSupportOptionsDto = { name, value };
+                const updatedOption = await SupportOptionsApi.update(client, id, updateData);
                 setSupportOptions((prev) => prev.map((option) => (option.id === id ? updatedOption : option)));
             } finally {
                 setIsSupportOptionsLoading(false);
@@ -112,12 +135,16 @@ export const DonatePageContent = () => {
 
     // Bank Details handlers
     const handleCreateBankDetails = useCallback(
-        async (data: Omit<UahBankDetailsType | ForeignBankDetailsType, 'correspondentBanks'>) => {
+        async (data: UahBankDetailsDto | ForeignBankDetailsDto) => {
             if (!config) return;
             try {
-                const newItem = await config.create(client, data);
+                const createData: CreateUahBankDetails | CreateForeignBankDetails =
+                    'correspondentBanks' in data
+                        ? mapToCreateForeignBankDetails(data)
+                        : mapToCreateUahBankDetails(data);
+                const newItem = await config.create(client, createData);
 
-                setItems((prev: (UahBankDetailsType | ForeignBankDetailsType)[]) => [...prev, newItem]);
+                setItems((prev: (UahBankDetailsDto | ForeignBankDetailsDto)[]) => [...prev, newItem]);
             } catch (error) {
                 throw error;
             }
@@ -126,12 +153,16 @@ export const DonatePageContent = () => {
     );
 
     const handleUpdateBankDetails = useCallback(
-        async (id: number, data: UahBankDetailsType | ForeignBankDetailsType) => {
+        async (id: number, data: UahBankDetailsDto | ForeignBankDetailsDto) => {
             if (!config) return;
             try {
-                const updatedItem = await config.update(client, id, data);
+                const updateData: UpdateUahBankDetails | UpdateForeignBankDetails =
+                    'correspondentBanks' in data
+                        ? mapToUpdateForeignBankDetails(data)
+                        : mapToUpdateUahBankDetails(data);
+                const updatedItem = await config.update(client, id, updateData);
 
-                setItems((prev: (UahBankDetailsType | ForeignBankDetailsType)[]) =>
+                setItems((prev: (UahBankDetailsDto | ForeignBankDetailsDto)[]) =>
                     prev.map((item) => {
                         if (item.id === id) {
                             return {
@@ -151,28 +182,25 @@ export const DonatePageContent = () => {
     );
 
     const handleDeleteBankDetails = useCallback(
-        async (id: number, isParentCreating?: boolean) => {
+        async (id: number) => {
             if (!config) return;
             try {
-                if (!isParentCreating) {
-                    await config.delete(client, id);
-                }
+                await config.delete(client, id);
                 setItems((prev: any) => prev.filter((item: any) => item.id !== id));
+                addToast(DONATE_TEXT.MESSAGE.BANK_DETAILS.DELETE, ToastType.Info);
             } catch (error) {
                 throw error;
             }
         },
-        [client, config, setItems],
+        [client, config, setItems, addToast],
     );
 
     // Correspondent Bank Details handlers
     const handleCreateCorrespondentBank = useCallback(
-        async (foreignBankId: number, data: any) => {
+        async (foreignBankId: number, data: CorrespondentBankDetailsDto) => {
             try {
-                const newBank = await CorrespondentBankDetailsApi.create(client, {
-                    ...data,
-                    foreignBankDetailsId: foreignBankId,
-                });
+                const createData = mapToCreateCorrespondentBankDetails(data, foreignBankId);
+                const newBank = await CorrespondentBankDetailsApi.create(client, createData);
                 setItems((prev: any) =>
                     prev.map((item: any) =>
                         item.id === foreignBankId
@@ -188,12 +216,10 @@ export const DonatePageContent = () => {
     );
 
     const handleUpdateCorrespondentBank = useCallback(
-        async (foreignBankId: number, id: number, data: any) => {
+        async (foreignBankId: number, id: number, data: CorrespondentBankDetailsDto) => {
             try {
-                const updatedBank = await CorrespondentBankDetailsApi.update(client, id, {
-                    ...data,
-                    foreignBankDetailsId: foreignBankId,
-                });
+                const updateData = mapToUpdateCorrespondentBankDetails(data);
+                const updatedBank = await CorrespondentBankDetailsApi.update(client, id, updateData);
                 setItems((prev: any) =>
                     prev.map((item: any) =>
                         item.id === foreignBankId
@@ -237,7 +263,7 @@ export const DonatePageContent = () => {
     );
 
     const handleLocalSubmit = useCallback(
-        (formState: any, setFormState: any, data: any) => {
+        (formState: any, setFormState: any, data: CorrespondentBankDetailsDto) => {
             const updatedBanks = [...(formState.correspondentBanks || []), data];
 
             setFormState({
@@ -267,11 +293,12 @@ export const DonatePageContent = () => {
     const renderCorrespondentBanks = useCallback(
         ({ formState, isItemsExpanded, setFormState }: any) => {
             const isCreating = !formState.id;
-
             const localBanks = formState.correspondentBanks || [];
 
             const existingItem = items.find((i) => i.id === formState.id);
-            const banksToShow = isCreating ? localBanks : (existingItem?.correspondentBanks ?? []);
+            const banksToShow = isCreating
+                ? localBanks
+                : [...(existingItem?.correspondentBanks ?? [])].sort((a, b) => a.id - b.id);
 
             return (
                 <GenericDetails
@@ -284,6 +311,7 @@ export const DonatePageContent = () => {
                     primaryAddButton={true}
                     addNewText={DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW}
                     isChildForm={true}
+                    isDisabled={!formState.id}
                     isParentCreating={isCreating}
                     onSubmit={(data) => handleCreateCorrespondentBank(formState.id, data)}
                     onUpdate={(id, data) => handleUpdateCorrespondentBank(formState.id, id, data)}
@@ -291,6 +319,8 @@ export const DonatePageContent = () => {
                     onLocalSubmit={(data) => handleLocalSubmit(formState, setFormState, data)}
                     onLocalUpdate={handleLocalUpdate}
                     onLocalDelete={(index) => handleLocalDelete(formState, setFormState, index)}
+                    onEditingStateChange={setIsChildEditing}
+                    onAddFormVisibilityChange={setIsCorrespondentBankFormVisible}
                 />
             );
         },
@@ -304,6 +334,7 @@ export const DonatePageContent = () => {
             handleLocalSubmit,
             handleLocalUpdate,
             handleLocalDelete,
+            setIsChildEditing,
         ],
     );
 
@@ -322,14 +353,18 @@ export const DonatePageContent = () => {
                     {config && (
                         <GenericDetails
                             key={`bank-details-${selectedCategory}`}
-                            items={items}
+                            items={[...items].sort((a, b) => a.id - b.id)}
                             isLoading={isLoading}
                             FormComponent={config.form}
                             notFoundText={DONATE_TEXT.BANK_DETAILS.NOT_FOUND}
-                            addNewText={DONATE_TEXT.BANK_DETAILS.ADD_FIRST}
+                            addNewText={
+                                items.length > 0 ? DONATE_TEXT.BANK_DETAILS.ADD_NEW : DONATE_TEXT.BANK_DETAILS.ADD_FIRST
+                            }
                             onSubmit={handleCreateBankDetails}
                             onUpdate={handleUpdateBankDetails}
                             onDelete={handleDeleteBankDetails}
+                            isAddButtonDisabled={isChildEditing}
+                            isParentAddFormVisible={isCorrespondentBankFormVisible}
                         >
                             {config.withCorrespondentBanks ? renderCorrespondentBanks : () => null}
                         </GenericDetails>

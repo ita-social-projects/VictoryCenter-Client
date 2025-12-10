@@ -1,5 +1,5 @@
 import { bankDetailsConfig } from './BankDetailsCurrenciesConfig';
-import { UahBankDetailsType, ForeignBankDetailsType, BankCurrency } from '../../../../../../types/admin/donate';
+import { UahBankDetailsDto, ForeignBankDetailsDto, BankCurrency } from '../../../../../../types/admin/donate';
 import { BankDetailsUahApi } from '../../../../../../services/api/admin/donate/bank-details-uah/bank-details-uah-api';
 import { ForeignBankDetailsApi } from '../../../../../../services/api/admin/donate/bank-details-foreign/bank-details-foreign-api';
 import { AxiosInstance } from 'axios';
@@ -23,7 +23,7 @@ describe('bankDetailsConfig', () => {
         it('createEmptyItem returns item without id initially', () => {
             const item = bankDetailsConfig.UAH.createEmptyItem({ name: 'MonoBank' });
 
-            expect((item as UahBankDetailsType).name).toBe('MonoBank');
+            expect((item as UahBankDetailsDto).name).toBe('MonoBank');
         });
 
         it('fetch return empty array', async () => {
@@ -46,9 +46,9 @@ describe('bankDetailsConfig', () => {
         it('createEmptyItem adds currency and correspondentBanks', () => {
             const item = bankDetailsConfig.USD.createEmptyItem({ receiver: 'John Doe' });
 
-            expect((item as ForeignBankDetailsType).receiver).toBe('John Doe');
-            expect((item as ForeignBankDetailsType).currency).toBe(BankCurrency.Usd);
-            expect((item as ForeignBankDetailsType).correspondentBanks).toEqual([]);
+            expect((item as ForeignBankDetailsDto).receiver).toBe('John Doe');
+            expect((item as ForeignBankDetailsDto).currency).toBe(BankCurrency.Usd);
+            expect((item as ForeignBankDetailsDto).correspondentBanks).toEqual([]);
         });
 
         it('withCorrespondentBanks is exists on USD bank details', () => {
@@ -75,9 +75,9 @@ describe('bankDetailsConfig', () => {
         it('createEmptyItem adds currency and correspondentBanks', () => {
             const item = bankDetailsConfig.EUR.createEmptyItem({ address: 'Berlin' });
 
-            expect((item as ForeignBankDetailsType).address).toBe('Berlin');
-            expect((item as ForeignBankDetailsType).currency).toBe(BankCurrency.Eur);
-            expect((item as ForeignBankDetailsType).correspondentBanks).toEqual([]);
+            expect((item as ForeignBankDetailsDto).address).toBe('Berlin');
+            expect((item as ForeignBankDetailsDto).currency).toBe(BankCurrency.Eur);
+            expect((item as ForeignBankDetailsDto).correspondentBanks).toEqual([]);
         });
 
         it('fetch calls ForeignBankDetailsApi with EUR currency', async () => {

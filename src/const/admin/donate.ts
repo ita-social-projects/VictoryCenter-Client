@@ -9,6 +9,7 @@ const COMMON_TEXT = {
     TITLE_SWIFT: 'SWIFT',
     TITLE_EDRPOU: 'ЄДРПОУ',
     PLACEHOLDER_CODE: 'Введіть код',
+    PLACEHOLDER_NUMBER: 'Введіть номер',
     PLACEHOLDER_BANK_NAME: 'Введіть назву банку',
     BANK_NAME: 'Назва банку',
 };
@@ -32,6 +33,7 @@ export const DONATE_TEXT = {
         },
         IBAN: {
             TITLE: COMMON_TEXT.TITLE_IBAN,
+            PLACEHOLDER: COMMON_TEXT.PLACEHOLDER_NUMBER,
         },
         PAYMENT_PURPOSE: {
             TITLE: 'Призначення платежу',
@@ -103,6 +105,9 @@ export const DONATE_TEXT = {
             DELETED: 'Варіант підтримки видалено успішно',
         },
         CHANGES_SAVED: 'Зміни успішно опубліковано',
+        BANK_DETAILS: {
+            DELETE: 'Реквізити успішно видалено',
+        },
         CORRESPONDENT_BANKS: {
             ADD: 'Банк-кореспондент додано успішно',
             DELETED: 'Банк-кореспондент видалено успішно',
@@ -128,7 +133,8 @@ export const VALIDATION_PARAMS = {
 };
 
 export const DONATE_VALIDATION = {
-    getDigitsOnlyError: () => `Мають бути цифри`,
+    getDigitsOnlyError: () => `Мають бути тільки цифри`,
+    getAlphaNumericError: () => `Мають бути тільки літери та цифри`,
     name: {
         maxLength: VALIDATION_PARAMS.name.maxLength,
         getRequiredError: () => getGenericRequiredError(),

@@ -126,6 +126,33 @@ jest.mock('../support-options/support-options-form/SupportOptionsForm', () => ({
     ),
 }));
 
+jest.mock('../../../../../utils/functions/mappers/admin/donate-mappers', () => ({
+    mapToCreateUahBankDetails: (data: any) => {
+        const { id: _id, ...rest } = data;
+        return rest;
+    },
+    mapToUpdateUahBankDetails: (data: any) => {
+        const { id: _id, ...rest } = data;
+        return rest;
+    },
+    mapToCreateForeignBankDetails: (data: any) => {
+        const { id: _id, correspondentBanks: _correspondentBanks, currency: _currency, ...rest } = data;
+        return rest;
+    },
+    mapToUpdateForeignBankDetails: (data: any) => {
+        const { id: _id, correspondentBanks: _correspondentBanks, currency: _currency, ...rest } = data;
+        return rest;
+    },
+    mapToCreateCorrespondentBankDetails: (data: any, foreignBankDetailsId: number) => {
+        const { id: _id, ...rest } = data;
+        return { ...rest, foreignBankDetailsId };
+    },
+    mapToUpdateCorrespondentBankDetails: (data: any) => {
+        const { id: _id, foreignBankDetailsId: _foreignBankDetailsId, ...rest } = data;
+        return rest;
+    },
+}));
+
 describe('DonatePageContent', () => {
     const createMockConfig = (withCorrespondentBanks = false) => ({
         form: jest.fn(),
@@ -425,7 +452,7 @@ describe('DonatePageContent', () => {
 
             fireEvent.click(within(genericDetails).getByText('Submit'));
             await waitFor(() => {
-                expect(mockConfig.create).toHaveBeenCalledWith('mockClient', { id: 1 });
+                expect(mockConfig.create).toHaveBeenCalledWith('mockClient', {});
             });
 
             fireEvent.click(within(genericDetails).getByText('Update'));
@@ -518,7 +545,7 @@ describe('DonatePageContent', () => {
 
             await testCorrespondentOperation('Submit', mockCorrespondentCreate, [
                 'mockClient',
-                { id: 1, foreignBankDetailsId: 1 },
+                { foreignBankDetailsId: 1 },
             ]);
         });
 
@@ -527,11 +554,7 @@ describe('DonatePageContent', () => {
             setupWithCorrespondentBanks();
             render(<DonatePageContent />);
 
-            await testCorrespondentOperation('Update', mockCorrespondentUpdate, [
-                'mockClient',
-                1,
-                { name: 'Updated', foreignBankDetailsId: 1 },
-            ]);
+            await testCorrespondentOperation('Update', mockCorrespondentUpdate, ['mockClient', 1, { name: 'Updated' }]);
         });
 
         it('deletes correspondent bank successfully', async () => {
@@ -549,7 +572,7 @@ describe('DonatePageContent', () => {
 
             await testCorrespondentOperation('Submit', mockCorrespondentCreate, [
                 'mockClient',
-                { id: 1, foreignBankDetailsId: 1 },
+                { foreignBankDetailsId: 1 },
             ]);
         });
 
@@ -558,11 +581,7 @@ describe('DonatePageContent', () => {
             setupWithCorrespondentBanks([{ id: 10, name: 'Old' }]);
             render(<DonatePageContent />);
 
-            await testCorrespondentOperation('Update', mockCorrespondentUpdate, [
-                'mockClient',
-                1,
-                { name: 'Updated', foreignBankDetailsId: 1 },
-            ]);
+            await testCorrespondentOperation('Update', mockCorrespondentUpdate, ['mockClient', 1, { name: 'Updated' }]);
         });
 
         it('calls addToast after successful deletion', async () => {

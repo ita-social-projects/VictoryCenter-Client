@@ -1,8 +1,8 @@
-import { axiosInstance } from '../../axios';
+import { axiosInstance } from '@/services/api/axios';
 import { teamPageDataFetch } from './team-api';
-import { TeamPageData, PublicCategoryWithTeamMembersDto } from '../../../../types/public/team-page';
+import { TeamPageData, PublicCategoryWithTeamMembersDto } from '@/types/public/team-page';
 
-jest.mock('../../../api/axios', () => ({
+jest.mock('@/services/api/axios', () => ({
     axiosInstance: {
         get: jest.fn(),
     },

@@ -2,19 +2,19 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MultiSelectInput, MultiSelectInputProps } from './MultiSelectInput';
 
-jest.mock('../../../assets/icons/chevron-checked.svg', () => ({
+jest.mock('@/assets/icons/chevron-checked.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="chevron-checked-icon" />,
 }));
 
-jest.mock('../../../assets/icons/chevron-unchecked.svg', () => ({
+jest.mock('@/assets/icons/chevron-unchecked.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="chevron-unchecked-icon" />,
 }));
 
-jest.mock('../../../assets/icons/chevron-down.svg', () => ({
+jest.mock('@/assets/icons/chevron-down.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="chevron-down-icon" />,
 }));
 
-jest.mock('../../../assets/icons/chevron-up.svg', () => ({
+jest.mock('@/assets/icons/chevron-up.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="chevron-up-icon" />,
 }));
 

@@ -1,11 +1,11 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react';
-import { Button } from '../../../../../components/admin/button/Button';
+import { Button } from '@/components/admin/button/Button';
 import { DonateInput } from '../donate-input/DonateInput';
-import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './GenericForm.scss';
 import { FieldValues } from 'react-hook-form';
-import { DONATE_TEXT } from '../../../../../const/admin/donate';
+import { DONATE_TEXT } from '@/const/admin/donate';
 
 interface ModalConfig {
     title: string;
@@ -24,9 +24,16 @@ export interface GenericFormProps<T extends FieldValues> {
     initialMode: GenericFormMode;
     onSubmit: (data: T) => void;
     onClose: () => void;
-    onDelete?: (id: number) => void;
+    onDelete?: (id: number | null, index?: number) => void;
+    itemIndex?: number;
     isChildForm?: boolean;
-    children?: (form: { formState: T; isItemsExpanded: boolean }) => React.ReactNode;
+    children?: (form: {
+        formState: T;
+        isItemsExpanded: boolean;
+        setFormState: React.Dispatch<React.SetStateAction<T>>;
+    }) => React.ReactNode;
+    isParentCreating?: boolean;
+    isDisabled?: boolean;
     onModeChange?: (mode: GenericFormMode) => void;
 }
 
@@ -61,8 +68,11 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 onClose,
                 onSubmit,
                 onDelete,
+                itemIndex,
                 isChildForm = false,
+                isDisabled = false,
                 children,
+                isParentCreating = false,
                 onModeChange,
             },
             ref,
@@ -82,6 +92,9 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
             const isItemsExpanded = true;
 
             const editable = mode !== GenericFormMode.View;
+
+            const isCorrespondentInParentCreation =
+                isChildForm && isParentCreating && (mode === GenericFormMode.Create || mode === GenericFormMode.Edit);
 
             const titleField = useMemo(() => fields.find((f) => f.isTitle), []);
             const titleFieldName = titleField?.name;
@@ -115,6 +128,17 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                     return !Object.values(newErrors).some((e) => e !== undefined);
                 },
                 [formState],
+            );
+
+            const getIsFieldRequired = useCallback(
+                (f: GenericFormField<T>) => {
+                    return (
+                        (mode === GenericFormMode.Create && f.isRequired) ||
+                        (isChildForm && mode === GenericFormMode.View && f.isRequired) ||
+                        (isChildForm && mode === GenericFormMode.Edit && f.isRequired)
+                    );
+                },
+                [mode, isChildForm],
             );
 
             const submit = useCallback(async () => {
@@ -174,7 +198,12 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
             };
 
             const handleCreateCancel = () => {
-                if (isChanged()) {
+                if (isChanged() && isCorrespondentInParentCreation) {
+                    setModalConfig({
+                        title: COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+                        onConfirm: () => onClose?.(),
+                    });
+                } else if (isChanged()) {
                     setModalConfig({
                         title: DONATE_TEXT.QUESTION.BANK_DETAILS.CANCEL_CREATE,
                         onConfirm: () => onClose?.(),
@@ -251,13 +280,18 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
             };
 
             const handleDelete = async () => {
-                if (!initialData?.id || !onDelete) {
+                if (!onDelete) {
                     return;
                 }
                 try {
-                    await onDelete(initialData.id);
-                    onClose?.();
+                    const id = initialData?.id ?? null;
+                    if (itemIndex !== undefined) {
+                        await onDelete(id, itemIndex);
+                    } else if (id !== null) {
+                        await onDelete(id);
+                    }
                 } finally {
+                    onClose?.();
                     handleModalCancelOrClose();
                 }
             };
@@ -277,7 +311,44 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 isSubmitting ||
                 hasEmptyRequiredFields ||
                 !isChanged() ||
-                Object.values(errors).some((e) => e !== undefined);
+                Object.values(errors).some((e) => e !== undefined) ||
+                (isDisabled && !isCorrespondentInParentCreation);
+
+            const handlePublishClick = () => {
+                if (isCorrespondentInParentCreation) {
+                    submit();
+                } else if (mode === GenericFormMode.Edit) {
+                    setModalConfig({
+                        title: DONATE_TEXT.QUESTION.BANK_DETAILS.UPDATE,
+                        onConfirm: submit,
+                    });
+                } else {
+                    setModalConfig({
+                        title: DONATE_TEXT.QUESTION.BANK_DETAILS.ADD,
+                        onConfirm: submit,
+                    });
+                }
+            };
+
+            const renderFormButtons = () => (
+                <div className="form-footer">
+                    <div className="actions">
+                        <Button type="button" onClick={handleCancel} buttonStyle="secondary">
+                            {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={handlePublishClick}
+                            buttonStyle="primary"
+                            disabled={isPublishingDisabled}
+                        >
+                            {isCorrespondentInParentCreation
+                                ? COMMON_TEXT_ADMIN.BUTTON.SAVE
+                                : DONATE_TEXT.BUTTON.PUBLISH}
+                        </Button>
+                    </div>
+                </div>
+            );
 
             return (
                 <div
@@ -370,7 +441,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                 <DonateInput
                                                     name={String(f.name)}
                                                     label={f.label}
-                                                    isRequired={mode === GenericFormMode.Create && f.isRequired}
+                                                    isRequired={getIsFieldRequired(f)}
                                                     isTitle={f.isTitle}
                                                     placeholder={f.placeholder}
                                                     prefix={f.prefix}
@@ -388,56 +459,31 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                 )}
                                             </div>
 
-                                            {isChildForm && isTitleField && mode === GenericFormMode.Edit && (
-                                                <div className={`title-actions`}>
-                                                    <button
-                                                        type="button"
-                                                        aria-label="edit-btn"
-                                                        className={`edit-btn ${mode}`}
-                                                        onClick={handleEditClick}
-                                                        disabled
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        aria-label="delete-btn"
-                                                        className={`delete-btn delete-btn-icon ${isDeleting ? 'pressed' : ''}`}
-                                                        onClick={handleDeleteClick}
-                                                    />
-                                                </div>
-                                            )}
+                                            {isChildForm &&
+                                                isTitleField &&
+                                                mode === GenericFormMode.Edit &&
+                                                !isParentCreating && (
+                                                    <div className={`title-actions`}>
+                                                        <button
+                                                            type="button"
+                                                            aria-label="edit-btn"
+                                                            className={`edit-btn ${mode}`}
+                                                            onClick={handleEditClick}
+                                                            disabled
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            aria-label="delete-btn"
+                                                            className={`delete-btn delete-btn-icon ${isDeleting ? 'pressed' : ''}`}
+                                                            onClick={handleDeleteClick}
+                                                        />
+                                                    </div>
+                                                )}
                                         </div>
                                     );
                                 })}
 
-                            {editable && (
-                                <div className="form-footer">
-                                    <div className="actions">
-                                        <Button type="button" onClick={handleCancel} buttonStyle="secondary">
-                                            {COMMON_TEXT_ADMIN.BUTTON.CANCEL}
-                                        </Button>
-                                        <Button
-                                            type="button"
-                                            onClick={
-                                                mode === GenericFormMode.Edit
-                                                    ? () =>
-                                                          setModalConfig({
-                                                              title: DONATE_TEXT.QUESTION.BANK_DETAILS.UPDATE,
-                                                              onConfirm: submit,
-                                                          })
-                                                    : () =>
-                                                          setModalConfig({
-                                                              title: DONATE_TEXT.QUESTION.BANK_DETAILS.ADD,
-                                                              onConfirm: submit,
-                                                          })
-                                            }
-                                            buttonStyle="primary"
-                                            disabled={isPublishingDisabled}
-                                        >
-                                            {DONATE_TEXT.BUTTON.PUBLISH}
-                                        </Button>
-                                    </div>
-                                </div>
-                            )}
+                            {editable && (isChildForm || mode !== GenericFormMode.Create) && renderFormButtons()}
                         </div>
                     )}
 
@@ -453,7 +499,12 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                         onClose={handleModalCancelOrClose}
                     />
 
-                    {!isChildForm && <>{children && children({ formState, isItemsExpanded })}</>}
+                    {!isChildForm && (
+                        <>
+                            {children?.({ formState, isItemsExpanded, setFormState })}
+                            {mode === GenericFormMode.Create && <div className="divider">{renderFormButtons()}</div>}
+                        </>
+                    )}
                 </div>
             );
         },

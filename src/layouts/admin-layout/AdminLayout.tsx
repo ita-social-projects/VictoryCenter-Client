@@ -1,6 +1,6 @@
 import './AdminLayout.scss';
 import { Outlet } from 'react-router-dom';
-import { AdminNavigation } from '../../components/admin/admin-navigation/AdminNavigation';
+import { AdminNavigation } from '@/components/admin/admin-navigation/AdminNavigation';
 
 export const AdminLayout = () => (
     <div className="admin">

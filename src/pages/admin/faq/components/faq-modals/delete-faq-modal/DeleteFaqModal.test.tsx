@@ -1,24 +1,24 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { DeleteFaqModal } from './DeleteFaqModal';
 
-jest.mock('../../../../../../components/common/modal/Modal', () => {
+jest.mock('@/components/common/modal/Modal', () => {
     const Modal = ({ isOpen, children }: any) => (isOpen ? <div data-testid="delete-faq-modal">{children}</div> : null);
     Modal.Title = ({ children }: any) => <div>{children}</div>;
     Modal.Content = ({ children }: any) => <div>{children}</div>;
     Modal.Actions = ({ children }: any) => <div>{children}</div>;
     return { __esModule: true, Modal };
 });
-jest.mock('../../../../../../components/admin/button/Button', () => ({
+jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled }: any) => (
         <button onClick={onClick} disabled={disabled}>
             {children}
         </button>
     ),
 }));
-jest.mock('../../../../../../const/admin/common', () => ({
+jest.mock('@/const/admin/common', () => ({
     COMMON_TEXT_ADMIN: { BUTTON: { CANCEL: 'Cancel', DELETE: 'Delete' } },
 }));
-jest.mock('../../../../../../const/admin/faq', () => ({
+jest.mock('@/const/admin/faq', () => ({
     FAQ_TEXT: {
         FORM: {
             TITLE: { DELETE_FAQ: 'Delete FAQ' },
@@ -26,10 +26,10 @@ jest.mock('../../../../../../const/admin/faq', () => ({
         },
     },
 }));
-jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: () => ({}),
 }));
-jest.mock('../../../../../../services/api/admin/faq/faq-api', () => ({
+jest.mock('@/services/api/admin/faq/faq-api', () => ({
     FaqApi: { delete: jest.fn() },
 }));
 

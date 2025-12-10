@@ -1,15 +1,15 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import aboutUsPageUk from '../../../../locales/uk/about-us.json';
+import aboutUsPageUk from '@/locales/uk/about-us.json';
 import { OurMission } from './OurMission';
-import { ContentType } from '../../../../types/common/about-us';
-import { AboutUsContent } from '../../../../types/public/about-us-page';
+import { ContentType } from '@/types/common/about-us';
+import { AboutUsContent } from '@/types/public/about-us-page';
 
-jest.mock('../../../../assets/icons/arrow-up-right.svg', () => ({
+jest.mock('@/assets/icons/arrow-up-right.svg', () => ({
     ReactComponent: (props: any) => <svg data-testid="arrow-icon" {...props} />,
 }));
 
-jest.mock('../../../../const/public/routes', () => ({
+jest.mock('@/const/public/routes', () => ({
     PUBLIC_ROUTES: {
         PROGRAMS: {
             FULL: '/programs',

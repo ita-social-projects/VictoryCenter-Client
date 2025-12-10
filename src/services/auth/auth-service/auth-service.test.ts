@@ -1,4 +1,4 @@
-import { JwtPayload } from '../../../types/admin/auth';
+import { JwtPayload } from '@/types/admin/auth';
 import { decodeToken, getTokenPayload, hasValidStructure, isAccessTokenValid, isTokenExpired } from './auth-service';
 
 describe('AuthService functions', () => {

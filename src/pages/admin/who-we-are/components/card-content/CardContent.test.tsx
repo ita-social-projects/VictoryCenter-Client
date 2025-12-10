@@ -2,19 +2,20 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { CardContent } from './CardContent';
-import { ContentType } from '../../../../../types/common/about-us';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { WHO_WE_ARE_TEXT } from '../../../../../const/admin/who-we-are';
-import { Image } from '../../../../../types/common/image';
+import { ContentType } from '@/types/common/about-us';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
+import { Image } from '@/types/common/image';
+import { TextAreaWithCharacterLimitProps } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 
-jest.mock('../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
-    TextAreaWithCharacterLimit: ({ onChange, value, maxLength, onBlur }: any) => (
+jest.mock('@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
+    TextAreaWithCharacterLimit: ({ onChange, value, maxLength, onBlur }: TextAreaWithCharacterLimitProps) => (
         <textarea data-testid="mock-textarea" onChange={onChange} value={value} maxLength={maxLength} onBlur={onBlur} />
     ),
 }));
 
-jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
-    ImageInput: ({ value, onChange, label, setError, ...rest }: any) => (
+jest.mock('@/components/admin/image-input/ImageInput', () => ({
+    ImageInput: ({ onChange, label, setError }: any) => (
         <div data-testid="mock-image-input">
             <label>{label}</label>
             <input data-testid="mock-image-input-file" type="file" onChange={(e) => onChange(e.target.files?.[0])} />

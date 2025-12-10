@@ -2,9 +2,9 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { OutroSection } from './OutroSection';
 
-jest.mock('../../../../../assets/videos/public/partners-page/outro.mp4', () => 'mocked-outro-video');
+jest.mock('@/assets/videos/public/partners-page/outro.mp4', () => 'mocked-outro-video');
 
-jest.mock('../../../../../const/public/partners-page', () => ({
+jest.mock('@/const/public/partners-page', () => ({
     OUTRO: {
         TITLE: {
             FIRST_LINE: 'Mocked Title',
@@ -15,7 +15,7 @@ jest.mock('../../../../../const/public/partners-page', () => ({
     },
 }));
 
-const { OUTRO } = require('../../../../../const/public/partners-page');
+const { OUTRO } = require('@/const/public/partners-page');
 
 const renderComponent = () => {
     return render(<OutroSection />);

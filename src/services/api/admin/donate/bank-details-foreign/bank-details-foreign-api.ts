@@ -1,29 +1,31 @@
 import { AxiosInstance } from 'axios';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { ForeignBankDetailsType, BankCurrency } from '../../../../../types/admin/donate';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import {
+    ForeignBankDetailsDto,
+    BankCurrency,
+    CreateForeignBankDetails,
+    UpdateForeignBankDetails,
+} from '@/types/admin/donate';
 
 export const ForeignBankDetailsApi = {
-    getAll: async (client: AxiosInstance, currency: BankCurrency): Promise<ForeignBankDetailsType[]> => {
-        const response = await client.get<ForeignBankDetailsType[]>(API_ROUTES.DONATE.BANK_DETAILS_FOREIGN, {
+    getAll: async (client: AxiosInstance, currency: BankCurrency): Promise<ForeignBankDetailsDto[]> => {
+        const response = await client.get<ForeignBankDetailsDto[]>(API_ROUTES.DONATE.BANK_DETAILS_FOREIGN, {
             params: { currency },
         });
         return response.data;
     },
 
-    create: async (
-        client: AxiosInstance,
-        bankDetails: Omit<ForeignBankDetailsType, 'id'>,
-    ): Promise<ForeignBankDetailsType> => {
-        const response = await client.post<ForeignBankDetailsType>(API_ROUTES.DONATE.BANK_DETAILS_FOREIGN, bankDetails);
+    create: async (client: AxiosInstance, bankDetails: CreateForeignBankDetails): Promise<ForeignBankDetailsDto> => {
+        const response = await client.post<ForeignBankDetailsDto>(API_ROUTES.DONATE.BANK_DETAILS_FOREIGN, bankDetails);
         return response.data;
     },
 
     update: async (
         client: AxiosInstance,
         id: number,
-        bankDetails: Partial<ForeignBankDetailsType>,
-    ): Promise<ForeignBankDetailsType> => {
-        const response = await client.put<ForeignBankDetailsType>(
+        bankDetails: UpdateForeignBankDetails,
+    ): Promise<ForeignBankDetailsDto> => {
+        const response = await client.put<ForeignBankDetailsDto>(
             `${API_ROUTES.DONATE.BANK_DETAILS_FOREIGN}/${id}`,
             bankDetails,
         );

@@ -1,6 +1,6 @@
-import { ABROAD_PAYMENT_DETAILS } from '../../../../../const/public/donate-page';
+import { ABROAD_PAYMENT_DETAILS } from '@/const/public/donate-page';
 import { CorrespondentBankBlock } from './CorrespondentBankBlock';
-import { PublishedCorrespondentBankDetailsDto } from '../../../../../types/public/donate-page';
+import { PublishedCorrespondentBankDetailsDto } from '@/types/public/donate-page';
 
 export const CorrespondentBanksSection = ({
     correspondentBanks = [],
@@ -11,11 +11,12 @@ export const CorrespondentBanksSection = ({
         return null;
     }
 
-    const banks = correspondentBanks.map((apiBank) => ({
+    const sortedCorrespondentBanks = [...correspondentBanks].sort((a, b) => a.id - b.id);
+    const banks = sortedCorrespondentBanks.map((apiBank) => ({
         title: apiBank.name,
         fields: [
             { label: ABROAD_PAYMENT_DETAILS.SWIFT_LABEL, value: apiBank.swift },
-            { label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL, value: apiBank.account },
+            ...(apiBank.account ? [{ label: ABROAD_PAYMENT_DETAILS.ACCOUNT_LABEL, value: apiBank.account }] : []),
             ...(apiBank.foreignIban ? [{ label: ABROAD_PAYMENT_DETAILS.IBAN_LABEL, value: apiBank.foreignIban }] : []),
         ],
     }));

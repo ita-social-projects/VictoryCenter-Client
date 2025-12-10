@@ -1,4 +1,4 @@
-@use '../../../../../assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors';
 
 .admin-page_faq-item {
     width: 100%;
@@ -96,35 +96,35 @@
             }
 
             .faq-edit-btn {
-                background: url('../../../../../assets/icons/edit-default.svg');
+                background: url('~@/assets/icons/edit-default.svg');
 
                 &:hover:not(:disabled) {
-                    background: url('../../../../../assets/icons/edit-hover.svg');
+                    background: url('~@/assets/icons/edit-hover.svg');
                 }
 
                 &:active:not(:disabled) {
-                    background: url('../../../../../assets/icons/edit-pressed.svg');
+                    background: url('~@/assets/icons/edit-pressed.svg');
                 }
 
                 &:disabled {
-                    background: url('../../../../../assets/icons/edit-disabled.svg');
+                    background: url('~@/assets/icons/edit-disabled.svg');
                     cursor: not-allowed;
                 }
             }
 
             .faq-delete-btn {
-                background: url('../../../../../assets/icons/delete-default.svg');
+                background: url('~@/assets/icons/delete-default.svg');
 
                 &:hover:not(:disabled) {
-                    background: url('../../../../../assets/icons/delete-hover.svg');
+                    background: url('~@/assets/icons/delete-hover.svg');
                 }
 
                 &:active:not(:disabled) {
-                    background: url('../../../../../assets/icons/delete-pressed.svg');
+                    background: url('~@/assets/icons/delete-pressed.svg');
                 }
 
                 &:disabled {
-                    background: url('../../../../../assets/icons/delete-disabled.svg');
+                    background: url('~@/assets/icons/delete-disabled.svg');
                     cursor: not-allowed;
                 }
             }

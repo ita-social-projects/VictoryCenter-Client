@@ -1,10 +1,10 @@
 import './ScrollableFrame.scss';
-import { programPageDataFetch } from '../../../../services/api/public/programs/programs-api';
-import { ProgramCard } from '../../../../components/public/program-card/ProgramCard';
-import { Swiper } from '../../../../components/public/swiper/Swiper';
-import { ProgramsPageData } from '../../../../types/public/programs-page';
+import { programPageDataFetch } from '@/services/api/public/programs/programs-api';
+import { ProgramCard } from '@/components/public/program-card/ProgramCard';
+import { Swiper } from '@/components/public/swiper/Swiper';
+import { ProgramsPageData } from '@/types/public/programs-page';
 import { useTranslation } from 'react-i18next';
-import { useDataFetch } from '../../../../hooks/common/use-data-fetch/useDataFetch';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import { LinearProgress } from '@mui/material';
 
 export const ScrollableFrame = () => {

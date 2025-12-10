@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { bankDetailsConfig } from '../bank-details-currencies-config/BankDetailsCurrenciesConfig';
-import { BankCurrency } from '../../../../../../../src/types/admin/donate';
-import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { BankCurrency } from '@/types/admin/donate';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
 export enum Currencies {
     UAH = 'UAH',
@@ -32,7 +32,7 @@ export function useBankDetails<T extends keyof typeof bankDetailsConfig>(currenc
         config
             .fetch(client)
             .then((data: any[]) => {
-                if (alive) setItems(data);
+                if (alive) setItems(data ?? []);
             })
             .catch(() => {
                 if (alive) setItems([]);

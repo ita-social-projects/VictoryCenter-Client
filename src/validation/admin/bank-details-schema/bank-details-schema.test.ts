@@ -1,5 +1,5 @@
 import { BANK_DETAILS_VALIDATION_FUNCTIONS, SUPPORT_OPTIONS_VALIDATION_FUNCTIONS } from './bank-details-schema';
-import { DONATE_VALIDATION } from '../../../const/admin/donate';
+import { DONATE_VALIDATION } from '@/const/admin/donate';
 
 describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
     describe('validateName', () => {

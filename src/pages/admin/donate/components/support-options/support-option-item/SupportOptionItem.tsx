@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Button } from '../../../../../../components/admin/button/Button';
+import { Button } from '@/components/admin/button/Button';
 import { DonateInput } from '../../donate-input/DonateInput';
 import './SupportOptionItem.scss';
-import { SupportOptionsType } from '../../../../../../types/admin/donate';
-import { ConfirmationModal } from '../../../../../../components/admin/confirmation-modal/ConfirmationModal';
-import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
-import { DONATE_TEXT, VALIDATION_PARAMS } from '../../../../../../const/admin/donate';
-import { SUPPORT_OPTIONS_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/bank-details-schema/bank-details-schema';
+import { SupportOptionsDto } from '@/types/admin/donate';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { DONATE_TEXT, VALIDATION_PARAMS } from '@/const/admin/donate';
+import { SUPPORT_OPTIONS_VALIDATION_FUNCTIONS } from '@/validation/admin/bank-details-schema/bank-details-schema';
 
 export enum SupportOptionItemMode {
     Create = 'create',
@@ -20,7 +20,7 @@ interface ModalConfig {
 }
 
 export interface SupportOptionItemProps {
-    data?: SupportOptionsType;
+    data?: SupportOptionsDto;
     initialMode?: SupportOptionItemMode;
     onSave?: (name: string, value: string) => Promise<void>;
     onCancel?: () => void;
@@ -155,7 +155,7 @@ export const SupportOptionItem = ({
                     <div className="support-option-header-actions">
                         <button
                             aria-label="edit-btn"
-                            className={`edit-btn ${editable ? 'edit' : ''}`}
+                            className={`edit-btn ${editable ? 'edit' : 'view'}`}
                             onClick={handleEditClick}
                             disabled={isSubmitting}
                         />

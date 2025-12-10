@@ -1,10 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Swiper } from './Swiper';
 
-jest.mock('../../../assets/icons/arrow-right.svg', () => ({
+jest.mock('@/assets/icons/arrow-right.svg', () => ({
     ReactComponent: () => <svg data-testid="arrow-right" />,
 }));
-jest.mock('../../../assets/icons/arrow-left.svg', () => ({
+jest.mock('@/assets/icons/arrow-left.svg', () => ({
     ReactComponent: () => <svg data-testid="arrow-left" />,
 }));
 

@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { BankDetailsUahApi } from './bank-details-uah-api';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { UahBankDetailsType } from '../../../../../types/admin/donate';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { UahBankDetailsDto, CreateUahBankDetails } from '@/types/admin/donate';
 
 describe('BankDetailsUahApi', () => {
     const mockClient = {
@@ -11,7 +11,7 @@ describe('BankDetailsUahApi', () => {
         delete: jest.fn(),
     } as unknown as jest.Mocked<AxiosInstance>;
 
-    const mockUahBankDetails: UahBankDetailsType = {
+    const mockUahBankDetails: UahBankDetailsDto = {
         id: 1,
         name: 'ПриватБанк',
         receiver: 'ТОВ "Тест"',
@@ -47,7 +47,7 @@ describe('BankDetailsUahApi', () => {
     });
 
     describe('create', () => {
-        const bankDetailsWithoutId: Omit<UahBankDetailsType, 'id'> = {
+        const bankDetailsWithoutId: CreateUahBankDetails = {
             name: 'Новий банк',
             receiver: 'ТОВ "Новий"',
             ukrainianIban: '1111222233334444555566667777',
@@ -78,24 +78,26 @@ describe('BankDetailsUahApi', () => {
     describe('update', () => {
         const testCases = [
             {
-                description: 'updates with multiple fields',
-                id: 5,
-                updates: { name: 'Оновлений банк', paymentPurpose: 'Оновлена мета' },
-            },
-            {
                 description: 'updates with id 1',
                 id: 1,
-                updates: { name: 'Перший оновлений' },
+                updates: {
+                    name: 'Перший оновлений',
+                    receiver: mockUahBankDetails.receiver,
+                    edrpou: mockUahBankDetails.edrpou,
+                    ukrainianIban: mockUahBankDetails.ukrainianIban,
+                    paymentPurpose: mockUahBankDetails.paymentPurpose,
+                },
             },
             {
                 description: 'updates with large id',
                 id: 9999,
-                updates: { receiver: 'ТОВ "Великий"', edrpou: '44445555' },
-            },
-            {
-                description: 'updates only specific fields',
-                id: 7,
-                updates: { receiver: 'Новий отримувач' },
+                updates: {
+                    name: mockUahBankDetails.name,
+                    receiver: 'ТОВ "Великий"',
+                    edrpou: '44445555',
+                    ukrainianIban: mockUahBankDetails.ukrainianIban,
+                    paymentPurpose: mockUahBankDetails.paymentPurpose,
+                },
             },
         ];
 

@@ -1,4 +1,4 @@
-@use '../../../../../assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors';
 
 .generic-form {
     display: flex;
@@ -36,7 +36,7 @@
             .arrow {
                 display: inline-block;
                 margin-left: 0.25rem;
-                background: url('../../../../../assets/icons/chevron-down.svg') no-repeat center;
+                background: url('~@/assets/icons/chevron-down.svg') no-repeat center;
                 width: 1.5rem;
                 height: 1.5rem;
                 transition: transform 0.2s ease;
@@ -113,7 +113,7 @@
         }
 
         .body {
-            flex-direction: column-reverse;
+            flex-direction: column;
         }
 
         .generic-form {
@@ -131,5 +131,11 @@
                 flex: 1;
             }
         }
+    }
+
+    .divider {
+        padding-top: 1.875rem;
+        border-radius: 0;
+        border-top: 1px solid colors.$grey-700;
     }
 }

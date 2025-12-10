@@ -1,8 +1,8 @@
 import React, { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { ProgramSearchItem, ProgramSearchItemProps } from './ProgramSearchItem';
-import { SearchItemContentRef } from '../../../../../components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
-import { ProgramSearchItemData } from '../../../../../types/admin/programs';
+import { SearchItemContentRef } from '@/components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
+import { ProgramSearchItemData } from '@/types/admin/programs';
 
 const defaultProps: ProgramSearchItemProps = {
     item: {

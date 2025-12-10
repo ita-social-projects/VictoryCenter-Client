@@ -1,16 +1,16 @@
 import { useState } from 'react';
-import { Button } from '../../../../../../components/admin/button/Button';
-import { SupportOptionsType } from '../../../../../../types/admin/donate';
-import { InlineLoader } from '../../../../../../components/common/inline-loader/InlineLoader';
-import { ReactComponent as PlusIcon } from '../../../../../../assets/icons/plus.svg';
+import { Button } from '@/components/admin/button/Button';
+import { SupportOptionsDto } from '@/types/admin/donate';
+import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
+import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import './SupportOptionsForm.scss';
 import { SupportOptionItem } from '../support-option-item/SupportOptionItem';
-import NotFoundIcon from '../../../../../../assets/icons/not-found.svg';
-import { DONATE_TEXT } from '../../../../../../const/admin/donate';
-import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
+import NotFoundIcon from '@/assets/icons/not-found.svg';
+import { DONATE_TEXT } from '@/const/admin/donate';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 export interface SupportOptionsFormProps {
-    supportOptions: SupportOptionsType[];
+    supportOptions: SupportOptionsDto[];
     isLoading: boolean;
     onCreateOption: (name: string, value: string) => Promise<void>;
     onUpdateOption: (id: number, name: string, value: string) => Promise<void>;

@@ -30,7 +30,7 @@ import { getCerts } from 'https-localhost/certs.js';
 
         // Forwarding arguments to react-scripts start
         const args = ['start', ...process.argv.slice(2)];
-        const child = spawn('react-scripts', args, {
+        const child = spawn('craco', args, {
             stdio: 'inherit',
             shell: process.platform === 'win32',
         });

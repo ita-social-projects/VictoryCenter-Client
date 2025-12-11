@@ -25,8 +25,10 @@ export interface ImageInputProps {
     label?: string | null;
     subText?: string | null;
     style?: React.CSSProperties;
-    height?: number;
-    width?: number;
+    cropHeight?: number;
+    cropWidth?: number;
+    minHeight?: number;
+    minWidth?: number;
 }
 
 export const ImageInput = ({
@@ -41,8 +43,10 @@ export const ImageInput = ({
     name,
     disabled = false,
     style,
-    height = 1080,
-    width = 1920,
+    cropHeight = 1080,
+    cropWidth = 1920,
+    minHeight = 1080,
+    minWidth = 1920,
 }: ImageInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
@@ -62,7 +66,7 @@ export const ImageInput = ({
         async (file: File) => {
             setError(null);
             if (!file.type.startsWith('image/')) return;
-            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file, width, height);
+            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file, minWidth, minHeight);
 
             if (error) {
                 setError(error);
@@ -73,7 +77,7 @@ export const ImageInput = ({
             setRawImage(imgItem);
             setShowCropperModal(true);
         },
-        [height, width, setError],
+        [minHeight, minWidth, setError],
     );
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -147,7 +151,7 @@ export const ImageInput = ({
         if (!previewImage) setPreviewImage(rawImage);
 
         if (previewImage && 'base64' in previewImage) {
-            const error = await IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage(previewImage, width, height);
+            const error = await IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage(previewImage, cropWidth, cropHeight);
             if (error) {
                 setError(error);
             }
@@ -253,8 +257,8 @@ export const ImageInput = ({
                         setError(null);
                         setShowCropperModal(false);
                     }}
-                    height={height}
-                    width={width}
+                    height={cropHeight}
+                    width={cropWidth}
                     onCancel={handleCropCancel}
                     isOpen={showCropperModal}
                 />

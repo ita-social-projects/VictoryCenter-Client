@@ -192,8 +192,10 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                         onChange={handleImgChange}
                         id="image"
                         name="image"
-                        width={TEAM_MEMBER_VALIDATION.img.width}
-                        height={TEAM_MEMBER_VALIDATION.img.height}
+                        cropWidth={TEAM_MEMBER_VALIDATION.img.croppedWidth}
+                        cropHeight={TEAM_MEMBER_VALIDATION.img.croppedHeight}
+                        minWidth={TEAM_MEMBER_VALIDATION.img.minWidth}
+                        minHeight={TEAM_MEMBER_VALIDATION.img.minHeight}
                         disabled={isSubmitting || formDisabled}
                         setError={(error) =>
                             setErrors((prev) => ({

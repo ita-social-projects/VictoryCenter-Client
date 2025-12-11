@@ -8,72 +8,21 @@ import {
     PartnerBanner,
     PartnersPageData,
     PartnersSectionUpdateRequest,
+    CreatePartnerDto,
+    CreatePartnersSectionDto,
+    UpdatePartnerDto,
+    UpdatePartnersSectionDto,
+    UpdatePartnerBannerDto,
+    PartnerBannerDto,
+    PartnersSectionDto,
+    PartnersPageDataDto,
 } from '../../../../types/admin/partners';
 import { RequestOptions } from '../../../../types/common/api';
-import { Image } from '../../../../types/common/image';
 import {
     mapBannerDtoToBanner,
     mapPartnerPageDataDtoToPageData,
     mapSectionDtoToSection,
 } from '../../../../utils/functions/mappers/admin/partner-mapper/partner-mapper';
-
-// DTO Payloads (Internal Request Body Types)
-interface CreatePartnerDto {
-    description: string;
-    imageId: number;
-}
-
-interface CreatePartnersSectionDto {
-    title: string;
-    description: string;
-    partners: CreatePartnerDto[];
-}
-
-interface UpdatePartnerDto {
-    id: number;
-    description: string;
-    imageId: number;
-}
-
-interface UpdatePartnersSectionDto {
-    title: string;
-    description: string;
-    partnersToCreate: CreatePartnerDto[];
-    partnersToUpdate: UpdatePartnerDto[];
-    partnerIdsToDelete: number[];
-}
-
-interface UpdatePartnerBannerDto {
-    title: string;
-    description: string;
-    imageId: number;
-}
-
-// Response DTO
-export interface PartnerBannerDto {
-    id: number;
-    title: string;
-    description: string;
-    image: Image | null;
-}
-
-export interface PartnerDto {
-    id: number;
-    description: string;
-    image: Image;
-}
-
-export interface PartnersSectionDto {
-    id: number;
-    title: string;
-    description: string;
-    partners: PartnerDto[];
-}
-
-export interface PartnersPageDataDto {
-    banner: PartnerBannerDto;
-    sections: PartnersSectionDto[];
-}
 
 // Api Service
 export const PartnersApi = {

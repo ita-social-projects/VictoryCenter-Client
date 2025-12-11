@@ -38,6 +38,10 @@ export function useLocalizationToolkit({ setErrorState }: UseLocalizationToolkit
         }
     }, [setErrorState]);
 
+    const retryFetchLanguages = () => {
+        return fetchLanguages();
+    };
+
     useEffect(() => {
         fetchLanguages();
     }, [fetchLanguages]);
@@ -49,5 +53,6 @@ export function useLocalizationToolkit({ setErrorState }: UseLocalizationToolkit
         onLanguageChange,
         translationStatusFilter,
         onTranslationStatusFilterChange,
+        retryFetchLanguages,
     };
 }

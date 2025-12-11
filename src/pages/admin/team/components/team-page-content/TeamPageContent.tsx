@@ -105,6 +105,7 @@ export const TeamPageContent = () => {
         onLanguageChange,
         translationStatusFilter,
         onTranslationStatusFilterChange,
+        retryFetchLanguages,
     } = useLocalizationToolkit({ setErrorState });
 
     const isSingleView = !!selectedSearchMember;
@@ -318,6 +319,8 @@ export const TeamPageContent = () => {
             fetchCategories();
         } else if (error.type === 'members') {
             resetMembersState();
+        } else if (error.type === 'languages') {
+            retryFetchLanguages();
         }
     }, [error.type, fetchCategories, resetMembersState]);
 

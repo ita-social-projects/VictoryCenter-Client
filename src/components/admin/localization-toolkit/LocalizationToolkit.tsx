@@ -40,6 +40,9 @@ export const LocalizationToolkit = ({
     );
 
     useEffect(() => {
+        if (!languages.length) {
+            return;
+        }
         const defaultLanguage = languages.find((language) => language.code === DEFAULT_LOCALE) || languages[0];
         changeLanguage(defaultLanguage);
         changeTranslationStatus(TranslationStatusFilter.All);

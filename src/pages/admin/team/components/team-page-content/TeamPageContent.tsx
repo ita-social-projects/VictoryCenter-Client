@@ -480,16 +480,18 @@ export const TeamPageContent = () => {
                 entity={member}
                 id={member.id}
                 ariaLabel={TEAM_MEMBERS_TEXT.ACTIONS.REORDER}
-                renderEntityComponent={(m) => (
-                    <MemberComponent
-                        key={m.id}
-                        member={m}
-                        handleOnDeleteMember={handleDeleteTeamMemberModalOpen}
-                        handleOnEditMember={handleEditMemberModalOpen}
-                        language={selectedLanguage!}
-                        translationLanguages={translationLanguages}
-                    />
-                )}
+                renderEntityComponent={(m) =>
+                    selectedLanguage && (
+                        <MemberComponent
+                            key={m.id}
+                            member={m}
+                            handleOnDeleteMember={handleDeleteTeamMemberModalOpen}
+                            handleOnEditMember={handleEditMemberModalOpen}
+                            language={selectedLanguage}
+                            translationLanguages={translationLanguages}
+                        />
+                    )
+                }
                 entities={members}
                 idSelector={(m) => m.id}
                 onEntitiesReordered={handleEntitiesReordered}
@@ -566,7 +568,6 @@ export const TeamPageContent = () => {
                 onEditTeamCategory={handleEditCategory}
                 onDeleteTeamCategory={handleDeleteCategory}
             />
-
             <ToastContainer />
         </div>
     );

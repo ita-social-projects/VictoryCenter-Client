@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { SupportCard } from './SupportCard';
-import { ContentType } from '../../../../../../types/common/about-us';
-import { AboutUsContent } from '../../../../../../types/public/about-us-page';
-import { aboutUsPageUk } from '../../../../../../locales/uk';
+import { ContentType } from '@/types/common/about-us';
+import { AboutUsContent } from '@/types/public/about-us-page';
+import { aboutUsPageUk } from '@/locales/uk';
 
 describe('SupportCard component', () => {
     const card: AboutUsContent = {

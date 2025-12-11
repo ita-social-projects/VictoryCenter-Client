@@ -2,9 +2,9 @@ import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import { TeamMemberSearchItem } from './TeamMemberSearchItem';
 import { SearchItemContentRef } from '../search-item-wrapper/SearchItemWrapper';
-import { TeamMember } from '../../../../types/admin/team-members';
-import { TeamCategory } from '../../../../types/admin/team-category';
-import { VisibilityStatus } from '../../../../types/admin/common';
+import { TeamMember } from '@/types/admin/team-members';
+import { TeamCategory } from '@/types/admin/team-category';
+import { VisibilityStatus } from '@/types/admin/common';
 
 describe('TeamMemberSearchItem', () => {
     const categories: TeamCategory[] = [

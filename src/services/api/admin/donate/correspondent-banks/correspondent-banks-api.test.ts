@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { CorrespondentBankDetailsApi } from './correspondent-banks-api';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 
 describe('CorrespondentBankDetailsApi', () => {
     const mockClient = {
@@ -84,6 +84,8 @@ describe('CorrespondentBankDetailsApi', () => {
             const bankDetails = {
                 name: 'Updated Bank',
                 swift: 'UPDATED11',
+                account: '111111111',
+                foreignBankDetailsId: 15,
             };
 
             const result = await CorrespondentBankDetailsApi.update(mockClient, 5, bankDetails);
@@ -93,31 +95,6 @@ describe('CorrespondentBankDetailsApi', () => {
                 bankDetails,
             );
             expect(result).toEqual(mockResponse.data);
-        });
-
-        it('updates correspondent bank with partial data', async () => {
-            const mockResponse = {
-                data: {
-                    id: 3,
-                    name: 'Partially Updated',
-                    swift: 'PART1234',
-                    account: '555555555',
-                    foreignBankDetailsId: 30,
-                },
-            };
-            mockClient.put.mockResolvedValue(mockResponse);
-
-            const bankDetails = {
-                account: '555555555',
-            };
-
-            const result = await CorrespondentBankDetailsApi.update(mockClient, 3, bankDetails);
-
-            expect(mockClient.put).toHaveBeenCalledWith(
-                `${API_ROUTES.DONATE.CORRESPONDENT_BANK_DETAILS}/3`,
-                bankDetails,
-            );
-            expect(result.id).toBe(3);
         });
 
         it('updates correspondent bank with large id', async () => {
@@ -134,6 +111,9 @@ describe('CorrespondentBankDetailsApi', () => {
 
             const bankDetails = {
                 name: 'Large ID Bank',
+                swift: 'LARGE999',
+                account: '999999999',
+                foreignBankDetailsId: 100,
             };
 
             const result = await CorrespondentBankDetailsApi.update(mockClient, 9999, bankDetails);

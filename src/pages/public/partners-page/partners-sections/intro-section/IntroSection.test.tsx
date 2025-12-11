@@ -32,7 +32,6 @@ describe('IntroSection', () => {
         it('should render the title and description from props', () => {
             render(<IntroSection banner={mockBanner} />);
 
-            // TODO: Replace with: "expect(screen.getByText('Test Title')).toBeInTheDocument();" when rich text component is implemented
             const title = screen.getByRole('heading', { level: 1 });
             expect(title).toHaveTextContent('Test First Regular Test First Bold');
             expect(title).toHaveTextContent('Test Second BoldStart Test Second Regular Test Second BoldEnd');
@@ -61,11 +60,6 @@ describe('IntroSection', () => {
 
         it('should render empty title and description when banner is null', () => {
             render(<IntroSection banner={null} />);
-
-            //TODO: Uncomment when rich text component is implemented
-            // const heading = screen.getByRole('heading', { level: 1 });
-            // expect(heading).toBeInTheDocument();
-            // expect(heading.textContent).toBe('');
 
             const paragraph = document.querySelector('.subtitle');
             expect(paragraph).toBeInTheDocument();

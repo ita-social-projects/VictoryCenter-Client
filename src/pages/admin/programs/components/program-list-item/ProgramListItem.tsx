@@ -1,10 +1,10 @@
-import { ButtonTooltip } from '../../../../../components/admin/button-tooltip/ButtonTooltip';
-import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
+import { ButtonTooltip } from '@/components/admin/button-tooltip/ButtonTooltip';
+import { VisibilityStatusLabel } from '@/components/admin/visibility-status-label/VisibilityStatusLabel';
+import { Program } from '@/types/admin/programs';
+import { VisibilityStatus } from '@/types/admin/common';
+import { ReactComponent as BlankImage } from '@/assets/icons/blank-image.svg';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './ProgramListItem.scss';
-import { Program } from '../../../../../types/admin/programs';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { ReactComponent as BlankImage } from '../../../../../assets/icons/blank-image.svg';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
 
 export interface ProgramListItemProps {
     program: Program;

@@ -1,14 +1,8 @@
 import { AxiosInstance } from 'axios';
-import { PaginationResult, VisibilityStatus } from '../../../../types/admin/common';
-import {
-    FaqCreateUpdate,
-    FaqQuestionDto,
-    FaqSearchItemData,
-    ReorderFaq,
-    VisitorPage,
-} from '../../../../types/admin/faq';
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
-import { PaginationRequestParams } from '../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
+import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
+import { FaqCreateUpdate, FaqQuestionDto, FaqSearchItemData, ReorderFaq, VisitorPage } from '@/types/admin/faq';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { PaginationRequestParams } from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 
 type FaqPayload = Omit<FaqCreateUpdate, 'id'>;
 const toPayload = (faq: FaqCreateUpdate): FaqPayload => {

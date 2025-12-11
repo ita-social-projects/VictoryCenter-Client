@@ -1,12 +1,12 @@
 import { AxiosInstance } from 'axios';
 import { WhoWeAreApi } from './who-we-are-api';
-import { ImageApi } from '../image/image-api';
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
-import { Content, WhoWeAreCategory, WhoWeAreSection } from '../../../../types/admin/who-we-are';
-import { ContentType, SectionType } from '../../../../types/common/about-us';
-import { ImageValues } from '../../../../types/common/image';
+import { ImageApi } from '@/services/api/admin/image/image-api';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { Content, WhoWeAreCategory, WhoWeAreSection } from '@/types/admin/who-we-are';
+import { ContentType, SectionType } from '@/types/common/about-us';
+import { ImageValues } from '@/types/common/image';
 
-jest.mock('../image/image-api');
+jest.mock('@/services/api/admin/image/image-api');
 
 describe('WhoWeAreApi', () => {
     const mockClient = {

@@ -1,11 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { SupportSectionTablet } from './SupportSectionTablet';
-import { AboutUsContent } from '../../../../../../types/public/about-us-page';
-import { ContentType } from '../../../../../../types/common/about-us';
-import { ABOUT_US_DATA } from '../../../../../../const/public/about-us-page';
-import { aboutUsPageUk } from '../../../../../../locales/uk';
+import { AboutUsContent } from '@/types/public/about-us-page';
+import { ContentType } from '@/types/common/about-us';
+import { ABOUT_US_DATA } from '@/const/public/about-us-page';
+import { aboutUsPageUk } from '@/locales/uk';
 
-jest.mock('../../../../../../const/public/about-us-page', () => ({
+jest.mock('@/const/public/about-us-page', () => ({
     ABOUT_US_DATA: {
         SUPPORT_TITLE: 'Support Title',
         SUPPORT_DATA: [

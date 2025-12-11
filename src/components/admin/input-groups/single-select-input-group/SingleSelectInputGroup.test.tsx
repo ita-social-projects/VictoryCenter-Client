@@ -7,7 +7,7 @@ jest.mock('@/components/admin/input-label/InputLabel', () => ({
 }));
 
 jest.mock('@/components/common/single-select-input/SingleSelectInput', () => ({
-    SingleSelectInput: () => <select data-testid="mock-select" />,
+    SingleSelectInput: () => <select title="mock-input" data-testid="mock-select" />,
 }));
 
 jest.mock('@/components/admin/input-error/InputError', () => ({

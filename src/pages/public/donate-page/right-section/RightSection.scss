@@ -3,6 +3,14 @@
 
 .rightSection {
     width: 33.1rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
+
+    .label {
+        word-break: break-word;
+        overflow-wrap: break-word;
+        max-width: 100%;
+    }
 }
 
 .locationToggleContainer {

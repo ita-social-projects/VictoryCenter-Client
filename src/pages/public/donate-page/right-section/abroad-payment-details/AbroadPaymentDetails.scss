@@ -41,6 +41,8 @@
             color: colors.$blue-900;
             font-family: fonts.$mulish-regular-font;
             padding-bottom: 0.125rem;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .label {
@@ -60,6 +62,8 @@
             font-weight: 700;
             color: colors.$blue-900;
             font-size: 1.125rem;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .labelWithCopyButton {

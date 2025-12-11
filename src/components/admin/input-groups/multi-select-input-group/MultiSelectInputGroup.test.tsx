@@ -7,7 +7,7 @@ jest.mock('@/components/admin/input-label/InputLabel', () => ({
 }));
 
 jest.mock('@/components/admin/multi-select-input/MultiSelectInput', () => ({
-    MultiSelectInput: () => <input data-testid="mock-input" />,
+    MultiSelectInput: () => <input title="mock-input" data-testid="mock-input" />,
 }));
 
 jest.mock('@/components/admin/input-error/InputError', () => ({

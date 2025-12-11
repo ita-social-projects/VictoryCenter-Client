@@ -3,8 +3,11 @@ import {
     PartnerDto,
     PartnersPageDataDto,
     PartnersSectionDto,
-} from '../../../../../services/api/admin/partners/partners-api';
-import { PartnerBanner, PartnersPageData, Partner, PartnerSection } from '../../../../../types/admin/partners';
+    PartnerBanner,
+    PartnersPageData,
+    Partner,
+    PartnerSection,
+} from '../../../../../types/admin/partners';
 
 export const mapPartnerDtoToPartner = (dto: PartnerDto): Partner => ({
     id: dto.id,

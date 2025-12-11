@@ -2,18 +2,21 @@ import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
 import { ImageApi } from '../image/image-api';
 import {
+    // Domain types
     PartnerBannerUpdateRequest,
     PartnersSectionCreateRequest,
     PartnerSection,
     PartnerBanner,
     PartnersPageData,
     PartnersSectionUpdateRequest,
+    // DTO types
     CreatePartnerDto,
     CreatePartnersSectionDto,
     UpdatePartnerDto,
     UpdatePartnersSectionDto,
     UpdatePartnerBannerDto,
     PartnerBannerDto,
+    PartnerDto,
     PartnersSectionDto,
     PartnersPageDataDto,
 } from '../../../../types/admin/partners';

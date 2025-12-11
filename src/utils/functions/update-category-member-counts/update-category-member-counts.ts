@@ -1,5 +1,5 @@
-import { TeamCategory } from '../../../types/admin/team-category';
-import { TeamMember } from '../../../types/admin/team-members';
+import { TeamCategory } from '@/types/admin/team-category';
+import { TeamMember } from '@/types/admin/team-members';
 
 export const updateCategoryMemberCounts = (
     prevCategories: TeamCategory[],

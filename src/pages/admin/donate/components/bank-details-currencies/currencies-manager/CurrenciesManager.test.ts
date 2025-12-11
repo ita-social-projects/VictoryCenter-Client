@@ -1,10 +1,10 @@
 import { renderHook, act } from '@testing-library/react';
 import { waitFor } from '@testing-library/react';
 import { Currencies, mapCurrencyToBankCurrency, useBankDetails } from './CurrenciesManager';
-import { BankCurrency } from '../../../../../../types/admin/donate';
+import { BankCurrency } from '@/types/admin/donate';
 import { bankDetailsConfig } from '../bank-details-currencies-config/BankDetailsCurrenciesConfig';
 
-jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(() => ({
         get: jest.fn(),
         post: jest.fn(),

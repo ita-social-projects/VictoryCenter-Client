@@ -1,14 +1,14 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { FaqComponent } from './FaqComponent';
-import { FaqQuestion } from '../../../../../types/admin/faq';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { FAQ_TEXT } from '../../../../../const/admin/faq';
+import { FaqQuestion } from '@/types/admin/faq';
+import { VisibilityStatus } from '@/types/admin/common';
+import { FAQ_TEXT } from '@/const/admin/faq';
 
-jest.mock('../../../../../components/admin/button-tooltip/ButtonTooltip', () => ({
+jest.mock('@/components/admin/button-tooltip/ButtonTooltip', () => ({
     ButtonTooltip: ({ children }: any) => <div data-testid="button-tooltip">{children}</div>,
 }));
 
-jest.mock('../../../../../components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
+jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
     VisibilityStatusLabel: ({ status }: any) => <span data-testid="status-label">{status}</span>,
 }));
 const mockFaq: FaqQuestion = {

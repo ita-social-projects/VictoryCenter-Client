@@ -1,7 +1,7 @@
 import React, { ReactNode, useEffect, useId, useRef } from 'react';
 import './Modal.scss';
 
-interface ModalProps {
+export interface ModalProps {
     children?: ReactNode;
     isOpen: boolean;
     onClose: () => void;

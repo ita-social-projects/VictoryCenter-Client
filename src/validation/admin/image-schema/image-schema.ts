@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { IMAGE_VALIDATION } from '../../../const/admin/image';
+import { IMAGE_VALIDATION } from '@/const/admin/image';
 
 export const getImageValidationSchema = (minWidth: number, minHeight: number) => {
     return Yup.mixed<File>()

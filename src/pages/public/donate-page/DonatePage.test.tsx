@@ -35,7 +35,7 @@ jest.mock('./right-section/RightSection', () => ({
     ),
 }));
 
-jest.mock('../../../components/public/faq-section/FaqSection', () => ({
+jest.mock('@/components/public/faq-section/FaqSection', () => ({
     FaqSection: ({ slug }: { slug: string }) => (
         <div data-testid="faq-section" data-slug={slug}>
             FAQ Section
@@ -43,21 +43,21 @@ jest.mock('../../../components/public/faq-section/FaqSection', () => ({
     ),
 }));
 
-jest.mock('../../../const/public/faq', () => ({
+jest.mock('@/const/public/faq', () => ({
     PAGE_SLUGS: {
         DONATE: 'donate-page',
     },
 }));
 
-jest.mock('../../../hooks/common/use-data-fetch/useDataFetch', () => ({
+jest.mock('@/hooks/common/use-data-fetch/useDataFetch', () => ({
     useDataFetch: jest.fn(),
 }));
 
-jest.mock('../../../services/api/public/donate/donate-api', () => ({
+jest.mock('@/services/api/public/donate/donate-api', () => ({
     donatePageDataFetch: jest.fn(),
 }));
 
-const mockUseDataFetch = require('../../../hooks/common/use-data-fetch/useDataFetch').useDataFetch;
+const mockUseDataFetch = require('@/hooks/common/use-data-fetch/useDataFetch').useDataFetch;
 
 describe('DonatePage', () => {
     const mockUseDataFetchSuccess = (

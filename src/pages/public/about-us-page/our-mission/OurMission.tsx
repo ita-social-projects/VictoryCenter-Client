@@ -1,9 +1,9 @@
 import { NavLink } from 'react-router-dom';
-import { ReactComponent as ArrowIcon } from '../../../../assets/icons/arrow-up-right.svg';
-import { PUBLIC_ROUTES } from '../../../../const/public/routes';
+import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-up-right.svg';
+import { PUBLIC_ROUTES } from '@/const/public/routes';
 import classNames from 'classnames';
-import { AboutUsContent } from '../../../../types/public/about-us-page';
-import { ContentType } from '../../../../types/common/about-us';
+import { AboutUsContent } from '@/types/public/about-us-page';
+import { ContentType } from '@/types/common/about-us';
 import { useTranslation } from 'react-i18next';
 import './OurMission.scss';
 

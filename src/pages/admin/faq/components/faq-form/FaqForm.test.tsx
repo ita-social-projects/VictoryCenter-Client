@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { FaqForm } from './FaqForm';
 
-jest.mock('../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup', () => ({
+jest.mock('@/components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup', () => ({
     MultiSelectInputGroup: (props: any) => {
         // Call getOptionId and getOptionName to cover those lines
         if (props.options && props.options.length > 0) {
@@ -23,26 +23,23 @@ jest.mock('../../../../../components/admin/input-groups/multi-select-input-group
     },
 }));
 
-jest.mock(
-    '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
-    () => ({
-        InputWithCharacterLimitGroup: (props: any) => (
-            <div data-testid="input-with-char-limit">
-                <input
-                    data-testid="question-input"
-                    value={props.value}
-                    onChange={props.onChange}
-                    onBlur={props.onBlur}
-                    disabled={props.disabled}
-                />
-                {props.error && <span data-testid="question-error">{props.error}</span>}
-            </div>
-        ),
-    }),
-);
+jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
+    InputWithCharacterLimitGroup: (props: any) => (
+        <div data-testid="input-with-char-limit">
+            <input
+                data-testid="question-input"
+                value={props.value}
+                onChange={props.onChange}
+                onBlur={props.onBlur}
+                disabled={props.disabled}
+            />
+            {props.error && <span data-testid="question-error">{props.error}</span>}
+        </div>
+    ),
+}));
 
 jest.mock(
-    '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
+    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
         TextAreaWithCharacterLimitGroup: (props: any) => (
             <div data-testid="textarea-with-char-limit">

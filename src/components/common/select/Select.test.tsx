@@ -2,15 +2,15 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Select, SelectProps } from './Select';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 jest.mock('./select.scss', () => ({}));
 
-jest.mock('../../../assets/icons/chevron-down.svg', () => ({
+jest.mock('@/assets/icons/chevron-down.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="chevron-down-icon" />,
 }));
 
-jest.mock('../../../assets/icons/chevron-up.svg', () => ({
+jest.mock('@/assets/icons/chevron-up.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="chevron-up-icon" />,
 }));
 

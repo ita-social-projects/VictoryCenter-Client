@@ -3,10 +3,10 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { DropdownMenu, DropdownLink } from './DropdownMenu';
 import { MemoryRouter } from 'react-router-dom';
 
-jest.mock('../../../assets/icons/chevron-up.svg', () => ({
+jest.mock('@/assets/icons/chevron-up.svg', () => ({
     ReactComponent: () => <span data-testid="arrow-up" />,
 }));
-jest.mock('../../../assets/icons/chevron-down.svg', () => ({
+jest.mock('@/assets/icons/chevron-down.svg', () => ({
     ReactComponent: () => <span data-testid="arrow-down" />,
 }));
 

@@ -1,4 +1,4 @@
-import { Toast, ToastType } from '../../../types/admin/toast';
+import { Toast, ToastType } from '@/types/admin/toast';
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
 interface ToastContextType {

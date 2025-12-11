@@ -1,12 +1,12 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { AboutUsPage } from './AboutUsPage';
-import { AboutUsApi } from '../../../services/api/public/about-us/about-us-api';
+import { AboutUsApi } from '@/services/api/public/about-us/about-us-api';
 import { AboutUsIntro } from './intro-section/IntroSection';
 import { OurMission } from './our-mission/OurMission';
 import { SupportSection } from './support-section/SupportSection';
 import { OurTeam } from './our-team-section/OurTeam';
 import { MainValues } from './main-value/MainValue';
-import { SectionType } from '../../../types/common/about-us';
+import { SectionType } from '@/types/common/about-us';
 
 jest.mock('./intro-section/IntroSection');
 jest.mock('./our-mission/OurMission');
@@ -19,7 +19,7 @@ jest.mock('./main-value/MainValue');
 jest.mock('./donate-section/DonateSection', () => ({
     DonateSection: () => <div data-testid="donate-section">Donate Section</div>,
 }));
-jest.mock('../../../services/api/public/about-us/about-us-api');
+jest.mock('@/services/api/public/about-us/about-us-api');
 jest.mock('./scrollable-frame/ScrollableFrame', () => ({
     ScrollableFrame: () => <div data-testid="scrollable-frame">Scrollable Frame</div>,
 }));

@@ -1,17 +1,17 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { ReactComponent as DeleteIcon } from '../../../assets/icons/delete.svg';
-import { ReactComponent as UploadIcon } from '../../../assets/icons/cloud-download.svg';
-import { ReactComponent as CropIcon } from '../../../assets/icons/crop.svg';
 import classNames from 'classnames';
 import './ImageInput.scss';
 import './WhoWeAreImageInput.scss';
-import { Image, ImageValues } from '../../../types/common/image';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
+import { ReactComponent as UploadIcon } from '@/assets/icons/cloud-download.svg';
+import { ReactComponent as CropIcon } from '@/assets/icons/crop.svg';
+import { Image, ImageValues } from '@/types/common/image';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { IMAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/image-schema/image-schema';
+import { IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from '@/validation/admin/image-dimension-schema/image-dimension-schema';
 import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
-import { COMMON_IMAGE_TEXT } from '../../../const/admin/image';
-import { IMAGE_VALIDATION_FUNCTIONS } from '../../../validation/admin/image-schema/image-schema';
+import { COMMON_IMAGE_TEXT } from '@/const/admin/image';
 import { CropModal } from '../cropper-modal/CropperModal';
-import { IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from '../../../validation/admin/image-dimension-schema/image-dimension-schema';
 
 export interface ImageInputProps {
     value: ImageValues | Image | null;

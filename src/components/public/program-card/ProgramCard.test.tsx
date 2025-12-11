@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ProgramCard } from './ProgramCard';
-import { PublishedProgramDto } from '../../../types/public/programs-page';
+import { PublishedProgramDto } from '@/types/public/programs-page';
 
-jest.mock('../../../assets/icons/arrow-up-right.svg', () => ({
+jest.mock('@/assets/icons/arrow-up-right.svg', () => ({
     ReactComponent: (props: any) => <svg data-testid="arrow-up-right" {...props} />,
 }));
 

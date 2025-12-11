@@ -1,6 +1,6 @@
-import { FAQ_VALIDATION } from '../../../const/admin/faq';
+import { FAQ_VALIDATION } from '@/const/admin/faq';
 import * as Yup from 'yup';
-import { VisitorPage } from '../../../types/admin/faq';
+import { VisitorPage } from '@/types/admin/faq';
 
 export const FaqValidationSchema = Yup.object({
     questionText: Yup.string()

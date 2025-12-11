@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { convertFileToBase64, ImageInput, getImageSrc } from './ImageInput';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { Image, ImageValues } from '../../../types/common/image';
-import { IMAGE_VALIDATION_FUNCTIONS } from '../../../validation/admin/image-schema/image-schema';
-import { IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from '../../../validation/admin/image-dimension-schema/image-dimension-schema';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { Image, ImageValues } from '@/types/common/image';
+import { IMAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/image-schema/image-schema';
+import { IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from '@/validation/admin/image-dimension-schema/image-dimension-schema';
 
-jest.mock('../confirmation-modal/ConfirmationModal', () => ({
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, onConfirm, onCancel, onClose }: any) => {
         if (!isOpen) return null;
         return (
@@ -26,11 +26,11 @@ jest.mock('../confirmation-modal/ConfirmationModal', () => ({
 
 const createImageFile = () => new File(['dummy content'], 'example.png', { type: 'image/png' });
 
-jest.mock('../../../assets/icons/cloud-download.svg', () => ({
+jest.mock('@/assets/icons/cloud-download.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="upload-icon" />,
 }));
 
-jest.mock('../../../assets/icons/delete.svg', () => ({
+jest.mock('@/assets/icons/delete.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="delete-icon" />,
 }));
 
@@ -45,13 +45,13 @@ jest.mock('../cropper-modal/CropperModal', () => ({
         ) : null,
 }));
 
-jest.mock('../../../validation/admin/image-schema/image-schema', () => ({
+jest.mock('@/validation/admin/image-schema/image-schema', () => ({
     IMAGE_VALIDATION_FUNCTIONS: {
         validateImage: jest.fn().mockResolvedValue(null), // null means no error
     },
 }));
 
-jest.mock('../../../validation/admin/image-dimension-schema/image-dimension-schema', () => ({
+jest.mock('@/validation/admin/image-dimension-schema/image-dimension-schema', () => ({
     IMAGE_DIMENSION_VALIDATION_FUNCTIONS: {
         validateImage: jest.fn().mockResolvedValue(null),
     },

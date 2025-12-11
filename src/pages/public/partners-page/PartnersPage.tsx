@@ -1,7 +1,7 @@
 import React from 'react';
 import { IntroSection } from './partners-sections/intro-section/IntroSection';
 import { OutroSection } from './partners-sections/outro-section/OutroSection';
-import { PartnerSection } from '../../../components/common/partners/PartnerSection';
+import { PartnerSection } from '@/components/common/partners/PartnerSection';
 import {
     PARTNER_FIRST_SECTION,
     PARTNER_FOURTH_SECTION,
@@ -15,7 +15,7 @@ import {
     PARTNERS_SECOND_SECTION_TITLE,
     PARTNERS_THIRD_SECTION_DESCRIPTION,
     PARTNERS_THIRD_SECTION_TITLE,
-} from '../../../const/public/partners-page';
+} from '@/const/public/partners-page';
 
 export const PartnersPage = () => {
     return (

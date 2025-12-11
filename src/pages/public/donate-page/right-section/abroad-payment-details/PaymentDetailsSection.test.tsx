@@ -23,7 +23,7 @@ jest.mock('./MultiFieldLabelWithCopy', () => ({
     ),
 }));
 
-jest.mock('../../../../../const/public/donate-page', () => ({
+jest.mock('@/const/public/donate-page', () => ({
     PAYMENT_DETAILS_COMMON: {
         RECIPIENT_LABEL: 'Recipient',
         RECIPIENT_NAME_LABEL: 'Default Recipient Name',

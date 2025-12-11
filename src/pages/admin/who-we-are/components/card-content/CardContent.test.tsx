@@ -14,11 +14,7 @@ jest.mock('@/components/admin/textarea-with-character-limit/TextAreaWithCharacte
     ),
 }));
 
-<<<<<<< HEAD
-jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
-=======
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
->>>>>>> eac56803e04c0cc4e1e26589fcfe8c16c9add385
     ImageInput: ({ onChange, label, setError }: any) => (
         <div data-testid="mock-image-input">
             <label>{label}</label>

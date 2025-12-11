@@ -32,7 +32,6 @@
             height: 100%;
         }
 
-        // Перевизначення для специфічних розмірів
         width: 52.5625rem;
         height: 33.125rem;
 
@@ -89,7 +88,6 @@
     }
 }
 
-// Глобальні класи для стилізації помилок (використовуються всередині InputWithCharacterLimitGroup)
 :global(.partner-banner-form__title-group),
 :global(.partner-banner-form__description-group) {
     position: relative;

@@ -111,10 +111,6 @@ describe('PartnerBanner', () => {
     const getRemoveImageButton = () => screen.getByRole('button', { name: 'Remove image' });
     const getPublishButton = () => screen.getByRole('button', { name: COMMON_TEXT_ADMIN.BUTTON.SAVE_AS_PUBLISHED });
 
-    const changeTitleValue = (value: string) => {
-        fireEvent.change(getTitleInput(), { target: { value } });
-    };
-
     const changeDescriptionValue = (value: string) => {
         fireEvent.change(getDescriptionInput(), { target: { value } });
     };
@@ -331,6 +327,12 @@ describe('PartnerBanner', () => {
             expect(getTitleInput()).toBeDisabled();
             expect(getDescriptionInput()).toBeDisabled();
             expect(getPublishButton()).toBeDisabled();
+        });
+
+        await waitFor(() => {
+            expect(getTitleInput()).toBeEnabled();
+            expect(getDescriptionInput()).toBeEnabled();
+            expect(getPublishButton()).toBeEnabled();
         });
     });
 

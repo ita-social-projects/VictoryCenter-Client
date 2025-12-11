@@ -15,7 +15,6 @@ import { ConfirmationModalProps } from '@/components/admin/confirmation-modal/Co
 jest.mock('@/services/api/admin/programs/programs-api');
 const mockedProgramsCategoriesApi = ProgramsCategoriesApi as jest.Mocked<typeof ProgramsCategoriesApi>;
 
-// Simplify Modal rendering and expose structure hooks
 jest.mock('../../../../../components/common/modal/Modal', () => {
     const ModalMock = ({ isOpen, children, onClose }: any) =>
         isOpen ? (

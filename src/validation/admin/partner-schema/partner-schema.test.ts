@@ -84,14 +84,14 @@ describe('partner-schema validations', () => {
             });
 
             it('returns min length error', () => {
-                const min = PARTNER_SECTION_VALIDATION.description.min;
-                const result = PARTNER_SECTION_VALIDATION_FUNCTIONS.validateDescription('a'.repeat(min - 1));
+                const min = PARTNER_VALIDATION.description.min;
+                const result = PARTNER_VALIDATION_FUNCTIONS.validateDescription('a'.repeat(min - 1));
                 expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(min));
             });
 
             it('returns max length error', () => {
-                const max = PARTNER_SECTION_VALIDATION.description.max;
-                const result = PARTNER_SECTION_VALIDATION_FUNCTIONS.validateDescription('a'.repeat(max + 1));
+                const max = PARTNER_VALIDATION.description.max;
+                const result = PARTNER_VALIDATION_FUNCTIONS.validateDescription('a'.repeat(max + 1));
                 expect(result).toBe(COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(max));
             });
         });

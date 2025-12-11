@@ -1,12 +1,6 @@
-<<<<<<< HEAD
 import styles from './OutroSection.module.scss';
-import outro from '../../../../../assets/videos/public/partners-page/outro.mp4';
-import { OUTRO } from '../../../../../const/public/partners-page';
-=======
-import './OutroSection.scss';
 import outro from '@/assets/videos/public/partners-page/outro.mp4';
 import { OUTRO } from '@/const/public/partners-page';
->>>>>>> eac56803e04c0cc4e1e26589fcfe8c16c9add385
 
 export const OutroSection = () => {
     return (

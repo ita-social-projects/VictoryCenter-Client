@@ -3,13 +3,13 @@ import {
     mapSectionDtoToSection,
     mapBannerDtoToBanner,
     mapPartnerPageDataDtoToPageData,
-} from './partner-mapper';
+} from './partner-mappers';
 import {
     PartnerBannerDto,
     PartnerDto,
     PartnersPageDataDto,
     PartnersSectionDto,
-} from '../../../../../services/api/admin/partners/partners-api';
+} from '../../../../../types/admin/partners';
 import { Image } from '../../../../../types/common/image';
 
 describe('partner-mapper', () => {

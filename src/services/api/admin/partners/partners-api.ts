@@ -22,7 +22,7 @@ import {
     mapBannerDtoToBanner,
     mapPartnerPageDataDtoToPageData,
     mapSectionDtoToSection,
-} from '../../../../utils/functions/mappers/admin/partner-mapper/partner-mapper';
+} from '../../../../utils/functions/mappers/admin/partner-mappers/partner-mappers';
 
 // Api Service
 export const PartnersApi = {

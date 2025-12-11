@@ -17,6 +17,7 @@ interface DonateInputProps {
     onlyNumbers?: boolean;
     maxLength?: number;
     className?: string;
+    error?: string;
 }
 
 export const DonateInput = ({
@@ -33,6 +34,7 @@ export const DonateInput = ({
     onlyNumbers = false,
     maxLength,
     className,
+    error,
 }: DonateInputProps) => {
     const computedInitialValue =
         externalValue !== undefined && externalValue !== null ? prefix + externalValue.replace(prefix, '') : prefix;
@@ -89,6 +91,7 @@ export const DonateInput = ({
     const showClearButton = isFocused && value.length > prefix.length;
     const currentLength = value.length - prefix.length;
     const showCharacterCounter = maxLength !== undefined;
+    const showFooter = showCharacterCounter || error;
 
     return (
         <>
@@ -142,9 +145,14 @@ export const DonateInput = ({
                 </div>
             </div>
 
-            {showCharacterCounter && (
-                <div className="donate-input-character-counter">
-                    {currentLength}/{maxLength}
+            {showFooter && (
+                <div className="donate-input-footer">
+                    <span className="donate-input-error">{error || ''}</span>
+                    {showCharacterCounter && (
+                        <span className="donate-input-character-counter">
+                            {currentLength}/{maxLength}
+                        </span>
+                    )}
                 </div>
             )}
         </>

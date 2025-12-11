@@ -453,10 +453,8 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                     onBlur={() => handleBlur(f.name)}
                                                     onlyNumbers={f.onlyNumbers}
                                                     maxLength={f.maxLength}
+                                                    error={touchedFields.has(f.name) ? errors[f.name] : undefined}
                                                 />
-                                                {touchedFields.has(f.name) && errors[f.name] && (
-                                                    <span className="error">{errors[f.name]}</span>
-                                                )}
                                             </div>
 
                                             {isChildForm &&

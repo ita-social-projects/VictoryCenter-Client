@@ -186,8 +186,8 @@ export const SupportOptionItem = ({
                             onBlur={() => validateField('name', name)}
                             isRequired={true}
                             maxLength={VALIDATION_PARAMS.supportOptions.name.maxLength}
+                            error={errors.name}
                         />
-                        {errors.name && <span className="error">{errors.name}</span>}
                     </div>
                 )}
                 <div className="support-option-field">
@@ -201,8 +201,8 @@ export const SupportOptionItem = ({
                         onBlur={() => validateField('value', value)}
                         isRequired={true}
                         maxLength={VALIDATION_PARAMS.supportOptions.value.maxLength}
+                        error={errors.value}
                     />
-                    {errors.value && <span className="error">{errors.value}</span>}
                 </div>
             </div>
 

@@ -54,3 +54,61 @@ export interface PartnersSectionUpdateRequest {
     }>;
     partnerIdsToDelete: number[];
 }
+
+// DTO Payloads (Internal Request Body Types)
+export interface CreatePartnerDto {
+    description: string;
+    imageId: number;
+}
+
+export interface CreatePartnersSectionDto {
+    title: string;
+    description: string;
+    partners: CreatePartnerDto[];
+}
+
+export interface UpdatePartnerDto {
+    id: number;
+    description: string;
+    imageId: number;
+}
+
+export interface UpdatePartnersSectionDto {
+    title: string;
+    description: string;
+    partnersToCreate: CreatePartnerDto[];
+    partnersToUpdate: UpdatePartnerDto[];
+    partnerIdsToDelete: number[];
+}
+
+export interface UpdatePartnerBannerDto {
+    title: string;
+    description: string;
+    imageId: number;
+}
+
+// Response DTO
+export interface PartnerBannerDto {
+    id: number;
+    title: string;
+    description: string;
+    image: Image | null;
+}
+
+export interface PartnerDto {
+    id: number;
+    description: string;
+    image: Image;
+}
+
+export interface PartnersSectionDto {
+    id: number;
+    title: string;
+    description: string;
+    partners: PartnerDto[];
+}
+
+export interface PartnersPageDataDto {
+    banner: PartnerBannerDto;
+    sections: PartnersSectionDto[];
+}

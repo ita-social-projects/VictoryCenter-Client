@@ -181,7 +181,7 @@ describe('CategoryBar', () => {
         const mockOnCategorySelect = jest.fn();
         const disconnectSpy = jest.fn();
 
-        const mockResizeObserver = jest.fn((callback) => ({
+        const mockResizeObserver = jest.fn(() => ({
             observe: jest.fn(),
             disconnect: disconnectSpy,
             unobserve: jest.fn(),

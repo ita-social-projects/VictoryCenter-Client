@@ -13,7 +13,6 @@ export const COMMON_TEXT_ADMIN = {
 
     INPUT: {
         IMAGE_PLACEHOLDER: 'Перетягніть файл сюди або натисніть для завантаження',
-        UPLOAD_IMAGE: 'Upload image',
     },
 
     STATUS: {

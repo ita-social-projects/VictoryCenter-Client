@@ -1,4 +1,3 @@
-import React from 'react';
 import { InputLabel, InputLabelProps } from '@/components/admin/input-label/InputLabel';
 import { InputError, InputErrorProps } from '@/components/admin/input-error/InputError';
 import { ImageInput, ImageInputProps } from '@/components/admin/image-input/ImageInput';
@@ -22,6 +21,10 @@ export const PhotoInputGroup = ({
     disabled,
     error,
     setError,
+    cropWidth,
+    cropHeight,
+    minWidth,
+    minHeight,
 }: PhotoInputGroupProps) => {
     return (
         <div className="input-group">
@@ -34,6 +37,10 @@ export const PhotoInputGroup = ({
                 onBlur={onBlur}
                 disabled={disabled}
                 setError={setError}
+                cropHeight={cropHeight}
+                cropWidth={cropWidth}
+                minHeight={minHeight}
+                minWidth={minWidth}
             />
             <InputError error={error} />
         </div>

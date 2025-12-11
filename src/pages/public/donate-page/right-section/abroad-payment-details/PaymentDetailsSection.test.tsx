@@ -64,13 +64,6 @@ describe('PaymentDetailsSection', () => {
         ).toBeInTheDocument();
     };
 
-    const expectPaymentLabel = (label: string, value: string, copyValue: string) => {
-        const element = screen.getByTestId('payment-label');
-        expect(element).toHaveAttribute('data-label', label);
-        expect(element).toHaveAttribute('data-value', value);
-        expect(element).toHaveAttribute('data-copy-value', copyValue);
-    };
-
     describe('rendering with all props provided', () => {
         it('should render all required fields with provided values', () => {
             const props = createProps();

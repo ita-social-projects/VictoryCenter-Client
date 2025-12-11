@@ -53,7 +53,9 @@ describe('CardsSection', () => {
     let mockOnPublish: jest.Mock;
     let mockSetIsPublishButtonActive: jest.Mock;
     const descriptionLimit = 500;
-    const cardImageConfigs = [{ style: { width: '20rem' }, width: 20, height: 20, subText: '200x200' }];
+    const cardImageConfigs = [
+        { style: { width: '20rem' }, cropWidth: 20, cropHeight: 20, minWidth: 20, minHeight: 20, subText: '200x200' },
+    ];
     const titleText = 'Our Values';
 
     const mockContent = [

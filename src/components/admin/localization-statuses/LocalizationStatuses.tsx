@@ -4,7 +4,7 @@ import {
     LocalizationLanguage,
     TranslationStatus,
 } from '../../../types/common/language';
-import './LocalizationStatuses.scss';
+import styles from './LocalizationStatuses.module.scss';
 
 export interface LocalizationStatusProps<TLocalization extends EntityLocalization> {
     languages: LocalizationLanguage[];
@@ -16,11 +16,11 @@ export const LocalizationStatuses = <TLocalization extends EntityLocalization>({
     localizedEntity,
 }: LocalizationStatusProps<TLocalization>) => {
     return (
-        <div className="statuses" data-testId="localization-statuses">
+        <div className={styles.statuses} data-testId="localization-statuses">
             {languages.map((language) => (
                 <span
                     key={language.id}
-                    className={`badge ${getLocalizationClassNameFromStatus(language, localizedEntity)}`}
+                    className={`${styles.badge} ${getLocalizationClassNameFromStatus(language, localizedEntity)}`}
                 >
                     {language.code.toUpperCase()}
                 </span>
@@ -39,12 +39,12 @@ export function getLocalizationClassNameFromStatus<TLocalization extends EntityL
 
     switch (entityLocalization?.translationStatus) {
         case TranslationStatus.Relevant:
-            return 'status-relevant';
+            return styles.relevant;
 
         case TranslationStatus.Outdated:
-            return 'status-outdated';
+            return styles.outdated;
 
         default:
-            return 'status-missing';
+            return styles.missing;
     }
 }

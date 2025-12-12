@@ -5,7 +5,7 @@ import { Select } from '../../common/select/Select';
 import { ReactComponent as GlobeIcon } from '../../../assets/icons/globe.svg';
 import { LocalizationLanguage, TranslationStatusFilter } from '../../../types/common/language';
 import { mapLabelToTranslationStatusFilter } from '../../../utils/functions/mappers/admin/localization-status/localization-status-mappers';
-import './LocalizationToolkit.scss';
+import styles from './LocalizationToolkit.module.scss';
 
 export interface LocalizationToolkitProps {
     languages: LocalizationLanguage[];
@@ -49,7 +49,7 @@ export const LocalizationToolkit = ({
     }, [languages, changeLanguage, changeTranslationStatus]);
 
     return (
-        <div className="toolkit" data-testid="localization-toolkit">
+        <div className={styles.toolkit} data-testid="localization-toolkit">
             {selectedLanguage && (
                 <Select<LocalizationLanguage>
                     value={selectedLanguage}

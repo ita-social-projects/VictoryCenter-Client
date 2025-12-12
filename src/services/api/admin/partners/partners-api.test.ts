@@ -1,5 +1,5 @@
 import { PartnersApi } from './partners-api';
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import {
     PartnerBanner,
     PartnerBannerUpdateRequest,
@@ -7,8 +7,8 @@ import {
     PartnersPageData,
     PartnersSectionCreateRequest,
     PartnersSectionUpdateRequest,
-} from '../../../../types/admin/partners';
-import { RequestOptions } from '../../../../types/common/api';
+} from '@/types/admin/partners';
+import { RequestOptions } from '@/types/common/api';
 import { ImageApi } from '../image/image-api';
 
 jest.mock('../image/image-api');

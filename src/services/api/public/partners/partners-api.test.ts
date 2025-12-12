@@ -1,6 +1,6 @@
 import { PartnersApi } from './partners-api';
-import { PartnerPage } from '../../../../types/public/partners-page';
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
+import { PartnerPage } from '@/types/public/partners-page';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { axiosInstance } from '../../axios';
 
 jest.mock('../../axios');

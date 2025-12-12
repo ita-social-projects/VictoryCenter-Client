@@ -1,7 +1,7 @@
 import styles from './IntroSection.module.scss';
-import background from '../../../../../assets/images/public/partners-page/horses.png';
-import { PartnersBanner } from '../../../../../types/public/partners-page';
-import { PARTNERS_PAGE_TITLE } from '../../../../../const/public/partners-page';
+import background from '@/assets/images/public/partners-page/horses.png';
+import { PartnersBanner } from '@/types/public/partners-page';
+import { PARTNERS_PAGE_TITLE } from '@/const/public/partners-page';
 
 export interface IntroSectionProps {
     banner: PartnersBanner | null;

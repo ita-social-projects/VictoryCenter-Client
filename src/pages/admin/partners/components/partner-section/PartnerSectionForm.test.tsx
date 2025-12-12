@@ -2,18 +2,18 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { PartnerSectionForm, PartnerSectionFormValues, PartnerSectionErrors } from './PartnerSectionForm';
-import { PARTNERS_TEXT } from '../../../../../const/admin/partners';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { PARTNERS_TEXT } from '@/const/admin/partners';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import {
     PARTNER_SECTION_VALIDATION_FUNCTIONS,
     PARTNER_VALIDATION_FUNCTIONS,
-} from '../../../../../validation/admin/partner-schema/partner-schema';
-import { TextAreaWithCharacterLimitGroupProps } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+} from '@/validation/admin/partner-schema/partner-schema';
+import { TextAreaWithCharacterLimitGroupProps } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PartnerFormProps } from '../partner-form/PartnerForm';
-import { ButtonProps } from '../../../../../components/admin/button/Button';
+import { ButtonProps } from '@/components/admin/button/Button';
 
 jest.mock(
-    '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
+    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
         TextAreaWithCharacterLimitGroup: ({
             label,
@@ -66,11 +66,11 @@ jest.mock('../partner-form/PartnerForm', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/common/inline-loader/InlineLoader', () => ({
+jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: ({ size }: { size: number }) => <div data-testid={`inline-loader-${size}`} />,
 }));
 
-jest.mock('../../../../../components/admin/button/Button', () => ({
+jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled, type, ...props }: ButtonProps) => (
         <button onClick={onClick} disabled={disabled} type={type} {...props}>
             {children}
@@ -78,7 +78,7 @@ jest.mock('../../../../../components/admin/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../validation/admin/partner-schema/partner-schema', () => ({
+jest.mock('@/validation/admin/partner-schema/partner-schema', () => ({
     PARTNER_SECTION_VALIDATION_FUNCTIONS: {
         validateTitle: jest.fn(),
         validateDescription: jest.fn(),

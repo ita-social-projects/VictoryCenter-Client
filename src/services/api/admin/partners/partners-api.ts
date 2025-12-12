@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios';
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { ImageApi } from '../image/image-api';
 import {
     PartnerBannerUpdateRequest,
@@ -16,13 +16,13 @@ import {
     PartnerBannerDto,
     PartnersSectionDto,
     PartnersPageDataDto,
-} from '../../../../types/admin/partners';
-import { RequestOptions } from '../../../../types/common/api';
+} from '@/types/admin/partners';
+import { RequestOptions } from '@/types/common/api';
 import {
     mapBannerDtoToBanner,
     mapPartnerPageDataDtoToPageData,
     mapSectionDtoToSection,
-} from '../../../../utils/functions/mappers/admin/partner-mappers/partner-mappers';
+} from '@/utils/functions/mappers/admin/partner-mappers/partner-mappers';
 
 // Api Service
 export const PartnersApi = {

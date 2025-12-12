@@ -1,15 +1,15 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { DeletePartnerSectionModal } from './DeletePartnerSectionModal';
-import { PARTNERS_TEXT } from '../../../../../const/admin/partners';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { PartnersApi } from '../../../../../services/api/admin/partners/partners-api';
+import { PARTNERS_TEXT } from '@/const/admin/partners';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { PartnersApi } from '@/services/api/admin/partners/partners-api';
 
-jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
-jest.mock('../../../../../services/api/admin/partners/partners-api', () => ({
+jest.mock('@/services/api/admin/partners/partners-api', () => ({
     PartnersApi: {
         deleteSection: jest.fn(),
     },

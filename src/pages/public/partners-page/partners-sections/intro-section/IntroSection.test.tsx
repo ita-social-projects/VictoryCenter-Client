@@ -2,11 +2,11 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { IntroSection } from './IntroSection';
-import { PartnersBanner } from '../../../../../types/public/partners-page';
+import { PartnersBanner } from '@/types/public/partners-page';
 
-jest.mock('../../../../../assets/images/public/partners-page/horses.png', () => 'fallback-background-image.png');
+jest.mock('@/assets/images/public/partners-page/horses.png', () => 'fallback-background-image.png');
 
-jest.mock('../../../../../const/public/partners-page', () => ({
+jest.mock('@/const/public/partners-page', () => ({
     PARTNERS_PAGE_TITLE: {
         FIRST_LINE: { REGULAR: 'Test First Regular ', BOLD: 'Test First Bold' },
         SECOND_LINE: {

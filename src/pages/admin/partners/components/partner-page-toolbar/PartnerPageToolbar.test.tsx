@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PartnerPageToolbar, PartnerPageToolbarProps } from './PartnerPageToolbar';
 
-jest.mock('../../../../../components/admin/button/Button', () => ({
+jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, onClick, buttonStyle }: any) => (
         <button onClick={onClick} data-button-style={buttonStyle}>
             {children}
@@ -11,11 +11,11 @@ jest.mock('../../../../../components/admin/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../assets/icons/plus.svg', () => ({
+jest.mock('@/assets/icons/plus.svg', () => ({
     ReactComponent: () => <svg data-testid="plus-icon" />,
 }));
 
-jest.mock('../../../../../const/admin/partners', () => ({
+jest.mock('@/const/admin/partners', () => ({
     PARTNERS_TEXT: {
         BUTTON: {
             ADD_PARTNER_SECTION: 'Add Partner Section',

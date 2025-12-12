@@ -2,24 +2,24 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { PartnerBanner } from './PartnerBannerForm';
-import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
-import { PartnersApi } from '../../../../../services/api/admin/partners/partners-api';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
-import { PARTNERS_TEXT } from '../../../../../const/admin/partners';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { PARTNER_BANNER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/partner-schema/partner-schema';
-import { ToastType } from '../../../../../types/admin/toast';
-import { ButtonProps } from '../../../../../components/admin/button/Button';
-import { ImageInputProps } from '../../../../../components/admin/image-input/ImageInput';
-import { InputErrorProps } from '../../../../../components/admin/input-error/InputError';
-import { InputWithCharacterLimitGroupProps } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { PartnersApi } from '@/services/api/admin/partners/partners-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { PARTNERS_TEXT } from '@/const/admin/partners';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { PARTNER_BANNER_VALIDATION_FUNCTIONS } from '@/validation/admin/partner-schema/partner-schema';
+import { ToastType } from '@/types/admin/toast';
+import { ButtonProps } from '@/components/admin/button/Button';
+import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
+import { InputErrorProps } from '@/components/admin/input-error/InputError';
+import { InputWithCharacterLimitGroupProps } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 
-jest.mock('../../../../../components/common/inline-loader/InlineLoader', () => ({
+jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: ({ size }: { size: number }) => <div data-testid="inline-loader">Loader size {size}</div>,
 }));
 
-jest.mock('../../../../../components/admin/button/Button', () => ({
+jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, onClick, type, formId, disabled }: ButtonProps) => (
         <button onClick={onClick} type={type} form={formId} disabled={disabled}>
             {children}
@@ -27,7 +27,7 @@ jest.mock('../../../../../components/admin/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
+jest.mock('@/components/admin/image-input/ImageInput', () => ({
     ImageInput: ({ label, value, onChange, disabled, id, setError }: ImageInputProps) => (
         <div data-testid={`${id}-container`}>
             <span>{label}</span>
@@ -52,12 +52,12 @@ jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/admin/input-error/InputError', () => ({
+jest.mock('@/components/admin/input-error/InputError', () => ({
     InputError: ({ error }: InputErrorProps) => (error ? <span data-testid="input-error">{error}</span> : null),
 }));
 
 jest.mock(
-    '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
+    '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
     () => ({
         InputWithCharacterLimitGroup: ({ label, value, onChange, disabled, id }: InputWithCharacterLimitGroupProps) => (
             <label>
@@ -68,11 +68,11 @@ jest.mock(
     }),
 );
 
-jest.mock('../../../../../hooks/common/use-data-fetch/useDataFetch');
-jest.mock('../../../../../services/api/admin/partners/partners-api');
-jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient');
-jest.mock('../../../../../contexts/admin/toast-context-provider/ToastContextProvider');
-jest.mock('../../../../../validation/admin/partner-schema/partner-schema', () => ({
+jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
+jest.mock('@/services/api/admin/partners/partners-api');
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
+jest.mock('@/validation/admin/partner-schema/partner-schema', () => ({
     PARTNER_BANNER_VALIDATION_FUNCTIONS: {
         validateTitle: jest.fn(),
         validateDescription: jest.fn(),

@@ -1,11 +1,11 @@
 import React, { memo, useCallback } from 'react';
-import { Image, ImageValues } from '../../../../../types/common/image';
-import { ImageInput } from '../../../../../components/admin/image-input/ImageInput';
-import { InputError } from '../../../../../components/admin/input-error/InputError';
-import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { PARTNER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/partner-schema/partner-schema';
-import { PARTNER_VALIDATION, PARTNERS_TEXT } from '../../../../../const/admin/partners';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { Image, ImageValues } from '@/types/common/image';
+import { ImageInput } from '@/components/admin/image-input/ImageInput';
+import { InputError } from '@/components/admin/input-error/InputError';
+import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { PARTNER_VALIDATION_FUNCTIONS } from '@/validation/admin/partner-schema/partner-schema';
+import { PARTNER_VALIDATION, PARTNERS_TEXT } from '@/const/admin/partners';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import styles from './PartnerForm.module.scss';
 
 export interface PartnerFormValues {

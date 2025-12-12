@@ -1,12 +1,12 @@
 import { IntroSection } from './partners-sections/intro-section/IntroSection';
 import { OutroSection } from './partners-sections/outro-section/OutroSection';
 import { PartnersSection } from './partners-sections/partners-section/PartnersSection';
-import { PartnerPage } from '../../../types/public/partners-page';
-import { PartnersApi } from '../../../services/api/public/partners/partners-api';
-import { DOWNLOAD_ERROR } from '../../../const/public/partners-page';
+import { PartnerPage } from '@/types/public/partners-page';
+import { PartnersApi } from '@/services/api/public/partners/partners-api';
+import { DOWNLOAD_ERROR } from '@/const/public/partners-page';
 import { LinearProgress } from '@mui/material';
 import styles from './PartnersPage.module.scss';
-import { useDataFetch } from '../../../hooks/common/use-data-fetch/useDataFetch';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 
 export const PartnersPage = () => {
     const {

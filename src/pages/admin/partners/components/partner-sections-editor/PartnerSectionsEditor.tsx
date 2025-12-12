@@ -4,23 +4,23 @@ import {
     PartnerSectionErrors,
     PartnerSectionFormValues,
 } from '../partner-section/PartnerSectionForm';
-import { RequestOptions } from '../../../../../types/common/api';
-import { ToastType } from '../../../../../types/admin/toast';
-import { PARTNERS_TEXT } from '../../../../../const/admin/partners';
+import { RequestOptions } from '@/types/common/api';
+import { ToastType } from '@/types/admin/toast';
+import { PARTNERS_TEXT } from '@/const/admin/partners';
 import axios from 'axios';
 import { PartnerFormValues } from '../partner-form/PartnerForm';
-import { PartnersApi } from '../../../../../services/api/admin/partners/partners-api';
-import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
-import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
-import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
+import { PartnersApi } from '@/services/api/admin/partners/partners-api';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import {
     Partner,
     PartnerSection,
     PartnersSectionCreateRequest,
     PartnersSectionUpdateRequest,
-} from '../../../../../types/admin/partners';
+} from '@/types/admin/partners';
 import styles from './PartnerSectionsEditor.module.scss';
 
 const isPartnerEmpty = (partner: PartnerFormValues): boolean => {

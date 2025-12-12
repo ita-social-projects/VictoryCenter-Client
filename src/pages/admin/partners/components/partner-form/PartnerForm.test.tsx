@@ -2,17 +2,17 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { PartnerForm, PartnerFormValues, PartnerFormErrors } from './PartnerForm';
-import { PARTNERS_TEXT } from '../../../../../const/admin/partners';
-import { PARTNER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/partner-schema/partner-schema';
-import { InputErrorProps } from '../../../../../components/admin/input-error/InputError';
-import { ImageInputProps } from '../../../../../components/admin/image-input/ImageInput';
-import { TextAreaWithCharacterLimitGroupProps } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { PARTNERS_TEXT } from '@/const/admin/partners';
+import { PARTNER_VALIDATION_FUNCTIONS } from '@/validation/admin/partner-schema/partner-schema';
+import { InputErrorProps } from '@/components/admin/input-error/InputError';
+import { ImageInputProps } from '@/components/admin/image-input/ImageInput';
+import { TextAreaWithCharacterLimitGroupProps } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 
-jest.mock('../../../../../components/admin/input-error/InputError', () => ({
+jest.mock('@/components/admin/input-error/InputError', () => ({
     InputError: ({ error }: InputErrorProps) => (error ? <div data-testid="input-error">{error}</div> : null),
 }));
 
-jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
+jest.mock('@/components/admin/image-input/ImageInput', () => ({
     ImageInput: ({ onChange, setError, disabled, id, label }: ImageInputProps) => (
         <div>
             <label htmlFor={id}>{label}</label>
@@ -45,7 +45,7 @@ jest.mock('../../../../../components/admin/image-input/ImageInput', () => ({
 }));
 
 jest.mock(
-    '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
+    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
         TextAreaWithCharacterLimitGroup: ({
             label,
@@ -74,7 +74,7 @@ jest.mock(
     }),
 );
 
-jest.mock('../../../../../validation/admin/partner-schema/partner-schema', () => ({
+jest.mock('@/validation/admin/partner-schema/partner-schema', () => ({
     PARTNER_VALIDATION_FUNCTIONS: {
         validateDescription: jest.fn(),
     },

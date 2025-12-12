@@ -1,22 +1,22 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { ImageValues, Image } from '../../../../../types/common/image';
+import { ImageValues, Image } from '@/types/common/image';
 import styles from './PartnerBannerForm.module.scss';
 import { PARTNER_BANNER_VALIDATION, PARTNERS_TEXT } from '../../../../../const/admin/partners';
-import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
-import { PartnersApi } from '../../../../../services/api/admin/partners/partners-api';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
-import { ToastType } from '../../../../../types/admin/toast';
-import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
-import { Button } from '../../../../../components/admin/button/Button';
-import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { PartnersApi } from '@/services/api/admin/partners/partners-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
+import { Button } from '@/components/admin/button/Button';
+import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import axios from 'axios';
-import { PartnerBanner as PartnerBannerType } from '../../../../../types/admin/partners';
-import { PARTNER_BANNER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/partner-schema/partner-schema';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { ImageInput } from '../../../../../components/admin/image-input/ImageInput';
-import { InputError } from '../../../../../components/admin/input-error/InputError';
-import BannerImage from '../../../../../assets/images/public/partners-page/horses.png';
+import { PartnerBanner as PartnerBannerType } from '@/types/admin/partners';
+import { PARTNER_BANNER_VALIDATION_FUNCTIONS } from '@/validation/admin/partner-schema/partner-schema';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ImageInput } from '@/components/admin/image-input/ImageInput';
+import { InputError } from '@/components/admin/input-error/InputError';
+import BannerImage from '@/assets/images/public/partners-page/horses.png';
 
 export interface PartnerBannerValues {
     title: string;

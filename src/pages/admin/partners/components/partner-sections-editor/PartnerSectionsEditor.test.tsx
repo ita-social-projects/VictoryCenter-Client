@@ -2,12 +2,12 @@ import React, { createRef } from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { PartnerSectionsEditor, PartnerSectionsEditorRef } from './PartnerSectionsEditor';
-import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
-import { PartnersApi } from '../../../../../services/api/admin/partners/partners-api';
-import { PARTNERS_TEXT } from '../../../../../const/admin/partners';
-import { ToastType } from '../../../../../types/admin/toast';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { PartnersApi } from '@/services/api/admin/partners/partners-api';
+import { PARTNERS_TEXT } from '@/const/admin/partners';
+import { ToastType } from '@/types/admin/toast';
 
 const mockPartnerSectionFormRender = jest.fn((props: any) => {
     const { value, errors, disabled, onChange, onDelete, onPublish } = props;
@@ -46,15 +46,15 @@ jest.mock('../partner-section/PartnerSectionForm', () => ({
     PartnerSectionForm: (props: any) => mockPartnerSectionFormRender(props),
 }));
 
-jest.mock('../../../../../components/common/inline-loader/InlineLoader', () => ({
+jest.mock('@/components/common/inline-loader/InlineLoader', () => ({
     InlineLoader: ({ size }: { size: number }) => <div data-testid={`inline-loader-${size}`} />,
 }));
 
-jest.mock('../../../../../components/admin/button/Button', () => ({
+jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, ...props }: any) => <button {...props}>{children}</button>,
 }));
 
-jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, onConfirm, onCancel, title }: any) =>
         isOpen ? (
             <div data-testid="confirmation-modal">
@@ -69,10 +69,10 @@ jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal'
         ) : null,
 }));
 
-jest.mock('../../../../../hooks/common/use-data-fetch/useDataFetch');
-jest.mock('../../../../../services/api/admin/partners/partners-api');
-jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient');
-jest.mock('../../../../../contexts/admin/toast-context-provider/ToastContextProvider');
+jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
+jest.mock('@/services/api/admin/partners/partners-api');
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider');
 
 const mockedUseDataFetch = useDataFetch as jest.Mock;
 const mockedPartnersApi = PartnersApi as jest.Mocked<typeof PartnersApi>;

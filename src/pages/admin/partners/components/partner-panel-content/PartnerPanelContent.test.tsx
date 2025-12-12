@@ -31,7 +31,7 @@ jest.mock('../partner-sections-editor/PartnerSectionsEditor', () => {
     };
 });
 
-jest.mock('../../../../../components/admin/toast/toast-container/ToastContainer', () => ({
+jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
     ToastContainer: () => <div data-testid="toast-container" />,
 }));
 

@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { PartnerSection } from '../../../../../types/admin/partners';
-import { PartnersApi } from '../../../../../services/api/admin/partners/partners-api';
-import { PARTNERS_TEXT } from '../../../../../const/admin/partners';
-import { Modal } from '../../../../../components/common/modal/Modal';
-import { Button } from '../../../../../components/admin/button/Button';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { PartnerSection } from '@/types/admin/partners';
+import { PartnersApi } from '@/services/api/admin/partners/partners-api';
+import { PARTNERS_TEXT } from '@/const/admin/partners';
+import { Modal } from '@/components/common/modal/Modal';
+import { Button } from '@/components/admin/button/Button';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import styles from './DeletePartnerSectionModal.module.scss';
 
 interface DeletePartnerSectionModalProps {

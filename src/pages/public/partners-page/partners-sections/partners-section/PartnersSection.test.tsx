@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { PartnersSection } from './PartnersSection';
-import { PartnerSection as PartnerSectionType } from '../../../../../types/public/partners-page';
+import { PartnerSection as PartnerSectionType } from '@/types/public/partners-page';
 
 describe('PartnersSection', () => {
     const mockSection: PartnerSectionType = {

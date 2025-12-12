@@ -1,5 +1,5 @@
 import React from 'react';
-import { PartnerSection } from '../../../../../types/public/partners-page';
+import { PartnerSection } from '@/types/public/partners-page';
 import styles from './PartnersSection.module.scss';
 
 interface PartnersSectionProps {

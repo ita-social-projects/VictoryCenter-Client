@@ -7,7 +7,7 @@ import {
     PartnersPageData,
     Partner,
     PartnerSection,
-} from '../../../../../types/admin/partners';
+} from '@/types/admin/partners';
 
 export const mapPartnerDtoToPartner = (dto: PartnerDto): Partner => ({
     id: dto.id,

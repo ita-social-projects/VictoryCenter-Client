@@ -1,10 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { PartnersPage } from './PartnersPage';
-import { PartnersApi } from '../../../services/api/public/partners/partners-api';
-import { PartnerPage } from '../../../types/public/partners-page';
-import { DOWNLOAD_ERROR } from '../../../const/public/partners-page';
+import { PartnersApi } from '@/services/api/public/partners/partners-api';
+import { PartnerPage } from '@/types/public/partners-page';
+import { DOWNLOAD_ERROR } from '@/const/public/partners-page';
 
-jest.mock('../../../services/api/public/partners/partners-api');
+jest.mock('@/services/api/public/partners/partners-api');
 
 jest.mock('./partners-sections/intro-section/IntroSection', () => ({
     IntroSection: () => <div data-testid="intro-section" />,

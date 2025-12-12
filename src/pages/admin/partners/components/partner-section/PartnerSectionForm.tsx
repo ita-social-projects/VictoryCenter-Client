@@ -2,13 +2,13 @@ import React, { useCallback, memo } from 'react';
 import {
     PARTNER_SECTION_VALIDATION_FUNCTIONS,
     PARTNER_VALIDATION_FUNCTIONS,
-} from '../../../../../validation/admin/partner-schema/partner-schema';
-import { PARTNER_SECTION_VALIDATION, PARTNERS_TEXT } from '../../../../../const/admin/partners';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+} from '@/validation/admin/partner-schema/partner-schema';
+import { PARTNER_SECTION_VALIDATION, PARTNERS_TEXT } from '@/const/admin/partners';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { PartnerForm, PartnerFormErrors, PartnerFormValues } from '../partner-form/PartnerForm';
-import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
-import { Button } from '../../../../../components/admin/button/Button';
+import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
+import { Button } from '@/components/admin/button/Button';
 import styles from './PartnerSectionForm.module.scss';
 
 export interface PartnerSectionFormValues {

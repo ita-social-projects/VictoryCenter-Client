@@ -1,6 +1,6 @@
-import { Button } from '../../../../../components/admin/button/Button';
-import { PARTNERS_TEXT } from '../../../../../const/admin/partners';
-import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
+import { Button } from '@/components/admin/button/Button';
+import { PARTNERS_TEXT } from '@/const/admin/partners';
+import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import styles from './PartnerPageToolbar.module.scss';
 
 export interface PartnerPageToolbarProps {

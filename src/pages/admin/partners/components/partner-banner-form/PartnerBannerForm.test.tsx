@@ -56,17 +56,14 @@ jest.mock('@/components/admin/input-error/InputError', () => ({
     InputError: ({ error }: InputErrorProps) => (error ? <span data-testid="input-error">{error}</span> : null),
 }));
 
-jest.mock(
-    '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
-    () => ({
-        InputWithCharacterLimitGroup: ({ label, value, onChange, disabled, id }: InputWithCharacterLimitGroupProps) => (
-            <label>
-                {label}
-                <input data-testid={`${id}-input`} value={value} disabled={disabled} onChange={onChange} />
-            </label>
-        ),
-    }),
-);
+jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
+    InputWithCharacterLimitGroup: ({ label, value, onChange, disabled, id }: InputWithCharacterLimitGroupProps) => (
+        <label>
+            {label}
+            <input data-testid={`${id}-input`} value={value} disabled={disabled} onChange={onChange} />
+        </label>
+    ),
+}));
 
 jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
 jest.mock('@/services/api/admin/partners/partners-api');

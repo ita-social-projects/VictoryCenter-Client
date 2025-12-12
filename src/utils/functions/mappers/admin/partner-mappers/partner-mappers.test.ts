@@ -4,12 +4,7 @@ import {
     mapBannerDtoToBanner,
     mapPartnerPageDataDtoToPageData,
 } from './partner-mappers';
-import {
-    PartnerBannerDto,
-    PartnerDto,
-    PartnersPageDataDto,
-    PartnersSectionDto,
-} from '@/types/admin/partners';
+import { PartnerBannerDto, PartnerDto, PartnersPageDataDto, PartnersSectionDto } from '@/types/admin/partners';
 import { Image } from '@/types/common/image';
 
 describe('partner-mapper', () => {

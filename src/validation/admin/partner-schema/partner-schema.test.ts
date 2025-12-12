@@ -3,11 +3,7 @@ import {
     PARTNER_SECTION_VALIDATION_FUNCTIONS,
     PARTNER_VALIDATION_FUNCTIONS,
 } from './partner-schema';
-import {
-    PARTNER_BANNER_VALIDATION,
-    PARTNER_SECTION_VALIDATION,
-    PARTNER_VALIDATION,
-} from '@/const/admin/partners';
+import { PARTNER_BANNER_VALIDATION, PARTNER_SECTION_VALIDATION, PARTNER_VALIDATION } from '@/const/admin/partners';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 const createValidPartner = () => ({

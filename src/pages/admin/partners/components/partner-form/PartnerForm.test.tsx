@@ -112,7 +112,7 @@ describe('PartnerForm', () => {
     const getImageChangeButton = () => screen.getByTestId(`${imageTestId}-change`);
     const getImageRemoveButton = () => screen.getByTestId(`${imageTestId}-remove`);
     const getImageSetErrorButton = () => screen.getByTestId(`${imageTestId}-set-error`);
-    const getDeleteButton = () => container.querySelector('.partner-form__delete-button');
+    const getDeleteButton = () => screen.queryByTestId(`partner-form-delete-button-${cardHtmlId}`);
     const getDescriptionError = () => screen.queryByTestId(`${descriptionTestId}-error`);
     const getImageError = () => screen.queryByTestId('input-error');
 

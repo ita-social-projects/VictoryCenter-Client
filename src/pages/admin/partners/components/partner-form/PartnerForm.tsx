@@ -62,7 +62,12 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
     return (
         <div className={styles['root']} data-testid={`partner-form-${cardHtmlId}`}>
             <div className={styles['header']}>
-                <button type="button" className={styles['delete-button']} onClick={handleDelete} />
+                <button
+                    type="button"
+                    className={styles['delete-button']}
+                    onClick={handleDelete}
+                    data-testid={`partner-form-delete-button-${cardHtmlId}`}
+                />
             </div>
             <div className={styles['content']}>
                 <div className={styles['image']}>

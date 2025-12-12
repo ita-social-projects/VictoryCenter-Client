@@ -51,9 +51,7 @@ export const DeletePartnerSectionModal = ({
     return (
         <Modal isOpen={isOpen} onClose={handleClose}>
             <Modal.Title>{PARTNERS_TEXT.FORM.TITLE.DELETE_SECTION}</Modal.Title>
-            <Modal.Content>
-                {error && <div className={styles['error-container']}>{error}</div>}
-            </Modal.Content>
+            <Modal.Content>{error && <div className={styles['error-container']}>{error}</div>}</Modal.Content>
             <Modal.Actions>
                 <Button onClick={handleClose} buttonStyle="secondary" disabled={isSubmitting}>
                     {COMMON_TEXT_ADMIN.BUTTON.NO}

@@ -32,7 +32,7 @@ jest.mock('@/services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
 jest.mock('@/components/common/modal/Modal', () => {
-    const ModalMock = ({ isOpen, onClose, children, 'data-testid': dataTestId }: ModalProps) =>
+    const ModalMock = ({ isOpen, onClose, children }: ModalProps) =>
         isOpen ? (
             <div>
                 <button data-testid="modal-close-btn" onClick={onClose}>

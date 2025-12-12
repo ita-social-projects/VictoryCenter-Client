@@ -9,6 +9,8 @@ import { ProgramsApi, ProgramsCategoriesApi } from '@/services/api/admin/program
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ProgramsPageModalsProps } from '@/pages/admin/programs/components/programs-page-modals/ProgramsPageModals';
 import { InfiniteScrollListProps } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
+import { ProgramListItemProps } from '@/pages/admin/programs/components/program-list-item/ProgramListItem';
+import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -57,7 +59,7 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({ categories, selectedCategory, onCategorySelect, onContextMenuOptionSelected }: any) => (
         <div data-testid="category-bar">
-            {categories.map((cat) => (
+            {categories.map((cat: ProgramCategory) => (
                 <button
                     key={cat.id}
                     data-testid={`category-${cat.id}`}

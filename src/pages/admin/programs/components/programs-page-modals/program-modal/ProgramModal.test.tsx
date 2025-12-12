@@ -1,13 +1,15 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { ProgramModal, ProgramModalProps } from './ProgramModal';
-import { Program, ProgramCategory } from '@/types/admin/programs';
+import { BaseProgramModalProps, ProgramModal, ProgramModalProps } from './ProgramModal';
+import { Program, ProgramCategory, ProgramCreateUpdate } from '@/types/admin/programs';
 import { ModalMode } from '@/types/admin/common';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
 import { VisibilityStatus } from '@/types/admin/common';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { ProgramFormProps, ProgramFormRef } from '@/pages/admin/programs/components/program-form/ProgramForm';
+import { ButtonProps } from '@/components/admin/button/Button';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -66,12 +68,7 @@ jest.mock('@/components/common/modal/Modal', () => {
 });
 
 jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({
-        onClick,
-        disabled,
-        children,
-        buttonStyle,
-    }: ButtonProps) => (
+    Button: ({ onClick, disabled, children, buttonStyle }: ButtonProps) => (
         <button
             onClick={onClick}
             disabled={disabled}

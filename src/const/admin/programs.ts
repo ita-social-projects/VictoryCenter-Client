@@ -72,20 +72,22 @@ export const PROGRAM_VALIDATION = {
     categories: {
         getAtLeastOneRequiredError: () => 'Потрібно обрати хоча б одну категорію',
     },
-    image: {
-        cropWidth: 960,
-        cropHeight: 870,
-        minWidth: 960,
-        minHeight: 870,
-    },
     previewImage: {
         width: 440,
         height: 480,
+        cropWidth: 440,
+        cropHeight: 480,
+        minWidth: 440,
+        minHeight: 480,
         getRequiredWhenPublishingError: () => 'Фото обов’язкове при публікації',
     },
     backgroundImage: {
         width: 1440,
         height: 860,
+        cropWidth: 1440,
+        cropHeight: 860,
+        minWidth: 1440,
+        minHeight: 860,
         getRequiredWhenPublishingError: () => 'Фото обов’язкове при публікації',
     },
     location: {

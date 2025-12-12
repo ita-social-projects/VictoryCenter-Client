@@ -6,7 +6,6 @@ import {
     ProgramCategoryCreateUpdate,
     ProgramCreateUpdate,
     ProgramSearchItemData,
-    Program,
 } from '@/types/admin/programs';
 import { AxiosInstance } from 'axios';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';

@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useFormManager } from './useFormManager';
+import { FormManagerRef, useFormManager } from './useFormManager';
 import { VisibilityStatus } from '@/types/admin/common';
 import React from 'react';
 

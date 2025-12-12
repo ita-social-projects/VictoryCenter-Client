@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useGenericModal, GenericFormRef } from './useGenericModal';
+import { useGenericModal, GenericFormRef, ButtonValidationState } from './useGenericModal';
 import { VisibilityStatus, ModalMode } from '@/types/admin/common';
 
 describe('useGenericModal', () => {

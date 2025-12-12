@@ -1,6 +1,5 @@
-import React, { ReactNode, useId } from 'react';
+import React, { ReactNode, useEffect, useId, useRef } from 'react';
 import './Modal.scss';
-import { useModal } from '@/hooks/admin/use-modal/UseModal';
 
 export interface ModalProps {
     children?: ReactNode;

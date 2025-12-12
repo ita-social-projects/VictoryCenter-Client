@@ -1,8 +1,8 @@
-import { InputLabel, InputLabelProps } from '@/input-label/InputLabel';
-import { InputError, InputErrorProps } from '@/input-error/InputError';
-import { MultiSelectInput, MultiSelectInputProps } from '../../multi-select-input/MultiSelectInput';
-import '../input-group.scss';
+import { MultiSelectInput, MultiSelectInputProps } from '@/components/admin/multi-select-input/MultiSelectInput';
+import { InputError, InputErrorProps } from '@/components/admin/input-error/InputError';
+import { InputLabel, InputLabelProps } from '@/components/admin/input-label/InputLabel';
 import classNames from 'classnames';
+import '../input-group.scss';
 
 export interface MultiSelectInputGroupProps<T> extends MultiSelectInputProps<T> {
     label: InputLabelProps['text'];

@@ -16,7 +16,15 @@ jest.mock('@/services/api/admin/programs/programs-api');
 const mockedProgramsCategoriesApi = ProgramsCategoriesApi as jest.Mocked<typeof ProgramsCategoriesApi>;
 
 jest.mock('@/components/common/modal/Modal', () => {
-    const ModalMock = ({ isOpen, children }: any) => (isOpen ? <div data-testid="modal">{children}</div> : null);
+    const ModalMock = ({ isOpen, onClose, children }: any) => (
+        isOpen ? (
+            <div data-testid="modal">
+                <button data-testid="modal-close-btn" onClick={onClose}>Close</button>
+                {children}
+            </div>
+        ) : null
+    );
+
     ModalMock.Title = ({ children }: { children: React.ReactNode }) => <h1 data-testid="modal-title">{children}</h1>;
     ModalMock.Content = ({ children }: { children: React.ReactNode }) => (
         <div data-testid="modal-content">{children}</div>

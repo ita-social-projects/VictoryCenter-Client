@@ -1,10 +1,5 @@
 import { VisibilityStatus } from '@/types/admin/common';
-import {
-    ProgramCategoryCreateUpdate,
-    ProgramCreateUpdate,
-    Program,
-    ProgramCategory,
-} from '@/types/admin/programs';
+import { ProgramCategoryCreateUpdate, ProgramCreateUpdate, Program, ProgramCategory } from '@/types/admin/programs';
 import { ProgramsApi, ProgramsCategoriesApi } from './programs-api';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';

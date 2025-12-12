@@ -256,6 +256,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         error={errors.backgroundImage}
                         className="program-background-image-input"
                         setError={handleSetBackgroundImageError}
+                        cropWidth={PROGRAM_VALIDATION.backgroundImage.cropWidth}
+                        cropHeight={PROGRAM_VALIDATION.backgroundImage.cropHeight}
+                        minWidth={PROGRAM_VALIDATION.backgroundImage.minWidth}
+                        minHeight={PROGRAM_VALIDATION.backgroundImage.minHeight}
                         imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
                         imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
                             PROGRAM_VALIDATION.backgroundImage.height,
@@ -343,10 +347,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.previewImage}
                                 setError={handleSetPreviewImageError}
-                                                    cropWidth={PROGRAM_VALIDATION.image.cropWidth}
-                    cropHeight={PROGRAM_VALIDATION.image.cropHeight}
-                    minWidth={PROGRAM_VALIDATION.image.minWidth}
-                    minHeight={PROGRAM_VALIDATION.image.minHeight}
+                                cropWidth={PROGRAM_VALIDATION.previewImage.cropWidth}
+                                cropHeight={PROGRAM_VALIDATION.previewImage.cropHeight}
+                                minWidth={PROGRAM_VALIDATION.previewImage.minWidth}
+                                minHeight={PROGRAM_VALIDATION.previewImage.minHeight}
                                 imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
                                 imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
                                     PROGRAM_VALIDATION.previewImage.height,

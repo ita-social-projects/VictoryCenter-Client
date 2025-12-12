@@ -2,14 +2,14 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramForm, ProgramFormProps, ProgramFormRef, ProgramFormValues } from './ProgramForm';
-import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-schema';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { ProgramCategory } from '../../../../../types/admin/programs';
-import { InputWithCharacterLimitGroupProps } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import { TextAreaWithCharacterLimitGroupProps } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { MultiSelectInputGroupProps } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
-import { PhotoInputGroupProps } from '../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup';
-import { ButtonProps } from '../../../../../components/admin/button/Button';
+import { PROGRAM_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
+import { VisibilityStatus } from '@/types/admin/common';
+import { ProgramCategory } from '@/types/admin/programs';
+import { InputWithCharacterLimitGroupProps } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { TextAreaWithCharacterLimitGroupProps } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { MultiSelectInputGroupProps } from '@/components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
+import { PhotoInputGroupProps } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
+import { ButtonProps } from '@/components/admin/button/Button';
 
 jest.mock('../../../../../validation/admin/program-schema/program-schema', () => ({
     PROGRAM_VALIDATION_FUNCTIONS: {
@@ -46,7 +46,7 @@ jest.mock(
 );
 
 jest.mock(
-    '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
+    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
         TextAreaWithCharacterLimitGroup: ({
             label,
@@ -65,7 +65,7 @@ jest.mock(
     }),
 );
 
-jest.mock('../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup', () => ({
+jest.mock('@/components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup', () => ({
     MultiSelectInputGroup: ({
         label,
         value,
@@ -88,7 +88,7 @@ jest.mock('../../../../../components/admin/input-groups/multi-select-input-group
     ),
 }));
 
-jest.mock('../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup', () => ({
+jest.mock('@/components/admin/input-groups/photo-input-group/PhotoInputGroup', () => ({
     PhotoInputGroup: ({ id, value, onChange, error, setError }: PhotoInputGroupProps) => (
         <div data-testid={`group-${id}`}>
             <span data-testid={`value-${id}`}>{value ? 'HasImage' : 'NoImage'}</span>
@@ -111,7 +111,7 @@ jest.mock('../../../../../components/admin/input-groups/photo-input-group/PhotoI
     ),
 }));
 
-jest.mock('../../../../../components/admin/button/Button', () => ({
+jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled }: ButtonProps) => (
         <button type="button" onClick={onClick} disabled={disabled} data-testid="add-section-btn">
             {children}
@@ -119,11 +119,9 @@ jest.mock('../../../../../components/admin/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../assets/icons/plus.svg', () => ({
+jest.mock('@/assets/icons/plus.svg', () => ({
     ReactComponent: () => <svg>PlusIcon</svg>,
 }));
-
-// --- Tests ---
 
 describe('ProgramForm', () => {
     const mockOnSubmit = jest.fn();

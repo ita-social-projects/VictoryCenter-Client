@@ -74,6 +74,10 @@ export const TEAM_MEMBER_VALIDATION = {
     },
     img: {
         getRequiredWhenPublishingError: () => "Фото обов'язкове при публікації",
+        croppedWidth: 960,
+        croppedHeight: 1200,
+        minWidth: 960,
+        minHeight: 1200,
     },
 };
 

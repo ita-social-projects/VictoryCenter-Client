@@ -1,5 +1,5 @@
-@use "../../../../../../../assets/sass/variables/colors.scss" as c;
-@use "../../../../../../../assets/sass/mixins/typography.mixins" as type;
+@use "@/assets/sass/variables/colors.scss" as c;
+@use "@/assets/sass/mixins/typography.mixins" as type;
 
 .card {
   display: flex;
@@ -52,6 +52,10 @@
 .text-blue {
   color: c.$light-blue-100;
   padding-bottom: 16px;
+
+  @media (min-width: 1440px) {
+    padding-bottom: 4px;
+  }
 }
 
 .text-yellow {

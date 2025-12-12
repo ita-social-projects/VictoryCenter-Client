@@ -1,10 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { SUMMARY_DATA } from '@/utils/mock-data/public/reports-page';
 import { StatCard } from './components/stat-card/StatCard';
-import { SUMMARY_DATA } from '../../../../../utils/mock-data/public/reports-page';
 import styles from './SummarySection.module.scss';
 
-// WIP; DO NOT REVIEW :)
 export const SummarySection: React.FC = () => {
     const { t, i18n } = useTranslation('reportsPage');
 

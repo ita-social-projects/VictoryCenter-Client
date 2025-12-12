@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReactComponent as ArrowIcon } from '../../../../../../../assets/icons/arrow-down-to-line.svg';
+import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-down-to-line.svg';
 import styles from './ReportItem.module.scss';
 
 interface ReportItemProps {

@@ -1,5 +1,5 @@
-@use "../../../../../assets/sass/variables/colors" as c;
-@use "../../../../../assets/sass/mixins/effects.mixins" as effects;
+@use "@/assets/sass/variables/colors" as c;
+@use "@/assets/sass/mixins/effects.mixins" as effects;
 
 .root {
   margin-top: 64px; // TODO: fix PublicLayout Header uses fixed position conflicting with main content (cover content)

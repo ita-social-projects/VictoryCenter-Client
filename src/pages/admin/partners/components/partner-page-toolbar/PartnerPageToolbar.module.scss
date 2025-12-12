@@ -1,4 +1,4 @@
-@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors' as c;
 
 .partner-page-toolbar {
     height: 5.625rem;
@@ -7,5 +7,5 @@
     justify-content: end;
     padding: 0.5rem 1.5rem;
     width: 100%;
-    border-bottom: 1px solid colors.$grey-50;
+    border-bottom: 1px solid c.$grey-50;
 }

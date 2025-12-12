@@ -1,20 +1,20 @@
-﻿@use '@/assets/sass/variables/colors';
+﻿@use '@/assets/sass/variables/colors' as c;
 
-.partner-panel-content {
+.root {
     display: flex;
     flex-direction: column;
     height: 100vh;
     overflow: hidden;
 }
 
-.partner-panel-content__toolbar {
+.toolbar {
     flex-shrink: 0;
-    border-bottom: 1px solid colors.$grey-700;
-    background: colors.$grey-50;
+    border-bottom: 1px solid c.$grey-700;
+    background: c.$grey-50;
     z-index: 10;
 }
 
-.partner-panel-content__scrollable-area {
+.scrollable-area {
     flex-grow: 1;
     overflow-y: auto;
     padding: 24px 32px;

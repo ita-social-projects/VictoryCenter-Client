@@ -1,22 +1,22 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { ImageValues, Image } from '@/types/common/image';
+import { ImageValues, Image } from '../../../../../types/common/image';
 import styles from './PartnerBannerForm.module.scss';
 import { PARTNER_BANNER_VALIDATION, PARTNERS_TEXT } from '../../../../../const/admin/partners';
 import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
-import { PartnersApi } from '@/services/api/admin/partners/partners-api';
-import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
-import { ToastType } from '@/types/admin/toast';
-import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
-import { Button } from '@/components/admin/button/Button';
-import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { PartnersApi } from '../../../../../services/api/admin/partners/partners-api';
+import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '../../../../../types/admin/toast';
+import { InlineLoader } from '../../../../../components/common/inline-loader/InlineLoader';
+import { Button } from '../../../../../components/admin/button/Button';
+import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import axios from 'axios';
-import { PartnerBanner as PartnerBannerType } from '@/types/admin/partners';
-import { PARTNER_BANNER_VALIDATION_FUNCTIONS } from '@/validation/admin/partner-schema/partner-schema';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { ImageInput } from '@/components/admin/image-input/ImageInput';
-import { InputError } from '@/components/admin/input-error/InputError';
-import BannerImage from '@/assets/images/public/partners-page/horses.png';
+import { PartnerBanner as PartnerBannerType } from '../../../../../types/admin/partners';
+import { PARTNER_BANNER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/partner-schema/partner-schema';
+import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { ImageInput } from '../../../../../components/admin/image-input/ImageInput';
+import { InputError } from '../../../../../components/admin/input-error/InputError';
+import BannerImage from '../../../../../assets/images/public/partners-page/horses.png';
 
 export interface PartnerBannerValues {
     title: string;
@@ -141,7 +141,7 @@ export const PartnerBanner = () => {
 
     if (isLoadingData) {
         return (
-            <div className={styles['partner-banner-form__loader']}>
+            <div className={styles['loader']}>
                 <InlineLoader size={2} />
             </div>
         );
@@ -149,7 +149,7 @@ export const PartnerBanner = () => {
 
     if (fetchError || !values) {
         return (
-            <div className={styles['partner-banner-form__error']}>
+            <div className={styles['error']}>
                 <p>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER}</p>
                 <Button onClick={refetchBanner} buttonStyle="primary">
                     {PARTNERS_TEXT.BUTTON.TRY_AGAIN}
@@ -161,15 +161,15 @@ export const PartnerBanner = () => {
     const isDisabled = isPublishing;
 
     return (
-        <div className={styles['partner-banner-form']}>
+        <div className={styles['root']}>
             {isLoadingData && (
-                <div className={styles['partner-banner-form__loader']}>
+                <div className={styles['loader']}>
                     <InlineLoader size={2} />
                 </div>
             )}
 
             {fetchError && !isLoadingData && (
-                <div className={styles['partner-banner-form__error']}>
+                <div className={styles['error']}>
                     <p>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER}</p>
                     <Button onClick={refetchBanner} buttonStyle="primary">
                         {PARTNERS_TEXT.BUTTON.TRY_AGAIN}
@@ -178,8 +178,8 @@ export const PartnerBanner = () => {
             )}
 
             {!isLoadingData && !fetchError && values && (
-                <div className={styles['partner-banner-form__content']}>
-                    <div className={styles['partner-banner-form__image']}>
+                <div className={styles['content']}>
+                    <div className={styles['image']}>
                         <ImageInput
                             label={PARTNERS_TEXT.BANNER.ADD_IMAGE_HERE}
                             subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
@@ -203,8 +203,8 @@ export const PartnerBanner = () => {
                         <InputError error={errors.image} />
                     </div>
 
-                    <div className={styles['partner-banner-form__main']}>
-                        <div className={styles['partner-banner-form__fields']}>
+                    <div className={styles['main']}>
+                        <div className={styles['fields']}>
                             <InputWithCharacterLimitGroup
                                 label={PARTNERS_TEXT.FORM.LABEL.TITLE}
                                 value={values.title}
@@ -230,7 +230,7 @@ export const PartnerBanner = () => {
                             />
                         </div>
 
-                        <div className={styles['partner-banner-form__actions']}>
+                        <div className={styles['actions']}>
                             <Button
                                 type="button"
                                 buttonStyle="primary"

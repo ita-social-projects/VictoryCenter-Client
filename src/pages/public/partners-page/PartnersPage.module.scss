@@ -1,4 +1,4 @@
-@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors' as c;
 
 .partners-page {
     &-loader {
@@ -8,7 +8,7 @@
     }
 
     &-error-message {
-        color: colors.$error;
+        color: c.$error;
         text-align: center;
         margin-top: 8rem;
     }

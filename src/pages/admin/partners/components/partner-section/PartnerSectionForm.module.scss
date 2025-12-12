@@ -1,109 +1,111 @@
 @use '@/assets/sass/variables/fonts';
-@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors' as c;
 
-.partner-section-form {
+.root {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 2rem;
     padding: 5.25rem 3.5rem;
-    border-bottom: 1px solid colors.$grey-700;
+    border-bottom: 1px solid c.$grey-700;
+}
 
-    &__inputs {
-        display: flex;
-        flex-direction: row;
-        gap: 28.5625rem;
+.inputs {
+    display: flex;
+    flex-direction: row;
+    gap: 28.5625rem;
+}
 
-        .partner-section-form__title-group,
-        .partner-section-form__description-group {
-            flex: 1;
-            position: relative;
-        }
+.inputs > * {
+    flex: 1;
+}
 
-        .partner-section-form__title-group {
-            .char-limit-textarea {
-                width: 28.75rem;
-            }
-            .input-group {
-                width: 28.75rem;
-                height: 10rem;
-            }
+.title-group {
+    flex: 1;
+    position: relative;
+}
 
-            .input-error {
-                position: absolute;
-                left: 0;
-                bottom: 0px;
-                font-size: 0.75rem;
-                line-height: 1rem;
-            }
-        }
+.title-group :global(.char-limit-textarea) {
+    width: 28.75rem;
+}
 
-        .partner-section-form__description-group {
-            .char-limit-textarea {
-                width: 31.5rem;
-            }
+.title-group :global(.input-group) {
+    width: 28.75rem;
+    height: 10rem;
+}
 
-            .char-limit-textarea__field {
-                font-size: 1.25rem;
-            }
-            .input-error {
-                position: absolute;
-                left: 0;
-                bottom: 0px;
-                font-size: 0.75rem;
-                line-height: 1rem;
-            }
-        }
-    }
+.title-group :global(.input-error) {
+    position: absolute;
+    left: 0;
+    bottom: 0px;
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
 
-    &__inputs > * {
-        flex: 1;
-    }
+.description-group {
+    flex: 1;
+    position: relative;
+}
 
-    &__partners-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1.875rem;
-        align-items: flex-start;
-    }
+.description-group :global(.char-limit-textarea) {
+    width: 31.5rem;
+}
 
-    &__add-card {
-        width: 13.125rem;
-        height: 25rem;
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
+.description-group :global(.char-limit-textarea__field) {
+    font-size: 1.25rem;
+}
 
-        button {
-            font-family: fonts.$mulish-regular-font;
-            font-weight: 400;
-            font-size: 1rem;
-            line-height: 1.5rem;
-            color: colors.$blue-500;
-            cursor: pointer;
-            border: none;
-            background: none;
-            padding: 0;
-        }
-    }
+.description-group :global(.input-error) {
+    position: absolute;
+    left: 0;
+    bottom: 0px;
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
 
-    &__loader {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+.partners-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.875rem;
+    align-items: flex-start;
+}
 
-    &__actions {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        height: 2.5rem;
-        gap: 4rem;
+.add-card {
+    width: 13.125rem;
+    height: 25rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
 
-        button {
-            width: 20.3125rem;
-        }
-    }
+.add-card button {
+    font-family: fonts.$mulish-regular-font;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.5rem;
+    color: c.$blue-500;
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+}
+
+.loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 2.5rem;
+    gap: 4rem;
+}
+
+.actions button {
+    width: 20.3125rem;
 }

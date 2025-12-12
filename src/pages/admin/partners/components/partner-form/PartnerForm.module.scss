@@ -1,96 +1,94 @@
-﻿@use '@/assets/sass/variables/colors.scss';
+﻿@use '@/assets/sass/variables/colors' as c;
 
-.partner-form {
+.root {
     width: 13rem;
     height: 25.25rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+}
 
-    &__header {
-        width: 100%;
-        display: flex;
-        flex-direction: row;
-        justify-content: end;
+.header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+}
+
+.delete-button {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: none;
+    cursor: pointer;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url('~@/assets/icons/delete-default.svg');
+
+    &:hover:not(:disabled) {
+        background-image: url('~@/assets/icons/delete-hover.svg');
     }
 
-    &__delete-button {
-        width: 1.5rem;
-        height: 1.5rem;
-        border: none;
-        cursor: pointer;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center;
-        background-image: url('~@/assets/icons/delete-default.svg');
-
-        &:hover:not(:disabled) {
-            background-image: url('~@/assets/icons/delete-hover.svg');
-        }
-
-        &:active:not(:disabled) {
-            background-image: url('~@/assets/icons/delete-pressed.svg');
-        }
-
-        &:disabled {
-            background-image: url('~@/assets/icons/delete-disabled.svg');
-            cursor: not-allowed;
-        }
+    &:active:not(:disabled) {
+        background-image: url('~@/assets/icons/delete-pressed.svg');
     }
 
-    &__content {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
+    &:disabled {
+        background-image: url('~@/assets/icons/delete-disabled.svg');
+        cursor: not-allowed;
     }
+}
 
-    &__image {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
+.content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
 
-        :global(.image-input-wrapper) {
-            width: 13rem;
-            height: 13rem;
+.image {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
 
-            :global(.image-placeholder) {
-                width: 100%;
-                height: 100%;
+.image :global(.image-input-wrapper) {
+    width: 13rem;
+    height: 13rem;
+}
 
-                :global(.placeholder-icon) {
-                    width: 2.14rem;
-                    height: 2.14rem;
-                }
-            }
+.image :global(.image-placeholder) {
+    width: 100%;
+    height: 100%;
+}
 
-            :global(.image-preview) {
-                :global(.delete-button) {
-                    width: 3.92rem;
-                    height: 3.92rem;
-                    padding: 0.89rem;
+.image :global(.placeholder-icon) {
+    width: 2.14rem;
+    height: 2.14rem;
+}
 
-                    :global(.delete-icon) {
-                        width: 1.425rem;
-                        height: 1.425rem;
-                    }
-                }
-            }
-        }
-    }
+.image :global(.image-preview .delete-button) {
+    width: 3.92rem;
+    height: 3.92rem;
+    padding: 0.89rem;
+}
 
-    &__description {
-        position: relative;
-        width: 13rem;
-        height: 9.75rem;
+.image :global(.delete-icon) {
+    width: 1.425rem;
+    height: 1.425rem;
+}
 
-        :global(.input-error) {
-            position: absolute;
-            left: 0;
-            bottom: 0px;
-            font-size: 0.75rem;
-            line-height: 1rem;
-        }
-    }
+.description {
+    position: relative;
+    width: 13rem;
+    height: 9.75rem;
+}
+
+.description :global(.input-error) {
+    position: absolute;
+    left: 0;
+    bottom: 0px;
+    font-size: 0.75rem;
+    line-height: 1rem;
 }

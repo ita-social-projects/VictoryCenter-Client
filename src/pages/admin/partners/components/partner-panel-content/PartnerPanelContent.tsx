@@ -13,12 +13,12 @@ export const PartnerPanelContent = () => {
     }, []);
 
     return (
-        <div className={styles['partner-panel-content']}>
-            <div className={styles['partner-panel-content__toolbar']}>
+        <div className={styles['root']}>
+            <div className={styles['toolbar']}>
                 <PartnerPageToolbar onAddSection={handleAddSection} />
             </div>
 
-            <div className={styles['partner-panel-content__scrollable-area']}>
+            <div className={styles['scrollable-area']}>
                 <PartnerBanner />
                 <PartnerSectionsEditor ref={sectionsEditorRef} />
             </div>

@@ -2,18 +2,17 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { AxiosInstance } from 'axios';
-import { TeamMember } from '../../../../../types/admin/team-members';
-import { VisibilityStatus, ModalMode } from '../../../../../types/admin/common';
-import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { TeamMember } from '@/types/admin/team-members';
+import { VisibilityStatus, ModalMode } from '@/types/admin/common';
+import { TeamMembersApi } from '@/services/api/admin/team/team-members/team-members-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { TeamMemberModal } from './TeamMemberModal';
-import { TeamCategory } from '../../../../../types/admin/team-category';
-import { ModalProps } from '../../../../../components/common/modal/Modal';
-import { ButtonProps } from '../../../../../components/admin/button/Button';
-import { ConfirmationModalProps } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
+import { TeamCategory } from '@/types/admin/team-category';
+import { ModalProps } from '@/components/common/modal/Modal';
+import { ButtonProps } from '@/components/admin/button/Button';
+import { ConfirmationModalProps } from '@/components/admin/confirmation-modal/ConfirmationModal';
 
-// Mock data-fetch API
-jest.mock('../../../../../services/api/admin/team/team-members/team-members-api', () => ({
+jest.mock('@/services/api/admin/team/team-members/team-members-api', () => ({
     TeamMembersApi: {
         postMember: jest.fn(),
         updateMember: jest.fn(),
@@ -21,13 +20,11 @@ jest.mock('../../../../../services/api/admin/team/team-members/team-members-api'
     },
 }));
 
-// Mock admin client hook
-jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
-// Lightweight Modal mock with named export and slot components
-jest.mock('../../../../../components/common/modal/Modal', () => {
+jest.mock('@/components/common/modal/Modal', () => {
     const React = require('react');
     const Modal = ({ children, isOpen, onClose }: ModalProps) =>
         isOpen
@@ -46,8 +43,7 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     return { Modal };
 });
 
-// Lightweight Button mock with named export
-jest.mock('../../../../../components/admin/button/Button', () => ({
+jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled }: ButtonProps) => (
         <button onClick={onClick} disabled={disabled}>
             {children}
@@ -55,8 +51,7 @@ jest.mock('../../../../../components/admin/button/Button', () => ({
     ),
 }));
 
-// Lightweight QuestionModal mock with named export
-jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, title, onConfirm, onCancel, isButtonsDisabled }: ConfirmationModalProps) =>
         isOpen ? (
             <div data-testid="question-modal">
@@ -67,7 +62,6 @@ jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal'
         ) : null,
 }));
 
-// Mock MemberForm with named export and inline factory (avoid TDZ issues)
 jest.mock('../member-form/MemberForm', () => {
     const React = require('react');
     return {
@@ -109,8 +103,7 @@ jest.mock('../member-form/MemberForm', () => {
     };
 });
 
-// Mock constants to stable english text (named exports)
-jest.mock('../../../../../const/admin/team', () => ({
+jest.mock('@/const/admin/team', () => ({
     TEAM_MEMBERS_TEXT: {
         FORM: {
             TITLE: { ADD_MEMBER: 'Add Member', EDIT_MEMBER: 'Edit Member' },
@@ -120,7 +113,7 @@ jest.mock('../../../../../const/admin/team', () => ({
     },
 }));
 
-jest.mock('../../../../../const/admin/common', () => ({
+jest.mock('@/const/admin/common', () => ({
     COMMON_TEXT_ADMIN: {
         FILTER: {
             STATUS: {

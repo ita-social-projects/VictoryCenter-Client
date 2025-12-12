@@ -1,5 +1,5 @@
-import { InputLabel, InputLabelProps } from '../../input-label/InputLabel';
-import { InputError, InputErrorProps } from '../../input-error/InputError';
+import { InputLabel, InputLabelProps } from '@/input-label/InputLabel';
+import { InputError, InputErrorProps } from '@/input-error/InputError';
 import { MultiSelectInput, MultiSelectInputProps } from '../../multi-select-input/MultiSelectInput';
 import '../input-group.scss';
 import classNames from 'classnames';

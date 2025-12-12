@@ -1,8 +1,8 @@
 import { programValidationSchema, ProgramValidationContext, PROGRAM_VALIDATION_FUNCTIONS } from './program-schema';
-import { PROGRAM_VALIDATION } from '../../../const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { ImageValues, Image } from '../../../types/common/image';
-import { Program } from '../../../types/admin/programs';
+import { PROGRAM_VALIDATION } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ImageValues, Image } from '@/types/common/image';
+import { Program } from '@/types/admin/programs';
 
 const createMockFile = (type = 'image/jpeg'): ImageValues => ({
     base64: 'fsdgdsgdsdgsdgsd',

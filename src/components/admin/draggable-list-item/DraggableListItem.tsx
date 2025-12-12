@@ -1,7 +1,7 @@
-import { ReactComponent as DragIcon } from '../../../assets/icons/dragger.svg';
+import { ReactComponent as DragIcon } from '@/assets/icons/dragger.svg';
 import React, { useCallback, useState } from 'react';
 import './DraggableListItem.scss';
-import { DragPreviewModel } from '../../../types/admin/common';
+import { DragPreviewModel } from '@/types/admin/common';
 import { DragPreview } from '../drag-preview/DragPreview';
 
 export interface DraggableListItemProps<TEntity> {

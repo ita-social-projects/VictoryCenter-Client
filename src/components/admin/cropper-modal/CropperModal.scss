@@ -1,0 +1,111 @@
+@use '../../../assets/sass/variables/colors';
+
+.ReactCrop {
+    --ReactCrop-overlay-color: rgba(164, 164, 155, 0.9) !important;
+    --ReactCrop-line-color: none;
+    --ReactCrop-crop-selection-border-color: transparent !important;
+}
+
+.ReactCrop__crop-selection {
+    &::before {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    border: 2px solid colors.$grey-600 !important;
+    animation: none !important;
+    background: transparent !important;
+}
+
+.ReactCrop__drag-handle {
+    width: 59px;
+    height: 55px;
+    background: colors.$grey-600;
+    position: absolute;
+
+    transform: translate(-50%, -50%);
+}
+
+.ReactCrop__drag-handle.ord-nw {
+    top: 0;
+    left: 0;
+    transform: translate(-15%, -15%);
+    clip-path: polygon(100% 0, 100% 15%, 15% 15%, 15% 100%, 0 100%, 0 0);
+}
+
+.ReactCrop__drag-handle.ord-ne {
+    top: 0;
+    right: 0;
+    transform: translate(15%, -15%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 85% 100%, 85% 15%, 0 15%);
+}
+
+.ReactCrop__drag-handle.ord-sw {
+    bottom: 0;
+    left: 0;
+    transform: translate(-15%, 15%);
+    clip-path: polygon(15% 0, 15% 85%, 100% 85%, 100% 100%, 0 100%, 0 0);
+}
+
+.ReactCrop__drag-handle.ord-se {
+    bottom: 0;
+    right: 0;
+    transform: translate(15%, 15%);
+    clip-path: polygon(85% 0, 100% 0, 100% 100%, 0 100%, 0 85%, 85% 85%);
+}
+
+.ReactCrop__drag-handle.ord-n,
+.ReactCrop__drag-handle.ord-s {
+    width: 59px;
+    height: 8px;
+    clip-path: none;
+}
+
+.ReactCrop__drag-handle.ord-e,
+.ReactCrop__drag-handle.ord-w {
+    width: 8px;
+    height: 59px;
+    clip-path: none;
+}
+
+.ReactCrop__drag-handle.ord-n {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -100%);
+}
+
+.ReactCrop__drag-handle.ord-s {
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 100%);
+}
+
+.ReactCrop__drag-handle.ord-w {
+    top: 50%;
+    left: 0;
+    transform: translate(-100%, -50%);
+}
+
+.ReactCrop__drag-handle.ord-e {
+    top: 50%;
+    right: 0;
+    transform: translate(100%, -50%);
+}
+
+.cropper-container {
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+
+    .ReactCrop {
+        --ReactCrop-overlay-color: rgba(255, 0, 0, 1) !important;
+    }
+
+    img {
+        width: 100%;
+        height: auto;
+        display: block;
+
+        max-height: 70vh;
+    }
+}

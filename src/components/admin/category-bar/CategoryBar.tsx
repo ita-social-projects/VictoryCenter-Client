@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ContextMenuButton } from '../context-menu-button/ContextMenuButton';
 import { CategoryButton } from '../category-button/CategoryButton';
-import { ReactComponent as ArrowLeftIcon } from '../../../assets/icons/arrow-left.svg';
-import { ReactComponent as ArrowRightIcon } from '../../../assets/icons/arrow-right.svg';
+import { ReactComponent as ArrowLeftIcon } from '@/assets/icons/arrow-left.svg';
+import { ReactComponent as ArrowRightIcon } from '@/assets/icons/arrow-right.svg';
 import './CategoryBar.scss';
 
 export interface ContextMenuOption {
@@ -92,6 +92,7 @@ export const CategoryBar = <T,>({
             )}
             {showLeftArrow && (
                 <button
+                    title="Scroll Left"
                     className="category-bar-arrow category-bar-arrow-left"
                     onClick={() => handleScroll('left')}
                     type="button"
@@ -113,6 +114,7 @@ export const CategoryBar = <T,>({
             </div>
             {showRightArrow && (
                 <button
+                    title="Scroll Right"
                     className="category-bar-arrow category-bar-arrow-right"
                     onClick={() => handleScroll('right')}
                     type="button"

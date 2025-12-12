@@ -1,14 +1,14 @@
 import './LoginForm.scss';
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { ReactComponent as Logo } from '../../../../assets/icons/logo-with-text.svg';
-import { ReactComponent as EyeOpened } from '../../../../assets/icons/eye-opened.svg';
-import { ReactComponent as EyeClosed } from '../../../../assets/icons/eye-closed.svg';
-import { Button } from '../../../../components/admin/button/Button';
-import { LOGIN_CONST } from '../../../../const/admin/login';
-import { PUBLIC_ROUTES } from '../../../../const/public/routes';
-import { useAdminContext } from '../../../../contexts/admin/admin-context-provider/AdminContextProvider';
-import { Credentials } from '../../../../types/admin/auth';
+import { ReactComponent as Logo } from '@/assets/icons/logo-with-text.svg';
+import { ReactComponent as EyeOpened } from '@/assets/icons/eye-opened.svg';
+import { ReactComponent as EyeClosed } from '@/assets/icons/eye-closed.svg';
+import { Button } from '@/components/admin/button/Button';
+import { LOGIN_CONST } from '@/const/admin/login';
+import { PUBLIC_ROUTES } from '@/const/public/routes';
+import { useAdminContext } from '@/contexts/admin/admin-context-provider/AdminContextProvider';
+import { Credentials } from '@/types/admin/auth';
 
 type LoginFormProps = {
     setShowErrorModal: (value: boolean) => void;

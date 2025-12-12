@@ -1,23 +1,20 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramsPageContent } from './ProgramsPageContent';
-import { Program, ProgramCategory } from '../../../../../types/admin/programs';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { ProgramsApi, ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { AdminPanelToolbarProps } from '../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar';
-import { CategoryBarProps } from '../../../../../components/admin/category-bar/CategoryBar';
-import { ProgramListItemProps } from '../program-list-item/ProgramListItem';
-import { ProgramsPageModalsProps } from '../programs-page-modals/ProgramsPageModals';
-import { InfiniteScrollListProps } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
+import { Program, ProgramCategory } from '@/types/admin/programs';
+import { VisibilityStatus } from '@/types/admin/common';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { ProgramsApi, ProgramsCategoriesApi } from '@/services/api/admin/programs/programs-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { ProgramsPageModalsProps } from '@/pages/admin/programs/components/programs-page-modals/ProgramsPageModals';
+import { InfiniteScrollListProps } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
 
-jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
-jest.mock('../../../../../services/api/admin/programs/programs-api', () => ({
+jest.mock('@/services/api/admin/programs/programs-api', () => ({
     ProgramsApi: {
         fetchProgramCategories: jest.fn(),
         fetchPrograms: jest.fn(),
@@ -29,12 +26,12 @@ jest.mock('../../../../../services/api/admin/programs/programs-api', () => ({
     },
 }));
 
-jest.mock('../../../../../hooks/admin/use-modals-state/useModalsState', () => ({
+jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
     __esModule: true,
     useModalsState: jest.fn(),
 }));
 
-jest.mock('../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
+jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
     AdminPanelToolbar: ({
         onSearchClear,
         onStatusFilterChange,
@@ -57,13 +54,8 @@ jest.mock('../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar'
     ),
 }));
 
-jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
-    CategoryBar: ({
-        categories,
-        selectedCategory,
-        onCategorySelect,
-        onContextMenuOptionSelected,
-    }: CategoryBarProps<ProgramCategory>) => (
+jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
+    CategoryBar: ({ categories, selectedCategory, onCategorySelect, onContextMenuOptionSelected }: any) => (
         <div data-testid="category-bar">
             {categories.map((cat) => (
                 <button
@@ -88,7 +80,7 @@ jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
+jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
     InfiniteScrollList: ({
         items,
         renderItem,
@@ -121,7 +113,7 @@ jest.mock('../program-list-item/ProgramListItem', () => ({
 }));
 
 jest.mock('../programs-page-modals/ProgramsPageModals', () => {
-    const { VisibilityStatus } = require('../../../../../types/admin/common');
+    const { VisibilityStatus } = require('@/types/admin/common');
     return {
         ProgramsPageModals: (props: ProgramsPageModalsProps) => (
             <div data-testid="programs-modals">
@@ -181,7 +173,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
     };
 });
 
-const mockUseModalsState = require('../../../../../hooks/admin/use-modals-state/useModalsState');
+const mockUseModalsState = require('@/hooks/admin/use-modals-state/useModalsState');
 const mockProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 const mockProgramsCategoriesApi = ProgramsCategoriesApi as jest.Mocked<typeof ProgramsCategoriesApi>;
 

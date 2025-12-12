@@ -72,6 +72,12 @@ export const PROGRAM_VALIDATION = {
     categories: {
         getAtLeastOneRequiredError: () => 'Потрібно обрати хоча б одну категорію',
     },
+    image: {
+        cropWidth: 960,
+        cropHeight: 870,
+        minWidth: 960,
+        minHeight: 870,
+    },
     previewImage: {
         width: 440,
         height: 480,

@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ModalMode, PendingAction, VisibilityStatus } from '../../../types/admin/common';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ModalMode, PendingAction, VisibilityStatus } from '@/types/admin/common';
 
 export interface GenericFormRef {
     submit: (status: VisibilityStatus) => Promise<void>;

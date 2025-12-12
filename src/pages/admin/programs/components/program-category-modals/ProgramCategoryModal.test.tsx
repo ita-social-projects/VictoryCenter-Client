@@ -2,30 +2,21 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramCategoryModal, ProgramCategoryModalProps } from './ProgramCategoryModal';
-import { ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
-import { ProgramCategory } from '../../../../../types/admin/programs';
-import { PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { ModalProps } from '../../../../../components/common/modal/Modal';
-import { InputLabelProps } from '../../../../../components/admin/input-label/InputLabel';
-import { ButtonProps } from '../../../../../components/admin/button/Button';
-import { HintBoxProps } from '../../../../../components/admin/hint-box/HintBox';
-import { ConfirmationModalProps } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
+import { ProgramsCategoriesApi } from '@/services/api/admin/programs/programs-api';
+import { ProgramCategory } from '@/types/admin/programs';
+import { PROGRAM_CATEGORY_VALIDATION } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { InputLabelProps } from '@/components/admin/input-label/InputLabel';
+import { ButtonProps } from '@/components/admin/button/Button';
+import { HintBoxProps } from '@/components/admin/hint-box/HintBox';
+import { ConfirmationModalProps } from '@/components/admin/confirmation-modal/ConfirmationModal';
 
-jest.mock('../../../../../services/api/admin/programs/programs-api');
+jest.mock('@/services/api/admin/programs/programs-api');
 const mockedProgramsCategoriesApi = ProgramsCategoriesApi as jest.Mocked<typeof ProgramsCategoriesApi>;
 
-jest.mock('../../../../../components/common/modal/Modal', () => {
-    const ModalMock = ({ isOpen, children, onClose }: ModalProps) =>
-        isOpen ? (
-            <div data-testid="modal">
-                <button data-testid="modal-close-btn" onClick={onClose}>
-                    X
-                </button>
-                {children}
-            </div>
-        ) : null;
+jest.mock('@/components/common/modal/Modal', () => {
+    const ModalMock = ({ isOpen, children }: any) => (isOpen ? <div data-testid="modal">{children}</div> : null);
     ModalMock.Title = ({ children }: { children: React.ReactNode }) => <h1 data-testid="modal-title">{children}</h1>;
     ModalMock.Content = ({ children }: { children: React.ReactNode }) => (
         <div data-testid="modal-content">{children}</div>
@@ -36,12 +27,11 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     return { Modal: ModalMock };
 });
 
-jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
-// Simplify Button
-jest.mock('../../../../../components/admin/button/Button', () => ({
+jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled, className, buttonStyle, type }: ButtonProps) => (
         <button
             onClick={onClick}
@@ -55,7 +45,7 @@ jest.mock('../../../../../components/admin/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/admin/input-label/InputLabel', () => ({
+jest.mock('@/components/admin/input-label/InputLabel', () => ({
     InputLabel: ({ htmlFor, text, isRequired }: InputLabelProps) => (
         <div data-testid="input-label" data-for={htmlFor}>
             {text}
@@ -64,8 +54,7 @@ jest.mock('../../../../../components/admin/input-label/InputLabel', () => ({
     ),
 }));
 
-// Simplify HintBox
-jest.mock('../../../../../components/admin/hint-box/HintBox', () => ({
+jest.mock('@/components/admin/hint-box/HintBox', () => ({
     HintBox: ({ title, text }: HintBoxProps) => (
         <div data-testid="hint-box">
             <p>{title}</p>
@@ -74,8 +63,7 @@ jest.mock('../../../../../components/admin/hint-box/HintBox', () => ({
     ),
 }));
 
-// Render ConfirmationModal inline and clickable
-jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
     ConfirmationModal: ({ isOpen, title, onConfirm, onCancel }: ConfirmationModalProps) =>
         isOpen ? (
             <div data-testid="confirm-modal">

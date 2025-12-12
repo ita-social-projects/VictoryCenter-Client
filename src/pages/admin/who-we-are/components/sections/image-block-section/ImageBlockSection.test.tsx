@@ -1,13 +1,15 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ImageSection, ImageSectionProps } from './ImageBlockSection';
-import { ContentType } from '../../../../../../types/common/about-us';
-import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
-import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
-import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
-import { Image } from '../../../../../../types/common/image';
+import { ContentType } from '@/types/common/about-us';
+import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
+import { Image } from '@/types/common/image';
+import { InputWithCharacterLimitProps } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
+import { TextAreaWithCharacterLimitProps } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 
-jest.mock('../../../../../../components/admin/image-input/ImageInput', () => ({
+jest.mock('@/components/admin/image-input/ImageInput', () => ({
     ImageInput: ({ onChange, label, setError }: any) => (
         <div data-testid="mock-image-input">
             <label htmlFor="mock-image-input-id">{label}</label>
@@ -22,8 +24,8 @@ jest.mock('../../../../../../components/admin/image-input/ImageInput', () => ({
     ),
 }));
 
-jest.mock('../../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
-    InputWithCharacterLimit: ({ onChange, value, maxLength, onBlur, id }: any) => (
+jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
+    InputWithCharacterLimit: ({ onChange, value, maxLength, onBlur, id }: InputWithCharacterLimitProps) => (
         <input
             data-testid="mock-title-input"
             onChange={onChange}
@@ -35,8 +37,8 @@ jest.mock('../../../../../../components/admin/input-with-character-limit/InputWi
     ),
 }));
 
-jest.mock('../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
-    TextAreaWithCharacterLimit: ({ onChange, value, maxLength, onBlur, id }: any) => (
+jest.mock('@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit', () => ({
+    TextAreaWithCharacterLimit: ({ onChange, value, maxLength, onBlur, id }: TextAreaWithCharacterLimitProps) => (
         <textarea
             data-testid="mock-description-textarea"
             onChange={onChange}
@@ -48,7 +50,7 @@ jest.mock('../../../../../../components/admin/textarea-with-character-limit/Text
     ),
 }));
 
-jest.mock('../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
+jest.mock('@/validation/admin/who-we-are-schema/WhoWeAreSchema', () => ({
     WHO_WE_ARE_VALIDATION_FUNCTIONS: {
         validateText: jest.fn((value: string) => {
             if (value === 'invalid text') {

@@ -3,22 +3,22 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import {
     SearchItemContentRef,
     SearchItemContentRenderProps,
-} from '../search-bar/search-item-wrapper/SearchItemWrapper';
+} from '@/components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
 import { AdminPanelToolbar } from './AdminPageToolbar';
-import { UI_CONFIG } from '../../../const/admin/common';
-import { VisibilityStatus } from '../../../types/admin/common';
-import { StatusFilterDropdownProps } from '../status-filter-dropdown/StatusFilterDropdown';
-import { ButtonProps } from '../button/Button';
+import { UI_CONFIG } from '@/const/admin/common';
+import { VisibilityStatus } from '@/types/admin/common';
+import { StatusFilterDropdownProps } from '@/components/admin/status-filter-dropdown/StatusFilterDropdown';
+import { ButtonProps } from '@/components/admin/button/Button';
 
-jest.mock('../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch', () => ({
+jest.mock('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch', () => ({
     useDataPaginationFetch: jest.fn(),
 }));
 
-jest.mock('../search-bar/SearchBar', () => ({
+jest.mock('@/components/admin/search-bar/SearchBar', () => ({
     SearchBar: jest.fn(() => <div data-testid="search-bar">Search Bar Mock</div>),
 }));
 
-jest.mock('../status-filter-dropdown/StatusFilterDropdown', () => ({
+jest.mock('@/components/admin/status-filter-dropdown/StatusFilterDropdown', () => ({
     StatusFilterDropdown: jest.fn(({ value }: StatusFilterDropdownProps) => (
         <div data-testid="status-filter-dropdown" data-value={value}>
             Status Filter Mock
@@ -26,7 +26,7 @@ jest.mock('../status-filter-dropdown/StatusFilterDropdown', () => ({
     )),
 }));
 
-jest.mock('../button/Button', () => ({
+jest.mock('@/components/admin/button/Button', () => ({
     Button: jest.fn(({ children, onClick, ...props }: ButtonProps) => (
         <button data-testid="add-item-button" onClick={onClick} {...props}>
             {children}
@@ -34,7 +34,7 @@ jest.mock('../button/Button', () => ({
     )),
 }));
 
-jest.mock('../../../assets/icons/plus.svg', () => ({
+jest.mock('@/assets/icons/plus.svg', () => ({
     ReactComponent: () => <div data-testid="plus-icon" />,
 }));
 

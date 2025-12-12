@@ -1,15 +1,15 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProgramsSection } from './ProgramsSection';
-import { useDataFetch } from '../../../../hooks/common/use-data-fetch/useDataFetch';
-import { mockPrograms } from '../../../../utils/mock-data/public/programs-page';
-import programsPageUk from '../../../../locales/uk/programs.json';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import { mockPrograms } from '@/utils/mock-data/public/programs-page';
+import programsPageUk from '@/locales/uk/programs.json';
 
-jest.mock('../../../../components/public/program-card/ProgramCard', () => ({
+jest.mock('@/components/public/program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: any) => <div data-testid="program-card">{program.name}</div>,
 }));
 
-jest.mock('../../../../services/api/public/programs/programs-api');
-jest.mock('../../../../hooks/common/use-data-fetch/useDataFetch');
+jest.mock('@/services/api/public/programs/programs-api');
+jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
 
 describe('ProgramsSection', () => {
     afterEach(() => {

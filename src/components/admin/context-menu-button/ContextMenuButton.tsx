@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { useOnClickOutside } from '../../../hooks/common/use-on-click-outside/useOnClickOutside';
-import { ReactComponent as MenuIcon } from '../../../assets/icons/menu.svg';
+import { useOnClickOutside } from '@/hooks/common/use-on-click-outside/useOnClickOutside';
+import { ReactComponent as MenuIcon } from '@/assets/icons/menu.svg';
 import classNames from 'classnames';
 import './ContextMenuButton.scss';
 

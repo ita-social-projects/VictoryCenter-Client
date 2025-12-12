@@ -1,13 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
-import { Program, ProgramCategory, ProgramCreateUpdate } from '../../../../../../types/admin/programs';
-import { VisibilityStatus, PendingAction, ModalMode } from '../../../../../../types/admin/common';
-import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
-import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
-import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
-import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
-import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { Program, ProgramCategory, ProgramCreateUpdate } from '@/types/admin/programs';
+import { VisibilityStatus, PendingAction, ModalMode } from '@/types/admin/common';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
+import { useGenericModal } from '@/hooks/admin/use-generic-modal/useGenericModal';
+import { GenericModalWrapper } from '@/components/admin/generic-modal-wrapper/GenericModalWrapper';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
 export interface BaseProgramModalProps {
     isOpen: boolean;

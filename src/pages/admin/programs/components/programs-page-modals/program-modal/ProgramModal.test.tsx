@@ -1,19 +1,15 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { BaseProgramModalProps, ProgramModal, ProgramModalProps } from './ProgramModal';
-import { Program, ProgramCategory, ProgramCreateUpdate } from '../../../../../../types/admin/programs';
-import { ModalMode } from '../../../../../../types/admin/common';
-import { PROGRAMS_TEXT } from '../../../../../../const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
-import { ProgramsApi } from '../../../../../../services/api/admin/programs/programs-api';
-import { VisibilityStatus } from '../../../../../../types/admin/common';
-import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { ModalProps } from '../../../../../../components/common/modal/Modal';
-import { ButtonProps } from '../../../../../../components/admin/button/Button';
-import { ConfirmationModalProps } from '../../../../../../components/admin/confirmation-modal/ConfirmationModal';
-import { ProgramFormProps, ProgramFormRef } from '../../program-form/ProgramForm';
+import { ProgramModal, ProgramModalProps } from './ProgramModal';
+import { Program, ProgramCategory } from '@/types/admin/programs';
+import { ModalMode } from '@/types/admin/common';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
+import { VisibilityStatus } from '@/types/admin/common';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
-jest.mock('../../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
@@ -30,7 +26,7 @@ beforeEach(() => {
     });
 });
 
-jest.mock('../../../../../../services/api/admin/programs/programs-api', () => ({
+jest.mock('@/services/api/admin/programs/programs-api', () => ({
     ProgramsApi: {
         addProgram: jest.fn(),
         editProgram: jest.fn(),
@@ -39,8 +35,16 @@ jest.mock('../../../../../../services/api/admin/programs/programs-api', () => ({
 
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
-jest.mock('../../../../../../components/common/modal/Modal', () => {
-    const MockModal = ({ isOpen, children, onClose }: ModalProps) => {
+jest.mock('@/components/common/modal/Modal', () => {
+    const MockModal = ({
+        isOpen,
+        children,
+        onClose,
+    }: {
+        isOpen: boolean;
+        children: React.ReactNode;
+        onClose: () => void;
+    }) => {
         if (!isOpen) return null;
         return (
             <div data-testid="modal">
@@ -61,8 +65,13 @@ jest.mock('../../../../../../components/common/modal/Modal', () => {
     return { Modal: MockModal };
 });
 
-jest.mock('../../../../../../components/admin/button/Button', () => ({
-    Button: ({ onClick, disabled, children, buttonStyle }: ButtonProps) => (
+jest.mock('@/components/admin/button/Button', () => ({
+    Button: ({
+        onClick,
+        disabled,
+        children,
+        buttonStyle,
+    }: ButtonProps) => (
         <button
             onClick={onClick}
             disabled={disabled}
@@ -73,8 +82,18 @@ jest.mock('../../../../../../components/admin/button/Button', () => ({
     ),
 }));
 
-jest.mock('../../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel }: ConfirmationModalProps) =>
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({
+        isOpen,
+        title,
+        onConfirm,
+        onCancel,
+    }: {
+        isOpen: boolean;
+        title: string;
+        onConfirm: () => void;
+        onCancel: () => void;
+    }) =>
         isOpen ? (
             <div data-testid="question-modal">
                 <div data-testid="question-title">{title}</div>

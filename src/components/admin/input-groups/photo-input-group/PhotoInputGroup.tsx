@@ -1,7 +1,6 @@
-import React from 'react';
-import { InputLabel, InputLabelProps } from '../../input-label/InputLabel';
-import { InputError, InputErrorProps } from '../../input-error/InputError';
-import { ImageInput, ImageInputProps } from '../../image-input/ImageInput';
+import { InputLabel, InputLabelProps } from '@/components/admin/input-label/InputLabel';
+import { InputError, InputErrorProps } from '@/components/admin/input-error/InputError';
+import { ImageInput, ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import '../input-group.scss';
 
 export interface PhotoInputGroupProps extends Omit<ImageInputProps, 'label' | 'subText'> {
@@ -28,6 +27,10 @@ export const PhotoInputGroup = ({
     className,
     imageLabel,
     imageSubText,
+    cropWidth,
+    cropHeight,
+    minWidth,
+    minHeight,
 }: PhotoInputGroupProps) => {
     return (
         <div className="input-group">
@@ -43,6 +46,10 @@ export const PhotoInputGroup = ({
                 className={className}
                 label={imageLabel}
                 subText={imageSubText}
+                cropHeight={cropHeight}
+                cropWidth={cropWidth}
+                minHeight={minHeight}
+                minWidth={minWidth}
             />
             <InputError error={error} />
         </div>

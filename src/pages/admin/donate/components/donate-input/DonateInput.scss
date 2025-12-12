@@ -1,5 +1,5 @@
-@use '../../../../../assets/sass/variables/colors.scss';
-@use '../../../../../assets/sass/variables/fonts.scss';
+@use '@/assets/sass/variables/colors.scss';
+@use '@/assets/sass/variables/fonts.scss';
 
 .donate-input {
     display: flex;
@@ -44,7 +44,7 @@
         border: none;
         width: 1.5rem;
         height: 1.5rem;
-        background: url('../../../../../assets/icons/remove-query.svg');
+        background: url('~@/assets/icons/remove-query.svg');
 
         &:hover {
             cursor: pointer;
@@ -65,8 +65,6 @@
             display: flex;
             gap: 0.25rem;
         }
-
-        min-height: 62px;
 
         .donate-input-textarea {
             min-height: 3rem;
@@ -96,8 +94,24 @@
     }
 }
 
-.donate-input-character-counter {
-    color: colors.$grey-900;
-    text-align: right;
+.donate-input-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     margin-top: 0.25rem;
+    min-height: 1.25rem;
+
+    .donate-input-error {
+        font-size: 0.875rem;
+        font-weight: 400;
+        color: colors.$error;
+        flex: 1;
+    }
+
+    .donate-input-character-counter {
+        color: colors.$grey-900;
+        font-size: 0.875rem;
+        flex-shrink: 0;
+        margin-left: 1rem;
+    }
 }

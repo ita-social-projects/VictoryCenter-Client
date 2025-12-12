@@ -1,17 +1,17 @@
 import React, { forwardRef, useCallback, useMemo } from 'react';
-import { PROGRAM_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/program-schema/program-schema';
-import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { InputWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
-import { TextAreaWithCharacterLimitGroup } from '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { MultiSelectInputGroup } from '../../../../../components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
-import { PhotoInputGroup } from '../../../../../components/admin/input-groups/photo-input-group/PhotoInputGroup';
-import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
-import { Button } from '../../../../../components/admin/button/Button';
-import { Image, ImageValues } from '../../../../../types/common/image';
-import { ProgramCategory } from '../../../../../types/admin/programs';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
+import { PROGRAM_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
+import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
+import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
+import { MultiSelectInputGroup } from '@/components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
+import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
+import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
+import { Button } from '@/components/admin/button/Button';
+import { Image, ImageValues } from '@/types/common/image';
+import { ProgramCategory } from '@/types/admin/programs';
+import { VisibilityStatus } from '@/types/admin/common';
+import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import './ProgramForm.scss';
 
 export interface ProgramFormValues {
@@ -343,6 +343,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                 disabled={isSubmitting || isFormDisabled}
                                 error={errors.previewImage}
                                 setError={handleSetPreviewImageError}
+                                                    cropWidth={PROGRAM_VALIDATION.image.cropWidth}
+                    cropHeight={PROGRAM_VALIDATION.image.cropHeight}
+                    minWidth={PROGRAM_VALIDATION.image.minWidth}
+                    minHeight={PROGRAM_VALIDATION.image.minHeight}
                                 imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
                                 imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
                                     PROGRAM_VALIDATION.previewImage.height,

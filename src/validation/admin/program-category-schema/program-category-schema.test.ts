@@ -1,6 +1,6 @@
 import { ProgramCategoryValidationSchema } from './program-category-schema';
-import { PROGRAM_CATEGORY_VALIDATION } from '../../../const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { PROGRAM_CATEGORY_VALIDATION } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 describe('ProgramCategoryValidationSchema', () => {
     const expectValidationToPass = async (data: any) => {

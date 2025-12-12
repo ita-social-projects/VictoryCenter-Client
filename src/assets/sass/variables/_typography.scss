@@ -1,0 +1,52 @@
+$font-family-base: 'Mulish Variable', sans-serif;
+
+// Font Weights
+$fw-light: 300;
+$fw-regular: 400;
+$fw-medium: 500;
+$fw-semibold: 600;
+$fw-bold: 700;
+
+// Letter Spacing
+$ls-normal: 0;
+$ls-tight: -0.02em;
+
+// Headings
+$h1-size: 96px;
+$h1-height: 104px;
+$h1-spacing: $ls-tight;
+
+$h2-size: 64px;
+$h2-height: 72px;
+$h2-spacing: $ls-normal;
+
+$h3-size: 40px;
+$h3-height: 48px;
+$h3-spacing: $ls-normal;
+
+$h4-size: 32px;
+$h4-height: 40px;
+$h4-spacing: $ls-tight;
+
+// Subtitles
+$sub1-size: 24px;
+$sub1-height: 36px;
+$sub1-spacing: $ls-tight;
+
+$sub2-size: 20px;
+$sub2-height: 28px;
+$sub2-spacing: $ls-tight;
+
+// Body
+$body1-size: 18px;
+$body1-height: 28px;
+$body1-spacing: $ls-tight;
+
+$body2-size: 16px;
+$body2-height: 24px;
+$body2-spacing: $ls-tight;
+
+// Small Text
+$small-size: 14px;
+$small-height: 20px;
+$small-spacing: $ls-tight;

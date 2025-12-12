@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { LOGIN_CONST } from '../../../const/admin/login';
+import { LOGIN_CONST } from '@/const/admin/login';
 import { LoginPage } from './LoginPage';
 
 jest.mock('./login-form/LoginForm', () => ({

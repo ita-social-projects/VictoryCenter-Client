@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import { LocalizationStatuses, getLocalizationClassNameFromStatus } from './LocalizationStatuses';
+
+import { LocalizationStatuses} from './LocalizationStatuses'; 
+import styles from './LocalizationStatuses.module.scss';
 import {
     TranslationStatus,
     LocalizationLanguage,
@@ -7,30 +9,32 @@ import {
     EntityLocalization,
 } from '../../../types/common/language';
 
+// --- Тестові дані ---
 type TestLocalization = EntityLocalization;
 
+const languages: LocalizationLanguage[] = [
+    { id: 1, code: 'en', name: 'Англійська' },
+    { id: 2, code: 'es', name: 'Іспанська' },
+    { id: 3, code: 'pl', name: 'Польська' },
+];
+
+const localizedEntity: EntityWithLocalizations<TestLocalization> = {
+    localizations: [
+        {
+            language: { id: 1, code: 'en' },
+            translationStatus: TranslationStatus.Relevant,
+        },
+        {
+            language: { id: 2, code: 'es' },
+            translationStatus: TranslationStatus.Outdated,
+        },
+    ],
+};
+// --------------------
+
 describe('LocalizationStatuses component', () => {
-    const languages: LocalizationLanguage[] = [
-        { id: 1, code: 'en', name: 'Англійська' },
-        { id: 2, code: 'es', name: 'Іспанська' },
-        { id: 3, code: 'pl', name: 'Польська' },
-    ];
 
-    const localizedEntity: EntityWithLocalizations<TestLocalization> = {
-        localizations: [
-            {
-                language: { id: 1, code: 'en' },
-                translationStatus: TranslationStatus.Relevant,
-            },
-            {
-                language: { id: 2, code: 'es' },
-                translationStatus: TranslationStatus.Outdated,
-            },
-            // pl intentionally missing to test "status-missing"
-        ],
-    };
-
-    it('renders all language badges', () => {
+    it('renders all language badges with correct codes', () => {
         render(<LocalizationStatuses languages={languages} localizedEntity={localizedEntity} />);
 
         expect(screen.getByText('EN')).toBeInTheDocument();
@@ -42,55 +46,29 @@ describe('LocalizationStatuses component', () => {
         render(<LocalizationStatuses languages={languages} localizedEntity={localizedEntity} />);
 
         const enBadge = screen.getByText('EN');
-        const ukBadge = screen.getByText('ES');
+        const esBadge = screen.getByText('ES');
         const plBadge = screen.getByText('PL');
 
-        expect(enBadge).toHaveClass('badge status-relevant');
-        expect(ukBadge).toHaveClass('badge status-outdated');
-        expect(plBadge).toHaveClass('badge status-missing');
+        // Relevant (EN)
+        expect(enBadge).toHaveClass(styles.badge);
+        expect(enBadge).toHaveClass(styles.relevant);
+        expect(enBadge).not.toHaveClass(styles.outdated);
+
+        // Outdated (ES)
+        expect(esBadge).toHaveClass(styles.badge);
+        expect(esBadge).toHaveClass(styles.outdated);
+        expect(esBadge).not.toHaveClass(styles.relevant);
+
+        // Missing (PL)
+        expect(plBadge).toHaveClass(styles.badge);
+        expect(plBadge).not.toHaveClass(styles.relevant);
+        expect(plBadge).not.toHaveClass(styles.outdated);
     });
 
+    // 3. Тест на коректний data-testid
     it('renders wrapper with correct test id', () => {
-        const { container } = render(<LocalizationStatuses languages={languages} localizedEntity={localizedEntity} />);
+        const { getByTestId } = render(<LocalizationStatuses languages={languages} localizedEntity={localizedEntity} />);
 
-        expect(container.querySelector('[data-testId="localization-statuses"]')).toBeInTheDocument();
-    });
-});
-
-describe('getLocalizationClassNameFromStatus', () => {
-    const language: LocalizationLanguage = {
-        id: 1,
-        code: 'en',
-        name: 'Англійська',
-    };
-
-    const baseEntity = (status?: TranslationStatus): EntityWithLocalizations<TestLocalization> => ({
-        localizations:
-            status !== undefined
-                ? [
-                      {
-                          language: { id: 1, code: 'en' },
-                          translationStatus: status,
-                      },
-                  ]
-                : [],
-    });
-
-    it('returns status-relevant when translation is Relevant', () => {
-        const result = getLocalizationClassNameFromStatus(language, baseEntity(TranslationStatus.Relevant));
-
-        expect(result).toBe('status-relevant');
-    });
-
-    it('returns status-outdated when translation is Outdated', () => {
-        const result = getLocalizationClassNameFromStatus(language, baseEntity(TranslationStatus.Outdated));
-
-        expect(result).toBe('status-outdated');
-    });
-
-    it('returns status-missing when localization not found', () => {
-        const result = getLocalizationClassNameFromStatus(language, baseEntity());
-
-        expect(result).toBe('status-missing');
+        expect(getByTestId('localization-statuses')).toBeInTheDocument();
     });
 });

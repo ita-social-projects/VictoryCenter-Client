@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import {
     EntityLocalization,
     EntityWithLocalizations,
@@ -15,36 +16,28 @@ export const LocalizationStatuses = <TLocalization extends EntityLocalization>({
     languages,
     localizedEntity,
 }: LocalizationStatusProps<TLocalization>) => {
+    const getTranslationStatus = <TLocalization extends EntityLocalization>(
+        languageCode: string,
+        localizations: TLocalization[],
+    ): TranslationStatus | undefined => {
+        return localizations.find((loc) => loc.language?.code === languageCode)?.translationStatus;
+    };
+
     return (
         <div className={styles.statuses} data-testId="localization-statuses">
-            {languages.map((language) => (
-                <span
-                    key={language.id}
-                    className={`${styles.badge} ${getLocalizationClassNameFromStatus(language, localizedEntity)}`}
-                >
-                    {language.code.toUpperCase()}
-                </span>
-            ))}
+            {languages.map((language) => {
+                const status = getTranslationStatus(language.code, localizedEntity.localizations);
+
+                const statusClass = classNames(styles.badge, {
+                    [styles.relevant]: status === TranslationStatus.Relevant,
+                    [styles.outdated]: status === TranslationStatus.Outdated,
+                });
+                return (
+                    <span key={language.id} className={statusClass}>
+                        {language.code.toUpperCase()}
+                    </span>
+                );
+            })}
         </div>
     );
 };
-
-export function getLocalizationClassNameFromStatus<TLocalization extends EntityLocalization>(
-    language: LocalizationLanguage,
-    localizedEntity: EntityWithLocalizations<TLocalization>,
-) {
-    const entityLocalization = localizedEntity.localizations.find(
-        (localization) => localization.language?.code === language.code,
-    );
-
-    switch (entityLocalization?.translationStatus) {
-        case TranslationStatus.Relevant:
-            return styles.relevant;
-
-        case TranslationStatus.Outdated:
-            return styles.outdated;
-
-        default:
-            return styles.missing;
-    }
-}

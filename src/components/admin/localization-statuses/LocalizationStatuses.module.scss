@@ -1,4 +1,4 @@
-@use '../../../assets/sass/variables/colors.scss';
+@use '../../../assets/sass/variables/colors.scss' as c;
 
 .statuses {
     display: flex;
@@ -17,20 +17,16 @@
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: 1.25rem;
+    background-color: c.$red-50;
+    color: c.$error;
 }
 
 .relevant {
-    background-color: colors.$green-50;
-    color: colors.$green;
+    background-color: c.$green-50;
+    color: c.$green;
 }
 
 .outdated {
-    background-color: colors.$yellow-50;
-    color: colors.$orange;
+    background-color: c.$yellow-50;
+    color: c.$orange;
 }
-
-.missing {
-    background-color: colors.$red-50;
-    color: colors.$error;
-}
-

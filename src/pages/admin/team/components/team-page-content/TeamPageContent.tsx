@@ -556,7 +556,7 @@ export const TeamPageContent = () => {
                     renderItem={renderMemberItem}
                     onLoadMore={handleLoadMore}
                     hasMore={hasMoreToShow}
-                    isLoading={isMembersLoading || isCategoriesLoading}
+                    isLoading={isMembersLoading || isCategoriesLoading || !selectedLanguage}
                     emptyStateMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
                 />
             </div>

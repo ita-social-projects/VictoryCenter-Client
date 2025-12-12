@@ -1,9 +1,5 @@
 import * as Yup from 'yup';
-import {
-    PARTNER_BANNER_VALIDATION,
-    PARTNER_SECTION_VALIDATION,
-    PARTNER_VALIDATION,
-} from '@/const/admin/partners';
+import { PARTNER_BANNER_VALIDATION, PARTNER_SECTION_VALIDATION, PARTNER_VALIDATION } from '@/const/admin/partners';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 export const partnerBannerSchema = Yup.object({

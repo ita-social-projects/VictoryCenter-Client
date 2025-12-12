@@ -13,7 +13,7 @@ export const ReportsSection: React.FC = () => {
                 <h2 className={styles.title}>{t('reports.title')}</h2>
                 <p className={styles.description}>{t('reports.description')}</p>
             </div>
-            <div className={styles.reportList}>
+            <div className={styles.list}>
                 {REPORTS_DATA.map(({ year, fileUrl }) => (
                     <ReportItem
                         key={year}

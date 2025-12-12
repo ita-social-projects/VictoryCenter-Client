@@ -5,14 +5,17 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { BankCurrency } from '@/types/admin/donate';
 
 jest.mock('../../donate-input/DonateInput', () => ({
-    DonateInput: ({ value, onValueChange, onBlur, name }: any) => (
-        <input
-            value={value}
-            onChange={(e) => onValueChange?.(e.target.value)}
-            onBlur={onBlur}
-            data-testid={`input-${name}`}
-            placeholder={name}
-        />
+    DonateInput: ({ value, onValueChange, onBlur, name, error }: any) => (
+        <div>
+            <input
+                value={value}
+                onChange={(e) => onValueChange?.(e.target.value)}
+                onBlur={onBlur}
+                data-testid={`input-${name}`}
+                placeholder={name}
+            />
+            {error && <span>{error}</span>}
+        </div>
     ),
 }));
 

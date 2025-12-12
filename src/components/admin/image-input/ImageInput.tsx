@@ -1,14 +1,17 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
-import { ReactComponent as UploadIcon } from '@/assets/icons/cloud-download.svg';
 import classNames from 'classnames';
 import './ImageInput.scss';
 import './WhoWeAreImageInput.scss';
+import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
+import { ReactComponent as UploadIcon } from '@/assets/icons/cloud-download.svg';
+import { ReactComponent as CropIcon } from '@/assets/icons/crop.svg';
 import { Image, ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
-import { COMMON_IMAGE_TEXT } from '@/const/admin/image';
 import { IMAGE_VALIDATION_FUNCTIONS } from '@/validation/admin/image-schema/image-schema';
+import { IMAGE_DIMENSION_VALIDATION_FUNCTIONS } from '@/validation/admin/image-dimension-schema/image-dimension-schema';
+import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
+import { COMMON_IMAGE_TEXT } from '@/const/admin/image';
+import { CropModal } from '../cropper-modal/CropperModal';
 
 export interface ImageInputProps {
     value: ImageValues | Image | null;
@@ -22,6 +25,10 @@ export interface ImageInputProps {
     label?: string | null;
     subText?: string | null;
     style?: React.CSSProperties;
+    cropHeight?: number;
+    cropWidth?: number;
+    minHeight?: number;
+    minWidth?: number;
 }
 
 export const ImageInput = ({
@@ -36,30 +43,41 @@ export const ImageInput = ({
     name,
     disabled = false,
     style,
+    cropHeight = 1080,
+    cropWidth = 1920,
+    minHeight = 1080,
+    minWidth = 1920,
 }: ImageInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showCropperModal, setShowCropperModal] = useState(false);
+    const [rawImage, setRawImage] = useState<ImageValues | Image | null>(null);
 
     useEffect(() => {
         setPreviewImage(value);
+        if (value && 'url' in value) {
+            setRawImage(null);
+        }
     }, [value]);
 
     const handleFile = useCallback(
         async (file: File) => {
             setError(null);
             if (!file.type.startsWith('image/')) return;
-            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file);
+            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file, minWidth, minHeight);
 
             if (error) {
                 setError(error);
                 return;
             }
             const imgItem = await convertFileToBase64(file);
-            onChange(imgItem);
+
+            setRawImage(imgItem);
+            setShowCropperModal(true);
         },
-        [onChange, setError],
+        [minHeight, minWidth, setError],
     );
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -127,6 +145,19 @@ export const ImageInput = ({
         setShowConfirmModal(false);
     };
 
+    const handleCropCancel = async () => {
+        setShowCropperModal(false);
+
+        if (!previewImage) setPreviewImage(rawImage);
+
+        if (previewImage && 'base64' in previewImage) {
+            const error = await IMAGE_DIMENSION_VALIDATION_FUNCTIONS.validateImage(previewImage, cropWidth, cropHeight);
+            if (error) {
+                setError(error);
+            }
+        }
+    };
+
     return (
         <div>
             <div
@@ -144,7 +175,7 @@ export const ImageInput = ({
                 onKeyDown={handleKeyDown}
                 onFocus={handleFocus}
                 onBlur={handleBlurEvent}
-                aria-label={COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER || COMMON_TEXT_ADMIN.INPUT.UPLOAD_IMAGE}
+                aria-label={COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER}
                 tabIndex={disabled ? -1 : 0}
                 role="button"
             >
@@ -170,18 +201,34 @@ export const ImageInput = ({
                             data-testid="preview-image"
                         />
                         {!disabled && (
-                            <button
-                                data-testid="remove-photo-button"
-                                type="button"
-                                className="delete-button"
-                                disabled={disabled}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowConfirmModal(true);
-                                }}
-                            >
-                                <DeleteIcon className="delete-icon" />
-                            </button>
+                            <div className="preview-actions">
+                                <button
+                                    data-testid="remove-photo-button"
+                                    type="button"
+                                    className="delete-button"
+                                    disabled={disabled}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setShowConfirmModal(true);
+                                    }}
+                                >
+                                    <DeleteIcon className={classNames('delete-icon')} />
+                                </button>
+                                {rawImage && 'base64' in rawImage ? (
+                                    <button
+                                        data-testid="crop-photo-button"
+                                        type="button"
+                                        className="crop-button"
+                                        disabled={disabled}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowCropperModal(true);
+                                        }}
+                                    >
+                                        <CropIcon className={classNames('crop-icon')} />
+                                    </button>
+                                ) : null}
+                            </div>
                         )}
                     </div>
                 ) : (
@@ -201,6 +248,21 @@ export const ImageInput = ({
                 onCancel={() => setShowConfirmModal(false)}
                 onClose={() => setShowConfirmModal(false)}
             />
+            {showCropperModal && rawImage && 'base64' in rawImage && (
+                <CropModal
+                    data-testid="cropper"
+                    src={rawImage}
+                    onChange={(image: ImageValues) => {
+                        onChange(image);
+                        setError(null);
+                        setShowCropperModal(false);
+                    }}
+                    height={cropHeight}
+                    width={cropWidth}
+                    onCancel={handleCropCancel}
+                    isOpen={showCropperModal}
+                />
+            )}
         </div>
     );
 };
@@ -218,6 +280,7 @@ export const getImageSrc = (image: Image | ImageValues | null) => {
 
     return undefined;
 };
+
 export function convertFileToBase64(file: File): Promise<ImageValues> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();

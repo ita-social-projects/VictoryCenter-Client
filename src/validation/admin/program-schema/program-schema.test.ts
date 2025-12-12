@@ -1,8 +1,8 @@
 import { programValidationSchema, ProgramValidationContext } from './program-schema';
 import { PROGRAM_VALIDATION } from '@/const/admin/programs';
-import { Image, ImageValues } from '@/types/common/image';
+import { ImageValues } from '@/types/common/image';
 
-const createMockFile = (type = 'image/jpeg', size = 1024) => {
+const createMockFile = (type = 'image/jpeg') => {
     const image: ImageValues = {
         base64: 'fsdgdsgdsdgsdgsd',
         mimeType: type,

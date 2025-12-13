@@ -7,7 +7,7 @@ const mockOnClose = jest.fn();
 
 const defaultProps: ModalProps = {
     isOpen: true,
-    fullScreen: false,
+    fullscreen: false,
     onClose: mockOnClose,
 };
 
@@ -333,7 +333,7 @@ describe('Modal Component', () => {
 
     test('applies "fullscreen" class to container when fullScreen prop is true', () => {
         render(
-            <Modal {...defaultProps} fullScreen={true}>
+            <Modal {...defaultProps} fullscreen={true}>
                 <Modal.Content>Content</Modal.Content>
             </Modal>,
         );
@@ -343,7 +343,7 @@ describe('Modal Component', () => {
 
     test('does not apply "fullscreen" class when fullScreen prop is false or undefined', () => {
         const { rerender } = render(
-            <Modal {...defaultProps} fullScreen={false}>
+            <Modal {...defaultProps} fullscreen={false}>
                 <Modal.Content>Content</Modal.Content>
             </Modal>,
         );

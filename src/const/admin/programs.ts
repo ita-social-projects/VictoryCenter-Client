@@ -92,17 +92,14 @@ export const PROGRAM_VALIDATION = {
     },
     location: {
         max: 55,
-        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.location.max} символів`,
         getRequiredWhenPublishingError: () => 'Локація обов’язкова при публікації',
     },
     participantsCount: {
         max: 55,
-        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.participantsCount.max} символів`,
         getRequiredWhenPublishingError: () => 'Кількість учасників обов’язкова при публікації',
     },
     meetingCount: {
         max: 55,
-        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.meetingCount.max} символів`,
         getRequiredWhenPublishingError: () => 'Кількість зустрічей обов’язкова при публікації',
     },
 };

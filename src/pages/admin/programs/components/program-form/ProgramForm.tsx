@@ -12,7 +12,7 @@ import { Image, ImageValues } from '@/types/common/image';
 import { ProgramCategory } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
-import './ProgramForm.scss';
+import styles from './ProgramForm.module.scss';
 
 export interface ProgramFormValues {
     name: string;
@@ -186,7 +186,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
         const handlePreviewImageChange = useCallback(
             (file: ImageValues | null) => {
-                setFormState((prev) => ({ ...prev, previewImage: file }));
+                setFormState((prev) => ({ ...prev, previewImage: file, previewImageId: null }));
                 const error = PROGRAM_VALIDATION_FUNCTIONS.validatePreviewImage(file, false);
                 setErrors((prev) => ({ ...prev, previewImage: error }));
             },
@@ -200,7 +200,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
         const handleBackgroundImageChange = useCallback(
             (file: ImageValues | null) => {
-                setFormState((prev) => ({ ...prev, backgroundImage: file }));
+                setFormState((prev) => ({ ...prev, backgroundImage: file, backgroundImageId: null }));
                 const error = PROGRAM_VALIDATION_FUNCTIONS.validateBackgroundImage(file, false);
                 setErrors((prev) => ({ ...prev, backgroundImage: error }));
             },
@@ -213,10 +213,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
 
         return (
-            <form className="program-form" noValidate>
+            <form className={styles.container} noValidate>
                 {/* Header Section */}
-                <div className="program-form__header">
-                    <div className="program-form__header-left">
+                <div className={styles.header}>
+                    <div className={styles.headerLeft}>
                         <MultiSelectInputGroup
                             label={PROGRAMS_TEXT.FORM.LABEL.CATEGORY}
                             isRequired={true}
@@ -232,12 +232,12 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         />
                     </div>
 
-                    <div className="program-form__header-right">
+                    <div className={styles.headerRight}>
                         <Button
                             onClick={onAddSection}
                             buttonStyle="primary"
+                            disabled={isSubmitting || isFormDisabled}
                             data-testid="add-program-button"
-                            className="program-form__add-btn"
                         >
                             {PROGRAMS_TEXT.BUTTON.ADD_NEW_SECTION} <PlusIcon />
                         </Button>
@@ -245,7 +245,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 </div>
 
                 {/* Main Content Layout */}
-                <div className="program-form__body">
+                <div className={styles.body}>
                     <PhotoInputGroup
                         id="backgroundImage"
                         isRequired={true}
@@ -266,8 +266,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             PROGRAM_VALIDATION.backgroundImage.width,
                         )}
                     />
-                    <div className="program-form__body__inputs">
-                        <div className="program-form__col-left">
+                    <div className={styles.bodyInputs}>
+                        <div className={styles.colLeft}>
                             <TextAreaWithCharacterLimitGroup
                                 label={PROGRAMS_TEXT.FORM.LABEL.NAME}
                                 isRequired={true}
@@ -322,7 +322,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             />
                         </div>
 
-                        <div className="program-form__col-right">
+                        <div className={styles.colRight}>
                             <TextAreaWithCharacterLimitGroup
                                 label={PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION}
                                 id="description"
@@ -364,5 +364,3 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
     },
 );
-
-ProgramForm.displayName = 'ProgramForm';

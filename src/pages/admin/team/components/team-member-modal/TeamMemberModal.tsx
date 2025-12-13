@@ -103,17 +103,17 @@ export const TeamMemberModal = ({
     return (
         <GenericModalWrapper
             isOpen={isOpen}
-            onClose={modalHookData.handleClose}
             onFormValidationChange={modalHookData.handleFormValidationChange}
             onFormSubmit={modalHookData.handleFormSubmit}
             onDraftSubmit={modalHookData.handleDraftSubmit}
+            onClose={modalHookData.handleClose}
             onPublishSubmit={modalHookData.handlePublishSubmit}
-            onActionConfirm={modalHookData.handleConfirmAction}
-            onActionCancel={modalHookData.handleCancelConfirmation}
             onExitConfirm={modalHookData.handleConfirmClose}
             onExitCancel={modalHookData.handleCancelClose}
-            buttonStates={modalHookData.buttonStates}
+            onActionConfirm={modalHookData.handleConfirmAction}
+            onActionCancel={modalHookData.handleCancelConfirmation}
             formRef={modalHookData.formRef}
+            buttonStates={modalHookData.buttonStates}
             isSubmitting={modalHookData.isSubmitting}
             error={modalHookData.error}
             isActionConfirmationOpen={modalHookData.showFormConfirmModal}

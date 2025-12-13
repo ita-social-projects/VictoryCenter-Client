@@ -11,19 +11,21 @@ import { InputLabelProps } from '@/components/admin/input-label/InputLabel';
 import { ButtonProps } from '@/components/admin/button/Button';
 import { HintBoxProps } from '@/components/admin/hint-box/HintBox';
 import { ConfirmationModalProps } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { ModalProps } from '@/components/common/modal/Modal';
 
 jest.mock('@/services/api/admin/programs/programs-api');
 const mockedProgramsCategoriesApi = ProgramsCategoriesApi as jest.Mocked<typeof ProgramsCategoriesApi>;
 
 jest.mock('@/components/common/modal/Modal', () => {
-    const ModalMock = ({ isOpen, onClose, children }: any) => (
+    const ModalMock = ({ isOpen, onClose, children }: ModalProps) =>
         isOpen ? (
             <div data-testid="modal">
-                <button data-testid="modal-close-btn" onClick={onClose}>Close</button>
+                <button data-testid="modal-close-btn" onClick={onClose}>
+                    Close
+                </button>
                 {children}
             </div>
-        ) : null
-    );
+        ) : null;
 
     ModalMock.Title = ({ children }: { children: React.ReactNode }) => <h1 data-testid="modal-title">{children}</h1>;
     ModalMock.Content = ({ children }: { children: React.ReactNode }) => (

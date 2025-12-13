@@ -66,7 +66,7 @@ export const GenericModalWrapper = <TFormValues, TFormRef>({
 }: GenericModalWrapperProps<TFormValues, TFormRef>) => {
     return (
         <>
-            <Modal isOpen={isOpen} onClose={onClose} fullScreen={fullScreen}>
+            <Modal isOpen={isOpen} onClose={onClose} fullscreen={fullScreen}>
                 {title && <Modal.Title>{title}</Modal.Title>}
                 <Modal.Content>
                     {renderForm({

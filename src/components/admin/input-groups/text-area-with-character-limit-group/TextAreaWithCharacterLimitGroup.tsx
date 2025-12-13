@@ -6,7 +6,7 @@ import {
     TextAreaWithCharacterLimitProps,
 } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import '../input-group.scss';
-import classNames from 'classnames';
+import cn from 'classnames';
 
 export interface TextAreaWithCharacterLimitGroupProps extends TextAreaWithCharacterLimitProps {
     label: InputLabelProps['text'];
@@ -32,7 +32,7 @@ export const TextAreaWithCharacterLimitGroup = ({
     className,
 }: TextAreaWithCharacterLimitGroupProps) => {
     return (
-        <div className={classNames('input-group', className)}>
+        <div className={cn('input-group', className)}>
             <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
             <TextAreaWithCharacterLimit
                 id={id}

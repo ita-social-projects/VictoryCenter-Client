@@ -251,12 +251,10 @@ export const ProgramsPageContent = () => {
 
     const handleEditProgram = useCallback(
         (updatedProgram: Program) => {
-            // Update the searched program if it's the same
             if (isSearchResultView && fetchedSearchProgram?.id === updatedProgram.id) {
                 updateSearchedProgram(updatedProgram);
             }
 
-            // Find the original program
             const originalProgram =
                 fetchedPrograms.find((p) => p.id === updatedProgram.id) ??
                 (isSearchResultView && fetchedSearchProgram?.id === updatedProgram.id ? fetchedSearchProgram : null);

@@ -1,15 +1,16 @@
 import React, { ReactNode, useEffect, useId, useRef } from 'react';
+import cn from 'classnames';
 import './Modal.scss';
 
 export interface ModalProps {
     children?: ReactNode;
     isOpen: boolean;
     onClose: () => void;
-    fullScreen?: boolean;
+    fullscreen?: boolean;
     maxWidth?: string;
 }
 
-export const Modal = ({ children, isOpen, onClose, maxWidth, fullScreen = false }: ModalProps) => {
+export const Modal = ({ children, isOpen, onClose, maxWidth, fullscreen = false }: ModalProps) => {
     const mouseDownInsideModal = useRef(false);
     const modalRef = useRef<HTMLDivElement>(null);
     const titleId = useId();
@@ -123,7 +124,9 @@ export const Modal = ({ children, isOpen, onClose, maxWidth, fullScreen = false 
                 ref={modalRef}
                 role="button"
                 aria-labelledby={titleId}
-                className={`modal-container ${fullScreen ? 'fullscreen' : ''}`}
+                className={cn('modal-container', {
+                    fullscreen: fullscreen,
+                })}
                 onMouseDown={handleOnMouseDownModal}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}

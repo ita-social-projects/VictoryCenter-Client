@@ -204,7 +204,7 @@ describe('Program Validation Schema', () => {
         it('should fail with null backgroundImage', async () => {
             await expectValidationToFail(
                 getValidData({ backgroundImage: null }),
-                PROGRAM_VALIDATION.previewImage.getRequiredWhenPublishingError(),
+                PROGRAM_VALIDATION.backgroundImage.getRequiredWhenPublishingError(),
                 publishContext,
             );
         });

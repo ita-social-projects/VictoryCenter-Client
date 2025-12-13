@@ -126,24 +126,24 @@ export const ProgramModal = (props: ProgramModalProps) => {
             isOpen={isOpen}
             title={title}
             onClose={modalHookData.handleClose}
-            onFormValidationChange={modalHookData.handleFormValidationChange}
             onFormSubmit={modalHookData.handleFormSubmit}
-            onDraftSubmit={modalHookData.handleDraftSubmit}
+            onFormValidationChange={modalHookData.handleFormValidationChange}
             onPublishSubmit={modalHookData.handlePublishSubmit}
-            onActionConfirm={modalHookData.handleConfirmAction}
+            onDraftSubmit={modalHookData.handleDraftSubmit}
             onActionCancel={modalHookData.handleCancelConfirmation}
-            onExitConfirm={modalHookData.handleConfirmClose}
+            onActionConfirm={modalHookData.handleConfirmAction}
             onExitCancel={modalHookData.handleCancelClose}
+            onExitConfirm={modalHookData.handleConfirmClose}
             buttonStates={modalHookData.buttonStates}
             formRef={modalHookData.formRef}
             isSubmitting={modalHookData.isSubmitting}
             error={modalHookData.error}
-            isActionConfirmationOpen={modalHookData.showFormConfirmModal}
             isExitConfirmationOpen={modalHookData.showCloseConfirmModal}
+            isActionConfirmationOpen={modalHookData.showFormConfirmModal}
             formKey={modalHookData.formKey}
             actionConfirmationTitle={modalHookData.formConfirmTitle}
-            categories={categories}
             initialData={initialData}
+            categories={categories}
             fullScreen={true}
             renderForm={(props) => (
                 <ProgramForm

@@ -11,7 +11,7 @@ import { MultiSelectInputGroupProps } from '@/components/admin/input-groups/mult
 import { PhotoInputGroupProps } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ButtonProps } from '@/components/admin/button/Button';
 
-jest.mock('../../../../../validation/admin/program-schema/program-schema', () => ({
+jest.mock('@/validation/admin/program-schema/program-schema', () => ({
     PROGRAM_VALIDATION_FUNCTIONS: {
         validateName: jest.fn(),
         validateCategories: jest.fn(),
@@ -24,26 +24,22 @@ jest.mock('../../../../../validation/admin/program-schema/program-schema', () =>
     },
 }));
 
-// Mock Child Components using Props
-jest.mock(
-    '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
-    () => ({
-        InputWithCharacterLimitGroup: ({
-            label,
-            value,
-            onChange,
-            onBlur,
-            error,
-            id,
-        }: InputWithCharacterLimitGroupProps) => (
-            <div data-testid={`group-${id}`}>
-                <label htmlFor={id}>{label}</label>
-                <input id={id} data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
-                {error && <span data-testid={`error-${id}`}>{error}</span>}
-            </div>
-        ),
-    }),
-);
+jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
+    InputWithCharacterLimitGroup: ({
+        label,
+        value,
+        onChange,
+        onBlur,
+        error,
+        id,
+    }: InputWithCharacterLimitGroupProps) => (
+        <div data-testid={`group-${id}`}>
+            <label htmlFor={id}>{label}</label>
+            <input id={id} data-testid={`input-${id}`} value={value} onChange={onChange} onBlur={onBlur} />
+            {error && <span data-testid={`error-${id}`}>{error}</span>}
+        </div>
+    ),
+}));
 
 jest.mock(
     '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',

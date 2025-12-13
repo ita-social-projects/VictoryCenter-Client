@@ -89,7 +89,7 @@ export const DONATE_TEXT = {
         },
         CORRESPONDENT_BANKS: {
             DELETE: 'Видалити банк-кореспондент?',
-            CANCEL_CREATE: 'Зміни будуть втрачені. Бажаєте продовжити',
+            CANCEL_CREATE: 'Зміни будуть втрачені. Бажаєте продовжити?',
         },
     },
     BUTTON: {

@@ -29,7 +29,8 @@ export function useLocalizationToolkit({ setErrorState }: UseLocalizationToolkit
         try {
             const fetchedLanguages = await localizationLanguagesDataFetch();
             setAllLanguages(fetchedLanguages);
-            setSelectedLanguage(fetchedLanguages.find((language) => language.code === DEFAULT_LOCALE));
+            const defaultLang = fetchedLanguages.find((language) => language.code === DEFAULT_LOCALE) ?? fetchedLanguages[0];
+            setSelectedLanguage(defaultLang);
             setTranslationLanguages(fetchedLanguages.filter((language) => language.code !== DEFAULT_LOCALE));
         } catch (error: any) {
             if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {

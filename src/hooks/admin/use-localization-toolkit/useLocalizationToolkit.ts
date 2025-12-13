@@ -5,11 +5,11 @@ import axios from 'axios';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { DEFAULT_LOCALE } from '../../../const/common/locales';
 
-type ErrorType = "categories" | "members" | "languages";
+type ErrorType = 'categories' | 'members' | 'languages';
 
 export interface UseLocalizationToolkitProps {
     setErrorState: (message: string, type: ErrorType) => void;
-}   
+}
 
 export function useLocalizationToolkit({ setErrorState }: UseLocalizationToolkitProps) {
     const [allLanguages, setAllLanguages] = useState<LocalizationLanguage[]>([]);
@@ -29,7 +29,8 @@ export function useLocalizationToolkit({ setErrorState }: UseLocalizationToolkit
         try {
             const fetchedLanguages = await localizationLanguagesDataFetch();
             setAllLanguages(fetchedLanguages);
-            const defaultLang = fetchedLanguages.find((language) => language.code === DEFAULT_LOCALE) ?? fetchedLanguages[0];
+            const defaultLang =
+                fetchedLanguages.find((language) => language.code === DEFAULT_LOCALE) ?? fetchedLanguages[0];
             setSelectedLanguage(defaultLang);
             setTranslationLanguages(fetchedLanguages.filter((language) => language.code !== DEFAULT_LOCALE));
         } catch (error: any) {

@@ -204,8 +204,11 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                         onConfirm: () => onClose?.(),
                     });
                 } else if (isChanged()) {
+                    const title = isChildForm
+                        ? DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.CANCEL_CREATE
+                        : DONATE_TEXT.QUESTION.BANK_DETAILS.CANCEL_CREATE;
                     setModalConfig({
-                        title: DONATE_TEXT.QUESTION.BANK_DETAILS.CANCEL_CREATE,
+                        title: title,
                         onConfirm: () => onClose?.(),
                     });
                 } else {

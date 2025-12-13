@@ -9,7 +9,6 @@ import {
     EntityLocalization,
 } from '../../../types/common/language';
 
-// --- Тестові дані ---
 type TestLocalization = EntityLocalization;
 
 const languages: LocalizationLanguage[] = [
@@ -30,7 +29,6 @@ const localizedEntity: EntityWithLocalizations<TestLocalization> = {
         },
     ],
 };
-// --------------------
 
 describe('LocalizationStatuses component', () => {
 
@@ -49,23 +47,19 @@ describe('LocalizationStatuses component', () => {
         const esBadge = screen.getByText('ES');
         const plBadge = screen.getByText('PL');
 
-        // Relevant (EN)
         expect(enBadge).toHaveClass(styles.badge);
         expect(enBadge).toHaveClass(styles.relevant);
         expect(enBadge).not.toHaveClass(styles.outdated);
 
-        // Outdated (ES)
         expect(esBadge).toHaveClass(styles.badge);
         expect(esBadge).toHaveClass(styles.outdated);
         expect(esBadge).not.toHaveClass(styles.relevant);
 
-        // Missing (PL)
         expect(plBadge).toHaveClass(styles.badge);
         expect(plBadge).not.toHaveClass(styles.relevant);
         expect(plBadge).not.toHaveClass(styles.outdated);
     });
 
-    // 3. Тест на коректний data-testid
     it('renders wrapper with correct test id', () => {
         const { getByTestId } = render(<LocalizationStatuses languages={languages} localizedEntity={localizedEntity} />);
 

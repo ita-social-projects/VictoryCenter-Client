@@ -5,9 +5,11 @@ import axios from 'axios';
 import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
 import { DEFAULT_LOCALE } from '../../../const/common/locales';
 
+type ErrorType = "categories" | "members" | "languages";
+
 export interface UseLocalizationToolkitProps {
-    setErrorState: (message: string, type: any) => void;
-}
+    setErrorState: (message: string, type: ErrorType) => void;
+}   
 
 export function useLocalizationToolkit({ setErrorState }: UseLocalizationToolkitProps) {
     const [allLanguages, setAllLanguages] = useState<LocalizationLanguage[]>([]);

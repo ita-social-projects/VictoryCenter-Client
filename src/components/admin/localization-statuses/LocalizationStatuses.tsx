@@ -24,7 +24,7 @@ export const LocalizationStatuses = <TLocalization extends EntityLocalization>({
     };
 
     return (
-        <div className={styles.statuses} data-testId="localization-statuses">
+        <div className={styles.statuses} data-testid="localization-statuses">
             {languages.map((language) => {
                 const status = getTranslationStatus(language.code, localizedEntity.localizations);
 

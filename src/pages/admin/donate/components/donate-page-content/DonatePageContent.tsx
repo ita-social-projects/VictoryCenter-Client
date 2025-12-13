@@ -45,6 +45,7 @@ export const DonatePageContent = () => {
     const [supportOptions, setSupportOptions] = useState<SupportOptionsDto[]>([]);
     const [isSupportOptionsLoading, setIsSupportOptionsLoading] = useState(false);
     const [isChildEditing, setIsChildEditing] = useState(false);
+    const [correspondentListVersion, setCorrespondentListVersion] = useState(0);
 
     const [isCorrespondentBankFormVisible, setIsCorrespondentBankFormVisible] = useState(false);
     useEffect(() => {
@@ -208,11 +209,12 @@ export const DonatePageContent = () => {
                             : item,
                     ),
                 );
+                addToast(DONATE_TEXT.MESSAGE.CHANGES_SAVED, ToastType.Info);
             } catch (error) {
                 throw error;
             }
         },
-        [client, setItems],
+        [client, setItems, addToast],
     );
 
     const handleUpdateCorrespondentBank = useCallback(
@@ -232,11 +234,13 @@ export const DonatePageContent = () => {
                             : item,
                     ),
                 );
+                addToast(DONATE_TEXT.MESSAGE.CHANGES_SAVED, ToastType.Info);
+                setCorrespondentListVersion((prev) => prev + 1);
             } catch (error) {
                 throw error;
             }
         },
-        [client, setItems],
+        [client, setItems, addToast],
     );
 
     const handleDeleteCorrespondentBank = useCallback(
@@ -302,7 +306,7 @@ export const DonatePageContent = () => {
 
             return (
                 <GenericDetails
-                    key={`corr-${selectedCategory}-${formState.id}`}
+                    key={`corr-${selectedCategory}-${formState.id}-${correspondentListVersion}`}
                     title={DONATE_TEXT.CORRESPONDENT_BANKS.TITLE}
                     items={banksToShow}
                     isLoading={false}
@@ -335,6 +339,7 @@ export const DonatePageContent = () => {
             handleLocalUpdate,
             handleLocalDelete,
             setIsChildEditing,
+            correspondentListVersion,
         ],
     );
 

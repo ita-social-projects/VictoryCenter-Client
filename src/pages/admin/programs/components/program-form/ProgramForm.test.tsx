@@ -73,9 +73,11 @@ jest.mock('@/components/admin/input-groups/multi-select-input-group/MultiSelectI
     }: MultiSelectInputGroupProps<ProgramCategory>) => (
         <div data-testid={`group-${id}`}>
             <label>{label}</label>
-            <div data-testid={`select-${id}`} onClick={() => onChange && onChange([options[0]])}>
+
+            <button type="button" data-testid={`select-${id}`} onClick={() => onChange && onChange([options[0]])}>
                 {value?.map((v) => v.name).join(', ')}
-            </div>
+            </button>
+
             <button type="button" data-testid={`blur-${id}`} onClick={onBlur}>
                 Blur
             </button>
@@ -83,7 +85,6 @@ jest.mock('@/components/admin/input-groups/multi-select-input-group/MultiSelectI
         </div>
     ),
 }));
-
 jest.mock('@/components/admin/input-groups/photo-input-group/PhotoInputGroup', () => ({
     PhotoInputGroup: ({ id, value, onChange, error, setError }: PhotoInputGroupProps) => (
         <div data-testid={`group-${id}`}>

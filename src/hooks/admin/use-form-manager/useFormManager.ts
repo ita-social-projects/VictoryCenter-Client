@@ -1,6 +1,33 @@
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { VisibilityStatus } from '@/types/admin/common';
 
+export interface FormManagerRef {
+    submit: (status: VisibilityStatus) => Promise<void>;
+    isValid: (isPublishing?: boolean) => boolean;
+    isDirty: () => boolean;
+}
+
+export interface UseFormManagerProps<TFormValues, TFormErrors> {
+    defaultFormState: TFormValues;
+    initialData?: TFormValues | null;
+    validateForm: (values: TFormValues, isPublishing: boolean) => TFormErrors;
+    onSubmit: (data: TFormValues, status: VisibilityStatus) => Promise<void> | void;
+    onValidationChange?: (isValid: boolean) => void;
+    ref?: React.Ref<FormManagerRef>;
+}
+
+export interface UseFormManagerReturn<TFormValues, TFormErrors> {
+    formState: TFormValues;
+    setFormState: React.Dispatch<React.SetStateAction<TFormValues>>;
+    errors: TFormErrors;
+    setErrors: React.Dispatch<React.SetStateAction<TFormErrors>>;
+    isSubmitting: boolean;
+    reset: (data?: TFormValues | null) => void;
+    isDirty: () => boolean;
+    isValid: (isPublishing?: boolean) => boolean;
+    submit: (status: VisibilityStatus) => Promise<void>;
+}
+
 export function useFormManager<TFormValues, TFormErrors extends Record<string, unknown>>({
     defaultFormState,
     initialData,
@@ -8,14 +35,7 @@ export function useFormManager<TFormValues, TFormErrors extends Record<string, u
     onSubmit,
     onValidationChange,
     ref,
-}: {
-    defaultFormState: TFormValues;
-    initialData?: TFormValues | null;
-    validateForm: (values: TFormValues, isPublishing: boolean) => TFormErrors;
-    onSubmit: (data: TFormValues, status: VisibilityStatus) => Promise<void> | void;
-    onValidationChange?: (isValid: boolean) => void;
-    ref?: React.Ref<any>;
-}) {
+}: UseFormManagerProps<TFormValues, TFormErrors>): UseFormManagerReturn<TFormValues, TFormErrors> {
     const [formState, setFormState] = useState<TFormValues>(defaultFormState);
     const [errors, setErrors] = useState<TFormErrors>({} as TFormErrors);
     const [initialFormState, setInitialFormState] = useState<TFormValues>(defaultFormState);

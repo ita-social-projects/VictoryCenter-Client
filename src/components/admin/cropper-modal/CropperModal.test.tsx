@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { CropModal } from './CropperModal';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { ImageValues } from '../../../types/common/image';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ImageValues } from '@/types/common/image';
 import { PixelCrop } from 'react-image-crop';
 
 const mockCanvasContext = {

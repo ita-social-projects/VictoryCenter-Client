@@ -89,7 +89,7 @@ describe('AdminPanelToolbar', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         const useDataPaginationFetch =
-            require('../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
+            require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
         useDataPaginationFetch.mockImplementation(() => mockHookImplementation);
 
         // Reset mock implementation of component mocks
@@ -103,7 +103,7 @@ describe('AdminPanelToolbar', () => {
                 Status Filter Mock
             </div>
         ));
-        Button.mockImplementation(({ children, onClick, buttonStyle, ...props }: ButtonProps) => (
+        Button.mockImplementation(({ children, onClick, ...props }: ButtonProps) => (
             <button data-testid="add-item-button" onClick={onClick} {...props}>
                 {children}
             </button>

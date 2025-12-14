@@ -12,17 +12,17 @@ export interface LocalizationStatusProps<TLocalization extends EntityLocalizatio
     localizedEntity: EntityWithLocalizations<TLocalization>;
 }
 
+const getTranslationStatus = <TLocalization extends EntityLocalization>(
+    languageCode: string,
+    localizations: TLocalization[],
+): TranslationStatus | undefined => {
+    return localizations.find((loc) => loc.language?.code === languageCode)?.translationStatus;
+};
+
 export const LocalizationStatuses = <TLocalization extends EntityLocalization>({
     languages,
     localizedEntity,
 }: LocalizationStatusProps<TLocalization>) => {
-    const getTranslationStatus = <TLocalization extends EntityLocalization>(
-        languageCode: string,
-        localizations: TLocalization[],
-    ): TranslationStatus | undefined => {
-        return localizations.find((loc) => loc.language?.code === languageCode)?.translationStatus;
-    };
-
     return (
         <div className={styles.statuses} data-testid="localization-statuses">
             {languages.map((language) => {

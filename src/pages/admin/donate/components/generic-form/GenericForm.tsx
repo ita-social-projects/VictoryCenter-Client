@@ -301,7 +301,10 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                     if (!f.isRequired) return false;
                     const value = formState[f.name];
                     if (Array.isArray(value)) return value.length === 0;
-                    return !String(value ?? '').trim();
+                    const normalized = String(value ?? '')
+                        .trim()
+                        .replace(/\s+/g, ' ');
+                    return !normalized;
                 });
             }, [formState]);
 

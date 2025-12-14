@@ -6,6 +6,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './GenericForm.scss';
 import { FieldValues } from 'react-hook-form';
 import { DONATE_TEXT } from '@/const/admin/donate';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 
 interface ModalConfig {
     title: string;
@@ -301,10 +302,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                     if (!f.isRequired) return false;
                     const value = formState[f.name];
                     if (Array.isArray(value)) return value.length === 0;
-                    const normalized = String(value ?? '')
-                        .trim()
-                        .replace(/\s+/g, ' ');
-                    return !normalized;
+                    return !getNormalizedInputText(String(value ?? ''));
                 });
             }, [formState]);
 

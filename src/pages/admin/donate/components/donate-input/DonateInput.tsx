@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import './DonateInput.scss';
 import { DONATE_TEXT } from '@/const/admin/donate';
 import classNames from 'classnames';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 
 interface DonateInputProps {
     label?: string;
@@ -90,13 +91,7 @@ export const DonateInput = ({
 
     const showClearButton = isFocused && value.length > prefix.length;
 
-    const getNormalizedLength = (text: string) => {
-        const withoutPrefix = text.slice(prefix.length);
-        const normalized = withoutPrefix.trim().replace(/\s+/g, ' ');
-        return normalized.length;
-    };
-
-    const currentLength = getNormalizedLength(value);
+    const currentLength = getNormalizedInputText(value, prefix).length;
     const showCharacterCounter = maxLength !== undefined;
     const showFooter = showCharacterCounter || error;
 

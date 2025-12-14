@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import cn from 'classnames';
 import {
     EntityLocalization,
     EntityWithLocalizations,
@@ -28,7 +28,7 @@ export const LocalizationStatuses = <TLocalization extends EntityLocalization>({
             {languages.map((language) => {
                 const status = getTranslationStatus(language.code, localizedEntity.localizations);
 
-                const statusClass = classNames(styles.badge, {
+                const statusClass = cn(styles.badge, {
                     [styles.relevant]: status === TranslationStatus.Relevant,
                     [styles.outdated]: status === TranslationStatus.Outdated,
                 });

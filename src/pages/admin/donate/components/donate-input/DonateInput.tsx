@@ -89,7 +89,14 @@ export const DonateInput = ({
     };
 
     const showClearButton = isFocused && value.length > prefix.length;
-    const currentLength = value.length - prefix.length;
+
+    const getNormalizedLength = (text: string) => {
+        const withoutPrefix = text.slice(prefix.length);
+        const normalized = withoutPrefix.trim().replace(/\s+/g, ' ');
+        return normalized.length;
+    };
+
+    const currentLength = getNormalizedLength(value);
     const showCharacterCounter = maxLength !== undefined;
     const showFooter = showCharacterCounter || error;
 

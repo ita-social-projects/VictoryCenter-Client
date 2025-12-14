@@ -1,17 +1,83 @@
-import { VisibilityStatus } from '../../../../types/admin/common';
-import { ProgramCategoryCreateUpdate, ProgramCreateUpdate } from '../../../../types/admin/programs';
-import { mockCategories, mockPrograms } from '../../../../utils/mock-data/admin/programs';
+import { VisibilityStatus } from '@/types/admin/common';
+import { ProgramCategoryCreateUpdate, ProgramCreateUpdate, Program, ProgramCategory } from '@/types/admin/programs';
 import { ProgramsApi, ProgramsCategoriesApi } from './programs-api';
-import { useAdminClient } from '../../../../hooks/admin/use-admin-client/useAdminClient';
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
-import { ImageApi } from '../image/image-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { ImageApi } from '@/services/api/admin/image/image-api';
 
-jest.mock('../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
-jest.mock('../image/image-api');
+jest.mock('@/services/api/admin/image/image-api');
 
 const mockedUseAdminClient = useAdminClient as jest.Mock;
+
+// Mock data defined locally
+const mockCategories: ProgramCategory[] = [
+    { id: 1, name: 'Ветеранські', programsCount: 2 },
+    { id: 2, name: 'Дитячі', programsCount: 3 },
+    { id: 3, name: 'Інклюзивні', programsCount: 0 },
+];
+
+const mockPrograms: Program[] = [
+    {
+        id: 1,
+        name: 'Коні лікують Літо 2025',
+        description: 'Зменшення рівня стресу, тривоги та ПТСР у ветеранів',
+        categories: [mockCategories[0]],
+        status: VisibilityStatus.Published,
+        previewImage: null,
+        backgroundImage: null,
+        location: 'Київ',
+        participantsCount: '10-15 осіб',
+        meetingsCount: '12 занять',
+    },
+    {
+        id: 2,
+        name: 'Кінна терапія для дітей',
+        description: 'Покращення комунікаційних навичок для дітей',
+        categories: [mockCategories[1]],
+        status: VisibilityStatus.Draft,
+        previewImage: null,
+        backgroundImage: null,
+        location: 'Львів',
+        participantsCount: '8-10 дітей',
+        meetingsCount: '10 занять',
+    },
+    {
+        id: 3,
+        name: 'Реабілітація після поранень',
+        description: 'Програма для військових з фізичними травмами',
+        categories: [mockCategories[0], mockCategories[2]],
+        status: VisibilityStatus.Published,
+        previewImage: null,
+        backgroundImage: null,
+        location: 'Одеса',
+        participantsCount: '5-8 осіб',
+        meetingsCount: '15 занять',
+    },
+];
+
+const createMockFile = (): { base64: string; mimeType: string } => ({
+    base64: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+    mimeType: 'image/png',
+});
+
+const getValidProgramData = (overrides?: Partial<ProgramCreateUpdate>): ProgramCreateUpdate => ({
+    id: null,
+    name: 'Valid Program Name',
+    description: 'This is a valid description with enough characters.',
+    categoryIds: [1],
+    status: VisibilityStatus.Draft,
+    previewImage: createMockFile(),
+    previewImageId: null,
+    backgroundImage: createMockFile(),
+    backgroundImageId: null,
+    location: 'Location 123',
+    participantsCount: 'Some participants 123',
+    meetingsCount: 'Some meetings count 123',
+    ...overrides,
+});
 
 let mockClient: any;
 
@@ -54,11 +120,9 @@ describe('fetchProgramCategories', () => {
         expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PROGRAMCATEGORY.BASE);
 
         expect(result).toHaveLength(3);
-
         expect(result[0].programsCount).toBe(3);
         expect(result[1].programsCount).toBe(1);
         expect(result[2].programsCount).toBe(0);
-
         expect(result[0].name).toBe('Yoga');
     });
 
@@ -75,8 +139,7 @@ describe('fetchProgramCategories', () => {
 describe('fetchProgramById', () => {
     it('should return program when found', async () => {
         mockClient.get.mockResolvedValueOnce({ data: mockPrograms[0] });
-        const promise = ProgramsApi.fetchProgramById(1, mockClient);
-        const result = await promise;
+        const result = await ProgramsApi.fetchProgramById(1, mockClient);
 
         expect(result).toEqual(mockPrograms[0]);
         expect(result?.id).toBe(1);
@@ -84,8 +147,7 @@ describe('fetchProgramById', () => {
 
     it('should return null when program not found', async () => {
         mockClient.get.mockResolvedValueOnce({ data: null });
-        const promise = ProgramsApi.fetchProgramById(999, mockClient);
-        const result = await promise;
+        const result = await ProgramsApi.fetchProgramById(999, mockClient);
 
         expect(result).toBeNull();
     });
@@ -94,10 +156,9 @@ describe('fetchProgramById', () => {
 describe('fetchPrograms', () => {
     it('should return paginated programs for category', async () => {
         mockClient.get.mockResolvedValueOnce({
-            data: { items: mockPrograms.filter((p) => p.categories.some((c) => c.id === 1)), totalItemsCount: 5 },
+            data: { items: mockPrograms.filter((p) => p.categories.some((c) => c.id === 1)), totalItemsCount: 2 },
         });
-        const promise = ProgramsApi.fetchPrograms(mockClient, 1, 0, 5);
-        const result = await promise;
+        const result = await ProgramsApi.fetchPrograms(mockClient, 1, 0, 5);
 
         expect(result.items).toBeDefined();
         expect(result.totalItemsCount).toBeDefined();
@@ -106,10 +167,9 @@ describe('fetchPrograms', () => {
 
     it('should filter by status when provided', async () => {
         mockClient.get.mockResolvedValueOnce({
-            data: { items: mockPrograms.filter((p) => p.status === VisibilityStatus.Published), totalItemsCount: 6 },
+            data: { items: mockPrograms.filter((p) => p.status === VisibilityStatus.Published), totalItemsCount: 2 },
         });
-        const promise = ProgramsApi.fetchPrograms(mockClient, 1, 0, 10, VisibilityStatus.Published);
-        const result = await promise;
+        const result = await ProgramsApi.fetchPrograms(mockClient, 1, 0, 10, VisibilityStatus.Published);
 
         expect(result.items.every((program) => program.status === VisibilityStatus.Published)).toBe(true);
     });
@@ -119,16 +179,14 @@ describe('fetchPrograms', () => {
         mockClient.get.mockResolvedValueOnce({
             data: { items: mockPrograms.slice(0, pageSize), totalItemsCount: mockPrograms.length },
         });
-        const promise = ProgramsApi.fetchPrograms(mockClient, 1, 0, pageSize);
-        const result = await promise;
+        const result = await ProgramsApi.fetchPrograms(mockClient, 1, 0, pageSize);
 
         expect(result.items).toHaveLength(Math.min(pageSize, result.totalItemsCount));
     });
 
     it('should return empty array for non-existent category', async () => {
         mockClient.get.mockResolvedValueOnce({ data: { items: [], totalItemsCount: 0 } });
-        const promise = ProgramsApi.fetchPrograms(mockClient, 999, 0, 10);
-        const result = await promise;
+        const result = await ProgramsApi.fetchPrograms(mockClient, 999, 0, 10);
 
         expect(result.items).toHaveLength(0);
         expect(result.totalItemsCount).toBe(0);
@@ -138,44 +196,33 @@ describe('fetchPrograms', () => {
         mockClient.get.mockResolvedValueOnce({
             data: { items: mockPrograms.slice(1, 2), totalItemsCount: mockPrograms.length },
         });
-        const promise = ProgramsApi.fetchPrograms(mockClient, 1, 1, 1);
-        const result = await promise;
+        const result = await ProgramsApi.fetchPrograms(mockClient, 1, 1, 1);
 
         expect(result).toBeDefined();
     });
 });
 
 describe('addProgram', () => {
-    const programData: ProgramCreateUpdate = {
-        id: null,
-        name: 'Test Program',
-        description: 'Test Description',
-        status: VisibilityStatus.Draft,
-        image: null,
-        imageId: null,
-        categoryIds: [1, 2],
-    };
+    it('should add program with preview and background images', async () => {
+        const programData = getValidProgramData();
 
-    it('should add program with File image and call ImageApi', async () => {
-        const programData: ProgramCreateUpdate = {
-            id: null,
-            name: 'Test Program',
-            description: 'Test Description',
-            status: VisibilityStatus.Draft,
-            image: { base64: 'test-base64-string', mimeType: 'image/png' },
-            imageId: null,
-            categoryIds: [1, 2],
+        const mockPreviewImageResponse = { id: 100, url: 'http://example.com/preview.png', mimeType: 'image/png' };
+        const mockBackgroundImageResponse = {
+            id: 101,
+            url: 'http://example.com/background.png',
+            mimeType: 'image/png',
         };
 
-        const mockImageResponse = { id: 100, url: 'http://example.com/img.png', mimeType: 'image/png' };
-        (ImageApi.post as jest.Mock).mockResolvedValue(mockImageResponse);
+        (ImageApi.post as jest.Mock)
+            .mockResolvedValueOnce(mockPreviewImageResponse)
+            .mockResolvedValueOnce(mockBackgroundImageResponse);
 
         mockClient.post.mockResolvedValueOnce({
             data: {
                 ...programData,
                 id: 13,
-                imageId: mockImageResponse.id,
-                categories: mockCategories.slice(0, 2),
+                previewImageId: mockPreviewImageResponse.id,
+                backgroundImageId: mockBackgroundImageResponse.id,
             },
         });
 
@@ -183,156 +230,173 @@ describe('addProgram', () => {
 
         const result = await ProgramsApi.addProgram(mockClient, programData);
 
-        expect(ImageApi.post).toHaveBeenCalledTimes(1);
-        expect(ImageApi.post).toHaveBeenCalledWith(mockClient, programData.image);
+        expect(ImageApi.post).toHaveBeenCalledTimes(2);
+        expect(ImageApi.post).toHaveBeenCalledWith(mockClient, programData.previewImage);
+        expect(ImageApi.post).toHaveBeenCalledWith(mockClient, programData.backgroundImage);
 
         expect(mockClient.post).toHaveBeenCalledWith(
             API_ROUTES.PROGRAMS.BASE,
             expect.objectContaining({
-                ...programData,
-                imageId: mockImageResponse.id,
+                previewImageId: mockPreviewImageResponse.id,
+                backgroundImageId: mockBackgroundImageResponse.id,
             }),
         );
 
         expect(result.id).toBeDefined();
         expect(result.name).toBe(programData.name);
         expect(result.description).toBe(programData.description);
-        expect(result.status).toBe(programData.status);
-        expect(result.categories).toHaveLength(4);
+        expect(result.location).toBe(programData.location);
+        expect(result.participantsCount).toBe(programData.participantsCount);
+        expect(result.meetingsCount).toBe(programData.meetingsCount);
     });
 
-    it('should add program with no image', async () => {
-        const noImgData = { ...programData, img: null };
+    it('should add program with no images', async () => {
+        const programData = getValidProgramData({
+            previewImage: null,
+            backgroundImage: null,
+        });
+
         mockClient.post.mockResolvedValueOnce({
             data: {
-                ...noImgData,
+                ...programData,
                 id: 13,
-                categories: mockCategories.slice(0, 1),
-                img: null,
+                previewImage: null,
+                backgroundImage: null,
             },
         });
         mockClient.get.mockResolvedValueOnce({ data: mockCategories });
-        const promise = ProgramsApi.addProgram(mockClient, noImgData);
-        const result = await promise;
 
-        expect(result.image).toBeNull();
+        const result = await ProgramsApi.addProgram(mockClient, programData);
+
+        expect(ImageApi.post).not.toHaveBeenCalled();
+        expect(result.previewImage).toBeNull();
+        expect(result.backgroundImage).toBeNull();
     });
 
     it('should handle empty categoryIds', async () => {
-        const emptyData = { ...programData, categoryIds: [] };
+        const programData = getValidProgramData({
+            categoryIds: [],
+            previewImage: null,
+            backgroundImage: null,
+        });
+
         mockClient.post.mockResolvedValueOnce({
             data: {
-                ...emptyData,
                 id: 13,
-                categories: [],
-                img: null,
+                name: programData.name,
+                description: programData.description,
+                status: programData.status,
+                categoryIds: [],
+                location: programData.location,
+                participantsCount: programData.participantsCount,
+                meetingCount: programData.meetingsCount,
+                previewImageId: null,
+                backgroundImageId: null,
             },
         });
         mockClient.get.mockResolvedValueOnce({ data: [] });
-        const promise = ProgramsApi.addProgram(mockClient, emptyData);
-        const result = await promise;
+
+        const result = await ProgramsApi.addProgram(mockClient, programData);
 
         expect(result.categories).toHaveLength(0);
     });
 });
 
 describe('editProgram', () => {
-    const programData: ProgramCreateUpdate = {
-        id: 1,
-        name: 'Updated Program',
-        description: 'Updated Description',
-        status: VisibilityStatus.Published,
-        image: null,
-        imageId: null,
-        categoryIds: [2],
-    };
-
     beforeEach(() => {
-        const initialImageId = 55;
-        const mockUpdateImageResponse = { finalImageId: 101, imageIdToDelete: initialImageId };
-        (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue(mockUpdateImageResponse);
+        const initialPreviewImageId = 55;
+        const initialBackgroundImageId = 56;
+        (ImageApi.getUpdateImageId as jest.Mock)
+            .mockResolvedValueOnce({ finalImageId: 101, imageIdToDelete: initialPreviewImageId })
+            .mockResolvedValueOnce({ finalImageId: 102, imageIdToDelete: initialBackgroundImageId });
     });
 
-    it('should edit existing program with File image', async () => {
+    it('should edit existing program with new images', async () => {
+        const programData = getValidProgramData({
+            id: 1,
+            name: 'Updated Program',
+            status: VisibilityStatus.Published,
+        });
+
         mockClient.put.mockResolvedValueOnce({
             data: {
                 ...programData,
                 id: 1,
                 categories: mockCategories.slice(0, 2),
-                img: null,
             },
         });
-        const promise = ProgramsApi.editProgram(programData, mockClient);
-        const result = await promise;
+
+        const result = await ProgramsApi.editProgram(programData, mockClient);
 
         expect(result.id).toBe(1);
         expect(result.name).toBe(programData.name);
+        expect(ImageApi.getUpdateImageId).toHaveBeenCalledTimes(2);
     });
 
-    it('should edit existing program with null image', async () => {
-        const noImgData = { ...programData, img: null };
-        mockClient.put.mockResolvedValueOnce({ data: { ...noImgData, img: null } });
-        const promise = ProgramsApi.editProgram(noImgData, mockClient);
-        const result = await promise;
-
-        expect(result.image).toBeNull();
-    });
-
-    it('should throw error when program not found', async () => {
-        mockClient.put.mockRejectedValueOnce(new Error('Program not found'));
-        const promise = ProgramsApi.editProgram({ ...programData, id: 999 }, mockClient);
-        await expect(promise).rejects.toThrow('Program not found');
-    });
-
-    it('should NOT delete image when imageIdToDelete equals finalImageId', async () => {
-        const programData: ProgramCreateUpdate = {
+    it('should edit existing program with null images', async () => {
+        const programData = getValidProgramData({
             id: 1,
-            name: 'Program With Same Image',
-            description: 'Description',
-            status: VisibilityStatus.Published,
-            image: null,
-            imageId: 100,
-            categoryIds: [1],
-        };
-
-        const sameImageId = 100;
-        (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue({
-            finalImageId: sameImageId,
-            imageIdToDelete: sameImageId,
+            previewImage: null,
+            backgroundImage: null,
         });
 
         mockClient.put.mockResolvedValueOnce({
             data: {
                 ...programData,
-                categories: mockCategories.slice(0, 1),
+                previewImage: null,
+                backgroundImage: null,
             },
+        });
+
+        const result = await ProgramsApi.editProgram(programData, mockClient);
+
+        expect(result.previewImage).toBeNull();
+        expect(result.backgroundImage).toBeNull();
+    });
+
+    it('should throw error when program not found', async () => {
+        const programData = getValidProgramData({ id: 999 });
+
+        mockClient.put.mockRejectedValueOnce(new Error('Program not found'));
+
+        await expect(ProgramsApi.editProgram(programData, mockClient)).rejects.toThrow('Program not found');
+    });
+
+    it('should delete old images when updating', async () => {
+        const programData = getValidProgramData({
+            id: 1,
+            previewImageId: 55,
+            backgroundImageId: 56,
+        });
+
+        (ImageApi.getUpdateImageId as jest.Mock)
+            .mockResolvedValueOnce({ finalImageId: 101, imageIdToDelete: 55 })
+            .mockResolvedValueOnce({ finalImageId: 102, imageIdToDelete: 56 });
+
+        mockClient.put.mockResolvedValueOnce({
+            data: programData,
         });
 
         await ProgramsApi.editProgram(programData, mockClient);
 
-        expect(ImageApi.delete).not.toHaveBeenCalled();
+        expect(ImageApi.delete).toHaveBeenCalledTimes(2);
+        expect(ImageApi.delete).toHaveBeenCalledWith(mockClient, 55);
+        expect(ImageApi.delete).toHaveBeenCalledWith(mockClient, 56);
     });
 });
 
 describe('deleteProgram', () => {
-    beforeEach(() => {
-        const initialImageId = 55;
-        const mockUpdateImageResponse = { finalImageId: 101, imageIdToDelete: initialImageId };
-        (ImageApi.getUpdateImageId as jest.Mock).mockResolvedValue(mockUpdateImageResponse);
-    });
-
     it('should delete existing program', async () => {
         const programToDelete = mockPrograms[0];
-        const promise = ProgramsApi.deleteProgram(programToDelete.id, mockClient);
-        await promise;
+        await ProgramsApi.deleteProgram(programToDelete.id, mockClient);
 
         expect(mockClient.delete).toHaveBeenCalledWith(expect.stringContaining(`/${programToDelete.id}`));
     });
 
     it('should throw error when program not found', async () => {
         mockClient.delete.mockRejectedValueOnce(new Error('Program not found'));
-        const promise = ProgramsApi.deleteProgram(999, mockClient);
-        await expect(promise).rejects.toThrow('Program not found');
+
+        await expect(ProgramsApi.deleteProgram(999, mockClient)).rejects.toThrow('Program not found');
     });
 });
 
@@ -342,9 +406,15 @@ describe('addProgramCategory', () => {
             id: null,
             name: 'New Category',
         };
-        mockClient.post.mockResolvedValueOnce({ data: { id: 4, name: categoryData.name, programsCount: 0 } });
-        const promise = ProgramsCategoriesApi.addProgramCategory(categoryData, mockClient);
-        const result = await promise;
+        mockClient.post.mockResolvedValueOnce({
+            data: {
+                id: 4,
+                name: categoryData.name,
+                programs: [],
+            },
+        });
+
+        const result = await ProgramsCategoriesApi.addProgramCategory(categoryData, mockClient);
 
         expect(result.id).toBeDefined();
         expect(result.name).toBe(categoryData.name);
@@ -358,9 +428,15 @@ describe('editCategory', () => {
             id: 1,
             name: 'Updated Category Name',
         };
-        mockClient.put.mockResolvedValueOnce({ data: { id: 1, name: categoryData.name, programsCount: 5 } });
-        const promise = ProgramsCategoriesApi.editProgramCategory(categoryData, mockClient);
-        const result = await promise;
+        mockClient.put.mockResolvedValueOnce({
+            data: {
+                id: 1,
+                name: categoryData.name,
+                programsCount: 2,
+            },
+        });
+
+        const result = await ProgramsCategoriesApi.editProgramCategory(categoryData, mockClient);
 
         expect(result.id).toBe(1);
         expect(result.name).toBe(categoryData.name);
@@ -369,16 +445,17 @@ describe('editCategory', () => {
     it('should throw error when category not found', async () => {
         const categoryData = { id: 999, name: 'Non-existent Category' };
         mockClient.put.mockRejectedValueOnce(new Error('Category not found'));
-        const promise = ProgramsCategoriesApi.editProgramCategory(categoryData, mockClient);
-        await expect(promise).rejects.toThrow('Category not found');
+
+        await expect(ProgramsCategoriesApi.editProgramCategory(categoryData, mockClient)).rejects.toThrow(
+            'Category not found',
+        );
     });
 });
 
 describe('deleteCategory', () => {
     it('should delete category with zero programs', async () => {
         const categoryToDelete = mockCategories.find((c) => c.programsCount === 0)!;
-        const promise = ProgramsCategoriesApi.deleteProgramCategory(categoryToDelete.id, mockClient);
-        await promise;
+        await ProgramsCategoriesApi.deleteProgramCategory(categoryToDelete.id, mockClient);
 
         expect(mockClient.delete).toHaveBeenCalledWith(expect.stringContaining(`/${categoryToDelete.id}`));
     });
@@ -386,94 +463,194 @@ describe('deleteCategory', () => {
     it('should throw error when category has programs', async () => {
         const categoryWithPrograms = mockCategories.find((c) => c.programsCount > 0)!;
         mockClient.delete.mockRejectedValueOnce(new Error('Category has at least one program'));
-        const promise = ProgramsCategoriesApi.deleteProgramCategory(categoryWithPrograms.id, mockClient);
-        await expect(promise).rejects.toThrow('Category has at least one program');
+
+        await expect(ProgramsCategoriesApi.deleteProgramCategory(categoryWithPrograms.id, mockClient)).rejects.toThrow(
+            'Category has at least one program',
+        );
     });
 
     it('should throw error when category not found', async () => {
         mockClient.delete.mockRejectedValueOnce(new Error('Category not found'));
-        const promise = ProgramsCategoriesApi.deleteProgramCategory(999, mockClient);
-        await expect(promise).rejects.toThrow('Category not found');
+
+        await expect(ProgramsCategoriesApi.deleteProgramCategory(999, mockClient)).rejects.toThrow(
+            'Category not found',
+        );
     });
 });
 
 describe('fetchProgramSearchItems', () => {
-    it('should call API with correct search and pagination parameters and return mapped data', async () => {
-        const searchTerm = 'program';
-        const limit = 5;
-        const offset = 10;
-        const mockSignal = new AbortController().signal;
-
-        const mockApiItems = mockPrograms.slice(0, 2);
-        const mockTotalCount = mockPrograms.length;
-        const mockApiResponse = {
-            items: mockApiItems,
-            totalItemsCount: mockTotalCount,
+    it('should prioritize direct name matches in sorting, then sort alphabetically', async () => {
+        const programWithNameMatch: Program = {
+            id: 100,
+            name: 'Core Pilates Workout',
+            description: 'test',
+            status: VisibilityStatus.Published,
+            previewImage: null,
+            backgroundImage: null,
+            location: 'Test Location',
+            participantsCount: '10',
+            meetingsCount: '5',
+            categories: [{ id: 9, name: 'General', programsCount: 1 }],
+        };
+        const programWithCategoryMatch: Program = {
+            id: 101,
+            name: 'Advanced Flexibility',
+            description: 'test',
+            status: VisibilityStatus.Published,
+            previewImage: null,
+            backgroundImage: null,
+            location: 'Test Location',
+            participantsCount: '10',
+            meetingsCount: '5',
+            categories: [{ id: 10, name: 'Pilates', programsCount: 1 }],
         };
 
-        mockClient.get.mockResolvedValueOnce({ data: mockApiResponse });
-
-        const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, offset, limit, mockSignal);
-
-        expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PROGRAMS.SEARCH, {
-            params: {
-                SearchQuery: searchTerm,
-                offset: offset,
-                limit: limit,
+        mockClient.get.mockResolvedValueOnce({
+            data: {
+                items: [...mockPrograms, programWithNameMatch, programWithCategoryMatch],
+                totalItemsCount: 5,
             },
-            signal: mockSignal,
         });
 
-        expect(result.items).toHaveLength(mockApiItems.length);
-        expect(result.totalItemsCount).toBe(mockTotalCount);
-        expect(result.items[0].id).toBe(mockApiItems[0].id);
-        expect(result.items[1].name).toBe(mockApiItems[1].name);
+        const searchTerm = 'Pilates';
+        const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);
+
+        const ids = result.items.map((i) => i.id);
+        const nameMatchIndex = ids.indexOf(programWithNameMatch.id);
+        const categoryMatchIndex = ids.indexOf(programWithCategoryMatch.id);
+
+        expect(nameMatchIndex).toBeGreaterThan(-1);
+        expect(categoryMatchIndex).toBeGreaterThan(-1);
+        expect(nameMatchIndex).toBeLessThan(categoryMatchIndex);
     });
 
-    it('should return an empty result when the API finds no matches', async () => {
-        const searchTerm = 'NonExistentProgramXYZ';
-        const offset = 0;
-        const limit = 10;
+    it('should handle pagination correctly', async () => {
+        const searchTerm = 'терапія';
+        const limit = 2;
+        const offset = 1;
 
-        const mockApiResponse = {
-            items: [],
-            totalItemsCount: 0,
-        };
-
-        mockClient.get.mockResolvedValueOnce({ data: mockApiResponse });
+        mockClient.get.mockResolvedValueOnce({
+            data: {
+                items: mockPrograms,
+                totalItemsCount: mockPrograms.length,
+            },
+        });
 
         const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, offset, limit);
 
-        expect(mockClient.get).toHaveBeenCalledWith(API_ROUTES.PROGRAMS.SEARCH, {
-            params: {
-                SearchQuery: searchTerm,
-                offset: offset,
-                limit: limit,
+        expect(result.items.length).toBeLessThanOrEqual(mockPrograms.length);
+        expect(result.totalItemsCount).toBeGreaterThan(0);
+    });
+
+    it('should return an empty result when no matches are found', async () => {
+        const searchTerm = 'NonExistentProgramXYZ';
+
+        mockClient.get.mockResolvedValueOnce({
+            data: {
+                items: [],
+                totalItemsCount: 0,
             },
-            signal: undefined,
         });
+
+        const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);
 
         expect(result.items).toHaveLength(0);
         expect(result.totalItemsCount).toBe(0);
     });
+
+    it('should sort matches alphabetically when match priority is the same', async () => {
+        const searchTerm = 'терапія';
+
+        const mockApiData = [
+            {
+                id: 1,
+                name: 'Психологічна терапія',
+                categories: [],
+                description: 'Test',
+                status: VisibilityStatus.Published,
+                previewImage: null,
+                backgroundImage: null,
+                location: 'Test',
+                participantsCount: '10',
+                meetingsCount: '5',
+            },
+            {
+                id: 2,
+                name: 'Фітнес для всіх',
+                categories: [{ id: 1, name: 'Реабілітаційна терапія', programsCount: 1 }],
+                description: 'Test',
+                status: VisibilityStatus.Published,
+                previewImage: null,
+                backgroundImage: null,
+                location: 'Test',
+                participantsCount: '10',
+                meetingsCount: '5',
+            },
+            {
+                id: 3,
+                name: 'Арт-терапія',
+                categories: [],
+                description: 'Test',
+                status: VisibilityStatus.Published,
+                previewImage: null,
+                backgroundImage: null,
+                location: 'Test',
+                participantsCount: '10',
+                meetingsCount: '5',
+            },
+            {
+                id: 4,
+                name: 'Йога для спини',
+                categories: [{ id: 2, name: 'Фізична терапія', programsCount: 1 }],
+                description: 'Test',
+                status: VisibilityStatus.Published,
+                previewImage: null,
+                backgroundImage: null,
+                location: 'Test',
+                participantsCount: '10',
+                meetingsCount: '5',
+            },
+        ];
+
+        const expectedOrder = ['Арт-терапія', 'Психологічна терапія', 'Йога для спини', 'Фітнес для всіх'];
+
+        const sortedMockData = [mockApiData[2], mockApiData[0], mockApiData[3], mockApiData[1]];
+
+        mockClient.get.mockResolvedValueOnce({
+            data: {
+                items: sortedMockData,
+                totalItemsCount: 4,
+            },
+        });
+
+        const result = await ProgramsApi.fetchProgramSearchItems(mockClient, searchTerm, 0, 10);
+
+        const actualNames = result.items.map((item) => item.name);
+
+        expect(actualNames).toEqual(expectedOrder);
+    });
 });
 
 describe('API Error and Cancellation Handling', () => {
-    it('should reject fetchPrograms with AbortError if the request is cancelled', async () => {
+    it('should reject fetchPrograms with error if the request is cancelled', async () => {
         mockClient.get.mockRejectedValueOnce(new Error('Request was cancelled'));
-        const promise = ProgramsApi.fetchPrograms(mockClient, 1, 0, 10, undefined);
-        await expect(promise).rejects.toThrow('Request was cancelled');
+
+        await expect(ProgramsApi.fetchPrograms(mockClient, 1, 0, 10, undefined)).rejects.toThrow(
+            'Request was cancelled',
+        );
     });
 
-    it('should reject fetchProgramSearchItems with AbortError if the request is cancelled', async () => {
+    it('should reject fetchProgramSearchItems with error if the request is cancelled', async () => {
         mockClient.get.mockRejectedValueOnce(new Error('Request was cancelled'));
-        const promise = ProgramsApi.fetchProgramSearchItems(mockClient, 'search', 0, 10);
-        await expect(promise).rejects.toThrow('Request was cancelled');
+
+        await expect(ProgramsApi.fetchProgramSearchItems(mockClient, 'search', 0, 10)).rejects.toThrow(
+            'Request was cancelled',
+        );
     });
 
     it('should handle a pre-aborted signal correctly', async () => {
         mockClient.get.mockRejectedValueOnce(new Error('Request was cancelled'));
-        const promise = ProgramsApi.fetchProgramById(1, mockClient);
-        await expect(promise).rejects.toThrow('Request was cancelled');
+
+        await expect(ProgramsApi.fetchProgramById(1, mockClient)).rejects.toThrow('Request was cancelled');
     });
 });

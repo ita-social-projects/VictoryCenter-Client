@@ -1,8 +1,8 @@
-import { ButtonTooltip } from '../../../../../components/admin/button-tooltip/ButtonTooltip';
-import { VisibilityStatusLabel } from '../../../../../components/admin/visibility-status-label/VisibilityStatusLabel';
-import { FAQ_TEXT } from '../../../../../const/admin/faq';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { FaqQuestion } from '../../../../../types/admin/faq';
+import { ButtonTooltip } from '@/components/admin/button-tooltip/ButtonTooltip';
+import { VisibilityStatusLabel } from '@/components/admin/visibility-status-label/VisibilityStatusLabel';
+import { FAQ_TEXT } from '@/const/admin/faq';
+import { VisibilityStatus } from '@/types/admin/common';
+import { FaqQuestion } from '@/types/admin/faq';
 import './FaqComponent.scss';
 
 export interface FaqComponentProps {

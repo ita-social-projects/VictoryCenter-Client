@@ -1,11 +1,11 @@
 import { AxiosInstance } from 'axios';
 import { TeamMembersApi } from './team-members-api';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { ImageApi } from '../../image/image-api';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { TranslationStatusFilter } from '../../../../../types/common/language';
+import { VisibilityStatus } from '@/types/admin/common';
+import { ImageApi } from '@/services/api/admin/image/image-api';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { TranslationStatusFilter } from '@/types/common/language';
 
-jest.mock('../../image/image-api');
+jest.mock('@/services/api/admin/image/image-api');
 
 describe('TeamMembersApi', () => {
     const mockClient = {

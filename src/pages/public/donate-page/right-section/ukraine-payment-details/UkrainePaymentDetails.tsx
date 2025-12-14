@@ -1,7 +1,7 @@
 import './UkrainePaymentDetails.scss';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
-import { UKRAINE_PAYMENT_DETAILS, PAYMENT_DETAILS_COMMON } from '../../../../../const/public/donate-page';
-import { PublishedUahBankDetailsDto } from '../../../../../types/public/donate-page';
+import { UKRAINE_PAYMENT_DETAILS, PAYMENT_DETAILS_COMMON } from '@/const/public/donate-page';
+import { PublishedUahBankDetailsDto } from '@/types/public/donate-page';
 
 interface UkrainePaymentDetailsProps {
     bankDetails: PublishedUahBankDetailsDto[];
@@ -12,10 +12,12 @@ export const UkrainePaymentDetails = ({ bankDetails }: UkrainePaymentDetailsProp
         return null;
     }
 
+    const sortedBankDetails = [...bankDetails].sort((a, b) => a.id - b.id);
+
     return (
         <div className="UkrainePaymentDetails">
             <h2>{UKRAINE_PAYMENT_DETAILS.UKRAINE_PAYMENT_DETAILS_LABEL}</h2>
-            {bankDetails.map((bank, index) => (
+            {sortedBankDetails.map((bank, index) => (
                 <div key={bank.id} className={`paymentDetails ${index > 0 ? 'separated' : ''}`}>
                     <div className="paymentLabel">
                         <h3>{PAYMENT_DETAILS_COMMON.RECIPIENT_LABEL}</h3>
@@ -41,8 +43,8 @@ export const UkrainePaymentDetails = ({ bankDetails }: UkrainePaymentDetailsProp
                     <div className="paymentLabel">
                         <h3>{UKRAINE_PAYMENT_DETAILS.IBAN_UAH_LABEL}</h3>
                         <div className="labelWithCopyButton">
-                            <span className="label">{bank.iban}</span>
-                            <CopyTextButton textToCopy={bank.iban} />
+                            <span className="label">{bank.ukrainianIban}</span>
+                            <CopyTextButton textToCopy={bank.ukrainianIban} />
                         </div>
                     </div>
                     <div className="paymentLabel">

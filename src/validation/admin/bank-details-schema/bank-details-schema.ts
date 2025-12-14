@@ -1,4 +1,4 @@
-import { DONATE_VALIDATION } from '../../../const/admin/donate';
+import { DONATE_VALIDATION } from '@/const/admin/donate';
 import * as Yup from 'yup';
 
 export const BankDetailsValidationSchema = Yup.object({
@@ -29,8 +29,8 @@ export const BankDetailsValidationSchema = Yup.object({
         .required(DONATE_VALIDATION.paymentPurpose.getRequiredError())
         .max(DONATE_VALIDATION.paymentPurpose.maxLength, DONATE_VALIDATION.paymentPurpose.getMaxError()),
     swift: Yup.string()
-        .trim()
         .required(DONATE_VALIDATION.swift.getRequiredError())
+        .matches(/^[a-zA-Z0-9]+$/, DONATE_VALIDATION.getAlphaNumericError())
         .min(DONATE_VALIDATION.swift.minLength, DONATE_VALIDATION.swift.getMinError())
         .max(DONATE_VALIDATION.swift.maxLength, DONATE_VALIDATION.swift.getMaxError()),
     address: Yup.string()

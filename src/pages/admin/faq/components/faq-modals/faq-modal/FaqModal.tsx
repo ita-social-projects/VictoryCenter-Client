@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
-import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
-import { FAQ_TEXT } from '../../../../../../const/admin/faq';
-import { useGenericModal } from '../../../../../../hooks/admin/use-generic-modal/useGenericModal';
-import { FaqApi } from '../../../../../../services/api/admin/faq/faq-api';
-import { VisibilityStatus, ModalMode, PendingAction } from '../../../../../../types/admin/common';
-import { FaqCreateUpdate, FaqQuestion, VisitorPage } from '../../../../../../types/admin/faq';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { FAQ_TEXT } from '@/const/admin/faq';
+import { useGenericModal } from '@/hooks/admin/use-generic-modal/useGenericModal';
+import { FaqApi } from '@/services/api/admin/faq/faq-api';
+import { VisibilityStatus, ModalMode, PendingAction } from '@/types/admin/common';
+import { FaqCreateUpdate, FaqQuestion, VisitorPage } from '@/types/admin/faq';
 import { FaqForm, FaqFormRef, FaqFormValues } from '../../faq-form/FaqForm';
-import { GenericModalWrapper } from '../../../../../../components/admin/generic-modal-wrapper/GenericModalWrapper';
-import { useAdminClient } from '../../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { mapFaqQuestionDtoToModel } from '../../../../../../utils/functions/mappers/admin/faq/faq-mappers';
+import { GenericModalWrapper } from '@/components/admin/generic-modal-wrapper/GenericModalWrapper';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { mapFaqQuestionDtoToModel } from '@/utils/functions/mappers/admin/faq/faq-mappers';
 
 interface BaseProps {
     isOpen: boolean;
@@ -107,13 +107,20 @@ export const FaqModal = (props: FaqModalProps) => {
             onFormSubmit={modalHookData.handleFormSubmit}
             onDraftSubmit={modalHookData.handleDraftSubmit}
             onPublishSubmit={modalHookData.handlePublishSubmit}
-            onConfirmAction={modalHookData.handleConfirmAction}
-            onCancelConfirmation={modalHookData.handleCancelConfirmation}
-            onConfirmClose={modalHookData.handleConfirmClose}
-            onCancelClose={modalHookData.handleCancelClose}
-            {...modalHookData}
-            initialData={initialData}
+            onActionConfirm={modalHookData.handleConfirmAction}
+            onActionCancel={modalHookData.handleCancelConfirmation}
+            onExitConfirm={modalHookData.handleConfirmClose}
+            onExitCancel={modalHookData.handleCancelClose}
+            buttonStates={modalHookData.buttonStates}
+            formRef={modalHookData.formRef}
+            isSubmitting={modalHookData.isSubmitting}
+            error={modalHookData.error}
+            isActionConfirmationOpen={modalHookData.showFormConfirmModal}
+            isExitConfirmationOpen={modalHookData.showCloseConfirmModal}
+            formKey={modalHookData.formKey}
+            actionConfirmationTitle={modalHookData.formConfirmTitle}
             categories={pages}
+            initialData={initialData}
             renderForm={(props) => (
                 <FaqForm
                     ref={modalHookData.formRef}

@@ -1,25 +1,25 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CategoryBar } from '../../../../../components/admin/category-bar/CategoryBar';
-import { FaqQuestion, FaqSearchItemData, VisitorPage } from '../../../../../types/admin/faq';
-import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { FaqApi } from '../../../../../services/api/admin/faq/faq-api';
-import { VisibilityStatus, ModalMode } from '../../../../../types/admin/common';
-import { FAQ_TEXT } from '../../../../../const/admin/faq';
-import { ToastType } from '../../../../../types/admin/toast';
-import { DraggableListItem } from '../../../../../components/admin/draggable-list-item/DraggableListItem';
-import { InfiniteScrollList } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { CategoryBar } from '@/components/admin/category-bar/CategoryBar';
+import { FaqQuestion, FaqSearchItemData, VisitorPage } from '@/types/admin/faq';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { FaqApi } from '@/services/api/admin/faq/faq-api';
+import { VisibilityStatus, ModalMode } from '@/types/admin/common';
+import { FAQ_TEXT } from '@/const/admin/faq';
+import { ToastType } from '@/types/admin/toast';
+import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
+import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { FaqModal } from '../faq-modals/faq-modal/FaqModal';
-import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
+import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
 import { DeleteFaqModal } from '../faq-modals/delete-faq-modal/DeleteFaqModal';
 import { FaqComponent } from '../faq-component/FaqComponent';
-import { useVisitorPages } from '../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider';
-import './FaqPanelContent.scss';
-import axios from 'axios';
-import { AdminPanelToolbar } from '../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar';
+import { useVisitorPages } from '@/contexts/admin/visitor-pages-provider/VisitorPagesProvider';
+import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { FaqSearchItem } from '../faq-search-item/FaqSearchItem';
-import { mapFaqQuestionDtoToModel } from '../../../../../utils/functions/mappers/admin/faq/faq-mappers';
+import { mapFaqQuestionDtoToModel } from '@/utils/functions/mappers/admin/faq/faq-mappers';
+import axios from 'axios';
+import './FaqPanelContent.scss';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -379,6 +379,7 @@ export const FaqPanelContent = () => {
                     renderSearchItemComponent={FaqSearchItem}
                     placeholder={FAQ_TEXT.PLACEHOLDER.SEARCH_FAQ}
                     onSearchClear={() => {}}
+                    statusFilter={statusFilter}
                     onStatusFilterChange={onStatusFilterChange}
                     onAddItem={handleAddFaqModalOpen}
                     AddItemButtonText={FAQ_TEXT.BUTTON.ADD_FAQ}

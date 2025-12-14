@@ -1,6 +1,6 @@
 import { mapFaqQuestionDtoToModel } from './faq-mappers';
-import { FaqQuestionDto, VisitorPage } from '../../../../../types/admin/faq';
-import { VisibilityStatus } from '../../../../../types/admin/common';
+import { FaqQuestionDto, VisitorPage } from '@/types/admin/faq';
+import { VisibilityStatus } from '@/types/admin/common';
 
 describe('mapFaqQuestionDtoToModel', () => {
     const pages: VisitorPage[] = [

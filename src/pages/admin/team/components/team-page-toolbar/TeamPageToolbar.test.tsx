@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent, act, within } from '@testing-library/react';
 import { TeamPageToolbar } from './TeamPageToolbar';
-import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
-import { ProgramSearchItemData } from '../../../../../types/admin/programs';
+import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { VisibilityStatus } from '@/types/admin/common';
+import { SearchBarProps } from '@/components/admin/search-bar/SearchBar';
+import { ProgramSearchItemData } from '@/types/admin/programs';
 
 type PartialProps = Partial<React.ComponentProps<typeof TeamPageToolbar>>;
 
@@ -13,6 +13,7 @@ const DEFAULT_PROPS: React.ComponentProps<typeof TeamPageToolbar> = {
     onSearchQueryChange: jest.fn(),
     onStatusFilterChange: jest.fn(),
     onAddMember: jest.fn(),
+    statusFilter: undefined,
     searchItems: [],
     isSearchLoading: false,
     searchHasMore: false,
@@ -35,11 +36,11 @@ const CATS_2 = [...CATS_1, { id: 'c2', name: 'Category 2' } as any];
 const ITEM_JOHN = [{ id: '1', fullName: 'John Doe' } as any];
 const ITEM_JANE = [{ id: '1', fullName: 'Jane Roe' } as any];
 
-jest.mock('../../../../../assets/icons/plus.svg', () => ({
+jest.mock('@/assets/icons/plus.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="plus-icon" />,
 }));
 
-jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
+jest.mock('@/components/admin/search-bar/SearchBar', () => ({
     SearchBar: (props: SearchBarProps<ProgramSearchItemData>) => {
         const {
             onQueryChange,
@@ -94,7 +95,7 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
     },
 }));
 
-jest.mock('../../../../../components/admin/search-bar/team-member-search-item/TeamMemberSearchItem', () => {
+jest.mock('@/components/admin/search-bar/team-member-search-item/TeamMemberSearchItem', () => {
     const ReactActual = jest.requireActual('react');
     return {
         TeamMemberSearchItem: ReactActual.forwardRef(({ item, categories }: any, ref: any) => (
@@ -140,21 +141,27 @@ describe('TeamPageToolbar', () => {
         const onStatusFilterChange = jest.fn();
         renderToolbar({ onStatusFilterChange });
 
-        const statusSelect = screen.getByTestId('status-filter');
-        const button = within(statusSelect).getByRole('button');
-        fireEvent.click(button);
+        const statusSelect = screen.getByRole('button', { name: /Статус/i });
 
-        const dropdown = within(statusSelect);
+        fireEvent.click(statusSelect);
 
-        fireEvent.click(dropdown.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.ALL));
+        const optionAll = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.ALL });
+        fireEvent.click(optionAll);
+
         expect(onStatusFilterChange).toHaveBeenCalledWith(undefined);
 
-        fireEvent.click(button);
-        fireEvent.click(dropdown.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED));
+        fireEvent.click(statusSelect);
+
+        const optionPublished = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED });
+        fireEvent.click(optionPublished);
+
         expect(onStatusFilterChange).toHaveBeenCalledWith(VisibilityStatus.Published);
 
-        fireEvent.click(button);
-        fireEvent.click(dropdown.getByText(COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT));
+        fireEvent.click(statusSelect);
+
+        const optionDraft = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT });
+        fireEvent.click(optionDraft);
+
         expect(onStatusFilterChange).toHaveBeenCalledWith(VisibilityStatus.Draft);
     });
 
@@ -210,5 +217,21 @@ describe('TeamPageToolbar', () => {
         rerender(<TeamPageToolbar {...{ ...DEFAULT_PROPS, categories: CATS_2, searchItems: ITEM_JANE }} />);
 
         expect(screen.getByTestId('team-member-item')).toHaveTextContent('Jane Roe - 2');
+    });
+
+    it('renders with statusFilter prop value', () => {
+        renderToolbar({ statusFilter: VisibilityStatus.Published });
+
+        expect(screen.getByTestId('team-page-toolbar')).toBeInTheDocument();
+    });
+
+    it('passes statusFilter to StatusFilterDropdown', () => {
+        const { rerender } = renderToolbar({ statusFilter: undefined });
+
+        expect(screen.getByTestId('team-page-toolbar')).toBeInTheDocument();
+
+        rerender(<TeamPageToolbar {...{ ...DEFAULT_PROPS, statusFilter: VisibilityStatus.Draft }} />);
+
+        expect(screen.getByTestId('team-page-toolbar')).toBeInTheDocument();
     });
 });

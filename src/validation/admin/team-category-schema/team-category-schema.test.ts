@@ -1,4 +1,4 @@
-import { TEAM_CATEGORY_VALIDATION } from '../../../const/admin/team';
+import { TEAM_CATEGORY_VALIDATION } from '@/const/admin/team';
 import { TEAM_CATEGORY_VALIDATION_FUNCTIONS } from './team-category-schema';
 
 describe('TeamCategoryValidationSchema', () => {

@@ -2,18 +2,31 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramCategoryModal, ProgramCategoryModalProps } from './ProgramCategoryModal';
-import { ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
-import { ProgramCategory } from '../../../../../types/admin/programs';
-import { PROGRAM_CATEGORY_VALIDATION } from '../../../../../const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
+import { ProgramsCategoriesApi } from '@/services/api/admin/programs/programs-api';
+import { ProgramCategory } from '@/types/admin/programs';
+import { PROGRAM_CATEGORY_VALIDATION } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { InputLabelProps } from '@/components/admin/input-label/InputLabel';
+import { ButtonProps } from '@/components/admin/button/Button';
+import { HintBoxProps } from '@/components/admin/hint-box/HintBox';
+import { ConfirmationModalProps } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { ModalProps } from '@/components/common/modal/Modal';
 
-jest.mock('../../../../../services/api/admin/programs/programs-api');
+jest.mock('@/services/api/admin/programs/programs-api');
 const mockedProgramsCategoriesApi = ProgramsCategoriesApi as jest.Mocked<typeof ProgramsCategoriesApi>;
 
-// Simplify Modal rendering and expose structure hooks
-jest.mock('../../../../../components/common/modal/Modal', () => {
-    const ModalMock = ({ isOpen, children }: any) => (isOpen ? <div data-testid="modal">{children}</div> : null);
+jest.mock('@/components/common/modal/Modal', () => {
+    const ModalMock = ({ isOpen, onClose, children }: ModalProps) =>
+        isOpen ? (
+            <div data-testid="modal">
+                <button data-testid="modal-close-btn" onClick={onClose}>
+                    Close
+                </button>
+                {children}
+            </div>
+        ) : null;
+
     ModalMock.Title = ({ children }: { children: React.ReactNode }) => <h1 data-testid="modal-title">{children}</h1>;
     ModalMock.Content = ({ children }: { children: React.ReactNode }) => (
         <div data-testid="modal-content">{children}</div>
@@ -24,13 +37,12 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     return { Modal: ModalMock };
 });
 
-jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
-// Simplify Button
-jest.mock('../../../../../components/admin/button/Button', () => ({
-    Button: ({ children, onClick, disabled, className, buttonStyle, type }: any) => (
+jest.mock('@/components/admin/button/Button', () => ({
+    Button: ({ children, onClick, disabled, className, buttonStyle, type }: ButtonProps) => (
         <button
             onClick={onClick}
             disabled={disabled}
@@ -43,9 +55,8 @@ jest.mock('../../../../../components/admin/button/Button', () => ({
     ),
 }));
 
-// Simplify InputLabel to avoid DOM label coupling in tests
-jest.mock('../../../../../components/admin/input-label/InputLabel', () => ({
-    InputLabel: ({ htmlFor, text, isRequired }: { htmlFor: string; text: string; isRequired?: boolean }) => (
+jest.mock('@/components/admin/input-label/InputLabel', () => ({
+    InputLabel: ({ htmlFor, text, isRequired }: InputLabelProps) => (
         <div data-testid="input-label" data-for={htmlFor}>
             {text}
             {isRequired ? '*' : ''}
@@ -53,9 +64,8 @@ jest.mock('../../../../../components/admin/input-label/InputLabel', () => ({
     ),
 }));
 
-// Simplify HintBox
-jest.mock('../../../../../components/admin/hint-box/HintBox', () => ({
-    HintBox: ({ title, text }: { title: string; text?: string }) => (
+jest.mock('@/components/admin/hint-box/HintBox', () => ({
+    HintBox: ({ title, text }: HintBoxProps) => (
         <div data-testid="hint-box">
             <p>{title}</p>
             {text && <p>{text}</p>}
@@ -63,9 +73,8 @@ jest.mock('../../../../../components/admin/hint-box/HintBox', () => ({
     ),
 }));
 
-// Render ConfirmationModal inline and clickable
-jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel }: any) =>
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel }: ConfirmationModalProps) =>
         isOpen ? (
             <div data-testid="confirm-modal">
                 <div data-testid="confirm-title">{title}</div>
@@ -326,5 +335,103 @@ describe('ProgramCategoryModal - Edit Mode', () => {
         expect(
             screen.getByText(PROGRAM_CATEGORY_VALIDATION.name.getCategoryWithThisNameAlreadyExistsError()),
         ).toBeInTheDocument();
+    });
+});
+
+describe('ProgramCategoryModal - Closing Behavior', () => {
+    const getCloseButton = () => screen.getByTestId('modal-close-btn');
+
+    it('closes immediately when form is not dirty (Add Mode)', () => {
+        const { props } = renderModal();
+
+        fireEvent.click(getCloseButton());
+
+        expect((props as any).onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows confirmation modal when closing dirty form (Add Mode)', () => {
+        const { props } = renderModal();
+
+        typeName('New Dirty Value');
+        fireEvent.click(getCloseButton());
+
+        expect((props as any).onClose).not.toHaveBeenCalled();
+        expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+        expect(screen.getByTestId('confirm-title')).toHaveTextContent(
+            COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE,
+        );
+    });
+
+    it('closes modal when confirming discard changes (Add Mode)', () => {
+        const { props } = renderModal();
+
+        typeName('New Dirty Value');
+        fireEvent.click(getCloseButton());
+        fireEvent.click(screen.getByText('Yes'));
+
+        expect((props as any).onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('stays open when canceling discard changes (Add Mode)', () => {
+        const { props } = renderModal();
+
+        typeName('New Dirty Value');
+        fireEvent.click(getCloseButton());
+        fireEvent.click(screen.getByText('No'));
+
+        expect((props as any).onClose).not.toHaveBeenCalled();
+        expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+        expect(screen.getByTestId('modal')).toBeInTheDocument();
+    });
+});
+
+describe('ProgramCategoryModal - Edit Mode Edge Cases', () => {
+    const renderEdit = (overrideProps?: Partial<ProgramCategoryModalProps>) => {
+        const baseEditProps: ProgramCategoryModalProps = {
+            isOpen: true,
+            onClose: jest.fn(),
+            categories: mockCategories,
+            mode: 'edit',
+            onEditCategory: jest.fn(),
+        } as any;
+
+        const props = { ...baseEditProps, ...overrideProps } as ProgramCategoryModalProps;
+        render(<ProgramCategoryModal {...props} />);
+        return { props };
+    };
+
+    it('handles empty categories list gracefully', () => {
+        renderEdit({ categories: [] });
+
+        expect(screen.getByTestId('modal-title')).toHaveTextContent(
+            COMMON_TEXT_ADMIN.CATEGORIES.FORM.TITLE.EDIT_CATEGORY,
+        );
+        expect((getNameInput() as HTMLInputElement).value).toBe('');
+        expect(getSaveButton()).toBeDisabled();
+    });
+
+    it('cancels Save action when clicking "No" in confirmation modal', async () => {
+        renderEdit();
+
+        typeName('Omega');
+        fireEvent.click(getSaveButton());
+
+        expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+        expect(screen.getByTestId('confirm-title')).toHaveTextContent(COMMON_TEXT_ADMIN.QUESTION.SAVE_CHANGES);
+
+        fireEvent.click(screen.getByText('No'));
+        expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+
+        expect(mockedProgramsCategoriesApi.editProgramCategory).not.toHaveBeenCalled();
+    });
+
+    it('triggers name validation on blur', () => {
+        renderEdit();
+
+        const input = getNameInput();
+        fireEvent.change(input, { target: { value: '' } });
+        fireEvent.blur(input);
+
+        expect(getSaveButton()).toBeDisabled();
     });
 });

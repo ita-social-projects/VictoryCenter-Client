@@ -3,9 +3,14 @@ import { COMMON_TEXT_ADMIN } from './common';
 export const PROGRAMS_TEXT = {
     BUTTON: {
         ADD_PROGRAM: 'Додати програму',
+        ADD_NEW_SECTION: 'Додати нову секцію',
     },
     PLACEHOLDER: {
         SEARCH_PROGRAMS: 'Шукати програми...',
+        INSERT_PROGRAM_NAME: 'Введіть назву програми',
+        INSERT_PROGRAM_LOCATION: 'Введіть місце проведення',
+        INSERT_PROGRAM_PARTICIPANTS_COUNT: 'Введіть кількість учасників',
+        INSERT_PROGRAM_MEETINGS_COUNT: 'Введіть кількість зустрічей',
     },
 
     MESSAGE: {
@@ -35,7 +40,10 @@ export const PROGRAMS_TEXT = {
             DESCRIPTION: 'Опис',
             CATEGORY: 'Категорія',
             SELECT_CATEGORY: 'Оберіть категорію',
-            PHOTO: 'Фото',
+            PREVIEW_IMAGE: 'Фото-прев’ю',
+            LOCATION: 'Локація',
+            PARTICIPANTS_COUNT: 'Кількість учасників',
+            MEETING_COUNT: 'Кількість зустрічей',
         },
     },
 };
@@ -53,27 +61,46 @@ export const PROGRAM_CATEGORY_TEXT = {
 export const PROGRAM_VALIDATION = {
     name: {
         min: 5,
-        max: 200,
+        max: 90,
         getRequiredError: () => 'Назва обов’язкова',
-        getMinError: () => `Не менше ${PROGRAM_VALIDATION.name.min} символів`,
-        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.name.max} символів`,
     },
     description: {
         min: 10,
-        max: 1000,
+        max: 400,
         getRequiredWhenPublishingError: () => 'Опис обов’язковий при публікації',
-        getMinError: () => `Не менше ${PROGRAM_VALIDATION.description.min} символів`,
-        getMaxError: () => `Не більше ${PROGRAM_VALIDATION.description.max} символів`,
     },
     categories: {
         getAtLeastOneRequiredError: () => 'Потрібно обрати хоча б одну категорію',
     },
-    image: {
-        maxSizeBytes: 3 * 1024 * 1024,
-        allowedFormats: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+    previewImage: {
+        width: 440,
+        height: 480,
+        cropWidth: 440,
+        cropHeight: 480,
+        minWidth: 440,
+        minHeight: 480,
         getRequiredWhenPublishingError: () => 'Фото обов’язкове при публікації',
-        getFormatError: () => 'Невірний формат фото, дозволено jpeg, jpg, png, webp',
-        getSizeError: () => `Фото не більше ${PROGRAM_VALIDATION.image.maxSizeBytes / (1024 * 1024)} Mb`,
+    },
+    backgroundImage: {
+        width: 1440,
+        height: 860,
+        cropWidth: 1440,
+        cropHeight: 860,
+        minWidth: 1440,
+        minHeight: 860,
+        getRequiredWhenPublishingError: () => 'Фото обов’язкове при публікації',
+    },
+    location: {
+        max: 55,
+        getRequiredWhenPublishingError: () => 'Локація обов’язкова при публікації',
+    },
+    participantsCount: {
+        max: 55,
+        getRequiredWhenPublishingError: () => 'Кількість учасників обов’язкова при публікації',
+    },
+    meetingCount: {
+        max: 55,
+        getRequiredWhenPublishingError: () => 'Кількість зустрічей обов’язкова при публікації',
     },
 };
 
@@ -82,8 +109,6 @@ export const PROGRAM_CATEGORY_VALIDATION = {
         min: 5,
         max: 20,
         getRequiredError: () => 'Назва обов’язкова',
-        getMinError: () => `Не менше ${PROGRAM_CATEGORY_VALIDATION.name.min} символи`,
-        getMaxError: () => `Не більше ${PROGRAM_CATEGORY_VALIDATION.name.max} символів`,
         getCategoryWithThisNameAlreadyExistsError: () =>
             COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.ALREADY_CONTAIN_CATEGORY_WITH_NAME,
     },

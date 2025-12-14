@@ -1,7 +1,7 @@
-import React, { RefObject, useState, useEffect } from 'react';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { ReactComponent as ArrowDown } from '../../../assets/icons/chevron-down.svg';
-import { ReactComponent as ArrowUp } from '../../../assets/icons/chevron-up.svg';
+import React, { RefObject, useState } from 'react';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ReactComponent as ArrowDown } from '@/assets/icons/chevron-down.svg';
+import { ReactComponent as ArrowUp } from '@/assets/icons/chevron-up.svg';
 import classNames from 'classnames';
 import './Select.scss';
 
@@ -37,31 +37,24 @@ export const Select = <TValue,>({
     }) as React.ReactElement<SelectOptionProps<TValue>>[];
 
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedValue, setSelectedValue] = useState<TValue | null>(null);
-    const [selectedName, setSelectedName] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (value !== undefined) {
-            const selectedOption = options.find((opt) => opt.props.value === value);
-            setSelectedValue(value);
-            setSelectedName(selectedOption ? selectedOption.props.name : null);
-        }
-    }, [value, options]);
+    const selectedOption = options.find((opt) => opt.props.value === value);
+    const hasValue = value !== null && value !== undefined;
+    const displayLabel =
+        hasValue && selectedOption ? selectedOption.props.name : (placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT);
 
     const handleOpenSelect = () => {
         setIsOpen(!isOpen);
     };
 
-    const handleSelect = (value: TValue, name: string) => {
-        setSelectedValue(value);
-        setSelectedName(name);
-        onValueChange(value);
+    const handleSelect = (newValue: TValue) => {
+        onValueChange(newValue);
         setIsOpen(false);
     };
 
-    const handleOptionClick = (e: React.MouseEvent, value: TValue, name: string) => {
+    const handleOptionClick = (e: React.MouseEvent, val: TValue) => {
         e.stopPropagation();
-        handleSelect(value, name);
+        handleSelect(val);
     };
 
     return (
@@ -93,10 +86,10 @@ export const Select = <TValue,>({
                 {Icon && <Icon />}
                 <span
                     className={classNames('empty', {
-                        'not-empty': selectedValue !== null && selectedValue !== undefined,
+                        'not-empty': hasValue,
                     })}
                 >
-                    {selectedName ?? placeholder ?? COMMON_TEXT_ADMIN.STATUS.DEFAULT}
+                    {displayLabel}
                 </span>
                 {isOpen ? <ArrowUp /> : <ArrowDown />}
             </button>
@@ -108,9 +101,9 @@ export const Select = <TValue,>({
                             <button
                                 key={`${name}-${index}`}
                                 className={classNames(optionClassName, {
-                                    'select-options-selected': !isAutocomplete && selectedValue === optValue,
+                                    'select-options-selected': !isAutocomplete && value === optValue,
                                 })}
-                                onClick={(e) => handleOptionClick(e, optValue, name)}
+                                onClick={(e) => handleOptionClick(e, optValue)}
                             >
                                 <span>{name}</span>
                             </button>

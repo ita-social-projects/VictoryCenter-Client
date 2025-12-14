@@ -2,33 +2,38 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { TeamCategoryModal } from './TeamCategoryModal';
-import { ModalMode } from '../../../../../types/admin/common';
-import { TeamCategory } from '../../../../../types/admin/team-category';
-import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { TEAM_CATEGORY_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/team-category-schema/team-category-schema';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { ModalMode } from '@/types/admin/common';
+import { TeamCategory } from '@/types/admin/team-category';
+import { TeamCategoriesApi } from '@/services/api/admin/team/team-categories/team-categories-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { TEAM_CATEGORY_VALIDATION_FUNCTIONS } from '@/validation/admin/team-category-schema/team-category-schema';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ModalProps } from '@/components/common/modal/Modal';
+import { ButtonProps } from '@/components/admin/button/Button';
+import { HintBoxProps } from '@/components/admin/hint-box/HintBox';
+import { ConfirmationModalProps } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { TextAreaWithCharacterLimitGroupProps } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 
-jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
-jest.mock('../../../../../services/api/admin/team/team-categories/team-categories-api', () => ({
+jest.mock('@/services/api/admin/team/team-categories/team-categories-api', () => ({
     TeamCategoriesApi: {
         create: jest.fn(),
         update: jest.fn(),
     },
 }));
 
-jest.mock('../../../../../validation/admin/team-category-schema/team-category-schema', () => ({
+jest.mock('@/validation/admin/team-category-schema/team-category-schema', () => ({
     TEAM_CATEGORY_VALIDATION_FUNCTIONS: {
         validateName: jest.fn(),
         validateDescription: jest.fn(),
     },
 }));
 
-jest.mock('../../../../../components/common/modal/Modal', () => {
-    const Modal = ({ children, isOpen, onClose }: any) =>
+jest.mock('@/components/common/modal/Modal', () => {
+    const Modal = ({ children, isOpen, onClose }: ModalProps) =>
         isOpen ? (
             <div data-testid="modal">
                 <button data-testid="modal-close" onClick={onClose}>
@@ -45,20 +50,20 @@ jest.mock('../../../../../components/common/modal/Modal', () => {
     return { Modal };
 });
 
-jest.mock('../../../../../components/admin/button/Button', () => ({
-    Button: ({ children, onClick, disabled, className }: any) => (
+jest.mock('@/components/admin/button/Button', () => ({
+    Button: ({ children, onClick, disabled, className }: ButtonProps) => (
         <button data-testid="button" onClick={onClick} disabled={disabled} className={className}>
             {children}
         </button>
     ),
 }));
 
-jest.mock('../../../../../components/admin/hint-box/HintBox', () => ({
-    HintBox: ({ title }: any) => <div data-testid="hint-box">{title}</div>,
+jest.mock('@/components/admin/hint-box/HintBox', () => ({
+    HintBox: ({ title }: HintBoxProps) => <div data-testid="hint-box">{title}</div>,
 }));
 
-jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel, confirmText, cancelText }: any) =>
+jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
+    ConfirmationModal: ({ isOpen, title, onConfirm, onCancel, confirmText, cancelText }: ConfirmationModalProps) =>
         isOpen ? (
             <div data-testid="confirmation-modal">
                 <div data-testid="confirmation-title">{title}</div>
@@ -72,43 +77,40 @@ jest.mock('../../../../../components/admin/confirmation-modal/ConfirmationModal'
         ) : null,
 }));
 
-jest.mock(
-    '../../../../../components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup',
-    () => ({
-        InputWithCharacterLimitGroup: ({
-            label,
-            error,
-            value,
-            onChange,
-            onBlur,
-            name,
-            id,
-            maxLength,
-            disabled,
-            isRequired,
-        }: any) => (
-            <div data-testid={`input-group-${name}`}>
-                <label data-testid={`label-${name}`}>
-                    {label} {isRequired && '*'}
-                </label>
-                <input
-                    data-testid={`input-${name}`}
-                    value={value}
-                    onChange={onChange}
-                    onBlur={onBlur}
-                    name={name}
-                    id={id}
-                    maxLength={maxLength}
-                    disabled={disabled}
-                />
-                {error && <div data-testid={`error-${name}`}>{error}</div>}
-            </div>
-        ),
-    }),
-);
+jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
+    InputWithCharacterLimitGroup: ({
+        label,
+        error,
+        value,
+        onChange,
+        onBlur,
+        name,
+        id,
+        maxLength,
+        disabled,
+        isRequired,
+    }: any) => (
+        <div data-testid={`input-group-${name}`}>
+            <label data-testid={`label-${name}`}>
+                {label} {isRequired && '*'}
+            </label>
+            <input
+                data-testid={`input-${name}`}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                name={name}
+                id={id}
+                maxLength={maxLength}
+                disabled={disabled}
+            />
+            {error && <div data-testid={`error-${name}`}>{error}</div>}
+        </div>
+    ),
+}));
 
 jest.mock(
-    '../../../../../components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
+    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
     () => ({
         TextAreaWithCharacterLimitGroup: ({
             label,
@@ -121,7 +123,7 @@ jest.mock(
             maxLength,
             disabled,
             isRequired,
-        }: any) => (
+        }: TextAreaWithCharacterLimitGroupProps) => (
             <div data-testid={`textarea-group-${name}`}>
                 <label data-testid={`label-${name}`}>
                     {label} {isRequired && '*'}
@@ -142,7 +144,7 @@ jest.mock(
     }),
 );
 
-jest.mock('../../../../../components/admin/input-groups/single-select-input-group/SingleSelectInputGroup', () => ({
+jest.mock('@/components/admin/input-groups/single-select-input-group/SingleSelectInputGroup', () => ({
     SingleSelectInputGroup: ({
         id,
         label,

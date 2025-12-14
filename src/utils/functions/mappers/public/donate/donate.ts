@@ -1,4 +1,4 @@
-import { Currency } from '../../../../../types/public/donate-page';
+import { Currency } from '@/types/public/donate-page';
 
 export const currencyToString = (currency: Currency) => {
     switch (currency) {

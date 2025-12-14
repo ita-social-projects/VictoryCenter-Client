@@ -1,4 +1,4 @@
-@use '../../../../../../assets/sass/variables/colors.scss';
+@use '@/assets/sass/variables/colors.scss';
 
 .support-option {
     display: flex;
@@ -14,13 +14,6 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-
-            .error {
-                font-size: 0.875rem;
-                font-weight: 400;
-                color: colors.$blue-500;
-                margin-top: 0.25rem;
-            }
         }
 
         .input-title {

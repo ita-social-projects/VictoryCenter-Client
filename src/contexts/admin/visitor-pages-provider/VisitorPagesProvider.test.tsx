@@ -1,15 +1,15 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { VisitorPagesProvider, useVisitorPages } from './VisitorPagesProvider';
-import { FaqApi } from '../../../services/api/admin/faq/faq-api';
+import { FaqApi } from '@/services/api/admin/faq/faq-api';
 
-jest.mock('../../../services/api/admin/faq/faq-api', () => ({
+jest.mock('@/services/api/admin/faq/faq-api', () => ({
     FaqApi: {
         getPages: jest.fn(),
     },
 }));
 
-jest.mock('../../../hooks/admin/use-admin-client/useAdminClient', () => ({
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(() => ({})),
 }));
 

@@ -1,13 +1,16 @@
 import React, { ReactNode, useEffect, useId, useRef } from 'react';
+import cn from 'classnames';
 import './Modal.scss';
 
-interface ModalProps {
+export interface ModalProps {
     children?: ReactNode;
     isOpen: boolean;
     onClose: () => void;
+    fullscreen?: boolean;
+    maxWidth?: string;
 }
 
-export const Modal = ({ children, isOpen, onClose }: ModalProps) => {
+export const Modal = ({ children, isOpen, onClose, maxWidth, fullscreen = false }: ModalProps) => {
     const mouseDownInsideModal = useRef(false);
     const modalRef = useRef<HTMLDivElement>(null);
     const titleId = useId();
@@ -121,11 +124,14 @@ export const Modal = ({ children, isOpen, onClose }: ModalProps) => {
                 ref={modalRef}
                 role="button"
                 aria-labelledby={titleId}
-                className="modal-container"
+                className={cn('modal-container', {
+                    fullscreen: fullscreen,
+                })}
                 onMouseDown={handleOnMouseDownModal}
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
                 tabIndex={-1}
+                style={{ maxWidth: maxWidth }}
             >
                 <div className="modal-header">
                     <div className="close-icon">

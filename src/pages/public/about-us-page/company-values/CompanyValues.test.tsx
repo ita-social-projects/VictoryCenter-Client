@@ -25,7 +25,7 @@ jest.mock('react-i18next', () => ({
     }),
 }));
 
-jest.mock('../../../../components/public/swiper/Swiper', () => ({
+jest.mock('@/components/public/swiper/Swiper', () => ({
     Swiper: ({ items, renderItem }: any) => (
         <div data-testid="custom-swiper">
             {items.map((group: any, index: number) => (

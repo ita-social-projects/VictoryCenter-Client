@@ -1,22 +1,22 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { FaqPanelContent } from './FaqPanelContent';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { FaqApi } from '../../../../../services/api/admin/faq/faq-api';
-import { FaqQuestion, VisitorPage } from '../../../../../types/admin/faq';
-import { FAQ_TEXT } from '../../../../../const/admin/faq';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { VisibilityStatus } from '@/types/admin/common';
+import { FaqApi } from '@/services/api/admin/faq/faq-api';
+import { FaqQuestion, VisitorPage } from '@/types/admin/faq';
+import { FAQ_TEXT } from '@/const/admin/faq';
 import axios from 'axios';
 
-jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient');
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
 
 const mockedUseAdminClient = useAdminClient as jest.Mock;
 
-jest.mock('../../../../../services/api/admin/faq/faq-api');
+jest.mock('@/services/api/admin/faq/faq-api');
 const mockFaqApi = FaqApi as jest.Mocked<typeof FaqApi>;
 
-jest.mock('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProvider', () => {
+jest.mock('@/contexts/admin/visitor-pages-provider/VisitorPagesProvider', () => {
     const mockPages = [
         { id: 1, title: 'Page A', slug: 'page-a' },
         { id: 2, title: 'Page B', slug: 'page-b' },
@@ -36,7 +36,7 @@ jest.mock('../../../../../contexts/admin/visitor-pages-provider/VisitorPagesProv
 
 const mockAddToast = jest.fn();
 
-jest.mock('../../../../../contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
     useToast: () => ({
         addToast: mockAddToast,
         toasts: [],
@@ -49,7 +49,7 @@ jest.mock('../faq-modals/faq-modal/FaqModal', () => {
         FaqModal: (props: any) => {
             if (!props.isOpen) return null;
 
-            const { ModalMode } = require('../../../../../types/admin/common');
+            const { ModalMode } = require('@/types/admin/common');
             const isAddMode = props.mode === ModalMode.Add;
             const isEditMode = props.mode === ModalMode.Edit;
 
@@ -113,7 +113,7 @@ jest.mock('../faq-modals/delete-faq-modal/DeleteFaqModal', () => ({
         ) : null,
 }));
 
-jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
+jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({
         categories,
         selectedCategory,
@@ -138,7 +138,7 @@ jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
+jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
     InfiniteScrollList: ({ items, renderItem, onLoadMore, hasMore, isLoading, emptyStateMessage }: any) => (
         <div data-testid="infinite-scroll-list">
             {isLoading && <div data-testid="infinite-scroll-loader">Loading...</div>}
@@ -188,7 +188,7 @@ const mockNewFaq: FaqQuestion = {
     pages: mockPages,
 };
 
-jest.mock('../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar', () => {
+jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => {
     const mockVisibilityStatus = {
         Published: 'published',
         Draft: 'draft',
@@ -238,7 +238,7 @@ jest.mock('../faq-component/FaqComponent', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/admin/draggable-list-item/DraggableListItem', () => ({
+jest.mock('@/components/admin/draggable-list-item/DraggableListItem', () => ({
     DraggableListItem: ({ entity, renderEntityComponent, entities, onEntitiesReordered }: any) => {
         const faq = entity;
         return (
@@ -268,7 +268,7 @@ jest.mock('../../../../../components/admin/draggable-list-item/DraggableListItem
     },
 }));
 
-jest.mock('../../../../../components/admin/toast/toast-container/ToastContainer', () => ({
+jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
     ToastContainer: () => <div data-testid="toast-container"></div>,
 }));
 

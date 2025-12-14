@@ -2,30 +2,30 @@ import React from 'react';
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { TeamPageContent } from './TeamPageContent';
-import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
-import { TeamMember } from '../../../../../types/admin/team-members';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { TeamCategory } from '../../../../../types/admin/team-category';
-import { ToastType } from '../../../../../types/admin/toast';
-import { LocalizationLanguage } from '../../../../../types/common/language';
+import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { TeamCategoriesApi } from '@/services/api/admin/team/team-categories/team-categories-api';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { TeamMembersApi } from '@/services/api/admin/team/team-members/team-members-api';
+import { TeamMember } from '@/types/admin/team-members';
+import { VisibilityStatus } from '@/types/admin/common';
+import { TeamCategory } from '@/types/admin/team-category';
+import { ToastType } from '@/types/admin/toast';
+import { LocalizationLanguage } from '@/types/common/language';
 
-jest.mock('../../../../../hooks/admin/use-admin-client/useAdminClient');
+jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
 const mockedUseAdminClient = useAdminClient as jest.MockedFunction<typeof useAdminClient>;
 
-jest.mock('../../../../../services/api/admin/team/team-members/team-members-api');
+jest.mock('@/services/api/admin/team/team-members/team-members-api');
 const mockTeamMembersApi = TeamMembersApi as jest.Mocked<typeof TeamMembersApi>;
 
-jest.mock('../../../../../services/api/admin/team/team-categories/team-categories-api');
+jest.mock('@/services/api/admin/team/team-categories/team-categories-api');
 const mockTeamCategoriesApi = TeamCategoriesApi as jest.Mocked<typeof TeamCategoriesApi>;
 
 jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
     TeamPageToolbar: (props: any) => {
-        const { VisibilityStatus } = require('../../../../../types/admin/common');
-        const { TranslationStatusFilter } = require('../../../../../types/common/language');
+        const { VisibilityStatus } = require('@/types/admin/common');
+        const { TranslationStatusFilter } = require('@/types/common/language');
 
         const handleSelectFirstResult = () => {
             if (props.searchItems?.[0]) {
@@ -48,7 +48,6 @@ jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
                 <button onClick={props.onSearchClear} data-testid="clear-search-selection">
                     Clear Selection
                 </button>
-                <span data-testid="status-reset-key">{props.statusResetKey}</span>
                 <input
                     data-testid="search-input"
                     onChange={(e) => props.onSearchQueryChange(e.target.value)}
@@ -92,7 +91,7 @@ jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
 }));
 
 const mockAddToast = jest.fn();
-jest.mock('../../../../../contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
     useToast: () => ({
         addToast: mockAddToast,
         toasts: [],
@@ -126,7 +125,7 @@ const mockCloseModalActions = {
     closeDeleteCategoryModal: jest.fn(),
 };
 
-jest.mock('../../../../../hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
     useLocalizationToolkit: () => {
         return {
             allLanguages: mockLanguages,
@@ -139,7 +138,7 @@ jest.mock('../../../../../hooks/admin/use-localization-toolkit/useLocalizationTo
     },
 }));
 
-jest.mock('../../../../../hooks/admin/use-modals-state/useModalsState', () => ({
+jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
     useModalsState: () => {
         const isAnyModalOpened = Object.values(mockModalState).some((value) =>
             typeof value === 'boolean' ? value : value !== null,
@@ -153,7 +152,7 @@ jest.mock('../../../../../hooks/admin/use-modals-state/useModalsState', () => ({
     },
 }));
 
-jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
+jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({
         categories,
         selectedCategory,
@@ -187,7 +186,7 @@ jest.mock('../../../../../components/admin/category-bar/CategoryBar', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
+jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
     InfiniteScrollList: ({ items, renderItem, onLoadMore, hasMore, isLoading, emptyStateMessage }: any) => (
         <div data-testid="infinite-scroll-list">
             {isLoading && <div data-testid="loading-indicator">Loading...</div>}
@@ -208,7 +207,7 @@ jest.mock('../../../../../components/admin/infinite-scroll-list/InfiniteScrollLi
     ),
 }));
 
-jest.mock('../../../../../components/admin/draggable-list-item/DraggableListItem', () => ({
+jest.mock('@/components/admin/draggable-list-item/DraggableListItem', () => ({
     DraggableListItem: ({ entity, renderEntityComponent, entities, onEntitiesReordered }: any) => (
         <div data-testid={`draggable-item-${entity.id}`}>
             {renderEntityComponent(entity)}
@@ -336,7 +335,7 @@ jest.mock('../team-page-modals/TeamPageModals', () => ({
     ),
 }));
 
-jest.mock('../../../../../components/admin/toast/toast-container/ToastContainer', () => ({
+jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
     ToastContainer: () => <div data-testid="toast-container" />,
 }));
 

@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
-import { API_ROUTES } from '../../../../const/common/api-routes/main-api';
-import { Credentials, AuthResponse } from '../../../../types/admin/auth';
-import { AuthClient } from '../../../auth/auth-client';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { Credentials, AuthResponse } from '@/types/admin/auth';
+import { AuthClient } from '@/services/auth/auth-client';
 
 export const loginRequest = async (creds: Credentials): Promise<string> => {
     const response = await AuthClient.post<AuthResponse>(API_ROUTES.AUTH.LOGIN, creds);

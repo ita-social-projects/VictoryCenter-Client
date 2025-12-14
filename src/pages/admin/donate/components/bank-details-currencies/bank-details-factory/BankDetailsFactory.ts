@@ -1,5 +1,5 @@
-import { DONATE_TEXT, VALIDATION_PARAMS } from '../../../../../../const/admin/donate';
-import { BANK_DETAILS_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/bank-details-schema/bank-details-schema';
+import { DONATE_TEXT, VALIDATION_PARAMS } from '@/const/admin/donate';
+import { BANK_DETAILS_VALIDATION_FUNCTIONS } from '@/validation/admin/bank-details-schema/bank-details-schema';
 import { createGenericForm, GenericFormField } from '../../generic-form/GenericForm';
 
 export interface BaseBankDetails {
@@ -71,6 +71,7 @@ function createForeignFields(currency: 'USD' | 'EUR'): GenericFormField<ForeignB
             onlyNumbers: true,
             validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateUkrainianIban),
             isRequired: true,
+            placeholder: DONATE_TEXT.BANK_DETAILS.IBAN.PLACEHOLDER,
             maxLength: VALIDATION_PARAMS.ukrainianIban.maxLengthWithoutPrefix,
         },
         {

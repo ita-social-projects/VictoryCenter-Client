@@ -1,4 +1,4 @@
-import { FaqQuestionDto, VisitorPage, FaqQuestion } from '../../../../../types/admin/faq';
+import { FaqQuestionDto, VisitorPage, FaqQuestion } from '@/types/admin/faq';
 
 export function mapFaqQuestionDtoToModel(dto: FaqQuestionDto, pages: VisitorPage[]): FaqQuestion {
     const mappedPages = pages.filter((page) => dto.pageIds.includes(page.id));

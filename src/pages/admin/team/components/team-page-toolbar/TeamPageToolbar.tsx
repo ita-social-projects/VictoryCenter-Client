@@ -1,14 +1,14 @@
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { TEAM_MEMBERS_TEXT, TEAM_SEARCH } from '../../../../../const/admin/team';
-import { COMMON_TEXT_ADMIN, UI_CONFIG } from '../../../../../const/admin/common';
-import { SearchBar } from '../../../../../components/admin/search-bar/SearchBar';
-import { StatusFilterDropdown } from '../../../../../components/admin/status-filter-dropdown/StatusFilterDropdown';
-import { Button } from '../../../../../components/admin/button/Button';
-import { ReactComponent as PlusIcon } from '../../../../../assets/icons/plus.svg';
+import { VisibilityStatus } from '@/types/admin/common';
+import { TEAM_MEMBERS_TEXT, TEAM_SEARCH } from '@/const/admin/team';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
+import { SearchBar } from '@/components/admin/search-bar/SearchBar';
+import { StatusFilterDropdown } from '@/components/admin/status-filter-dropdown/StatusFilterDropdown';
+import { Button } from '@/components/admin/button/Button';
+import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import './TeamPageToolbar.scss';
-import { TeamMember } from '../../../../../types/admin/team-members';
-import { TeamCategory } from '../../../../../types/admin/team-category';
-import { TeamMemberSearchItem } from '../../../../../components/admin/search-bar/team-member-search-item/TeamMemberSearchItem';
+import { TeamMember } from '@/types/admin/team-members';
+import { TeamCategory } from '@/types/admin/team-category';
+import { TeamMemberSearchItem } from '@/components/admin/search-bar/team-member-search-item/TeamMemberSearchItem';
 import { forwardRef, useMemo } from 'react';
 import {
     SearchItemContentRef,
@@ -23,6 +23,7 @@ export interface TeamPageToolbarProps extends LocalizationToolkitProps {
     onSearchQueryChange: (query: string) => void;
     onStatusFilterChange: (status: VisibilityStatus | undefined) => void;
     onAddMember: () => void;
+    statusFilter: VisibilityStatus | undefined;
     searchItems: TeamMember[];
     isSearchLoading: boolean;
     searchHasMore: boolean;
@@ -31,6 +32,7 @@ export interface TeamPageToolbarProps extends LocalizationToolkitProps {
     onSearchItemSelect: (item: TeamMember) => void;
     onSearchClear: () => void;
 }
+
 const TeamMemberItemRenderer = forwardRef<
     SearchItemContentRef,
     SearchItemContentRenderProps<TeamMember> & { categories: TeamCategory[] }
@@ -46,6 +48,7 @@ export const TeamPageToolbar = ({
     onStatusFilterChange,
     onAddMember,
     searchItems,
+    statusFilter,
     isSearchLoading,
     searchHasMore,
     onSearchLoadMore,
@@ -84,7 +87,7 @@ export const TeamPageToolbar = ({
                     onLanguageChange={onLanguageChange}
                     onTranslationStatusFilterChange={onTranslationStatusFilterChange}
                 />
-                <StatusFilterDropdown onStatusFilterChange={onStatusFilterChange} />
+                <StatusFilterDropdown value={statusFilter} onStatusFilterChange={onStatusFilterChange} />
                 <Button onClick={onAddMember} buttonStyle="primary">
                     {TEAM_MEMBERS_TEXT.BUTTON.ADD_MEMBER}
                     <PlusIcon />

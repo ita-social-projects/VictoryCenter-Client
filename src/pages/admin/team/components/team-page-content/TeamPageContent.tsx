@@ -1,28 +1,28 @@
 import axios from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './TeamPageContent.scss';
-import { TeamMember } from '../../../../../types/admin/team-members';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/common';
-import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
-import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
-import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/category-bar/CategoryBar';
-import { InfiniteScrollList } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
-import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
-import { ToastType } from '../../../../../types/admin/toast';
-import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
-import { DraggableListItem } from '../../../../../components/admin/draggable-list-item/DraggableListItem';
+import { TeamMember } from '@/types/admin/team-members';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
+import { TeamCategoriesApi } from '@/services/api/admin/team/team-categories/team-categories-api';
+import { TeamMembersApi } from '@/services/api/admin/team/team-members/team-members-api';
+import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
+import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
+import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { MemberComponent } from '../member-component/MemberComponent';
-import { TeamCategory } from '../../../../../types/admin/team-category';
-import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
+import { TeamCategory } from '@/types/admin/team-category';
+import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { TeamPageModals } from '../team-page-modals/TeamPageModals';
-import { useTeamMemberSearch } from '../../../../../hooks/admin/team/useTeamMemberSearch';
-import { updateCategoryMemberCounts } from '../../../../../utils/functions/update-category-member-counts/update-category-member-counts';
-import { useLocalizationToolkit } from '../../../../../hooks/admin/use-localization-toolkit/useLocalizationToolkit';
-import { mapEntityWithLocalizations } from '../../../../../utils/functions/mappers/common/localization/localization-mappers';
+import { useTeamMemberSearch } from '@/hooks/admin/team/useTeamMemberSearch';
+import { updateCategoryMemberCounts } from '@/utils/functions/update-category-member-counts/update-category-member-counts';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
@@ -516,6 +516,7 @@ export const TeamPageContent = () => {
                 <TeamPageToolbar
                     onSearchQueryChange={handleSearchQueryByName}
                     onStatusFilterChange={onStatusFilterChange}
+                    statusFilter={statusFilter}
                     onAddMember={openModalActions.openAddItemModal}
                     searchItems={searchSuggestions}
                     isSearchLoading={isSearchLoading}

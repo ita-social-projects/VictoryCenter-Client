@@ -4,7 +4,7 @@ import {
     Currency,
     PublishedForeignBankDetailsDto,
     PublishedCorrespondentBankDetailsDto,
-} from '../../../../../types/public/donate-page';
+} from '@/types/public/donate-page';
 
 jest.mock('./PaymentDetailsSection', () => ({
     PaymentDetailsSection: ({ title, ibanLabel, ibanValue, receiverName, bankName, swift, address }: any) => (
@@ -37,7 +37,7 @@ jest.mock('./CorrespondentBanksSection', () => ({
     ),
 }));
 
-jest.mock('../../../../../const/public/donate-page', () => ({
+jest.mock('@/const/public/donate-page', () => ({
     ABROAD_PAYMENT_DETAILS: {
         USD_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в USD',
         EUR_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в EUR',
@@ -46,7 +46,7 @@ jest.mock('../../../../../const/public/donate-page', () => ({
     },
 }));
 
-jest.mock('../../../../../utils/functions/mappers/public/donate/donate', () => ({
+jest.mock('@/utils/functions/mappers/public/donate/donate.ts', () => ({
     currencyToString: (currency: number) => {
         switch (currency) {
             case 1:
@@ -68,7 +68,7 @@ describe('AbroadPaymentDetails', () => {
         name: 'Test Correspondent Bank',
         swift: 'CORRBANK',
         account: '987654321',
-        iban: 'US29CORR60161331926819',
+        foreignIban: 'US29CORR60161331926819',
         foreignBankDetailsId: 1,
         ...overrides,
     });
@@ -79,7 +79,7 @@ describe('AbroadPaymentDetails', () => {
         id: 1,
         name: 'Test Foreign Bank',
         receiver: 'Test Receiver Organization',
-        iban: 'US29NWBK60161331926819',
+        ukrainianIban: 'US29NWBK60161331926819',
         swift: 'TESTBANK',
         address: '123 Test Street, Test City',
         currency: Currency.USD,
@@ -122,7 +122,7 @@ describe('AbroadPaymentDetails', () => {
             const mockForeignBankDetails = [
                 createMockForeignBankDetails({
                     currency: Currency.EUR,
-                    iban: 'GB29NWBK60161331926819',
+                    ukrainianIban: 'GB29NWBK60161331926819',
                     correspondentBanks: [
                         createMockCorrespondentBank({ name: 'EUR Correspondent 1' }),
                         createMockCorrespondentBank({ name: 'EUR Correspondent 2' }),

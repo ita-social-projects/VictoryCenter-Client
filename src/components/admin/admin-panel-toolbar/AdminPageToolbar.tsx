@@ -1,18 +1,18 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ReactComponent as PlusIcon } from '../../../assets/icons/plus.svg';
+import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import {
     SearchItemContentRef,
     SearchItemContentRenderProps,
-} from '../search-bar/search-item-wrapper/SearchItemWrapper';
+} from '@/components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
 import {
     PaginationRequestParams,
     useDataPaginationFetch,
-} from '../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
-import { COMMON_TEXT_ADMIN, UI_CONFIG } from '../../../const/admin/common';
-import { SearchBar } from '../search-bar/SearchBar';
-import { PaginationResult, VisibilityStatus } from '../../../types/admin/common';
-import { StatusFilterDropdown } from '../status-filter-dropdown/StatusFilterDropdown';
-import { Button } from '../button/Button';
+} from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
+import { COMMON_TEXT_ADMIN, UI_CONFIG } from '@/const/admin/common';
+import { SearchBar } from '@/components/admin/search-bar/SearchBar';
+import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
+import { StatusFilterDropdown } from '@/components/admin/status-filter-dropdown/StatusFilterDropdown';
+import { Button } from '@/components/admin/button/Button';
 import './AdminPageToolbar.scss';
 
 const DEFAULT_PAGE_SIZE = 5;
@@ -28,6 +28,7 @@ export interface AdminPanelToolbarProps<T> {
     searchPageSize?: number;
     suggestionsNotFoundMessage?: string;
     onSearchClear?: () => void;
+    statusFilter: VisibilityStatus | undefined;
     onStatusFilterChange: (statusFilter: VisibilityStatus | undefined) => void;
     onAddItem: () => void;
     AddItemButtonText: string;
@@ -43,6 +44,7 @@ export const AdminPanelToolbar = <T,>({
     searchPageSize = DEFAULT_PAGE_SIZE,
     suggestionsNotFoundMessage = COMMON_TEXT_ADMIN.LIST.NOT_FOUND,
     onSearchClear,
+    statusFilter,
     onStatusFilterChange,
     onAddItem,
     AddItemButtonText,
@@ -122,7 +124,7 @@ export const AdminPanelToolbar = <T,>({
             </div>
 
             <div className="admin-panel-toolbar-actions">
-                <StatusFilterDropdown onStatusFilterChange={onStatusFilterChange} />
+                <StatusFilterDropdown value={statusFilter} onStatusFilterChange={onStatusFilterChange} />
                 <Button onClick={onAddItem} buttonStyle="primary">
                     {AddItemButtonText} <PlusIcon />
                 </Button>

@@ -1,9 +1,9 @@
 import { AxiosInstance } from 'axios';
-import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/common';
-import { TeamMember, TeamMemberCreateUpdateRequest, TeamMemberDto } from '../../../../../types/admin/team-members';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { ImageApi } from '../../image/image-api';
-import { TranslationStatusFilter } from '../../../../../types/common/language';
+import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
+import { TeamMember, TeamMemberCreateUpdateRequest, TeamMemberDto } from '@/types/admin/team-members';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { ImageApi } from '@/services/api/admin/image/image-api';
+import { TranslationStatusFilter } from '@/types/common/language';
 
 export const TeamMembersApi = {
     getAll: async (

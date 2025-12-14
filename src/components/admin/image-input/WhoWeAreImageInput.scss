@@ -1,5 +1,5 @@
-@use '../../../assets/sass/variables/colors';
-@use '../../../assets/sass/variables/z-index.scss';
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/z-index.scss';
 
 .who-we-are-image-input-wrapper {
     background-size: cover;
@@ -71,35 +71,52 @@
         &:hover::after {
             opacity: 0.78;
         }
-        .delete-button {
+
+        .preview-actions {
             position: absolute;
             inset: 0;
+            margin: auto;
+            display: flex;
+            gap: 0.5rem;
+            width: fit-content;
+            height: fit-content;
+            z-index: z-index.admin('image-input-action-buttons');
+        }
+
+        .delete-button,
+        .crop-button {
             display: none;
             align-items: center;
             justify-content: center;
-            height: 25%;
+            width: 5rem;
+            height: 5rem;
             aspect-ratio: 1 / 1;
             padding: 0.625rem;
-            margin: auto;
             border-radius: 8px;
             background: colors.$grey-900;
             opacity: 0.8;
-            z-index: z-index.admin('who-we-are-page-delete-button');
+            z-index: z-index.admin('image-input-action-buttons');
             cursor: pointer;
 
             &:hover {
                 opacity: 1;
             }
 
-            .delete-icon {
+            .delete-icon,
+            .crop-icon {
                 width: 55%;
                 height: 55%;
                 color: colors.$grey-50;
             }
         }
 
-        &:hover .delete-button {
-            display: flex;
+        &:hover {
+            .preview-actions {
+                .delete-button,
+                .crop-button {
+                    display: flex;
+                }
+            }
         }
     }
 }

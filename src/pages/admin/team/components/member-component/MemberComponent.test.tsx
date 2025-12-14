@@ -1,16 +1,16 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemberComponent, MemberComponentProps } from './MemberComponent';
 import '@testing-library/jest-dom';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { DEFAULT_LOCALE } from '../../../../../const/common/locales';
-import { returnDisplayedLocalization } from '../../../../../utils/functions/localization/localization';
+import { VisibilityStatus } from '@/types/admin/common';
+import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 
-jest.mock('../../../../../assets/icons/blank-user.svg', () => ({
+jest.mock('@/assets/icons/blank-user.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="blank-user-icon" />,
 }));
 
-jest.mock('../../../../../components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
+jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', () => ({
     VisibilityStatusLabel: ({ status }: { status: VisibilityStatus }) => (
         <div data-testid="visibility-label">{`Status: ${status}`}</div>
     ),
@@ -35,8 +35,8 @@ describe('MemberComponent', () => {
     let handleOnDeleteMember: jest.Mock;
 
     beforeEach(() => {
-        jest.clearAllMocks();
         handleOnEditMember = jest.fn();
+        jest.clearAllMocks();
         handleOnDeleteMember = jest.fn();
     });
 

@@ -7,8 +7,8 @@ import {
     PublishedUahBankDetailsDto,
     PublishedForeignBankDetailsDto,
     PublishedSupportOptionsDto,
-} from '../../../../types/public/donate-page';
-import { ERROR_MESSAGES } from '../../../../const/public/donate-page';
+} from '@/types/public/donate-page';
+import { ERROR_MESSAGES } from '@/const/public/donate-page';
 
 jest.mock('./ukraine-payment-details/UkrainePaymentDetails', () => ({
     UkrainePaymentDetails: ({ bankDetails }: { bankDetails: PublishedUahBankDetailsDto[] }) => (
@@ -44,7 +44,7 @@ jest.mock('./alternative-support-ways/AlternativeSupportWays', () => ({
     ),
 }));
 
-jest.mock('../../../../components/common/tabs/Tabs', () => ({
+jest.mock('@/components/common/tabs/Tabs', () => ({
     Tabs: ({ activeTab, setActiveTab, tabs }: any) => (
         <div data-testid="tabs-container">
             {tabs.map((tab: any) => (
@@ -66,7 +66,7 @@ describe('RightSection', () => {
         {
             id: 1,
             name: 'UAH Bank',
-            iban: 'UA123456789012345678901234567',
+            ukrainianIban: 'UA123456789012345678901234567',
             receiver: 'UAH Receiver',
             edrpou: '12345678',
             paymentPurpose: 'Donation purpose',
@@ -78,7 +78,7 @@ describe('RightSection', () => {
             id: 1,
             currency: Currency.USD,
             name: 'USD Bank',
-            iban: 'US123456789012345678901234567',
+            ukrainianIban: 'US123456789012345678901234567',
             receiver: 'USD Receiver',
             swift: 'USDBANK',
             address: 'USD Bank Address',
@@ -88,7 +88,7 @@ describe('RightSection', () => {
             id: 2,
             currency: Currency.EUR,
             name: 'EUR Bank',
-            iban: 'EU123456789012345678901234567',
+            ukrainianIban: 'EU123456789012345678901234567',
             receiver: 'EUR Receiver',
             swift: 'EURBANK',
             address: 'EUR Bank Address',

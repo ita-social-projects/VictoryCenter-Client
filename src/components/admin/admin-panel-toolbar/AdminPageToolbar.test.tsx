@@ -1,33 +1,40 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import {
     SearchItemContentRef,
     SearchItemContentRenderProps,
-} from '../search-bar/search-item-wrapper/SearchItemWrapper';
+} from '@/components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
 import { AdminPanelToolbar } from './AdminPageToolbar';
-import { UI_CONFIG } from '../../../const/admin/common';
+import { UI_CONFIG } from '@/const/admin/common';
+import { VisibilityStatus } from '@/types/admin/common';
+import { StatusFilterDropdownProps } from '@/components/admin/status-filter-dropdown/StatusFilterDropdown';
+import { ButtonProps } from '@/components/admin/button/Button';
 
-jest.mock('../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch', () => ({
+jest.mock('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch', () => ({
     useDataPaginationFetch: jest.fn(),
 }));
 
-jest.mock('../search-bar/SearchBar', () => ({
+jest.mock('@/components/admin/search-bar/SearchBar', () => ({
     SearchBar: jest.fn(() => <div data-testid="search-bar">Search Bar Mock</div>),
 }));
 
-jest.mock('../status-filter-dropdown/StatusFilterDropdown', () => ({
-    StatusFilterDropdown: jest.fn(() => <div data-testid="status-filter-dropdown">Status Filter Mock</div>),
+jest.mock('@/components/admin/status-filter-dropdown/StatusFilterDropdown', () => ({
+    StatusFilterDropdown: jest.fn(({ value }: StatusFilterDropdownProps) => (
+        <div data-testid="status-filter-dropdown" data-value={value}>
+            Status Filter Mock
+        </div>
+    )),
 }));
 
-jest.mock('../button/Button', () => ({
-    Button: jest.fn(({ children, onClick, ...props }) => (
+jest.mock('@/components/admin/button/Button', () => ({
+    Button: jest.fn(({ children, onClick, ...props }: ButtonProps) => (
         <button data-testid="add-item-button" onClick={onClick} {...props}>
             {children}
         </button>
     )),
 }));
 
-jest.mock('../../../assets/icons/plus.svg', () => ({
+jest.mock('@/assets/icons/plus.svg', () => ({
     ReactComponent: () => <div data-testid="plus-icon" />,
 }));
 
@@ -82,7 +89,7 @@ describe('AdminPanelToolbar', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         const useDataPaginationFetch =
-            require('../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
+            require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
         useDataPaginationFetch.mockImplementation(() => mockHookImplementation);
 
         // Reset mock implementation of component mocks
@@ -91,24 +98,16 @@ describe('AdminPanelToolbar', () => {
         const { Button } = require('../button/Button');
 
         SearchBar.mockImplementation(() => <div data-testid="search-bar">Search Bar Mock</div>);
-        StatusFilterDropdown.mockImplementation(() => (
-            <div data-testid="status-filter-dropdown">Status Filter Mock</div>
+        StatusFilterDropdown.mockImplementation(({ value }: StatusFilterDropdownProps) => (
+            <div data-testid="status-filter-dropdown" data-value={value}>
+                Status Filter Mock
+            </div>
         ));
-        Button.mockImplementation(
-            ({
-                children,
-                onClick,
-                ...props
-            }: {
-                children: React.ReactNode;
-                onClick: () => void;
-                [key: string]: any;
-            }) => (
-                <button data-testid="add-item-button" onClick={onClick} {...props}>
-                    {children}
-                </button>
-            ),
-        );
+        Button.mockImplementation(({ children, onClick, ...props }: ButtonProps) => (
+            <button data-testid="add-item-button" onClick={onClick} {...props}>
+                {children}
+            </button>
+        ));
     });
 
     const renderComponent = (props = {}) => {
@@ -122,6 +121,7 @@ describe('AdminPanelToolbar', () => {
                 searchPageSize={5}
                 suggestionsNotFoundMessage="No items found"
                 onSearchClear={mockOnSearchClear}
+                statusFilter={undefined}
                 onStatusFilterChange={mockOnStatusFilterChange}
                 onAddItem={mockOnAddItem}
                 AddItemButtonText="Add Item"
@@ -148,10 +148,19 @@ describe('AdminPanelToolbar', () => {
         // Get the last call to StatusFilterDropdown
         const onStatusFilterChange = StatusFilterDropdown.mock.calls[0][0].onStatusFilterChange;
 
-        // Trigger the filter change with value 1 (Published)
-        onStatusFilterChange(1);
+        onStatusFilterChange(VisibilityStatus.Published);
 
-        expect(mockOnStatusFilterChange).toHaveBeenCalledWith(1);
+        expect(mockOnStatusFilterChange).toHaveBeenCalledWith(VisibilityStatus.Published);
+    });
+
+    it('passes statusFilter value correctly to StatusFilterDropdown', () => {
+        const testStatus = VisibilityStatus.Draft;
+        renderComponent({ statusFilter: testStatus });
+
+        const { StatusFilterDropdown } = require('../status-filter-dropdown/StatusFilterDropdown');
+        const lastCallProps = StatusFilterDropdown.mock.calls[StatusFilterDropdown.mock.calls.length - 1][0];
+
+        expect(lastCallProps.value).toBe(testStatus);
     });
 
     it('calls onAddItem when add button is clicked', () => {
@@ -197,8 +206,9 @@ describe('AdminPanelToolbar', () => {
         const { SearchBar } = require('../search-bar/SearchBar');
         const onSearchItemSelect = SearchBar.mock.calls[0][0].onSearchItemSelect;
 
-        // Call the onSearchItemSelect function with a mock item
-        onSearchItemSelect(mockItems[0]);
+        act(() => {
+            onSearchItemSelect(mockItems[0]);
+        });
 
         expect(mockOnSuggestionSelect).toHaveBeenCalledWith(1);
         expect(mockHookImplementation.resetList).toHaveBeenCalledTimes(1);
@@ -206,12 +216,12 @@ describe('AdminPanelToolbar', () => {
 
     it('calls onSearchClear when clear button is clicked', () => {
         renderComponent();
-
         const { SearchBar } = require('../search-bar/SearchBar');
         const onClear = SearchBar.mock.calls[0][0].onClear;
 
-        // Call the onClear function
-        onClear();
+        act(() => {
+            onClear();
+        });
 
         expect(mockOnSearchClear).toHaveBeenCalledTimes(1);
         expect(mockHookImplementation.resetList).toHaveBeenCalledTimes(1);
@@ -223,7 +233,7 @@ describe('AdminPanelToolbar', () => {
 
         // Verify initial state
         const { SearchBar } = require('../search-bar/SearchBar');
-        // Initially the search items array should be empty (matches component behavior)
+        // Initially, the search items array should be empty (matches component behavior)
         expect(SearchBar.mock.calls[0][0].searchItems).toEqual([]);
 
         // Change the data in the hook implementation
@@ -244,6 +254,7 @@ describe('AdminPanelToolbar', () => {
                 getSearchItemKey={(item) => item.id}
                 getSearchItemLabel={(item) => item.name}
                 fetchSearchItems={mockFetchSearchItems}
+                statusFilter={undefined}
                 onStatusFilterChange={mockOnStatusFilterChange}
                 onAddItem={mockOnAddItem}
                 AddItemButtonText="Add Item"
@@ -287,12 +298,12 @@ describe('AdminPanelToolbar', () => {
             }
         };
 
-        // Test with short query
+        // Test with a short query
         onSearch('a');
         expect(setCurrentSearchTerm).toHaveBeenCalledWith('a');
         expect(setLocalSearchItems).toHaveBeenCalledWith([]);
 
-        // Test with longer query
+        // Test with a longer query
         onSearch('test query');
         expect(setCurrentSearchTerm).toHaveBeenCalledWith('test query');
         // setLocalSearchItems shouldn't be called again for the longer query

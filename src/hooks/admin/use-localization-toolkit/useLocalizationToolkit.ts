@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { LocalizationLanguage, TranslationStatusFilter } from '../../../types/common/language';
-import { localizationLanguagesDataFetch } from '../../../services/api/public/localization/languages/languages-api';
+import { LocalizationLanguage, TranslationStatusFilter } from '@/types/common/language';
+import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
 import axios from 'axios';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { DEFAULT_LOCALE } from '../../../const/common/locales';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
 
 type ErrorType = 'categories' | 'members' | 'languages';
 

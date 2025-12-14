@@ -4,7 +4,7 @@ import {
     EntityWithLocalizations,
     LocalizationLanguage,
     TranslationStatus,
-} from '../../../types/common/language';
+} from '@/types/common/language';
 import styles from './LocalizationStatuses.module.scss';
 
 export interface LocalizationStatusProps<TLocalization extends EntityLocalization> {

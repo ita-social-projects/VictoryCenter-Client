@@ -1,11 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { LocalizationToolkit } from './LocalizationToolkit';
-import { DEFAULT_LOCALE } from '../../../const/common/locales';
-import { LOCALIZATION_TEXT } from '../../../const/admin/localization';
-import { TranslationStatusFilter } from '../../../types/common/language';
-import { mapLabelToTranslationStatusFilter } from '../../../utils/functions/mappers/admin/localization-status/localization-status-mappers';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { LOCALIZATION_TEXT } from '@/const/admin/localization';
+import { TranslationStatusFilter } from '@/types/common/language';
+import { mapLabelToTranslationStatusFilter } from '@/utils/functions/mappers/admin/localization-status/localization-status-mappers';
 
-jest.mock('../../common/select/Select', () => {
+jest.mock('@/components/common/select/Select', () => {
     const MockOption = ({ value, name, ...props }: any) => (
         <option value={typeof value === 'object' ? JSON.stringify(value) : value} {...props}>
             {name}

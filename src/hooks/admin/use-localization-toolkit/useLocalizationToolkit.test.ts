@@ -1,10 +1,10 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import axios from 'axios';
 import { useLocalizationToolkit } from './useLocalizationToolkit';
-import { localizationLanguagesDataFetch } from '../../../services/api/public/localization/languages/languages-api';
-import { DEFAULT_LOCALE } from '../../../const/common/locales';
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { TranslationStatusFilter } from '../../../types/common/language';
+import { localizationLanguagesDataFetch } from '@/services/api/public/localization/languages/languages-api';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { TranslationStatusFilter } from '@/types/common/language';
 
 jest.mock('../../../services/api/public/localization/languages/languages-api');
 jest.mock('axios');

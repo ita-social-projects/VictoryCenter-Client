@@ -1,13 +1,12 @@
 import { render, screen } from '@testing-library/react';
-
-import { LocalizationStatuses} from './LocalizationStatuses'; 
+import { LocalizationStatuses } from './LocalizationStatuses';
 import styles from './LocalizationStatuses.module.scss';
 import {
     TranslationStatus,
     LocalizationLanguage,
     EntityWithLocalizations,
     EntityLocalization,
-} from '../../../types/common/language';
+} from '@/types/common/language';
 
 type TestLocalization = EntityLocalization;
 
@@ -31,7 +30,6 @@ const localizedEntity: EntityWithLocalizations<TestLocalization> = {
 };
 
 describe('LocalizationStatuses component', () => {
-
     it('renders all language badges with correct codes', () => {
         render(<LocalizationStatuses languages={languages} localizedEntity={localizedEntity} />);
 
@@ -61,7 +59,9 @@ describe('LocalizationStatuses component', () => {
     });
 
     it('renders wrapper with correct test id', () => {
-        const { getByTestId } = render(<LocalizationStatuses languages={languages} localizedEntity={localizedEntity} />);
+        const { getByTestId } = render(
+            <LocalizationStatuses languages={languages} localizedEntity={localizedEntity} />,
+        );
 
         expect(getByTestId('localization-statuses')).toBeInTheDocument();
     });

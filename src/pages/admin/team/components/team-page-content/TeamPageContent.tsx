@@ -322,7 +322,7 @@ export const TeamPageContent = () => {
         } else if (error.type === 'languages') {
             retryFetchLanguages();
         }
-    }, [error.type, fetchCategories, resetMembersState]);
+    }, [error.type, fetchCategories, resetMembersState, retryFetchLanguages]);
 
     const updatePageSize = () => {
         if (listContainerRef.current) {

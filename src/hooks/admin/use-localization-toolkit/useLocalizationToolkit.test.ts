@@ -119,7 +119,7 @@ describe('useLocalizationToolkit', () => {
         expect(result.current.translationStatusFilter).toBe(TranslationStatusFilter.Outdated);
     });
 
-    it('should select undefined when DEFAULT_LOCALE not found', async () => {
+    it('should fallback to first language when DEFAULT_LOCALE not found', async () => {
         mockedFetch.mockResolvedValue([
             { id: 2, code: 'en', name: 'Англійська' },
             { id: 3, code: 'es', name: 'Іспанська' },
@@ -133,6 +133,10 @@ describe('useLocalizationToolkit', () => {
 
         await waitFor(() => expect(result.current.allLanguages.length).toBeGreaterThan(0));
 
-        expect(result.current.selectedLanguage).toBeUndefined();
+        expect(result.current.selectedLanguage).toEqual({
+            id: 2,
+            code: 'en',
+            name: 'Англійська',
+        });
     });
 });

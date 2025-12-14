@@ -12,7 +12,7 @@ jest.mock('@/components/common/select/Select', () => {
         </option>
     );
 
-    const MockSelect = ({ children, onValueChange, value, ...props }: any) => {
+    const MockSelect = ({ children, onValueChange, ...props }: any) => {
         const handleChange = (e: any) => {
             let val: any = e.target.value;
 
@@ -137,7 +137,7 @@ describe('LocalizationToolkit', () => {
         const expectedValue = mapLabelToTranslationStatusFilter(firstStatusLabel);
 
         fireEvent.change(statusSelect, {
-            target: { value: expectedValue },
+            target: { value: String(expectedValue) },
         });
 
         expect(mockOnTranslationStatusChange).toHaveBeenCalledWith(expectedValue);

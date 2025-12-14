@@ -142,26 +142,23 @@ describe('TeamPageToolbar', () => {
         renderToolbar({ onStatusFilterChange });
 
         const statusSelect = screen.getByRole('button', { name: /Статус/i });
-
         fireEvent.click(statusSelect);
 
-        const optionAll = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.ALL });
+        const optionsAll = screen.getAllByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.ALL });
+        const optionAll = optionsAll.find((btn) => btn.classList.contains('select-options-selected'))!;
         fireEvent.click(optionAll);
-
         expect(onStatusFilterChange).toHaveBeenCalledWith(undefined);
 
         fireEvent.click(statusSelect);
 
         const optionPublished = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED });
         fireEvent.click(optionPublished);
-
         expect(onStatusFilterChange).toHaveBeenCalledWith(VisibilityStatus.Published);
 
         fireEvent.click(statusSelect);
 
         const optionDraft = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT });
         fireEvent.click(optionDraft);
-
         expect(onStatusFilterChange).toHaveBeenCalledWith(VisibilityStatus.Draft);
     });
 

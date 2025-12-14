@@ -59,10 +59,8 @@ describe('LocalizationStatuses component', () => {
     });
 
     it('renders wrapper with correct test id', () => {
-        const { getByTestId } = render(
-            <LocalizationStatuses languages={languages} localizedEntity={localizedEntity} />,
-        );
+        render(<LocalizationStatuses languages={languages} localizedEntity={localizedEntity} />);
 
-        expect(getByTestId('localization-statuses')).toBeInTheDocument();
+        expect(screen.getByTestId('localization-statuses')).toBeInTheDocument();
     });
 });

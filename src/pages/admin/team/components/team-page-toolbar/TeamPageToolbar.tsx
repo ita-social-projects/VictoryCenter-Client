@@ -13,11 +13,11 @@ import { forwardRef, useMemo } from 'react';
 import {
     SearchItemContentRef,
     SearchItemContentRenderProps,
-} from '../../../../../components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
+} from '@/components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
 import {
     LocalizationToolkit,
     LocalizationToolkitProps,
-} from '../../../../../components/admin/localization-toolkit/LocalizationToolkit';
+} from '@/components/admin/localization-toolkit/LocalizationToolkit';
 
 export interface TeamPageToolbarProps extends LocalizationToolkitProps {
     onSearchQueryChange: (query: string) => void;

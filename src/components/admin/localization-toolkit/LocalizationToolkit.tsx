@@ -56,7 +56,6 @@ export const LocalizationToolkit = ({
                     onValueChange={changeLanguage}
                     placeholder={LOCALIZATION_TEXT.LANGUAGE}
                     icon={GlobeIcon}
-                    data-testId="language-filter"
                 >
                     {languages.map((language) => (
                         <Select.Option key={language.id} value={language} name={language.name} />
@@ -67,7 +66,6 @@ export const LocalizationToolkit = ({
                 value={selectedTranslationStatus}
                 onValueChange={changeTranslationStatus}
                 placeholder={LOCALIZATION_TEXT.TRANSLATIONS}
-                data-testId="translation-status-filter"
             >
                 {Object.entries(LOCALIZATION_TEXT.FILTER.STATUS).map(([, value], index) => (
                     <Select.Option key={index} value={mapLabelToTranslationStatusFilter(value)} name={value} />

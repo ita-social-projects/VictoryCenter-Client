@@ -25,7 +25,6 @@ export const LanguageSwitcher = ({ onValueChange, className }: LanguageSwitcherP
             placeholder="lng"
             className={classNames('language-switcher', className)}
             headClassName="language-switcher-head"
-            data-testid="language-switcher"
         >
             {LOCALES.map((lng) => (
                 <Select.Option key={lng} value={lng} name={lng.toUpperCase()} />

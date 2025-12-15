@@ -18,12 +18,8 @@ export const OutroSection = () => {
                 <div>
                     <p className={styles['video-description']}>{OUTRO.TEXT}</p>
                     <div className={styles['video-buttons']}>
-                        <Button buttonStyle="primary" className={styles['btn-primary']}>
-                            {OUTRO.BUTTON_BECOME_SUPPORT_TEXT}
-                        </Button>
-                        <Button buttonStyle="secondary" className={styles['btn-secondary']}>
-                            {OUTRO.BUTTON_SUPPORT_TEXT}
-                        </Button>
+                        <button className="btn-primary">{OUTRO.BUTTON_BECOME_SUPPORT_TEXT}</button>
+                        <button className="btn-secondary">{OUTRO.BUTTON_SUPPORT_TEXT}</button>
                     </div>
                 </div>
             </div>

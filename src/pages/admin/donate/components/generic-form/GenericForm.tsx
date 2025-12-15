@@ -205,7 +205,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                     });
                 } else if (isChanged()) {
                     const title = isChildForm
-                        ? DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.CANCEL_CREATE
+                        ? COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
                         : DONATE_TEXT.QUESTION.BANK_DETAILS.CANCEL_CREATE;
                     setModalConfig({
                         title: title,

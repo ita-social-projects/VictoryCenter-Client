@@ -128,8 +128,10 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
             } else if (onDelete && id !== null) {
                 await onDelete(id);
             }
+            setEditingItemId(null);
+            onEditingStateChange?.(false);
         },
-        [isParentCreating, onDelete, onLocalDelete],
+        [isParentCreating, onDelete, onLocalDelete, onEditingStateChange],
     );
 
     const showNotFound = !isLoading && !isAddFormVisible && items.length === 0;

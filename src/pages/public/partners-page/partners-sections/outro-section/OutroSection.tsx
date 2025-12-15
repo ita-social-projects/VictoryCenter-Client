@@ -1,7 +1,6 @@
 import styles from './OutroSection.module.scss';
 import outro from '@/assets/videos/public/partners-page/outro.mp4';
 import { OUTRO } from '@/const/public/partners-page';
-import { Button } from '@/components/admin/button/Button';
 
 export const OutroSection = () => {
     return (

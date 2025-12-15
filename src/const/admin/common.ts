@@ -5,6 +5,7 @@ export const COMMON_TEXT_ADMIN = {
         DONATE: 'Донати',
         FAQ: 'Часті питання',
         WHO_WE_ARE: 'Хто ми',
+        PARTNERS: 'Партнери',
     },
 
     ALT: {
@@ -13,6 +14,7 @@ export const COMMON_TEXT_ADMIN = {
 
     INPUT: {
         IMAGE_PLACEHOLDER: 'Перетягніть файл сюди або натисніть для завантаження',
+        UPLOAD_IMAGE: 'Upload image',
         DRAG_AND_DROP_FILE_HERE: 'Перетягніть файл сюди',
         getImageSizeSubText: (height: number, width: number) => `Розмір:${width}x${height}`,
     },
@@ -109,6 +111,7 @@ export const COMMON_TEXT_ADMIN = {
         FIELD_REQUIRED: "Поле обов'язкове",
         getMinError: (min: number) => `Не менше ${min} символів`,
         getMaxError: (max: number) => `Не більше ${max} символів`,
+        getImageDimensionError: (height: number, width: number) => `Розмір фото має бути ${width}X${height}`,
     },
 };
 

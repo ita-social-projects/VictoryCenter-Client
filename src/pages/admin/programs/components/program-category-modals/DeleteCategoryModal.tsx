@@ -10,7 +10,7 @@ import { ProgramCategory } from '@/types/admin/programs';
 import './ProgramCategoryModal.scss';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
-interface DeleteCategoryModalProps {
+export interface DeleteCategoryModalProps {
     isOpen: boolean;
     onClose: () => void;
     onDeleteCategory: (categoryId: number) => void;

@@ -1,7 +1,7 @@
 @use '@/assets/sass/variables/fonts.scss';
 @use '@/assets/sass/variables/colors';
 
-.partners-intro-block {
+.intro-block {
     position: relative;
     width: 100%;
     height: 60rem;
@@ -11,7 +11,7 @@
     overflow: hidden;
 }
 
-.background-img-partners {
+.bg-img {
     position: absolute;
     top: 0;
     left: 0;
@@ -21,7 +21,7 @@
     object-position: center;
 }
 
-.content-overlay {
+.overlay {
     position: relative;
     text-align: center;
     color: white;
@@ -30,7 +30,7 @@
     margin-bottom: 0;
 }
 
-.main-title {
+.title {
     font-family: fonts.$mulish-regular-font;
     font-weight: 500;
     font-size: 6rem;
@@ -39,20 +39,20 @@
     text-transform: uppercase;
     margin-bottom: 0;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
 
-    .title-line {
-        display: block;
-        margin-bottom: 0.5rem;
+.title-line {
+    display: block;
+    margin-bottom: 0.5rem;
+}
 
-        &:last-child {
-            margin-bottom: 0;
-        }
-    }
+.title-line:last-child {
+    margin-bottom: 0;
+}
 
-    .bold-text {
-        font-weight: 800;
-        font-style: italic;
-    }
+.bold {
+    font-weight: 800;
+    font-style: italic;
 }
 
 .subtitle {
@@ -67,7 +67,7 @@
 }
 
 @media (max-width: 1024px) {
-    .main-title {
+    .title {
         font-size: 3.5rem;
         line-height: 4rem;
     }
@@ -79,11 +79,11 @@
 }
 
 @media (max-width: 925px) {
-    .partners-intro-block {
+    .intro-block {
         height: 50rem;
     }
 
-    .main-title {
+    .title {
         font-size: 2.5rem;
         line-height: 3rem;
         margin-bottom: 1.5rem;
@@ -94,17 +94,17 @@
         line-height: 1.5rem;
     }
 
-    .content-overlay {
+    .overlay {
         padding: 0 1rem 3rem 1rem;
     }
 }
 
 @media (max-width: 480px) {
-    .partners-intro-block {
+    .intro-block {
         height: 40rem;
     }
 
-    .main-title {
+    .title {
         font-size: 2rem;
         line-height: 2.5rem;
     }
@@ -114,7 +114,7 @@
         line-height: 1.25rem;
     }
 
-    .content-overlay {
+    .overlay {
         padding: 0 1rem 2rem 1rem;
     }
 }

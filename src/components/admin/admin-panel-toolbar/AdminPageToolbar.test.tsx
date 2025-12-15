@@ -89,7 +89,7 @@ describe('AdminPanelToolbar', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         const useDataPaginationFetch =
-            require('../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
+            require('@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch').useDataPaginationFetch;
         useDataPaginationFetch.mockImplementation(() => mockHookImplementation);
 
         // Reset mock implementation of component mocks

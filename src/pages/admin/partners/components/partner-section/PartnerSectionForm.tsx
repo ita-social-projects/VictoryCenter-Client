@@ -10,6 +10,7 @@ import { PartnerForm, PartnerFormErrors, PartnerFormValues } from '../partner-fo
 import { InlineLoader } from '@/components/common/inline-loader/InlineLoader';
 import { Button } from '@/components/admin/button/Button';
 import styles from './PartnerSectionForm.module.scss';
+import './PartnerSectionForm.scss';
 
 export interface PartnerSectionFormValues {
     localId: string;

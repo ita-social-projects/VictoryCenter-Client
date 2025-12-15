@@ -28,7 +28,7 @@ export interface TeamMemberFormErrorState {
 }
 
 export interface TeamMemberFormRef {
-    submit: (status: VisibilityStatus) => void;
+    submit: (status: VisibilityStatus) => Promise<void>;
     isValid: (isPublishing?: boolean) => boolean;
     isDirty: () => boolean;
 }

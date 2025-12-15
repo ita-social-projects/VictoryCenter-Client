@@ -7,6 +7,7 @@ import { PARTNER_VALIDATION_FUNCTIONS } from '@/validation/admin/partner-schema/
 import { PARTNER_VALIDATION, PARTNERS_TEXT } from '@/const/admin/partners';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import styles from './PartnerForm.module.scss';
+import './PartnerForm.scss';
 
 export interface PartnerFormValues {
     localId: string;

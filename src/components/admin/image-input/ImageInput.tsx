@@ -1,7 +1,8 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import classNames from 'classnames';
+import cn from 'classnames';
 import './ImageInput.scss';
 import './WhoWeAreImageInput.scss';
+import './ProgramImageInput.scss';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ReactComponent as UploadIcon } from '@/assets/icons/cloud-download.svg';
 import { ReactComponent as CropIcon } from '@/assets/icons/crop.svg';
@@ -161,7 +162,7 @@ export const ImageInput = ({
     return (
         <div>
             <div
-                className={classNames(className, {
+                className={cn(className, {
                     'image-input-wrapper-focused': isFocused && !disabled,
                     'image-input-wrapper-disabled': disabled,
                 })}
@@ -212,7 +213,7 @@ export const ImageInput = ({
                                         setShowConfirmModal(true);
                                     }}
                                 >
-                                    <DeleteIcon className={classNames('delete-icon')} />
+                                    <DeleteIcon className={cn('delete-icon')} />
                                 </button>
                                 {rawImage && 'base64' in rawImage ? (
                                     <button
@@ -225,7 +226,7 @@ export const ImageInput = ({
                                             setShowCropperModal(true);
                                         }}
                                     >
-                                        <CropIcon className={classNames('crop-icon')} />
+                                        <CropIcon className={cn('crop-icon')} />
                                     </button>
                                 ) : null}
                             </div>

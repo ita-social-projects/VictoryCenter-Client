@@ -53,42 +53,8 @@
     gap: 0.25rem;
 }
 
-.image :global(.image-input-wrapper) {
-    width: 13rem;
-    height: 13rem;
-}
-
-.image :global(.image-placeholder) {
-    width: 100%;
-    height: 100%;
-}
-
-.image :global(.placeholder-icon) {
-    width: 2.14rem;
-    height: 2.14rem;
-}
-
-.image :global(.image-preview .delete-button) {
-    width: 3.92rem;
-    height: 3.92rem;
-    padding: 0.89rem;
-}
-
-.image :global(.delete-icon) {
-    width: 1.425rem;
-    height: 1.425rem;
-}
-
 .description {
     position: relative;
     width: 13rem;
     height: 9.75rem;
-}
-
-.description :global(.input-error) {
-    position: absolute;
-    left: 0;
-    bottom: 0px;
-    font-size: 0.75rem;
-    line-height: 1rem;
 }

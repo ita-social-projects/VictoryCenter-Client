@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
 import { Program, ProgramCategory, ProgramCreateUpdate } from '@/types/admin/programs';
 import { VisibilityStatus, PendingAction, ModalMode } from '@/types/admin/common';
@@ -9,18 +9,18 @@ import { useGenericModal } from '@/hooks/admin/use-generic-modal/useGenericModal
 import { GenericModalWrapper } from '@/components/admin/generic-modal-wrapper/GenericModalWrapper';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 
-interface BaseProps {
+export interface BaseProgramModalProps {
     isOpen: boolean;
     onClose: () => void;
     categories: ProgramCategory[];
 }
 
-interface AddModalProps extends BaseProps {
+interface AddModalProps extends BaseProgramModalProps {
     mode: ModalMode.Add;
     onAddProgram: (program: Program) => void;
 }
 
-interface EditModalProps extends BaseProps {
+interface EditModalProps extends BaseProgramModalProps {
     mode: ModalMode.Edit;
     programToEdit: Program;
     onEditProgram: (program: Program) => void;
@@ -42,8 +42,14 @@ export const ProgramModal = (props: ProgramModalProps) => {
             name: program.name,
             description: program.description,
             categories: program.categories.map((c) => ({ ...c, programsCount: c.programsCount ?? 0 })),
-            image: program.image,
-            imageId: program.image && 'id' in program.image ? program.image.id : null,
+            previewImage: program.previewImage,
+            previewImageId: program.previewImage && 'id' in program.previewImage ? program.previewImage.id : null,
+            backgroundImage: program.backgroundImage || null,
+            backgroundImageId:
+                program.backgroundImage && 'id' in program.backgroundImage ? program.backgroundImage.id : null,
+            location: program.location,
+            participantsCount: program.participantsCount,
+            meetingCount: program.meetingsCount,
         };
     }, [program, isEditMode]);
 
@@ -89,16 +95,29 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 id: mode === ModalMode.Edit && program ? program.id : null,
                 name: formData.name,
                 description: formData.description,
-                image: formData.image && 'base64' in formData.image ? formData.image : null,
+                previewImage: formData.previewImage,
+                backgroundImage: formData.backgroundImage,
                 status: status,
                 categoryIds: formData.categories.map((x) => x.id),
-                imageId: initialData?.imageId ?? null,
+                previewImageId: initialData?.previewImageId ?? null,
+                backgroundImageId: initialData?.backgroundImageId ?? null,
+                location: formData.location,
+                participantsCount: formData.participantsCount,
+                meetingsCount: formData.meetingCount,
             }),
         }),
         [isEditMode, isOpen, mode, onClose, onSuccess, program, client, initialData],
     );
 
     const modalHookData = useGenericModal<ProgramFormValues, Program, ProgramFormRef>(modalConfig);
+
+    const handleLanguageChange = useCallback((_: string) => {
+        // TODO: Implement language selection
+    }, []);
+
+    const handleAddNewSection = useCallback(() => {
+        // TODO: Implement add new section logic
+    }, []);
 
     const title = isEditMode ? PROGRAMS_TEXT.FORM.TITLE.EDIT_PROGRAM : PROGRAMS_TEXT.FORM.TITLE.ADD_PROGRAM;
 
@@ -107,17 +126,25 @@ export const ProgramModal = (props: ProgramModalProps) => {
             isOpen={isOpen}
             title={title}
             onClose={modalHookData.handleClose}
-            onFormValidationChange={modalHookData.handleFormValidationChange}
             onFormSubmit={modalHookData.handleFormSubmit}
-            onDraftSubmit={modalHookData.handleDraftSubmit}
+            onFormValidationChange={modalHookData.handleFormValidationChange}
             onPublishSubmit={modalHookData.handlePublishSubmit}
-            onConfirmAction={modalHookData.handleConfirmAction}
-            onCancelConfirmation={modalHookData.handleCancelConfirmation}
-            onConfirmClose={modalHookData.handleConfirmClose}
-            onCancelClose={modalHookData.handleCancelClose}
-            {...modalHookData}
+            onDraftSubmit={modalHookData.handleDraftSubmit}
+            onActionCancel={modalHookData.handleCancelConfirmation}
+            onActionConfirm={modalHookData.handleConfirmAction}
+            onExitCancel={modalHookData.handleCancelClose}
+            onExitConfirm={modalHookData.handleConfirmClose}
+            buttonStates={modalHookData.buttonStates}
+            formRef={modalHookData.formRef}
+            isSubmitting={modalHookData.isSubmitting}
+            error={modalHookData.error}
+            isExitConfirmationOpen={modalHookData.showCloseConfirmModal}
+            isActionConfirmationOpen={modalHookData.showFormConfirmModal}
+            formKey={modalHookData.formKey}
+            actionConfirmationTitle={modalHookData.formConfirmTitle}
             initialData={initialData}
             categories={categories}
+            fullScreen={true}
             renderForm={(props) => (
                 <ProgramForm
                     ref={modalHookData.formRef}
@@ -127,6 +154,8 @@ export const ProgramModal = (props: ProgramModalProps) => {
                     onSubmit={props.onSubmit}
                     categories={categories}
                     onValidationChange={props.onValidationChange}
+                    onLanguageChange={handleLanguageChange}
+                    onAddSection={handleAddNewSection}
                 />
             )}
         />

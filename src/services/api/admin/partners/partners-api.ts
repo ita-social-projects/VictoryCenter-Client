@@ -24,7 +24,6 @@ import {
     mapSectionDtoToSection,
 } from '@/utils/functions/mappers/admin/partner-mappers/partner-mappers';
 
-// Api Service
 export const PartnersApi = {
     getBanner: async (client: AxiosInstance): Promise<PartnerBanner> => {
         const response = await client.get<PartnerBannerDto>(API_ROUTES.PARTNERS.BANNER);
@@ -66,7 +65,6 @@ export const PartnersApi = {
     },
 
     postSection: async (client: AxiosInstance, section: PartnersSectionCreateRequest): Promise<PartnerSection> => {
-        // Upload images for new partners and get their IDs
         const partnersPayload = await Promise.all(
             section.partners.map(async (partner) => {
                 const { finalImageId } = await ImageApi.getUpdateImageId(client, partner.image, null);
@@ -78,7 +76,6 @@ export const PartnersApi = {
             }),
         );
 
-        // Build the final DTO for the section
         const createDto: CreatePartnersSectionDto = {
             title: section.title,
             description: section.description,
@@ -87,7 +84,6 @@ export const PartnersApi = {
 
         const response = await client.post<PartnersSectionDto>(API_ROUTES.PARTNERS.SECTIONS, createDto);
 
-        // Map DTO response back to a domain type
         return mapSectionDtoToSection(response.data);
     },
 
@@ -100,7 +96,6 @@ export const PartnersApi = {
         const partnersToCreate: CreatePartnerDto[] = [];
         const partnersToUpdate: UpdatePartnerDto[] = [];
 
-        // Process all partners (create/update images and sort into lists)
         await Promise.all(
             section.partnersToUpdate.map(async (partner) => {
                 const { finalImageId, imageIdToDelete } = await ImageApi.getUpdateImageId(
@@ -116,13 +111,11 @@ export const PartnersApi = {
                 const partnerId = partner.id;
 
                 if (partnerId === null) {
-                    // This is a new partner (Create)
                     partnersToCreate.push({
                         description: partner.description,
                         imageId: finalImageId ?? 0,
                     });
                 } else {
-                    // This is an existing partner (Update)
                     partnersToUpdate.push({
                         id: partnerId,
                         description: partner.description,
@@ -132,7 +125,6 @@ export const PartnersApi = {
             }),
         );
 
-        // Build the final DTO for the update
         const updateDto: UpdatePartnersSectionDto = {
             title: section.title,
             description: section.description,
@@ -145,11 +137,8 @@ export const PartnersApi = {
             `${API_ROUTES.PARTNERS.SECTIONS}/${sectionId}`,
             updateDto,
         );
-
-        // Clean up deleted images
         await Promise.allSettled(imagesToDelete.map((id) => ImageApi.delete(client, id)));
 
-        // Map DTO response back to a domain type
         return mapSectionDtoToSection(response.data);
     },
 };

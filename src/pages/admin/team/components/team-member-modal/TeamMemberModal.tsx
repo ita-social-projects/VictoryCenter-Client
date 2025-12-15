@@ -103,19 +103,26 @@ export const TeamMemberModal = ({
     return (
         <GenericModalWrapper
             isOpen={isOpen}
-            onClose={modalHookData.handleClose}
             onFormValidationChange={modalHookData.handleFormValidationChange}
             onFormSubmit={modalHookData.handleFormSubmit}
             onDraftSubmit={modalHookData.handleDraftSubmit}
+            onClose={modalHookData.handleClose}
             onPublishSubmit={modalHookData.handlePublishSubmit}
-            onConfirmAction={modalHookData.handleConfirmAction}
-            onCancelConfirmation={modalHookData.handleCancelConfirmation}
-            onConfirmClose={modalHookData.handleConfirmClose}
-            onCancelClose={modalHookData.handleCancelClose}
-            {...modalHookData}
-            title={title}
+            onExitConfirm={modalHookData.handleConfirmClose}
+            onExitCancel={modalHookData.handleCancelClose}
+            onActionConfirm={modalHookData.handleConfirmAction}
+            onActionCancel={modalHookData.handleCancelConfirmation}
+            formRef={modalHookData.formRef}
+            buttonStates={modalHookData.buttonStates}
+            isSubmitting={modalHookData.isSubmitting}
+            error={modalHookData.error}
+            isActionConfirmationOpen={modalHookData.showFormConfirmModal}
+            isExitConfirmationOpen={modalHookData.showCloseConfirmModal}
+            formKey={modalHookData.formKey}
+            actionConfirmationTitle={modalHookData.formConfirmTitle}
             initialData={initialData}
             categories={categories}
+            title={title}
             renderForm={(props) => (
                 <MemberForm
                     ref={modalHookData.formRef}

@@ -25,42 +25,9 @@
     position: relative;
 }
 
-.title-group :global(.char-limit-textarea) {
-    width: 28.75rem;
-}
-
-.title-group :global(.input-group) {
-    width: 28.75rem;
-    height: 10rem;
-}
-
-.title-group :global(.input-error) {
-    position: absolute;
-    left: 0;
-    bottom: 0px;
-    font-size: 0.75rem;
-    line-height: 1rem;
-}
-
 .description-group {
     flex: 1;
     position: relative;
-}
-
-.description-group :global(.char-limit-textarea) {
-    width: 31.5rem;
-}
-
-.description-group :global(.char-limit-textarea__field) {
-    font-size: 1.25rem;
-}
-
-.description-group :global(.input-error) {
-    position: absolute;
-    left: 0;
-    bottom: 0px;
-    font-size: 0.75rem;
-    line-height: 1rem;
 }
 
 .partners-grid {

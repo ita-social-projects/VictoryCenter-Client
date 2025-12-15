@@ -8,6 +8,8 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { Program } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { ButtonProps } from '@/components/admin/button/Button';
+import { ModalProps } from '@/components/common/modal/Modal';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -30,9 +32,9 @@ jest.mock('@/services/api/admin/programs/programs-api');
 const mockedProgramsApi = ProgramsApi as jest.Mocked<typeof ProgramsApi>;
 
 jest.mock('@/components/common/modal/Modal', () => {
-    const ModalMock = ({ isOpen, onClose, children, 'data-testid': dataTestId }: any) =>
+    const ModalMock = ({ isOpen, onClose, children }: ModalProps) =>
         isOpen ? (
-            <div data-testid={dataTestId}>
+            <div>
                 <button data-testid="modal-close-btn" onClick={onClose}>
                     X
                 </button>
@@ -51,7 +53,7 @@ jest.mock('@/components/common/modal/Modal', () => {
 });
 
 jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({ children, onClick, disabled }: any) => (
+    Button: ({ children, onClick, disabled }: ButtonProps) => (
         <button onClick={onClick} disabled={disabled}>
             {children}
         </button>
@@ -64,8 +66,12 @@ describe('DeleteProgramModal', () => {
         name: 'Test program',
         description: 'Description',
         status: VisibilityStatus.Published,
-        image: null,
+        previewImage: null,
+        backgroundImage: null,
         categories: [],
+        location: '',
+        meetingsCount: '',
+        participantsCount: '',
     };
 
     const defaultProps: DeleteProgramModalProps = {

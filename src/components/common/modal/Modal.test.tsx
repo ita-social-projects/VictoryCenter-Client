@@ -1,15 +1,14 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Modal } from './Modal';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { Modal, ModalProps } from './Modal';
 
 const mockOnClose = jest.fn();
 
-const defaultProps = {
+const defaultProps: ModalProps = {
     isOpen: true,
+    fullscreen: false,
     onClose: mockOnClose,
-    width: '80%',
-    maxWidth: '600px',
 };
 
 describe('Modal Component', () => {
@@ -330,5 +329,34 @@ describe('Modal Component', () => {
         await user.tab({ shift: true });
 
         expect(lastFocusableElement).toHaveFocus();
+    });
+
+    test('applies "fullscreen" class to container when fullScreen prop is true', () => {
+        render(
+            <Modal {...defaultProps} fullscreen={true}>
+                <Modal.Content>Content</Modal.Content>
+            </Modal>,
+        );
+        const modalContainer = document.querySelector('.modal-container');
+        expect(modalContainer).toHaveClass('fullscreen');
+    });
+
+    test('does not apply "fullscreen" class when fullScreen prop is false or undefined', () => {
+        const { rerender } = render(
+            <Modal {...defaultProps} fullscreen={false}>
+                <Modal.Content>Content</Modal.Content>
+            </Modal>,
+        );
+        let modalContainer = document.querySelector('.modal-container');
+        expect(modalContainer).not.toHaveClass('fullscreen');
+
+        // Test default (undefined) behavior
+        rerender(
+            <Modal {...defaultProps}>
+                <Modal.Content>Content</Modal.Content>
+            </Modal>,
+        );
+        modalContainer = document.querySelector('.modal-container');
+        expect(modalContainer).not.toHaveClass('fullscreen');
     });
 });

@@ -65,12 +65,6 @@ export const Select = <TValue,>({
                 'select-opened': isOpen,
                 'select-closed': !isOpen,
             })}
-            tabIndex={0}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    handleOpenSelect();
-                }
-            }}
         >
             <button
                 type="button"

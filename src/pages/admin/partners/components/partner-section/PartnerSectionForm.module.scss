@@ -1,5 +1,6 @@
 @use '@/assets/sass/variables/fonts';
 @use '@/assets/sass/variables/colors' as c;
+@use "@/assets/sass/mixins/typography.mixins" as type;
 
 .root {
     width: 100%;
@@ -46,10 +47,7 @@
 }
 
 .add-card button {
-    font-family: fonts.$mulish-regular-font;
-    font-weight: 400;
-    font-size: 1rem;
-    line-height: 1.5rem;
+    @include type.body-1-regular;
     color: c.$blue-500;
     cursor: pointer;
     border: none;

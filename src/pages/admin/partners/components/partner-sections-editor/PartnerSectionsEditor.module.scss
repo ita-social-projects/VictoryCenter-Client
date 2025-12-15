@@ -1,4 +1,5 @@
-@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors' as c;
+@use "@/assets/sass/mixins/typography.mixins" as type;
 
 .partner-section__loader {
     width: 100%;
@@ -23,7 +24,7 @@
 }
 
 .partner-sections-editor__error-text {
-    color: colors.$error;
+    color: c.$error;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -33,10 +34,8 @@
         background: none;
         border: none;
         cursor: pointer;
-        color: colors.$blue-500;
-        font-size: 1rem;
-        line-height: 1.5rem;
-        font-weight: 600;
+        color: c.$blue-500;
+        @include type.body-1-regular;
         text-decoration: underline;
     }
 }

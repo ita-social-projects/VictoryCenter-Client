@@ -1,6 +1,7 @@
 @use '@/assets/sass/variables/fonts';
-@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/mixins/utilits.mixins';
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .partners-content-section {
     padding: 5rem 0;
@@ -16,7 +17,7 @@
     right: 5rem;
     bottom: 0;
     height: 2px;
-    background: colors.$grey-400;
+    background: c.$grey-400;
 }
 
 .container {
@@ -37,20 +38,14 @@
 }
 
 .section-title {
-    font-family: fonts.$mulish-regular-font;
-    font-weight: 600;
-    font-size: 2rem;
-    line-height: 2.375rem;
-    color: colors.$blue-900;
+    @include type.h4-bold;
+    color: c.$blue-900;
     grid-column: 1 / span 2;
 }
 
 .section-description {
-    font-family: fonts.$mulish-regular-font;
-    font-weight: 500;
-    font-size: 1rem;
-    line-height: 1.45;
-    color: colors.$blue-900;
+    @include type.subtitle-2-medium;
+    color: c.$blue-900;
     text-align: left;
     grid-column: -3 / -1;
 }
@@ -85,11 +80,8 @@
 }
 
 .partner-name {
-    font-family: fonts.$mulish-regular-font;
-    font-weight: 500;
-    font-size: 1rem;
-    line-height: 1.25;
-    color: colors.$blue-900;
+    @include type.subtitle-2-medium;
+    color: c.$blue-900;
     margin: 0;
     max-width: 12rem;
 }

@@ -13,8 +13,8 @@ export const PartnerPanelContent = () => {
     }, []);
 
     return (
-        <div className={styles['root']}>
-            <div className={styles['toolbar']}>
+        <div className={styles.root}>
+            <div className={styles.toolbar}>
                 <PartnerPageToolbar onAddSection={handleAddSection} />
             </div>
 

@@ -275,7 +275,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
 
     if (isSectionsLoading && localSections.length === 0) {
         return (
-            <div className={styles['loader']}>
+            <div className={styles.loader}>
                 <InlineLoader size={2} />
             </div>
         );
@@ -283,7 +283,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
 
     if (sectionsFetchError && localSections.length === 0) {
         return (
-            <div className={styles['error']}>
+            <div className={styles.error}>
                 <p className={styles['error-text']}>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_PARTNERS}</p>
                 <button onClick={refetchSections} className={styles['error-text-button']}>
                     {PARTNERS_TEXT.BUTTON.TRY_AGAIN}
@@ -293,7 +293,7 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
     }
 
     return (
-        <div className={styles['root']}>
+        <div className={styles.root}>
             {localSections.map((section, index) => (
                 <PartnerSectionForm
                     key={section.localId}

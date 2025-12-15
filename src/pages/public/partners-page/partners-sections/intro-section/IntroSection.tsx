@@ -14,19 +14,19 @@ export const IntroSection = ({ banner }: IntroSectionProps) => {
     return (
         <div className={styles['intro-block']}>
             <img src={imageUrl} className={styles['bg-img']} alt="Horses" />
-            <div className={styles['overlay']}>
-                <h1 className={styles['title']}>
+            <div className={styles.overlay}>
+                <h1 className={styles.title}>
                     <div className={styles['title-line']}>
                         {PARTNERS_PAGE_TITLE.FIRST_LINE.REGULAR}
-                        <span className={styles['bold']}>{PARTNERS_PAGE_TITLE.FIRST_LINE.BOLD}</span>
+                        <span className={styles.bold}>{PARTNERS_PAGE_TITLE.FIRST_LINE.BOLD}</span>
                     </div>
                     <div className={styles['title-line']}>
-                        <span className={styles['bold']}>{PARTNERS_PAGE_TITLE.SECOND_LINE.BOLD_START}</span>
+                        <span className={styles.bold}>{PARTNERS_PAGE_TITLE.SECOND_LINE.BOLD_START}</span>
                         {PARTNERS_PAGE_TITLE.SECOND_LINE.REGULAR}
-                        <span className={styles['bold']}>{PARTNERS_PAGE_TITLE.SECOND_LINE.BOLD_END}</span>
+                        <span className={styles.bold}>{PARTNERS_PAGE_TITLE.SECOND_LINE.BOLD_END}</span>
                     </div>
                 </h1>
-                <p className={styles['subtitle']}>{description}</p>
+                <p className={styles.subtitle}>{description}</p>
             </div>
         </div>
     );

@@ -146,8 +146,8 @@ const PartnerSectionComponent = ({
     };
 
     return (
-        <div className={styles['root']}>
-            <div className={styles['inputs']}>
+        <div className={styles.root}>
+            <div className={styles.inputs}>
                 <div className={styles['title-group']}>
                     <TextAreaWithCharacterLimitGroup
                         label={PARTNERS_TEXT.FORM.LABEL.TITLE}

@@ -142,7 +142,7 @@ export const PartnerBanner = () => {
 
     if (isLoadingData) {
         return (
-            <div className={styles['loader']}>
+            <div className={styles.loader}>
                 <InlineLoader size={2} />
             </div>
         );
@@ -150,7 +150,7 @@ export const PartnerBanner = () => {
 
     if (fetchError || !values) {
         return (
-            <div className={styles['error']}>
+            <div className={styles.error}>
                 <p>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER}</p>
                 <Button onClick={refetchBanner} buttonStyle="primary">
                     {PARTNERS_TEXT.BUTTON.TRY_AGAIN}
@@ -162,15 +162,15 @@ export const PartnerBanner = () => {
     const isDisabled = isPublishing;
 
     return (
-        <div className={styles['root']}>
+        <div className={styles.root}>
             {isLoadingData && (
-                <div className={styles['loader']}>
+                <div className={styles.loader}>
                     <InlineLoader size={2} />
                 </div>
             )}
 
             {fetchError && !isLoadingData && (
-                <div className={styles['error']}>
+                <div className={styles.error}>
                     <p>{PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER}</p>
                     <Button onClick={refetchBanner} buttonStyle="primary">
                         {PARTNERS_TEXT.BUTTON.TRY_AGAIN}
@@ -179,8 +179,8 @@ export const PartnerBanner = () => {
             )}
 
             {!isLoadingData && !fetchError && values && (
-                <div className={styles['content']}>
-                    <div className={styles['image']}>
+                <div className={styles.content}>
+                    <div className={styles.image}>
                         <ImageInput
                             label={PARTNERS_TEXT.BANNER.ADD_IMAGE_HERE}
                             subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
@@ -204,8 +204,8 @@ export const PartnerBanner = () => {
                         <InputError error={errors.image} />
                     </div>
 
-                    <div className={styles['main']}>
-                        <div className={styles['fields']}>
+                    <div className={styles.main}>
+                        <div className={styles.fields}>
                             <InputWithCharacterLimitGroup
                                 label={PARTNERS_TEXT.FORM.LABEL.TITLE}
                                 value={values.title}
@@ -231,7 +231,7 @@ export const PartnerBanner = () => {
                             />
                         </div>
 
-                        <div className={styles['actions']}>
+                        <div className={styles.actions}>
                             <Button
                                 type="button"
                                 buttonStyle="primary"

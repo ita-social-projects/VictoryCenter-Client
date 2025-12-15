@@ -13,7 +13,7 @@ export const PartnersSection = ({ section }: PartnersSectionProps) => {
 
     return (
         <section className={styles['partners-content-section']}>
-            <div className={styles['container']}>
+            <div className={styles.container}>
                 <div className={styles['partners-header']}>
                     <h2 className={styles['section-title']}>{section.title}</h2>
                     <p className={styles['section-description']}>{section.description}</p>

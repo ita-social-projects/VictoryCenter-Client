@@ -61,8 +61,8 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
     const cardHtmlId = values.localId;
 
     return (
-        <div className={styles['root']} data-testid={`partner-form-${cardHtmlId}`}>
-            <div className={styles['header']}>
+        <div className={styles.root} data-testid={`partner-form-${cardHtmlId}`}>
+            <div className={styles.header}>
                 <button
                     type="button"
                     className={styles['delete-button']}
@@ -70,8 +70,8 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
                     data-testid={`partner-form-delete-button-${cardHtmlId}`}
                 />
             </div>
-            <div className={styles['content']}>
-                <div className={styles['image']}>
+            <div className={styles.content}>
+                <div className={styles.image}>
                     <ImageInput
                         value={values.image}
                         id={`partner-form-image-${cardHtmlId}`}
@@ -88,7 +88,7 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
                     <InputError error={errors.image} />
                 </div>
 
-                <div className={styles['description']}>
+                <div className={styles.description}>
                     <TextAreaWithCharacterLimitGroup
                         label={PARTNERS_TEXT.PARTNER.DESCRIPTION_LABEL}
                         placeholder={PARTNERS_TEXT.PARTNER.DESCRIPTION_PLACEHOLDER}

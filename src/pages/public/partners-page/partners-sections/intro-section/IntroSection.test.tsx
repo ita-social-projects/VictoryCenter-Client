@@ -59,9 +59,9 @@ describe('IntroSection', () => {
         });
 
         it('should render empty title and description when banner is null', () => {
-            render(<IntroSection banner={null} />);
+            const { container } = render(<IntroSection banner={null} />);
 
-            const paragraph = document.querySelector('.subtitle');
+            const paragraph = container.querySelector('[class*="subtitle"]');
             expect(paragraph).toBeInTheDocument();
             expect(paragraph?.textContent).toBe('');
         });
@@ -74,18 +74,18 @@ describe('IntroSection', () => {
         });
 
         it('should have the correct base CSS classes', () => {
-            render(<IntroSection banner={null} />);
+            const { container } = render(<IntroSection banner={null} />);
 
-            const container = document.querySelector('.partners-intro-block');
-            expect(container).toBeInTheDocument();
+            const introBlock = container.querySelector('[class*="intro-block"]');
+            expect(introBlock).toBeInTheDocument();
 
             const image = screen.getByRole('img', { name: /Horses/i });
-            expect(image).toHaveClass('background-img-partners');
+            expect(image.className).toContain('bg-img');
 
-            const title = document.querySelector('.main-title');
-            expect(title).toBeInTheDocument();
+            const title = screen.getByRole('heading', { level: 1 });
+            expect(title.className).toContain('title');
 
-            const subtitle = document.querySelector('.subtitle');
+            const subtitle = container.querySelector('[class*="subtitle"]');
             expect(subtitle).toBeInTheDocument();
         });
     });

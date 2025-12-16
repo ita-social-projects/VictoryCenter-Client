@@ -262,6 +262,7 @@ jest.mock('../team-page-modals/TeamPageModals', () => ({
                         status: 1,
                         categoryId: 1,
                         image: null,
+                        localizations: [],
                     };
                     onAddTeamMember(newMember);
                 }}
@@ -278,6 +279,7 @@ jest.mock('../team-page-modals/TeamPageModals', () => ({
                         status: 1,
                         categoryId: 1,
                         image: { id: 1, url: 'updated.jpg', mimeType: 'image/jpeg' },
+                        localizations: [],
                     };
                     onEditTeamMember(updatedMember);
                 }}

@@ -9,15 +9,25 @@ export interface MemberComponentProps {
     member: TeamMember;
     handleOnDeleteMember: (member: TeamMember) => void;
     handleOnEditMember: (member: TeamMember) => void;
+    handleOnTranslateMember: (member: TeamMember) => void;
 }
 
-export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMember }: MemberComponentProps) => {
+export const MemberComponent = ({
+    member,
+    handleOnDeleteMember,
+    handleOnEditMember,
+    handleOnTranslateMember,
+}: MemberComponentProps) => {
     const [error, setError] = useState(false);
     const imageUrl = member.image && 'url' in member.image ? member.image.url : null;
 
     useEffect(() => {
         setError(false);
     }, [imageUrl]);
+
+    const handleTranslateMember = () => {
+        handleOnTranslateMember(member);
+    };
 
     const handleEditMember = () => {
         handleOnEditMember(member);
@@ -48,6 +58,12 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
                     <VisibilityStatusLabel status={member.status} />
                 </div>
                 <div className="members-actions">
+                    <button
+                        aria-label={TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE}
+                        type="button"
+                        onClick={handleTranslateMember}
+                        className="members-actions-translate"
+                    />
                     <button
                         aria-label={TEAM_MEMBERS_TEXT.ACTIONS.EDIT}
                         type="button"

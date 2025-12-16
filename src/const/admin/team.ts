@@ -6,6 +6,7 @@ export const TEAM_MEMBERS_TEXT = {
     },
     BUTTON: {
         ADD_MEMBER: 'Додати в команду',
+        GENETATE_TRANSLATION: 'Згенерувати переклад',
     },
 
     MESSAGE: {
@@ -23,12 +24,14 @@ export const TEAM_MEMBERS_TEXT = {
         TITLE: {
             ADD_MEMBER: 'Додати в команду',
             EDIT_MEMBER: 'Редагування члена команди',
+            TRANSLATE_MEMBER: 'Додати переклад',
             DELETE_MEMBER: 'Видалити члена команди?',
         },
         MESSAGE: {
             FAIL_TO_CREATE_MEMBER: 'Виникла помилка під час додавання учасника',
             FAIL_TO_UPDATE_MEMBER: 'Виникла помилка під час оновлення учасника',
             FAIL_TO_DELETE_MEMBER: 'Виникла помилка під час видалення учасника',
+            FAIL_TO_TRANSLATE_MEMBER: 'Виникла помилка під час додаванні перекладу для учасника',
         },
         LABEL: {
             FULLNAME: "Ім'я та Прізвище",
@@ -43,6 +46,7 @@ export const TEAM_MEMBERS_TEXT = {
         REORDER: 'Змінити порядок елемента',
         EDIT: 'Редагувати учасника',
         DELETE: 'Видалити учасника',
+        TRANSLATE: 'Зберегти переклад',
     },
 };
 

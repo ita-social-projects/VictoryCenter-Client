@@ -1,0 +1,77 @@
+@use '../../../../../assets/sass/variables/colors';
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.functional-group {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 0.5rem 0;
+}
+
+.form-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.language-select {
+    width: 150px;
+
+    :global(.select-head) {
+        border: none;
+        background: transparent;
+        box-shadow: none;
+        padding: 0; 
+    }
+
+    :global(.select-options-selected) {
+        justify-content: center;
+    }
+
+}
+.language-select-head {
+    display: inline-flex;
+    align-items: center;
+}
+
+.language-select-head::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    margin: 4px;
+    
+    background-image: url('../../../../../assets/icons/globe.svg');
+    background-size: contain; 
+    background-position: center;
+}
+
+.generate-button {
+    width: 45%;
+    font-size: 16px;
+}
+
+.translate-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.error {
+    color: colors.$error;
+    font-weight: 400;
+    font-size: 0.875rem;
+    line-height: 20px;
+}
+
+.desc-error {
+    position: absolute;
+    bottom: 0;
+}

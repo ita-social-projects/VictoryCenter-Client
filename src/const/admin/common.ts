@@ -64,8 +64,18 @@ export const COMMON_TEXT_ADMIN = {
         CANCEL: 'Відмінити',
         SAVE_AS_DRAFT: 'Зберегти як чернетку',
         SAVE_AS_PUBLISHED: 'Опублікувати',
+        SAVE_TRANSLATION: 'Зберегти переклад',
+        GENERATE_TRANSLATION: 'Згенерувати переклад',
         TRY_AGAIN: 'Спробувати ще раз',
         EXIT: 'Вихід',
+    },
+
+    LOCALIZATION: {
+        LANGUAGES: {
+            MESSAGE: {
+                FAILED_TO_FETCH_LANGUAGES: 'Виникла помилка, не вдалось завантажити мови',
+            },
+        },
     },
 
     CATEGORIES: {
@@ -115,4 +125,9 @@ export const UI_CONFIG = {
         MIN_CHARACTERS_FOR_SEARCH: 3,
         SEARCH_DELAY_MS: 100,
     },
+};
+
+export const LANGUAGES = {
+    EN: 'Англійська',
+    UK: 'Українська',
 };

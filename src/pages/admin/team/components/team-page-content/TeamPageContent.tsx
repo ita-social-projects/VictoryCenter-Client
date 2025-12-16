@@ -260,6 +260,14 @@ export const TeamPageContent = () => {
         [selectedCategory, resetMembersState],
     );
 
+    const handleTranslateMemberModalOpen = useCallback(
+        (member: TeamMember) => {
+            if (isAnyModalOpened) return;
+            openModalActions.openTranslateItemModal(member);
+        },
+        [isAnyModalOpened, openModalActions],
+    );
+
     const handleDeleteTeamMemberModalOpen = useCallback(
         (member: TeamMember) => {
             if (isAnyModalOpened) return;
@@ -366,6 +374,25 @@ export const TeamPageContent = () => {
         [closeModalActions, pageSize, selectedCategory?.id, addToast],
     );
 
+    const handleTranslateMember = useCallback(
+        (memberToTranslate: TeamMember) => {
+            setMembers((prevMembers) => prevMembers.filter((member) => member.id !== memberToTranslate.id));
+            currentItemsCountRef.current -= 1;
+            setCategories((prevCategories) =>
+                prevCategories.map((category) =>
+                    category.id === memberToTranslate.categoryId
+                        ? { ...category, teamMembersCount: category.teamMembersCount - 1 }
+                        : category,
+                ),
+            );
+
+            setHasMore(true);
+            hasMoreRef.current = true;
+            closeModalActions.closeTranslateItemModal();
+        },
+        [closeModalActions],
+    );
+
     const handleEditMember = useCallback(
         (updatedMember: TeamMember) => {
             if (updatedMember.image && 'url' in updatedMember.image)
@@ -466,6 +493,7 @@ export const TeamPageContent = () => {
                     <MemberComponent
                         key={m.id}
                         member={m}
+                        handleOnTranslateMember={handleTranslateMemberModalOpen}
                         handleOnDeleteMember={handleDeleteTeamMemberModalOpen}
                         handleOnEditMember={handleEditMemberModalOpen}
                     />
@@ -475,7 +503,13 @@ export const TeamPageContent = () => {
                 onEntitiesReordered={handleEntitiesReordered}
             ></DraggableListItem>
         ),
-        [handleDeleteTeamMemberModalOpen, handleEditMemberModalOpen, handleEntitiesReordered, members],
+        [
+            handleTranslateMemberModalOpen,
+            handleDeleteTeamMemberModalOpen,
+            handleEditMemberModalOpen,
+            handleEntitiesReordered,
+            members,
+        ],
     );
 
     return (
@@ -532,6 +566,7 @@ export const TeamPageContent = () => {
                 categories={categories}
                 onAddTeamMember={handleAddMember}
                 onEditTeamMember={handleEditMember}
+                onTranslateTeamMember={handleTranslateMember}
                 onDeleteTeamMember={handleDeleteMember}
                 onAddTeamCategory={handleAddCategory}
                 onEditTeamCategory={handleEditCategory}

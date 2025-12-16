@@ -4,6 +4,7 @@ export const PROGRAMS_TEXT = {
     BUTTON: {
         ADD_PROGRAM: 'Додати програму',
         ADD_NEW_SECTION: 'Додати нову секцію',
+        ADD_SECTION: 'Додати секцію',
     },
     PLACEHOLDER: {
         SEARCH_PROGRAMS: 'Шукати програми...',
@@ -17,6 +18,7 @@ export const PROGRAMS_TEXT = {
         FAIL_TO_FETCH_PROGRAMS: 'Виникла помилка, не вдалось завантажити програми',
         FAIL_TO_FETCH_PROGRAM: 'Не вдалося знайти вибрану програму',
         SELECTED_PROGRAM_HAS_NO_CATEGORIES: 'У вибраної програми відсутні категорії',
+        NO_SECTIONS_YET: 'Ще немає секцій опису програми',
     },
 
     QUESTION: {

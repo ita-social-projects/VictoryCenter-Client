@@ -1,0 +1,20 @@
+@use '@/assets/sass/variables/colors';
+
+.add-section-modal-content {
+    width: 100%;
+    min-height: 1000px;
+    background: colors.$grey-100;
+    border-radius: 4px;
+    padding: 1.5rem;
+    box-sizing: border-box;
+
+    @media (max-width: 768px) {
+        min-height: 600px;
+        padding: 1rem;
+    }
+
+    @media (max-width: 480px) {
+        min-height: 400px;
+        padding: 0.75rem;
+    }
+}

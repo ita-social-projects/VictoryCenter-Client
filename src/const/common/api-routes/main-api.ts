@@ -63,4 +63,10 @@ export const API_ROUTES = {
             LANGUAGE_ID: 'TeamMemberLocalizations/languageId',
         },
     },
+    PARTNERS: {
+        BASE: 'Partners',
+        BANNER: 'Partners/banner',
+        SECTIONS: 'Partners/sections',
+        PAGE: 'Partners/page',
+    },
 };

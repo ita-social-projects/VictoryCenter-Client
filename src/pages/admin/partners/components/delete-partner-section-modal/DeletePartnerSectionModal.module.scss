@@ -1,0 +1,10 @@
+@use '@/assets/sass/variables/colors' as c;
+@use "@/assets/sass/mixins/typography.mixins" as type;
+
+.error-container {
+    width: 100%;
+    margin: 8px;
+    text-align: center;
+    color: c.$error;
+    @include type.text-sm;
+}

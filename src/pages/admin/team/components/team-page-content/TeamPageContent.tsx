@@ -389,16 +389,19 @@ export const TeamPageContent = () => {
 
     const handleEditMember = useCallback(
         (updatedMember: TeamMember) => {
-            if (updatedMember.image && 'url' in updatedMember.image)
-                updatedMember.image.url = `${updatedMember.image.url}?cb=${Date.now()}`;
+            const mappedMember = mapEntityWithLocalizations(updatedMember as any) as TeamMember;
+
+            if (mappedMember.image && 'url' in mappedMember.image)
+                mappedMember.image.url = `${mappedMember.image.url}?cb=${Date.now()}`;
+
             setMembers((prevMembers) =>
-                prevMembers.map((member) => (member.id === updatedMember.id ? updatedMember : member)),
+                prevMembers.map((member) => (member.id === mappedMember.id ? mappedMember : member)),
             );
 
-            if (updatedMember.categoryId !== selectedCategory!.id) {
-                setMembers((prev) => prev.filter((m) => m.id !== updatedMember.id));
+            if (mappedMember.categoryId !== selectedCategory!.id) {
+                setMembers((prev) => prev.filter((m) => m.id !== mappedMember.id));
                 setCategories((prevCategories) =>
-                    updateCategoryMemberCounts(prevCategories, selectedCategory!.id, updatedMember),
+                    updateCategoryMemberCounts(prevCategories, selectedCategory!.id, mappedMember),
                 );
             }
 

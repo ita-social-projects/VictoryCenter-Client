@@ -213,10 +213,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         );
 
         return (
-            <form className={styles.container} noValidate>
+            <form className={styles['container']} noValidate>
                 {/* Header Section */}
-                <div className={styles.header}>
-                    <div className={styles.headerLeft}>
+                <div className={styles['header']}>
+                    <div className={styles['header-left']}>
                         <MultiSelectInputGroup
                             label={PROGRAMS_TEXT.FORM.LABEL.CATEGORY}
                             isRequired={true}
@@ -232,7 +232,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         />
                     </div>
 
-                    <div className={styles.headerRight}>
+                    <div className={styles['header-right']}>
                         <Button
                             onClick={onAddSection}
                             buttonStyle="primary"
@@ -245,7 +245,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 </div>
 
                 {/* Main Content Layout */}
-                <div className={styles.body}>
+                <div className={styles['body']}>
                     <PhotoInputGroup
                         id="backgroundImage"
                         isRequired={true}
@@ -266,8 +266,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             PROGRAM_VALIDATION.backgroundImage.width,
                         )}
                     />
-                    <div className={styles.bodyInputs}>
-                        <div className={styles.colLeft}>
+                    <div className={styles['body-inputs']}>
+                        <div className={styles['col-left']}>
                             <TextAreaWithCharacterLimitGroup
                                 label={PROGRAMS_TEXT.FORM.LABEL.NAME}
                                 isRequired={true}
@@ -322,7 +322,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             />
                         </div>
 
-                        <div className={styles.colRight}>
+                        <div className={styles['col-right']}>
                             <TextAreaWithCharacterLimitGroup
                                 label={PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION}
                                 id="description"

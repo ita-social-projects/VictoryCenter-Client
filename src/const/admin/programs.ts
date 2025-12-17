@@ -5,6 +5,7 @@ export const PROGRAMS_TEXT = {
         ADD_PROGRAM: 'Додати програму',
         ADD_NEW_SECTION: 'Додати нову секцію',
         ADD_SECTION: 'Додати секцію',
+        CHOOSE_SECTION: 'Обрати шаблон',
     },
     PLACEHOLDER: {
         SEARCH_PROGRAMS: 'Шукати програми...',

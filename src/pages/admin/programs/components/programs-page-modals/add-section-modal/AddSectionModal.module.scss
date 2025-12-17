@@ -1,0 +1,54 @@
+.content {
+    width: 100%;
+    min-height: 35rem;
+    border-radius: 4px;
+    padding: 1.5rem;
+    box-sizing: border-box;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    button {
+        width: auto;
+    }
+}
+
+.chevronButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: opacity 0.2s ease;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+
+    &:hover {
+        opacity: 0.7;
+    }
+
+    &:active {
+        opacity: 0.5;
+    }
+
+    svg {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+.chevronButtonLeft {
+    left: 0.75rem;
+}
+
+.chevronButtonRight {
+    right: 0.75rem;
+}

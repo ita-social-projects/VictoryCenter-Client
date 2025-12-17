@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AddSectionModal, AddSectionModalProps } from './AddSectionModal';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { ButtonProps } from '@/components/admin/button/Button';
 import { ModalProps } from '@/components/common/modal/Modal';
 
@@ -51,7 +51,7 @@ describe('AddSectionModal', () => {
         render(<AddSectionModal {...defaultProps} />);
 
         expect(screen.getByTestId('add-section-modal')).toBeInTheDocument();
-        expect(screen.getByText('Додати секцію')).toBeInTheDocument();
+        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.ADD_SECTION)).toBeInTheDocument();
     });
 
     it('should not render when isOpen is false', () => {
@@ -76,35 +76,31 @@ describe('AddSectionModal', () => {
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
-    it('should call onClose when cancel button is clicked', () => {
+    it('should call onClose when choose template button is clicked', () => {
         render(<AddSectionModal {...defaultProps} />);
 
-        const cancelButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
-        fireEvent.click(cancelButton);
+        const chooseButton = screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION);
+        fireEvent.click(chooseButton);
 
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
-    it('should call onClose when save button is clicked', () => {
+    it('should render choose template button', () => {
         render(<AddSectionModal {...defaultProps} />);
 
-        const saveButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE);
-        fireEvent.click(saveButton);
-
-        expect(mockOnClose).toHaveBeenCalledTimes(1);
+        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION)).toBeInTheDocument();
     });
 
-    it('should render cancel and save buttons', () => {
+    it('should render left and right chevrons', () => {
         render(<AddSectionModal {...defaultProps} />);
 
-        expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL)).toBeInTheDocument();
-        expect(screen.getByText(COMMON_TEXT_ADMIN.BUTTON.SAVE)).toBeInTheDocument();
+        expect(screen.getByTitle('scroll-left-button')).toBeInTheDocument();
+        expect(screen.getByTitle('scroll-right-button')).toBeInTheDocument();
     });
 
     it('should render the modal content area', () => {
         render(<AddSectionModal {...defaultProps} />);
 
-        const contentArea = screen.getByTestId('add-section-modal');
-        expect(contentArea.querySelector('.add-section-modal-content')).toBeInTheDocument();
+        expect(screen.getByTestId('add-section-modal-content')).toBeInTheDocument();
     });
 });

@@ -1,4 +1,8 @@
 .program-modal .modal-container.fullscreen {
-    padding: 0;
+    padding: 0 0 6rem 0;
+
+    .modal-footer {
+        padding: 0 15rem;
+    }
 }
 

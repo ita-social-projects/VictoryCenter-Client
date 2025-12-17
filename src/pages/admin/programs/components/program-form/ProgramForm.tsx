@@ -244,6 +244,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         </Button>
                     </div>
                 </div>
+                <div className={styles['sections-divider']} />
 
                 {/* Main Content Layout */}
                 <div className={styles['body']}>
@@ -382,6 +383,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     </div>
                     {/* TODO: When sections exist, they will be displayed here and emptySectionsState will be hidden */}
                 </div>
+                <div className={styles['sections-divider']} />
             </form>
         );
     },

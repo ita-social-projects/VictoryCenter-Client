@@ -3,6 +3,8 @@ import { MemberComponent, MemberComponentProps } from './MemberComponent';
 import '@testing-library/jest-dom';
 import { VisibilityStatus } from '@/types/admin/common';
 import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 
 jest.mock('@/assets/icons/blank-user.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="blank-user-icon" />,
@@ -14,6 +16,10 @@ jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', ()
     ),
 }));
 
+jest.mock('../../../../../utils/functions/localization/localization', () => ({
+    returnDisplayedLocalization: jest.fn(),
+}));
+
 const baseMember = {
     id: 1,
     image: { id: 10, url: 'base64string', mimeType: 'image/png', size: 1234 },
@@ -21,6 +27,7 @@ const baseMember = {
     description: 'Frontend Developer',
     status: VisibilityStatus.Published,
     categoryId: 5,
+    localizations: [],
 };
 
 describe('MemberComponent', () => {
@@ -37,6 +44,8 @@ describe('MemberComponent', () => {
         render(
             <MemberComponent
                 member={{ ...baseMember, ...override }}
+                language={{ id: 1, code: DEFAULT_LOCALE, name: 'Українська' }}
+                translationLanguages={[{ id: 1, code: 'en', name: 'Англійська' }]}
                 handleOnEditMember={handleOnEditMember}
                 handleOnDeleteMember={handleOnDeleteMember}
             />,
@@ -76,5 +85,29 @@ describe('MemberComponent', () => {
         const deleteBtn = screen.getByRole('button', { name: TEAM_MEMBERS_TEXT.ACTIONS.DELETE });
         fireEvent.click(deleteBtn);
         expect(handleOnDeleteMember).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+    });
+
+    it('renders localized fullName and description when localization exists', () => {
+        (returnDisplayedLocalization as jest.Mock).mockReturnValue({
+            fullName: 'Localized Name',
+            description: 'Localized Description',
+        });
+
+        renderComponent();
+
+        expect(screen.getByText('Localized Name')).toBeInTheDocument();
+        expect(screen.getByText('Localized Description')).toBeInTheDocument();
+    });
+
+    it('shows fallback icon when image fails to load', () => {
+        renderComponent({
+            image: { id: 10, url: 'broken-image-url.png', mimeType: 'image/png' },
+        });
+
+        const img = screen.getByRole('img');
+
+        fireEvent.error(img);
+
+        expect(screen.getByTestId('blank-user-icon')).toBeInTheDocument();
     });
 });

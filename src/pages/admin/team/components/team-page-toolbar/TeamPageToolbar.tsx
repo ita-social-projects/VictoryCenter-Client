@@ -14,8 +14,12 @@ import {
     SearchItemContentRef,
     SearchItemContentRenderProps,
 } from '@/components/admin/search-bar/search-item-wrapper/SearchItemWrapper';
+import {
+    LocalizationToolkit,
+    LocalizationToolkitProps,
+} from '@/components/admin/localization-toolkit/LocalizationToolkit';
 
-export interface TeamPageToolbarProps {
+export interface TeamPageToolbarProps extends LocalizationToolkitProps {
     onSearchQueryChange: (query: string) => void;
     onStatusFilterChange: (status: VisibilityStatus | undefined) => void;
     onAddMember: () => void;
@@ -51,6 +55,9 @@ export const TeamPageToolbar = ({
     categories,
     onSearchItemSelect,
     onSearchClear,
+    languages,
+    onLanguageChange,
+    onTranslationStatusFilterChange,
 }: TeamPageToolbarProps) => {
     const itemRenderer = useMemo(() => createItemRenderer(categories), [categories]);
 
@@ -75,6 +82,11 @@ export const TeamPageToolbar = ({
                 />
             </div>
             <div className="toolbar-actions">
+                <LocalizationToolkit
+                    languages={languages}
+                    onLanguageChange={onLanguageChange}
+                    onTranslationStatusFilterChange={onTranslationStatusFilterChange}
+                />
                 <StatusFilterDropdown value={statusFilter} onStatusFilterChange={onStatusFilterChange} />
                 <Button onClick={onAddMember} buttonStyle="primary">
                     {TEAM_MEMBERS_TEXT.BUTTON.ADD_MEMBER}

@@ -23,6 +23,7 @@ describe('TeamMemberSearchItem', () => {
         status: VisibilityStatus.Published,
         categoryId: 1,
         image: null,
+        localizations: [],
         ...overrides,
     });
 

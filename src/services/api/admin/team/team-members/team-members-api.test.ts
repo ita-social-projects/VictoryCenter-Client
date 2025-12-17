@@ -3,6 +3,7 @@ import { TeamMembersApi } from './team-members-api';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ImageApi } from '@/services/api/admin/image/image-api';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { TranslationStatusFilter } from '@/types/common/language';
 
 jest.mock('@/services/api/admin/image/image-api');
 
@@ -25,10 +26,23 @@ describe('TeamMembersApi', () => {
             };
             mockClient.get.mockResolvedValue(mockResponse);
 
-            const result = await TeamMembersApi.getAll(mockClient, 1, VisibilityStatus.Published, 0, 10);
+            const result = await TeamMembersApi.getAll(
+                mockClient,
+                1,
+                VisibilityStatus.Published,
+                TranslationStatusFilter.All,
+                0,
+                10,
+            );
 
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}`, {
-                params: { categoryId: 1, status: VisibilityStatus.Published, offset: 0, limit: 10 },
+                params: {
+                    categoryId: 1,
+                    status: VisibilityStatus.Published,
+                    translationStatusFilter: TranslationStatusFilter.All,
+                    offset: 0,
+                    limit: 10,
+                },
             });
             expect(result).toEqual(mockResponse.data);
         });
@@ -353,34 +367,41 @@ describe('TeamMembersApi', () => {
         });
 
         it('does NOT add categoryId param if categoryId is undefined', async () => {
-            await TeamMembersApi.getAll(mockClient, undefined, undefined, undefined, undefined);
+            await TeamMembersApi.getAll(mockClient, undefined, undefined, undefined, undefined, undefined);
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}`, { params: {} });
         });
 
         it('does NOT add categoryId param if categoryId is null', async () => {
-            await TeamMembersApi.getAll(mockClient, null!, VisibilityStatus.Published, 1, 1);
+            await TeamMembersApi.getAll(mockClient, null!, VisibilityStatus.Published, undefined, 1, 1);
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}`, {
                 params: { status: VisibilityStatus.Published, offset: 1, limit: 1 },
             });
         });
 
         it('adds categoryId param if categoryId is a number', async () => {
-            await TeamMembersApi.getAll(mockClient, 42, undefined, undefined, undefined);
+            await TeamMembersApi.getAll(mockClient, 42, undefined, undefined, undefined, undefined);
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}`, { params: { categoryId: 42 } });
         });
 
         it('adds status param if status is defined (even null)', async () => {
-            await TeamMembersApi.getAll(mockClient, undefined, VisibilityStatus.Published, undefined, undefined);
+            await TeamMembersApi.getAll(
+                mockClient,
+                undefined,
+                VisibilityStatus.Published,
+                undefined,
+                undefined,
+                undefined,
+            );
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}`, {
                 params: { status: VisibilityStatus.Published },
             });
 
-            await TeamMembersApi.getAll(mockClient, undefined, null, undefined, undefined);
+            await TeamMembersApi.getAll(mockClient, undefined, null, undefined, undefined, undefined);
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}`, { params: { status: null } });
         });
 
         it('does NOT add offset param if offset is undefined', async () => {
-            await TeamMembersApi.getAll(mockClient, 1, VisibilityStatus.Published, undefined, 1);
+            await TeamMembersApi.getAll(mockClient, 1, VisibilityStatus.Published, undefined, undefined, 1);
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}`, {
                 params: {
                     categoryId: 1,
@@ -391,7 +412,7 @@ describe('TeamMembersApi', () => {
         });
 
         it('does NOT add offset param if offset is null', async () => {
-            await TeamMembersApi.getAll(mockClient, 1, VisibilityStatus.Draft, null!, 2);
+            await TeamMembersApi.getAll(mockClient, 1, VisibilityStatus.Draft, undefined, null!, 2);
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}`, {
                 params: {
                     categoryId: 1,
@@ -402,22 +423,22 @@ describe('TeamMembersApi', () => {
         });
 
         it('adds offset param if offset is a number', async () => {
-            await TeamMembersApi.getAll(mockClient, undefined, undefined, 5, undefined);
+            await TeamMembersApi.getAll(mockClient, undefined, undefined, undefined, 5, undefined);
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}`, { params: { offset: 5 } });
         });
 
         it('does NOT add limit param if limit is null', async () => {
-            await TeamMembersApi.getAll(mockClient, undefined, undefined, undefined, undefined);
+            await TeamMembersApi.getAll(mockClient, undefined, undefined, undefined, undefined, undefined);
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}`, { params: {} });
         });
 
         it('adds limit param floored if limit is a decimal number', async () => {
-            await TeamMembersApi.getAll(mockClient, undefined, undefined, undefined, 7.8);
+            await TeamMembersApi.getAll(mockClient, undefined, undefined, undefined, undefined, 7.8);
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}`, { params: { limit: 7 } });
         });
 
         it('adds limit param if limit is an integer', async () => {
-            await TeamMembersApi.getAll(mockClient, undefined, undefined, undefined, 10);
+            await TeamMembersApi.getAll(mockClient, undefined, undefined, undefined, undefined, 10);
             expect(mockClient.get).toHaveBeenCalledWith(`${API_ROUTES.TEAM.BASE}`, { params: { limit: 10 } });
         });
     });

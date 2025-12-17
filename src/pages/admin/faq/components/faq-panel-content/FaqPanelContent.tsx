@@ -17,7 +17,7 @@ import { FaqComponent } from '../faq-component/FaqComponent';
 import { useVisitorPages } from '@/contexts/admin/visitor-pages-provider/VisitorPagesProvider';
 import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { FaqSearchItem } from '../faq-search-item/FaqSearchItem';
-import { mapFaqQuestionDtoToModel } from '@/utils/functions/mappers/admin/faq-mappers';
+import { mapFaqQuestionDtoToModel } from '@/utils/functions/mappers/admin/faq/faq-mappers';
 import axios from 'axios';
 import './FaqPanelContent.scss';
 

@@ -11,7 +11,7 @@ import { TeamMember } from '@/types/admin/team-members';
 import { VisibilityStatus } from '@/types/admin/common';
 import { TeamCategory } from '@/types/admin/team-category';
 import { ToastType } from '@/types/admin/toast';
-import { TeamPageToolbarProps } from '@/pages/admin/team/components/team-page-toolbar/TeamPageToolbar';
+import { LocalizationLanguage } from '@/types/common/language';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
 const mockedUseAdminClient = useAdminClient as jest.MockedFunction<typeof useAdminClient>;
@@ -23,8 +23,9 @@ jest.mock('@/services/api/admin/team/team-categories/team-categories-api');
 const mockTeamCategoriesApi = TeamCategoriesApi as jest.Mocked<typeof TeamCategoriesApi>;
 
 jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
-    TeamPageToolbar: (props: TeamPageToolbarProps) => {
+    TeamPageToolbar: (props: any) => {
         const { VisibilityStatus } = require('@/types/admin/common');
+        const { TranslationStatusFilter } = require('@/types/common/language');
 
         const handleSelectFirstResult = () => {
             if (props.searchItems?.[0]) {
@@ -52,6 +53,27 @@ jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
                     onChange={(e) => props.onSearchQueryChange(e.target.value)}
                     placeholder="Search..."
                 />
+                <select
+                    data-testid="language-filter"
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        props.onLanguageChange(value);
+                    }}
+                >
+                    <option value="uk">Українська</option>
+                    <option value="en">Англійська</option>
+                </select>
+                <select
+                    data-testid="translation-status-filter"
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        props.onTranslationStatusFilterChange(value);
+                    }}
+                >
+                    <option value={TranslationStatusFilter.All}>All</option>
+                    <option value={TranslationStatusFilter.Outdated}>Outdated</option>
+                    <option value={TranslationStatusFilter.Missing}>Missing</option>
+                </select>
                 <select
                     data-testid="status-filter"
                     onChange={(e) => {
@@ -102,6 +124,19 @@ const mockCloseModalActions = {
     closeEditCategoryModal: jest.fn(),
     closeDeleteCategoryModal: jest.fn(),
 };
+
+jest.mock('@/hooks/admin/use-localization-toolkit/useLocalizationToolkit', () => ({
+    useLocalizationToolkit: () => {
+        return {
+            allLanguages: mockLanguages,
+            translationLanguages: mockLanguages.filter((language) => language.code !== 'uk'),
+            selectedLanguage: mockLanguages[0],
+            onLanguageChange: jest.fn(),
+            translationStatusFilter: 0,
+            onTranslationStatusFilterChange: jest.fn(),
+        };
+    },
+}));
 
 jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
     useModalsState: () => {
@@ -227,6 +262,7 @@ jest.mock('../team-page-modals/TeamPageModals', () => ({
                         status: 1,
                         categoryId: 1,
                         image: null,
+                        localizations: [],
                     };
                     onAddTeamMember(newMember);
                 }}
@@ -243,6 +279,7 @@ jest.mock('../team-page-modals/TeamPageModals', () => ({
                         status: 1,
                         categoryId: 1,
                         image: { id: 1, url: 'updated.jpg', mimeType: 'image/jpeg' },
+                        localizations: [],
                     };
                     onEditTeamMember(updatedMember);
                 }}
@@ -304,6 +341,11 @@ jest.mock('@/components/admin/toast/toast-container/ToastContainer', () => ({
     ToastContainer: () => <div data-testid="toast-container" />,
 }));
 
+const mockLanguages: LocalizationLanguage[] = [
+    { id: 1, code: 'uk', name: 'Українська' },
+    { id: 2, code: 'en', name: 'Англійська' },
+];
+
 const mockCategories: TeamCategory[] = [
     { id: 1, name: 'Category A', description: 'desc', teamMembersCount: 2 },
     { id: 2, name: 'Category B', description: 'desc', teamMembersCount: 1 },
@@ -317,6 +359,7 @@ const mockMembers: TeamMember[] = [
         status: VisibilityStatus.Published,
         categoryId: 1,
         image: { id: 1, url: 'test.jpg', mimeType: 'image/jpeg' } as any,
+        localizations: [],
     },
     {
         id: 2,
@@ -325,6 +368,7 @@ const mockMembers: TeamMember[] = [
         status: VisibilityStatus.Draft,
         categoryId: 1,
         image: null,
+        localizations: [],
     },
 ];
 
@@ -386,6 +430,7 @@ describe('TeamPageContent', () => {
                     mockCategories[0].id,
                     undefined,
                     0,
+                    0,
                     5,
                 );
             });
@@ -401,6 +446,7 @@ describe('TeamPageContent', () => {
                     mockClient,
                     mockCategories[1].id,
                     undefined,
+                    0,
                     0,
                     5,
                 );
@@ -438,7 +484,14 @@ describe('TeamPageContent', () => {
             changeStatusFilter(VisibilityStatus.Published.toString());
 
             await waitFor(() => {
-                expect(mockTeamMembersApi.getAll).toHaveBeenLastCalledWith(mockClient, mockCategories[0].id, '1', 0, 5);
+                expect(mockTeamMembersApi.getAll).toHaveBeenLastCalledWith(
+                    mockClient,
+                    mockCategories[0].id,
+                    '1',
+                    0,
+                    0,
+                    5,
+                );
             });
         });
 
@@ -1255,6 +1308,7 @@ describe('TeamPageContent', () => {
                         mockClient,
                         mockCategories[0].id,
                         undefined,
+                        0,
                         5,
                         5,
                     );

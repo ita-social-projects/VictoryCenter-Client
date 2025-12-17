@@ -1,23 +1,43 @@
 import { useState, useEffect } from 'react';
 import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
-import './MemberComponent.scss';
 import { ReactComponent as BlankUserImage } from '@/assets/icons/blank-user.svg';
-import { TeamMember } from '@/types/admin/team-members';
+import { TeamMember, TeamMemberLocalizableFields } from '@/types/admin/team-members';
 import { VisibilityStatusLabel } from '@/components/admin/visibility-status-label/VisibilityStatusLabel';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
+import { LocalizationLanguage } from '@/types/common/language';
+import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
+import './MemberComponent.scss';
 
 export interface MemberComponentProps {
     member: TeamMember;
+    language: LocalizationLanguage;
+    translationLanguages: LocalizationLanguage[];
     handleOnDeleteMember: (member: TeamMember) => void;
     handleOnEditMember: (member: TeamMember) => void;
 }
 
-export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMember }: MemberComponentProps) => {
+export const MemberComponent = ({
+    member,
+    language,
+    translationLanguages,
+    handleOnDeleteMember,
+    handleOnEditMember,
+}: MemberComponentProps) => {
     const [error, setError] = useState(false);
+    const [textFields, setTextFields] = useState<TeamMemberLocalizableFields>();
     const imageUrl = member.image && 'url' in member.image ? member.image.url : null;
 
     useEffect(() => {
         setError(false);
     }, [imageUrl]);
+
+    useEffect(() => {
+        const displayedLocalization = returnDisplayedLocalization(member, language.code);
+        setTextFields({
+            fullName: displayedLocalization?.fullName || member.fullName,
+            description: displayedLocalization?.description || member.description,
+        });
+    }, [language, member]);
 
     const handleEditMember = () => {
         handleOnEditMember(member);
@@ -26,6 +46,7 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
     const handleDeleteMember = () => {
         handleOnDeleteMember(member);
     };
+
     return (
         <div className="members-item">
             <div className="members-profile">
@@ -38,10 +59,13 @@ export const MemberComponent = ({ member, handleOnDeleteMember, handleOnEditMemb
                         onError={() => setError(true)}
                     />
                 )}
-                <p>{member.fullName}</p>
+                <div className="members-profile-data">
+                    <p>{textFields?.fullName}</p>
+                    <LocalizationStatuses languages={translationLanguages} localizedEntity={member} />
+                </div>
             </div>
             <div className="members-position">
-                <p>{member.description}</p>
+                <p>{textFields?.description}</p>
             </div>
             <div className="members-controls">
                 <div className="program-info-status">

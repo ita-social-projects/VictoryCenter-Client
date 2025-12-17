@@ -9,6 +9,7 @@ import { useGenericModal } from '@/hooks/admin/use-generic-modal/useGenericModal
 import { GenericModalWrapper } from '@/components/admin/generic-modal-wrapper/GenericModalWrapper';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { AddSectionModal } from '../add-section-modal/AddSectionModal';
+import './ProgramModal.scss';
 
 export interface BaseProgramModalProps {
     isOpen: boolean;
@@ -125,13 +126,10 @@ export const ProgramModal = (props: ProgramModalProps) => {
         setIsAddSectionModalOpen(false);
     }, []);
 
-    const title = isEditMode ? PROGRAMS_TEXT.FORM.TITLE.EDIT_PROGRAM : PROGRAMS_TEXT.FORM.TITLE.ADD_PROGRAM;
-
     return (
-        <>
+        <div className="program-modal">
             <GenericModalWrapper
                 isOpen={isOpen}
-                title={title}
                 onClose={modalHookData.handleClose}
                 onFormSubmit={modalHookData.handleFormSubmit}
                 onFormValidationChange={modalHookData.handleFormValidationChange}
@@ -167,6 +165,6 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 )}
             />
             <AddSectionModal isOpen={isAddSectionModalOpen} onClose={handleCloseAddSectionModal} />
-        </>
+        </div>
     );
 };

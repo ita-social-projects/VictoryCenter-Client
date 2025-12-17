@@ -262,11 +262,6 @@ describe('ProgramModal', () => {
     });
 
     describe('Add Mode', () => {
-        it('should render with the correct "Add Program" title', () => {
-            render(<ProgramModal {...addModeProps} />);
-            expect(screen.getByTestId('modal-title')).toHaveTextContent(PROGRAMS_TEXT.FORM.TITLE.ADD_PROGRAM);
-        });
-
         it('should successfully add a program as a draft', async () => {
             render(<ProgramModal {...addModeProps} />);
             simulateFormBecomesValid(); // Enable buttons
@@ -364,11 +359,6 @@ describe('ProgramModal', () => {
     });
 
     describe('Edit Mode', () => {
-        it('should render with the correct "Edit Program" title', () => {
-            render(<ProgramModal {...editModeProps} />);
-            expect(screen.getByTestId('modal-title')).toHaveTextContent(PROGRAMS_TEXT.FORM.TITLE.EDIT_PROGRAM);
-        });
-
         it('should successfully save changes to a draft program', async () => {
             render(<ProgramModal {...editModeProps} />);
             simulateFormBecomesValid(); // Enable buttons

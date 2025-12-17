@@ -1,4 +1,4 @@
-import { TranslationStatus } from './common/translation-status';
+import { TranslationStatus } from '../../common/language';
 
 export type TeamMemberLocalizationDto = {
     entityId: number;

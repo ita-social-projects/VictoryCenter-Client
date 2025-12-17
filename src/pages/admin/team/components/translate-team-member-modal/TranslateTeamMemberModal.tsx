@@ -13,12 +13,14 @@ import { ConfirmationModal } from '../../../../../components/admin/confirmation-
 import styles from './TranslateTeamMemberModal.module.scss';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { TeamMemberLocalizationsApi } from '../../../../../services/api/admin/team/team-member-localizations/team-member-localizations-api';
+import { LocalizationLanguage } from '../../../../../types/common/language';
 
 interface TranslateTeamMemberModalProps {
     isOpen: boolean;
     onClose: () => void;
     memberToTranslate: TeamMember | null;
     onTranslateMember: (member: TeamMember) => void;
+    language: LocalizationLanguage;
 }
 
 export const TranslateTeamMemberModal = ({
@@ -26,6 +28,7 @@ export const TranslateTeamMemberModal = ({
     onClose,
     memberToTranslate,
     onTranslateMember,
+    language,
 }: TranslateTeamMemberModalProps) => {
     const formRef = useRef<TranslateTeamMemberFormRef>(null);
 
@@ -48,7 +51,7 @@ export const TranslateTeamMemberModal = ({
 
         await TeamMemberLocalizationsApi.create(client, {
             entityId: memberToTranslate.id,
-            languageId: data.languageId,
+            languageId: language.id,
             fullName: data.fullName,
             description: data.description,
         });

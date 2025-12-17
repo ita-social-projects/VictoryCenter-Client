@@ -1,0 +1,62 @@
+import { useCallback, useEffect, useState } from 'react';
+import axios from 'axios';
+import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
+import { DEFAULT_LOCALE } from '../../../const/common/locales';
+import { localizationLanguagesDataFetch } from '../../../services/api/public/localization/languages/languages-api';
+import { LocalizationLanguage, TranslationStatusFilter } from '../../../types/common/language';
+
+type ErrorType = 'categories' | 'members' | 'languages';
+
+export interface UseLocalizationToolkitProps {
+    setErrorState: (message: string, type: ErrorType) => void;
+}
+
+export function useLocalizationToolkit({ setErrorState }: UseLocalizationToolkitProps) {
+    const [allLanguages, setAllLanguages] = useState<LocalizationLanguage[]>([]);
+    const [translationLanguages, setTranslationLanguages] = useState<LocalizationLanguage[]>([]);
+    const [selectedLanguage, setSelectedLanguage] = useState<LocalizationLanguage>();
+    const [translationStatusFilter, setTranslationStatusFilter] = useState<TranslationStatusFilter | undefined>();
+
+    const onLanguageChange = useCallback((language: LocalizationLanguage) => {
+        setSelectedLanguage(language);
+    }, []);
+
+    const onTranslationStatusFilterChange = useCallback((translationStatus: TranslationStatusFilter | undefined) => {
+        setTranslationStatusFilter(translationStatus);
+    }, []);
+
+    const fetchLanguages = useCallback(async () => {
+        try {
+            const fetchedLanguages = await localizationLanguagesDataFetch();
+            setAllLanguages(fetchedLanguages);
+            const defaultLang =
+                fetchedLanguages.find((language) => language.code === DEFAULT_LOCALE) ?? fetchedLanguages[0];
+            setSelectedLanguage(defaultLang);
+            setTranslationLanguages(fetchedLanguages.filter((language) => language.code !== DEFAULT_LOCALE));
+        } catch (error: any) {
+            if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
+                return;
+            }
+
+            setErrorState(COMMON_TEXT_ADMIN.LOCALIZATION.LANGUAGES.MESSAGE.FAILED_TO_FETCH_LANGUAGES, 'languages');
+        }
+    }, [setErrorState]);
+
+    const retryFetchLanguages = () => {
+        return fetchLanguages();
+    };
+
+    useEffect(() => {
+        fetchLanguages();
+    }, [fetchLanguages]);
+
+    return {
+        allLanguages,
+        translationLanguages,
+        selectedLanguage,
+        onLanguageChange,
+        translationStatusFilter,
+        onTranslationStatusFilterChange,
+        retryFetchLanguages,
+    };
+}

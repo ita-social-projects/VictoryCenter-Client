@@ -21,13 +21,15 @@ import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useM
 import { TeamPageModals } from '../team-page-modals/TeamPageModals';
 import { useTeamMemberSearch } from '../../../../../hooks/admin/team/useTeamMemberSearch';
 import { updateCategoryMemberCounts } from '../../../../../utils/functions/update-category-member-counts/update-category-member-counts';
+import { useLocalizationToolkit } from '../../../../../hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { LOCALES } from '../../../../../const/common/locales';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;
 
 interface ErrorState {
     message: string | null;
-    type: 'categories' | 'members' | null;
+    type: 'categories' | 'members' | 'languages' | null;
 }
 
 export const TeamPageContent = () => {
@@ -66,7 +68,7 @@ export const TeamPageContent = () => {
     const isCategoriesLoadingRef = useRef(false);
     const abortControllerRef = useRef<AbortController | null>(null);
 
-    const setErrorState = useCallback((message: string, type: 'categories' | 'members') => {
+    const setErrorState = useCallback((message: string, type: 'categories' | 'members' | 'languages') => {
         setError({ message, type });
     }, []);
 
@@ -95,6 +97,18 @@ export const TeamPageContent = () => {
         ],
         [],
     );
+
+    const {
+        allLanguages,
+        translationLanguages,
+        selectedLanguage,
+        onLanguageChange,
+        translationStatusFilter,
+        onTranslationStatusFilterChange,
+        retryFetchLanguages,
+    } = useLocalizationToolkit({ setErrorState });
+
+    const englishLanguage = useMemo(() => allLanguages.find((l) => l.code === LOCALES[1]), [allLanguages]);
 
     const isSingleView = !!selectedSearchMember;
     const itemsToRender = useMemo(() => {
@@ -374,24 +388,9 @@ export const TeamPageContent = () => {
         [closeModalActions, pageSize, selectedCategory?.id, addToast],
     );
 
-    const handleTranslateMember = useCallback(
-        (memberToTranslate: TeamMember) => {
-            setMembers((prevMembers) => prevMembers.filter((member) => member.id !== memberToTranslate.id));
-            currentItemsCountRef.current -= 1;
-            setCategories((prevCategories) =>
-                prevCategories.map((category) =>
-                    category.id === memberToTranslate.categoryId
-                        ? { ...category, teamMembersCount: category.teamMembersCount - 1 }
-                        : category,
-                ),
-            );
-
-            setHasMore(true);
-            hasMoreRef.current = true;
-            closeModalActions.closeTranslateItemModal();
-        },
-        [closeModalActions],
-    );
+    const handleTranslateMember = useCallback(() => {
+        closeModalActions.closeTranslateItemModal();
+    }, [closeModalActions]);
 
     const handleEditMember = useCallback(
         (updatedMember: TeamMember) => {
@@ -564,6 +563,7 @@ export const TeamPageContent = () => {
             <TeamPageModals
                 modalsStateControl={modalsStateControl}
                 categories={categories}
+                englishLanguage={englishLanguage}
                 onAddTeamMember={handleAddMember}
                 onEditTeamMember={handleEditMember}
                 onTranslateTeamMember={handleTranslateMember}

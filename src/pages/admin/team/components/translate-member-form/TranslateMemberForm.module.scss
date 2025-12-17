@@ -29,13 +29,12 @@
         border: none;
         background: transparent;
         box-shadow: none;
-        padding: 0; 
+        padding: 0;
     }
 
     :global(.select-options-selected) {
         justify-content: center;
     }
-
 }
 .language-select-head {
     display: inline-flex;
@@ -48,9 +47,9 @@
     height: 20px;
     display: inline-block;
     margin: 4px;
-    
+
     background-image: url('../../../../../assets/icons/globe.svg');
-    background-size: contain; 
+    background-size: contain;
     background-position: center;
 }
 

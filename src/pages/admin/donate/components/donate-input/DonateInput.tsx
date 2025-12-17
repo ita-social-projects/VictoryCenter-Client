@@ -93,7 +93,7 @@ export const DonateInput = ({
 
     const currentLength = getNormalizedInputText(value, prefix).length;
     const showCharacterCounter = maxLength !== undefined;
-    const showFooter = showCharacterCounter || error;
+    const showFooter = editable && (showCharacterCounter || error);
 
     return (
         <>

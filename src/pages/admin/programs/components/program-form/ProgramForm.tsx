@@ -12,6 +12,7 @@ import { Image, ImageValues } from '@/types/common/image';
 import { ProgramCategory } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
+import NotFoundIcon from '@/assets/icons/not-found.svg';
 import styles from './ProgramForm.module.scss';
 
 export interface ProgramFormValues {
@@ -359,6 +360,27 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             />
                         </div>
                     </div>
+                </div>
+
+                <div className={styles['sections-divider']} />
+
+                {/* Sections Area */}
+                <div className={styles['sections-container']}>
+                    <div className={styles['empty-sections-state']}>
+                        <img src={NotFoundIcon} alt="No sections" className={styles['empty-sections-image']} />
+                        <p className={styles['empty-sections-text']}>{PROGRAMS_TEXT.MESSAGE.NO_SECTIONS_YET}</p>
+                        <Button
+                            className={styles['btn-add']}
+                            onClick={onAddSection}
+                            buttonStyle="secondary"
+                            disabled={isSubmitting || isFormDisabled}
+                            data-testid="add-section-button-empty"
+                        >
+                            {PROGRAMS_TEXT.BUTTON.ADD_SECTION}
+                            <PlusIcon className={styles['plus-icon']} />
+                        </Button>
+                    </div>
+                    {/* TODO: When sections exist, they will be displayed here and emptySectionsState will be hidden */}
                 </div>
             </form>
         );

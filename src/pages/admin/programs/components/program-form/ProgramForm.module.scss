@@ -1,4 +1,5 @@
 @use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/typography';
 
 .container {
     display: flex;
@@ -56,4 +57,57 @@
     flex-direction: column;
     gap: 1.5rem;
     min-width: 0;
+}
+
+.sections-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 0 3rem;
+    overflow-y: auto;
+}
+
+.sections-divider {
+    width: 100%;
+    height: 1px;
+    background-color: colors.$grey-700;
+}
+
+.empty-sections-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 3rem 2rem;
+    margin: 0 2rem;
+    border-radius: 8px;
+}
+
+.btn-add {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    width: 29.375rem;
+}
+
+.plus-icon path {
+    stroke: colors.$blue-500;
+}
+
+.empty-sections-image {
+    width: 120px;
+    height: 120px;
+    opacity: 0.6;
+}
+
+.empty-sections-text {
+    width: 29.375rem;
+    font-size: typography.$h3-size;
+    font-weight: typography.$fw-semibold;
+    line-height: typography.$h3-height;
+    color: colors.$blue-900;
+    margin: 0;
+    text-align: center;
 }

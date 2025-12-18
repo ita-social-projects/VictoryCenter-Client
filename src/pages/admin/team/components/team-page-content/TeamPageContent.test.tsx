@@ -111,6 +111,7 @@ const mockOpenModalActions = {
     openAddItemModal: jest.fn(),
     openEditItemModal: jest.fn(),
     openDeleteItemModal: jest.fn(),
+    openTranslateItemModal: jest.fn(),
     openAddCategoryModal: jest.fn(),
     openEditCategoryModal: jest.fn(),
     openDeleteCategoryModal: jest.fn(),
@@ -120,6 +121,7 @@ const mockCloseModalActions = {
     closeAddItemModal: jest.fn(),
     closeEditItemModal: jest.fn(),
     closeDeleteItemModal: jest.fn(),
+    closeTranslateItemModal: jest.fn(),
     closeAddCategoryModal: jest.fn(),
     closeEditCategoryModal: jest.fn(),
     closeDeleteCategoryModal: jest.fn(),
@@ -229,9 +231,13 @@ jest.mock('@/components/admin/draggable-list-item/DraggableListItem', () => ({
 }));
 
 jest.mock('../member-component/MemberComponent', () => ({
-    MemberComponent: ({ member, handleOnDeleteMember, handleOnEditMember }: any) => (
+    MemberComponent: ({ member, handleOnDeleteMember, handleOnEditMember, handleOnTranslateMember, language }: any) => (
         <div data-testid={`member-component-${member.id}`}>
             <span data-testid={`member-name-${member.id}`}>{member.fullName}</span>
+            <span data-testid={`member-language-${member.id}`}>{language?.code}</span>
+            <button data-testid={`translate-member-${member.id}`} onClick={() => handleOnTranslateMember(member)}>
+                Translate
+            </button>
             <button data-testid={`edit-member-${member.id}`} onClick={() => handleOnEditMember(member)}>
                 Edit
             </button>
@@ -246,6 +252,7 @@ jest.mock('../team-page-modals/TeamPageModals', () => ({
     TeamPageModals: ({
         onAddTeamMember,
         onEditTeamMember,
+        onTranslateTeamMember,
         onDeleteTeamMember,
         onAddTeamCategory,
         onEditTeamCategory,
@@ -285,6 +292,23 @@ jest.mock('../team-page-modals/TeamPageModals', () => ({
                 }}
             >
                 Simulate Edit Member
+            </button>
+            <button
+                data-testid="simulate-translate-member"
+                onClick={() => {
+                    const translatedMember = {
+                        id: 1,
+                        fullName: 'Translated Member',
+                        description: 'Translated description.',
+                        status: 1,
+                        categoryId: 1,
+                        image: null,
+                        localizations: [],
+                    };
+                    onTranslateTeamMember(translatedMember);
+                }}
+            >
+                Simulate Translate Member
             </button>
             <button
                 data-testid="simulate-delete-member"
@@ -871,6 +895,22 @@ describe('TeamPageContent', () => {
                 );
             });
 
+            it('should update member in list after translate', async () => {
+                renderTeamPageContent();
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('member-name-1')).toHaveTextContent('John Doe');
+                });
+
+                fireEvent.click(screen.getByTestId('simulate-translate-member'));
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('member-name-1')).toHaveTextContent('Translated Member');
+                });
+
+                expect(mockCloseModalActions.closeTranslateItemModal).toHaveBeenCalled();
+            });
+
             // it('should edit member without image cache busting when no url present', async () => {
             //     const membersWithoutImageUrl: TeamMember[] = [
             //         { ...mockMembers[0], image: { id: 1 } as any },
@@ -1160,6 +1200,32 @@ describe('TeamPageContent', () => {
                 expect(mockOpenModalActions.openDeleteItemModal).toHaveBeenCalledWith(mockMembers[0]);
             });
 
+            it('should open translate member modal when translate button clicked', async () => {
+                renderTeamPageContent();
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('translate-member-1')).toBeInTheDocument();
+                });
+
+                fireEvent.click(screen.getByTestId('translate-member-1'));
+
+                expect(mockOpenModalActions.openTranslateItemModal).toHaveBeenCalledWith(mockMembers[0]);
+            });
+
+            it('should not open translate modal if another modal is already opened', async () => {
+                mockModalState.isAddModalOpen = true;
+
+                renderTeamPageContent();
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('translate-member-1')).toBeInTheDocument();
+                });
+
+                fireEvent.click(screen.getByTestId('translate-member-1'));
+
+                expect(mockOpenModalActions.openTranslateItemModal).not.toHaveBeenCalled();
+            });
+
             it('prevents modal operations when other modal is open', async () => {
                 mockModalState.isAddModalOpen = true;
 
@@ -1313,6 +1379,16 @@ describe('TeamPageContent', () => {
                         5,
                     );
                 });
+            });
+
+            it('should pass englishLanguage to TeamPageModals', async () => {
+                renderTeamPageContent();
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('team-page-modals')).toBeInTheDocument();
+                });
+
+                expect(mockLanguages.find((l) => l.code === 'en')).toBeDefined();
             });
         });
     });

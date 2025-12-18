@@ -31,6 +31,44 @@ jest.mock('@/components/common/single-select-input/SingleSelectInput', () => ({
     },
 }));
 
+jest.mock('../common-member-fields/CommonMemberFields', () => ({
+    CommonMemberFields: ({
+        formState,
+        handleFullNameChange,
+        handleFullNameBlur,
+        handleDescriptionChange,
+        handleDescriptionBlur,
+        isSubmitting,
+        formDisabled,
+        errors,
+    }: any) => (
+        <div data-testid="common-member-fields">
+            <label htmlFor="fullName">Ім'я та Прізвище</label>
+            <input
+                id="fullName"
+                aria-label="Ім'я та Прізвище"
+                value={formState.fullName}
+                onChange={(e) => handleFullNameChange(e)}
+                onBlur={handleFullNameBlur}
+                disabled={isSubmitting || formDisabled}
+            />
+
+            <label htmlFor="description">Опис</label>
+            <textarea
+                id="description"
+                aria-label="Опис"
+                value={formState.description}
+                onChange={(e) => handleDescriptionChange(e)}
+                onBlur={handleDescriptionBlur}
+                disabled={isSubmitting || formDisabled}
+            />
+
+            {errors?.fullName && <span>{errors.fullName}</span>}
+            {errors?.description && <span>{errors.description}</span>}
+        </div>
+    ),
+}));
+
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
     ImageInput: ({ onChange, disabled }: any) => (
         <div>

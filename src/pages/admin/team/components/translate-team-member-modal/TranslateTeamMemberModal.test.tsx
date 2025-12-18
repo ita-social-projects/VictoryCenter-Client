@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-
 import { TranslateTeamMemberModal } from './TranslateTeamMemberModal';
 import { TeamMember } from '@/types/admin/team-members';
 import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
+import { TeamMemberLocalizationsApi } from '@/services/api/admin/team/team-member-localizations/team-member-localizations-api';
 
 jest.mock('@/components/admin/button/Button', () => ({
     Button: ({ children, onClick, disabled }: any) => (
@@ -24,16 +24,6 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
                 <button data-testid="cancel-close" onClick={onCancel}>
                     cancel
                 </button>
-            </div>
-        ) : null,
-}));
-
-jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
-    ConfirmationModal: ({ isOpen, onConfirm, onCancel }: any) =>
-        isOpen ? (
-            <div data-testid="confirmation-modal">
-                <button data-testid="confirm-close" onClick={onConfirm} />
-                <button data-testid="cancel-close" onClick={onCancel} />
             </div>
         ) : null,
 }));
@@ -210,7 +200,7 @@ describe('TranslateTeamMemberModal', () => {
             />,
         );
 
-        fireEvent.click(screen.getByText(TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE));
+        fireEvent.click(screen.getByTestId('modal'));
 
         expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
     });
@@ -251,6 +241,33 @@ describe('TranslateTeamMemberModal', () => {
         fireEvent.click(screen.getByTestId('modal'));
         fireEvent.click(screen.getByTestId('cancel-close'));
 
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('shows error message if API fails', async () => {
+        const onTranslateMember = jest.fn();
+        const onClose = jest.fn();
+
+        jest.spyOn(TeamMemberLocalizationsApi, 'create').mockRejectedValue(new Error('Fail'));
+
+        render(
+            <TranslateTeamMemberModal
+                isOpen
+                onClose={onClose}
+                memberToTranslate={member}
+                onTranslateMember={onTranslateMember}
+                language={language}
+            />,
+        );
+
+        const button = screen.getByRole('button');
+
+        await act(async () => {
+            fireEvent.click(button);
+        });
+
+        expect(screen.getByText(TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_TRANSLATE_MEMBER)).toBeInTheDocument();
+        expect(onTranslateMember).not.toHaveBeenCalled();
         expect(onClose).not.toHaveBeenCalled();
     });
 });

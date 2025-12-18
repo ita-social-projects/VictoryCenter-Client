@@ -32,6 +32,9 @@ export const TranslateTeamMemberModal = ({
     onTranslateMember,
     language,
 }: TranslateTeamMemberModalProps) => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState<string>('');
+
     const formRef = useRef<TranslateTeamMemberFormRef>(null);
 
     const [showCloseConfirm, setShowCloseConfirm] = useState(false);
@@ -51,22 +54,32 @@ export const TranslateTeamMemberModal = ({
     const handleFormSubmit = async (data: TranslateTeamMemberFormValues) => {
         if (!memberToTranslate) return;
 
-        const createdLocalizationDto = await TeamMemberLocalizationsApi.create(client, {
-            entityId: memberToTranslate.id,
-            languageId: language.id,
-            fullName: data.fullName,
-            description: data.description,
-        });
+        try {
+            setIsSubmitting(true);
+            setError('');
 
-        const createdLocalization = mapLocalizationDtoToModel<typeof createdLocalizationDto, TeamMemberLocalization>(
-            createdLocalizationDto,
-        );
+            const createdLocalizationDto = await TeamMemberLocalizationsApi.create(client, {
+                entityId: memberToTranslate.id,
+                languageId: language.id,
+                fullName: data.fullName,
+                description: data.description,
+            });
 
-        onTranslateMember({
-            ...memberToTranslate,
-            localizations: [...(memberToTranslate.localizations || []), createdLocalization],
-        });
-        onClose();
+            const createdLocalization = mapLocalizationDtoToModel<
+                typeof createdLocalizationDto,
+                TeamMemberLocalization
+            >(createdLocalizationDto);
+
+            onTranslateMember({
+                ...memberToTranslate,
+                localizations: [...(memberToTranslate.localizations || []), createdLocalization],
+            });
+            onClose();
+        } catch (err) {
+            setError(TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_TRANSLATE_MEMBER);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleRequestClose = () => {
@@ -93,6 +106,7 @@ export const TranslateTeamMemberModal = ({
                 <Modal.Title>{TEAM_MEMBERS_TEXT.FORM.TITLE.TRANSLATE_MEMBER}</Modal.Title>
 
                 <Modal.Content>
+                    {error && <div className="translate-member-error">{error}</div>}
                     <TranslateMemberForm
                         ref={formRef}
                         onSubmit={handleFormSubmit}
@@ -101,7 +115,7 @@ export const TranslateTeamMemberModal = ({
                 </Modal.Content>
 
                 <Modal.Actions>
-                    <div className={`${styles['modal-scope']} translate-team-member-modal modal-scope`}>
+                    <div className={`${styles['modal-scope']} translate-team-member-modal`}>
                         <Button buttonStyle="primary" onClick={handleSubmit} disabled={!isFormValid}>
                             {TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE}
                         </Button>

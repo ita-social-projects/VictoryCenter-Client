@@ -109,7 +109,7 @@ export const TeamPageContent = () => {
         retryFetchLanguages,
     } = useLocalizationToolkit({ setErrorState });
 
-    const englishLanguage = useMemo(() => allLanguages.find((l) => l.code === LOCALES[1]), [allLanguages]);
+    const englishLanguage = useMemo(() => allLanguages.find((l) => l.code === 'en'), [allLanguages]);
 
     const isSingleView = !!selectedSearchMember;
     const itemsToRender = useMemo(() => {

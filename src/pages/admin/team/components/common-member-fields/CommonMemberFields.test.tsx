@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { CommonMemberFields, CommonFields, CommonErrors } from './CommonMemberFields';
-import { TEAM_MEMBERS_TEXT, TEAM_MEMBER_VALIDATION } from '@/const/admin/team';
+import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
 
 jest.mock('@/components/admin/input-with-character-limit/InputWithCharacterLimit', () => ({
     InputWithCharacterLimit: ({ value, onChange, onBlur, disabled, id }: any) => (
@@ -64,27 +64,27 @@ describe('CommonMemberFields', () => {
     });
 
     it('calls change and blur handlers for full name', () => {
-        const props = renderComponent();
+        const view = renderComponent();
 
         const input = screen.getByTestId('fullName');
 
         fireEvent.change(input, { target: { value: 'Jane' } });
         fireEvent.blur(input);
 
-        expect(props.handleFullNameChange).toHaveBeenCalled();
-        expect(props.handleFullNameBlur).toHaveBeenCalled();
+        expect(view.handleFullNameChange).toHaveBeenCalled();
+        expect(view.handleFullNameBlur).toHaveBeenCalled();
     });
 
     it('calls change and blur handlers for description', () => {
-        const props = renderComponent();
+        const view = renderComponent();
 
         const textarea = screen.getByTestId('description');
 
         fireEvent.change(textarea, { target: { value: 'Text' } });
         fireEvent.blur(textarea);
 
-        expect(props.handleDescriptionChange).toHaveBeenCalled();
-        expect(props.handleDescriptionBlur).toHaveBeenCalled();
+        expect(view.handleDescriptionChange).toHaveBeenCalled();
+        expect(view.handleDescriptionBlur).toHaveBeenCalled();
     });
 
     it('disables inputs when submitting', () => {

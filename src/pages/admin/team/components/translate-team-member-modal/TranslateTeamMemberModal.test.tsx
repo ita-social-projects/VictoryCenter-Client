@@ -7,11 +7,7 @@ import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
 import { TeamMemberLocalizationsApi } from '@/services/api/admin/team/team-member-localizations/team-member-localizations-api';
 
 jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({ children, onClick, disabled }: any) => (
-        <button onClick={onClick} disabled={disabled}>
-            {children}
-        </button>
-    ),
+    Button: (props: any) => <button {...props}>{props.children}</button>,
 }));
 
 jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
@@ -269,5 +265,47 @@ describe('TranslateTeamMemberModal', () => {
         expect(screen.getByText(TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_TRANSLATE_MEMBER)).toBeInTheDocument();
         expect(onTranslateMember).not.toHaveBeenCalled();
         expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('disables translate button while submitting', async () => {
+        const onTranslateMember = jest.fn();
+        const onClose = jest.fn();
+
+        let resolvePromise: any;
+        jest.spyOn(TeamMemberLocalizationsApi, 'create').mockImplementation(
+            () =>
+                new Promise((resolve) => {
+                    resolvePromise = resolve;
+                }),
+        );
+
+        render(
+            <TranslateTeamMemberModal
+                isOpen
+                onClose={onClose}
+                memberToTranslate={member}
+                onTranslateMember={onTranslateMember}
+                language={language}
+            />,
+        );
+
+        const button = screen.getByTestId('translate-submit-btn');
+
+        fireEvent.click(button);
+        expect(button).toBeDisabled();
+
+        await act(async () => {
+            resolvePromise({
+                id: 10,
+                entityId: 1,
+                languageId: 2,
+                fullName: 'Translated Name',
+                description: 'Translated Description',
+            });
+        });
+
+        await screen.findByTestId('modal', {}, { timeout: 100 }).catch(() => {});
+
+        expect(onClose).toHaveBeenCalled();
     });
 });

@@ -116,7 +116,12 @@ export const TranslateTeamMemberModal = ({
 
                 <Modal.Actions>
                     <div className={`${styles['modal-scope']} translate-team-member-modal`}>
-                        <Button buttonStyle="primary" onClick={handleSubmit} disabled={!isFormValid}>
+                        <Button
+                            buttonStyle="primary"
+                            onClick={handleSubmit}
+                            disabled={!isFormValid || isSubmitting}
+                            data-testid="translate-submit-btn"
+                        >
                             {TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE}
                         </Button>
                     </div>

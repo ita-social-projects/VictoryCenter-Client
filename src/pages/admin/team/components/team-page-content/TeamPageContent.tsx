@@ -23,7 +23,6 @@ import { useTeamMemberSearch } from '@/hooks/admin/team/useTeamMemberSearch';
 import { updateCategoryMemberCounts } from '@/utils/functions/update-category-member-counts/update-category-member-counts';
 import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
 import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
-import { LOCALES } from '@/const/common/locales';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
 const LIST_ITEM_HEIGHT_IN_PIXELS = 120;

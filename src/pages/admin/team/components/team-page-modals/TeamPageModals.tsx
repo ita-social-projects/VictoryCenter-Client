@@ -7,7 +7,7 @@ import { DeleteTeamMemberModal } from '../delete-team-member-modal/DeleteTeamMem
 import { TranslateTeamMemberModal } from '../translate-team-member-modal/TranslateTeamMemberModal';
 import { TeamCategoryModal } from '../team-category-modal/TeamCategoryModal';
 import { DeleteTeamCategoryModal } from '../delete-team-category-modal/DeleteTeamCategoryModal';
-import { LocalizationLanguage } from '../../../../../types/common/language';
+import { LocalizationLanguage } from '@/types/common/language';
 
 export interface TeamPageModalsProps {
     modalsStateControl: UseModalsStateResult<TeamMember>;

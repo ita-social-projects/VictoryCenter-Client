@@ -1,10 +1,11 @@
 import { forwardRef, useCallback, useMemo } from 'react';
-import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '../../../../../validation/admin/team-member-schema/team-member-schema';
-import { useFormManager } from '../../../../../hooks/admin/use-form-manager/useFormManager';
-import { Select } from '../../../../../components/common/select/Select';
-import { Button } from '../../../../../components/admin/button/Button';
-import { COMMON_TEXT_ADMIN, LANGUAGES } from '../../../../../const/admin/common';
+import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '@/validation/admin/team-member-schema/team-member-schema';
+import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
+import { Select } from '@/components/common/select/Select';
+import { Button } from '@/components/admin/button/Button';
+import { COMMON_TEXT_ADMIN, LANGUAGES } from '@/const/admin/common';
 import { CommonMemberFields } from '../common-member-fields/CommonMemberFields';
+import { VisibilityStatus } from '@/types/admin/common';
 import styles from './TranslateMemberForm.module.scss';
 
 export interface TranslateTeamMemberFormValues {
@@ -17,12 +18,12 @@ export interface TranslateTeamMemberFormErrorState {
     [key: string]: string | undefined;
 }
 export interface TranslateTeamMemberFormRef {
-    submit: () => void;
+    submit: (status?: VisibilityStatus) => Promise<void>;
     isValid: () => boolean;
     isDirty: () => boolean;
 }
 export interface TranslateMemberFormProps {
-    onSubmit: (data: TranslateTeamMemberFormValues) => void;
+    onSubmit: (data: TranslateTeamMemberFormValues, status?: VisibilityStatus) => void | Promise<void>;
     initialData?: TranslateTeamMemberFormValues | null;
     formDisabled?: boolean;
     onValidationChange?: (isValid: boolean) => void;
@@ -55,9 +56,9 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
             defaultFormState,
             initialData,
             validateForm,
-            onSubmit,
             onValidationChange,
             ref,
+            onSubmit: (data, _status) => onSubmit(data),
         });
 
         const handleFullNameChange = useCallback(

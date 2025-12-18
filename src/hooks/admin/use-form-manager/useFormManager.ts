@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { VisibilityStatus } from '../../../types/admin/common';
-import axios from 'axios';
+import { VisibilityStatus } from '@/types/admin/common';
 
 export interface FormManagerRef {
     submit: (status: VisibilityStatus) => Promise<void>;

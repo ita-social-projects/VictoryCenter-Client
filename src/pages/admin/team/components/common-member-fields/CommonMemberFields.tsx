@@ -1,7 +1,7 @@
-import { InputLabel } from '../../../../../components/admin/input-label/InputLabel';
-import { InputWithCharacterLimit } from '../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { TextAreaWithCharacterLimit } from '../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { TEAM_MEMBERS_TEXT, TEAM_MEMBER_VALIDATION } from '../../../../../const/admin/team';
+import { InputLabel } from '@/components/admin/input-label/InputLabel';
+import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
+import { TextAreaWithCharacterLimit } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { TEAM_MEMBERS_TEXT, TEAM_MEMBER_VALIDATION } from '@/const/admin/team';
 import styles from './CommonMemberFields.module.scss';
 
 interface CommonMemberFieldsProps<TFormData extends CommonFields, TErrorState extends CommonErrors> {

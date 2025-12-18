@@ -1,19 +1,19 @@
-import { Button } from '../../../../../components/admin/button/Button';
-import { Modal } from '../../../../../components/common/modal/Modal';
-import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { TeamMember, TeamMemberLocalization } from '../../../../../types/admin/team-members';
+import { Button } from '@/components/admin/button/Button';
+import { Modal } from '@/components/common/modal/Modal';
+import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
+import { TeamMember, TeamMemberLocalization } from '@/types/admin/team-members';
 import {
     TranslateMemberForm,
     TranslateTeamMemberFormRef,
     TranslateTeamMemberFormValues,
 } from '../translate-member-form/TranslateMemberForm';
 import { useRef, useState } from 'react';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { ConfirmationModal } from '../../../../../components/admin/confirmation-modal/ConfirmationModal';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import styles from './TranslateTeamMemberModal.module.scss';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { TeamMemberLocalizationsApi } from '../../../../../services/api/admin/team/team-member-localizations/team-member-localizations-api';
-import { LocalizationLanguage } from '../../../../../types/common/language';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { TeamMemberLocalizationsApi } from '@/services/api/admin/team/team-member-localizations/team-member-localizations-api';
+import { LocalizationLanguage } from '@/types/common/language';
 import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 interface TranslateTeamMemberModalProps {

@@ -448,6 +448,7 @@ describe('TeamPageContent', () => {
             render(<TeamPageContent />);
 
             await waitFor(() => {
+                expect(mockTeamCategoriesApi.getAll).toHaveBeenCalled();
                 expect(mockTeamMembersApi.getAll).toHaveBeenCalledWith(
                     mockClient,
                     mockCategories[0].id,
@@ -487,16 +488,14 @@ describe('TeamPageContent', () => {
             fireEvent.change(searchInput, { target: { value: 'test query' } });
 
             await waitFor(() => {
-                expect(mockTeamMembersApi.search).toHaveBeenCalled();
+                expect(mockTeamMembersApi.search).toHaveBeenCalledWith(
+                    expect.any(Object),
+                    'test query',
+                    0,
+                    expect.any(Number),
+                    expect.any(AbortSignal),
+                );
             });
-
-            expect(mockTeamMembersApi.search).toHaveBeenCalledWith(
-                expect.any(Object),
-                'test query',
-                0,
-                expect.any(Number),
-                expect.any(AbortSignal),
-            );
         });
 
         it('should handle status filter changes', async () => {
@@ -564,13 +563,11 @@ describe('TeamPageContent', () => {
             fireEvent.click(screen.getByTestId('reorder-btn-1'));
 
             await waitFor(() => {
-                expect(mockTeamMembersApi.reorder).toHaveBeenCalled();
+                expect(mockTeamMembersApi.reorder).toHaveBeenCalledWith(expect.any(Object), mockCategories[0].id, [
+                    mockMembers[1].id,
+                    mockMembers[0].id,
+                ]);
             });
-
-            expect(mockTeamMembersApi.reorder).toHaveBeenCalledWith(expect.any(Object), mockCategories[0].id, [
-                mockMembers[1].id,
-                mockMembers[0].id,
-            ]);
 
             await waitFor(() => {
                 expectErrorToBeDisplayed(TEAM_MEMBERS_TEXT.MESSAGE.FAIL_TO_REORDER_MEMBERS);
@@ -593,7 +590,9 @@ describe('TeamPageContent', () => {
 
             resolveFirstCall(mockCategories);
 
-            await screen.findByTestId('category-bar');
+            await waitFor(() => {
+                expect(screen.getByTestId('category-bar')).toBeInTheDocument();
+            });
 
             expect(mockTeamCategoriesApi.getAll).toHaveBeenCalledTimes(1);
         });
@@ -650,6 +649,7 @@ describe('TeamPageContent', () => {
 
             clickTryAgainButton();
 
+            // Change filter to trigger a new fetch
             const statusFilter = screen.getByTestId('status-filter');
             fireEvent.change(statusFilter, { target: { value: '1' } });
 
@@ -748,6 +748,7 @@ describe('TeamPageContent', () => {
         describe('Mouse move event handling', () => {
             it('should handle mousemove event when drag preview is not visible', async () => {
                 const { unmount } = renderTeamPageContent();
+
                 unmount();
             });
         });
@@ -755,7 +756,9 @@ describe('TeamPageContent', () => {
         it('should handle useEffect cleanup for search hook', async () => {
             const { unmount } = renderTeamPageContent();
 
-            await screen.findByTestId('team-page-content');
+            await waitFor(() => {
+                expect(screen.getByTestId('team-page-content')).toBeInTheDocument();
+            });
 
             unmount();
         });
@@ -779,6 +782,58 @@ describe('TeamPageContent', () => {
             expect(screen.getByTestId('member-name-2')).toHaveTextContent('Jane Smith');
         });
 
+        // it('should handle isAnyModalOpened calculation correctly', async () => {
+        //     renderTeamPageContent();
+        //     await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+        //     fireEvent.click(screen.getByTestId('edit-1'));
+
+        //     await waitFor(() => {
+        //         expect(getEditMemberModal()).toBeInTheDocument();
+        //     });
+
+        //     fireEvent.click(screen.getByTestId('close-edit'));
+
+        //     await waitFor(() => {
+        //         expect(getEditMemberModal()).not.toBeInTheDocument();
+        //     });
+        // });
+
+        // it('should test closeModalActions functionality', async () => {
+        //     renderTeamPageContent();
+        //     await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+        //     fireEvent.click(screen.getByTestId('edit-1'));
+        //     await waitFor(() => expect(getEditMemberModal()).toBeInTheDocument());
+
+        //     fireEvent.click(screen.getByTestId('close-edit'));
+        //     await waitFor(() => expect(getEditMemberModal()).not.toBeInTheDocument());
+
+        //     fireEvent.click(screen.getByTestId('delete-1'));
+        //     await waitFor(() => expect(getDeleteMemberModal()).toBeInTheDocument());
+
+        //     fireEvent.click(screen.getByTestId('close-delete'));
+        //     await waitFor(() => expect(getDeleteMemberModal()).not.toBeInTheDocument());
+        // });
+
+        // it('should handle modal state when modals are already opened', async () => {
+        //     renderTeamPageContent();
+        //     await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+        //     clickAddMemberButton();
+        //     await waitFor(() => expect(getAddMemberModal()).toBeInTheDocument());
+
+        //     fireEvent.click(screen.getByTestId(`edit-${mockMembers[0].id}`));
+
+        //     expect(getAddMemberModal()).toBeInTheDocument();
+        //     expect(getEditMemberModal()).not.toBeInTheDocument();
+
+        //     fireEvent.click(screen.getByTestId(`delete-${mockMembers[0].id}`));
+
+        //     expect(getAddMemberModal()).toBeInTheDocument();
+        //     expect(getDeleteMemberModal()).not.toBeInTheDocument();
+        // });
+
         it('should handle search query change through toolbar', async () => {
             renderTeamPageContent();
             await waitFor(() => expect(getMemberItems()).toHaveLength(2));
@@ -786,230 +841,482 @@ describe('TeamPageContent', () => {
             typeInSearchInput('test');
 
             await waitFor(() => {
-                expect(mockTeamMembersApi.search).toHaveBeenCalled();
+                expect(mockTeamMembersApi.search).toHaveBeenCalledWith(
+                    expect.any(Object),
+                    'test',
+                    0,
+                    expect.any(Number),
+                    expect.any(AbortSignal),
+                );
             });
-
-            expect(mockTeamMembersApi.search).toHaveBeenCalledWith(
-                expect.any(Object),
-                'test',
-                0,
-                expect.any(Number),
-                expect.any(AbortSignal),
-            );
         });
-    });
 
-    it('should handle search clear selection and restore normal view', async () => {
-        mockTeamMembersApi.getAll
-            .mockResolvedValueOnce({ items: mockMembers, totalItemsCount: mockMembers.length } as any)
-            .mockResolvedValueOnce({ items: mockMembers, totalItemsCount: mockMembers.length } as any);
+        it('should handle search clear selection and restore normal view', async () => {
+            mockTeamMembersApi.getAll
+                .mockResolvedValueOnce({ items: mockMembers, totalItemsCount: mockMembers.length } as any)
+                .mockResolvedValueOnce({ items: mockMembers, totalItemsCount: mockMembers.length } as any);
 
-        renderTeamPageContent();
-        await waitFor(() => expect(getMemberItems()).toHaveLength(2));
-
-        typeInSearchInput('test');
-        fireEvent.click(screen.getByTestId('select-first-result'));
-
-        fireEvent.click(screen.getByTestId('clear-search-selection'));
-
-        await waitFor(() => {
-            expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(2);
-            expect(getMemberItems()).toHaveLength(2);
-        });
-    });
-
-    describe('Modal state management', () => {
-        const waitForMemberName = async (memberId: number, expectedName: string) => {
-            await waitFor(() => {
-                const element = screen.getByTestId(`member-name-${memberId}`);
-                expect(element).toHaveTextContent(expectedName);
-            });
-        };
-
-        const clickSimulateButton = (testId: string) => {
-            const button = screen.getByTestId(testId);
-            fireEvent.click(button);
-        };
-
-        it('should handle add member when members list shorter than capacity and fire toast for Published', async () => {
             renderTeamPageContent();
             await waitFor(() => expect(getMemberItems()).toHaveLength(2));
 
-            clickAddMemberButton();
+            typeInSearchInput('test');
+            fireEvent.click(screen.getByTestId('select-first-result'));
+
+            fireEvent.click(screen.getByTestId('clear-search-selection'));
 
             await waitFor(() => {
-                expect(screen.getByTestId('simulate-add-member')).toBeInTheDocument();
+                expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(2);
+                expect(getMemberItems()).toHaveLength(2);
             });
-
-            // Confirm adding member when list is at page size (lines 401-403)
-            fireEvent.click(screen.getByTestId('simulate-add-member'));
-
-            await waitFor(() => {
-                // Member should be added to the list
-                expect(getMemberItems()).toHaveLength(3);
-            });
-
-            expect(mockAddToast).toHaveBeenCalledWith(TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER, ToastType.Info);
         });
 
-        it('should update member in list after translate', async () => {
-            renderTeamPageContent();
+        describe('Modal state management', () => {
+            it('should handle add member when members list shorter than capacity and fire toast for Published', async () => {
+                renderTeamPageContent();
+                await waitFor(() => expect(getMemberItems()).toHaveLength(2));
 
-            await waitForMemberName(1, 'John Doe');
+                clickAddMemberButton();
 
-            fireEvent.click(screen.getByTestId('simulate-translate-member'));
+                await waitFor(() => {
+                    expect(screen.getByTestId('simulate-add-member')).toBeInTheDocument();
+                });
 
-            clickSimulateButton('simulate-translate-member');
+                // Confirm adding member when list is at page size (lines 401-403)
+                fireEvent.click(screen.getByTestId('simulate-add-member'));
 
-            await waitForMemberName(1, 'Translated Member');
+                await waitFor(() => {
+                    // Member should be added to the list
+                    expect(getMemberItems()).toHaveLength(3);
+                });
 
-            expect(mockCloseModalActions.closeTranslateItemModal).toHaveBeenCalled();
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER,
+                    ToastType.Info,
+                );
+            });
+
+            it('should update member in list after translate', async () => {
+                renderTeamPageContent();
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('member-name-1')).toHaveTextContent('John Doe');
+                });
+
+                fireEvent.click(screen.getByTestId('simulate-translate-member'));
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('member-name-1')).toHaveTextContent('Translated Member');
+                });
+
+                expect(mockCloseModalActions.closeTranslateItemModal).toHaveBeenCalled();
+            });
+
+            // it('should edit member without image cache busting when no url present', async () => {
+            //     const membersWithoutImageUrl: TeamMember[] = [
+            //         { ...mockMembers[0], image: { id: 1 } as any },
+            //         mockMembers[1],
+            //     ];
+            //     mockTeamMembersApi.getAll.mockResolvedValueOnce({
+            //         items: membersWithoutImageUrl,
+            //         totalItemsCount: membersWithoutImageUrl.length,
+            //     } as any);
+
+            //     renderTeamPageContent();
+            //     await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            //     fireEvent.click(screen.getByTestId(`edit-${membersWithoutImageUrl[0].id}`));
+            //     await waitFor(() => expect(getEditMemberModal()).toBeInTheDocument());
+
+            //     clickConfirmEditButton();
+
+            //     await waitFor(() => expect(getEditMemberModal()).not.toBeInTheDocument());
+
+            //     expect(screen.getByTestId('member-name-1')).toHaveTextContent('Updated Member');
+            // });
+
+            //     it('should set hasMore to true when adding member that exceeds current page capacity', async () => {
+            //         mockTeamMembersApi.getAll.mockResolvedValueOnce({
+            //             items: mockMembers,
+            //             totalItemsCount: mockMembers.length,
+            //         } as any);
+
+            //         renderTeamPageContent();
+            //         await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            //         clickAddMemberButton();
+
+            //         const addModal = getAddMemberModal();
+            //         expect(addModal).toBeInTheDocument();
+
+            //         clickConfirmAddButton();
+
+            //         await waitFor(() => {
+            //             expect(getAddMemberModal()).not.toBeInTheDocument();
+            //         });
+
+            //         expect(getMemberItems()).toHaveLength(2);
+            //     });
+
+            //     it('should open edit modal and confirm edit updating member name and busting image cache when url present', async () => {
+            //         const membersWithImage: TeamMember[] = [
+            //             { ...mockMembers[0], image: { url: 'https://img/test.png' } as any },
+            //             mockMembers[1],
+            //         ];
+            //         mockTeamMembersApi.getAll.mockResolvedValueOnce({
+            //             items: membersWithImage,
+            //             totalItemsCount: membersWithImage.length,
+            //         } as any);
+
+            //         renderTeamPageContent();
+
+            //         await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            //         fireEvent.click(screen.getByTestId(`edit-${membersWithImage[0].id}`));
+
+            //         await waitFor(() => expect(getEditMemberModal()).toBeInTheDocument());
+
+            //         clickConfirmEditButton();
+
+            //         await waitFor(() => expect(getEditMemberModal()).not.toBeInTheDocument());
+            //     });
+
+            //     it('should open delete modal and confirm deletion removing member', async () => {
+            //         renderTeamPageContent();
+
+            //         await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+            //         fireEvent.click(screen.getByTestId(`delete-${mockMembers[0].id}`));
+
+            //         await waitFor(() => expect(getDeleteMemberModal()).toBeInTheDocument());
+
+            //         clickConfirmDeleteButton();
+
+            //         await waitFor(() => expect(getDeleteMemberModal()).not.toBeInTheDocument());
+            //     });
+            // });
+
+            describe('AbortController and lgetTeamToolbaroading states', () => {
+                it('should abort previous request when fetchMembers is called again', async () => {
+                    const mockAbortController = {
+                        abort: jest.fn(() => {}),
+                        signal: { aborted: false },
+                    };
+
+                    const originalAbortController = global.AbortController;
+                    global.AbortController = jest.fn(() => mockAbortController) as any;
+
+                    renderTeamPageContent();
+
+                    await waitFor(() => {
+                        expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(1);
+                    });
+
+                    mockTeamMembersApi.getAll.mockResolvedValueOnce({
+                        items: [],
+                        totalItemsCount: 0,
+                    } as any);
+
+                    clickCategoryButton(2);
+
+                    await waitFor(() => {
+                        expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(2);
+                    });
+
+                    expect(mockAbortController.abort).toHaveBeenCalled();
+
+                    global.AbortController = originalAbortController;
+                });
+
+                it('should return early when fetchMembers conditions are not met', async () => {
+                    mockTeamCategoriesApi.getAll.mockResolvedValueOnce([]);
+
+                    renderTeamPageContent();
+
+                    await waitFor(() => {
+                        expect(mockTeamCategoriesApi.getAll).toHaveBeenCalledTimes(1);
+                    });
+
+                    expect(mockTeamMembersApi.getAll).not.toHaveBeenCalled();
+
+                    const loadMoreButton = screen.queryByTestId('load-more');
+                    if (loadMoreButton) {
+                        fireEvent.click(loadMoreButton);
+                    }
+
+                    expect(mockTeamMembersApi.getAll).not.toHaveBeenCalled();
+                });
+
+                it('should handle canceled axios errors gracefully', async () => {
+                    const canceledError = {
+                        name: 'CanceledError',
+                        message: 'Request canceled',
+                    } as Error;
+
+                    mockTeamMembersApi.getAll.mockRejectedValueOnce(canceledError);
+
+                    renderTeamPageContent();
+
+                    await waitFor(() => {
+                        expect(mockTeamMembersApi.getAll).toHaveBeenCalled();
+                    });
+
+                    expect(screen.queryByTestId('team-error-container')).not.toBeInTheDocument();
+                });
+            });
+
+            describe('Page size calculation', () => {
+                it('should calculate page size based on container height on mount', async () => {
+                    const { container } = renderTeamPageContent();
+
+                    const listContainer = container.querySelector('.team-page-list-container');
+                    if (listContainer) {
+                        Object.defineProperty(listContainer, 'clientHeight', {
+                            value: 360,
+                            configurable: true,
+                        });
+                    }
+
+                    await waitFor(() => {
+                        expect(mockTeamMembersApi.getAll).toHaveBeenCalled();
+                    });
+                });
+            });
+
+            describe('Reordering action', () => {
+                it('calls reorder API and updates list on reorder click', async () => {
+                    renderTeamPageContent();
+
+                    await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+
+                    fireEvent.click(screen.getByTestId('reorder-btn-1'));
+
+                    await waitFor(() => {
+                        expect(mockTeamMembersApi.reorder).toHaveBeenCalledWith(
+                            expect.any(Object),
+                            mockCategories[0].id,
+                            [mockMembers[1].id, mockMembers[0].id],
+                        );
+                    });
+                });
+            });
         });
 
-        // it('should edit member without image cache busting when no url present', async () => {
-        //     const membersWithoutImageUrl: TeamMember[] = [
-        //         { ...mockMembers[0], image: { id: 1 } as any },
-        //         mockMembers[1],
-        //     ];
-        //     mockTeamMembersApi.getAll.mockResolvedValueOnce({
-        //         items: membersWithoutImageUrl,
-        //         totalItemsCount: membersWithoutImageUrl.length,
-        //     } as any);
+        describe('Comprehensive Coverage Tests', () => {
+            beforeEach(() => {
+                jest.clearAllMocks();
+                mockedUseAdminClient.mockReturnValue(mockClient as any);
+                mockTeamCategoriesApi.getAll.mockResolvedValue(mockCategories);
+                mockTeamMembersApi.getAll.mockResolvedValue({
+                    items: mockMembers,
+                    totalItemsCount: mockMembers.length,
+                } as any);
+                mockTeamMembersApi.reorder.mockResolvedValue(undefined);
 
-        //     renderTeamPageContent();
-        //     await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+                // Reset modal state
+                Object.assign(mockModalState, {
+                    isAddModalOpen: false,
+                    itemToEdit: null,
+                    itemToDelete: null,
+                    isAddCategoryModalOpen: false,
+                    isEditCategoryModalOpen: false,
+                    isDeleteCategoryModalOpen: false,
+                });
+            });
 
-        //     fireEvent.click(screen.getByTestId(`edit-${membersWithoutImageUrl[0].id}`));
-        //     await waitFor(() => expect(getEditMemberModal()).toBeInTheDocument());
+            it('handles context menu operations', async () => {
+                render(<TeamPageContent />);
 
-        //     clickConfirmEditButton();
+                await waitFor(() => {
+                    expect(screen.getByTestId('context-menu')).toBeInTheDocument();
+                });
 
-        //     await waitFor(() => expect(getEditMemberModal()).not.toBeInTheDocument());
+                // Test add category
+                fireEvent.click(screen.getByTestId('context-menu-add'));
+                expect(mockOpenModalActions.openAddCategoryModal).toHaveBeenCalled();
 
-        //     expect(screen.getByTestId('member-name-1')).toHaveTextContent('Updated Member');
-        // });
+                // Test edit category
+                fireEvent.click(screen.getByTestId('context-menu-edit'));
+                expect(mockOpenModalActions.openEditCategoryModal).toHaveBeenCalled();
 
-        //     it('should set hasMore to true when adding member that exceeds current page capacity', async () => {
-        //         mockTeamMembersApi.getAll.mockResolvedValueOnce({
-        //             items: mockMembers,
-        //             totalItemsCount: mockMembers.length,
-        //         } as any);
+                // Test delete category
+                fireEvent.click(screen.getByTestId('context-menu-delete'));
+                expect(mockOpenModalActions.openDeleteCategoryModal).toHaveBeenCalled();
+            });
 
-        //         renderTeamPageContent();
-        //         await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+            it('handles member operations through modals', async () => {
+                render(<TeamPageContent />);
 
-        //         clickAddMemberButton();
+                await waitFor(() => {
+                    expect(screen.getByTestId('simulate-add-member')).toBeInTheDocument();
+                });
 
-        //         const addModal = getAddMemberModal();
-        //         expect(addModal).toBeInTheDocument();
+                // Test add member
+                fireEvent.click(screen.getByTestId('simulate-add-member'));
+                expect(mockCloseModalActions.closeAddItemModal).toHaveBeenCalled();
+                expect(mockAddToast).toHaveBeenCalledWith(
+                    TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER,
+                    ToastType.Info,
+                );
 
-        //         clickConfirmAddButton();
+                // Test edit member
+                fireEvent.click(screen.getByTestId('simulate-edit-member'));
+                expect(mockCloseModalActions.closeEditItemModal).toHaveBeenCalled();
 
-        //         await waitFor(() => {
-        //             expect(getAddMemberModal()).not.toBeInTheDocument();
-        //         });
+                // Test delete member
+                fireEvent.click(screen.getByTestId('simulate-delete-member'));
+                expect(mockCloseModalActions.closeDeleteItemModal).toHaveBeenCalled();
+            });
 
-        //         expect(getMemberItems()).toHaveLength(2);
-        //     });
+            it('handles category operations through modals', async () => {
+                render(<TeamPageContent />);
 
-        //     it('should open edit modal and confirm edit updating member name and busting image cache when url present', async () => {
-        //         const membersWithImage: TeamMember[] = [
-        //             { ...mockMembers[0], image: { url: 'https://img/test.png' } as any },
-        //             mockMembers[1],
-        //         ];
-        //         mockTeamMembersApi.getAll.mockResolvedValueOnce({
-        //             items: membersWithImage,
-        //             totalItemsCount: membersWithImage.length,
-        //         } as any);
+                await waitFor(() => {
+                    expect(screen.getByTestId('simulate-add-category')).toBeInTheDocument();
+                });
 
-        //         renderTeamPageContent();
+                // Test add category
+                fireEvent.click(screen.getByTestId('simulate-add-category'));
 
-        //         await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+                // Test edit category
+                fireEvent.click(screen.getByTestId('simulate-edit-category'));
 
-        //         fireEvent.click(screen.getByTestId(`edit-${membersWithImage[0].id}`));
+                // Test delete category
+                fireEvent.click(screen.getByTestId('simulate-delete-category'));
+            });
 
-        //         await waitFor(() => expect(getEditMemberModal()).toBeInTheDocument());
+            it('handles member edit and delete modal opening', async () => {
+                render(<TeamPageContent />);
 
-        //         clickConfirmEditButton();
+                await waitFor(() => {
+                    expect(screen.getByTestId('edit-member-1')).toBeInTheDocument();
+                });
 
-        //         await waitFor(() => expect(getEditMemberModal()).not.toBeInTheDocument());
-        //     });
+                // Test edit member modal
+                fireEvent.click(screen.getByTestId('edit-member-1'));
+                expect(mockOpenModalActions.openEditItemModal).toHaveBeenCalledWith(mockMembers[0]);
 
-        //     it('should open delete modal and confirm deletion removing member', async () => {
-        //         renderTeamPageContent();
+                // Test delete member modal
+                fireEvent.click(screen.getByTestId('delete-member-1'));
+                expect(mockOpenModalActions.openDeleteItemModal).toHaveBeenCalledWith(mockMembers[0]);
+            });
 
-        //         await waitFor(() => expect(getMemberItems()).toHaveLength(2));
+            it('should open translate member modal when translate button clicked', async () => {
+                renderTeamPageContent();
 
-        //         fireEvent.click(screen.getByTestId(`delete-${mockMembers[0].id}`));
+                await waitFor(() => {
+                    expect(screen.getByTestId('translate-member-1')).toBeInTheDocument();
+                });
 
-        //         await waitFor(() => expect(getDeleteMemberModal()).toBeInTheDocument());
+                fireEvent.click(screen.getByTestId('translate-member-1'));
 
-        //         clickConfirmDeleteButton();
+                expect(mockOpenModalActions.openTranslateItemModal).toHaveBeenCalledWith(mockMembers[0]);
+            });
 
-        //         await waitFor(() => expect(getDeleteMemberModal()).not.toBeInTheDocument());
-        //     });
-        // });
-
-        describe('AbortController and lgetTeamToolbaroading states', () => {
-            it('should abort previous request when fetchMembers is called again', async () => {
-                const mockAbortController = {
-                    abort: jest.fn(() => {}),
-                    signal: { aborted: false },
-                };
-
-                const originalAbortController = global.AbortController;
-                global.AbortController = jest.fn(() => mockAbortController) as any;
+            it('should not open translate modal if another modal is already opened', async () => {
+                mockModalState.isAddModalOpen = true;
 
                 renderTeamPageContent();
 
                 await waitFor(() => {
-                    expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(1);
+                    expect(screen.getByTestId('translate-member-1')).toBeInTheDocument();
                 });
 
+                fireEvent.click(screen.getByTestId('translate-member-1'));
+
+                expect(mockOpenModalActions.openTranslateItemModal).not.toHaveBeenCalled();
+            });
+
+            it('prevents modal operations when other modal is open', async () => {
+                mockModalState.isAddModalOpen = true;
+
+                render(<TeamPageContent />);
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('edit-member-1')).toBeInTheDocument();
+                });
+
+                fireEvent.click(screen.getByTestId('edit-member-1'));
+                fireEvent.click(screen.getByTestId('delete-member-1'));
+
+                expect(mockOpenModalActions.openEditItemModal).not.toHaveBeenCalled();
+                expect(mockOpenModalActions.openDeleteItemModal).not.toHaveBeenCalled();
+            });
+
+            it('handles error states and retry functionality', async () => {
+                mockTeamCategoriesApi.getAll.mockRejectedValueOnce(new Error('Categories API Error'));
+
+                render(<TeamPageContent />);
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('team-error-container')).toBeInTheDocument();
+                    expect(
+                        screen.getByText(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES),
+                    ).toBeInTheDocument();
+                });
+
+                mockTeamCategoriesApi.getAll.mockResolvedValueOnce(mockCategories);
+
+                const retryButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN);
+                fireEvent.click(retryButton);
+
+                await waitFor(() => {
+                    expect(mockTeamCategoriesApi.getAll).toHaveBeenCalledTimes(2);
+                });
+            });
+
+            it('handles members API error and retry', async () => {
+                // Clear any existing calls
+                mockTeamMembersApi.getAll.mockClear();
+
+                mockTeamMembersApi.getAll.mockRejectedValueOnce(new Error('Members API Error'));
+
+                render(<TeamPageContent />);
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('team-error-container')).toBeInTheDocument();
+                    expect(screen.getByText(TEAM_MEMBERS_TEXT.MESSAGE.FAIL_TO_FETCH_MEMBERS)).toBeInTheDocument();
+                });
+
+                // Ensure the first call happened
+                expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(1);
+
                 mockTeamMembersApi.getAll.mockResolvedValueOnce({
-                    items: [],
-                    totalItemsCount: 0,
+                    items: mockMembers,
+                    totalItemsCount: mockMembers.length,
                 } as any);
 
-                clickCategoryButton(2);
+                // Trigger retry by changing status filter (since that's what triggers fetchMembers)
+                fireEvent.change(screen.getByTestId('status-filter'), {
+                    target: { value: '1' },
+                });
 
                 await waitFor(() => {
                     expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(2);
                 });
-
-                expect(mockAbortController.abort).toHaveBeenCalled();
-
-                global.AbortController = originalAbortController;
             });
 
-            it('should return early when fetchMembers conditions are not met', async () => {
-                mockTeamCategoriesApi.getAll.mockResolvedValueOnce([]);
+            it('handles reorder API error', async () => {
+                mockTeamMembersApi.reorder.mockRejectedValueOnce(new Error('Reorder Error'));
 
-                renderTeamPageContent();
+                render(<TeamPageContent />);
 
                 await waitFor(() => {
-                    expect(mockTeamCategoriesApi.getAll).toHaveBeenCalledTimes(1);
+                    expect(screen.getByTestId('reorder-btn-1')).toBeInTheDocument();
                 });
 
-                expect(mockTeamMembersApi.getAll).not.toHaveBeenCalled();
+                fireEvent.click(screen.getByTestId('reorder-btn-1'));
 
-                const loadMoreButton = screen.queryByTestId('load-more');
-                if (loadMoreButton) {
-                    fireEvent.click(loadMoreButton);
-                }
-
-                expect(mockTeamMembersApi.getAll).not.toHaveBeenCalled();
+                await waitFor(() => {
+                    expect(screen.getByTestId('team-error-container')).toBeInTheDocument();
+                    expect(screen.getByText(TEAM_MEMBERS_TEXT.MESSAGE.FAIL_TO_REORDER_MEMBERS)).toBeInTheDocument();
+                });
             });
 
-            it('should handle canceled axios errors gracefully', async () => {
-                const canceledError = {
-                    name: 'CanceledError',
-                    message: 'Request canceled',
-                } as Error;
-
+            it('ignores cancelled API errors', async () => {
+                const canceledError = { name: 'CanceledError' };
                 mockTeamMembersApi.getAll.mockRejectedValueOnce(canceledError);
 
-                renderTeamPageContent();
+                render(<TeamPageContent />);
 
                 await waitFor(() => {
                     expect(mockTeamMembersApi.getAll).toHaveBeenCalled();
@@ -1017,358 +1324,72 @@ describe('TeamPageContent', () => {
 
                 expect(screen.queryByTestId('team-error-container')).not.toBeInTheDocument();
             });
-        });
 
-        describe('Page size calculation', () => {
-            it('should calculate page size based on container height on mount', async () => {
-                const { container } = renderTeamPageContent();
+            it('handles resize events and page size calculation', async () => {
+                const addEventListenerSpy = jest.spyOn(window, 'addEventListener');
+                const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
 
-                const listContainer = container.querySelector('.team-page-list-container');
-                if (listContainer) {
-                    Object.defineProperty(listContainer, 'clientHeight', {
-                        value: 360,
-                        configurable: true,
-                    });
-                }
+                const { unmount } = render(<TeamPageContent />);
+
+                expect(addEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+
+                unmount();
+
+                expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+            });
+
+            it('handles empty categories gracefully', async () => {
+                mockTeamCategoriesApi.getAll.mockResolvedValueOnce([]);
+
+                render(<TeamPageContent />);
 
                 await waitFor(() => {
-                    expect(mockTeamMembersApi.getAll).toHaveBeenCalled();
+                    expect(mockTeamCategoriesApi.getAll).toHaveBeenCalled();
+                });
+
+                expect(mockTeamMembersApi.getAll).not.toHaveBeenCalled();
+            });
+
+            it('loads more members when available', async () => {
+                mockTeamMembersApi.getAll.mockResolvedValueOnce({
+                    items: mockMembers,
+                    totalItemsCount: 10,
+                } as any);
+
+                render(<TeamPageContent />);
+
+                await waitFor(() => {
+                    expect(screen.getByTestId('load-more-btn')).toBeInTheDocument();
+                });
+
+                mockTeamMembersApi.getAll.mockResolvedValueOnce({
+                    items: [{ ...mockMembers[0], id: 99, fullName: 'Additional Member' }],
+                    totalItemsCount: 10,
+                } as any);
+
+                fireEvent.click(screen.getByTestId('load-more-btn'));
+
+                await waitFor(() => {
+                    expect(mockTeamMembersApi.getAll).toHaveBeenCalledWith(
+                        mockClient,
+                        mockCategories[0].id,
+                        undefined,
+                        0,
+                        5,
+                        5,
+                    );
                 });
             });
-        });
 
-        describe('Reordering action', () => {
-            it('calls reorder API and updates list on reorder click', async () => {
+            it('should pass englishLanguage to TeamPageModals', async () => {
                 renderTeamPageContent();
 
-                await waitFor(() => expect(getMemberItems()).toHaveLength(2));
-
-                fireEvent.click(screen.getByTestId('reorder-btn-1'));
-
                 await waitFor(() => {
-                    expect(mockTeamMembersApi.reorder).toHaveBeenCalledWith(expect.any(Object), mockCategories[0].id, [
-                        mockMembers[1].id,
-                        mockMembers[0].id,
-                    ]);
+                    expect(screen.getByTestId('team-page-modals')).toBeInTheDocument();
                 });
+
+                expect(mockLanguages.find((l) => l.code === 'en')).toBeDefined();
             });
-        });
-    });
-
-    describe('Comprehensive Coverage Tests', () => {
-        beforeEach(() => {
-            jest.clearAllMocks();
-            mockedUseAdminClient.mockReturnValue(mockClient as any);
-            mockTeamCategoriesApi.getAll.mockResolvedValue(mockCategories);
-            mockTeamMembersApi.getAll.mockResolvedValue({
-                items: mockMembers,
-                totalItemsCount: mockMembers.length,
-            } as any);
-            mockTeamMembersApi.reorder.mockResolvedValue(undefined);
-
-            // Reset modal state
-            Object.assign(mockModalState, {
-                isAddModalOpen: false,
-                itemToEdit: null,
-                itemToDelete: null,
-                isAddCategoryModalOpen: false,
-                isEditCategoryModalOpen: false,
-                isDeleteCategoryModalOpen: false,
-            });
-        });
-
-        const verifyContextMenuExists = async () => {
-            await waitFor(() => {
-                expect(screen.getByTestId('context-menu')).toBeInTheDocument();
-            });
-        };
-
-        const clickContextMenuOption = (optionId: string) => {
-            fireEvent.click(screen.getByTestId(`context-menu-${optionId}`));
-        };
-
-        it('handles context menu operations', async () => {
-            render(<TeamPageContent />);
-
-            await verifyContextMenuExists();
-
-            // Test add category
-            clickContextMenuOption('add');
-            expect(mockOpenModalActions.openAddCategoryModal).toHaveBeenCalled();
-
-            // Test edit category
-            clickContextMenuOption('edit');
-            expect(mockOpenModalActions.openEditCategoryModal).toHaveBeenCalled();
-
-            // Test delete category
-            clickContextMenuOption('delete');
-            expect(mockOpenModalActions.openDeleteCategoryModal).toHaveBeenCalled();
-        });
-
-        const verifyModalButtonExists = async (testId: string) => {
-            await waitFor(() => {
-                expect(screen.getByTestId(testId)).toBeInTheDocument();
-            });
-        };
-
-        const testModalOperation = (buttonId: string, closeAction: jest.Mock, toastMessage?: string) => {
-            fireEvent.click(screen.getByTestId(buttonId));
-            expect(closeAction).toHaveBeenCalled();
-
-            if (toastMessage) {
-                expect(mockAddToast).toHaveBeenCalledWith(toastMessage, ToastType.Info);
-            }
-        };
-
-        it('handles member operations through modals', async () => {
-            render(<TeamPageContent />);
-
-            await verifyModalButtonExists('simulate-add-member');
-
-            // Test add member
-            testModalOperation(
-                'simulate-add-member',
-                mockCloseModalActions.closeAddItemModal,
-                TEAM_MEMBERS_TEXT.MESSAGE.DONT_FORGET_TO_ORDER,
-            );
-
-            // Test edit member
-            testModalOperation('simulate-edit-member', mockCloseModalActions.closeEditItemModal);
-
-            // Test delete member
-            testModalOperation('simulate-delete-member', mockCloseModalActions.closeDeleteItemModal);
-        });
-
-        it('handles category operations through modals', async () => {
-            render(<TeamPageContent />);
-            await verifyModalButtonExists('simulate-add-category');
-
-            // Test add category
-            fireEvent.click(screen.getByTestId('simulate-add-category'));
-
-            // Test edit category
-            fireEvent.click(screen.getByTestId('simulate-edit-category'));
-
-            // Test delete category
-            fireEvent.click(screen.getByTestId('simulate-delete-category'));
-        });
-
-        const testMemberActionButton = async (
-            memberId: number,
-            action: 'edit' | 'delete',
-            mockAction: jest.Mock,
-            expectedMember: TeamMember,
-        ) => {
-            await waitFor(() => {
-                expect(screen.getByTestId(`${action}-member-${memberId}`)).toBeInTheDocument();
-            });
-
-            fireEvent.click(screen.getByTestId(`${action}-member-${memberId}`));
-            expect(mockAction).toHaveBeenCalledWith(expectedMember);
-        };
-
-        it('handles member edit and delete modal opening', async () => {
-            render(<TeamPageContent />);
-
-            await waitFor(() => {
-                expect(screen.getByTestId('edit-member-1')).toBeInTheDocument();
-            });
-
-            // Test edit member modal
-            await testMemberActionButton(1, 'edit', mockOpenModalActions.openEditItemModal, mockMembers[0]);
-
-            // Test delete member modal
-            await testMemberActionButton(1, 'delete', mockOpenModalActions.openDeleteItemModal, mockMembers[0]);
-        });
-
-        it('should open translate member modal when translate button clicked', async () => {
-            renderTeamPageContent();
-
-            await waitFor(() => {
-                expect(screen.getByTestId('translate-member-1')).toBeInTheDocument();
-            });
-
-            fireEvent.click(screen.getByTestId('translate-member-1'));
-            expect(mockOpenModalActions.openTranslateItemModal).toHaveBeenCalledWith(mockMembers[0]);
-        });
-
-        it('should not open translate modal if another modal is already opened', async () => {
-            mockModalState.isAddModalOpen = true;
-            renderTeamPageContent();
-
-            await waitFor(() => {
-                expect(screen.getByTestId('translate-member-1')).toBeInTheDocument();
-            });
-
-            fireEvent.click(screen.getByTestId('translate-member-1'));
-            expect(mockOpenModalActions.openTranslateItemModal).not.toHaveBeenCalled();
-        });
-
-        // Helper to verify modal operations are prevented
-        const verifyModalOperationsPrevented = async () => {
-            await waitFor(() => {
-                expect(screen.getByTestId('edit-member-1')).toBeInTheDocument();
-            });
-
-            fireEvent.click(screen.getByTestId('edit-member-1'));
-            fireEvent.click(screen.getByTestId('delete-member-1'));
-
-            expect(mockOpenModalActions.openEditItemModal).not.toHaveBeenCalled();
-            expect(mockOpenModalActions.openDeleteItemModal).not.toHaveBeenCalled();
-        };
-
-        it('prevents modal operations when other modal is open', async () => {
-            mockModalState.isAddModalOpen = true;
-            render(<TeamPageContent />);
-            await verifyModalOperationsPrevented();
-        });
-
-        // Helper to verify error state
-        const verifyErrorState = async (errorMessage: string) => {
-            await waitFor(() => {
-                expect(screen.getByTestId('team-error-container')).toBeInTheDocument();
-                expect(screen.getByText(errorMessage)).toBeInTheDocument();
-            });
-        };
-
-        // Helper to retry after error
-        const retryAfterError = async (expectedCallCount: number) => {
-            const retryButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.TRY_AGAIN);
-            fireEvent.click(retryButton);
-
-            await waitFor(() => {
-                expect(mockTeamCategoriesApi.getAll).toHaveBeenCalledTimes(expectedCallCount);
-            });
-        };
-
-        it('handles error states and retry functionality', async () => {
-            mockTeamCategoriesApi.getAll.mockRejectedValueOnce(new Error('Categories API Error'));
-            render(<TeamPageContent />);
-
-            await verifyErrorState(COMMON_TEXT_ADMIN.CATEGORIES.MESSAGE.FAIL_TO_FETCH_CATEGORIES);
-
-            mockTeamCategoriesApi.getAll.mockResolvedValueOnce(mockCategories);
-            await retryAfterError(2);
-        });
-
-        it('handles members API error and retry', async () => {
-            mockTeamMembersApi.getAll.mockClear();
-            mockTeamMembersApi.getAll.mockRejectedValueOnce(new Error('Members API Error'));
-
-            render(<TeamPageContent />);
-
-            await verifyErrorState(TEAM_MEMBERS_TEXT.MESSAGE.FAIL_TO_FETCH_MEMBERS);
-
-            expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(1);
-
-            mockTeamMembersApi.getAll.mockResolvedValueOnce({
-                items: mockMembers,
-                totalItemsCount: mockMembers.length,
-            } as any);
-
-            // Trigger retry by changing status filter
-            fireEvent.change(screen.getByTestId('status-filter'), {
-                target: { value: '1' },
-            });
-
-            await waitFor(() => {
-                expect(mockTeamMembersApi.getAll).toHaveBeenCalledTimes(2);
-            });
-        });
-
-        it('handles reorder API error', async () => {
-            mockTeamMembersApi.reorder.mockRejectedValueOnce(new Error('Reorder Error'));
-            render(<TeamPageContent />);
-
-            await waitFor(() => {
-                expect(screen.getByTestId('reorder-btn-1')).toBeInTheDocument();
-            });
-
-            fireEvent.click(screen.getByTestId('reorder-btn-1'));
-
-            await verifyErrorState(TEAM_MEMBERS_TEXT.MESSAGE.FAIL_TO_REORDER_MEMBERS);
-        });
-
-        it('ignores cancelled API errors', async () => {
-            const canceledError = { name: 'CanceledError' };
-            mockTeamMembersApi.getAll.mockRejectedValueOnce(canceledError);
-
-            render(<TeamPageContent />);
-
-            await waitFor(() => {
-                expect(mockTeamMembersApi.getAll).toHaveBeenCalled();
-            });
-
-            expect(screen.queryByTestId('team-error-container')).not.toBeInTheDocument();
-        });
-
-        it('handles resize events and page size calculation', async () => {
-            const addEventListenerSpy = jest.spyOn(window, 'addEventListener');
-            const removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
-
-            const { unmount } = render(<TeamPageContent />);
-
-            expect(addEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
-
-            unmount();
-
-            expect(removeEventListenerSpy).toHaveBeenCalledWith('resize', expect.any(Function));
-        });
-
-        it('handles empty categories gracefully', async () => {
-            mockTeamCategoriesApi.getAll.mockResolvedValueOnce([]);
-            render(<TeamPageContent />);
-
-            await waitFor(() => {
-                expect(mockTeamCategoriesApi.getAll).toHaveBeenCalled();
-            });
-
-            expect(mockTeamMembersApi.getAll).not.toHaveBeenCalled();
-        });
-
-        // Helper to verify load more functionality
-        const verifyLoadMoreButton = async () => {
-            await waitFor(() => {
-                expect(screen.getByTestId('load-more-btn')).toBeInTheDocument();
-            });
-        };
-
-        it('loads more members when available', async () => {
-            mockTeamMembersApi.getAll.mockResolvedValueOnce({
-                items: mockMembers,
-                totalItemsCount: 10,
-            } as any);
-
-            render(<TeamPageContent />);
-            await verifyLoadMoreButton();
-
-            mockTeamMembersApi.getAll.mockResolvedValueOnce({
-                items: [{ ...mockMembers[0], id: 99, fullName: 'Additional Member' }],
-                totalItemsCount: 10,
-            } as any);
-
-            fireEvent.click(screen.getByTestId('load-more-btn'));
-
-            await waitFor(() => {
-                expect(mockTeamMembersApi.getAll).toHaveBeenCalledWith(
-                    mockClient,
-                    mockCategories[0].id,
-                    undefined,
-                    0,
-                    5,
-                    5,
-                );
-            });
-        });
-
-        it('should pass englishLanguage to TeamPageModals', async () => {
-            renderTeamPageContent();
-
-            await waitFor(() => {
-                expect(screen.getByTestId('team-page-modals')).toBeInTheDocument();
-            });
-
-            expect(mockLanguages.find((l) => l.code === 'en')).toBeDefined();
         });
     });
 });

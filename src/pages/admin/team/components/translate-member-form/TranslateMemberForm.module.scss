@@ -24,18 +24,8 @@
 
 .language-select {
     width: 150px;
-
-    :global(.select-head) {
-        border: none;
-        background: transparent;
-        box-shadow: none;
-        padding: 0;
-    }
-
-    :global(.select-options-selected) {
-        justify-content: center;
-    }
 }
+
 .language-select-head {
     display: inline-flex;
     align-items: center;

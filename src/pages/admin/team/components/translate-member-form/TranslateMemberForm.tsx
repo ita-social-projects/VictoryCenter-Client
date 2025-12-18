@@ -7,6 +7,7 @@ import { COMMON_TEXT_ADMIN, LANGUAGES } from '@/const/admin/common';
 import { CommonMemberFields } from '../common-member-fields/CommonMemberFields';
 import { VisibilityStatus } from '@/types/admin/common';
 import styles from './TranslateMemberForm.module.scss';
+import './TranslateMemberForm.scss';
 
 export interface TranslateTeamMemberFormValues {
     fullName: string;
@@ -89,11 +90,16 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
         }, [formState.description, setErrors]);
 
         return (
-            <form onSubmit={(e) => e.preventDefault()} className={styles['form']} data-testid="test-form" noValidate>
+            <form
+                onSubmit={(e) => e.preventDefault()}
+                className={`${styles.form} translate-member-form`}
+                data-testid="test-form"
+                noValidate
+            >
                 <div className={styles['functional-group']}>
                     <div className={styles['language-select']}>
                         <Select<string>
-                            className={styles['language-select']}
+                            className="language-select"
                             headClassName={styles['language-select-head']}
                             value="EN"
                             onValueChange={() => {}}

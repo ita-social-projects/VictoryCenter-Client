@@ -15,6 +15,7 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { TeamMemberLocalizationsApi } from '@/services/api/admin/team/team-member-localizations/team-member-localizations-api';
 import { LocalizationLanguage } from '@/types/common/language';
 import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
+import './TranslateTeamMemberModal.scss';
 
 interface TranslateTeamMemberModalProps {
     isOpen: boolean;
@@ -100,7 +101,7 @@ export const TranslateTeamMemberModal = ({
                 </Modal.Content>
 
                 <Modal.Actions>
-                    <div className={styles['modal-scope']}>
+                    <div className={`${styles['modal-scope']} translate-team-member-modal modal-scope`}>
                         <Button buttonStyle="primary" onClick={handleSubmit} disabled={!isFormValid}>
                             {TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE}
                         </Button>

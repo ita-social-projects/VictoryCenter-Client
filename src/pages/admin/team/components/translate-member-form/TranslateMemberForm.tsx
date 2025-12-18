@@ -8,6 +8,7 @@ import { CommonMemberFields } from '../common-member-fields/CommonMemberFields';
 import { VisibilityStatus } from '@/types/admin/common';
 import styles from './TranslateMemberForm.module.scss';
 import './TranslateMemberForm.scss';
+import { useCommonMemberFields } from '@/hooks/admin/use-common-member-fields/useCommonMemberFields';
 
 export interface TranslateTeamMemberFormValues {
     fullName: string;
@@ -62,32 +63,12 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
             onSubmit: (data, _status) => onSubmit(data),
         });
 
-        const handleFullNameChange = useCallback(
-            (e: React.ChangeEvent<HTMLInputElement>) => {
-                setFormState((prev) => ({ ...prev, fullName: e.target.value }));
-            },
-            [setFormState],
-        );
-        const handleFullNameBlur = useCallback(() => {
-            setErrors((prev) => ({
-                ...prev,
-                fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false),
-            }));
-        }, [formState.fullName, setErrors]);
-
-        const handleDescriptionChange = useCallback(
-            (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                setFormState((prev) => ({ ...prev, description: e.target.value }));
-            },
-            [setFormState],
-        );
-
-        const handleDescriptionBlur = useCallback(() => {
-            setErrors((prev) => ({
-                ...prev,
-                description: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(formState.description, false),
-            }));
-        }, [formState.description, setErrors]);
+        const { handleFullNameChange, handleFullNameBlur, handleDescriptionChange, handleDescriptionBlur } =
+            useCommonMemberFields({
+                formState,
+                setFormState,
+                setErrors,
+            });
 
         return (
             <form

@@ -56,31 +56,39 @@ export const AddSectionModal = ({ isOpen, onClose }: AddSectionModalProps) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} maxWidth="80vw">
             <Modal.Content>
-                <div className={styles.content} data-testid="add-section-modal-content">
-                    {renderSection()}
+                <div className={styles.container}>
+                    <div className={styles['left-section']}>
+                        <button
+                            title="scroll-left-button"
+                            className={styles['chevron-button']}
+                            onClick={handlePrevious}
+                            type="button"
+                        >
+                            <ChevronLeft />
+                        </button>
+                    </div>
+                    <div className={styles['middle-section']}>
+                        <div className={styles['template-content']} data-testid="add-section-modal-content">
+                            {renderSection()}
+                        </div>
+                    </div>
+                    <div className={styles['right-section']}>
+                        <button
+                            title="scroll-right-button"
+                            className={styles['chevron-button']}
+                            onClick={handleNext}
+                            type="button"
+                        >
+                            <ChevronRight />
+                        </button>
+                    </div>
                 </div>
             </Modal.Content>
             <Modal.Actions>
-                <div className={styles.actions}>
-                    <button
-                        title="scroll-left-button"
-                        className={`${styles.chevronButton} ${styles.chevronButtonLeft}`}
-                        onClick={handlePrevious}
-                        type="button"
-                    >
-                        <ChevronLeft />
-                    </button>
+                <div className={styles['button-wrapper']}>
                     <Button buttonStyle="primary" onClick={handleSave}>
                         {PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION}
                     </Button>
-                    <button
-                        title="scroll-right-button"
-                        className={`${styles.chevronButton} ${styles.chevronButtonRight}`}
-                        onClick={handleNext}
-                        type="button"
-                    >
-                        <ChevronRight />
-                    </button>
                 </div>
             </Modal.Actions>
         </Modal>

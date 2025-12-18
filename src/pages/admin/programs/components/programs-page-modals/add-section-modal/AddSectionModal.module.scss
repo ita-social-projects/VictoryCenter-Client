@@ -1,35 +1,51 @@
-.content {
+.container {
+    display: flex;
+    align-items: stretch;
     width: 100%;
-    min-height: 35rem;
-    border-radius: 4px;
-    padding: 1.5rem;
-    box-sizing: border-box;
+    height: 48rem;
+    gap: 0;
 }
 
-.actions {
+.left-section {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-
-    button {
-        width: auto;
-    }
+    flex-shrink: 0;
 }
 
-.chevronButton {
+.middle-section {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-items: center;
+    padding: 0;
+    overflow: auto;
+}
+
+.right-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.template-content {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chevron-button {
     display: flex;
     align-items: center;
     justify-content: center;
     background: transparent;
     border: none;
     cursor: pointer;
-    padding: 0.5rem;
+    padding: 1rem;
     transition: opacity 0.2s ease;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1;
 
     &:hover {
         opacity: 0.7;
@@ -45,10 +61,15 @@
     }
 }
 
-.chevronButtonLeft {
-    left: 0.75rem;
+.button-wrapper {
+    width: 250rem;
+    display: flex;
+    justify-content: center;
+    
+    button {
+        width: 25rem;
+        height: 2.5rem;
+    }
 }
 
-.chevronButtonRight {
-    right: 0.75rem;
-}
+

@@ -1,14 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { ScrollableFrame } from './ScrollableFrame';
-import { useDataFetch } from '../../../../hooks/common/use-data-fetch/useDataFetch';
-import programsPageUk from '../../../../locales/uk/programs.json';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
+import programsPageUk from '@/locales/uk/programs.json';
 
-jest.mock('../../../../components/public/program-card/ProgramCard', () => ({
+jest.mock('@/components/public/program-card/ProgramCard', () => ({
     ProgramCard: ({ program }: { program: any }) => (
         <div data-testid="program-card">{program.name || program.title}</div>
     ),
 }));
-jest.mock('../../../../hooks/common/use-data-fetch/useDataFetch');
+jest.mock('@/hooks/common/use-data-fetch/useDataFetch');
 
 jest.mock('swiper/react', () => {
     return {

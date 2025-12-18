@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { useCategoriesCounter } from './useCategoriesCounter';
-import { Program, ProgramCategory } from '../../../types/admin/programs';
-import { VisibilityStatus } from '../../../types/admin/common';
+import { Program, ProgramCategory } from '@/types/admin/programs';
+import { VisibilityStatus } from '@/types/admin/common';
 
 // Test helpers
 const createCategory = (props: Partial<ProgramCategory> = {}): ProgramCategory => ({
@@ -17,7 +17,11 @@ const createProgram = (props: Partial<Program> = {}): Program => ({
     description: 'Test description',
     status: VisibilityStatus.Draft,
     categories: [],
-    image: null,
+    previewImage: null,
+    backgroundImage: null,
+    location: '',
+    meetingsCount: '',
+    participantsCount: '',
     ...props,
 });
 

@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { ForeignBankDetailsApi } from './bank-details-foreign-api';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { BankCurrency, ForeignBankDetailsType } from '../../../../../types/admin/donate';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { BankCurrency, ForeignBankDetailsDto } from '@/types/admin/donate';
 
 describe('ForeignBankDetailsApi', () => {
     const mockClient = {
@@ -11,7 +11,7 @@ describe('ForeignBankDetailsApi', () => {
         delete: jest.fn(),
     } as unknown as jest.Mocked<AxiosInstance>;
 
-    const createMockBankDetails = (overrides?: Partial<ForeignBankDetailsType>): ForeignBankDetailsType => ({
+    const createMockBankDetails = (overrides?: Partial<ForeignBankDetailsDto>): ForeignBankDetailsDto => ({
         id: 1,
         name: 'Test Bank',
         receiver: 'Test Receiver',
@@ -76,9 +76,28 @@ describe('ForeignBankDetailsApi', () => {
 
     describe('update', () => {
         const testCases = [
-            { id: 5, updates: { name: 'Updated Bank', address: 'Updated Address' } },
-            { id: 1, updates: { receiver: 'Updated Receiver Only' } },
-            { id: 9999, updates: { name: 'Large ID Bank' } },
+            {
+                id: 5,
+                updates: {
+                    name: 'Updated Bank',
+                    receiver: 'Updated Receiver',
+                    ukrainianIban: 'UA987654321098765432109876543',
+                    swift: 'UPDATED1',
+                    address: 'Updated Address',
+                    currency: BankCurrency.Usd,
+                },
+            },
+            {
+                id: 9999,
+                updates: {
+                    name: 'Large ID Bank',
+                    receiver: 'Large Receiver',
+                    ukrainianIban: 'UA111111111111111111111111111',
+                    swift: 'LARGEID1',
+                    address: 'Large Address',
+                    currency: BankCurrency.Eur,
+                },
+            },
         ];
 
         testCases.forEach(({ id, updates }) => {

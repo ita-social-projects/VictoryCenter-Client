@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
+import { LOCALIZATION_TEXT } from '@/const/admin/localization';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { Select } from '@/components/common/select/Select';
 import { ReactComponent as GlobeIcon } from '@/assets/icons/globe.svg';
+import { LocalizationLanguage, TranslationStatusFilter } from '@/types/common/language';
+import { mapLabelToTranslationStatusFilter } from '@/utils/functions/mappers/admin/localization-status/localization-status-mappers';
 import styles from './LocalizationToolkit.module.scss';
-import { DEFAULT_LOCALE } from '../../../const/common/locales';
-import { LocalizationLanguage, TranslationStatusFilter } from '../../../types/common/language';
-import { Select } from '../../common/select/Select';
-import { LOCALIZATION_TEXT } from '../../../const/admin/localization';
-import { mapLabelToTranslationStatusFilter } from '../../../utils/functions/mappers/admin/localization-status/localization-status-mappers';
 
 export interface LocalizationToolkitProps {
     languages: LocalizationLanguage[];

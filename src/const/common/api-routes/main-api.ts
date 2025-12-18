@@ -1,4 +1,4 @@
-import { getEnvVariable } from '../../../utils/functions/get-env-variable/get-env-variable';
+import { getEnvVariable } from '@/utils/functions/get-env-variable/get-env-variable';
 
 export const API_ROUTES = {
     BASE: getEnvVariable('REACT_APP_BACKEND_URL'),
@@ -12,9 +12,6 @@ export const API_ROUTES = {
         SEARCH: 'TeamMembers/search',
         REORDER: 'TeamMembers/reorder',
         PUBLISHED: 'team/published',
-    },
-    TEAM_LOCALIZATIONS: {
-        BASE: 'TeamMemberLocalizations',
     },
     TEAM_CATEGORIES: {
         BASE: 'TeamCategories',
@@ -65,5 +62,11 @@ export const API_ROUTES = {
             TEAM_MEMBER_ID: 'TeamMemberLocalizations/entityId',
             LANGUAGE_ID: 'TeamMemberLocalizations/languageId',
         },
+    },
+    PARTNERS: {
+        BASE: 'Partners',
+        BANNER: 'Partners/banner',
+        SECTIONS: 'Partners/sections',
+        PAGE: 'Partners/page',
     },
 };

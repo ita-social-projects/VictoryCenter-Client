@@ -1,9 +1,9 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { ValueCard } from './ValueCard';
-import { aboutUsPageUk } from '../../../../../../locales/uk';
+import { aboutUsPageUk } from '@/locales/uk';
 
-jest.mock('../../../../../../const/public/about-us-page', () => ({
+jest.mock('@/const/public/about-us-page', () => ({
     ABOUT_US_DATA: {
         OUR_VALUES: 'Наші Цінності',
     },

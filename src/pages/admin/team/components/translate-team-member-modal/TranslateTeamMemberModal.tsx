@@ -1,7 +1,7 @@
 import { Button } from '../../../../../components/admin/button/Button';
 import { Modal } from '../../../../../components/common/modal/Modal';
 import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { TeamMember } from '../../../../../types/admin/team-members';
+import { TeamMember, TeamMemberLocalization } from '../../../../../types/admin/team-members';
 import {
     TranslateMemberForm,
     TranslateTeamMemberFormRef,
@@ -14,6 +14,7 @@ import styles from './TranslateTeamMemberModal.module.scss';
 import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
 import { TeamMemberLocalizationsApi } from '../../../../../services/api/admin/team/team-member-localizations/team-member-localizations-api';
 import { LocalizationLanguage } from '../../../../../types/common/language';
+import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 
 interface TranslateTeamMemberModalProps {
     isOpen: boolean;
@@ -49,14 +50,21 @@ export const TranslateTeamMemberModal = ({
     const handleFormSubmit = async (data: TranslateTeamMemberFormValues) => {
         if (!memberToTranslate) return;
 
-        await TeamMemberLocalizationsApi.create(client, {
+        const createdLocalizationDto = await TeamMemberLocalizationsApi.create(client, {
             entityId: memberToTranslate.id,
             languageId: language.id,
             fullName: data.fullName,
             description: data.description,
         });
 
-        onTranslateMember(memberToTranslate);
+        const createdLocalization = mapLocalizationDtoToModel<typeof createdLocalizationDto, TeamMemberLocalization>(
+            createdLocalizationDto,
+        );
+
+        onTranslateMember({
+            ...memberToTranslate,
+            localizations: [...(memberToTranslate.localizations || []), createdLocalization],
+        });
         onClose();
     };
 

@@ -1,24 +1,25 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { NotFound } from '../../pages/public/not-found-page/NotFound';
-import { ProgramsPage } from '../../pages/public/programs-page/ProgramsPage';
-import { AdminLayout } from '../../layouts/admin-layout/AdminLayout';
-import { PublicLayout } from '../../layouts/public-layout/PublicLayout';
-import { TeamPageAdmin } from '../../pages/admin/team/TeamPage';
-import { ProgramsPageAdmin } from '../../pages/admin/programs/ProgramsPageAdmin';
-import { DonatePageAdmin } from '../../pages/admin/donate/DonatePageAdmin';
-import { AdminContextWrapper } from '../../components/admin/admin-context-wrapper/AdminContextWrapper';
-import { PUBLIC_ROUTES } from '../../const/public/routes';
-import { ADMIN_ROUTES } from '../../const/admin/routes';
-import { PrivateRoute } from '../../components/admin/private-route/PrivateRoute';
-import { PublicRoute } from '../../components/admin/public-route/PublicRoute';
-import { AboutUsPage } from '../../pages/public/about-us-page/AboutUsPage';
-import { DonatePage } from '../../pages/public/donate-page/DonatePage';
-import { LoginPage } from '../../pages/admin/login/LoginPage';
-import { AdminHomePage } from '../../pages/admin/home/AdminHomePage';
-import { TeamPage } from '../../pages/public/team-page/TeamPage';
-import { FaqPanel } from '../../pages/admin/faq/FaqPanel';
-import { PartnersPage } from '../../pages/public/partners-page/PartnersPage';
-import { WhoWeArePageAdmin } from '../../pages/admin/who-we-are/WhoWeArePageAdmin';
+import { NotFound } from '@/pages/public/not-found-page/NotFound';
+import { ProgramsPage } from '@/pages/public/programs-page/ProgramsPage';
+import { AdminLayout } from '@/layouts/admin-layout/AdminLayout';
+import { PublicLayout } from '@/layouts/public-layout/PublicLayout';
+import { TeamPageAdmin } from '@/pages/admin/team/TeamPage';
+import { ProgramsPageAdmin } from '@/pages/admin/programs/ProgramsPageAdmin';
+import { DonatePageAdmin } from '@/pages/admin/donate/DonatePageAdmin';
+import { AdminContextWrapper } from '@/components/admin/admin-context-wrapper/AdminContextWrapper';
+import { PUBLIC_ROUTES } from '@/const/public/routes';
+import { ADMIN_ROUTES } from '@/const/admin/routes';
+import { PrivateRoute } from '@/components/admin/private-route/PrivateRoute';
+import { PublicRoute } from '@/components/admin/public-route/PublicRoute';
+import { AboutUsPage } from '@/pages/public/about-us-page/AboutUsPage';
+import { DonatePage } from '@/pages/public/donate-page/DonatePage';
+import { LoginPage } from '@/pages/admin/login/LoginPage';
+import { AdminHomePage } from '@/pages/admin/home/AdminHomePage';
+import { TeamPage } from '@/pages/public/team-page/TeamPage';
+import { FaqPanel } from '@/pages/admin/faq/FaqPanel';
+import { PartnersPage } from '@/pages/public/partners-page/PartnersPage';
+import { WhoWeArePageAdmin } from '@/pages/admin/who-we-are/WhoWeArePageAdmin';
+import { PartnerPanel } from '@/pages/admin/partners/PartnerPanel';
 
 export const AppRouter = () => (
     <BrowserRouter>
@@ -46,6 +47,7 @@ export const AppRouter = () => (
                         <Route path={ADMIN_ROUTES.DONATE.PATH} element={<DonatePageAdmin />} />
                         <Route path={ADMIN_ROUTES.FAQ.PATH} element={<FaqPanel />} />
                         <Route path={ADMIN_ROUTES.WHO_WE_ARE.PATH} element={<WhoWeArePageAdmin />} />
+                        <Route path={ADMIN_ROUTES.PARTNERS.PATH} element={<PartnerPanel />} />
                     </Route>
                 </Route>
             </Route>

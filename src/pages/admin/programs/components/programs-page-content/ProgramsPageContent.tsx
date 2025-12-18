@@ -1,23 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Program, ProgramCategory, ProgramSearchItemData } from '../../../../../types/admin/programs';
-import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/common';
+import { Program, ProgramCategory, ProgramSearchItemData } from '@/types/admin/programs';
+import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
 import { ProgramsPageModals } from '../programs-page-modals/ProgramsPageModals';
-import { InfiniteScrollList } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
-import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/category-bar/CategoryBar';
+import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
+import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
 import { ProgramListItem } from '../program-list-item/ProgramListItem';
-import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
-import { useCategoriesCounter } from '../../../../../hooks/admin/use-categories-counter/useCategoriesCounter';
-import { ProgramsApi, ProgramsCategoriesApi } from '../../../../../services/api/admin/programs/programs-api';
-import { PROGRAMS_TEXT } from '../../../../../const/admin/programs';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { useDataFetch } from '../../../../../hooks/common/use-data-fetch/useDataFetch';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { useCategoriesCounter } from '@/hooks/admin/use-categories-counter/useCategoriesCounter';
+import { ProgramsApi, ProgramsCategoriesApi } from '@/services/api/admin/programs/programs-api';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { useDataFetch } from '@/hooks/common/use-data-fetch/useDataFetch';
 import {
     PaginationRequestParams,
     useDataPaginationFetch,
-} from '../../../../../hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
+} from '@/hooks/admin/fetch/use-data-pagination-fetch/useDataPaginationFetch';
 import './ProgramsPageContent.scss';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { AdminPanelToolbar } from '../../../../../components/admin/admin-panel-toolbar/AdminPageToolbar';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { AdminPanelToolbar } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 import { ProgramSearchItem } from '../program-search-item/ProgramSearchItem';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
@@ -251,12 +251,10 @@ export const ProgramsPageContent = () => {
 
     const handleEditProgram = useCallback(
         (updatedProgram: Program) => {
-            // Update searched program if it's the same
             if (isSearchResultView && fetchedSearchProgram?.id === updatedProgram.id) {
                 updateSearchedProgram(updatedProgram);
             }
 
-            // Find original program
             const originalProgram =
                 fetchedPrograms.find((p) => p.id === updatedProgram.id) ??
                 (isSearchResultView && fetchedSearchProgram?.id === updatedProgram.id ? fetchedSearchProgram : null);
@@ -273,8 +271,10 @@ export const ProgramsPageContent = () => {
             const statusMatches = statusFilter === undefined || updatedProgram.status === statusFilter;
 
             if (belongsToSelectedCategory && statusMatches) {
-                if (updatedProgram.image && 'url' in updatedProgram.image)
-                    updatedProgram.image.url = `${updatedProgram.image.url}?cb=${Date.now()}`;
+                if (updatedProgram.previewImage && 'url' in updatedProgram.previewImage)
+                    updatedProgram.previewImage.url = `${updatedProgram.previewImage.url}?cb=${Date.now()}`;
+                if (updatedProgram.backgroundImage && 'url' in updatedProgram.backgroundImage)
+                    updatedProgram.backgroundImage.url = `${updatedProgram.backgroundImage.url}?cb=${Date.now()}`;
                 updatePrograms((prev) => prev.map((p) => (p.id === updatedProgram.id ? updatedProgram : p)));
             } else {
                 updatePrograms((prev) => prev.filter((p) => p.id !== updatedProgram.id));

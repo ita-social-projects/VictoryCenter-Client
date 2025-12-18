@@ -1,5 +1,5 @@
-import { MemberCard } from '../../../../types/public/team-page';
-import { ReactComponent as DefaultTeamMemberIcon } from '../../../../assets/icons/team-member-blank.svg';
+import { MemberCard } from '@/types/public/team-page';
+import { ReactComponent as DefaultTeamMemberIcon } from '@/assets/icons/team-member-blank.svg';
 import { useState, useEffect } from 'react';
 
 interface TeamMemberProps {

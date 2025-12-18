@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent, act, within } from '@testing-library/react';
 import { TeamPageToolbar } from './TeamPageToolbar';
-import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { SearchBarProps } from '../../../../../components/admin/search-bar/SearchBar';
-import { ProgramSearchItemData } from '../../../../../types/admin/programs';
+import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { VisibilityStatus } from '@/types/admin/common';
+import { SearchBarProps } from '@/components/admin/search-bar/SearchBar';
+import { ProgramSearchItemData } from '@/types/admin/programs';
 
 type PartialProps = Partial<React.ComponentProps<typeof TeamPageToolbar>>;
 
@@ -21,6 +21,9 @@ const DEFAULT_PROPS: React.ComponentProps<typeof TeamPageToolbar> = {
     categories: [],
     onSearchItemSelect: jest.fn(),
     onSearchClear: jest.fn(),
+    languages: [],
+    onLanguageChange: jest.fn(),
+    onTranslationStatusFilterChange: jest.fn(),
 };
 
 const renderToolbar = (overrides: PartialProps = {}) => {
@@ -33,11 +36,11 @@ const CATS_2 = [...CATS_1, { id: 'c2', name: 'Category 2' } as any];
 const ITEM_JOHN = [{ id: '1', fullName: 'John Doe' } as any];
 const ITEM_JANE = [{ id: '1', fullName: 'Jane Roe' } as any];
 
-jest.mock('../../../../../assets/icons/plus.svg', () => ({
+jest.mock('@/assets/icons/plus.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="plus-icon" />,
 }));
 
-jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
+jest.mock('@/components/admin/search-bar/SearchBar', () => ({
     SearchBar: (props: SearchBarProps<ProgramSearchItemData>) => {
         const {
             onQueryChange,
@@ -92,7 +95,7 @@ jest.mock('../../../../../components/admin/search-bar/SearchBar', () => ({
     },
 }));
 
-jest.mock('../../../../../components/admin/search-bar/team-member-search-item/TeamMemberSearchItem', () => {
+jest.mock('@/components/admin/search-bar/team-member-search-item/TeamMemberSearchItem', () => {
     const ReactActual = jest.requireActual('react');
     return {
         TeamMemberSearchItem: ReactActual.forwardRef(({ item, categories }: any, ref: any) => (
@@ -139,26 +142,23 @@ describe('TeamPageToolbar', () => {
         renderToolbar({ onStatusFilterChange });
 
         const statusSelect = screen.getByRole('button', { name: /Статус/i });
-
         fireEvent.click(statusSelect);
 
-        const optionAll = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.ALL });
+        const optionsAll = screen.getAllByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.ALL });
+        const optionAll = optionsAll.find((btn) => btn.classList.contains('select-options-selected'))!;
         fireEvent.click(optionAll);
-
         expect(onStatusFilterChange).toHaveBeenCalledWith(undefined);
 
         fireEvent.click(statusSelect);
 
         const optionPublished = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.PUBLISHED });
         fireEvent.click(optionPublished);
-
         expect(onStatusFilterChange).toHaveBeenCalledWith(VisibilityStatus.Published);
 
         fireEvent.click(statusSelect);
 
         const optionDraft = screen.getByRole('button', { name: COMMON_TEXT_ADMIN.FILTER.STATUS.DRAFT });
         fireEvent.click(optionDraft);
-
         expect(onStatusFilterChange).toHaveBeenCalledWith(VisibilityStatus.Draft);
     });
 

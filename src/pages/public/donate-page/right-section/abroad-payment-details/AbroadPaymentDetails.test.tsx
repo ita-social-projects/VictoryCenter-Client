@@ -4,7 +4,7 @@ import {
     Currency,
     PublishedForeignBankDetailsDto,
     PublishedCorrespondentBankDetailsDto,
-} from '../../../../../types/public/donate-page';
+} from '@/types/public/donate-page';
 
 jest.mock('./PaymentDetailsSection', () => ({
     PaymentDetailsSection: ({ title, ibanLabel, ibanValue, receiverName, bankName, swift, address }: any) => (
@@ -37,7 +37,7 @@ jest.mock('./CorrespondentBanksSection', () => ({
     ),
 }));
 
-jest.mock('../../../../../const/public/donate-page', () => ({
+jest.mock('@/const/public/donate-page', () => ({
     ABROAD_PAYMENT_DETAILS: {
         USD_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в USD',
         EUR_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в EUR',
@@ -46,7 +46,7 @@ jest.mock('../../../../../const/public/donate-page', () => ({
     },
 }));
 
-jest.mock('../../../../../utils/functions/mappers/public/donate', () => ({
+jest.mock('@/utils/functions/mappers/public/donate/donate.ts', () => ({
     currencyToString: (currency: number) => {
         switch (currency) {
             case 1:

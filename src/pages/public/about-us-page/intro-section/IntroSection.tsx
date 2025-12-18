@@ -1,7 +1,7 @@
-import background from '../../../../assets/images/public/about-us-page/background.jpg';
+import background from '@/assets/images/public/about-us-page/background.jpg';
 import './IntroSection.scss';
-import { ContentType } from '../../../../types/common/about-us';
-import { AboutUsContent } from '../../../../types/public/about-us-page';
+import { ContentType } from '@/types/common/about-us';
+import { AboutUsContent } from '@/types/public/about-us-page';
 import { useTranslation } from 'react-i18next';
 
 export interface AboutUsIntroProps {

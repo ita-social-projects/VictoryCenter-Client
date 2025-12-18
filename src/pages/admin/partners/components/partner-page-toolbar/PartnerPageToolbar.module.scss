@@ -1,0 +1,11 @@
+@use '@/assets/sass/variables/colors' as c;
+
+.partner-page-toolbar {
+    height: 5.625rem;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    padding: 0.5rem 1.5rem;
+    width: 100%;
+    border-bottom: 1px solid c.$grey-50;
+}

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import './Header.scss';
-import { ReactComponent as VictoryCenterLogo } from '../../../assets/icons/logo-with-text.svg';
-import { PUBLIC_ROUTES } from '../../../const/public/routes';
-import { DropdownLink, DropdownMenu } from '../dropdown-menu/DropdownMenu';
-import { ReactComponent as BurgerIcon } from '../../../assets/icons/burger.svg';
-import { LanguageSwitcher } from '../language-switcher/LanguageSwitcher';
+import { ReactComponent as VictoryCenterLogo } from '@/assets/icons/logo-with-text.svg';
+import { PUBLIC_ROUTES } from '@/const/public/routes';
+import { DropdownLink, DropdownMenu } from '@/components/public/dropdown-menu/DropdownMenu';
+import { ReactComponent as BurgerIcon } from '@/assets/icons/burger.svg';
+import { LanguageSwitcher } from '@/components/public/language-switcher/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 

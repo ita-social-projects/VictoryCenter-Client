@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { createGenericForm, GenericFormField, GenericFormMode, GenericFormProps } from './GenericForm';
-import { DONATE_TEXT } from '../../../../../const/admin/donate';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { DONATE_TEXT } from '@/const/admin/donate';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import React from 'react';
 
 interface Item {
@@ -560,5 +560,131 @@ describe('GenericForm', () => {
         fireEvent.click(deleteButton);
 
         expect(screen.getByText(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE)).toBeInTheDocument();
+    });
+
+    it('shows correct modal when canceling Create mode in child form during parent creation', () => {
+        render(
+            <GenericForm
+                {...defaultProps}
+                initialMode={GenericFormMode.Create}
+                isChildForm={true}
+                isParentCreating={true}
+            />,
+        );
+
+        const input = screen.getByDisplayValue('Test Name');
+        fireEvent.change(input, { target: { value: 'Changed' } });
+
+        const cancelBtn = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+        fireEvent.click(cancelBtn);
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
+    });
+
+    it('confirms cancel and resets form state in Edit mode when changes exist', () => {
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.Edit} />);
+
+        const input = screen.getByDisplayValue('Test Name');
+        fireEvent.change(input, { target: { value: 'Changed' } });
+
+        const cancelBtn = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+        fireEvent.click(cancelBtn);
+
+        expect(screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE)).toBeInTheDocument();
+
+        const confirmBtn = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES);
+        fireEvent.click(confirmBtn);
+
+        expect(screen.getByText('Test Name')).toBeInTheDocument();
+    });
+
+    it('calls preventDefault on delete button click', () => {
+        render(<GenericForm {...defaultProps} />);
+        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
+
+        const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
+        const preventDefaultSpy = jest.spyOn(clickEvent, 'preventDefault');
+
+        fireEvent(deleteButton, clickEvent);
+
+        expect(preventDefaultSpy).toHaveBeenCalled();
+    });
+
+    it('calls onDelete and onClose for child form in parent creation mode', async () => {
+        const onDelete = jest.fn().mockResolvedValue(undefined);
+        const onClose = jest.fn();
+
+        render(
+            <GenericForm
+                {...defaultProps}
+                initialData={{ id: 1, name: 'Test Name', optional: 'opt' }}
+                isChildForm={true}
+                isParentCreating={true}
+                onDelete={onDelete}
+                onClose={onClose}
+            />,
+        );
+
+        const header = screen.getByText('Test Name');
+        fireEvent.click(header);
+
+        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
+        fireEvent.click(deleteButton);
+
+        const confirmButton = screen.getByText(COMMON_TEXT_ADMIN.BUTTON.YES);
+        fireEvent.click(confirmButton);
+
+        await waitFor(() => {
+            expect(onDelete).toHaveBeenCalledWith(1);
+            expect(onClose).toHaveBeenCalled();
+        });
+    });
+
+    it('calls onModeChange when mode changes', () => {
+        const onModeChange = jest.fn();
+
+        render(<GenericForm {...defaultProps} initialMode={GenericFormMode.View} onModeChange={onModeChange} />);
+
+        expect(onModeChange).toHaveBeenCalledWith(GenericFormMode.View);
+
+        const editButton = screen.getByRole('button', { name: 'edit-btn' });
+        fireEvent.click(editButton);
+
+        expect(onModeChange).toHaveBeenCalledWith(GenericFormMode.Edit);
+    });
+
+    it('shows default delete title when correspondentBanks is empty array', () => {
+        const dataWithEmptyCorrespondentBanks = {
+            id: 1,
+            name: 'Test Bank',
+            optional: 'opt',
+            correspondentBanks: [],
+        };
+
+        render(<GenericForm {...defaultProps} initialData={dataWithEmptyCorrespondentBanks as any} />);
+
+        const deleteButton = screen.getByRole('button', { name: 'delete-btn' });
+        fireEvent.click(deleteButton);
+
+        expect(screen.getByText(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE)).toBeInTheDocument();
+    });
+
+    it('does not render fields with empty array values in View mode', () => {
+        const fieldsWithArray: GenericFormField<any>[] = [
+            { name: 'name', isTitle: true },
+            { name: 'tags', label: 'Tags' },
+        ];
+        const FormWithArray = createGenericForm<{ id?: number; name: string; tags: string[] }>(fieldsWithArray);
+
+        render(
+            <FormWithArray
+                initialData={{ id: 1, name: 'Test', tags: [] }}
+                initialMode={GenericFormMode.View}
+                onClose={jest.fn()}
+                onSubmit={jest.fn()}
+            />,
+        );
+
+        expect(screen.queryByText('Tags')).not.toBeInTheDocument();
     });
 });

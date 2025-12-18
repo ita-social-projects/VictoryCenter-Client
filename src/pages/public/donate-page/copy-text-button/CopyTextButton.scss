@@ -1,5 +1,5 @@
-@use '../../../../assets/sass/variables/colors';
-@use '../../../../assets/sass/variables/fonts';
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/fonts';
 .copyTextButton {
     all: unset;
     position: relative;
@@ -10,6 +10,8 @@
     width: 1.25rem;
     height: 1.25rem;
     opacity: 0.6;
+    word-break: normal;
+    overflow-wrap: normal;
 }
 .copyTextButton:hover {
     opacity: 1;
@@ -29,6 +31,9 @@
         line-height: 1.5rem;
         letter-spacing: -0.02em;
         animation: fadeInOut 2s ease forwards;
+        white-space: nowrap;
+        word-break: normal;
+        overflow-wrap: normal;
     }
 }
 

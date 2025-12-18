@@ -1,16 +1,18 @@
 import React from 'react';
-import { InputLabel, InputLabelProps } from '../../input-label/InputLabel';
-import { InputError, InputErrorProps } from '../../input-error/InputError';
+import { InputLabel, InputLabelProps } from '@/components/admin/input-label/InputLabel';
+import { InputError, InputErrorProps } from '@/components/admin/input-error/InputError';
 import {
     InputWithCharacterLimit,
     InputWithCharacterLimitProps,
-} from '../../input-with-character-limit/InputWithCharacterLimit';
+} from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
 import '../input-group.scss';
+import cn from 'classnames';
 
 export interface InputWithCharacterLimitGroupProps extends InputWithCharacterLimitProps {
     label: InputLabelProps['text'];
     isRequired?: InputLabelProps['isRequired'];
     error?: InputErrorProps['error'];
+    className?: string;
 }
 
 export const InputWithCharacterLimitGroup = ({
@@ -27,9 +29,10 @@ export const InputWithCharacterLimitGroup = ({
     disabled,
     placeholder,
     error,
+    className,
 }: InputWithCharacterLimitGroupProps) => {
     return (
-        <div className="input-group">
+        <div className={cn('input-group', className)}>
             <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
             <InputWithCharacterLimit
                 id={id}

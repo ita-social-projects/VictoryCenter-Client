@@ -1,6 +1,6 @@
-import { COMMON_TEXT_ADMIN } from '../../../const/admin/common';
-import { Button } from '../button/Button';
-import { Modal } from '../../common/modal/Modal';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
+import { Button } from '@/components/admin/button/Button';
+import { Modal } from '@/components/common/modal/Modal';
 import './ConfirmationModal.scss';
 
 export interface ConfirmationModalProps {

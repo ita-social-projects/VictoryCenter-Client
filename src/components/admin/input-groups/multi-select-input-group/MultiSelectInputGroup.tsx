@@ -1,13 +1,14 @@
-import React from 'react';
-import { InputLabel, InputLabelProps } from '../../input-label/InputLabel';
-import { InputError, InputErrorProps } from '../../input-error/InputError';
-import { MultiSelectInput, MultiSelectInputProps } from '../../multi-select-input/MultiSelectInput';
+import { MultiSelectInput, MultiSelectInputProps } from '@/components/admin/multi-select-input/MultiSelectInput';
+import { InputError, InputErrorProps } from '@/components/admin/input-error/InputError';
+import { InputLabel, InputLabelProps } from '@/components/admin/input-label/InputLabel';
+import cn from 'classnames';
 import '../input-group.scss';
 
 export interface MultiSelectInputGroupProps<T> extends MultiSelectInputProps<T> {
     label: InputLabelProps['text'];
     isRequired?: InputLabelProps['isRequired'];
     error?: InputErrorProps['error'];
+    className?: string;
 }
 
 export const MultiSelectInputGroup = <T,>({
@@ -23,9 +24,10 @@ export const MultiSelectInputGroup = <T,>({
     placeholder,
     disabled,
     error,
+    className,
 }: MultiSelectInputGroupProps<T>) => {
     return (
-        <div className="input-group">
+        <div className={cn('input-group', className)}>
             <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
             <MultiSelectInput
                 id={id}

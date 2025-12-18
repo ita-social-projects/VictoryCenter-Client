@@ -1,13 +1,23 @@
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TeamPageModals, TeamPageModalsProps } from './TeamPageModals';
-import { UseModalsStateResult } from '../../../../../hooks/admin/use-modals-state/useModalsState';
-import { ModalMode, VisibilityStatus } from '../../../../../types/admin/common';
-import { TeamCategory } from '../../../../../types/admin/team-category';
-import { TeamMember } from '../../../../../types/admin/team-members';
+import { UseModalsStateResult } from '@/hooks/admin/use-modals-state/useModalsState';
+import { ModalMode, VisibilityStatus } from '@/types/admin/common';
+import { TeamCategory } from '@/types/admin/team-category';
+import { TeamMember } from '@/types/admin/team-members';
+import { TeamMemberModalProps } from '@/pages/admin/team/components/team-member-modal/TeamMemberModal';
+import { DeleteTeamMemberModalProps } from '@/pages/admin/team/components/delete-team-member-modal/DeleteTeamMemberModal';
 
 jest.mock('../team-member-modal/TeamMemberModal', () => ({
-    TeamMemberModal: ({ mode, isOpen, onClose, onAddMember, onEditMember, memberToEdit, categories }: any) => (
+    TeamMemberModal: ({
+        mode,
+        isOpen,
+        onClose,
+        onAddMember,
+        onEditMember,
+        memberToEdit,
+        categories,
+    }: TeamMemberModalProps) => (
         <div data-testid="team-member-modal">
             <span data-testid="modal-mode">{mode}</span>
             <span data-testid="modal-is-open">{isOpen.toString()}</span>
@@ -31,7 +41,7 @@ jest.mock('../team-member-modal/TeamMemberModal', () => ({
 }));
 
 jest.mock('../delete-team-member-modal/DeleteTeamMemberModal', () => ({
-    DeleteTeamMemberModal: ({ isOpen, onClose, memberToDelete, onDeleteMember }: any) => (
+    DeleteTeamMemberModal: ({ isOpen, onClose, memberToDelete, onDeleteMember }: DeleteTeamMemberModalProps) => (
         <div data-testid="delete-team-member-modal">
             <span data-testid="delete-modal-is-open">{isOpen.toString()}</span>
             {memberToDelete && <span data-testid="delete-modal-member">{memberToDelete.id}</span>}
@@ -39,7 +49,7 @@ jest.mock('../delete-team-member-modal/DeleteTeamMemberModal', () => ({
                 Close
             </button>
             {onDeleteMember && (
-                <button data-testid="delete-modal-confirm-btn" onClick={() => onDeleteMember(memberToDelete)}>
+                <button data-testid="delete-modal-confirm-btn" onClick={() => onDeleteMember(memberToDelete!)}>
                     Delete
                 </button>
             )}
@@ -94,6 +104,7 @@ const mockTeamMember: TeamMember = {
     description: 'Test member',
     status: VisibilityStatus.Published,
     categoryId: 1,
+    localizations: [],
 };
 
 const mockTeamCategory: TeamCategory = {

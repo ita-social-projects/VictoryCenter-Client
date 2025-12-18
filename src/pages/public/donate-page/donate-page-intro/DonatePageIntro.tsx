@@ -1,6 +1,6 @@
 import React from 'react';
 import './DonatePageIntro.scss';
-import { PAGE_TITLE } from '../../../../const/public/donate-page';
+import { PAGE_TITLE } from '@/const/public/donate-page';
 
 export const DonatePageIntro = () => {
     const titleParts = PAGE_TITLE.split(' | ');

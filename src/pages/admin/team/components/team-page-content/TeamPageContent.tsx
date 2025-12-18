@@ -1,27 +1,28 @@
 import axios from 'axios';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TeamPageToolbar } from '../team-page-toolbar/TeamPageToolbar';
-import { COMMON_TEXT_ADMIN } from '../../../../../const/admin/common';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './TeamPageContent.scss';
-import { TeamMember } from '../../../../../types/admin/team-members';
-import { useAdminClient } from '../../../../../hooks/admin/use-admin-client/useAdminClient';
-import { VisibilityStatus } from '../../../../../types/admin/common';
-import { TeamCategoriesApi } from '../../../../../services/api/admin/team/team-categories/team-categories-api';
-import { TeamMembersApi } from '../../../../../services/api/admin/team/team-members/team-members-api';
-import { CategoryBar, ContextMenuOption } from '../../../../../components/admin/category-bar/CategoryBar';
-import { InfiniteScrollList } from '../../../../../components/admin/infinite-scroll-list/InfiniteScrollList';
-import { useToast } from '../../../../../contexts/admin/toast-context-provider/ToastContextProvider';
-import { ToastType } from '../../../../../types/admin/toast';
-import { ToastContainer } from '../../../../../components/admin/toast/toast-container/ToastContainer';
-import { DraggableListItem } from '../../../../../components/admin/draggable-list-item/DraggableListItem';
+import { TeamMember } from '@/types/admin/team-members';
+import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
+import { TeamCategoriesApi } from '@/services/api/admin/team/team-categories/team-categories-api';
+import { TeamMembersApi } from '@/services/api/admin/team/team-members/team-members-api';
+import { CategoryBar, ContextMenuOption } from '@/components/admin/category-bar/CategoryBar';
+import { InfiniteScrollList } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
+import { useToast } from '@/contexts/admin/toast-context-provider/ToastContextProvider';
+import { ToastType } from '@/types/admin/toast';
+import { ToastContainer } from '@/components/admin/toast/toast-container/ToastContainer';
+import { DraggableListItem } from '@/components/admin/draggable-list-item/DraggableListItem';
 import { MemberComponent } from '../member-component/MemberComponent';
-import { TeamCategory } from '../../../../../types/admin/team-category';
-import { TEAM_MEMBERS_TEXT } from '../../../../../const/admin/team';
-import { useModalsState } from '../../../../../hooks/admin/use-modals-state/useModalsState';
+import { TeamCategory } from '@/types/admin/team-category';
+import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { TeamPageModals } from '../team-page-modals/TeamPageModals';
-import { useTeamMemberSearch } from '../../../../../hooks/admin/team/useTeamMemberSearch';
-import { updateCategoryMemberCounts } from '../../../../../utils/functions/update-category-member-counts/update-category-member-counts';
-import { useLocalizationToolkit } from '../../../../../hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { useTeamMemberSearch } from '@/hooks/admin/team/useTeamMemberSearch';
+import { updateCategoryMemberCounts } from '@/utils/functions/update-category-member-counts/update-category-member-counts';
+import { useLocalizationToolkit } from '@/hooks/admin/use-localization-toolkit/useLocalizationToolkit';
+import { mapEntityWithLocalizations } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import { LOCALES } from '../../../../../const/common/locales';
 
 const DEFAULT_LOAD_ITEMS_COUNT = 5;
@@ -194,9 +195,15 @@ export const TeamPageContent = () => {
                     client,
                     searchCategoryId.id,
                     searchStatus,
+                    translationStatusFilter,
                     offset,
                     pageSize,
                 );
+
+                const mappedMembers: PaginationResult<TeamMember> = {
+                    items: fetchedMembers.items.map((item) => mapEntityWithLocalizations(item)),
+                    totalItemsCount: fetchedMembers.totalItemsCount,
+                };
 
                 if (abortController.signal.aborted) {
                     return;
@@ -204,10 +211,10 @@ export const TeamPageContent = () => {
 
                 setMembers((prev) => {
                     if (shouldResetList) {
-                        return [...fetchedMembers.items];
+                        return [...mappedMembers.items];
                     } else {
                         const existingIds = new Set(prev.map((m) => m.id));
-                        const uniqueFetchedMembers = fetchedMembers.items.filter((m) => !existingIds.has(m.id));
+                        const uniqueFetchedMembers = mappedMembers.items.filter((m) => !existingIds.has(m.id));
                         return [...prev, ...uniqueFetchedMembers];
                     }
                 });
@@ -215,13 +222,13 @@ export const TeamPageContent = () => {
                 currentPageRef.current = pageToFetch + 1;
 
                 if (shouldResetList) {
-                    currentItemsCountRef.current = fetchedMembers.items.length;
+                    currentItemsCountRef.current = mappedMembers.items.length;
                 } else {
-                    currentItemsCountRef.current += fetchedMembers.items.length;
+                    currentItemsCountRef.current += mappedMembers.items.length;
                 }
 
-                setHasMore(currentItemsCountRef.current < fetchedMembers.totalItemsCount);
-                hasMoreRef.current = currentItemsCountRef.current < fetchedMembers.totalItemsCount;
+                setHasMore(currentItemsCountRef.current < mappedMembers.totalItemsCount);
+                hasMoreRef.current = currentItemsCountRef.current < mappedMembers.totalItemsCount;
             } catch (error: any) {
                 if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
                     return;
@@ -238,6 +245,7 @@ export const TeamPageContent = () => {
             setErrorState,
             pageSize,
             statusFilter,
+            translationStatusFilter,
             client,
             isSingleView,
             selectedCategory,
@@ -322,8 +330,10 @@ export const TeamPageContent = () => {
             fetchCategories();
         } else if (error.type === 'members') {
             resetMembersState();
+        } else if (error.type === 'languages') {
+            retryFetchLanguages();
         }
-    }, [error.type, fetchCategories, resetMembersState]);
+    }, [error.type, fetchCategories, resetMembersState, retryFetchLanguages]);
 
     const updatePageSize = () => {
         if (listContainerRef.current) {
@@ -388,22 +398,31 @@ export const TeamPageContent = () => {
         [closeModalActions, pageSize, selectedCategory?.id, addToast],
     );
 
-    const handleTranslateMember = useCallback(() => {
-        closeModalActions.closeTranslateItemModal();
-    }, [closeModalActions]);
-
-    const handleEditMember = useCallback(
+    const handleTranslateMember = useCallback(
         (updatedMember: TeamMember) => {
-            if (updatedMember.image && 'url' in updatedMember.image)
-                updatedMember.image.url = `${updatedMember.image.url}?cb=${Date.now()}`;
             setMembers((prevMembers) =>
                 prevMembers.map((member) => (member.id === updatedMember.id ? updatedMember : member)),
             );
+            closeModalActions.closeTranslateItemModal();
+        },
+        [closeModalActions],
+    );
 
-            if (updatedMember.categoryId !== selectedCategory!.id) {
-                setMembers((prev) => prev.filter((m) => m.id !== updatedMember.id));
+    const handleEditMember = useCallback(
+        (updatedMember: TeamMember) => {
+            const mappedMember = mapEntityWithLocalizations(updatedMember as any) as TeamMember;
+
+            if (mappedMember.image && 'url' in mappedMember.image)
+                mappedMember.image.url = `${mappedMember.image.url}?cb=${Date.now()}`;
+
+            setMembers((prevMembers) =>
+                prevMembers.map((member) => (member.id === mappedMember.id ? mappedMember : member)),
+            );
+
+            if (mappedMember.categoryId !== selectedCategory!.id) {
+                setMembers((prev) => prev.filter((m) => m.id !== mappedMember.id));
                 setCategories((prevCategories) =>
-                    updateCategoryMemberCounts(prevCategories, selectedCategory!.id, updatedMember),
+                    updateCategoryMemberCounts(prevCategories, selectedCategory!.id, mappedMember),
                 );
             }
 
@@ -488,15 +507,19 @@ export const TeamPageContent = () => {
                 entity={member}
                 id={member.id}
                 ariaLabel={TEAM_MEMBERS_TEXT.ACTIONS.REORDER}
-                renderEntityComponent={(m) => (
-                    <MemberComponent
-                        key={m.id}
-                        member={m}
-                        handleOnTranslateMember={handleTranslateMemberModalOpen}
-                        handleOnDeleteMember={handleDeleteTeamMemberModalOpen}
-                        handleOnEditMember={handleEditMemberModalOpen}
-                    />
-                )}
+                renderEntityComponent={(m) =>
+                    selectedLanguage && (
+                        <MemberComponent
+                            key={m.id}
+                            member={m}
+                            handleOnTranslateMember={handleTranslateMemberModalOpen}
+                            handleOnDeleteMember={handleDeleteTeamMemberModalOpen}
+                            handleOnEditMember={handleEditMemberModalOpen}
+                            language={selectedLanguage}
+                            translationLanguages={translationLanguages}
+                        />
+                    )
+                }
                 entities={members}
                 idSelector={(m) => m.id}
                 onEntitiesReordered={handleEntitiesReordered}
@@ -508,6 +531,8 @@ export const TeamPageContent = () => {
             handleEditMemberModalOpen,
             handleEntitiesReordered,
             members,
+            selectedLanguage,
+            translationLanguages,
         ],
     );
 
@@ -526,6 +551,9 @@ export const TeamPageContent = () => {
                     categories={categories}
                     onSearchItemSelect={handleSearchItemSelect}
                     onSearchClear={handleSearchClearSelection}
+                    languages={allLanguages}
+                    onLanguageChange={onLanguageChange}
+                    onTranslationStatusFilterChange={onTranslationStatusFilterChange}
                 />
             </div>
 
@@ -555,7 +583,7 @@ export const TeamPageContent = () => {
                     renderItem={renderMemberItem}
                     onLoadMore={handleLoadMore}
                     hasMore={hasMoreToShow}
-                    isLoading={isMembersLoading || isCategoriesLoading}
+                    isLoading={isMembersLoading || isCategoriesLoading || !selectedLanguage}
                     emptyStateMessage={COMMON_TEXT_ADMIN.LIST.NOT_FOUND}
                 />
             </div>
@@ -572,7 +600,6 @@ export const TeamPageContent = () => {
                 onEditTeamCategory={handleEditCategory}
                 onDeleteTeamCategory={handleDeleteCategory}
             />
-
             <ToastContainer />
         </div>
     );

@@ -1,6 +1,6 @@
 import { updateCategoryMemberCounts } from './update-category-member-counts';
-import { TeamCategory } from '../../../types/admin/team-category';
-import { TeamMember } from '../../../types/admin/team-members';
+import { TeamCategory } from '@/types/admin/team-category';
+import { TeamMember } from '@/types/admin/team-members';
 
 describe('updateCategoryMemberCounts', () => {
     const mockCategories: TeamCategory[] = [
@@ -16,6 +16,7 @@ describe('updateCategoryMemberCounts', () => {
         description: 'Test member',
         status: 1,
         categoryId: 2,
+        localizations: [],
     };
 
     it('should decrement the selected category member count by 1', () => {

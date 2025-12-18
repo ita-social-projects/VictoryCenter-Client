@@ -1,17 +1,19 @@
 import { AxiosInstance } from 'axios';
-import { PaginationResult, VisibilityStatus } from '../../../../../types/admin/common';
-import { TeamMember, TeamMemberCreateUpdateRequest } from '../../../../../types/admin/team-members';
-import { API_ROUTES } from '../../../../../const/common/api-routes/main-api';
-import { ImageApi } from '../../image/image-api';
+import { PaginationResult, VisibilityStatus } from '@/types/admin/common';
+import { TeamMember, TeamMemberCreateUpdateRequest, TeamMemberDto } from '@/types/admin/team-members';
+import { API_ROUTES } from '@/const/common/api-routes/main-api';
+import { ImageApi } from '@/services/api/admin/image/image-api';
+import { TranslationStatusFilter } from '@/types/common/language';
 
 export const TeamMembersApi = {
     getAll: async (
         client: AxiosInstance,
         categoryId?: number,
         status?: VisibilityStatus | null,
+        translationStatusFilter?: TranslationStatusFilter | null,
         offset?: number,
         limit?: number,
-    ): Promise<PaginationResult<TeamMember>> => {
+    ): Promise<PaginationResult<TeamMemberDto>> => {
         const params: Record<string, any> = {};
 
         if (categoryId !== undefined && categoryId !== null) {
@@ -20,6 +22,9 @@ export const TeamMembersApi = {
         if (status !== undefined) {
             params.status = status;
         }
+        if (translationStatusFilter !== undefined && translationStatusFilter !== null) {
+            params.translationStatusFilter = translationStatusFilter;
+        }
         if (offset !== undefined && offset !== null) {
             params.offset = offset;
         }
@@ -27,7 +32,7 @@ export const TeamMembersApi = {
             params.limit = Math.floor(limit);
         }
 
-        const response = await client.get<PaginationResult<TeamMember>>(`${API_ROUTES.TEAM.BASE}`, { params });
+        const response = await client.get<PaginationResult<TeamMemberDto>>(`${API_ROUTES.TEAM.BASE}`, { params });
         return response.data;
     },
 

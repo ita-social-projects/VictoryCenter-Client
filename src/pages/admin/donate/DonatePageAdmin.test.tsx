@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { DonatePageAdmin } from './DonatePageAdmin';
+
 jest.mock('./components/donate-page-content/DonatePageContent', () => ({
     DonatePageContent: () => <div data-testid="donate-page-content" />,
 }));

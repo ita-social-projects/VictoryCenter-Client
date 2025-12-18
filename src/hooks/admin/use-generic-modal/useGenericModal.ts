@@ -1,14 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ModalMode, PendingAction, VisibilityStatus } from '../../../types/admin/common';
+import { ModalMode, PendingAction, VisibilityStatus } from '@/types/admin/common';
 
 export interface GenericFormRef {
-    submit: (status: VisibilityStatus) => void;
+    submit: (status: VisibilityStatus) => Promise<void>;
     isDirty: () => boolean;
     isValid: (isPublishing?: boolean) => boolean;
 }
 
 export interface GenericFormValues {
     [key: string]: any;
+}
+
+export interface ButtonValidationState {
+    isDraftValid: boolean;
+    isPublishValid: boolean;
 }
 
 export interface UseGenericModalConfig<TFormValues extends GenericFormValues, TEntity> {
@@ -22,6 +27,28 @@ export interface UseGenericModalConfig<TFormValues extends GenericFormValues, TE
     getErrorMessage: (mode: ModalMode) => string;
     getFormKey: (mode: ModalMode, entity?: TEntity) => string | number;
     transformFormData: (formData: TFormValues, status: VisibilityStatus, entity?: TEntity) => any;
+}
+
+export interface UseGenericModalReturn<TFormValues, TFormRef> {
+    formRef: React.RefObject<TFormRef | null>;
+    isSubmitting: boolean;
+    error: string;
+    showFormConfirmModal: boolean;
+    showCloseConfirmModal: boolean;
+    isFormValid: boolean;
+    isEditMode: boolean;
+    formKey: string | number;
+    formConfirmTitle: string;
+    buttonStates: ButtonValidationState;
+    handleFormValidationChange: (isValid: boolean) => void;
+    handleFormSubmit: (data: TFormValues, status: VisibilityStatus) => void;
+    handleCancelConfirmation: () => void;
+    handleConfirmAction: () => Promise<void>;
+    handleClose: () => void;
+    handleConfirmClose: () => void;
+    handleCancelClose: () => void;
+    handleDraftSubmit: () => void;
+    handlePublishSubmit: () => void;
 }
 
 export const useGenericModal = <
@@ -39,7 +66,7 @@ export const useGenericModal = <
     getErrorMessage,
     getFormKey,
     transformFormData,
-}: UseGenericModalConfig<TFormValues, TEntity>) => {
+}: UseGenericModalConfig<TFormValues, TEntity>): UseGenericModalReturn<TFormValues, TFormRef> => {
     const formRef = useRef<TFormRef>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
@@ -48,9 +75,9 @@ export const useGenericModal = <
     const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
     const [pendingFormData, setPendingFormData] = useState<TFormValues | null>(null);
     const [isFormValid, setIsFormValid] = useState(false);
-    const [buttonStates, setButtonStates] = useState({
-        draftValid: false,
-        publishValid: false,
+    const [buttonStates, setButtonStates] = useState<ButtonValidationState>({
+        isDraftValid: false,
+        isPublishValid: false,
     });
 
     const isEditMode = mode === ModalMode.Edit;
@@ -59,8 +86,8 @@ export const useGenericModal = <
         const api = formRef.current;
 
         setButtonStates({
-            draftValid: api?.isValid?.(false) ?? currentIsValid,
-            publishValid: api?.isValid?.(true) ?? currentIsValid,
+            isDraftValid: api?.isValid?.(false) ?? currentIsValid,
+            isPublishValid: api?.isValid?.(true) ?? currentIsValid,
         });
     }, []);
 

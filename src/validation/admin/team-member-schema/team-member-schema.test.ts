@@ -1,4 +1,4 @@
-import { TEAM_MEMBER_VALIDATION } from '../../../const/admin/team';
+import { TEAM_MEMBER_VALIDATION } from '@/const/admin/team';
 import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from './team-member-schema';
 
 describe('teamMemberValidationSchema', () => {
@@ -16,7 +16,6 @@ describe('teamMemberValidationSchema', () => {
 
     const validImageObj = { base64: 'abc', mimeType: 'image/png', size: 1000 };
     const validImageValue = { url: 'https://localhost:8080', mimeType: 'image/png', id: 1000 };
-    const invalidImageBadFormat = { ...validImageObj, mimeType: 'application/pdf' };
 
     describe('fullName validation', () => {
         it('accepts valid fullName', () => {

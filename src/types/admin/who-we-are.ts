@@ -27,4 +27,8 @@ export type Content = {
 export interface CardImageConfig {
     style: React.CSSProperties;
     subText: string;
+    cropWidth: number;
+    cropHeight: number;
+    minWidth: number;
+    minHeight: number;
 }

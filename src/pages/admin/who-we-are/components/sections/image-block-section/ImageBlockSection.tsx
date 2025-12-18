@@ -1,15 +1,15 @@
-import { Content } from '../../../../../../types/admin/who-we-are';
-import { ImageInput, ImageInputProps } from '../../../../../../components/admin/image-input/ImageInput';
-import { WHO_WE_ARE_TEXT } from '../../../../../../const/admin/who-we-are';
+import { Content } from '@/types/admin/who-we-are';
+import { ImageInput, ImageInputProps } from '@/components/admin/image-input/ImageInput';
+import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
 import React, { useState } from 'react';
-import { TextAreaWithCharacterLimit } from '../../../../../../components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
-import { ImageValues } from '../../../../../../types/common/image';
-import { COMMON_TEXT_ADMIN } from '../../../../../../const/admin/common';
+import { TextAreaWithCharacterLimit } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { ImageValues } from '@/types/common/image';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './ImageBlockSection.scss';
-import { InputWithCharacterLimit } from '../../../../../../components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { Button } from '../../../../../../components/admin/button/Button';
-import { ContentType } from '../../../../../../types/common/about-us';
-import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '../../../../../../validation/admin/who-we-are-schema/WhoWeAreSchema';
+import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
+import { Button } from '@/components/admin/button/Button';
+import { ContentType } from '@/types/common/about-us';
+import { WHO_WE_ARE_VALIDATION_FUNCTIONS } from '@/validation/admin/who-we-are-schema/WhoWeAreSchema';
 
 export interface ImageSectionProps {
     content: Content[] | undefined;
@@ -99,7 +99,7 @@ export const ImageSection = ({
                     setError={setImageError}
                     value={imageContent?.image ?? null}
                     onChange={handleImageChange}
-                    className="who-we-are-image-input-wrapper"
+                    className="image-input-featured"
                     label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
                     {...imageInputProps}
                 />

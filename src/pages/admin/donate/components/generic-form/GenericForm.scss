@@ -1,4 +1,4 @@
-@use '../../../../../assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors';
 
 .generic-form {
     display: flex;
@@ -36,7 +36,7 @@
             .arrow {
                 display: inline-block;
                 margin-left: 0.25rem;
-                background: url('../../../../../assets/icons/chevron-down.svg') no-repeat center;
+                background: url('~@/assets/icons/chevron-down.svg') no-repeat center;
                 width: 1.5rem;
                 height: 1.5rem;
                 transition: transform 0.2s ease;
@@ -53,12 +53,6 @@
         flex-direction: column;
         gap: 1.75rem;
 
-        .error {
-            font-size: 0.875rem;
-            font-weight: 400;
-            color: colors.$blue-500;
-        }
-
         .form-field {
             display: flex;
             flex-direction: column;
@@ -68,10 +62,6 @@
                 display: flex;
                 flex-direction: column;
                 flex: 1;
-
-                .error {
-                    margin-top: 0.25rem;
-                }
             }
         }
     }
@@ -113,7 +103,7 @@
         }
 
         .body {
-            flex-direction: column-reverse;
+            flex-direction: column;
         }
 
         .generic-form {
@@ -131,5 +121,11 @@
                 flex: 1;
             }
         }
+    }
+
+    .divider {
+        padding-top: 1.875rem;
+        border-radius: 0;
+        border-top: 1px solid colors.$grey-700;
     }
 }

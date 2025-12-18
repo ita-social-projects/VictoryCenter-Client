@@ -23,7 +23,7 @@ jest.mock('./MultiFieldLabelWithCopy', () => ({
     ),
 }));
 
-jest.mock('../../../../../const/public/donate-page', () => ({
+jest.mock('@/const/public/donate-page', () => ({
     PAYMENT_DETAILS_COMMON: {
         RECIPIENT_LABEL: 'Recipient',
         RECIPIENT_NAME_LABEL: 'Default Recipient Name',
@@ -62,13 +62,6 @@ describe('PaymentDetailsSection', () => {
                 .closest('.abroadPaymentDetailsBlock')
                 ?.querySelector('.abroadPaymentDetailsContent'),
         ).toBeInTheDocument();
-    };
-
-    const expectPaymentLabel = (label: string, value: string, copyValue: string) => {
-        const element = screen.getByTestId('payment-label');
-        expect(element).toHaveAttribute('data-label', label);
-        expect(element).toHaveAttribute('data-value', value);
-        expect(element).toHaveAttribute('data-copy-value', copyValue);
     };
 
     describe('rendering with all props provided', () => {

@@ -1,0 +1,10 @@
+.template-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: calc(100% - 10rem);
+    height: 42rem;
+    margin: 0 auto;
+    background-color: #fff;
+    box-sizing: border-box;
+}

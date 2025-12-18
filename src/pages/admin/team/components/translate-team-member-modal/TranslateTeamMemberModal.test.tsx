@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TranslateTeamMemberModal } from './TranslateTeamMemberModal';
 import { TeamMember } from '@/types/admin/team-members';
@@ -165,11 +165,12 @@ describe('TranslateTeamMemberModal', () => {
 
         const button = screen.getByRole('button');
 
-        await act(async () => {
-            fireEvent.click(button);
+        fireEvent.click(button);
+
+        await waitFor(() => {
+            expect(onTranslateMember).toHaveBeenCalledTimes(1);
         });
 
-        expect(onTranslateMember).toHaveBeenCalledTimes(1);
         expect(onTranslateMember).toHaveBeenCalledWith(
             expect.objectContaining({
                 localizations: expect.arrayContaining([
@@ -258,11 +259,12 @@ describe('TranslateTeamMemberModal', () => {
 
         const button = screen.getByRole('button');
 
-        await act(async () => {
-            fireEvent.click(button);
+        fireEvent.click(button);
+
+        await waitFor(() => {
+            expect(screen.getByText(TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_TRANSLATE_MEMBER)).toBeInTheDocument();
         });
 
-        expect(screen.getByText(TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_TRANSLATE_MEMBER)).toBeInTheDocument();
         expect(onTranslateMember).not.toHaveBeenCalled();
         expect(onClose).not.toHaveBeenCalled();
     });
@@ -294,18 +296,16 @@ describe('TranslateTeamMemberModal', () => {
         fireEvent.click(button);
         expect(button).toBeDisabled();
 
-        await act(async () => {
-            resolvePromise({
-                id: 10,
-                entityId: 1,
-                languageId: 2,
-                fullName: 'Translated Name',
-                description: 'Translated Description',
-            });
+        resolvePromise({
+            id: 10,
+            entityId: 1,
+            languageId: 2,
+            fullName: 'Translated Name',
+            description: 'Translated Description',
         });
 
-        await screen.findByTestId('modal', {}, { timeout: 100 }).catch(() => {});
-
-        expect(onClose).toHaveBeenCalled();
+        await waitFor(() => {
+            expect(onClose).toHaveBeenCalled();
+        });
     });
 });

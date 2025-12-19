@@ -41,7 +41,7 @@ export const renderProgramSection = ({ templateId, data }: RenderProgramSectionP
                 />
             );
         case ProgramSectionTemplate.TextOnly:
-            return <TextOnly />;
+            return <TextOnly title={data.title} description={data.description} image1={data.image1} />;
         case ProgramSectionTemplate.TripleImagesBottom:
             // TODO: Implement TripleImagesBottom template
             return null;

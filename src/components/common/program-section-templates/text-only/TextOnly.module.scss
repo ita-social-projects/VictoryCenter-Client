@@ -2,12 +2,56 @@
 
 .container {
     @extend .template-container;
+}
+
+.topSection {
+    height: 50%;
+    display: flex;
+}
+
+.imageWrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bottomSection {
+    display: flex;
+    gap: 2rem;
     padding: 2rem;
+    height: 50%;
+}
+
+.titleSection {
+    flex: 1;
+    display: flex;
+    align-items: center;
 }
 
 .title {
     font-size: 2rem;
     font-weight: bold;
+    line-height: 1.2;
+    word-wrap: break-word;
+}
+
+.descriptionSection {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.description {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #333;
+    word-wrap: break-word;
 }

@@ -18,6 +18,7 @@ const TEMPLATES = [
     ProgramSectionTemplate.QuadImagesBottom,
     ProgramSectionTemplate.DualImagesBottom,
     ProgramSectionTemplate.SingleImageTop,
+    ProgramSectionTemplate.TextOnly,
 ];
 
 export const AddSectionModal = ({ isOpen, onClose }: AddSectionModalProps) => {

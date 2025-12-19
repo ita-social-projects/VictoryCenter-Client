@@ -32,7 +32,14 @@ export const renderProgramSection = ({ templateId, data }: RenderProgramSectionP
                 />
             );
         case ProgramSectionTemplate.DualImagesBottom:
-            return <DualImagesBottom />;
+            return (
+                <DualImagesBottom
+                    title={data.title}
+                    description={data.description}
+                    image1={data.image1}
+                    image2={data.image2}
+                />
+            );
         case ProgramSectionTemplate.TextOnly:
             return <TextOnly />;
         case ProgramSectionTemplate.TripleImagesBottom:

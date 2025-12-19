@@ -1,12 +1,12 @@
-import styles from './TextOnly.module.scss';
+import styles from './SingleImageTop.module.scss';
 
-export interface TextOnlyProps {
+export interface SingleImageTopProps {
     title?: string;
     description?: string;
     image1?: string;
 }
 
-export const TextOnly = ({ title = '', description = '', image1 = '' }: TextOnlyProps) => {
+export const SingleImageTop = ({ title = '', description = '', image1 = '' }: SingleImageTopProps) => {
     return (
         <div className={styles.container}>
             <div className={styles.topSection}>

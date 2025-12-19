@@ -17,7 +17,7 @@ export interface AddSectionModalProps {
 const TEMPLATES = [
     ProgramSectionTemplate.QuadImagesBottom,
     ProgramSectionTemplate.DualImagesBottom,
-    ProgramSectionTemplate.TextOnly,
+    ProgramSectionTemplate.SingleImageTop,
 ];
 
 export const AddSectionModal = ({ isOpen, onClose }: AddSectionModalProps) => {

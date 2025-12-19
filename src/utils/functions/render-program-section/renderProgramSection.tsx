@@ -2,7 +2,7 @@ import React from 'react';
 import { ProgramSectionTemplate } from '@/types/common/program-sections';
 import { QuadImagesBottom } from '@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom';
 import { DualImagesBottom } from '@/components/common/program-section-templates/dual-images-bottom/DualImagesBottom';
-import { TextOnly } from '@/components/common/program-section-templates/text-only/TextOnly';
+import { SingleImageTop } from '@/components/common/program-section-templates/single-image-top/SingleImageTop';
 
 export interface ProgramSectionData {
     title?: string;
@@ -41,7 +41,8 @@ export const renderProgramSection = ({ templateId, data }: RenderProgramSectionP
                 />
             );
         case ProgramSectionTemplate.TextOnly:
-            return <TextOnly title={data.title} description={data.description} image1={data.image1} />;
+            // TODO: Implement TextOnly template
+            return null;
         case ProgramSectionTemplate.TripleImagesBottom:
             // TODO: Implement TripleImagesBottom template
             return null;
@@ -49,8 +50,7 @@ export const renderProgramSection = ({ templateId, data }: RenderProgramSectionP
             // TODO: Implement SingleImageBottom template
             return null;
         case ProgramSectionTemplate.SingleImageTop:
-            // TODO: Implement SingleImageTop template
-            return null;
+            return <SingleImageTop title={data.title} description={data.description} image1={data.image1} />;
         case ProgramSectionTemplate.SingleImageRight:
             // TODO: Implement SingleImageRight template
             return null;

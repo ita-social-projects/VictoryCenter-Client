@@ -27,7 +27,16 @@ jest.mock('@/components/admin/confirmation-modal/ConfirmationModal', () => ({
 jest.mock('@/components/common/modal/Modal', () => {
     const Modal = ({ isOpen, children, onClose }: any) =>
         isOpen ? (
-            <div data-testid="modal" onClick={onClose}>
+            <div
+                data-testid="modal"
+                onClick={onClose}
+                role="dialog"
+                aria-modal="true"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                    if (e.key === 'Escape') onClose();
+                }}
+            >
                 {children}
             </div>
         ) : null;

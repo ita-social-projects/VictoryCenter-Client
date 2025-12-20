@@ -398,6 +398,24 @@ const mockMembers: TeamMember[] = [
 
 const mockClient = {};
 
+const expectMemberNameToBe = async (name: string) => {
+    await waitFor(() => {
+        expect(screen.getByTestId('member-name-1')).toHaveTextContent(name);
+    });
+};
+
+const expectTranslateButtonToBeVisible = async () => {
+    await waitFor(() => {
+        expect(screen.getByTestId('translate-member-1')).toBeInTheDocument();
+    });
+};
+
+const expectTeamPageModalsToBeVisible = async () => {
+    await waitFor(() => {
+        expect(screen.getByTestId('team-page-modals')).toBeInTheDocument();
+    });
+};
+
 describe('TeamPageContent', () => {
     const renderTeamPageContent = () => render(<TeamPageContent />);
 
@@ -898,16 +916,11 @@ describe('TeamPageContent', () => {
             it('should update member in list after translate', async () => {
                 renderTeamPageContent();
 
-                await waitFor(() => {
-                    expect(screen.getByTestId('member-name-1')).toHaveTextContent('John Doe');
-                });
+                await expectMemberNameToBe('John Doe');
 
                 fireEvent.click(screen.getByTestId('simulate-translate-member'));
 
-                await waitFor(() => {
-                    expect(screen.getByTestId('member-name-1')).toHaveTextContent('Translated Member');
-                });
-
+                await expectMemberNameToBe('Translated Member');
                 expect(mockCloseModalActions.closeTranslateItemModal).toHaveBeenCalled();
             });
 
@@ -1203,9 +1216,7 @@ describe('TeamPageContent', () => {
             it('should open translate member modal when translate button clicked', async () => {
                 renderTeamPageContent();
 
-                await waitFor(() => {
-                    expect(screen.getByTestId('translate-member-1')).toBeInTheDocument();
-                });
+                await expectTranslateButtonToBeVisible();
 
                 fireEvent.click(screen.getByTestId('translate-member-1'));
 
@@ -1217,9 +1228,7 @@ describe('TeamPageContent', () => {
 
                 renderTeamPageContent();
 
-                await waitFor(() => {
-                    expect(screen.getByTestId('translate-member-1')).toBeInTheDocument();
-                });
+                await expectTranslateButtonToBeVisible();
 
                 fireEvent.click(screen.getByTestId('translate-member-1'));
 
@@ -1384,11 +1393,10 @@ describe('TeamPageContent', () => {
             it('should pass englishLanguage to TeamPageModals', async () => {
                 renderTeamPageContent();
 
-                await waitFor(() => {
-                    expect(screen.getByTestId('team-page-modals')).toBeInTheDocument();
-                });
+                await expectTeamPageModalsToBeVisible();
 
-                expect(mockLanguages.find((l) => l.code === 'en')).toBeDefined();
+                const englishLanguage = mockLanguages.find((l) => l.code === 'en');
+                expect(englishLanguage).toBeDefined();
             });
         });
     });

@@ -93,7 +93,7 @@ jobs:
           | cut -d "-" -f2 | head -c -1)" >> $GITHUB_OUTPUT
     - name: "Set frontend tag"
       id: frontend_tag
-      run: echo "frontend_tag=$(docker container inspect $(docker container ls -aq) --format "{{.Config.Image}}" | grep -m 1 "victorycenterua/client:" | cut -d "-" -f2 | head -c -1)" >> $GITHUB_OUTPUT   
+      run: echo "DOCKER_TAG_FRONTEND=client:release-${GITHUB_REF##*/}.${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
     - name: Checkout
       uses: actions/checkout@v2
       with:

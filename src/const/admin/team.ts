@@ -23,7 +23,6 @@ export const TEAM_MEMBERS_TEXT = {
         TITLE: {
             ADD_MEMBER: 'Додати в команду',
             EDIT_MEMBER: 'Редагування члена команди',
-            TRANSLATE_MEMBER: 'Додати переклад',
             DELETE_MEMBER: 'Видалити члена команди?',
         },
         MESSAGE: {

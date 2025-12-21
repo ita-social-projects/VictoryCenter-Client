@@ -14,6 +14,7 @@ import styles from './TranslateTeamMemberModal.module.scss';
 import { LocalizationLanguage } from '@/types/common/language';
 import './TranslateTeamMemberModal.scss';
 import { useTranslateTeamMember } from '@/hooks/admin/use-translate-team-member/useTranslateTeamMember';
+import cn from 'classnames';
 
 interface TranslateTeamMemberModalProps {
     isOpen: boolean;
@@ -76,7 +77,7 @@ export const TranslateTeamMemberModal = ({
     return (
         <>
             <Modal isOpen={isOpen} onClose={handleRequestClose}>
-                <Modal.Title>{TEAM_MEMBERS_TEXT.FORM.TITLE.TRANSLATE_MEMBER}</Modal.Title>
+                <Modal.Title>{COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION}</Modal.Title>
 
                 <Modal.Content>
                     {error && <div className="translate-member-error">{error}</div>}
@@ -88,7 +89,7 @@ export const TranslateTeamMemberModal = ({
                 </Modal.Content>
 
                 <Modal.Actions>
-                    <div className={`${styles['modal-scope']} translate-team-member-modal`}>
+                    <div className={cn(styles['modal-scope'], 'translate-team-member-modal')}>
                         <Button
                             buttonStyle="primary"
                             onClick={handleSubmit}

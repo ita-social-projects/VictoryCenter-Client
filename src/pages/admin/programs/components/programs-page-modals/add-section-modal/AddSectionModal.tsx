@@ -20,6 +20,7 @@ const TEMPLATES = [
     ProgramSectionTemplate.DualImagesBottom,
     ProgramSectionTemplate.SingleImageTop,
     ProgramSectionTemplate.SingleImageBottom,
+    ProgramSectionTemplate.SingleImageRight,
     ProgramSectionTemplate.TextOnly,
 ];
 

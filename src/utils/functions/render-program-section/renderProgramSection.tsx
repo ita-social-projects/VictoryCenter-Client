@@ -6,6 +6,7 @@ import { DualImagesBottom } from '@/components/common/program-section-templates/
 import { TextOnly } from '@/components/common/program-section-templates/text-only/TextOnly';
 import { SingleImageTop } from '@/components/common/program-section-templates/single-image-top/SingleImageTop';
 import { SingleImageBottom } from '@/components/common/program-section-templates/single-image-bottom/SingleImageBottom';
+import { SingleImageRight } from '@/components/common/program-section-templates/single-image-right/SingleImageRight';
 
 export interface ProgramSectionData {
     title?: string;
@@ -60,8 +61,7 @@ export const renderProgramSection = ({ templateId, data }: RenderProgramSectionP
         case ProgramSectionTemplate.SingleImageTop:
             return <SingleImageTop title={data.title} description={data.description} image1={data.image1} />;
         case ProgramSectionTemplate.SingleImageRight:
-            // TODO: Implement SingleImageRight template
-            return null;
+            return <SingleImageRight title={data.title} description={data.description} image1={data.image1} />;
         default:
             return null;
     }

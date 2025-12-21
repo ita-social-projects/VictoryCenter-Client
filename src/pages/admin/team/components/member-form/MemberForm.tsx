@@ -5,12 +5,12 @@ import { ImageValues, Image } from '@/types/common/image';
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { SingleSelectInput } from '@/components/common/single-select-input/SingleSelectInput';
 import { TEAM_MEMBER_VALIDATION, TEAM_MEMBERS_TEXT } from '@/const/admin/team';
-import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { TextAreaWithCharacterLimit } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import './MemberForm.scss';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { TeamCategory } from '@/types/admin/team-category';
+import { CommonMemberFields } from '../common-member-fields/CommonMemberFields';
+import { useCommonMemberFields } from '@/hooks/admin/use-common-member-fields/useCommonMemberFields';
 export interface TeamMemberFormValues {
     categoryId: number | null;
     fullName: string;
@@ -75,33 +75,12 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
             ref,
         });
 
-        const handleFullNameChange = useCallback(
-            (e: React.ChangeEvent<HTMLInputElement>) => {
-                setFormState((prev) => ({ ...prev, fullName: e.target.value }));
-            },
-            [setFormState],
-        );
-
-        const handleNameBlur = useCallback(() => {
-            setErrors((prev) => ({
-                ...prev,
-                fullName: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(formState.fullName, false),
-            }));
-        }, [formState.fullName, setErrors]);
-
-        const handleDescriptionChange = useCallback(
-            (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                setFormState((prev) => ({ ...prev, description: e.target.value }));
-            },
-            [setFormState],
-        );
-
-        const handleDescriptionBlur = useCallback(() => {
-            setErrors((prev) => ({
-                ...prev,
-                description: TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription(formState.description, false),
-            }));
-        }, [formState.description, setErrors]);
+        const { handleFullNameChange, handleFullNameBlur, handleDescriptionChange, handleDescriptionBlur } =
+            useCommonMemberFields({
+                formState,
+                setFormState,
+                setErrors,
+            });
 
         const handleImgChange = useCallback(
             (file: ImageValues | Image | null) => {
@@ -158,33 +137,16 @@ export const MemberForm = forwardRef<TeamMemberFormRef, MemberFormProps>(
                     {errors.category && <p className="error">{errors.category}</p>}
                 </div>
 
-                <div className="form-group">
-                    <InputLabel htmlFor={'fullName'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.FULLNAME} isRequired />
-                    <InputWithCharacterLimit
-                        value={formState.fullName}
-                        onChange={handleFullNameChange}
-                        onBlur={handleNameBlur}
-                        id="fullName"
-                        name="fullName"
-                        maxLength={TEAM_MEMBER_VALIDATION.fullName.max}
-                        disabled={isSubmitting || formDisabled}
-                    />
-                    {errors.fullName && <p className="error">{errors.fullName}</p>}
-                </div>
-                <div className="form-group">
-                    <InputLabel htmlFor={'description'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.DESCRIPTION} />
-                    <TextAreaWithCharacterLimit
-                        value={formState.description}
-                        onChange={handleDescriptionChange}
-                        onBlur={handleDescriptionBlur}
-                        id="description"
-                        name="description"
-                        rows={8}
-                        disabled={isSubmitting || formDisabled}
-                        maxLength={TEAM_MEMBER_VALIDATION.description.max}
-                    />
-                    {errors.description && <span className="error desc-error">{errors.description}</span>}
-                </div>
+                <CommonMemberFields
+                    formState={formState}
+                    errors={errors}
+                    isSubmitting={isSubmitting}
+                    formDisabled={formDisabled}
+                    handleFullNameChange={handleFullNameChange}
+                    handleFullNameBlur={handleFullNameBlur}
+                    handleDescriptionChange={handleDescriptionChange}
+                    handleDescriptionBlur={handleDescriptionBlur}
+                />
                 <div className="form-group">
                     <InputLabel htmlFor={'image'} text={TEAM_MEMBERS_TEXT.FORM.LABEL.PHOTO} />
                     <ImageInput

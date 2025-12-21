@@ -38,6 +38,13 @@ export interface TeamMemberLocalizationDto extends EntityLocalizationDto, TeamMe
     entityId: number;
 }
 
+export type CreateTeamMemberLocalizationDto = {
+    entityId: number;
+    languageId: number;
+    fullName: string;
+    description?: string | null;
+};
+
 export interface TeamMemberCreateUpdateRequest {
     id: number | null;
     fullName: string;

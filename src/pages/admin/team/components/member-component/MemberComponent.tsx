@@ -14,6 +14,7 @@ export interface MemberComponentProps {
     translationLanguages: LocalizationLanguage[];
     handleOnDeleteMember: (member: TeamMember) => void;
     handleOnEditMember: (member: TeamMember) => void;
+    handleOnTranslateMember: (member: TeamMember) => void;
 }
 
 export const MemberComponent = ({
@@ -22,6 +23,7 @@ export const MemberComponent = ({
     translationLanguages,
     handleOnDeleteMember,
     handleOnEditMember,
+    handleOnTranslateMember,
 }: MemberComponentProps) => {
     const [error, setError] = useState(false);
     const [textFields, setTextFields] = useState<TeamMemberLocalizableFields>();
@@ -38,6 +40,10 @@ export const MemberComponent = ({
             description: displayedLocalization?.description || member.description,
         });
     }, [language, member]);
+
+    const handleTranslateMember = () => {
+        handleOnTranslateMember(member);
+    };
 
     const handleEditMember = () => {
         handleOnEditMember(member);
@@ -72,6 +78,12 @@ export const MemberComponent = ({
                     <VisibilityStatusLabel status={member.status} />
                 </div>
                 <div className="members-actions">
+                    <button
+                        aria-label={TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE}
+                        type="button"
+                        onClick={handleTranslateMember}
+                        className="members-actions-translate"
+                    />
                     <button
                         aria-label={TEAM_MEMBERS_TEXT.ACTIONS.EDIT}
                         type="button"

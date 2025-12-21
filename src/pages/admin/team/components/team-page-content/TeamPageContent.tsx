@@ -108,6 +108,8 @@ export const TeamPageContent = () => {
         retryFetchLanguages,
     } = useLocalizationToolkit({ setErrorState });
 
+    const englishLanguage = useMemo(() => allLanguages.find((l) => l.code === 'en'), [allLanguages]);
+
     const isSingleView = !!selectedSearchMember;
     const itemsToRender = useMemo(() => {
         if (isSingleView && selectedCategory && selectedSearchMember?.categoryId === selectedCategory.id) {
@@ -279,6 +281,14 @@ export const TeamPageContent = () => {
         [selectedCategory, resetMembersState],
     );
 
+    const handleTranslateMemberModalOpen = useCallback(
+        (member: TeamMember) => {
+            if (isAnyModalOpened) return;
+            openModalActions.openTranslateItemModal(member);
+        },
+        [isAnyModalOpened, openModalActions],
+    );
+
     const handleDeleteTeamMemberModalOpen = useCallback(
         (member: TeamMember) => {
             if (isAnyModalOpened) return;
@@ -387,6 +397,16 @@ export const TeamPageContent = () => {
         [closeModalActions, pageSize, selectedCategory?.id, addToast],
     );
 
+    const handleTranslateMember = useCallback(
+        (updatedMember: TeamMember) => {
+            setMembers((prevMembers) =>
+                prevMembers.map((member) => (member.id === updatedMember.id ? updatedMember : member)),
+            );
+            closeModalActions.closeTranslateItemModal();
+        },
+        [closeModalActions],
+    );
+
     const handleEditMember = useCallback(
         (updatedMember: TeamMember) => {
             const mappedMember = mapEntityWithLocalizations(updatedMember as any) as TeamMember;
@@ -491,6 +511,7 @@ export const TeamPageContent = () => {
                         <MemberComponent
                             key={m.id}
                             member={m}
+                            handleOnTranslateMember={handleTranslateMemberModalOpen}
                             handleOnDeleteMember={handleDeleteTeamMemberModalOpen}
                             handleOnEditMember={handleEditMemberModalOpen}
                             language={selectedLanguage}
@@ -504,6 +525,7 @@ export const TeamPageContent = () => {
             ></DraggableListItem>
         ),
         [
+            handleTranslateMemberModalOpen,
             handleDeleteTeamMemberModalOpen,
             handleEditMemberModalOpen,
             handleEntitiesReordered,
@@ -568,8 +590,10 @@ export const TeamPageContent = () => {
             <TeamPageModals
                 modalsStateControl={modalsStateControl}
                 categories={categories}
+                englishLanguage={englishLanguage}
                 onAddTeamMember={handleAddMember}
                 onEditTeamMember={handleEditMember}
+                onTranslateTeamMember={handleTranslateMember}
                 onDeleteTeamMember={handleDeleteMember}
                 onAddTeamCategory={handleAddCategory}
                 onEditTeamCategory={handleEditCategory}

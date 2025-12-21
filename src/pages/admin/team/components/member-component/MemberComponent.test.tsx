@@ -33,11 +33,13 @@ const baseMember = {
 describe('MemberComponent', () => {
     let handleOnEditMember: jest.Mock;
     let handleOnDeleteMember: jest.Mock;
+    let handleOnTranslateMember: jest.Mock;
 
     beforeEach(() => {
         handleOnEditMember = jest.fn();
         jest.clearAllMocks();
         handleOnDeleteMember = jest.fn();
+        handleOnTranslateMember = jest.fn();
     });
 
     const renderComponent = (override: Partial<MemberComponentProps['member']> = {}) =>
@@ -48,6 +50,7 @@ describe('MemberComponent', () => {
                 translationLanguages={[{ id: 1, code: 'en', name: 'Англійська' }]}
                 handleOnEditMember={handleOnEditMember}
                 handleOnDeleteMember={handleOnDeleteMember}
+                handleOnTranslateMember={handleOnTranslateMember}
             />,
         );
 
@@ -78,6 +81,18 @@ describe('MemberComponent', () => {
         const editBtn = screen.getByRole('button', { name: TEAM_MEMBERS_TEXT.ACTIONS.EDIT }); // no visible text, so fallback query
         fireEvent.click(editBtn); // first button in DOM is edit
         expect(handleOnEditMember).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+    });
+
+    it('calls handleOnTranslateMember when translate button clicked', () => {
+        renderComponent();
+
+        const translateBtn = screen.getByRole('button', {
+            name: TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE,
+        });
+
+        fireEvent.click(translateBtn);
+
+        expect(handleOnTranslateMember).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
     });
 
     it('calls handleOnDeleteMember when delete button clicked', () => {

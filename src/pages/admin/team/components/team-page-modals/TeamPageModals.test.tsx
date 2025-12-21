@@ -133,6 +133,7 @@ const createMockModalsStateControl = (
         isAddCategoryModalOpen: false,
         isEditCategoryModalOpen: false,
         isDeleteCategoryModalOpen: false,
+        isAddSectionModalOpen: false,
         ...overrides,
     },
     closeModalActions: {
@@ -142,6 +143,7 @@ const createMockModalsStateControl = (
         closeAddCategoryModal: jest.fn(),
         closeEditCategoryModal: jest.fn(),
         closeDeleteCategoryModal: jest.fn(),
+        closeAddSectionModal: jest.fn(),
     },
     openModalActions: {
         openAddItemModal: jest.fn(),
@@ -150,6 +152,7 @@ const createMockModalsStateControl = (
         openAddCategoryModal: jest.fn(),
         openEditCategoryModal: jest.fn(),
         openDeleteCategoryModal: jest.fn(),
+        openAddSectionModal: jest.fn(),
     },
     isAnyModalOpened: false,
 });

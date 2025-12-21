@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
 import { Program, ProgramCategory, ProgramCreateUpdate } from '@/types/admin/programs';
 import { VisibilityStatus, PendingAction, ModalMode } from '@/types/admin/common';
@@ -8,6 +8,7 @@ import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
 import { useGenericModal } from '@/hooks/admin/use-generic-modal/useGenericModal';
 import { GenericModalWrapper } from '@/components/admin/generic-modal-wrapper/GenericModalWrapper';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { AddSectionModal } from '../add-section-modal/AddSectionModal';
 import './ProgramModal.scss';
 
@@ -36,7 +37,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const isEditMode = mode === ModalMode.Edit;
     const program = isEditMode ? props.programToEdit : undefined;
     const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
-    const [isAddSectionModalOpen, setIsAddSectionModalOpen] = useState(false);
+    const { modalState, openModalActions, closeModalActions } = useModalsState();
 
     const initialData = useMemo<ProgramFormValues | null>(() => {
         if (!isEditMode || !program) return null;
@@ -118,14 +119,6 @@ export const ProgramModal = (props: ProgramModalProps) => {
         // TODO: Implement language selection
     }, []);
 
-    const handleAddNewSection = useCallback(() => {
-        setIsAddSectionModalOpen(true);
-    }, []);
-
-    const handleCloseAddSectionModal = useCallback(() => {
-        setIsAddSectionModalOpen(false);
-    }, []);
-
     return (
         <div className="program-modal">
             <GenericModalWrapper
@@ -160,11 +153,14 @@ export const ProgramModal = (props: ProgramModalProps) => {
                         categories={categories}
                         onValidationChange={props.onValidationChange}
                         onLanguageChange={handleLanguageChange}
-                        onAddSection={handleAddNewSection}
+                        onAddSection={openModalActions.openAddSectionModal}
                     />
                 )}
             />
-            <AddSectionModal isOpen={isAddSectionModalOpen} onClose={handleCloseAddSectionModal} />
+            <AddSectionModal
+                isOpen={modalState.isAddSectionModalOpen}
+                onClose={closeModalActions.closeAddSectionModal}
+            />
         </div>
     );
 };

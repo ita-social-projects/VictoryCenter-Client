@@ -1,0 +1,1 @@
+export { isExternalLink } from './url';

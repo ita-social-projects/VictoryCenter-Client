@@ -16,6 +16,7 @@ export interface AddSectionModalProps {
 
 const TEMPLATES = [
     ProgramSectionTemplate.QuadImagesBottom,
+    ProgramSectionTemplate.TripleImagesBottom,
     ProgramSectionTemplate.DualImagesBottom,
     ProgramSectionTemplate.SingleImageTop,
     ProgramSectionTemplate.TextOnly,

@@ -20,7 +20,7 @@ export const StatCard: React.FC<StatCardProps> = ({ value, label, color = 'blue'
         return new Intl.NumberFormat(i18n.language, {
             style: currency ? 'currency' : 'decimal',
             currency: currency,
-            maximumFractionDigits: 2,
+            maximumFractionDigits: 0,
         }).format(value);
     }, [value, currency, i18n.language]);
 

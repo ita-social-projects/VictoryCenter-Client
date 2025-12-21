@@ -1,4 +1,5 @@
-@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .form {
     display: flex;
@@ -54,10 +55,8 @@
 }
 
 .error {
-    color: colors.$error;
-    font-weight: 400;
-    font-size: 0.875rem;
-    line-height: 20px;
+    color: c.$error;
+    @include type.small-text-regular;
 }
 
 .desc-error {

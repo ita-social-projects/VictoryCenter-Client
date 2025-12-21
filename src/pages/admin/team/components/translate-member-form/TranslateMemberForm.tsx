@@ -1,4 +1,4 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef } from 'react';
 import { TEAM_MEMBER_VALIDATION_FUNCTIONS } from '@/validation/admin/team-member-schema/team-member-schema';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { Select } from '@/components/common/select/Select';
@@ -9,16 +9,13 @@ import { VisibilityStatus } from '@/types/admin/common';
 import styles from './TranslateMemberForm.module.scss';
 import './TranslateMemberForm.scss';
 import { useCommonMemberFields } from '@/hooks/admin/use-common-member-fields/useCommonMemberFields';
+import cn from 'classnames';
 
 export interface TranslateTeamMemberFormValues {
     fullName: string;
     description: string;
 }
-export interface TranslateTeamMemberFormErrorState {
-    fullName?: string;
-    description?: string;
-    [key: string]: string | undefined;
-}
+export type TranslateTeamMemberFormErrorState = Partial<Record<keyof TranslateTeamMemberFormValues, string>>;
 export interface TranslateTeamMemberFormRef {
     submit: (status?: VisibilityStatus) => Promise<void>;
     isValid: () => boolean;
@@ -30,6 +27,11 @@ export interface TranslateMemberFormProps {
     formDisabled?: boolean;
     onValidationChange?: (isValid: boolean) => void;
 }
+
+const DEFAULT_FORM_STATE: TranslateTeamMemberFormValues = {
+    fullName: '',
+    description: '',
+};
 
 const validateForm = (
     formState: TranslateTeamMemberFormValues,
@@ -43,19 +45,11 @@ const validateForm = (
 
 export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, TranslateMemberFormProps>(
     ({ initialData = null, onSubmit, formDisabled, onValidationChange }: TranslateMemberFormProps, ref) => {
-        const defaultFormState = useMemo<TranslateTeamMemberFormValues>(
-            () => ({
-                fullName: '',
-                description: '',
-            }),
-            [],
-        );
-
         const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
             TranslateTeamMemberFormValues,
             TranslateTeamMemberFormErrorState
         >({
-            defaultFormState,
+            defaultFormState: DEFAULT_FORM_STATE,
             initialData,
             validateForm,
             onValidationChange,
@@ -63,17 +57,16 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
             onSubmit: (data, _status) => onSubmit(data),
         });
 
-        const { handleFullNameChange, handleFullNameBlur, handleDescriptionChange, handleDescriptionBlur } =
-            useCommonMemberFields({
-                formState,
-                setFormState,
-                setErrors,
-            });
+        const fieldHandlers = useCommonMemberFields({
+            formState,
+            setFormState,
+            setErrors,
+        });
 
         return (
             <form
                 onSubmit={(e) => e.preventDefault()}
-                className={`${styles.form} translate-member-form`}
+                className={cn(styles.form, 'translate-member-form')}
                 data-testid="test-form"
                 noValidate
             >
@@ -98,10 +91,7 @@ export const TranslateMemberForm = forwardRef<TranslateTeamMemberFormRef, Transl
                     errors={errors}
                     isSubmitting={isSubmitting}
                     formDisabled={formDisabled}
-                    handleFullNameChange={handleFullNameChange}
-                    handleFullNameBlur={handleFullNameBlur}
-                    handleDescriptionChange={handleDescriptionChange}
-                    handleDescriptionBlur={handleDescriptionBlur}
+                    {...fieldHandlers}
                 />
             </form>
         );

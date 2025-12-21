@@ -4,6 +4,7 @@ import { TextAreaWithCharacterLimit } from '@/components/admin/textarea-with-cha
 import { TEAM_MEMBERS_TEXT, TEAM_MEMBER_VALIDATION } from '@/const/admin/team';
 import styles from './CommonMemberFields.module.scss';
 import './CommonMemberFields.scss';
+import cn from 'classnames';
 
 interface CommonMemberFieldsProps<TFormData extends CommonFields, TErrorState extends CommonErrors> {
     formState: TFormData;
@@ -38,7 +39,7 @@ export const CommonMemberFields = <TFormData extends CommonFields, TErrorState e
     handleDescriptionBlur,
 }: CommonMemberFieldsProps<TFormData, TErrorState>) => {
     return (
-        <div className={`${styles.root} common-member-fields`}>
+        <div className={cn(styles.root, 'common-member-fields')}>
             <div className={styles['form-group']}>
                 <InputLabel htmlFor="fullName" text={TEAM_MEMBERS_TEXT.FORM.LABEL.FULLNAME} isRequired />
                 <InputWithCharacterLimit
@@ -66,7 +67,7 @@ export const CommonMemberFields = <TFormData extends CommonFields, TErrorState e
                     maxLength={TEAM_MEMBER_VALIDATION.description.max}
                 />
                 {errors.description && (
-                    <span className={`${styles.error} ${styles['desc-error']}`}>{errors.description}</span>
+                    <span className={cn(styles.error, styles['desc-error'])}>{errors.description}</span>
                 )}
             </div>
         </div>

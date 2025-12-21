@@ -72,30 +72,19 @@ jest.mock('../translate-member-form/TranslateMemberForm', () => {
     };
 });
 
-jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
-    useAdminClient: () => ({}),
+const mockTranslateMember = jest.fn();
+jest.mock('@/hooks/admin/use-translate-team-member/useTranslateTeamMember', () => ({
+    useTranslateTeamMember: jest.fn(() => ({
+        translateMember: mockTranslateMember,
+        isSubmitting: false,
+        error: '',
+        clearError: jest.fn(),
+    })),
 }));
 
-jest.mock('@/services/api/admin/team/team-member-localizations/team-member-localizations-api', () => ({
-    TeamMemberLocalizationsApi: {
-        create: jest.fn(async () => ({
-            id: 10,
-            entityId: 1,
-            languageId: 2,
-            fullName: 'Translated Name',
-            description: 'Translated Description',
-        })),
-    },
-}));
+import { useTranslateTeamMember } from '@/hooks/admin/use-translate-team-member/useTranslateTeamMember';
 
-jest.mock('@/utils/functions/mappers/common/localization/localization-mappers', () => ({
-    mapLocalizationDtoToModel: (_dto: any) => ({
-        id: 10,
-        fullName: 'Translated Name',
-        description: 'Translated Description',
-        languageId: 2,
-    }),
-}));
+const mockUseTranslateTeamMember = jest.mocked(useTranslateTeamMember);
 
 const member: TeamMember = {
     id: 1,
@@ -114,6 +103,17 @@ const language = {
 };
 
 describe('TranslateTeamMemberModal', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        mockTranslateMember.mockResolvedValue(undefined);
+        mockUseTranslateTeamMember.mockReturnValue({
+            translateMember: mockTranslateMember,
+            isSubmitting: false,
+            error: '',
+            clearError: jest.fn(),
+        });
+    });
+
     it('renders modal when open and member exists', () => {
         render(
             <TranslateTeamMemberModal
@@ -158,9 +158,24 @@ describe('TranslateTeamMemberModal', () => {
         expect(button).toBeEnabled();
     });
 
-    it('submits translation and calls onTranslateMember and onClose', async () => {
+    it('submits translation and calls translateMember', async () => {
         const onTranslateMember = jest.fn();
         const onClose = jest.fn();
+
+        mockTranslateMember.mockImplementation(async () => {
+            const hookCall = mockUseTranslateTeamMember.mock.calls[0][0];
+            hookCall.onSuccess({
+                ...member,
+                localizations: [
+                    {
+                        language: { id: 2, code: 'en' },
+                        translationStatus: 1,
+                        fullName: 'Translated Name',
+                        description: 'Translated Description',
+                    },
+                ],
+            });
+        });
 
         render(
             <TranslateTeamMemberModal
@@ -173,23 +188,16 @@ describe('TranslateTeamMemberModal', () => {
         );
 
         const button = screen.getByRole('button');
-
         fireEvent.click(button);
 
         await waitFor(() => {
-            expect(onTranslateMember).toHaveBeenCalledTimes(1);
+            expect(mockTranslateMember).toHaveBeenCalledWith({
+                fullName: 'Translated Name',
+                description: 'Translated Description',
+            });
         });
 
-        expect(onTranslateMember).toHaveBeenCalledWith(
-            expect.objectContaining({
-                localizations: expect.arrayContaining([
-                    expect.objectContaining({
-                        fullName: 'Translated Name',
-                    }),
-                ]),
-            }),
-        );
-
+        expect(onTranslateMember).toHaveBeenCalledTimes(1);
         expect(onClose).toHaveBeenCalled();
     });
 
@@ -254,7 +262,12 @@ describe('TranslateTeamMemberModal', () => {
         const onTranslateMember = jest.fn();
         const onClose = jest.fn();
 
-        jest.spyOn(TeamMemberLocalizationsApi, 'create').mockRejectedValue(new Error('Fail'));
+        mockUseTranslateTeamMember.mockReturnValue({
+            translateMember: mockTranslateMember,
+            isSubmitting: false,
+            error: TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_TRANSLATE_MEMBER,
+            clearError: jest.fn(),
+        });
 
         render(
             <TranslateTeamMemberModal
@@ -266,55 +279,28 @@ describe('TranslateTeamMemberModal', () => {
             />,
         );
 
-        const button = screen.getByRole('button');
-
-        fireEvent.click(button);
-
-        await waitFor(() => {
-            expect(screen.getByText(TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_TRANSLATE_MEMBER)).toBeInTheDocument();
-        });
-
-        expect(onTranslateMember).not.toHaveBeenCalled();
-        expect(onClose).not.toHaveBeenCalled();
+        expect(screen.getByText(TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_TRANSLATE_MEMBER)).toBeInTheDocument();
     });
 
     it('disables translate button while submitting', async () => {
-        const onTranslateMember = jest.fn();
-        const onClose = jest.fn();
-
-        let resolvePromise: any;
-        jest.spyOn(TeamMemberLocalizationsApi, 'create').mockImplementation(
-            () =>
-                new Promise((resolve) => {
-                    resolvePromise = resolve;
-                }),
-        );
+        mockUseTranslateTeamMember.mockReturnValue({
+            translateMember: mockTranslateMember,
+            isSubmitting: true,
+            error: '',
+            clearError: jest.fn(),
+        });
 
         render(
             <TranslateTeamMemberModal
                 isOpen
-                onClose={onClose}
+                onClose={jest.fn()}
                 memberToTranslate={member}
-                onTranslateMember={onTranslateMember}
+                onTranslateMember={jest.fn()}
                 language={language}
             />,
         );
 
         const button = screen.getByTestId('translate-submit-btn');
-
-        fireEvent.click(button);
         expect(button).toBeDisabled();
-
-        resolvePromise({
-            id: 10,
-            entityId: 1,
-            languageId: 2,
-            fullName: 'Translated Name',
-            description: 'Translated Description',
-        });
-
-        await waitFor(() => {
-            expect(onClose).toHaveBeenCalled();
-        });
     });
 });

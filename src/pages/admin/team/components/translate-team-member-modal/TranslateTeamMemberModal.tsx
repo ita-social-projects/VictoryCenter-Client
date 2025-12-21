@@ -1,7 +1,7 @@
 import { Button } from '@/components/admin/button/Button';
 import { Modal } from '@/components/common/modal/Modal';
 import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
-import { TeamMember, TeamMemberLocalization } from '@/types/admin/team-members';
+import { TeamMember } from '@/types/admin/team-members';
 import {
     TranslateMemberForm,
     TranslateTeamMemberFormRef,
@@ -11,11 +11,9 @@ import { useRef, useState } from 'react';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import styles from './TranslateTeamMemberModal.module.scss';
-import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
-import { TeamMemberLocalizationsApi } from '@/services/api/admin/team/team-member-localizations/team-member-localizations-api';
 import { LocalizationLanguage } from '@/types/common/language';
-import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/localization/localization-mappers';
 import './TranslateTeamMemberModal.scss';
+import { useTranslateTeamMember } from '@/hooks/admin/use-translate-team-member/useTranslateTeamMember';
 
 interface TranslateTeamMemberModalProps {
     isOpen: boolean;
@@ -32,54 +30,29 @@ export const TranslateTeamMemberModal = ({
     onTranslateMember,
     language,
 }: TranslateTeamMemberModalProps) => {
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState<string>('');
-
     const formRef = useRef<TranslateTeamMemberFormRef>(null);
 
     const [showCloseConfirm, setShowCloseConfirm] = useState(false);
     const [isFormValid, setIsFormValid] = useState(false);
 
-    const client = useAdminClient();
+    const { translateMember, isSubmitting, error } = useTranslateTeamMember({
+        member: memberToTranslate,
+        language,
+        onSuccess: (updatedMember) => {
+            onTranslateMember(updatedMember);
+            onClose();
+        },
+    });
 
     if (!memberToTranslate) return null;
 
     const handleSubmit = () => {
-        if (!formRef.current) return;
-        if (!formRef.current.isValid()) return;
-
+        if (!formRef.current?.isValid()) return;
         formRef.current.submit();
     };
 
     const handleFormSubmit = async (data: TranslateTeamMemberFormValues) => {
-        if (!memberToTranslate) return;
-
-        try {
-            setIsSubmitting(true);
-            setError('');
-
-            const createdLocalizationDto = await TeamMemberLocalizationsApi.create(client, {
-                entityId: memberToTranslate.id,
-                languageId: language.id,
-                fullName: data.fullName,
-                description: data.description,
-            });
-
-            const createdLocalization = mapLocalizationDtoToModel<
-                typeof createdLocalizationDto,
-                TeamMemberLocalization
-            >(createdLocalizationDto);
-
-            onTranslateMember({
-                ...memberToTranslate,
-                localizations: [...(memberToTranslate.localizations || []), createdLocalization],
-            });
-            onClose();
-        } catch (err) {
-            setError(TEAM_MEMBERS_TEXT.FORM.MESSAGE.FAIL_TO_TRANSLATE_MEMBER);
-        } finally {
-            setIsSubmitting(false);
-        }
+        await translateMember(data);
     };
 
     const handleRequestClose = () => {

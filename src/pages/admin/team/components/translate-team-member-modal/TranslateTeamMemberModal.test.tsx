@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import { TranslateTeamMemberModal } from './TranslateTeamMemberModal';
 import { TeamMember } from '@/types/admin/team-members';
 import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
-import { TeamMemberLocalizationsApi } from '@/services/api/admin/team/team-member-localizations/team-member-localizations-api';
+import { useTranslateTeamMember } from '@/hooks/admin/use-translate-team-member/useTranslateTeamMember';
 
 jest.mock('@/components/admin/button/Button', () => ({
     Button: (props: any) => <button {...props}>{props.children}</button>,
@@ -81,8 +81,6 @@ jest.mock('@/hooks/admin/use-translate-team-member/useTranslateTeamMember', () =
         clearError: jest.fn(),
     })),
 }));
-
-import { useTranslateTeamMember } from '@/hooks/admin/use-translate-team-member/useTranslateTeamMember';
 
 const mockUseTranslateTeamMember = jest.mocked(useTranslateTeamMember);
 

@@ -17,7 +17,6 @@ export const ReportsSection: React.FC = () => {
                 {REPORTS_DATA.map(({ year, fileUrl }) => (
                     <ReportItem
                         key={year}
-                        year={year}
                         fileUrl={fileUrl}
                         label={t('reports.itemLabel', { year })}
                         buttonLabel={t('actions.downloadPdf')}

@@ -11,29 +11,3 @@
     gap: 2rem;
     padding: 2rem;
 }
-
-.titleSection {
-    flex: 1;
-    display: flex;
-    align-items: center;
-}
-
-.title {
-    font-size: 2rem;
-    font-weight: bold;
-    line-height: 1.2;
-    word-wrap: break-word;
-}
-
-.descriptionSection {
-    flex: 1;
-    display: flex;
-    align-items: center;
-}
-
-.description {
-    font-size: 0.95rem;
-    line-height: 1.5;
-    color: #333;
-    word-wrap: break-word;
-}

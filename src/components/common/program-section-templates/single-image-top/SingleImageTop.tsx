@@ -1,3 +1,4 @@
+import { TitleDescriptionSection } from '../shared/title-description-section/TitleDescriptionSection';
 import styles from './SingleImageTop.module.scss';
 
 export interface SingleImageTopProps {
@@ -14,14 +15,7 @@ export const SingleImageTop = ({ title = '', description = '', image1 = '' }: Si
                     <img src={image1} alt="" className={styles.image} />
                 </div>
             </div>
-            <div className={styles.bottomSection}>
-                <div className={styles.titleSection}>
-                    <h2 className={styles.title}>{title}</h2>
-                </div>
-                <div className={styles.descriptionSection}>
-                    <p className={styles.description}>{description}</p>
-                </div>
-            </div>
+            <TitleDescriptionSection title={title} description={description} className={styles.bottomSection} />
         </div>
     );
 };

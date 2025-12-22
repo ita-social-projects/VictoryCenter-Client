@@ -1,5 +1,4 @@
 import { TitleDescriptionSection } from '../shared/title-description-section/TitleDescriptionSection';
-import { StaggeredImagesGrid } from '../shared/staggered-images-grid/StaggeredImagesGrid';
 import styles from './QuadImagesBottom.module.scss';
 
 export interface QuadImagesBottomProps {
@@ -19,10 +18,20 @@ export const QuadImagesBottom = ({
     image3 = '',
     image4 = '',
 }: QuadImagesBottomProps) => {
+    const images = [image1, image2, image3, image4];
+
     return (
         <div className={styles.container}>
             <TitleDescriptionSection title={title} description={description} className={styles.topSection} />
-            <StaggeredImagesGrid images={[image1, image2, image3, image4]} className={styles.bottomSection} />
+            <div className={styles.bottomSection}>
+                <div className={styles.imagesGrid}>
+                    {images.map((image, index) => (
+                        <div key={index} className={`${styles.imageWrapper} ${index % 2 === 1 ? styles.elevated : ''}`}>
+                            <img src={image} alt="" className={styles.image} />
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };

@@ -1,5 +1,4 @@
 import { TitleDescriptionSection } from '../shared/title-description-section/TitleDescriptionSection';
-import { StaggeredImagesGrid } from '../shared/staggered-images-grid/StaggeredImagesGrid';
 import styles from './TrippleImagesBottom.module.scss';
 
 export interface TrippleImagesBottomProps {
@@ -17,10 +16,20 @@ export const TrippleImagesBottom = ({
     image2 = '',
     image3 = '',
 }: TrippleImagesBottomProps) => {
+    const images = [image1, image2, image3];
+
     return (
         <div className={styles.container}>
             <TitleDescriptionSection title={title} description={description} className={styles.topSection} />
-            <StaggeredImagesGrid images={[image1, image2, image3]} className={styles.bottomSection} />
+            <div className={styles.bottomSection}>
+                <div className={styles.imagesGrid}>
+                    {images.map((image, index) => (
+                        <div key={index} className={`${styles.imageWrapper} ${index % 2 === 0 ? styles.elevated : ''}`}>
+                            <img src={image} alt="" className={styles.image} />
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };

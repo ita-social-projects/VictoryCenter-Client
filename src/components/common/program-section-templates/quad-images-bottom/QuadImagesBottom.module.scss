@@ -5,10 +5,40 @@
 }
 
 .topSection {
-    padding: 2rem;
-    height: 50%;
+    flex: 1 1 50%;
+    min-height: 0;
 }
 
 .bottomSection {
-    height: 50%;
+    flex: 1 1 50%;
+    min-height: 0;
+    padding: 2rem 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    box-sizing: border-box;
+}
+
+.imagesGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    align-items: end;
+}
+
+.imageWrapper {
+    width: 100%;
+}
+
+.elevated {
+    transform: translateY(4rem);
+}
+
+.image {
+    max-width: 360px;
+    max-height: 390px;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    aspect-ratio: 360 / 390;
 }

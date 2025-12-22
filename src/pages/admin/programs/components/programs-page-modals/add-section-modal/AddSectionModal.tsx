@@ -16,12 +16,12 @@ export interface AddSectionModalProps {
 
 const TEMPLATES = [
     ProgramSectionTemplate.QuadImagesBottom,
-    ProgramSectionTemplate.TripleImagesBottom,
     ProgramSectionTemplate.DualImagesBottom,
-    ProgramSectionTemplate.SingleImageTop,
-    ProgramSectionTemplate.SingleImageBottom,
-    ProgramSectionTemplate.SingleImageRight,
     ProgramSectionTemplate.TextOnly,
+    ProgramSectionTemplate.TripleImagesBottom,
+    ProgramSectionTemplate.SingleImageBottom,
+    ProgramSectionTemplate.SingleImageTop,
+    ProgramSectionTemplate.SingleImageRight,
 ];
 
 export const AddSectionModal = ({ isOpen, onClose }: AddSectionModalProps) => {
@@ -61,10 +61,10 @@ export const AddSectionModal = ({ isOpen, onClose }: AddSectionModalProps) => {
         <Modal isOpen={isOpen} onClose={onClose} maxWidth="80vw">
             <Modal.Content>
                 <div className={styles.container}>
-                    <div className={styles['left-section']}>
+                    <div className={styles['arrows-section']}>
                         <button
                             title="scroll-left-button"
-                            className={styles['chevron-button']}
+                            className={`${styles['chevron-button']} ${styles['chevron-left']}`}
                             onClick={handlePrevious}
                             type="button"
                         >
@@ -76,10 +76,10 @@ export const AddSectionModal = ({ isOpen, onClose }: AddSectionModalProps) => {
                             {renderSection()}
                         </div>
                     </div>
-                    <div className={styles['right-section']}>
+                    <div className={styles['arrows-section']}>
                         <button
                             title="scroll-right-button"
-                            className={styles['chevron-button']}
+                            className={`${styles['chevron-button']} ${styles['chevron-right']}`}
                             onClick={handleNext}
                             type="button"
                         >

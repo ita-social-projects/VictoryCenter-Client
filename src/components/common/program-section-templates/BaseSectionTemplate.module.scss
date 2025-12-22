@@ -2,8 +2,9 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: calc(100% - 5rem);
-    height: 40rem;
+    max-width: calc(100% - 2rem);
+    height: auto;
+    min-height: 45rem;
     margin: 0;
     background-color: #fff;
     box-sizing: border-box;

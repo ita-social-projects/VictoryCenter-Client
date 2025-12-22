@@ -146,11 +146,12 @@ export const DonatePageContent = () => {
                 const newItem = await config.create(client, createData);
 
                 setItems((prev: (UahBankDetailsDto | ForeignBankDetailsDto)[]) => [...prev, newItem]);
+                addToast(DONATE_TEXT.MESSAGE.BANK_DETAILS.PUBLISHED, ToastType.Info);
             } catch (error) {
                 throw error;
             }
         },
-        [client, config, setItems],
+        [client, config, setItems, addToast],
     );
 
     const handleUpdateBankDetails = useCallback(

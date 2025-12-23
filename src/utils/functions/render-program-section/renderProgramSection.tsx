@@ -20,9 +20,14 @@ export interface ProgramSectionData {
 export interface RenderProgramSectionParams {
     templateId: ProgramSectionTemplate;
     data: ProgramSectionData;
+    isTemplate?: boolean;
 }
 
-export const renderProgramSection = ({ templateId, data }: RenderProgramSectionParams): React.ReactElement | null => {
+export const renderProgramSection = ({
+    templateId,
+    data,
+    isTemplate = false,
+}: RenderProgramSectionParams): React.ReactElement | null => {
     switch (templateId) {
         case ProgramSectionTemplate.QuadImagesBottom:
             return (
@@ -33,6 +38,7 @@ export const renderProgramSection = ({ templateId, data }: RenderProgramSectionP
                     image2={data.image2}
                     image3={data.image3}
                     image4={data.image4}
+                    isTemplate={isTemplate}
                 />
             );
         case ProgramSectionTemplate.DualImagesBottom:
@@ -42,10 +48,11 @@ export const renderProgramSection = ({ templateId, data }: RenderProgramSectionP
                     description={data.description}
                     image1={data.image1}
                     image2={data.image2}
+                    isTemplate={isTemplate}
                 />
             );
         case ProgramSectionTemplate.TextOnly:
-            return <TextOnly title={data.title} description={data.description} />;
+            return <TextOnly title={data.title} description={data.description} isTemplate={isTemplate} />;
         case ProgramSectionTemplate.TripleImagesBottom:
             return (
                 <TrippleImagesBottom
@@ -54,14 +61,36 @@ export const renderProgramSection = ({ templateId, data }: RenderProgramSectionP
                     image1={data.image1}
                     image2={data.image2}
                     image3={data.image3}
+                    isTemplate={isTemplate}
                 />
             );
         case ProgramSectionTemplate.SingleImageBottom:
-            return <SingleImageBottom title={data.title} description={data.description} image1={data.image1} />;
+            return (
+                <SingleImageBottom
+                    title={data.title}
+                    description={data.description}
+                    image1={data.image1}
+                    isTemplate={isTemplate}
+                />
+            );
         case ProgramSectionTemplate.SingleImageTop:
-            return <SingleImageTop title={data.title} description={data.description} image1={data.image1} />;
+            return (
+                <SingleImageTop
+                    title={data.title}
+                    description={data.description}
+                    image1={data.image1}
+                    isTemplate={isTemplate}
+                />
+            );
         case ProgramSectionTemplate.SingleImageRight:
-            return <SingleImageRight title={data.title} description={data.description} image1={data.image1} />;
+            return (
+                <SingleImageRight
+                    title={data.title}
+                    description={data.description}
+                    image1={data.image1}
+                    isTemplate={isTemplate}
+                />
+            );
         default:
             return null;
     }

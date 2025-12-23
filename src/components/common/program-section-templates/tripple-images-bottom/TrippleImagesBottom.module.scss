@@ -2,20 +2,20 @@
 
 .container {
     @extend .template-container;
+    aspect-ratio: 1330 / 1300;
 }
 
 .topSection {
-    flex: 1 1 50%;
+    flex: 0 0 49%;
     min-height: 0;
 }
 
 .bottomSection {
-    flex: 1 1 50%;
+    flex: 0 0 51%;
     min-height: 0;
-    padding: 2rem 3rem;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: center;
     box-sizing: border-box;
 }
 
@@ -31,12 +31,12 @@
 }
 
 .elevated {
-    transform: translateY(-2rem);
+    transform: translateY(-5rem);
 }
 
 .image {
     width: 100%;
     height: auto;
     object-fit: cover;
-    aspect-ratio: 1.2;
+    aspect-ratio: 480 / 480;
 }

@@ -8,6 +8,7 @@ export interface QuadImagesBottomProps {
     image2?: string;
     image3?: string;
     image4?: string;
+    isTemplate?: boolean;
 }
 
 export const QuadImagesBottom = ({
@@ -17,12 +18,18 @@ export const QuadImagesBottom = ({
     image2 = '',
     image3 = '',
     image4 = '',
+    isTemplate = false,
 }: QuadImagesBottomProps) => {
     const images = [image1, image2, image3, image4];
 
     return (
         <div className={styles.container}>
-            <TitleDescriptionSection title={title} description={description} className={styles.topSection} />
+            <TitleDescriptionSection
+                title={title}
+                description={description}
+                className={styles.topSection}
+                isTemplate={isTemplate}
+            />
             <div className={styles.bottomSection}>
                 <div className={styles.imagesGrid}>
                     {images.map((image, index) => (

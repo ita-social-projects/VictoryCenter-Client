@@ -6,14 +6,26 @@ export interface DualImagesBottomProps {
     description?: string;
     image1?: string;
     image2?: string;
+    isTemplate?: boolean;
 }
 
-export const DualImagesBottom = ({ title = '', description = '', image1 = '', image2 = '' }: DualImagesBottomProps) => {
+export const DualImagesBottom = ({
+    title = '',
+    description = '',
+    image1 = '',
+    image2 = '',
+    isTemplate = false,
+}: DualImagesBottomProps) => {
     const images = [image1, image2];
 
     return (
         <div className={styles.container}>
-            <TitleDescriptionSection title={title} description={description} className={styles.topSection} />
+            <TitleDescriptionSection
+                title={title}
+                description={description}
+                className={styles.topSection}
+                isTemplate={isTemplate}
+            />
             <div className={styles.bottomSection}>
                 <div className={styles.imagesGrid}>
                     {images.map((image, index) => (

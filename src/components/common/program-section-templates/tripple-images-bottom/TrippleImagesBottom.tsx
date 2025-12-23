@@ -7,6 +7,7 @@ export interface TrippleImagesBottomProps {
     image1?: string;
     image2?: string;
     image3?: string;
+    isTemplate?: boolean;
 }
 
 export const TrippleImagesBottom = ({
@@ -15,12 +16,18 @@ export const TrippleImagesBottom = ({
     image1 = '',
     image2 = '',
     image3 = '',
+    isTemplate = false,
 }: TrippleImagesBottomProps) => {
     const images = [image1, image2, image3];
 
     return (
         <div className={styles.container}>
-            <TitleDescriptionSection title={title} description={description} className={styles.topSection} />
+            <TitleDescriptionSection
+                title={title}
+                description={description}
+                className={styles.topSection}
+                isTemplate={isTemplate}
+            />
             <div className={styles.bottomSection}>
                 <div className={styles.imagesGrid}>
                     {images.map((image, index) => (

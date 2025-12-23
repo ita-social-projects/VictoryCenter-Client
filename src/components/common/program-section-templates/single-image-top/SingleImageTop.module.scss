@@ -2,6 +2,7 @@
 
 .container {
     @extend .template-container;
+    aspect-ratio: 1330 / 1200;
 }
 
 .topSection {
@@ -19,8 +20,9 @@
 
 .image {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    object-fit: contain;
+    aspect-ratio: 1330 / 680;
 }
 
 .bottomSection {

@@ -54,11 +54,12 @@ export const AddSectionModal = ({ isOpen, onClose }: AddSectionModalProps) => {
                 image3: placeholderImage,
                 image4: placeholderImage,
             },
+            isTemplate: true,
         });
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} maxWidth="80vw">
+        <Modal isOpen={isOpen} onClose={onClose} maxWidth="90vw">
             <Modal.Content>
                 <div className={styles.container}>
                     <div className={styles['arrows-section']}>

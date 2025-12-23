@@ -4,11 +4,17 @@ export interface SingleImageRightProps {
     title?: string;
     description?: string;
     image1?: string;
+    isTemplate?: boolean;
 }
 
-export const SingleImageRight = ({ title = '', description = '', image1 = '' }: SingleImageRightProps) => {
+export const SingleImageRight = ({
+    title = '',
+    description = '',
+    image1 = '',
+    isTemplate = false,
+}: SingleImageRightProps) => {
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} ${isTemplate ? styles.template : ''}`}>
             <div className={styles.leftSection}>
                 <div className={styles.titleSection}>
                     <h2 className={styles.title}>{title}</h2>

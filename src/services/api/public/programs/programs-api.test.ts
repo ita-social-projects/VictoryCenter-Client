@@ -18,7 +18,7 @@ describe('programs-api', () => {
             const mockPrograms: PublishedProgramDto[] = [
                 {
                     id: 1,
-                    image: null,
+                    previewImage: null,
                     name: 'Program A',
                     description: 'Description A',
                     categories: [
@@ -28,7 +28,7 @@ describe('programs-api', () => {
                 },
                 {
                     id: 2,
-                    image: null,
+                    previewImage: null,
                     name: 'Program B',
                     description: 'Description B',
                     categories: [{ id: 1, name: 'Category 1' }], // duplicate

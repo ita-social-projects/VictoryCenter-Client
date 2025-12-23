@@ -106,6 +106,7 @@ export const DONATE_TEXT = {
         },
         CHANGES_SAVED: 'Зміни успішно опубліковано',
         BANK_DETAILS: {
+            PUBLISHED: 'Реквізити успішно опубліковано',
             DELETE: 'Реквізити успішно видалено',
         },
         CORRESPONDENT_BANKS: {

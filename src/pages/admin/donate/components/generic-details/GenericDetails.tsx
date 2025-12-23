@@ -244,6 +244,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                                 className="generic-details btn-add"
                                 onClick={handleAdd}
                                 buttonStyle={primaryAddButton ? 'primary' : 'secondary'}
+                                disabled={isAddButtonDisabled || isParentAddFormVisible || isAddFormVisible}
                             >
                                 <div>{addNewText}</div>
                                 <PlusIcon className="plus-icon" />

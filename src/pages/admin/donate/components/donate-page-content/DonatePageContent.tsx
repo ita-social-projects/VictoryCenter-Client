@@ -45,7 +45,6 @@ export const DonatePageContent = () => {
     const [supportOptions, setSupportOptions] = useState<SupportOptionsDto[]>([]);
     const [isSupportOptionsLoading, setIsSupportOptionsLoading] = useState(false);
     const [isChildEditing, setIsChildEditing] = useState(false);
-    const [correspondentListVersion, setCorrespondentListVersion] = useState(0);
 
     const [isCorrespondentBankFormVisible, setIsCorrespondentBankFormVisible] = useState(false);
     useEffect(() => {
@@ -236,7 +235,6 @@ export const DonatePageContent = () => {
                     ),
                 );
                 addToast(DONATE_TEXT.MESSAGE.CHANGES_SAVED, ToastType.Info);
-                setCorrespondentListVersion((prev) => prev + 1);
             } catch (error) {
                 throw error;
             }
@@ -267,47 +265,19 @@ export const DonatePageContent = () => {
         [client, setItems, addToast],
     );
 
-    const handleLocalSubmit = useCallback(
-        (formState: any, setFormState: any, data: CorrespondentBankDetailsDto) => {
-            const updatedBanks = [...(formState.correspondentBanks || []), data];
-
-            setFormState({
-                ...formState,
-                correspondentBanks: updatedBanks,
-            });
-
-            addToast(DONATE_TEXT.MESSAGE.CORRESPONDENT_BANKS.ADD, ToastType.Info);
-        },
-        [addToast],
-    );
-
-    const handleLocalUpdate = useCallback(() => {
-        addToast(DONATE_TEXT.MESSAGE.CORRESPONDENT_BANKS.UPDATE, ToastType.Info);
-    }, [addToast]);
-
-    const handleLocalDelete = useCallback(
-        (formState: any, setFormState: any, index: number): void => {
-            const updatedBanks = [...(formState.correspondentBanks || [])];
-            updatedBanks.splice(index, 1);
-            setFormState({ ...formState, correspondentBanks: updatedBanks });
-            addToast(DONATE_TEXT.MESSAGE.CORRESPONDENT_BANKS.DELETED, ToastType.Info);
-        },
-        [addToast],
-    );
-
     const renderCorrespondentBanks = useCallback(
-        ({ formState, isItemsExpanded, setFormState }: any) => {
-            const isCreating = !formState.id;
-            const localBanks = formState.correspondentBanks || [];
+        ({ formState, isItemsExpanded }: any) => {
+            const parentId = formState.id;
+            const isParentCreating = !parentId;
 
-            const existingItem = items.find((i) => i.id === formState.id);
-            const banksToShow = isCreating
-                ? localBanks
+            const existingItem = items.find((i) => i.id === parentId);
+            const banksToShow = isParentCreating
+                ? []
                 : [...(existingItem?.correspondentBanks ?? [])].sort((a, b) => a.id - b.id);
 
             return (
                 <GenericDetails
-                    key={`corr-${selectedCategory}-${formState.id}-${correspondentListVersion}`}
+                    key={`corr-${selectedCategory}-${parentId || 'new'}`}
                     title={DONATE_TEXT.CORRESPONDENT_BANKS.TITLE}
                     items={banksToShow}
                     isLoading={false}
@@ -316,14 +286,12 @@ export const DonatePageContent = () => {
                     primaryAddButton={true}
                     addNewText={DONATE_TEXT.CORRESPONDENT_BANKS.ADD_NEW}
                     isChildForm={true}
-                    isDisabled={!formState.id}
-                    isParentCreating={isCreating}
-                    onSubmit={(data) => handleCreateCorrespondentBank(formState.id, data)}
-                    onUpdate={(id, data) => handleUpdateCorrespondentBank(formState.id, id, data)}
-                    onDelete={(id) => handleDeleteCorrespondentBank(formState.id, id)}
-                    onLocalSubmit={(data) => handleLocalSubmit(formState, setFormState, data)}
-                    onLocalUpdate={handleLocalUpdate}
-                    onLocalDelete={(index) => handleLocalDelete(formState, setFormState, index)}
+                    isDisabled={isParentCreating}
+                    isParentCreating={isParentCreating}
+                    isAddButtonDisabled={isParentCreating}
+                    onSubmit={(data) => handleCreateCorrespondentBank(parentId, data)}
+                    onUpdate={(id, data) => handleUpdateCorrespondentBank(parentId, id, data)}
+                    onDelete={(id) => handleDeleteCorrespondentBank(parentId, id)}
                     onEditingStateChange={setIsChildEditing}
                     onAddFormVisibilityChange={setIsCorrespondentBankFormVisible}
                 />
@@ -336,11 +304,7 @@ export const DonatePageContent = () => {
             handleCreateCorrespondentBank,
             handleUpdateCorrespondentBank,
             handleDeleteCorrespondentBank,
-            handleLocalSubmit,
-            handleLocalUpdate,
-            handleLocalDelete,
             setIsChildEditing,
-            correspondentListVersion,
         ],
     );
 

@@ -44,7 +44,13 @@
         border: none;
         width: 1.5rem;
         height: 1.5rem;
-        background: url('~@/assets/icons/remove-query.svg');
+        background-color: colors.$grey-900; 
+        -webkit-mask: url('~@/assets/icons/remove-query.svg') no-repeat center / contain;
+        mask: url('~@/assets/icons/remove-query.svg') no-repeat center / contain;
+
+        &.error {
+            background-color: colors.$error;
+        }
 
         &:hover {
             cursor: pointer;

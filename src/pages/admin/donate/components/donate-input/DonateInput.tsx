@@ -141,7 +141,9 @@ export const DonateInput = ({
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={handleClear}
                             aria-label="Clear input"
-                            className="donate-input-clear-button"
+                            className={classNames('donate-input-clear-button', {
+                                error: !!error,
+                            })}
                         ></button>
                     )}
                 </div>

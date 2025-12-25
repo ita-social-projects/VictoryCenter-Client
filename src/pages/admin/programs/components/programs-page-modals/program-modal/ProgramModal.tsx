@@ -1,7 +1,8 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
-import { Program, ProgramCategory, ProgramCreateUpdate } from '@/types/admin/programs';
+import { Program, ProgramCategory, ProgramCreateUpdate, ProgramSection } from '@/types/admin/programs';
 import { VisibilityStatus, PendingAction, ModalMode } from '@/types/admin/common';
+import { ProgramSectionTemplate } from '@/types/common/program-sections';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
@@ -10,6 +11,7 @@ import { GenericModalWrapper } from '@/components/admin/generic-modal-wrapper/Ge
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { AddSectionModal } from '../add-section-modal/AddSectionModal';
+import { UnsavedSectionChangesModal } from '../unsaved-section-changes-modal/UnsavedSectionChangesModal';
 import './ProgramModal.scss';
 
 export interface BaseProgramModalProps {
@@ -38,6 +40,9 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const program = isEditMode ? props.programToEdit : undefined;
     const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
     const { modalState, openModalActions, closeModalActions } = useModalsState();
+    const [sections, setSections] = useState<ProgramSection[]>([]);
+    const [isSectionUnsavedModalOpen, setIsSectionUnsavedModalOpen] = useState(false);
+    const [sectionToCancel, setSectionToCancel] = useState<number | null>(null);
 
     const initialData = useMemo<ProgramFormValues | null>(() => {
         if (!isEditMode || !program) return null;
@@ -54,8 +59,9 @@ export const ProgramModal = (props: ProgramModalProps) => {
             location: program.location,
             participantsCount: program.participantsCount,
             meetingCount: program.meetingsCount,
+            sections: sections,
         };
-    }, [program, isEditMode]);
+    }, [program, isEditMode, sections]);
 
     const modalConfig = useMemo(
         () => ({
@@ -119,6 +125,42 @@ export const ProgramModal = (props: ProgramModalProps) => {
         // TODO: Implement language selection
     }, []);
 
+    const handleTemplateSelect = useCallback(
+        (templateId: ProgramSectionTemplate) => {
+            const newSection: ProgramSection = {
+                templateId,
+                title: '',
+                description: '',
+                order: sections.length,
+                isEditing: true,
+            };
+            setSections((prev) => [newSection, ...prev]);
+
+            // Add section directly to form state
+            if (modalHookData.formRef.current) {
+                modalHookData.formRef.current.addSection(newSection);
+            }
+        },
+        [sections.length, modalHookData.formRef],
+    );
+
+    const handleRequestCancelSection = useCallback((sectionIndex: number) => {
+        setSectionToCancel(sectionIndex);
+        setIsSectionUnsavedModalOpen(true);
+    }, []);
+
+    const handleCloseSectionUnsavedModal = useCallback(() => {
+        setIsSectionUnsavedModalOpen(false);
+        setSectionToCancel(null);
+    }, []);
+
+    const handleConfirmDiscardSection = useCallback(() => {
+        if (sectionToCancel !== null) {
+            setSections((prev) => prev.filter((_, index) => index !== sectionToCancel));
+        }
+        handleCloseSectionUnsavedModal();
+    }, [sectionToCancel, handleCloseSectionUnsavedModal]);
+
     return (
         <div className="program-modal">
             <GenericModalWrapper
@@ -154,12 +196,19 @@ export const ProgramModal = (props: ProgramModalProps) => {
                         onValidationChange={props.onValidationChange}
                         onLanguageChange={handleLanguageChange}
                         onAddSection={openModalActions.openAddSectionModal}
+                        onRequestCancelSection={handleRequestCancelSection}
                     />
                 )}
             />
             <AddSectionModal
                 isOpen={modalState.isAddSectionModalOpen}
                 onClose={closeModalActions.closeAddSectionModal}
+                onSelectTemplate={handleTemplateSelect}
+            />
+            <UnsavedSectionChangesModal
+                isOpen={isSectionUnsavedModalOpen}
+                onClose={handleCloseSectionUnsavedModal}
+                onConfirm={handleConfirmDiscardSection}
             />
         </div>
     );

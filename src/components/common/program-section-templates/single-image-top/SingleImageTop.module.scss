@@ -6,8 +6,7 @@
 }
 
 .topSection {
-    height: 50%;
-    display: flex;
+    flex: 0 0 56%;
 }
 
 .imageWrapper {
@@ -26,6 +25,5 @@
 }
 
 .bottomSection {
-    padding: 2rem;
-    height: 50%;
+    flex: 0 0 44%;
 }

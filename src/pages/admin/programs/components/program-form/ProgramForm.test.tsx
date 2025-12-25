@@ -171,6 +171,7 @@ describe('ProgramForm', () => {
                 location: 'Kyiv',
                 participantsCount: '10',
                 meetingCount: '5',
+                sections: [],
             };
 
             renderProgramForm({ initialData });

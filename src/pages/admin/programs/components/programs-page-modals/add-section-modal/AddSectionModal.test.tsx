@@ -37,10 +37,12 @@ jest.mock('@/components/admin/button/Button', () => ({
 
 describe('AddSectionModal', () => {
     const mockOnClose = jest.fn();
+    const mockOnSelectTemplate = jest.fn();
 
     const defaultProps: AddSectionModalProps = {
         isOpen: true,
         onClose: mockOnClose,
+        onSelectTemplate: mockOnSelectTemplate,
     };
 
     beforeEach(() => {
@@ -64,7 +66,7 @@ describe('AddSectionModal', () => {
         render(<AddSectionModal {...defaultProps} />);
 
         const modal = screen.getByTestId('add-section-modal');
-        expect(modal).toHaveAttribute('data-max-width', '80vw');
+        expect(modal).toHaveAttribute('data-max-width', '90vw');
     });
 
     it('should call onClose when close button is clicked', () => {
@@ -76,12 +78,13 @@ describe('AddSectionModal', () => {
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
-    it('should call onClose when choose template button is clicked', () => {
+    it('should call onClose and onSelectTemplate when choose template button is clicked', () => {
         render(<AddSectionModal {...defaultProps} />);
 
         const chooseButton = screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION);
         fireEvent.click(chooseButton);
 
+        expect(mockOnSelectTemplate).toHaveBeenCalledTimes(1);
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 

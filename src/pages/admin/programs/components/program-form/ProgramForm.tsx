@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useMemo } from 'react';
+import React, { forwardRef, useCallback, useMemo, useImperativeHandle, useRef } from 'react';
 import { PROGRAM_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -8,8 +8,9 @@ import { MultiSelectInputGroup } from '@/components/admin/input-groups/multi-sel
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { Button } from '@/components/admin/button/Button';
+import { ProgramSectionForm } from '../program-section-form/ProgramSectionForm';
 import { Image, ImageValues } from '@/types/common/image';
-import { ProgramCategory } from '@/types/admin/programs';
+import { ProgramCategory, ProgramSection } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
 import NotFoundIcon from '@/assets/icons/not-found.svg';
@@ -26,6 +27,7 @@ export interface ProgramFormValues {
     location: string;
     participantsCount: string;
     meetingCount: string;
+    sections: ProgramSection[];
 }
 
 export interface ProgramFormErrors {
@@ -44,6 +46,7 @@ export interface ProgramFormRef {
     submit: (status: VisibilityStatus) => Promise<void>;
     isValid: (isPublishing?: boolean) => boolean;
     isDirty: () => boolean;
+    addSection: (section: ProgramSection) => void;
 }
 
 export interface ProgramFormProps {
@@ -55,6 +58,7 @@ export interface ProgramFormProps {
     onAddSection?: () => void;
     selectedLanguage?: string;
     onLanguageChange?: (language: string) => void;
+    onRequestCancelSection?: (sectionIndex: number) => void;
 }
 
 const validateForm = (formState: ProgramFormValues, isPublishing: boolean): ProgramFormErrors => {
@@ -82,6 +86,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             categories = [],
             onValidationChange,
             onAddSection,
+            onRequestCancelSection,
         }: ProgramFormProps,
         ref,
     ) => {
@@ -97,9 +102,12 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 location: '',
                 participantsCount: '',
                 meetingCount: '',
+                sections: [],
             }),
             [],
         );
+
+        const internalRef = useRef<any>(null);
 
         const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
             ProgramFormValues,
@@ -110,8 +118,30 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             validateForm,
             onSubmit,
             onValidationChange,
-            ref,
+            ref: internalRef,
         });
+
+        const handleAddSection = useCallback(
+            (section: ProgramSection) => {
+                setFormState((prev) => ({
+                    ...prev,
+                    sections: [section, ...prev.sections],
+                }));
+            },
+            [setFormState],
+        );
+
+        // Extend ref to add addSection method
+        useImperativeHandle(
+            ref,
+            () => ({
+                submit: internalRef.current?.submit || (async () => {}),
+                isValid: internalRef.current?.isValid || (() => false),
+                isDirty: internalRef.current?.isDirty || (() => false),
+                addSection: handleAddSection,
+            }),
+            [handleAddSection],
+        );
 
         const handleNameChange = useCallback(
             (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -212,6 +242,28 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             (error: string | null) => setErrors((prev) => ({ ...prev, backgroundImage: error || undefined })),
             [setErrors],
         );
+
+        const handleSaveSection = useCallback(
+            (sectionIndex: number) => {
+                setFormState((prev) => {
+                    const updatedSections = [...prev.sections];
+                    updatedSections[sectionIndex] = { ...updatedSections[sectionIndex], isEditing: false };
+                    return { ...prev, sections: updatedSections };
+                });
+            },
+            [setFormState],
+        );
+
+        const handleCancelSection = useCallback(
+            (sectionIndex: number) => {
+                if (onRequestCancelSection) {
+                    onRequestCancelSection(sectionIndex);
+                }
+            },
+            [onRequestCancelSection],
+        );
+
+        const hasSections = formState.sections.length > 0;
 
         return (
             <form className={styles['container']} noValidate>
@@ -367,21 +419,45 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
 
                 {/* Sections Area */}
                 <div className={styles['sections-container']}>
-                    <div className={styles['empty-sections-state']}>
-                        <img src={NotFoundIcon} alt="No sections" className={styles['empty-sections-image']} />
-                        <p className={styles['empty-sections-text']}>{PROGRAMS_TEXT.MESSAGE.NO_SECTIONS_YET}</p>
-                        <Button
-                            className={styles['btn-add']}
-                            onClick={onAddSection}
-                            buttonStyle="secondary"
-                            disabled={isSubmitting || isFormDisabled}
-                            data-testid="add-section-button-empty"
-                        >
-                            {PROGRAMS_TEXT.BUTTON.ADD_SECTION}
-                            <PlusIcon className={styles['plus-icon']} />
-                        </Button>
-                    </div>
-                    {/* TODO: When sections exist, they will be displayed here and emptySectionsState will be hidden */}
+                    {!hasSections && (
+                        <div className={styles['empty-sections-state']}>
+                            <img src={NotFoundIcon} alt="No sections" className={styles['empty-sections-image']} />
+                            <p className={styles['empty-sections-text']}>{PROGRAMS_TEXT.MESSAGE.NO_SECTIONS_YET}</p>
+                            <Button
+                                className={styles['btn-add']}
+                                onClick={onAddSection}
+                                buttonStyle="secondary"
+                                disabled={isSubmitting || isFormDisabled}
+                                data-testid="add-section-button-empty"
+                            >
+                                {PROGRAMS_TEXT.BUTTON.ADD_SECTION}
+                                <PlusIcon className={styles['plus-icon']} />
+                            </Button>
+                        </div>
+                    )}
+
+                    {hasSections && (
+                        <div className={styles['sections-list']}>
+                            {formState.sections.map((section, index) =>
+                                section.isEditing ? (
+                                    <ProgramSectionForm
+                                        key={index}
+                                        section={section}
+                                        onSave={() => handleSaveSection(index)}
+                                        onCancel={() => handleCancelSection(index)}
+                                        isDisabled={isSubmitting || isFormDisabled}
+                                    />
+                                ) : (
+                                    <div key={index} className={styles['section-preview']}>
+                                        {/* todo sections preview */}
+                                        <p>
+                                            Section {index + 1} - Template ID: {section.templateId}
+                                        </p>
+                                    </div>
+                                ),
+                            )}
+                        </div>
+                    )}
                 </div>
                 <div className={styles['sections-divider']} />
             </form>

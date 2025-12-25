@@ -12,6 +12,7 @@ import styles from './AddSectionModal.module.scss';
 export interface AddSectionModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onSelectTemplate: (templateId: ProgramSectionTemplate) => void;
 }
 
 const TEMPLATES = [
@@ -24,7 +25,7 @@ const TEMPLATES = [
     ProgramSectionTemplate.SingleImageRight,
 ];
 
-export const AddSectionModal = ({ isOpen, onClose }: AddSectionModalProps) => {
+export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectionModalProps) => {
     const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
 
     const handlePrevious = () => {
@@ -37,8 +38,7 @@ export const AddSectionModal = ({ isOpen, onClose }: AddSectionModalProps) => {
 
     const handleSave = () => {
         const selectedTemplateId = TEMPLATES[selectedTemplateIndex];
-        // TODO: Implement save logic with selectedTemplateId
-        console.log('Selected template:', selectedTemplateId);
+        onSelectTemplate(selectedTemplateId);
         onClose();
     };
 

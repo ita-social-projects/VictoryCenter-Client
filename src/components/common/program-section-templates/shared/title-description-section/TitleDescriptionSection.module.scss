@@ -1,11 +1,5 @@
 @import '@/assets/sass/mixins/typography.mixins';
 
-.container * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 .container {
     padding: 2vw 5vw;
     display: flex;
@@ -54,11 +48,10 @@
 .template {
     .title {
         font-size: 1.4vw;
-        line-height: 1.8vw;
     }
 
     .description {
         font-size: clamp(6px, 0.9vw, 12px);
-        line-height: 0.9vw;
+        line-height: 0.7vw;
     }
 }

@@ -1,0 +1,32 @@
+.container {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    margin-bottom: 1rem;
+}
+
+.content {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.template-info {
+    font-size: 1rem;
+    color: #666;
+    
+    strong {
+        color: #333;
+        font-weight: 600;
+    }
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}

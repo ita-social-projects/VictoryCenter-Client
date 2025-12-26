@@ -1,7 +1,5 @@
 import { Currency } from '@/types/public/donate-page';
 
-export const PAGE_TITLE = 'МИ ВДЯЧНІ | ЗА КОЖЕН ДОНАТ';
-
 export const DONATION_AMOUNTS = {
     [Currency.UAH]: {
         small: 100,
@@ -20,46 +18,21 @@ export const DONATION_AMOUNTS = {
     },
 };
 
-export const DONATE_SECTION = {
-    ONE_TIME_DONATE: 'Разовий донат',
-    SUBSCRIPTION: 'Підписка',
-    ONE_TIME_DONATE_BUTTON_LABEL: 'Донатити',
-    SUBSCRIPTION_BUTTON_LABEL: 'Донатити щомісячно',
-};
-
-export const CURRENCY_TABS = {
-    UAH: 'Гривня / UAH',
-    USD: 'Долар / USD',
-    EUR: 'Євро / EUR',
-};
-
 export const UKRAINE_PAYMENT_DETAILS = {
-    UKRAINE_PAYMENT_DETAILS_LABEL: 'Реквізити для донатів в Україні',
-    UIDSREOU_LABEL: 'ЄДРПОУ',
-    UIDSREOU_NUMBER_LABEL: '45262516',
-    BANK_LABEL: 'Банк',
-    BANK_NAME_LABEL: 'АТ КБ «ПРИВАТБАНК»',
     IBAN_UAH_LABEL: 'IBAN (UAH)',
-    IBAN_UAH_NUMBER_LABEL: 'UA463052990000026000040142147',
-    PAYMENT_DESTINATION_LABEL: 'Призначення платежу',
-    PAYMENT_DESTINATION_NAME_LABEL: 'Благодійна допомога на статутну діяльність',
 };
 
 export const PAYMENT_DETAILS_COMMON = {
-    RECIPIENT_LABEL: 'Одержувач',
     RECIPIENT_NAME_LABEL: 'ГО «ЦЕНТР ПЕРЕМОГИ»',
 };
 
 export const ABROAD_PAYMENT_DETAILS = {
-    USD_PAYMENT_DETAILS_LABEL: 'Для переказів в USD:',
     IBAN_EUR_LABEL: 'IBAN (EUR)',
     IBAN_EUR_NUMBER_LABEL: 'UA813052990000026001030140880',
     SWIFT_CODE_LABEL: 'SWIFT-код банку',
     SWIFT_CODE_VALUE_LABEL: 'PBANUA2X',
-    BANK_RECEIVER_LABEL: 'Банк-отримувач',
     BANK_NAME_TRANSLITERATED_LABEL: 'JSC CB "PRIVATBANK", ',
     BANK_STREET_TRANSLITERATED_LABEL: '1D Hrushevskoho Str., ',
-    ADDRESS_LABEL: 'Адреса',
     COUNTRY_LABEL: '01001, Україна, ',
     CITY_LABEL: 'м. Київ, вул. Шулявська, б. 20/22, кв. 41',
     CORRESPONDENT_BANKS_LABEL: 'Кореспондентські банки (один із варіантів на вибір)',
@@ -74,7 +47,6 @@ export const ABROAD_PAYMENT_DETAILS = {
     CITY_BANK_USA_LABEL: 'Citibank N.A., New York, USA',
     SWIFT_CITY_BANK_USA_CODE_LABEL: 'CITIUS33',
     ACCOUNT_CITY_BANK_USA_CODE_LABEL: '36445343',
-    EUR_PAYMENT_DETAILS_LABEL: 'Для переказів в EUR:',
     COMMERZBANK_AG_GERMANY_LABEL: 'Commerzbank AG, Frankfurt am Main, Germany',
     SWIFT_COMMERZBANK_AG_GERMANY_CODE_LABEL: 'COBADEFF',
     ACCOUNT_COMMERZBANK_AG_GERMANY_CODE_LABEL: '400886700401',
@@ -93,14 +65,6 @@ export const ABROAD_PAYMENT_DETAILS = {
     IBAN_USD_LABEL: 'IBAN (USD)',
     IBAN_USD_NUMBER_LABEL: 'UA613052990000026006020145317',
     BANK_CITY_AND_COUNTRY_TRANSLITERATED_LABEL: 'Kyiv, 01001, Ukraine',
-};
-
-export const ALTERNATIVE_SUPPORT_WAYS = {
-    ALTERNATIVE_SUPPORT_WAYS_LABEL: 'Інші варіанти підтримки',
-    PAY_PAL_LABEL: 'Pay Pal',
-    PAY_PAL_EMAIL_LABEL: 'victorycenterua@gmail.com',
-    MONOBANK_JAR_LABEL: 'Monobank баночка',
-    MONOBANK_JAR_LINK_LABEL: 'https://send.monobank.ua/jar/2JGG2F8rHQ',
 };
 
 export const CORRESPONDENT_BANKS = {
@@ -207,8 +171,4 @@ export const CORRESPONDENT_BANKS = {
             ],
         },
     ],
-};
-
-export const ERROR_MESSAGES = {
-    LOADING_ERROR: 'Не вдалося завантажити реквізити',
 };

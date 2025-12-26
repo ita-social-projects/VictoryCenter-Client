@@ -8,7 +8,7 @@ import {
     PublishedForeignBankDetailsDto,
     PublishedSupportOptionsDto,
 } from '@/types/public/donate-page';
-import { ERROR_MESSAGES } from '@/const/public/donate-page';
+import donatePageUk from '@/locales/uk/donate.json';
 
 jest.mock('./ukraine-payment-details/UkrainePaymentDetails', () => ({
     UkrainePaymentDetails: ({ bankDetails }: { bankDetails: PublishedUahBankDetailsDto[] }) => (
@@ -151,7 +151,7 @@ describe('RightSection', () => {
 
             const errorElement = screen.getByRole('alert');
             expect(errorElement).toBeInTheDocument();
-            expect(errorElement).toHaveTextContent(ERROR_MESSAGES.LOADING_ERROR);
+            expect(errorElement).toHaveTextContent(donatePageUk.LOADING_ERROR_MESSAGE);
             expect(screen.queryByTestId('ukraine-payment')).not.toBeInTheDocument();
         });
     });

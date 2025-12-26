@@ -1,16 +1,18 @@
 import './DonateSection.scss';
 import React, { useState } from 'react';
-import { DONATE_SECTION, DONATION_AMOUNTS } from '@/const/public/donate-page';
+import { DONATION_AMOUNTS } from '@/const/public/donate-page';
 import { DonateTab, PaymentSystem, Currency } from '@/types/public/donate-page';
 import { API_ROUTES } from '@/const/common/api-routes/main-api';
 import { getEnvVariable } from '@/utils/functions/get-env-variable/get-env-variable';
 import { Tabs } from '@/components/common/tabs/Tabs';
 import { currencyToString } from '@/utils/functions/mappers/public/donate/donate';
+import { useTranslation } from 'react-i18next';
 
 export const DonateSection = () => {
     const [activeTab, setActiveTab] = useState<DonateTab>(DonateTab.oneTime);
     const [donationAmount, setDonationAmount] = useState<number>(0);
     const [currency, setCurrency] = useState<Currency>(Currency.UAH);
+    const { t } = useTranslation('donatePage');
 
     const currencyString = currencyToString(currency);
 
@@ -63,8 +65,8 @@ export const DonateSection = () => {
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                 tabs={[
-                    { id: DonateTab.oneTime, label: DONATE_SECTION.ONE_TIME_DONATE },
-                    { id: DonateTab.subscription, label: DONATE_SECTION.SUBSCRIPTION, disabled: true },
+                    { id: DonateTab.oneTime, label: t('DONATE_ONE_TIME_LABEL') },
+                    { id: DonateTab.subscription, label: t('DONATE_SUBSCRIPTION_LABEL'), disabled: true },
                 ]}
             ></Tabs>
             <div className="donateAmountSection">
@@ -113,8 +115,8 @@ export const DonateSection = () => {
             </div>
             <button className="donateButton" type="submit">
                 {activeTab === DonateTab.oneTime
-                    ? DONATE_SECTION.ONE_TIME_DONATE_BUTTON_LABEL
-                    : DONATE_SECTION.SUBSCRIPTION_BUTTON_LABEL}
+                    ? t('ONE_TIME_DONATE_BUTTON_LABEL')
+                    : t('SUBSCRIPTION_DONATE_BUTTON_LABEL')}
             </button>
         </form>
     );

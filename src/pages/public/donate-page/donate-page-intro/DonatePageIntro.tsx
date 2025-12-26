@@ -1,14 +1,15 @@
 import React from 'react';
 import './DonatePageIntro.scss';
-import { PAGE_TITLE } from '@/const/public/donate-page';
+import { useTranslation } from 'react-i18next';
 
 export const DonatePageIntro = () => {
-    const titleParts = PAGE_TITLE.split(' | ');
+    const { t } = useTranslation('donatePage');
+    const titleParts = t('DONATE_PAGE_TITLE').split(' | ');
 
     if (titleParts.length < 2) {
         return (
             <div className="donatePageIntro">
-                <h1>{PAGE_TITLE}</h1>
+                <h1>{t('DONATE_PAGE_TITLE')}</h1>
             </div>
         );
     }

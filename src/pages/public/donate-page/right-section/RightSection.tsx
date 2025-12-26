@@ -5,7 +5,8 @@ import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSu
 import { Tabs } from '@/components/common/tabs/Tabs';
 import { UkrainePaymentDetails } from './ukraine-payment-details/UkrainePaymentDetails';
 import { Currency, DonatePageData } from '@/types/public/donate-page';
-import { CURRENCY_TABS, ERROR_MESSAGES } from '@/const/public/donate-page';
+import { useTranslation } from 'react-i18next';
+import { currencyToString } from '@/utils/functions/mappers/public/donate/donate';
 
 interface RightSectionProps {
     donateData: DonatePageData | null;
@@ -13,6 +14,7 @@ interface RightSectionProps {
 }
 
 export const RightSection = ({ donateData, error }: RightSectionProps) => {
+    const { t } = useTranslation('donatePage');
     const getAvailableCurrencies = () => {
         if (!donateData) return [];
 
@@ -75,7 +77,7 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
     if (error) {
         return (
             <div className="donate-error-message" role="alert">
-                {ERROR_MESSAGES.LOADING_ERROR}
+                {t('LOADING_ERROR_MESSAGE')}
             </div>
         );
     }
@@ -84,10 +86,13 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
         return null;
     }
 
-    const tabs = availableCurrencies.map((currency) => ({
-        id: currency,
-        label: CURRENCY_TABS[Currency[currency] as keyof typeof CURRENCY_TABS],
-    }));
+    const tabs = availableCurrencies.map((currency) => {
+        const key = currencyToString(currency);
+        return {
+            id: currency,
+            label: t(`CURRENCY_TABS.${key}`),
+        };
+    });
 
     return (
         <div className="rightSection">

@@ -59,9 +59,9 @@ export const ProgramModal = (props: ProgramModalProps) => {
             location: program.location,
             participantsCount: program.participantsCount,
             meetingCount: program.meetingsCount,
-            sections: sections,
+            sections: program.sections || [],
         };
-    }, [program, isEditMode, sections]);
+    }, [program, isEditMode]);
 
     const modalConfig = useMemo(
         () => ({
@@ -114,6 +114,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 location: formData.location,
                 participantsCount: formData.participantsCount,
                 meetingsCount: formData.meetingCount,
+                sections: formData.sections,
             }),
         }),
         [isEditMode, isOpen, mode, onClose, onSuccess, program, client, initialData],
@@ -128,11 +129,9 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const handleTemplateSelect = useCallback(
         (templateId: ProgramSectionTemplate) => {
             const newSection: ProgramSection = {
-                templateId,
-                title: '',
-                description: '',
+                template: templateId,
                 order: sections.length,
-                isEditing: true,
+                contents: [],
             };
             setSections((prev) => [newSection, ...prev]);
 

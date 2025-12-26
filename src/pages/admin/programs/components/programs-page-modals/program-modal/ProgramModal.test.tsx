@@ -133,6 +133,7 @@ const mockProgram: Program = {
     participantsCount: '',
     meetingsCount: '',
     location: '',
+    sections: [],
 };
 
 const mockCategories: ProgramCategory[] = [

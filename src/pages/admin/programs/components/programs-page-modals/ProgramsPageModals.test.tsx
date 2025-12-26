@@ -42,6 +42,7 @@ describe('ProgramsPageModals', () => {
         location: '',
         meetingsCount: '',
         participantsCount: '',
+        sections: [],
     };
 
     const mockCategories: ProgramCategory[] = [

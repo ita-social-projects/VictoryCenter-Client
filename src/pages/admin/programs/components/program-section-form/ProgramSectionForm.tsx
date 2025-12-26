@@ -15,7 +15,7 @@ export const ProgramSectionForm = ({ section, onSave, onCancel, isDisabled = fal
         <div className={styles.container}>
             <div className={styles.content}>
                 <p className={styles['template-info']}>
-                    Template ID: <strong>{section.templateId}</strong>
+                    Template ID: <strong>{section.template}</strong>
                 </p>
                 {/* Empty space for future template-specific inputs */}
             </div>

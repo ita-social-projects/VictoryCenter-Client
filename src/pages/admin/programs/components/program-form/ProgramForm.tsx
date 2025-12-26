@@ -247,7 +247,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             (sectionIndex: number) => {
                 setFormState((prev) => {
                     const updatedSections = [...prev.sections];
-                    updatedSections[sectionIndex] = { ...updatedSections[sectionIndex], isEditing: false };
+                    updatedSections[sectionIndex] = { ...updatedSections[sectionIndex] };
                     return { ...prev, sections: updatedSections };
                 });
             },
@@ -439,7 +439,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     {hasSections && (
                         <div className={styles['sections-list']}>
                             {formState.sections.map((section, index) =>
-                                section.isEditing ? (
+                                true ? (
                                     <ProgramSectionForm
                                         key={index}
                                         section={section}
@@ -451,7 +451,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                                     <div key={index} className={styles['section-preview']}>
                                         {/* todo sections preview */}
                                         <p>
-                                            Section {index + 1} - Template ID: {section.templateId}
+                                            Section {index + 1} - Template ID: {section.template}
                                         </p>
                                     </div>
                                 ),

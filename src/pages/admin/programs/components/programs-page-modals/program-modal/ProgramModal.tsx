@@ -11,7 +11,7 @@ import { GenericModalWrapper } from '@/components/admin/generic-modal-wrapper/Ge
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { AddSectionModal } from '../add-section-modal/AddSectionModal';
-import { UnsavedSectionChangesModal } from '../unsaved-section-changes-modal/UnsavedSectionChangesModal';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
 import './ProgramModal.scss';
 
 export interface BaseProgramModalProps {
@@ -156,9 +156,12 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const handleConfirmDiscardSection = useCallback(() => {
         if (sectionToCancel !== null) {
             setSections((prev) => prev.filter((_, index) => index !== sectionToCancel));
+            if (modalHookData.formRef.current) {
+                modalHookData.formRef.current.removeSection(sectionToCancel);
+            }
         }
         handleCloseSectionUnsavedModal();
-    }, [sectionToCancel, handleCloseSectionUnsavedModal]);
+    }, [sectionToCancel, handleCloseSectionUnsavedModal, modalHookData.formRef]);
 
     return (
         <div className="program-modal">
@@ -204,10 +207,12 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 onClose={closeModalActions.closeAddSectionModal}
                 onSelectTemplate={handleTemplateSelect}
             />
-            <UnsavedSectionChangesModal
+            <ConfirmationModal
                 isOpen={isSectionUnsavedModalOpen}
                 onClose={handleCloseSectionUnsavedModal}
+                title={PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE}
                 onConfirm={handleConfirmDiscardSection}
+                onCancel={handleCloseSectionUnsavedModal}
             />
         </div>
     );

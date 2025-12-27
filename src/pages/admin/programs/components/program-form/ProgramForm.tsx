@@ -47,6 +47,7 @@ export interface ProgramFormRef {
     isValid: (isPublishing?: boolean) => boolean;
     isDirty: () => boolean;
     addSection: (section: ProgramSection) => void;
+    removeSection: (sectionIndex: number) => void;
 }
 
 export interface ProgramFormProps {
@@ -131,7 +132,17 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [setFormState],
         );
 
-        // Extend ref to add addSection method
+        const handleRemoveSection = useCallback(
+            (sectionIndex: number) => {
+                setFormState((prev) => ({
+                    ...prev,
+                    sections: prev.sections.filter((_, index) => index !== sectionIndex),
+                }));
+            },
+            [setFormState],
+        );
+
+        // Extend ref to add addSection and removeSection methods
         useImperativeHandle(
             ref,
             () => ({
@@ -139,8 +150,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 isValid: internalRef.current?.isValid || (() => false),
                 isDirty: internalRef.current?.isDirty || (() => false),
                 addSection: handleAddSection,
+                removeSection: handleRemoveSection,
             }),
-            [handleAddSection],
+            [handleAddSection, handleRemoveSection],
         );
 
         const handleNameChange = useCallback(

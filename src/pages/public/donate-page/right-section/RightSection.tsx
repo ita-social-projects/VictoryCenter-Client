@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import './RightSection.scss';
 import { AbroadPaymentDetails } from './abroad-payment-details/AbroadPaymentDetails';
 import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSupportWays';
@@ -14,7 +14,7 @@ interface RightSectionProps {
 }
 
 export const RightSection = ({ donateData, error }: RightSectionProps) => {
-    const { t } = useTranslation('donatePage');
+    const { t, i18n } = useTranslation('donatePage');
     const getAvailableCurrencies = () => {
         if (!donateData) return [];
 
@@ -44,6 +44,20 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
 
     const availableCurrencies = getAvailableCurrencies();
     const [activeTab, setActiveTab] = useState<Currency>(availableCurrencies[0] || Currency.UAH);
+
+    useEffect(() => {
+        const currentLang = i18n.language;
+
+        if (currentLang === 'en') {
+            if (availableCurrencies.includes(Currency.USD)) {
+                setActiveTab(Currency.USD);
+            }
+        } else if (currentLang === 'uk') {
+            if (availableCurrencies.includes(Currency.UAH)) {
+                setActiveTab(Currency.UAH);
+            }
+        }
+    }, [i18n.language, availableCurrencies]);
 
     useEffect(() => {
         if (availableCurrencies.length > 0 && !availableCurrencies.includes(activeTab)) {

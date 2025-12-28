@@ -1,24 +1,36 @@
 import { render, screen } from '@testing-library/react';
+import { useTranslation } from 'react-i18next';
+import { DonatePageIntro } from './DonatePageIntro';
 
-const mockPageTitle = (value: string) => {
-    jest.resetModules();
-    jest.doMock('@/const/public/donate-page', () => ({
-        PAGE_TITLE: value,
-    }));
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    return require('./DonatePageIntro');
-};
+jest.mock('react-i18next', () => ({
+    useTranslation: jest.fn(),
+}));
 
 describe('DonatePageIntro', () => {
+    const mockUseTranslation = useTranslation as jest.Mock;
+
+    const setupMockTitle = (title: string) => {
+        mockUseTranslation.mockReturnValue({
+            t: (key: string) => (key === 'DONATE_PAGE_TITLE' ? title : key),
+        });
+    };
+
     it('renders with line breaks if PAGE_TITLE contains |', () => {
-        const { DonatePageIntro } = mockPageTitle('Part1 | Part2');
+        setupMockTitle('Part1 | Part2');
+
         render(<DonatePageIntro />);
-        expect(screen.getByRole('heading').innerHTML).toContain('<br');
+
+        const heading = screen.getByRole('heading');
+        expect(heading.innerHTML).toContain('<br');
     });
 
     it('renders without line breaks if PAGE_TITLE does not contain |', () => {
-        const { DonatePageIntro } = mockPageTitle('SingleTitle');
+        setupMockTitle('SingleTitle');
+
         render(<DonatePageIntro />);
-        expect(screen.getByRole('heading')).toHaveTextContent('SingleTitle');
+
+        const heading = screen.getByRole('heading');
+        expect(heading).toHaveTextContent('SingleTitle');
+        expect(heading.innerHTML).not.toContain('<br');
     });
 });

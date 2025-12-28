@@ -11,7 +11,6 @@ jest.mock('../../copy-text-button/CopyTextButton', () => ({
     ),
 }));
 
-
 describe('AlternativeSupportWays', () => {
     const createMockSupportOption = (
         overrides: Partial<PublishedSupportOptionsDto> = {},

@@ -45,7 +45,7 @@ export const TextOnly = ({
                         name="section-title"
                         value={title}
                         onChange={handleTitleChange}
-                        maxLength={100}
+                        maxLength={60}
                         placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                     />
                 ) : (
@@ -61,8 +61,8 @@ export const TextOnly = ({
                         name="section-description"
                         value={description}
                         onChange={handleDescriptionChange}
-                        maxLength={1000}
-                        rows={6}
+                        maxLength={600}
+                        rows={8}
                     />
                 ) : (
                     <p className={styles.description}>{description}</p>

@@ -432,46 +432,50 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 {/* Sections Area */}
                 <div className={styles['sections-container']}>
                     {!hasSections && (
-                        <div className={styles['empty-sections-state']}>
-                            <img src={NotFoundIcon} alt="No sections" className={styles['empty-sections-image']} />
-                            <p className={styles['empty-sections-text']}>{PROGRAMS_TEXT.MESSAGE.NO_SECTIONS_YET}</p>
-                            <Button
-                                className={styles['btn-add']}
-                                onClick={onAddSection}
-                                buttonStyle="secondary"
-                                disabled={isSubmitting || isFormDisabled}
-                                data-testid="add-section-button-empty"
-                            >
-                                {PROGRAMS_TEXT.BUTTON.ADD_SECTION}
-                                <PlusIcon className={styles['plus-icon']} />
-                            </Button>
-                        </div>
+                        <>
+                            <div className={styles['empty-sections-state']}>
+                                <img src={NotFoundIcon} alt="No sections" className={styles['empty-sections-image']} />
+                                <p className={styles['empty-sections-text']}>{PROGRAMS_TEXT.MESSAGE.NO_SECTIONS_YET}</p>
+                                <Button
+                                    className={styles['btn-add']}
+                                    onClick={onAddSection}
+                                    buttonStyle="secondary"
+                                    disabled={isSubmitting || isFormDisabled}
+                                    data-testid="add-section-button-empty"
+                                >
+                                    {PROGRAMS_TEXT.BUTTON.ADD_SECTION}
+                                    <PlusIcon className={styles['plus-icon']} />
+                                </Button>
+                            </div>
+                            <div className={styles['sections-divider']} />
+                        </>
                     )}
 
                     {hasSections && (
                         <div className={styles['sections-list']}>
-                            {formState.sections.map((section, index) =>
-                                true ? (
-                                    <ProgramSectionForm
-                                        key={index}
-                                        section={section}
-                                        onSave={() => handleSaveSection(index)}
-                                        onCancel={() => handleCancelSection(index)}
-                                        isDisabled={isSubmitting || isFormDisabled}
-                                    />
-                                ) : (
-                                    <div key={index} className={styles['section-preview']}>
-                                        {/* todo sections preview */}
-                                        <p>
-                                            Section {index + 1} - Template ID: {section.template}
-                                        </p>
-                                    </div>
-                                ),
-                            )}
+                            {formState.sections.map((section, index) => (
+                                <React.Fragment key={index}>
+                                    {true ? (
+                                        <ProgramSectionForm
+                                            section={section}
+                                            onSave={() => handleSaveSection(index)}
+                                            onCancel={() => handleCancelSection(index)}
+                                            isDisabled={isSubmitting || isFormDisabled}
+                                        />
+                                    ) : (
+                                        <div className={styles['section-preview']}>
+                                            {/* todo sections preview */}
+                                            <p>
+                                                Section {index + 1} - Template ID: {section.template}
+                                            </p>
+                                        </div>
+                                    )}
+                                    <div className={styles['sections-divider']} />
+                                </React.Fragment>
+                            ))}
                         </div>
                     )}
                 </div>
-                <div className={styles['sections-divider']} />
             </form>
         );
     },

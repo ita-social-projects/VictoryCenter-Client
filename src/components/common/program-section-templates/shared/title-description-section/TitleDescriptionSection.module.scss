@@ -1,7 +1,7 @@
 @import '@/assets/sass/mixins/typography.mixins';
 
 .container {
-    padding: 2vw 5vw;
+    padding: 2vw 6vw;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -46,12 +46,11 @@
 }
 
 .template {
-    .title {
-        font-size: 1.4vw;
+    .title{
+        font-size: 1.7vw;
     }
-
     .description {
         font-size: clamp(6px, 0.9vw, 12px);
-        line-height: 0.7vw;
+        line-height: 0.9vw;
     }
 }

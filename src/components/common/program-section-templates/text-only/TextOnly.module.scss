@@ -1,13 +1,61 @@
+@import '@/assets/sass/mixins/typography.mixins';
+
 .container {
     display: flex;
-    flex-direction: column;
     width: auto;
     margin: 0;
     background-color: #fff;
     box-sizing: border-box;
     overflow: hidden;
     aspect-ratio: 1330 / 552;
-    align-items: center;
-    justify-content: center;
-    padding: 0 4vw;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 2vw 5vw;
+}
+
+.title-section {
+    flex: 60% 0 0;
+}
+
+.description-section {
+    flex: 40% 0 0;
+}
+
+.title {
+    @include h3-semibold-uppercase;
+    flex-shrink: 0;
+}
+
+.description {
+    @include body-1-regular;
+    white-space: pre-wrap;
+}
+
+.editable {
+    padding: 2rem 4rem;
+    
+    .title-section,
+    .description-section {
+        flex: 1 1 50%;
+    }
+}
+
+@media (max-width: 1024px) {
+    .title-section {
+        flex: 40% 0 0;
+    }
+
+    .description-section {
+        flex: 60% 0 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .title-section {
+        flex: 30% 0 0;
+    }
+
+    .description-section {
+        flex: 70% 0 0;
+    }
 }

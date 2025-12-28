@@ -12,6 +12,7 @@ import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
 import { AddSectionModal } from '../add-section-modal/AddSectionModal';
 import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { getInitialSectionContents } from '@/utils/functions/render-program-section';
 import './ProgramModal.scss';
 
 export interface BaseProgramModalProps {
@@ -40,7 +41,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const program = isEditMode ? props.programToEdit : undefined;
     const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
     const { modalState, openModalActions, closeModalActions } = useModalsState();
-    const [sections, setSections] = useState<ProgramSection[]>([]);
+    const [_sections, setSections] = useState<ProgramSection[]>([]);
     const [isSectionUnsavedModalOpen, setIsSectionUnsavedModalOpen] = useState(false);
     const [sectionToCancel, setSectionToCancel] = useState<number | null>(null);
 
@@ -130,17 +131,16 @@ export const ProgramModal = (props: ProgramModalProps) => {
         (templateId: ProgramSectionTemplate) => {
             const newSection: ProgramSection = {
                 template: templateId,
-                order: sections.length,
-                contents: [],
+                order: 0,
+                contents: getInitialSectionContents(templateId),
             };
             setSections((prev) => [newSection, ...prev]);
 
-            // Add section directly to form state
             if (modalHookData.formRef.current) {
                 modalHookData.formRef.current.addSection(newSection);
             }
         },
-        [sections.length, modalHookData.formRef],
+        [modalHookData.formRef],
     );
 
     const handleRequestCancelSection = useCallback((sectionIndex: number) => {

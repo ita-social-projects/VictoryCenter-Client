@@ -3,29 +3,54 @@
 .container {
     @extend .template-container;
     aspect-ratio: 1330 / 1200;
+    display: flex;
 }
 
-.topSection {
+.top-section {
     padding: 2rem;
-    height: 50%;
+    flex: 40% 0 0;
 }
 
-.bottomSection {
-    height: 50%;
+.bottom-section {
+    flex: 60% 0 0;
     display: flex;
 }
 
-.imageWrapper {
-    width: 100%;
+.image-wrapper {
     height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .image {
     width: 100%;
     height: auto;
-    object-fit: contain;
+    object-fit: cover;
     aspect-ratio: 1330 / 680;
+}
+
+.container.editable {
+    max-height: 1300px;
+    gap: 2vw;
+
+    .top-section {
+        height: auto;
+    }
+
+    .bottom-section {
+        flex: auto;
+        height: auto;
+        justify-content: center;
+    }
+
+    .image-wrapper {
+        aspect-ratio: 1330 / 680;
+        max-height: 680px;
+
+        > div {
+            height: 100%;
+
+            > div {
+                height: 100%;
+            }
+        }
+    }
 }

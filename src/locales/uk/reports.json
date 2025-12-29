@@ -13,5 +13,8 @@
     },
     "actions": {
         "downloadPdf": "Завантажити PDF"
+    },
+    "cta": {
+        "buttonLabel": "Донатити"
     }
 }

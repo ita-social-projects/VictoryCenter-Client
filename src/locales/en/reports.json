@@ -13,5 +13,8 @@
     },
     "actions": {
         "downloadPdf": "Download PDF"
+    },
+    "cta": {
+        "buttonLabel": "Donate"
     }
 }

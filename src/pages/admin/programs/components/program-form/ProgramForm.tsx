@@ -146,9 +146,15 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
         useImperativeHandle(
             ref,
             () => ({
-                submit: internalRef.current?.submit || (async () => {}),
-                isValid: internalRef.current?.isValid || (() => false),
-                isDirty: internalRef.current?.isDirty || (() => false),
+                submit: async (status: VisibilityStatus) => {
+                    await internalRef.current?.submit(status);
+                },
+                isValid: (isPublishing?: boolean) => {
+                    return internalRef.current?.isValid(isPublishing) ?? false;
+                },
+                isDirty: () => {
+                    return internalRef.current?.isDirty() ?? false;
+                },
                 addSection: handleAddSection,
                 removeSection: handleRemoveSection,
             }),

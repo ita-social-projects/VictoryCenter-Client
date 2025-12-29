@@ -53,7 +53,7 @@ describe('AddSectionModal', () => {
         render(<AddSectionModal {...defaultProps} />);
 
         expect(screen.getByTestId('add-section-modal')).toBeInTheDocument();
-        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.ADD_SECTION)).toBeInTheDocument();
+        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION)).toBeInTheDocument();
     });
 
     it('should not render when isOpen is false', () => {

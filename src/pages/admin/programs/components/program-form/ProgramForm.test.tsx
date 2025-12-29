@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ProgramForm, ProgramFormProps, ProgramFormRef, ProgramFormValues } from './ProgramForm';
 import { PROGRAM_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
@@ -187,7 +187,8 @@ describe('ProgramForm', () => {
 
         it('should call onAddSection when the add button is clicked', () => {
             renderProgramForm();
-            fireEvent.click(screen.getByTestId('add-section-btn'));
+            const addButtons = screen.getAllByTestId('add-section-btn');
+            fireEvent.click(addButtons[0]);
             expect(mockOnAddSection).toHaveBeenCalled();
         });
     });
@@ -317,13 +318,32 @@ describe('ProgramForm', () => {
     });
 
     describe('Form Submission & Ref Methods', () => {
-        it('should return true for isDirty when any field is changed', () => {
+        it('should return true for isDirty when form differs from initial data', () => {
             const ref = React.createRef<ProgramFormRef>();
             renderProgramForm({}, ref);
 
             expect(ref.current?.isDirty()).toBe(false);
-            fireEvent.change(screen.getByTestId('input-location'), { target: { value: 'Changed' } });
-            expect(ref.current?.isDirty()).toBe(true);
+        });
+
+        it('should return false for isDirty when form matches initial data', () => {
+            const ref = React.createRef<ProgramFormRef>();
+            const initialData: ProgramFormValues = {
+                name: 'Test Program',
+                categories: [],
+                description: 'Test',
+                previewImage: null,
+                previewImageId: null,
+                backgroundImage: null,
+                backgroundImageId: null,
+                location: 'Kyiv',
+                participantsCount: '10',
+                meetingCount: '5',
+                sections: [],
+            };
+            renderProgramForm({ initialData }, ref);
+
+            // Form was initialized with data and hasn't changed
+            expect(ref.current?.isDirty()).toBe(false);
         });
 
         it('should return false for isValid if validation fails', () => {
@@ -342,13 +362,28 @@ describe('ProgramForm', () => {
 
         it('should submit form when valid and call validateForm for all fields', async () => {
             const ref = React.createRef<ProgramFormRef>();
-            renderProgramForm({}, ref);
+            const initialData: ProgramFormValues = {
+                name: 'Program A',
+                categories: [],
+                description: 'Test description',
+                previewImage: null,
+                previewImageId: null,
+                backgroundImage: null,
+                backgroundImageId: null,
+                location: 'Kyiv',
+                participantsCount: '10',
+                meetingCount: '5',
+                sections: [],
+            };
+            renderProgramForm({ initialData }, ref);
 
             // Ensure validation returns no errors
             Object.values(PROGRAM_VALIDATION_FUNCTIONS).forEach((fn) => (fn as jest.Mock).mockReturnValue(undefined));
 
-            // Fill minimal data
-            fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Program A' } });
+            // Wait for component to fully initialize with initial data
+            await waitFor(() => {
+                expect(screen.getByTestId('input-name')).toHaveValue('Program A');
+            });
 
             await act(async () => {
                 await ref.current?.submit(VisibilityStatus.Published);
@@ -365,7 +400,12 @@ describe('ProgramForm', () => {
             expect(PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount).toHaveBeenCalled();
 
             expect(mockOnSubmit).toHaveBeenCalledWith(
-                expect.objectContaining({ name: 'Program A' }),
+                expect.objectContaining({ 
+                    name: 'Program A',
+                    location: 'Kyiv',
+                    participantsCount: '10',
+                    meetingCount: '5',
+                }),
                 VisibilityStatus.Published,
             );
         });

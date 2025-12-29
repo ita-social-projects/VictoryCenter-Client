@@ -71,6 +71,11 @@ export const renderProgramSection = ({
                     image1={data.image1}
                     image2={data.image2}
                     isTemplate={isTemplate}
+                    isEditable={isEditable}
+                    onTitleChange={handlers?.onTitleChange}
+                    onDescriptionChange={handlers?.onDescriptionChange}
+                    onImage1Change={handlers?.onImage1Change}
+                    onImage2Change={handlers?.onImage2Change}
                 />
             );
         case ProgramSectionTemplate.TextOnly:

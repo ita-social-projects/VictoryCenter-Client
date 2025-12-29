@@ -38,6 +38,16 @@
     gap: 20vw;
 }
 
+.template {
+    .title{
+        font-size: 2vw;
+    }
+    .description {
+        font-size: 0.9vw;
+        line-height: 1.3vw;
+    }
+}
+
 .container.template {
     padding: 2vw 6vw 0vw 6vw;
 }

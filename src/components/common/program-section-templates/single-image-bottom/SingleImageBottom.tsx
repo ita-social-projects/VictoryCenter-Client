@@ -49,7 +49,7 @@ export const SingleImageBottom = ({
                             <PhotoInputGroup
                                 id="section-image-1"
                                 name="section-image-1"
-                                value={null}
+                                value={image1 ? { base64: image1, mimeType: '' } : null}
                                 onChange={onImage1Change || (() => {})}
                                 setError={() => {}}
                                 cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth}

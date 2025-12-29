@@ -70,18 +70,25 @@ export const ProgramSectionForm = ({
         [onSectionChange],
     );
 
+    const updateImageContent = useCallback(
+        (order: number, file: ImageValues | null, prev: ProgramSection): ProgramSection => {
+            const updatedContents = prev.contents.map((c) =>
+                c.contentType === ContentType.Image && c.order === order ? { ...c, image: file } : c,
+            );
+            return { ...prev, contents: updatedContents };
+        },
+        [],
+    );
+
     const handleImageChange = useCallback(
         (order: number) => (file: ImageValues | null) => {
             setLocalSection((prev) => {
-                const updatedContents = prev.contents.map((c) =>
-                    c.contentType === ContentType.Image && c.order === order ? { ...c, image: file } : c,
-                );
-                const updatedSection = { ...prev, contents: updatedContents };
+                const updatedSection = updateImageContent(order, file, prev);
                 onSectionChange?.(updatedSection);
                 return updatedSection;
             });
         },
-        [onSectionChange],
+        [onSectionChange, updateImageContent],
     );
 
     const editableSection = renderProgramSection({

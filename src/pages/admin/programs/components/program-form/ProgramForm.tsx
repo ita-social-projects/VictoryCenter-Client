@@ -460,7 +460,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                     {hasSections && (
                         <div className={styles['sections-list']}>
                             {formState.sections.map((section, index) => (
-                                <React.Fragment key={index}>
+                                <React.Fragment key={section.id ?? `${section.template}-${index}`}>
                                     {true ? (
                                         <ProgramSectionForm
                                             section={section}

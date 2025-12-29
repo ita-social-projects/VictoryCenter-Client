@@ -48,14 +48,11 @@
 
     .top-section{
         flex: 40%;
-        height: 10px;
     }
     .bottom-section{
         flex: 40%;
     }
     .images-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0;
         display: flex;
         justify-content: center;
     }

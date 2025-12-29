@@ -1,4 +1,3 @@
-import { TEXT } from '../public/notfound-page';
 import { COMMON_TEXT_ADMIN } from './common';
 
 export const PROGRAMS_TEXT = {

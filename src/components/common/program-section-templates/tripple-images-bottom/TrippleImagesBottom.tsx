@@ -36,7 +36,11 @@ export const TrippleImagesBottom = ({
     onImage3Change,
 }: TrippleImagesBottomProps) => {
     const images = [image1, image2, image3];
-    const imageHandlers = [onImage1Change, onImage2Change, onImage3Change];
+    const imageHandlers = [
+        { handler: onImage1Change, key: 'image1', value: image1 },
+        { handler: onImage2Change, key: 'image2', value: image2 },
+        { handler: onImage3Change, key: 'image3', value: image3 },
+    ];
 
     return (
         <div
@@ -57,15 +61,15 @@ export const TrippleImagesBottom = ({
                     />
                     <div className={styles['bottom-section']}>
                         <div className={styles['images-grid']}>
-                            {imageHandlers.map((handler, index) => (
+                            {imageHandlers.map(({ handler, key, value }, index) => (
                                 <div
-                                    key={index}
+                                    key={key}
                                     className={`${styles['image-wrapper']} ${index % 2 === 0 ? styles.elevated : ''}`}
                                 >
                                     <PhotoInputGroup
                                         id={`section-image-${index + 1}`}
                                         name={`section-image-${index + 1}`}
-                                        value={null}
+                                        value={value ? { id: null, url: value, mimeType: '' } : null}
                                         onChange={handler || (() => {})}
                                         setError={() => {}}
                                         cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.TRIPLE_IMAGES.cropWidth}
@@ -96,7 +100,7 @@ export const TrippleImagesBottom = ({
                         <div className={styles['images-grid']}>
                             {images.map((image, index) => (
                                 <div
-                                    key={index}
+                                    key={image ? `image-${image}` : `image-${index}`}
                                     className={`${styles['image-wrapper']} ${index % 2 === 0 ? styles.elevated : ''}`}
                                 >
                                     <img src={image} alt="" className={styles.image} />

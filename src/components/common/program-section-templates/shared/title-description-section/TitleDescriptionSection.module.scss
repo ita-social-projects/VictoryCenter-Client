@@ -1,11 +1,11 @@
 @import '@/assets/sass/mixins/typography.mixins';
 
 .container {
-    padding: 2vw 4vw;
+    padding: 1.5rem 3rem;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 3vw;
+    gap: 2rem;
 }
 
 .title {
@@ -22,8 +22,17 @@
 }
 
 .container.editable {
-    padding: 8vw 8vw 0 8vw;
+    padding: 8rem 6rem 0 6rem;
     gap: 15vw;
+    justify-content: center;
+
+    .title-section {
+    flex: 30% 0 0;
+}
+
+.description-section {
+    flex: 30% 0 0;
+}
 }
 
 .description {

@@ -400,7 +400,7 @@ describe('ProgramForm', () => {
             expect(PROGRAM_VALIDATION_FUNCTIONS.validateMeetingCount).toHaveBeenCalled();
 
             expect(mockOnSubmit).toHaveBeenCalledWith(
-                expect.objectContaining({ 
+                expect.objectContaining({
                     name: 'Program A',
                     location: 'Kyiv',
                     participantsCount: '10',

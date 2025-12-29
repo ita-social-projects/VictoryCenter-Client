@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { REPORTS_DATA } from '@/utils/mock-data/public/reports-page';
-import { ReportItem } from './components';
+import { ReportItem } from './report-item';
 import styles from './ReportsSection.module.scss';
 
 export const ReportsSection: React.FC = () => {

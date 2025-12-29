@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SUMMARY_DATA } from '@/utils/mock-data/public/reports-page';
-import { StatCard } from './components/stat-card/StatCard';
+import { StatCard } from './stat-card';
 import styles from './SummarySection.module.scss';
 
 export const SummarySection: React.FC = () => {

@@ -36,14 +36,14 @@
         font-size: 1.5vw;
     }
     .description {
-        font-size: clamp(6px, 0.9vw, 12px);
+        font-size: clamp(6px, 0.9vw, 14px);
         line-height: clamp(6px, 0.9vw, 14px);
     }
 }
 
 .title-input{
     input{
-        @include h3-semibold-uppercase;
+        @include h3-semibold-uppercase; 
     }
 }
 

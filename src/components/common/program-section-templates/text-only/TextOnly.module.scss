@@ -27,15 +27,29 @@
     flex-shrink: 0;
 }
 
+.title-input{
+    input{
+        @include h3-semibold-uppercase; 
+    }
+}
+
 .description {
     @include body-1-regular;
     white-space: pre-wrap;
 }
 
 .container.editable {
-    padding: 8vw 8vw 0 8vw;
     max-height: 644px;
-    gap: 20vw;
+    justify-content: center;
+    gap: 10vw;
+
+    .title-section {
+    flex: 30% 0 0;
+}
+
+.description-section {
+    flex: 30% 0 0;
+}
 }
 
 .template {

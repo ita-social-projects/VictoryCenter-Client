@@ -1,4 +1,5 @@
 @import '../shared/BaseSectionTemplate.module.scss';
+@import '@/assets/sass/mixins/typography.mixins';
 
 .container {
     @extend .section-container;
@@ -9,7 +10,7 @@
     padding: 2rem 0;
 }
 
-.leftSection {
+.left-section {
     flex: 1;
     display: flex;
     flex: 0 0 50%;
@@ -20,9 +21,20 @@
     gap: 1vw;
 }
 
-.titleSection {
+.title-section {
     display: flex;
-    align-items: center;
+    align-items: start;
+    width: 100%;
+    > div{
+        flex: 1;
+    }
+}
+
+.title-input{
+    textarea{
+        @include h3-semibold-uppercase;
+        height: 7rem;
+    }
 }
 
 .title {
@@ -32,9 +44,12 @@
     word-wrap: break-word;
 }
 
-.descriptionSection {
+.description-section {
     display: flex;
-    align-items: flex-start;
+    align-items: start;
+    > div{
+        flex: 1;
+    }
 }
 
 .description {
@@ -44,25 +59,20 @@
     word-wrap: break-word;
 }
 
-.rightSection {
+.right-section {
     flex: 0 0 50%;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.imageWrapper {
-    width: 100%;
+.image-wrapper {
     height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 0;
 }
 
 .image {
-    width: 100%;
-    height: auto;
+    height: 100%;
+    width: auto;
     object-fit: cover;
     aspect-ratio: 700 / 600;
 }
@@ -76,5 +86,44 @@
     .description {
         font-size: clamp(6px, 0.9vw, 12px);
         line-height: 0.9vw;
+    }
+}
+
+.container.editable {
+    aspect-ratio: auto;
+    max-height: 1000px;
+    justify-content: center;
+    padding: 5vw 0;
+
+    .left-section {
+        justify-content: space-around;
+        flex: 0 0 30%;
+    }
+
+    .title-section {
+        width: 100%;
+    }
+
+    .description-section {
+        width: 100%;
+    }
+
+    .right-section {
+        height: auto;
+    }
+
+    .image-wrapper {
+        aspect-ratio: 700 / 600;
+        width: 100%;
+        max-width: 700px;
+        max-height: 600px;
+
+        > div {
+            height: 100%;
+
+            > div {
+                height: 100%;
+            }
+        }
     }
 }

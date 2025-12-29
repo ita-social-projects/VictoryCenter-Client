@@ -47,6 +47,7 @@ export const TextOnly = ({
                         onChange={handleTitleChange}
                         maxLength={60}
                         placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
+                        className={styles['title-input']}
                     />
                 ) : (
                     <h2 className={styles.title}>{title}</h2>

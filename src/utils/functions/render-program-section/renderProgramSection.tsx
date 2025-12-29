@@ -93,6 +93,12 @@ export const renderProgramSection = ({
                     image2={data.image2}
                     image3={data.image3}
                     isTemplate={isTemplate}
+                    isEditable={isEditable}
+                    onTitleChange={handlers?.onTitleChange}
+                    onDescriptionChange={handlers?.onDescriptionChange}
+                    onImage1Change={handlers?.onImage1Change}
+                    onImage2Change={handlers?.onImage2Change}
+                    onImage3Change={handlers?.onImage3Change}
                 />
             );
         case ProgramSectionTemplate.SingleImageBottom:

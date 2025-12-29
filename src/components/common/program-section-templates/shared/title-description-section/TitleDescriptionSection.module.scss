@@ -31,6 +31,20 @@
     white-space: pre-wrap;
 }
 
+.template {
+    .title{
+        font-size: 1.5vw;
+    }
+    .description {
+        font-size: clamp(6px, 0.9vw, 12px);
+        line-height: clamp(6px, 0.9vw, 14px);
+    }
+}
+
+.title-input{
+    @include h3-semibold-uppercase;
+}
+
 @media (max-width: 1024px) {
     .title-section {
         flex: 40% 0 0;
@@ -48,15 +62,5 @@
 
     .description-section {
         flex: 70% 0 0;
-    }
-}
-
-.template {
-    .title{
-        font-size: 1.5vw;
-    }
-    .description {
-        font-size: clamp(6px, 0.9vw, 12px);
-        line-height: clamp(6px, 0.9vw, 14px);
     }
 }

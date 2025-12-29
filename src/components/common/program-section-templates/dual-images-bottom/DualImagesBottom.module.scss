@@ -1,7 +1,7 @@
-@import '../BaseSectionTemplate.module.scss';
+@import '../shared/BaseSectionTemplate.module.scss';
 
 .container {
-    @extend .template-container;
+    @extend .section-container;
     aspect-ratio: 1330 / 1235;
     gap: 1vw;
 }

@@ -1,7 +1,7 @@
-@import '../BaseSectionTemplate.module.scss';
+@import '../shared/BaseSectionTemplate.module.scss';
 
 .container {
-    @extend .template-container;
+    @extend .section-container;
     aspect-ratio: 1330 / 1200;
     display: flex;
 }
@@ -32,7 +32,7 @@
     gap: 2vw;
 
     .top-section {
-        height: auto;
+        //height: auto;
     }
 
     .bottom-section {

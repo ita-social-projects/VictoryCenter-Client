@@ -1,20 +1,18 @@
-@import '../BaseSectionTemplate.module.scss';
+@import '../shared/BaseSectionTemplate.module.scss';
 
 .container {
-    @extend .template-container;
+    @extend .section-container;
     aspect-ratio: 1330 / 1200;
 }
 
-.topSection {
-    flex: 0 0 56%;
-}
-
-.imageWrapper {
-    width: 100%;
-    height: 100%;
+.top-section {
+    flex: 0 0 60%;
     display: flex;
     align-items: center;
-    justify-content: center;
+}
+
+.image-wrapper {
+    height: 100%;
 }
 
 .image {
@@ -24,6 +22,36 @@
     aspect-ratio: 1330 / 680;
 }
 
-.bottomSection {
-    flex: 0 0 44%;
+.bottom-section {
+    flex: 0 0 20%;
+}
+
+.container.editable {
+    max-height: 1300px;
+    gap: 2vw;
+
+    .top-section {
+        height: 300px;
+        justify-content: center;
+    }
+
+    .bottom-section {
+        gap: 2rem;
+        padding: 0 8vw 0 8vw;
+    }
+
+    .image-wrapper {
+        aspect-ratio: 1330 / 680;
+        width: 100%;
+        max-width: 1330px;
+        max-height: 680px;
+
+        > div {
+            height: 100%;
+
+            > div {
+                height: 100%;
+            }
+        }
+    }
 }

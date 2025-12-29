@@ -42,7 +42,9 @@
 }
 
 .title-input{
-    @include h3-semibold-uppercase;
+    input{
+        @include h3-semibold-uppercase;
+    }
 }
 
 @media (max-width: 1024px) {

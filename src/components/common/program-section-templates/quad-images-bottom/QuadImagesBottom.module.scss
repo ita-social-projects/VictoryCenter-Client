@@ -1,8 +1,8 @@
-@import '../BaseSectionTemplate.module.scss';
+@import '../shared/BaseSectionTemplate.module.scss';
 @import '@/assets/sass/mixins/typography.mixins';
 
 .container {
-    @extend .template-container;
+    @extend .section-container;
     aspect-ratio: 1330 / 1183;
     display: flex;
     gap: 1vw;

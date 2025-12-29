@@ -126,6 +126,10 @@ export const renderProgramSection = ({
                     description={data.description}
                     image1={data.image1}
                     isTemplate={isTemplate}
+                    isEditable={isEditable}
+                    onTitleChange={handlers?.onTitleChange}
+                    onDescriptionChange={handlers?.onDescriptionChange}
+                    onImage1Change={handlers?.onImage1Change}
                 />
             );
         case ProgramSectionTemplate.SingleImageRight:

@@ -3,6 +3,7 @@ import cn from 'classnames';
 import './ImageInput.scss';
 import './WhoWeAreImageInput.scss';
 import './ProgramImageInput.scss';
+import './ProgramSectionImageInput.scss';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ReactComponent as UploadIcon } from '@/assets/icons/cloud-download.svg';
 import { ReactComponent as CropIcon } from '@/assets/icons/crop.svg';

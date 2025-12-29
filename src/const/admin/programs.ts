@@ -80,6 +80,45 @@ export const PROGRAM_CATEGORY_TEXT = {
     },
 };
 
+export const PROGRAM_SECTION_IMAGE_CONFIGS = {
+    QUAD_IMAGES: {
+        cropWidth: 360,
+        cropHeight: 390,
+        minWidth: 360,
+        minHeight: 390,
+    },
+    DUAL_IMAGES: {
+        cropWidth: 730,
+        cropHeight: 430,
+        minWidth: 730,
+        minHeight: 430,
+    },
+    TRIPLE_IMAGES: {
+        cropWidth: 480,
+        cropHeight: 480,
+        minWidth: 480,
+        minHeight: 480,
+    },
+    SINGLE_IMAGE_TOP: {
+        cropWidth: 1330,
+        cropHeight: 680,
+        minWidth: 1330,
+        minHeight: 680,
+    },
+    SINGLE_IMAGE_BOTTOM: {
+        cropWidth: 1330,
+        cropHeight: 680,
+        minWidth: 1330,
+        minHeight: 680,
+    },
+    SINGLE_IMAGE_RIGHT: {
+        cropWidth: 700,
+        cropHeight: 600,
+        minWidth: 700,
+        minHeight: 600,
+    },
+};
+
 export const PROGRAM_VALIDATION = {
     name: {
         min: 5,

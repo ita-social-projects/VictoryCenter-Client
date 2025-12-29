@@ -1,6 +1,5 @@
 .container {
     background-color: #f9f9f9;
-    margin-bottom: 1rem;
     overflow: hidden;
 }
 
@@ -11,7 +10,6 @@
 
     > div {
         width: 100%;
-        padding: 2rem 4rem;
     }
 }
 
@@ -30,6 +28,7 @@
     justify-content: center;
     background-color: #fff;
     gap: 2rem;
+    padding-bottom: 4rem;
 
     Button {
         width: 325px;

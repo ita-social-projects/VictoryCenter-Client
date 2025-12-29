@@ -1,16 +1,19 @@
 @import '../BaseSectionTemplate.module.scss';
+@import '@/assets/sass/mixins/typography.mixins';
 
 .container {
     @extend .template-container;
     aspect-ratio: 1330 / 1183;
+    display: flex;
+    gap: 1vw;
 }
 
-.topSection {
+.top-section {
     flex: 0 0 53%;
     min-height: 0;
 }
 
-.bottomSection {
+.bottom-section {
     flex: 0 0 48%;
     min-height: 0;
     display: flex;
@@ -19,14 +22,14 @@
     box-sizing: border-box;
 }
 
-.imagesGrid {
+.images-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 0;
     align-items: end;
 }
 
-.imageWrapper {
+.image-wrapper {
     width: 100%;
 }
 
@@ -39,4 +42,39 @@
     height: auto;
     object-fit: cover;
     aspect-ratio: 360 / 390;
+}
+
+
+.container.editable {
+    max-height: 1200px;
+    gap: 2vw;
+
+    .top-section{
+        flex: 40%;
+        height: 10px;
+    }
+    .bottom-section{
+        flex: 40%;
+    }
+    .images-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .image-wrapper {
+        aspect-ratio: 360 / 390;
+        width: 100%;
+        max-height: 390px;
+        max-width: 360px;
+
+        > div {
+            height: 100%;
+
+            > div {
+                height: 100%;
+            }
+        }
+    }
 }

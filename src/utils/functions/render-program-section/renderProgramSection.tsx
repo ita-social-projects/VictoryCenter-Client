@@ -1,6 +1,7 @@
 import React from 'react';
 import { ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ProgramSectionContent, ContentType } from '@/types/admin/programs';
+import { ImageValues } from '@/types/common/image';
 import { QuadImagesBottom } from '@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom';
 import { TrippleImagesBottom } from '@/components/common/program-section-templates/tripple-images-bottom/TrippleImagesBottom';
 import { DualImagesBottom } from '@/components/common/program-section-templates/dual-images-bottom/DualImagesBottom';
@@ -21,6 +22,10 @@ export interface ProgramSectionData {
 export interface ProgramSectionHandlers {
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
+    onImage1Change?: (file: ImageValues | null) => void;
+    onImage2Change?: (file: ImageValues | null) => void;
+    onImage3Change?: (file: ImageValues | null) => void;
+    onImage4Change?: (file: ImageValues | null) => void;
 }
 
 export interface RenderProgramSectionParams {
@@ -49,6 +54,13 @@ export const renderProgramSection = ({
                     image3={data.image3}
                     image4={data.image4}
                     isTemplate={isTemplate}
+                    isEditable={isEditable}
+                    onTitleChange={handlers?.onTitleChange}
+                    onDescriptionChange={handlers?.onDescriptionChange}
+                    onImage1Change={handlers?.onImage1Change}
+                    onImage2Change={handlers?.onImage2Change}
+                    onImage3Change={handlers?.onImage3Change}
+                    onImage4Change={handlers?.onImage4Change}
                 />
             );
         case ProgramSectionTemplate.DualImagesBottom:

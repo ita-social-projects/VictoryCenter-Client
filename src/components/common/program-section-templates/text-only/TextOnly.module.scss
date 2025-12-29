@@ -7,13 +7,9 @@
     background-color: #fff;
     box-sizing: border-box;
     overflow: hidden;
-    //aspect-ratio: 1330 / 552;
     aspect-ratio: 1330 / 511;
-    max-height: 644px;
-
     align-items: flex-start;
     justify-content: space-between;
-    //padding: 8vw 6vw 6vw 0;
     padding-top: 9vw;
     gap: 3vw;
 }
@@ -37,8 +33,9 @@
 }
 
 .container.editable {
-    padding: 8vw 12vw 0 12vw;
-    gap: 15vw;
+    padding: 8vw 8vw 0 8vw;
+    max-height: 644px;
+    gap: 20vw;
 }
 
 .container.template {

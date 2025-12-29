@@ -1,10 +1,11 @@
 @import '@/assets/sass/mixins/typography.mixins';
 
 .container {
-    padding: 2vw 6vw;
+    padding: 2vw 4vw;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    gap: 3vw;
 }
 
 .title {
@@ -13,11 +14,16 @@
 }
 
 .title-section {
-    flex: 60% 0 0;
+    flex: 50% 0 0;
 }
 
 .description-section {
-    flex: 40% 0 0;
+    flex: 50% 0 0;
+}
+
+.container.editable {
+    padding: 8vw 8vw 0 8vw;
+    gap: 15vw;
 }
 
 .description {
@@ -47,10 +53,10 @@
 
 .template {
     .title{
-        font-size: 1.7vw;
+        font-size: 1.5vw;
     }
     .description {
         font-size: clamp(6px, 0.9vw, 12px);
-        line-height: 0.9vw;
+        line-height: clamp(6px, 0.9vw, 14px);
     }
 }

@@ -1,10 +1,7 @@
-import cn from 'classnames';
 import { ImagesBottomSection, ImagesBottomSectionConfig } from '../shared/images-bottom-section/ImagesBottomSection';
 import { ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
-import styles from './QuadImagesBottom.module.scss';
-import sharedStyles from '../shared/images-bottom-section/ImagesBottomSection.module.scss';
 
 export interface QuadImagesBottomProps {
     title?: string;
@@ -60,6 +57,7 @@ export const QuadImagesBottom = ({
 
     return (
         <ImagesBottomSection
+            variant="quad"
             title={title}
             description={description}
             images={images}
@@ -69,7 +67,6 @@ export const QuadImagesBottom = ({
             isEditable={isEditable}
             onTitleChange={onTitleChange}
             onDescriptionChange={onDescriptionChange}
-            className={cn(sharedStyles.container, styles.container)}
         />
     );
 };

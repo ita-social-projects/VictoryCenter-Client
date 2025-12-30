@@ -1,14 +1,11 @@
 .container {
     aspect-ratio: 1330 / 1235;
     gap: 1vw;
-
-    &.top-section {
-        flex: 0 0 51%;
-        background-color: red;
-    }
 }
 
-
+.top-section {
+    flex: 0 0 51%;
+}
 
 .bottom-section {
     flex: 0 0 49%;

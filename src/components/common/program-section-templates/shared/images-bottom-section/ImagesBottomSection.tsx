@@ -3,7 +3,18 @@ import { TitleDescriptionSection } from '../title-description-section/TitleDescr
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import styles from './ImagesBottomSection.module.scss';
+import baseStyles from './ImagesBottomSection.module.scss';
+import quadStyles from '../../quad-images-bottom/QuadImagesBottom.module.scss';
+import tripleStyles from '../../tripple-images-bottom/TrippleImagesBottom.module.scss';
+import dualStyles from '../../dual-images-bottom/DualImagesBottom.module.scss';
+
+const stylesMap = {
+    quad: quadStyles,
+    triple: tripleStyles,
+    dual: dualStyles,
+} as const;
+
+export type ImageVariant = keyof typeof stylesMap;
 
 export interface ImageConfig {
     cropWidth: number;
@@ -24,6 +35,7 @@ export interface ImagesBottomSectionConfig {
 }
 
 export interface ImagesBottomSectionProps {
+    variant: ImageVariant;
     title?: string;
     description?: string;
     images: string[];
@@ -37,6 +49,7 @@ export interface ImagesBottomSectionProps {
 }
 
 export const ImagesBottomSection = ({
+    variant,
     title = '',
     description = '',
     images,
@@ -48,29 +61,38 @@ export const ImagesBottomSection = ({
     onDescriptionChange,
     className = '',
 }: ImagesBottomSectionProps) => {
+    const variantStyles = stylesMap[variant];
+
+    const cx = (name: string) =>
+        cn(baseStyles[name as keyof typeof baseStyles], variantStyles[name as keyof typeof variantStyles]);
+
     return (
         <div
-            className={cn(styles.container, className, {
-                [styles.template]: isTemplate,
-                [styles.editable]: isEditable,
-            })}
+            className={cn(
+                cx('container'),
+                {
+                    [baseStyles.template]: isTemplate,
+                    [cx('editable')]: isEditable,
+                },
+                className,
+            )}
         >
             <TitleDescriptionSection
                 title={title}
                 description={description}
-                className={styles['top-section']}
+                className={cx('top-section')}
                 isEditable={isEditable}
                 isTemplate={isTemplate}
                 onTitleChange={onTitleChange}
                 onDescriptionChange={onDescriptionChange}
             />
-            <div className={styles['bottom-section']}>
-                <div className={styles['images-grid']}>
+            <div className={cx('bottom-section')}>
+                <div className={cx('images-grid')}>
                     {isEditable
                         ? imageHandlers.map(({ handler, key, value }, index) => (
                               <div
                                   key={key}
-                                  className={styles['image-wrapper']}
+                                  className={cx('image-wrapper')}
                                   data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
                               >
                                   <PhotoInputGroup
@@ -95,10 +117,10 @@ export const ImagesBottomSection = ({
                         : images.map((image, index) => (
                               <div
                                   key={image ? `image-${image}` : `image-${index}`}
-                                  className={styles['image-wrapper']}
+                                  className={cx('image-wrapper')}
                                   data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
                               >
-                                  <img src={image} alt="" className={styles.image} />
+                                  <img src={image} alt="" className={cx('image')} />
                               </div>
                           ))}
                 </div>

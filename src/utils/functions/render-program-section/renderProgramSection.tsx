@@ -3,7 +3,7 @@ import { ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ProgramSectionContent, ContentType } from '@/types/admin/programs';
 import { ImageValues } from '@/types/common/image';
 import { QuadImagesBottom } from '@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom';
-import { TrippleImagesBottom } from '@/components/common/program-section-templates/triple-images-bottom/TripleImagesBottom';
+import { TripleImagesBottom } from '@/components/common/program-section-templates/triple-images-bottom/TripleImagesBottom';
 import { DualImagesBottom } from '@/components/common/program-section-templates/dual-images-bottom/DualImagesBottom';
 import { TextOnly } from '@/components/common/program-section-templates/text-only/TextOnly';
 import { SingleImageTop } from '@/components/common/program-section-templates/single-image-top/SingleImageTop';
@@ -91,7 +91,7 @@ export const renderProgramSection = ({
             );
         case ProgramSectionTemplate.TripleImagesBottom:
             return (
-                <TrippleImagesBottom
+                <TripleImagesBottom
                     title={data.title}
                     description={data.description}
                     image1={data.image1}

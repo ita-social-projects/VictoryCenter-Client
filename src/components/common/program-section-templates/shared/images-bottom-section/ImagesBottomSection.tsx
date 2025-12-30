@@ -94,6 +94,7 @@ export const ImagesBottomSection = ({
                                   key={key}
                                   className={cx('image-wrapper')}
                                   data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
+                                  data-testid="image-wrapper"
                               >
                                   <PhotoInputGroup
                                       id={`section-image-${index + 1}`}
@@ -119,6 +120,7 @@ export const ImagesBottomSection = ({
                                   key={image ? `image-${image}` : `image-${index}`}
                                   className={cx('image-wrapper')}
                                   data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
+                                  data-testid="image-wrapper"
                               >
                                   <img src={image} alt="" className={cx('image')} />
                               </div>

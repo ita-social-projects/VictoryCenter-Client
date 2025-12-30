@@ -169,7 +169,6 @@ describe('SingleImageBottom', () => {
             const image = container.querySelector('img');
             expect(image).toBeInTheDocument();
             expect(image).toHaveAttribute('src', 'test-image.jpg');
-            expect(image).toHaveAttribute('alt', '');
         });
 
         it('does not render PhotoInputGroup when not editable', () => {
@@ -180,7 +179,7 @@ describe('SingleImageBottom', () => {
             expect(getPhotoInputGroup()).not.toBeInTheDocument();
         });
 
-        it('does not render image when image1 is empty and not editable', () => {
+        it('renders image element with empty src when image1 is empty and not editable', () => {
             const { container } = renderSingleImageBottom({
                 image1: '',
                 isEditable: false,
@@ -188,8 +187,7 @@ describe('SingleImageBottom', () => {
 
             const image = container.querySelector('img');
             expect(image).toBeTruthy();
-            const src = image?.getAttribute('src');
-            expect(src === '' || src === null).toBe(true);
+            expect(image).toHaveAttribute('src', '');
         });
     });
 

@@ -76,7 +76,7 @@ export const SingleImageBottom = ({
                     />
                     <div className={styles['bottom-section']}>
                         <div className={styles['image-wrapper']}>
-                            <img src={image1} alt="" className={styles.image} />
+                            <img src={image1} alt="img1-of-single-image-bottom" className={styles.image} />
                         </div>
                     </div>
                 </>

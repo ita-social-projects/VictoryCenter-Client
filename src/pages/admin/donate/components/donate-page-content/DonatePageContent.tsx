@@ -288,7 +288,6 @@ export const DonatePageContent = () => {
                     isChildForm={true}
                     isDisabled={isParentCreating}
                     isParentCreating={isParentCreating}
-                    isAddButtonDisabled={isParentCreating}
                     onSubmit={(data) => handleCreateCorrespondentBank(parentId, data)}
                     onUpdate={(id, data) => handleUpdateCorrespondentBank(parentId, id, data)}
                     onDelete={(id) => handleDeleteCorrespondentBank(parentId, id)}

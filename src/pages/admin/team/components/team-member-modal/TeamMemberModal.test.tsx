@@ -152,6 +152,7 @@ const baseMember: TeamMember = {
     status: VisibilityStatus.Draft,
     categoryId: 1,
     image: { id: 7, base64: 'x', mimeType: 'image/png' },
+    localizations: [],
 };
 
 describe('TeamMemberModal', () => {

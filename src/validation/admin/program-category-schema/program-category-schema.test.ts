@@ -1,5 +1,6 @@
 import { ProgramCategoryValidationSchema } from './program-category-schema';
 import { PROGRAM_CATEGORY_VALIDATION } from '@/const/admin/programs';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 describe('ProgramCategoryValidationSchema', () => {
     const expectValidationToPass = async (data: any) => {
@@ -43,12 +44,12 @@ describe('ProgramCategoryValidationSchema', () => {
             {
                 description: 'name is too short',
                 data: { name: 'a'.repeat(PROGRAM_CATEGORY_VALIDATION.name.min - 1) },
-                expectedError: PROGRAM_CATEGORY_VALIDATION.name.getMinError(),
+                expectedError: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_CATEGORY_VALIDATION.name.min),
             },
             {
                 description: 'name is too long',
                 data: { name: 'a'.repeat(PROGRAM_CATEGORY_VALIDATION.name.max + 1) },
-                expectedError: PROGRAM_CATEGORY_VALIDATION.name.getMaxError(),
+                expectedError: COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_CATEGORY_VALIDATION.name.max),
             },
         ];
 

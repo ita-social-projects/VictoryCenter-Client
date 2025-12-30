@@ -1,13 +1,15 @@
 import React from 'react';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { ProgramModal, ProgramModalProps } from './ProgramModal';
-import { Program, ProgramCategory } from '@/types/admin/programs';
+import { BaseProgramModalProps, ProgramModal, ProgramModalProps } from './ProgramModal';
+import { Program, ProgramCategory, ProgramCreateUpdate } from '@/types/admin/programs';
 import { ModalMode } from '@/types/admin/common';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
 import { VisibilityStatus } from '@/types/admin/common';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { ProgramFormProps, ProgramFormRef } from '@/pages/admin/programs/components/program-form/ProgramForm';
+import { ButtonProps } from '@/components/admin/button/Button';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -66,17 +68,7 @@ jest.mock('@/components/common/modal/Modal', () => {
 });
 
 jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({
-        onClick,
-        disabled,
-        children,
-        buttonStyle,
-    }: {
-        onClick?: () => void;
-        disabled?: boolean;
-        children: React.ReactNode;
-        buttonStyle?: string;
-    }) => (
+    Button: ({ onClick, disabled, children, buttonStyle }: ButtonProps) => (
         <button
             onClick={onClick}
             disabled={disabled}
@@ -121,7 +113,7 @@ const mockFormRef = {
 let capturedFormProps: any = {};
 jest.mock('../../program-form/ProgramForm', () => {
     const React = require('react');
-    const MockProgramForm = React.forwardRef((props: any, ref: any) => {
+    const MockProgramForm = React.forwardRef((props: ProgramFormProps, ref: ProgramFormRef) => {
         capturedFormProps = props;
         React.useImperativeHandle(ref, () => mockFormRef);
 
@@ -136,7 +128,11 @@ const mockProgram: Program = {
     description: 'Test Description',
     categories: [{ id: 1, name: 'Category 1', programsCount: 1 }],
     status: VisibilityStatus.Draft,
-    image: null,
+    previewImage: null,
+    backgroundImage: null,
+    participantsCount: '',
+    meetingsCount: '',
+    location: '',
 };
 
 const mockCategories: ProgramCategory[] = [
@@ -144,11 +140,11 @@ const mockCategories: ProgramCategory[] = [
     { id: 2, name: 'Category 2', programsCount: 2 },
 ];
 
-const mockFormData = {
+const mockFormData: Partial<Program> = {
     name: 'Updated Name',
     description: 'Updated Description',
     categories: [mockCategories[0]],
-    img: null,
+    previewImage: null,
 };
 
 describe('ProgramModal', () => {
@@ -156,7 +152,7 @@ describe('ProgramModal', () => {
     const mockOnAddProgram = jest.fn();
     const mockOnEditProgram = jest.fn();
 
-    const baseProps = {
+    const baseProps: BaseProgramModalProps = {
         isOpen: true,
         onClose: mockOnClose,
         categories: mockCategories,
@@ -175,8 +171,8 @@ describe('ProgramModal', () => {
         onEditProgram: mockOnEditProgram,
     };
 
-    const getModal = () => screen.queryByTestId('modal');
     const getDraftButton = () => screen.getByTestId('draft-button');
+    const getModal = () => screen.queryByTestId('modal');
     const getPublishButton = () => screen.getByTestId('publish-button');
     const getQuestionModal = () => screen.queryByTestId('question-modal');
     const getQuestionTitle = () => screen.getByTestId('question-title');
@@ -287,13 +283,13 @@ describe('ProgramModal', () => {
             await waitFor(() => {
                 expect(mockedProgramsApi.addProgram).toHaveBeenCalledWith(
                     expect.any(Object),
-                    expect.objectContaining({
+                    expect.objectContaining<Partial<ProgramCreateUpdate>>({
                         name: mockFormData.name,
                         description: mockFormData.description,
                         categoryIds: [1],
                         status: VisibilityStatus.Draft,
-                        image: null,
-                        imageId: null,
+                        previewImage: null,
+                        previewImageId: null,
                         id: null,
                     }),
                 );
@@ -319,12 +315,12 @@ describe('ProgramModal', () => {
             await waitFor(() => {
                 expect(mockedProgramsApi.addProgram).toHaveBeenCalledWith(
                     expect.any(Object),
-                    expect.objectContaining({
+                    expect.objectContaining<Partial<ProgramCreateUpdate>>({
                         name: mockFormData.name,
                         description: mockFormData.description,
                         categoryIds: [1],
                         status: VisibilityStatus.Published,
-                        imageId: null,
+                        previewImageId: null,
                     }),
                 );
             });
@@ -359,8 +355,10 @@ describe('ProgramModal', () => {
             fireEvent.click(getQuestionCancelButton());
 
             expect(getQuestionModal()).not.toBeInTheDocument();
+
             expect(mockedProgramsApi.addProgram).not.toHaveBeenCalled();
             expect(mockOnAddProgram).not.toHaveBeenCalled();
+
             expect(mockOnClose).not.toHaveBeenCalled();
         });
     });
@@ -383,13 +381,13 @@ describe('ProgramModal', () => {
 
             await waitFor(() => {
                 expect(mockedProgramsApi.editProgram).toHaveBeenCalledWith(
-                    expect.objectContaining({
+                    expect.objectContaining<Partial<ProgramCreateUpdate>>({
                         id: mockProgram.id,
                         name: mockFormData.name,
                         description: mockFormData.description,
                         categoryIds: [1],
                         status: VisibilityStatus.Draft,
-                        imageId: null,
+                        previewImageId: null,
                     }),
                     expect.any(Object), // client
                 );

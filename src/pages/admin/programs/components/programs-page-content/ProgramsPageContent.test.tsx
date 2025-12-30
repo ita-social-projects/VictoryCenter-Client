@@ -9,6 +9,8 @@ import { ProgramsApi, ProgramsCategoriesApi } from '@/services/api/admin/program
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ProgramsPageModalsProps } from '@/pages/admin/programs/components/programs-page-modals/ProgramsPageModals';
 import { InfiniteScrollListProps } from '@/components/admin/infinite-scroll-list/InfiniteScrollList';
+import { ProgramListItemProps } from '@/pages/admin/programs/components/program-list-item/ProgramListItem';
+import { AdminPanelToolbarProps } from '@/components/admin/admin-panel-toolbar/AdminPageToolbar';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -38,7 +40,7 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
         onAddItem,
         AddItemButtonText,
         onSuggestionSelect,
-    }: any) => (
+    }: AdminPanelToolbarProps<any>) => (
         <div data-testid="programs-toolbar">
             <button data-testid="select-program" onClick={() => onSuggestionSelect(1)}>
                 Select Program
@@ -57,7 +59,7 @@ jest.mock('@/components/admin/admin-panel-toolbar/AdminPageToolbar', () => ({
 jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
     CategoryBar: ({ categories, selectedCategory, onCategorySelect, onContextMenuOptionSelected }: any) => (
         <div data-testid="category-bar">
-            {categories.map((cat: any) => (
+            {categories.map((cat: ProgramCategory) => (
                 <button
                     key={cat.id}
                     data-testid={`category-${cat.id}`}
@@ -67,13 +69,13 @@ jest.mock('@/components/admin/category-bar/CategoryBar', () => ({
                     {cat.name}
                 </button>
             ))}
-            <button data-testid="ctx-add" onClick={() => onContextMenuOptionSelected('add')}>
+            <button data-testid="ctx-add" onClick={() => onContextMenuOptionSelected!('add')}>
                 Add Category
             </button>
-            <button data-testid="ctx-edit" onClick={() => onContextMenuOptionSelected('edit')}>
+            <button data-testid="ctx-edit" onClick={() => onContextMenuOptionSelected!('edit')}>
                 Edit Category
             </button>
-            <button data-testid="ctx-delete" onClick={() => onContextMenuOptionSelected('delete')}>
+            <button data-testid="ctx-delete" onClick={() => onContextMenuOptionSelected!('delete')}>
                 Delete Category
             </button>
         </div>
@@ -92,7 +94,7 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
         <div data-testid="infinite-scroll-list">
             {isLoading && <div data-testid="loader">Loading</div>}
             {!isLoading && items.length === 0 && <div data-testid="empty">{emptyStateMessage}</div>}
-            {items.map((item: any) => (
+            {items.map((item) => (
                 <div key={item.id} data-testid="program-item">
                     {renderItem(item)}
                 </div>
@@ -103,7 +105,7 @@ jest.mock('@/components/admin/infinite-scroll-list/InfiniteScrollList', () => ({
 }));
 
 jest.mock('../program-list-item/ProgramListItem', () => ({
-    ProgramListItem: ({ program, handleOnEditProgram, handleOnDeleteProgram }: any) => (
+    ProgramListItem: ({ program, handleOnEditProgram, handleOnDeleteProgram }: ProgramListItemProps) => (
         <div>
             <span>{program.name}</span>
             <button data-testid="edit-program" onClick={() => handleOnEditProgram(program)} />
@@ -124,7 +126,11 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             id: 999,
                             name: 'New Program',
                             description: 'New Description',
-                            image: null,
+                            meetingsCount: '123',
+                            participantsCount: '123',
+                            location: 'New Location',
+                            previewImage: null,
+                            backgroundImage: null,
                             status: VisibilityStatus.Published,
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                         })
@@ -137,7 +143,11 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             id: 10,
                             name: 'Alpha Edited',
                             description: 'Edited Description',
-                            image: null,
+                            meetingsCount: '1234',
+                            participantsCount: '1234',
+                            location: 'Edited Location',
+                            previewImage: null,
+                            backgroundImage: null,
                             status: VisibilityStatus.Published,
                             categories: [{ id: 2, name: 'Category B', programsCount: 1 }],
                         })
@@ -150,7 +160,11 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             id: 10,
                             name: 'Alpha',
                             description: 'Description',
-                            image: null,
+                            meetingsCount: '12',
+                            participantsCount: '12',
+                            location: 'DeletedLocation',
+                            previewImage: null,
+                            backgroundImage: null,
                             status: VisibilityStatus.Published,
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
                         })
@@ -188,7 +202,11 @@ const mockPrograms: Program[] = [
         id: 10,
         name: 'Alpha',
         description: 'Description',
-        image: null,
+        location: 'So? Uhm yeah',
+        participantsCount: 'I must add some test data',
+        meetingsCount: 'To do list is not meeting count',
+        previewImage: null,
+        backgroundImage: null,
         status: VisibilityStatus.Published,
         categories: [mockCategories[0]],
     },
@@ -196,7 +214,11 @@ const mockPrograms: Program[] = [
         id: 11,
         name: 'Beta',
         description: 'Description',
-        image: null,
+        location: 'So? Uhm yeah',
+        participantsCount: 'I must add some test data',
+        meetingsCount: 'To do list is not meeting count',
+        previewImage: null,
+        backgroundImage: null,
         status: VisibilityStatus.Draft,
         categories: [mockCategories[0]],
     },

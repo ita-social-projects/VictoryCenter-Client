@@ -3,11 +3,14 @@ import { InputError, InputErrorProps } from '@/components/admin/input-error/Inpu
 import { ImageInput, ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import '../input-group.scss';
 
-export interface PhotoInputGroupProps extends ImageInputProps {
-    label: InputLabelProps['text'];
+export interface PhotoInputGroupProps extends Omit<ImageInputProps, 'label' | 'subText'> {
+    label?: InputLabelProps['text'];
     isRequired?: InputLabelProps['isRequired'];
     error?: InputErrorProps['error'];
     id: string;
+    className?: string;
+    imageLabel?: string | null;
+    imageSubText?: string | null;
 }
 
 export const PhotoInputGroup = ({
@@ -21,6 +24,9 @@ export const PhotoInputGroup = ({
     disabled,
     error,
     setError,
+    className,
+    imageLabel,
+    imageSubText,
     cropWidth,
     cropHeight,
     minWidth,
@@ -28,7 +34,7 @@ export const PhotoInputGroup = ({
 }: PhotoInputGroupProps) => {
     return (
         <div className="input-group">
-            <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
+            {label && <InputLabel htmlFor={id} text={label} isRequired={isRequired} />}
             <ImageInput
                 id={id}
                 name={name}
@@ -37,6 +43,9 @@ export const PhotoInputGroup = ({
                 onBlur={onBlur}
                 disabled={disabled}
                 setError={setError}
+                className={className}
+                label={imageLabel}
+                subText={imageSubText}
                 cropHeight={cropHeight}
                 cropWidth={cropWidth}
                 minHeight={minHeight}

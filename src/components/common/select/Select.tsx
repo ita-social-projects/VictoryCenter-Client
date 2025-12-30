@@ -15,6 +15,7 @@ export type SelectProps<TValue> = {
     headClassName?: string;
     optionClassName?: string;
     isAutocomplete?: boolean;
+    icon?: React.ElementType<React.SVGProps<SVGSVGElement>>;
 };
 
 export const Select = <TValue,>({
@@ -27,6 +28,7 @@ export const Select = <TValue,>({
     optionClassName,
     placeholder,
     isAutocomplete = false,
+    icon: Icon,
 }: SelectProps<TValue>) => {
     const options = React.Children.toArray(children).filter((child) => {
         return React.isValidElement(child) && child.type === Select.Option;
@@ -72,6 +74,7 @@ export const Select = <TValue,>({
                     }
                 }}
             >
+                {Icon && <Icon />}
                 <span
                     className={classNames('empty', {
                         'not-empty': hasValue,

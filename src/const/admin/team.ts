@@ -29,6 +29,7 @@ export const TEAM_MEMBERS_TEXT = {
             FAIL_TO_CREATE_MEMBER: 'Виникла помилка під час додавання учасника',
             FAIL_TO_UPDATE_MEMBER: 'Виникла помилка під час оновлення учасника',
             FAIL_TO_DELETE_MEMBER: 'Виникла помилка під час видалення учасника',
+            FAIL_TO_TRANSLATE_MEMBER: 'Виникла помилка під час додавання перекладу для учасника',
         },
         LABEL: {
             FULLNAME: "Ім'я та Прізвище",
@@ -43,6 +44,7 @@ export const TEAM_MEMBERS_TEXT = {
         REORDER: 'Змінити порядок елемента',
         EDIT: 'Редагувати учасника',
         DELETE: 'Видалити учасника',
+        TRANSLATE: 'Зберегти переклад',
     },
 };
 

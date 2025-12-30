@@ -87,10 +87,15 @@ jobs:
     - run: echo ${{ needs.manual_approval_deploy.outputs.comment }}
     - name: "Set backend tag"
       id: backend_tag
-      run: echo "backend_tag=$(docker container inspect $(docker container ls -aq) --format "{{.Config.Image}}" | grep -m 1 "victorycenterua/backend:" | cut -d "-" -f2 | head -c -1)" >> $GITHUB_OUTPUT   
+      run: |
+        echo "backend_tag=release-$(docker container inspect $(docker container ls -aq) \
+          --format "{{.Config.Image}}" | grep -m 1 "victorycenterua/backend:" \
+          | cut -d "-" -f2 | head -c -1)" >> $GITHUB_OUTPUT
     - name: "Set frontend tag"
       id: frontend_tag
-      run: echo "frontend_tag=$(docker container inspect $(docker container ls -aq) --format "{{.Config.Image}}" | grep -m 1 "victorycenterua/client:" | cut -d "-" -f2 | head -c -1)" >> $GITHUB_OUTPUT   
+      run: |
+        echo "frontend_tag=release-${GITHUB_REF##*/}.${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
+        echo "DOCKER_TAG_FRONTEND=release-${GITHUB_REF##*/}.${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
     - name: Checkout
       uses: actions/checkout@v2
       with:
@@ -99,8 +104,6 @@ jobs:
       run: docker stop nginx certbot frontend backend 
     - name: Delete additon info
       run: docker system prune -f
-    - name: Set docker tag
-      run: echo "DOCKER_TAG_FRONTEND=${GITHUB_REF##*/}.${GITHUB_RUN_NUMBER}" >> $GITHUB_ENV
     - name: Check value
       run: echo "$DOCKER_TAG_FRONTEND"
     - name: Set up enviroments and Deploy

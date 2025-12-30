@@ -25,6 +25,7 @@ describe('DeleteTeamMemberModal', () => {
         description: 'Developer',
         status: 0,
         categoryId: 1,
+        localizations: [],
     };
 
     beforeEach(() => {

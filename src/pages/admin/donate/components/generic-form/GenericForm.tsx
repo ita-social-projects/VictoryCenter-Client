@@ -6,6 +6,7 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import './GenericForm.scss';
 import { FieldValues } from 'react-hook-form';
 import { DONATE_TEXT } from '@/const/admin/donate';
+import { getNormalizedInputText } from '@/utils/functions/formatters/text-formatters';
 
 interface ModalConfig {
     title: string;
@@ -204,8 +205,11 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                         onConfirm: () => onClose?.(),
                     });
                 } else if (isChanged()) {
+                    const title = isChildForm
+                        ? COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE
+                        : DONATE_TEXT.QUESTION.BANK_DETAILS.CANCEL_CREATE;
                     setModalConfig({
-                        title: DONATE_TEXT.QUESTION.BANK_DETAILS.CANCEL_CREATE,
+                        title: title,
                         onConfirm: () => onClose?.(),
                     });
                 } else {
@@ -301,7 +305,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                     if (!f.isRequired) return false;
                     const value = formState[f.name];
                     if (Array.isArray(value)) return value.length === 0;
-                    return !String(value ?? '').trim();
+                    return !getNormalizedInputText(String(value ?? ''));
                 });
             }, [formState]);
 

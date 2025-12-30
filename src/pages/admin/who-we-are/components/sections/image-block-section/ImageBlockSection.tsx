@@ -99,7 +99,7 @@ export const ImageSection = ({
                     setError={setImageError}
                     value={imageContent?.image ?? null}
                     onChange={handleImageChange}
-                    className="who-we-are-image-input-wrapper"
+                    className="image-input-featured"
                     label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
                     {...imageInputProps}
                 />

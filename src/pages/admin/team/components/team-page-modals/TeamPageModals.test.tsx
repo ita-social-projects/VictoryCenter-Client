@@ -7,6 +7,7 @@ import { TeamCategory } from '@/types/admin/team-category';
 import { TeamMember } from '@/types/admin/team-members';
 import { TeamMemberModalProps } from '@/pages/admin/team/components/team-member-modal/TeamMemberModal';
 import { DeleteTeamMemberModalProps } from '@/pages/admin/team/components/delete-team-member-modal/DeleteTeamMemberModal';
+import { LocalizationLanguage } from '@/types/common/language';
 
 jest.mock('../team-member-modal/TeamMemberModal', () => ({
     TeamMemberModal: ({
@@ -51,6 +52,26 @@ jest.mock('../delete-team-member-modal/DeleteTeamMemberModal', () => ({
             {onDeleteMember && (
                 <button data-testid="delete-modal-confirm-btn" onClick={() => onDeleteMember(memberToDelete!)}>
                     Delete
+                </button>
+            )}
+        </div>
+    ),
+}));
+
+jest.mock('../translate-team-member-modal/TranslateTeamMemberModal', () => ({
+    TranslateTeamMemberModal: ({ isOpen, onClose, onTranslateMember, memberToTranslate, language }: any) => (
+        <div data-testid="translate-team-member-modal">
+            <span data-testid="translate-modal-is-open">{isOpen.toString()}</span>
+            {memberToTranslate && <span data-testid="translate-modal-member">{memberToTranslate.id}</span>}
+            <span data-testid="translate-modal-language">{language?.code}</span>
+
+            <button data-testid="translate-modal-close-btn" onClick={onClose}>
+                Close
+            </button>
+
+            {onTranslateMember && memberToTranslate && (
+                <button data-testid="translate-modal-confirm-btn" onClick={() => onTranslateMember(memberToTranslate)}>
+                    Translate
                 </button>
             )}
         </div>
@@ -104,6 +125,7 @@ const mockTeamMember: TeamMember = {
     description: 'Test member',
     status: VisibilityStatus.Published,
     categoryId: 1,
+    localizations: [],
 };
 
 const mockTeamCategory: TeamCategory = {
@@ -130,6 +152,7 @@ const createMockModalsStateControl = (
         isAddModalOpen: false,
         itemToDelete: null,
         itemToEdit: null,
+        itemToTranslate: null,
         isAddCategoryModalOpen: false,
         isEditCategoryModalOpen: false,
         isDeleteCategoryModalOpen: false,
@@ -139,6 +162,7 @@ const createMockModalsStateControl = (
         closeAddItemModal: jest.fn(),
         closeEditItemModal: jest.fn(),
         closeDeleteItemModal: jest.fn(),
+        closeTranslateItemModal: jest.fn(),
         closeAddCategoryModal: jest.fn(),
         closeEditCategoryModal: jest.fn(),
         closeDeleteCategoryModal: jest.fn(),
@@ -147,6 +171,7 @@ const createMockModalsStateControl = (
         openAddItemModal: jest.fn(),
         openEditItemModal: jest.fn(),
         openDeleteItemModal: jest.fn(),
+        openTranslateItemModal: jest.fn(),
         openAddCategoryModal: jest.fn(),
         openEditCategoryModal: jest.fn(),
         openDeleteCategoryModal: jest.fn(),
@@ -154,14 +179,22 @@ const createMockModalsStateControl = (
     isAnyModalOpened: false,
 });
 
+const mockEnglishLanguage: LocalizationLanguage = {
+    id: 1,
+    code: 'en',
+    name: 'English',
+};
+
 const createDefaultProps = (
     modalsStateOverrides?: Partial<UseModalsStateResult<TeamMember>['modalState']>,
 ): TeamPageModalsProps => ({
     modalsStateControl: createMockModalsStateControl(modalsStateOverrides),
     categories: mockCategories,
+    englishLanguage: mockEnglishLanguage,
     onAddTeamMember: jest.fn(),
     onEditTeamMember: jest.fn(),
     onDeleteTeamMember: jest.fn(),
+    onTranslateTeamMember: jest.fn(),
     onAddTeamCategory: jest.fn(),
     onEditTeamCategory: jest.fn(),
     onDeleteTeamCategory: jest.fn(),
@@ -323,6 +356,52 @@ describe('TeamPageModals', () => {
                 deleteBtn.click();
 
                 expect(props.onDeleteTeamMember).toHaveBeenCalledWith(mockTeamMember);
+            });
+        });
+
+        describe('Translate Team Member Modal', () => {
+            it('does not render when englishLanguage is missing', () => {
+                const props = {
+                    ...createDefaultProps({ itemToTranslate: mockTeamMember }),
+                    englishLanguage: undefined,
+                };
+
+                render(<TeamPageModals {...props} />);
+                expect(document.querySelector('[data-testid="translate-team-member-modal"]')).not.toBeInTheDocument();
+            });
+
+            it('renders and passes correct props when itemToTranslate exists', () => {
+                const props = createDefaultProps({ itemToTranslate: mockTeamMember });
+                render(<TeamPageModals {...props} />);
+
+                const modal = document.querySelector('[data-testid="translate-team-member-modal"]');
+                expect(modal).toBeInTheDocument();
+                expect(modal?.querySelector('[data-testid="translate-modal-is-open"]')).toHaveTextContent('true');
+                expect(modal?.querySelector('[data-testid="translate-modal-member"]')).toHaveTextContent(
+                    mockTeamMember.id.toString(),
+                );
+            });
+
+            it('calls closeTranslateItemModal when close button is clicked', () => {
+                const props = createDefaultProps({ itemToTranslate: mockTeamMember });
+                render(<TeamPageModals {...props} />);
+
+                const closeBtn = document.querySelector('[data-testid="translate-modal-close-btn"]') as HTMLElement;
+                closeBtn.click();
+
+                expect(props.modalsStateControl.closeModalActions.closeTranslateItemModal).toHaveBeenCalledTimes(1);
+            });
+
+            it('calls onTranslateTeamMember when translate button is clicked', () => {
+                const props = createDefaultProps({ itemToTranslate: mockTeamMember });
+                render(<TeamPageModals {...props} />);
+
+                const translateBtn = document.querySelector(
+                    '[data-testid="translate-modal-confirm-btn"]',
+                ) as HTMLElement;
+                translateBtn.click();
+
+                expect(props.onTranslateTeamMember).toHaveBeenCalledWith(mockTeamMember);
             });
         });
     });

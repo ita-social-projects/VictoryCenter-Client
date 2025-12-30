@@ -7,3 +7,6 @@ export const generateInitials = (fullName: string, maxInitials: number = 2): str
         .join('')
         .toUpperCase();
 };
+
+export const getNormalizedInputText = (text: string, prefix = ''): string =>
+    text.slice(prefix.length).trim().replace(/\s+/g, ' ');

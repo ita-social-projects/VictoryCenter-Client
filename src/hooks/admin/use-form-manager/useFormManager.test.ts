@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useFormManager } from './useFormManager';
+import { FormManagerRef, useFormManager } from './useFormManager';
 import { VisibilityStatus } from '@/types/admin/common';
 import React from 'react';
 
@@ -9,6 +9,7 @@ type FormErrors = { name?: string; age?: string };
 describe('useFormManager', () => {
     const defaultFormState: FormValues = { name: '', age: 0 };
     const initialData: FormValues = { name: 'Alice', age: 30 };
+
     let validateForm: jest.Mock<FormErrors, [FormValues, boolean]>;
     let onSubmit: jest.Mock<Promise<void>, [FormValues, VisibilityStatus]>;
     let onValidationChange: jest.Mock<void, [boolean]>;
@@ -192,15 +193,16 @@ describe('useFormManager', () => {
         });
 
         await act(async () => {
-            result.current.submit(VisibilityStatus.Published);
-            result.current.submit(VisibilityStatus.Published);
+            const p1 = result.current.submit(VisibilityStatus.Published);
+            const p2 = result.current.submit(VisibilityStatus.Published);
+            await Promise.all([p1, p2]);
         });
 
         expect(delayedSubmit).toHaveBeenCalledTimes(1);
     });
 
     it('should expose submit, isValid, isDirty via ref', () => {
-        const ref: React.Ref<any> = React.createRef();
+        const ref = React.createRef<FormManagerRef>();
         renderHook(() =>
             useFormManager<FormValues, FormErrors>({
                 defaultFormState,
@@ -210,8 +212,10 @@ describe('useFormManager', () => {
             }),
         );
 
-        expect(ref.current.submit).toBeDefined();
-        expect(ref.current.isValid).toBeDefined();
-        expect(ref.current.isDirty).toBeDefined();
+        expect(ref.current).not.toBeNull();
+        expect(ref.current?.submit).toBeDefined();
+        expect(ref.current?.isValid).toBeDefined();
+        expect(ref.current?.isDirty).toBeDefined();
+        expect(ref.current?.isDirty()).toBe(false);
     });
 });

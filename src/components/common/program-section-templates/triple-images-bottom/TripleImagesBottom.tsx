@@ -3,7 +3,7 @@ import { ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
 
-export interface TrippleImagesBottomProps {
+export interface TripleImagesBottomProps {
     title?: string;
     description?: string;
     image1?: string;
@@ -29,7 +29,7 @@ const TRIPLE_IMAGES_CONFIG: ImagesBottomSectionConfig = {
     editableImageMaxWidth: 480,
 };
 
-export const TrippleImagesBottom = ({
+export const TripleImagesBottom = ({
     title = '',
     description = '',
     image1 = '',
@@ -42,7 +42,7 @@ export const TrippleImagesBottom = ({
     onImage1Change,
     onImage2Change,
     onImage3Change,
-}: TrippleImagesBottomProps) => {
+}: TripleImagesBottomProps) => {
     const images = [image1, image2, image3];
     const imageHandlers = [
         { handler: onImage1Change, key: 'image1', value: image1 },

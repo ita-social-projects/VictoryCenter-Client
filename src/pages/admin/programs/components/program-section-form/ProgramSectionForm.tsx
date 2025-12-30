@@ -96,10 +96,10 @@ export const ProgramSectionForm = ({
         data: {
             title: titleContent?.title || '',
             description: descriptionContent?.description || '',
-            image1: image1Content?.image ? '' : undefined,
-            image2: image2Content?.image ? '' : undefined,
-            image3: image3Content?.image ? '' : undefined,
-            image4: image4Content?.image ? '' : undefined,
+            image1: image1Content?.image && 'url' in image1Content.image ? image1Content.image.url : undefined,
+            image2: image2Content?.image && 'url' in image2Content.image ? image2Content.image.url : undefined,
+            image3: image3Content?.image && 'url' in image3Content.image ? image3Content.image.url : undefined,
+            image4: image4Content?.image && 'url' in image4Content.image ? image4Content.image.url : undefined,
         },
         isEditable: true,
         handlers: {

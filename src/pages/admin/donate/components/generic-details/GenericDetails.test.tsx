@@ -13,7 +13,7 @@ const MockForm = forwardRef<GenericFormRef, any>(({ onSubmit, onClose, initialDa
         submit: async () => {},
         isChanged: () => false,
         isValid: () => true,
-        cancel: () => onClose(), // Mocking cancel functionality
+        cancel: () => onClose(),
     }));
 
     const testId = initialData?.id ? `mock-form-${initialData.id}` : 'mock-form-new';

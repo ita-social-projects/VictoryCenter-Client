@@ -106,7 +106,15 @@ export const PartnerBanner = () => {
     }, []);
 
     const handleImageChange = useCallback((value: ImageValues | null) => {
-        setValues((prev) => (prev ? { ...prev, image: value, imageId: value ? prev.imageId : null } : null));
+        setValues((prev) => {
+            if (!prev) return null;
+
+            return {
+                ...prev,
+                image: value,
+                imageId: value ? prev.imageId : null,
+            };
+        });
     }, []);
 
     const handleImageError = useCallback((error: string | null) => {
@@ -129,6 +137,7 @@ export const PartnerBanner = () => {
             });
 
             setValues(updatedBanner);
+
             addToast(PARTNERS_TEXT.MESSAGE.BANNER_SAVED, ToastType.Success);
         } catch (error: any) {
             if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {

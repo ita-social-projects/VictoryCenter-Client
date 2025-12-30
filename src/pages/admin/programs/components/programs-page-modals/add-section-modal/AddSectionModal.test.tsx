@@ -3,8 +3,25 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { AddSectionModal, AddSectionModalProps } from './AddSectionModal';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { ProgramSectionTemplate } from '@/types/common/program-sections';
 import { ButtonProps } from '@/components/admin/button/Button';
 import { ModalProps } from '@/components/common/modal/Modal';
+
+const mockRenderProgramSection = jest.fn((_: any) => <div data-testid="rendered-section" />);
+
+jest.mock('@/utils/functions/render-program-section', () => ({
+    renderProgramSection: (args: any) => mockRenderProgramSection(args),
+}));
+
+jest.mock('@/assets/icons/chevron-left.svg', () => ({
+    ReactComponent: () => <svg data-testid="chevron-left" />,
+}));
+
+jest.mock('@/assets/icons/chevron-right.svg', () => ({
+    ReactComponent: () => <svg data-testid="chevron-right" />,
+}));
+
+jest.mock('@/assets/images/common/section-photo-placeholder.png', () => 'placeholder.png');
 
 jest.mock('@/components/common/modal/Modal', () => {
     const ModalMock = ({ isOpen, onClose, children, maxWidth }: ModalProps & { maxWidth?: string }) =>
@@ -38,6 +55,23 @@ jest.mock('@/components/admin/button/Button', () => ({
 describe('AddSectionModal', () => {
     const mockOnClose = jest.fn();
     const mockOnSelectTemplate = jest.fn();
+
+    const TEMPLATES = [
+        ProgramSectionTemplate.QuadImagesBottom,
+        ProgramSectionTemplate.DualImagesBottom,
+        ProgramSectionTemplate.TextOnly,
+        ProgramSectionTemplate.TripleImagesBottom,
+        ProgramSectionTemplate.SingleImageBottom,
+        ProgramSectionTemplate.SingleImageTop,
+        ProgramSectionTemplate.SingleImageRight,
+    ];
+
+    const getLastTemplateId = () => {
+        const calls = mockRenderProgramSection.mock.calls as unknown as any[];
+        const lastCall = calls[calls.length - 1] as any[] | undefined;
+        const args = lastCall?.[0] as any;
+        return args?.templateId as ProgramSectionTemplate | undefined;
+    };
 
     const defaultProps: AddSectionModalProps = {
         isOpen: true,
@@ -88,12 +122,6 @@ describe('AddSectionModal', () => {
         expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
 
-    it('should render choose template button', () => {
-        render(<AddSectionModal {...defaultProps} />);
-
-        expect(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION)).toBeInTheDocument();
-    });
-
     it('should render left and right chevrons', () => {
         render(<AddSectionModal {...defaultProps} />);
 
@@ -105,5 +133,38 @@ describe('AddSectionModal', () => {
         render(<AddSectionModal {...defaultProps} />);
 
         expect(screen.getByTestId('add-section-modal-content')).toBeInTheDocument();
+    });
+
+    it('cycles templates with wrap-around: previous at index 0 -> last, next at last -> 0', () => {
+        render(<AddSectionModal {...defaultProps} />);
+
+        expect(mockRenderProgramSection).toHaveBeenCalled();
+        expect(getLastTemplateId()).toBe(TEMPLATES[0]);
+
+        fireEvent.click(screen.getByTitle('scroll-left-button'));
+        expect(getLastTemplateId()).toBe(TEMPLATES[TEMPLATES.length - 1]);
+
+        fireEvent.click(screen.getByTitle('scroll-right-button'));
+        expect(getLastTemplateId()).toBe(TEMPLATES[0]);
+    });
+
+    it('moves between adjacent templates: next increments, previous decrements', () => {
+        render(<AddSectionModal {...defaultProps} />);
+
+        fireEvent.click(screen.getByTitle('scroll-right-button'));
+        expect(getLastTemplateId()).toBe(TEMPLATES[1]);
+
+        fireEvent.click(screen.getByTitle('scroll-left-button'));
+        expect(getLastTemplateId()).toBe(TEMPLATES[0]);
+    });
+
+    it('selects the currently shown template when saving', () => {
+        render(<AddSectionModal {...defaultProps} />);
+
+        fireEvent.click(screen.getByTitle('scroll-right-button'));
+        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION));
+
+        expect(mockOnSelectTemplate).toHaveBeenCalledWith(TEMPLATES[1]);
+        expect(mockOnClose).toHaveBeenCalled();
     });
 });

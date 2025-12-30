@@ -25,7 +25,12 @@ interface TestConfig<TProps> {
 const getImagesBottomSection = () => screen.getByTestId('images-bottom-section');
 const getVariant = () => screen.getByTestId('variant');
 const getImagesCount = () => screen.getByTestId('images-count');
+const getNonEmptyImagesCount = () => screen.getByTestId('non-empty-images-count');
+const getImagesJson = () => screen.getByTestId('images-json');
 const getImageHandlersCount = () => screen.getByTestId('image-handlers-count');
+const getImageHandlersSummary = () => screen.getByTestId('image-handlers-summary');
+const getHasOnTitleChange = () => screen.getByTestId('has-onTitleChange');
+const getHasOnDescriptionChange = () => screen.getByTestId('has-onDescriptionChange');
 
 export function createImagesBottomTestSuite<TProps extends Record<string, any>>(config: TestConfig<TProps>) {
     const {
@@ -51,6 +56,15 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
         };
 
         describe('Rendering', () => {
+            it('renders with no props (default destructuring branch)', () => {
+                render(<Component {...({} as TProps)} />);
+
+                expect(getImagesBottomSection()).toBeInTheDocument();
+                expect(getVariant()).toHaveTextContent(variant);
+                expect(getImagesCount()).toHaveTextContent(imageCount.toString());
+                expect(getNonEmptyImagesCount()).toHaveTextContent('0');
+            });
+
             it('renders ImagesBottomSection with correct variant', () => {
                 renderComponent();
 
@@ -65,6 +79,8 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
                 renderComponent(imageProps);
 
                 expect(getImagesCount()).toHaveTextContent(imageCount.toString());
+                expect(getNonEmptyImagesCount()).toHaveTextContent(imageCount.toString());
+                expect(getImagesJson()).toHaveTextContent(JSON.stringify(images));
                 expect(getImageHandlersCount()).toHaveTextContent(imageCount.toString());
             });
 
@@ -72,6 +88,7 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
                 renderComponent();
 
                 expect(getImagesCount()).toHaveTextContent(imageCount.toString());
+                expect(getNonEmptyImagesCount()).toHaveTextContent('0');
                 expect(getImageHandlersCount()).toHaveTextContent(imageCount.toString());
             });
 
@@ -104,6 +121,7 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
                 renderComponent({ onTitleChange } as unknown as Partial<TProps>);
 
                 expect(getImagesBottomSection()).toBeInTheDocument();
+                expect(getHasOnTitleChange()).toHaveTextContent('true');
             });
 
             it('forwards onDescriptionChange callback to ImagesBottomSection', () => {
@@ -111,6 +129,7 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
                 renderComponent({ onDescriptionChange } as unknown as Partial<TProps>);
 
                 expect(getImagesBottomSection()).toBeInTheDocument();
+                expect(getHasOnDescriptionChange()).toHaveTextContent('true');
             });
         });
 
@@ -125,6 +144,17 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
                 renderComponent({ ...imageProps, ...handlerProps } as unknown as Partial<TProps>);
 
                 expect(getImageHandlersCount()).toHaveTextContent(imageCount.toString());
+                const summary = JSON.parse(getImageHandlersSummary().textContent || '[]');
+                expect(summary).toHaveLength(imageCount);
+                summary.forEach((h: any, i: number) => {
+                    expect(h).toEqual(
+                        expect.objectContaining({
+                            key: `image${i + 1}`,
+                            value: images[i],
+                            hasHandler: true,
+                        }),
+                    );
+                });
             });
 
             it('handles missing image handlers gracefully', () => {
@@ -134,6 +164,17 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
                 renderComponent(imageProps);
 
                 expect(getImageHandlersCount()).toHaveTextContent(imageCount.toString());
+                const summary = JSON.parse(getImageHandlersSummary().textContent || '[]');
+                expect(summary).toHaveLength(imageCount);
+                summary.forEach((h: any, i: number) => {
+                    expect(h).toEqual(
+                        expect.objectContaining({
+                            key: `image${i + 1}`,
+                            value: images[i],
+                            hasHandler: false,
+                        }),
+                    );
+                });
             });
 
             it('passes correct image values to handlers', () => {
@@ -202,6 +243,7 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
                 renderComponent(imageProps);
 
                 expect(getImagesCount()).toHaveTextContent(imageCount.toString());
+                expect(getImagesJson()).toHaveTextContent(JSON.stringify(images));
             });
 
             it('handles partial image values', () => {
@@ -211,6 +253,8 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
                 renderComponent(imageProps);
 
                 expect(getImagesCount()).toHaveTextContent(imageCount.toString());
+                expect(getNonEmptyImagesCount()).toHaveTextContent(Math.ceil(imageCount / 2).toString());
+                expect(getImagesJson()).toHaveTextContent(JSON.stringify(images));
             });
         });
     });

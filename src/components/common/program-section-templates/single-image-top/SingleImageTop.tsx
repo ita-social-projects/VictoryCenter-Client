@@ -70,7 +70,7 @@ export const SingleImageTop = ({
                 <>
                     <div className={styles['top-section']}>
                         <div className={styles['image-wrapper']}>
-                            <img src={image1} alt="" className={styles.image} />
+                            <img src={image1 || undefined} alt="" className={styles.image} />
                         </div>
                     </div>
                     <TitleDescriptionSection

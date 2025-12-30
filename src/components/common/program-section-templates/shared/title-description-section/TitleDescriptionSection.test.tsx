@@ -86,6 +86,9 @@ describe('TitleDescriptionSection', () => {
     const renderTitleDescriptionSection = (overrideProps: Partial<TitleDescriptionSectionProps> = {}) =>
         render(<TitleDescriptionSection {...defaultProps} {...overrideProps} />);
 
+    const renderBareTitleDescriptionSection = (overrideProps: Partial<TitleDescriptionSectionProps> = {}) =>
+        render(<TitleDescriptionSection {...overrideProps} />);
+
     // Element getters
     const getTitleHeading = () => screen.queryByRole('heading', { level: 2 });
     const getDescriptionParagraph = (text?: string) => {
@@ -100,6 +103,16 @@ describe('TitleDescriptionSection', () => {
     const getDescriptionTextarea = () => screen.queryByTestId('description-textarea-section-description');
 
     describe('Non-editable mode', () => {
+        it('uses default values when props are omitted', () => {
+            const { container } = renderBareTitleDescriptionSection();
+
+            expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('');
+            expect(container.querySelector('.description')).toHaveTextContent('');
+            expect(container.firstChild).toHaveClass('container');
+            expect(container.firstChild).not.toHaveClass('template');
+            expect(container.firstChild).not.toHaveClass('editable');
+        });
+
         it('renders title and description as text when not editable', () => {
             renderTitleDescriptionSection({
                 title: 'Test Title',
@@ -161,10 +174,7 @@ describe('TitleDescriptionSection', () => {
                 isEditable: true,
             });
 
-            // The heading and paragraph should not be rendered in editable mode
             const heading = screen.queryByRole('heading', { level: 2 });
-            // We need to check if the heading exists but might be in a different structure
-            // Since we're using input groups, the heading won't be there
             expect(heading).not.toBeInTheDocument();
         });
 

@@ -1,4 +1,3 @@
-import { render, screen } from '@testing-library/react';
 import { QuadImagesBottom, QuadImagesBottomProps } from './QuadImagesBottom';
 import { createImagesBottomTestSuite } from '../shared/test-utils/imagesBottomTestFactory';
 
@@ -51,57 +50,4 @@ createImagesBottomTestSuite<QuadImagesBottomProps>({
         editableImageMaxHeight: 390,
         editableImageMaxWidth: 360,
     },
-});
-
-describe('QuadImagesBottom branch coverage', () => {
-    const baseProps: QuadImagesBottomProps = {
-        title: 'Test Title',
-        description: 'Test Description',
-        image1: 'img1.png',
-        image2: 'img2.png',
-        image3: 'img3.png',
-        image4: 'img4.png',
-        isTemplate: false,
-        isEditable: false,
-    };
-
-    it('renders with default props (all undefined)', () => {
-        expect(() => render(<QuadImagesBottom />)).not.toThrow();
-    });
-
-    it('renders view mode with images', () => {
-        render(<QuadImagesBottom {...baseProps} />);
-        expect(screen.getByTestId('images-bottom-section')).toBeInTheDocument();
-        expect(screen.getByTestId('images-count').textContent).toBe('4');
-    });
-
-    it('renders with isTemplate=true', () => {
-        expect(() => render(<QuadImagesBottom {...baseProps} isTemplate={true} />)).not.toThrow();
-    });
-
-    it('renders editable UI when isEditable=true', () => {
-        expect(() => render(<QuadImagesBottom {...baseProps} isEditable={true} />)).not.toThrow();
-    });
-
-    it('renders with only one, two, or three images', () => {
-        render(<QuadImagesBottom {...baseProps} image2={''} image3={''} image4={''} />);
-        expect(screen.queryAllByAltText('')).toHaveLength(0);
-        render(<QuadImagesBottom {...baseProps} image1={''} image3={''} image4={''} />);
-        expect(screen.queryAllByAltText('')).toHaveLength(0);
-        render(<QuadImagesBottom {...baseProps} image1={''} image2={''} image4={''} />);
-        expect(screen.queryAllByAltText('')).toHaveLength(0);
-        render(<QuadImagesBottom {...baseProps} image1={''} image2={''} image3={''} />);
-        expect(screen.queryAllByAltText('')).toHaveLength(0);
-    });
-
-    it('renders with no images', () => {
-        render(<QuadImagesBottom {...baseProps} image1={''} image2={''} image3={''} image4={''} />);
-        expect(screen.queryAllByAltText('')).toHaveLength(0);
-    });
-
-    it('renders with no title/description', () => {
-        render(<QuadImagesBottom {...baseProps} title={''} description={''} />);
-        expect(screen.getByTestId('title')).toBeInTheDocument();
-        expect(screen.getByTestId('description')).toBeInTheDocument();
-    });
 });

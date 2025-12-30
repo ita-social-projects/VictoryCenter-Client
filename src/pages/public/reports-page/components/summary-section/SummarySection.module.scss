@@ -1,75 +1,75 @@
-@use "@/assets/sass/variables/colors" as c;
-@use "@/assets/sass/mixins/effects.mixins" as effects;
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/effects.mixins' as effects;
 
 .root {
-  margin-top: 64px; // TODO: fix PublicLayout Header uses fixed position conflicting with main content (cover content)
+    margin-top: 64px; // TODO: fix PublicLayout Header uses fixed position conflicting with main content (cover content)
 
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    "collected"
-    "expenses"
-    "income"
-    "programs"
-    "lives";
-
-  @media (min-width: 768px) {
-    grid-template-columns: 1fr 1fr;
+    display: grid;
+    grid-template-columns: 1fr;
     grid-template-areas:
-      "collected expenses"
-      "income    programs"
-      "lives     lives";
-  }
-
-  @media (min-width: 1440px) {
-    grid-template-columns: 2.25fr 2fr 1fr;
-    grid-template-areas:
-      "collected expenses lives"
-      "income    programs lives";
-  }
-
-  .lives {
-    grid-area: lives;
-    height: 200px;
-    @include effects.grayscale-bg-image('../../images/public/reports-page/lives-changed.jpg');
+        'collected'
+        'expenses'
+        'income'
+        'programs'
+        'lives';
 
     @media (min-width: 768px) {
-      height: 240px;
-      padding-bottom: 55px;
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+            'collected expenses'
+            'income    programs'
+            'lives     lives';
     }
 
     @media (min-width: 1440px) {
-      height: auto;
-      padding: 0 0 90px 16px;
+        grid-template-columns: 2.25fr 2fr 1fr;
+        grid-template-areas:
+            'collected expenses lives'
+            'income    programs lives';
     }
-  }
+
+    .lives {
+        grid-area: lives;
+        height: 200px;
+        @include effects.grayscale-bg-image('../../images/public/reports-page/lives-changed.jpg');
+
+        @media (min-width: 768px) {
+            height: 240px;
+            padding-bottom: 55px;
+        }
+
+        @media (min-width: 1440px) {
+            height: auto;
+            padding: 0 0 90px 16px;
+        }
+    }
 }
 
 .collected {
-  grid-area: collected;
-  height: 200px;
-  @include effects.grayscale-bg-image('../../images/public/reports-page/collected.jpg');
+    grid-area: collected;
+    height: 200px;
+    @include effects.grayscale-bg-image('../../images/public/reports-page/collected.jpg');
 
-  @media (min-width: 768px) {
-    height: 485px;
-  }
+    @media (min-width: 768px) {
+        height: 485px;
+    }
 
-  @media (min-width: 1440px) {
-    height: 555px;
-  }
+    @media (min-width: 1440px) {
+        height: 555px;
+    }
 }
 
 .expenses {
-  grid-area: expenses;
-  background-color: c.$light-blue-600;
+    grid-area: expenses;
+    background-color: c.$light-blue-600;
 }
 
 .income {
-  grid-area: income;
-  background-color: c.$blue-500;
+    grid-area: income;
+    background-color: c.$blue-500;
 }
 
 .programs {
-  grid-area: programs;
-  background-color: c.$yellow-300;
+    grid-area: programs;
+    background-color: c.$yellow-300;
 }

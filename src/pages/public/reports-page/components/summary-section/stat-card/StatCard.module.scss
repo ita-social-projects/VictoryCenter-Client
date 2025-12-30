@@ -1,63 +1,63 @@
-@use "@/assets/sass/variables/colors" as c;
-@use "@/assets/sass/mixins/typography.mixins" as type;
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .card {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  color: c.$white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    color: c.$white;
 
-  padding: 0 16px 16px;
+    padding: 0 16px 16px;
 
-  @media (min-width: 560px) {
-    padding: 0 28px 28px;
-  }
+    @media (min-width: 560px) {
+        padding: 0 28px 28px;
+    }
 
-  @media (min-width: 768px) {
-    padding: 0 20px 20px 32px;
-  }
+    @media (min-width: 768px) {
+        padding: 0 20px 20px 32px;
+    }
 
-  @media (min-width: 1440px) {
-    padding: 0 16px 28px 58px;
-  }
+    @media (min-width: 1440px) {
+        padding: 0 16px 28px 58px;
+    }
 }
 
 .wrapper {
-  width: fit-content;
+    width: fit-content;
 }
 
 .value {
-  position: relative;
-  @include type.h3-bold;
+    position: relative;
+    @include type.h3-bold;
 
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 2px;
-    width: calc(100% + 16px);
-    background-color: c.$white;
-  }
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        width: calc(100% + 16px);
+        background-color: c.$white;
+    }
 
-  @media (min-width: 1440px) {
-    @include type.h2-bold;
-  }
+    @media (min-width: 1440px) {
+        @include type.h2-bold;
+    }
 }
 
 .label {
-  @include type.subtitle-1-bold;
+    @include type.subtitle-1-bold;
 }
 
 .text-blue {
-  color: c.$light-blue-100;
-  padding-bottom: 16px;
+    color: c.$light-blue-100;
+    padding-bottom: 16px;
 
-  @media (min-width: 1440px) {
-    padding-bottom: 4px;
-  }
+    @media (min-width: 1440px) {
+        padding-bottom: 4px;
+    }
 }
 
 .text-yellow {
-  color: c.$yellow-500;
+    color: c.$yellow-500;
 }

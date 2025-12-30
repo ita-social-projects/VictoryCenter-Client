@@ -36,35 +36,38 @@ jest.mock('@/components/admin/input-groups/input-with-character-limit-group/Inpu
     ),
 }));
 
-jest.mock('@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup', () => ({
-    TextAreaWithCharacterLimitGroup: ({
-        label,
-        value,
-        onChange,
-        id,
-        maxLength,
-        rows,
-    }: {
-        label: string;
-        value: string;
-        onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-        id: string;
-        maxLength: number;
-        rows: number;
-    }) => (
-        <div data-testid={`textarea-group-${id}`}>
-            <label htmlFor={id}>{label}</label>
-            <textarea
-                id={id}
-                data-testid={`description-textarea-${id}`}
-                value={value}
-                onChange={onChange}
-                maxLength={maxLength}
-                rows={rows}
-            />
-        </div>
-    ),
-}));
+jest.mock(
+    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
+    () => ({
+        TextAreaWithCharacterLimitGroup: ({
+            label,
+            value,
+            onChange,
+            id,
+            maxLength,
+            rows,
+        }: {
+            label: string;
+            value: string;
+            onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+            id: string;
+            maxLength: number;
+            rows: number;
+        }) => (
+            <div data-testid={`textarea-group-${id}`}>
+                <label htmlFor={id}>{label}</label>
+                <textarea
+                    id={id}
+                    data-testid={`description-textarea-${id}`}
+                    value={value}
+                    onChange={onChange}
+                    maxLength={maxLength}
+                    rows={rows}
+                />
+            </div>
+        ),
+    }),
+);
 
 describe('TitleDescriptionSection', () => {
     const defaultProps: TitleDescriptionSectionProps = {
@@ -316,4 +319,3 @@ describe('TitleDescriptionSection', () => {
         });
     });
 });
-

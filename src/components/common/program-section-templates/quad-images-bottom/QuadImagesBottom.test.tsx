@@ -207,7 +207,7 @@ describe('QuadImagesBottom', () => {
 
             const configElement = screen.getByTestId('image-config');
             const config = JSON.parse(configElement.textContent || '{}');
-            
+
             expect(config.imageCount).toBe(4);
             expect(config.gridColumns).toBe(4);
             expect(config.elevatedIndices).toEqual([1, 3]);
@@ -277,4 +277,3 @@ describe('QuadImagesBottom', () => {
         });
     });
 });
-

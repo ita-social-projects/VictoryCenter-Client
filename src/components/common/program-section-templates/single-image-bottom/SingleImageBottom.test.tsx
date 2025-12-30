@@ -31,12 +31,20 @@ jest.mock('../shared/title-description-section/TitleDescriptionSection', () => (
             {isTemplate && <span data-testid="template-flag">template</span>}
             {isEditable && <span data-testid="editable-flag">editable</span>}
             {onTitleChange && (
-                <button data-testid="trigger-title-change" onClick={() => onTitleChange('New Title')} aria-label="Trigger title change">
+                <button
+                    data-testid="trigger-title-change"
+                    onClick={() => onTitleChange('New Title')}
+                    aria-label="Trigger title change"
+                >
                     Trigger Title Change
                 </button>
             )}
             {onDescriptionChange && (
-                <button data-testid="trigger-description-change" onClick={() => onDescriptionChange('New Description')} aria-label="Trigger description change">
+                <button
+                    data-testid="trigger-description-change"
+                    onClick={() => onDescriptionChange('New Description')}
+                    aria-label="Trigger description change"
+                >
                     Trigger Description Change
                 </button>
             )}
@@ -79,7 +87,11 @@ jest.mock('@/components/admin/input-groups/photo-input-group/PhotoInputGroup', (
             data-image-subtext={imageSubText}
             className={className}
         >
-            {value ? <span data-testid={`has-image-${id}`}>Has Image</span> : <span data-testid={`no-image-${id}`}>No Image</span>}
+            {value ? (
+                <span data-testid={`has-image-${id}`}>Has Image</span>
+            ) : (
+                <span data-testid={`no-image-${id}`}>No Image</span>
+            )}
             <button
                 type="button"
                 data-testid={`upload-button-${id}`}
@@ -119,7 +131,8 @@ describe('SingleImageBottom', () => {
 
     // Element getters
     const getTitleDescriptionSection = () => screen.getByTestId('title-description-section');
-    const getContainer = () => screen.getByTestId('single-image-bottom-container') || document.querySelector('.container');
+    const getContainer = () =>
+        screen.getByTestId('single-image-bottom-container') || document.querySelector('.container');
     const getPhotoInputGroup = () => screen.queryByTestId('photo-input-group-section-image-1');
     const getImage = () => {
         // Try multiple ways to find the image
@@ -174,11 +187,9 @@ describe('SingleImageBottom', () => {
             });
 
             const image = container.querySelector('img');
-            // Image might still render with empty src or null src
-            if (image) {
-                const src = image.getAttribute('src');
-                expect(src === '' || src === null).toBe(true);
-            }
+            expect(image).toBeTruthy();
+            const src = image?.getAttribute('src');
+            expect(src === '' || src === null).toBe(true);
         });
     });
 
@@ -423,4 +434,3 @@ describe('SingleImageBottom', () => {
         });
     });
 });
-

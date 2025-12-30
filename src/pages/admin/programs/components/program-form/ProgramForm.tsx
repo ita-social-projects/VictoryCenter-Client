@@ -48,6 +48,7 @@ export interface ProgramFormRef {
     isDirty: () => boolean;
     addSection: (section: ProgramSection) => void;
     removeSection: (sectionIndex: number) => void;
+    getSections: () => ProgramSection[];
 }
 
 export interface ProgramFormProps {
@@ -157,8 +158,9 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 },
                 addSection: handleAddSection,
                 removeSection: handleRemoveSection,
+                getSections: () => formState.sections,
             }),
-            [handleAddSection, handleRemoveSection],
+            [handleAddSection, handleRemoveSection, formState.sections],
         );
 
         const handleNameChange = useCallback(

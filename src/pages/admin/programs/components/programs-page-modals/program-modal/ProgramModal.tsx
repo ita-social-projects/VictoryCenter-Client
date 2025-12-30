@@ -135,14 +135,17 @@ export const ProgramModal = (props: ProgramModalProps) => {
 
     const handleTemplateSelect = useCallback(
         (templateId: ProgramSectionTemplate) => {
-            const newSection: ProgramSection = {
-                template: templateId,
-                order: 0,
-                contents: getInitialSectionContents(templateId),
-            };
-            setSections((prev) => [newSection, ...prev]);
-
-            if (modalHookData.formRef.current) {
+            if (modalHookData.formRef?.current) {
+                const currentSections = modalHookData.formRef.current.getSections
+                    ? modalHookData.formRef.current.getSections()
+                    : [];
+                const nextOrder =
+                    currentSections.length === 0 ? 0 : Math.max(...currentSections.map((s) => s.order)) + 1;
+                const newSection: ProgramSection = {
+                    template: templateId,
+                    order: nextOrder,
+                    contents: getInitialSectionContents(templateId),
+                };
                 modalHookData.formRef.current.addSection(newSection);
             }
         },

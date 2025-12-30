@@ -59,7 +59,7 @@ export const TEAM_MEMBER_VALIDATION = {
         max: 50,
         allowedCharsPattern: /^[A-Za-zА-Яа-яҐґЄєІіЇї''\-\s0-9]+$/,
         digitsPattern: /\d/,
-        getInvalidCharsError: () => 'Поле може містити лише літери, пробіли, ’ -.',
+        getInvalidCharsError: () => 'Поле може містити лише літери, пробіли, ’ -',
         getDigitsError: () => 'Поле не може містити цифри',
         getRequiredError: () => "Ім'я та прізвище обов'язкові",
         getMinError: () => `Не менше ${TEAM_MEMBER_VALIDATION.fullName.min} символів`,

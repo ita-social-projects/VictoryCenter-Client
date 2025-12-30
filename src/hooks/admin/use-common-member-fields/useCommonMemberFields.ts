@@ -8,9 +8,9 @@ interface CommonFormState {
 }
 
 interface CommonErrorState {
-    fullName?: string;
+    fullName?: string[];
     description?: string;
-    [key: string]: string | undefined;
+    [key: string]: string | string[] | undefined;
 }
 
 interface UseCommonMemberFieldsParams<T extends CommonFormState, E extends CommonErrorState> {

@@ -5,7 +5,7 @@ describe('teamMemberValidationSchema', () => {
     const validFullName = 'John Doe';
     const invalidFullNameShort = 'J'.repeat(TEAM_MEMBER_VALIDATION.fullName.min - 1);
     const invalidFullNameLong = 'J'.repeat(TEAM_MEMBER_VALIDATION.fullName.max + 1);
-    const invalidFullNamePattern = 'John123';
+    const invalidFullNamePattern = 'John123#';
 
     const validDescription = 'This is a valid description';
     const invalidDescriptionShort = 'a'.repeat(TEAM_MEMBER_VALIDATION.description.min - 1);
@@ -23,27 +23,25 @@ describe('teamMemberValidationSchema', () => {
         });
 
         it('rejects empty fullName', () => {
-            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName('', false)).toBe(
-                TEAM_MEMBER_VALIDATION.fullName.getRequiredError(),
-            );
+            const errors = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName('', false);
+            expect(errors).toEqual([TEAM_MEMBER_VALIDATION.fullName.getRequiredError()]);
         });
 
         it('rejects too short fullName', () => {
-            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(invalidFullNameShort, false)).toBe(
-                TEAM_MEMBER_VALIDATION.fullName.getMinError(),
-            );
+            const errors = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(invalidFullNameShort, false);
+            expect(errors).toEqual([TEAM_MEMBER_VALIDATION.fullName.getMinError()]);
         });
 
         it('rejects too long fullName', () => {
-            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(invalidFullNameLong, false)).toBe(
-                TEAM_MEMBER_VALIDATION.fullName.getMaxError(),
-            );
+            const errors = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(invalidFullNameLong, false);
+            expect(errors).toEqual([TEAM_MEMBER_VALIDATION.fullName.getMaxError()]);
         });
 
-        it('rejects fullName not matching pattern', () => {
-            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(invalidFullNamePattern, false)).toBe(
-                TEAM_MEMBER_VALIDATION.fullName.getPatternError(),
-            );
+        it('rejects fullName with digits and special characters', () => {
+            const errors = TEAM_MEMBER_VALIDATION_FUNCTIONS.validateFullName(invalidFullNamePattern, false);
+            expect(errors).toHaveLength(2);
+            expect(errors).toContain(TEAM_MEMBER_VALIDATION.fullName.getDigitsError());
+            expect(errors).toContain(TEAM_MEMBER_VALIDATION.fullName.getInvalidCharsError());
         });
     });
 

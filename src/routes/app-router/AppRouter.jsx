@@ -20,6 +20,7 @@ import { FaqPanel } from '@/pages/admin/faq/FaqPanel';
 import { PartnersPage } from '@/pages/public/partners-page/PartnersPage';
 import { WhoWeArePageAdmin } from '@/pages/admin/who-we-are/WhoWeArePageAdmin';
 import { PartnerPanel } from '@/pages/admin/partners/PartnerPanel';
+import { ReportsPage } from '@/pages/public/reports-page';
 
 export const AppRouter = () => (
     <BrowserRouter>
@@ -31,6 +32,7 @@ export const AppRouter = () => (
                 <Route path={PUBLIC_ROUTES.PARTNERS.FULL} element={<PartnersPage />} />
                 <Route path={PUBLIC_ROUTES.ABOUT_US.FULL} element={<AboutUsPage />} />
                 <Route path={PUBLIC_ROUTES.DONATE.FULL} element={<DonatePage />} />
+                <Route path={PUBLIC_ROUTES.REPORTS.FULL} element={<ReportsPage />} />
                 <Route path="*" element={<NotFound />} />
             </Route>
 

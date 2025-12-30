@@ -16,6 +16,7 @@ module.exports = {
     coveragePathIgnorePatterns: [
         'src/utils/mock-data',
         'src/const',
+        'index.ts',
         'index.tsx',
         'react-app-env.d.ts',
         'reportWebVitals.ts',

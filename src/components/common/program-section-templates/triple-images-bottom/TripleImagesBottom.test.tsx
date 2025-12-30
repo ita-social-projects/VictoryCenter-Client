@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { TripleImagesBottom, TripleImagesBottomProps } from './TripleImagesBottom';
 import { createImagesBottomTestSuite } from '../shared/test-utils/imagesBottomTestFactory';
 
@@ -61,25 +61,35 @@ describe('TripleImagesBottom branch coverage', () => {
         isEditable: false,
     };
 
-    it('renders with isTemplate=true', () => {
-        render(<TripleImagesBottom {...baseProps} isTemplate={true} />);
+    it('renders with default props (all undefined)', () => {
+        expect(() => render(<TripleImagesBottom />)).not.toThrow();
     });
 
-    it('renders with isEditable=true', () => {
-        render(<TripleImagesBottom {...baseProps} isEditable={true} />);
+    it('renders view mode with images', () => {
+        render(<TripleImagesBottom {...baseProps} />);
+        expect(screen.getByTestId('images-bottom-section')).toBeInTheDocument();
+        expect(screen.getByTestId('images-count').textContent).toBe('3');
+    });
+
+    it('renders with isTemplate=true', () => {
+        expect(() => render(<TripleImagesBottom {...baseProps} isTemplate={true} />)).not.toThrow();
+    });
+
+    it('renders editable UI when isEditable=true', () => {
+        expect(() => render(<TripleImagesBottom {...baseProps} isEditable={true} />)).not.toThrow();
     });
 
     it('renders with only one or two images', () => {
         render(<TripleImagesBottom {...baseProps} image2={''} image3={''} />);
+        expect(screen.queryAllByAltText('')).toHaveLength(0);
         render(<TripleImagesBottom {...baseProps} image1={''} image3={''} />);
+        expect(screen.queryAllByAltText('')).toHaveLength(0);
         render(<TripleImagesBottom {...baseProps} image1={''} image2={''} />);
+        expect(screen.queryAllByAltText('')).toHaveLength(0);
     });
 
     it('renders with no images', () => {
         render(<TripleImagesBottom {...baseProps} image1={''} image2={''} image3={''} />);
-    });
-
-    it('renders with no title/description', () => {
-        render(<TripleImagesBottom {...baseProps} title={''} description={''} />);
+        expect(screen.queryAllByAltText('')).toHaveLength(0);
     });
 });

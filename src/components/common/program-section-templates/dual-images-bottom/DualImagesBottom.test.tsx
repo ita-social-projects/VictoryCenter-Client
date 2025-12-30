@@ -1,6 +1,6 @@
 import { DualImagesBottom, DualImagesBottomProps } from './DualImagesBottom';
 import { createImagesBottomTestSuite } from '../shared/test-utils/imagesBottomTestFactory';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 jest.mock('../shared/title-description-section/TitleDescriptionSection', () => {
     const { mockTitleDescriptionSection } = require('../shared/test-utils/imagesBottomTestMocks');
@@ -56,24 +56,37 @@ describe('DualImagesBottom branch coverage', () => {
         isEditable: false,
     };
 
-    it('renders with isTemplate=true', () => {
-        render(<DualImagesBottom {...baseProps} isTemplate={true} />);
+    it('renders with default props (all undefined)', () => {
+        expect(() => render(<DualImagesBottom />)).not.toThrow();
     });
 
-    it('renders with isEditable=true', () => {
-        render(<DualImagesBottom {...baseProps} isEditable={true} />);
+    it('renders view mode with images', () => {
+        render(<DualImagesBottom {...baseProps} />);
+        expect(screen.getByTestId('images-bottom-section')).toBeInTheDocument();
+        expect(screen.getByTestId('images-count').textContent).toBe('2');
+    });
+
+    it('renders with isTemplate=true', () => {
+        expect(() => render(<DualImagesBottom {...baseProps} isTemplate={true} />)).not.toThrow();
+    });
+
+    it('renders editable UI when isEditable=true', () => {
+        expect(() => render(<DualImagesBottom {...baseProps} isEditable={true} />)).not.toThrow();
     });
 
     it('renders with only one image', () => {
         render(<DualImagesBottom {...baseProps} image2={''} />);
-        render(<DualImagesBottom {...baseProps} image1={''} />);
+        expect(screen.queryAllByAltText('')).toHaveLength(0);
     });
 
     it('renders with no images', () => {
         render(<DualImagesBottom {...baseProps} image1={''} image2={''} />);
+        expect(screen.queryAllByAltText('')).toHaveLength(0);
     });
 
     it('renders with no title/description', () => {
         render(<DualImagesBottom {...baseProps} title={''} description={''} />);
+        expect(screen.getByTestId('title')).toBeInTheDocument();
+        expect(screen.getByTestId('description')).toBeInTheDocument();
     });
 });

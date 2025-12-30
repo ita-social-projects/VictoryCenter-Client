@@ -1,10 +1,10 @@
 import cn from 'classnames';
-import { TitleDescriptionSection } from '../shared/title-description-section/TitleDescriptionSection';
-import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
+import { ImagesBottomSection, ImagesBottomSectionConfig } from '../shared/images-bottom-section/ImagesBottomSection';
 import { ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
 import styles from './TrippleImagesBottom.module.scss';
+import sharedStyles from '../shared/images-bottom-section/ImagesBottomSection.module.scss';
 
 export interface TrippleImagesBottomProps {
     title?: string;
@@ -20,6 +20,17 @@ export interface TrippleImagesBottomProps {
     onImage2Change?: (file: ImageValues | null) => void;
     onImage3Change?: (file: ImageValues | null) => void;
 }
+
+const TRIPLE_IMAGES_CONFIG: ImagesBottomSectionConfig = {
+    imageCount: 3,
+    gridColumns: 3,
+    imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.TRIPLE_IMAGES,
+    elevatedIndices: [0, 2],
+    imageLabel: COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE,
+    editableGridColumns: 4,
+    editableImageMaxHeight: 480,
+    editableImageMaxWidth: 480,
+};
 
 export const TrippleImagesBottom = ({
     title = '',
@@ -43,58 +54,17 @@ export const TrippleImagesBottom = ({
     ];
 
     return (
-        <div
-            className={cn(styles.container, {
-                [styles.template]: isTemplate,
-                [styles.editable]: isEditable,
-            })}
-        >
-            <TitleDescriptionSection
-                title={title}
-                description={description}
-                className={styles['top-section']}
-                isEditable={isEditable}
-                isTemplate={isTemplate}
-                onTitleChange={onTitleChange}
-                onDescriptionChange={onDescriptionChange}
-            />
-            <div className={styles['bottom-section']}>
-                <div className={styles['images-grid']}>
-                    {isEditable
-                        ? imageHandlers.map(({ handler, key, value }, index) => (
-                              <div
-                                  key={key}
-                                  className={`${styles['image-wrapper']} ${index % 2 === 0 ? styles.elevated : ''}`}
-                              >
-                                  <PhotoInputGroup
-                                      id={`section-image-${index + 1}`}
-                                      name={`section-image-${index + 1}`}
-                                      value={value ? { id: null, url: value, mimeType: '' } : null}
-                                      onChange={handler || (() => {})}
-                                      setError={() => {}}
-                                      cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.TRIPLE_IMAGES.cropWidth}
-                                      cropHeight={PROGRAM_SECTION_IMAGE_CONFIGS.TRIPLE_IMAGES.cropHeight}
-                                      minWidth={PROGRAM_SECTION_IMAGE_CONFIGS.TRIPLE_IMAGES.minWidth}
-                                      minHeight={PROGRAM_SECTION_IMAGE_CONFIGS.TRIPLE_IMAGES.minHeight}
-                                      imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
-                                      imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                                          PROGRAM_SECTION_IMAGE_CONFIGS.TRIPLE_IMAGES.cropHeight,
-                                          PROGRAM_SECTION_IMAGE_CONFIGS.TRIPLE_IMAGES.cropWidth,
-                                      )}
-                                      className="program-section-image-input"
-                                  />
-                              </div>
-                          ))
-                        : images.map((image, index) => (
-                              <div
-                                  key={image ? `image-${image}` : `image-${index}`}
-                                  className={`${styles['image-wrapper']} ${index % 2 === 0 ? styles.elevated : ''}`}
-                              >
-                                  <img src={image} alt="" className={styles.image} />
-                              </div>
-                          ))}
-                </div>
-            </div>
-        </div>
+        <ImagesBottomSection
+            title={title}
+            description={description}
+            images={images}
+            imageHandlers={imageHandlers}
+            config={TRIPLE_IMAGES_CONFIG}
+            isTemplate={isTemplate}
+            isEditable={isEditable}
+            onTitleChange={onTitleChange}
+            onDescriptionChange={onDescriptionChange}
+            className={cn(sharedStyles.container, styles.container)}
+        />
     );
 };

@@ -1,10 +1,10 @@
 import cn from 'classnames';
-import { TitleDescriptionSection } from '../shared/title-description-section/TitleDescriptionSection';
-import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
+import { ImagesBottomSection, ImagesBottomSectionConfig } from '../shared/images-bottom-section/ImagesBottomSection';
 import { ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
 import styles from './QuadImagesBottom.module.scss';
+import sharedStyles from '../shared/images-bottom-section/ImagesBottomSection.module.scss';
 
 export interface QuadImagesBottomProps {
     title?: string;
@@ -22,6 +22,17 @@ export interface QuadImagesBottomProps {
     onImage3Change?: (file: ImageValues | null) => void;
     onImage4Change?: (file: ImageValues | null) => void;
 }
+
+const QUAD_IMAGES_CONFIG: ImagesBottomSectionConfig = {
+    imageCount: 4,
+    gridColumns: 4,
+    imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.QUAD_IMAGES,
+    elevatedIndices: [1, 3],
+    imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
+    editableGridColumns: 4,
+    editableImageMaxHeight: 390,
+    editableImageMaxWidth: 360,
+};
 
 export const QuadImagesBottom = ({
     title = '',
@@ -48,58 +59,17 @@ export const QuadImagesBottom = ({
     ];
 
     return (
-        <div
-            className={cn(styles.container, {
-                [styles.template]: isTemplate,
-                [styles.editable]: isEditable,
-            })}
-        >
-            <TitleDescriptionSection
-                title={title}
-                description={description}
-                className={styles['top-section']}
-                isEditable={isEditable}
-                isTemplate={isTemplate}
-                onTitleChange={onTitleChange}
-                onDescriptionChange={onDescriptionChange}
-            />
-            <div className={styles['bottom-section']}>
-                <div className={styles['images-grid']}>
-                    {isEditable
-                        ? imageHandlers.map(({ handler, key, value }, index) => (
-                              <div
-                                  key={key}
-                                  className={`${styles['image-wrapper']} ${index % 2 === 1 ? styles.elevated : ''}`}
-                              >
-                                  <PhotoInputGroup
-                                      id={`section-image-${index + 1}`}
-                                      name={`section-image-${index + 1}`}
-                                      value={value ? { id: null, url: value, mimeType: '' } : null}
-                                      onChange={handler || (() => {})}
-                                      setError={() => {}}
-                                      cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.QUAD_IMAGES.cropWidth}
-                                      cropHeight={PROGRAM_SECTION_IMAGE_CONFIGS.QUAD_IMAGES.cropHeight}
-                                      minWidth={PROGRAM_SECTION_IMAGE_CONFIGS.QUAD_IMAGES.minWidth}
-                                      minHeight={PROGRAM_SECTION_IMAGE_CONFIGS.QUAD_IMAGES.minHeight}
-                                      imageLabel={COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE}
-                                      imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                                          PROGRAM_SECTION_IMAGE_CONFIGS.QUAD_IMAGES.cropHeight,
-                                          PROGRAM_SECTION_IMAGE_CONFIGS.QUAD_IMAGES.cropWidth,
-                                      )}
-                                      className="program-section-image-input"
-                                  />
-                              </div>
-                          ))
-                        : images.map((image, index) => (
-                              <div
-                                  key={image ? `image-${image}` : `image-${index}`}
-                                  className={`${styles['image-wrapper']} ${index % 2 === 1 ? styles.elevated : ''}`}
-                              >
-                                  <img src={image} alt="" className={styles.image} />
-                              </div>
-                          ))}
-                </div>
-            </div>
-        </div>
+        <ImagesBottomSection
+            title={title}
+            description={description}
+            images={images}
+            imageHandlers={imageHandlers}
+            config={QUAD_IMAGES_CONFIG}
+            isTemplate={isTemplate}
+            isEditable={isEditable}
+            onTitleChange={onTitleChange}
+            onDescriptionChange={onDescriptionChange}
+            className={cn(sharedStyles.container, styles.container)}
+        />
     );
 };

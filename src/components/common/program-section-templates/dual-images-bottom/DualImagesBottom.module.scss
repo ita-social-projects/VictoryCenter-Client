@@ -1,74 +1,44 @@
-@import '../shared/BaseSectionTemplate.module.scss';
-
 .container {
-    @extend .section-container;
     aspect-ratio: 1330 / 1235;
     gap: 1vw;
+
+    &.top-section {
+        flex: 0 0 51%;
+        background-color: red;
+    }
 }
 
-.top-section {
-    flex: 0 0 51%;
-    min-height: 0;
-}
+
 
 .bottom-section {
     flex: 0 0 49%;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
     justify-content: center;
-    box-sizing: border-box;
 }
 
 .images-grid {
-    display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 0;
-    align-items: end;
 }
 
 .image-wrapper {
-    width: 100%;
-}
-
-.elevated {
-    transform: translateY(-5rem);
+    &[data-elevated='true'] {
+        transform: translateY(-5rem);
+    }
 }
 
 .image {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
     aspect-ratio: 730 / 430;
 }
 
 .container.editable {
-    max-height: 1200px;
     gap: 2vw;
 
-    .top-section{
-        flex: 40%;
-    }
-    .bottom-section{
-        flex: 40%;
-    }
     .images-grid {
-        display: flex;
-        justify-content: center;
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .image-wrapper {
         aspect-ratio: 730 / 430;
-        width: 100%;
         max-height: 430px;
         max-width: 730px;
-
-        > div {
-            height: 100%;
-
-            > div {
-                height: 100%;
-            }
-        }
     }
 }

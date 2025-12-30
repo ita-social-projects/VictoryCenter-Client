@@ -1,5 +1,6 @@
 @import '@/assets/sass/mixins/typography.mixins';
 
+// Container styles that override TitleDescriptionSection defaults
 .container {
     display: flex;
     width: auto;
@@ -12,76 +13,76 @@
     justify-content: space-between;
     padding-top: 9vw;
     gap: 3vw;
-}
 
-.title-section {
-    flex: 50% 0 0;
-}
+    // Target TitleDescriptionSection's title-section (using > to target direct children)
+    > div:first-child {
+        flex: 50% 0 0;
+    }
 
-.description-section {
-    flex: 50% 0 0;
-}
+    // Target TitleDescriptionSection's description-section
+    > div:last-child {
+        flex: 50% 0 0;
+    }
 
-.title {
-    @include h3-semibold-uppercase;
-    flex-shrink: 0;
-}
-
-.title-input{
-    input{
-        @include h3-semibold-uppercase; 
+    // Target input elements within title section for editable mode
+    > div:first-child {
+        input {
+            @include h3-semibold-uppercase;
+        }
     }
 }
 
-.description {
-    @include body-1-regular;
-    white-space: pre-wrap;
-}
-
+// Editable state overrides
 .container.editable {
     max-height: 644px;
     justify-content: center;
     gap: 10vw;
 
-    .title-section {
-    flex: 30% 0 0;
+    > div:first-child {
+        flex: 30% 0 0;
+    }
+
+    > div:last-child {
+        flex: 30% 0 0;
+    }
 }
 
-.description-section {
-    flex: 30% 0 0;
-}
-}
+// Template state styles
+.container.template {
+    padding: 2vw 6vw 0vw 6vw;
 
-.template {
-    .title{
+    // Target TitleDescriptionSection's title (h2 element)
+    h2 {
         font-size: 2vw;
     }
-    .description {
+
+    // Target TitleDescriptionSection's description (p element)
+    p {
         font-size: 0.9vw;
         line-height: 1.3vw;
     }
 }
 
-.container.template {
-    padding: 2vw 6vw 0vw 6vw;
-}
-
 @media (max-width: 1024px) {
-    .title-section {
-        flex: 40% 0 0;
-    }
+    .container {
+        > div:first-child {
+            flex: 40% 0 0;
+        }
 
-    .description-section {
-        flex: 60% 0 0;
+        > div:last-child {
+            flex: 60% 0 0;
+        }
     }
 }
 
 @media (max-width: 768px) {
-    .title-section {
-        flex: 30% 0 0;
-    }
+    .container {
+        > div:first-child {
+            flex: 30% 0 0;
+        }
 
-    .description-section {
-        flex: 70% 0 0;
+        > div:last-child {
+            flex: 70% 0 0;
+        }
     }
 }

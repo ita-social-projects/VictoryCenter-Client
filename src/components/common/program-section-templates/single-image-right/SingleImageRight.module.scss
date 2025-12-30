@@ -56,6 +56,7 @@
     line-height: 1.5;
     color: #333;
     word-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .right-section {
@@ -83,8 +84,8 @@
     }
 
     .description {
-        font-size: clamp(6px, 0.9vw, 12px);
-        line-height: 0.9vw;
+        font-size: clamp(6px, 0.95vw, 16px);
+        line-height: clamp(6px, 0.95vw, 16px);
     }
 }
 

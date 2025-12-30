@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import { SingleImageRight } from './SingleImageRight';
-import { ImageValues } from '@/types/common/image';
 import { fireEvent } from '@testing-library/react';
 
 jest.mock(

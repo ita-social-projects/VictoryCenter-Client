@@ -1,4 +1,3 @@
-import cn from 'classnames';
 import { TitleDescriptionSection } from '@/components/common/program-section-templates/shared/title-description-section/TitleDescriptionSection';
 import styles from './TextOnly.module.scss';
 
@@ -27,10 +26,7 @@ export const TextOnly = ({
             isEditable={isEditable}
             onTitleChange={onTitleChange}
             onDescriptionChange={onDescriptionChange}
-            className={cn(styles.container, {
-                [styles.template]: isTemplate,
-                [styles.editable]: isEditable,
-            })}
+            templateStyles={styles}
         />
     );
 };

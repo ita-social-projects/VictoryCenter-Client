@@ -21,6 +21,50 @@ interface TestConfig<TProps> {
     expectedConfig: ExpectedImageConfig;
 }
 
+const buildImages = (imageCount: number, prefix = 'image') => {
+    return Array.from({ length: imageCount }, (_, i) => `${prefix}${i + 1}.jpg`);
+};
+
+const buildAlternatingImages = (imageCount: number) => {
+    return Array.from({ length: imageCount }, (_, i) => (i % 2 === 0 ? `image${i + 1}.jpg` : ''));
+};
+
+const parseJson = <T,>(json: string | null | undefined, fallback: T): T => {
+    if (!json) return fallback;
+    try {
+        return JSON.parse(json) as T;
+    } catch {
+        return fallback;
+    }
+};
+
+const parseJsonFromTestId = <T,>(testId: string, fallback: T): T => {
+    const el = screen.getByTestId(testId);
+    return parseJson<T>(el.textContent, fallback);
+};
+
+const buildHandlersSummaryExpectation = (images: string[], hasHandler: boolean) => {
+    return images.map((value, i) => ({
+        key: `image${i + 1}`,
+        value,
+        hasHandler,
+    }));
+};
+
+const expectImageConfigMatches = (actual: any, expected: ExpectedImageConfig) => {
+    expect(actual.imageCount).toBe(expected.imageCount);
+    expect(actual.gridColumns).toBe(expected.gridColumns);
+    expect(actual.elevatedIndices).toEqual(expected.elevatedIndices);
+
+    if (expected.editableGridColumns !== undefined) {
+        expect(actual.editableGridColumns).toBe(expected.editableGridColumns);
+    }
+
+    expect(actual.editableImageMaxHeight).toBe(expected.editableImageMaxHeight);
+    expect(actual.editableImageMaxWidth).toBe(expected.editableImageMaxWidth);
+    expect(actual.imageConfig).toBeDefined();
+};
+
 // Element getters
 const getImagesBottomSection = () => screen.getByTestId('images-bottom-section');
 const getVariant = () => screen.getByTestId('variant');
@@ -49,7 +93,6 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
             jest.clearAllMocks();
         });
 
-        // Render helper
         const renderComponent = (overrideProps: Partial<TProps> = {}) => {
             const defaultProps = createDefaultProps();
             return render(<Component {...defaultProps} {...overrideProps} />);
@@ -73,7 +116,7 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
             });
 
             it(`passes all ${imageCount} images to ImagesBottomSection`, () => {
-                const images = Array.from({ length: imageCount }, (_, i) => `image${i + 1}.jpg`);
+                const images = buildImages(imageCount);
                 const imageProps = createImageProps(images);
 
                 renderComponent(imageProps);
@@ -136,7 +179,7 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
         describe('Image handlers', () => {
             it(`creates image handlers array with all ${imageCount} handlers`, () => {
                 const handlers = Array.from({ length: imageCount }, () => jest.fn());
-                const images = Array.from({ length: imageCount }, (_, i) => `img${i + 1}.jpg`);
+                const images = buildImages(imageCount, 'img');
 
                 const imageProps = createImageProps(images);
                 const handlerProps = createImageHandlers(handlers);
@@ -144,51 +187,29 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
                 renderComponent({ ...imageProps, ...handlerProps } as unknown as Partial<TProps>);
 
                 expect(getImageHandlersCount()).toHaveTextContent(imageCount.toString());
-                const summary = JSON.parse(getImageHandlersSummary().textContent || '[]');
-                expect(summary).toHaveLength(imageCount);
-                summary.forEach((h: any, i: number) => {
-                    expect(h).toEqual(
-                        expect.objectContaining({
-                            key: `image${i + 1}`,
-                            value: images[i],
-                            hasHandler: true,
-                        }),
-                    );
-                });
+                const summary = parseJson<any[]>(getImageHandlersSummary().textContent, []);
+                expect(summary).toEqual(expect.arrayContaining(buildHandlersSummaryExpectation(images, true)));
             });
 
             it('handles missing image handlers gracefully', () => {
-                const images = Array.from({ length: imageCount }, (_, i) => `img${i + 1}.jpg`);
+                const images = buildImages(imageCount, 'img');
                 const imageProps = createImageProps(images);
 
                 renderComponent(imageProps);
 
                 expect(getImageHandlersCount()).toHaveTextContent(imageCount.toString());
-                const summary = JSON.parse(getImageHandlersSummary().textContent || '[]');
-                expect(summary).toHaveLength(imageCount);
-                summary.forEach((h: any, i: number) => {
-                    expect(h).toEqual(
-                        expect.objectContaining({
-                            key: `image${i + 1}`,
-                            value: images[i],
-                            hasHandler: false,
-                        }),
-                    );
-                });
+                const summary = parseJson<any[]>(getImageHandlersSummary().textContent, []);
+                expect(summary).toEqual(expect.arrayContaining(buildHandlersSummaryExpectation(images, false)));
             });
 
             it('passes correct image values to handlers', () => {
-                const images = Array.from({ length: imageCount }, (_, i) => `image${i + 1}.jpg`);
+                const images = buildImages(imageCount);
                 const imageProps = createImageProps(images);
 
                 renderComponent(imageProps);
 
-                const configElement = screen.getByTestId('image-config');
-                const config = JSON.parse(configElement.textContent || '{}');
-
-                expect(config.imageCount).toBe(expectedConfig.imageCount);
-                expect(config.gridColumns).toBe(expectedConfig.gridColumns);
-                expect(config.elevatedIndices).toEqual(expectedConfig.elevatedIndices);
+                const config = parseJsonFromTestId<any>('image-config', {});
+                expectImageConfigMatches(config, expectedConfig);
             });
         });
 
@@ -196,20 +217,8 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
             it(`passes correct ${variant.toUpperCase()}_IMAGES_CONFIG to ImagesBottomSection`, () => {
                 renderComponent();
 
-                const configElement = screen.getByTestId('image-config');
-                const config = JSON.parse(configElement.textContent || '{}');
-
-                expect(config.imageCount).toBe(expectedConfig.imageCount);
-                expect(config.gridColumns).toBe(expectedConfig.gridColumns);
-                expect(config.elevatedIndices).toEqual(expectedConfig.elevatedIndices);
-
-                if (expectedConfig.editableGridColumns !== undefined) {
-                    expect(config.editableGridColumns).toBe(expectedConfig.editableGridColumns);
-                }
-
-                expect(config.editableImageMaxHeight).toBe(expectedConfig.editableImageMaxHeight);
-                expect(config.editableImageMaxWidth).toBe(expectedConfig.editableImageMaxWidth);
-                expect(config.imageConfig).toBeDefined();
+                const config = parseJsonFromTestId<any>('image-config', {});
+                expectImageConfigMatches(config, expectedConfig);
             });
         });
 
@@ -237,7 +246,7 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
 
         describe('Image array construction', () => {
             it('constructs images array in correct order', () => {
-                const images = Array.from({ length: imageCount }, (_, i) => `image${i + 1}.jpg`);
+                const images = buildImages(imageCount);
                 const imageProps = createImageProps(images);
 
                 renderComponent(imageProps);
@@ -247,7 +256,7 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
             });
 
             it('handles partial image values', () => {
-                const images = Array.from({ length: imageCount }, (_, i) => (i % 2 === 0 ? `image${i + 1}.jpg` : ''));
+                const images = buildAlternatingImages(imageCount);
                 const imageProps = createImageProps(images);
 
                 renderComponent(imageProps);

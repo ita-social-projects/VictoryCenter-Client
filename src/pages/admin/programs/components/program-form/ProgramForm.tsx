@@ -463,21 +463,12 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         <div className={styles['sections-list']}>
                             {formState.sections.map((section, index) => (
                                 <React.Fragment key={section.id ?? `${section.template}-${index}`}>
-                                    {true ? (
-                                        <ProgramSectionForm
-                                            section={section}
-                                            onSave={() => handleSaveSection(index)}
-                                            onCancel={() => handleCancelSection(index)}
-                                            isDisabled={isSubmitting || isFormDisabled}
-                                        />
-                                    ) : (
-                                        <div className={styles['section-preview']}>
-                                            {/* todo sections preview */}
-                                            <p>
-                                                Section {index + 1} - Template ID: {section.template}
-                                            </p>
-                                        </div>
-                                    )}
+                                    <ProgramSectionForm
+                                        section={section}
+                                        onSave={() => handleSaveSection(index)}
+                                        onCancel={() => handleCancelSection(index)}
+                                        isDisabled={isSubmitting || isFormDisabled}
+                                    />
                                     <div className={styles['sections-divider']} />
                                 </React.Fragment>
                             ))}

@@ -10,6 +10,7 @@ import { TextAreaWithCharacterLimitGroupProps } from '@/components/admin/input-g
 import { MultiSelectInputGroupProps } from '@/components/admin/input-groups/multi-select-input-group/MultiSelectInputGroup';
 import { PhotoInputGroupProps } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ButtonProps } from '@/components/admin/button/Button';
+import { ProgramSection } from '@/types/admin/programs';
 
 jest.mock('@/validation/admin/program-schema/program-schema', () => ({
     PROGRAM_VALIDATION_FUNCTIONS: {
@@ -109,8 +110,8 @@ jest.mock('@/components/admin/input-groups/photo-input-group/PhotoInputGroup', (
 }));
 
 jest.mock('@/components/admin/button/Button', () => ({
-    Button: ({ children, onClick, disabled }: ButtonProps) => (
-        <button type="button" onClick={onClick} disabled={disabled} data-testid="add-section-btn">
+    Button: ({ children, onClick, disabled, ...rest }: ButtonProps & { 'data-testid'?: string }) => (
+        <button type="button" onClick={onClick} disabled={disabled} data-testid={rest['data-testid'] ?? 'button'}>
             {children}
         </button>
     ),
@@ -118,6 +119,23 @@ jest.mock('@/components/admin/button/Button', () => ({
 
 jest.mock('@/assets/icons/plus.svg', () => ({
     ReactComponent: () => <svg>PlusIcon</svg>,
+}));
+
+jest.mock('../program-section-form/ProgramSectionForm', () => ({
+    ProgramSectionForm: ({ section, onSave, onCancel, isDisabled }: any) => (
+        <div
+            data-testid="program-section-form"
+            data-section-template={String(section.template)}
+            data-disabled={String(isDisabled)}
+        >
+            <button type="button" data-testid={`save-section-${section.id ?? section.template}`} onClick={onSave}>
+                Save
+            </button>
+            <button type="button" data-testid={`cancel-section-${section.id ?? section.template}`} onClick={onCancel}>
+                Cancel
+            </button>
+        </div>
+    ),
 }));
 
 describe('ProgramForm', () => {
@@ -187,8 +205,13 @@ describe('ProgramForm', () => {
 
         it('should call onAddSection when the add button is clicked', () => {
             renderProgramForm();
-            const addButtons = screen.getAllByTestId('add-section-btn');
-            fireEvent.click(addButtons[0]);
+            fireEvent.click(screen.getByTestId('add-program-button'));
+            expect(mockOnAddSection).toHaveBeenCalled();
+        });
+
+        it('should call onAddSection from empty sections state button', () => {
+            renderProgramForm();
+            fireEvent.click(screen.getByTestId('add-section-button-empty'));
             expect(mockOnAddSection).toHaveBeenCalled();
         });
     });
@@ -422,6 +445,184 @@ describe('ProgramForm', () => {
 
             expect(mockOnSubmit).not.toHaveBeenCalled();
             expect(screen.getByTestId('error-name')).toHaveTextContent('Required');
+        });
+    });
+
+    describe('Sections handling (branches)', () => {
+        const sectionWithId: ProgramSection = {
+            id: 101,
+            template: 'dual-images-bottom' as any,
+            order: 0,
+            contents: [],
+        } as ProgramSection;
+
+        const sectionWithoutId: ProgramSection = {
+            id: undefined,
+            template: 'images-bottom' as any,
+            order: 1,
+            contents: [],
+        } as ProgramSection;
+
+        it('renders empty state when there are no sections, and sections list when sections exist', async () => {
+            const ref = React.createRef<ProgramFormRef>();
+            renderProgramForm({}, ref);
+
+            expect(screen.queryAllByTestId('program-section-form')).toHaveLength(0);
+            expect(screen.getByTestId('add-section-button-empty')).toBeInTheDocument();
+
+            await act(async () => {
+                ref.current?.addSection(sectionWithId);
+            });
+
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
+            });
+            expect(screen.queryByTestId('add-section-button-empty')).not.toBeInTheDocument();
+        });
+
+        it('supports addSection/removeSection/getSections via ref (and covers key id ?? template)', async () => {
+            const ref = React.createRef<ProgramFormRef>();
+            const initialData: ProgramFormValues = {
+                name: '',
+                categories: [],
+                description: '',
+                previewImage: null,
+                previewImageId: null,
+                backgroundImage: null,
+                backgroundImageId: null,
+                location: '',
+                participantsCount: '',
+                meetingCount: '',
+                sections: [sectionWithId, sectionWithoutId],
+            };
+
+            renderProgramForm({ initialData }, ref);
+
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(2);
+            });
+
+            expect(ref.current?.getSections()).toHaveLength(2);
+
+            const newSection: ProgramSection = {
+                id: 202,
+                template: 'quad-images-bottom' as any,
+                order: 2,
+                contents: [],
+            } as ProgramSection;
+            await act(async () => {
+                ref.current?.addSection(newSection);
+            });
+
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(3);
+            });
+            expect(ref.current?.getSections()?.[0]).toMatchObject({ id: 202 });
+
+            await act(async () => {
+                ref.current?.removeSection(1);
+            });
+
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(2);
+            });
+            expect(ref.current?.getSections()).toHaveLength(2);
+        });
+
+        it('calls onRequestCancelSection when section cancel is requested', async () => {
+            const onRequestCancelSection = jest.fn();
+            const initialData: ProgramFormValues = {
+                name: '',
+                categories: [],
+                description: '',
+                previewImage: null,
+                previewImageId: null,
+                backgroundImage: null,
+                backgroundImageId: null,
+                location: '',
+                participantsCount: '',
+                meetingCount: '',
+                sections: [sectionWithId],
+            };
+
+            renderProgramForm({ initialData, onRequestCancelSection });
+
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
+            });
+
+            fireEvent.click(screen.getByTestId('cancel-section-101'));
+            expect(onRequestCancelSection).toHaveBeenCalledWith(0);
+        });
+
+        it('does not throw if onRequestCancelSection is not provided', async () => {
+            const initialData: ProgramFormValues = {
+                name: '',
+                categories: [],
+                description: '',
+                previewImage: null,
+                previewImageId: null,
+                backgroundImage: null,
+                backgroundImageId: null,
+                location: '',
+                participantsCount: '',
+                meetingCount: '',
+                sections: [sectionWithId],
+            };
+
+            renderProgramForm({ initialData });
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
+            });
+
+            expect(() => fireEvent.click(screen.getByTestId('cancel-section-101'))).not.toThrow();
+        });
+
+        it('wires ProgramSectionForm isDisabled based on isFormDisabled', async () => {
+            const initialData: ProgramFormValues = {
+                name: '',
+                categories: [],
+                description: '',
+                previewImage: null,
+                previewImageId: null,
+                backgroundImage: null,
+                backgroundImageId: null,
+                location: '',
+                participantsCount: '',
+                meetingCount: '',
+                sections: [sectionWithId],
+            };
+
+            renderProgramForm({ initialData, isFormDisabled: true });
+            await waitFor(() => {
+                const section = screen.getByTestId('program-section-form') as HTMLElement;
+                expect(section.dataset.disabled).toBe('true');
+            });
+        });
+
+        it('triggers handleSaveSection via ProgramSectionForm onSave', async () => {
+            const initialData: ProgramFormValues = {
+                name: '',
+                categories: [],
+                description: '',
+                previewImage: null,
+                previewImageId: null,
+                backgroundImage: null,
+                backgroundImageId: null,
+                location: '',
+                participantsCount: '',
+                meetingCount: '',
+                sections: [sectionWithId],
+            };
+
+            renderProgramForm({ initialData });
+            await waitFor(() => {
+                expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
+            });
+
+            fireEvent.click(screen.getByTestId('save-section-101'));
+            // No visible UI change expected; this asserts the handler path runs without error.
+            expect(screen.getAllByTestId('program-section-form')).toHaveLength(1);
         });
     });
 });

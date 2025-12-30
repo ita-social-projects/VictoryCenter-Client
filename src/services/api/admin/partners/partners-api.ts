@@ -36,7 +36,7 @@ export const PartnersApi = {
         const updateBannerDto: UpdatePartnerBannerDto = {
             title: banner.title,
             description: banner.description,
-            imageId: finalImageId !== null ? finalImageId : null,
+            imageId: finalImageId ?? null,
         };
 
         const response = await client.put<PartnerBannerDto>(API_ROUTES.PARTNERS.BANNER, updateBannerDto);

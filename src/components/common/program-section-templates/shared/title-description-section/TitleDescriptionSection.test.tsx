@@ -1,182 +1,319 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import { TitleDescriptionSection } from './TitleDescriptionSection';
+import { TitleDescriptionSection, TitleDescriptionSectionProps } from './TitleDescriptionSection';
+import { PROGRAMS_TEXT } from '@/const/admin/programs';
 
+// Mock the input group components
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
     InputWithCharacterLimitGroup: ({
+        label,
         value,
         onChange,
         id,
-        label,
+        maxLength,
         placeholder,
+        className,
     }: {
+        label: string;
         value: string;
         onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
         id: string;
-        label: string;
+        maxLength: number;
         placeholder: string;
+        className?: string;
     }) => (
-        <div data-testid={`group-${id}`}>
+        <div data-testid={`input-group-${id}`} className={className}>
             <label htmlFor={id}>{label}</label>
-            <input id={id} data-testid={`input-${id}`} value={value} onChange={onChange} placeholder={placeholder} />
+            <input
+                id={id}
+                data-testid={`title-input-${id}`}
+                value={value}
+                onChange={onChange}
+                maxLength={maxLength}
+                placeholder={placeholder}
+            />
         </div>
     ),
 }));
 
-jest.mock(
-    '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup',
-    () => ({
-        TextAreaWithCharacterLimitGroup: ({
-            value,
-            onChange,
-            id,
-            label,
-        }: {
-            value: string;
-            onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-            id: string;
-            label: string;
-        }) => (
-            <div data-testid={`group-${id}`}>
-                <label htmlFor={id}>{label}</label>
-                <textarea id={id} data-testid={`input-${id}`} value={value} onChange={onChange} />
-            </div>
-        ),
-    }),
-);
+jest.mock('@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup', () => ({
+    TextAreaWithCharacterLimitGroup: ({
+        label,
+        value,
+        onChange,
+        id,
+        maxLength,
+        rows,
+    }: {
+        label: string;
+        value: string;
+        onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+        id: string;
+        maxLength: number;
+        rows: number;
+    }) => (
+        <div data-testid={`textarea-group-${id}`}>
+            <label htmlFor={id}>{label}</label>
+            <textarea
+                id={id}
+                data-testid={`description-textarea-${id}`}
+                value={value}
+                onChange={onChange}
+                maxLength={maxLength}
+                rows={rows}
+            />
+        </div>
+    ),
+}));
 
 describe('TitleDescriptionSection', () => {
-    describe('View Mode (isEditable=false)', () => {
-        it('should render title and description in view mode by default', () => {
-            render(<TitleDescriptionSection title="Test Title" description="Test Description" />);
+    const defaultProps: TitleDescriptionSectionProps = {
+        title: '',
+        description: '',
+        className: '',
+        isTemplate: false,
+        isEditable: false,
+    };
 
-            expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Test Title');
-            expect(screen.getByText('Test Description')).toBeInTheDocument();
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    // Render helpers
+    const renderTitleDescriptionSection = (overrideProps: Partial<TitleDescriptionSectionProps> = {}) =>
+        render(<TitleDescriptionSection {...defaultProps} {...overrideProps} />);
+
+    // Element getters
+    const getTitleHeading = () => screen.queryByRole('heading', { level: 2 });
+    const getDescriptionParagraph = (text?: string) => {
+        if (text) {
+            return screen.queryByText(text);
+        }
+        // Find description paragraph by looking for the description class or by being a direct child
+        const container = document.querySelector('.container');
+        return container?.querySelector('.description') || null;
+    };
+    const getTitleInput = () => screen.queryByTestId('title-input-section-title');
+    const getDescriptionTextarea = () => screen.queryByTestId('description-textarea-section-description');
+
+    describe('Non-editable mode', () => {
+        it('renders title and description as text when not editable', () => {
+            renderTitleDescriptionSection({
+                title: 'Test Title',
+                description: 'Test Description',
+                isEditable: false,
+            });
+
+            expect(getTitleHeading()).toBeInTheDocument();
+            expect(getTitleHeading()).toHaveTextContent('Test Title');
+            const description = getDescriptionParagraph('Test Description');
+            expect(description).toBeInTheDocument();
+            expect(description).toHaveTextContent('Test Description');
         });
 
-        it('should render empty title and description when not provided', () => {
-            render(<TitleDescriptionSection />);
+        it('renders empty title and description when values are empty', () => {
+            const { container } = renderTitleDescriptionSection({
+                title: '',
+                description: '',
+                isEditable: false,
+            });
 
-            expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('');
-            expect(screen.getByText('', { selector: 'p' })).toBeInTheDocument();
+            expect(getTitleHeading()).toBeInTheDocument();
+            expect(getTitleHeading()).toHaveTextContent('');
+            const description = container.querySelector('.description');
+            expect(description).toBeInTheDocument();
+            expect(description).toHaveTextContent('');
         });
 
-        it('should not render input fields in view mode', () => {
-            render(<TitleDescriptionSection title="Test" description="Desc" />);
+        it('does not render input fields when not editable', () => {
+            renderTitleDescriptionSection({
+                title: 'Test Title',
+                description: 'Test Description',
+                isEditable: false,
+            });
 
-            expect(screen.queryByTestId('input-section-title')).not.toBeInTheDocument();
-            expect(screen.queryByTestId('input-section-description')).not.toBeInTheDocument();
-        });
-
-        it('should apply custom className', () => {
-            const { container } = render(<TitleDescriptionSection className="custom-class" />);
-
-            expect(container.firstChild).toHaveClass('custom-class');
-        });
-
-        it('should apply template class when isTemplate is true', () => {
-            const { container } = render(<TitleDescriptionSection isTemplate={true} />);
-
-            expect(container.firstChild).toHaveClass('template');
-        });
-
-        it('should not apply template class when isTemplate is false', () => {
-            const { container } = render(<TitleDescriptionSection isTemplate={false} />);
-
-            expect(container.firstChild).not.toHaveClass('template');
+            expect(getTitleInput()).not.toBeInTheDocument();
+            expect(getDescriptionTextarea()).not.toBeInTheDocument();
         });
     });
 
-    describe('Edit Mode (isEditable=true)', () => {
-        it('should render input fields when isEditable is true', () => {
-            render(<TitleDescriptionSection isEditable={true} />);
+    describe('Editable mode', () => {
+        it('renders input fields when editable', () => {
+            renderTitleDescriptionSection({
+                title: 'Test Title',
+                description: 'Test Description',
+                isEditable: true,
+            });
 
-            expect(screen.getByTestId('input-section-title')).toBeInTheDocument();
-            expect(screen.getByTestId('input-section-description')).toBeInTheDocument();
+            expect(getTitleInput()).toBeInTheDocument();
+            expect(getTitleInput()).toHaveValue('Test Title');
+            expect(getDescriptionTextarea()).toBeInTheDocument();
+            expect(getDescriptionTextarea()).toHaveValue('Test Description');
         });
 
-        it('should not render h2 and p elements when isEditable is true', () => {
-            render(<TitleDescriptionSection isEditable={true} title="Test" description="Desc" />);
+        it('does not render heading and paragraph when editable', () => {
+            renderTitleDescriptionSection({
+                title: 'Test Title',
+                description: 'Test Description',
+                isEditable: true,
+            });
 
-            expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
-            expect(screen.queryByText('Desc', { selector: 'p' })).not.toBeInTheDocument();
+            // The heading and paragraph should not be rendered in editable mode
+            const heading = screen.queryByRole('heading', { level: 2 });
+            // We need to check if the heading exists but might be in a different structure
+            // Since we're using input groups, the heading won't be there
+            expect(heading).not.toBeInTheDocument();
         });
 
-        it('should apply editable class when isEditable is true', () => {
-            const { container } = render(<TitleDescriptionSection isEditable={true} />);
+        it('calls onTitleChange when title input changes', () => {
+            const onTitleChange = jest.fn();
+            renderTitleDescriptionSection({
+                title: 'Initial Title',
+                isEditable: true,
+                onTitleChange,
+            });
 
-            expect(container.firstChild).toHaveClass('editable');
+            const titleInput = getTitleInput();
+            expect(titleInput).toBeInTheDocument();
+
+            fireEvent.change(titleInput!, { target: { value: 'New Title' } });
+
+            expect(onTitleChange).toHaveBeenCalledTimes(1);
+            expect(onTitleChange).toHaveBeenCalledWith('New Title');
         });
 
-        it('should display title value in input field', () => {
-            render(<TitleDescriptionSection isEditable={true} title="Editable Title" />);
+        it('calls onDescriptionChange when description textarea changes', () => {
+            const onDescriptionChange = jest.fn();
+            renderTitleDescriptionSection({
+                description: 'Initial Description',
+                isEditable: true,
+                onDescriptionChange,
+            });
 
-            expect(screen.getByTestId('input-section-title')).toHaveValue('Editable Title');
+            const descriptionTextarea = getDescriptionTextarea();
+            expect(descriptionTextarea).toBeInTheDocument();
+
+            fireEvent.change(descriptionTextarea!, { target: { value: 'New Description' } });
+
+            expect(onDescriptionChange).toHaveBeenCalledTimes(1);
+            expect(onDescriptionChange).toHaveBeenCalledWith('New Description');
         });
 
-        it('should display description value in textarea', () => {
-            render(<TitleDescriptionSection isEditable={true} description="Editable Description" />);
+        it('does not call callbacks when they are not provided', () => {
+            renderTitleDescriptionSection({
+                title: 'Test Title',
+                description: 'Test Description',
+                isEditable: true,
+            });
 
-            expect(screen.getByTestId('input-section-description')).toHaveValue('Editable Description');
+            const titleInput = getTitleInput();
+            const descriptionTextarea = getDescriptionTextarea();
+
+            fireEvent.change(titleInput!, { target: { value: 'New Title' } });
+            fireEvent.change(descriptionTextarea!, { target: { value: 'New Description' } });
+
+            // Should not throw errors
+            expect(titleInput).toBeInTheDocument();
+            expect(descriptionTextarea).toBeInTheDocument();
         });
 
-        it('should call onTitleChange when title input changes', () => {
-            const mockOnTitleChange = jest.fn();
-            render(<TitleDescriptionSection isEditable={true} onTitleChange={mockOnTitleChange} />);
+        it('passes correct props to InputWithCharacterLimitGroup', () => {
+            renderTitleDescriptionSection({
+                title: 'Test Title',
+                isEditable: true,
+            });
 
-            const input = screen.getByTestId('input-section-title');
-            fireEvent.change(input, { target: { value: 'New Title' } });
+            const inputGroup = screen.getByTestId('input-group-section-title');
+            expect(inputGroup).toBeInTheDocument();
 
-            expect(mockOnTitleChange).toHaveBeenCalledWith('New Title');
+            const titleInput = getTitleInput();
+            expect(titleInput).toHaveAttribute('id', 'section-title');
+            expect(titleInput).toHaveAttribute('maxLength', '60');
+            expect(titleInput).toHaveAttribute('placeholder', PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER);
         });
 
-        it('should call onDescriptionChange when description textarea changes', () => {
-            const mockOnDescriptionChange = jest.fn();
-            render(<TitleDescriptionSection isEditable={true} onDescriptionChange={mockOnDescriptionChange} />);
+        it('passes correct props to TextAreaWithCharacterLimitGroup', () => {
+            renderTitleDescriptionSection({
+                description: 'Test Description',
+                isEditable: true,
+            });
 
-            const textarea = screen.getByTestId('input-section-description');
-            fireEvent.change(textarea, { target: { value: 'New Description' } });
+            const textareaGroup = screen.getByTestId('textarea-group-section-description');
+            expect(textareaGroup).toBeInTheDocument();
 
-            expect(mockOnDescriptionChange).toHaveBeenCalledWith('New Description');
-        });
-
-        it('should not throw when onTitleChange is not provided', () => {
-            render(<TitleDescriptionSection isEditable={true} />);
-
-            const input = screen.getByTestId('input-section-title');
-
-            expect(() => {
-                fireEvent.change(input, { target: { value: 'Test' } });
-            }).not.toThrow();
-        });
-
-        it('should not throw when onDescriptionChange is not provided', () => {
-            render(<TitleDescriptionSection isEditable={true} />);
-
-            const textarea = screen.getByTestId('input-section-description');
-
-            expect(() => {
-                fireEvent.change(textarea, { target: { value: 'Test' } });
-            }).not.toThrow();
+            const descriptionTextarea = getDescriptionTextarea();
+            expect(descriptionTextarea).toHaveAttribute('id', 'section-description');
+            expect(descriptionTextarea).toHaveAttribute('maxLength', '600');
+            expect(descriptionTextarea).toHaveAttribute('rows', '8');
         });
     });
 
-    describe('Combined Props', () => {
-        it('should apply both template and editable classes when both are true', () => {
-            const { container } = render(<TitleDescriptionSection isTemplate={true} isEditable={true} />);
+    describe('CSS classes', () => {
+        it('applies custom className to container', () => {
+            const { container } = renderTitleDescriptionSection({
+                className: 'custom-class',
+            });
 
-            expect(container.firstChild).toHaveClass('template');
-            expect(container.firstChild).toHaveClass('editable');
+            const sectionContainer = container.querySelector('.container');
+            expect(sectionContainer).toHaveClass('custom-class');
         });
 
-        it('should apply custom className along with template and editable classes', () => {
-            const { container } = render(
-                <TitleDescriptionSection isTemplate={true} isEditable={true} className="my-custom-class" />,
-            );
+        it('applies template class when isTemplate is true', () => {
+            const { container } = renderTitleDescriptionSection({
+                isTemplate: true,
+            });
 
-            expect(container.firstChild).toHaveClass('template');
-            expect(container.firstChild).toHaveClass('editable');
-            expect(container.firstChild).toHaveClass('my-custom-class');
+            const sectionContainer = container.querySelector('.container');
+            expect(sectionContainer).toHaveClass('template');
+        });
+
+        it('applies editable class when isEditable is true', () => {
+            const { container } = renderTitleDescriptionSection({
+                isEditable: true,
+            });
+
+            const sectionContainer = container.querySelector('.container');
+            expect(sectionContainer).toHaveClass('editable');
+        });
+
+        it('applies multiple classes when multiple props are true', () => {
+            const { container } = renderTitleDescriptionSection({
+                className: 'custom-class',
+                isTemplate: true,
+                isEditable: true,
+            });
+
+            const sectionContainer = container.querySelector('.container');
+            expect(sectionContainer).toHaveClass('custom-class');
+            expect(sectionContainer).toHaveClass('template');
+            expect(sectionContainer).toHaveClass('editable');
+        });
+    });
+
+    describe('Default values', () => {
+        it('uses empty strings as default for title and description', () => {
+            const { container } = renderTitleDescriptionSection();
+
+            expect(getTitleHeading()).toBeInTheDocument();
+            expect(getTitleHeading()).toHaveTextContent('');
+            const description = container.querySelector('.description');
+            expect(description).toBeInTheDocument();
+            expect(description).toHaveTextContent('');
+        });
+
+        it('defaults isTemplate to false', () => {
+            const { container } = renderTitleDescriptionSection();
+
+            const sectionContainer = container.querySelector('.container');
+            expect(sectionContainer).not.toHaveClass('template');
+        });
+
+        it('defaults isEditable to false', () => {
+            renderTitleDescriptionSection();
+
+            expect(getTitleInput()).not.toBeInTheDocument();
+            expect(getDescriptionTextarea()).not.toBeInTheDocument();
         });
     });
 });
+

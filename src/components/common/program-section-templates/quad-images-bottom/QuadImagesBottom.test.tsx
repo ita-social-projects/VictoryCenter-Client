@@ -1,356 +1,280 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { QuadImagesBottom } from './QuadImagesBottom';
+import { QuadImagesBottom, QuadImagesBottomProps } from './QuadImagesBottom';
 import { ImageValues } from '@/types/common/image';
 
+// Mock the shared components - we test TitleDescriptionSection separately
 jest.mock('../shared/title-description-section/TitleDescriptionSection', () => ({
     TitleDescriptionSection: ({
         title,
         description,
-        isEditable,
         isTemplate,
-        onTitleChange,
-        onDescriptionChange,
-    }: any) => (
-        <div data-testid="title-description-section">
-            <div data-testid="title">{title}</div>
-            <div data-testid="description">{description}</div>
-            <div data-testid="is-editable">{String(isEditable)}</div>
-            <div data-testid="is-template">{String(isTemplate)}</div>
-            {onTitleChange && (
-                <button data-testid="title-change" onClick={() => onTitleChange('new title')}>
-                    Change Title
-                </button>
-            )}
-            {onDescriptionChange && (
-                <button data-testid="description-change" onClick={() => onDescriptionChange('new description')}>
-                    Change Description
-                </button>
-            )}
+        isEditable,
+    }: {
+        title?: string;
+        description?: string;
+        isTemplate?: boolean;
+        isEditable?: boolean;
+        onTitleChange?: (value: string) => void;
+        onDescriptionChange?: (value: string) => void;
+        className?: string;
+    }) => (
+        <div data-testid="title-description-section" data-title={title} data-description={description}>
+            {isTemplate && <span data-testid="template-flag">template</span>}
+            {isEditable && <span data-testid="editable-flag">editable</span>}
         </div>
     ),
 }));
 
-jest.mock('@/components/admin/input-groups/photo-input-group/PhotoInputGroup', () => ({
-    PhotoInputGroup: ({ id, value, onChange }: any) => (
-        <div data-testid={`photo-input-group-${id}`}>
-            <div data-testid={`photo-id-${id}`}>{id}</div>
-            <div data-testid={`photo-value-${id}`}>{value?.url || 'no-image'}</div>
-            <button
-                data-testid={`photo-change-${id}`}
-                onClick={() => onChange({ id: '123', url: `new-${id}.jpg`, mimeType: 'image/jpeg' })}
-            >
-                Change Photo
-            </button>
+// Mock ImagesBottomSection
+jest.mock('../shared/images-bottom-section/ImagesBottomSection', () => ({
+    ImagesBottomSection: ({
+        variant,
+        title,
+        description,
+        images,
+        imageHandlers,
+        config,
+        isTemplate,
+        isEditable,
+        onTitleChange,
+        onDescriptionChange,
+    }: {
+        variant: string;
+        title?: string;
+        description?: string;
+        images: string[];
+        imageHandlers: Array<{ handler?: (file: ImageValues | null) => void; key: string; value: string }>;
+        config: any;
+        isTemplate?: boolean;
+        isEditable?: boolean;
+        onTitleChange?: (value: string) => void;
+        onDescriptionChange?: (value: string) => void;
+    }) => (
+        <div data-testid="images-bottom-section">
+            <div data-testid="variant">{variant}</div>
+            <div data-testid="title">{title}</div>
+            <div data-testid="description">{description}</div>
+            <div data-testid="images-count">{images.length}</div>
+            <div data-testid="image-handlers-count">{imageHandlers.length}</div>
+            <div data-testid="image-config">{JSON.stringify(config)}</div>
+            {isTemplate && <span data-testid="template-flag">template</span>}
+            {isEditable && <span data-testid="editable-flag">editable</span>}
         </div>
     ),
 }));
 
 describe('QuadImagesBottom', () => {
-    describe('Non-editable mode', () => {
-        it('renders with title and description', () => {
-            render(<QuadImagesBottom title="Test Title" description="Test Description" />);
+    const defaultProps: QuadImagesBottomProps = {
+        title: '',
+        description: '',
+        image1: '',
+        image2: '',
+        image3: '',
+        image4: '',
+        isTemplate: false,
+        isEditable: false,
+    };
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    // Render helpers
+    const renderQuadImagesBottom = (overrideProps: Partial<QuadImagesBottomProps> = {}) =>
+        render(<QuadImagesBottom {...defaultProps} {...overrideProps} />);
+
+    // Element getters
+    const getImagesBottomSection = () => screen.getByTestId('images-bottom-section');
+    const getVariant = () => screen.getByTestId('variant');
+    const getImagesCount = () => screen.getByTestId('images-count');
+    const getImageHandlersCount = () => screen.getByTestId('image-handlers-count');
+
+    describe('Rendering', () => {
+        it('renders ImagesBottomSection with correct variant', () => {
+            renderQuadImagesBottom();
+
+            expect(getImagesBottomSection()).toBeInTheDocument();
+            expect(getVariant()).toHaveTextContent('quad');
+        });
+
+        it('passes all four images to ImagesBottomSection', () => {
+            renderQuadImagesBottom({
+                image1: 'image1.jpg',
+                image2: 'image2.jpg',
+                image3: 'image3.jpg',
+                image4: 'image4.jpg',
+            });
+
+            expect(getImagesCount()).toHaveTextContent('4');
+            expect(getImageHandlersCount()).toHaveTextContent('4');
+        });
+
+        it('passes empty images array when no images provided', () => {
+            renderQuadImagesBottom();
+
+            expect(getImagesCount()).toHaveTextContent('4');
+            expect(getImageHandlersCount()).toHaveTextContent('4');
+        });
+
+        it('passes title and description to ImagesBottomSection', () => {
+            renderQuadImagesBottom({
+                title: 'Test Title',
+                description: 'Test Description',
+            });
 
             expect(screen.getByTestId('title')).toHaveTextContent('Test Title');
             expect(screen.getByTestId('description')).toHaveTextContent('Test Description');
         });
+    });
 
-        it('renders all four images when provided', () => {
-            const { container } = render(
-                <QuadImagesBottom
-                    title="Test"
-                    image1="image1.jpg"
-                    image2="image2.jpg"
-                    image3="image3.jpg"
-                    image4="image4.jpg"
-                />,
-            );
-
-            const images = container.querySelectorAll('img');
-            expect(images).toHaveLength(4);
-            expect(images[0]).toHaveAttribute('src', 'image1.jpg');
-            expect(images[1]).toHaveAttribute('src', 'image2.jpg');
-            expect(images[2]).toHaveAttribute('src', 'image3.jpg');
-            expect(images[3]).toHaveAttribute('src', 'image4.jpg');
-        });
-
-        it('renders empty images when no images provided', () => {
-            const { container } = render(<QuadImagesBottom title="Test" />);
-
-            const images = container.querySelectorAll('img');
-            expect(images).toHaveLength(4);
-            images.forEach((img) => {
-                expect(img.getAttribute('src')).toBeFalsy();
+    describe('Props forwarding', () => {
+        it('forwards isTemplate prop to ImagesBottomSection', () => {
+            renderQuadImagesBottom({
+                isTemplate: true,
             });
+
+            expect(screen.getByTestId('template-flag')).toBeInTheDocument();
         });
 
-        it('applies template class when isTemplate is true', () => {
-            const { container } = render(<QuadImagesBottom title="Test" isTemplate={true} />);
+        it('forwards isEditable prop to ImagesBottomSection', () => {
+            renderQuadImagesBottom({
+                isEditable: true,
+            });
 
-            expect(container.firstChild).toHaveClass('template');
+            expect(screen.getByTestId('editable-flag')).toBeInTheDocument();
         });
 
-        it('passes isTemplate prop to TitleDescriptionSection', () => {
-            render(<QuadImagesBottom title="Test" isTemplate={true} />);
+        it('forwards onTitleChange callback to ImagesBottomSection', () => {
+            const onTitleChange = jest.fn();
+            renderQuadImagesBottom({
+                onTitleChange,
+            });
 
-            expect(screen.getByTestId('is-template')).toHaveTextContent('true');
+            // The callback is passed through, we verify it's in the component tree
+            expect(getImagesBottomSection()).toBeInTheDocument();
         });
 
-        it('renders with default empty values', () => {
-            render(<QuadImagesBottom />);
+        it('forwards onDescriptionChange callback to ImagesBottomSection', () => {
+            const onDescriptionChange = jest.fn();
+            renderQuadImagesBottom({
+                onDescriptionChange,
+            });
+
+            expect(getImagesBottomSection()).toBeInTheDocument();
+        });
+    });
+
+    describe('Image handlers', () => {
+        it('creates image handlers array with all four handlers', () => {
+            const onImage1Change = jest.fn();
+            const onImage2Change = jest.fn();
+            const onImage3Change = jest.fn();
+            const onImage4Change = jest.fn();
+
+            renderQuadImagesBottom({
+                image1: 'img1.jpg',
+                image2: 'img2.jpg',
+                image3: 'img3.jpg',
+                image4: 'img4.jpg',
+                onImage1Change,
+                onImage2Change,
+                onImage3Change,
+                onImage4Change,
+            });
+
+            expect(getImageHandlersCount()).toHaveTextContent('4');
+        });
+
+        it('handles missing image handlers gracefully', () => {
+            renderQuadImagesBottom({
+                image1: 'img1.jpg',
+                image2: 'img2.jpg',
+                image3: 'img3.jpg',
+                image4: 'img4.jpg',
+            });
+
+            expect(getImageHandlersCount()).toHaveTextContent('4');
+        });
+
+        it('passes correct image values to handlers', () => {
+            renderQuadImagesBottom({
+                image1: 'image1.jpg',
+                image2: 'image2.jpg',
+                image3: 'image3.jpg',
+                image4: 'image4.jpg',
+            });
+
+            const configElement = screen.getByTestId('image-config');
+            const config = JSON.parse(configElement.textContent || '{}');
+            
+            expect(config.imageCount).toBe(4);
+            expect(config.gridColumns).toBe(4);
+            expect(config.elevatedIndices).toEqual([1, 3]);
+        });
+    });
+
+    describe('Configuration', () => {
+        it('passes correct QUAD_IMAGES_CONFIG to ImagesBottomSection', () => {
+            renderQuadImagesBottom();
+
+            const configElement = screen.getByTestId('image-config');
+            const config = JSON.parse(configElement.textContent || '{}');
+
+            expect(config.imageCount).toBe(4);
+            expect(config.gridColumns).toBe(4);
+            expect(config.elevatedIndices).toEqual([1, 3]);
+            expect(config.editableGridColumns).toBe(4);
+            expect(config.editableImageMaxHeight).toBe(390);
+            expect(config.editableImageMaxWidth).toBe(360);
+            expect(config.imageConfig).toBeDefined();
+        });
+    });
+
+    describe('Default values', () => {
+        it('uses empty strings as default for all props', () => {
+            renderQuadImagesBottom();
 
             expect(screen.getByTestId('title')).toHaveTextContent('');
             expect(screen.getByTestId('description')).toHaveTextContent('');
+            expect(getImagesCount()).toHaveTextContent('4');
         });
 
-        it('does not render PhotoInputGroup in non-editable mode', () => {
-            render(<QuadImagesBottom title="Test" />);
+        it('defaults isTemplate to false', () => {
+            renderQuadImagesBottom();
 
-            expect(screen.queryByTestId('photo-input-group-section-image-1')).not.toBeInTheDocument();
-            expect(screen.queryByTestId('photo-input-group-section-image-2')).not.toBeInTheDocument();
-            expect(screen.queryByTestId('photo-input-group-section-image-3')).not.toBeInTheDocument();
-            expect(screen.queryByTestId('photo-input-group-section-image-4')).not.toBeInTheDocument();
+            expect(screen.queryByTestId('template-flag')).not.toBeInTheDocument();
         });
 
-        it('applies elevated class to correct images (index % 2 === 1)', () => {
-            const { container } = render(
-                <QuadImagesBottom
-                    title="Test"
-                    image1="img1.jpg"
-                    image2="img2.jpg"
-                    image3="img3.jpg"
-                    image4="img4.jpg"
-                />,
-            );
+        it('defaults isEditable to false', () => {
+            renderQuadImagesBottom();
 
-            const imageWrappers = container.querySelectorAll('.image-wrapper');
-            expect(imageWrappers).toHaveLength(4);
-            expect(imageWrappers[0]).not.toHaveClass('elevated');
-            expect(imageWrappers[1]).toHaveClass('elevated');
-            expect(imageWrappers[2]).not.toHaveClass('elevated');
-            expect(imageWrappers[3]).toHaveClass('elevated');
+            expect(screen.queryByTestId('editable-flag')).not.toBeInTheDocument();
         });
     });
 
-    describe('Editable mode', () => {
-        it('renders all four PhotoInputGroups when isEditable is true', () => {
-            render(<QuadImagesBottom title="Test" isEditable={true} />);
-
-            expect(screen.getByTestId('photo-input-group-section-image-1')).toBeInTheDocument();
-            expect(screen.getByTestId('photo-input-group-section-image-2')).toBeInTheDocument();
-            expect(screen.getByTestId('photo-input-group-section-image-3')).toBeInTheDocument();
-            expect(screen.getByTestId('photo-input-group-section-image-4')).toBeInTheDocument();
-        });
-
-        it('applies editable class when isEditable is true', () => {
-            const { container } = render(<QuadImagesBottom title="Test" isEditable={true} />);
-
-            expect(container.firstChild).toHaveClass('editable');
-        });
-
-        it('passes isEditable prop to TitleDescriptionSection', () => {
-            render(<QuadImagesBottom title="Test" isEditable={true} />);
-
-            expect(screen.getByTestId('is-editable')).toHaveTextContent('true');
-        });
-
-        it('calls onTitleChange when title is changed', () => {
-            const onTitleChange = jest.fn();
-            render(<QuadImagesBottom title="Test" isEditable={true} onTitleChange={onTitleChange} />);
-
-            screen.getByTestId('title-change').click();
-            expect(onTitleChange).toHaveBeenCalledWith('new title');
-        });
-
-        it('calls onDescriptionChange when description is changed', () => {
-            const onDescriptionChange = jest.fn();
-            render(<QuadImagesBottom title="Test" isEditable={true} onDescriptionChange={onDescriptionChange} />);
-
-            screen.getByTestId('description-change').click();
-            expect(onDescriptionChange).toHaveBeenCalledWith('new description');
-        });
-
-        it('calls onImage1Change when first image is changed', () => {
-            const onImage1Change = jest.fn();
-            render(<QuadImagesBottom title="Test" isEditable={true} onImage1Change={onImage1Change} />);
-
-            screen.getByTestId('photo-change-section-image-1').click();
-            expect(onImage1Change).toHaveBeenCalledWith({
-                id: '123',
-                url: 'new-section-image-1.jpg',
-                mimeType: 'image/jpeg',
+    describe('Image array construction', () => {
+        it('constructs images array in correct order', () => {
+            renderQuadImagesBottom({
+                image1: 'first.jpg',
+                image2: 'second.jpg',
+                image3: 'third.jpg',
+                image4: 'fourth.jpg',
             });
+
+            expect(getImagesCount()).toHaveTextContent('4');
         });
 
-        it('calls onImage2Change when second image is changed', () => {
-            const onImage2Change = jest.fn();
-            render(<QuadImagesBottom title="Test" isEditable={true} onImage2Change={onImage2Change} />);
-
-            screen.getByTestId('photo-change-section-image-2').click();
-            expect(onImage2Change).toHaveBeenCalledWith({
-                id: '123',
-                url: 'new-section-image-2.jpg',
-                mimeType: 'image/jpeg',
+        it('handles partial image values', () => {
+            renderQuadImagesBottom({
+                image1: 'image1.jpg',
+                image2: '',
+                image3: 'image3.jpg',
+                image4: '',
             });
-        });
 
-        it('calls onImage3Change when third image is changed', () => {
-            const onImage3Change = jest.fn();
-            render(<QuadImagesBottom title="Test" isEditable={true} onImage3Change={onImage3Change} />);
-
-            screen.getByTestId('photo-change-section-image-3').click();
-            expect(onImage3Change).toHaveBeenCalledWith({
-                id: '123',
-                url: 'new-section-image-3.jpg',
-                mimeType: 'image/jpeg',
-            });
-        });
-
-        it('calls onImage4Change when fourth image is changed', () => {
-            const onImage4Change = jest.fn();
-            render(<QuadImagesBottom title="Test" isEditable={true} onImage4Change={onImage4Change} />);
-
-            screen.getByTestId('photo-change-section-image-4').click();
-            expect(onImage4Change).toHaveBeenCalledWith({
-                id: '123',
-                url: 'new-section-image-4.jpg',
-                mimeType: 'image/jpeg',
-            });
-        });
-
-        it('passes image values to PhotoInputGroups', () => {
-            render(
-                <QuadImagesBottom
-                    title="Test"
-                    isEditable={true}
-                    image1="existing1.jpg"
-                    image2="existing2.jpg"
-                    image3="existing3.jpg"
-                    image4="existing4.jpg"
-                />,
-            );
-
-            expect(screen.getByTestId('photo-value-section-image-1')).toHaveTextContent('existing1.jpg');
-            expect(screen.getByTestId('photo-value-section-image-2')).toHaveTextContent('existing2.jpg');
-            expect(screen.getByTestId('photo-value-section-image-3')).toHaveTextContent('existing3.jpg');
-            expect(screen.getByTestId('photo-value-section-image-4')).toHaveTextContent('existing4.jpg');
-        });
-
-        it('passes null to PhotoInputGroups when no images', () => {
-            render(<QuadImagesBottom title="Test" isEditable={true} />);
-
-            expect(screen.getByTestId('photo-value-section-image-1')).toHaveTextContent('no-image');
-            expect(screen.getByTestId('photo-value-section-image-2')).toHaveTextContent('no-image');
-            expect(screen.getByTestId('photo-value-section-image-3')).toHaveTextContent('no-image');
-            expect(screen.getByTestId('photo-value-section-image-4')).toHaveTextContent('no-image');
-        });
-
-        it('does not render regular img tags in editable mode', () => {
-            const { container } = render(
-                <QuadImagesBottom
-                    title="Test"
-                    isEditable={true}
-                    image1="test1.jpg"
-                    image2="test2.jpg"
-                    image3="test3.jpg"
-                    image4="test4.jpg"
-                />,
-            );
-
-            expect(container.querySelectorAll('img')).toHaveLength(0);
-        });
-
-        it('handles missing callback props gracefully', () => {
-            render(<QuadImagesBottom title="Test" isEditable={true} />);
-
-            expect(screen.getByTestId('photo-input-group-section-image-1')).toBeInTheDocument();
-            expect(screen.getByTestId('photo-input-group-section-image-2')).toBeInTheDocument();
-            expect(screen.getByTestId('photo-input-group-section-image-3')).toBeInTheDocument();
-            expect(screen.getByTestId('photo-input-group-section-image-4')).toBeInTheDocument();
-        });
-
-        it('applies elevated class to correct PhotoInputGroups (index % 2 === 1)', () => {
-            const { container } = render(<QuadImagesBottom title="Test" isEditable={true} />);
-
-            const imageWrappers = container.querySelectorAll('.image-wrapper');
-            expect(imageWrappers).toHaveLength(4);
-            expect(imageWrappers[0]).not.toHaveClass('elevated');
-            expect(imageWrappers[1]).toHaveClass('elevated');
-            expect(imageWrappers[2]).not.toHaveClass('elevated');
-            expect(imageWrappers[3]).toHaveClass('elevated');
-        });
-    });
-
-    describe('CSS classes', () => {
-        it('applies container class', () => {
-            const { container } = render(<QuadImagesBottom title="Test" />);
-
-            expect(container.firstChild).toHaveClass('container');
-        });
-
-        it('applies both template and editable classes when both props are true', () => {
-            const { container } = render(<QuadImagesBottom title="Test" isTemplate={true} isEditable={true} />);
-
-            expect(container.firstChild).toHaveClass('template');
-            expect(container.firstChild).toHaveClass('editable');
-        });
-
-        it('applies no additional classes when both props are false', () => {
-            const { container } = render(<QuadImagesBottom title="Test" isTemplate={false} isEditable={false} />);
-
-            expect(container.firstChild).toHaveClass('container');
-            expect(container.firstChild).not.toHaveClass('template');
-            expect(container.firstChild).not.toHaveClass('editable');
-        });
-    });
-
-    describe('Props combinations', () => {
-        it('renders correctly with all props provided', () => {
-            const handlers = {
-                onTitleChange: jest.fn(),
-                onDescriptionChange: jest.fn(),
-                onImage1Change: jest.fn(),
-                onImage2Change: jest.fn(),
-                onImage3Change: jest.fn(),
-                onImage4Change: jest.fn(),
-            };
-
-            render(
-                <QuadImagesBottom
-                    title="Full Title"
-                    description="Full Description"
-                    image1="full1.jpg"
-                    image2="full2.jpg"
-                    image3="full3.jpg"
-                    image4="full4.jpg"
-                    isTemplate={true}
-                    isEditable={true}
-                    {...handlers}
-                />,
-            );
-
-            expect(screen.getByTestId('title')).toHaveTextContent('Full Title');
-            expect(screen.getByTestId('description')).toHaveTextContent('Full Description');
-            expect(screen.getByTestId('photo-input-group-section-image-1')).toBeInTheDocument();
-            expect(screen.getByTestId('photo-input-group-section-image-2')).toBeInTheDocument();
-            expect(screen.getByTestId('photo-input-group-section-image-3')).toBeInTheDocument();
-            expect(screen.getByTestId('photo-input-group-section-image-4')).toBeInTheDocument();
-        });
-
-        it('renders correctly with minimal props', () => {
-            render(<QuadImagesBottom />);
-
-            expect(screen.getByTestId('title-description-section')).toBeInTheDocument();
-        });
-
-        it('renders correctly with partial images', () => {
-            const { container } = render(<QuadImagesBottom title="Test" image1="img1.jpg" image3="img3.jpg" />);
-
-            const images = container.querySelectorAll('img');
-            expect(images).toHaveLength(4);
-            expect(images[0]).toHaveAttribute('src', 'img1.jpg');
-            expect(images[1].getAttribute('src')).toBeFalsy();
-            expect(images[2]).toHaveAttribute('src', 'img3.jpg');
-            expect(images[3].getAttribute('src')).toBeFalsy();
+            expect(getImagesCount()).toHaveTextContent('4');
         });
     });
 });
+

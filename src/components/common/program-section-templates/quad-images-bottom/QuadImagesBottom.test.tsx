@@ -1,3 +1,4 @@
+import { render } from '@testing-library/react';
 import { QuadImagesBottom, QuadImagesBottomProps } from './QuadImagesBottom';
 import { createImagesBottomTestSuite } from '../shared/test-utils/imagesBottomTestFactory';
 
@@ -50,4 +51,40 @@ createImagesBottomTestSuite<QuadImagesBottomProps>({
         editableImageMaxHeight: 390,
         editableImageMaxWidth: 360,
     },
+});
+
+describe('QuadImagesBottom branch coverage', () => {
+    const baseProps: QuadImagesBottomProps = {
+        title: 'Test Title',
+        description: 'Test Description',
+        image1: 'img1.png',
+        image2: 'img2.png',
+        image3: 'img3.png',
+        image4: 'img4.png',
+        isTemplate: false,
+        isEditable: false,
+    };
+
+    it('renders with isTemplate=true', () => {
+        render(<QuadImagesBottom {...baseProps} isTemplate={true} />);
+    });
+
+    it('renders with isEditable=true', () => {
+        render(<QuadImagesBottom {...baseProps} isEditable={true} />);
+    });
+
+    it('renders with only one, two, or three images', () => {
+        render(<QuadImagesBottom {...baseProps} image2={''} image3={''} image4={''} />);
+        render(<QuadImagesBottom {...baseProps} image1={''} image3={''} image4={''} />);
+        render(<QuadImagesBottom {...baseProps} image1={''} image2={''} image4={''} />);
+        render(<QuadImagesBottom {...baseProps} image1={''} image2={''} image3={''} />);
+    });
+
+    it('renders with no images', () => {
+        render(<QuadImagesBottom {...baseProps} image1={''} image2={''} image3={''} image4={''} />);
+    });
+
+    it('renders with no title/description', () => {
+        render(<QuadImagesBottom {...baseProps} title={''} description={''} />);
+    });
 });

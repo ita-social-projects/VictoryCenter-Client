@@ -43,29 +43,6 @@ describe('renderProgramSection', () => {
         onImage4Change: jest.fn(),
     };
 
-    // Mock all section components
-    jest.mock('@/components/common/program-section-templates/quad-images-bottom/QuadImagesBottom', () => ({
-        QuadImagesBottom: (props: any) => <div data-testid="QuadImagesBottom" {...props} />,
-    }));
-    jest.mock('@/components/common/program-section-templates/triple-images-bottom/TripleImagesBottom', () => ({
-        TripleImagesBottom: (props: any) => <div data-testid="TripleImagesBottom" {...props} />,
-    }));
-    jest.mock('@/components/common/program-section-templates/dual-images-bottom/DualImagesBottom', () => ({
-        DualImagesBottom: (props: any) => <div data-testid="DualImagesBottom" {...props} />,
-    }));
-    jest.mock('@/components/common/program-section-templates/text-only/TextOnly', () => ({
-        TextOnly: (props: any) => <div data-testid="TextOnly" {...props} />,
-    }));
-    jest.mock('@/components/common/program-section-templates/single-image-top/SingleImageTop', () => ({
-        SingleImageTop: (props: any) => <div data-testid="SingleImageTop" {...props} />,
-    }));
-    jest.mock('@/components/common/program-section-templates/single-image-bottom/SingleImageBottom', () => ({
-        SingleImageBottom: (props: any) => <div data-testid="SingleImageBottom" {...props} />,
-    }));
-    jest.mock('@/components/common/program-section-templates/single-image-right/SingleImageRight', () => ({
-        SingleImageRight: (props: any) => <div data-testid="SingleImageRight" {...props} />,
-    }));
-
     const templates = [
         { id: ProgramSectionTemplate.QuadImagesBottom, testId: 'QuadImagesBottom' },
         { id: ProgramSectionTemplate.TripleImagesBottom, testId: 'TripleImagesBottom' },

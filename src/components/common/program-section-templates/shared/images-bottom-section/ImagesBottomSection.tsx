@@ -5,7 +5,7 @@ import { ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import baseStyles from './ImagesBottomSection.module.scss';
 import quadStyles from '../../quad-images-bottom/QuadImagesBottom.module.scss';
-import tripleStyles from '../../tripple-images-bottom/TrippleImagesBottom.module.scss';
+import tripleStyles from '../../triple-images-bottom/TripleImagesBottom.module.scss';
 import dualStyles from '../../dual-images-bottom/DualImagesBottom.module.scss';
 
 const stylesMap = {

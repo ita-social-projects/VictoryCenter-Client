@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
-interface ImageConfig {
+interface ExpectedImageConfig {
     imageCount: number;
     gridColumns: number;
     elevatedIndices: number[];
@@ -18,7 +18,7 @@ interface TestConfig<TProps> {
     createDefaultProps: () => TProps;
     createImageProps: (images: string[]) => Partial<TProps>;
     createImageHandlers: (handlers: Array<jest.Mock>) => Partial<TProps>;
-    expectedConfig: ImageConfig;
+    expectedConfig: ExpectedImageConfig;
 }
 
 // Element getters

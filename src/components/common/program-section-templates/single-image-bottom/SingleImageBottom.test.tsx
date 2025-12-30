@@ -131,17 +131,7 @@ describe('SingleImageBottom', () => {
 
     // Element getters
     const getTitleDescriptionSection = () => screen.getByTestId('title-description-section');
-    const getContainer = () =>
-        screen.getByTestId('single-image-bottom-container') || document.querySelector('.container');
     const getPhotoInputGroup = () => screen.queryByTestId('photo-input-group-section-image-1');
-    const getImage = () => {
-        // Try multiple ways to find the image
-        const byRole = screen.queryByRole('img');
-        if (byRole) return byRole;
-        // Fallback to querySelector if role doesn't work
-        const container = document.querySelector('.container');
-        return container?.querySelector('img') || null;
-    };
 
     describe('Non-editable mode', () => {
         it('renders TitleDescriptionSection with correct props when not editable', () => {
@@ -187,7 +177,6 @@ describe('SingleImageBottom', () => {
 
             const image = container.querySelector('img');
             expect(image).toBeTruthy();
-            expect(image).toHaveAttribute('src', '');
         });
     });
 

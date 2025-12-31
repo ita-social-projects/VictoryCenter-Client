@@ -15,7 +15,7 @@ interface RightSectionProps {
 }
 
 export const RightSection = ({ donateData, error }: RightSectionProps) => {
-    const { t, i18n } = useTranslation('donatePage');
+    const { t } = useTranslation('donatePage');
     const getAvailableCurrencies = () => {
         if (!donateData) return [];
 
@@ -60,7 +60,7 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
                 setActiveTab(Currency.UAH);
             }
         }
-    }, [i18n.language, availableCurrencies, isManualChange]);
+    }, [currentLang, availableCurrencies, isManualChange]);
 
     useEffect(() => {
         if (availableCurrencies.length > 0 && !availableCurrencies.includes(activeTab)) {

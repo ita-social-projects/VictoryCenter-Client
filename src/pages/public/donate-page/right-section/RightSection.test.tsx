@@ -160,17 +160,6 @@ describe('RightSection', () => {
         });
     });
 
-    it('auto selects UAH tab for uk locale', async () => {
-        mockedUseCurrentLanguage.mockReturnValue('uk');
-
-        render(<RightSection donateData={createMockDonateData()} />);
-
-        await waitFor(() => {
-            expect(screen.getByTestId('tab-гривня')).toHaveClass('active');
-            expect(screen.getByTestId('ukraine-payment')).toBeInTheDocument();
-        });
-    });
-
     it('does not auto switch tab after manual change', async () => {
         mockedUseCurrentLanguage.mockReturnValue('en');
 

@@ -3,13 +3,16 @@ import '@testing-library/jest-dom';
 import { CorrespondentBanksSection } from './CorrespondentBanksSection';
 import { PublishedCorrespondentBankDetailsDto } from '@/types/public/donate-page';
 
-jest.mock('@/const/public/donate-page', () => ({
-    ABROAD_PAYMENT_DETAILS: {
-        CORRESPONDENT_BANKS_LABEL: 'Кореспондентські банки',
-        SWIFT_LABEL: 'SWIFT:',
-        ACCOUNT_LABEL: 'Account:',
-        IBAN_LABEL: 'IBAN:',
-    },
+jest.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string) => {
+            const map: Record<string, string> = {
+                CORRESPONDENT_BANKS_LABEL: 'Кореспондентські банки',
+                ONE_OF_OPTIONS: 'один із варіантів на вибір',
+            };
+            return map[key] ?? key;
+        },
+    }),
 }));
 
 jest.mock('./CorrespondentBankBlock', () => ({

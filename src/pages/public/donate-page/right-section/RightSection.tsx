@@ -44,8 +44,11 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
 
     const availableCurrencies = getAvailableCurrencies();
     const [activeTab, setActiveTab] = useState<Currency>(availableCurrencies[0] || Currency.UAH);
+    const [isManualChange, setIsManualChange] = useState(false);
 
     useEffect(() => {
+        if (isManualChange) return;
+
         const currentLang = i18n.language;
 
         if (currentLang === 'en') {
@@ -112,7 +115,14 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
         <div className="rightSection">
             <div className="locationToggleContainer">
                 <div className="switch">
-                    <Tabs activeTab={activeTab} setActiveTab={setActiveTab} tabs={tabs} />
+                    <Tabs
+                        activeTab={activeTab}
+                        setActiveTab={(tab) => {
+                            setIsManualChange(true);
+                            setActiveTab(tab);
+                        }}
+                        tabs={tabs}
+                    />
                 </div>
             </div>
             <div className="donatePaymentDetails">

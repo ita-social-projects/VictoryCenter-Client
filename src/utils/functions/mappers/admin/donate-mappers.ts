@@ -21,17 +21,7 @@ export function mapToUpdateUahBankDetails(dto: UahBankDetailsDto): UpdateUahBank
 }
 
 export function mapToCreateForeignBankDetails(dto: ForeignBankDetailsDto): CreateForeignBankDetails {
-    const { id: _id, correspondentBanks, ...createData } = dto;
-
-    if (correspondentBanks && correspondentBanks.length > 0) {
-        return {
-            ...createData,
-            correspondentBanks: correspondentBanks.map(
-                ({ id: _id, foreignBankDetailsId: _foreignBankDetailsId, ...bank }) => bank,
-            ),
-        };
-    }
-
+    const { id: _id, correspondentBanks: _correspondentBanks, ...createData } = dto;
     return createData;
 }
 

@@ -8,8 +8,7 @@
     aspect-ratio: 1330 / 511;
     align-items: flex-start;
     justify-content: space-between;
-    padding-top: 9vw;
-    gap: 3vw;
+    gap: 3rem;
 }
 
 .title-section {
@@ -40,12 +39,12 @@
 
 
 .template .title {
-    font-size: 2vw;
+    font-size: clamp(1rem, 2vw, 2.5rem);
 }
 
 .template .description {
-    font-size: 0.9vw;
-    line-height: 1.3vw;
+    font-size: clamp(1rem, 0.9vw, 1.5rem);
+    line-height: clamp(1rem, 1.3vw, 1.5rem);
 }
 
 @media (max-width: 1024px) {

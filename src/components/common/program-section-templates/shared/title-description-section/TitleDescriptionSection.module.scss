@@ -23,7 +23,7 @@
 
 .container.editable {
     padding: 8rem 6rem 0 6rem;
-    gap: 15vw;
+    gap: 15%;
     justify-content: center;
 
     .title-section {
@@ -42,11 +42,11 @@
 
 .template {
     .title{
-        font-size: 1.5vw;
+        font-size: clamp(1rem, 1.5vw, 2rem);
     }
     .description {
-        font-size: clamp(6px, 0.9vw, 16px);
-        line-height: clamp(6px, 0.9vw, 16px);
+        font-size: clamp(0.6rem, 0.9vw, 1rem);
+        line-height: clamp(0.6rem, 0.9vw, 1rem);
     }
 }
 

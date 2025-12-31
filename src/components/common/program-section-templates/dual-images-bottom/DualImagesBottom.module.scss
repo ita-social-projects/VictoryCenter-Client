@@ -1,6 +1,6 @@
 .container {
     aspect-ratio: 1330 / 1235;
-    gap: 1vw;
+    gap: 1rem;
 }
 
 .top-section {
@@ -27,7 +27,7 @@
 }
 
 .container.editable {
-    gap: 2vw;
+    gap: 2rem;
 
     .images-grid {
         grid-template-columns: repeat(2, 1fr);

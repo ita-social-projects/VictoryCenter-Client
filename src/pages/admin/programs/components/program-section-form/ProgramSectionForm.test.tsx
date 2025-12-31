@@ -105,7 +105,6 @@ describe('ProgramSectionForm', () => {
                     description: null,
                     image: mockImage('img1', 'img1-url'),
                 },
-                // image exists but doesn't contain url -> ternary should produce undefined
                 {
                     contentType: ContentType.Image,
                     order: 3,
@@ -113,9 +112,7 @@ describe('ProgramSectionForm', () => {
                     description: null,
                     image: { id: 'no-url' } as any,
                 },
-                // image explicitly null -> should produce undefined
                 { contentType: ContentType.Image, order: 4, title: null, description: null, image: null },
-                // order 5 omitted entirely -> should produce undefined
             ],
         });
 

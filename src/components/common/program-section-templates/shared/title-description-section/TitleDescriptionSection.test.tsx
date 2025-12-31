@@ -95,7 +95,6 @@ describe('TitleDescriptionSection', () => {
         if (text) {
             return screen.queryByText(text);
         }
-        // Find description paragraph by looking for the description class or by being a direct child
         const container = document.querySelector('.container');
         return container?.querySelector('.description') || null;
     };

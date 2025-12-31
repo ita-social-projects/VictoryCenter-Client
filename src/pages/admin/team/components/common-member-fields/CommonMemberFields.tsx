@@ -23,9 +23,9 @@ export type CommonFields = {
 };
 
 export type CommonErrors = {
-    fullName?: string;
+    fullName?: string[];
     description?: string;
-    [key: string]: string | undefined;
+    [key: string]: string | string[] | undefined;
 };
 
 export const CommonMemberFields = <TFormData extends CommonFields, TErrorState extends CommonErrors>({
@@ -51,7 +51,13 @@ export const CommonMemberFields = <TFormData extends CommonFields, TErrorState e
                     maxLength={TEAM_MEMBER_VALIDATION.fullName.max}
                     disabled={isSubmitting || formDisabled}
                 />
-                {errors.fullName && <p className={styles.error}>{errors.fullName}</p>}
+                {errors.fullName &&
+                    Array.isArray(errors.fullName) &&
+                    errors.fullName.map((error, index) => (
+                        <p key={index} className={styles.error}>
+                            {error}
+                        </p>
+                    ))}
             </div>
 
             <div className={styles['form-group']}>

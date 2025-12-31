@@ -108,7 +108,7 @@ describe('CommonMemberFields', () => {
     it('shows validation errors when provided', () => {
         renderComponent({
             errors: {
-                fullName: 'Invalid full name',
+                fullName: ['Invalid full name'],
                 description: 'Description too short',
             },
         });

@@ -63,7 +63,9 @@ jest.mock('../common-member-fields/CommonMemberFields', () => ({
                 disabled={isSubmitting || formDisabled}
             />
 
-            {errors?.fullName && <span>{errors.fullName}</span>}
+            {errors?.fullName &&
+                Array.isArray(errors.fullName) &&
+                errors.fullName.map((error: string, index: number) => <span key={index}>{error}</span>)}
             {errors?.description && <span>{errors.description}</span>}
         </div>
     ),
@@ -126,17 +128,18 @@ describe('MemberForm', () => {
         });
     });
 
-    it('shows validation errors on blur for invalid full name', () => {
+    it('shows multiple validation errors on blur for invalid full name', () => {
         const onSubmit = jest.fn();
         const ref = createRef<TeamMemberFormRef>();
 
         render(<MemberForm ref={ref} categories={categories} onSubmit={onSubmit} />);
 
         const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
-        fireEvent.change(fullNameInput, { target: { value: '123' } });
+        fireEvent.change(fullNameInput, { target: { value: 'John123@' } });
         fireEvent.blur(fullNameInput);
 
-        expect(screen.getByText(TEAM_MEMBER_VALIDATION.fullName.getPatternError())).toBeInTheDocument();
+        expect(screen.getByText(TEAM_MEMBER_VALIDATION.fullName.getDigitsError())).toBeInTheDocument();
+        expect(screen.getByText(TEAM_MEMBER_VALIDATION.fullName.getInvalidCharsError())).toBeInTheDocument();
     });
 
     it('submit: calls onSubmit for Draft when valid, but blocks Published without image/description', async () => {

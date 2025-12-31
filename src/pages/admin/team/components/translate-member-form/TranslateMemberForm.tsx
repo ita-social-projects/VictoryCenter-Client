@@ -15,7 +15,11 @@ export interface TranslateTeamMemberFormValues {
     fullName: string;
     description: string;
 }
-export type TranslateTeamMemberFormErrorState = Partial<Record<keyof TranslateTeamMemberFormValues, string>>;
+export interface TranslateTeamMemberFormErrorState {
+    fullName?: string[];
+    description?: string;
+    [key: string]: string | string[] | undefined;
+}
 export interface TranslateTeamMemberFormRef {
     submit: (status?: VisibilityStatus) => Promise<void>;
     isValid: () => boolean;

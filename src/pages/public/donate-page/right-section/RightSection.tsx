@@ -7,6 +7,7 @@ import { UkrainePaymentDetails } from './ukraine-payment-details/UkrainePaymentD
 import { Currency, DonatePageData } from '@/types/public/donate-page';
 import { useTranslation } from 'react-i18next';
 import { currencyToString } from '@/utils/functions/mappers/public/donate/donate';
+import { useCurrentLanguage } from '@/hooks/common/use-current-language/useCurrentLanguage';
 
 interface RightSectionProps {
     donateData: DonatePageData | null;
@@ -45,11 +46,10 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
     const availableCurrencies = getAvailableCurrencies();
     const [activeTab, setActiveTab] = useState<Currency>(availableCurrencies[0] || Currency.UAH);
     const [isManualChange, setIsManualChange] = useState(false);
+    const currentLang = useCurrentLanguage();
 
     useEffect(() => {
         if (isManualChange) return;
-
-        const currentLang = i18n.language;
 
         if (currentLang === 'en') {
             if (availableCurrencies.includes(Currency.USD)) {

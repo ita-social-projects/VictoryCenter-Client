@@ -9,6 +9,11 @@ import {
     PublishedSupportOptionsDto,
 } from '@/types/public/donate-page';
 import donatePageUk from '@/locales/uk/donate.json';
+import { useCurrentLanguage } from '@/hooks/common/use-current-language/useCurrentLanguage';
+
+jest.mock('@/hooks/common/use-current-language/useCurrentLanguage', () => ({
+    useCurrentLanguage: jest.fn(),
+}));
 
 jest.mock('./ukraine-payment-details/UkrainePaymentDetails', () => ({
     UkrainePaymentDetails: ({ bankDetails }: { bankDetails: PublishedUahBankDetailsDto[] }) => (
@@ -60,6 +65,8 @@ jest.mock('@/components/common/tabs/Tabs', () => ({
         </div>
     ),
 }));
+
+const mockedUseCurrentLanguage = useCurrentLanguage as jest.Mock;
 
 describe('RightSection', () => {
     const createMockUahBankDetails = (): PublishedUahBankDetailsDto[] => [
@@ -141,6 +148,39 @@ describe('RightSection', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+    });
+    it('auto selects USD tab for en locale', async () => {
+        mockedUseCurrentLanguage.mockReturnValue('en');
+
+        render(<RightSection donateData={createMockDonateData()} />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('tab-долар')).toHaveClass('active');
+            expect(screen.getByTestId('abroad-payment')).toBeInTheDocument();
+        });
+    });
+
+    it('auto selects UAH tab for uk locale', async () => {
+        mockedUseCurrentLanguage.mockReturnValue('uk');
+
+        render(<RightSection donateData={createMockDonateData()} />);
+
+        await waitFor(() => {
+            expect(screen.getByTestId('tab-гривня')).toHaveClass('active');
+            expect(screen.getByTestId('ukraine-payment')).toBeInTheDocument();
+        });
+    });
+
+    it('does not auto switch tab after manual change', async () => {
+        mockedUseCurrentLanguage.mockReturnValue('en');
+
+        render(<RightSection donateData={createMockDonateData()} />);
+
+        fireEvent.click(screen.getByTestId('tab-євро'));
+
+        await waitFor(() => {
+            expect(screen.getByTestId('tab-євро')).toHaveClass('active');
+        });
     });
 
     describe('error state', () => {

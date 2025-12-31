@@ -60,7 +60,7 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
                 setActiveTab(Currency.UAH);
             }
         }
-    }, [i18n.language, availableCurrencies]);
+    }, [i18n.language, availableCurrencies, isManualChange]);
 
     useEffect(() => {
         if (availableCurrencies.length > 0 && !availableCurrencies.includes(activeTab)) {

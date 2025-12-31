@@ -3,6 +3,7 @@ import footerEn from './footer.json';
 import aboutUsPageEn from './about-us.json';
 import programsPageEn from './programs.json';
 import donateEn from './donate.json';
+import reportsPageEn from './reports.json';
 import globalEn from './global.json';
 
-export { headerEn, footerEn, aboutUsPageEn, programsPageEn, donateEn, globalEn };
+export { headerEn, footerEn, aboutUsPageEn, programsPageEn, donateEn, reportsPageEn, globalEn };

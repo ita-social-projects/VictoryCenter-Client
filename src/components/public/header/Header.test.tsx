@@ -53,7 +53,7 @@ describe('Header', () => {
         );
         expect(screen.getByRole('link', { name: headerUk['REPORTING'] })).toHaveAttribute(
             'href',
-            PUBLIC_ROUTES.MOCK.FULL,
+            PUBLIC_ROUTES.REPORTS.FULL,
         );
         expect(screen.getByRole('link', { name: headerUk['HOW_TO_SUPPORT'] })).toHaveAttribute(
             'href',

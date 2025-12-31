@@ -7,7 +7,7 @@ export interface ProgramCategoryDto {
 
 export interface PublishedProgramDto {
     id: number;
-    image: Image | null;
+    previewImage: Image | null;
     name: string;
     description: string;
     categories: ProgramCategoryDto[];

@@ -1,0 +1,26 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.root {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+
+    padding: 24px 16px 32px;
+    border-bottom: 1px solid c.$grey-600;
+
+    color: c.$blue-900;
+
+    @media (min-width: 560px) {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        padding: 30px 16px;
+    }
+}
+
+.year {
+    @include type.body-1-bold;
+}

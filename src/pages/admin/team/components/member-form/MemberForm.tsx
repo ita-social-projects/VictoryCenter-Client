@@ -21,10 +21,10 @@ export interface TeamMemberFormValues {
 
 export interface TeamMemberFormErrorState {
     category?: string;
-    fullName?: string;
+    fullName?: string[];
     description?: string;
     image?: string;
-    [key: string]: string | undefined;
+    [key: string]: string | string[] | undefined;
 }
 
 export interface TeamMemberFormRef {

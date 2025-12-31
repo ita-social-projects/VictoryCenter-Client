@@ -84,7 +84,7 @@ export interface UpdatePartnersSectionDto {
 export interface UpdatePartnerBannerDto {
     title: string;
     description: string;
-    imageId: number;
+    imageId: number | null;
 }
 
 // Response DTO

@@ -10,7 +10,7 @@ jest.mock('@/assets/icons/arrow-up-right.svg', () => ({
 describe('ProgramCard', () => {
     const program: PublishedProgramDto = {
         id: 1,
-        image: {
+        previewImage: {
             id: 1,
             url: 'mocked-image',
             mimeType: 'mocked-mime-type',

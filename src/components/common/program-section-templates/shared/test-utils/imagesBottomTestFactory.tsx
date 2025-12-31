@@ -29,6 +29,14 @@ const buildAlternatingImages = (imageCount: number) => {
     return Array.from({ length: imageCount }, (_, i) => (i % 2 === 0 ? `image${i + 1}.jpg` : ''));
 };
 
+const createMockHandlers = (count: number): Array<jest.Mock> => {
+    const handlers: Array<jest.Mock> = [];
+    for (let i = 0; i < count; i += 1) {
+        handlers.push(jest.fn());
+    }
+    return handlers;
+};
+
 const parseJson = <T,>(json: string | null | undefined, fallback: T): T => {
     if (!json) return fallback;
     try {
@@ -178,7 +186,7 @@ export function createImagesBottomTestSuite<TProps extends Record<string, any>>(
 
         describe('Image handlers', () => {
             it(`creates image handlers array with all ${imageCount} handlers`, () => {
-                const handlers = Array.from({ length: imageCount }, () => jest.fn());
+                const handlers = createMockHandlers(imageCount);
                 const images = buildImages(imageCount, 'img');
 
                 const imageProps = createImageProps(images);

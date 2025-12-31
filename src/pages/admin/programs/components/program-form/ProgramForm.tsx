@@ -143,7 +143,6 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [setFormState],
         );
 
-        // Extend ref to add addSection and removeSection methods
         useImperativeHandle(
             ref,
             () => ({

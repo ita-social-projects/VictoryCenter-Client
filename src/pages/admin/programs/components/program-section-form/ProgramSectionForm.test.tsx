@@ -38,6 +38,10 @@ const defaultProps: ProgramSectionFormProps = {
 };
 
 describe('ProgramSectionForm', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
     it('renders editable section', () => {
         const { renderProgramSection } = require('@/utils/functions/render-program-section');
         renderProgramSection.mockReturnValue(<div data-testid="editable-section" />);
@@ -73,6 +77,72 @@ describe('ProgramSectionForm', () => {
         renderProgramSection.mockReturnValue(<div data-testid="editable-section" />);
         render(<ProgramSectionForm {...defaultProps} isDisabled={true} />);
         expect(screen.getByText('Відмінити')).toBeDisabled();
+    });
+
+    it('defaults isDisabled to false when omitted', () => {
+        const { renderProgramSection } = require('@/utils/functions/render-program-section');
+        renderProgramSection.mockReturnValue(<div data-testid="editable-section" />);
+
+        const { isDisabled: _isDisabled, ...propsWithoutIsDisabled } = defaultProps;
+        render(<ProgramSectionForm {...propsWithoutIsDisabled} />);
+
+        expect(screen.getByText('Відмінити')).not.toBeDisabled();
+    });
+
+    it('passes normalized title/description and images into renderProgramSection (branch coverage)', () => {
+        const { renderProgramSection } = require('@/utils/functions/render-program-section');
+        renderProgramSection.mockReturnValue(<div data-testid="editable-section" />);
+
+        const section = makeSection({
+            template: ProgramSectionTemplate.TextOnly,
+            contents: [
+                { contentType: ContentType.Title, order: 0, title: null, description: null, image: null },
+                { contentType: ContentType.Description, order: 1, title: null, description: undefined, image: null },
+                {
+                    contentType: ContentType.Image,
+                    order: 2,
+                    title: null,
+                    description: null,
+                    image: mockImage('img1', 'img1-url'),
+                },
+                // image exists but doesn't contain url -> ternary should produce undefined
+                {
+                    contentType: ContentType.Image,
+                    order: 3,
+                    title: null,
+                    description: null,
+                    image: { id: 'no-url' } as any,
+                },
+                // image explicitly null -> should produce undefined
+                { contentType: ContentType.Image, order: 4, title: null, description: null, image: null },
+                // order 5 omitted entirely -> should produce undefined
+            ],
+        });
+
+        render(<ProgramSectionForm {...defaultProps} section={section} onSectionChange={jest.fn()} />);
+
+        expect(renderProgramSection).toHaveBeenCalledTimes(1);
+        const callArg = renderProgramSection.mock.calls[0][0];
+
+        expect(callArg.templateId).toBe(section.template);
+        expect(callArg.isEditable).toBe(true);
+        expect(callArg.data).toEqual({
+            title: '',
+            description: '',
+            image1: 'img1-url',
+            image2: undefined,
+            image3: undefined,
+            image4: undefined,
+        });
+
+        expect(callArg.handlers).toEqual({
+            onTitleChange: expect.any(Function),
+            onDescriptionChange: expect.any(Function),
+            onImage1Change: expect.any(Function),
+            onImage2Change: expect.any(Function),
+            onImage3Change: expect.any(Function),
+            onImage4Change: expect.any(Function),
+        });
     });
 
     it('calls onSectionChange when title changes', () => {

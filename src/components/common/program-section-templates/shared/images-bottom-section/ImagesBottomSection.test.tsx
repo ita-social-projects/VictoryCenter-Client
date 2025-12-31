@@ -85,6 +85,29 @@ describe('ImagesBottomSection', () => {
         expect(callProps.description).toBe('');
     });
 
+    it('defaults isTemplate/isEditable/className and keeps optional handlers undefined when omitted', () => {
+        const minimalProps: ImagesBottomSectionProps = {
+            variant: 'dual',
+            images: ['img1.jpg', 'img2.jpg'],
+            imageHandlers: [
+                { key: '1', value: '', handler: jest.fn() },
+                { key: '2', value: '', handler: jest.fn() },
+            ],
+            config: baseConfig,
+        };
+
+        const { container } = render(<ImagesBottomSection {...minimalProps} />);
+
+        expect(TitleDescriptionSection).toHaveBeenCalledTimes(1);
+        const callProps = (TitleDescriptionSection as unknown as jest.Mock).mock.calls[0][0];
+        expect(callProps.isEditable).toBe(false);
+        expect(callProps.isTemplate).toBe(false);
+        expect(callProps.onTitleChange).toBeUndefined();
+        expect(callProps.onDescriptionChange).toBeUndefined();
+
+        expect(container.firstElementChild).not.toHaveClass('my-custom-class');
+    });
+
     it('renders images in view mode', () => {
         render(<ImagesBottomSection {...defaultProps} />);
         // Use role 'presentation' because <img alt=""> is role=presentation
@@ -92,6 +115,14 @@ describe('ImagesBottomSection', () => {
         expect(images).toHaveLength(2);
         expect(images[0]).toHaveAttribute('src', 'img1.jpg');
         expect(images[1]).toHaveAttribute('src', 'img2.jpg');
+    });
+
+    it('renders when an image string is empty (key fallback branch coverage)', () => {
+        render(<ImagesBottomSection {...defaultProps} images={['', 'img2.jpg']} />);
+
+        const wrappers = screen.getAllByTestId('image-wrapper');
+        expect(wrappers).toHaveLength(2);
+        expect(screen.getAllByRole('presentation')).toHaveLength(2);
     });
 
     it('wires PhotoInputGroup props for each editable image', () => {

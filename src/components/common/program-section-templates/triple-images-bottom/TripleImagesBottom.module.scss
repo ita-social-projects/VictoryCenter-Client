@@ -1,5 +1,9 @@
+$img-width: 480px;
+$img-height: 480px;
+$img-number: 3;
+
 .container {
-    aspect-ratio: 1330 / 1300;
+    aspect-ratio: 1440 / 1302;
 }
 
 .top-section {
@@ -8,21 +12,16 @@
 
 .bottom-section {
     flex: 0 0 51%;
-    justify-content: center;
+    justify-content: end;
+    padding-bottom: 1rem;
 }
 
 .images-grid {
-    grid-template-columns: repeat(3, 1fr);
-}
-
-.image-wrapper {
-    &[data-elevated='true'] {
-        transform: translateY(-5rem);
-    }
+    display: flex;
 }
 
 .image {
-    aspect-ratio: 480 / 480;
+    aspect-ratio: #{ $img-width } / #{ $img-height };
 }
 
 .container.editable {
@@ -33,12 +32,12 @@
     }
 
     .images-grid {
-        grid-template-columns: repeat(4, 1fr);
+        width: 100%;
     }
 
     .image-wrapper {
-        aspect-ratio: 480 / 480;
-        max-height: 480px;
-        max-width: 480px;
+        height: 100%;
+        max-width: #{ $img-width };
+        max-height: #{ $img-height };
     }
 }

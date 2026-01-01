@@ -1,5 +1,9 @@
+$img-width: 730px;
+$img-height: 430px;
+$img-number: 3;
+
 .container {
-    aspect-ratio: 1330 / 1235;
+    aspect-ratio: 1460 / 1235;
     gap: 1rem;
 }
 
@@ -9,17 +13,12 @@
 
 .bottom-section {
     flex: 0 0 49%;
-    justify-content: center;
+    justify-content: end;
+    padding-bottom: 1rem;
 }
 
 .images-grid {
-    grid-template-columns: repeat(2, 1fr);
-}
-
-.image-wrapper {
-    &[data-elevated='true'] {
-        transform: translateY(-5rem);
-    }
+    display: flex;
 }
 
 .image {
@@ -29,13 +28,9 @@
 .container.editable {
     gap: 2rem;
 
-    .images-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
     .image-wrapper {
-        aspect-ratio: 730 / 430;
-        max-height: 430px;
-        max-width: 730px;
+        aspect-ratio: #{ $img-width } / #{ $img-height };
+        max-width: #{ $img-width };
+        max-height: #{ $img-height };
     }
 }

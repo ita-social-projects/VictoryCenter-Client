@@ -45,7 +45,7 @@ createImagesBottomTestSuite<QuadImagesBottomProps>({
     expectedConfig: {
         imageCount: 4,
         gridColumns: 4,
-        elevatedIndices: [1, 3],
+        elevatedIndices: [0, 2],
         editableGridColumns: 4,
         editableImageMaxHeight: 390,
         editableImageMaxWidth: 360,

@@ -1,0 +1,66 @@
+.button-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: none;
+    z-index: 10;
+
+    :global(.arrow-button) {
+        pointer-events: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+
+        &:hover:not(:disabled) {
+            opacity: 0.7;
+        }
+
+        &:active:not(:disabled) {
+            opacity: 0.5;
+        }
+
+        &:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+    }
+
+    :global(.arrow-icon) {
+        display: none;
+    }
+
+    :global(.arrow-button)::before {
+        content: '';
+        display: block;
+        width: 32px;
+        height: 32px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    :global(.arrow-left) {
+        margin-left: 3vw;
+
+        &::before {
+            background-image: url('../../../../../../assets/icons/chevron-left.svg');
+        }
+    }
+
+    :global(.arrow-right) {
+        margin-right: 3vw;
+
+        &::before {
+            background-image: url('../../../../../../assets/icons/chevron-right.svg');
+        }
+    }
+}

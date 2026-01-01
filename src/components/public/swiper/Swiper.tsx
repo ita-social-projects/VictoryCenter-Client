@@ -14,6 +14,8 @@ interface SwiperProps<T> {
     slidesPerView?: number;
     breakpoints?: Record<number, { slidesPerView: number }>;
     showScrollbar?: boolean;
+    onSlideChange?: (activeIndex: number) => void;
+    className?: string;
 }
 
 export function Swiper<T>({
@@ -22,6 +24,8 @@ export function Swiper<T>({
     slidesPerView = 1,
     breakpoints = {},
     showScrollbar = false,
+    onSlideChange,
+    className = '',
 }: SwiperProps<T>) {
     const swiperRef = useRef<SwiperClass | null>(null);
     const [isPrevEnabled, setIsPrevEnabled] = useState(false);
@@ -34,11 +38,15 @@ export function Swiper<T>({
         swiperRef.current?.slideNext();
     }, []);
 
-    const handleInit = useCallback((swiper: SwiperClass) => {
-        swiperRef.current = swiper;
-        setIsPrevEnabled(!swiper.isBeginning);
-        setIsNextEnabled(!swiper.isEnd);
-    }, []);
+    const handleInit = useCallback(
+        (swiper: SwiperClass) => {
+            swiperRef.current = swiper;
+            setIsPrevEnabled(!swiper.isBeginning);
+            setIsNextEnabled(!swiper.isEnd);
+            onSlideChange?.(swiper.activeIndex);
+        },
+        [onSlideChange],
+    );
 
     const handleResize = useCallback((swiper: SwiperClass) => {
         setIsPrevEnabled(!swiper.isBeginning);
@@ -53,6 +61,15 @@ export function Swiper<T>({
         setIsPrevEnabled(true);
         setIsNextEnabled(true);
     }, []);
+
+    const handleSlideChangeInternal = useCallback(
+        (swiper: SwiperClass) => {
+            setIsPrevEnabled(!swiper.isBeginning);
+            setIsNextEnabled(!swiper.isEnd);
+            onSlideChange?.(swiper.activeIndex);
+        },
+        [onSlideChange],
+    );
 
     const swiperModules = useMemo(() => {
         const modules = [Navigation, Pagination];
@@ -71,6 +88,7 @@ export function Swiper<T>({
             <SwiperReact
                 modules={swiperModules}
                 onInit={handleInit}
+                onSlideChange={handleSlideChangeInternal}
                 onResize={handleResize}
                 onReachBeginning={handleReachBeginning}
                 onReachEnd={handleReachEnd}
@@ -83,12 +101,14 @@ export function Swiper<T>({
                     <SwiperSlide key={index}>{renderItem(item, index)}</SwiperSlide>
                 ))}
             </SwiperReact>
-            <div className="button-container">
+            <div className={`button-container ${className}`}>
                 <button
                     type="button"
                     onClick={handlePrev}
                     className="arrow-button arrow-left"
                     disabled={!isPrevEnabled}
+                    title="Previous slide"
+                    aria-label="Previous slide"
                 >
                     <ArrowLeft className="arrow-icon" />
                 </button>
@@ -97,6 +117,8 @@ export function Swiper<T>({
                     onClick={handleNext}
                     className="arrow-button arrow-right"
                     disabled={!isNextEnabled}
+                    title="Next slide"
+                    aria-label="Next slide"
                 >
                     <ArrowRight className="arrow-icon" />
                 </button>

@@ -3,11 +3,11 @@ import { Modal } from '@/components/common/modal/Modal';
 import { Button } from '@/components/admin/button/Button';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { Swiper } from '@/components/public/swiper/Swiper';
 import { renderProgramSection } from '@/utils/functions/render-program-section';
-import { ReactComponent as ChevronLeft } from '@/assets/icons/chevron-left.svg';
-import { ReactComponent as ChevronRight } from '@/assets/icons/chevron-right.svg';
 import placeholderImage from '@/assets/images/common/section-photo-placeholder.png';
 import styles from './AddSectionModal.module.scss';
+import swiperStyles from './AddSectionSwiper.module.scss';
 
 export interface AddSectionModalProps {
     isOpen: boolean;
@@ -28,22 +28,17 @@ const TEMPLATES = [
 export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectionModalProps) => {
     const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
 
-    const handlePrevious = () => {
-        setSelectedTemplateIndex((prev) => (prev === 0 ? TEMPLATES.length - 1 : prev - 1));
-    };
-
-    const handleNext = () => {
-        setSelectedTemplateIndex((prev) => (prev === TEMPLATES.length - 1 ? 0 : prev + 1));
-    };
-
     const handleSave = () => {
         const selectedTemplateId = TEMPLATES[selectedTemplateIndex];
         onSelectTemplate(selectedTemplateId);
         onClose();
     };
 
-    const renderSection = () => {
-        const templateId = TEMPLATES[selectedTemplateIndex];
+    const handleSlideChange = (activeIndex: number) => {
+        setSelectedTemplateIndex(activeIndex);
+    };
+
+    const renderSection = (templateId: ProgramSectionTemplate) => {
         return renderProgramSection({
             templateId,
             data: {
@@ -62,31 +57,19 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
         <Modal isOpen={isOpen} onClose={onClose} maxWidth="90vw">
             <Modal.Content>
                 <div className={styles.container}>
-                    <div className={styles['arrows-section']}>
-                        <button
-                            title="scroll-left-button"
-                            className={`${styles['chevron-button']} ${styles['chevron-left']}`}
-                            onClick={handlePrevious}
-                            type="button"
-                        >
-                            <ChevronLeft />
-                        </button>
-                    </div>
-                    <div className={styles['middle-section']}>
-                        <div className={styles['template-content']} data-testid="add-section-modal-content">
-                            {renderSection()}
-                        </div>
-                    </div>
-                    <div className={styles['arrows-section']}>
-                        <button
-                            title="scroll-right-button"
-                            className={`${styles['chevron-button']} ${styles['chevron-right']}`}
-                            onClick={handleNext}
-                            type="button"
-                        >
-                            <ChevronRight />
-                        </button>
-                    </div>
+                    <Swiper
+                        items={TEMPLATES}
+                        renderItem={(templateId) => (
+                            <div className={styles['middle-section']}>
+                                <div className={styles['template-content']} data-testid="add-section-modal-content">
+                                    {renderSection(templateId)}
+                                </div>
+                            </div>
+                        )}
+                        slidesPerView={1}
+                        onSlideChange={handleSlideChange}
+                        className={swiperStyles['button-container']}
+                    />
                 </div>
             </Modal.Content>
             <Modal.Actions>

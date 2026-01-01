@@ -13,6 +13,7 @@
 
 .image-wrapper {
     height: 100%;
+    aspect-ratio: 1330 / 680;
 }
 
 .image {
@@ -24,6 +25,7 @@
 
 .bottom-section {
     flex: 0 0 20%;
+    padding-top: 0;
 }
 
 .container.editable {
@@ -40,7 +42,6 @@
     }
 
     .image-wrapper {
-        aspect-ratio: 1330 / 680;
         width: 100%;
         max-width: 1330px;
         max-height: 680px;

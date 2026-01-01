@@ -7,17 +7,17 @@
 }
 
 .top-section {
-    padding: 2rem;
-    flex: 40% 0 0;
+    flex: 0 0 40%;
 }
 
 .bottom-section {
-    flex: 60% 0 0;
+    flex: 0 0 60%;
     display: flex;
 }
 
 .image-wrapper {
     height: 100%;
+    aspect-ratio: 1330 / 680;
 }
 
 .image {
@@ -38,7 +38,6 @@
     }
 
     .image-wrapper {
-        aspect-ratio: 1330 / 680;
         max-height: 680px;
 
         > div {

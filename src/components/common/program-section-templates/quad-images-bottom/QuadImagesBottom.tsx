@@ -24,7 +24,7 @@ const QUAD_IMAGES_CONFIG: ImagesBottomSectionConfig = {
     imageCount: 4,
     gridColumns: 4,
     imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.QUAD_IMAGES,
-    elevatedIndices: [1, 3],
+    elevatedIndices: [0, 2],
     imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
     editableGridColumns: 4,
     editableImageMaxHeight: 390,

@@ -9,8 +9,55 @@ import { ModalProps } from '@/components/common/modal/Modal';
 
 const mockRenderProgramSection = jest.fn((_: any) => <div data-testid="rendered-section" />);
 
+let mockSwiperActiveIndex = 0;
+let mockSwiperOnSlideChange: ((index: number) => void) | undefined;
+
 jest.mock('@/utils/functions/render-program-section', () => ({
     renderProgramSection: (args: any) => mockRenderProgramSection(args),
+}));
+
+jest.mock('@/components/public/swiper/Swiper', () => ({
+    Swiper: ({ items, renderItem, onSlideChange, className }: any) => {
+        mockSwiperOnSlideChange = onSlideChange;
+        // Initialize on first render
+        if (mockSwiperActiveIndex === -1) {
+            mockSwiperActiveIndex = 0;
+            setTimeout(() => onSlideChange?.(0), 0);
+        }
+
+        const handlePrev = () => {
+            mockSwiperActiveIndex = mockSwiperActiveIndex === 0 ? items.length - 1 : mockSwiperActiveIndex - 1;
+            mockSwiperOnSlideChange?.(mockSwiperActiveIndex);
+        };
+
+        const handleNext = () => {
+            mockSwiperActiveIndex = mockSwiperActiveIndex === items.length - 1 ? 0 : mockSwiperActiveIndex + 1;
+            mockSwiperOnSlideChange?.(mockSwiperActiveIndex);
+        };
+
+        return (
+            <div data-testid="swiper" className={className}>
+                {items.map((item: any, index: number) => (
+                    <div key={index} data-testid="swiper-slide">
+                        {renderItem(item, index)}
+                    </div>
+                ))}
+                <div className="button-container">
+                    <button
+                        type="button"
+                        onClick={handlePrev}
+                        className="arrow-button arrow-left"
+                        title="Previous slide"
+                    >
+                        <svg className="arrow-icon" />
+                    </button>
+                    <button type="button" onClick={handleNext} className="arrow-button arrow-right" title="Next slide">
+                        <svg className="arrow-icon" />
+                    </button>
+                </div>
+            </div>
+        );
+    },
 }));
 
 jest.mock('@/assets/icons/chevron-left.svg', () => ({
@@ -81,6 +128,8 @@ describe('AddSectionModal', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        mockSwiperActiveIndex = 0;
+        mockSwiperOnSlideChange = undefined;
     });
 
     it('should render when isOpen is true', () => {
@@ -125,43 +174,51 @@ describe('AddSectionModal', () => {
     it('should render left and right chevrons', () => {
         render(<AddSectionModal {...defaultProps} />);
 
-        expect(screen.getByTitle('scroll-left-button')).toBeInTheDocument();
-        expect(screen.getByTitle('scroll-right-button')).toBeInTheDocument();
+        expect(screen.getByTitle('Previous slide')).toBeInTheDocument();
+        expect(screen.getByTitle('Next slide')).toBeInTheDocument();
     });
 
     it('should render the modal content area', () => {
         render(<AddSectionModal {...defaultProps} />);
 
-        expect(screen.getByTestId('add-section-modal-content')).toBeInTheDocument();
+        expect(screen.getAllByTestId('add-section-modal-content')[0]).toBeInTheDocument();
     });
 
     it('cycles templates with wrap-around: previous at index 0 -> last, next at last -> 0', () => {
         render(<AddSectionModal {...defaultProps} />);
 
         expect(mockRenderProgramSection).toHaveBeenCalled();
-        expect(getLastTemplateId()).toBe(TEMPLATES[0]);
 
-        fireEvent.click(screen.getByTitle('scroll-left-button'));
-        expect(getLastTemplateId()).toBe(TEMPLATES[TEMPLATES.length - 1]);
+        fireEvent.click(screen.getByTitle('Previous slide'));
+        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION));
+        expect(mockOnSelectTemplate).toHaveBeenCalledWith(TEMPLATES[TEMPLATES.length - 1]);
 
-        fireEvent.click(screen.getByTitle('scroll-right-button'));
-        expect(getLastTemplateId()).toBe(TEMPLATES[0]);
+        mockOnSelectTemplate.mockClear();
+        mockSwiperActiveIndex = TEMPLATES.length - 1;
+
+        fireEvent.click(screen.getByTitle('Next slide'));
+        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION));
+        expect(mockOnSelectTemplate).toHaveBeenCalledWith(TEMPLATES[0]);
     });
 
     it('moves between adjacent templates: next increments, previous decrements', () => {
         render(<AddSectionModal {...defaultProps} />);
 
-        fireEvent.click(screen.getByTitle('scroll-right-button'));
-        expect(getLastTemplateId()).toBe(TEMPLATES[1]);
+        fireEvent.click(screen.getByTitle('Next slide'));
+        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION));
+        expect(mockOnSelectTemplate).toHaveBeenCalledWith(TEMPLATES[1]);
 
-        fireEvent.click(screen.getByTitle('scroll-left-button'));
-        expect(getLastTemplateId()).toBe(TEMPLATES[0]);
+        mockOnSelectTemplate.mockClear();
+        mockSwiperActiveIndex = 1;
+        fireEvent.click(screen.getByTitle('Previous slide'));
+        fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION));
+        expect(mockOnSelectTemplate).toHaveBeenCalledWith(TEMPLATES[0]);
     });
 
     it('selects the currently shown template when saving', () => {
         render(<AddSectionModal {...defaultProps} />);
 
-        fireEvent.click(screen.getByTitle('scroll-right-button'));
+        fireEvent.click(screen.getByTitle('Next slide'));
         fireEvent.click(screen.getByText(PROGRAMS_TEXT.BUTTON.CHOOSE_SECTION));
 
         expect(mockOnSelectTemplate).toHaveBeenCalledWith(TEMPLATES[1]);

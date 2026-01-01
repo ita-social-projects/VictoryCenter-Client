@@ -1,5 +1,9 @@
+$img-width: 360px;
+$img-height: 390px;
+$img-number: 4;
+
 .container {
-    aspect-ratio: 1330 / 1183;
+    aspect-ratio: 1440 / 1183;
     gap: 1rem;
 }
 
@@ -9,21 +13,16 @@
 
 .bottom-section {
     flex: 0 0 48%;
-    justify-content: flex-start;
+    justify-content: end;
+    padding-bottom: 1rem;
 }
 
 .images-grid {
-    grid-template-columns: repeat(4, 1fr);
+    display: flex;
 }
 
 .image-wrapper {
-    &[data-elevated='true'] {
-        transform: translateY(5rem);
-    }
-}
-
-.image {
-    aspect-ratio: 360 / 390;
+    aspect-ratio: #{ $img-width } / #{ $img-height };
 }
 
 .container.editable {
@@ -33,13 +32,9 @@
         height: 10px;
     }
 
-    .images-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-
     .image-wrapper {
-        aspect-ratio: 360 / 390;
-        max-height: 390px;
-        max-width: 360px;
+        aspect-ratio: #{ $img-width } / #{ $img-height };
+        max-width: #{ $img-width };
+        max-height: #{ $img-height };
     }
 }

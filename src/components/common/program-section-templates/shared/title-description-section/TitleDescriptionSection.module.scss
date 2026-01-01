@@ -1,11 +1,11 @@
 @import '@/assets/sass/mixins/typography.mixins';
 
 .container {
-    padding: 1.5rem 3rem;
+    padding: 5% 15%;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 2rem;
+    gap: 1rem;
 }
 
 .title {

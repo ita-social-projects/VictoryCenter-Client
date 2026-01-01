@@ -23,7 +23,7 @@ const TRIPLE_IMAGES_CONFIG: ImagesBottomSectionConfig = {
     gridColumns: 3,
     imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.TRIPLE_IMAGES,
     elevatedIndices: [0, 2],
-    imageLabel: COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE,
+    imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
     editableGridColumns: 4,
     editableImageMaxHeight: 480,
     editableImageMaxWidth: 480,

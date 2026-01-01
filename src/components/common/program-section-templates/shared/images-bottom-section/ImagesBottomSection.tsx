@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import cn from 'classnames';
+import { nanoid } from 'nanoid';
 import { TitleDescriptionSection } from '../title-description-section/TitleDescriptionSection';
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ImageValues } from '@/types/common/image';
@@ -63,6 +65,8 @@ export const ImagesBottomSection = ({
 }: ImagesBottomSectionProps) => {
     const variantStyles = stylesMap[variant];
 
+    const imageKeys = useMemo(() => Array.from({ length: images.length }, () => nanoid()), [images.length]);
+
     const cx = (name: string) =>
         cn(baseStyles[name as keyof typeof baseStyles], variantStyles[name as keyof typeof variantStyles]);
 
@@ -117,7 +121,7 @@ export const ImagesBottomSection = ({
                           ))
                         : images.map((image, index) => (
                               <div
-                                  key={`image-${index}`}
+                                  key={imageKeys[index]}
                                   className={cx('image-wrapper')}
                                   data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
                                   data-testid="image-wrapper"

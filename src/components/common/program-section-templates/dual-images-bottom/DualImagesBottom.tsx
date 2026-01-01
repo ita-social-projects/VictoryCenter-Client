@@ -21,7 +21,7 @@ const DUAL_IMAGES_CONFIG: ImagesBottomSectionConfig = {
     gridColumns: 2,
     imageConfig: PROGRAM_SECTION_IMAGE_CONFIGS.DUAL_IMAGES,
     elevatedIndices: [0],
-    imageLabel: COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE,
+    imageLabel: COMMON_TEXT_ADMIN.INPUT.ADD_FILE_HERE,
     editableImageMaxHeight: 430,
     editableImageMaxWidth: 730,
 };

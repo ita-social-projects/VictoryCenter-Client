@@ -25,7 +25,13 @@
 
 .bottom-section {
     flex: 0 0 20%;
-    padding-top: 0;
+    padding-top: 1vw;
+}
+
+.template {
+    .bottom-section {
+        padding-top: 5% 1%;
+    }
 }
 
 .container.editable {
@@ -38,7 +44,7 @@
     }
 
     .bottom-section {
-        padding: 0 8vw 0 8vw;
+        padding: 0vw 8vw 0 8vw;
     }
 
     .image-wrapper {

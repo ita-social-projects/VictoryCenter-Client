@@ -34,53 +34,40 @@ export const SingleImageBottom = ({
                 [styles.editable]: isEditable,
             })}
         >
-            {isEditable ? (
-                <>
-                    <TitleDescriptionSection
-                        title={title}
-                        description={description}
-                        className={styles['top-section']}
-                        isEditable={true}
-                        onTitleChange={onTitleChange}
-                        onDescriptionChange={onDescriptionChange}
-                    />
-                    <div className={styles['bottom-section']}>
-                        <div className={styles['image-wrapper']}>
-                            <PhotoInputGroup
-                                id="section-image-1"
-                                name="section-image-1"
-                                value={image1 ? { base64: image1, mimeType: '' } : null}
-                                onChange={onImage1Change || (() => {})}
-                                setError={() => {}}
-                                cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth}
-                                cropHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropHeight}
-                                minWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.minWidth}
-                                minHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.minHeight}
-                                imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
-                                imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                                    PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropHeight,
-                                    PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth,
-                                )}
-                                className="program-section-image-input"
-                            />
-                        </div>
-                    </div>
-                </>
-            ) : (
-                <>
-                    <TitleDescriptionSection
-                        title={title}
-                        description={description}
-                        className={styles['top-section']}
-                        isTemplate={isTemplate}
-                    />
-                    <div className={styles['bottom-section']}>
-                        <div className={styles['image-wrapper']}>
-                            <img src={image1 || undefined} alt="img1-of-single-image-bottom" className={styles.image} />
-                        </div>
-                    </div>
-                </>
-            )}
+            <TitleDescriptionSection
+                title={title}
+                description={description}
+                className={styles['top-section']}
+                isTemplate={isTemplate}
+                isEditable={isEditable}
+                onTitleChange={onTitleChange}
+                onDescriptionChange={onDescriptionChange}
+            />
+            <div className={styles['bottom-section']}>
+                <div className={styles['image-wrapper']}>
+                    {isEditable ? (
+                        <PhotoInputGroup
+                            id="section-image-1"
+                            name="section-image-1"
+                            value={image1 ? { base64: image1, mimeType: '' } : null}
+                            onChange={onImage1Change || (() => {})}
+                            setError={() => {}}
+                            cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth}
+                            cropHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropHeight}
+                            minWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.minWidth}
+                            minHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.minHeight}
+                            imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                            imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                                PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropHeight,
+                                PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth,
+                            )}
+                            className="program-section-image-input"
+                        />
+                    ) : (
+                        <img src={image1 || undefined} alt="img1-of-single-image-bottom" className={styles.image} />
+                    )}
+                </div>
+            </div>
         </div>
     );
 };

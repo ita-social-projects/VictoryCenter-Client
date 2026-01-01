@@ -34,53 +34,40 @@ export const SingleImageTop = ({
                 [styles.editable]: isEditable,
             })}
         >
-            {isEditable ? (
-                <>
-                    <div className={styles['top-section']}>
-                        <div className={styles['image-wrapper']}>
-                            <PhotoInputGroup
-                                id="section-image-1"
-                                name="section-image-1"
-                                value={null}
-                                onChange={onImage1Change || (() => {})}
-                                setError={() => {}}
-                                cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropWidth}
-                                cropHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropHeight}
-                                minWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.minWidth}
-                                minHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.minHeight}
-                                imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
-                                imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
-                                    PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropHeight,
-                                    PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropWidth,
-                                )}
-                                className="program-section-image-input"
-                            />
-                        </div>
-                    </div>
-                    <TitleDescriptionSection
-                        title={title}
-                        description={description}
-                        className={styles['bottom-section']}
-                        isEditable={true}
-                        onTitleChange={onTitleChange}
-                        onDescriptionChange={onDescriptionChange}
-                    />
-                </>
-            ) : (
-                <>
-                    <div className={styles['top-section']}>
-                        <div className={styles['image-wrapper']}>
-                            <img src={image1 || undefined} alt="" className={styles.image} />
-                        </div>
-                    </div>
-                    <TitleDescriptionSection
-                        title={title}
-                        description={description}
-                        className={styles['bottom-section']}
-                        isTemplate={isTemplate}
-                    />
-                </>
-            )}
+            <div className={styles['top-section']}>
+                <div className={styles['image-wrapper']}>
+                    {isEditable ? (
+                        <PhotoInputGroup
+                            id="section-image-1"
+                            name="section-image-1"
+                            value={null}
+                            onChange={onImage1Change || (() => {})}
+                            setError={() => {}}
+                            cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropWidth}
+                            cropHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropHeight}
+                            minWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.minWidth}
+                            minHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.minHeight}
+                            imageLabel={COMMON_TEXT_ADMIN.INPUT.DRAG_AND_DROP_FILE_HERE}
+                            imageSubText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
+                                PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropHeight,
+                                PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropWidth,
+                            )}
+                            className="program-section-image-input"
+                        />
+                    ) : (
+                        <img src={image1 || undefined} alt="" className={styles.image} />
+                    )}
+                </div>
+            </div>
+            <TitleDescriptionSection
+                title={title}
+                description={description}
+                className={styles['bottom-section']}
+                isTemplate={isTemplate}
+                isEditable={isEditable}
+                onTitleChange={onTitleChange}
+                onDescriptionChange={onDescriptionChange}
+            />
         </div>
     );
 };

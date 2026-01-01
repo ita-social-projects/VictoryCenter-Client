@@ -42,11 +42,12 @@
 
 .template {
     .title{
-        font-size: clamp(1rem, 1.5vw, 2rem);
+        font-size: clamp(3px, 1.5vw, 2rem);
+        line-height: clamp(3px, 0.9vw, 1rem);
     }
     .description {
-        font-size: clamp(0.6rem, 0.9vw, 1rem);
-        line-height: clamp(0.6rem, 0.9vw, 1rem);
+        font-size: clamp(3px, 0.9vw, 1rem);
+        line-height: clamp(3px, 0.9vw, 1rem);
     }
 }
 

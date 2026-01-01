@@ -117,7 +117,7 @@ export const ImagesBottomSection = ({
                           ))
                         : images.map((image, index) => (
                               <div
-                                  key={image ? `image-${image}` : `image-${index}`}
+                                  key={`image-${index}`}
                                   className={cx('image-wrapper')}
                                   data-elevated={config.elevatedIndices.includes(index) ? 'true' : undefined}
                                   data-testid="image-wrapper"

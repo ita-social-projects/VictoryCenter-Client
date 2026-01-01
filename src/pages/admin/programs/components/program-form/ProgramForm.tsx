@@ -109,7 +109,13 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [],
         );
 
-        const internalRef = useRef<any>(null);
+        interface InternalFormRef {
+            submit: (status: VisibilityStatus) => Promise<void>;
+            isValid: (isPublishing?: boolean) => boolean;
+            isDirty: () => boolean;
+        }
+
+        const internalRef = useRef<InternalFormRef | null>(null);
 
         const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
             ProgramFormValues,

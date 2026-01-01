@@ -340,7 +340,7 @@ describe('ProgramForm', () => {
             expect(ref.current?.isDirty()).toBe(false);
         });
 
-        it('should return false for isDirty when form matches initial data', () => {
+        it('should return false for isDirty when form differs from initial data', () => {
             const ref = React.createRef<ProgramFormRef>();
             const initialData: ProgramFormValues = {
                 name: 'Test Program',

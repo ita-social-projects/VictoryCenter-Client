@@ -1,24 +1,28 @@
-import React from 'react';
-import './NotFoundMessage.scss';
+import cn from './NotFoundMessage.module.scss';
 import { DESCRIPTION, TEXT, GO_BACK_BUTTON } from '@/const/public/notfound-page';
 import { ReactComponent as ArrowIcon } from '@/assets/icons/arrow-up-right.svg';
 import { PUBLIC_ROUTES } from '@/const/public/routes';
-import { NavLink } from 'react-router-dom';
+import { Button } from '@/components/public/ui/button/Button';
 
 export const NotFoundMessage = () => {
     return (
-        <div className="not-found-message-container">
-            <div className="not-found-message-text">
-                <h1>{TEXT}</h1>
+        <div className={cn.root}>
+            <div className={cn.header}>
+                <h4 className={cn.title}>{TEXT}</h4>
             </div>
-            <div className="not-found-message-description">
-                <p>{DESCRIPTION}</p>
-                <NavLink to={PUBLIC_ROUTES.ABOUT_US.FULL} className="link-to-main">
-                    <div className="link-block">
-                        <span className="link-title">{GO_BACK_BUTTON}</span>
-                        <ArrowIcon />
-                    </div>
-                </NavLink>
+            <div className={cn.content}>
+                <p className={cn.description}>{DESCRIPTION}</p>
+                <div className={cn.actions}>
+                    <Button
+                        href={PUBLIC_ROUTES.ROOT}
+                        icon={ArrowIcon}
+                        iconPosition="right"
+                        variant="tertiary"
+                        size="medium"
+                    >
+                        {GO_BACK_BUTTON}
+                    </Button>
+                </div>
             </div>
         </div>
     );

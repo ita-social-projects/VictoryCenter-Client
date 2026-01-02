@@ -1,0 +1,23 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 111.1px;
+    margin: 203.88px 0 93.36px;
+
+    @media (min-width: 560px) {
+        gap: 112.24px;
+        margin: 177.52px 0 155.85px;
+    }
+
+    @media (min-width: 768px) {
+        gap: 160.06px;
+        margin: 220.72px 0 244.36px;
+    }
+
+    @media (min-width: 1440px) {
+        gap: 161px;
+        margin: 212px 0 72px;
+    }
+}

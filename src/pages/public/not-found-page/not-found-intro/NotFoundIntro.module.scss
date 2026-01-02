@@ -1,0 +1,52 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/fonts';
+
+.root {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.content {
+    background-color: c.$light-blue-100;
+    width: 100%;
+    height: 125.02px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    @media (min-width: 560px) {
+        height: 190.74px;
+    }
+
+    @media (min-width: 768px) {
+        height: 251.22px;
+    }
+
+    @media (min-width: 1440px) {
+        height: 336px;
+    }
+}
+
+.text {
+    font-size: 13rem;
+    font-weight: 900;
+    color: #fdfdfb;
+    line-height: 1;
+    transform: translateY(-6%);
+    font-family: fonts.$mulish-regular-font;
+
+    @media (min-width: 560px) {
+        font-size: 19rem;
+    }
+
+    @media (min-width: 768px) {
+        font-size: 25.2rem;
+    }
+
+    @media (min-width: 1440px) {
+        font-size: 34rem;
+    }
+}

@@ -30,6 +30,7 @@ export interface ImageInputProps {
     cropWidth?: number;
     minHeight?: number;
     minWidth?: number;
+    enableCrop?: boolean;
 }
 
 export const ImageInput = ({
@@ -48,6 +49,7 @@ export const ImageInput = ({
     cropWidth = 1920,
     minHeight = 1080,
     minWidth = 1920,
+    enableCrop = true,
 }: ImageInputProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const [previewImage, setPreviewImage] = useState<ImageValues | Image | null>(null);
@@ -67,18 +69,25 @@ export const ImageInput = ({
         async (file: File) => {
             setError(null);
             if (!file.type.startsWith('image/')) return;
-            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file, minWidth, minHeight);
 
+            const error = await IMAGE_VALIDATION_FUNCTIONS.validateImage(file, minWidth, minHeight);
             if (error) {
                 setError(error);
                 return;
             }
+
             const imgItem = await convertFileToBase64(file);
+
+            if (!enableCrop) {
+                setPreviewImage(imgItem);
+                onChange(imgItem);
+                return;
+            }
 
             setRawImage(imgItem);
             setShowCropperModal(true);
         },
-        [minHeight, minWidth, setError],
+        [enableCrop, minHeight, minWidth, onChange, setError],
     );
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -159,6 +168,10 @@ export const ImageInput = ({
         }
     };
 
+    const internalIdRef = useRef(id ?? `image-input-${crypto.randomUUID()}`);
+
+    const inputId = id ?? internalIdRef.current;
+
     return (
         <div>
             <div
@@ -188,8 +201,8 @@ export const ImageInput = ({
                     style={{ display: 'none' }}
                     disabled={disabled}
                     data-testid="image-input-hidden"
-                    id={id}
-                    name={name}
+                    id={inputId}
+                    name={name ?? inputId}
                     tabIndex={-1}
                 />
 

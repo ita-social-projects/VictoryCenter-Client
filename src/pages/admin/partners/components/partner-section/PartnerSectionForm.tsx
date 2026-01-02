@@ -89,6 +89,9 @@ const PartnerSectionComponent = ({
             newPartners[index] = partnerValues;
 
             const newPartnerErrors = [...errors.partners];
+            while (newPartnerErrors.length < newPartners.length) {
+                newPartnerErrors.push({});
+            }
             newPartnerErrors[index] = partnerErrors;
 
             onChange({ ...value, partners: newPartners }, { ...errors, partners: newPartnerErrors });
@@ -135,10 +138,15 @@ const PartnerSectionComponent = ({
             return false;
         }
 
+        if (value.partners.length === 0) {
+            return false;
+        }
+
+        const partnerErrors = errors.partners || [];
         const hasPartnerErrors = value.partners.some((partner, index) => {
             const descError = PARTNER_VALIDATION_FUNCTIONS.validateDescription(partner.description);
             const hasImage = !!partner.image;
-            const imageError = errors.partners?.[index]?.image;
+            const imageError = partnerErrors[index]?.image;
             return !!descError || !hasImage || !!imageError;
         });
 

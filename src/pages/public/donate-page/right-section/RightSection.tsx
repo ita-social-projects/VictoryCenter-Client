@@ -7,7 +7,7 @@ import { UkrainePaymentDetails } from './ukraine-payment-details/UkrainePaymentD
 import { Currency, DonatePageData } from '@/types/public/donate-page';
 import { useTranslation } from 'react-i18next';
 import { currencyToString } from '@/utils/functions/mappers/public/donate/donate';
-import { useCurrentLanguage } from '@/hooks/common/use-current-language/useCurrentLanguage';
+import { useLocale } from '@/hooks/common/use-current-language/useLocale';
 
 interface RightSectionProps {
     donateData: DonatePageData | null;
@@ -46,21 +46,20 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
     const availableCurrencies = getAvailableCurrencies();
     const [activeTab, setActiveTab] = useState<Currency>(availableCurrencies[0] || Currency.UAH);
     const [isManualChange, setIsManualChange] = useState(false);
-    const currentLang = useCurrentLanguage();
+    const { currentLanguage, isEn, isUk } = useLocale();
 
     useEffect(() => {
         if (isManualChange) return;
-
-        if (currentLang === 'en') {
+        if (isEn) {
             if (availableCurrencies.includes(Currency.USD)) {
                 setActiveTab(Currency.USD);
             }
-        } else if (currentLang === 'uk') {
+        } else if (isUk) {
             if (availableCurrencies.includes(Currency.UAH)) {
                 setActiveTab(Currency.UAH);
             }
         }
-    }, [currentLang, availableCurrencies, isManualChange]);
+    }, [currentLanguage, availableCurrencies, isManualChange, isEn, isUk]);
 
     useEffect(() => {
         if (availableCurrencies.length > 0 && !availableCurrencies.includes(activeTab)) {

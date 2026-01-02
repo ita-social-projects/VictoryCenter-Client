@@ -54,7 +54,7 @@ export const CardContent = ({
                 value={content?.image ?? null}
                 onChange={handleImageChange}
                 label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
-                className="who-we-are-image-input-wrapper"
+                variant="whoWeAre"
                 setError={setImageError}
                 {...imageInputProps}
             />

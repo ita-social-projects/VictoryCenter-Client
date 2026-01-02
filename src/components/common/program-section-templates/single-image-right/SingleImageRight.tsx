@@ -89,7 +89,7 @@ export const SingleImageRight = ({
                                     PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropHeight,
                                     PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropWidth,
                                 )}
-                                className="program-section-image-input"
+                                variant="programSection"
                             />
                         </div>
                     </div>

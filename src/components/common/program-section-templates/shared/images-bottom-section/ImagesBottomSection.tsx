@@ -115,7 +115,7 @@ export const ImagesBottomSection = ({
                                           config.imageConfig.cropHeight,
                                           config.imageConfig.cropWidth,
                                       )}
-                                      className="program-section-image-input"
+                                      variant="programSection"
                                   />
                               </div>
                           ))

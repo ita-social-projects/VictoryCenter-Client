@@ -61,7 +61,7 @@ export const SingleImageBottom = ({
                                 PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropHeight,
                                 PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth,
                             )}
-                            className="program-section-image-input"
+                            variant="programSection"
                         />
                     ) : (
                         <img src={image1 || undefined} alt="img1-of-single-image-bottom" className={styles.image} />

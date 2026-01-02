@@ -73,12 +73,16 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
             <div className={styles.content}>
                 <div className={styles.image}>
                     <ImageInput
+                        key={values.localId}
                         value={values.image}
                         id={`partner-form-image-${cardHtmlId}`}
                         name={`partner-form-image-${cardHtmlId}`}
                         onChange={handleImageChange}
                         setError={handleImageError}
                         disabled={disabled}
+                        enableCrop={false}
+                        minWidth={PARTNER_VALIDATION.image.width}
+                        minHeight={PARTNER_VALIDATION.image.height}
                         label={PARTNERS_TEXT.PARTNER.IMAGE_LABEL}
                         subText={COMMON_TEXT_ADMIN.INPUT.getImageSizeSubText(
                             PARTNER_VALIDATION.image.height,

@@ -70,7 +70,6 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
     });
 
     useEffect(() => {
-        setErrors(fetchedSections.map(() => ({ partners: [] })));
         setLocalSections(
             fetchedSections.map((section: PartnerSection) => ({
                 localId: crypto.randomUUID(),
@@ -85,6 +84,11 @@ export const PartnerSectionsEditor = forwardRef<PartnerSectionsEditorRef>((_, re
                     image: p.image,
                     imageId: p.imageId,
                 })),
+            })),
+        );
+        setErrors(
+            fetchedSections.map((section: PartnerSection) => ({
+                partners: section.partners.map(() => ({})),
             })),
         );
     }, [fetchedSections]);

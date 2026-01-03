@@ -1,5 +1,13 @@
 import 'i18next';
-import { headerUk, footerUk, aboutUsPageUk, programsPageUk, globalUk, reportsPageUk } from '../../locales/uk';
+import {
+    headerUk,
+    footerUk,
+    aboutUsPageUk,
+    programsPageUk,
+    globalUk,
+    reportsPageUk,
+    partnersPageUk,
+} from '../../locales/uk';
 
 declare module 'i18next' {
     interface CustomTypeOptions {
@@ -10,6 +18,7 @@ declare module 'i18next' {
             aboutUsPage: typeof aboutUsPageUk;
             programsPage: typeof programsPageUk;
             reportsPage: typeof reportsPageUk;
+            partnersPage: typeof partnersPageUk;
             global: typeof globalUk;
         };
     }

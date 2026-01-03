@@ -1,4 +1,4 @@
-@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors' as c;
 @use './ImageInput.module.scss' as base;
 
 .container {
@@ -6,26 +6,26 @@
     width: 9.125rem;
     height: 9.5rem;
     padding: 1rem;
-    border: 1px solid colors.$grey-700;
+    border: 1px solid c.$grey-700;
     border-radius: 8px;
     background: white;
     box-shadow: 0 1px 0 0 rgba(black, 0.25);
 
     &-focused {
-        background-color: colors.$blue-50;
-        border-color: rgba(colors.$grey-900, 0.8);
+        background-color: c.$blue-50;
+        border-color: rgba(c.$grey-900, 0.8);
     }
 
     &-disabled {
-        background-color: colors.$grey-600;
+        background-color: c.$grey-600;
     }
 }
 
 .image-placeholder {
     @extend %image-placeholder;
-    border: 1px dashed colors.$grey-900;
+    border: 1px dashed c.$grey-900;
     border-radius: 4px;
-    color: colors.$grey-900;
+    color: c.$grey-900;
     font-size: 14px;
     line-height: 20px;
     font-weight: 400;

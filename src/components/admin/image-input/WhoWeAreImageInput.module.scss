@@ -1,4 +1,4 @@
-@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/variables/z-index.scss';
 @use './ImageInput.module.scss' as base;
 
@@ -6,21 +6,21 @@
     @extend %container;
     background-size: cover;
     background-position: center;
-    border: 1px solid colors.$grey-700;
+    border: 1px solid c.$grey-700;
 
     &-focused {
-        background-color: colors.$grey-700;
-        border-color: rgba(colors.$grey-900, 0.8);
+        background-color: c.$grey-700;
+        border-color: rgba(c.$grey-900, 0.8);
     }
 
     &-disabled {
-        background-color: colors.$grey-600;
+        background-color: c.$grey-600;
     }
 }
 
 .image-placeholder {
     @extend %image-placeholder;
-    color: colors.$grey-900;
+    color: c.$grey-900;
     font-size: 16px;
     font-weight: 600;
     line-height: 28px;
@@ -31,7 +31,7 @@
     @extend %placeholder-icon;
     width: 4rem;
     height: 4rem;
-    color: colors.$grey-700;
+    color: c.$grey-700;
 }
 
 .placeholder-text-primary {
@@ -49,7 +49,7 @@
         content: '';
         position: absolute;
         inset: 0;
-        background: colors.$grey-50;
+        background: c.$grey-50;
         opacity: 0;
         transition: opacity 0.3s ease;
         z-index: z-index.admin('who-we-are-page-image-preview');
@@ -89,6 +89,4 @@
 .delete-icon,
 .crop-icon {
     @extend %delete-icon;
-    width: 55%;
-    height: 55%;
 }

@@ -1,35 +1,36 @@
-﻿@use '@/assets/sass/variables/colors';
+﻿@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/z-index.scss';
 @use './ImageInput.module.scss' as base;
 
 .container {
     @extend %container;
-    width: 100%;
+    width: auto;
     min-height: 18rem;
     max-height: 53rem;
     height: auto;
     background: white;
 
     &-focused {
-        background-color: colors.$blue-50;
-        border-color: rgba(colors.$grey-900, 0.8);
+        background-color: c.$blue-50;
+        border-color: rgba(c.$grey-900, 0.8);
     }
 
     &-disabled {
-        background-color: colors.$grey-600;
+        background-color: c.$grey-600;
     }
 }
 
 .image-placeholder {
     @extend %image-placeholder;
     padding: 2rem;
-    color: colors.$grey-900;
+    color: c.$grey-900;
 }
 
 .placeholder-icon {
     @extend %placeholder-icon;
     width: 4rem;
     height: 4rem;
-    color: colors.$grey-900;
+    color: c.$grey-900;
     margin-bottom: 0.5rem;
 }
 
@@ -38,7 +39,7 @@
     font-size: 16px;
     line-height: 24px;
     font-weight: 500;
-    color: colors.$grey-900;
+    color: c.$grey-900;
 }
 
 .placeholder-text-secondary {
@@ -46,16 +47,37 @@
     font-size: 14px;
     line-height: 20px;
     font-weight: 400;
-    color: colors.$grey-900;
+    color: c.$grey-900;
 }
 
 .image-preview {
     @extend %image-preview;
-    height: auto;
-    min-height: 18rem;
-    max-height: 53rem;
 
-    @extend %image-preview-hover;
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: c.$grey-700;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: z-index.admin('who-we-are-page-image-preview');
+        cursor: pointer;
+    }
+
+    &:hover {
+        @extend %image-preview-hover;
+
+        &::after {
+            opacity: 0.50;
+        }
+
+        %delete-button,
+        %crop-button {
+            opacity: 1;
+        }
+    }
+
+    
 }
 
 .preview-image {
@@ -68,17 +90,20 @@
     @extend %preview-actions;
 }
 
-.delete-button {
+.delete-button,
+.crop-button {
     @extend %delete-button;
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    width: 4rem;
-    height: 4rem;
+    width: 5rem;
+    height: 5rem;
+    aspect-ratio: 1 / 1;
+    opacity: 0.8;
+    z-index: z-index.admin('image-input-action-buttons');
+    cursor: pointer;
 }
 
-.delete-icon {
+.delete-icon,
+.crop-icon {
     @extend %delete-icon;
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 55%;
+    height: 55%;
 }

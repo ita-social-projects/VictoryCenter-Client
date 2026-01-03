@@ -1,5 +1,5 @@
 @use '@/assets/sass/variables/z-index.scss';
-@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors' as c;
 
 %container {
     position: relative;
@@ -22,7 +22,7 @@
 }
 
 %placeholder-icon {
-    color: colors.$grey-900;
+    color: c.$grey-900;
 }
 
 %placeholder-text-primary {
@@ -50,13 +50,14 @@
 
 %preview-actions {
     position: absolute;
-    inset: 0;
-    margin: auto;
     display: flex;
-    gap: 0.5rem;
-    width: fit-content;
-    height: fit-content;
+    top: 50%;
+    left: 50%;
+    width: auto;
+    height: auto;
+    gap: 1rem;
     z-index: z-index.admin('image-input-action-buttons');
+    transform: translate(-50%, -50%);
 }
 
 %delete-button,
@@ -64,10 +65,9 @@
     display: none;
     align-items: center;
     justify-content: center;
-    padding: 0.625rem;
     border-radius: 8px;
     border: none;
-    background: colors.$grey-900;
+    background: c.$grey-900;
 
     &:hover {
         opacity: 1;
@@ -77,7 +77,7 @@
 %delete-icon,
 %crop-icon {
     filter: brightness(0) invert(1);
-    color: colors.$grey-50;
+    color: c.$grey-50;
 }
 
 %image-preview-hover {

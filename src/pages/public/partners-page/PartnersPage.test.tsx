@@ -10,16 +10,16 @@ jest.mock('./partners-sections/intro-section/IntroSection', () => ({
     IntroSection: () => <div data-testid="intro-section" />,
 }));
 
-jest.mock('./partners-sections/outro-section/OutroSection', () => ({
-    OutroSection: () => <div data-testid="outro-section" />,
-}));
-
 jest.mock('./partners-sections/partners-section/PartnersSection', () => ({
     PartnersSection: ({ section }: { section: any }) => <div data-testid={`partners-section-${section.id}`} />,
 }));
 
 jest.mock('@mui/material', () => ({
     LinearProgress: () => <div data-testid="loader" />,
+}));
+
+jest.mock('@/components/public/cta', () => ({
+    CtaSection: () => <div data-testid="cta-section" />,
 }));
 
 const mockedPartnersApi = PartnersApi as jest.Mocked<typeof PartnersApi>;
@@ -56,7 +56,7 @@ describe('PartnersPage', () => {
             expect(screen.getByTestId('intro-section')).toBeInTheDocument();
             expect(screen.getByTestId('partners-section-1')).toBeInTheDocument();
             expect(screen.getByTestId('partners-section-2')).toBeInTheDocument();
-            expect(screen.getByTestId('outro-section')).toBeInTheDocument();
+            expect(screen.getByTestId('cta-section')).toBeInTheDocument();
         });
     });
 

@@ -6,16 +6,12 @@ import { PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
 export interface TripleImagesBottomProps {
     title?: string;
     description?: string;
-    image1?: string;
-    image2?: string;
-    image3?: string;
+    images?: string[];
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
-    onImage1Change?: (file: ImageValues | null) => void;
-    onImage2Change?: (file: ImageValues | null) => void;
-    onImage3Change?: (file: ImageValues | null) => void;
+    onImagesChange?: (index: number, file: ImageValues | null) => void;
 }
 
 const TRIPLE_IMAGES_CONFIG: ImagesBottomSectionConfig = {
@@ -32,23 +28,18 @@ const TRIPLE_IMAGES_CONFIG: ImagesBottomSectionConfig = {
 export const TripleImagesBottom = ({
     title = '',
     description = '',
-    image1 = '',
-    image2 = '',
-    image3 = '',
+    images = ['', '', ''],
     isTemplate = false,
     isEditable = false,
     onTitleChange,
     onDescriptionChange,
-    onImage1Change,
-    onImage2Change,
-    onImage3Change,
+    onImagesChange,
 }: TripleImagesBottomProps) => {
-    const images = [image1, image2, image3];
-    const imageHandlers = [
-        { handler: onImage1Change, key: 'image1', value: image1 },
-        { handler: onImage2Change, key: 'image2', value: image2 },
-        { handler: onImage3Change, key: 'image3', value: image3 },
-    ];
+    const imageHandlers = images.map((image, index) => ({
+        handler: onImagesChange ? (file: ImageValues | null) => onImagesChange(index, file) : undefined,
+        key: `image${index + 1}`,
+        value: image,
+    }));
 
     return (
         <ImagesBottomSection

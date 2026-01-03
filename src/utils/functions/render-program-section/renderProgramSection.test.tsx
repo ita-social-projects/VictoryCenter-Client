@@ -29,18 +29,12 @@ describe('renderProgramSection', () => {
     const baseData = {
         title: 'Title',
         description: 'Desc',
-        image1: 'img1',
-        image2: 'img2',
-        image3: 'img3',
-        image4: 'img4',
+        images: ['img1', 'img2', 'img3', 'img4'],
     };
     const baseHandlers = {
         onTitleChange: jest.fn(),
         onDescriptionChange: jest.fn(),
-        onImage1Change: jest.fn(),
-        onImage2Change: jest.fn(),
-        onImage3Change: jest.fn(),
-        onImage4Change: jest.fn(),
+        onImagesChange: jest.fn(),
     };
 
     const templates = [

@@ -44,10 +44,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
             data: {
                 title: PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT,
                 description: PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
-                image1: placeholderImage,
-                image2: placeholderImage,
-                image3: placeholderImage,
-                image4: placeholderImage,
+                images: [placeholderImage, placeholderImage, placeholderImage, placeholderImage],
             },
             isTemplate: true,
         });

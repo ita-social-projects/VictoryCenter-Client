@@ -9,23 +9,23 @@ import styles from './SingleImageBottom.module.scss';
 export interface SingleImageBottomProps {
     title?: string;
     description?: string;
-    image1?: string;
+    image?: string;
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
-    onImage1Change?: (file: ImageValues | null) => void;
+    onImageChange?: (file: ImageValues | null) => void;
 }
 
 export const SingleImageBottom = ({
     title = '',
     description = '',
-    image1 = '',
+    image = '',
     isTemplate = false,
     isEditable = false,
     onTitleChange,
     onDescriptionChange,
-    onImage1Change,
+    onImageChange,
 }: SingleImageBottomProps) => {
     return (
         <div
@@ -49,8 +49,8 @@ export const SingleImageBottom = ({
                         <PhotoInputGroup
                             id="section-image-1"
                             name="section-image-1"
-                            value={image1 ? { base64: image1, mimeType: '' } : null}
-                            onChange={onImage1Change || (() => {})}
+                            value={image ? { base64: image, mimeType: '' } : null}
+                            onChange={onImageChange || (() => {})}
                             setError={() => {}}
                             cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth}
                             cropHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropHeight}
@@ -64,7 +64,7 @@ export const SingleImageBottom = ({
                             variant="programSection"
                         />
                     ) : (
-                        <img src={image1 || undefined} alt="img1-of-single-image-bottom" className={styles.image} />
+                        <img src={image || undefined} alt="img1-of-single-image-bottom" className={styles.image} />
                     )}
                 </div>
             </div>

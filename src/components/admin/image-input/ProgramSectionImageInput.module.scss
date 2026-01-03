@@ -1,5 +1,6 @@
 @use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/variables/typography';
+@use '@/assets/sass/variables/z-index.scss';
 @use './ImageInput.module.scss' as base;
 
 .container {
@@ -16,6 +17,7 @@
     &-disabled {
         background-color: c.$grey-500;
     }
+    cursor: pointer;
 }
 
 .image-placeholder {
@@ -52,7 +54,23 @@
 
 .image-preview {
     @extend %image-preview;
-    @extend %image-preview-hover;
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: c.$grey-400;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    &:hover {
+        @extend %image-preview-hover;
+
+        &::after {
+            opacity: 0.50;
+        }
+    }
 }
 
 .preview-image {
@@ -64,17 +82,17 @@
     @extend %preview-actions;
 }
 
-.delete-button {
+.delete-button,
+.crop-button {
     @extend %delete-button;
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    width: 4rem;
-    height: 4rem;
+    width: 5rem;
+    height: 5rem;
+    aspect-ratio: 1 / 1;
+    opacity: 0.8;
+    z-index: z-index.admin('image-input-action-buttons');
 }
 
-.delete-icon {
+.delete-icon,
+.crop-icon {
     @extend %delete-icon;
-    width: 1.5rem;
-    height: 1.5rem;
 }

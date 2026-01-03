@@ -23,7 +23,7 @@ describe('SingleImageTop', () => {
     const baseProps: SingleImageTopProps = {
         title: 'Test Title',
         description: 'Test Description',
-        image1: 'test-image.png',
+        image: 'test-image.png',
         isTemplate: false,
         isEditable: false,
     };
@@ -57,21 +57,21 @@ describe('SingleImageTop', () => {
         );
     });
 
-    it('passes onImage1Change to PhotoInputGroup in edit mode', () => {
-        const onImage1Change = jest.fn();
-        render(<SingleImageTop {...baseProps} isEditable={true} onImage1Change={onImage1Change} />);
+    it('passes onImageChange to PhotoInputGroup in edit mode', () => {
+        const onImageChange = jest.fn();
+        render(<SingleImageTop {...baseProps} isEditable={true} onImageChange={onImageChange} />);
 
         expect(screen.getByTestId('photo-input-group')).toBeInTheDocument();
         expect(mockPhotoInputGroup).toHaveBeenCalledWith(
             expect.objectContaining({
                 id: 'section-image-1',
                 name: 'section-image-1',
-                onChange: onImage1Change,
+                onChange: onImageChange,
             }),
         );
     });
 
-    it('uses a fallback onChange when onImage1Change is missing', () => {
+    it('uses a fallback onChange when onImageChange is missing', () => {
         render(<SingleImageTop {...baseProps} isEditable={true} />);
 
         const photoProps = mockPhotoInputGroup.mock.calls[0]?.[0];
@@ -84,7 +84,7 @@ describe('SingleImageTop', () => {
 
         const img = container.querySelector('img');
         expect(img).not.toBeNull();
-        expect(img).toHaveAttribute('src', baseProps.image1);
+        expect(img).toHaveAttribute('src', baseProps.image);
         expect(screen.getByTestId('title-description-section')).toBeInTheDocument();
         expect(mockTitleDescriptionSection).toHaveBeenCalledWith(
             expect.objectContaining({

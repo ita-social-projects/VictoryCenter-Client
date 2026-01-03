@@ -9,23 +9,23 @@ import styles from './SingleImageTop.module.scss';
 export interface SingleImageTopProps {
     title?: string;
     description?: string;
-    image1?: string;
+    image?: string;
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
-    onImage1Change?: (file: ImageValues | null) => void;
+    onImageChange?: (file: ImageValues | null) => void;
 }
 
 export const SingleImageTop = ({
     title = '',
     description = '',
-    image1 = '',
+    image = '',
     isTemplate = false,
     isEditable = false,
     onTitleChange,
     onDescriptionChange,
-    onImage1Change,
+    onImageChange,
 }: SingleImageTopProps) => {
     return (
         <div
@@ -41,7 +41,7 @@ export const SingleImageTop = ({
                             id="section-image-1"
                             name="section-image-1"
                             value={null}
-                            onChange={onImage1Change || (() => {})}
+                            onChange={onImageChange || (() => {})}
                             setError={() => {}}
                             cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropWidth}
                             cropHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_TOP.cropHeight}
@@ -55,7 +55,7 @@ export const SingleImageTop = ({
                             variant="programSection"
                         />
                     ) : (
-                        <img src={image1 || undefined} alt="" className={styles.image} />
+                        <img src={image || undefined} alt="" className={styles.image} />
                     )}
                 </div>
             </div>

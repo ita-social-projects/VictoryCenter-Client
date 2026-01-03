@@ -6,18 +6,12 @@ import { PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
 export interface QuadImagesBottomProps {
     title?: string;
     description?: string;
-    image1?: string;
-    image2?: string;
-    image3?: string;
-    image4?: string;
+    images?: string[];
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
-    onImage1Change?: (file: ImageValues | null) => void;
-    onImage2Change?: (file: ImageValues | null) => void;
-    onImage3Change?: (file: ImageValues | null) => void;
-    onImage4Change?: (file: ImageValues | null) => void;
+    onImagesChange?: (index: number, file: ImageValues | null) => void;
 }
 
 const QUAD_IMAGES_CONFIG: ImagesBottomSectionConfig = {
@@ -34,26 +28,18 @@ const QUAD_IMAGES_CONFIG: ImagesBottomSectionConfig = {
 export const QuadImagesBottom = ({
     title = '',
     description = '',
-    image1 = '',
-    image2 = '',
-    image3 = '',
-    image4 = '',
+    images = ['', '', '', ''],
     isTemplate = false,
     isEditable = false,
     onTitleChange,
     onDescriptionChange,
-    onImage1Change,
-    onImage2Change,
-    onImage3Change,
-    onImage4Change,
+    onImagesChange,
 }: QuadImagesBottomProps) => {
-    const images = [image1, image2, image3, image4];
-    const imageHandlers = [
-        { handler: onImage1Change, key: 'image1', value: image1 },
-        { handler: onImage2Change, key: 'image2', value: image2 },
-        { handler: onImage3Change, key: 'image3', value: image3 },
-        { handler: onImage4Change, key: 'image4', value: image4 },
-    ];
+    const imageHandlers = images.map((image, index) => ({
+        handler: onImagesChange ? (file: ImageValues | null) => onImagesChange(index, file) : undefined,
+        key: `image${index + 1}`,
+        value: image,
+    }));
 
     return (
         <ImagesBottomSection

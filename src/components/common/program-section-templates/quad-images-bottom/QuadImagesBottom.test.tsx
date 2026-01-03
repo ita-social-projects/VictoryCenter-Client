@@ -23,24 +23,13 @@ createImagesBottomTestSuite<QuadImagesBottomProps>({
     createDefaultProps: () => ({
         title: '',
         description: '',
-        image1: '',
-        image2: '',
-        image3: '',
-        image4: '',
+        images: ['', '', '', ''],
         isTemplate: false,
         isEditable: false,
     }),
-    createImageProps: (images) => ({
-        image1: images[0] || '',
-        image2: images[1] || '',
-        image3: images[2] || '',
-        image4: images[3] || '',
-    }),
+    createImageProps: (images) => ({ images }),
     createImageHandlers: (handlers) => ({
-        onImage1Change: handlers[0],
-        onImage2Change: handlers[1],
-        onImage3Change: handlers[2],
-        onImage4Change: handlers[3],
+        onImagesChange: (index, file) => handlers[index]?.(file),
     }),
     expectedConfig: {
         imageCount: 4,

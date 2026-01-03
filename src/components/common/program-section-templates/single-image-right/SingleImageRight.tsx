@@ -9,23 +9,23 @@ import styles from './SingleImageRight.module.scss';
 export interface SingleImageRightProps {
     title?: string;
     description?: string;
-    image1?: string;
+    image?: string;
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
-    onImage1Change?: (file: ImageValues | null) => void;
+    onImageChange?: (file: ImageValues | null) => void;
 }
 
 export const SingleImageRight = ({
     title = '',
     description = '',
-    image1 = '',
+    image = '',
     isTemplate = false,
     isEditable = false,
     onTitleChange,
     onDescriptionChange,
-    onImage1Change,
+    onImageChange,
 }: SingleImageRightProps) => {
     const handleTitleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         onTitleChange?.(e.target.value);
@@ -78,7 +78,7 @@ export const SingleImageRight = ({
                                 id="section-image-1"
                                 name="section-image-1"
                                 value={null}
-                                onChange={onImage1Change || (() => {})}
+                                onChange={onImageChange || (() => {})}
                                 setError={() => {}}
                                 cropWidth={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropWidth}
                                 cropHeight={PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_RIGHT.cropHeight}
@@ -106,7 +106,7 @@ export const SingleImageRight = ({
                     </div>
                     <div className={styles['right-section']}>
                         <div className={styles['image-wrapper']}>
-                            <img src={image1} alt="" className={styles.image} />
+                            <img src={image} alt="" className={styles.image} />
                         </div>
                     </div>
                 </>

@@ -55,7 +55,7 @@ describe('SingleImageRight', () => {
         });
 
         it('renders image when provided', () => {
-            const { container } = render(<SingleImageRight title="Test" image1="test-image.jpg" />);
+            const { container } = render(<SingleImageRight title="Test" image="test-image.jpg" />);
 
             const image = container.querySelector('img');
             expect(image).toBeInTheDocument();
@@ -142,12 +142,12 @@ describe('SingleImageRight', () => {
             expect(onDescriptionChange).toHaveBeenCalledWith('New Description');
         });
 
-        it('calls onImage1Change when image is changed', () => {
-            const onImage1Change = jest.fn();
-            render(<SingleImageRight title="Test" isEditable={true} onImage1Change={onImage1Change} />);
+        it('calls onImageChange when image is changed', () => {
+            const onImageChange = jest.fn();
+            render(<SingleImageRight title="Test" isEditable={true} onImageChange={onImageChange} />);
 
             screen.getByTestId('photo-change').click();
-            expect(onImage1Change).toHaveBeenCalledWith({
+            expect(onImageChange).toHaveBeenCalledWith({
                 id: '123',
                 url: 'new-image.jpg',
                 mimeType: 'image/jpeg',
@@ -168,8 +168,8 @@ describe('SingleImageRight', () => {
             expect(descriptionTextarea).toHaveValue('Existing Description');
         });
 
-        it('passes null to PhotoInputGroup (not using image1 value)', () => {
-            render(<SingleImageRight title="Test" isEditable={true} image1="existing-image.jpg" />);
+        it('passes null to PhotoInputGroup (not using image value)', () => {
+            render(<SingleImageRight title="Test" isEditable={true} image="existing-image.jpg" />);
 
             expect(screen.getByTestId('photo-value')).toHaveTextContent('no-image');
         });
@@ -182,7 +182,7 @@ describe('SingleImageRight', () => {
         });
 
         it('does not render regular img tag in editable mode', () => {
-            const { container } = render(<SingleImageRight title="Test" isEditable={true} image1="test.jpg" />);
+            const { container } = render(<SingleImageRight title="Test" isEditable={true} image="test.jpg" />);
 
             expect(container.querySelector('img')).not.toBeInTheDocument();
         });
@@ -234,14 +234,14 @@ describe('SingleImageRight', () => {
             const handlers = {
                 onTitleChange: jest.fn(),
                 onDescriptionChange: jest.fn(),
-                onImage1Change: jest.fn(),
+                onImageChange: jest.fn(),
             };
 
             render(
                 <SingleImageRight
                     title="Full Title"
                     description="Full Description"
-                    image1="full-image.jpg"
+                    image="full-image.jpg"
                     isTemplate={true}
                     isEditable={true}
                     {...handlers}

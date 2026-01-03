@@ -126,19 +126,13 @@ describe('ProgramSectionForm', () => {
         expect(callArg.data).toEqual({
             title: '',
             description: '',
-            image1: 'img1-url',
-            image2: undefined,
-            image3: undefined,
-            image4: undefined,
+            images: ['img1-url', '', ''],
         });
 
         expect(callArg.handlers).toEqual({
             onTitleChange: expect.any(Function),
             onDescriptionChange: expect.any(Function),
-            onImage1Change: expect.any(Function),
-            onImage2Change: expect.any(Function),
-            onImage3Change: expect.any(Function),
-            onImage4Change: expect.any(Function),
+            onImagesChange: expect.any(Function),
         });
     });
 
@@ -170,11 +164,11 @@ describe('ProgramSectionForm', () => {
         const { renderProgramSection } = require('@/utils/functions/render-program-section');
         let handler: any;
         renderProgramSection.mockImplementation(({ handlers }: any) => {
-            handler = handlers.onImage1Change;
+            handler = handlers.onImagesChange;
             return <div data-testid="editable-section" />;
         });
         render(<ProgramSectionForm {...defaultProps} />);
-        handler({ id: 'newimg', url: 'newimg', mimeType: 'image/png' });
+        handler(0, { id: 'newimg', url: 'newimg', mimeType: 'image/png' });
         expect(defaultProps.onSectionChange).toHaveBeenCalled();
     });
 });

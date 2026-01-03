@@ -6,14 +6,12 @@ import { PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
 export interface DualImagesBottomProps {
     title?: string;
     description?: string;
-    image1?: string;
-    image2?: string;
+    images?: string[];
     isTemplate?: boolean;
     isEditable?: boolean;
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
-    onImage1Change?: (file: ImageValues | null) => void;
-    onImage2Change?: (file: ImageValues | null) => void;
+    onImagesChange?: (index: number, file: ImageValues | null) => void;
 }
 
 const DUAL_IMAGES_CONFIG: ImagesBottomSectionConfig = {
@@ -29,20 +27,18 @@ const DUAL_IMAGES_CONFIG: ImagesBottomSectionConfig = {
 export const DualImagesBottom = ({
     title = '',
     description = '',
-    image1 = '',
-    image2 = '',
+    images = ['', ''],
     isTemplate = false,
     isEditable = false,
     onTitleChange,
     onDescriptionChange,
-    onImage1Change,
-    onImage2Change,
+    onImagesChange,
 }: DualImagesBottomProps) => {
-    const images = [image1, image2];
-    const imageHandlers = [
-        { handler: onImage1Change, key: 'image1', value: image1 },
-        { handler: onImage2Change, key: 'image2', value: image2 },
-    ];
+    const imageHandlers = images.map((image, index) => ({
+        handler: onImagesChange ? (file: ImageValues | null) => onImagesChange(index, file) : undefined,
+        key: `image${index + 1}`,
+        value: image,
+    }));
 
     return (
         <ImagesBottomSection

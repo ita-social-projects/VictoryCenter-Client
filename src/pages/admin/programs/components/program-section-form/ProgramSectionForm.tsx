@@ -18,14 +18,6 @@ const getContentByType = (contents: ProgramSectionContent[], type: ContentType):
     return contents.find((c) => c.contentType === type);
 };
 
-const getImageContentByOrder = (
-    contents: ProgramSectionContent[],
-    order: number,
-): ProgramSectionContent | undefined => {
-    const imageContents = contents.filter((c) => c.contentType === ContentType.Image);
-    return imageContents.find((c) => c.order === order);
-};
-
 export const ProgramSectionForm = ({
     section,
     onSave,
@@ -37,10 +29,11 @@ export const ProgramSectionForm = ({
 
     const titleContent = getContentByType(localSection.contents, ContentType.Title);
     const descriptionContent = getContentByType(localSection.contents, ContentType.Description);
-    const image1Content = getImageContentByOrder(localSection.contents, 2);
-    const image2Content = getImageContentByOrder(localSection.contents, 3);
-    const image3Content = getImageContentByOrder(localSection.contents, 4);
-    const image4Content = getImageContentByOrder(localSection.contents, 5);
+
+    const imageContents = localSection.contents
+        .filter((c) => c.contentType === ContentType.Image)
+        .sort((a, b) => a.order - b.order)
+        .map((c) => (c.image && 'url' in c.image ? c.image.url : '') || '');
 
     const handleTitleChange = useCallback(
         (value: string) => {
@@ -80,12 +73,19 @@ export const ProgramSectionForm = ({
         [],
     );
 
-    const handleImageChange = useCallback(
-        (order: number) => (file: ImageValues | null) => {
+    const handleImagesChange = useCallback(
+        (index: number, file: ImageValues | null) => {
             setLocalSection((prev) => {
-                const updatedSection = updateImageContent(order, file, prev);
-                onSectionChange?.(updatedSection);
-                return updatedSection;
+                const imageContentsList = prev.contents.filter((c) => c.contentType === ContentType.Image);
+                imageContentsList.sort((a, b) => a.order - b.order);
+
+                if (index < imageContentsList.length) {
+                    const targetOrder = imageContentsList[index].order;
+                    const updatedSection = updateImageContent(targetOrder, file, prev);
+                    onSectionChange?.(updatedSection);
+                    return updatedSection;
+                }
+                return prev;
             });
         },
         [onSectionChange, updateImageContent],
@@ -96,19 +96,13 @@ export const ProgramSectionForm = ({
         data: {
             title: titleContent?.title || '',
             description: descriptionContent?.description || '',
-            image1: image1Content?.image && 'url' in image1Content.image ? image1Content.image.url : undefined,
-            image2: image2Content?.image && 'url' in image2Content.image ? image2Content.image.url : undefined,
-            image3: image3Content?.image && 'url' in image3Content.image ? image3Content.image.url : undefined,
-            image4: image4Content?.image && 'url' in image4Content.image ? image4Content.image.url : undefined,
+            images: imageContents,
         },
         isEditable: true,
         handlers: {
             onTitleChange: handleTitleChange,
             onDescriptionChange: handleDescriptionChange,
-            onImage1Change: handleImageChange(2),
-            onImage2Change: handleImageChange(3),
-            onImage3Change: handleImageChange(4),
-            onImage4Change: handleImageChange(5),
+            onImagesChange: handleImagesChange,
         },
     });
 

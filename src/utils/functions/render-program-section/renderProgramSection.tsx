@@ -13,19 +13,13 @@ import { SingleImageRight } from '@/components/common/program-section-templates/
 export interface ProgramSectionData {
     title?: string;
     description?: string;
-    image1?: string;
-    image2?: string;
-    image3?: string;
-    image4?: string;
+    images?: string[];
 }
 
 export interface ProgramSectionHandlers {
     onTitleChange?: (value: string) => void;
     onDescriptionChange?: (value: string) => void;
-    onImage1Change?: (file: ImageValues | null) => void;
-    onImage2Change?: (file: ImageValues | null) => void;
-    onImage3Change?: (file: ImageValues | null) => void;
-    onImage4Change?: (file: ImageValues | null) => void;
+    onImagesChange?: (index: number, file: ImageValues | null) => void;
 }
 
 export interface RenderProgramSectionParams {
@@ -49,18 +43,12 @@ export const renderProgramSection = ({
                 <QuadImagesBottom
                     title={data.title}
                     description={data.description}
-                    image1={data.image1}
-                    image2={data.image2}
-                    image3={data.image3}
-                    image4={data.image4}
+                    images={data.images}
                     isTemplate={isTemplate}
                     isEditable={isEditable}
                     onTitleChange={handlers?.onTitleChange}
                     onDescriptionChange={handlers?.onDescriptionChange}
-                    onImage1Change={handlers?.onImage1Change}
-                    onImage2Change={handlers?.onImage2Change}
-                    onImage3Change={handlers?.onImage3Change}
-                    onImage4Change={handlers?.onImage4Change}
+                    onImagesChange={handlers?.onImagesChange}
                 />
             );
         case ProgramSectionTemplate.DualImagesBottom:
@@ -68,14 +56,12 @@ export const renderProgramSection = ({
                 <DualImagesBottom
                     title={data.title}
                     description={data.description}
-                    image1={data.image1}
-                    image2={data.image2}
+                    images={data.images}
                     isTemplate={isTemplate}
                     isEditable={isEditable}
                     onTitleChange={handlers?.onTitleChange}
                     onDescriptionChange={handlers?.onDescriptionChange}
-                    onImage1Change={handlers?.onImage1Change}
-                    onImage2Change={handlers?.onImage2Change}
+                    onImagesChange={handlers?.onImagesChange}
                 />
             );
         case ProgramSectionTemplate.TextOnly:
@@ -94,16 +80,12 @@ export const renderProgramSection = ({
                 <TripleImagesBottom
                     title={data.title}
                     description={data.description}
-                    image1={data.image1}
-                    image2={data.image2}
-                    image3={data.image3}
+                    images={data.images}
                     isTemplate={isTemplate}
                     isEditable={isEditable}
                     onTitleChange={handlers?.onTitleChange}
                     onDescriptionChange={handlers?.onDescriptionChange}
-                    onImage1Change={handlers?.onImage1Change}
-                    onImage2Change={handlers?.onImage2Change}
-                    onImage3Change={handlers?.onImage3Change}
+                    onImagesChange={handlers?.onImagesChange}
                 />
             );
         case ProgramSectionTemplate.SingleImageBottom:
@@ -111,12 +93,12 @@ export const renderProgramSection = ({
                 <SingleImageBottom
                     title={data.title}
                     description={data.description}
-                    image1={data.image1}
+                    image={data.images?.[0]}
                     isTemplate={isTemplate}
                     isEditable={isEditable}
                     onTitleChange={handlers?.onTitleChange}
                     onDescriptionChange={handlers?.onDescriptionChange}
-                    onImage1Change={handlers?.onImage1Change}
+                    onImageChange={handlers?.onImagesChange ? (file) => handlers.onImagesChange!(0, file) : undefined}
                 />
             );
         case ProgramSectionTemplate.SingleImageTop:
@@ -124,12 +106,12 @@ export const renderProgramSection = ({
                 <SingleImageTop
                     title={data.title}
                     description={data.description}
-                    image1={data.image1}
+                    image={data.images?.[0]}
                     isTemplate={isTemplate}
                     isEditable={isEditable}
                     onTitleChange={handlers?.onTitleChange}
                     onDescriptionChange={handlers?.onDescriptionChange}
-                    onImage1Change={handlers?.onImage1Change}
+                    onImageChange={handlers?.onImagesChange ? (file) => handlers.onImagesChange!(0, file) : undefined}
                 />
             );
         case ProgramSectionTemplate.SingleImageRight:
@@ -137,12 +119,12 @@ export const renderProgramSection = ({
                 <SingleImageRight
                     title={data.title}
                     description={data.description}
-                    image1={data.image1}
+                    image={data.images?.[0]}
                     isTemplate={isTemplate}
                     isEditable={isEditable}
                     onTitleChange={handlers?.onTitleChange}
                     onDescriptionChange={handlers?.onDescriptionChange}
-                    onImage1Change={handlers?.onImage1Change}
+                    onImageChange={handlers?.onImagesChange ? (file) => handlers.onImagesChange!(0, file) : undefined}
                 />
             );
         default:

@@ -145,13 +145,14 @@ describe('ImagesBottomSection', () => {
         expect(firstCallProps.minWidth).toBe(baseConfig.imageConfig.minWidth);
         expect(firstCallProps.minHeight).toBe(baseConfig.imageConfig.minHeight);
         expect(firstCallProps.imageLabel).toBe(baseConfig.imageLabel);
-        expect(firstCallProps.className).toBe('program-section-image-input');
+        expect(firstCallProps.variant).toBe('programSection');
 
         const secondCallProps = (PhotoInputGroup as unknown as jest.Mock).mock.calls[1][0];
         expect(secondCallProps.id).toBe('section-image-2');
         expect(secondCallProps.name).toBe('section-image-2');
         expect(secondCallProps.value).toEqual({ id: null, url: 'img2.jpg', mimeType: '' });
         expect(secondCallProps.onChange).toBe(imageHandlers[1].handler);
+        expect(secondCallProps.variant).toBe('programSection');
     });
 
     it('includes custom className on the root element', () => {

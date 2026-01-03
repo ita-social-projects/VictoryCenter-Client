@@ -35,7 +35,7 @@ describe('SingleImageBottom', () => {
         renderSingleImageBottom({
             title: 'T',
             description: 'D',
-            image1: 'test-image.jpg',
+            image: 'test-image.jpg',
             isTemplate: true,
             isEditable: false,
         });
@@ -58,16 +58,16 @@ describe('SingleImageBottom', () => {
     it('renders editable layout: wires handlers and configures PhotoInputGroup', () => {
         const onTitleChange = jest.fn();
         const onDescriptionChange = jest.fn();
-        const onImage1Change = jest.fn();
+        const onImageChange = jest.fn();
 
         renderSingleImageBottom({
             title: 'T',
             description: 'D',
-            image1: 'base64-data',
+            image: 'base64-data',
             isEditable: true,
             onTitleChange,
             onDescriptionChange,
-            onImage1Change,
+            onImageChange,
         });
 
         expect(screen.getByTestId('title-description-section')).toBeInTheDocument();
@@ -101,12 +101,12 @@ describe('SingleImageBottom', () => {
         );
 
         photoProps.onChange({ base64: 'new', mimeType: 'image/png' });
-        expect(onImage1Change).toHaveBeenCalledWith({ base64: 'new', mimeType: 'image/png' });
+        expect(onImageChange).toHaveBeenCalledWith({ base64: 'new', mimeType: 'image/png' });
     });
 
-    it('uses null value for PhotoInputGroup when image1 is empty (editable branch)', () => {
+    it('uses null value for PhotoInputGroup when image is empty (editable branch)', () => {
         renderSingleImageBottom({
-            image1: '',
+            image: '',
             isEditable: true,
         });
 
@@ -114,7 +114,7 @@ describe('SingleImageBottom', () => {
         expect(photoProps).toEqual(expect.objectContaining({ value: null }));
     });
 
-    it('uses a fallback onChange when onImage1Change is not provided', () => {
+    it('uses a fallback onChange when onImageChange is not provided', () => {
         renderSingleImageBottom({
             isEditable: true,
         });

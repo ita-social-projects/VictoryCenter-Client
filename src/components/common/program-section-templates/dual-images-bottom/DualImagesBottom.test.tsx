@@ -23,18 +23,13 @@ createImagesBottomTestSuite<DualImagesBottomProps>({
     createDefaultProps: () => ({
         title: '',
         description: '',
-        image1: '',
-        image2: '',
+        images: ['', ''],
         isTemplate: false,
         isEditable: false,
     }),
-    createImageProps: (images) => ({
-        image1: images[0] || '',
-        image2: images[1] || '',
-    }),
+    createImageProps: (images) => ({ images }),
     createImageHandlers: (handlers) => ({
-        onImage1Change: handlers[0],
-        onImage2Change: handlers[1],
+        onImagesChange: (index, file) => handlers[index]?.(file),
     }),
     expectedConfig: {
         imageCount: 2,

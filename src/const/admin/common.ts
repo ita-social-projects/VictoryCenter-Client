@@ -57,6 +57,8 @@ export const COMMON_TEXT_ADMIN = {
     MESSAGE: {
         SUCCESSFULLY_PUBLISHED: 'успішно опубліковано',
         FAIL_TO_PUBLISH_CHANGES: 'Не вдалося опублікувати зміни',
+        TRANSLATION_SAVED_SUCCESS: 'Переклад збережено успішно',
+        TRANSLATION_PUBLISHED_SUCCESS: 'Переклад опубліковано успішно',
     },
 
     BUTTON: {

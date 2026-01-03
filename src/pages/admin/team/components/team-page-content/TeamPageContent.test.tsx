@@ -311,6 +311,22 @@ jest.mock('../team-page-modals/TeamPageModals', () => ({
                 Simulate Translate Member
             </button>
             <button
+                data-testid="simulate-translate-member-draft"
+                onClick={() => {
+                    onTranslateTeamMember({
+                        id: 1,
+                        fullName: 'Translated Member Draft',
+                        description: 'Draft description',
+                        status: 0,
+                        categoryId: 1,
+                        image: null,
+                        localizations: [],
+                    });
+                }}
+            >
+                Simulate Translate Draft
+            </button>
+            <button
                 data-testid="simulate-delete-member"
                 onClick={() => {
                     const memberToDelete = {
@@ -922,6 +938,33 @@ describe('TeamPageContent', () => {
 
                 await expectMemberNameToBe('Translated Member');
                 expect(mockCloseModalActions.closeTranslateItemModal).toHaveBeenCalled();
+                expect(mockAddToast).toHaveBeenCalled();
+            });
+
+            it('shows success toast when translated member is published', async () => {
+                renderTeamPageContent();
+
+                fireEvent.click(screen.getByTestId('simulate-translate-member'));
+
+                await waitFor(() => {
+                    expect(mockAddToast).toHaveBeenCalledWith(
+                        COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS,
+                        ToastType.Success,
+                    );
+                });
+            });
+
+            it('shows success toast when translated member is draft', async () => {
+                renderTeamPageContent();
+
+                fireEvent.click(screen.getByTestId('simulate-translate-member-draft'));
+
+                await waitFor(() => {
+                    expect(mockAddToast).toHaveBeenCalledWith(
+                        COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS,
+                        ToastType.Success,
+                    );
+                });
             });
 
             // it('should edit member without image cache busting when no url present', async () => {

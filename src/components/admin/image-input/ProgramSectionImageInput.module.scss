@@ -1,11 +1,9 @@
-@use '../../../assets/sass/variables/colors';
-@use '../../../assets/sass/variables/typography';
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/typography';
+@use './ImageInput.module.scss' as base;
 
 .container {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    @extend %container;
     width: 100%;
     height: 100%;
     background: colors.$grey-50;
@@ -21,20 +19,12 @@
 }
 
 .image-placeholder {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
+    @extend %image-placeholder;
     padding: 2rem;
-    border: none;
-    background: none;
-    text-align: center;
 }
 
 .placeholder-icon {
+    @extend %placeholder-icon;
     width: 4rem;
     height: 4rem;
     color: colors.$grey-700;
@@ -42,7 +32,7 @@
 }
 
 .placeholder-text-primary {
-    display: block;
+    @extend %placeholder-text-primary;
     font-family: typography.$font-family-base;
     font-size: typography.$body2-size;
     line-height: 28px;
@@ -52,59 +42,40 @@
 }
 
 .placeholder-text-secondary {
-    display: block;
+    @extend %placeholder-text-secondary;
     font-family: typography.$font-family-base;
     font-size: typography.$small-size;
     line-height: 28px;
     font-weight: typography.$fw-regular;
     letter-spacing: typography.$ls-tight;
     color: colors.$blue-900;
-    margin-top: 0.25rem;
 }
 
 .image-preview {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @extend %image-preview;
+    @extend %image-preview-hover;
 }
 
 .preview-image {
-    display: block;
-    width: 100%;
-    height: 100%;
+    @extend %preview-image;
     object-fit: cover;
-    object-position: center;
+}
+
+.preview-actions {
+    @extend %preview-actions;
 }
 
 .delete-button {
+    @extend %delete-button;
     position: absolute;
     inset: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
+    margin: auto;
     width: 4rem;
     height: 4rem;
-    padding: 0.625rem;
-    margin: auto;
-    border-radius: 8px;
-    border: none;
-    background: colors.$grey-900;
-}
-
-.delete-button:hover {
-    opacity: 1;
 }
 
 .delete-icon {
+    @extend %delete-icon;
     width: 1.5rem;
     height: 1.5rem;
-    filter: brightness(0) invert(1);
-    color: colors.$grey-50;
-}
-
-.image-preview:hover .delete-button {
-    display: flex;
 }

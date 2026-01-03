@@ -1,9 +1,9 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import cn from 'classnames';
-import defaultStyles from './ImageInput.module.scss';
-import whoWeAreStyles from './WhoWeAreImageInput.module.scss';
-import programStyles from './ProgramImageInput.module.scss';
-import programSectionStyles from './ProgramSectionImageInput.module.scss';
+import defaultVariantStyles from './DefaultImageInput.module.scss';
+import whoWeAreVariantStyles from './WhoWeAreImageInput.module.scss';
+import programVariantStyles from './ProgramImageInput.module.scss';
+import programSectionVariantStyles from './ProgramSectionImageInput.module.scss';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ReactComponent as UploadIcon } from '@/assets/icons/cloud-download.svg';
 import { ReactComponent as CropIcon } from '@/assets/icons/crop.svg';
@@ -15,14 +15,14 @@ import { ConfirmationModal } from '../confirmation-modal/ConfirmationModal';
 import { COMMON_IMAGE_TEXT } from '@/const/admin/image';
 import { CropModal } from '../cropper-modal/CropperModal';
 
-const stylesMap = {
-    default: defaultStyles,
-    whoWeAre: whoWeAreStyles,
-    program: programStyles,
-    programSection: programSectionStyles,
+const variantStylesMap = {
+    default: defaultVariantStyles,
+    whoWeAre: whoWeAreVariantStyles,
+    program: programVariantStyles,
+    programSection: programSectionVariantStyles,
 } as const;
 
-export type ImageInputVariant = keyof typeof stylesMap;
+export type ImageInputVariant = keyof typeof variantStylesMap;
 
 export interface ImageInputProps {
     value: ImageValues | Image | null;
@@ -66,7 +66,7 @@ export const ImageInput = ({
     const [showCropperModal, setShowCropperModal] = useState(false);
     const [rawImage, setRawImage] = useState<ImageValues | Image | null>(null);
 
-    const styles = stylesMap[variant];
+    const styles = variantStylesMap[variant];
 
     useEffect(() => {
         setPreviewImage(value);

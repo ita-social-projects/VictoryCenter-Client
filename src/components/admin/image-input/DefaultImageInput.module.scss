@@ -1,13 +1,15 @@
-﻿@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/variables/colors';
 @use './ImageInput.module.scss' as base;
 
 .container {
     @extend %container;
-    width: 100%;
-    min-height: 18rem;
-    max-height: 53rem;
-    height: auto;
+    width: 9.125rem;
+    height: 9.5rem;
+    padding: 1rem;
+    border: 1px solid colors.$grey-700;
+    border-radius: 8px;
     background: white;
+    box-shadow: 0 1px 0 0 rgba(black, 0.25);
 
     &-focused {
         background-color: colors.$blue-50;
@@ -21,64 +23,53 @@
 
 .image-placeholder {
     @extend %image-placeholder;
-    padding: 2rem;
+    border: 1px dashed colors.$grey-900;
+    border-radius: 4px;
     color: colors.$grey-900;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
 }
 
 .placeholder-icon {
     @extend %placeholder-icon;
-    width: 4rem;
-    height: 4rem;
-    color: colors.$grey-900;
-    margin-bottom: 0.5rem;
+    width: 1.5rem;
+    height: 1.5rem;
 }
 
 .placeholder-text-primary {
     @extend %placeholder-text-primary;
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 500;
-    color: colors.$grey-900;
 }
 
 .placeholder-text-secondary {
     @extend %placeholder-text-secondary;
-    font-size: 14px;
-    line-height: 20px;
-    font-weight: 400;
-    color: colors.$grey-900;
 }
 
 .image-preview {
     @extend %image-preview;
-    height: auto;
-    min-height: 18rem;
-    max-height: 53rem;
-
     @extend %image-preview-hover;
 }
 
 .preview-image {
     @extend %preview-image;
-    max-height: 53rem;
     object-fit: contain;
+    object-position: center;
 }
 
 .preview-actions {
     @extend %preview-actions;
 }
 
-.delete-button {
+.delete-button,
+.crop-button {
     @extend %delete-button;
-    position: absolute;
-    inset: 0;
-    margin: auto;
-    width: 4rem;
-    height: 4rem;
+    width: 2.75rem;
+    height: 2.75rem;
 }
 
-.delete-icon {
+.delete-icon,
+.crop-icon {
     @extend %delete-icon;
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 1rem;
+    height: 1rem;
 }

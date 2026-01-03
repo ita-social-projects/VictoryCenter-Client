@@ -1,13 +1,11 @@
 @use '@/assets/sass/variables/colors';
 @use '@/assets/sass/variables/z-index.scss';
+@use './ImageInput.module.scss' as base;
 
 .container {
+    @extend %container;
     background-size: cover;
     background-position: center;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     border: 1px solid colors.$grey-700;
 
     &-focused {
@@ -18,54 +16,34 @@
     &-disabled {
         background-color: colors.$grey-600;
     }
-
-    &:hover {
-        .preview-actions {
-            .delete-button,
-            .crop-button {
-                display: flex;
-            }
-        }
-    }
 }
 
 .image-placeholder {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0;
-    background: none;
+    @extend %image-placeholder;
     color: colors.$grey-900;
     font-size: 16px;
     font-weight: 600;
-    text-align: center;
     line-height: 28px;
     letter-spacing: 0.02rem;
 }
 
 .placeholder-icon {
+    @extend %placeholder-icon;
     width: 4rem;
     height: 4rem;
     color: colors.$grey-700;
 }
 
-.image-preview {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    border-radius: 4px;
-    overflow: hidden;
+.placeholder-text-primary {
+    @extend %placeholder-text-primary;
+}
 
-    .preview-image {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: fill;
-        object-position: center;
-        transition: filter 0.3s ease;
-    }
+.placeholder-text-secondary {
+    @extend %placeholder-text-secondary;
+}
+
+.image-preview {
+    @extend %image-preview;
 
     &::after {
         content: '';
@@ -78,47 +56,39 @@
         cursor: pointer;
     }
 
-    &:hover::after {
-        opacity: 0.78;
-    }
+    &:hover {
+        @extend %image-preview-hover;
 
-    .preview-actions {
-        position: absolute;
-        inset: 0;
-        margin: auto;
-        display: flex;
-        gap: 0.5rem;
-        width: fit-content;
-        height: fit-content;
-        z-index: z-index.admin('image-input-action-buttons');
-    }
-
-    .delete-button,
-    .crop-button {
-        display: none;
-        align-items: center;
-        justify-content: center;
-        width: 5rem;
-        height: 5rem;
-        aspect-ratio: 1 / 1;
-        padding: 0.625rem;
-        border-radius: 8px;
-        background: colors.$grey-900;
-        opacity: 0.8;
-        z-index: z-index.admin('image-input-action-buttons');
-        cursor: pointer;
-
-        &:hover {
-            opacity: 1;
-        }
-
-        .delete-icon,
-        .crop-icon {
-            width: 55%;
-            height: 55%;
-            color: colors.$grey-50;
+        &::after {
+            opacity: 0.78;
         }
     }
+}
 
-    
+.preview-image {
+    @extend %preview-image;
+    object-fit: fill;
+    transition: filter 0.3s ease;
+}
+
+.preview-actions {
+    @extend %preview-actions;
+}
+
+.delete-button,
+.crop-button {
+    @extend %delete-button;
+    width: 5rem;
+    height: 5rem;
+    aspect-ratio: 1 / 1;
+    opacity: 0.8;
+    z-index: z-index.admin('image-input-action-buttons');
+    cursor: pointer;
+}
+
+.delete-icon,
+.crop-icon {
+    @extend %delete-icon;
+    width: 55%;
+    height: 55%;
 }

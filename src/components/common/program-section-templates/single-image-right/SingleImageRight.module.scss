@@ -117,12 +117,8 @@
         max-width: 700px;
         max-height: 600px;
 
-        > div {
+        [class~="input-group"] {
             height: 100%;
-
-            > div {
-                height: 100%;
-            }
         }
     }
 }

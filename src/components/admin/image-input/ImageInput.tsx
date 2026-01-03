@@ -172,91 +172,89 @@ export const ImageInput = ({
     };
 
     return (
-        <div>
-            <div
-                className={cn(styles.container, {
-                    [styles['container-focused']]: isFocused && !disabled,
-                    [styles['container-disabled']]: disabled,
-                })}
-                style={style}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-                onClick={handleClick}
-                onKeyDown={handleKeyDown}
-                onFocus={handleFocus}
-                onBlur={handleBlurEvent}
-                aria-label={COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER}
-                tabIndex={disabled ? -1 : 0}
-                role="button"
-            >
-                <input
-                    aria-label="Image input"
-                    ref={inputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleInputChange}
-                    style={{ display: 'none' }}
-                    disabled={disabled}
-                    data-testid="image-input-hidden"
-                    id={id}
-                    name={name}
-                    tabIndex={-1}
-                />
+        <div
+            className={cn(styles.container, {
+                [styles['container-focused']]: isFocused && !disabled,
+                [styles['container-disabled']]: disabled,
+            })}
+            style={style}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            onClick={handleClick}
+            onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
+            onBlur={handleBlurEvent}
+            aria-label={COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER}
+            tabIndex={disabled ? -1 : 0}
+            role="button"
+        >
+            <input
+                aria-label="Image input"
+                ref={inputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleInputChange}
+                style={{ display: 'none' }}
+                disabled={disabled}
+                data-testid="image-input-hidden"
+                id={id}
+                name={name}
+                tabIndex={-1}
+            />
 
-                {previewImage ? (
-                    <div className={styles['image-preview']}>
-                        <img
-                            src={getImageSrc(previewImage)}
-                            alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
-                            className={styles['preview-image']}
-                            data-testid="preview-image"
-                        />
-                        {!disabled && (
-                            <div className={styles['preview-actions']}>
+            {previewImage ? (
+                <div className={styles['image-preview']}>
+                    <img
+                        src={getImageSrc(previewImage)}
+                        alt={COMMON_TEXT_ADMIN.ALT.IMAGE_PREVIEW}
+                        className={styles['preview-image']}
+                        data-testid="preview-image"
+                    />
+                    {!disabled && (
+                        <div className={styles['preview-actions']}>
+                            <button
+                                data-testid="remove-photo-button"
+                                type="button"
+                                aria-label="Remove image"
+                                title="Remove image"
+                                className={styles['delete-button']}
+                                disabled={disabled}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowConfirmModal(true);
+                                }}
+                            >
+                                <DeleteIcon className={styles['delete-icon']} />
+                            </button>
+                            {rawImage && 'base64' in rawImage ? (
                                 <button
-                                    data-testid="remove-photo-button"
+                                    data-testid="crop-photo-button"
                                     type="button"
-                                    aria-label="Remove image"
-                                    title="Remove image"
-                                    className={styles['delete-button']}
+                                    aria-label="Crop image"
+                                    title="Crop image"
+                                    className={styles['crop-button']}
                                     disabled={disabled}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        setShowConfirmModal(true);
+                                        setShowCropperModal(true);
                                     }}
                                 >
-                                    <DeleteIcon className={styles['delete-icon']} />
+                                    <CropIcon className={styles['crop-icon']} />
                                 </button>
-                                {rawImage && 'base64' in rawImage ? (
-                                    <button
-                                        data-testid="crop-photo-button"
-                                        type="button"
-                                        aria-label="Crop image"
-                                        title="Crop image"
-                                        className={styles['crop-button']}
-                                        disabled={disabled}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setShowCropperModal(true);
-                                        }}
-                                    >
-                                        <CropIcon className={styles['crop-icon']} />
-                                    </button>
-                                ) : null}
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    <div className={styles['image-placeholder']}>
-                        <UploadIcon className={styles['placeholder-icon']} />
-                        <span className={styles['placeholder-text-primary']}>{label}</span>
-                        <span className={styles['placeholder-text-secondary']}>{subText}</span>
-                    </div>
-                )}
-            </div>
+                            ) : null}
+                        </div>
+                    )}
+                </div>
+            ) : (
+                <div className={styles['image-placeholder']}>
+                    <UploadIcon className={styles['placeholder-icon']} />
+                    <span className={styles['placeholder-text-primary']}>{label}</span>
+                    <span className={styles['placeholder-text-secondary']}>{subText}</span>
+                </div>
+            )}
 
             <ConfirmationModal
                 isOpen={showConfirmModal}

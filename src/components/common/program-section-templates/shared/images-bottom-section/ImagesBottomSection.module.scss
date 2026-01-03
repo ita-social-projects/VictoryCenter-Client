@@ -50,12 +50,8 @@
     .image-wrapper {
         width: 100%;
 
-        > div {
+        [class~="input-group"] {
             height: 100%;
-
-            > div {
-                height: 100%;
-            }
         }
     }
 }

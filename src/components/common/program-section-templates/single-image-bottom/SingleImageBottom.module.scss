@@ -40,12 +40,8 @@
     .image-wrapper {
         max-height: 680px;
 
-        > div {
+        [class~="input-group"] {
             height: 100%;
-
-            > div {
-                height: 100%;
-            }
         }
     }
 }

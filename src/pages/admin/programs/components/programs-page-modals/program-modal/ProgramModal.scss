@@ -2,7 +2,11 @@
     padding: 0 0 6rem 0;
 
     .modal-footer {
-        padding: 0 15rem;
+        justify-content: center;
+        gap: 2%;
+        >button{
+            max-width: 33rem;
+        }
     }
 }
 

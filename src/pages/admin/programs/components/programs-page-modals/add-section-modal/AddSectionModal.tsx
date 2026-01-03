@@ -69,6 +69,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
                         slidesPerView={1}
                         onSlideChange={handleSlideChange}
                         className={swiperStyles['button-container']}
+                        useChevrons={true}
                     />
                 </div>
             </Modal.Content>

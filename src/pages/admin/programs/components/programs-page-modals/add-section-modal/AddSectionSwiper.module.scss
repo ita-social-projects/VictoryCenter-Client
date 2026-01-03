@@ -10,7 +10,9 @@
     pointer-events: none;
     z-index: 10;
 
-    :global(.arrow-button) {
+    [class~="arrow-button"] {
+        width: auto;
+        height: auto;
         pointer-events: auto;
         display: flex;
         align-items: center;
@@ -34,33 +36,17 @@
         }
     }
 
-    :global(.arrow-icon) {
-        display: none;
-    }
-
-    :global(.arrow-button)::before {
-        content: '';
-        display: block;
+    [class~="arrow-icon"] {
         width: 32px;
         height: 32px;
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
     }
 
-    :global(.arrow-left) {
+    [class~="arrow-left"] {
         margin-left: 3vw;
-
-        &::before {
-            background-image: url('../../../../../../assets/icons/chevron-left.svg');
-        }
     }
 
-    :global(.arrow-right) {
-        margin-right: 3vw;
 
-        &::before {
-            background-image: url('../../../../../../assets/icons/chevron-right.svg');
-        }
+    [class~="arrow-right"] {
+        margin-right: 3vw;
     }
 }

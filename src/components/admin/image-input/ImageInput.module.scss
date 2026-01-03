@@ -6,6 +6,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
+    &:hover {
+        .placeholder-icon {
+            color: c.$grey-900;
+        }
+    }
 }
 
 %image-placeholder {
@@ -22,7 +28,8 @@
 }
 
 %placeholder-icon {
-    color: c.$grey-900;
+    color: c.$grey-700;
+    transition: color 0.2s ease;
 }
 
 %placeholder-text-primary {

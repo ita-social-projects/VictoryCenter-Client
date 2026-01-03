@@ -7,6 +7,8 @@ import 'swiper/css/scrollbar';
 
 import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
 import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
+import { ReactComponent as ChevronRight } from '@/assets/icons/chevron-right.svg';
+import { ReactComponent as ChevronLeft } from '@/assets/icons/chevron-left.svg';
 
 interface SwiperProps<T> {
     items: T[] | null;
@@ -16,6 +18,7 @@ interface SwiperProps<T> {
     showScrollbar?: boolean;
     onSlideChange?: (activeIndex: number) => void;
     className?: string;
+    useChevrons?: boolean;
 }
 
 export function Swiper<T>({
@@ -26,6 +29,7 @@ export function Swiper<T>({
     showScrollbar = false,
     onSlideChange,
     className = '',
+    useChevrons = false,
 }: SwiperProps<T>) {
     const swiperRef = useRef<SwiperClass | null>(null);
     const [isPrevEnabled, setIsPrevEnabled] = useState(false);
@@ -83,6 +87,9 @@ export function Swiper<T>({
         return null;
     }
 
+    const LeftIcon = useChevrons ? ChevronLeft : ArrowLeft;
+    const RightIcon = useChevrons ? ChevronRight : ArrowRight;
+
     return (
         <>
             <SwiperReact
@@ -110,7 +117,7 @@ export function Swiper<T>({
                     title="Previous slide"
                     aria-label="Previous slide"
                 >
-                    <ArrowLeft className="arrow-icon" />
+                    <LeftIcon className="arrow-icon" />
                 </button>
                 <button
                     type="button"
@@ -120,7 +127,7 @@ export function Swiper<T>({
                     title="Next slide"
                     aria-label="Next slide"
                 >
-                    <ArrowRight className="arrow-icon" />
+                    <RightIcon className="arrow-icon" />
                 </button>
             </div>
         </>

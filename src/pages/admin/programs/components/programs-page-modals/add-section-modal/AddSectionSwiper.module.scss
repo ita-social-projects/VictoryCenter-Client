@@ -1,0 +1,51 @@
+.button-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: none;
+    z-index: 10;
+
+    [class~='arrow-button'] {
+        width: auto;
+        height: auto;
+        pointer-events: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: opacity 0.2s ease;
+
+        &:hover:not(:disabled) {
+            opacity: 0.7;
+        }
+
+        &:active:not(:disabled) {
+            opacity: 0.5;
+        }
+
+        &:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+    }
+
+    [class~='arrow-icon'] {
+        width: 32px;
+        height: 32px;
+    }
+
+    [class~='arrow-left'] {
+        margin-left: 3vw;
+    }
+
+    [class~='arrow-right'] {
+        margin-right: 3vw;
+    }
+}

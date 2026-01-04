@@ -1,14 +1,14 @@
 import { InputLabel, InputLabelProps } from '@/components/admin/input-label/InputLabel';
 import { InputError, InputErrorProps } from '@/components/admin/input-error/InputError';
-import { ImageInput, ImageInputProps } from '@/components/admin/image-input/ImageInput';
+import { ImageInput, ImageInputProps, ImageInputVariant } from '@/components/admin/image-input/ImageInput';
 import '../input-group.scss';
 
-export interface PhotoInputGroupProps extends Omit<ImageInputProps, 'label' | 'subText'> {
+export interface PhotoInputGroupProps extends Omit<ImageInputProps, 'label' | 'subText' | 'variant'> {
     label?: InputLabelProps['text'];
     isRequired?: InputLabelProps['isRequired'];
     error?: InputErrorProps['error'];
     id: string;
-    className?: string;
+    variant?: ImageInputVariant;
     imageLabel?: string | null;
     imageSubText?: string | null;
 }
@@ -24,7 +24,7 @@ export const PhotoInputGroup = ({
     disabled,
     error,
     setError,
-    className,
+    variant,
     imageLabel,
     imageSubText,
     cropWidth,
@@ -43,7 +43,7 @@ export const PhotoInputGroup = ({
                 onBlur={onBlur}
                 disabled={disabled}
                 setError={setError}
-                className={className}
+                variant={variant}
                 label={imageLabel}
                 subText={imageSubText}
                 cropHeight={cropHeight}

@@ -8,6 +8,7 @@ export interface BaseModalState<TEntity> {
     isAddCategoryModalOpen: boolean;
     isEditCategoryModalOpen: boolean;
     isDeleteCategoryModalOpen: boolean;
+    isAddSectionModalOpen: boolean;
 }
 
 export interface BaseCloseModalActions {
@@ -18,6 +19,7 @@ export interface BaseCloseModalActions {
     closeEditCategoryModal: () => void;
     closeTranslateItemModal: () => void;
     closeDeleteCategoryModal: () => void;
+    closeAddSectionModal: () => void;
 }
 
 export interface BaseOpenModalActions<TEntity> {
@@ -28,6 +30,7 @@ export interface BaseOpenModalActions<TEntity> {
     openAddCategoryModal: () => void;
     openEditCategoryModal: () => void;
     openDeleteCategoryModal: () => void;
+    openAddSectionModal: () => void;
 }
 
 export interface UseModalsStateResult<TEntity> {
@@ -46,6 +49,7 @@ export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
         isAddCategoryModalOpen: false,
         isEditCategoryModalOpen: false,
         isDeleteCategoryModalOpen: false,
+        isAddSectionModalOpen: false,
     });
 
     const isAnyModalOpened = useMemo(() => {
@@ -65,6 +69,7 @@ export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
             closeEditCategoryModal: () => updateModalState({ isEditCategoryModalOpen: false }),
             closeTranslateItemModal: () => updateModalState({ itemToTranslate: null }),
             closeDeleteCategoryModal: () => updateModalState({ isDeleteCategoryModalOpen: false }),
+            closeAddSectionModal: () => updateModalState({ isAddSectionModalOpen: false }),
         }),
         [updateModalState],
     );
@@ -114,6 +119,12 @@ export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
                 setModalState((prev) => {
                     if (isAnyModalOpenedInState(prev)) return prev;
                     return { ...prev, isDeleteCategoryModalOpen: true };
+                });
+            },
+            openAddSectionModal: () => {
+                setModalState((prev) => {
+                    if (isAnyModalOpenedInState(prev)) return prev;
+                    return { ...prev, isAddSectionModalOpen: true };
                 });
             },
         };

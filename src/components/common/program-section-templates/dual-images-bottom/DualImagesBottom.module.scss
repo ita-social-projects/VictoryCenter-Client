@@ -1,0 +1,36 @@
+$img-width: 730px;
+$img-height: 430px;
+$img-number: 3;
+
+.container {
+    aspect-ratio: 1460 / 1235;
+    gap: 1rem;
+}
+
+.top-section {
+    flex: 0 0 51%;
+}
+
+.bottom-section {
+    flex: 0 0 49%;
+    justify-content: end;
+    padding-bottom: 1rem;
+}
+
+.images-grid {
+    display: flex;
+}
+
+.image {
+    aspect-ratio: 730 / 430;
+}
+
+.container.editable {
+    gap: 2rem;
+
+    .image-wrapper {
+        aspect-ratio: #{$img-width} / #{$img-height};
+        max-width: #{$img-width};
+        max-height: #{$img-height};
+    }
+}

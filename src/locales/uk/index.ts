@@ -5,5 +5,6 @@ import programsPageUk from './programs.json';
 import donateUk from './donate.json';
 import globalUk from './global.json';
 import reportsPageUk from './reports.json';
+import partnersPageUk from './partners.json';
 
-export { headerUk, footerUk, aboutUsPageUk, programsPageUk, donateUk, reportsPageUk, globalUk };
+export { headerUk, footerUk, aboutUsPageUk, programsPageUk, donateUk, reportsPageUk, partnersPageUk, globalUk };

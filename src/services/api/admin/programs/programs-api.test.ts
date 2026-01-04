@@ -31,6 +31,7 @@ const mockPrograms: Program[] = [
         location: 'Київ',
         participantsCount: '10-15 осіб',
         meetingsCount: '12 занять',
+        sections: [],
     },
     {
         id: 2,
@@ -43,6 +44,7 @@ const mockPrograms: Program[] = [
         location: 'Львів',
         participantsCount: '8-10 дітей',
         meetingsCount: '10 занять',
+        sections: [],
     },
     {
         id: 3,
@@ -55,6 +57,7 @@ const mockPrograms: Program[] = [
         location: 'Одеса',
         participantsCount: '5-8 осіб',
         meetingsCount: '15 занять',
+        sections: [],
     },
 ];
 
@@ -76,6 +79,7 @@ const getValidProgramData = (overrides?: Partial<ProgramCreateUpdate>): ProgramC
     location: 'Location 123',
     participantsCount: 'Some participants 123',
     meetingsCount: 'Some meetings count 123',
+    sections: [],
     ...overrides,
 });
 
@@ -491,6 +495,7 @@ describe('fetchProgramSearchItems', () => {
             participantsCount: '10',
             meetingsCount: '5',
             categories: [{ id: 9, name: 'General', programsCount: 1 }],
+            sections: [],
         };
         const programWithCategoryMatch: Program = {
             id: 101,
@@ -503,6 +508,7 @@ describe('fetchProgramSearchItems', () => {
             participantsCount: '10',
             meetingsCount: '5',
             categories: [{ id: 10, name: 'Pilates', programsCount: 1 }],
+            sections: [],
         };
 
         mockClient.get.mockResolvedValueOnce({

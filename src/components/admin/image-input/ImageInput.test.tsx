@@ -81,6 +81,12 @@ describe('ImageInput', () => {
         globalThis.URL.createObjectURL = jest.fn(() => 'mock-preview-url');
         globalThis.URL.revokeObjectURL = jest.fn();
 
+        // Mock crypto.randomUUID for Jest environment
+        if (!globalThis.crypto) {
+            globalThis.crypto = {} as Crypto;
+        }
+        globalThis.crypto.randomUUID = jest.fn(() => '00000000-0000-0000-0000-000000000000') as any;
+
         jest.clearAllMocks();
         jest.spyOn(globalThis, 'FileReader').mockImplementation(() => {
             const mock = {
@@ -130,6 +136,29 @@ describe('ImageInput', () => {
         await waitFor(() => {
             expect(screen.getByTestId('cropper')).toBeInTheDocument();
         });
+    });
+
+    it('calls onChange immediately when file is selected and enableCrop is false', async () => {
+        const file = createImageFile();
+
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} enableCrop={false} />);
+
+        const fileInput = screen.getByTestId('image-input-hidden');
+
+        fireEvent.change(fileInput, {
+            target: { files: [file] },
+        });
+
+        await waitFor(() => {
+            expect(onChangeMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    base64: expect.any(String),
+                    mimeType: 'image/png',
+                }),
+            );
+        });
+
+        expect(screen.queryByTestId('cropper')).not.toBeInTheDocument();
     });
 
     it('displays error when image validation fails', async () => {
@@ -256,6 +285,36 @@ describe('ImageInput', () => {
         });
     });
 
+    it('handles drag and drop image when enableCrop is false', async () => {
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} enableCrop={false} />);
+        const dropZone = screen.getByRole('button', {
+            name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER,
+        });
+
+        const file = createImageFile();
+
+        const data = {
+            dataTransfer: {
+                files: [file],
+                types: ['Files'],
+            },
+        };
+
+        fireEvent.dragOver(dropZone);
+        fireEvent.drop(dropZone, data as unknown as DragEvent);
+
+        await waitFor(() => {
+            expect(onChangeMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    base64: expect.any(String),
+                    mimeType: 'image/png',
+                }),
+            );
+        });
+
+        expect(screen.queryByTestId('cropper')).not.toBeInTheDocument();
+    });
+
     it('adds focus class on drag over and removes on drag leave', () => {
         render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} />);
         const wrapper = screen.getByRole('button', {
@@ -263,10 +322,10 @@ describe('ImageInput', () => {
         });
 
         fireEvent.dragOver(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(true);
+        expect(wrapper.classList.contains('container-focused')).toBe(true);
 
         fireEvent.dragLeave(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
     });
 
     it('does not open file dialog or allow drop when disabled', () => {
@@ -276,7 +335,7 @@ describe('ImageInput', () => {
         });
         const input = wrapper.querySelector('input[type="file"]')!;
 
-        expect(wrapper.classList.contains('image-input-wrapper-disabled')).toBe(true);
+        expect(wrapper.classList.contains('container-disabled')).toBe(true);
 
         fireEvent.click(wrapper);
         expect(document.activeElement).not.toBe(input);
@@ -324,10 +383,10 @@ describe('ImageInput', () => {
         });
 
         fireEvent.mouseEnter(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(true);
+        expect(wrapper.classList.contains('container-focused')).toBe(true);
 
         fireEvent.mouseLeave(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
     });
 
     it('does not add focus class on mouse enter when disabled', () => {
@@ -337,7 +396,7 @@ describe('ImageInput', () => {
         });
 
         fireEvent.mouseEnter(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
     });
 
     it('does not add focus class on mouse leave when disabled', () => {
@@ -347,7 +406,7 @@ describe('ImageInput', () => {
         });
 
         fireEvent.mouseLeave(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
     });
 
     it('handles keyboard events (Enter and Space)', () => {
@@ -411,10 +470,10 @@ describe('ImageInput', () => {
         });
 
         fireEvent.focus(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(true);
+        expect(wrapper.classList.contains('container-focused')).toBe(true);
 
         fireEvent.blur(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
         expect(onBlurMock).toHaveBeenCalled();
     });
 
@@ -428,10 +487,10 @@ describe('ImageInput', () => {
         });
 
         fireEvent.focus(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
 
         fireEvent.blur(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
         expect(onBlurMock).toHaveBeenCalled();
     });
 
@@ -451,7 +510,7 @@ describe('ImageInput', () => {
         });
 
         fireEvent.dragOver(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
     });
 
     it('clears input value when removing file', () => {

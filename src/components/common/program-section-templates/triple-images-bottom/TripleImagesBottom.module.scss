@@ -1,0 +1,43 @@
+$img-width: 480px;
+$img-height: 480px;
+$img-number: 3;
+
+.container {
+    aspect-ratio: 1440 / 1302;
+}
+
+.top-section {
+    flex: 0 0 49%;
+}
+
+.bottom-section {
+    flex: 0 0 51%;
+    justify-content: end;
+    padding-bottom: 1rem;
+}
+
+.images-grid {
+    display: flex;
+}
+
+.image {
+    aspect-ratio: #{$img-width} / #{$img-height};
+}
+
+.container.editable {
+    gap: 2rem;
+
+    .top-section {
+        height: 10px;
+    }
+
+    .images-grid {
+        width: 100%;
+    }
+
+    .image-wrapper {
+        height: 100%;
+        max-width: #{$img-width};
+        max-height: #{$img-height};
+    }
+}

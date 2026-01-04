@@ -403,8 +403,14 @@ export const TeamPageContent = () => {
                 prevMembers.map((member) => (member.id === updatedMember.id ? updatedMember : member)),
             );
             closeModalActions.closeTranslateItemModal();
+
+            if (updatedMember.status === VisibilityStatus.Published) {
+                addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_PUBLISHED_SUCCESS, ToastType.Success);
+            } else {
+                addToast(COMMON_TEXT_ADMIN.MESSAGE.TRANSLATION_SAVED_SUCCESS, ToastType.Success);
+            }
         },
-        [closeModalActions],
+        [closeModalActions, addToast],
     );
 
     const handleEditMember = useCallback(

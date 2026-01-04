@@ -1,0 +1,56 @@
+@import '../BaseSectionTemplate.module.scss';
+
+.container {
+    @extend .section-container;
+    display: flex;
+}
+
+.bottom-section {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.images-grid {
+    display: flex;
+    flex: 1;
+    align-items: end;
+    justify-content: center;
+}
+
+.image-wrapper {
+    height: 75%;
+    &[data-elevated='true'] {
+        transform: translateY(-25%);
+    }
+    justify-content: end;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    display: block;
+}
+
+.container.editable {
+    max-height: 1200px;
+
+    .top-section {
+        flex: 40%;
+    }
+
+    .bottom-section {
+        flex: 40%;
+        padding-bottom: 6rem;
+    }
+
+    .image-wrapper {
+        width: 100%;
+
+        [class~='input-group'] {
+            height: 100%;
+        }
+    }
+}

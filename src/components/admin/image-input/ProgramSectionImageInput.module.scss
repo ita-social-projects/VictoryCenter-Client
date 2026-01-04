@@ -1,7 +1,7 @@
 @use '@/assets/sass/variables/colors' as c;
 @use '@/assets/sass/variables/typography';
 @use '@/assets/sass/variables/z-index.scss';
-@use './ImageInput.module.scss' as base;
+@use './ImageInput.module.scss';
 
 .container {
     @extend %container;
@@ -21,19 +21,16 @@
 }
 
 .image-placeholder {
-    @extend %image-placeholder;
     padding: 2rem;
 }
 
 .placeholder-icon {
-    @extend %placeholder-icon;
     width: 4rem;
     height: 4rem;
     margin-bottom: 0.5rem;
 }
 
 .placeholder-text-primary {
-    @extend %placeholder-text-primary;
     font-family: typography.$font-family-base;
     font-size: typography.$body2-size;
     line-height: 28px;
@@ -43,7 +40,6 @@
 }
 
 .placeholder-text-secondary {
-    @extend %placeholder-text-secondary;
     font-family: typography.$font-family-base;
     font-size: typography.$small-size;
     line-height: 28px;
@@ -53,7 +49,6 @@
 }
 
 .image-preview {
-    @extend %image-preview;
 
     &::after {
         content: '';
@@ -65,8 +60,6 @@
     }
 
     &:hover {
-        @extend %image-preview-hover;
-
         &::after {
             opacity: 0.50;
         }
@@ -74,25 +67,14 @@
 }
 
 .preview-image {
-    @extend %preview-image;
     object-fit: cover;
-}
-
-.preview-actions {
-    @extend %preview-actions;
 }
 
 .delete-button,
 .crop-button {
-    @extend %delete-button;
     width: 5rem;
     height: 5rem;
     aspect-ratio: 1 / 1;
     opacity: 0.8;
     z-index: z-index.admin('image-input-action-buttons');
-}
-
-.delete-icon,
-.crop-icon {
-    @extend %delete-icon;
 }

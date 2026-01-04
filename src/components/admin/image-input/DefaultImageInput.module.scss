@@ -1,5 +1,5 @@
 @use '@/assets/sass/variables/colors' as c;
-@use './ImageInput.module.scss' as base;
+@use './ImageInput.module.scss';
 
 .container {
     @extend %container;
@@ -22,7 +22,6 @@
 }
 
 .image-placeholder {
-    @extend %image-placeholder;
     border: 1px dashed c.$grey-900;
     border-radius: 4px;
     color: c.$grey-900;
@@ -32,44 +31,23 @@
 }
 
 .placeholder-icon {
-    @extend %placeholder-icon;
     width: 1.5rem;
     height: 1.5rem;
 }
 
-.placeholder-text-primary {
-    @extend %placeholder-text-primary;
-}
-
-.placeholder-text-secondary {
-    @extend %placeholder-text-secondary;
-}
-
-.image-preview {
-    @extend %image-preview;
-    @extend %image-preview-hover;
-}
-
 .preview-image {
-    @extend %preview-image;
     object-fit: contain;
     object-position: center;
 }
 
-.preview-actions {
-    @extend %preview-actions;
-}
-
 .delete-button,
 .crop-button {
-    @extend %delete-button;
     width: 2.75rem;
     height: 2.75rem;
 }
 
 .delete-icon,
 .crop-icon {
-    @extend %delete-icon;
     width: 1rem;
     height: 1rem;
 }

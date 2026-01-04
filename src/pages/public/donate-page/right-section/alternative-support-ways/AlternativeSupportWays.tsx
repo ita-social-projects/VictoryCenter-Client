@@ -1,7 +1,7 @@
 import './AlternativeSupportWays.scss';
 import { CopyTextButton } from '../../copy-text-button/CopyTextButton';
-import { ALTERNATIVE_SUPPORT_WAYS } from '@/const/public/donate-page';
 import { PublishedSupportOptionsDto, Currency } from '@/types/public/donate-page';
+import { useTranslation } from 'react-i18next';
 
 interface AlternativeSupportWaysProps {
     supportOptions: PublishedSupportOptionsDto[];
@@ -9,6 +9,7 @@ interface AlternativeSupportWaysProps {
 }
 
 export const AlternativeSupportWays = ({ supportOptions, currentCurrency }: AlternativeSupportWaysProps) => {
+    const { t } = useTranslation('donatePage');
     const currentCurrencyOptions = supportOptions.filter((option) => option.currency === currentCurrency);
 
     if (currentCurrencyOptions.length === 0) {
@@ -17,7 +18,7 @@ export const AlternativeSupportWays = ({ supportOptions, currentCurrency }: Alte
 
     return (
         <div className="alternativeSupportWays">
-            <h2>{ALTERNATIVE_SUPPORT_WAYS.ALTERNATIVE_SUPPORT_WAYS_LABEL}</h2>
+            <h2>{t('ALTERNATIVE_SUPPORT_WAYS_LABEL')}</h2>
 
             {currentCurrencyOptions.map((option) => (
                 <div key={option.id} className="labelContainer">

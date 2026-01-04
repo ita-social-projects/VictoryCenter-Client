@@ -1,0 +1,32 @@
+{
+    "DONATE_PAGE_TITLE": "МИ ВДЯЧНІ | ЗА КОЖЕН ДОНАТ",
+    "DONATE_ONE_TIME_LABEL": "Разовий донат",
+    "DONATE_SUBSCRIPTION_LABEL": "Підписка",
+    "ONE_TIME_DONATE_BUTTON_LABEL": "Донатити",
+    "SUBSCRIPTION_DONATE_BUTTON_LABEL": "Донатити щомісячно",
+
+    "UKRAINE_PAYMENT_DETAILS_LABEL": "Реквізити для донатів в Україні",
+    "UKRAINE_UIDSREOU_LABEL": "ЄДРПОУ",
+    "UKRAINE_PAYMENT_DESTINATION_LABEL": "Призначення платежу",
+    "PAYMENT_DETAILS_COMMON_RECIPIENT_LABEL": "Одержувач",
+    "PAYMENT_DETAILS_COMMON_BANK_LABEL": "Банк",
+
+    "SWIFT_CODE_LABEL": "SWIFT-код банку",
+    "BANK_RECEIVER_LABEL": "Банк-отримувач",
+    "ADDRESS_LABEL": "Адреса",
+
+    "USD_PAYMENT_DETAILS_LABEL": "Для переказів в USD:",
+    "EUR_PAYMENT_DETAILS_LABEL": "Для переказів в EUR:",
+
+    "CORRESPONDENT_BANKS_LABEL": "Кореспондентські банки (один із варіантів на вибір)",
+
+    "CURRENCY_TABS": {
+        "UAH": "Гривня / UAH",
+        "USD": "Долар / USD",
+        "EUR": "Євро / EUR"
+    },
+
+    "ALTERNATIVE_SUPPORT_WAYS_LABEL": "Інші варіанти підтримки",
+
+    "LOADING_ERROR_MESSAGE": "Не вдалося завантажити реквізити"
+}

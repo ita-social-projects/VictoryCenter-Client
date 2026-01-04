@@ -7,7 +7,7 @@ import { UkrainePaymentDetails } from './ukraine-payment-details/UkrainePaymentD
 import { Currency, DonatePageData } from '@/types/public/donate-page';
 import { useTranslation } from 'react-i18next';
 import { currencyToString } from '@/utils/functions/mappers/public/donate/donate';
-import { useLocale } from '@/hooks/common/use-current-language/useLocale';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
 
 interface RightSectionProps {
     donateData: DonatePageData | null;

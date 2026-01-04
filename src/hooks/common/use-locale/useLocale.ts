@@ -12,6 +12,5 @@ export const useLocale = () => {
         changeLocaleLanguage,
         isUk: i18n.language === 'uk',
         isEn: i18n.language === 'en',
-        i18n,
     };
 };

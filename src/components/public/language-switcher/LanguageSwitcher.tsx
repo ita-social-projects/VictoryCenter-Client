@@ -3,7 +3,7 @@ import { Select } from '@/components/common/select/Select';
 import { LOCALES } from '@/const/common/locales';
 import classNames from 'classnames';
 import './LanguageSwitcher.scss';
-import { useLocale } from '@/hooks/common/use-current-language/useLocale';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
 
 export interface LanguageSwitcherProps {
     onValueChange?: () => void;

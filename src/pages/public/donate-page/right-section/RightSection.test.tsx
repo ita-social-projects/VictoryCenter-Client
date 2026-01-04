@@ -9,16 +9,14 @@ import {
     PublishedSupportOptionsDto,
 } from '@/types/public/donate-page';
 import donatePageUk from '@/locales/uk/donate.json';
-import { useLocale } from '@/hooks/common/use-current-language/useLocale';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
 
-// 1. Мокаємо хук
-jest.mock('@/hooks/common/use-current-language/useLocale', () => ({
+jest.mock('@/hooks/common/use-locale/useLocale', () => ({
     useLocale: jest.fn(),
 }));
 
 const mockedUseLocale = useLocale as jest.Mock;
 
-// 2. Мокаємо дочірні компоненти (використовуємо числа замість Currency enum всередині мока)
 jest.mock('./ukraine-payment-details/UkrainePaymentDetails', () => ({
     UkrainePaymentDetails: ({ bankDetails }: any) => (
         <div data-testid="ukraine-payment">Ukraine Payment Details ({bankDetails?.length || 0} items)</div>

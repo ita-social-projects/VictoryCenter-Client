@@ -56,7 +56,7 @@ describe('useLocale hook', () => {
         const { result } = renderHook(() => useLocale());
 
         act(() => {
-            result.current.changeLocaleLanguage('en');
+            result.current.changeLanguage('en');
         });
 
         expect(mockChangeLanguage).toHaveBeenCalledWith('en');

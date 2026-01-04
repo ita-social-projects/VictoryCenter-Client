@@ -11,17 +11,17 @@ export interface LanguageSwitcherProps {
 }
 
 export const LanguageSwitcher = ({ onValueChange, className }: LanguageSwitcherProps) => {
-    const { changeLocaleLanguage, currentLanguage } = useLocale();
+    const { changeLanguage, currentLanguage } = useLocale();
 
-    const changeLanguage = (lng: string) => {
-        changeLocaleLanguage(lng);
+    const handleChangeLanguage = (lng: string) => {
+        changeLanguage(lng);
         onValueChange?.();
     };
 
     return (
         <Select<string>
             value={currentLanguage}
-            onValueChange={changeLanguage}
+            onValueChange={handleChangeLanguage}
             placeholder="lng"
             className={classNames('language-switcher', className)}
             headClassName="language-switcher-head"

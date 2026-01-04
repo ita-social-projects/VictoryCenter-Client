@@ -13,6 +13,7 @@ describe('useModalsState', () => {
             isAddCategoryModalOpen: false,
             isEditCategoryModalOpen: false,
             isDeleteCategoryModalOpen: false,
+            isAddSectionModalOpen: false,
         });
         expect(result.current.isAnyModalOpened).toBe(false);
     });

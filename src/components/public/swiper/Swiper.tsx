@@ -7,6 +7,8 @@ import 'swiper/css/scrollbar';
 
 import { ReactComponent as ArrowRight } from '@/assets/icons/arrow-right.svg';
 import { ReactComponent as ArrowLeft } from '@/assets/icons/arrow-left.svg';
+import { ReactComponent as ChevronRight } from '@/assets/icons/chevron-right.svg';
+import { ReactComponent as ChevronLeft } from '@/assets/icons/chevron-left.svg';
 
 interface SwiperProps<T> {
     items: T[] | null;
@@ -14,6 +16,9 @@ interface SwiperProps<T> {
     slidesPerView?: number;
     breakpoints?: Record<number, { slidesPerView: number }>;
     showScrollbar?: boolean;
+    onSlideChange?: (activeIndex: number) => void;
+    className?: string;
+    useChevrons?: boolean;
 }
 
 export function Swiper<T>({
@@ -22,6 +27,9 @@ export function Swiper<T>({
     slidesPerView = 1,
     breakpoints = {},
     showScrollbar = false,
+    onSlideChange,
+    className = '',
+    useChevrons = false,
 }: SwiperProps<T>) {
     const swiperRef = useRef<SwiperClass | null>(null);
     const [isPrevEnabled, setIsPrevEnabled] = useState(false);
@@ -34,11 +42,15 @@ export function Swiper<T>({
         swiperRef.current?.slideNext();
     }, []);
 
-    const handleInit = useCallback((swiper: SwiperClass) => {
-        swiperRef.current = swiper;
-        setIsPrevEnabled(!swiper.isBeginning);
-        setIsNextEnabled(!swiper.isEnd);
-    }, []);
+    const handleInit = useCallback(
+        (swiper: SwiperClass) => {
+            swiperRef.current = swiper;
+            setIsPrevEnabled(!swiper.isBeginning);
+            setIsNextEnabled(!swiper.isEnd);
+            onSlideChange?.(swiper.activeIndex);
+        },
+        [onSlideChange],
+    );
 
     const handleResize = useCallback((swiper: SwiperClass) => {
         setIsPrevEnabled(!swiper.isBeginning);
@@ -54,6 +66,15 @@ export function Swiper<T>({
         setIsNextEnabled(true);
     }, []);
 
+    const handleSlideChangeInternal = useCallback(
+        (swiper: SwiperClass) => {
+            setIsPrevEnabled(!swiper.isBeginning);
+            setIsNextEnabled(!swiper.isEnd);
+            onSlideChange?.(swiper.activeIndex);
+        },
+        [onSlideChange],
+    );
+
     const swiperModules = useMemo(() => {
         const modules = [Navigation, Pagination];
         if (showScrollbar) {
@@ -66,11 +87,15 @@ export function Swiper<T>({
         return null;
     }
 
+    const LeftIcon = useChevrons ? ChevronLeft : ArrowLeft;
+    const RightIcon = useChevrons ? ChevronRight : ArrowRight;
+
     return (
         <>
             <SwiperReact
                 modules={swiperModules}
                 onInit={handleInit}
+                onSlideChange={handleSlideChangeInternal}
                 onResize={handleResize}
                 onReachBeginning={handleReachBeginning}
                 onReachEnd={handleReachEnd}
@@ -83,22 +108,26 @@ export function Swiper<T>({
                     <SwiperSlide key={index}>{renderItem(item, index)}</SwiperSlide>
                 ))}
             </SwiperReact>
-            <div className="button-container">
+            <div className={`button-container ${className}`}>
                 <button
                     type="button"
                     onClick={handlePrev}
                     className="arrow-button arrow-left"
                     disabled={!isPrevEnabled}
+                    title="Previous slide"
+                    aria-label="Previous slide"
                 >
-                    <ArrowLeft className="arrow-icon" />
+                    <LeftIcon className="arrow-icon" />
                 </button>
                 <button
                     type="button"
                     onClick={handleNext}
                     className="arrow-button arrow-right"
                     disabled={!isNextEnabled}
+                    title="Next slide"
+                    aria-label="Next slide"
                 >
-                    <ArrowRight className="arrow-icon" />
+                    <RightIcon className="arrow-icon" />
                 </button>
             </div>
         </>

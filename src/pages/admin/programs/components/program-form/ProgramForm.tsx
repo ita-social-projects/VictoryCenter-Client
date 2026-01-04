@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useMemo } from 'react';
+import React, { forwardRef, useCallback, useMemo, useImperativeHandle, useRef } from 'react';
 import { PROGRAM_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
 import { PROGRAM_VALIDATION, PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
@@ -8,10 +8,12 @@ import { MultiSelectInputGroup } from '@/components/admin/input-groups/multi-sel
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { useFormManager } from '@/hooks/admin/use-form-manager/useFormManager';
 import { Button } from '@/components/admin/button/Button';
+import { ProgramSectionForm } from '../program-section-form/ProgramSectionForm';
 import { Image, ImageValues } from '@/types/common/image';
-import { ProgramCategory } from '@/types/admin/programs';
+import { ProgramCategory, ProgramSection } from '@/types/admin/programs';
 import { VisibilityStatus } from '@/types/admin/common';
 import { ReactComponent as PlusIcon } from '@/assets/icons/plus.svg';
+import NotFoundIcon from '@/assets/icons/not-found.svg';
 import styles from './ProgramForm.module.scss';
 
 export interface ProgramFormValues {
@@ -25,6 +27,7 @@ export interface ProgramFormValues {
     location: string;
     participantsCount: string;
     meetingCount: string;
+    sections: ProgramSection[];
 }
 
 export interface ProgramFormErrors {
@@ -43,6 +46,9 @@ export interface ProgramFormRef {
     submit: (status: VisibilityStatus) => Promise<void>;
     isValid: (isPublishing?: boolean) => boolean;
     isDirty: () => boolean;
+    addSection: (section: ProgramSection) => void;
+    removeSection: (sectionIndex: number) => void;
+    getSections: () => ProgramSection[];
 }
 
 export interface ProgramFormProps {
@@ -54,6 +60,7 @@ export interface ProgramFormProps {
     onAddSection?: () => void;
     selectedLanguage?: string;
     onLanguageChange?: (language: string) => void;
+    onRequestCancelSection?: (sectionIndex: number) => void;
 }
 
 const validateForm = (formState: ProgramFormValues, isPublishing: boolean): ProgramFormErrors => {
@@ -81,6 +88,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             categories = [],
             onValidationChange,
             onAddSection,
+            onRequestCancelSection,
         }: ProgramFormProps,
         ref,
     ) => {
@@ -96,9 +104,18 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                 location: '',
                 participantsCount: '',
                 meetingCount: '',
+                sections: [],
             }),
             [],
         );
+
+        interface InternalFormRef {
+            submit: (status: VisibilityStatus) => Promise<void>;
+            isValid: (isPublishing?: boolean) => boolean;
+            isDirty: () => boolean;
+        }
+
+        const internalRef = useRef<InternalFormRef | null>(null);
 
         const { formState, setFormState, errors, setErrors, isSubmitting } = useFormManager<
             ProgramFormValues,
@@ -109,8 +126,47 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             validateForm,
             onSubmit,
             onValidationChange,
-            ref,
+            ref: internalRef,
         });
+
+        const handleAddSection = useCallback(
+            (section: ProgramSection) => {
+                setFormState((prev) => ({
+                    ...prev,
+                    sections: [section, ...prev.sections],
+                }));
+            },
+            [setFormState],
+        );
+
+        const handleRemoveSection = useCallback(
+            (sectionIndex: number) => {
+                setFormState((prev) => ({
+                    ...prev,
+                    sections: prev.sections.filter((_, index) => index !== sectionIndex),
+                }));
+            },
+            [setFormState],
+        );
+
+        useImperativeHandle(
+            ref,
+            () => ({
+                submit: async (status: VisibilityStatus) => {
+                    await internalRef.current?.submit(status);
+                },
+                isValid: (isPublishing?: boolean) => {
+                    return internalRef.current?.isValid(isPublishing) ?? false;
+                },
+                isDirty: () => {
+                    return internalRef.current?.isDirty() ?? false;
+                },
+                addSection: handleAddSection,
+                removeSection: handleRemoveSection,
+                getSections: () => formState.sections,
+            }),
+            [handleAddSection, handleRemoveSection, formState.sections],
+        );
 
         const handleNameChange = useCallback(
             (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -212,11 +268,33 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
             [setErrors],
         );
 
+        const handleSaveSection = useCallback(
+            (sectionIndex: number) => {
+                setFormState((prev) => {
+                    const updatedSections = [...prev.sections];
+                    updatedSections[sectionIndex] = { ...updatedSections[sectionIndex] };
+                    return { ...prev, sections: updatedSections };
+                });
+            },
+            [setFormState],
+        );
+
+        const handleCancelSection = useCallback(
+            (sectionIndex: number) => {
+                if (onRequestCancelSection) {
+                    onRequestCancelSection(sectionIndex);
+                }
+            },
+            [onRequestCancelSection],
+        );
+
+        const hasSections = formState.sections.length > 0;
+
         return (
-            <form className={styles.container} noValidate>
+            <form className={styles['container']} noValidate>
                 {/* Header Section */}
-                <div className={styles.header}>
-                    <div className={styles.headerLeft}>
+                <div className={styles['header']}>
+                    <div className={styles['header-left']}>
                         <MultiSelectInputGroup
                             label={PROGRAMS_TEXT.FORM.LABEL.CATEGORY}
                             isRequired={true}
@@ -232,7 +310,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         />
                     </div>
 
-                    <div className={styles.headerRight}>
+                    <div className={styles['header-right']}>
                         <Button
                             onClick={onAddSection}
                             buttonStyle="primary"
@@ -243,9 +321,10 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         </Button>
                     </div>
                 </div>
+                <div className={styles['sections-divider']} />
 
                 {/* Main Content Layout */}
-                <div className={styles.body}>
+                <div className={styles['body']}>
                     <PhotoInputGroup
                         id="backgroundImage"
                         isRequired={true}
@@ -254,7 +333,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                         onChange={handleBackgroundImageChange}
                         disabled={isSubmitting || isFormDisabled}
                         error={errors.backgroundImage}
-                        className="program-background-image-input"
+                        variant="program"
                         setError={handleSetBackgroundImageError}
                         cropWidth={PROGRAM_VALIDATION.backgroundImage.cropWidth}
                         cropHeight={PROGRAM_VALIDATION.backgroundImage.cropHeight}
@@ -266,8 +345,8 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             PROGRAM_VALIDATION.backgroundImage.width,
                         )}
                     />
-                    <div className={styles.bodyInputs}>
-                        <div className={styles.colLeft}>
+                    <div className={styles['body-inputs']}>
+                        <div className={styles['col-left']}>
                             <TextAreaWithCharacterLimitGroup
                                 label={PROGRAMS_TEXT.FORM.LABEL.NAME}
                                 isRequired={true}
@@ -322,7 +401,7 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             />
                         </div>
 
-                        <div className={styles.colRight}>
+                        <div className={styles['col-right']}>
                             <TextAreaWithCharacterLimitGroup
                                 label={PROGRAMS_TEXT.FORM.LABEL.DESCRIPTION}
                                 id="description"
@@ -359,6 +438,47 @@ export const ProgramForm = forwardRef<ProgramFormRef, ProgramFormProps>(
                             />
                         </div>
                     </div>
+                </div>
+
+                <div className={styles['sections-divider']} />
+
+                {/* Sections Area */}
+                <div className={styles['sections-container']}>
+                    {!hasSections && (
+                        <>
+                            <div className={styles['empty-sections-state']}>
+                                <img src={NotFoundIcon} alt="No sections" className={styles['empty-sections-image']} />
+                                <p className={styles['empty-sections-text']}>{PROGRAMS_TEXT.MESSAGE.NO_SECTIONS_YET}</p>
+                                <Button
+                                    className={styles['btn-add']}
+                                    onClick={onAddSection}
+                                    buttonStyle="secondary"
+                                    disabled={isSubmitting || isFormDisabled}
+                                    data-testid="add-section-button-empty"
+                                >
+                                    {PROGRAMS_TEXT.BUTTON.ADD_SECTION}
+                                    <PlusIcon className={styles['plus-icon']} />
+                                </Button>
+                            </div>
+                            <div className={styles['sections-divider']} />
+                        </>
+                    )}
+
+                    {hasSections && (
+                        <div className={styles['sections-list']}>
+                            {formState.sections.map((section, index) => (
+                                <React.Fragment key={section.id ?? `${section.template}-${index}`}>
+                                    <ProgramSectionForm
+                                        section={section}
+                                        onSave={() => handleSaveSection(index)}
+                                        onCancel={() => handleCancelSection(index)}
+                                        isDisabled={isSubmitting || isFormDisabled}
+                                    />
+                                    <div className={styles['sections-divider']} />
+                                </React.Fragment>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </form>
         );

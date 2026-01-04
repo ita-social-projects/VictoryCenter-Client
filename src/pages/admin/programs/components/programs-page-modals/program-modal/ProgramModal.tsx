@@ -1,13 +1,19 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ProgramForm, ProgramFormRef, ProgramFormValues } from '../../program-form/ProgramForm';
-import { Program, ProgramCategory, ProgramCreateUpdate } from '@/types/admin/programs';
+import { Program, ProgramCategory, ProgramCreateUpdate, ProgramSection } from '@/types/admin/programs';
 import { VisibilityStatus, PendingAction, ModalMode } from '@/types/admin/common';
+import { ProgramSectionTemplate } from '@/types/common/program-sections';
 import { PROGRAMS_TEXT } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramsApi } from '@/services/api/admin/programs/programs-api';
 import { useGenericModal } from '@/hooks/admin/use-generic-modal/useGenericModal';
 import { GenericModalWrapper } from '@/components/admin/generic-modal-wrapper/GenericModalWrapper';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { AddSectionModal } from '../add-section-modal/AddSectionModal';
+import { ConfirmationModal } from '@/components/admin/confirmation-modal/ConfirmationModal';
+import { getInitialSectionContents } from '@/utils/functions/render-program-section';
+import './ProgramModal.scss';
 
 export interface BaseProgramModalProps {
     isOpen: boolean;
@@ -34,6 +40,16 @@ export const ProgramModal = (props: ProgramModalProps) => {
     const isEditMode = mode === ModalMode.Edit;
     const program = isEditMode ? props.programToEdit : undefined;
     const onSuccess = isEditMode ? props.onEditProgram : props.onAddProgram;
+    const { modalState, openModalActions, closeModalActions } = useModalsState();
+    //TODO: const [sections, setSections] = useState<ProgramSection[]>(program?.sections || []);
+
+    useEffect(() => {
+        if (program?.sections) {
+            //TODO: setSections(program.sections);
+        }
+    }, [program?.sections]);
+    const [isSectionUnsavedModalOpen, setIsSectionUnsavedModalOpen] = useState(false);
+    const [sectionToCancel, setSectionToCancel] = useState<number | null>(null);
 
     const initialData = useMemo<ProgramFormValues | null>(() => {
         if (!isEditMode || !program) return null;
@@ -50,6 +66,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
             location: program.location,
             participantsCount: program.participantsCount,
             meetingCount: program.meetingsCount,
+            sections: program.sections || [],
         };
     }, [program, isEditMode]);
 
@@ -104,6 +121,7 @@ export const ProgramModal = (props: ProgramModalProps) => {
                 location: formData.location,
                 participantsCount: formData.participantsCount,
                 meetingsCount: formData.meetingCount,
+                sections: formData.sections,
             }),
         }),
         [isEditMode, isOpen, mode, onClose, onSuccess, program, client, initialData],
@@ -115,49 +133,96 @@ export const ProgramModal = (props: ProgramModalProps) => {
         // TODO: Implement language selection
     }, []);
 
-    const handleAddNewSection = useCallback(() => {
-        // TODO: Implement add new section logic
+    const handleTemplateSelect = useCallback(
+        (templateId: ProgramSectionTemplate) => {
+            if (modalHookData.formRef?.current) {
+                const currentSections = modalHookData.formRef.current.getSections
+                    ? modalHookData.formRef.current.getSections()
+                    : [];
+                const nextOrder =
+                    currentSections.length === 0 ? 0 : Math.max(...currentSections.map((s) => s.order)) + 1;
+                const newSection: ProgramSection = {
+                    template: templateId,
+                    order: nextOrder,
+                    contents: getInitialSectionContents(templateId),
+                };
+                modalHookData.formRef.current.addSection(newSection);
+            }
+        },
+        [modalHookData.formRef],
+    );
+
+    const handleRequestCancelSection = useCallback((sectionIndex: number) => {
+        setSectionToCancel(sectionIndex);
+        setIsSectionUnsavedModalOpen(true);
     }, []);
 
-    const title = isEditMode ? PROGRAMS_TEXT.FORM.TITLE.EDIT_PROGRAM : PROGRAMS_TEXT.FORM.TITLE.ADD_PROGRAM;
+    const handleCloseSectionUnsavedModal = useCallback(() => {
+        setIsSectionUnsavedModalOpen(false);
+        setSectionToCancel(null);
+    }, []);
+
+    const handleConfirmDiscardSection = useCallback(() => {
+        if (sectionToCancel !== null) {
+            //TODO: setSections((prev) => prev.filter((_, index) => index !== sectionToCancel));
+            if (modalHookData.formRef.current) {
+                modalHookData.formRef.current.removeSection(sectionToCancel);
+            }
+        }
+        handleCloseSectionUnsavedModal();
+    }, [sectionToCancel, handleCloseSectionUnsavedModal, modalHookData.formRef]);
 
     return (
-        <GenericModalWrapper
-            isOpen={isOpen}
-            title={title}
-            onClose={modalHookData.handleClose}
-            onFormSubmit={modalHookData.handleFormSubmit}
-            onFormValidationChange={modalHookData.handleFormValidationChange}
-            onPublishSubmit={modalHookData.handlePublishSubmit}
-            onDraftSubmit={modalHookData.handleDraftSubmit}
-            onActionCancel={modalHookData.handleCancelConfirmation}
-            onActionConfirm={modalHookData.handleConfirmAction}
-            onExitCancel={modalHookData.handleCancelClose}
-            onExitConfirm={modalHookData.handleConfirmClose}
-            buttonStates={modalHookData.buttonStates}
-            formRef={modalHookData.formRef}
-            isSubmitting={modalHookData.isSubmitting}
-            error={modalHookData.error}
-            isExitConfirmationOpen={modalHookData.showCloseConfirmModal}
-            isActionConfirmationOpen={modalHookData.showFormConfirmModal}
-            formKey={modalHookData.formKey}
-            actionConfirmationTitle={modalHookData.formConfirmTitle}
-            initialData={initialData}
-            categories={categories}
-            fullScreen={true}
-            renderForm={(props) => (
-                <ProgramForm
-                    ref={modalHookData.formRef}
-                    key={props.key}
-                    initialData={initialData}
-                    isFormDisabled={props.formDisabled}
-                    onSubmit={props.onSubmit}
-                    categories={categories}
-                    onValidationChange={props.onValidationChange}
-                    onLanguageChange={handleLanguageChange}
-                    onAddSection={handleAddNewSection}
-                />
-            )}
-        />
+        <div className="program-modal">
+            <GenericModalWrapper
+                isOpen={isOpen}
+                onClose={modalHookData.handleClose}
+                onFormSubmit={modalHookData.handleFormSubmit}
+                onFormValidationChange={modalHookData.handleFormValidationChange}
+                onPublishSubmit={modalHookData.handlePublishSubmit}
+                onDraftSubmit={modalHookData.handleDraftSubmit}
+                onActionCancel={modalHookData.handleCancelConfirmation}
+                onActionConfirm={modalHookData.handleConfirmAction}
+                onExitCancel={modalHookData.handleCancelClose}
+                onExitConfirm={modalHookData.handleConfirmClose}
+                buttonStates={modalHookData.buttonStates}
+                formRef={modalHookData.formRef}
+                isSubmitting={modalHookData.isSubmitting}
+                error={modalHookData.error}
+                isExitConfirmationOpen={modalHookData.showCloseConfirmModal}
+                isActionConfirmationOpen={modalHookData.showFormConfirmModal}
+                formKey={modalHookData.formKey}
+                actionConfirmationTitle={modalHookData.formConfirmTitle}
+                initialData={initialData}
+                categories={categories}
+                fullScreen={true}
+                renderForm={(props) => (
+                    <ProgramForm
+                        ref={modalHookData.formRef}
+                        key={props.key}
+                        initialData={initialData}
+                        isFormDisabled={props.formDisabled}
+                        onSubmit={props.onSubmit}
+                        categories={categories}
+                        onValidationChange={props.onValidationChange}
+                        onLanguageChange={handleLanguageChange}
+                        onAddSection={openModalActions.openAddSectionModal}
+                        onRequestCancelSection={handleRequestCancelSection}
+                    />
+                )}
+            />
+            <AddSectionModal
+                isOpen={modalState.isAddSectionModalOpen}
+                onClose={closeModalActions.closeAddSectionModal}
+                onSelectTemplate={handleTemplateSelect}
+            />
+            <ConfirmationModal
+                isOpen={isSectionUnsavedModalOpen}
+                onClose={handleCloseSectionUnsavedModal}
+                title={PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE}
+                onConfirm={handleConfirmDiscardSection}
+                onCancel={handleCloseSectionUnsavedModal}
+            />
+        </div>
     );
 };

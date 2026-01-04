@@ -1,0 +1,59 @@
+@import '../shared/BaseSectionTemplate.module.scss';
+
+.container {
+    @extend .section-container;
+    aspect-ratio: 1330 / 1200;
+}
+
+.top-section {
+    flex: 0 0 60%;
+    display: flex;
+    align-items: center;
+}
+
+.image-wrapper {
+    height: 100%;
+    aspect-ratio: 1330 / 680;
+}
+
+.image {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    aspect-ratio: 1330 / 680;
+}
+
+.bottom-section {
+    flex: 0 0 20%;
+    padding-top: 1vw;
+}
+
+.template {
+    .bottom-section {
+        padding-top: 5% 1%;
+    }
+}
+
+.container.editable {
+    max-height: 1300px;
+    gap: 2rem;
+
+    .top-section {
+        height: 300px;
+        justify-content: center;
+    }
+
+    .bottom-section {
+        padding: 0vw 8vw 0 8vw;
+    }
+
+    .image-wrapper {
+        width: 100%;
+        max-width: 1330px;
+        max-height: 680px;
+
+        [class~='input-group'] {
+            height: 100%;
+        }
+    }
+}

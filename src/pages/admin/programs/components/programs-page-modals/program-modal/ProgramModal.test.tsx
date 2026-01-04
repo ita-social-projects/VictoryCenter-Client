@@ -10,6 +10,44 @@ import { VisibilityStatus } from '@/types/admin/common';
 import { useAdminClient } from '@/hooks/admin/use-admin-client/useAdminClient';
 import { ProgramFormProps, ProgramFormRef } from '@/pages/admin/programs/components/program-form/ProgramForm';
 import { ButtonProps } from '@/components/admin/button/Button';
+import { useModalsState } from '@/hooks/admin/use-modals-state/useModalsState';
+import { ProgramSectionTemplate } from '@/types/common/program-sections';
+import { getInitialSectionContents } from '@/utils/functions/render-program-section';
+
+jest.mock('@/hooks/admin/use-modals-state/useModalsState', () => ({
+    useModalsState: jest.fn(),
+}));
+
+const mockedUseModalsState = useModalsState as jest.Mock;
+
+jest.mock('@/utils/functions/render-program-section', () => ({
+    getInitialSectionContents: jest.fn(() => []),
+}));
+
+const mockedGetInitialSectionContents = getInitialSectionContents as jest.Mock;
+
+let capturedAddSectionModalProps: any = {};
+jest.mock('../add-section-modal/AddSectionModal', () => {
+    const React = require('react');
+    const { ProgramSectionTemplate } = require('@/types/common/program-sections');
+
+    return {
+        AddSectionModal: (props: any) => {
+            capturedAddSectionModalProps = props;
+            if (!props.isOpen) return null;
+            return (
+                <div data-testid="add-section-modal-mock">
+                    <button
+                        data-testid="add-section-select-template"
+                        onClick={() => props.onSelectTemplate(ProgramSectionTemplate.TextOnly)}
+                    >
+                        select-template
+                    </button>
+                </div>
+            );
+        },
+    };
+});
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
@@ -108,6 +146,9 @@ const mockFormRef = {
     submit: jest.fn(),
     isDirty: jest.fn(() => false),
     isValid: jest.fn(() => true),
+    getSections: undefined as undefined | (() => Array<{ order: number }>),
+    addSection: jest.fn(),
+    removeSection: jest.fn(),
 };
 
 let capturedFormProps: any = {};
@@ -133,6 +174,7 @@ const mockProgram: Program = {
     participantsCount: '',
     meetingsCount: '',
     location: '',
+    sections: [],
 };
 
 const mockCategories: ProgramCategory[] = [
@@ -198,8 +240,77 @@ describe('ProgramModal', () => {
         jest.clearAllMocks();
         mockFormRef.isDirty.mockReturnValue(false);
         mockFormRef.isValid.mockReturnValue(true);
+        mockFormRef.getSections = undefined;
+        mockFormRef.addSection.mockReset();
+        mockFormRef.removeSection.mockReset();
+
+        mockedUseModalsState.mockReturnValue({
+            modalState: { isAddSectionModalOpen: false },
+            openModalActions: { openAddSectionModal: jest.fn() },
+            closeModalActions: { closeAddSectionModal: jest.fn() },
+        });
+        mockedGetInitialSectionContents.mockReturnValue([]);
         mockedProgramsApi.addProgram.mockResolvedValue({ ...mockProgram, ...mockFormData });
         mockedProgramsApi.editProgram.mockResolvedValue({ ...mockProgram, ...mockFormData });
+    });
+
+    describe('Section template + unsaved-section flows', () => {
+        it('handleTemplateSelect: falls back to empty sections when getSections is missing (nextOrder=0)', () => {
+            mockedUseModalsState.mockReturnValue({
+                modalState: { isAddSectionModalOpen: true },
+                openModalActions: { openAddSectionModal: jest.fn() },
+                closeModalActions: { closeAddSectionModal: jest.fn() },
+            });
+            mockedGetInitialSectionContents.mockReturnValue([{ contentType: 0, order: 0 }] as any);
+
+            render(<ProgramModal {...addModeProps} />);
+
+            expect(screen.getByTestId('add-section-modal-mock')).toBeInTheDocument();
+            fireEvent.click(screen.getByTestId('add-section-select-template'));
+
+            expect(mockedGetInitialSectionContents).toHaveBeenCalledWith(ProgramSectionTemplate.TextOnly);
+            expect(mockFormRef.addSection).toHaveBeenCalledTimes(1);
+            expect(mockFormRef.addSection).toHaveBeenCalledWith({
+                template: ProgramSectionTemplate.TextOnly,
+                order: 0,
+                contents: [{ contentType: 0, order: 0 }],
+            });
+        });
+
+        it('handleTemplateSelect: computes nextOrder from max existing order (Math.max + 1)', () => {
+            mockedUseModalsState.mockReturnValue({
+                modalState: { isAddSectionModalOpen: true },
+                openModalActions: { openAddSectionModal: jest.fn() },
+                closeModalActions: { closeAddSectionModal: jest.fn() },
+            });
+            mockFormRef.getSections = () => [{ order: 0 }, { order: 5 }];
+            mockedGetInitialSectionContents.mockReturnValue([]);
+
+            render(<ProgramModal {...addModeProps} />);
+            fireEvent.click(screen.getByTestId('add-section-select-template'));
+
+            expect(mockFormRef.addSection).toHaveBeenCalledWith({
+                template: ProgramSectionTemplate.TextOnly,
+                order: 6,
+                contents: [],
+            });
+        });
+
+        it('handleRequestCancelSection opens the unsaved-changes modal and handleCloseSectionUnsavedModal closes it', () => {
+            render(<ProgramModal {...addModeProps} />);
+
+            act(() => {
+                capturedFormProps.onRequestCancelSection(2);
+            });
+
+            expect(screen.getByTestId('question-modal')).toBeInTheDocument();
+            expect(screen.getByTestId('question-title')).toHaveTextContent(
+                PROGRAMS_TEXT.SECTION.MODAL.UNSAVED_CHANGES_TITLE,
+            );
+
+            fireEvent.click(screen.getByTestId('question-cancel'));
+            expect(screen.queryByTestId('question-modal')).not.toBeInTheDocument();
+        });
     });
 
     describe('General rendering and closing behavior', () => {
@@ -230,46 +341,38 @@ describe('ProgramModal', () => {
         it('should close the modal after confirming to discard changes', () => {
             mockFormRef.isDirty.mockReturnValue(true);
             render(<ProgramModal {...addModeProps} />);
-            fireEvent.click(getModalCloseButton()); // Open confirmation
+            fireEvent.click(getModalCloseButton());
 
-            fireEvent.click(getQuestionConfirmButton()); // Click "Yes"
+            fireEvent.click(getQuestionConfirmButton());
             expect(mockOnClose).toHaveBeenCalledTimes(1);
         });
 
         it('should not close the modal after canceling the discard changes confirmation', () => {
             mockFormRef.isDirty.mockReturnValue(true);
             render(<ProgramModal {...addModeProps} />);
-            fireEvent.click(getModalCloseButton()); // Open confirmation
+            fireEvent.click(getModalCloseButton());
 
-            fireEvent.click(getQuestionCancelButton()); // Click "No"
+            fireEvent.click(getQuestionCancelButton());
             expect(mockOnClose).not.toHaveBeenCalled();
             expect(getQuestionModal()).not.toBeInTheDocument();
         });
 
         it('should start with disabled buttons and enable them when form is valid', () => {
             render(<ProgramModal {...addModeProps} />);
-            // Buttons are initially disabled because the form hasn't reported its validity
             expect(getDraftButton()).toBeDisabled();
             expect(getPublishButton()).toBeDisabled();
 
-            // Simulate the form becoming valid
             simulateFormBecomesValid();
 
-            // Buttons should now be enabled
             expect(getDraftButton()).not.toBeDisabled();
             expect(getPublishButton()).not.toBeDisabled();
         });
     });
 
     describe('Add Mode', () => {
-        it('should render with the correct "Add Program" title', () => {
-            render(<ProgramModal {...addModeProps} />);
-            expect(screen.getByTestId('modal-title')).toHaveTextContent(PROGRAMS_TEXT.FORM.TITLE.ADD_PROGRAM);
-        });
-
         it('should successfully add a program as a draft', async () => {
             render(<ProgramModal {...addModeProps} />);
-            simulateFormBecomesValid(); // Enable buttons
+            simulateFormBecomesValid();
 
             fireEvent.click(getDraftButton());
             expect(mockFormRef.submit).toHaveBeenCalledWith(VisibilityStatus.Draft);
@@ -301,7 +404,7 @@ describe('ProgramModal', () => {
 
         it('should successfully add a program as published', async () => {
             render(<ProgramModal {...addModeProps} />);
-            simulateFormBecomesValid(); // Enable buttons
+            simulateFormBecomesValid();
 
             fireEvent.click(getPublishButton());
             expect(mockFormRef.submit).toHaveBeenCalledWith(VisibilityStatus.Published);
@@ -331,7 +434,7 @@ describe('ProgramModal', () => {
         it('should show an error message if adding a program fails', async () => {
             mockedProgramsApi.addProgram.mockRejectedValue(new Error('API Error'));
             render(<ProgramModal {...addModeProps} />);
-            simulateFormBecomesValid(); // Enable buttons
+            simulateFormBecomesValid();
 
             fireEvent.click(getPublishButton());
             simulateFormSubmit(VisibilityStatus.Published);
@@ -347,7 +450,7 @@ describe('ProgramModal', () => {
 
         it('should cancel the submission and not call the API', async () => {
             render(<ProgramModal {...addModeProps} />);
-            simulateFormBecomesValid(); // Enable buttons
+            simulateFormBecomesValid();
 
             fireEvent.click(getPublishButton());
             simulateFormSubmit(VisibilityStatus.Published);
@@ -364,14 +467,9 @@ describe('ProgramModal', () => {
     });
 
     describe('Edit Mode', () => {
-        it('should render with the correct "Edit Program" title', () => {
-            render(<ProgramModal {...editModeProps} />);
-            expect(screen.getByTestId('modal-title')).toHaveTextContent(PROGRAMS_TEXT.FORM.TITLE.EDIT_PROGRAM);
-        });
-
         it('should successfully save changes to a draft program', async () => {
             render(<ProgramModal {...editModeProps} />);
-            simulateFormBecomesValid(); // Enable buttons
+            simulateFormBecomesValid();
 
             fireEvent.click(getDraftButton());
             simulateFormSubmit(VisibilityStatus.Draft);
@@ -389,7 +487,7 @@ describe('ProgramModal', () => {
                         status: VisibilityStatus.Draft,
                         previewImageId: null,
                     }),
-                    expect.any(Object), // client
+                    expect.any(Object),
                 );
             });
             expect(mockOnEditProgram).toHaveBeenCalled();
@@ -398,7 +496,7 @@ describe('ProgramModal', () => {
 
         it('should show correct confirmation title when publishing a draft program', async () => {
             render(<ProgramModal {...editModeProps} />);
-            simulateFormBecomesValid(); // Enable buttons
+            simulateFormBecomesValid();
 
             fireEvent.click(getPublishButton());
             simulateFormSubmit(VisibilityStatus.Published);
@@ -409,7 +507,7 @@ describe('ProgramModal', () => {
         it('should show correct confirmation title when saving changes to a published program', async () => {
             const publishedProgram = { ...mockProgram, status: VisibilityStatus.Published };
             render(<ProgramModal {...editModeProps} programToEdit={publishedProgram} />);
-            simulateFormBecomesValid(); // Enable buttons
+            simulateFormBecomesValid();
 
             fireEvent.click(getPublishButton());
             simulateFormSubmit(VisibilityStatus.Published);
@@ -420,7 +518,7 @@ describe('ProgramModal', () => {
         it('should show correct confirmation title when un-publishing a program', async () => {
             const publishedProgram = { ...mockProgram, status: VisibilityStatus.Published };
             render(<ProgramModal {...editModeProps} programToEdit={publishedProgram} />);
-            simulateFormBecomesValid(); // Enable buttons
+            simulateFormBecomesValid();
 
             fireEvent.click(getDraftButton());
             simulateFormSubmit(VisibilityStatus.Draft);
@@ -431,7 +529,7 @@ describe('ProgramModal', () => {
         it('should show an error message if editing a program fails', async () => {
             mockedProgramsApi.editProgram.mockRejectedValue(new Error('API Error'));
             render(<ProgramModal {...editModeProps} />);
-            simulateFormBecomesValid(); // Enable buttons
+            simulateFormBecomesValid();
 
             fireEvent.click(getPublishButton());
             simulateFormSubmit(VisibilityStatus.Published);

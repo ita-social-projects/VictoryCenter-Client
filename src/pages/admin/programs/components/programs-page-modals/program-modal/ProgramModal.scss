@@ -1,0 +1,11 @@
+.program-modal .modal-container.fullscreen {
+    padding: 0 0 6rem 0;
+
+    .modal-footer {
+        justify-content: center;
+        gap: 2%;
+        > button {
+            max-width: 33rem;
+        }
+    }
+}

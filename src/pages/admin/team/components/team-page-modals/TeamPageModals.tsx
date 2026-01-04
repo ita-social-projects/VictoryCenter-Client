@@ -4,14 +4,18 @@ import { TeamCategory } from '@/types/admin/team-category';
 import { TeamMember } from '@/types/admin/team-members';
 import { TeamMemberModal } from '../team-member-modal/TeamMemberModal';
 import { DeleteTeamMemberModal } from '../delete-team-member-modal/DeleteTeamMemberModal';
+import { TranslateTeamMemberModal } from '../translate-team-member-modal/TranslateTeamMemberModal';
 import { TeamCategoryModal } from '../team-category-modal/TeamCategoryModal';
 import { DeleteTeamCategoryModal } from '../delete-team-category-modal/DeleteTeamCategoryModal';
+import { LocalizationLanguage } from '@/types/common/language';
 
 export interface TeamPageModalsProps {
     modalsStateControl: UseModalsStateResult<TeamMember>;
     categories: TeamCategory[];
+    englishLanguage?: LocalizationLanguage;
     onAddTeamMember: (addedMember: TeamMember) => void;
     onEditTeamMember: (updatedMember: TeamMember) => void;
+    onTranslateTeamMember: (translatedMember: TeamMember) => void;
     onDeleteTeamMember: (member: TeamMember) => void;
     onAddTeamCategory: (newCategory: TeamCategory) => void;
     onEditTeamCategory: (updatedCategory: TeamCategory) => void;
@@ -21,7 +25,9 @@ export interface TeamPageModalsProps {
 export const TeamPageModals = ({
     modalsStateControl,
     categories,
+    englishLanguage,
     onAddTeamMember,
+    onTranslateTeamMember,
     onEditTeamMember,
     onDeleteTeamMember,
     onAddTeamCategory,
@@ -56,6 +62,15 @@ export const TeamPageModals = ({
                 memberToDelete={modalState.itemToDelete}
                 onDeleteMember={onDeleteTeamMember}
             />
+            {englishLanguage && modalState.itemToTranslate && (
+                <TranslateTeamMemberModal
+                    isOpen={!!modalState.itemToTranslate}
+                    onClose={closeModalActions.closeTranslateItemModal}
+                    onTranslateMember={onTranslateTeamMember}
+                    memberToTranslate={modalState.itemToTranslate}
+                    language={englishLanguage}
+                />
+            )}
 
             {/* Team Category Modals */}
             <TeamCategoryModal

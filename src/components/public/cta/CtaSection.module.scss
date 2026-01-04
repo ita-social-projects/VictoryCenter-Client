@@ -1,0 +1,91 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.root {
+    position: relative;
+    height: 760px;
+
+    display: flex;
+    color: c.$white;
+
+    @media (min-width: 560px) {
+        height: 840px;
+    }
+
+    @media (min-width: 768px) {
+        height: 880px;
+    }
+
+    @media (min-width: 1440px) {
+        height: 810px;
+    }
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+
+    padding: 64px 16px 40px;
+
+    flex: 1;
+    z-index: 1;
+
+    @media (min-width: 560px) {
+        align-items: center;
+        padding: 64px;
+    }
+
+    @media (min-width: 768px) {
+        padding: 64px 80px;
+    }
+
+    @media (min-width: 1440px) {
+        padding: 60px 200px 80px;
+    }
+}
+
+.title {
+    @include type.h4-bold-uppercase;
+
+    @media (min-width: 768px) {
+        @include type.h3-bold-uppercase;
+    }
+
+    @media (min-width: 1440px) {
+        @include type.h2-bold-uppercase;
+    }
+}
+
+.description {
+    @include type.body-2-medium;
+    margin: auto 0 32px;
+
+    @media (min-width: 768px) {
+        @include type.body-1-medium;
+    }
+
+    @media (min-width: 1440px) {
+        margin-bottom: 16px;
+        text-wrap: balance;
+    }
+}
+
+.actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+
+    @media (min-width: 560px) {
+        flex-wrap: nowrap;
+        gap: 8px;
+    }
+}
+
+.button {
+    width: 100%;
+
+    @media (min-width: 560px) {
+        width: auto;
+    }
+}

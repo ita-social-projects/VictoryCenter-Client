@@ -28,11 +28,7 @@ export interface GenericFormProps<T extends FieldValues> {
     onDelete?: (id: number | null, index?: number) => void;
     itemIndex?: number;
     isChildForm?: boolean;
-    children?: (form: {
-        formState: T;
-        isItemsExpanded: boolean;
-        setFormState: React.Dispatch<React.SetStateAction<T>>;
-    }) => React.ReactNode;
+    children?: (form: { formState: T; isItemsExpanded: boolean }) => React.ReactNode;
     isParentCreating?: boolean;
     isDisabled?: boolean;
     onModeChange?: (mode: GenericFormMode) => void;
@@ -503,7 +499,7 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
 
                     {!isChildForm && (
                         <>
-                            {children?.({ formState, isItemsExpanded, setFormState })}
+                            {children?.({ formState, isItemsExpanded })}
                             {mode === GenericFormMode.Create && <div className="divider">{renderFormButtons()}</div>}
                         </>
                     )}

@@ -5,6 +5,7 @@ export const COMMON_TEXT_ADMIN = {
         DONATE: 'Донати',
         FAQ: 'Часті питання',
         WHO_WE_ARE: 'Хто ми',
+        PARTNERS: 'Партнери',
     },
 
     ALT: {
@@ -13,6 +14,7 @@ export const COMMON_TEXT_ADMIN = {
 
     INPUT: {
         IMAGE_PLACEHOLDER: 'Перетягніть файл сюди або натисніть для завантаження',
+        UPLOAD_IMAGE: 'Upload image',
         DRAG_AND_DROP_FILE_HERE: 'Перетягніть файл сюди',
         ADD_FILE_HERE: 'Додайте файл сюди',
         getImageSizeSubText: (height: number, width: number) => `Розмір:${width}x${height}`,
@@ -56,6 +58,8 @@ export const COMMON_TEXT_ADMIN = {
     MESSAGE: {
         SUCCESSFULLY_PUBLISHED: 'успішно опубліковано',
         FAIL_TO_PUBLISH_CHANGES: 'Не вдалося опублікувати зміни',
+        TRANSLATION_SAVED_SUCCESS: 'Переклад збережено успішно',
+        TRANSLATION_PUBLISHED_SUCCESS: 'Переклад опубліковано успішно',
     },
 
     BUTTON: {
@@ -66,8 +70,18 @@ export const COMMON_TEXT_ADMIN = {
         CANCEL: 'Відмінити',
         SAVE_AS_DRAFT: 'Зберегти як чернетку',
         SAVE_AS_PUBLISHED: 'Опублікувати',
+        SAVE_TRANSLATION: 'Зберегти переклад',
+        GENERATE_TRANSLATION: 'Згенерувати переклад',
         TRY_AGAIN: 'Спробувати ще раз',
         EXIT: 'Вихід',
+    },
+
+    LOCALIZATION: {
+        LANGUAGES: {
+            MESSAGE: {
+                FAILED_TO_FETCH_LANGUAGES: 'Виникла помилка, не вдалось завантажити мови',
+            },
+        },
     },
 
     CATEGORIES: {
@@ -110,6 +124,7 @@ export const COMMON_TEXT_ADMIN = {
         FIELD_REQUIRED: "Поле обов'язкове",
         getMinError: (min: number) => `Не менше ${min} символів`,
         getMaxError: (max: number) => `Не більше ${max} символів`,
+        getImageDimensionError: (height: number, width: number) => `Розмір фото має бути ${width}X${height}`,
     },
 };
 
@@ -118,4 +133,9 @@ export const UI_CONFIG = {
         MIN_CHARACTERS_FOR_SEARCH: 3,
         SEARCH_DELAY_MS: 100,
     },
+};
+
+export const LANGUAGES = {
+    EN: 'Англійська',
+    UK: 'Українська',
 };

@@ -31,6 +31,46 @@ jest.mock('@/components/common/single-select-input/SingleSelectInput', () => ({
     },
 }));
 
+jest.mock('../common-member-fields/CommonMemberFields', () => ({
+    CommonMemberFields: ({
+        formState,
+        handleFullNameChange,
+        handleFullNameBlur,
+        handleDescriptionChange,
+        handleDescriptionBlur,
+        isSubmitting,
+        formDisabled,
+        errors,
+    }: any) => (
+        <div data-testid="common-member-fields">
+            <label htmlFor="fullName">Ім'я та Прізвище</label>
+            <input
+                id="fullName"
+                aria-label="Ім'я та Прізвище"
+                value={formState.fullName}
+                onChange={(e) => handleFullNameChange(e)}
+                onBlur={handleFullNameBlur}
+                disabled={isSubmitting || formDisabled}
+            />
+
+            <label htmlFor="description">Опис</label>
+            <textarea
+                id="description"
+                aria-label="Опис"
+                value={formState.description}
+                onChange={(e) => handleDescriptionChange(e)}
+                onBlur={handleDescriptionBlur}
+                disabled={isSubmitting || formDisabled}
+            />
+
+            {errors?.fullName &&
+                Array.isArray(errors.fullName) &&
+                errors.fullName.map((error: string, index: number) => <span key={index}>{error}</span>)}
+            {errors?.description && <span>{errors.description}</span>}
+        </div>
+    ),
+}));
+
 jest.mock('@/components/admin/image-input/ImageInput', () => ({
     ImageInput: ({ onChange, disabled }: any) => (
         <div>
@@ -88,17 +128,18 @@ describe('MemberForm', () => {
         });
     });
 
-    it('shows validation errors on blur for invalid full name', () => {
+    it('shows multiple validation errors on blur for invalid full name', () => {
         const onSubmit = jest.fn();
         const ref = createRef<TeamMemberFormRef>();
 
         render(<MemberForm ref={ref} categories={categories} onSubmit={onSubmit} />);
 
         const fullNameInput = screen.getByLabelText(/Ім'я та Прізвище/);
-        fireEvent.change(fullNameInput, { target: { value: '123' } });
+        fireEvent.change(fullNameInput, { target: { value: 'John123@' } });
         fireEvent.blur(fullNameInput);
 
-        expect(screen.getByText(TEAM_MEMBER_VALIDATION.fullName.getPatternError())).toBeInTheDocument();
+        expect(screen.getByText(TEAM_MEMBER_VALIDATION.fullName.getDigitsError())).toBeInTheDocument();
+        expect(screen.getByText(TEAM_MEMBER_VALIDATION.fullName.getInvalidCharsError())).toBeInTheDocument();
     });
 
     it('submit: calls onSubmit for Draft when valid, but blocks Published without image/description', async () => {

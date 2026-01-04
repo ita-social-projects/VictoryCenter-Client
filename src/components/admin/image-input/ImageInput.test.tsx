@@ -81,6 +81,12 @@ describe('ImageInput', () => {
         globalThis.URL.createObjectURL = jest.fn(() => 'mock-preview-url');
         globalThis.URL.revokeObjectURL = jest.fn();
 
+        // Mock crypto.randomUUID for Jest environment
+        if (!globalThis.crypto) {
+            globalThis.crypto = {} as Crypto;
+        }
+        globalThis.crypto.randomUUID = jest.fn(() => '00000000-0000-0000-0000-000000000000') as any;
+
         jest.clearAllMocks();
         jest.spyOn(globalThis, 'FileReader').mockImplementation(() => {
             const mock = {
@@ -130,6 +136,29 @@ describe('ImageInput', () => {
         await waitFor(() => {
             expect(screen.getByTestId('cropper')).toBeInTheDocument();
         });
+    });
+
+    it('calls onChange immediately when file is selected and enableCrop is false', async () => {
+        const file = createImageFile();
+
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} enableCrop={false} />);
+
+        const fileInput = screen.getByTestId('image-input-hidden');
+
+        fireEvent.change(fileInput, {
+            target: { files: [file] },
+        });
+
+        await waitFor(() => {
+            expect(onChangeMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    base64: expect.any(String),
+                    mimeType: 'image/png',
+                }),
+            );
+        });
+
+        expect(screen.queryByTestId('cropper')).not.toBeInTheDocument();
     });
 
     it('displays error when image validation fails', async () => {
@@ -254,6 +283,36 @@ describe('ImageInput', () => {
         await waitFor(() => {
             expect(screen.getByTestId('cropper')).toBeInTheDocument();
         });
+    });
+
+    it('handles drag and drop image when enableCrop is false', async () => {
+        render(<ImageInput value={null} onChange={onChangeMock} setError={setErrorMock} enableCrop={false} />);
+        const dropZone = screen.getByRole('button', {
+            name: COMMON_TEXT_ADMIN.INPUT.IMAGE_PLACEHOLDER,
+        });
+
+        const file = createImageFile();
+
+        const data = {
+            dataTransfer: {
+                files: [file],
+                types: ['Files'],
+            },
+        };
+
+        fireEvent.dragOver(dropZone);
+        fireEvent.drop(dropZone, data as unknown as DragEvent);
+
+        await waitFor(() => {
+            expect(onChangeMock).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    base64: expect.any(String),
+                    mimeType: 'image/png',
+                }),
+            );
+        });
+
+        expect(screen.queryByTestId('cropper')).not.toBeInTheDocument();
     });
 
     it('adds focus class on drag over and removes on drag leave', () => {

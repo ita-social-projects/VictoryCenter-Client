@@ -20,22 +20,13 @@ export interface GenericDetailsProps<T extends FieldValues> {
     notFoundText?: string;
     addNewText: string;
     isChildForm?: boolean;
-
-    children?: (form: {
-        formState: T;
-        isItemsExpanded: boolean;
-        setFormState: React.Dispatch<React.SetStateAction<T>>;
-    }) => React.ReactNode;
+    children?: (form: { formState: T; isItemsExpanded: boolean }) => React.ReactNode;
     isParentCreating?: boolean;
-
     isDisabled?: boolean;
     onChangeItems?: React.Dispatch<React.SetStateAction<T[]>>;
     onSubmit?: (data: T) => Promise<void>;
     onUpdate?: (id: number, data: T) => Promise<void>;
     onDelete?: (id: number) => Promise<void>;
-    onLocalSubmit?: (data: T) => void;
-    onLocalUpdate?: (index: number, data: T) => void;
-    onLocalDelete?: (index: number) => void;
     onEditingStateChange?: (isEditing: boolean) => void;
     isAddButtonDisabled?: boolean;
     onAddFormVisibilityChange?: (isVisible: boolean) => void;
@@ -62,9 +53,6 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
     isAddButtonDisabled = false,
     onAddFormVisibilityChange,
     isParentAddFormVisible = false,
-    onLocalSubmit,
-    onLocalUpdate,
-    onLocalDelete,
 }: Readonly<GenericDetailsProps<T>>) {
     const addformRef = useRef<GenericFormRef>(null);
     const [isAddFormVisible, setIsAddFormVisible] = useState(false);
@@ -95,43 +83,34 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
 
     const handleSubmit = useCallback(
         async (data: T) => {
-            if (isParentCreating && isChildForm && onLocalSubmit) {
-                onLocalSubmit(data);
-            } else if (onSubmit) {
+            if (onSubmit) {
                 await onSubmit(data);
-            } else if (isChildForm) {
-                onAddFormVisibilityChange?.(false);
-            } else {
-                onAddFormVisibilityChange?.(false);
             }
+            onAddFormVisibilityChange?.(false);
             setIsAddFormVisible(false);
             onEditingStateChange?.(false);
         },
-        [onSubmit, isChildForm, onEditingStateChange, onAddFormVisibilityChange, isParentCreating, onLocalSubmit],
+        [onSubmit, onEditingStateChange, onAddFormVisibilityChange],
     );
 
     const handleItemUpdate = useCallback(
-        async (item: T, updated: T, index?: number) => {
-            if (isParentCreating && onLocalUpdate && index != null) {
-                onLocalUpdate(index, updated);
-            } else if (onUpdate && item.id != null) {
+        async (item: T, updated: T) => {
+            if (onUpdate && item.id != null) {
                 await onUpdate(item.id, updated);
             }
         },
-        [isParentCreating, onUpdate, onLocalUpdate],
+        [onUpdate],
     );
 
     const handleItemDelete = useCallback(
-        async (id: number | null, index?: number) => {
-            if (isParentCreating && onLocalDelete && index != null) {
-                onLocalDelete(index);
-            } else if (onDelete && id !== null) {
+        async (id: number | null) => {
+            if (onDelete && id !== null) {
                 await onDelete(id);
             }
             setEditingItemId(null);
             onEditingStateChange?.(false);
         },
-        [isParentCreating, onDelete, onLocalDelete, onEditingStateChange],
+        [onDelete, onEditingStateChange],
     );
 
     const showNotFound = !isLoading && !isAddFormVisible && items.length === 0;
@@ -182,9 +161,9 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                                     <FormComponent
                                         initialData={item}
                                         initialMode={GenericFormMode.View}
-                                        onSubmit={(updated) => handleItemUpdate(item, updated, index)}
+                                        onSubmit={(updated) => handleItemUpdate(item, updated)}
                                         onClose={handleClose}
-                                        onDelete={(id, index) => handleItemDelete(id, index)}
+                                        onDelete={(id) => handleItemDelete(id)}
                                         itemIndex={index}
                                         isChildForm={isChildForm}
                                         isParentCreating={isParentCreating}
@@ -217,6 +196,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             onClick={handleAdd}
                             buttonStyle="primary"
                             disabled={
+                                isDisabled ||
                                 isAddButtonDisabled ||
                                 isParentAddFormVisible ||
                                 isAddFormVisible ||
@@ -244,6 +224,9 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                                 className="generic-details btn-add"
                                 onClick={handleAdd}
                                 buttonStyle={primaryAddButton ? 'primary' : 'secondary'}
+                                disabled={
+                                    isDisabled || isAddButtonDisabled || isParentAddFormVisible || isAddFormVisible
+                                }
                             >
                                 <div>{addNewText}</div>
                                 <PlusIcon className="plus-icon" />

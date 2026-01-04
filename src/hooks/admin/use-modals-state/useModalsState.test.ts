@@ -9,6 +9,7 @@ describe('useModalsState', () => {
             isAddModalOpen: false,
             itemToDelete: null,
             itemToEdit: null,
+            itemToTranslate: null,
             isAddCategoryModalOpen: false,
             isEditCategoryModalOpen: false,
             isDeleteCategoryModalOpen: false,
@@ -141,6 +142,48 @@ describe('useModalsState', () => {
         });
 
         expect(result.current.modalState.itemToDelete).toBe(null);
+        expect(result.current.isAnyModalOpened).toBe(false);
+    });
+
+    it('should open translate item modal with item when no other modals are open', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+        const testItem = 'test-item';
+
+        act(() => {
+            result.current.openModalActions.openTranslateItemModal(testItem);
+        });
+
+        expect(result.current.modalState.itemToTranslate).toBe(testItem);
+        expect(result.current.isAnyModalOpened).toBe(true);
+    });
+
+    it('should not open translate item modal when another modal is already open', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+
+        act(() => {
+            result.current.openModalActions.openAddItemModal();
+        });
+
+        act(() => {
+            result.current.openModalActions.openTranslateItemModal('test-item');
+        });
+
+        expect(result.current.modalState.itemToTranslate).toBe(null);
+        expect(result.current.modalState.isAddModalOpen).toBe(true);
+    });
+
+    it('should close translate item modal', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+
+        act(() => {
+            result.current.openModalActions.openTranslateItemModal('test-item');
+        });
+
+        act(() => {
+            result.current.closeModalActions.closeTranslateItemModal();
+        });
+
+        expect(result.current.modalState.itemToTranslate).toBe(null);
         expect(result.current.isAnyModalOpened).toBe(false);
     });
 
@@ -287,6 +330,16 @@ describe('useModalsState', () => {
         expect(result.current.isAnyModalOpened).toBe(true);
     });
 
+    it('should correctly detect any modal opened - translate item', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+
+        act(() => {
+            result.current.openModalActions.openTranslateItemModal('test');
+        });
+
+        expect(result.current.isAnyModalOpened).toBe(true);
+    });
+
     it('should correctly detect no modals opened when all are closed', () => {
         const { result } = renderHook(() => useModalsState<string>());
 
@@ -334,6 +387,22 @@ describe('useModalsState', () => {
         });
 
         expect(result.current.modalState.itemToEdit).toEqual(testItem);
+    });
+
+    it('should work with translate modal and different generic types', () => {
+        interface TestItem {
+            id: number;
+            name: string;
+        }
+
+        const { result } = renderHook(() => useModalsState<TestItem>());
+        const testItem: TestItem = { id: 2, name: 'Translate' };
+
+        act(() => {
+            result.current.openModalActions.openTranslateItemModal(testItem);
+        });
+
+        expect(result.current.modalState.itemToTranslate).toEqual(testItem);
     });
 
     it('should maintain action reference stability when dependencies do not change', () => {

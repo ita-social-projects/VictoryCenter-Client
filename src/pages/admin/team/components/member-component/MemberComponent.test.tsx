@@ -3,6 +3,8 @@ import { MemberComponent, MemberComponentProps } from './MemberComponent';
 import '@testing-library/jest-dom';
 import { VisibilityStatus } from '@/types/admin/common';
 import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
+import { DEFAULT_LOCALE } from '@/const/common/locales';
+import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
 
 jest.mock('@/assets/icons/blank-user.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="blank-user-icon" />,
@@ -14,6 +16,10 @@ jest.mock('@/components/admin/visibility-status-label/VisibilityStatusLabel', ()
     ),
 }));
 
+jest.mock('../../../../../utils/functions/localization/localization', () => ({
+    returnDisplayedLocalization: jest.fn(),
+}));
+
 const baseMember = {
     id: 1,
     image: { id: 10, url: 'base64string', mimeType: 'image/png', size: 1234 },
@@ -21,24 +27,30 @@ const baseMember = {
     description: 'Frontend Developer',
     status: VisibilityStatus.Published,
     categoryId: 5,
+    localizations: [],
 };
 
 describe('MemberComponent', () => {
     let handleOnEditMember: jest.Mock;
     let handleOnDeleteMember: jest.Mock;
+    let handleOnTranslateMember: jest.Mock;
 
     beforeEach(() => {
         handleOnEditMember = jest.fn();
         jest.clearAllMocks();
         handleOnDeleteMember = jest.fn();
+        handleOnTranslateMember = jest.fn();
     });
 
     const renderComponent = (override: Partial<MemberComponentProps['member']> = {}) =>
         render(
             <MemberComponent
                 member={{ ...baseMember, ...override }}
+                language={{ id: 1, code: DEFAULT_LOCALE, name: 'Українська' }}
+                translationLanguages={[{ id: 1, code: 'en', name: 'Англійська' }]}
                 handleOnEditMember={handleOnEditMember}
                 handleOnDeleteMember={handleOnDeleteMember}
+                handleOnTranslateMember={handleOnTranslateMember}
             />,
         );
 
@@ -71,10 +83,46 @@ describe('MemberComponent', () => {
         expect(handleOnEditMember).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
     });
 
+    it('calls handleOnTranslateMember when translate button clicked', () => {
+        renderComponent();
+
+        const translateBtn = screen.getByRole('button', {
+            name: TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE,
+        });
+
+        fireEvent.click(translateBtn);
+
+        expect(handleOnTranslateMember).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+    });
+
     it('calls handleOnDeleteMember when delete button clicked', () => {
         renderComponent();
         const deleteBtn = screen.getByRole('button', { name: TEAM_MEMBERS_TEXT.ACTIONS.DELETE });
         fireEvent.click(deleteBtn);
         expect(handleOnDeleteMember).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+    });
+
+    it('renders localized fullName and description when localization exists', () => {
+        (returnDisplayedLocalization as jest.Mock).mockReturnValue({
+            fullName: 'Localized Name',
+            description: 'Localized Description',
+        });
+
+        renderComponent();
+
+        expect(screen.getByText('Localized Name')).toBeInTheDocument();
+        expect(screen.getByText('Localized Description')).toBeInTheDocument();
+    });
+
+    it('shows fallback icon when image fails to load', () => {
+        renderComponent({
+            image: { id: 10, url: 'broken-image-url.png', mimeType: 'image/png' },
+        });
+
+        const img = screen.getByRole('img');
+
+        fireEvent.error(img);
+
+        expect(screen.getByTestId('blank-user-icon')).toBeInTheDocument();
     });
 });

@@ -93,7 +93,7 @@ export const DonateInput = ({
 
     const currentLength = getNormalizedInputText(value, prefix).length;
     const showCharacterCounter = maxLength !== undefined;
-    const showFooter = showCharacterCounter || error;
+    const showFooter = editable && (showCharacterCounter || error);
 
     return (
         <>
@@ -141,7 +141,9 @@ export const DonateInput = ({
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={handleClear}
                             aria-label="Clear input"
-                            className="donate-input-clear-button"
+                            className={classNames('donate-input-clear-button', {
+                                error: !!error,
+                            })}
                         ></button>
                     )}
                 </div>

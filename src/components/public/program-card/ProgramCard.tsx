@@ -11,7 +11,7 @@ export const ProgramCard = ({ program, className }: ProgramCardProps) => {
     const programCategories = program.categories.map((categorie) => categorie.name).join(', ');
     return (
         <div className={`card-block ${className}`}>
-            <img src={program.image?.url} alt={program.name} className="card-img" />
+            <img src={program.previewImage?.url} alt={program.name} className="card-img" />
             <div className="card-content">
                 <div className="subtitle-info">
                     <div className="subtitle-content">

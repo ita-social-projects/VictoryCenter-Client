@@ -11,7 +11,14 @@ export const teamMemberValidationSchema = Yup.object({
         .required(TEAM_MEMBER_VALIDATION.fullName.getRequiredError())
         .min(TEAM_MEMBER_VALIDATION.fullName.min, TEAM_MEMBER_VALIDATION.fullName.getMinError())
         .max(TEAM_MEMBER_VALIDATION.fullName.max, TEAM_MEMBER_VALIDATION.fullName.getMaxError())
-        .matches(TEAM_MEMBER_VALIDATION.fullName.pattern, TEAM_MEMBER_VALIDATION.fullName.getPatternError()),
+        .test('no-digits', TEAM_MEMBER_VALIDATION.fullName.getDigitsError(), (value) => {
+            if (!value) return true;
+            return !TEAM_MEMBER_VALIDATION.fullName.digitsPattern.test(value);
+        })
+        .test('allowed-chars', TEAM_MEMBER_VALIDATION.fullName.getInvalidCharsError(), (value) => {
+            if (!value) return true;
+            return TEAM_MEMBER_VALIDATION.fullName.allowedCharsPattern.test(value);
+        }),
 
     description: Yup.string()
         .min(TEAM_MEMBER_VALIDATION.description.min, TEAM_MEMBER_VALIDATION.description.getMinError())
@@ -51,13 +58,23 @@ export const teamMemberValidationSchema = Yup.object({
 });
 
 export const TEAM_MEMBER_VALIDATION_FUNCTIONS = {
-    validateFullName: (value: string, isPublishing: boolean): string | undefined => {
+    validateFullName: (value: string, isPublishing: boolean): string[] | undefined => {
         const context: TeamMemberValidationContext = { isPublishing };
+        const testTypes = ['no-digits', 'allowed-chars'];
         try {
             teamMemberValidationSchema.validateSyncAt('fullName', { fullName: value }, { context });
             return undefined;
         } catch (error: any) {
-            return error.message;
+            if (!testTypes.includes(error.type)) {
+                return [error.message];
+            }
+        }
+
+        try {
+            teamMemberValidationSchema.validateSyncAt('fullName', { fullName: value }, { context, abortEarly: false });
+            return undefined;
+        } catch (error: any) {
+            return error.inner.map((err: any) => err.message);
         }
     },
 

@@ -1,0 +1,24 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.root {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.error {
+    color: c.$error;
+    @include type.small-text-regular;
+}
+
+.desc-error {
+    position: absolute;
+    bottom: 0;
+}

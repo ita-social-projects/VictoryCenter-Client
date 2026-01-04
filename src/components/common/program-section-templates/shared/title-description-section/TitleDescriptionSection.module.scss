@@ -1,4 +1,4 @@
-@import '@/assets/sass/mixins/typography.mixins';
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .container {
     padding: 5% 15%;
@@ -9,7 +9,7 @@
 }
 
 .title {
-    @include h3-semibold-uppercase;
+    @include type.h3-semibold-uppercase;
     flex-shrink: 0;
 }
 
@@ -36,7 +36,7 @@
 }
 
 .description {
-    @include body-1-regular;
+    @include type.body-1-regular;
     white-space: pre-wrap;
 }
 
@@ -53,7 +53,7 @@
 
 .title-input{
     input{
-        @include h3-semibold-uppercase; 
+        @include type.h3-semibold-uppercase; 
     }
 }
 

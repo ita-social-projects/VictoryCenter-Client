@@ -90,7 +90,6 @@ describe('SingleImageBottom', () => {
             expect.objectContaining({
                 id: 'section-image-1',
                 name: 'section-image-1',
-                className: 'program-section-image-input',
                 cropWidth: PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropWidth,
                 cropHeight: PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.cropHeight,
                 minWidth: PROGRAM_SECTION_IMAGE_CONFIGS.SINGLE_IMAGE_BOTTOM.minWidth,

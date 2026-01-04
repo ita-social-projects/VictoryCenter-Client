@@ -1,5 +1,5 @@
+@use '@/assets/sass/mixins/typography.mixins' as type;
 @import '../shared/BaseSectionTemplate.module.scss';
-@import '@/assets/sass/mixins/typography.mixins';
 
 .container {
     @extend .section-container;
@@ -31,7 +31,7 @@
 
 .title-input{
     textarea{
-        @include h3-semibold-uppercase;
+        @include type.h3-semibold-uppercase;
         height: 7rem;
     }
 }

@@ -4,6 +4,7 @@ import defaultVariantStyles from './DefaultImageInput.module.scss';
 import whoWeAreVariantStyles from './WhoWeAreImageInput.module.scss';
 import programVariantStyles from './ProgramImageInput.module.scss';
 import programSectionVariantStyles from './ProgramSectionImageInput.module.scss';
+import partnerBannerVariantStyles from './PartnerBannerImageInput.module.scss';
 import { ReactComponent as DeleteIcon } from '@/assets/icons/delete.svg';
 import { ReactComponent as UploadIcon } from '@/assets/icons/cloud-download.svg';
 import { ReactComponent as CropIcon } from '@/assets/icons/crop.svg';
@@ -20,6 +21,7 @@ const variantStylesMap = {
     whoWeAre: whoWeAreVariantStyles,
     program: programVariantStyles,
     programSection: programSectionVariantStyles,
+    partnerBanner: partnerBannerVariantStyles,
 } as const;
 
 export type ImageInputVariant = keyof typeof variantStylesMap;
@@ -213,7 +215,7 @@ export const ImageInput = ({
                 style={{ display: 'none' }}
                 disabled={disabled}
                 data-testid="image-input-hidden"
-                id={id}
+                id={inputId}
                 name={name}
                 tabIndex={-1}
             />

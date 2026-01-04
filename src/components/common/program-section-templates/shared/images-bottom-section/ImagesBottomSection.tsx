@@ -65,7 +65,16 @@ export const ImagesBottomSection = ({
 }: ImagesBottomSectionProps) => {
     const variantStyles = stylesMap[variant];
 
-    const imageKeys = useMemo(() => Array.from({ length: images.length }, () => nanoid()), [images.length]);
+    const effectiveImages = useMemo(() => images.slice(0, config.imageCount), [images, config.imageCount]);
+    const effectiveImageHandlers = useMemo(
+        () => imageHandlers.slice(0, config.imageCount),
+        [imageHandlers, config.imageCount],
+    );
+
+    const imageKeys = useMemo(
+        () => Array.from({ length: effectiveImages.length }, () => nanoid()),
+        [effectiveImages.length],
+    );
 
     const cx = (name: string) =>
         cn(baseStyles[name as keyof typeof baseStyles], variantStyles[name as keyof typeof variantStyles]);
@@ -93,7 +102,7 @@ export const ImagesBottomSection = ({
             <div className={cx('bottom-section')}>
                 <div className={cx('images-grid')}>
                     {isEditable
-                        ? imageHandlers.map(({ handler, key, value }, index) => (
+                        ? effectiveImageHandlers.map(({ handler, key, value }, index) => (
                               <div
                                   key={key}
                                   className={cx('image-wrapper')}
@@ -119,7 +128,7 @@ export const ImagesBottomSection = ({
                                   />
                               </div>
                           ))
-                        : images.map((image, index) => (
+                        : effectiveImages.map((image, index) => (
                               <div
                                   key={imageKeys[index]}
                                   className={cx('image-wrapper')}

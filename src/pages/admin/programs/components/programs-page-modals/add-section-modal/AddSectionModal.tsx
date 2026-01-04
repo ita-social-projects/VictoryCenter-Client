@@ -28,6 +28,24 @@ const TEMPLATES = [
 export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectionModalProps) => {
     const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
 
+    const getPlaceholderImages = (templateId: ProgramSectionTemplate) => {
+        switch (templateId) {
+            case ProgramSectionTemplate.QuadImagesBottom:
+                return [placeholderImage, placeholderImage, placeholderImage, placeholderImage];
+            case ProgramSectionTemplate.TripleImagesBottom:
+                return [placeholderImage, placeholderImage, placeholderImage];
+            case ProgramSectionTemplate.DualImagesBottom:
+                return [placeholderImage, placeholderImage];
+            case ProgramSectionTemplate.SingleImageBottom:
+            case ProgramSectionTemplate.SingleImageTop:
+            case ProgramSectionTemplate.SingleImageRight:
+                return [placeholderImage];
+            case ProgramSectionTemplate.TextOnly:
+            default:
+                return [];
+        }
+    };
+
     const handleSave = () => {
         const selectedTemplateId = TEMPLATES[selectedTemplateIndex];
         onSelectTemplate(selectedTemplateId);
@@ -44,7 +62,7 @@ export const AddSectionModal = ({ isOpen, onClose, onSelectTemplate }: AddSectio
             data: {
                 title: PROGRAMS_TEXT.SECTION.TITLE_SAMPLE_TEXT,
                 description: PROGRAMS_TEXT.SECTION.DESCRIPTION_SAMPLE_TEXT,
-                images: [placeholderImage, placeholderImage, placeholderImage, placeholderImage],
+                images: getPlaceholderImages(templateId),
             },
             isTemplate: true,
         });

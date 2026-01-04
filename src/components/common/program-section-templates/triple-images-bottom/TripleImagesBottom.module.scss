@@ -21,7 +21,7 @@ $img-number: 3;
 }
 
 .image {
-    aspect-ratio: #{ $img-width } / #{ $img-height };
+    aspect-ratio: #{$img-width} / #{$img-height};
 }
 
 .container.editable {
@@ -37,7 +37,7 @@ $img-number: 3;
 
     .image-wrapper {
         height: 100%;
-        max-width: #{ $img-width };
-        max-height: #{ $img-height };
+        max-width: #{$img-width};
+        max-height: #{$img-height};
     }
 }

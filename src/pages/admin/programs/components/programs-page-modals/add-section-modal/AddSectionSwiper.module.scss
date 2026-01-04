@@ -10,7 +10,7 @@
     pointer-events: none;
     z-index: 10;
 
-    [class~="arrow-button"] {
+    [class~='arrow-button'] {
         width: auto;
         height: auto;
         pointer-events: auto;
@@ -36,17 +36,16 @@
         }
     }
 
-    [class~="arrow-icon"] {
+    [class~='arrow-icon'] {
         width: 32px;
         height: 32px;
     }
 
-    [class~="arrow-left"] {
+    [class~='arrow-left'] {
         margin-left: 3vw;
     }
 
-
-    [class~="arrow-right"] {
+    [class~='arrow-right'] {
         margin-right: 3vw;
     }
 }

@@ -27,12 +27,12 @@
     justify-content: center;
 
     .title-section {
-    flex: 30% 0 0;
-}
+        flex: 30% 0 0;
+    }
 
-.description-section {
-    flex: 30% 0 0;
-}
+    .description-section {
+        flex: 30% 0 0;
+    }
 }
 
 .description {
@@ -41,7 +41,7 @@
 }
 
 .template {
-    .title{
+    .title {
         font-size: clamp(3px, 1.5vw, 2rem);
         line-height: clamp(3px, 0.9vw, 1rem);
     }
@@ -51,9 +51,9 @@
     }
 }
 
-.title-input{
-    input{
-        @include type.h3-semibold-uppercase; 
+.title-input {
+    input {
+        @include type.h3-semibold-uppercase;
     }
 }
 

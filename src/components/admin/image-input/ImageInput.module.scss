@@ -28,8 +28,8 @@
     }
 
     .placeholder-icon {
-    color: c.$grey-700;
-    transition: color 0.2s ease;
+        color: c.$grey-700;
+        transition: color 0.2s ease;
     }
 
     .placeholder-text-primary {
@@ -93,15 +93,7 @@
         filter: brightness(0) invert(1);
         color: c.$grey-50;
     }
-
 }
-
-
-
-
-
-
-
 
 // %image-preview-hover {
 //     &:hover {

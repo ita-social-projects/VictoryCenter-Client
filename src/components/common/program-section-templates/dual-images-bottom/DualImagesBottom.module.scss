@@ -29,8 +29,8 @@ $img-number: 3;
     gap: 2rem;
 
     .image-wrapper {
-        aspect-ratio: #{ $img-width } / #{ $img-height };
-        max-width: #{ $img-width };
-        max-height: #{ $img-height };
+        aspect-ratio: #{$img-width} / #{$img-height};
+        max-width: #{$img-width};
+        max-height: #{$img-height};
     }
 }

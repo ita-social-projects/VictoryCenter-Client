@@ -5,7 +5,6 @@
     display: flex;
 }
 
-
 .bottom-section {
     min-height: 0;
     display: flex;
@@ -50,9 +49,8 @@
     .image-wrapper {
         width: 100%;
 
-        [class~="input-group"] {
+        [class~='input-group'] {
             height: 100%;
         }
     }
 }
-

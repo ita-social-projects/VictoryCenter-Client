@@ -88,6 +88,7 @@ const PartnerFormComponent = ({ values, errors, disabled, onValuesChange, onDele
                             PARTNER_VALIDATION.image.height,
                             PARTNER_VALIDATION.image.width,
                         )}
+                        style={{ width: '13rem', height: '13rem' }}
                     />
                     <InputError error={errors.image} />
                 </div>

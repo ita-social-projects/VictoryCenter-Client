@@ -19,6 +19,7 @@
     height: 100%;
     object-fit: cover;
     object-position: center;
+    margin-top: 64px;
 }
 
 .overlay {
@@ -26,7 +27,7 @@
     text-align: center;
     color: white;
     max-width: 1200px;
-    padding: 0 2rem 4rem 2rem;
+    padding-bottom: 2rem;
     margin-bottom: 0;
 }
 
@@ -43,7 +44,6 @@
 
 .title-line {
     display: block;
-    margin-bottom: 0.5rem;
 }
 
 .title-line:last-child {

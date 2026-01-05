@@ -57,4 +57,70 @@ describe('DonateInput component', () => {
         const textarea = screen.getByRole('textbox');
         expect(textarea).toHaveAttribute('readOnly');
     });
+
+    test('shows warning and blocks input when maxLength is exceeded (standard mode)', () => {
+        const warningText = 'Max limit reached';
+        render(<DonateInput name="test" maxLength={5} maxLimitWarning={warningText} />);
+        const textarea = screen.getByRole('textbox');
+
+        fireEvent.change(textarea, { target: { value: '12345' } });
+        expect(textarea).toHaveValue('12345');
+        expect(screen.queryByText(warningText)).not.toBeInTheDocument();
+
+        fireEvent.change(textarea, { target: { value: '123456' } });
+
+        expect(textarea).toHaveValue('12345');
+        expect(screen.getByText(warningText)).toBeInTheDocument();
+    });
+
+    test('allows input with spaces exceeding maxLength visual count but respecting valid char count when ignoreSpacesInCount is true', () => {
+        const warningText = 'Limit exceeded';
+        render(<DonateInput name="test" maxLength={3} ignoreSpacesInCount maxLimitWarning={warningText} />);
+        const textarea = screen.getByRole('textbox');
+
+        fireEvent.change(textarea, { target: { value: 'A B C' } });
+        expect(textarea).toHaveValue('A B C');
+        expect(screen.queryByText(warningText)).not.toBeInTheDocument();
+
+        fireEvent.change(textarea, { target: { value: 'A B C D' } });
+
+        expect(textarea).toHaveValue('A B C');
+        expect(screen.getByText(warningText)).toBeInTheDocument();
+    });
+
+    test('truncates pasted content correctly respecting ignoreSpacesInCount logic', () => {
+        const warningText = 'Limit exceeded';
+        render(<DonateInput name="test" maxLength={3} ignoreSpacesInCount maxLimitWarning={warningText} />);
+        const textarea = screen.getByRole('textbox');
+
+        fireEvent.change(textarea, { target: { value: '1 2 3 4 5' } });
+
+        expect(textarea).toHaveValue('1 2 3');
+        expect(screen.getByText(warningText)).toBeInTheDocument();
+    });
+
+    test('clear button has error class when local limit warning is active', () => {
+        render(<DonateInput name="test" maxLength={2} maxLimitWarning="Err" />);
+        const textarea = screen.getByRole('textbox');
+
+        fireEvent.focus(textarea);
+
+        fireEvent.change(textarea, { target: { value: '123' } });
+
+        const clearButton = screen.getByRole('button', { name: /clear input/i });
+        expect(clearButton).toBeInTheDocument();
+        expect(clearButton).toHaveClass('error');
+    });
+
+    test('removes warning when input becomes valid again', () => {
+        const warningText = 'Limit reached';
+        render(<DonateInput name="test" maxLength={5} maxLimitWarning={warningText} />);
+        const textarea = screen.getByRole('textbox');
+
+        fireEvent.change(textarea, { target: { value: '123456' } });
+        expect(screen.getByText(warningText)).toBeInTheDocument();
+
+        fireEvent.change(textarea, { target: { value: '1234' } });
+        expect(screen.queryByText(warningText)).not.toBeInTheDocument();
+    });
 });

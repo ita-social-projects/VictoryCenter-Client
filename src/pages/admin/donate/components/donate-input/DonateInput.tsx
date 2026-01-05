@@ -103,7 +103,7 @@ export const DonateInput = ({
                         }
                         cutIndex = i + 1;
                     }
-                    validPart = textWithoutPrefix.slice(0, cutIndex);
+                    validPart = textWithoutPrefix.slice(0, cutIndex).trimEnd();
                 } else {
                     validPart = textWithoutPrefix.slice(0, maxLength);
                 }

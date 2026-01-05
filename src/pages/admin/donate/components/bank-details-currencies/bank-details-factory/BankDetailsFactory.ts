@@ -1,4 +1,4 @@
-import { DONATE_TEXT, VALIDATION_PARAMS } from '@/const/admin/donate';
+import { DONATE_TEXT, DONATE_VALIDATION, VALIDATION_PARAMS } from '@/const/admin/donate';
 import { BANK_DETAILS_VALIDATION_FUNCTIONS } from '@/validation/admin/bank-details-schema/bank-details-schema';
 import { createGenericForm, GenericFormField } from '../../generic-form/GenericForm';
 
@@ -73,6 +73,7 @@ function createForeignFields(currency: 'USD' | 'EUR'): GenericFormField<ForeignB
             isRequired: true,
             placeholder: DONATE_TEXT.BANK_DETAILS.IBAN.PLACEHOLDER,
             maxLength: VALIDATION_PARAMS.ukrainianIban.maxLengthWithoutPrefix,
+            maxLimitWarning: DONATE_VALIDATION.ukrainianIban.getMaxError(),
         },
         {
             name: 'swift',
@@ -81,6 +82,8 @@ function createForeignFields(currency: 'USD' | 'EUR'): GenericFormField<ForeignB
             isRequired: true,
             placeholder: DONATE_TEXT.BANK_DETAILS.SWIFT.PLACEHOLDER,
             maxLength: VALIDATION_PARAMS.swift.maxLength,
+            ignoreSpacesInCount: true,
+            maxLimitWarning: DONATE_VALIDATION.swift.getMaxError(),
         },
         {
             name: 'address',
@@ -103,6 +106,7 @@ function createUahFields(): GenericFormField<UahBankDetails>[] {
             isRequired: true,
             placeholder: DONATE_TEXT.BANK_DETAILS.EDRPOU.PLACEHOLDER,
             maxLength: VALIDATION_PARAMS.edrpou.maxLength,
+            maxLimitWarning: DONATE_VALIDATION.edrpou.getMaxError(),
         },
         {
             name: 'ukrainianIban',
@@ -112,6 +116,7 @@ function createUahFields(): GenericFormField<UahBankDetails>[] {
             validate: withNullCheck(BANK_DETAILS_VALIDATION_FUNCTIONS.validateUkrainianIban),
             isRequired: true,
             maxLength: VALIDATION_PARAMS.ukrainianIban.maxLengthWithoutPrefix,
+            maxLimitWarning: DONATE_VALIDATION.ukrainianIban.getMaxError(),
         },
         {
             name: 'paymentPurpose',
@@ -149,6 +154,8 @@ const correspondentBanksFields: GenericFormField<CorrespondentBankDetails>[] = [
         isRequired: true,
         placeholder: DONATE_TEXT.CORRESPONDENT_BANKS.DEFAULT_PLACEHOLDER,
         maxLength: VALIDATION_PARAMS.swift.maxLength,
+        ignoreSpacesInCount: true,
+        maxLimitWarning: DONATE_VALIDATION.swift.getMaxError(),
     },
     {
         name: 'account',

@@ -17,8 +17,10 @@ interface DonateInputProps {
     onValueChange?: (val: string) => void;
     onlyNumbers?: boolean;
     maxLength?: number;
+    ignoreSpacesInCount?: boolean;
     className?: string;
     error?: string;
+    maxLimitWarning?: string;
 }
 
 export const DonateInput = ({
@@ -34,8 +36,10 @@ export const DonateInput = ({
     onValueChange,
     onlyNumbers = false,
     maxLength,
+    ignoreSpacesInCount = false,
     className,
     error,
+    maxLimitWarning,
 }: DonateInputProps) => {
     const computedInitialValue =
         externalValue !== undefined && externalValue !== null ? prefix + externalValue.replace(prefix, '') : prefix;
@@ -45,6 +49,7 @@ export const DonateInput = ({
     const [hasEdited, setHasEdited] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
+    const [localWarning, setLocalWarning] = useState<string | null>(null);
 
     useEffect(() => {
         const newValue =
@@ -74,6 +79,44 @@ export const DonateInput = ({
             const numbers = newValue.replace(/\D/g, '');
             newValue = prefix ? prefix + numbers : numbers;
         }
+
+        if (maxLength) {
+            const textWithoutPrefix = newValue.startsWith(prefix) ? newValue.slice(prefix.length) : newValue;
+
+            const currentLength = ignoreSpacesInCount
+                ? textWithoutPrefix.replace(/\s/g, '').length
+                : textWithoutPrefix.length;
+
+            if (currentLength > maxLength) {
+                if (maxLimitWarning) {
+                    setLocalWarning(maxLimitWarning);
+                }
+                let validPart = textWithoutPrefix;
+                if (ignoreSpacesInCount) {
+                    let count = 0;
+                    let cutIndex = 0;
+                    for (let i = 0; i < textWithoutPrefix.length; i++) {
+                        if (textWithoutPrefix[i] !== ' ') count++;
+                        if (count > maxLength) {
+                            cutIndex = i;
+                            break;
+                        }
+                        cutIndex = i + 1;
+                    }
+                    validPart = textWithoutPrefix.slice(0, cutIndex);
+                } else {
+                    validPart = textWithoutPrefix.slice(0, maxLength);
+                }
+
+                newValue = prefix + validPart;
+                setValue(newValue);
+                onValueChange?.(newValue);
+                return;
+            } else {
+                setLocalWarning(null);
+            }
+        }
+
         setValue(newValue);
 
         onValueChange?.(newValue);
@@ -91,7 +134,9 @@ export const DonateInput = ({
 
     const showClearButton = isFocused && value.length > prefix.length;
 
-    const currentLength = getNormalizedInputText(value, prefix).length;
+    const currentLength = ignoreSpacesInCount
+        ? getNormalizedInputText(value, prefix).replace(/\s/g, '').length
+        : getNormalizedInputText(value, prefix).length;
     const showCharacterCounter = maxLength !== undefined;
     const showFooter = editable && (showCharacterCounter || error);
 
@@ -132,7 +177,7 @@ export const DonateInput = ({
                         readOnly={!editable}
                         className="donate-input-textarea"
                         inputMode={onlyNumbers ? 'numeric' : undefined}
-                        maxLength={maxLength ? prefix.length + maxLength : undefined}
+                        maxLength={undefined}
                     />
 
                     {showClearButton && (
@@ -142,7 +187,7 @@ export const DonateInput = ({
                             onClick={handleClear}
                             aria-label="Clear input"
                             className={classNames('donate-input-clear-button', {
-                                error: !!error,
+                                error: !!error || !!localWarning,
                             })}
                         ></button>
                     )}
@@ -151,7 +196,7 @@ export const DonateInput = ({
 
             {showFooter && (
                 <div className="donate-input-footer">
-                    <span className="donate-input-error">{error || ''}</span>
+                    <span className="donate-input-error">{error || localWarning || ''}</span>
                     {showCharacterCounter && (
                         <span className="donate-input-character-counter">
                             {currentLength}/{maxLength}

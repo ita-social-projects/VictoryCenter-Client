@@ -49,6 +49,8 @@ export interface GenericFormField<T extends Record<string, any>> {
     isRequired?: boolean;
     onlyNumbers?: boolean;
     maxLength?: number;
+    ignoreSpacesInCount?: boolean;
+    maxLimitWarning?: string;
     validate?: (value: T[keyof T], isPublishing?: boolean) => string | undefined;
 }
 
@@ -453,7 +455,9 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                     onBlur={() => handleBlur(f.name)}
                                                     onlyNumbers={f.onlyNumbers}
                                                     maxLength={f.maxLength}
+                                                    ignoreSpacesInCount={f.ignoreSpacesInCount}
                                                     error={touchedFields.has(f.name) ? errors[f.name] : undefined}
+                                                    maxLimitWarning={f.maxLimitWarning}
                                                 />
                                             </div>
 

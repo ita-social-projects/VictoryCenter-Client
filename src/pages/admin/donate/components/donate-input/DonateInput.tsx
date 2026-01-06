@@ -96,22 +96,61 @@ export const DonateInput = ({
         }, 2000);
     };
 
+    const clearWarning = () => {
+        setLocalWarning(null);
+        if (warningTimerRef.current) {
+            clearTimeout(warningTimerRef.current);
+            warningTimerRef.current = null;
+        }
+    };
+
+    const getTruncatedText = (text: string): string => {
+        if (!maxLength) return text;
+
+        if (ignoreSpacesInCount) {
+            let validCharsCount = 0;
+            let cutIndex = 0;
+
+            for (let i = 0; i < text.length; i++) {
+                if (text[i] !== ' ') {
+                    validCharsCount++;
+                }
+                if (validCharsCount > maxLength) {
+                    break;
+                }
+                cutIndex = i + 1;
+            }
+            return text.slice(0, cutIndex).trimEnd();
+        } else {
+            const leadingSpacesCount = text.length - text.trimStart().length;
+            return text.slice(0, maxLength + leadingSpacesCount);
+        }
+    };
+
+    const sanitizeNumbers = (input: string): { value: string; isModified: boolean } => {
+        if (!onlyNumbers) return { value: input, isModified: false };
+
+        const numbers = input.replace(/\D/g, '');
+        const sanitized = prefix ? prefix + numbers : numbers;
+
+        return { value: sanitized, isModified: input !== sanitized };
+    };
+
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         let newValue = e.target.value;
         let warningTriggered = false;
 
-        if (onlyNumbers) {
-            const numbers = newValue.replace(/\D/g, '');
-            const sanitizedValue = prefix ? prefix + numbers : numbers;
+        if (prefix && newValue === '') {
+            newValue = prefix;
+        }
 
-            if (newValue !== sanitizedValue) {
-                if (digitsOnlyWarning) {
-                    showTemporaryWarning(digitsOnlyWarning);
-                    warningTriggered = true;
-                }
-            }
-
+        const { value: sanitizedValue, isModified } = sanitizeNumbers(newValue);
+        if (isModified) {
             newValue = sanitizedValue;
+            if (digitsOnlyWarning) {
+                showTemporaryWarning(digitsOnlyWarning);
+                warningTriggered = true;
+            }
         }
 
         if (maxLength) {
@@ -124,47 +163,13 @@ export const DonateInput = ({
             if (currentLength > maxLength) {
                 if (maxLimitWarning) {
                     showTemporaryWarning(maxLimitWarning);
-
-                    if (warningTimerRef.current) {
-                        clearTimeout(warningTimerRef.current);
-                    }
-                    warningTimerRef.current = setTimeout(() => {
-                        setLocalWarning(null);
-                        warningTimerRef.current = null;
-                    }, 2000);
+                    warningTriggered = true;
                 }
 
-                let allowedText = textWithoutPrefix;
-
-                if (ignoreSpacesInCount) {
-                    let validCharsCount = 0;
-                    let cutIndex = 0;
-
-                    for (let i = 0; i < textWithoutPrefix.length; i++) {
-                        if (textWithoutPrefix[i] !== ' ') {
-                            validCharsCount++;
-                        }
-
-                        if (validCharsCount > maxLength) {
-                            break;
-                        }
-                        cutIndex = i + 1;
-                    }
-                    allowedText = textWithoutPrefix.slice(0, cutIndex).trimEnd();
-                } else {
-                    const leadingSpacesCount = textWithoutPrefix.length - textWithoutPrefix.trimStart().length;
-                    allowedText = textWithoutPrefix.slice(0, maxLength + leadingSpacesCount);
-                }
-
+                const allowedText = getTruncatedText(textWithoutPrefix);
                 newValue = prefix + allowedText;
-            } else {
-                if (!warningTriggered) {
-                    setLocalWarning(null);
-                    if (warningTimerRef.current) {
-                        clearTimeout(warningTimerRef.current);
-                        warningTimerRef.current = null;
-                    }
-                }
+            } else if (!warningTriggered) {
+                clearWarning();
             }
         }
 
@@ -188,7 +193,7 @@ export const DonateInput = ({
         ? getNormalizedInputText(value, prefix).replace(/\s/g, '').length
         : getNormalizedInputText(value, prefix).length;
     const showCharacterCounter = maxLength !== undefined;
-    const showFooter = editable && (showCharacterCounter || error);
+    const showFooter = editable && (showCharacterCounter || error || localWarning);
 
     return (
         <>

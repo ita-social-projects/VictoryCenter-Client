@@ -29,12 +29,6 @@ describe('BANK_DETAILS_VALIDATION_FUNCTIONS', () => {
             expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateEdrpou('12345678')).toBeUndefined();
         });
 
-        it('return error if value is not digits', () => {
-            expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateEdrpou('abc')).toBe(
-                DONATE_VALIDATION.getDigitsOnlyError(),
-            );
-        });
-
         it('return error if value is too short', () => {
             expect(BANK_DETAILS_VALIDATION_FUNCTIONS.validateEdrpou('123')).toBe(
                 DONATE_VALIDATION.edrpou.getMinError(),

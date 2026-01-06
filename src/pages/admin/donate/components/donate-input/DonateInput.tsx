@@ -21,6 +21,7 @@ interface DonateInputProps {
     className?: string;
     error?: string;
     maxLimitWarning?: string;
+    digitsOnlyWarning?: string;
 }
 
 export const DonateInput = ({
@@ -40,6 +41,7 @@ export const DonateInput = ({
     className,
     error,
     maxLimitWarning,
+    digitsOnlyWarning,
 }: DonateInputProps) => {
     const computedInitialValue =
         externalValue !== undefined && externalValue !== null ? prefix + externalValue.replace(prefix, '') : prefix;
@@ -50,6 +52,15 @@ export const DonateInput = ({
     const [isFocused, setIsFocused] = useState(false);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
     const [localWarning, setLocalWarning] = useState<string | null>(null);
+    const warningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (warningTimerRef.current) {
+                clearTimeout(warningTimerRef.current);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         const newValue =
@@ -72,12 +83,35 @@ export const DonateInput = ({
         }
     }, [value, prefix]);
 
+    const showTemporaryWarning = (text: string) => {
+        setLocalWarning(text);
+
+        if (warningTimerRef.current) {
+            clearTimeout(warningTimerRef.current);
+        }
+
+        warningTimerRef.current = setTimeout(() => {
+            setLocalWarning(null);
+            warningTimerRef.current = null;
+        }, 2000);
+    };
+
     const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         let newValue = e.target.value;
+        let warningTriggered = false;
 
         if (onlyNumbers) {
             const numbers = newValue.replace(/\D/g, '');
-            newValue = prefix ? prefix + numbers : numbers;
+            const sanitizedValue = prefix ? prefix + numbers : numbers;
+
+            if (newValue !== sanitizedValue) {
+                if (digitsOnlyWarning) {
+                    showTemporaryWarning(digitsOnlyWarning);
+                    warningTriggered = true;
+                }
+            }
+
+            newValue = sanitizedValue;
         }
 
         if (maxLength) {
@@ -85,40 +119,56 @@ export const DonateInput = ({
 
             const currentLength = ignoreSpacesInCount
                 ? textWithoutPrefix.replace(/\s/g, '').length
-                : textWithoutPrefix.length;
+                : textWithoutPrefix.trimStart().length;
 
             if (currentLength > maxLength) {
                 if (maxLimitWarning) {
-                    setLocalWarning(maxLimitWarning);
+                    showTemporaryWarning(maxLimitWarning);
+
+                    if (warningTimerRef.current) {
+                        clearTimeout(warningTimerRef.current);
+                    }
+                    warningTimerRef.current = setTimeout(() => {
+                        setLocalWarning(null);
+                        warningTimerRef.current = null;
+                    }, 2000);
                 }
-                let validPart = textWithoutPrefix;
+
+                let allowedText = textWithoutPrefix;
+
                 if (ignoreSpacesInCount) {
-                    let count = 0;
+                    let validCharsCount = 0;
                     let cutIndex = 0;
+
                     for (let i = 0; i < textWithoutPrefix.length; i++) {
-                        if (textWithoutPrefix[i] !== ' ') count++;
-                        if (count > maxLength) {
-                            cutIndex = i;
+                        if (textWithoutPrefix[i] !== ' ') {
+                            validCharsCount++;
+                        }
+
+                        if (validCharsCount > maxLength) {
                             break;
                         }
                         cutIndex = i + 1;
                     }
-                    validPart = textWithoutPrefix.slice(0, cutIndex).trimEnd();
+                    allowedText = textWithoutPrefix.slice(0, cutIndex).trimEnd();
                 } else {
-                    validPart = textWithoutPrefix.slice(0, maxLength);
+                    const leadingSpacesCount = textWithoutPrefix.length - textWithoutPrefix.trimStart().length;
+                    allowedText = textWithoutPrefix.slice(0, maxLength + leadingSpacesCount);
                 }
 
-                newValue = prefix + validPart;
-                setValue(newValue);
-                onValueChange?.(newValue);
-                return;
+                newValue = prefix + allowedText;
             } else {
-                setLocalWarning(null);
+                if (!warningTriggered) {
+                    setLocalWarning(null);
+                    if (warningTimerRef.current) {
+                        clearTimeout(warningTimerRef.current);
+                        warningTimerRef.current = null;
+                    }
+                }
             }
         }
 
         setValue(newValue);
-
         onValueChange?.(newValue);
 
         if (!hasEdited && newValue !== initialValue) {
@@ -196,7 +246,7 @@ export const DonateInput = ({
 
             {showFooter && (
                 <div className="donate-input-footer">
-                    <span className="donate-input-error">{error || localWarning || ''}</span>
+                    <span className="donate-input-error">{localWarning || error || ''}</span>
                     {showCharacterCounter && (
                         <span className="donate-input-character-counter">
                             {currentLength}/{maxLength}

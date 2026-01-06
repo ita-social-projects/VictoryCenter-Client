@@ -74,6 +74,7 @@ function createForeignFields(currency: 'USD' | 'EUR'): GenericFormField<ForeignB
             placeholder: DONATE_TEXT.BANK_DETAILS.IBAN.PLACEHOLDER,
             maxLength: VALIDATION_PARAMS.ukrainianIban.maxLengthWithoutPrefix,
             maxLimitWarning: DONATE_VALIDATION.ukrainianIban.getMaxError(),
+            digitsOnlyWarning: DONATE_VALIDATION.getDigitsOnlyError(),
         },
         {
             name: 'swift',
@@ -107,6 +108,7 @@ function createUahFields(): GenericFormField<UahBankDetails>[] {
             placeholder: DONATE_TEXT.BANK_DETAILS.EDRPOU.PLACEHOLDER,
             maxLength: VALIDATION_PARAMS.edrpou.maxLength,
             maxLimitWarning: DONATE_VALIDATION.edrpou.getMaxError(),
+            digitsOnlyWarning: DONATE_VALIDATION.getDigitsOnlyError(),
         },
         {
             name: 'ukrainianIban',
@@ -117,6 +119,7 @@ function createUahFields(): GenericFormField<UahBankDetails>[] {
             isRequired: true,
             maxLength: VALIDATION_PARAMS.ukrainianIban.maxLengthWithoutPrefix,
             maxLimitWarning: DONATE_VALIDATION.ukrainianIban.getMaxError(),
+            digitsOnlyWarning: DONATE_VALIDATION.getDigitsOnlyError(),
         },
         {
             name: 'paymentPurpose',

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { DonateInput } from './DonateInput';
 import { DONATE_TEXT } from '@/const/admin/donate';
 
@@ -68,6 +68,16 @@ describe('DonateInput component', () => {
         expect(textarea).toHaveAttribute('readOnly');
     });
 
+    test('calls onBlur prop when focus is lost', () => {
+        const handleBlur = jest.fn();
+        const { textarea } = setup({ onBlur: handleBlur });
+
+        fireEvent.focus(textarea);
+        fireEvent.blur(textarea);
+
+        expect(handleBlur).toHaveBeenCalled();
+    });
+
     describe('Limit and Warning Logic', () => {
         const testLimitEnforcement = (
             props: any,
@@ -125,6 +135,61 @@ describe('DonateInput component', () => {
 
             const clearButton = screen.getByRole('button', { name: /clear input/i });
             expect(clearButton).toHaveClass('error');
+        });
+
+        test('Standard Mode: ignores leading spaces (trimStart) when counting', () => {
+            const warningText = 'Limit!';
+            const { textarea, changeValue } = setup({
+                maxLength: 3,
+                maxLimitWarning: warningText,
+            });
+
+            changeValue('   A');
+            expect(textarea).toHaveValue('   A');
+            expect(screen.queryByText(warningText)).not.toBeInTheDocument();
+
+            changeValue('   ABCD');
+            expect(textarea).toHaveValue('   ABC');
+            expect(screen.getByText(warningText)).toBeInTheDocument();
+        });
+    });
+
+    describe('Digits Only Warning Logic', () => {
+        const DIGITS_WARN = 'Digits only!';
+
+        test('does not hide digits warning immediately if length is valid', () => {
+            const { changeValue } = setup({
+                onlyNumbers: true,
+                maxLength: 5,
+                digitsOnlyWarning: DIGITS_WARN,
+            });
+            changeValue('a');
+
+            expect(screen.getByText(DIGITS_WARN)).toBeInTheDocument();
+        });
+    });
+
+    describe('Timer Logic', () => {
+        beforeEach(() => {
+            jest.useFakeTimers();
+        });
+
+        afterEach(() => {
+            jest.useRealTimers();
+        });
+
+        test('hides warning automatically after 2 seconds', () => {
+            const warningText = 'Temporary Error';
+            const { changeValue } = setup({ maxLength: 2, maxLimitWarning: warningText });
+
+            changeValue('123');
+            expect(screen.getByText(warningText)).toBeInTheDocument();
+
+            act(() => {
+                jest.advanceTimersByTime(2000);
+            });
+
+            expect(screen.queryByText(warningText)).not.toBeInTheDocument();
         });
     });
 });

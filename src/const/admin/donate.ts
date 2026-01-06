@@ -132,8 +132,7 @@ export const VALIDATION_PARAMS = {
 };
 
 export const DONATE_VALIDATION = {
-    getDigitsOnlyError: () => `Мають бути тільки цифри`,
-    getAlphaNumericError: () => `Мають бути тільки літери та цифри`,
+    getDigitsOnlyError: () => `Мають бути цифри`,
     name: {
         maxLength: VALIDATION_PARAMS.name.maxLength,
         getRequiredError: () => getGenericRequiredError(),

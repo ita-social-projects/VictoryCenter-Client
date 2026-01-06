@@ -1,4 +1,4 @@
-import './InputErrorWithCharacterCounter.scss';
+import styles from './InputErrorWithCharacterCounter.module.scss';
 
 export interface InputErrorWithCharacterCounterProps {
     error?: string;
@@ -15,25 +15,14 @@ export const InputErrorWithCharacterCounter = ({
     counterId,
     htmlFor,
 }: InputErrorWithCharacterCounterProps) => {
-    const hasError = Boolean(error);
-
     return (
-        <div
-            className={
-                hasError
-                    ? 'input-error-with-character-counter'
-                    : 'input-error-with-character-counter input-error-with-character-counter--no-error'
-            }
-        >
-            {hasError && <span className="input-error-with-character-counter__error">{error}</span>}
-            <output
-                className="input-error-with-character-counter__counter"
-                id={counterId}
-                htmlFor={htmlFor}
-                aria-live="polite"
-            >
-                {currentLength}/{maxLength}
-            </output>
+        <div className={styles['container']}>
+            {error && <div className={styles['error-section']}>{error}</div>}
+            <div className={styles['counter-section']}>
+                <output id={counterId} htmlFor={htmlFor}>
+                    {currentLength}/{maxLength}
+                </output>
+            </div>
         </div>
     );
 };

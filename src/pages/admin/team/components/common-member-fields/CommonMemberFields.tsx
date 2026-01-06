@@ -1,6 +1,6 @@
 import { InputLabel } from '@/components/admin/input-label/InputLabel';
 import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
-import { TextAreaWithCharacterLimit } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { TEAM_MEMBERS_TEXT, TEAM_MEMBER_VALIDATION } from '@/const/admin/team';
 import styles from './CommonMemberFields.module.scss';
 import './CommonMemberFields.scss';
@@ -61,20 +61,18 @@ export const CommonMemberFields = <TFormData extends CommonFields, TErrorState e
             </div>
 
             <div className={styles['form-group']}>
-                <InputLabel htmlFor="description" text={TEAM_MEMBERS_TEXT.FORM.LABEL.DESCRIPTION} />
-                <TextAreaWithCharacterLimit
+                <TextAreaWithCharacterLimitGroup
+                    label={TEAM_MEMBERS_TEXT.FORM.LABEL.DESCRIPTION}
+                    id="description"
+                    name="description"
                     value={formState.description}
                     onChange={handleDescriptionChange}
                     onBlur={handleDescriptionBlur}
-                    id="description"
-                    name="description"
                     rows={8}
                     disabled={isSubmitting || formDisabled}
                     maxLength={TEAM_MEMBER_VALIDATION.description.max}
+                    error={errors.description}
                 />
-                {errors.description && (
-                    <span className={cn(styles.error, styles['desc-error'])}>{errors.description}</span>
-                )}
             </div>
         </div>
     );

@@ -7,6 +7,7 @@ import { returnDisplayedLocalization } from '@/utils/functions/localization/loca
 import { LocalizationLanguage } from '@/types/common/language';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import './MemberComponent.scss';
+import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 export interface MemberComponentProps {
     member: TeamMember;
@@ -79,7 +80,7 @@ export const MemberComponent = ({
                 </div>
                 <div className="members-actions">
                     <button
-                        aria-label={TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE}
+                        aria-label={COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION}
                         type="button"
                         onClick={handleTranslateMember}
                         className="members-actions-translate"

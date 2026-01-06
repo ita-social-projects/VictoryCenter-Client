@@ -22,6 +22,10 @@ const mockTeamMembersApi = TeamMembersApi as jest.Mocked<typeof TeamMembersApi>;
 jest.mock('@/services/api/admin/team/team-categories/team-categories-api');
 const mockTeamCategoriesApi = TeamCategoriesApi as jest.Mocked<typeof TeamCategoriesApi>;
 
+jest.mock('@/utils/functions/mappers/common/localization/localization-mappers', () => ({
+    mapEntityWithLocalizations: (entity: any) => entity,
+}));
+
 jest.mock('../team-page-toolbar/TeamPageToolbar', () => ({
     TeamPageToolbar: (props: any) => {
         const { VisibilityStatus } = require('@/types/admin/common');
@@ -112,6 +116,7 @@ const mockOpenModalActions = {
     openEditItemModal: jest.fn(),
     openDeleteItemModal: jest.fn(),
     openTranslateItemModal: jest.fn(),
+    openEditTranslationModal: jest.fn(),
     openAddCategoryModal: jest.fn(),
     openEditCategoryModal: jest.fn(),
     openDeleteCategoryModal: jest.fn(),
@@ -1256,7 +1261,7 @@ describe('TeamPageContent', () => {
                 expect(mockOpenModalActions.openDeleteItemModal).toHaveBeenCalledWith(mockMembers[0]);
             });
 
-            it('should open translate member modal when translate button clicked', async () => {
+            it('should open translate modal when member has no translation', async () => {
                 renderTeamPageContent();
 
                 await expectTranslateButtonToBeVisible();
@@ -1264,6 +1269,35 @@ describe('TeamPageContent', () => {
                 fireEvent.click(screen.getByTestId('translate-member-1'));
 
                 expect(mockOpenModalActions.openTranslateItemModal).toHaveBeenCalledWith(mockMembers[0]);
+                expect(mockOpenModalActions.openEditTranslationModal).not.toHaveBeenCalled();
+            });
+
+            it('should open edit translation modal when member already has translation', async () => {
+                const memberWithTranslation: TeamMember = {
+                    ...mockMembers[0],
+                    localizations: [
+                        {
+                            id: 10,
+                            fullName: 'John Doe EN',
+                            description: 'Desc EN',
+                            language: mockLanguages.find((l) => l.code === 'en')!,
+                        } as any,
+                    ],
+                };
+
+                mockTeamMembersApi.getAll.mockResolvedValueOnce({
+                    items: [memberWithTranslation],
+                    totalItemsCount: 1,
+                } as any);
+
+                renderTeamPageContent();
+
+                await expectTranslateButtonToBeVisible();
+
+                fireEvent.click(screen.getByTestId('translate-member-1'));
+
+                expect(mockOpenModalActions.openEditTranslationModal).toHaveBeenCalledWith(memberWithTranslation);
+                expect(mockOpenModalActions.openTranslateItemModal).not.toHaveBeenCalled();
             });
 
             it('should not open translate modal if another modal is already opened', async () => {
@@ -1276,6 +1310,7 @@ describe('TeamPageContent', () => {
                 fireEvent.click(screen.getByTestId('translate-member-1'));
 
                 expect(mockOpenModalActions.openTranslateItemModal).not.toHaveBeenCalled();
+                expect(mockOpenModalActions.openEditTranslationModal).not.toHaveBeenCalled();
             });
 
             it('prevents modal operations when other modal is open', async () => {

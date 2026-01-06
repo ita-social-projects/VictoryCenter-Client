@@ -63,7 +63,7 @@ i18n.use(initReactI18next).init({
     },
     detection: {
         // saving selected language
-        order: ['localStorage', 'navigator'],
+        order: ['path', 'localStorage', 'navigator'],
         caches: ['localStorage'],
     },
 });

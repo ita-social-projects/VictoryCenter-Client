@@ -80,7 +80,7 @@ export const MemberComponent = ({
                 </div>
                 <div className="members-actions">
                     <button
-                        aria-label={COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION}
+                        aria-label={TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE}
                         type="button"
                         onClick={handleTranslateMember}
                         className="members-actions-translate"

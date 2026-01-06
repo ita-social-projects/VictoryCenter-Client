@@ -11,7 +11,7 @@ import { TeamMember } from '@/types/admin/team-members';
 import { VisibilityStatus } from '@/types/admin/common';
 import { TeamCategory } from '@/types/admin/team-category';
 import { ToastType } from '@/types/admin/toast';
-import { LocalizationLanguage } from '@/types/common/language';
+import { LocalizationLanguage, TranslationStatus } from '@/types/common/language';
 
 jest.mock('@/hooks/admin/use-admin-client/useAdminClient');
 const mockedUseAdminClient = useAdminClient as jest.MockedFunction<typeof useAdminClient>;
@@ -1277,10 +1277,10 @@ describe('TeamPageContent', () => {
                     ...mockMembers[0],
                     localizations: [
                         {
-                            id: 10,
                             fullName: 'John Doe EN',
                             description: 'Desc EN',
                             language: mockLanguages.find((l) => l.code === 'en')!,
+                            TranslationStatus: TranslationStatus.Relevant,
                         } as any,
                     ],
                 };

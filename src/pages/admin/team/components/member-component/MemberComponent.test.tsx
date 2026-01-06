@@ -5,7 +5,6 @@ import { VisibilityStatus } from '@/types/admin/common';
 import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
 import { DEFAULT_LOCALE } from '@/const/common/locales';
 import { returnDisplayedLocalization } from '@/utils/functions/localization/localization';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 jest.mock('@/assets/icons/blank-user.svg', () => ({
     ReactComponent: (props: any) => <svg {...props} data-testid="blank-user-icon" />,
@@ -88,7 +87,7 @@ describe('MemberComponent', () => {
         renderComponent();
 
         const translateBtn = screen.getByRole('button', {
-            name: COMMON_TEXT_ADMIN.BUTTON.SAVE_TRANSLATION,
+            name: TEAM_MEMBERS_TEXT.ACTIONS.TRANSLATE,
         });
 
         fireEvent.click(translateBtn);

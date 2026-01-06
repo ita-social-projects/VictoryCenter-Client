@@ -45,6 +45,7 @@ export const TEAM_MEMBERS_TEXT = {
         REORDER: 'Змінити порядок елемента',
         EDIT: 'Редагувати учасника',
         DELETE: 'Видалити учасника',
+        TRANSLATE: 'Перекласти учасника',
     },
 };
 

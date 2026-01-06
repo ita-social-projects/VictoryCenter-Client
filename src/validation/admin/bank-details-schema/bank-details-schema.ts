@@ -1,4 +1,4 @@
-import { DONATE_VALIDATION } from '@/const/admin/donate';
+import { DONATE_VALIDATION, VALIDATION_PARAMS } from '@/const/admin/donate';
 import * as Yup from 'yup';
 
 export const BankDetailsValidationSchema = Yup.object({
@@ -13,14 +13,16 @@ export const BankDetailsValidationSchema = Yup.object({
     edrpou: Yup.string()
         .trim()
         .required(DONATE_VALIDATION.edrpou.getRequiredError())
-        .matches(/^\d+$/, DONATE_VALIDATION.getDigitsOnlyError())
         .min(DONATE_VALIDATION.edrpou.maxLength, DONATE_VALIDATION.edrpou.getMinError())
         .max(DONATE_VALIDATION.edrpou.maxLength, DONATE_VALIDATION.edrpou.getMaxError()),
     ukrainianIban: Yup.string()
         .trim()
+        .transform((value) => {
+            return value?.startsWith('UA') ? value.slice(2) : value;
+        })
         .required(DONATE_VALIDATION.ukrainianIban.getRequiredError())
-        .min(DONATE_VALIDATION.ukrainianIban.maxLength, DONATE_VALIDATION.ukrainianIban.getMinError())
-        .max(DONATE_VALIDATION.ukrainianIban.maxLength, DONATE_VALIDATION.ukrainianIban.getMaxError()),
+        .min(VALIDATION_PARAMS.ukrainianIban.maxLengthWithoutPrefix, DONATE_VALIDATION.ukrainianIban.getMinError())
+        .max(VALIDATION_PARAMS.ukrainianIban.maxLengthWithoutPrefix, DONATE_VALIDATION.ukrainianIban.getMaxError()),
     foreignIban: Yup.string()
         .trim()
         .max(DONATE_VALIDATION.foreignIban.maxLength, DONATE_VALIDATION.foreignIban.getMaxError()),
@@ -31,7 +33,6 @@ export const BankDetailsValidationSchema = Yup.object({
     swift: Yup.string()
         .trim()
         .required(DONATE_VALIDATION.swift.getRequiredError())
-        .matches(/^[a-zA-Z0-9]+$/, DONATE_VALIDATION.getAlphaNumericError())
         .min(DONATE_VALIDATION.swift.minLength, DONATE_VALIDATION.swift.getMinError())
         .max(DONATE_VALIDATION.swift.maxLength, DONATE_VALIDATION.swift.getMaxError()),
     address: Yup.string()

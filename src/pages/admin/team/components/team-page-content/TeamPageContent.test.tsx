@@ -1280,7 +1280,7 @@ describe('TeamPageContent', () => {
                             fullName: 'John Doe EN',
                             description: 'Desc EN',
                             language: mockLanguages.find((l) => l.code === 'en')!,
-                            TranslationStatus: TranslationStatus.Relevant,
+                            translationStatus: TranslationStatus.Relevant,
                         } as any,
                     ],
                 };

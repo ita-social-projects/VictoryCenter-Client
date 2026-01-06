@@ -5,6 +5,7 @@ export interface BaseModalState<TEntity> {
     itemToDelete: TEntity | null;
     itemToEdit: TEntity | null;
     itemToTranslate: TEntity | null;
+    itemToEditTranslation: TEntity | null;
     isAddCategoryModalOpen: boolean;
     isEditCategoryModalOpen: boolean;
     isDeleteCategoryModalOpen: boolean;
@@ -18,6 +19,7 @@ export interface BaseCloseModalActions {
     closeAddCategoryModal: () => void;
     closeEditCategoryModal: () => void;
     closeTranslateItemModal: () => void;
+    closeEditTranslationModal: () => void;
     closeDeleteCategoryModal: () => void;
     closeAddSectionModal: () => void;
 }
@@ -27,6 +29,7 @@ export interface BaseOpenModalActions<TEntity> {
     openEditItemModal: (item: TEntity) => void;
     openDeleteItemModal: (item: TEntity) => void;
     openTranslateItemModal: (item: TEntity) => void;
+    openEditTranslationModal: (item: TEntity) => void;
     openAddCategoryModal: () => void;
     openEditCategoryModal: () => void;
     openDeleteCategoryModal: () => void;
@@ -46,6 +49,7 @@ export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
         itemToDelete: null,
         itemToEdit: null,
         itemToTranslate: null,
+        itemToEditTranslation: null,
         isAddCategoryModalOpen: false,
         isEditCategoryModalOpen: false,
         isDeleteCategoryModalOpen: false,
@@ -68,6 +72,7 @@ export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
             closeAddCategoryModal: () => updateModalState({ isAddCategoryModalOpen: false }),
             closeEditCategoryModal: () => updateModalState({ isEditCategoryModalOpen: false }),
             closeTranslateItemModal: () => updateModalState({ itemToTranslate: null }),
+            closeEditTranslationModal: () => updateModalState({ itemToEditTranslation: null }),
             closeDeleteCategoryModal: () => updateModalState({ isDeleteCategoryModalOpen: false }),
             closeAddSectionModal: () => updateModalState({ isAddSectionModalOpen: false }),
         }),
@@ -101,6 +106,12 @@ export const useModalsState = <TEntity>(): UseModalsStateResult<TEntity> => {
                 setModalState((prev) => {
                     if (isAnyModalOpenedInState(prev)) return prev;
                     return { ...prev, itemToTranslate: item };
+                });
+            },
+            openEditTranslationModal: (item: TEntity) => {
+                setModalState((prev) => {
+                    if (isAnyModalOpenedInState(prev)) return prev;
+                    return { ...prev, itemToEditTranslation: item };
                 });
             },
             openAddCategoryModal: () => {

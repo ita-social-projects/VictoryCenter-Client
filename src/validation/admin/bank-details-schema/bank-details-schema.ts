@@ -29,6 +29,7 @@ export const BankDetailsValidationSchema = Yup.object({
         .required(DONATE_VALIDATION.paymentPurpose.getRequiredError())
         .max(DONATE_VALIDATION.paymentPurpose.maxLength, DONATE_VALIDATION.paymentPurpose.getMaxError()),
     swift: Yup.string()
+        .trim()
         .required(DONATE_VALIDATION.swift.getRequiredError())
         .matches(/^[a-zA-Z0-9]+$/, DONATE_VALIDATION.getAlphaNumericError())
         .min(DONATE_VALIDATION.swift.minLength, DONATE_VALIDATION.swift.getMinError())

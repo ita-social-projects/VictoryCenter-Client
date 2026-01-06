@@ -100,6 +100,10 @@ export const DonateInput = ({
         let newValue = e.target.value;
         let warningTriggered = false;
 
+        if (prefix && newValue === '') {
+            newValue = prefix;
+        }
+
         if (onlyNumbers) {
             const numbers = newValue.replace(/\D/g, '');
             const sanitizedValue = prefix ? prefix + numbers : numbers;
@@ -188,7 +192,7 @@ export const DonateInput = ({
         ? getNormalizedInputText(value, prefix).replace(/\s/g, '').length
         : getNormalizedInputText(value, prefix).length;
     const showCharacterCounter = maxLength !== undefined;
-    const showFooter = editable && (showCharacterCounter || error);
+    const showFooter = editable && (showCharacterCounter || error || localWarning);
 
     return (
         <>

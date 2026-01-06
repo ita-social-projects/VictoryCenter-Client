@@ -78,6 +78,15 @@ describe('DonateInput component', () => {
         expect(handleBlur).toHaveBeenCalled();
     });
 
+    test('handles prefix correctly: keeps prefix on input and clear', () => {
+        const { textarea, changeValue } = setup({ prefix: 'UA' });
+        changeValue('UA123');
+        expect(textarea).toHaveValue('UA123');
+
+        changeValue('');
+        expect(textarea).toHaveValue('UA');
+    });
+
     describe('Limit and Warning Logic', () => {
         const testLimitEnforcement = (
             props: any,
@@ -165,6 +174,16 @@ describe('DonateInput component', () => {
             });
             changeValue('a');
 
+            expect(screen.getByText(DIGITS_WARN)).toBeInTheDocument();
+        });
+
+        test('shows warning when typing non-digits', () => {
+            const { textarea, changeValue } = setup({
+                onlyNumbers: true,
+                digitsOnlyWarning: DIGITS_WARN,
+            });
+            changeValue('12a');
+            expect(textarea).toHaveValue('12');
             expect(screen.getByText(DIGITS_WARN)).toBeInTheDocument();
         });
     });

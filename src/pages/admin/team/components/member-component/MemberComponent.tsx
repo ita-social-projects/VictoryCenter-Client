@@ -7,7 +7,6 @@ import { returnDisplayedLocalization } from '@/utils/functions/localization/loca
 import { LocalizationLanguage } from '@/types/common/language';
 import { LocalizationStatuses } from '@/components/admin/localization-statuses/LocalizationStatuses';
 import './MemberComponent.scss';
-import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 
 export interface MemberComponentProps {
     member: TeamMember;

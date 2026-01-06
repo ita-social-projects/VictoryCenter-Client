@@ -1,0 +1,28 @@
+@use '@/assets/sass/variables/colors';
+
+.input-error-with-character-counter {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 0.25rem;
+    min-height: 1.25rem;
+}
+
+.input-error-with-character-counter--no-error {
+    justify-content: flex-end;
+}
+
+.input-error-with-character-counter__error {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: colors.$error;
+    flex: 1;
+}
+
+.input-error-with-character-counter__counter {
+    color: colors.$grey-900;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    margin-left: 1rem;
+    white-space: nowrap;
+}

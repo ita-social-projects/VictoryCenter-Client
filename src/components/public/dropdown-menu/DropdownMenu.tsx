@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './DropdownMenu.scss';
 import { ReactComponent as ArrowUp } from '@/assets/icons/chevron-up.svg';
 import { ReactComponent as ArrowDown } from '@/assets/icons/chevron-down.svg';
-import { Link } from 'react-router-dom';
+import { AppLink } from '@/routes/app-router/AppLink';
 import classNames from 'classnames';
 export interface DropdownLink {
     text: string;
@@ -37,7 +37,7 @@ export const DropdownMenu = ({ links, mainText }: DropdownMenuProps) => {
             {isOpen && (
                 <div className="dropdown-links">
                     {links.map((option, index) => (
-                        <Link
+                        <AppLink
                             onClick={handleLinkClick}
                             key={index}
                             className={classNames('dropdown-link', {
@@ -46,7 +46,7 @@ export const DropdownMenu = ({ links, mainText }: DropdownMenuProps) => {
                             to={option.navigateTo}
                         >
                             {option.text}
-                        </Link>
+                        </AppLink>
                     ))}
                 </div>
             )}

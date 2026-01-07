@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { AppLink } from '@/routes/app-router/AppLink';
 import { ReactComponent as ArrowUpIcon } from '@/assets/icons/arrow-up-right.svg';
 import { ReactComponent as PhoneIcon } from '@/assets/icons/phone.svg';
 import { ReactComponent as MailIcon } from '@/assets/icons/mail.svg';
@@ -52,40 +52,40 @@ export const Footer = () => {
 
                 <div className="menu">
                     <span className="title">{t('MENU')}</span>
-                    <Link to={PUBLIC_ROUTES.REPORTS.FULL}>{t('REPORTING')}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                    <AppLink to={PUBLIC_ROUTES.REPORTS.FULL}>{t('REPORTING')}</AppLink>
+                    <AppLink to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {t('STORE')}
-                    </Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                    </AppLink>
+                    <AppLink to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {t('HOW_TO_SUPPORT')}
-                    </Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                    </AppLink>
+                    <AppLink to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {t('STORIES_OF_VICTORIES')}
-                    </Link>
+                    </AppLink>
                 </div>
 
                 <div className="about-us">
                     <span className="title">{t('ABOUT_US')}</span>
-                    <Link to={PUBLIC_ROUTES.ABOUT_US.FULL}>{t('ABOUT_US')}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                    <AppLink to={PUBLIC_ROUTES.ABOUT_US.FULL}>{t('ABOUT_US')}</AppLink>
+                    <AppLink to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {t('OUR_HISTORY')}
-                    </Link>
-                    <Link to={PUBLIC_ROUTES.TEAM.FULL}>{t('OUR_TEAM')}</Link>
-                    <Link to={PUBLIC_ROUTES.PARTNERS.FULL}>{t('PARTNERS')}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                    </AppLink>
+                    <AppLink to={PUBLIC_ROUTES.TEAM.FULL}>{t('OUR_TEAM')}</AppLink>
+                    <AppLink to={PUBLIC_ROUTES.PARTNERS.FULL}>{t('PARTNERS')}</AppLink>
+                    <AppLink to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {t('EVENTS_AND_NEWS')}
-                    </Link>
+                    </AppLink>
                 </div>
 
                 <div className="hippotherapy">
                     <span className="title">{t('HIPPOTHERAPY')}</span>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                    <AppLink to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {t('WHAT_IS_HIPPOTHERAPY')}
-                    </Link>
-                    <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{t('PROGRAMS')}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                    </AppLink>
+                    <AppLink to={PUBLIC_ROUTES.PROGRAMS.FULL}>{t('PROGRAMS')}</AppLink>
+                    <AppLink to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {t('PROGRAMS_SESSIONS')}
-                    </Link>
+                    </AppLink>
                 </div>
             </div>
 

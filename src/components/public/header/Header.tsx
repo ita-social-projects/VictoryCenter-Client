@@ -6,7 +6,7 @@ import { DropdownLink, DropdownMenu } from '@/components/public/dropdown-menu/Dr
 import { ReactComponent as BurgerIcon } from '@/assets/icons/burger.svg';
 import { LanguageSwitcher } from '@/components/public/language-switcher/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { AppLink } from '@/routes/app-router/AppLink';
 
 export const Header = () => {
     const { t } = useTranslation('header');
@@ -33,19 +33,19 @@ export const Header = () => {
     return (
         <div className="header-block">
             <div className="logo-container">
-                <Link to="/">
+                <AppLink to="/">
                     <VictoryCenterLogo className="logo" />
-                </Link>
+                </AppLink>
             </div>
 
             <div className="link-container">
                 <nav>
                     <DropdownMenu mainText={t('ABOUT_US')} links={dropdownMenuLinks}></DropdownMenu>
-                    <Link to={PUBLIC_ROUTES.PROGRAMS.FULL}>{t('PROGRAMS')}</Link>
-                    <Link to={PUBLIC_ROUTES.REPORTS.FULL}>{t('REPORTING')}</Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
+                    <AppLink to={PUBLIC_ROUTES.PROGRAMS.FULL}>{t('PROGRAMS')}</AppLink>
+                    <AppLink to={PUBLIC_ROUTES.REPORTS.FULL}>{t('REPORTING')}</AppLink>
+                    <AppLink to={PUBLIC_ROUTES.MOCK.FULL} className="disable">
                         {t('HOW_TO_SUPPORT')}
-                    </Link>
+                    </AppLink>
                 </nav>
             </div>
 
@@ -54,27 +54,27 @@ export const Header = () => {
                 <button className="contact-us-button" onClick={onContactUsClick}>
                     {t('CONTACT_US')}
                 </button>
-                <Link to={PUBLIC_ROUTES.DONATE.FULL} className="button donate-button">
+                <AppLink to={PUBLIC_ROUTES.DONATE.FULL} className="button donate-button">
                     {t('DONATE')}
-                </Link>
+                </AppLink>
                 <button onClick={toggleMenu} className="burger-menu-icon">
                     <BurgerIcon />
                 </button>
             </div>
             {isMenuOpen && (
                 <div className="mobile-menu">
-                    <Link to={PUBLIC_ROUTES.ABOUT_US.FULL} onClick={toggleMenu}>
+                    <AppLink to={PUBLIC_ROUTES.ABOUT_US.FULL} onClick={toggleMenu}>
                         {t('ABOUT_US')}
-                    </Link>
-                    <Link to={PUBLIC_ROUTES.PROGRAMS.FULL} onClick={toggleMenu}>
+                    </AppLink>
+                    <AppLink to={PUBLIC_ROUTES.PROGRAMS.FULL} onClick={toggleMenu}>
                         {t('PROGRAMS')}
-                    </Link>
-                    <Link to={PUBLIC_ROUTES.REPORTS.FULL} onClick={toggleMenu}>
+                    </AppLink>
+                    <AppLink to={PUBLIC_ROUTES.REPORTS.FULL} onClick={toggleMenu}>
                         {t('REPORTING')}
-                    </Link>
-                    <Link to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className="disable">
+                    </AppLink>
+                    <AppLink to={PUBLIC_ROUTES.MOCK.FULL} onClick={toggleMenu} className="disable">
                         {t('HOW_TO_SUPPORT')}
-                    </Link>
+                    </AppLink>
                     <LanguageSwitcher onValueChange={toggleMenu} className="mobile-language-switcher" />
                 </div>
             )}

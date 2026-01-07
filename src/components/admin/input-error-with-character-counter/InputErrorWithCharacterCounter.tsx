@@ -16,7 +16,7 @@ export const InputErrorWithCharacterCounter = ({
     htmlFor,
 }: InputErrorWithCharacterCounterProps) => {
     return (
-        <div className={styles['container']}>
+        <div className={styles.container}>
             <div className={styles['error-section']}>{error || ''}</div>
             <div className={styles['counter-section']}>
                 <output id={counterId} htmlFor={htmlFor}>

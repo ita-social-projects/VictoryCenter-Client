@@ -2,7 +2,6 @@
 @use '@/assets/sass/mixins/effects.mixins' as effects;
 
 .root {
-    margin-top: 64px; // TODO: fix PublicLayout Header uses fixed position conflicting with main content (cover content)
 
     display: grid;
     grid-template-columns: 1fr;

@@ -2,33 +2,42 @@ import { renderHook, act } from '@testing-library/react';
 import { useProgramSectionValidation } from './useProgramSectionValidation';
 import { PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
 
+const createChangeEvent = (value: string) =>
+    ({
+        target: { value },
+    }) as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
+
+const createBlurEvent = (value: string) =>
+    ({
+        target: { value },
+    }) as React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>;
+
+const createTextAreaChangeEvent = (value: string) =>
+    ({
+        target: { value },
+    }) as React.ChangeEvent<HTMLTextAreaElement>;
+
+const createTextAreaBlurEvent = (value: string) =>
+    ({
+        target: { value },
+    }) as React.FocusEvent<HTMLTextAreaElement>;
+
 describe('useProgramSectionValidation', () => {
     describe('title validation', () => {
         it('should not show error initially', () => {
             const { result } = renderHook(() => useProgramSectionValidation({}));
-
             expect(result.current.titleError).toBeUndefined();
         });
 
-        it('should show error on blur when title is too short', () => {
+        it.each([
+            ['too short', 'abc'],
+            ['empty', ''],
+            ['whitespace-only', '     '],
+        ])('should show error on blur when title is %s', (_, value) => {
             const { result } = renderHook(() => useProgramSectionValidation({}));
 
             act(() => {
-                result.current.handleTitleBlur({
-                    target: { value: 'abc' },
-                } as React.FocusEvent<HTMLInputElement>);
-            });
-
-            expect(result.current.titleError).toBeDefined();
-        });
-
-        it('should show error on blur when title is empty', () => {
-            const { result } = renderHook(() => useProgramSectionValidation({}));
-
-            act(() => {
-                result.current.handleTitleBlur({
-                    target: { value: '' },
-                } as React.FocusEvent<HTMLInputElement>);
+                result.current.handleTitleBlur(createBlurEvent(value));
             });
 
             expect(result.current.titleError).toBeDefined();
@@ -39,9 +48,7 @@ describe('useProgramSectionValidation', () => {
             const validTitle = 'a'.repeat(PROGRAM_SECTION_VALIDATION.title.min);
 
             act(() => {
-                result.current.handleTitleBlur({
-                    target: { value: validTitle },
-                } as React.FocusEvent<HTMLInputElement>);
+                result.current.handleTitleBlur(createBlurEvent(validTitle));
             });
 
             expect(result.current.titleError).toBeUndefined();
@@ -52,9 +59,7 @@ describe('useProgramSectionValidation', () => {
             const { result } = renderHook(() => useProgramSectionValidation({ onTitleChange }));
 
             act(() => {
-                result.current.handleTitleBlur({
-                    target: { value: '  Valid Title  ' },
-                } as React.FocusEvent<HTMLInputElement>);
+                result.current.handleTitleBlur(createBlurEvent('  Valid Title  '));
             });
 
             expect(onTitleChange).toHaveBeenCalledWith('Valid Title');
@@ -64,39 +69,20 @@ describe('useProgramSectionValidation', () => {
             const { result } = renderHook(() => useProgramSectionValidation({}));
 
             act(() => {
-                result.current.handleTitleBlur({
-                    target: { value: 'abc' },
-                } as React.FocusEvent<HTMLInputElement>);
+                result.current.handleTitleBlur(createBlurEvent('abc'));
             });
-
             expect(result.current.titleError).toBeDefined();
 
             act(() => {
-                result.current.handleTitleChange({
-                    target: { value: 'Valid Title' },
-                } as React.ChangeEvent<HTMLInputElement>);
+                result.current.handleTitleChange(createChangeEvent('Valid Title'));
             });
-
             expect(result.current.titleError).toBeUndefined();
-        });
-
-        it('should treat whitespace-only input as empty', () => {
-            const { result } = renderHook(() => useProgramSectionValidation({}));
-
-            act(() => {
-                result.current.handleTitleBlur({
-                    target: { value: '     ' },
-                } as React.FocusEvent<HTMLInputElement>);
-            });
-
-            expect(result.current.titleError).toBeDefined();
         });
     });
 
     describe('description validation', () => {
         it('should not show error initially', () => {
             const { result } = renderHook(() => useProgramSectionValidation({}));
-
             expect(result.current.descriptionError).toBeUndefined();
         });
 
@@ -104,9 +90,7 @@ describe('useProgramSectionValidation', () => {
             const { result } = renderHook(() => useProgramSectionValidation({}));
 
             act(() => {
-                result.current.handleDescriptionBlur({
-                    target: { value: 'short' },
-                } as React.FocusEvent<HTMLTextAreaElement>);
+                result.current.handleDescriptionBlur(createTextAreaBlurEvent('short'));
             });
 
             expect(result.current.descriptionError).toBeDefined();
@@ -117,9 +101,7 @@ describe('useProgramSectionValidation', () => {
             const validDescription = 'a'.repeat(PROGRAM_SECTION_VALIDATION.description.min);
 
             act(() => {
-                result.current.handleDescriptionBlur({
-                    target: { value: validDescription },
-                } as React.FocusEvent<HTMLTextAreaElement>);
+                result.current.handleDescriptionBlur(createTextAreaBlurEvent(validDescription));
             });
 
             expect(result.current.descriptionError).toBeUndefined();
@@ -130,9 +112,7 @@ describe('useProgramSectionValidation', () => {
             const { result } = renderHook(() => useProgramSectionValidation({ onDescriptionChange }));
 
             act(() => {
-                result.current.handleDescriptionBlur({
-                    target: { value: '  Valid description here  ' },
-                } as React.FocusEvent<HTMLTextAreaElement>);
+                result.current.handleDescriptionBlur(createTextAreaBlurEvent('  Valid description here  '));
             });
 
             expect(onDescriptionChange).toHaveBeenCalledWith('Valid description here');
@@ -142,19 +122,15 @@ describe('useProgramSectionValidation', () => {
             const { result } = renderHook(() => useProgramSectionValidation({}));
 
             act(() => {
-                result.current.handleDescriptionBlur({
-                    target: { value: 'short' },
-                } as React.FocusEvent<HTMLTextAreaElement>);
+                result.current.handleDescriptionBlur(createTextAreaBlurEvent('short'));
             });
-
             expect(result.current.descriptionError).toBeDefined();
 
             act(() => {
-                result.current.handleDescriptionChange({
-                    target: { value: 'This is a valid description with enough characters' },
-                } as React.ChangeEvent<HTMLTextAreaElement>);
+                result.current.handleDescriptionChange(
+                    createTextAreaChangeEvent('This is a valid description with enough characters'),
+                );
             });
-
             expect(result.current.descriptionError).toBeUndefined();
         });
     });
@@ -165,9 +141,7 @@ describe('useProgramSectionValidation', () => {
             const { result } = renderHook(() => useProgramSectionValidation({ onTitleChange }));
 
             act(() => {
-                result.current.handleTitleChange({
-                    target: { value: 'New Title' },
-                } as React.ChangeEvent<HTMLInputElement>);
+                result.current.handleTitleChange(createChangeEvent('New Title'));
             });
 
             expect(onTitleChange).toHaveBeenCalledWith('New Title');
@@ -178,9 +152,7 @@ describe('useProgramSectionValidation', () => {
             const { result } = renderHook(() => useProgramSectionValidation({ onDescriptionChange }));
 
             act(() => {
-                result.current.handleDescriptionChange({
-                    target: { value: 'New Description' },
-                } as React.ChangeEvent<HTMLTextAreaElement>);
+                result.current.handleDescriptionChange(createTextAreaChangeEvent('New Description'));
             });
 
             expect(onDescriptionChange).toHaveBeenCalledWith('New Description');
@@ -191,9 +163,7 @@ describe('useProgramSectionValidation', () => {
 
             expect(() => {
                 act(() => {
-                    result.current.handleTitleChange({
-                        target: { value: 'Title' },
-                    } as React.ChangeEvent<HTMLInputElement>);
+                    result.current.handleTitleChange(createChangeEvent('Title'));
                 });
             }).not.toThrow();
         });

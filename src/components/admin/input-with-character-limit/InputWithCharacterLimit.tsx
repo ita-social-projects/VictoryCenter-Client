@@ -15,6 +15,7 @@ export interface InputWithCharacterLimitProps {
     type?: 'text' | 'email' | 'password' | 'number';
     placeholder?: string;
     className?: string;
+    hasError?: boolean;
 }
 
 export const InputWithCharacterLimit = ({
@@ -29,6 +30,7 @@ export const InputWithCharacterLimit = ({
     type = 'text',
     placeholder,
     className,
+    hasError = false,
 }: InputWithCharacterLimitProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const currentLength = value?.length ?? 0;
@@ -80,6 +82,7 @@ export const InputWithCharacterLimit = ({
                 type="button"
                 className={classNames('char-limit-input__clear-button', {
                     'char-limit-input__clear-button--visible': showClearButton,
+                    'char-limit-input__clear-button--error': hasError,
                 })}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={handleClear}

@@ -1,5 +1,4 @@
-import { InputLabel } from '@/components/admin/input-label/InputLabel';
-import { InputWithCharacterLimit } from '@/components/admin/input-with-character-limit/InputWithCharacterLimit';
+import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import { TEAM_MEMBERS_TEXT, TEAM_MEMBER_VALIDATION } from '@/const/admin/team';
 import styles from './CommonMemberFields.module.scss';
@@ -41,8 +40,9 @@ export const CommonMemberFields = <TFormData extends CommonFields, TErrorState e
     return (
         <div className={cn(styles.root, 'common-member-fields')}>
             <div className={styles['form-group']}>
-                <InputLabel htmlFor="fullName" text={TEAM_MEMBERS_TEXT.FORM.LABEL.FULLNAME} isRequired />
-                <InputWithCharacterLimit
+                <InputWithCharacterLimitGroup
+                    label={TEAM_MEMBERS_TEXT.FORM.LABEL.FULLNAME}
+                    isRequired
                     value={formState.fullName}
                     onChange={handleFullNameChange}
                     onBlur={handleFullNameBlur}
@@ -50,14 +50,8 @@ export const CommonMemberFields = <TFormData extends CommonFields, TErrorState e
                     name="fullName"
                     maxLength={TEAM_MEMBER_VALIDATION.fullName.max}
                     disabled={isSubmitting || formDisabled}
+                    error={errors.fullName && Array.isArray(errors.fullName) ? errors.fullName[0] : undefined}
                 />
-                {errors.fullName &&
-                    Array.isArray(errors.fullName) &&
-                    errors.fullName.map((error, index) => (
-                        <p key={index} className={styles.error}>
-                            {error}
-                        </p>
-                    ))}
             </div>
 
             <div className={styles['form-group']}>

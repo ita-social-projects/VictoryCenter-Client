@@ -51,6 +51,7 @@ export const TextAreaWithCharacterLimitGroup = ({
                 disabled={disabled}
                 placeholder={placeholder}
                 rows={rows}
+                hasError={!!error}
             />
             <InputErrorWithCharacterCounter
                 error={error}

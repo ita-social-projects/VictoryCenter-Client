@@ -14,6 +14,7 @@ export interface TextAreaWithCharacterLimitProps {
     disabled?: boolean;
     placeholder?: string;
     rows?: number;
+    hasError?: boolean;
 }
 
 export const TextAreaWithCharacterLimit = ({
@@ -27,6 +28,7 @@ export const TextAreaWithCharacterLimit = ({
     disabled = false,
     placeholder,
     rows = 4,
+    hasError = false,
 }: TextAreaWithCharacterLimitProps) => {
     const [isFocused, setIsFocused] = useState(false);
 
@@ -73,7 +75,9 @@ export const TextAreaWithCharacterLimit = ({
                 {showClearButton && (
                     <button
                         type="button"
-                        className="char-limit-textarea__clear-button"
+                        className={classNames('char-limit-textarea__clear-button', {
+                            'char-limit-textarea__clear-button--error': hasError,
+                        })}
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={handleClear}
                         aria-label="Clear input"

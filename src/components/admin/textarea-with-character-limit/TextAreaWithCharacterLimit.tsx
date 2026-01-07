@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
+import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import './TextAreaWithCharacterLimit.scss';
 
 export interface TextAreaWithCharacterLimitProps {
@@ -39,6 +40,15 @@ export const TextAreaWithCharacterLimit = ({
         onBlur?.(e);
     };
 
+    const handleClear = () => {
+        const syntheticEvent = {
+            target: { value: '', name, id },
+        } as React.ChangeEvent<HTMLTextAreaElement>;
+        onChange(syntheticEvent);
+    };
+
+    const showClearButton = isFocused && value.length > 0 && !disabled;
+
     return (
         <div className="char-limit-textarea">
             <div
@@ -60,6 +70,17 @@ export const TextAreaWithCharacterLimit = ({
                     placeholder={placeholder}
                     rows={rows}
                 />
+                {showClearButton && (
+                    <button
+                        type="button"
+                        className="char-limit-textarea__clear-button"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={handleClear}
+                        aria-label="Clear input"
+                    >
+                        <RemoveIcon />
+                    </button>
+                )}
             </div>
         </div>
     );

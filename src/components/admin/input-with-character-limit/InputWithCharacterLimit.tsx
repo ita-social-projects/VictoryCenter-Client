@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
+import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import './InputWithCharacterLimit.scss';
 
 export interface InputWithCharacterLimitProps {
@@ -42,6 +43,15 @@ export const InputWithCharacterLimit = ({
         onBlur?.(e);
     };
 
+    const handleClear = () => {
+        const syntheticEvent = {
+            target: { value: '', name, id },
+        } as React.ChangeEvent<HTMLInputElement>;
+        onChange(syntheticEvent);
+    };
+
+    const showClearButton = isFocused && value.length > 0 && !disabled;
+
     const countId = `${id}-character-count`;
 
     return (
@@ -66,6 +76,18 @@ export const InputWithCharacterLimit = ({
                 aria-describedby={countId}
                 aria-invalid={currentLength > maxLength}
             />
+            <button
+                type="button"
+                className={classNames('char-limit-input__clear-button', {
+                    'char-limit-input__clear-button--visible': showClearButton,
+                })}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={handleClear}
+                aria-label="Clear input"
+                tabIndex={showClearButton ? 0 : -1}
+            >
+                <RemoveIcon />
+            </button>
             <output htmlFor={id} className="char-limit-input__counter" id={countId}>
                 {currentLength}/{maxLength}
             </output>

@@ -168,12 +168,24 @@ export const PROGRAM_CATEGORY_VALIDATION = {
     name: {
         min: 5,
         max: 20,
-        getRequiredError: () => 'Назва обов’язкова',
+        getRequiredError: () => "Назва обов'язкова",
         getCategoryWithThisNameAlreadyExistsError: () =>
             COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.ALREADY_CONTAIN_CATEGORY_WITH_NAME,
     },
     programsCount: {
         getRelocationOrRemovalHint: () => 'Перенесіть їх в іншу категорію або видаліть, щоб продовжити',
         getHasProgramsCountError: (count: number) => `Категорія містить ${count} програм`,
+    },
+};
+export const PROGRAM_SECTION_VALIDATION = {
+    title: {
+        min: 5,
+        max: 60,
+        getRequiredError: () => "Заголовок обов'язковий",
+    },
+    description: {
+        min: 10,
+        max: 600,
+        getRequiredError: () => "Опис обов'язковий",
     },
 };

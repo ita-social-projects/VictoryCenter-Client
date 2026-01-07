@@ -1,4 +1,4 @@
-import { PROGRAM_VALIDATION } from '@/const/admin/programs';
+import { PROGRAM_VALIDATION, PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ProgramCategory } from '@/types/admin/programs';
 import { Image, ImageValues } from '@/types/common/image';
@@ -179,6 +179,52 @@ export const PROGRAM_VALIDATION_FUNCTIONS = {
         const context: ProgramValidationContext = { isPublishing };
         try {
             programValidationSchema.validateSyncAt('meetingsCount', { meetingsCount: value }, { context });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+};
+
+export const programSectionValidationSchema = Yup.object({
+    sectionTitle: Yup.string()
+        .trim()
+        .required(PROGRAM_SECTION_VALIDATION.title.getRequiredError())
+        .min(
+            PROGRAM_SECTION_VALIDATION.title.min,
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_SECTION_VALIDATION.title.min),
+        )
+        .max(
+            PROGRAM_SECTION_VALIDATION.title.max,
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_SECTION_VALIDATION.title.max),
+        ),
+
+    sectionDescription: Yup.string()
+        .trim()
+        .required(PROGRAM_SECTION_VALIDATION.description.getRequiredError())
+        .min(
+            PROGRAM_SECTION_VALIDATION.description.min,
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMinError(PROGRAM_SECTION_VALIDATION.description.min),
+        )
+        .max(
+            PROGRAM_SECTION_VALIDATION.description.max,
+            COMMON_TEXT_ADMIN.VALIDATION_MESSAGE.getMaxError(PROGRAM_SECTION_VALIDATION.description.max),
+        ),
+});
+
+export const PROGRAM_SECTION_VALIDATION_FUNCTIONS = {
+    validateSectionTitle: (value: string): string | undefined => {
+        try {
+            programSectionValidationSchema.validateSyncAt('sectionTitle', { sectionTitle: value });
+            return undefined;
+        } catch (error: any) {
+            return error.message;
+        }
+    },
+
+    validateSectionDescription: (value: string): string | undefined => {
+        try {
+            programSectionValidationSchema.validateSyncAt('sectionDescription', { sectionDescription: value });
             return undefined;
         } catch (error: any) {
             return error.message;

@@ -1,7 +1,6 @@
 @use '@/assets/sass/variables/colors';
 @use '@/assets/sass/mixins/typography.mixins' as type;
 
-
 .input-error {
     @include type.small-text-regular;
     display: block;

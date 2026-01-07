@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
 import { PROGRAM_SECTION_VALIDATION_FUNCTIONS } from '@/validation/admin/program-schema/program-schema';
+import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 
 export interface UseProgramSectionValidationReturn {
     titleError: string | undefined;
@@ -28,7 +29,7 @@ export const useProgramSectionValidation = ({
             const newValue = e.target.value;
             onTitleChange?.(newValue);
 
-            if (titleError && newValue.trim().length >= PROGRAM_SECTION_VALIDATION.title.min) {
+            if (titleError && getTrimmedInputText(newValue).length >= PROGRAM_SECTION_VALIDATION.title.min) {
                 setTitleError(undefined);
             }
         },
@@ -37,7 +38,7 @@ export const useProgramSectionValidation = ({
 
     const handleTitleBlur = useCallback(
         (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-            const trimmedValue = e.target.value.trim();
+            const trimmedValue = getTrimmedInputText(e.target.value);
             onTitleChange?.(trimmedValue);
 
             setTitleError(PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionTitle(trimmedValue));
@@ -50,7 +51,10 @@ export const useProgramSectionValidation = ({
             const newValue = e.target.value;
             onDescriptionChange?.(newValue);
 
-            if (descriptionError && newValue.trim().length >= PROGRAM_SECTION_VALIDATION.description.min) {
+            if (
+                descriptionError &&
+                getTrimmedInputText(newValue).length >= PROGRAM_SECTION_VALIDATION.description.min
+            ) {
                 setDescriptionError(undefined);
             }
         },
@@ -59,7 +63,7 @@ export const useProgramSectionValidation = ({
 
     const handleDescriptionBlur = useCallback(
         (e: React.FocusEvent<HTMLTextAreaElement>) => {
-            const trimmedValue = e.target.value.trim();
+            const trimmedValue = getTrimmedInputText(e.target.value);
             onDescriptionChange?.(trimmedValue);
 
             setDescriptionError(PROGRAM_SECTION_VALIDATION_FUNCTIONS.validateSectionDescription(trimmedValue));

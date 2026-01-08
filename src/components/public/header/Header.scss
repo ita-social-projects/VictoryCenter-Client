@@ -70,12 +70,17 @@ $header-height: 4rem;
 
 .burger-menu-icon {
     display: none;
-    font-size: 2rem;
-    cursor: pointer;
-    background: none;
-    border: none;
     align-self: center;
     color: black;
+    &.button {
+        width: 3.5rem !important;
+        height: 3.5rem !important;
+        padding: 0 !important;
+    }
+    svg {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+    }
 }
 
 .mobile-menu {

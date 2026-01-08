@@ -7,7 +7,7 @@ import { ReactComponent as BurgerIcon } from '@/assets/icons/burger.svg';
 import { LanguageSwitcher } from '@/components/public/language-switcher/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/public/ui/button/Button';
+import { Button } from '@/components/public/ui/button';
 
 export const Header = () => {
     const { t } = useTranslation('header');
@@ -59,13 +59,17 @@ export const Header = () => {
                             {t('CONTACT_US')}
                         </Button>
 
-                        <Button variant="primary-dark" href={PUBLIC_ROUTES.DONATE.FULL} className="donate-button">
+                        <Button variant="primary-dark" href={PUBLIC_ROUTES.DONATE.FULL}>
                             {t('DONATE')}
                         </Button>
 
-                        <button onClick={toggleMenu} className="burger-menu-icon">
-                            <BurgerIcon />
-                        </button>
+                        <Button
+                            variant="tertiary"
+                            icon={BurgerIcon}
+                            ariaLabel="Open menu"
+                            onClick={toggleMenu}
+                            className="burger-menu-icon"
+                        />
                     </div>
                 </div>
 

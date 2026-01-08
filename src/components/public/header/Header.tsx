@@ -7,7 +7,7 @@ import { ReactComponent as BurgerIcon } from '@/assets/icons/burger.svg';
 import { LanguageSwitcher } from '@/components/public/language-switcher/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/public/ui/button/Button';
+import { Button } from '@/components/public/ui/button';
 
 export const Header = () => {
     const { t } = useTranslation('header');

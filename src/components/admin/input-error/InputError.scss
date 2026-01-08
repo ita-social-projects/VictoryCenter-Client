@@ -1,10 +1,9 @@
 @use '@/assets/sass/variables/colors';
+@use '@/assets/sass/mixins/typography.mixins' as type;
 
 .input-error {
+    @include type.small-text-regular;
     display: block;
     width: 100%;
     color: colors.$error;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 20px;
 }

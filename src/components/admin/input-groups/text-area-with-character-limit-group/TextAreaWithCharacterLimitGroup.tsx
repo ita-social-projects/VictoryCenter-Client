@@ -1,10 +1,11 @@
 import React from 'react';
 import { InputLabel, InputLabelProps } from '@/components/admin/input-label/InputLabel';
-import { InputError, InputErrorProps } from '@/components/admin/input-error/InputError';
+import { InputErrorProps } from '@/components/admin/input-error/InputError';
 import {
     TextAreaWithCharacterLimit,
     TextAreaWithCharacterLimitProps,
 } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
+import { InputErrorWithCharacterCounter } from '@/components/admin/input-error-with-character-counter/InputErrorWithCharacterCounter';
 import '../input-group.scss';
 import cn from 'classnames';
 
@@ -13,6 +14,7 @@ export interface TextAreaWithCharacterLimitGroupProps extends TextAreaWithCharac
     isRequired?: InputLabelProps['isRequired'];
     error?: InputErrorProps['error'];
     className?: string;
+    currentLength?: number;
 }
 
 export const TextAreaWithCharacterLimitGroup = ({
@@ -28,9 +30,13 @@ export const TextAreaWithCharacterLimitGroup = ({
     disabled,
     placeholder,
     rows,
+    currentLength,
     error,
     className,
 }: TextAreaWithCharacterLimitGroupProps) => {
+    const counterId = `${id}-character-count`;
+    const resolvedCurrentLength = currentLength ?? value.length;
+
     return (
         <div className={cn('input-group', className)}>
             <InputLabel htmlFor={id} text={label} isRequired={isRequired} />
@@ -45,8 +51,15 @@ export const TextAreaWithCharacterLimitGroup = ({
                 disabled={disabled}
                 placeholder={placeholder}
                 rows={rows}
+                hasError={!!error}
             />
-            <InputError error={error} />
+            <InputErrorWithCharacterCounter
+                error={error}
+                currentLength={resolvedCurrentLength}
+                maxLength={maxLength}
+                counterId={counterId}
+                htmlFor={id}
+            />
         </div>
     );
 };

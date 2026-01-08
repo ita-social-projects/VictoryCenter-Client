@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
+import { ReactComponent as RemoveIcon } from '@/assets/icons/remove-query.svg';
 import './InputWithCharacterLimit.scss';
 
 export interface InputWithCharacterLimitProps {
@@ -14,6 +15,7 @@ export interface InputWithCharacterLimitProps {
     type?: 'text' | 'email' | 'password' | 'number';
     placeholder?: string;
     className?: string;
+    hasError?: boolean;
 }
 
 export const InputWithCharacterLimit = ({
@@ -28,6 +30,7 @@ export const InputWithCharacterLimit = ({
     type = 'text',
     placeholder,
     className,
+    hasError = false,
 }: InputWithCharacterLimitProps) => {
     const [isFocused, setIsFocused] = useState(false);
     const currentLength = value?.length ?? 0;
@@ -41,6 +44,15 @@ export const InputWithCharacterLimit = ({
         setIsFocused(false);
         onBlur?.(e);
     };
+
+    const handleClear = () => {
+        const syntheticEvent = {
+            target: { value: '', name, id },
+        } as React.ChangeEvent<HTMLInputElement>;
+        onChange(syntheticEvent);
+    };
+
+    const showClearButton = isFocused && value.length > 0 && !disabled;
 
     const countId = `${id}-character-count`;
 
@@ -66,6 +78,19 @@ export const InputWithCharacterLimit = ({
                 aria-describedby={countId}
                 aria-invalid={currentLength > maxLength}
             />
+            <button
+                type="button"
+                className={classNames('char-limit-input__clear-button', {
+                    'char-limit-input__clear-button--visible': showClearButton,
+                    'char-limit-input__clear-button--error': hasError,
+                })}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={handleClear}
+                aria-label="Clear input"
+                tabIndex={showClearButton ? 0 : -1}
+            >
+                <RemoveIcon />
+            </button>
             <output htmlFor={id} className="char-limit-input__counter" id={countId}>
                 {currentLength}/{maxLength}
             </output>

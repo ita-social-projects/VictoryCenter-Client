@@ -3,7 +3,9 @@ import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups
 import { PhotoInputGroup } from '@/components/admin/input-groups/photo-input-group/PhotoInputGroup';
 import { ImageValues } from '@/types/common/image';
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { PROGRAMS_TEXT, PROGRAM_SECTION_IMAGE_CONFIGS } from '@/const/admin/programs';
+import { PROGRAMS_TEXT, PROGRAM_SECTION_IMAGE_CONFIGS, PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
+import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
+import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 import styles from './SingleImageRight.module.scss';
 
 export interface SingleImageRightProps {
@@ -27,13 +29,17 @@ export const SingleImageRight = ({
     onDescriptionChange,
     onImageChange,
 }: SingleImageRightProps) => {
-    const handleTitleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        onTitleChange?.(e.target.value);
-    };
-
-    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        onDescriptionChange?.(e.target.value);
-    };
+    const {
+        titleError,
+        descriptionError,
+        handleTitleChange,
+        handleTitleBlur,
+        handleDescriptionChange,
+        handleDescriptionBlur,
+    } = useProgramSectionValidation({
+        onTitleChange,
+        onDescriptionChange,
+    });
 
     return (
         <div
@@ -53,10 +59,13 @@ export const SingleImageRight = ({
                                 name="section-title"
                                 value={title}
                                 onChange={handleTitleChange}
-                                maxLength={60}
+                                onBlur={handleTitleBlur}
+                                maxLength={PROGRAM_SECTION_VALIDATION.title.max}
                                 placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                                 className={styles['title-input']}
                                 rows={2}
+                                error={titleError}
+                                currentLength={getTrimmedInputText(title).length}
                             />
                         </div>
                         <div className={styles['description-section']}>
@@ -67,8 +76,11 @@ export const SingleImageRight = ({
                                 name="section-description"
                                 value={description}
                                 onChange={handleDescriptionChange}
-                                maxLength={600}
+                                onBlur={handleDescriptionBlur}
+                                maxLength={PROGRAM_SECTION_VALIDATION.description.max}
                                 rows={8}
+                                error={descriptionError}
+                                currentLength={getTrimmedInputText(description).length}
                             />
                         </div>
                     </div>

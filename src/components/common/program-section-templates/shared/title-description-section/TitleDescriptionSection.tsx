@@ -2,7 +2,9 @@ import styles from './TitleDescriptionSection.module.scss';
 import cn from 'classnames';
 import { InputWithCharacterLimitGroup } from '@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup';
 import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
-import { PROGRAMS_TEXT } from '@/const/admin/programs';
+import { PROGRAMS_TEXT, PROGRAM_SECTION_VALIDATION } from '@/const/admin/programs';
+import { useProgramSectionValidation } from '@/hooks/admin/use-program-section-validation';
+import { getTrimmedInputText } from '@/utils/functions/formatters/text-formatters';
 
 export interface TitleDescriptionSectionProps {
     title?: string;
@@ -27,13 +29,17 @@ export const TitleDescriptionSection = ({
 }: TitleDescriptionSectionProps) => {
     const cx = (name: string) => cn(styles[name as keyof typeof styles], templateStyles?.[name]);
 
-    const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onTitleChange?.(e.target.value);
-    };
-
-    const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        onDescriptionChange?.(e.target.value);
-    };
+    const {
+        titleError,
+        descriptionError,
+        handleTitleChange,
+        handleTitleBlur,
+        handleDescriptionChange,
+        handleDescriptionBlur,
+    } = useProgramSectionValidation({
+        onTitleChange,
+        onDescriptionChange,
+    });
 
     return (
         <div
@@ -55,9 +61,11 @@ export const TitleDescriptionSection = ({
                         name="section-title"
                         value={title}
                         onChange={handleTitleChange}
-                        maxLength={60}
+                        onBlur={handleTitleBlur}
+                        maxLength={PROGRAM_SECTION_VALIDATION.title.max}
                         placeholder={PROGRAMS_TEXT.SECTION.FORM.TITLE.PLACEHOLDER}
                         className={cx('title-input')}
+                        error={titleError}
                     />
                 ) : (
                     <h2 className={cx('title')}>{title}</h2>
@@ -72,8 +80,11 @@ export const TitleDescriptionSection = ({
                         name="section-description"
                         value={description}
                         onChange={handleDescriptionChange}
-                        maxLength={600}
+                        onBlur={handleDescriptionBlur}
+                        maxLength={PROGRAM_SECTION_VALIDATION.description.max}
                         rows={8}
+                        error={descriptionError}
+                        currentLength={getTrimmedInputText(description).length}
                     />
                 ) : (
                     <p className={cx('description')}>{description}</p>

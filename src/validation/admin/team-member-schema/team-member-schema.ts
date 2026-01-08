@@ -28,8 +28,7 @@ export const teamMemberValidationSchema = Yup.object({
             return !/\s{2,}/.test(value);
         })
         .test('min-length-if-not-empty', TEAM_MEMBER_VALIDATION.description.getMinError(), (value) => {
-            if (!value || value.length === 0) return true;
-            return value.length >= 10;
+            return !value || value.length >= TEAM_MEMBER_VALIDATION.description.min;
         })
         .when('$isPublishing', ([isPublishing], schema) =>
             isPublishing

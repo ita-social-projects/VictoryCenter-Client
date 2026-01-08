@@ -3,6 +3,13 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import i18n from '@/locales/i18n';
 import { LOCALES } from '@/const/common/locales';
 
+const EXPECTED_LABELS: Record<string, string> = {
+    uk: 'UA',
+    en: 'EN',
+};
+
+const getLabel = (locale: string) => EXPECTED_LABELS[locale] || locale.toUpperCase();
+
 describe('LanguageSwitcher', () => {
     beforeEach(async () => {
         await i18n.changeLanguage('uk');
@@ -17,7 +24,7 @@ describe('LanguageSwitcher', () => {
 
         for (const locale of LOCALES) {
             const option = within(optionsContainer as HTMLElement).getByRole('button', {
-                name: locale.toUpperCase(),
+                name: getLabel(locale),
             });
             expect(option).toBeInTheDocument();
         }
@@ -29,7 +36,7 @@ describe('LanguageSwitcher', () => {
 
         render(<LanguageSwitcher />);
 
-        expect(await screen.findByText(language.toUpperCase())).toBeInTheDocument();
+        expect(await screen.findByText(getLabel(language))).toBeInTheDocument();
     });
 
     it('calls onValueChange when language is changed', async () => {
@@ -41,7 +48,7 @@ describe('LanguageSwitcher', () => {
         const currentLang = i18n.language;
         const nextLocale = LOCALES.find((lng) => lng !== currentLang) || LOCALES[0];
 
-        const nextOption = screen.getByRole('button', { name: nextLocale.toUpperCase() });
+        const nextOption = screen.getByRole('button', { name: getLabel(nextLocale) });
         fireEvent.click(nextOption);
 
         expect(onValueChange).toHaveBeenCalled();

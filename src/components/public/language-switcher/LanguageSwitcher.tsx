@@ -10,6 +10,11 @@ export interface LanguageSwitcherProps {
     className?: string;
 }
 
+const LANGUAGE_LABELS: Record<string, string> = {
+    uk: 'UA',
+    en: 'EN',
+};
+
 export const LanguageSwitcher = ({ onValueChange, className }: LanguageSwitcherProps) => {
     const { changeLanguage, currentLanguage } = useLocale();
 
@@ -25,9 +30,10 @@ export const LanguageSwitcher = ({ onValueChange, className }: LanguageSwitcherP
             placeholder="lng"
             className={classNames('language-switcher', className)}
             headClassName="language-switcher-head"
+            openOnHover={true}
         >
             {LOCALES.map((lng) => (
-                <Select.Option key={lng} value={lng} name={lng.toUpperCase()} />
+                <Select.Option key={lng} value={lng} name={LANGUAGE_LABELS[lng] || lng.toUpperCase()} />
             ))}
         </Select>
     );

@@ -46,16 +46,16 @@ describe('Header', () => {
 
     it('renders nav links with correct text and href', () => {
         render(<Header />, { wrapper: MemoryRouter });
-
-        expect(screen.getByRole('link', { name: headerUk['PROGRAMS'] })).toHaveAttribute(
-            'href',
-            PUBLIC_ROUTES.PROGRAMS.FULL,
-        );
         expect(screen.getByRole('link', { name: headerUk['REPORTING'] })).toHaveAttribute(
             'href',
             PUBLIC_ROUTES.REPORTS.FULL,
         );
         expect(screen.getByRole('link', { name: headerUk['HOW_TO_SUPPORT'] })).toHaveAttribute(
+            'href',
+            PUBLIC_ROUTES.MOCK.FULL,
+        );
+        expect(screen.getByRole('link', { name: headerUk['STORE'] })).toHaveAttribute('href', PUBLIC_ROUTES.MOCK.FULL);
+        expect(screen.getByRole('link', { name: headerUk['STORIES_OF_VICTORIES'] })).toHaveAttribute(
             'href',
             PUBLIC_ROUTES.MOCK.FULL,
         );

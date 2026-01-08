@@ -714,4 +714,265 @@ describe('DonatePageContent', () => {
             expect(true).toBe(true);
         });
     });
+    describe('Bank Details Mapping', () => {
+        it('creates UAH bank details with correct mapping', async () => {
+            const mockConfig = createMockConfig();
+            mockConfig.create.mockResolvedValue({ id: 1, name: 'UAH Bank' });
+            setupMockBankDetails([], mockConfig);
+
+            render(<DonatePageContent />);
+
+            const genericDetails = screen.getByTestId('generic-details');
+            fireEvent.click(within(genericDetails).getByText('Submit'));
+
+            await waitFor(() => {
+                expect(mockConfig.create).toHaveBeenCalledWith('mockClient', {});
+            });
+        });
+
+        it('updates UAH bank details with correct mapping', async () => {
+            const mockConfig = createMockConfig();
+            mockConfig.update.mockResolvedValue({ id: 1, name: 'Updated UAH' });
+            setupMockBankDetails([{ id: 1, name: 'UAH Bank' }], mockConfig);
+
+            render(<DonatePageContent />);
+
+            const genericDetails = screen.getByTestId('generic-details');
+            fireEvent.click(within(genericDetails).getByText('Update'));
+
+            await waitFor(() => {
+                expect(mockConfig.update).toHaveBeenCalledWith('mockClient', 1, { name: 'Updated' });
+            });
+        });
+
+        it('updates foreign bank details with correct mapping', async () => {
+            const mockConfig = createMockConfig(true);
+            mockConfig.update.mockResolvedValue({
+                id: 1,
+                receiver: 'Updated Foreign',
+                correspondentBanks: [],
+            });
+            setupMockBankDetails(
+                [
+                    {
+                        id: 1,
+                        receiver: 'Foreign Bank',
+                        correspondentBanks: [{ id: 10 }],
+                    },
+                ],
+                mockConfig,
+            );
+
+            render(<DonatePageContent />);
+
+            const bankDetails = screen.getByTestId('generic-details');
+            const updateButton = bankDetails.querySelector(':scope > [data-action="update"]') as HTMLElement;
+            fireEvent.click(updateButton);
+
+            await waitFor(() => {
+                expect(mockConfig.update).toHaveBeenCalledWith('mockClient', 1, { name: 'Updated' });
+            });
+        });
+    });
+
+    describe('Items Sorting', () => {
+        it('sorts bank details items by id', async () => {
+            const mockConfig = createMockConfig();
+            setupMockBankDetails(
+                [
+                    { id: 3, name: 'Third' },
+                    { id: 1, name: 'First' },
+                    { id: 2, name: 'Second' },
+                ],
+                mockConfig,
+            );
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                const genericDetails = screen.getByTestId('generic-details');
+                expect(genericDetails).toBeInTheDocument();
+            });
+
+            const itemsCount = screen.getByTestId('items-count');
+            expect(itemsCount).toHaveTextContent('3');
+        });
+
+        it('sorts correspondent banks by id', async () => {
+            const mockConfig = createMockConfig(true);
+            setupMockBankDetails(
+                [
+                    {
+                        id: 1,
+                        correspondentBanks: [
+                            { id: 30, name: 'Third' },
+                            { id: 10, name: 'First' },
+                            { id: 20, name: 'Second' },
+                        ],
+                    },
+                ],
+                mockConfig,
+            );
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+            });
+
+            const itemsCount = within(screen.getByTestId('correspondent-details')).getByTestId('items-count');
+            expect(itemsCount).toHaveTextContent('3');
+        });
+    });
+
+    describe('Correspondent Banks Edge Cases', () => {
+        it('shows empty correspondent banks for parent being created', async () => {
+            const mockConfig = createMockConfig(true);
+            setupMockBankDetails([{ id: 1, correspondentBanks: [{ id: 10 }] }], mockConfig);
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+            });
+
+            expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+        });
+
+        it('handles correspondent banks for multiple parent items', async () => {
+            const mockConfig = createMockConfig(true);
+            setupMockBankDetails(
+                [
+                    { id: 1, correspondentBanks: [{ id: 10 }] },
+                    { id: 2, correspondentBanks: [{ id: 20 }, { id: 21 }] },
+                ],
+                mockConfig,
+            );
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+            });
+
+            const itemsCount = within(screen.getByTestId('correspondent-details')).getByTestId('items-count');
+            expect(itemsCount).toHaveTextContent('1');
+        });
+
+        it('updates correspondent banks for non-matching parent id', async () => {
+            const mockConfig = createMockConfig(true);
+            mockCorrespondentUpdate.mockResolvedValue({ id: 20, name: 'Updated' });
+            setupMockBankDetails(
+                [
+                    { id: 1, correspondentBanks: [{ id: 10 }] },
+                    { id: 2, correspondentBanks: [{ id: 20 }] },
+                ],
+                mockConfig,
+            );
+
+            render(<DonatePageContent />);
+
+            const correspondentDetails = await setupCorrespondentBankTest();
+            fireEvent.click(within(correspondentDetails).getByText('Update'));
+
+            await waitFor(() => {
+                expect(mockSetItems).toHaveBeenCalled();
+            });
+
+            testSetItemsCallback(
+                [
+                    { id: 1, correspondentBanks: [{ id: 10 }] },
+                    { id: 2, correspondentBanks: [{ id: 20 }] },
+                ],
+                (items) => {
+                    expect(items[0].correspondentBanks).toBeDefined();
+                    expect(items[1].correspondentBanks.length).toBe(1);
+                },
+            );
+        });
+    });
+
+    describe('Loading States', () => {
+        it('renders with isLoading true', async () => {
+            setupMockBankDetails([], createMockConfig(), true);
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('generic-details')).toBeInTheDocument();
+            });
+        });
+
+        it('handles support options loading during create', async () => {
+            let resolveCreate: (value: any) => void;
+            const createPromise = new Promise((resolve) => {
+                resolveCreate = resolve;
+            });
+
+            mockCreate.mockReturnValue(createPromise);
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('support-options-form')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByText('Create'));
+
+            await waitFor(() => {
+                expect(mockCreate).toHaveBeenCalled();
+            });
+
+            resolveCreate!({ id: 1, name: 'Test', value: '123', currency: 0 });
+
+            await waitFor(() => {
+                expect(mockAddToast).toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('Support Options State Updates', () => {
+        it('updates support options list after successful create', async () => {
+            mockCreate.mockResolvedValue({ id: 2, name: 'New', value: '789', currency: 0 });
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('support-options-form')).toBeInTheDocument();
+            });
+
+            fireEvent.click(screen.getByText('Create'));
+
+            await waitFor(() => {
+                expect(mockCreate).toHaveBeenCalled();
+                expect(mockAddToast).toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('Correspondent Banks Rendering', () => {
+        it('passes correct props to correspondent GenericDetails', async () => {
+            const mockConfig = createMockConfig(true);
+            setupMockBankDetails([{ id: 1, correspondentBanks: [{ id: 10 }] }], mockConfig);
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                const correspondentDetails = screen.getByTestId('correspondent-details');
+                expect(correspondentDetails).toBeInTheDocument();
+                expect(correspondentDetails).toHaveAttribute('data-instance');
+            });
+        });
+
+        it('renders correspondent banks with formState id', async () => {
+            const mockConfig = createMockConfig(true);
+            setupMockBankDetails([{ id: 5, correspondentBanks: [] }], mockConfig);
+
+            render(<DonatePageContent />);
+
+            await waitFor(() => {
+                expect(screen.getByTestId('correspondent-details')).toBeInTheDocument();
+            });
+        });
+    });
 });

@@ -16,6 +16,15 @@ jest.mock('@/hooks/admin/use-admin-client/useAdminClient', () => ({
     useAdminClient: jest.fn(),
 }));
 
+jest.mock('@/contexts/admin/toast-context-provider/ToastContextProvider', () => ({
+    useToast: () => ({
+        addToast: jest.fn(),
+        removeToast: jest.fn(),
+        toasts: [],
+    }),
+    ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 jest.mock('@/services/api/admin/programs/programs-api', () => ({
     ProgramsApi: {
         fetchProgramCategories: jest.fn(),

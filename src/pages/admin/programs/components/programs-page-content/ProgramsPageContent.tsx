@@ -241,6 +241,8 @@ export const ProgramsPageContent = () => {
         (addedProgram: Program) => {
             if (addedProgram.status === VisibilityStatus.Draft) {
                 addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_SAVED_SUCCESSFULLY, ToastType.Info);
+            } else if (addedProgram.status === VisibilityStatus.Published) {
+                addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_PUBLISHED_SUCCESSFULLY, ToastType.Info);
             }
             // Update program counters in categories
             updateCategories((prevCategories) => incrementCategoriesCount(prevCategories, addedProgram));
@@ -260,6 +262,8 @@ export const ProgramsPageContent = () => {
         (updatedProgram: Program) => {
             if (updatedProgram.status === VisibilityStatus.Draft) {
                 addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_SAVED_SUCCESSFULLY, ToastType.Info);
+            } else if (updatedProgram.status === VisibilityStatus.Published) {
+                addToast(PROGRAMS_TEXT.FORM.MESSAGE.PROGRAM_PUBLISHED_SUCCESSFULLY, ToastType.Info);
             }
             if (isSearchResultView && fetchedSearchProgram?.id === updatedProgram.id) {
                 updateSearchedProgram(updatedProgram);

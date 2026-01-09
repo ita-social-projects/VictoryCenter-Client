@@ -56,6 +56,7 @@ export const PROGRAMS_TEXT = {
             FAIL_TO_UPDATE_PROGRAM: 'Виникла помилка під час оновлення програми',
             FAIL_TO_DELETE_PROGRAM: 'Виникла помилка під час видалення програми',
             PROGRAM_SAVED_SUCCESSFULLY: 'Програма успішно збережена',
+            PROGRAM_PUBLISHED_SUCCESSFULLY: 'Програма успішно опублікована',
         },
         LABEL: {
             NAME: 'Назва',

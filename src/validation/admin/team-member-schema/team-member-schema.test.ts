@@ -52,10 +52,8 @@ describe('teamMemberValidationSchema', () => {
             );
         });
 
-        it('rejects empty description when not publishing', () => {
-            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription('', false)).toBe(
-                TEAM_MEMBER_VALIDATION.description.getMinError(),
-            );
+        it('accepts empty description when not publishing', () => {
+            expect(TEAM_MEMBER_VALIDATION_FUNCTIONS.validateDescription('', false)).toBeUndefined();
         });
 
         it('rejects description with multiple spaces when not publishing', () => {

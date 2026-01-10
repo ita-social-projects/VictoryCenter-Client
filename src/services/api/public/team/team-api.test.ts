@@ -19,13 +19,13 @@ describe('fetchTeamPageData', () => {
                 categoryName: 'Engineering',
                 description: 'Dev team',
                 teamMembers: [
-                    { id: 1, fullName: 'Alice', description: 'Frontend Dev' },
-                    { id: 2, fullName: 'Bob', description: null },
+                    { id: 1, fullName: 'Alice', description: 'Frontend Dev', localizations: [] },
+                    { id: 2, fullName: 'Bob', description: null, localizations: [] },
                 ],
             },
             {
                 categoryName: 'With no description',
-                teamMembers: [{ id: 3, fullName: 'John', description: 'Backend Dev' }],
+                teamMembers: [{ id: 3, fullName: 'John', description: 'Backend Dev', localizations: [] }],
             },
         ];
 
@@ -35,14 +35,14 @@ describe('fetchTeamPageData', () => {
                     title: 'Engineering',
                     description: 'Dev team',
                     members: [
-                        { id: 1, name: 'Alice', role: 'Frontend Dev', photo: null },
-                        { id: 2, name: 'Bob', role: '', photo: null },
+                        { id: 1, name: 'Alice', role: 'Frontend Dev', photo: null , localizations: []},
+                        { id: 2, name: 'Bob', role: '', photo: null, localizations: [] },
                     ],
                 },
                 {
                     title: 'With no description',
                     description: '',
-                    members: [{ id: 3, name: 'John', role: 'Backend Dev', photo: null }],
+                    members: [{ id: 3, name: 'John', role: 'Backend Dev', photo: null , localizations: []}],
                 },
             ],
         };
@@ -77,7 +77,7 @@ describe('fetchTeamPageData', () => {
                 {
                     title: 'Design',
                     description: 'Design team',
-                    members: [{ id: 5, name: 'John', role: 'Lead', photo: null }],
+                    members: [{ id: 5, name: 'John', role: 'Lead', photo: null , localizations: []}],
                 },
             ],
         };

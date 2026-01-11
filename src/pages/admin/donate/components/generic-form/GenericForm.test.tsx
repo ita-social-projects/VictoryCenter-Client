@@ -25,19 +25,21 @@ const createDefaultProps = (overrides?: Partial<GenericFormProps<Item>>): Generi
     ...overrides,
 });
 
-const renderForm = (props?: Partial<GenericFormProps<Item>>) => {
-    const fields = createDefaultFields();
-    const GenericForm = createGenericForm<Item>(fields);
-    const mergedProps = createDefaultProps(props);
-    return render(<GenericForm {...mergedProps} />);
-};
-
-const renderFormWithRef = (props?: Partial<GenericFormProps<Item>>) => {
+const renderFormInternal = (props?: Partial<GenericFormProps<Item>>, withRef = false) => {
     const fields = createDefaultFields();
     const GenericForm = createGenericForm<Item>(fields);
     const ref = React.createRef<any>();
     const mergedProps = createDefaultProps(props);
-    render(<GenericForm {...mergedProps} ref={ref} />);
+
+    // eslint-disable-next-line testing-library/render-result-naming-convention
+    const rendered = render(<GenericForm {...mergedProps} ref={withRef ? ref : undefined} />);
+    return { ...rendered, ref };
+};
+
+const renderForm = (props?: Partial<GenericFormProps<Item>>) => renderFormInternal(props, false);
+
+const renderFormWithRef = (props?: Partial<GenericFormProps<Item>>) => {
+    const { ref } = renderFormInternal(props, true);
     return ref;
 };
 
@@ -50,10 +52,17 @@ const getEditButton = () => getButton('edit-btn');
 const getDeleteButton = () => getButton('delete-btn');
 
 const clickButton = (button: HTMLElement) => fireEvent.click(button);
+
 const changeInput = (input: HTMLInputElement, value: string) => {
     fireEvent.change(input, { target: { value } });
 };
 const blurInput = (input: HTMLInputElement) => fireEvent.blur(input);
+
+const changeName = (oldValue: string, newValue: string) => {
+    const input = getInput(oldValue);
+    changeInput(input, newValue);
+    return input;
+};
 
 const clickHeader = (text: string = 'Test Name') => {
     const header = screen.getByText(text);
@@ -69,6 +78,23 @@ const confirmModal = async () => {
 const cancelModal = () => {
     const cancelButton = getTextButton(COMMON_TEXT_ADMIN.BUTTON.NO);
     clickButton(cancelButton);
+};
+
+const runDeleteFlow = async (props: Partial<GenericFormProps<Item>> = {}, confirm = true) => {
+    const onDelete = jest.fn().mockResolvedValue(undefined);
+    const onClose = jest.fn();
+
+    renderForm({ onDelete, onClose, ...props });
+
+    clickButton(getDeleteButton());
+
+    if (confirm) {
+        await confirmModal();
+    } else {
+        cancelModal();
+    }
+
+    return { onDelete, onClose };
 };
 
 const testFieldChange = (fieldsConfig: GenericFormField<Item>[], changeValue: string, expectedValue: string) => {
@@ -89,6 +115,8 @@ const testFieldChange = (fieldsConfig: GenericFormField<Item>[], changeValue: st
 
     expect(input.value).toBe(expectedValue);
 };
+
+type DeleteTestCase = [string, Partial<Item>, number | undefined, (number | null)[] | null];
 
 describe('GenericForm', () => {
     const fields = createDefaultFields();
@@ -158,8 +186,7 @@ describe('GenericForm', () => {
     describe('Input Handling', () => {
         test('changes input value', () => {
             renderForm({ initialMode: GenericFormMode.Edit });
-            const input = getInput('Test Name');
-            changeInput(input, 'New Name');
+            const input = changeName('Test Name', 'New Name');
             expect(input.value).toBe('New Name');
         });
 
@@ -174,8 +201,7 @@ describe('GenericForm', () => {
         test('publish on updated form', async () => {
             const onSubmit = jest.fn();
             renderForm({ initialMode: GenericFormMode.Edit, onSubmit });
-            const input = getInput('Test Name');
-            changeInput(input, 'Updated Name');
+            changeName('Test Name', 'Updated Name');
 
             clickButton(getPublishButton());
 
@@ -187,8 +213,7 @@ describe('GenericForm', () => {
             // eslint-disable-next-line testing-library/render-result-naming-convention
             const ref = renderFormWithRef({ initialMode: GenericFormMode.Edit, onSubmit });
 
-            const input = getInput('Test Name');
-            changeInput(input, 'New Name');
+            changeName('Test Name', 'New Name');
 
             await ref.current.submit();
 
@@ -202,8 +227,7 @@ describe('GenericForm', () => {
             // eslint-disable-next-line testing-library/render-result-naming-convention
             const ref = renderFormWithRef({ initialMode: GenericFormMode.Edit, onSubmit: undefined as any });
 
-            const input = getInput('Test Name');
-            changeInput(input, 'Changed');
+            changeName('Test Name', 'Changed');
 
             await ref.current.submit();
 
@@ -214,8 +238,7 @@ describe('GenericForm', () => {
     describe('Validation', () => {
         test('shows validation error', () => {
             renderForm({ initialMode: GenericFormMode.Edit });
-            const input = getInput('Test Name');
-            changeInput(input, '');
+            changeName('Test Name', '');
 
             clickButton(getPublishButton());
 
@@ -224,8 +247,7 @@ describe('GenericForm', () => {
 
         it('isValid blocks submit for invalid required field', async () => {
             renderForm({ initialMode: GenericFormMode.Edit });
-            const input = getInput('Test Name');
-            changeInput(input, '');
+            changeName('Test Name', '');
 
             const publishButton = getPublishButton();
             clickButton(publishButton);
@@ -254,7 +276,7 @@ describe('GenericForm', () => {
                 />,
             );
 
-            const input = screen.getByDisplayValue('Valid Name') as HTMLInputElement;
+            const input = getInput('Valid Name');
             const publishButton = getPublishButton() as HTMLButtonElement;
 
             changeInput(input, '123');
@@ -266,8 +288,7 @@ describe('GenericForm', () => {
 
         it('detects empty required fields', () => {
             renderForm({ initialMode: GenericFormMode.Edit });
-            const input = getInput('Test Name');
-            changeInput(input, '');
+            changeName('Test Name', '');
 
             const publishBtn = getPublishButton() as HTMLButtonElement;
             expect(publishBtn.disabled).toBe(true);
@@ -284,8 +305,7 @@ describe('GenericForm', () => {
 
         it('handleEditCancel restores initial state if changed', () => {
             renderForm({ initialMode: GenericFormMode.Edit });
-            const input = getInput('Test Name');
-            changeInput(input, 'Changed');
+            changeName('Test Name', 'Changed');
 
             clickButton(getCancelButton());
 
@@ -295,13 +315,6 @@ describe('GenericForm', () => {
         });
 
         it('Create mode cancel without changes calls onClose directly', () => {
-            const onClose = jest.fn();
-            renderForm({ initialMode: GenericFormMode.Create, onClose });
-            clickButton(getCancelButton());
-            expect(onClose).toHaveBeenCalled();
-        });
-
-        it('calls onClose directly in Create mode if no changes', () => {
             const onClose = jest.fn();
             renderForm({ initialMode: GenericFormMode.Create, onClose });
             clickButton(getCancelButton());
@@ -351,8 +364,7 @@ describe('GenericForm', () => {
 
         it('shows cancel edit modal in Create mode when there are unsaved changes', () => {
             renderForm({ initialMode: GenericFormMode.Create });
-            const input = getInput('Test Name');
-            changeInput(input, 'Changed');
+            changeName('Test Name', 'Changed');
 
             clickButton(getCancelButton());
 
@@ -366,8 +378,7 @@ describe('GenericForm', () => {
                 isParentCreating: true,
             });
 
-            const input = getInput('Test Name');
-            changeInput(input, 'Changed');
+            changeName('Test Name', 'Changed');
 
             clickButton(getCancelButton());
 
@@ -378,9 +389,7 @@ describe('GenericForm', () => {
 
         it('confirms cancel and resets form state in Edit mode when changes exist', () => {
             renderForm({ initialMode: GenericFormMode.Edit });
-
-            const input = getInput('Test Name');
-            changeInput(input, 'Changed');
+            changeName('Test Name', 'Changed');
 
             clickButton(getCancelButton());
 
@@ -402,32 +411,19 @@ describe('GenericForm', () => {
             expect(screen.getByText(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE)).toBeInTheDocument();
         });
 
-        test('closes modal on cancel', () => {
-            renderForm();
-            clickButton(getDeleteButton());
-
-            cancelModal();
-
+        test('closes modal on cancel', async () => {
+            const { onDelete } = await runDeleteFlow({}, false);
             expect(screen.queryByText(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE)).not.toBeInTheDocument();
+            expect(onDelete).not.toHaveBeenCalled();
         });
 
         it('handleDeleteClick triggers onDelete for Edit mode', async () => {
-            const onDelete = jest.fn().mockResolvedValue(undefined);
-            renderForm({ initialMode: GenericFormMode.Edit, onDelete });
-            clickButton(getDeleteButton());
-
-            await confirmModal();
-
+            const { onDelete } = await runDeleteFlow({ initialMode: GenericFormMode.Edit });
             await waitFor(() => expect(onDelete).toHaveBeenCalledWith(1));
         });
 
         it('does not call onDelete if no id provided', async () => {
-            const onDelete = jest.fn();
-            renderForm({ initialData: { name: 'No ID' }, onDelete });
-            clickButton(getDeleteButton());
-
-            await confirmModal();
-
+            const { onDelete } = await runDeleteFlow({ initialData: { name: 'No ID' } });
             await waitFor(() => expect(onDelete).not.toHaveBeenCalled());
         });
 
@@ -459,7 +455,6 @@ describe('GenericForm', () => {
             clickButton(header);
 
             clickButton(getDeleteButton());
-
             await confirmModal();
 
             await waitFor(() => {
@@ -505,15 +500,13 @@ describe('GenericForm', () => {
     describe('Publish Button States', () => {
         it('should have the publish button disabled on initial render in Edit mode', () => {
             renderForm({ initialMode: GenericFormMode.Edit });
-
             const publishButton = getPublishButton() as HTMLButtonElement;
             expect(publishButton.disabled).toBe(true);
         });
 
         it('publish button disabled if required field empty', () => {
             renderForm({ initialMode: GenericFormMode.Edit });
-            const input = getInput('Test Name');
-            changeInput(input, '');
+            changeName('Test Name', '');
 
             const publishButton = getPublishButton() as HTMLButtonElement;
             expect(publishButton.disabled).toBe(true);
@@ -521,17 +514,14 @@ describe('GenericForm', () => {
 
         it('isChanged returns true after input change', () => {
             renderForm({ initialMode: GenericFormMode.Edit });
-            const input = getInput('Test Name');
-            changeInput(input, 'Changed');
+            changeName('Test Name', 'Changed');
             const publishButton = getPublishButton();
             expect(publishButton).not.toBeDisabled();
         });
 
         it('disables publish button when isDisabled is true and not correspondent in parent creation', () => {
             renderForm({ initialMode: GenericFormMode.Edit, isDisabled: true });
-
-            const input = getInput('Test Name');
-            changeInput(input, 'Changed');
+            changeName('Test Name', 'Changed');
 
             const publishButton = getPublishButton() as HTMLButtonElement;
             expect(publishButton.disabled).toBe(true);
@@ -545,8 +535,7 @@ describe('GenericForm', () => {
                 isDisabled: true,
             });
 
-            const input = getInput('Test Name');
-            changeInput(input, 'Changed');
+            changeName('Test Name', 'Changed');
 
             const saveButton = getTextButton(COMMON_TEXT_ADMIN.BUTTON.SAVE) as HTMLButtonElement;
             expect(saveButton.disabled).toBe(false);
@@ -588,8 +577,7 @@ describe('GenericForm', () => {
 
             expect(ref.current.isChanged()).toBe(false);
 
-            const input = getInput('Test Name');
-            changeInput(input, 'Changed');
+            changeName('Test Name', 'Changed');
             expect(ref.current.isChanged()).toBe(true);
 
             expect(ref.current.isValid()).toBe(true);
@@ -737,59 +725,38 @@ describe('GenericForm', () => {
 });
 
 describe('Delete with ItemIndex', () => {
-    it('calls onDelete with id and itemIndex when both are provided', async () => {
-        const onDelete = jest.fn().mockResolvedValue(undefined);
-        const onClose = jest.fn();
+    const testCases: DeleteTestCase[] = [
+        [
+            'calls onDelete with id and itemIndex when both are provided',
+            { id: 5, name: 'Test', optional: 'opt' },
+            3,
+            [5, 3],
+        ],
+        ['calls onDelete with null and itemIndex when id is missing', { name: 'Test', optional: 'opt' }, 2, [null, 2]],
+        [
+            'does not call onDelete when both id and itemIndex are missing',
+            { name: 'Test', optional: 'opt' },
+            undefined,
+            null,
+        ],
+    ];
 
-        renderForm({
-            initialData: { id: 5, name: 'Test', optional: 'opt' },
-            itemIndex: 3,
-            onDelete,
-            onClose,
+    test.each(testCases)('%s', async (_, initialData, itemIndex, expectedArgs) => {
+        const { onDelete, onClose } = await runDeleteFlow({
+            initialData: initialData as any,
+            itemIndex: itemIndex,
         });
-
-        clickButton(getDeleteButton());
-
-        await confirmModal();
 
         await waitFor(() => {
-            expect(onDelete).toHaveBeenCalledWith(5, 3);
-            expect(onClose).toHaveBeenCalled();
-        });
-    });
-
-    it('calls onDelete with null and itemIndex when id is missing', async () => {
-        const onDelete = jest.fn().mockResolvedValue(undefined);
-        const onClose = jest.fn();
-
-        renderForm({
-            initialData: { name: 'Test', optional: 'opt' },
-            itemIndex: 2,
-            onDelete,
-            onClose,
-        });
-
-        clickButton(getDeleteButton());
-
-        await confirmModal();
-
-        await waitFor(() => {
-            expect(onDelete).toHaveBeenCalledWith(null, 2);
-            expect(onClose).toHaveBeenCalled();
-        });
-    });
-
-    it('does not call onDelete when both id and itemIndex are missing', async () => {
-        const onDelete = jest.fn().mockResolvedValue(undefined);
-
-        renderForm({ initialData: { name: 'Test', optional: 'opt' }, onDelete });
-
-        clickButton(getDeleteButton());
-
-        await confirmModal();
-
-        await waitFor(() => {
-            expect(onDelete).not.toHaveBeenCalled();
+            if (expectedArgs) {
+                // eslint-disable-next-line jest/no-conditional-expect
+                expect(onDelete).toHaveBeenCalledWith(...(expectedArgs as any[]));
+                // eslint-disable-next-line jest/no-conditional-expect
+                expect(onClose).toHaveBeenCalled();
+            } else {
+                // eslint-disable-next-line jest/no-conditional-expect
+                expect(onDelete).not.toHaveBeenCalled();
+            }
         });
     });
 });
@@ -805,8 +772,7 @@ describe('Publish Button Behaviors', () => {
             onSubmit,
         });
 
-        const input = getInput('Test Name');
-        changeInput(input, 'Changed');
+        changeName('Test Name', 'Changed');
 
         const saveButton = getTextButton(COMMON_TEXT_ADMIN.BUTTON.SAVE);
         clickButton(saveButton);
@@ -821,8 +787,7 @@ describe('Publish Button Behaviors', () => {
 
         renderForm({ initialMode: GenericFormMode.Edit, onSubmit });
 
-        const input = getInput('Test Name');
-        changeInput(input, 'Updated');
+        changeName('Test Name', 'Updated');
 
         clickButton(getPublishButton());
 
@@ -840,8 +805,7 @@ describe('Publish Button Behaviors', () => {
 
         renderForm({ initialMode: GenericFormMode.Create, onSubmit });
 
-        const input = getInput('Test Name');
-        changeInput(input, 'New Name');
+        changeName('Test Name', 'New Name');
 
         clickButton(getPublishButton());
 
@@ -919,8 +883,7 @@ describe('Field Value Processing', () => {
         // eslint-disable-next-line testing-library/render-result-naming-convention
         const ref = renderFormWithRef({ initialMode: GenericFormMode.Edit, onSubmit });
 
-        const input = getInput('Test Name');
-        changeInput(input, '   Leading Spaces');
+        changeName('Test Name', '   Leading Spaces');
 
         await ref.current.submit();
 
@@ -962,31 +925,22 @@ describe('Field Value Processing', () => {
 describe('Keyboard Interactions', () => {
     it('prevents propagation on Enter key in form container', () => {
         renderForm();
-
         const formContainer = document.querySelector('.generic-form') as HTMLElement;
-
         fireEvent.keyDown(formContainer, { key: 'Enter' });
-
         expect(screen.getByText('Test Name')).toBeInTheDocument();
     });
 
     it('prevents propagation on Space key in form container', () => {
         renderForm();
-
         const formContainer = document.querySelector('.generic-form') as HTMLElement;
-
         fireEvent.keyDown(formContainer, { key: ' ' });
-
         expect(screen.getByText('Test Name')).toBeInTheDocument();
     });
 
     it('does not prevent propagation on other keys in form container', () => {
         renderForm();
-
         const formContainer = document.querySelector('.generic-form') as HTMLElement;
-
         fireEvent.keyDown(formContainer, { key: 'Escape' });
-
         expect(screen.getByText('Test Name')).toBeInTheDocument();
     });
 
@@ -1004,7 +958,6 @@ describe('Keyboard Interactions', () => {
     it('does not toggle expansion on other keys on header', () => {
         renderForm();
         const header = screen.getByText('Test Name');
-
         const initialExpanded = header.querySelector('.arrow')?.classList.contains('expanded');
 
         fireEvent.keyDown(header, { key: 'a' });

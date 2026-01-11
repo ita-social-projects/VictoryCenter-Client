@@ -790,26 +790,22 @@ describe('Delete with ItemIndex', () => {
         ],
     ];
 
-    test.each(testCases.filter((tc) => tc[3] !== null))('%s', async (_, initialData, itemIndex, expectedArgs) => {
+    test.each(testCases)('%s', async (_, initialData, itemIndex, expectedArgs) => {
         const { onDelete, onClose } = await runDeleteFlow({
             initialData: initialData as any,
             itemIndex: itemIndex,
         });
 
         await waitFor(() => {
-            expect(onDelete).toHaveBeenCalledWith(...(expectedArgs as any[]));
-            expect(onClose).toHaveBeenCalled();
-        });
-    });
-
-    test.each(testCases.filter((tc) => tc[3] === null))('%s', async (_, initialData, itemIndex) => {
-        const { onDelete } = await runDeleteFlow({
-            initialData: initialData as any,
-            itemIndex: itemIndex,
-        });
-
-        await waitFor(() => {
-            expect(onDelete).not.toHaveBeenCalled();
+            if (expectedArgs) {
+                // eslint-disable-next-line jest/no-conditional-expect
+                expect(onDelete).toHaveBeenCalledWith(...(expectedArgs as any[]));
+                // eslint-disable-next-line jest/no-conditional-expect
+                expect(onClose).toHaveBeenCalled();
+            } else {
+                // eslint-disable-next-line jest/no-conditional-expect
+                expect(onDelete).not.toHaveBeenCalled();
+            }
         });
     });
 });

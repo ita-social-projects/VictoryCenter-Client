@@ -25,6 +25,25 @@ const createDefaultProps = (overrides?: Partial<GenericFormProps<Item>>): Generi
     ...overrides,
 });
 
+const runRefSubmitFlow = async (newName: string, props: Partial<GenericFormProps<Item>> = {}) => {
+    const onSubmit = 'onSubmit' in props ? props.onSubmit : jest.fn().mockResolvedValue(undefined);
+
+    // eslint-disable-next-line testing-library/render-result-naming-convention
+    const formRef = renderFormWithRef({
+        initialMode: GenericFormMode.Edit,
+        onSubmit,
+        ...props,
+    });
+
+    changeName('Test Name', newName);
+
+    if (formRef.current) {
+        await formRef.current.submit();
+    }
+
+    return { onSubmit, formRef };
+};
+
 const renderFormInternal = (props?: Partial<GenericFormProps<Item>>, withRef = false) => {
     const fields = createDefaultFields();
     const GenericForm = createGenericForm<Item>(fields);
@@ -209,13 +228,7 @@ describe('GenericForm', () => {
         });
 
         it('successfully submits form and switches Edit to View mode', async () => {
-            const onSubmit = jest.fn().mockResolvedValue(undefined);
-            // eslint-disable-next-line testing-library/render-result-naming-convention
-            const ref = renderFormWithRef({ initialMode: GenericFormMode.Edit, onSubmit });
-
-            changeName('Test Name', 'New Name');
-
-            await ref.current.submit();
+            const { onSubmit } = await runRefSubmitFlow('New Name');
 
             await waitFor(() => {
                 expect(onSubmit).toHaveBeenCalledWith({ id: 1, name: 'New Name', optional: 'opt' });
@@ -224,12 +237,7 @@ describe('GenericForm', () => {
         });
 
         it('prevents submit when onSubmit is not provided', async () => {
-            // eslint-disable-next-line testing-library/render-result-naming-convention
-            const ref = renderFormWithRef({ initialMode: GenericFormMode.Edit, onSubmit: undefined as any });
-
-            changeName('Test Name', 'Changed');
-
-            await ref.current.submit();
+            await runRefSubmitFlow('Changed', { onSubmit: undefined as any });
 
             expect(screen.getByDisplayValue('Changed')).toBeInTheDocument();
         });
@@ -569,18 +577,18 @@ describe('GenericForm', () => {
     describe('Ref API', () => {
         it('exposes submit, isChanged, isValid via ref', async () => {
             // eslint-disable-next-line testing-library/render-result-naming-convention
-            const ref = renderFormWithRef({ initialMode: GenericFormMode.Edit });
+            const formRef = renderFormWithRef({ initialMode: GenericFormMode.Edit });
 
             await waitFor(() => {
-                expect(ref.current).toBeDefined();
+                expect(formRef.current).toBeDefined();
             });
 
-            expect(ref.current.isChanged()).toBe(false);
+            expect(formRef.current.isChanged()).toBe(false);
 
             changeName('Test Name', 'Changed');
-            expect(ref.current.isChanged()).toBe(true);
+            expect(formRef.current.isChanged()).toBe(true);
 
-            expect(ref.current.isValid()).toBe(true);
+            expect(formRef.current.isValid()).toBe(true);
         });
     });
 
@@ -741,22 +749,26 @@ describe('Delete with ItemIndex', () => {
         ],
     ];
 
-    test.each(testCases)('%s', async (_, initialData, itemIndex, expectedArgs) => {
+    test.each(testCases.filter((tc) => tc[3] !== null))('%s', async (_, initialData, itemIndex, expectedArgs) => {
         const { onDelete, onClose } = await runDeleteFlow({
             initialData: initialData as any,
             itemIndex: itemIndex,
         });
 
         await waitFor(() => {
-            if (expectedArgs) {
-                // eslint-disable-next-line jest/no-conditional-expect
-                expect(onDelete).toHaveBeenCalledWith(...(expectedArgs as any[]));
-                // eslint-disable-next-line jest/no-conditional-expect
-                expect(onClose).toHaveBeenCalled();
-            } else {
-                // eslint-disable-next-line jest/no-conditional-expect
-                expect(onDelete).not.toHaveBeenCalled();
-            }
+            expect(onDelete).toHaveBeenCalledWith(...(expectedArgs as any[]));
+            expect(onClose).toHaveBeenCalled();
+        });
+    });
+
+    test.each(testCases.filter((tc) => tc[3] === null))('%s', async (_, initialData, itemIndex) => {
+        const { onDelete } = await runDeleteFlow({
+            initialData: initialData as any,
+            itemIndex: itemIndex,
+        });
+
+        await waitFor(() => {
+            expect(onDelete).not.toHaveBeenCalled();
         });
     });
 });
@@ -879,13 +891,7 @@ describe('Field Value Processing', () => {
     });
 
     it('trims start of string when ignoreSpacesInCount is false on submit', async () => {
-        const onSubmit = jest.fn().mockResolvedValue(undefined);
-        // eslint-disable-next-line testing-library/render-result-naming-convention
-        const ref = renderFormWithRef({ initialMode: GenericFormMode.Edit, onSubmit });
-
-        changeName('Test Name', '   Leading Spaces');
-
-        await ref.current.submit();
+        const { onSubmit } = await runRefSubmitFlow('   Leading Spaces');
 
         await waitFor(() => {
             expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ name: 'Leading Spaces' }));

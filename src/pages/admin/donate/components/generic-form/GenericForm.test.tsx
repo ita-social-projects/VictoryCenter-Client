@@ -44,6 +44,36 @@ const runRefSubmitFlow = async (newName: string, props: Partial<GenericFormProps
     return { onSubmit, formRef };
 };
 
+const runCustomFormRefFlow = async <T extends object>(
+    fields: GenericFormField<T>[],
+    initialData: Partial<T>,
+    findValue: string,
+    newValue: string,
+) => {
+    const CustomForm = createGenericForm<T>(fields);
+    const onSubmit = jest.fn().mockResolvedValue(undefined);
+    const formRef = React.createRef<any>();
+
+    render(
+        <CustomForm
+            initialData={initialData as T}
+            initialMode={GenericFormMode.Edit}
+            onSubmit={onSubmit}
+            onClose={jest.fn()}
+            ref={formRef}
+        />,
+    );
+
+    const input = getInput(findValue);
+    changeInput(input, newValue);
+
+    if (formRef.current) {
+        await formRef.current.submit();
+    }
+
+    return { onSubmit };
+};
+
 const renderFormInternal = (props?: Partial<GenericFormProps<Item>>, withRef = false) => {
     const fields = createDefaultFields();
     const GenericForm = createGenericForm<Item>(fields);
@@ -866,24 +896,13 @@ describe('Field Value Processing', () => {
         const fieldsWithIgnoreSpaces: GenericFormField<Item>[] = [
             { name: 'name', isRequired: true, isTitle: true, ignoreSpacesInCount: true },
         ];
-        const FormWithIgnoreSpaces = createGenericForm<Item>(fieldsWithIgnoreSpaces);
-        const onSubmit = jest.fn().mockResolvedValue(undefined);
-        const ref = React.createRef<any>();
 
-        render(
-            <FormWithIgnoreSpaces
-                initialData={{ name: 'Test Name' }}
-                initialMode={GenericFormMode.Edit}
-                onSubmit={onSubmit}
-                onClose={jest.fn()}
-                ref={ref}
-            />,
+        const { onSubmit } = await runCustomFormRefFlow(
+            fieldsWithIgnoreSpaces,
+            { name: 'Test Name' },
+            'Test Name',
+            'New   Name   With   Spaces',
         );
-
-        const input = screen.getByDisplayValue('Test Name') as HTMLInputElement;
-        changeInput(input, 'New   Name   With   Spaces');
-
-        await ref.current.submit();
 
         await waitFor(() => {
             expect(onSubmit).toHaveBeenCalledWith({ name: 'NewNameWithSpaces' });
@@ -903,24 +922,13 @@ describe('Field Value Processing', () => {
             { name: 'name', isRequired: true, isTitle: true },
             { name: 'count', label: 'Count' },
         ];
-        const FormWithNumber = createGenericForm<{ id?: number; name: string; count: number }>(fieldsWithNumber);
-        const onSubmit = jest.fn().mockResolvedValue(undefined);
-        const ref = React.createRef<any>();
 
-        render(
-            <FormWithNumber
-                initialData={{ name: 'Test', count: 42 }}
-                initialMode={GenericFormMode.Edit}
-                onSubmit={onSubmit}
-                onClose={jest.fn()}
-                ref={ref}
-            />,
+        const { onSubmit } = await runCustomFormRefFlow(
+            fieldsWithNumber,
+            { name: 'Test', count: 42 },
+            'Test',
+            'Updated',
         );
-
-        const input = screen.getByDisplayValue('Test') as HTMLInputElement;
-        changeInput(input, 'Updated');
-
-        await ref.current.submit();
 
         await waitFor(() => {
             expect(onSubmit).toHaveBeenCalledWith({ name: 'Updated', count: 42 });

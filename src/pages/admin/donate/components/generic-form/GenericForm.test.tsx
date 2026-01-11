@@ -25,6 +25,84 @@ const createDefaultProps = (overrides?: Partial<GenericFormProps<Item>>): Generi
     ...overrides,
 });
 
+const renderFormInternal = (
+    props: Partial<GenericFormProps<any>> = {},
+    withRef = false,
+    customFields?: GenericFormField<any>[],
+) => {
+    const fields = customFields || createDefaultFields();
+    const GenericForm = createGenericForm<any>(fields);
+    const ref = React.createRef<any>();
+    const mergedProps = createDefaultProps(props as any);
+
+    // eslint-disable-next-line testing-library/render-result-naming-convention
+    const rendered = render(
+        <GenericForm
+            {...mergedProps}
+            initialData={props.initialData || mergedProps.initialData}
+            ref={withRef ? ref : undefined}
+        />,
+    );
+
+    return { ...rendered, ref };
+};
+
+const renderForm = (props?: Partial<GenericFormProps<Item>>) => renderFormInternal(props, false);
+
+const renderFormWithRef = (props?: Partial<GenericFormProps<any>>, customFields?: GenericFormField<any>[]) => {
+    const { ref } = renderFormInternal(props, true, customFields);
+    return ref;
+};
+
+const renderFormWithFields = <T extends object>(fields: GenericFormField<T>[], props: Partial<GenericFormProps<T>>) => {
+    const GenericForm = createGenericForm<T>(fields);
+    const defaultProps = {
+        onClose: jest.fn(),
+        onSubmit: jest.fn(),
+        ...props,
+    };
+    return render(<GenericForm {...(defaultProps as any)} />);
+};
+
+const getButton = (name: string) => screen.getByRole('button', { name });
+const getTextButton = (text: string) => screen.getByText(text);
+const getInput = (value: string) => screen.getByDisplayValue(value) as HTMLInputElement;
+const getPublishButton = () => getTextButton(DONATE_TEXT.BUTTON.PUBLISH);
+const getCancelButton = () => getTextButton(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
+const getEditButton = () => getButton('edit-btn');
+const getDeleteButton = () => getButton('delete-btn');
+const getSaveButton = () => getTextButton(COMMON_TEXT_ADMIN.BUTTON.SAVE);
+
+const clickButton = (button: HTMLElement) => fireEvent.click(button);
+
+const changeInput = (input: HTMLInputElement, value: string) => {
+    fireEvent.change(input, { target: { value } });
+};
+
+const blurInput = (input: HTMLInputElement) => fireEvent.blur(input);
+
+const changeName = (oldValue: string, newValue: string) => {
+    const input = getInput(oldValue);
+    changeInput(input, newValue);
+    return input;
+};
+
+const clickHeader = (text: string = 'Test Name') => {
+    const header = screen.getByText(text);
+    fireEvent.click(header);
+    return header;
+};
+
+const confirmModal = async () => {
+    const confirmButton = getTextButton(COMMON_TEXT_ADMIN.BUTTON.YES);
+    clickButton(confirmButton);
+};
+
+const cancelModal = () => {
+    const cancelButton = getTextButton(COMMON_TEXT_ADMIN.BUTTON.NO);
+    clickButton(cancelButton);
+};
+
 const runRefSubmitFlow = async (newName: string, props: Partial<GenericFormProps<Item>> = {}) => {
     const onSubmit = 'onSubmit' in props ? props.onSubmit : jest.fn().mockResolvedValue(undefined);
 
@@ -73,73 +151,6 @@ const runCustomFormRefFlow = async <T extends object>(
     return { onSubmit };
 };
 
-const renderFormInternal = (
-    props: Partial<GenericFormProps<any>> = {},
-    withRef = false,
-    customFields?: GenericFormField<any>[],
-) => {
-    const fields = customFields || createDefaultFields();
-    const GenericForm = createGenericForm<any>(fields);
-
-    const ref = React.createRef<any>();
-    const mergedProps = createDefaultProps(props as any);
-
-    // eslint-disable-next-line testing-library/render-result-naming-convention
-    const rendered = render(
-        <GenericForm
-            {...mergedProps}
-            initialData={props.initialData || mergedProps.initialData}
-            ref={withRef ? ref : undefined}
-        />,
-    );
-
-    return { ...rendered, ref };
-};
-
-const renderForm = (props?: Partial<GenericFormProps<Item>>) => renderFormInternal(props, false);
-
-const renderFormWithRef = (props?: Partial<GenericFormProps<any>>, customFields?: GenericFormField<any>[]) => {
-    const { ref } = renderFormInternal(props, true, customFields);
-    return ref;
-};
-
-const getButton = (name: string) => screen.getByRole('button', { name });
-const getTextButton = (text: string) => screen.getByText(text);
-const getInput = (value: string) => screen.getByDisplayValue(value) as HTMLInputElement;
-const getPublishButton = () => getTextButton(DONATE_TEXT.BUTTON.PUBLISH);
-const getCancelButton = () => getTextButton(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
-const getEditButton = () => getButton('edit-btn');
-const getDeleteButton = () => getButton('delete-btn');
-
-const clickButton = (button: HTMLElement) => fireEvent.click(button);
-
-const changeInput = (input: HTMLInputElement, value: string) => {
-    fireEvent.change(input, { target: { value } });
-};
-const blurInput = (input: HTMLInputElement) => fireEvent.blur(input);
-
-const changeName = (oldValue: string, newValue: string) => {
-    const input = getInput(oldValue);
-    changeInput(input, newValue);
-    return input;
-};
-
-const clickHeader = (text: string = 'Test Name') => {
-    const header = screen.getByText(text);
-    fireEvent.click(header);
-    return header;
-};
-
-const confirmModal = async () => {
-    const confirmButton = getTextButton(COMMON_TEXT_ADMIN.BUTTON.YES);
-    clickButton(confirmButton);
-};
-
-const cancelModal = () => {
-    const cancelButton = getTextButton(COMMON_TEXT_ADMIN.BUTTON.NO);
-    clickButton(cancelButton);
-};
-
 const runDeleteFlow = async (props: Partial<GenericFormProps<Item>> = {}, confirm = true) => {
     const onDelete = jest.fn().mockResolvedValue(undefined);
     const onClose = jest.fn();
@@ -174,6 +185,57 @@ const testFieldChange = (fieldsConfig: GenericFormField<Item>[], changeValue: st
     blurInput(input);
 
     expect(input.value).toBe(expectedValue);
+};
+
+const renderChildFormAndExpand = () => {
+    const childFields: GenericFormField<Item>[] = [
+        { name: 'name', label: 'Name', isTitle: true, isRequired: true },
+        { name: 'optional', label: 'Optional' },
+    ];
+    const ChildForm = createGenericForm<Item>(childFields);
+
+    render(
+        <ChildForm
+            initialData={{ id: 1, name: 'Test Name', optional: 'opt' }}
+            initialMode={GenericFormMode.View}
+            isChildForm={true}
+            onClose={jest.fn()}
+            onSubmit={jest.fn()}
+            onDelete={jest.fn()}
+        />,
+    );
+
+    clickHeader();
+    return getDeleteButton();
+};
+
+const setupPublishButtonTest = async (modalText: string, mode: GenericFormMode, nameChange: string = 'Updated') => {
+    const onSubmit = jest.fn().mockResolvedValue(undefined);
+    const props: Partial<GenericFormProps<Item>> = { initialMode: mode, onSubmit };
+
+    renderForm(props);
+    changeName('Test Name', nameChange);
+    clickButton(getPublishButton());
+
+    expect(screen.getByText(modalText)).toBeInTheDocument();
+
+    await confirmModal();
+
+    await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalled();
+    });
+};
+
+const expectModalVisible = (text: string) => {
+    expect(screen.getByText(text)).toBeInTheDocument();
+};
+
+const expectModalNotVisible = (text: string) => {
+    expect(screen.queryByText(text)).not.toBeInTheDocument();
+};
+
+const expectButtonDisabled = (button: HTMLButtonElement, disabled: boolean = true) => {
+    expect(button.disabled).toBe(disabled);
 };
 
 type DeleteTestCase = [string, Partial<Item>, number | undefined, (number | null)[] | null];
@@ -314,16 +376,10 @@ describe('GenericForm', () => {
                 },
             ];
 
-            const FormWithValidator = createGenericForm<Item>(fieldsWithValidator);
-
-            render(
-                <FormWithValidator
-                    {...createDefaultProps({
-                        initialMode: GenericFormMode.Edit,
-                        initialData: { id: 1, name: 'Valid Name' },
-                    })}
-                />,
-            );
+            renderFormWithFields(fieldsWithValidator, {
+                initialMode: GenericFormMode.Edit,
+                initialData: { id: 1, name: 'Valid Name' },
+            });
 
             const input = getInput('Valid Name');
             const publishButton = getPublishButton() as HTMLButtonElement;
@@ -332,7 +388,7 @@ describe('GenericForm', () => {
             blurInput(input);
 
             expect(screen.getByText('Name is too short')).toBeInTheDocument();
-            expect(publishButton.disabled).toBe(true);
+            expectButtonDisabled(publishButton);
         });
 
         it('detects empty required fields', () => {
@@ -340,7 +396,7 @@ describe('GenericForm', () => {
             changeName('Test Name', '');
 
             const publishBtn = getPublishButton() as HTMLButtonElement;
-            expect(publishBtn.disabled).toBe(true);
+            expectButtonDisabled(publishBtn);
         });
     });
 
@@ -358,9 +414,7 @@ describe('GenericForm', () => {
 
             clickButton(getCancelButton());
 
-            expect(
-                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
-            ).toBeInTheDocument();
+            expectModalVisible(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE);
         });
 
         it('Create mode cancel without changes calls onClose directly', () => {
@@ -375,9 +429,7 @@ describe('GenericForm', () => {
 
             clickButton(getCancelButton());
 
-            expect(
-                screen.queryByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
-            ).not.toBeInTheDocument();
+            expectModalNotVisible(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE);
             expect(getEditButton()).toBeInTheDocument();
         });
 
@@ -417,7 +469,7 @@ describe('GenericForm', () => {
 
             clickButton(getCancelButton());
 
-            expect(screen.getByText(DONATE_TEXT.QUESTION.BANK_DETAILS.CANCEL_CREATE)).toBeInTheDocument();
+            expectModalVisible(DONATE_TEXT.QUESTION.BANK_DETAILS.CANCEL_CREATE);
         });
 
         it('shows correct modal when canceling Create mode in child form during parent creation', () => {
@@ -431,9 +483,7 @@ describe('GenericForm', () => {
 
             clickButton(getCancelButton());
 
-            expect(
-                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
-            ).toBeInTheDocument();
+            expectModalVisible(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE);
         });
 
         it('confirms cancel and resets form state in Edit mode when changes exist', () => {
@@ -442,9 +492,7 @@ describe('GenericForm', () => {
 
             clickButton(getCancelButton());
 
-            expect(
-                screen.getByText(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE),
-            ).toBeInTheDocument();
+            expectModalVisible(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE);
 
             const confirmBtn = getTextButton(COMMON_TEXT_ADMIN.BUTTON.YES);
             clickButton(confirmBtn);
@@ -457,12 +505,12 @@ describe('GenericForm', () => {
         test('opens confirmation modal on delete click', () => {
             renderForm();
             clickButton(getDeleteButton());
-            expect(screen.getByText(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE)).toBeInTheDocument();
+            expectModalVisible(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE);
         });
 
         test('closes modal on cancel', async () => {
             const { onDelete } = await runDeleteFlow({}, false);
-            expect(screen.queryByText(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE)).not.toBeInTheDocument();
+            expectModalNotVisible(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE);
             expect(onDelete).not.toHaveBeenCalled();
         });
 
@@ -527,7 +575,7 @@ describe('GenericForm', () => {
 
             clickButton(getDeleteButton());
 
-            expect(screen.getByText(DONATE_TEXT.QUESTION.BANK_DETAILS.FOREIGN.DELETE)).toBeInTheDocument();
+            expectModalVisible(DONATE_TEXT.QUESTION.BANK_DETAILS.FOREIGN.DELETE);
         });
 
         it('shows default delete title when correspondentBanks is empty array', () => {
@@ -542,7 +590,7 @@ describe('GenericForm', () => {
 
             clickButton(getDeleteButton());
 
-            expect(screen.getByText(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE)).toBeInTheDocument();
+            expectModalVisible(DONATE_TEXT.QUESTION.BANK_DETAILS.DELETE);
         });
     });
 
@@ -550,7 +598,7 @@ describe('GenericForm', () => {
         it('should have the publish button disabled on initial render in Edit mode', () => {
             renderForm({ initialMode: GenericFormMode.Edit });
             const publishButton = getPublishButton() as HTMLButtonElement;
-            expect(publishButton.disabled).toBe(true);
+            expectButtonDisabled(publishButton);
         });
 
         it('publish button disabled if required field empty', () => {
@@ -558,7 +606,7 @@ describe('GenericForm', () => {
             changeName('Test Name', '');
 
             const publishButton = getPublishButton() as HTMLButtonElement;
-            expect(publishButton.disabled).toBe(true);
+            expectButtonDisabled(publishButton);
         });
 
         it('isChanged returns true after input change', () => {
@@ -573,7 +621,7 @@ describe('GenericForm', () => {
             changeName('Test Name', 'Changed');
 
             const publishButton = getPublishButton() as HTMLButtonElement;
-            expect(publishButton.disabled).toBe(true);
+            expectButtonDisabled(publishButton);
         });
 
         it('enables publish button when isDisabled is true but isCorrespondentInParentCreation is true', () => {
@@ -586,8 +634,8 @@ describe('GenericForm', () => {
 
             changeName('Test Name', 'Changed');
 
-            const saveButton = getTextButton(COMMON_TEXT_ADMIN.BUTTON.SAVE) as HTMLButtonElement;
-            expect(saveButton.disabled).toBe(false);
+            const saveButton = getSaveButton() as HTMLButtonElement;
+            expectButtonDisabled(saveButton, false);
         });
     });
 
@@ -634,52 +682,32 @@ describe('GenericForm', () => {
     });
 
     describe('Child Form Behavior', () => {
-        const getChildFormDeleteButton = () => {
-            const childFields: GenericFormField<Item>[] = [
-                { name: 'name', label: 'Name', isTitle: true, isRequired: true },
-                { name: 'optional', label: 'Optional' },
-            ];
-            const ChildForm = createGenericForm<Item>(childFields);
-
-            render(
-                <ChildForm
-                    initialData={{ id: 1, name: 'Test Name', optional: 'opt' }}
-                    initialMode={GenericFormMode.View}
-                    isChildForm={true}
-                    onClose={jest.fn()}
-                    onSubmit={jest.fn()}
-                    onDelete={jest.fn()}
-                />,
-            );
-
-            clickHeader();
-
-            return getDeleteButton();
-        };
-
         test('resets isDeleting on modal cancel', () => {
-            const deleteButton = getChildFormDeleteButton();
+            // eslint-disable-next-line testing-library/render-result-naming-convention
+            const deleteButton = renderChildFormAndExpand();
             clickButton(deleteButton);
 
-            expect(screen.getByText(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE)).toBeInTheDocument();
+            expectModalVisible(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE);
 
             cancelModal();
 
-            expect(screen.queryByText(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE)).not.toBeInTheDocument();
+            expectModalNotVisible(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE);
         });
 
         it('shows correct delete title for child form', () => {
-            const deleteButton = getChildFormDeleteButton();
+            // eslint-disable-next-line testing-library/render-result-naming-convention
+            const deleteButton = renderChildFormAndExpand();
             clickButton(deleteButton);
 
-            expect(screen.getByText(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE)).toBeInTheDocument();
+            expectModalVisible(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE);
         });
 
         it('covers isDeleting state in child form delete', () => {
-            const deleteButton = getChildFormDeleteButton();
+            // eslint-disable-next-line testing-library/render-result-naming-convention
+            const deleteButton = renderChildFormAndExpand();
             clickButton(deleteButton);
 
-            expect(screen.getByText(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE)).toBeInTheDocument();
+            expectModalVisible(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE);
         });
     });
 
@@ -689,18 +717,14 @@ describe('GenericForm', () => {
                 { name: 'name', isRequired: true, isTitle: true },
                 { name: 'tags', isRequired: true },
             ];
-            const ArrayForm = createGenericForm<{ id?: number; name: string; tags: string[] }>(arrayFields);
 
-            render(
-                <ArrayForm
-                    initialData={{ id: 1, name: 'Name', tags: [] }}
-                    initialMode={GenericFormMode.Edit}
-                    onClose={jest.fn()}
-                    onSubmit={jest.fn()}
-                />,
-            );
+            renderFormWithFields(arrayFields, {
+                initialData: { id: 1, name: 'Name', tags: [] },
+                initialMode: GenericFormMode.Edit,
+            });
+
             const publishBtn = getPublishButton() as HTMLButtonElement;
-            expect(publishBtn.disabled).toBe(true);
+            expectButtonDisabled(publishBtn);
         });
 
         it('does not render fields with empty array values in View mode', () => {
@@ -708,16 +732,11 @@ describe('GenericForm', () => {
                 { name: 'name', isTitle: true },
                 { name: 'tags', label: 'Tags' },
             ];
-            const FormWithArray = createGenericForm<{ id?: number; name: string; tags: string[] }>(fieldsWithArray);
 
-            render(
-                <FormWithArray
-                    initialData={{ id: 1, name: 'Test', tags: [] }}
-                    initialMode={GenericFormMode.View}
-                    onClose={jest.fn()}
-                    onSubmit={jest.fn()}
-                />,
-            );
+            renderFormWithFields(fieldsWithArray, {
+                initialData: { id: 1, name: 'Test', tags: [] },
+                initialMode: GenericFormMode.View,
+            });
 
             expect(screen.queryByText('Tags')).not.toBeInTheDocument();
         });
@@ -823,7 +842,7 @@ describe('Publish Button Behaviors', () => {
 
         changeName('Test Name', 'Changed');
 
-        const saveButton = getTextButton(COMMON_TEXT_ADMIN.BUTTON.SAVE);
+        const saveButton = getSaveButton();
         clickButton(saveButton);
 
         await waitFor(() => {
@@ -832,39 +851,11 @@ describe('Publish Button Behaviors', () => {
     });
 
     it('shows update confirmation modal in Edit mode', async () => {
-        const onSubmit = jest.fn().mockResolvedValue(undefined);
-
-        renderForm({ initialMode: GenericFormMode.Edit, onSubmit });
-
-        changeName('Test Name', 'Updated');
-
-        clickButton(getPublishButton());
-
-        expect(screen.getByText(DONATE_TEXT.QUESTION.BANK_DETAILS.UPDATE)).toBeInTheDocument();
-
-        await confirmModal();
-
-        await waitFor(() => {
-            expect(onSubmit).toHaveBeenCalled();
-        });
+        await setupPublishButtonTest(DONATE_TEXT.QUESTION.BANK_DETAILS.UPDATE, GenericFormMode.Edit);
     });
 
     it('shows add confirmation modal in Create mode', async () => {
-        const onSubmit = jest.fn().mockResolvedValue(undefined);
-
-        renderForm({ initialMode: GenericFormMode.Create, onSubmit });
-
-        changeName('Test Name', 'New Name');
-
-        clickButton(getPublishButton());
-
-        expect(screen.getByText(DONATE_TEXT.QUESTION.BANK_DETAILS.ADD)).toBeInTheDocument();
-
-        await confirmModal();
-
-        await waitFor(() => {
-            expect(onSubmit).toHaveBeenCalled();
-        });
+        await setupPublishButtonTest(DONATE_TEXT.QUESTION.BANK_DETAILS.ADD, GenericFormMode.Create, 'New Name');
     });
 });
 

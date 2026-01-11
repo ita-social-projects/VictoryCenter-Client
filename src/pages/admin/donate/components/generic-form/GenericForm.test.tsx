@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/render-result-naming-convention */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { createGenericForm, GenericFormField, GenericFormMode, GenericFormProps } from './GenericForm';
 import { DONATE_TEXT } from '@/const/admin/donate';
@@ -35,7 +36,6 @@ const renderFormInternal = (
     const ref = React.createRef<any>();
     const mergedProps = createDefaultProps(props as any);
 
-    // eslint-disable-next-line testing-library/render-result-naming-convention
     const rendered = render(
         <GenericForm
             {...mergedProps}
@@ -72,6 +72,8 @@ const getCancelButton = () => getTextButton(COMMON_TEXT_ADMIN.BUTTON.CANCEL);
 const getEditButton = () => getButton('edit-btn');
 const getDeleteButton = () => getButton('delete-btn');
 const getSaveButton = () => getTextButton(COMMON_TEXT_ADMIN.BUTTON.SAVE);
+const getYesButton = () => getTextButton(COMMON_TEXT_ADMIN.BUTTON.YES);
+const getNoButton = () => getTextButton(COMMON_TEXT_ADMIN.BUTTON.NO);
 
 const clickButton = (button: HTMLElement) => fireEvent.click(button);
 
@@ -93,20 +95,36 @@ const clickHeader = (text: string = 'Test Name') => {
     return header;
 };
 
-const confirmModal = async () => {
-    const confirmButton = getTextButton(COMMON_TEXT_ADMIN.BUTTON.YES);
-    clickButton(confirmButton);
+const confirmModal = async () => clickButton(getYesButton());
+const cancelModal = () => clickButton(getNoButton());
+
+const expectModalVisible = (text: string) => {
+    expect(screen.getByText(text)).toBeInTheDocument();
 };
 
-const cancelModal = () => {
-    const cancelButton = getTextButton(COMMON_TEXT_ADMIN.BUTTON.NO);
-    clickButton(cancelButton);
+const expectModalNotVisible = (text: string) => {
+    expect(screen.queryByText(text)).not.toBeInTheDocument();
+};
+
+const expectButtonDisabled = (button: HTMLButtonElement, disabled: boolean = true) => {
+    expect(button.disabled).toBe(disabled);
+};
+
+const expectInDocument = (text: string) => {
+    expect(screen.getByText(text)).toBeInTheDocument();
+};
+
+const expectNotInDocument = (text: string) => {
+    expect(screen.queryByText(text)).not.toBeInTheDocument();
+};
+
+const expectInputInDocument = (value: string) => {
+    expect(getInput(value)).toBeInTheDocument();
 };
 
 const runRefSubmitFlow = async (newName: string, props: Partial<GenericFormProps<Item>> = {}) => {
     const onSubmit = 'onSubmit' in props ? props.onSubmit : jest.fn().mockResolvedValue(undefined);
 
-    // eslint-disable-next-line testing-library/render-result-naming-convention
     const formRef = renderFormWithRef({
         initialMode: GenericFormMode.Edit,
         onSubmit,
@@ -130,7 +148,6 @@ const runCustomFormRefFlow = async <T extends object>(
 ) => {
     const onSubmit = jest.fn().mockResolvedValue(undefined);
 
-    // eslint-disable-next-line testing-library/render-result-naming-convention
     const formRef = renderFormWithRef(
         {
             initialData: initialData as any,
@@ -217,8 +234,7 @@ const setupPublishButtonTest = async (modalText: string, mode: GenericFormMode, 
     changeName('Test Name', nameChange);
     clickButton(getPublishButton());
 
-    expect(screen.getByText(modalText)).toBeInTheDocument();
-
+    expectModalVisible(modalText);
     await confirmModal();
 
     await waitFor(() => {
@@ -226,16 +242,14 @@ const setupPublishButtonTest = async (modalText: string, mode: GenericFormMode, 
     });
 };
 
-const expectModalVisible = (text: string) => {
-    expect(screen.getByText(text)).toBeInTheDocument();
+const setupCancelTest = (mode: GenericFormMode, extraProps: Partial<GenericFormProps<Item>> = {}) => {
+    const onClose = jest.fn();
+    renderForm({ initialMode: mode, onClose, ...extraProps });
+    return { onClose };
 };
 
-const expectModalNotVisible = (text: string) => {
-    expect(screen.queryByText(text)).not.toBeInTheDocument();
-};
-
-const expectButtonDisabled = (button: HTMLButtonElement, disabled: boolean = true) => {
-    expect(button.disabled).toBe(disabled);
+const expectArrowExpanded = (header: HTMLElement, expanded: boolean) => {
+    expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(expanded);
 };
 
 type DeleteTestCase = [string, Partial<Item>, number | undefined, (number | null)[] | null];
@@ -246,7 +260,7 @@ describe('GenericForm', () => {
     describe('Basic Rendering', () => {
         test('renders form in view mode', () => {
             renderForm();
-            expect(screen.getByText('Test Name')).toBeInTheDocument();
+            expectInDocument('Test Name');
             expect(getDeleteButton()).toBeInTheDocument();
         });
 
@@ -257,27 +271,31 @@ describe('GenericForm', () => {
 
         it('renders children when isChildForm is false', () => {
             renderForm({ isChildForm: false });
-            expect(screen.getByText('opt')).toBeInTheDocument();
+            expectInDocument('opt');
         });
 
         it('does not render children when isChildForm is true', () => {
             renderForm({ isChildForm: true });
-            expect(screen.queryByText('opt')).not.toBeInTheDocument();
+            expectNotInDocument('opt');
         });
     });
 
     describe('Mode Switching', () => {
-        test('switches to edit mode when edit button is clicked', () => {
-            renderForm();
+        const testModeSwitch = (initialMode: GenericFormMode, shouldSwitch: boolean) => {
+            renderForm({ initialMode });
             clickButton(getEditButton());
-            expect(getInput('Test Name')).toBeInTheDocument();
+            expectInputInDocument('Test Name');
+            if (shouldSwitch) {
+                expectInputInDocument('opt');
+            }
+        };
+
+        test('switches to edit mode when edit button is clicked', () => {
+            testModeSwitch(GenericFormMode.View, true);
         });
 
         it('toggles from View to Edit mode and expands form on edit button click', () => {
-            renderForm({ initialMode: GenericFormMode.View });
-            clickButton(getEditButton());
-            expect(getInput('Test Name')).toBeInTheDocument();
-            expect(getInput('opt')).toBeInTheDocument();
+            testModeSwitch(GenericFormMode.View, true);
         });
 
         it('keeps form expanded after switching from View to Edit', () => {
@@ -288,9 +306,7 @@ describe('GenericForm', () => {
         });
 
         it('does not toggle mode when clicking edit button in Edit mode', () => {
-            renderForm({ initialMode: GenericFormMode.Edit });
-            clickButton(getEditButton());
-            expect(getInput('Test Name')).toBeInTheDocument();
+            testModeSwitch(GenericFormMode.Edit, false);
         });
 
         it('calls onModeChange when mode changes', () => {
@@ -335,26 +351,25 @@ describe('GenericForm', () => {
 
             await waitFor(() => {
                 expect(onSubmit).toHaveBeenCalledWith({ id: 1, name: 'New Name', optional: 'opt' });
-                expect(screen.getByText('New Name')).toBeInTheDocument();
+                expectInDocument('New Name');
             });
         });
 
         it('prevents submit when onSubmit is not provided', async () => {
             await runRefSubmitFlow('Changed', { onSubmit: undefined as any });
-
             expect(screen.getByDisplayValue('Changed')).toBeInTheDocument();
         });
     });
 
     describe('Validation', () => {
-        test('shows validation error', () => {
+        const testValidationError = () => {
             renderForm({ initialMode: GenericFormMode.Edit });
             changeName('Test Name', '');
-
             clickButton(getPublishButton());
-
             expect(getPublishButton()).toBeInTheDocument();
-        });
+        };
+
+        test('shows validation error', testValidationError);
 
         it('isValid blocks submit for invalid required field', async () => {
             renderForm({ initialMode: GenericFormMode.Edit });
@@ -387,7 +402,7 @@ describe('GenericForm', () => {
             changeInput(input, '123');
             blurInput(input);
 
-            expect(screen.getByText('Name is too short')).toBeInTheDocument();
+            expectInDocument('Name is too short');
             expectButtonDisabled(publishButton);
         });
 
@@ -402,8 +417,7 @@ describe('GenericForm', () => {
 
     describe('Cancel Behavior', () => {
         test('cancel resets form state', () => {
-            const onClose = jest.fn();
-            renderForm({ initialMode: GenericFormMode.Create, onClose });
+            const { onClose } = setupCancelTest(GenericFormMode.Create);
             clickButton(getCancelButton());
             expect(onClose).toHaveBeenCalled();
         });
@@ -418,8 +432,7 @@ describe('GenericForm', () => {
         });
 
         it('Create mode cancel without changes calls onClose directly', () => {
-            const onClose = jest.fn();
-            renderForm({ initialMode: GenericFormMode.Create, onClose });
+            const { onClose } = setupCancelTest(GenericFormMode.Create);
             clickButton(getCancelButton());
             expect(onClose).toHaveBeenCalled();
         });
@@ -459,8 +472,8 @@ describe('GenericForm', () => {
             clickButton(getCancelButton());
 
             expect(screen.getByRole('button', { name: /edit-btn/i })).toBeInTheDocument();
-            expect(screen.getByText('Test Name')).toBeInTheDocument();
-            expect(screen.getByText('Test Receiver')).toBeInTheDocument();
+            expectInDocument('Test Name');
+            expectInDocument('Test Receiver');
         });
 
         it('shows cancel edit modal in Create mode when there are unsaved changes', () => {
@@ -494,10 +507,10 @@ describe('GenericForm', () => {
 
             expectModalVisible(COMMON_TEXT_ADMIN.QUESTION.CHANGES_WILL_BE_LOST_WISH_TO_CONTINUE);
 
-            const confirmBtn = getTextButton(COMMON_TEXT_ADMIN.BUTTON.YES);
+            const confirmBtn = getYesButton();
             clickButton(confirmBtn);
 
-            expect(screen.getByText('Test Name')).toBeInTheDocument();
+            expectInDocument('Test Name');
         });
     });
 
@@ -644,22 +657,22 @@ describe('GenericForm', () => {
             renderForm();
             const header = clickHeader();
 
-            expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(true);
+            expectArrowExpanded(header, true);
 
             fireEvent.keyDown(header, { key: 'Enter' });
-            expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(false);
+            expectArrowExpanded(header, false);
         });
 
         it('handles View mode cancel by calling handleViewCancel', () => {
             renderForm({ initialMode: GenericFormMode.View });
 
             const header = clickHeader();
-            expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(true);
+            expectArrowExpanded(header, true);
 
             fireEvent.keyDown(header, { key: 'Escape' });
             clickButton(header);
 
-            expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(false);
+            expectArrowExpanded(header, false);
         });
     });
 
@@ -682,32 +695,31 @@ describe('GenericForm', () => {
     });
 
     describe('Child Form Behavior', () => {
-        test('resets isDeleting on modal cancel', () => {
+        const testChildFormDelete = (action: () => void, shouldShowModal: boolean = true) => {
             // eslint-disable-next-line testing-library/render-result-naming-convention
             const deleteButton = renderChildFormAndExpand();
             clickButton(deleteButton);
 
-            expectModalVisible(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE);
+            if (shouldShowModal) {
+                expectModalVisible(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE);
+            }
 
-            cancelModal();
+            action();
+        };
 
-            expectModalNotVisible(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE);
+        test('resets isDeleting on modal cancel', () => {
+            testChildFormDelete(() => {
+                cancelModal();
+                expectModalNotVisible(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE);
+            });
         });
 
         it('shows correct delete title for child form', () => {
-            // eslint-disable-next-line testing-library/render-result-naming-convention
-            const deleteButton = renderChildFormAndExpand();
-            clickButton(deleteButton);
-
-            expectModalVisible(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE);
+            testChildFormDelete(() => {});
         });
 
         it('covers isDeleting state in child form delete', () => {
-            // eslint-disable-next-line testing-library/render-result-naming-convention
-            const deleteButton = renderChildFormAndExpand();
-            clickButton(deleteButton);
-
-            expectModalVisible(DONATE_TEXT.QUESTION.CORRESPONDENT_BANKS.DELETE);
+            testChildFormDelete(() => {});
         });
     });
 
@@ -738,7 +750,7 @@ describe('GenericForm', () => {
                 initialMode: GenericFormMode.View,
             });
 
-            expect(screen.queryByText('Tags')).not.toBeInTheDocument();
+            expectNotInDocument('Tags');
         });
     });
 
@@ -766,8 +778,8 @@ describe('GenericForm', () => {
 
             clickButton(getEditButton());
 
-            expect(getInput('Test Name')).toBeInTheDocument();
-            expect(getInput('opt')).toBeInTheDocument();
+            expectInputInDocument('Test Name');
+            expectInputInDocument('opt');
         });
 
         it('handles value change for field without validator', () => {
@@ -866,8 +878,8 @@ describe('Field Filtering and Rendering', () => {
             initialMode: GenericFormMode.Create,
         });
 
-        expect(getInput('Test')).toBeInTheDocument();
-        expect(getInput('')).toBeInTheDocument();
+        expectInputInDocument('Test');
+        expectInputInDocument('');
     });
 
     it('filters out fields with empty trimmed string values in View mode', () => {
@@ -878,7 +890,7 @@ describe('Field Filtering and Rendering', () => {
 
         clickHeader('Test');
 
-        expect(screen.queryByText('Optional')).not.toBeInTheDocument();
+        expectNotInDocument('Optional');
     });
 
     it('does not filter title field in View mode', () => {
@@ -935,25 +947,24 @@ describe('Field Value Processing', () => {
 });
 
 describe('Keyboard Interactions', () => {
-    it('prevents propagation on Enter key in form container', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const testKeyboardInteraction = (key: string, p0?: boolean) => {
         renderForm();
         const formContainer = document.querySelector('.generic-form') as HTMLElement;
-        fireEvent.keyDown(formContainer, { key: 'Enter' });
-        expect(screen.getByText('Test Name')).toBeInTheDocument();
+        fireEvent.keyDown(formContainer, { key });
+        expectInDocument('Test Name');
+    };
+
+    it('prevents propagation on Enter key in form container', () => {
+        testKeyboardInteraction('Enter', true);
     });
 
     it('prevents propagation on Space key in form container', () => {
-        renderForm();
-        const formContainer = document.querySelector('.generic-form') as HTMLElement;
-        fireEvent.keyDown(formContainer, { key: ' ' });
-        expect(screen.getByText('Test Name')).toBeInTheDocument();
+        testKeyboardInteraction(' ', true);
     });
 
     it('does not prevent propagation on other keys in form container', () => {
-        renderForm();
-        const formContainer = document.querySelector('.generic-form') as HTMLElement;
-        fireEvent.keyDown(formContainer, { key: 'Escape' });
-        expect(screen.getByText('Test Name')).toBeInTheDocument();
+        testKeyboardInteraction('Escape', false);
     });
 
     it('toggles expansion on Space key press on header', () => {
@@ -961,10 +972,10 @@ describe('Keyboard Interactions', () => {
         const header = screen.getByText('Test Name');
 
         fireEvent.keyDown(header, { key: ' ' });
-        expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(true);
+        expectArrowExpanded(header, true);
 
         fireEvent.keyDown(header, { key: ' ' });
-        expect(header.querySelector('.arrow')?.classList.contains('expanded')).toBe(false);
+        expectArrowExpanded(header, false);
     });
 
     it('does not toggle expansion on other keys on header', () => {

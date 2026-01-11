@@ -50,18 +50,17 @@ const runCustomFormRefFlow = async <T extends object>(
     findValue: string,
     newValue: string,
 ) => {
-    const CustomForm = createGenericForm<T>(fields);
     const onSubmit = jest.fn().mockResolvedValue(undefined);
-    const formRef = React.createRef<any>();
 
-    render(
-        <CustomForm
-            initialData={initialData as T}
-            initialMode={GenericFormMode.Edit}
-            onSubmit={onSubmit}
-            onClose={jest.fn()}
-            ref={formRef}
-        />,
+    // eslint-disable-next-line testing-library/render-result-naming-convention
+    const formRef = renderFormWithRef(
+        {
+            initialData: initialData as any,
+            initialMode: GenericFormMode.Edit,
+            onSubmit,
+            onClose: jest.fn(),
+        },
+        fields as GenericFormField<any>[],
     );
 
     const input = getInput(findValue);
@@ -74,21 +73,33 @@ const runCustomFormRefFlow = async <T extends object>(
     return { onSubmit };
 };
 
-const renderFormInternal = (props?: Partial<GenericFormProps<Item>>, withRef = false) => {
-    const fields = createDefaultFields();
-    const GenericForm = createGenericForm<Item>(fields);
+const renderFormInternal = (
+    props: Partial<GenericFormProps<any>> = {},
+    withRef = false,
+    customFields?: GenericFormField<any>[],
+) => {
+    const fields = customFields || createDefaultFields();
+    const GenericForm = createGenericForm<any>(fields);
+
     const ref = React.createRef<any>();
-    const mergedProps = createDefaultProps(props);
+    const mergedProps = createDefaultProps(props as any);
 
     // eslint-disable-next-line testing-library/render-result-naming-convention
-    const rendered = render(<GenericForm {...mergedProps} ref={withRef ? ref : undefined} />);
+    const rendered = render(
+        <GenericForm
+            {...mergedProps}
+            initialData={props.initialData || mergedProps.initialData}
+            ref={withRef ? ref : undefined}
+        />,
+    );
+
     return { ...rendered, ref };
 };
 
 const renderForm = (props?: Partial<GenericFormProps<Item>>) => renderFormInternal(props, false);
 
-const renderFormWithRef = (props?: Partial<GenericFormProps<Item>>) => {
-    const { ref } = renderFormInternal(props, true);
+const renderFormWithRef = (props?: Partial<GenericFormProps<any>>, customFields?: GenericFormField<any>[]) => {
+    const { ref } = renderFormInternal(props, true, customFields);
     return ref;
 };
 
@@ -147,15 +158,15 @@ const runDeleteFlow = async (props: Partial<GenericFormProps<Item>> = {}, confir
 };
 
 const testFieldChange = (fieldsConfig: GenericFormField<Item>[], changeValue: string, expectedValue: string) => {
-    const TestForm = createGenericForm<Item>(fieldsConfig);
-
-    render(
-        <TestForm
-            initialData={{ id: 1, name: 'Test', optional: 'opt' }}
-            initialMode={GenericFormMode.Edit}
-            onClose={jest.fn()}
-            onSubmit={jest.fn()}
-        />,
+    renderFormInternal(
+        {
+            initialData: { id: 1, name: 'Test', optional: 'opt' },
+            initialMode: GenericFormMode.Edit,
+            onClose: jest.fn(),
+            onSubmit: jest.fn(),
+        },
+        false,
+        fieldsConfig,
     );
 
     const input = screen.getByDisplayValue('Test') as HTMLInputElement;

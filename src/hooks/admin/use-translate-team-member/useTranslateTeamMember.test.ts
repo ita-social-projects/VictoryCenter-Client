@@ -5,6 +5,7 @@ import { mapLocalizationDtoToModel } from '@/utils/functions/mappers/common/loca
 import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
 import { LocalizationLanguage } from '@/types/common/language';
 import { TeamMember, TeamMemberLocalization } from '@/types/admin/team-members';
+import { ModalMode } from '@/types/admin/common';
 
 jest.mock('@/services/api/admin/team/team-member-localizations/team-member-localizations-api');
 jest.mock('@/utils/functions/mappers/common/localization/localization-mappers');
@@ -13,6 +14,8 @@ jest.mock('../use-admin-client/useAdminClient', () => ({
 }));
 
 const mockedCreate = TeamMemberLocalizationsApi.create as jest.MockedFunction<typeof TeamMemberLocalizationsApi.create>;
+
+const mockedUpdate = TeamMemberLocalizationsApi.update as jest.MockedFunction<typeof TeamMemberLocalizationsApi.update>;
 
 const mockedMapper = mapLocalizationDtoToModel as jest.MockedFunction<typeof mapLocalizationDtoToModel>;
 
@@ -69,6 +72,7 @@ describe('useTranslateTeamMember', () => {
                 member: memberMock,
                 language: languageMock,
                 onSuccess: jest.fn(),
+                mode: ModalMode.Add,
             }),
         );
 
@@ -87,6 +91,7 @@ describe('useTranslateTeamMember', () => {
                 member: memberMock,
                 language: languageMock,
                 onSuccess,
+                mode: ModalMode.Add,
             }),
         );
 
@@ -114,6 +119,46 @@ describe('useTranslateTeamMember', () => {
         expect(result.current.error).toBe('');
     });
 
+    it('should update translation successfully in edit mode', async () => {
+        const onSuccess = jest.fn();
+
+        mockedUpdate.mockResolvedValue(localizationDtoMock as any);
+        mockedMapper.mockReturnValue(localizationModelMock);
+
+        const memberWithLocalization: TeamMember = {
+            ...memberMock,
+            localizations: [
+                {
+                    ...localizationModelMock,
+                    language: languageMock,
+                },
+            ],
+        };
+
+        const { result } = renderHook(() =>
+            useTranslateTeamMember({
+                member: memberWithLocalization,
+                language: languageMock,
+                onSuccess,
+                mode: ModalMode.Edit,
+            }),
+        );
+
+        await act(async () => {
+            await result.current.translateMember(formValues);
+        });
+
+        expect(mockedUpdate).toHaveBeenCalledWith(expect.anything(), memberMock.id, languageMock.id, {
+            fullName: formValues.fullName,
+            description: formValues.description,
+        });
+
+        expect(onSuccess).toHaveBeenCalledWith({
+            ...memberWithLocalization,
+            localizations: [localizationModelMock],
+        });
+    });
+
     it('should set error when translation fails', async () => {
         const onSuccess = jest.fn();
 
@@ -124,6 +169,7 @@ describe('useTranslateTeamMember', () => {
                 member: memberMock,
                 language: languageMock,
                 onSuccess,
+                mode: ModalMode.Add,
             }),
         );
 
@@ -149,6 +195,7 @@ describe('useTranslateTeamMember', () => {
                 member: memberMock,
                 language: languageMock,
                 onSuccess: jest.fn(),
+                mode: ModalMode.Add,
             }),
         );
 
@@ -167,6 +214,7 @@ describe('useTranslateTeamMember', () => {
                 member: null,
                 language: languageMock,
                 onSuccess,
+                mode: ModalMode.Add,
             }),
         );
 

@@ -1,10 +1,10 @@
 import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
-import { TextAreaWithCharacterLimit } from '@/components/admin/textarea-with-character-limit/TextAreaWithCharacterLimit';
 import React from 'react';
 import { ImageInput, ImageInputProps } from '@/components/admin/image-input/ImageInput';
 import { Content } from '@/types/admin/who-we-are';
 import { ImageValues } from '@/types/common/image';
 import { WHO_WE_ARE_TEXT } from '@/const/admin/who-we-are';
+import { TextAreaWithCharacterLimitGroup } from '@/components/admin/input-groups/text-area-with-character-limit-group/TextAreaWithCharacterLimitGroup';
 import './CardContent.scss';
 
 export interface CardContentProps {
@@ -54,14 +54,14 @@ export const CardContent = ({
                 value={content?.image ?? null}
                 onChange={handleImageChange}
                 label={WHO_WE_ARE_TEXT.IMAGE.INPUT}
-                className="image-input-featured"
+                variant="whoWeAre"
                 setError={setImageError}
                 {...imageInputProps}
             />
             {imageError && <p className="error">{imageError}</p>}
             <div className="card-content-description-wrapper">
-                <span className="card-content-description-wrapper-label">{COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}</span>
-                <TextAreaWithCharacterLimit
+                <TextAreaWithCharacterLimitGroup
+                    label={COMMON_TEXT_ADMIN.TYPE.DESCRIPTION}
                     onChange={handleDescriptionChange}
                     value={content.description ?? ''}
                     maxLength={descriptionLimit}
@@ -69,8 +69,8 @@ export const CardContent = ({
                     id={content.id.toString()}
                     rows={rows}
                     onBlur={onDescriptionValidate}
+                    error={descriptionError ?? undefined}
                 />
-                {descriptionError && <p className="error">{descriptionError}</p>}
             </div>
         </div>
     );

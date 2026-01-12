@@ -42,6 +42,7 @@ describe('ProgramsPageModals', () => {
         location: '',
         meetingsCount: '',
         participantsCount: '',
+        sections: [],
     };
 
     const mockCategories: ProgramCategory[] = [
@@ -63,9 +64,11 @@ describe('ProgramsPageModals', () => {
         closeEditItemModal: jest.fn(),
         closeDeleteItemModal: jest.fn(),
         closeTranslateItemModal: jest.fn(),
+        closeEditTranslationModal: jest.fn(),
         closeAddCategoryModal: jest.fn(),
         closeEditCategoryModal: jest.fn(),
         closeDeleteCategoryModal: jest.fn(),
+        closeAddSectionModal: jest.fn(),
     };
 
     const createMockModalsState = (
@@ -76,9 +79,11 @@ describe('ProgramsPageModals', () => {
             itemToDelete: null,
             itemToEdit: null,
             itemToTranslate: null,
+            itemToEditTranslation: null,
             isAddCategoryModalOpen: false,
             isEditCategoryModalOpen: false,
             isDeleteCategoryModalOpen: false,
+            isAddSectionModalOpen: false,
             ...overrides,
         },
         closeModalActions: mockCloseModalActions,
@@ -87,9 +92,11 @@ describe('ProgramsPageModals', () => {
             openEditItemModal: jest.fn(),
             openDeleteItemModal: jest.fn(),
             openTranslateItemModal: jest.fn(),
+            openEditTranslationModal: jest.fn(),
             openAddCategoryModal: jest.fn(),
             openEditCategoryModal: jest.fn(),
             openDeleteCategoryModal: jest.fn(),
+            openAddSectionModal: jest.fn(),
         },
         isAnyModalOpened: false,
     });

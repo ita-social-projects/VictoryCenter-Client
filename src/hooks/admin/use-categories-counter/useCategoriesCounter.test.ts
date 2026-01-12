@@ -22,6 +22,7 @@ const createProgram = (props: Partial<Program> = {}): Program => ({
     location: '',
     meetingsCount: '',
     participantsCount: '',
+    sections: [],
     ...props,
 });
 

@@ -1,0 +1,66 @@
+@use '@/assets/sass/variables/colors' as c;
+@use '@/assets/sass/variables/z-index.scss';
+@use './ImageInput.module.scss';
+
+.container {
+    @extend %container;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid c.$grey-700;
+
+    &-focused {
+        background-color: c.$grey-700;
+        border-color: rgba(c.$grey-900, 0.8);
+    }
+
+    &-disabled {
+        background-color: c.$grey-600;
+    }
+}
+
+.image-placeholder {
+    color: c.$grey-900;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 28px;
+    letter-spacing: 0.02rem;
+}
+
+.placeholder-icon {
+    width: 4rem;
+    height: 4rem;
+}
+
+.image-preview {
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: c.$grey-50;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: z-index.admin('who-we-are-page-image-preview');
+        cursor: pointer;
+    }
+
+    &:hover {
+        &::after {
+            opacity: 0.78;
+        }
+    }
+}
+
+.preview-image {
+    object-fit: fill;
+    transition: filter 0.3s ease;
+}
+
+.delete-button,
+.crop-button {
+    width: 5rem;
+    height: 5rem;
+    aspect-ratio: 1 / 1;
+    opacity: 0.8;
+    z-index: z-index.admin('image-input-action-buttons');
+    cursor: pointer;
+}

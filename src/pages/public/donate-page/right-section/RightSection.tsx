@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import './RightSection.scss';
 import { AbroadPaymentDetails } from './abroad-payment-details/AbroadPaymentDetails';
 import { AlternativeSupportWays } from './alternative-support-ways/AlternativeSupportWays';
 import { Tabs } from '@/components/common/tabs/Tabs';
 import { UkrainePaymentDetails } from './ukraine-payment-details/UkrainePaymentDetails';
 import { Currency, DonatePageData } from '@/types/public/donate-page';
-import { CURRENCY_TABS, ERROR_MESSAGES } from '@/const/public/donate-page';
+import { useTranslation } from 'react-i18next';
+import { currencyToString } from '@/utils/functions/mappers/public/donate/donate';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
 
 interface RightSectionProps {
     donateData: DonatePageData | null;
@@ -13,6 +15,7 @@ interface RightSectionProps {
 }
 
 export const RightSection = ({ donateData, error }: RightSectionProps) => {
+    const { t } = useTranslation('donatePage');
     const getAvailableCurrencies = () => {
         if (!donateData) return [];
 
@@ -42,6 +45,21 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
 
     const availableCurrencies = getAvailableCurrencies();
     const [activeTab, setActiveTab] = useState<Currency>(availableCurrencies[0] || Currency.UAH);
+    const [isManualChange, setIsManualChange] = useState(false);
+    const { currentLanguage, isEn, isUk } = useLocale();
+
+    useEffect(() => {
+        if (isManualChange) return;
+        if (isEn) {
+            if (availableCurrencies.includes(Currency.USD)) {
+                setActiveTab(Currency.USD);
+            }
+        } else if (isUk) {
+            if (availableCurrencies.includes(Currency.UAH)) {
+                setActiveTab(Currency.UAH);
+            }
+        }
+    }, [currentLanguage, availableCurrencies, isManualChange, isEn, isUk]);
 
     useEffect(() => {
         if (availableCurrencies.length > 0 && !availableCurrencies.includes(activeTab)) {
@@ -75,7 +93,7 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
     if (error) {
         return (
             <div className="donate-error-message" role="alert">
-                {ERROR_MESSAGES.LOADING_ERROR}
+                {t('LOADING_ERROR_MESSAGE')}
             </div>
         );
     }
@@ -84,16 +102,26 @@ export const RightSection = ({ donateData, error }: RightSectionProps) => {
         return null;
     }
 
-    const tabs = availableCurrencies.map((currency) => ({
-        id: currency,
-        label: CURRENCY_TABS[Currency[currency] as keyof typeof CURRENCY_TABS],
-    }));
+    const tabs = availableCurrencies.map((currency) => {
+        const key = currencyToString(currency);
+        return {
+            id: currency,
+            label: t(`CURRENCY_TABS.${key}`),
+        };
+    });
 
     return (
         <div className="rightSection">
             <div className="locationToggleContainer">
                 <div className="switch">
-                    <Tabs activeTab={activeTab} setActiveTab={setActiveTab} tabs={tabs} />
+                    <Tabs
+                        activeTab={activeTab}
+                        setActiveTab={(tab) => {
+                            setIsManualChange(true);
+                            setActiveTab(tab);
+                        }}
+                        tabs={tabs}
+                    />
                 </div>
             </div>
             <div className="donatePaymentDetails">

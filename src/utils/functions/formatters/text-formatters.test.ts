@@ -1,4 +1,4 @@
-import { generateInitials, getNormalizedInputText } from './text-formatters';
+import { generateInitials, getNormalizedInputText, getTrimmedInputText } from './text-formatters';
 
 describe('text-formatters', () => {
     describe('generateInitials', () => {
@@ -64,6 +64,56 @@ describe('text-formatters', () => {
 
         it('should not modify already normalized text', () => {
             expect(getNormalizedInputText('hello world')).toBe('hello world');
+        });
+    });
+
+    describe('getTrimmedInputText', () => {
+        it('should remove leading spaces', () => {
+            expect(getTrimmedInputText('   hello')).toBe('hello');
+        });
+
+        it('should remove trailing spaces', () => {
+            expect(getTrimmedInputText('hello   ')).toBe('hello');
+        });
+
+        it('should remove both leading and trailing spaces', () => {
+            expect(getTrimmedInputText('   hello   ')).toBe('hello');
+        });
+
+        it('should preserve spaces in the middle', () => {
+            expect(getTrimmedInputText('hello    world')).toBe('hello    world');
+            expect(getTrimmedInputText('  hello  world  test  ')).toBe('hello  world  test');
+        });
+
+        it('should return empty string for spaces-only input', () => {
+            expect(getTrimmedInputText('   ')).toBe('');
+            expect(getTrimmedInputText('        ')).toBe('');
+        });
+
+        it('should return empty string for empty input', () => {
+            expect(getTrimmedInputText('')).toBe('');
+        });
+
+        it('should not modify text without leading/trailing spaces', () => {
+            expect(getTrimmedInputText('hello world')).toBe('hello world');
+            expect(getTrimmedInputText('test')).toBe('test');
+        });
+
+        it('should handle text with prefix', () => {
+            expect(getTrimmedInputText('$   100   ', '$')).toBe('100');
+            expect(getTrimmedInputText('https://   example.com   ', 'https://')).toBe('example.com');
+        });
+
+        it('should handle prefix with multiple spaces after it', () => {
+            expect(getTrimmedInputText('$    value    ', '$')).toBe('value');
+        });
+
+        it('should handle single word', () => {
+            expect(getTrimmedInputText('  test  ')).toBe('test');
+        });
+
+        it('should preserve multiple consecutive spaces in middle', () => {
+            expect(getTrimmedInputText('  Program     Section     Title  ')).toBe('Program     Section     Title');
         });
     });
 });

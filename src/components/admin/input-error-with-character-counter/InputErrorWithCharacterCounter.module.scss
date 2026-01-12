@@ -1,0 +1,26 @@
+@use '@/assets/sass/variables/colors';
+@use '@/assets/sass/mixins/typography.mixins' as type;
+
+.container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.25rem;
+}
+
+.error-section {
+    @include type.small-text-regular;
+    word-spacing: 0;
+    color: colors.$error;
+    flex: 1;
+    min-width: 0;
+}
+
+.counter-section {
+    @include type.body-2-regular;
+    color: colors.$grey-900;
+    white-space: nowrap;
+    flex-shrink: 0;
+}

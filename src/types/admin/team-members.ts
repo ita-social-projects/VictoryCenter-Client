@@ -45,6 +45,11 @@ export type CreateTeamMemberLocalizationDto = {
     description?: string | null;
 };
 
+export type UpdateTeamMemberLocalizationDto = {
+    fullName: string;
+    description?: string | null;
+};
+
 export interface TeamMemberCreateUpdateRequest {
     id: number | null;
     fullName: string;

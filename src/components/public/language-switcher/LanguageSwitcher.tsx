@@ -1,9 +1,9 @@
 import '@/locales/i18n';
-import { useTranslation } from 'react-i18next';
 import { Select } from '@/components/common/select/Select';
 import { LOCALES } from '@/const/common/locales';
 import classNames from 'classnames';
 import './LanguageSwitcher.scss';
+import { useLocale } from '@/hooks/common/use-locale/useLocale';
 
 export interface LanguageSwitcherProps {
     onValueChange?: () => void;
@@ -11,17 +11,17 @@ export interface LanguageSwitcherProps {
 }
 
 export const LanguageSwitcher = ({ onValueChange, className }: LanguageSwitcherProps) => {
-    const { i18n } = useTranslation();
+    const { changeLanguage, currentLanguage } = useLocale();
 
-    const changeLanguage = (lng: string) => {
-        i18n.changeLanguage(lng);
+    const handleChangeLanguage = (lng: string) => {
+        changeLanguage(lng);
         onValueChange?.();
     };
 
     return (
         <Select<string>
-            value={i18n.language}
-            onValueChange={changeLanguage}
+            value={currentLanguage}
+            onValueChange={handleChangeLanguage}
             placeholder="lng"
             className={classNames('language-switcher', className)}
             headClassName="language-switcher-head"

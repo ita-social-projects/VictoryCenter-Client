@@ -21,7 +21,6 @@ describe('TextAreaWithCharacterLimit', () => {
 
     // Element getters
     const getTextArea = () => screen.getByRole('textbox') as HTMLTextAreaElement;
-    const getCharacterCounter = (current: number, max: number) => screen.getByText(`${current}/${max}`);
     const getWrapper = () => getTextArea().parentElement!;
 
     // Action helpers
@@ -40,24 +39,18 @@ describe('TextAreaWithCharacterLimit', () => {
     const expectWrapperToBeFocused = () => expectWrapperToHaveClass('char-limit-textarea__wrapper--focused');
     const expectWrapperNotToBeFocused = () => expectWrapperNotToHaveClass('char-limit-textarea__wrapper--focused');
 
-    it('renders textarea with initial value and character count', () => {
+    it('renders textarea with initial value', () => {
         renderTextAreaWithCharacterLimit({ value: 'test' });
 
         const textarea = getTextArea();
         expect(textarea).toBeInTheDocument();
         expect(textarea.value).toBe('test');
-        expect(getCharacterCounter(4, 100)).toBeInTheDocument();
     });
 
     it('calls onChange when typing', () => {
         renderTextAreaWithCharacterLimit();
         typeInTextArea('hello');
         expect(defaultProps.onChange).toHaveBeenCalledTimes(1);
-    });
-
-    it('shows character count correctly', () => {
-        renderTextAreaWithCharacterLimit({ value: '12345' });
-        expect(getCharacterCounter(5, 100)).toBeInTheDocument();
     });
 
     it('calls onFocus and onBlur when appropriate', () => {

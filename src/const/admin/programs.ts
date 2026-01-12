@@ -4,6 +4,10 @@ export const PROGRAMS_TEXT = {
     BUTTON: {
         ADD_PROGRAM: 'Додати програму',
         ADD_NEW_SECTION: 'Додати нову секцію',
+        ADD_SECTION: 'Додати секцію',
+        CHOOSE_SECTION: 'Обрати шаблон',
+        CANCEL: 'Відмінити',
+        SAVE: 'Зберегти',
     },
     PLACEHOLDER: {
         SEARCH_PROGRAMS: 'Шукати програми...',
@@ -17,8 +21,25 @@ export const PROGRAMS_TEXT = {
         FAIL_TO_FETCH_PROGRAMS: 'Виникла помилка, не вдалось завантажити програми',
         FAIL_TO_FETCH_PROGRAM: 'Не вдалося знайти вибрану програму',
         SELECTED_PROGRAM_HAS_NO_CATEGORIES: 'У вибраної програми відсутні категорії',
+        NO_SECTIONS_YET: 'Ще немає секцій опису програми',
     },
-
+    SECTION: {
+        TITLE_SAMPLE_TEXT: 'ЗАГОЛОВОК',
+        DESCRIPTION_SAMPLE_TEXT:
+            'Ідея створення Victory Center виникла не як проєкт, а як відповідь на виклик часу - глибокий біль, виснаження, але водночас сильна віра в перемогу.\n\n Розмови з ветеранами/ками та волонтерами/ками, які до останньої краплі віддавали свої сили заради майбутнього країни, висвітлити потребу у просторі, в якому можна знову відчути момент “тут i зараз”.\n\n Так народився задум Victory Center — ініціативи, що допомагає людям, які пройшли крізь жахи війни, зупинитися, відновитися i найголовніше бути почутими. ',
+        MODAL: {
+            UNSAVED_CHANGES_TITLE: 'Відмінити додавання секції?',
+        },
+        FORM: {
+            TITLE: {
+                TEXT: 'Заголовок',
+                PLACEHOLDER: 'ВВЕДІТЬ НАЗВУ',
+            },
+            DESCRIPTION: {
+                TEXT: 'Опис',
+            },
+        },
+    },
     QUESTION: {
         PUBLISH_PROGRAM: 'Опублікувати нову програму?',
         DRAFT_PROGRAM: 'Зберегти нову програму?',
@@ -55,6 +76,45 @@ export const PROGRAM_CATEGORY_TEXT = {
             EDIT_NAME: 'Редагувати назву',
             CATEGORY: 'Категорія',
         },
+    },
+};
+
+export const PROGRAM_SECTION_IMAGE_CONFIGS = {
+    QUAD_IMAGES: {
+        cropWidth: 360,
+        cropHeight: 390,
+        minWidth: 360,
+        minHeight: 390,
+    },
+    DUAL_IMAGES: {
+        cropWidth: 730,
+        cropHeight: 430,
+        minWidth: 730,
+        minHeight: 430,
+    },
+    TRIPLE_IMAGES: {
+        cropWidth: 480,
+        cropHeight: 480,
+        minWidth: 480,
+        minHeight: 480,
+    },
+    SINGLE_IMAGE_TOP: {
+        cropWidth: 1330,
+        cropHeight: 680,
+        minWidth: 1330,
+        minHeight: 680,
+    },
+    SINGLE_IMAGE_BOTTOM: {
+        cropWidth: 1330,
+        cropHeight: 680,
+        minWidth: 1330,
+        minHeight: 680,
+    },
+    SINGLE_IMAGE_RIGHT: {
+        cropWidth: 700,
+        cropHeight: 600,
+        minWidth: 700,
+        minHeight: 600,
     },
 };
 
@@ -108,12 +168,24 @@ export const PROGRAM_CATEGORY_VALIDATION = {
     name: {
         min: 5,
         max: 20,
-        getRequiredError: () => 'Назва обов’язкова',
+        getRequiredError: () => "Назва обов'язкова",
         getCategoryWithThisNameAlreadyExistsError: () =>
             COMMON_TEXT_ADMIN.CATEGORIES.FORM.MESSAGE.ALREADY_CONTAIN_CATEGORY_WITH_NAME,
     },
     programsCount: {
         getRelocationOrRemovalHint: () => 'Перенесіть їх в іншу категорію або видаліть, щоб продовжити',
         getHasProgramsCountError: (count: number) => `Категорія містить ${count} програм`,
+    },
+};
+export const PROGRAM_SECTION_VALIDATION = {
+    title: {
+        min: 5,
+        max: 60,
+        getRequiredError: () => "Заголовок обов'язковий",
+    },
+    description: {
+        min: 10,
+        max: 600,
+        getRequiredError: () => "Опис обов'язковий",
     },
 };

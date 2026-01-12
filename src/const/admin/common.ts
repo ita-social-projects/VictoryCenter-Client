@@ -16,6 +16,7 @@ export const COMMON_TEXT_ADMIN = {
         IMAGE_PLACEHOLDER: 'Перетягніть файл сюди або натисніть для завантаження',
         UPLOAD_IMAGE: 'Upload image',
         DRAG_AND_DROP_FILE_HERE: 'Перетягніть файл сюди',
+        ADD_FILE_HERE: 'Додайте файл сюди',
         getImageSizeSubText: (height: number, width: number) => `Розмір:${width}x${height}`,
     },
 
@@ -57,6 +58,8 @@ export const COMMON_TEXT_ADMIN = {
     MESSAGE: {
         SUCCESSFULLY_PUBLISHED: 'успішно опубліковано',
         FAIL_TO_PUBLISH_CHANGES: 'Не вдалося опублікувати зміни',
+        TRANSLATION_SAVED_SUCCESS: 'Переклад збережено успішно',
+        TRANSLATION_PUBLISHED_SUCCESS: 'Переклад опубліковано успішно',
     },
 
     BUTTON: {
@@ -74,6 +77,12 @@ export const COMMON_TEXT_ADMIN = {
     },
 
     LOCALIZATION: {
+        FORM: {
+            TITLE: {
+                ADD_TRANSLATION: 'Додати переклад',
+                UPDATE_TRANSLATION: 'Редагувати переклад',
+            },
+        },
         LANGUAGES: {
             MESSAGE: {
                 FAILED_TO_FETCH_LANGUAGES: 'Виникла помилка, не вдалось завантажити мови',

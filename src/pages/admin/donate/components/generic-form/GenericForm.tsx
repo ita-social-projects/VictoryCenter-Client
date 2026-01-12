@@ -49,6 +49,9 @@ export interface GenericFormField<T extends Record<string, any>> {
     isRequired?: boolean;
     onlyNumbers?: boolean;
     maxLength?: number;
+    ignoreSpacesInCount?: boolean;
+    maxLimitWarning?: string;
+    digitsOnlyWarning?: string;
     validate?: (value: T[keyof T], isPublishing?: boolean) => string | undefined;
 }
 
@@ -142,8 +145,22 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                 if (isSubmitting || !onSubmit) return;
                 setIsSubmitting(true);
                 try {
-                    const submitData = { ...initialData, ...formState } as T;
-                    await onSubmit(submitData);
+                    const rawData = { ...initialData, ...formState } as T;
+                    const cleanedData = { ...rawData };
+
+                    fields.forEach((field) => {
+                        const value = cleanedData[field.name];
+
+                        if (typeof value === 'string') {
+                            if (field.ignoreSpacesInCount) {
+                                cleanedData[field.name] = value.replace(/\s/g, '') as any;
+                            } else {
+                                cleanedData[field.name] = value.trimStart() as any;
+                            }
+                        }
+                    });
+
+                    await onSubmit(cleanedData);
                     setInitialFormState(formState);
                     if (mode === GenericFormMode.Edit) setMode(GenericFormMode.View);
                 } finally {
@@ -453,7 +470,10 @@ export function createGenericForm<T extends { id?: number }>(fields: GenericForm
                                                     onBlur={() => handleBlur(f.name)}
                                                     onlyNumbers={f.onlyNumbers}
                                                     maxLength={f.maxLength}
+                                                    ignoreSpacesInCount={f.ignoreSpacesInCount}
                                                     error={touchedFields.has(f.name) ? errors[f.name] : undefined}
+                                                    maxLimitWarning={f.maxLimitWarning}
+                                                    digitsOnlyWarning={f.digitsOnlyWarning}
                                                 />
                                             </div>
 

@@ -10,3 +10,5 @@ export const generateInitials = (fullName: string, maxInitials: number = 2): str
 
 export const getNormalizedInputText = (text: string, prefix = ''): string =>
     text.slice(prefix.length).trim().replace(/\s+/g, ' ');
+
+export const getTrimmedInputText = (text: string, prefix = ''): string => text.slice(prefix.length).trim();

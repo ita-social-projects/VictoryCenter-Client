@@ -1,0 +1,57 @@
+@use '@/assets/sass/variables/colors' as c;
+@use './ImageInput.module.scss';
+
+.container {
+    @extend %container;
+    width: 52.5625rem;
+    height: 33.125rem;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid c.$grey-700;
+
+    &-focused {
+        border-color: rgba(c.$grey-900, 0.8);
+    }
+
+    &-disabled {
+        background-color: c.$grey-600;
+    }
+}
+
+.image-placeholder {
+    padding: 2rem;
+    color: c.$grey-900;
+}
+
+.placeholder-icon {
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 0.5rem;
+}
+
+.placeholder-text-primary {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 500;
+    color: c.$grey-900;
+}
+
+.placeholder-text-secondary {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+    color: c.$grey-900;
+}
+
+.preview-image {
+    object-fit: cover;
+}
+
+.delete-button,
+.crop-button {
+    width: 5rem;
+    height: 5rem;
+    aspect-ratio: 1 / 1;
+    opacity: 0.8;
+    cursor: pointer;
+}

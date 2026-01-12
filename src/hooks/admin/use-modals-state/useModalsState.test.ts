@@ -10,9 +10,11 @@ describe('useModalsState', () => {
             itemToDelete: null,
             itemToEdit: null,
             itemToTranslate: null,
+            itemToEditTranslation: null,
             isAddCategoryModalOpen: false,
             isEditCategoryModalOpen: false,
             isDeleteCategoryModalOpen: false,
+            isAddSectionModalOpen: false,
         });
         expect(result.current.isAnyModalOpened).toBe(false);
     });
@@ -183,6 +185,33 @@ describe('useModalsState', () => {
         });
 
         expect(result.current.modalState.itemToTranslate).toBe(null);
+        expect(result.current.isAnyModalOpened).toBe(false);
+    });
+
+    it('should open edit translation modal with item when no other modals are open', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+        const testItem = 'edit-translation-item';
+
+        act(() => {
+            result.current.openModalActions.openEditTranslationModal(testItem);
+        });
+
+        expect(result.current.modalState.itemToEditTranslation).toBe(testItem);
+        expect(result.current.isAnyModalOpened).toBe(true);
+    });
+
+    it('should close edit translation modal', () => {
+        const { result } = renderHook(() => useModalsState<string>());
+
+        act(() => {
+            result.current.openModalActions.openEditTranslationModal('test-item');
+        });
+
+        act(() => {
+            result.current.closeModalActions.closeEditTranslationModal();
+        });
+
+        expect(result.current.modalState.itemToEditTranslation).toBe(null);
         expect(result.current.isAnyModalOpened).toBe(false);
     });
 

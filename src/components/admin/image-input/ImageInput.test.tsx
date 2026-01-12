@@ -322,10 +322,10 @@ describe('ImageInput', () => {
         });
 
         fireEvent.dragOver(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(true);
+        expect(wrapper.classList.contains('container-focused')).toBe(true);
 
         fireEvent.dragLeave(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
     });
 
     it('does not open file dialog or allow drop when disabled', () => {
@@ -335,7 +335,7 @@ describe('ImageInput', () => {
         });
         const input = wrapper.querySelector('input[type="file"]')!;
 
-        expect(wrapper.classList.contains('image-input-wrapper-disabled')).toBe(true);
+        expect(wrapper.classList.contains('container-disabled')).toBe(true);
 
         fireEvent.click(wrapper);
         expect(document.activeElement).not.toBe(input);
@@ -383,10 +383,10 @@ describe('ImageInput', () => {
         });
 
         fireEvent.mouseEnter(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(true);
+        expect(wrapper.classList.contains('container-focused')).toBe(true);
 
         fireEvent.mouseLeave(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
     });
 
     it('does not add focus class on mouse enter when disabled', () => {
@@ -396,7 +396,7 @@ describe('ImageInput', () => {
         });
 
         fireEvent.mouseEnter(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
     });
 
     it('does not add focus class on mouse leave when disabled', () => {
@@ -406,7 +406,7 @@ describe('ImageInput', () => {
         });
 
         fireEvent.mouseLeave(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
     });
 
     it('handles keyboard events (Enter and Space)', () => {
@@ -470,10 +470,10 @@ describe('ImageInput', () => {
         });
 
         fireEvent.focus(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(true);
+        expect(wrapper.classList.contains('container-focused')).toBe(true);
 
         fireEvent.blur(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
         expect(onBlurMock).toHaveBeenCalled();
     });
 
@@ -487,10 +487,10 @@ describe('ImageInput', () => {
         });
 
         fireEvent.focus(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
 
         fireEvent.blur(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
         expect(onBlurMock).toHaveBeenCalled();
     });
 
@@ -510,7 +510,7 @@ describe('ImageInput', () => {
         });
 
         fireEvent.dragOver(wrapper);
-        expect(wrapper.classList.contains('image-input-wrapper-focused')).toBe(false);
+        expect(wrapper.classList.contains('container-focused')).toBe(false);
     });
 
     it('clears input value when removing file', () => {

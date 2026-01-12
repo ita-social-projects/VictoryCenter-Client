@@ -5,6 +5,7 @@ import { TranslateTeamMemberModal } from './TranslateTeamMemberModal';
 import { TeamMember } from '@/types/admin/team-members';
 import { TEAM_MEMBERS_TEXT } from '@/const/admin/team';
 import { useTranslateTeamMember } from '@/hooks/admin/use-translate-team-member/useTranslateTeamMember';
+import { ModalMode } from '@/types/admin/common';
 
 jest.mock('@/components/admin/button/Button', () => ({
     Button: (props: any) => <button {...props}>{props.children}</button>,
@@ -115,6 +116,7 @@ describe('TranslateTeamMemberModal', () => {
     it('renders modal when open and member exists', () => {
         render(
             <TranslateTeamMemberModal
+                mode={ModalMode.Add}
                 isOpen
                 onClose={jest.fn()}
                 memberToTranslate={member}
@@ -130,6 +132,7 @@ describe('TranslateTeamMemberModal', () => {
     it('does not render when memberToTranslate is null', () => {
         render(
             <TranslateTeamMemberModal
+                mode={ModalMode.Add}
                 isOpen
                 onClose={jest.fn()}
                 memberToTranslate={null}
@@ -144,6 +147,7 @@ describe('TranslateTeamMemberModal', () => {
     it('enables translate button when form is valid', () => {
         render(
             <TranslateTeamMemberModal
+                mode={ModalMode.Add}
                 isOpen
                 onClose={jest.fn()}
                 memberToTranslate={member}
@@ -177,6 +181,7 @@ describe('TranslateTeamMemberModal', () => {
 
         render(
             <TranslateTeamMemberModal
+                mode={ModalMode.Add}
                 isOpen
                 onClose={onClose}
                 memberToTranslate={member}
@@ -199,11 +204,60 @@ describe('TranslateTeamMemberModal', () => {
         expect(onClose).toHaveBeenCalled();
     });
 
+    it('submits translation in EDIT mode', async () => {
+        const onTranslateMember = jest.fn();
+
+        render(
+            <TranslateTeamMemberModal
+                mode={ModalMode.Edit}
+                isOpen
+                onClose={jest.fn()}
+                memberToTranslate={member}
+                onTranslateMember={onTranslateMember}
+                language={language}
+            />,
+        );
+
+        fireEvent.click(screen.getByRole('button'));
+
+        await waitFor(() => {
+            expect(mockTranslateMember).toHaveBeenCalled();
+        });
+    });
+
+    it('renders EDIT mode with correct title', () => {
+        const memberWithLocalization: TeamMember = {
+            ...member,
+            localizations: [
+                {
+                    language,
+                    translationStatus: 1,
+                    fullName: 'Existing name',
+                    description: 'Existing description',
+                },
+            ],
+        };
+
+        render(
+            <TranslateTeamMemberModal
+                mode={ModalMode.Edit}
+                isOpen
+                onClose={jest.fn()}
+                memberToTranslate={memberWithLocalization}
+                onTranslateMember={jest.fn()}
+                language={language}
+            />,
+        );
+
+        expect(screen.getByTestId('modal-title')).toBeInTheDocument();
+    });
+
     it('shows confirmation modal on close when form is dirty', () => {
         const onClose = jest.fn();
 
         render(
             <TranslateTeamMemberModal
+                mode={ModalMode.Add}
                 isOpen
                 onClose={onClose}
                 memberToTranslate={member}
@@ -222,6 +276,7 @@ describe('TranslateTeamMemberModal', () => {
 
         render(
             <TranslateTeamMemberModal
+                mode={ModalMode.Add}
                 isOpen
                 onClose={onClose}
                 memberToTranslate={member}
@@ -242,6 +297,7 @@ describe('TranslateTeamMemberModal', () => {
 
         render(
             <TranslateTeamMemberModal
+                mode={ModalMode.Add}
                 isOpen
                 onClose={onClose}
                 memberToTranslate={member}
@@ -269,6 +325,7 @@ describe('TranslateTeamMemberModal', () => {
 
         render(
             <TranslateTeamMemberModal
+                mode={ModalMode.Add}
                 isOpen
                 onClose={onClose}
                 memberToTranslate={member}
@@ -290,6 +347,7 @@ describe('TranslateTeamMemberModal', () => {
 
         render(
             <TranslateTeamMemberModal
+                mode={ModalMode.Add}
                 isOpen
                 onClose={jest.fn()}
                 memberToTranslate={member}

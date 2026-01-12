@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Header } from '@/components/public/header/Header';
 import { Footer } from '@/components/public/footer/Footer';
 import { useLocale } from '@/hooks/common/use-locale/useLocale';
+import { DEFAULT_LOCALE, LOCALES } from '@/const/common/locales';
 
 export const PublicLayout = ({ behavior = 'auto' }: { behavior?: 'auto' | 'smooth' }) => {
     const { pathname, search } = useLocation();
@@ -11,20 +12,30 @@ export const PublicLayout = ({ behavior = 'auto' }: { behavior?: 'auto' | 'smoot
     const { currentLanguage, i18n } = useLocale();
 
     useEffect(() => {
-        const isEnPath = pathname.startsWith('/en');
-        const savedLang = currentLanguage;
+        const segments = pathname.split('/').filter(Boolean);
+        const langInUrl = segments[0];
+        const isSupported = LOCALES.includes(langInUrl);
+        const currentLang = currentLanguage;
 
-        if (savedLang === 'en' && !isEnPath) {
-            navigate(`/en${pathname === '/' ? '' : pathname}${search}`, { replace: true });
+        if (isSupported && langInUrl !== currentLang) {
+            i18n.changeLanguage(langInUrl);
             return;
         }
 
-        if (isEnPath && savedLang !== 'en') {
-            i18n.changeLanguage('en');
-        } else if (!isEnPath && savedLang === 'en' && pathname === '/') {
-            i18n.changeLanguage('uk');
+        if (isSupported) return;
+
+        if (pathname === '/') {
+            if (currentLang !== DEFAULT_LOCALE) {
+                i18n.changeLanguage(DEFAULT_LOCALE);
+            }
+            return;
         }
-    }, [pathname, currentLanguage, i18n, navigate, search]);
+
+        if (currentLang === DEFAULT_LOCALE) return;
+
+        navigate(`/${currentLang}${pathname}${search}`, { replace: true });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pathname, search, navigate, i18n]);
 
     //TODO: temp fix for issue when after redirecting view area would not be on top
     useEffect(() => {

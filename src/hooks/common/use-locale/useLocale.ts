@@ -1,3 +1,4 @@
+import { DEFAULT_LOCALE, LOCALES } from '@/const/common/locales';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -8,21 +9,27 @@ export const useLocale = () => {
 
     const currentLang = i18n.resolvedLanguage ?? i18n.language;
 
-    const changeLanguage = async (newLng: string) => {
+    const changeLanguage = (newLng: string) => {
         if (newLng === currentLang) return;
 
-        await i18n.changeLanguage(newLng);
+        i18n.changeLanguage(newLng);
 
-        const cleanPath = pathname.startsWith('/en') ? pathname.replace(/^\/en/, '') : pathname;
+        const segments = pathname.split('/').filter(Boolean);
 
-        let newPath = '';
-        if (newLng === 'en') {
-            newPath = `/en${cleanPath === '/' ? '' : cleanPath}`;
-        } else {
-            newPath = cleanPath || '/';
+        if (LOCALES.includes(segments[0])) {
+            segments.shift();
         }
 
-        navigate(`${newPath}${search}`, { replace: true });
+        let newPath = '';
+        if (newLng === DEFAULT_LOCALE) {
+            newPath = `/${segments.join('/')}`;
+        } else {
+            newPath = `/${newLng}/${segments.join('/')}`;
+        }
+
+        const finalPath = newPath.replace(/\/$/, '') || '/';
+
+        navigate(`${finalPath}${search}`, { replace: true });
     };
 
     return {

@@ -18,6 +18,8 @@ import { COMMON_TEXT_ADMIN } from '@/const/admin/common';
 import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { InputError } from '@/components/admin/input-error/InputError';
 import BannerImage from '@/assets/images/public/partners-page/horses.png';
+import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
+import { getPlainTextFromHtml } from '@/components/admin/rich-text-input/RichTextInput';
 
 export interface PartnerBannerValues {
     title: string;
@@ -40,7 +42,9 @@ const isFormValid = (values: PartnerBannerValues, errors: PartnerBannerErrorStat
         return false;
     }
 
-    const titleError = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateTitle(values.title);
+    const plainTitle = getPlainTextFromHtml(values.title);
+
+    const titleError = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateTitle(plainTitle);
     const descError = PARTNER_BANNER_VALIDATION_FUNCTIONS.validateDescription(values.description);
 
     return !titleError && !descError && !errors.image;
@@ -51,7 +55,9 @@ export const PartnerBanner = () => {
     const { addToast } = useToast();
     const [values, setValues] = useState<PartnerBannerValues | null>(null);
     const [errors, setErrors] = useState<PartnerBannerErrorState>({});
+    const [touched, setTouched] = useState<{ title?: boolean; description?: boolean }>({});
     const [isPublishing, setIsPublishing] = useState(false);
+    const [titleKey, setTitleKey] = useState(0);
 
     const fetchBannerHandler = useCallback(() => {
         return PartnersApi.getBanner(client);
@@ -71,6 +77,9 @@ export const PartnerBanner = () => {
     useEffect(() => {
         if (bannerData) {
             setValues(bannerData);
+            setTouched({});
+            setErrors({});
+            setTitleKey((prev) => prev + 1);
         }
     }, [bannerData]);
 
@@ -87,18 +96,25 @@ export const PartnerBanner = () => {
         }
     }, [fetchError, addToast]);
 
-    const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = e.target.value;
+    const handleTitleChange = useCallback((newValue: string) => {
         setValues((prev) => (prev ? { ...prev, title: newValue } : null));
+
+        const plainText = getPlainTextFromHtml(newValue);
+
         setErrors((prev) => ({
             ...prev,
-            title: PARTNER_BANNER_VALIDATION_FUNCTIONS.validateTitle(newValue),
+            title: PARTNER_BANNER_VALIDATION_FUNCTIONS.validateTitle(plainText),
         }));
+    }, []);
+
+    const handleTitleBlur = useCallback(() => {
+        setTouched((prev) => ({ ...prev, title: true }));
     }, []);
 
     const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = e.target.value;
         setValues((prev) => (prev ? { ...prev, description: newValue } : null));
+        setTouched((prev) => ({ ...prev, description: true }));
         setErrors((prev) => ({
             ...prev,
             description: PARTNER_BANNER_VALIDATION_FUNCTIONS.validateDescription(newValue),
@@ -129,6 +145,8 @@ export const PartnerBanner = () => {
             });
 
             setValues(updatedBanner);
+            setTouched({});
+            setErrors({});
             addToast(PARTNERS_TEXT.MESSAGE.BANNER_SAVED, ToastType.Success);
         } catch (error: any) {
             if (axios.isCancel?.(error) || error.name === 'CanceledError' || error.name === 'AbortError') {
@@ -206,11 +224,13 @@ export const PartnerBanner = () => {
 
                     <div className={styles.main}>
                         <div className={styles.fields}>
-                            <InputWithCharacterLimitGroup
+                            <RichTextInputGroup
+                                key={`title-${titleKey}`}
                                 label={PARTNERS_TEXT.FORM.LABEL.TITLE}
                                 value={values.title}
-                                error={errors.title}
+                                error={touched.title ? errors.title : undefined}
                                 onChange={handleTitleChange}
+                                onBlur={handleTitleBlur}
                                 name="title"
                                 id="title"
                                 maxLength={PARTNER_BANNER_VALIDATION.title.max}
@@ -221,7 +241,7 @@ export const PartnerBanner = () => {
                             <InputWithCharacterLimitGroup
                                 label={PARTNERS_TEXT.FORM.LABEL.DESCRIPTION}
                                 value={values.description}
-                                error={errors.description}
+                                error={touched.description ? errors.description : undefined}
                                 onChange={handleDescriptionChange}
                                 id="description"
                                 name="description"

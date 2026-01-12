@@ -1,0 +1,131 @@
+@use '@/assets/sass/variables/colors';
+
+.rich-text-input {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.625rem;
+    border: 1px solid colors.$grey-700;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(colors.$blue-900, 0.05);
+    font-size: 16px;
+    background-color: white;
+
+    &--focused {
+        border-color: colors.$blue-500;
+    }
+
+    &--disabled {
+        background-color: colors.$grey-600;
+        border-color: colors.$grey-900;
+    }
+
+    &__toolbar {
+        display: flex;
+        gap: 0.25rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid colors.$grey-700;
+    }
+
+    &__toolbar-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid colors.$grey-700;
+        border-radius: 4px;
+        background-color: white;
+        color: colors.$blue-900;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover:not(:disabled) {
+            background-color: colors.$grey-600;
+            border-color: colors.$blue-500;
+        }
+
+        &:active:not(:disabled) {
+            background-color: colors.$grey-700;
+        }
+
+        &--active {
+            background-color: colors.$blue-500;
+            border-color: colors.$blue-500;
+            color: white;
+
+            &:hover:not(:disabled) {
+                background-color: colors.$blue-600;
+                border-color: colors.$blue-600;
+            }
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        strong,
+        em {
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        em {
+            font-style: italic;
+        }
+    }
+
+    &__editor-container {
+        position: relative;
+        flex: 1;
+    }
+
+    &__field {
+        min-height: 80px;
+        padding: 0;
+        border: none;
+        outline: none;
+        color: colors.$blue-900;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 24px;
+        overflow-y: auto;
+    }
+
+    &__placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        color: colors.$grey-900;
+        opacity: 0.6;
+        pointer-events: none;
+        font-size: 16px;
+        line-height: 24px;
+    }
+
+    &__paragraph {
+        margin: 0;
+        padding: 0;
+    }
+
+    &__text-bold {
+        font-weight: bold;
+    }
+
+    &__text-italic {
+        font-style: italic;
+    }
+
+    &__counter {
+        display: flex;
+        justify-content: flex-end;
+        padding-top: 0.5rem;
+        border-top: 1px solid colors.$grey-700;
+        white-space: nowrap;
+        color: colors.$grey-900;
+        font-size: 14px;
+    }
+}

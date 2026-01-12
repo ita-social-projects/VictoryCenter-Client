@@ -1,4 +1,3 @@
-// RichTextInputGroup.tsx
 import React from 'react';
 import { InputLabel, InputLabelProps } from '@/components/admin/input-label/InputLabel';
 import { InputError, InputErrorProps } from '@/components/admin/input-error/InputError';

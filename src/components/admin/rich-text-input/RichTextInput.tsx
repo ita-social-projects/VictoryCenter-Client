@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import classNames from 'classnames';
 import './RichTextInput.scss';
 
@@ -26,7 +26,6 @@ export const RichTextInput = ({
     onChange,
     onBlur,
     onFocus,
-    name,
     id,
     maxLength,
     disabled = false,
@@ -46,9 +45,9 @@ export const RichTextInput = ({
         return text.replace(/\n/g, '').length;
     };
 
-    const updateLength = () => {
+    const updateLength = useCallback(() => {
         setCurrentLength(getTextLength());
-    };
+    }, []);
 
     useEffect(() => {
         if (editorRef.current) {
@@ -58,14 +57,14 @@ export const RichTextInput = ({
                 updateLength();
             }
         }
-    }, [value]);
+    }, [value, updateLength]);
 
     useEffect(() => {
         if (isInitialMount.current && editorRef.current) {
             updateLength();
             isInitialMount.current = false;
         }
-    }, []);
+    }, [updateLength]);
 
     const handleInput = () => {
         const textLength = getTextLength();
@@ -266,6 +265,7 @@ export const RichTextInput = ({
             <div className="rich-text-input__editor-container">
                 <div
                     ref={editorRef}
+                    id={id}
                     className={classNames('rich-text-input__field', className)}
                     contentEditable={!disabled}
                     onInput={handleInput}

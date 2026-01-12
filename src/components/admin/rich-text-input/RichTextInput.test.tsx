@@ -52,7 +52,7 @@ describe('RichTextInput', () => {
     const getBoldButton = () => screen.getByLabelText('Bold');
     const getItalicButton = () => screen.getByLabelText('Italic');
     const getLineBreakButton = () => screen.getByLabelText('Line break');
-    const getCharacterCounter = () => screen.getByText(/\d+\/\d+/);
+    const getCharacterCounter = () => screen.getByText(/^\d{1,4}\/\d{1,4}$/);
     const getWrapper = () => getEditor().closest('.rich-text-input');
 
     const focusEditor = () => fireEvent.focus(getEditor());

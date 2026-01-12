@@ -96,11 +96,16 @@ describe('PartnerBanner', () => {
         imageId: 1,
     };
 
-    // Helper functions for getting elements
     const getLoader = () => screen.queryByTestId('inline-loader');
     const getErrorMessage = () => screen.queryByText(PARTNERS_TEXT.MESSAGE.FAIL_TO_LOAD_BANNER);
     const getTryAgainButton = () => screen.queryByRole('button', { name: PARTNERS_TEXT.BUTTON.TRY_AGAIN });
-    const getTitleInput = () => screen.getByTestId('title-input');
+    const getTitleInput = () => {
+        const element = document.getElementById('title');
+        if (!element) {
+            throw new Error('Title input not found');
+        }
+        return element as HTMLElement;
+    };
     const getDescriptionInput = () => screen.getByTestId('description-input');
     const getImageContainer = () => screen.queryByTestId('banner-image-container');
     const getImageValue = () => screen.queryByTestId('banner-image-value');
@@ -321,13 +326,13 @@ describe('PartnerBanner', () => {
         clickPublish();
 
         await waitFor(() => {
-            expect(getTitleInput()).toBeDisabled();
+            expect(getTitleInput()).toHaveAttribute('contentEditable', 'false');
             expect(getDescriptionInput()).toBeDisabled();
             expect(getPublishButton()).toBeDisabled();
         });
 
         await waitFor(() => {
-            expect(getTitleInput()).toBeEnabled();
+            expect(getTitleInput()).toHaveAttribute('contentEditable', 'true');
             expect(getDescriptionInput()).toBeEnabled();
             expect(getPublishButton()).toBeEnabled();
         });
@@ -354,7 +359,7 @@ describe('PartnerBanner', () => {
 
     it('renders title input as enabled', () => {
         render(<PartnerBanner />);
-        expect(getTitleInput()).toBeEnabled();
+        expect(getTitleInput()).toHaveAttribute('contentEditable', 'true');
     });
 
     it('shows toast for fetch error', () => {

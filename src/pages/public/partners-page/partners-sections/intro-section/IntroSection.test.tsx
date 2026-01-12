@@ -33,8 +33,7 @@ describe('IntroSection', () => {
             render(<IntroSection banner={mockBanner} />);
 
             const title = screen.getByRole('heading', { level: 1 });
-            expect(title).toHaveTextContent('Test First Regular Test First Bold');
-            expect(title).toHaveTextContent('Test Second BoldStart Test Second Regular Test Second BoldEnd');
+            expect(title).toHaveTextContent('Test Title');
 
             expect(screen.getByText('Test Description')).toBeInTheDocument();
         });

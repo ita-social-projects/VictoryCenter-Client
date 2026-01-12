@@ -57,16 +57,18 @@ jest.mock('@/components/admin/input-error/InputError', () => ({
 }));
 
 jest.mock('@/components/admin/input-groups/input-with-character-limit-group/InputWithCharacterLimitGroup', () => ({
-    InputWithCharacterLimitGroup: ({ label, value, onChange, onBlur, disabled, id, error }: InputWithCharacterLimitGroupProps) => (
+    InputWithCharacterLimitGroup: ({
+        label,
+        value,
+        onChange,
+        onBlur,
+        disabled,
+        id,
+        error,
+    }: InputWithCharacterLimitGroupProps) => (
         <label>
             {label}
-            <input
-                data-testid={`${id}-input`}
-                value={value}
-                disabled={disabled}
-                onChange={onChange}
-                onBlur={onBlur}
-            />
+            <input data-testid={`${id}-input`} value={value} disabled={disabled} onChange={onChange} onBlur={onBlur} />
             {error && <span data-testid="input-error">{error}</span>}
         </label>
     ),
@@ -579,10 +581,7 @@ describe('PartnerBanner', () => {
         });
 
         await waitFor(() => {
-            expect(mockAddToast).not.toHaveBeenCalledWith(
-                PARTNERS_TEXT.MESSAGE.FAIL_TO_UPDATE_BANNER,
-                ToastType.Error,
-            );
+            expect(mockAddToast).not.toHaveBeenCalledWith(PARTNERS_TEXT.MESSAGE.FAIL_TO_UPDATE_BANNER, ToastType.Error);
         });
     });
 
@@ -614,10 +613,6 @@ describe('PartnerBanner', () => {
     });
 
     it('resets state when banner data changes', async () => {
-        // This test verifies that when bannerData changes (via useDataFetch),
-        // the component resets touched, errors, and increments titleKey
-        // We test this indirectly by ensuring the component handles data updates correctly
-        
         const initialData = {
             title: 'Initial Title',
             description: 'Initial Description',
@@ -639,7 +634,6 @@ describe('PartnerBanner', () => {
             expect(getTitleInput()).toHaveTextContent('Initial Title');
         });
 
-        // Verify component is in a clean state initially
         expect(screen.queryByTestId('input-error')).not.toBeInTheDocument();
     });
 
@@ -649,14 +643,11 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
-        // Simulate title change with HTML
         const titleInput = getTitleInput();
         titleInput.innerHTML = htmlTitle;
         fireEvent.input(titleInput);
 
         await waitFor(() => {
-            // getPlainTextFromHtml should extract plain text for validation
-            // It should be called with plain text "Bold Title", not HTML
             expect(mockValidateTitle).toHaveBeenCalled();
             const lastCall = mockValidateTitle.mock.calls[mockValidateTitle.mock.calls.length - 1];
             expect(lastCall[0]).toBe('Bold Title');
@@ -669,11 +660,9 @@ describe('PartnerBanner', () => {
         render(<PartnerBanner />);
 
         const descriptionInput = getDescriptionInput();
-        
-        // Change to empty value - this should mark as touched and trigger validation
+
         changeDescriptionValue('');
 
-        // Error should be visible after change (description is marked as touched on change)
         await waitFor(() => {
             const errorElement = screen.queryByTestId('input-error');
             expect(errorElement).toBeInTheDocument();
@@ -694,7 +683,6 @@ describe('PartnerBanner', () => {
 
         render(<PartnerBanner />);
 
-        // Component should show error UI when values is null
         expect(getErrorMessage()).toBeInTheDocument();
         expect(mockedPartnersApi.updateBanner).not.toHaveBeenCalled();
     });

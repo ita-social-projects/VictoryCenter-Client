@@ -666,9 +666,7 @@ describe('PartnerBanner', () => {
         await waitFor(() => {
             const errorElement = screen.queryByTestId('input-error');
             expect(errorElement).toBeInTheDocument();
-            if (errorElement) {
-                expect(errorElement).toHaveTextContent('Description is required');
-            }
+            expect(errorElement).toHaveTextContent('Description is required');
         });
     });
 

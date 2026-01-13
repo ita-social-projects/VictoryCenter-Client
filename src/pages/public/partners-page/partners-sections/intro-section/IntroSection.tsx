@@ -1,6 +1,7 @@
 import styles from './IntroSection.module.scss';
 import background from '@/assets/images/public/partners-page/horses.png';
 import { PartnersBanner } from '@/types/public/partners-page';
+import DOMPurify from 'dompurify';
 
 export interface IntroSectionProps {
     banner: PartnersBanner | null;
@@ -11,11 +12,17 @@ export const IntroSection = ({ banner }: IntroSectionProps) => {
     const description = banner?.description || '';
     const imageUrl = banner?.image?.url || background;
 
+    // Sanitize HTML and only allow safe formatting tags
+    const sanitizedTitle = DOMPurify.sanitize(title, {
+        ALLOWED_TAGS: ['strong', 'em', 'b', 'i', 'br'],
+        ALLOWED_ATTR: [],
+    });
+
     return (
         <div className={styles['intro-block']}>
             <img src={imageUrl} className={styles['bg-img']} alt="Horses" />
             <div className={styles.overlay}>
-                <h1 className={styles.title} dangerouslySetInnerHTML={{ __html: title }} />
+                <h1 className={styles.title} dangerouslySetInnerHTML={{ __html: sanitizedTitle }} />
                 <p className={styles.subtitle}>{description}</p>
             </div>
         </div>

@@ -94,6 +94,20 @@
     font-weight: 400;
     line-height: 24px;
     overflow-y: auto;
+
+    // Lexical content editable styles
+    &:focus {
+        outline: none;
+    }
+
+    &[contenteditable='true'] {
+        cursor: text;
+    }
+
+    &[contenteditable='false'] {
+        cursor: not-allowed;
+        user-select: none;
+    }
 }
 
 .placeholder {

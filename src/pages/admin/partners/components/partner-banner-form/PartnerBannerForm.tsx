@@ -18,7 +18,7 @@ import { ImageInput } from '@/components/admin/image-input/ImageInput';
 import { InputError } from '@/components/admin/input-error/InputError';
 import BannerImage from '@/assets/images/public/partners-page/horses.png';
 import { RichTextInputGroup } from '@/components/admin/input-groups/rich-text-input-group/RichTextInputGroup';
-import { getPlainTextFromHtml } from '@/components/admin/rich-text-input/RichTextInput';
+import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 
 export interface PartnerBannerValues {
     title: string;

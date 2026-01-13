@@ -1,7 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, createEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { RichTextInput, RichTextInputProps, getPlainTextFromHtml } from './RichTextInput';
+import { RichTextInput, RichTextInputProps } from './RichTextInput';
+import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
 
 jest.mock('./RichTextInput.scss', () => ({}));
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import classNames from 'classnames';
-import './RichTextInput.scss';
+import cn from 'classnames';
+import styles from './RichTextInput.module.scss';
+import { getTextLengthFromHtml } from '@/utils/functions/get-text-lenght-from-html/get-text-lenght-from-html';
 
 export interface RichTextInputProps {
     value: string;
@@ -14,12 +15,6 @@ export interface RichTextInputProps {
     placeholder?: string;
     className?: string;
 }
-
-export const getPlainTextFromHtml = (html: string): string => {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-    return tempDiv.innerText || tempDiv.textContent || '';
-};
 
 export const RichTextInput = ({
     value,
@@ -39,14 +34,10 @@ export const RichTextInput = ({
     const editorRef = useRef<HTMLDivElement>(null);
     const isInitialMount = useRef(true);
 
-    const getTextLength = (): number => {
-        if (!editorRef.current) return 0;
-        const text = editorRef.current.innerText || editorRef.current.textContent || '';
-        return text.replace(/\n/g, '').length;
-    };
-
     const updateLength = useCallback(() => {
-        setCurrentLength(getTextLength());
+        if (editorRef.current) {
+            setCurrentLength(getTextLengthFromHtml(editorRef.current.innerHTML));
+        }
     }, []);
 
     useEffect(() => {
@@ -67,7 +58,7 @@ export const RichTextInput = ({
     }, [updateLength]);
 
     const handleInput = () => {
-        const textLength = getTextLength();
+        const textLength = getTextLengthFromHtml(value);
 
         if (textLength > maxLength) {
             if (editorRef.current) {
@@ -95,7 +86,7 @@ export const RichTextInput = ({
     const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
         e.preventDefault();
         const text = e.clipboardData.getData('text/plain');
-        const currentTextLength = getTextLength();
+        const currentTextLength = getTextLengthFromHtml(value);
         const availableSpace = maxLength - currentTextLength;
 
         if (availableSpace <= 0) return;
@@ -104,14 +95,16 @@ export const RichTextInput = ({
         document.execCommand('insertText', false, textToInsert);
     };
 
+    const isModifierKey = (e: React.KeyboardEvent<HTMLDivElement>) => e.ctrlKey || e.metaKey;
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+        if (isModifierKey(e) && e.key === 'b') {
             e.preventDefault();
             formatBold();
             return;
         }
 
-        if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+        if (isModifierKey(e) && e.key === 'i') {
             e.preventDefault();
             formatItalic();
             return;
@@ -123,7 +116,7 @@ export const RichTextInput = ({
             return;
         }
 
-        const textLength = getTextLength();
+        const textLength = getTextLengthFromHtml(value);
         if (textLength >= maxLength) {
             const allowedKeys = [
                 'Backspace',
@@ -135,10 +128,10 @@ export const RichTextInput = ({
                 'Home',
                 'End',
             ];
-            const isCtrlKey = e.ctrlKey || e.metaKey;
-            const isAllowedCtrl = isCtrlKey && ['a', 'c', 'x', 'z', 'y', 'b', 'i'].includes(e.key.toLowerCase());
+            const isAllowedModifierKey =
+                isModifierKey(e) && ['a', 'c', 'x', 'z', 'y', 'b', 'i'].includes(e.key.toLowerCase());
 
-            if (!allowedKeys.includes(e.key) && !isAllowedCtrl) {
+            if (!allowedKeys.includes(e.key) && !isAllowedModifierKey) {
                 e.preventDefault();
             }
         }
@@ -190,7 +183,7 @@ export const RichTextInput = ({
     };
 
     const insertLineBreak = () => {
-        const textLength = getTextLength();
+        const textLength = getTextLengthFromHtml(value);
         if (textLength >= maxLength) return;
 
         const selection = window.getSelection();
@@ -221,16 +214,16 @@ export const RichTextInput = ({
 
     return (
         <div
-            className={classNames('rich-text-input', {
+            className={cn(styles.root, {
                 'rich-text-input--disabled': disabled,
                 'rich-text-input--focused': isFocused && !disabled,
             })}
         >
-            <div className="rich-text-input__toolbar">
+            <div className={styles.toolbar}>
                 <button
                     type="button"
-                    className={classNames('rich-text-input__toolbar-btn', {
-                        'rich-text-input__toolbar-btn--active': isBold,
+                    className={cn(styles.toolbarBtn, {
+                        [styles.toolbarBtnActive]: isBold,
                     })}
                     onClick={formatBold}
                     disabled={disabled}
@@ -241,8 +234,8 @@ export const RichTextInput = ({
                 </button>
                 <button
                     type="button"
-                    className={classNames('rich-text-input__toolbar-btn', {
-                        'rich-text-input__toolbar-btn--active': isItalic,
+                    className={cn(styles.toolbarBtn, {
+                        [styles.toolbarBtnActive]: isItalic,
                     })}
                     onClick={formatItalic}
                     disabled={disabled}
@@ -253,7 +246,7 @@ export const RichTextInput = ({
                 </button>
                 <button
                     type="button"
-                    className="rich-text-input__toolbar-btn"
+                    className={styles.toolbarBtn}
                     onClick={insertLineBreak}
                     disabled={disabled}
                     aria-label="Line break"
@@ -262,11 +255,11 @@ export const RichTextInput = ({
                     ↵
                 </button>
             </div>
-            <div className="rich-text-input__editor-container">
+            <div className={styles.editorContainer}>
                 <div
                     ref={editorRef}
                     id={id}
-                    className={classNames('rich-text-input__field', className)}
+                    className={cn(styles.field, className)}
                     contentEditable={!disabled}
                     onInput={handleInput}
                     onPaste={handlePaste}
@@ -280,7 +273,7 @@ export const RichTextInput = ({
                     suppressContentEditableWarning
                 />
             </div>
-            <output className="rich-text-input__counter">
+            <output className={styles.counter}>
                 {currentLength}/{maxLength}
             </output>
         </div>

@@ -14,7 +14,7 @@ export const TeamMemberCard = ({ member }: TeamMemberProps) => {
         setError(false);
     }, [member.photo]);
 
-    const translated = useGetLocalization(member.localizations, {
+    const { fullName, description } = useGetLocalization(member.localizations, {
         fullName: member.name,
         description: member.role,
     });
@@ -27,8 +27,8 @@ export const TeamMemberCard = ({ member }: TeamMemberProps) => {
                 <img src={member.photo} alt={member.name} className="member-photo" onError={() => setError(true)} />
             )}
             <div>
-                <p className="member-name">{translated.fullName}</p>
-                <p className="member-role">{translated.description}</p>
+                <p className="member-name">{fullName}</p>
+                <p className="member-role">{description}</p>
             </div>
         </div>
     );

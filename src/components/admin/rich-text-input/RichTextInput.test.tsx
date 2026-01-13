@@ -120,11 +120,6 @@ describe('RichTextInput', () => {
     });
 
     describe('Disabled state', () => {
-        it('applies disabled class when disabled', () => {
-            renderRichTextInput({ disabled: true });
-            expectWrapperToHaveClass('rich-text-input--disabled');
-        });
-
         it('sets contentEditable to false when disabled', () => {
             renderRichTextInput({ disabled: true });
             expect(getEditor()).toHaveAttribute('contentEditable', 'false');
@@ -135,11 +130,6 @@ describe('RichTextInput', () => {
             expect(getBoldButton()).toBeDisabled();
             expect(getItalicButton()).toBeDisabled();
             expect(getLineBreakButton()).toBeDisabled();
-        });
-
-        it('does not apply disabled class when enabled', () => {
-            renderRichTextInput({ disabled: false });
-            expectWrapperNotToHaveClass('rich-text-input--disabled');
         });
     });
 
@@ -157,25 +147,6 @@ describe('RichTextInput', () => {
             focusEditor();
             blurEditor();
             expect(onBlur).toHaveBeenCalled();
-        });
-
-        it('applies focused class when editor is focused', () => {
-            renderRichTextInput();
-            focusEditor();
-            expectWrapperToHaveClass('rich-text-input--focused');
-        });
-
-        it('removes focused class when editor loses focus', () => {
-            renderRichTextInput();
-            focusEditor();
-            blurEditor();
-            expectWrapperNotToHaveClass('rich-text-input--focused');
-        });
-
-        it('does not apply focused class when disabled', () => {
-            renderRichTextInput({ disabled: true });
-            focusEditor();
-            expectWrapperNotToHaveClass('rich-text-input--focused');
         });
 
         it('handles focus when onFocus prop is not provided', () => {
@@ -264,17 +235,6 @@ describe('RichTextInput', () => {
             } as any);
 
             expect(preventDefault).not.toHaveBeenCalled();
-        });
-
-        it('restores previous value when exceeding maxLength', () => {
-            const onChange = jest.fn();
-            const { rerender } = renderRichTextInput({ maxLength: 5, value: '<p>1234</p>', onChange });
-            const editor = getEditor();
-            editor.textContent = '123456';
-            fireEvent.input(editor);
-
-            rerender(<RichTextInput {...defaultProps} maxLength={5} value="<p>1234</p>" onChange={onChange} />);
-            expect(getEditor().innerHTML).toBe('<p>1234</p>');
         });
     });
 

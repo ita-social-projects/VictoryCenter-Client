@@ -44,11 +44,70 @@ export const RichTextInput = ({
         if (editorRef.current) {
             const currentHtml = editorRef.current.innerHTML;
             if (value !== currentHtml) {
+                // Save cursor position before updating content
+                const selection = window.getSelection();
+                let savedOffset = 0;
+                let hasSelection = false;
+
+                if (selection && selection.rangeCount > 0 && editorRef.current.contains(selection.anchorNode)) {
+                    hasSelection = true;
+                    // Calculate offset from start of editor
+                    const range = selection.getRangeAt(0);
+                    const preCaretRange = range.cloneRange();
+                    preCaretRange.selectNodeContents(editorRef.current);
+                    preCaretRange.setEnd(range.startContainer, range.startOffset);
+                    savedOffset = preCaretRange.toString().length;
+                }
+
                 editorRef.current.innerHTML = value || '';
                 updateLength();
+
+                // Restore cursor position if editor was focused
+                if (hasSelection && isFocused) {
+                    try {
+                        const newRange = document.createRange();
+                        const walker = document.createTreeWalker(
+                            editorRef.current,
+                            NodeFilter.SHOW_TEXT,
+                            null,
+                        );
+
+                        let currentOffset = 0;
+                        let node: Node | null = walker.nextNode();
+                        let targetNode: Node | null = null;
+                        let targetOffset = 0;
+
+                        while (node) {
+                            const nodeLength = node.textContent?.length || 0;
+                            if (currentOffset + nodeLength >= savedOffset) {
+                                targetNode = node;
+                                targetOffset = savedOffset - currentOffset;
+                                break;
+                            }
+                            currentOffset += nodeLength;
+                            node = walker.nextNode();
+                        }
+
+                        if (targetNode) {
+                            newRange.setStart(targetNode, Math.min(targetOffset, targetNode.textContent?.length || 0));
+                            newRange.collapse(true);
+                            selection?.removeAllRanges();
+                            selection?.addRange(newRange);
+                        }
+                    } catch {
+                        // If cursor restoration fails, just place cursor at end
+                        const range = document.createRange();
+                        if (editorRef.current.lastChild) {
+                            range.setStartAfter(editorRef.current.lastChild);
+                            range.collapse(true);
+                            selection?.removeAllRanges();
+                            selection?.addRange(range);
+                        }
+                    }
+                }
             }
         }
-    }, [value, updateLength]);
+    }, [value, updateLength, isFocused]);
 
     useEffect(() => {
         if (isInitialMount.current && editorRef.current) {
@@ -56,6 +115,106 @@ export const RichTextInput = ({
             isInitialMount.current = false;
         }
     }, [updateLength]);
+
+    // Modern replacement for deprecated document.queryCommandState
+    const updateFormatStates = useCallback(() => {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) {
+            setIsBold(false);
+            setIsItalic(false);
+            return;
+        }
+
+        const range = selection.getRangeAt(0);
+        const container = range.commonAncestorContainer;
+        const element =
+            container.nodeType === Node.TEXT_NODE ? container.parentElement : (container as Element);
+
+        setIsBold(!!element?.closest('strong, b'));
+        setIsItalic(!!element?.closest('em, i'));
+    }, []);
+
+    // Modern replacement for execCommand - wrap selection with tag
+    const wrapSelectionWithTag = useCallback(
+        (tagName: 'strong' | 'em') => {
+            const selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0) return;
+
+            const range = selection.getRangeAt(0);
+            if (!editorRef.current?.contains(range.commonAncestorContainer)) return;
+
+            // Check if selection is already wrapped with this tag
+            const parentElement = range.commonAncestorContainer.parentElement;
+            const isAlreadyWrapped =
+                parentElement?.tagName.toLowerCase() === tagName ||
+                parentElement?.closest(tagName) !== null;
+
+            if (isAlreadyWrapped) {
+                // Unwrap: extract content from the tag
+                const wrapper =
+                    parentElement?.tagName.toLowerCase() === tagName
+                        ? parentElement
+                        : parentElement?.closest(tagName);
+
+                if (wrapper && wrapper.parentNode) {
+                    const fragment = document.createDocumentFragment();
+                    while (wrapper.firstChild) {
+                        fragment.appendChild(wrapper.firstChild);
+                    }
+                    wrapper.parentNode.replaceChild(fragment, wrapper);
+                }
+            } else {
+                // Wrap selection with tag
+                const wrapper = document.createElement(tagName);
+                try {
+                    range.surroundContents(wrapper);
+                } catch {
+                    // Handle partial selection across elements
+                    const content = range.extractContents();
+                    wrapper.appendChild(content);
+                    range.insertNode(wrapper);
+                }
+            }
+
+            // Restore selection
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            editorRef.current?.focus();
+            if (editorRef.current) {
+                onChange(editorRef.current.innerHTML);
+                updateLength();
+            }
+            updateFormatStates();
+        },
+        [onChange, updateLength, updateFormatStates],
+    );
+
+    // Modern replacement for execCommand('insertText')
+    const insertTextAtCursor = useCallback((text: string) => {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return;
+
+        const range = selection.getRangeAt(0);
+        range.deleteContents();
+
+        const textNode = document.createTextNode(text);
+        range.insertNode(textNode);
+
+        // Move cursor to end of inserted text
+        range.setStartAfter(textNode);
+        range.setEndAfter(textNode);
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }, []);
+
+    const formatBold = useCallback(() => {
+        wrapSelectionWithTag('strong');
+    }, [wrapSelectionWithTag]);
+
+    const formatItalic = useCallback(() => {
+        wrapSelectionWithTag('em');
+    }, [wrapSelectionWithTag]);
 
     const handleInput = () => {
         const textLength = getTextLengthFromHtml(value);
@@ -92,7 +251,12 @@ export const RichTextInput = ({
         if (availableSpace <= 0) return;
 
         const textToInsert = text.slice(0, availableSpace);
-        document.execCommand('insertText', false, textToInsert);
+        insertTextAtCursor(textToInsert);
+
+        if (editorRef.current) {
+            onChange(editorRef.current.innerHTML);
+            updateLength();
+        }
     };
 
     const isModifierKey = (e: React.KeyboardEvent<HTMLDivElement>) => e.ctrlKey || e.metaKey;
@@ -137,11 +301,6 @@ export const RichTextInput = ({
         }
     };
 
-    const updateFormatStates = () => {
-        setIsBold(document.queryCommandState('bold'));
-        setIsItalic(document.queryCommandState('italic'));
-    };
-
     const handleFocus = () => {
         setIsFocused(true);
         onFocus?.();
@@ -160,26 +319,6 @@ export const RichTextInput = ({
 
     const handleKeyUp = () => {
         updateFormatStates();
-    };
-
-    const formatBold = () => {
-        document.execCommand('bold', false);
-        updateFormatStates();
-        editorRef.current?.focus();
-        if (editorRef.current) {
-            onChange(editorRef.current.innerHTML);
-            updateLength();
-        }
-    };
-
-    const formatItalic = () => {
-        document.execCommand('italic', false);
-        updateFormatStates();
-        editorRef.current?.focus();
-        if (editorRef.current) {
-            onChange(editorRef.current.innerHTML);
-            updateLength();
-        }
     };
 
     const insertLineBreak = () => {
@@ -215,8 +354,8 @@ export const RichTextInput = ({
     return (
         <div
             className={cn(styles.root, {
-                'rich-text-input--disabled': disabled,
-                'rich-text-input--focused': isFocused && !disabled,
+                [styles['root--disabled']]: disabled,
+                [styles['root--focused']]: isFocused && !disabled,
             })}
         >
             <div className={styles.toolbar}>

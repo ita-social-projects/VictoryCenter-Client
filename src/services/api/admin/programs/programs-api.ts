@@ -33,6 +33,7 @@ const mapProgramEditToProgram = async (program: ProgramCreateUpdate, client: Axi
         participantsCount: program.participantsCount,
         meetingsCount: program.meetingsCount,
         sections: program.sections,
+        slug: program.slug || '',
     };
 };
 

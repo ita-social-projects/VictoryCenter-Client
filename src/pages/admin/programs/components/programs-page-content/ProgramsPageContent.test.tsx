@@ -143,6 +143,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             status: VisibilityStatus.Published,
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
+                            slug: 'new-program',
                         })
                     }
                 />
@@ -161,6 +162,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             status: VisibilityStatus.Published,
                             sections: [],
                             categories: [{ id: 2, name: 'Category B', programsCount: 1 }],
+                            slug: 'alpha-edited',
                         })
                     }
                 />
@@ -179,6 +181,7 @@ jest.mock('../programs-page-modals/ProgramsPageModals', () => {
                             status: VisibilityStatus.Published,
                             sections: [],
                             categories: [{ id: 1, name: 'Category A', programsCount: 2 }],
+                            slug: 'alpha',
                         })
                     }
                 />
@@ -222,6 +225,7 @@ const mockPrograms: Program[] = [
         status: VisibilityStatus.Published,
         sections: [],
         categories: [mockCategories[0]],
+        slug: 'alpha',
     },
     {
         id: 11,
@@ -235,6 +239,7 @@ const mockPrograms: Program[] = [
         status: VisibilityStatus.Draft,
         sections: [],
         categories: [mockCategories[0]],
+        slug: 'beta',
     },
 ];
 

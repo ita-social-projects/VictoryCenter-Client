@@ -44,6 +44,7 @@ export interface Program {
     participantsCount: string;
     meetingsCount: string;
     sections: ProgramSection[];
+    slug: string;
 }
 
 export interface ProgramSearchItemData {
@@ -66,6 +67,7 @@ export interface ProgramCreateUpdate {
     participantsCount: string;
     meetingsCount: string;
     sections: ProgramSection[];
+    slug?: string;
 }
 
 export interface ProgramCategoryCreateUpdate {

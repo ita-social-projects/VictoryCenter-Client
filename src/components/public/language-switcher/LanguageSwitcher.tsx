@@ -8,6 +8,7 @@ import { useLocale } from '@/hooks/common/use-locale/useLocale';
 export interface LanguageSwitcherProps {
     onValueChange?: () => void;
     className?: string;
+    openOnHover?: boolean;
 }
 
 const LANGUAGE_LABELS: Record<string, string> = {
@@ -15,7 +16,7 @@ const LANGUAGE_LABELS: Record<string, string> = {
     en: 'EN',
 };
 
-export const LanguageSwitcher = ({ onValueChange, className }: LanguageSwitcherProps) => {
+export const LanguageSwitcher = ({ onValueChange, className, openOnHover = false }: LanguageSwitcherProps) => {
     const { changeLanguage, currentLanguage } = useLocale();
 
     const handleChangeLanguage = (lng: string) => {
@@ -30,7 +31,7 @@ export const LanguageSwitcher = ({ onValueChange, className }: LanguageSwitcherP
             placeholder="lng"
             className={classNames('language-switcher', className)}
             headClassName="language-switcher-head"
-            openOnHover={true}
+            openOnHover={openOnHover}
         >
             {LOCALES.map((lng) => (
                 <Select.Option key={lng} value={lng} name={LANGUAGE_LABELS[lng] || lng.toUpperCase()} />

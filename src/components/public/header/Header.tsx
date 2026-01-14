@@ -70,7 +70,7 @@ export const Header = () => {
                     </div>
 
                     <div className="button-container">
-                        <LanguageSwitcher className="language-switcher" />
+                        <LanguageSwitcher className="language-switcher" openOnHover={true} />
 
                         <Button variant="secondary-dark" onClick={onContactUsClick} className="contact-us-button">
                             {t('CONTACT_US')}

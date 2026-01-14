@@ -152,6 +152,27 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                     <span className={`arrow ${isItemsExpanded ? 'expanded' : ''}`}></span>
                 </div>
             )}
+            {isChildForm && (
+                <div className="generic-details-buttons top-add-new">
+                    <Button
+                        className={`generic-details ${showNotFound ? 'btn-add' : 'btn-add-new'} ${
+                            !showNotFound && (isAddFormVisible || editingItemId !== null) ? 'disabled' : ''
+                        }`}
+                        onClick={handleAdd}
+                        buttonStyle={showNotFound ? (primaryAddButton ? 'primary' : 'secondary') : 'primary'}
+                        disabled={
+                            isDisabled ||
+                            isAddButtonDisabled ||
+                            isParentAddFormVisible ||
+                            isAddFormVisible ||
+                            (!showNotFound && editingItemId !== null)
+                        }
+                    >
+                        <div>{addNewText}</div>
+                        <PlusIcon className="plus-icon" />
+                    </Button>
+                </div>
+            )}
             {!showNotFound && (
                 <div className="generic-details body">
                     {items.length > 0 && isItemsExpanded && (
@@ -190,7 +211,7 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                             {(formProps) => <>{children && children(formProps)}</>}
                         </FormComponent>
                     )}
-                    {!showNotFound && (
+                    {!isChildForm && !showNotFound && (
                         <Button
                             className={`generic-details btn-add-new ${isAddFormVisible || editingItemId !== null ? 'disabled' : ''}`}
                             onClick={handleAdd}
@@ -220,17 +241,19 @@ export function GenericDetails<T extends { id: number } & FieldValues>({
                                     <p>{notFoundText}</p>
                                 </div>
                             )}
-                            <Button
-                                className="generic-details btn-add"
-                                onClick={handleAdd}
-                                buttonStyle={primaryAddButton ? 'primary' : 'secondary'}
-                                disabled={
-                                    isDisabled || isAddButtonDisabled || isParentAddFormVisible || isAddFormVisible
-                                }
-                            >
-                                <div>{addNewText}</div>
-                                <PlusIcon className="plus-icon" />
-                            </Button>
+                            {!isChildForm && (
+                                <Button
+                                    className="generic-details btn-add"
+                                    onClick={handleAdd}
+                                    buttonStyle={primaryAddButton ? 'primary' : 'secondary'}
+                                    disabled={
+                                        isDisabled || isAddButtonDisabled || isParentAddFormVisible || isAddFormVisible
+                                    }
+                                >
+                                    <div>{addNewText}</div>
+                                    <PlusIcon className="plus-icon" />
+                                </Button>
+                            )}
                         </>
                     }
                 </div>

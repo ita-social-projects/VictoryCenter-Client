@@ -82,40 +82,33 @@ describe('ProgramCard', () => {
         expect(mockNavigate).not.toHaveBeenCalled();
     });
 
-    it('navigates when Enter key is pressed on the card', async () => {
-        const user = userEvent.setup();
-        render(<ProgramCard program={program} className={''} />);
+    describe('keyboard navigation', () => {
+        const setupKeyboardTest = () => {
+            const user = userEvent.setup();
+            render(<ProgramCard program={program} className={''} />);
+            const card = screen.getByRole('button');
+            card.focus();
+            return { user, card };
+        };
 
-        const card = screen.getByRole('button');
-        card.focus();
-        await user.keyboard('{Enter}');
+        it.each([
+            ['Enter', '{Enter}'],
+            ['Space', ' '],
+        ])('navigates when %s key is pressed on the card', async (_keyName, key) => {
+            const { user } = setupKeyboardTest();
+            await user.keyboard(key);
 
-        expect(mockNavigate).toHaveBeenCalledWith('/programs/program-a');
-        expect(mockNavigate).toHaveBeenCalledTimes(1);
-    });
+            expect(mockNavigate).toHaveBeenCalledWith('/programs/program-a');
+            expect(mockNavigate).toHaveBeenCalledTimes(1);
+        });
 
-    it('navigates when Space key is pressed on the card', async () => {
-        const user = userEvent.setup();
-        render(<ProgramCard program={program} className={''} />);
+        it('does not navigate when other keys are pressed', async () => {
+            const { user } = setupKeyboardTest();
+            await user.keyboard('{Escape}');
+            await user.keyboard('a');
 
-        const card = screen.getByRole('button');
-        card.focus();
-        await user.keyboard(' ');
-
-        expect(mockNavigate).toHaveBeenCalledWith('/programs/program-a');
-        expect(mockNavigate).toHaveBeenCalledTimes(1);
-    });
-
-    it('does not navigate when other keys are pressed', async () => {
-        const user = userEvent.setup();
-        render(<ProgramCard program={program} className={''} />);
-
-        const card = screen.getByRole('button');
-        card.focus();
-        await user.keyboard('{Escape}');
-        await user.keyboard('a');
-
-        expect(mockNavigate).not.toHaveBeenCalled();
+            expect(mockNavigate).not.toHaveBeenCalled();
+        });
     });
 
     it('has tabIndex 0 when slug exists', () => {

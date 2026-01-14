@@ -1,3 +1,38 @@
 .detailed-program-page-content {
-    padding: 2rem;
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+
+    .background-section {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 56rem;
+        overflow: hidden;
+        z-index: 0;
+
+        .background-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.5) 100%);
+            z-index: 1;
+        }
+    }
+
+    .content-wrapper {
+        position: relative;
+        z-index: 2;
+        padding: 2rem;
+        padding-top: 12rem;
+    }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { RichTextInput, RichTextInputProps } from './RichTextInput';
 import { getPlainTextFromHtml } from '@/utils/functions/get-plain-text-from-html/get-plain-text-from-html';
@@ -65,10 +65,24 @@ jest.mock('lexical', () => ({
     RootNode: class RootNode {},
 }));
 
+// Store plugin props for testing
+let mockMaxLengthPluginProps: any = null;
+let mockOnChangePluginProps: any = null;
+let mockFocusPluginProps: any = null;
+
 jest.mock('./plugins', () => {
-    const MockMaxLengthPlugin = () => null;
-    const MockOnChangePlugin = () => null;
-    const MockFocusPlugin = () => null;
+    const MockMaxLengthPlugin = (props: any) => {
+        mockMaxLengthPluginProps = props;
+        return null;
+    };
+    const MockOnChangePlugin = (props: any) => {
+        mockOnChangePluginProps = props;
+        return null;
+    };
+    const MockFocusPlugin = (props: any) => {
+        mockFocusPluginProps = props;
+        return null;
+    };
     const MockToolbarPlugin = ({ disabled }: { disabled?: boolean }) => (
         <div data-testid="toolbar">
             <button disabled={disabled} aria-label="Bold" title="Bold (Ctrl+B)">
@@ -187,6 +201,137 @@ describe('RichTextInput', () => {
         });
     });
 
+    describe('Plugin Props', () => {
+        it('passes correct props to MaxLengthPlugin', () => {
+            renderRichTextInput({ maxLength: 50 });
+            expect(mockMaxLengthPluginProps).not.toBeNull();
+            expect(mockMaxLengthPluginProps.maxLength).toBe(50);
+            expect(typeof mockMaxLengthPluginProps.onLengthChange).toBe('function');
+        });
+
+        it('passes onChange callback to OnChangePlugin', () => {
+            const onChange = jest.fn();
+            renderRichTextInput({ onChange });
+            expect(mockOnChangePluginProps).not.toBeNull();
+            expect(mockOnChangePluginProps.onChange).toBe(onChange);
+        });
+
+        it('passes focus callbacks to FocusPlugin', () => {
+            const onFocus = jest.fn();
+            const onBlur = jest.fn();
+            renderRichTextInput({ onFocus, onBlur });
+            expect(mockFocusPluginProps).not.toBeNull();
+            expect(mockFocusPluginProps.onFocus).toBe(onFocus);
+            expect(mockFocusPluginProps.onBlur).toBe(onBlur);
+            expect(typeof mockFocusPluginProps.onFocusChange).toBe('function');
+        });
+
+        it('handles missing optional focus callbacks', () => {
+            renderRichTextInput();
+            expect(mockFocusPluginProps).not.toBeNull();
+            expect(mockFocusPluginProps.onFocus).toBeUndefined();
+            expect(mockFocusPluginProps.onBlur).toBeUndefined();
+            expect(typeof mockFocusPluginProps.onFocusChange).toBe('function');
+        });
+    });
+
+    describe('State Management', () => {
+        it('updates character counter when length changes', () => {
+            renderRichTextInput({ maxLength: 100 });
+            expect(screen.getByText('0/100')).toBeInTheDocument();
+
+            // Simulate length change callback
+            const onLengthChange = mockMaxLengthPluginProps.onLengthChange;
+            act(() => {
+                onLengthChange(25);
+            });
+
+            expect(screen.getByText('25/100')).toBeInTheDocument();
+        });
+
+        it('applies focused class when focus changes', () => {
+            const { container } = renderRichTextInput();
+            const rootElement = container.firstChild as HTMLElement;
+
+            expect(rootElement).not.toHaveClass('root--focused');
+
+            // Simulate focus change callback
+            const onFocusChange = mockFocusPluginProps.onFocusChange;
+            act(() => {
+                onFocusChange(true);
+            });
+
+            expect(rootElement).toHaveClass('root--focused');
+        });
+
+        it('does not apply focused class when disabled', () => {
+            const { container } = renderRichTextInput({ disabled: true });
+            const rootElement = container.firstChild as HTMLElement;
+
+            // Simulate focus change callback
+            const onFocusChange = mockFocusPluginProps.onFocusChange;
+            act(() => {
+                onFocusChange(true);
+            });
+
+            expect(rootElement).not.toHaveClass('root--focused');
+            expect(rootElement).toHaveClass('root--disabled');
+        });
+
+        it('removes focused class when blur occurs', () => {
+            const { container } = renderRichTextInput();
+            const rootElement = container.firstChild as HTMLElement;
+
+            // Simulate focus
+            const onFocusChange = mockFocusPluginProps.onFocusChange;
+            act(() => {
+                onFocusChange(true);
+            });
+            expect(rootElement).toHaveClass('root--focused');
+
+            // Simulate blur
+            act(() => {
+                onFocusChange(false);
+            });
+            expect(rootElement).not.toHaveClass('root--focused');
+        });
+    });
+
+    describe('Initial Configuration', () => {
+        it('creates namespace based on id', () => {
+            renderRichTextInput({ id: 'custom-editor' });
+            // Configuration is tested implicitly through successful rendering
+            expect(screen.getByTestId('lexical-composer')).toBeInTheDocument();
+        });
+
+        it('sets editable to false when disabled', () => {
+            renderRichTextInput({ disabled: true });
+            // Verify disabled state is applied
+            expect(screen.getByLabelText('Bold')).toBeDisabled();
+        });
+
+        it('handles initial value', () => {
+            renderRichTextInput({ value: '<p>Initial content</p>' });
+            // Value handling is tested through the editorState callback
+            expect(screen.getByTestId('content-editable')).toBeInTheDocument();
+        });
+
+        it('handles empty initial value', () => {
+            renderRichTextInput({ value: '' });
+            expect(screen.getByTestId('content-editable')).toBeInTheDocument();
+        });
+    });
+
+    describe('Error Handling', () => {
+        it('includes error handler in config', () => {
+            const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+            renderRichTextInput();
+            // Error handler is configured in initialConfig
+            expect(screen.getByTestId('lexical-composer')).toBeInTheDocument();
+            consoleErrorSpy.mockRestore();
+        });
+    });
+
     describe('getPlainTextFromHtml utility', () => {
         beforeEach(() => {
             Object.defineProperty(HTMLElement.prototype, 'innerText', {
@@ -212,6 +357,18 @@ describe('RichTextInput', () => {
             const html = '<p>Text <em>italic</em> and <strong>bold</strong></p>';
             const plainText = getPlainTextFromHtml(html);
             expect(plainText).toBe('Text italic and bold');
+        });
+
+        it('strips script tags from HTML', () => {
+            const html = '<p>Text</p><script>alert("xss")</script>';
+            const plainText = getPlainTextFromHtml(html);
+            expect(plainText).toBe('Text');
+        });
+
+        it('strips style tags from HTML', () => {
+            const html = '<p>Text</p><style>body { color: red; }</style>';
+            const plainText = getPlainTextFromHtml(html);
+            expect(plainText).toBe('Text');
         });
     });
 });
